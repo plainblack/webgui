@@ -27,7 +27,7 @@ define tableName  => 'Shelf';
 
 property templateId => (
             fieldType        => "template",  
-            defaultValue     => 'nFen0xjkZn8WkpM93C9ceQ',
+            default          => 'nFen0xjkZn8WkpM93C9ceQ',
             tab              => "display",
             namespace        => "Shelf", 
             hoverHelp        => ['shelf template help', 'Asset_Shelf'],
@@ -238,7 +238,8 @@ See WebGUI::Asset::prepareView() for details.
 sub prepareView {
     my $self = shift;
     $self->SUPER::prepareView();
-    my $template = WebGUI::Asset::Template->newById($self->session, $self->templateId);
+warn "Shelf: going to do prepareView on template with id: " . $self->templateId . " and we are: " . $self->getId;
+    my $template = WebGUI::Asset::Template->newById($self->session, $self->templateId); # boom XXX
     if (!$template) {
         WebGUI::Error::ObjectNotFound::Template->throw(
             error      => qq{Template not found},
