@@ -55,13 +55,21 @@ our $I18N = {
         lastUpdated => 0,
         context     => q|Description of the asset_loop tmpl_loop for the template help.|
     },
-
     'asset_info' => {
         message     => q|General Asset information returned for the asset.  See WebGUI Asset Template Help for more details.|,
         lastUpdated => 0,
         context     => q|Description of the asset_loop tmpl_loop for the template help.|
     },
-    
+    'creation_date' => {
+        message     => q{Creation Date},
+        lastUpdate  => 1226174619,
+        context     => q{Label for Creation Date inside template},
+    },
+    'created_by' => {
+        message     => q{Created By},
+        lastUpdate  => 1226174619,
+        context     => q{Label for Created By inside template},
+    },    
 
 };
 
