@@ -1,5 +1,6 @@
 7.9.12
  - webgui.org homepage gives 404  (#11778)
+ - fixed #11779: SQLReport can run arbitrary queries
 
 7.9.11
  - fixed #11755: New cart does not update shipping methods correctly

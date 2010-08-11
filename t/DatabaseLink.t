@@ -156,6 +156,11 @@ my $queries = [
         expect  => 1,
         comment => '... parenthesized',
     },
+    {
+        query   => '/* SELECT */ DELETE FROM users',
+        expect  => 0,
+        comment => 'Initial comment with valid keyword',
+    },
 ];
 
 plan tests => 14
