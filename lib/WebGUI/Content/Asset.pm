@@ -64,7 +64,6 @@ The URL for this request.
 sub dispatch {
     my $session      = shift;
 	my $assetUrl     = shift;
-    return undef unless $assetUrl;
     my $permutations = getUrlPermutations($assetUrl);
     foreach my $url (@{ $permutations }) {
         if (my $asset = getAsset($session, $url)) {
@@ -139,14 +138,17 @@ The URL to permute.
 
 sub getUrlPermutations {
     my $url          = shift;
+    ##Handle empty urls (sitename only)
+    return ['/'] if !$url
+                 ||  $url eq '/';
     my @permutations = ();
-    return \@permutations if !$url;
     if ($url =~ /\.\w+$/) {
         push @permutations, $url;
         $url =~ s/\.\w+$//;
     }
     my $uri       = URI->new($url);
     my @fragments = $uri->path_segments();
+    use Data::Dumper;
     FRAG: while (@fragments) {
         last FRAG if $fragments[-1] eq '';
         push @permutations, join "/", @fragments;

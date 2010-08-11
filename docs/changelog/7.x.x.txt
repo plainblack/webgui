@@ -1,4 +1,5 @@
 7.9.12
+ - webgui.org homepage gives 404  (#11778)
 
 7.9.11
  - fixed #11755: New cart does not update shipping methods correctly
