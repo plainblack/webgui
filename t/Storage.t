@@ -31,8 +31,7 @@ my $cwd = Cwd::cwd();
 
 my ($extensionTests, $fileIconTests, $block_extension_tests) = setupDataDrivenTests($session);
 
-my $numTests = 140; # increment this value for each test you create
-plan tests => 140
+plan tests => 141
             + scalar @{ $extensionTests }
             + scalar @{ $fileIconTests  }
             + scalar @{ $block_extension_tests }
@@ -413,9 +412,19 @@ my $untarStorage = $tarStorage->untar('tar.tar');
 addToCleanup($untarStorage);
 isa_ok( $untarStorage, "WebGUI::Storage", "untar: returns a WebGUI::Storage object");
 is (substr($untarStorage->getPathFrag, 0, 5), 'temp/', 'untar: puts stuff in the temp directory');
-##Note, getFiles will NOT recurse, so do not use a deep directory structure here
 cmp_bag($untarStorage->getFiles, $copiedStorage->getFiles, 'tar and untar loop preserve all files');
 isnt($untarStorage->getPath, $tarStorage->getPath, 'untar did not reuse the same path as the tar storage object');
+
+$tarStorage->addFileFromFilesystem(WebGUI::Test->getTestCollateralPath('extensions.tar'));
+my $extensionStorage = $tarStorage->untar('extensions.tar');
+WebGUI::Test->addToCleanup($extensionStorage);
+use Data::Dumper;
+diag Dumper $extensionStorage->getFiles;
+cmp_bag(
+    $extensionStorage->getFiles, 
+    [ qw{ extension_pm.txt extension_perl.txt extension_html.txt extensions extensions/extension_html.txt }], 
+    'untar fixes file extensions'
+);
 
 ####################################################
 #

@@ -1844,6 +1844,13 @@ sub untar {
     }, ".");
     $self->_changeOwner(@files);
 
+    ##Prevent dangerous files from being added to the storage location via untar
+    FILE: foreach my $file (@files) {
+        my $blockname = $temp->block_extensions($file);
+        next FILE if $blockname eq $file;
+        $temp->renameFile($file, $blockname);
+    }
+
     chdir $originalDir;
     return $temp;
 }
