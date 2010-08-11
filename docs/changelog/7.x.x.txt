@@ -2,6 +2,7 @@
  - webgui.org homepage gives 404  (#11778)
  - fixed #11779: SQLReport can run arbitrary queries
  - fixed possible vulnerability loading template parser
+ - fixed possible vulnerability loading help files
 
 7.9.11
  - fixed #11755: New cart does not update shipping methods correctly

@@ -41,18 +41,16 @@ been already and logs errors during the load.
 sub _loadHelp {
 	my $session = shift;
 	my $helpPackage = shift;
+        eval { WebGUI::Pluggable::load( $helpPackage ); };
+	if ($@) {
+		$session->errorHandler->error("Help failed to compile: $helpPackage. ".$@);
+		return {};
+	}
 	if (defined *{"$helpPackage\::HELP"}) {  ##Symbol table lookup
 		our $table;
 		*table = *{"$helpPackage\::HELP"};  ##Create alias into symbol table
 		return $table;  ##return whole hashref
 	}
-	my $load = sprintf 'use %-s; $%-s::HELP', $helpPackage, $helpPackage;
-	my $help = eval($load);
-	if ($@) {
-		$session->errorHandler->error("Help failed to compile: $helpPackage. ".$@);
-		return {};
-	}
-	return $help;
 }
 
 #-------------------------------------------------------------------
