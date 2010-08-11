@@ -2,7 +2,7 @@ package WebGUI;
 
 
 our $VERSION = '7.9.11';
-our $STATUS = 'beta';
+our $STATUS = 'stable';
 
 
 =head1 LEGAL
