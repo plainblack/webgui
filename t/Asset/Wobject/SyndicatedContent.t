@@ -52,7 +52,7 @@ isa_ok($syndicated_content, 'WebGUI::Asset::Wobject::SyndicatedContent');
 my $newSyndicatedContentSettings = {
 	cacheTimeout => 124,
 	templateId   => "PBtmpl0000000000000065", 
-    rssUrl      => 'http://svn.webgui.org/svnweb/plainblack/rss/WebGUI/',
+    rssUrl      => 'http://github.com/plainblack/webgui/commits/master.atom',
 };
 
 # update the new values for this instance
