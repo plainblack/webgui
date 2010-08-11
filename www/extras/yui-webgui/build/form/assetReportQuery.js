@@ -359,8 +359,5 @@ YAHOO.util.Event.onDOMReady( function () {
     loadClasses(document.getElementById("className_formId"));
     loadWhereRows(document.getElementById("whereBody"));
     loadOrder(document.getElementById("orderBody"));
-};
-
-
 });
 
