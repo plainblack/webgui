@@ -41,7 +41,7 @@ use WebGUI::Pluggable;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 18;        # Increment this number for each test you create
+plan tests => 19;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -69,6 +69,7 @@ ok( !eval{ WebGUI::Pluggable::load( 'HA::HA::' ); 1 }, 'load dies on bad input' 
 ok( !eval{ WebGUI::Pluggable::load( 'HA::..::..::HA' ); 1 }, 'load dies on bad input' );
 ok( !eval{ WebGUI::Pluggable::load( '..::..::..::HA' ); 1 }, 'load dies on bad input' );
 ok( !eval{ WebGUI::Pluggable::load( 'uploads::ik::jo::ikjosdfwefsdfsefwef::myfile.txt\0.pm' ); 1 }, 'load dies on bad input' );
+ok( !eval{ WebGUI::Pluggable::load( 'HA::::HA' ); 1 }, 'load dies on bad input' );
 
 #----------------------------------------------------------------------------
 # Test find and findAndLoad
