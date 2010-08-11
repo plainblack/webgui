@@ -16,6 +16,9 @@ use Test::More;
 use Test::Deep;
 use Test::Exception;
 
+sub constructorExtras {
+    return shortcutToAssetId => 'PBasset000000000000001';
+}
 
 sub list_of_tables {
      return [qw/assetData Shortcut/];
