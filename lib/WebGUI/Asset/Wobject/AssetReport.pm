@@ -28,6 +28,9 @@ use base qw/WebGUI::Asset::Wobject/;
 Class method to verify that the user has the privileges necessary to add this type of asset. Return a boolean.
 Override this method to ensure that admin is the default group.
 
+Only allow admins to add AssetReport as AssetReport currently bypasses normal
+asset security measures.
+
 =head3 session
 
 The session variable.
