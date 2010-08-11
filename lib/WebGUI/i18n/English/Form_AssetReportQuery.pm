@@ -98,6 +98,11 @@ our $I18N = {
         context     => q{General item in asset select list},
 	},
 
+    'first_row_error_msg' => {
+    	message     => q|The first row may not be deleted.  Please adjust your query appropriately|,
+		lastUpdated => 1078852836,
+        context     => q{Error message in javascript},
+	},
 };
 
 1;

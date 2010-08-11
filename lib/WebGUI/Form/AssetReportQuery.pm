@@ -240,11 +240,12 @@ sub toHtml {
         $json->{$class} = \%fields;
     }
 
-    #Encode the JSON and add it to the end of the body    
-    my $jsonStr  = JSON->new->encode($json);
+    #Encode the JSON and add it to the end of the body
+    my $first_row_error_msg = $i18n->get("first_row_error_msg");
+    my $jsonStr             = JSON->new->encode($json);
     $style->setRawHeadTags(qq|<script type="text/javascript">var classValues = $jsonStr; </script>|);
-    my $jsonData = $self->get("value") || q|{ "isNew" : "true" }|;
-    $style->setRawHeadTags(qq|<script type="text/javascript">var dataValues  = $jsonData;</script>|);
+    my $jsonData            = $self->get("value") || q|{ "isNew" : "true" }|;
+    $style->setRawHeadTags(qq|<script type="text/javascript">var dataValues  = $jsonData; var first_row_error_msg = '$first_row_error_msg';</script>|);
     $session->style->setScript($session->url->extras("yui-webgui/build/form/assetReportQuery.js"),{ type=>"text/javascript" });    
 
     #Decode JSON data for filling in some of the fields

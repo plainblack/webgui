@@ -110,7 +110,7 @@ function deleteRow(row,ttbody) {
         ttbody.removeChild(row);
         return;
     }
-    alert("The first row may not be deleted.  Please adjust your query appropriately");
+    alert(first_row_error_msg);
     return;
 }
 
@@ -359,5 +359,8 @@ YAHOO.util.Event.onDOMReady( function () {
     loadClasses(document.getElementById("className_formId"));
     loadWhereRows(document.getElementById("whereBody"));
     loadOrder(document.getElementById("orderBody"));
+};
+
+
 });
 
