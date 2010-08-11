@@ -360,7 +360,8 @@ sub view {
 
 	my $self = shift;
     my $form = $self->session->form;
-    my $url = $self->session->url;
+    my $url  = $self->session->url;
+    my $dbh  = $self->session->db->dbh;
 	my $i18n = WebGUI::International->new($self->session, "Asset_UserList");
 	my (%var, @users, @profileField_loop, @profileFields);
 	my ($user, $sth, $sql, $profileField);
@@ -442,7 +443,6 @@ sub view {
     # Query user profile data. Exclude the visitor account and users that have been deactivated.
 	$sql = "select distinct users.userId, users.userName, userProfileData.publicProfile ";
 	# Include remaining profile fields in the query
-    my $dbh = $self->session->db->dbh;
 	foreach my $profileField (@profileFields){
     	$sql .= ", userProfileData." . $dbh->quote_identifier($profileField->{fieldName});
 	}
@@ -451,22 +451,22 @@ sub view {
 	
 	my $constraint;
     my @profileSearchFields = ();
-    my $searchType = $form->process('searchType') || 'or';
+    my $searchType = lc $form->process('searchType') eq 'and' ? 'and' : 'or';
 	if ($form->process('search')){
         # Normal search with one keyword takes precedence over other search options
         if($form->process('limitSearch')){
             # Normal search with one keyword in a limited number of fields
             foreach my $profileField (@profileFields){
                 if ($form->process('includeInSearch_'.$profileField->{fieldName})){    
-                    push(@profileSearchFields,'userProfileData.'.$profileField->{fieldName}
-                    .' like "%'.$form->process('search').'%"');
+                    push(@profileSearchFields, 'userProfileData.'.$dbh->quote_identifier($profileField->{fieldName})
+                    .' like '. $dbh->quote('%'.$form->process('search').'%'));
                 }
             }
         }
         else{
             # Normal search with one keyword in all fields
-    		$constraint = "(".join(' or ', map {'userProfileData.'.$_->{fieldName}
-            .' like "%'.$form->process('search').'%"'} @profileFields).")";	
+    		$constraint = "(".join(' or ', map {'userProfileData.'.$dbh->quote_identifier($_->{fieldName})
+            .' like '.$dbh->quote('%'.$form->process('search').'%')} @profileFields).")";	
         }
 	}
     elsif ($form->process('searchExact')){
@@ -475,15 +475,15 @@ sub view {
             # Exact search with one keyword in a limited number of fields
             foreach my $profileField (@profileFields){
                 if ($form->process('includeInSearch_'.$profileField->{fieldName})){
-                    push(@profileSearchFields,'userProfileData.'.$profileField->{fieldName}
-                    .' like "'.$form->process('search').'"');
+                    push(@profileSearchFields,'userProfileData.'.$dbh->quote_identifier($profileField->{fieldName})
+                    .' like '.$dbh->quote($form->process('search')));
                 }
             }
         }
         else{
             # Exact search with one keyword in all fields
-            $constraint = "(".join(' or ', map {'userProfileData.'.$_->{fieldName}
-            .' like "'.$form->process('searchExact').'"'} @profileFields).")";
+            $constraint = "(".join(' or ', map {'userProfileData.'.$dbh->quote_identifier($_->{fieldName})
+            .' like ' . $dbh->quote($form->process('searchExact'))} @profileFields).")";
         }
     }
     else{
@@ -491,12 +491,12 @@ sub view {
     	foreach my $profileField (@profileFields){
             # Exact search has precedence over normal search
             if ($form->process('searchExact_'.$profileField->{fieldName})){
-                push(@profileSearchFields,'userProfileData.'.$profileField->{fieldName}
-                    .' like "'.$form->process('searchExact_'.$profileField->{fieldName}).'"');
+                push(@profileSearchFields,'userProfileData.'.$dbh->quote_identifier($profileField->{fieldName})
+                    .' like '. $dbh->quote($form->process('searchExact_'.$profileField->{fieldName})));
             }
             elsif ($form->process('search_'.$profileField->{fieldName})){
-                push(@profileSearchFields,'userProfileData.'.$profileField->{fieldName}
-                    .' like "%'.$form->process('search_'.$profileField->{fieldName}).'%"');
+                push(@profileSearchFields,'userProfileData.'.$dbh->quote_identifier($profileField->{fieldName})
+                    .' like '. $dbh->quote('%'.$form->process('search_'.$profileField->{fieldName})));
             }
 	    }
 	}
@@ -505,7 +505,7 @@ sub view {
     }
 	$sql .= " and ".$constraint if ($constraint);
 
-	my $sortBy = $form->process('sortBy') || $self->get('sortBy') || 'users.username';
+    my $sortBy    = $form->process('sortBy')    || $self->get('sortBy') || 'users.username';
 	my $sortOrder = $form->process('sortOrder') || $self->get('sortOrder');
     if (lc $sortOrder ne 'desc') {
         $sortOrder = 'asc';

@@ -15,6 +15,7 @@
  - fixed #11768: Edit Branch does not update File wgaccess permissions
  - added Asset Report Asset allowing creation of reports based on Asset Properties.
  - fixed #11773: Pluggable allows arbitrary module loading
+ - fixed #11774: UserList SQL injection
 
 7.9.10
  - fixed #11721: spamStopWords not in WebGUI.conf.original
