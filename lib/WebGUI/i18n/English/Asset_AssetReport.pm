@@ -32,6 +32,37 @@ our $I18N = {
         context     => q{Hover help for asset edit screen},
     },
 
+    'help_asset_report_template' => {
+        message     => q{Asset Report Template Help},
+        lastUpdate  => 1226174619,
+        context     => q{Title for Asset Report Template Help},
+    },
+
+    'help_asset_report_template' => {
+        message     => q{Asset Report Template Help},
+        lastUpdate  => 1226174619,
+        context     => q{Title for Asset Report Template Help},
+    },
+
+    'help_asset_report_body' => {
+        message     => q{<p>The following template variables are available for asset report templates.</p>},
+        lastUpdate  => 1226174619,
+        context     => q{Body for Asset Report Template Help},
+    },
+
+    'asset_loop' => {
+        message     => q|A loop containing the assets returned by this report.|,
+        lastUpdated => 0,
+        context     => q|Description of the asset_loop tmpl_loop for the template help.|
+    },
+
+    'asset_info' => {
+        message     => q|General Asset information returned for the asset.  See WebGUI Asset Template Help for more details.|,
+        lastUpdated => 0,
+        context     => q|Description of the asset_loop tmpl_loop for the template help.|
+    },
+    
+
 };
 
 1;
