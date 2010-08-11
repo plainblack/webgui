@@ -1,3 +1,5 @@
+7.9.12
+
 7.9.11
  - fixed #11755: New cart does not update shipping methods correctly
  - fixed #11757: Update the USPS International driver for new country names
