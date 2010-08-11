@@ -18,6 +18,7 @@ use WebGUI::International;
 use WebGUI::Paginator;
 use WebGUI::Utility;
 use Class::C3;
+use WebGUI::Form::AssetReportQuery;
 use base qw/WebGUI::Asset::Wobject/;
 
 

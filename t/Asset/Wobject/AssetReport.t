@@ -64,7 +64,7 @@ my $value = {
         1   =>  {
             opSelect    =>  "=",
             propSelect  =>  "assetData.title",
-            valText     =>  "'Shawshank'"
+            valText     =>  "Shawshank"
         },
     },
     whereCount  => "2",
