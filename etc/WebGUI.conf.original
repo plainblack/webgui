@@ -664,7 +664,10 @@
    },
    "WebGUI::Asset::Wobject::Map" : {
        "category" : "basic"
-   }
+   },
+   "WebGUI::Asset::Wobject::AssetReport" : {
+      "category" : "utilities"
+   },
 },
 
 # 
