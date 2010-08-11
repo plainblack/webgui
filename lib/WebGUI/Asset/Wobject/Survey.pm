@@ -48,7 +48,7 @@ property doAfterTimeLimit => (
             tab          => 'properties',
             hoverHelp    => ['do after timelimit hoverHelp', 'Asset_Survey'],
             label        => ['do after timelimit label', 'Asset_Survey'],
-            options      => \&doAfterTimeLimit_options,
+            options      => \&_doAfterTimeLimit_options,
         );
 sub _doAfterTimeLimit_options {
     my $session = shift->session;
