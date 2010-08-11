@@ -315,7 +315,7 @@ sub addFileFromFilesystem {
         return undef;
     }
     my $filename = (File::Spec->splitpath( $pathToFile ))[2];
-    if (isIn($self->getFileExtension($filename), qw(pl perl sh cgi php asp))) {
+    if (isIn($self->getFileExtension($filename), qw(pl perl sh cgi php asp pm))) {
         $filename =~ s/\./\_/g;
         $filename .= ".txt";
     }

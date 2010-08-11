@@ -232,6 +232,11 @@ sub load {
         croak "Could not load $module because $moduleError{$module}";
     }
 
+    # Sanitize
+    if ( $module !~ m{^\w+(?:::\w+)*$} ) {
+        croak "Invalid module name: $module";
+    }
+
     # Try to load the module
     my $modulePath = $module . ".pm";
     $modulePath =~ s{::|'}{/}g;

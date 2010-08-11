@@ -31,6 +31,7 @@ use Test::Deep::Shallow;
 use Test::Deep::Blessed;
 use Test::Deep::Isa;
 use Test::Deep::Set;
+use Test::Exception;
 
 use WebGUI::Pluggable;
 
@@ -41,7 +42,7 @@ use WebGUI::Pluggable;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 12;        # Increment this number for each test you create
+plan tests => 19;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -61,6 +62,15 @@ is($dumper->Dump, q|$VAR1 = {
           'color' => 'black'
         };
 |, "Can instanciate an object.");
+
+dies_ok { WebGUI::Pluggable::load( '::HA::HA' ) } 'load dies on bad input';
+like( $@, qr/^\QInvalid module name: ::HA::HA/, 'helpful error message' );
+
+dies_ok { WebGUI::Pluggable::load( 'HA::HA::' ) } 'load dies on bad input';
+dies_ok { WebGUI::Pluggable::load( 'HA::..::..::HA' ) } 'load dies on bad input';
+dies_ok { WebGUI::Pluggable::load( '..::..::..::HA' ) } 'load dies on bad input';
+dies_ok { WebGUI::Pluggable::load( 'uploads::ik::jo::ikjosdfwefsdfsefwef::myfile.txt\0.pm' ) } 'load dies on bad input';
+dies_ok { WebGUI::Pluggable::load( 'HA::::HA' ) } 'load dies on bad input';
 
 #----------------------------------------------------------------------------
 # Test find and findAndLoad
