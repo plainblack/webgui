@@ -232,7 +232,7 @@ property downloadType => (
             options     => \&_downloadType_options,
             extras      => "onclick='changeDownloadType(this)'"
         );
-sub _downoadType_options {
+sub _downloadType_options {
     my $self = shift;
     tie my %downloadTypes, 'Tie::IxHash', 
         "none"     => "No Download",
