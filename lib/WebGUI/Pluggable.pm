@@ -233,7 +233,7 @@ sub load {
     }
 
     # Sanitize
-    if ( $module !~ m{^\w+(?:\w+|::)*\w+$} ) {
+    if ( $module !~ m{^\w+(?:::\w+)*$} ) {
         croak "Invalid module name: $module";
     }
 
