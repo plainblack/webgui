@@ -31,6 +31,7 @@ use Test::Deep::Shallow;
 use Test::Deep::Blessed;
 use Test::Deep::Isa;
 use Test::Deep::Set;
+use Test::Exception;
 
 use WebGUI::Pluggable;
 
@@ -62,14 +63,14 @@ is($dumper->Dump, q|$VAR1 = {
         };
 |, "Can instanciate an object.");
 
-ok( !eval{ WebGUI::Pluggable::load( '::HA::HA' ); 1 }, 'load dies on bad input' );
+dies_ok { WebGUI::Pluggable::load( '::HA::HA' ) } 'load dies on bad input';
 like( $@, qr/^\QInvalid module name: ::HA::HA/, 'helpful error message' );
 
-ok( !eval{ WebGUI::Pluggable::load( 'HA::HA::' ); 1 }, 'load dies on bad input' );
-ok( !eval{ WebGUI::Pluggable::load( 'HA::..::..::HA' ); 1 }, 'load dies on bad input' );
-ok( !eval{ WebGUI::Pluggable::load( '..::..::..::HA' ); 1 }, 'load dies on bad input' );
-ok( !eval{ WebGUI::Pluggable::load( 'uploads::ik::jo::ikjosdfwefsdfsefwef::myfile.txt\0.pm' ); 1 }, 'load dies on bad input' );
-ok( !eval{ WebGUI::Pluggable::load( 'HA::::HA' ); 1 }, 'load dies on bad input' );
+dies_ok { WebGUI::Pluggable::load( 'HA::HA::' ) } 'load dies on bad input';
+dies_ok { WebGUI::Pluggable::load( 'HA::..::..::HA' ) } 'load dies on bad input';
+dies_ok { WebGUI::Pluggable::load( '..::..::..::HA' ) } 'load dies on bad input';
+dies_ok { WebGUI::Pluggable::load( 'uploads::ik::jo::ikjosdfwefsdfsefwef::myfile.txt\0.pm' ) } 'load dies on bad input';
+dies_ok { WebGUI::Pluggable::load( 'HA::::HA' ) } 'load dies on bad input';
 
 #----------------------------------------------------------------------------
 # Test find and findAndLoad
