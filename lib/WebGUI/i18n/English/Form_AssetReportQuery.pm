@@ -67,6 +67,36 @@ our $I18N = {
 		lastUpdated => 1078852836,
         context     => q{Subtext for limit field in AssetReportQuery Form},
 	},
+    
+    'creationDate (asset)' => {
+		message     => q|creationDate (asset)|,
+		lastUpdated => 1078852836,
+        context     => q{General item in asset select list},
+	},
+
+    'createdBy (asset)' => {
+		message     => q|createdBy (asset)|,
+		lastUpdated => 1078852836,
+        context     => q{General item in asset select list},
+	},
+
+    'stateChanged (asset)' => {
+		message     => q|stateChanged (asset)|,
+		lastUpdated => 1078852836,
+        context     => q{General item in asset select list},
+	},
+
+    'stateChangedBy (asset)' => {
+		message     => q|stateChangedBy (asset)|,
+		lastUpdated => 1078852836,
+        context     => q{General item in asset select list},
+	},
+
+    'isLockedBy (asset)' => {
+		message     => q|isLockedBy (asset)|,
+		lastUpdated => 1078852836,
+        context     => q{General item in asset select list},
+	},
 
 };
 

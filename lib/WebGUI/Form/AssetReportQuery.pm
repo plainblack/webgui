@@ -8,7 +8,7 @@ use WebGUI::Utility;
 
 =head1 NAME
 
-WebGUI::Form::BooleanQuery -- Build a boolean query
+WebGUI::Form::AssetReportQuery -- Builds a form to collect query information used by Asset Report
 
 =head1 SYNOPSIS
 
@@ -215,11 +215,11 @@ sub toHtml {
 
     #Hard code these for now
     my %asset = (
-        "asset.creationDate"   => "creationDate (asset)",
-        "asset.createdBy"      => "createdBy (asset)",
-        "asset.stateChanged"   => "stateChanged (asset)",
-        "asset.stateChangedBy" => "stateChangedBy (asset)",
-        "asset.isLockedBy"     => "isLockedBy (asset)",
+        "asset.creationDate"   => $i18n->get("creationDate (asset)"),
+        "asset.createdBy"      => $i18n->get("createdBy (asset)"),
+        "asset.stateChanged"   => $i18n->get("stateChanged (asset)"),
+        "asset.stateChangedBy" => $i18n->get("stateChangedBy (asset)"),
+        "asset.isLockedBy"     => $i18n->get("isLockedBy (asset)"),
     );
 
     #Get the fields from the definition of each class
