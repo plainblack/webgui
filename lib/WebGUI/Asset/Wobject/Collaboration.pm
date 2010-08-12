@@ -1643,7 +1643,7 @@ sub www_edit {
     # Unarchive All needs to be an asset helper
     #$self->getAdminConsole->addConfirmedSubmenuItem($self->getUrl('func=unarchiveAll'),$i18n->get("unarchive all"),$i18n->get("unarchive confirm"));
     #return $self->getAdminConsole->render($self->getEditForm->toHtml,$i18n->get("assetName"));
-    return $self->SUPER::www_edit;
+    super();
 }
 
 #-------------------------------------------------------------------
