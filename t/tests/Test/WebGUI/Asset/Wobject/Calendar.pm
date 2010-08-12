@@ -9,6 +9,8 @@ package Test::WebGUI::Asset::Wobject::Calendar;
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
+use strict;
+use warnings;
 
 use base qw/Test::WebGUI::Asset::Wobject/;
 
@@ -20,5 +22,11 @@ use Test::Exception;
 sub list_of_tables {
      return [qw/assetData wobject Calendar/];
 }
+
+sub postProcessMergedProperties {
+    my $test = shift;
+    my $properties = shift;
+    $properties->{icalFeeds} = q{[]};     # XXX get some real data to stick in there
+}   
 
 1;

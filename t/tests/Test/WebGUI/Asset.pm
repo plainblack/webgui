@@ -21,6 +21,8 @@ use WebGUI::Test;
 use WebGUI::Utility;
 use Data::Dumper;
 
+# XXXX fix the Test(n) numbers to match reality
+
 sub constructorExtras {
     return;
 }
@@ -458,6 +460,8 @@ sub t_11_getEditForm : Tests {
     my $session = $test->session;
     my ( $tag, $asset, @parents ) = $test->getAnchoredAsset();
 
+local $SIG{__DIE__} = sub { use Carp; Carp::confess "@_"; };
+
     my $f   = $asset->getEditForm; # XXX "Attribute (name) is required" / CLASS WebGUI::Asset::Wobject::Poll... fixed, now it's something else:  not ok 2105 - t_11_getEditForm died (Can't locate object method "raw" via package "WebGUI::FormBuilder::Tab" at /data/WebGUI/lib/WebGUI/Asset/Wobject/Poll.pm line 292.)
 
     isa_ok( $f, 'WebGUI::FormBuilder' );
@@ -544,19 +548,16 @@ sub t_20_www_editSave : Tests {
 # $tag = WebGUI::VersionTag->create($session, {}); $tag->setWorking; # XXXXXX
 sleep 2; # also XXXX
 
-    # warn "XXX formProperties: " . Dumper [ formProperties($asset) ];
-
     my %mergedProperties = (   
         formProperties($asset),  
         title       => "Newly Saved Title", 
     );
 
-    if( exists $mergedProperties{attachmentsJson} and ! defined $mergedProperties{attachmentsJson} ) {
-        # XXX move this to the Test::WebGUI::Asset::Template subclass... maybe make a postProcessMergedProperties method
-        $mergedProperties{attachmentsJson} = '[{"url":"/webgui.css","type":"stylesheet"}]'; 
-    }
+    $test->postProcessMergedProperties(\%mergedProperties);
 
-local $SIG{__DIE__} = sub { use Carp; Carp::confess "@_"; };
+    warn "XXX mergedProperties: " . Dumper \%mergedProperties;
+
+# local $SIG{__DIE__} = sub { use Carp; Carp::confess "@_"; };
 
     $session->request->setup_body( \%mergedProperties );
 
