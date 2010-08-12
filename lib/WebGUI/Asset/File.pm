@@ -218,13 +218,15 @@ override getEditForm => sub {
 
     # Add field to upload file
     if ($self->filename ne "") {
-        $f->getTab("properties")->addField( "ReadOnly", {
+        $f->getTab("properties")->addField( 
+            "ReadOnly", 
             name        => "viewFile",
             value       => '<p style="display:inline;vertical-align:middle;"><a href="'.$self->getFileUrl.'"><img src="'.$self->getFileIconUrl.'" alt="'.$self->filename.'" style="border-style:none;vertical-align:middle;" /> '.$self->filename.'</a></p>',
-        });
+        );
     }
 
-    $f->getTab( "properties" )->addField( "File", 
+    $f->getTab( "properties" )->addField( 
+        "File", 
         name        => 'newFile',
         label       => $i18n->get('new file'),
         hoverHelp   => $i18n->get('new file description'),
