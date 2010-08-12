@@ -839,8 +839,8 @@ sub view {
 
     if( @$featuredIds ) {
         my $featuredId  = $featuredIds->[ int( rand @$featuredIds ) - 1 ]; 
-        my $featured    = WebGUI::Asset->newById( $session, $featuredId );
-        if ( $featured ) {
+        my $featured    = eval { WebGUI::Asset->newById( $session, $featuredId ) };
+        if ( ! Exception::Class->caught() ) {
             $self->appendFeaturedPageVars( $var, $featured );
         }
     }
