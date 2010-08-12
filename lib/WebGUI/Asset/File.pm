@@ -55,6 +55,7 @@ property templateId => (
                 label     => ['file template', 'Asset_File'],
                 hoverHelp => ['file template description', 'Asset_File'],
                 namespace => "FileAsset",
+                tab       => 'display',
          );
 
 with 'WebGUI::Role::Asset::SetStoragePermissions';
@@ -360,13 +361,13 @@ See WebGUI::Asset::prepareView() for details.
 
 =cut
 
-sub prepareView {
+override prepareView => sub {
 	my $self = shift;
-	$self->SUPER::prepareView();
+	super();
 	my $template = WebGUI::Asset::Template->newById($self->session, $self->templateId);
 	$template->prepare($self->getMetaDataAsTemplateVariables);
 	$self->{_viewTemplate} = $template;
-}
+};
 
 
 #-------------------------------------------------------------------
