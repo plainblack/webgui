@@ -1,3 +1,5 @@
+7.9.13
+
 7.9.12
  - webgui.org homepage gives 404  (#11778)
  - fixed #11779: SQLReport can run arbitrary queries
