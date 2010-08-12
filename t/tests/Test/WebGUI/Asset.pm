@@ -27,6 +27,10 @@ sub constructorExtras {
     return;
 }
 
+sub postProcessMergedProperties {
+    return;
+}
+
 sub debug {
 
     # if the last eval { } caught something, give full diagnostics on that and stop the tests.
