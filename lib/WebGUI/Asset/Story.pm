@@ -60,7 +60,8 @@ property story => (
          );
 sub _story_richEditId {
     my $self = shift;
-    return $self->parent->getStoryRichEdit;
+    # return $self->parent->getStoryRichEdit;
+    return undef;
 }
 property photo => (
             fieldType    => 'textarea',
