@@ -74,19 +74,21 @@ sub unzip {
     my $dir_guard = Scope::Guard->new(sub { chdir $cwd });
    
 	my $i18n = WebGUI::International->new($self->session,"Asset_ZipArchive");
-	if ($filename =~ m/\.zip/i) {
+	if ($filename =~ m/\.zip$/i) {
 		my $zip = Archive::Zip->new();
 		unless ($zip->read($filename) == $zip->AZ_OK){
 			$self->session->errorHandler->warn($i18n->get("zip_error"));
 			return 0;
 		}
-		$zip->extractTree();  
-	} elsif ($filename =~ m/\.tar/i) {
+		$zip->extractTree();
+        $self->fixFilenames;
+	} elsif ($filename =~ m/\.tar$/i) {
 		Archive::Tar->extract_archive($filepath.'/'.$filename,1);
 		if (Archive::Tar->error) {
 			$self->session->errorHandler->warn(Archive::Tar->error);
 			return 0;
 		}
+        $self->fixFilenames;
 	} else {
 		$self->session->errorHandler->warn($i18n->get("bad_archive"));
 	}
@@ -155,6 +157,28 @@ sub definition {
 
 #-------------------------------------------------------------------
 
+=head2 fixFilenames ( )
+
+Fix any files with dangerous extensions, in all files that were extracted.  This is done
+locally, because if we used a method from Storage, then it would also rename HTML files.
+
+=cut
+
+sub fixFilenames {
+	my $self    = shift;
+    my $storage = $self->getStorageLocation;
+    my $files   = $storage->getFiles('all');
+    FILE: foreach my $file (@{ $files }) {
+        my $extension = $storage->getFileExtension($file);
+        next FILE unless isIn($extension, qw/pl perl pm cgi php asp sh/);
+        my $newFile = $file;
+        $newFile =~ s/\.$extension/_$extension.txt/;
+        $storage->renameFile($file, $newFile);
+    }
+}
+
+#-------------------------------------------------------------------
+
 =head2 prepareView ( )
 
 See WebGUI::Asset::prepareView() for details.
@@ -196,7 +220,7 @@ sub processPropertiesFromFormPost {
 		return undef;
 	}
 	
-	unless ($file =~ m/\.tar/i || $file =~ m/\.zip/i) {
+	unless ($file =~ m/\.tar$/i || $file =~ m/\.zip$/i) {
 		$storage->delete;
 		$self->session->db->write("update FileAsset set filename=NULL where assetId=".$self->session->db->quote($self->getId));
 		$self->session->scratch->set("za_error",$i18n->get("za_error"));

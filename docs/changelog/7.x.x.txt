@@ -5,6 +5,7 @@
  - fixed possible vulnerability loading help files
  - fixed possible vulnerability with filenames in storage locations
  - fixed possible vulnerability with extracting tar files in storage locations
+ - fixed possible vulnerability with extracting files in Zip Archive assets.
 
 7.9.11
  - fixed #11755: New cart does not update shipping methods correctly
