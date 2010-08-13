@@ -324,6 +324,11 @@ If usePaginator is not passed, then this variable will limit the number of asset
 An array reference of asset states.  The ids of assets in those states will be returned.  If this option
 is missing, only assets in the C<published> state will be returned.
 
+=head4 sortOrder
+
+Determines the order that assets are returned.  By default, it is in Chronological order, by creationDate.  If
+you set sortOrder to Alphabetically, it will sort by title, and then lineage.
+
 =cut
 
 sub getMatchingAssets {
@@ -384,9 +389,18 @@ sub getMatchingAssets {
         push @clauses, 'keyword in ('.join(',', @placeholders).')';
     }
 
+    my $sortOrder = $options->{sortOrder} || 'Chronologically';
+
+    my $orderBy = $sortOrder eq 'Alphabetically' ? ' order by upper(title), lineage' : ' order by creationDate desc, lineage';
+
     # write the query
-    my $query = 'select distinct assetKeyword.assetId from assetKeyword left join asset using (assetId)
-        where '.join(' and ', @clauses).' order by creationDate desc, lineage';
+    my $query = q{
+        select distinct assetKeyword.assetId 
+        from   assetKeyword 
+        left join asset using (assetId) 
+        left join assetData using (assetId)
+        where } . 
+        join(' and ', @clauses) . $orderBy;
 
     # perform the search
     if ($options->{usePaginator}) {

@@ -61,6 +61,14 @@ sub _newsletterCategories_options {
     return $session->db->buildHashRef("select fieldId, fieldName from metaData_properties where fieldType in ('selectBox', 'checkList', 'radioList') order by fieldName");
 }
 
+# XXX TODO: Do this in Moose instead, if we can.
+#        # Change the default Collaboration template
+#        for my $def ( @$definition ) {
+#            if ( exists $def->{properties}->{collaborationTemplateId} ) {
+#                $def->{properties}->{collaborationTemplateId}->{defaultValue} = 'newslettercs0000000001';
+#            }
+#        }
+
 use WebGUI::Form;
 use WebGUI::International;
 use WebGUI::Utility;

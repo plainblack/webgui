@@ -486,6 +486,63 @@ sub session {
 
 
 
+=head2 webguiToStrftime ( format ) 
+
+Change a WebGUI format into a Strftime format.
+
+NOTE: %M in WebGUI's format has no equivalent in strftime format, so it will
+be replaced with "_varmonth_". Do something with it.
+
+=cut
+
+sub webguiToStrftime {
+    my ( $self, $format ) = @_;
+    $format ||= "%z %Z";
+    my $session = $self->session;
+    my $temp;
+
+    #--- date format preference
+    $temp = $session->user->profileField('dateFormat') || '%y-%M-%D';
+    $format =~ s/\%z/$temp/g;
+
+    #--- time format preference
+    $temp = $session->user->profileField('timeFormat') || '%H:%n %p';
+    $format =~ s/\%Z/$temp/g;
+
+    #--- convert WebGUI date formats to DateTime formats
+    my %conversion = (
+                "c" => "B",
+                "C" => "b",
+                "d" => "d",
+                "D" => "e",
+                "h" => "I",
+                "H" => "l",
+                "j" => "H",
+                "J" => "k",
+                "m" => "m",
+                "M" => "_varmonth_",
+                "n" => "M",
+                "t" => "Z",
+                "O" => "z",
+                "p" => "P",
+                "P" => "p",
+                "s" => "S",
+                "V" => "V",
+                "w" => "A",
+                "W" => "a",
+                "y" => "Y",
+                "Y" => "y"
+                );
+
+    $format =~ s/\%(\w)/\~$1/g;
+    foreach my $key (keys %conversion) {
+        my $replacement = $conversion{$key};
+        $format =~ s/\~$key/\%$replacement/g;
+    }
+
+    return $format;
+}
+
 #######################################################################
 
 =head2 webguiDate ( format )
@@ -527,53 +584,14 @@ sub webguiDate {
    my $self = shift;
    my $session = $self->session;
    return undef unless ($session);
-   my $format = shift || "%z %Z";
-   my $temp;
-   
-   #---date format preference
-   $temp = $session->user->profileField('dateFormat') || '%y-%M-%D';
-   $format =~ s/\%z/$temp/g;
-   
-   #---time format preference
-   $temp = $session->user->profileField('timeFormat') || '%H:%n %p';
-   $format =~ s/\%Z/$temp/g;
-   
-   #--- convert WebGUI date formats to DateTime formats
-   my %conversion = (
-		"c" => "B",
-		"C" => "b",
-		"d" => "d",
-		"D" => "e",
-		"h" => "I",
-		"H" => "l",
-		"j" => "H",
-		"J" => "k",
-		"m" => "m",
-		"M" => "_varmonth_",
-		"n" => "M",
-		"t" => "Z",
-		"O" => "z",
-		"p" => "P",
-		"P" => "p",
-		"s" => "S",
-		"V" => "V",
-		"w" => "A",
-		"W" => "a",
-		"y" => "Y",
-		"Y" => "y"
-		);
-   
-   $format =~ s/\%(\w)/\~$1/g;
-   foreach my $key (keys %conversion) {
-      my $replacement = $conversion{$key};
-	  $format =~ s/\~$key/\%$replacement/g;
-   }
-   
+
+   my $format = $self->webguiToStrftime( shift || "%z %Z" );
+
    #--- %M
    my $datestr = $self->strftime($format);
-   $temp = int($self->month);
+   my $temp = int($self->month);
    $datestr =~ s/\%_varmonth_/$temp/g;
-   
+
    #--- return
    return $datestr;
 }

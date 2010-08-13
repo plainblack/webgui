@@ -1,4 +1,21 @@
 7.9.11
+ - fixed #11755: New cart does not update shipping methods correctly
+ - fixed #11757: Update the USPS International driver for new country names
+ - fixed #11753: PayPal Plugin - Shipping not factored into total in paypal
+ - fixed #11588: CMSmatrix - Comparing certain products ends in data errors
+ - fixed #11765: WebGUI/Asset/Wobject/Navigation.pm still uses obsolete PBtmpl0000000000000048
+ - fixed #11766: Userlist problem / WebGUI 7.8.24
+ - fixed #11759: email template missing
+ - fixed #11769: WebGUI::Asset::File::ZipArchive specifies a default template of ''
+ - fixed #11758: formatting on account stuff is wrong
+ - fixed #11770: Starter needs to set all account plugins
+ - fixed #11771: Default Newsletter template not set
+ - fixed #11432: DataTable date input
+ - fixed #11772: Metadata in Post doesn't set default value correctly
+ - fixed #11768: Edit Branch does not update File wgaccess permissions
+ - added Asset Report Asset allowing creation of reports based on Asset Properties.
+ - fixed #11773: Pluggable allows arbitrary module loading
+ - fixed #11774: UserList SQL injection
 
 7.9.10
  - fixed #11721: spamStopWords not in WebGUI.conf.original
@@ -8,6 +25,8 @@
  - fixed #11742: linktag FilePump macro not xhtml valid
  - fixed #11744: Default DataForm list template does not contain pagination
  - fixed #11683: URL with UTF8 (for äÄöÖüÜß)
+ - added option for sort order of Alphabetically on title to StoryArchive, StoryTopic and Keyword
+ - fixed #11747: Empty StoryTopics throw a fatal error when viewed
 
 7.9.9
  - fixed #11693: Shopping cart does not show for visitor user

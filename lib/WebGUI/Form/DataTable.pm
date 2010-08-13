@@ -68,6 +68,10 @@ Any extra name=value pairs needed to save the data successfully
 If true, will enable the table for editing. This is only necessary when 
 displaying the table with getValueAsHtml().
 
+=head4 dateFormat
+
+A strftime string describing the proper date format
+
 =cut
 
 sub definition {
@@ -81,6 +85,7 @@ sub definition {
         ajaxSaveUrl    => { defaultValue => undef, },
         ajaxSaveFunc   => { defaultValue => "view", },
         ajaxSaveExtras => { defaultValue => undef, },
+        dateFormat     => { defaultValue => '%y-%m-%d', },
         };
 
     return $class->SUPER::definition( $session, $definition );
@@ -116,6 +121,8 @@ sub getDataTableHtml {
         textbox => "textbox",
     );
 
+    my $dateFormat  = $self->get('dateFormat') || '%y-%m-%d';
+
     my @columnsJson = ();
     for my $column ( @{ $data->{columns} } ) {
 
@@ -125,6 +132,7 @@ sub getDataTableHtml {
             . qq["key" : "$column->{ key }", ]
             . qq["abbr" : "$column->{ key }", ]
             . qq["formatter" : "$column->{ formatter }", ]
+            . ( $column->{formatter} eq "Date" ? qq["dateOptions" : { "format" : "$dateFormat" },] : "" )
             . qq["resizable" : 1, ]
             . qq["sortable" : 1];
 
@@ -155,6 +163,7 @@ sub getDataTableHtml {
         "ajaxDataFunc" => $self->get('ajaxDataFunc'),
         "ajaxSaveUrl"  => $self->get('ajaxSaveUrl'),
         "ajaxSaveFunc" => $self->get('ajaxSaveFunc'),
+        "dateFormat"   => $dateFormat,
     };
     my $optionsJson = JSON->new->encode($options);
 

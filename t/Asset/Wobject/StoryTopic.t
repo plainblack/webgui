@@ -31,7 +31,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 18;
+plan tests => 20;
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -55,6 +55,7 @@ WebGUI::Test->addToCleanup($versionTag);
 my $pastStory = $newFolder->addChild({ className => 'WebGUI::Asset::Story', title => "Yesterday is history", keywords => 'andy,norton'});
 $creationDateSth->execute([$yesterday, $pastStory->getId]);
 $pastStory->requestAutoCommit;
+$pastStory = $pastStory->cloneFromDb;
 
 my @staff       = qw/norton hadley mert trout/;
 my @inmates     = qw/bogs red brooks andy heywood tommy jake skeet/;
@@ -321,3 +322,61 @@ cmp_deeply(
     ],
     'rssFeedItems'
 );
+
+################################################################
+# Sort Order
+################################################################
+
+$pastStory->update( { title => "aaaay was history but isn't any more" } );
+$pastStory->requestAutoCommit;
+$pastStory = $pastStory->cloneFromDb;
+
+$topic->update({ storiesPer   => 4, storiesShort => 4, }); # storiesPer is used when _standAlone is true, storiesShort otherwise
+$topic->{_standAlone} = 0;
+$topic->update( { storySortOrder => 'Alphabetically' } );
+
+$templateVars = $topic->viewTemplateVariables();
+
+cmp_deeply(
+    $templateVars->{story_loop},
+    [
+        {
+            title        => "aaaay was history but isn't any more",
+            url          => ignore(),
+            creationDate => $yesterday,
+        },
+        {
+            title        => 'andy',
+            url          => ignore(),
+            creationDate => $now,
+        },
+        {
+            title        => 'bogs',
+            url          => ignore(),
+            creationDate => $now,
+        },
+        {
+            title        => 'brooks',
+            url          => ignore(),
+            creationDate => $now,
+        },
+    ],
+    'viewTemplateVars has right number and contents in the story_loop in sort order Alphabetically mode'
+);
+
+################################################################
+# Regression -- Empty StoryTopics shouldn't blow up
+################################################################
+
+my $emptyarchive    = WebGUI::Asset->getDefault($session)->addChild({
+    className => 'WebGUI::Asset::Wobject::StoryTopic', 
+    title => 'Why Do Good Things Happen To Bad People', 
+    url => '/home/badstories', 
+    keywords => 'aksjhgkja asgjhshs assajshhsg5',
+});
+WebGUI::Test->addToCleanup($emptyarchive); # blows up under the debugger...?
+
+$versionTag->commit;
+$emptyarchive->{_standAlone} = 1;  
+ok(eval { $emptyarchive->viewTemplateVariables() }, "viewTemplateVariables with _standAlone = 1 doesn't throw an error");
+

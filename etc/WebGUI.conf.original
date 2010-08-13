@@ -620,6 +620,9 @@
    "WebGUI::Asset::Wobject::Article" : {
       "category" : "basic"
    },
+   "WebGUI::Asset::Wobject::AssetReport" : {
+      "category" : "utilities"
+   },
    "WebGUI::Asset::Wobject::Search" : {
       "category" : "basic"
    },
@@ -682,7 +685,10 @@
    },
    "WebGUI::Asset::Wobject::Map" : {
        "category" : "basic"
-   }
+   },
+   "WebGUI::Asset::Wobject::AssetReport" : {
+      "category" : "utilities"
+   },
 },
 
 # 

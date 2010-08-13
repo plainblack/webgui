@@ -140,7 +140,7 @@ cmp_deeply(
     'create: requires a session variable',
 );
 
-my $now = WebGUI::DateTime->new($session, time);
+my $now = time();
 
 eval { $fence = WebGUI::Shop::Vendor->create($session, { userId => $fenceUser->userId, }); };
 $e = Exception::Class->caught();
@@ -152,9 +152,8 @@ is $fence->userId, $fenceUser->userId, 'object made with create has properties i
 
 $fence->write;
 ok($fence->get('dateCreated'), 'dateCreated is not null');
-my $dateCreated = WebGUI::DateTime->new($session, $fence->get('dateCreated'));
-my $deltaDC = $dateCreated - $now;
-cmp_ok( $deltaDC->in_units('seconds'), '<=', 2, 'dateCreated is set properly');
+my $deltaDC = $fence->dateCreated - $now;
+cmp_ok( $deltaDC, '<=', 2, 'dateCreated is set properly');
 
 #######################################################################
 #

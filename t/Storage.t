@@ -287,11 +287,11 @@ ok (!(-e $storage1->getPath("testfile-hash.file")), "rename file original file i
 ####################################################
 
 $storage1->addFileFromFilesystem(
-    WebGUI::Test->getTestCollateralPath('International/lib/WebGUI/i18n/PigLatin/WebGUI.pm'),
+    WebGUI::Test->getTestCollateralPath('littleTextFile'),
 );
 
 ok(
-    grep(/WebGUI\.pm/, @{ $storage1->getFiles }),
+    grep(/littleTextFile/, @{ $storage1->getFiles }),
     'addFileFromFilesystem: file added from test collateral area'
 );
 
@@ -312,7 +312,7 @@ cmp_bag($secondCopy->getFiles(), $storage1->getFiles(), 'copy: passing explicit 
 
 my $s3copy = WebGUI::Storage->create($session);
 addToCleanup($s3copy);
-my @filesToCopy = qw/WebGUI.pm testfile-hash-renamed.file/;
+my @filesToCopy = qw/littleTextFile testfile-hash-renamed.file/;
 $storage1->copy($s3copy, [@filesToCopy]);
 cmp_bag($s3copy->getFiles(), [ @filesToCopy ], 'copy: passing explicit variable and files to copy');
 {
@@ -347,7 +347,7 @@ cmp_bag($s3copy->getFiles(), [ @filesToCopy ], 'copy: passing explicit variable 
 is(scalar @{ $storage1->getFiles }, 4, 'storage1 has 4 files');
 is($storage1->deleteFile("testfile-hash-renamed.file"), 1, 'deleteFile: deleted 1 file');
 is($storage1->deleteFile("testfile-hash-copied.file"), 1, 'deleteFile: deleted 1 file');
-is($storage1->deleteFile("WebGUI.pm"), 1, 'deleteFile: deleted another file');
+is($storage1->deleteFile("littleTextFile"), 1, 'deleteFile: deleted another file');
 cmp_bag($storage1->getFiles, [$filename], 'deleteFile: storage1 has only 1 file');
 
 ##Test for out of object file deletion

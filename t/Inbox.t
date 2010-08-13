@@ -130,8 +130,6 @@ is(scalar @{ $inbox->getMessagesForUser($admin, '', '', '', 'sentBy='.$session->
 is($inbox->getUnreadMessageCount($admin->userId), 4, 'getUnreadMessageCount');
 my $messages = $inbox->getMessagesForUser($admin);
 $messages->[0]->setRead($admin->userId);
-note $messages->[0]->getStatus;
-note $messages->[0]->isRead;
 is($inbox->getUnreadMessageCount($admin->userId), 3, '... really tracks unread messages');
 
 #vim:ft=perl

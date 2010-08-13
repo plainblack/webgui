@@ -235,7 +235,11 @@ sub load {
         croak $moduleError{$module};
     }
 
-    # Check if we already have it
+    # Sanitize
+    if ( $module !~ m{^\w+(?:::\w+)*$} ) {
+        croak "Invalid module name: $module";
+    }
+
     # Try to load the module
     my $modulePath = $module . ".pm";
     $modulePath =~ s{::|'}{/}g;

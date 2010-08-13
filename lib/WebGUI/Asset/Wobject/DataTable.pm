@@ -24,6 +24,7 @@ property data => (
             fieldType    => 'DataTable',
             default      => undef,
             label        => '',
+            dateFormat   => \&getDateFormat,
          );
 property templateId => (
             tab          => "display",
@@ -120,6 +121,41 @@ sub getDataTemplateVars {
 
 #----------------------------------------------------------------------------
 
+=head2 getDateFormat ( )
+
+Get the current date format for the current user in a strftime format that YUI can
+understand.
+
+=cut
+
+sub getDateFormat {
+    my ( $self ) = @_;
+
+    my $dateFormat
+        = WebGUI::DateTime->new( $self->session )->webguiToStrftime( $self->session->user->get('dateFormat') );
+    # Special handle %_varmonth_ super special WebGUI field that strftime doesn't have
+    $dateFormat =~ s/%_varmonth_/%m/g;
+
+    return $dateFormat;
+}
+
+#----------------------------------------------------------------------------
+
+=head2 getEditTabs ( )
+
+Add a tab for the data table.
+
+=cut
+
+sub getEditTabs {
+    my $self = shift;
+    my $i18n = WebGUI::International->new( $self->session, "Asset_DataTable" );
+
+    return ( $self->SUPER::getEditTabs, [ "data" => $i18n->get("tab label data") ], );
+}
+
+#----------------------------------------------------------------------------
+
 =head2 getTemplateVars ( )
 
 Get the template vars for this asset.
@@ -159,6 +195,7 @@ sub prepareView {
             name         => $self->getId,
             value        => $self->data,
             defaultValue => undef,
+            dateFormat   => $self->getDateFormat,
         }
     );
     $dt->prepare;

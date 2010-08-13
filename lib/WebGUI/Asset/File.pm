@@ -101,6 +101,7 @@ override addRevision => sub {
     if ($newSelf->storageId && $newSelf->storageId eq $self->storageId) {
         my $newStorage = $self->getStorageClass->get($self->session, $self->storageId)->copy;
         $newSelf->update({storageId => $newStorage->getId});
+        $newSelf->applyConstraints;
     }
 
     return $newSelf;

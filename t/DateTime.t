@@ -26,7 +26,7 @@ my $session = WebGUI::Test->session;
 
 # put your tests here
 
-plan tests => 28;
+plan tests => 30;
 
 my $timeZoneUser = addUser($session);
 
@@ -90,6 +90,16 @@ my $badday = eval { WebGUI::DateTime->new($session, '2001-08-16 99:99:99'); };
 ok($@, 'new croaks on an out of range time');
 my $badday = eval { WebGUI::DateTime->new($session, '2001-08-16 99:199:99'); };
 ok($@, 'new croaks on an illegal time');
+
+
+#----------------------------------------------------------------------------
+# Test webguiToStrftime conversion
+is( $nowDt->webguiToStrftime('%y-%m-%d'), '%Y-%m-%d', 'webgui to strftime conversion' );
+
+$timeZoneUser->update({ 'dateFormat' => '%y-%M-%D' });
+$timeZoneUser->update({ 'timeFormat' => '%H:%n %p' });
+is( $nowDt->webguiToStrftime, '%Y-%_varmonth_-%e %l:%M %P', 'default datetime string' );
+
 
 sub addUser {
 	my $session = shift;

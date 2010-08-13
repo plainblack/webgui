@@ -238,20 +238,24 @@ sub correctCountry {
     my $self    = shift;
     my $country = shift;
     return $country eq q{United Kingdom}                         ? q{United Kingdom (Great Britain)} 
+         : $country eq q{Bosnia and Herzegovina}                 ? q{Bosnia-Herzegovina} 
+         : $country eq q{Christmas Island}                       ? q{Christmas Island (Australia)} 
          : $country eq q{Congo, the Democratic Republic of the}  ? q{Congo, Democratic Republic of the} 
          : $country eq q{Cocos (Keeling) Islands}                ? q{Cocos Island (Australia)} 
          : $country eq q{Congo}                                  ? q{Congo, Republic of the} 
-         : $country eq q{Christmas Island}                       ? q{Christmas Island (Australia)} 
+         : $country eq q{Cote d'Ivoire}                          ? q{Ivory Coast (Cote d’Ivoire)} 
          : $country eq q{Georgia}                                ? q{Georgia, Republic of} 
          : $country eq q{Heard and Mc Donald Islands}            ? q{Australia} 
          : $country eq q{Korea (South)}                          ? q{South Korea} 
-         : $country eq q{Korea, Republic of}                     ? q{Democratic People's Republic of Korea} 
+         : $country eq q{Korea, Republic of}                     ? q{Korea, Democratic People’s Republic of (North Korea)} 
          : $country eq q{Lao People's Democratic Republic}       ? q{Laos} 
          : $country eq q{Macedonia}                              ? q{Macedonia, Republic of} 
          : $country eq q{Moldova, Republic of}                   ? q{Moldova} 
          : $country eq q{Pitcairn}                               ? q{Pitcairn Island} 
          : $country eq q{Russian Federation}                     ? q{Russia} 
+         : $country eq q{Saint Kitts and Nevis}                  ? q{Saint Christopher and Nevis} 
          : $country eq q{Slovakia}                               ? q{Slovak Republic} 
+         : $country eq q{South Georgia and the South Sandwich Islands} ? q{South Georgia (Falkland Islands)} 
          : $country eq q{Tokelau}                                ? q{Tokelau (Union) Group (Western Samoa)} 
          : $country eq q{Trinidad}                               ? q{Trinidad and Tobago} 
          : $country eq q{Vatican City State (Holy See)}          ? q{Vatican City} 

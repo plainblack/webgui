@@ -17,7 +17,7 @@ use WebGUI::Keyword;
 use WebGUI::Asset;
 # load your modules here
 
-use Test::More tests => 15; # increment this value for each test you create
+use Test::More tests => 16; # increment this value for each test you create
 use Test::Deep;
 use Data::Dumper;
 
@@ -76,9 +76,27 @@ my $assetIds = $keyword->getMatchingAssets({ keyword => 'webgui', });
 
 cmp_deeply(
     $assetIds,
-    [$snippet->getId, $home->getId, ],
+    [ $snippet->getId, $home->getId, ],
     'getMatchingAssets, by keyword, assetIds in order by creationDate, descending'
 );
+
+# sorted by title, alphabetically
+
+my $aa_story = $home->addChild({ className => 'WebGUI::Asset::Snippet', title => "aaaa", keywords => 'webgui' });
+WebGUI::Test->addToCleanup($aa_story);
+
+$assetIds = $keyword->getMatchingAssets({ keyword => 'webgui', sortOrder => 'Alphabetically', });
+
+cmp_deeply(
+    $assetIds,
+    [ $aa_story->getId, $snippet->getId, $home->getId, ],           # 'aaa', 'Home', 'keyword snippet'
+    'getMatchingAssets, by keyword, assetIds in order by title'
+);
+
+$aa_story->trash();
+$aa_story->purge();
+
+# trashed assets
 
 $snippet->trash();
 

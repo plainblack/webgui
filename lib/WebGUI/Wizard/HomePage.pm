@@ -89,6 +89,45 @@ sub canView {
 
 #----------------------------------------------------------------------------
 
+=head2 updateDefaultStyle ( styleTemplateId [, asset ])
+
+Update the default style to the given style template. If an asset is given,
+also update all descendants of that asset.
+
+=cut
+
+sub updateDefaultStyle {
+    my ( $self, $styleTemplateId, $home ) = @_;
+    my $session     = $self->session;
+
+    # WebGUI::Account modules cannot be introspected, so we hard-code the default set here
+    my @settingStyles   = qw( userFunctionStyleId contribStyleTemplateId fmStyleTemplateId 
+                            friendsStyleTemplateId inboxStyleTemplateId profileStyleTemplateId 
+                            shopStyleTemplateId userAccountStyleTemplateId );
+    for my $setting ( @settingStyles ) {
+        $session->setting->set( $setting, $styleTemplateId );
+    }
+
+    # update default content styles
+    if ( $home ) {
+        my $assetIter = $home->getLineageIterator( [ "self", "descendants" ] );
+        while ( 1 ) {
+            my $asset;
+            eval { $asset = $assetIter->() };
+            if ( my $x = WebGUI::Error->caught('WebGUI::Error::ObjectNotFound') ) {
+                $session->log->error($x->full_message);
+                next;
+            }
+            last unless $asset;
+            $asset->update( { styleTemplateId => $styleTemplateId } );
+        }
+    }
+
+    return;
+}
+
+#----------------------------------------------------------------------------
+
 =head2 wrapStyle ( $output ) 
 
 Wrap the output in the wizard style.
@@ -255,18 +294,7 @@ sub www_chooseContentSave {
     }
 
     # update default site style
-    $session->setting->set( "userFunctionStyleId", $self->get('styleTemplateId') );
-    my $assetIter = $home->getLineageIterator( [ "self", "descendants" ] );
-    while ( 1 ) {
-        my $asset;
-        eval { $asset = $assetIter->() };
-        if ( my $x = WebGUI::Error->caught('WebGUI::Error::ObjectNotFound') ) {
-            $session->log->error($x->full_message);
-            next;
-        }
-        last unless $asset;
-        $asset->update( { styleTemplateId => $self->get("styleTemplateId") } );
-    }
+    $self->updateDefaultStyle( $self->get('styleTemplateId'), $home );
 
     # add new pages
     if ( $form->get("aboutUs") ) {

@@ -155,30 +155,30 @@ my $tag_set2 = WebGUI::VersionTag->getWorking($session);
 $tag_set2->commit;
 WebGUI::Test->addToCleanup($tag_set2);
 
-cmp_bag(
+cmp_deeply(
     $wiki->getKeywordHierarchy(),
     [
         {
             title => 'criminals', url   => '/testwiki?func=byKeyword;keyword=criminals',
-            children => bag(
-                superhashof({ title => 'red', }),
+            children => set(
                 superhashof({ title => 'andy', }),
+                superhashof({ title => 'red', }),
             ),
             descendants => 0,
         },
         {
             title => 'inmates', url   => '/testwiki?func=byKeyword;keyword=inmates',
-            children => bag(
-                superhashof({ title => 'heywood', }),
+            children => set(
                 superhashof({ title => 'brooks', }),
+                superhashof({ title => 'heywood', }),
             ),
             descendants => 0,
         },
         {
             title => 'staff', url   => '/testwiki?func=byKeyword;keyword=staff',
-            children => bag(
-                superhashof({ title => 'norton', }),
+            children => set(
                 superhashof({ title => 'hadley', }),
+                superhashof({ title => 'norton', }),
             ),
             descendants => 0,
         },
@@ -194,22 +194,22 @@ my $tag_set3 = WebGUI::VersionTag->getWorking($session);
 $tag_set3->commit;
 WebGUI::Test->addToCleanup($tag_set3);
 
-cmp_bag(
+cmp_deeply(
     $wiki->getKeywordHierarchy(),
     [
         superhashof({
             title    => 'criminals',
-            children => bag(
+            children => set(
                 superhashof({
                     title    => 'andy',
-                    children => bag(
+                    children => set(
                         superhashof({
                             title => 'inmates',
-                            children => bag(
+                            children => set(
                                 superhashof({ title => 'heywood', }),
                                 superhashof({
                                     title    => 'brooks',
-                                    children => bag(
+                                    children => set(
                                         superhashof({ title => 'criminals', }),
                                     ),
                                 }),
@@ -226,7 +226,7 @@ cmp_bag(
         }),
         superhashof({
             title    => 'staff',
-            children => bag(
+            children => set(
                 superhashof({ title => 'norton', }),
                 superhashof({ title => 'hadley', }),
             ),

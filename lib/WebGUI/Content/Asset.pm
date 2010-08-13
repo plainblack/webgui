@@ -19,6 +19,7 @@ use LWP::MediaTypes qw(guess_media_type);
 use Time::HiRes;
 use WebGUI::Asset;
 use WebGUI::PassiveAnalytics::Logging;
+use URI;
 
 =head1 NAME
 
@@ -38,6 +39,57 @@ A content handler that serves up assets.
 These subroutines are available from this package:
 
 =cut
+
+#-------------------------------------------------------------------
+
+=head2 dispatch ( $session, $assetUrl )
+
+Attempts to return the output from an asset, based on its url.  All permutations of the
+URL are tried, to find an asset that matches.  If it finds an Asset, then it calls the
+dispatch method on it.  An Asset's dispatch always returns SOMETHING, so if a matching
+asset is found, this is the last stop.
+
+=head3 $session
+
+A WebGUI::Session object.
+
+=head4 $assetUrl
+
+The URL for this request.
+
+=cut
+
+sub dispatch {
+    my $session      = shift;
+	my $assetUrl     = shift;
+    return undef unless $assetUrl;
+    my $permutations = getUrlPermutations($assetUrl);
+    foreach my $url (@{ $permutations }) {
+        if (my $asset = getAsset($session, $url)) {
+            ##Passive Analytics Logging
+            WebGUI::PassiveAnalytics::Logging::log($session, $asset);
+            # display from cache if page hasn't been modified.
+            if ($session->user->isVisitor
+             && !$session->http->ifModifiedSince($asset->getContentLastModified, $session->setting->get('maxCacheTimeout'))) {
+                $session->http->setStatus("304","Content Not Modified");
+                $session->http->sendHeader;
+                $session->close;
+                return "chunked";
+            } 
+
+            my $fragment = $assetUrl;
+            $fragment =~ s/$url//;
+            $session->asset($asset);
+            my $output = eval { $asset->dispatch($fragment); };
+            return $output if defined $output;
+        }
+    }
+    if ($session->var->isAdminOn) {
+        my $asset = WebGUI::Asset->newByUrl($session, $session->url->getRefererUrl) || WebGUI::Asset->getDefault($session);
+        return $asset->addMissing($assetUrl);
+    }
+    return undef;
+}
 
 #-------------------------------------------------------------------
 
@@ -73,6 +125,36 @@ sub getRequestedAssetUrl {
 
 #-------------------------------------------------------------------
 
+=head2 getUrlPermutations ( $url )
+
+Returns an array reference of permutations for the URL.
+
+=head3 $url
+
+The URL to permute.
+
+=cut
+
+sub getUrlPermutations {
+    my $url          = shift;
+    my @permutations = ();
+    return \@permutations if !$url;
+    if ($url =~ /\.\w+$/) {
+        push @permutations, $url;
+        $url =~ s/\.\w+$//;
+    }
+    my $uri       = URI->new($url);
+    my @fragments = $uri->path_segments();
+    FRAG: while (@fragments) {
+        last FRAG if $fragments[-1] eq '';
+        push @permutations, join "/", @fragments;
+        pop @fragments;
+    }
+    return \@permutations;
+}
+
+#-------------------------------------------------------------------
+
 =head2 handler ( session ) 
 
 The content handler for this package.
@@ -85,26 +167,28 @@ sub handler {
     my $output = "";
     if (my $perfLog = $errorHandler->performanceLogger) { #show performance indicators if required
         my $t = [Time::HiRes::gettimeofday()];
-        $output = page($session);
-        $perfLog->({ time => Time::HiRes::tv_interval($t), type => 'Page'});
-    }
-    else {
-
-        my $asset = getAsset($session, getRequestedAssetUrl($session));
-
-        # display from cache if page hasn't been modified.
-        if ($var->get("userId") eq "1"
-         && defined $asset
-         && !$http->ifModifiedSince($asset->getContentLastModified, $session->setting->get('maxCacheTimeout'))) {
-            $http->setStatus(304);
-            $http->sendHeader;
-            return "chunked";
+        $output = dispatch($session, getRequestedAssetUrl($session));
+        $t = Time::HiRes::tv_interval($t) ;
+        if ($output =~ /<\/title>/) {
+            $output =~ s/<\/title>/ : ${t} seconds<\/title>/i;
         } 
-
-        # return the page.
-        else {					
-            $output = page($session, undef, $asset);
+        else {
+            # Kludge.
+            my $mimeType = $http->getMimeType();
+            if ($mimeType eq 'text/css') {
+                $session->output->print("\n/* Page generated in $t seconds. */\n");
+            } 
+            elsif ($mimeType =~ m{text/html}) {
+                $session->output->print("\nPage generated in $t seconds.\n");
+            } 
+            else {
+                # Don't apply to content when we don't know how
+                # to modify it semi-safely.
+            }
         }
+    } 
+    else {
+        $output = dispatch($session, getRequestedAssetUrl($session));
     }
 
     my $filename = $http->getStreamedFile();
@@ -122,89 +206,4 @@ sub handler {
     return $output;
 }
 
-#-------------------------------------------------------------------
-
-=head2 page ( session , [ assetUrl ] )
-
-Processes operations (if any), then tries the requested method on the asset corresponding to the requested URL.  If that asset fails to be created, it tries the default page.
-
-=head3 session
-
-The current WebGUI::Session object.
-
-=head3 assetUrl
-
-Optionally pass in a URL to be loaded.
-
-=cut
-
-sub page {
-	my $session = shift;
-	my $assetUrl = getRequestedAssetUrl($session, shift);
-	my $asset = shift || getAsset($session, $assetUrl);
-	my $output = undef;
-	if (defined $asset) {
-		my $method = "view";
-		if ($session->form->param("func")) {
-			$method = $session->form->param("func");
-			unless ($method =~ /^[A-Za-z0-9]+$/) {
-				$session->errorHandler->security("to call a non-existent method $method on $assetUrl");
-				$method = "view";
-			}
-		}
-        ##Passive Analytics Logging
-        WebGUI::PassiveAnalytics::Logging::log($session, $asset);
-
-		$output = tryAssetMethod($session,$asset,$method);
-		$output = tryAssetMethod($session,$asset,"view") unless ($output || ($method eq "view"));
-	}
-	if ($output eq "") {
-		if ($session->var->isAdminOn) { # they're expecting it to be there, so let's help them add it
-			my $asset = WebGUI::Asset->newByUrl($session, $session->url->getRefererUrl);
-            if (Exception::Class->caught()) {
-                $asset = WebGUI::Asset->getDefault($session);
-            }
-			$output = $asset->addMissing($assetUrl);
-		}
-	}
-	return $output;
-}
-
-#-------------------------------------------------------------------
-
-=head2 tryAssetMethod ( session )
-
-Tries an asset method on the requested asset.  Tries the "view" method if that method fails.
-
-=head3 session
-
-The current WebGUI::Session object.
-
-=cut
-
-sub tryAssetMethod {
-	my $session = shift;
-	my $asset = shift;
-	my $method = shift;
-	my $state = $asset->get("state");
-	return undef if ($state ne "published" && $state ne "archived" && !$session->var->isAdminOn); # can't interact with an asset if it's not published
-	$session->asset($asset);
-	my $methodToTry = "www_".$method;
-	my $output = eval{$asset->$methodToTry()};
-    if (my $e = Exception::Class->caught('WebGUI::Error::ObjectNotFound::Template')) {
-        $session->errorHandler->error(sprintf "%s templateId: %s assetId: %s", $e->error, $e->templateId, $e->assetId);
-    }
-	elsif ($@) {
-		$session->errorHandler->warn("Couldn't call method ".$method." on asset for url: ".$session->url->getRequestedUrl." Root cause: ".$@);
-		if ($method ne "view") {
-			$output = tryAssetMethod($session,$asset,'view');
-		} else {
-			# fatals return chunked
-			$output = 'chunked';
-		}
-	}
-	return $output;
-}
-
 1;
-

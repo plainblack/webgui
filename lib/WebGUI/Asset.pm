@@ -267,6 +267,7 @@ property  skipNotification => (
              autoGenerate    => 0,
              noFormPost      => 1,
              fieldType       => 'yesNo',
+             default         => 0,
           );
 
 has       session => (
@@ -394,6 +395,7 @@ require WebGUI::ProgressBar;
 use WebGUI::Search::Index;
 use WebGUI::TabForm;
 use WebGUI::Utility;
+use WebGUI::PassiveAnalytics::Logging;
 
 =head1 NAME
 
@@ -654,6 +656,80 @@ Returns extraHeadTags
 If specified, stores it, but also updates extraHeadTagsPacked with the packed version.
 
 =cut
+
+#-------------------------------------------------------------------
+
+=head2 dispatch ( $fragment )
+
+Based on the URL and query parameters in the current request, call internal methods
+like www_view, www_edit, etc.  If no query parameter is present, then it returns the output
+from the www_view method.  If the requested method does not exist in the object, it returns
+the output from the www_view method.
+
+=head3 $fragment
+
+Any leftover part of the requested URL.
+
+=cut
+
+sub dispatch {
+    my ($self, $fragment) = @_;
+    return undef if $fragment;
+    my $session = $self->session;
+    my $state = $self->get('state');
+    ##Only allow interaction with assets in certain states
+    return if $state ne 'published' && $state ne 'archived' && !$session->var->isAdminOn;
+    my $func    = $session->form->param('func') || 'view';
+    my $viewing = $func eq 'view' ? 1 : 0;
+    my $sub     = $self->can('www_'.$func);
+    if (!$sub && $func ne 'view') {
+        $sub     = $self->can('www_view');
+        $viewing = 1;
+    }
+    return undef unless $sub;
+    my $output = eval { $self->$sub(); };
+    if (my $e = Exception::Class->caught('WebGUI::Error::ObjectNotFound::Template')) {
+                                         #WebGUI::Error::ObjectNotFound::Template
+        $session->log->error(sprintf "%s templateId: %s assetId: %s", $e->error, $e->templateId, $e->assetId);
+    }
+    elsif ($@) {
+        my $message = $@;
+        $session->log->warn("Couldn't call method www_".$func." on asset for url: ".$session->url->getRequestedUrl." Root cause: ".$message);
+    }
+    return $output if $output || $viewing;
+    ##No output, try the view method instead
+    $output = eval { $self->www_view };
+    if (my $e = Exception::Class->caught('WebGUI::Error::ObjectNotFound::Template')) {
+        $session->log->error(sprintf "%s templateId: %s assetId: %s", $e->error, $e->templateId, $e->assetId);
+        return "chunked";
+    }
+    elsif ($@) {
+        warn "logged another warn: $@";
+        my $message = $@;
+        $session->log->warn("Couldn't call method www_view on asset for url: ".$session->url->getRequestedUrl." Root cause: ".$@);
+        return "chunked";
+    }
+    return $output;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 drawExtraHeadTags ( )
+
+Draw the Extra Head Tags.  Done with a customDrawMethod because the Template
+will override this.
+
+=cut
+
+sub drawExtraHeadTags {
+	my ($self, $params) = @_;
+    return WebGUI::Form::codearea($self->session, {
+        name         => $params->{name},
+        value        => $self->get($params->{name}),
+        defaultValue => undef,
+    });
+}
 
 #-------------------------------------------------------------------
 

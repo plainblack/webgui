@@ -77,5 +77,5 @@ $xmlData = XMLin($output,
 cmp_deeply(
     \@actual_urls,
     \@expected_urls,
-    'hidden pages hidden'
+    'hidden pages shown'
 );

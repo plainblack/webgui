@@ -1733,6 +1733,7 @@ sub www_edit {
                 name      => "metadata_".$meta->{$field}{fieldId},
                 uiLevel   => 5,
                 value     => $meta->{$field}{value},
+                defaultValue => $meta->{$field}{defaultValue},
                 extras    => qq/title="$meta->{$field}{description}"/,
                 options   => $options,
                 fieldType => $fieldType,

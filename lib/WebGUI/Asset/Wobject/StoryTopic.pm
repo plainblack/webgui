@@ -49,6 +49,23 @@ property storyTemplateId => (
             namespace    => 'Story',
             default      => 'TbDcVLbbznPi0I0rxQf2CQ',
          );
+property storySortOrder => ( 
+            fieldType     => "selectBox",
+            tab           => 'display',
+            default       => 'Chronologically',
+            options       => \&_storySortOrder_options,
+            label         => ['sortAlphabeticallyChronologically', 'Asset_StoryArchive'],
+            hoverHelp     => ['sortAlphabeticallyChronologically description', 'Asset_StoryArchive'],
+         );
+sub _storySortOrder_options {
+    my $session = shift->session;
+    my $i18n    = WebGUI::International->new($session, 'Asset_StoryArchive');
+    return {
+        Alphabetically  => $i18n->get('alphabetically'),
+        Chronologically => $i18n->get('chronologically'),
+    };
+}
+
 with 'WebGUI::Role::Asset::RssFeed';
 
 
@@ -147,10 +164,11 @@ sub viewTemplateVariables {
     my $wordList = WebGUI::Keyword::string2list($self->keywords);
     my $key      = WebGUI::Keyword->new($session);
     my $p        = $key->getMatchingAssets({
-        keywords     => $wordList,
-        isa          => 'WebGUI::Asset::Story',
-        usePaginator => 1,
-        rowsPerPage  => $numberOfStories,
+        sortOrder      => $self->get('storySortOrder') || 'Chronologically',
+        keywords       => $wordList,
+        isa            => 'WebGUI::Asset::Story',
+        usePaginator   => 1,
+        rowsPerPage    => $numberOfStories,
     });
     my $storyIds = $p->getPageData();
     $var->{story_loop} = [];
@@ -180,7 +198,7 @@ sub viewTemplateVariables {
         push @{$var->{story_loop}}, $storyVars;
     }
 
-    if ($self->{_standAlone}) {
+    if ($self->{_standAlone} and @$storyIds) {
         my $topStoryData = $storyIds->[0];
         shift @{ $var->{story_loop} };
         ##Note, this could have saved from the loop above, but this looks more clean and encapsulated to me.
