@@ -1,4 +1,5 @@
 7.9.13
+ - fixed #11783: Instances deleted during realtime run
 
 7.9.12
  - webgui.org homepage gives 404  (#11778)

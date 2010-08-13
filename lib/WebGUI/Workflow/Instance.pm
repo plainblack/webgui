@@ -106,6 +106,10 @@ sub delete {
 	$self->session->db->write("delete from WorkflowInstanceScratch where instanceId=?",[$self->getId]);
 	$self->session->db->deleteRow("WorkflowInstance","instanceId",$self->getId);
 	WebGUI::Workflow::Spectre->new($self->session)->notify("workflow/deleteInstance",$self->getId) unless ($skipNotify);
+
+	# We will need to remember that we were deleted if we get realtime-run
+	# during start().
+	$self->{deleted} = 1;
 }
 
 #-------------------------------------------------------------------
@@ -643,7 +647,8 @@ sub start {
 		my $start = time();
 		my $status = "complete";
 		$log->info('Trying to execute workflow instance '.$self->getId.' in realtime.');
-		while ($status eq "complete" && ($start > time() -10)) { # how much can we run in 10 seconds
+		# If we got deleted in the middle, we need to stop.  This is a hack.
+		while (!$self->{deleted} && $status eq "complete" && ($start > time() -10)) { # how much can we run in 10 seconds
 			$status = $self->run;
 			$log->info('Completed activity for workflow instance '.$self->getId.' in realtime with return status of '.$status.'.');
 		}
