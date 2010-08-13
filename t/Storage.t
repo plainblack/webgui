@@ -29,10 +29,13 @@ my $session = WebGUI::Test->session;
 
 my $cwd = Cwd::cwd();
 
-my ($extensionTests, $fileIconTests) = setupDataDrivenTests($session);
+my ($extensionTests, $fileIconTests, $block_extension_tests) = setupDataDrivenTests($session);
 
-my $numTests = 140; # increment this value for each test you create
-plan tests => $numTests + scalar @{ $extensionTests } + scalar @{ $fileIconTests };
+plan tests => 141
+            + scalar @{ $extensionTests }
+            + scalar @{ $fileIconTests  }
+            + scalar @{ $block_extension_tests }
+            ;
 
 my $uploadDir = $session->config->get('uploadsPath');
 ok ($uploadDir, "uploadDir defined in config");
@@ -376,6 +379,17 @@ is($tempStor->getHexId, $session->id->toHex($tempStor->getId), '... returns the 
 
 ####################################################
 #
+# block_extensions
+#
+####################################################
+
+##Run a set of extensions through and watch how the files get changed.
+foreach my $extTest (@{ $block_extension_tests }) {
+	is( $storage1->block_extensions($extTest->{filename}), $extTest->{blockname}, $extTest->{comment} );
+}
+
+####################################################
+#
 # tar
 #
 ####################################################
@@ -397,9 +411,19 @@ my $untarStorage = $tarStorage->untar('tar.tar');
 addToCleanup($untarStorage);
 isa_ok( $untarStorage, "WebGUI::Storage", "untar: returns a WebGUI::Storage object");
 is (substr($untarStorage->getPathFrag, 0, 5), 'temp/', 'untar: puts stuff in the temp directory');
-##Note, getFiles will NOT recurse, so do not use a deep directory structure here
 cmp_bag($untarStorage->getFiles, $copiedStorage->getFiles, 'tar and untar loop preserve all files');
 isnt($untarStorage->getPath, $tarStorage->getPath, 'untar did not reuse the same path as the tar storage object');
+
+$tarStorage->addFileFromFilesystem(WebGUI::Test->getTestCollateralPath('extensions.tar'));
+my $extensionStorage = $tarStorage->untar('extensions.tar');
+WebGUI::Test->addToCleanup($extensionStorage);
+use Data::Dumper;
+diag Dumper $extensionStorage->getFiles;
+cmp_bag(
+    $extensionStorage->getFiles, 
+    [ qw{ extension_pm.txt extension_perl.txt extension_html.txt extensions extensions/extension_html.txt }], 
+    'untar fixes file extensions'
+);
 
 ####################################################
 #
@@ -474,11 +498,11 @@ use HTTP::Request::Common;
 
 {
     my $req = POST '/', Content_Type => 'form-data', Content => [
-        oneFile => [ WebGUI::Test->getTestCollateralPath('International/lib/WebGUI/i18n/PigLatin/WebGUI.pm') ],
+        oneFile => [ WebGUI::Test->getTestCollateralPath('littleTextFile') ],
     ];
     local $session->{_request} = Plack::Request->new($req->to_psgi);
-    is($formStore->addFileFromFormPost('oneFile'), 'WebGUI.pm', '... returns the name of the uploaded file');
-    cmp_bag($formStore->getFiles, [ qw/WebGUI.pm/ ], '... adds the file to the storage location');
+    is($formStore->addFileFromFormPost('oneFile'), 'littleTextFile', '... returns the name of the uploaded file');
+    cmp_bag($formStore->getFiles, [ qw/littleTextFile/ ], '... adds the file to the storage location');
 }
 
 {
@@ -487,7 +511,7 @@ use HTTP::Request::Common;
     ];
     local $session->{_request} = Plack::Request->new($req->to_psgi);
     is($formStore->addFileFromFormPost('thumbFile'), 'thumb.gif', '... strips thumb- prefix from files');
-    cmp_bag($formStore->getFiles, [ qw/WebGUI.pm thumb.gif/ ], '... adds the file to the storage location');
+    cmp_bag($formStore->getFiles, [ qw/littleTextFile thumb.gif/ ], '... adds the file to the storage location');
 }
 
 ####################################################
@@ -754,6 +778,63 @@ sub setupDataDrivenTests {
         },
     ];
 
+    my $block_extension_tests = [
+        {
+            filename  => 'filename',
+            blockname => 'filename',
+            comment  => 'no extension',
+        },
+        {
+            filename  => 'filename.pl',
+            blockname => 'filename_pl.txt',
+            comment  => 'pl file',
+        },
+        {
+            filename  => 'filename.perl',
+            blockname => 'filename_perl.txt',
+            comment  => 'perl file',
+        },
+        {
+            filename  => 'filename.cgi',
+            blockname => 'filename_cgi.txt',
+            comment  => 'cgi file',
+        },
+        {
+            filename  => 'filename.php',
+            blockname => 'filename_php.txt',
+            comment  => 'php file',
+        },
+        {
+            filename  => 'filename.asp',
+            blockname => 'filename_asp.txt',
+            comment  => 'asp file',
+        },
+        {
+            filename  => 'filename.pm',
+            blockname => 'filename_pm.txt',
+            comment  => 'perl module file',
+        },
+        {
+            filename  => 'filename.htm',
+            blockname => 'filename_htm.txt',
+            comment  => 'htm file',
+        },
+        {
+            filename  => 'filename.html',
+            blockname => 'filename_html.txt',
+            comment  => 'html file',
+        },
+        {
+            filename  => 'filename.pm.txt',
+            blockname => 'filename.pm.txt',
+            comment  => 'internal .pm not touched',
+        },
+        {
+            filename  => 'filename.txt.pm',
+            blockname => 'filename.txt_pm.txt',
+            comment  => 'double extension handled',
+        },
+    ];
     my $fileIconTests = [
         {
             filename => 'filename',
@@ -777,5 +858,5 @@ sub setupDataDrivenTests {
         },
     ];
 
-    return ($extensionTests, $fileIconTests)
+    return ($extensionTests, $fileIconTests, $block_extension_tests);
 }

@@ -284,6 +284,12 @@ use Exception::Class (
         isa             => 'WebGUI::Error',
         description     => 'A database error',
     },
+
+    'WebGUI::Error::NotInConfig' => {
+        isa             => 'WebGUI::Error',
+        description     => 'A module was requested that does not exist in the configuration file.',
+        fields          => [qw{ module configKey }],
+    },
 );
 
 {

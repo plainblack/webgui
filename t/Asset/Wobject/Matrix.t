@@ -135,6 +135,8 @@ is($matrixListing->get('views'),'1','Views were incremented');
 # Test getListings
 
 my $expectedAssetId = $matrixListing->getId;
+my $safeAssetId     = $expectedAssetId;
+$safeAssetId =~ s/-/_____/;
 
 my $listings = $matrix->getListings;
 
@@ -209,19 +211,19 @@ cmp_deeply(
         $compareListData,
         {ResultSet=>{
             Result=>[
-                    {$expectedAssetId=>$matrixListingLastUpdatedHuman,fieldType=>"lastUpdated",name=>"Last Updated"},
-                    {fieldType=>"category",name=>"category1",$expectedAssetId=>$matrixListing->get('title').' '},
-                    {fieldType=>"category",name=>"category2",$expectedAssetId=>$matrixListing->get('title').' '}
+                    {$safeAssetId=>$matrixListingLastUpdatedHuman,fieldType=>"lastUpdated",name=>"Last Updated"},
+                    {fieldType=>"category",name=>"category1",$safeAssetId=>$matrixListing->get('title').' '},
+                    {fieldType=>"category",name=>"category2",$safeAssetId=>$matrixListing->get('title').' '}
                     ]
             },
          ColumnDefs=>[{
-            key         =>$expectedAssetId,
+            key         =>$safeAssetId,
             label       =>$matrixListing->get('title').' '.$matrixListing->get('version'),
             formatter   =>"formatColors",
             url         =>$matrixListing->getUrl,
             lastUpdated =>$matrixListingLastUpdatedHuman,
             }],
-         ResponseFields=>["attributeId", "name", "description","fieldType", "checked",$expectedAssetId,$expectedAssetId."_compareColor"]
+         ResponseFields=>["attributeId", "name", "description","fieldType", "checked",$safeAssetId,$safeAssetId."_compareColor"]
         },
         'Getting compareListData as JSON'
     ); 

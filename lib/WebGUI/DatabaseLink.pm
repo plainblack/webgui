@@ -382,6 +382,9 @@ sub queryIsAllowed {
 	my $self  = shift;
 	my $query = shift;
 
+    # Remove all comments before checking validity
+    $query =~ s{/[*].*?[*]/}{}g;
+
     my ($firstWord) = $query =~ /(\w+)/;
     $firstWord = lc $firstWord;
     return isIn($firstWord, split(/\s+/, lc $self->{_databaseLink}{allowedKeywords})) ? 1 : 0;

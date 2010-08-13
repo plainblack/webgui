@@ -16,9 +16,11 @@ use WebGUI::Test;
 use WebGUI::Session;
 use WebGUI::Asset::Template;
 use Exception::Class;
-use Test::More tests => 46; # increment this value for each test you create
+
+use Test::More;
 use Test::Deep;
 use Data::Dumper;
+use Test::Exception;
 use JSON qw{ from_json };
 
 my $session = WebGUI::Test->session;
@@ -211,3 +213,28 @@ is($session->setting->get('userFunctionStyleId'), $userStyleTemplate->getId, 'Re
 
 $userStyleTemplate->purge;
 is($session->setting->get('userFunctionStyleId'), 'PBtmpl0000000000000060', 'purge resets the user function style template to Fail Safe');
+
+#----------------------------------------------------------------------------
+# Verify getParser
+WebGUI::Test->originalConfig( 'defaultTemplateParser' );
+WebGUI::Test->originalConfig( 'templateParsers' );
+$session->config->set( 'templateParsers', [ 'WebGUI::Asset::Template::HTMLTemplateExpr' ] );
+# Leaving out 'WebGUI::Asset::Template::TemplateToolkit' on purpose
+$session->config->set( 'defaultTemplateParser', 'WebGUI::Asset::Template::HTMLTemplateExpr' );
+
+my $class = 'WebGUI::Asset::Template';
+dies_ok { $class->getParser( $session, '::HI::' ) } "Invalid parser dies";
+
+isa_ok $class->getParser( $session ), 'WebGUI::Asset::Template::HTMLTemplateExpr', 'no parser passed in gets the default parser';
+
+$session->config->delete( 'defaultTemplateParser' );
+isa_ok $class->getParser( $session ), 'WebGUI::Asset::Template::HTMLTemplate', 'no parser passed and no default gets HTMLTemplate';
+$session->config->set( 'defaultTemplateParser', 'WebGUI::Asset::Template::HTMLTemplateExpr' );
+
+throws_ok 
+    { $class->getParser( $session, 'WebGUI::Asset::Template::TemplateToolkit') } 
+    'WebGUI::Error::NotInConfig',
+    'Parser not in config dies';
+isa_ok $class->getParser( $session, 'WebGUI::Asset::Template::HTMLTemplateExpr'), 'WebGUI::Asset::Template::HTMLTemplateExpr', 'parser in config is created';
+
+done_testing;

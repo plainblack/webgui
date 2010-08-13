@@ -22,6 +22,8 @@ use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
 use WebGUI::Content::Asset;
 
+my $output;
+
 #----------------------------------------------------------------------------
 # Init
 my $session         = WebGUI::Test->session;
@@ -74,20 +76,26 @@ my $td
         url             => 'testdispatch',
     } );
 
+diag $td->getId;
 WebGUI::Test->addToCleanup( WebGUI::VersionTag->getWorking( $session ) );
 
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 15;        # Increment this number for each test you create
+plan tests => 17;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # test getUrlPermutation( url ) method
 
 cmp_deeply( 
     WebGUI::Content::Asset::getUrlPermutations( ),
-    [ ],
-    "Handles no URL gracefully",
+    [ '/' ],
+    "No URL returns /",
+);
+cmp_deeply( 
+    WebGUI::Content::Asset::getUrlPermutations( '/' ),
+    [ '/' ],
+    "URL with only slash is handled",
 );
 cmp_deeply( 
     WebGUI::Content::Asset::getUrlPermutations( "one" ),
@@ -119,19 +127,13 @@ cmp_deeply(
 #----------------------------------------------------------------------------
 # test dispatch( session, url ) method
 is ($session->asset, undef, 'session asset is not defined, yet');
-is(
-    WebGUI::Content::Asset::dispatch( $session, "testdispatch" ),
-    "www_view one",
-    "Regular www_view",
-);
+$output = WebGUI::Content::Asset::dispatch( $session, "testdispatch" );
+is $output, "www_view one", "Regular www_view";
 
-is ($session->asset->getId, $td->getId, 'dispatch set the session asset');
+is $session->asset && $session->asset->getId, $td->getId, 'dispatch set the session asset';
 
-is(
-    WebGUI::Content::Asset::dispatch( $session, "testdispatch/foo" ),
-    "bar",
-    "special /foo handler",
-);
+$output = WebGUI::Content::Asset::dispatch( $session, "testdispatch/foo" );
+is $output, "bar", "special /foo handler";
 
 # Add an asset that clobbers the TestDispatch's /foo
 my $clobberingTime
@@ -170,8 +172,16 @@ $session->request->setup_body({
     func        => "edit",
 });
 
-my $output  = WebGUI::Content::Asset::dispatch( $session, "testdispatch/foo" );
+$output  = WebGUI::Content::Asset::dispatch( $session, "testdispatch/foo" );
 isnt( $output, "you'll never see me!", "func=edit was declined" );
 isnt( $output, "www_edit one", "func=edit was not for us" );
+
+# Test that empty URL returns the default page.
+$session->request->setup_body({ });
+my $originalDefaultPage = $session->setting->get('defaultPage');
+$session->setting->set('defaultPage', $td->getId);
+$output  = WebGUI::Content::Asset::dispatch( $session );
+is $output, 'www_view one', 'an empty URL returns the default asset';
+$session->setting->set('defaultPage', $originalDefaultPage);
 
 #vim:ft=perl
