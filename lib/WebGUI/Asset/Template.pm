@@ -713,7 +713,19 @@ ENDHTML
                 ;
     }
     
-    $output .= $self->getEditForm->toHtml;
+    my $func    = $self->session->form->get('func');
+    my $f   = eval { $self->getEditForm };
+    return $@ if $@;
+    $f->addField( "Hidden", name => "func", value => "editSave" );
+    if ( $func eq 'add' ) {
+        my $className   = $self->session->form->get('className');
+        $f->action( $self->getParent->getUrl );
+        $f->getTab('meta')->getField( 'className' )->set('value', $className);
+    }
+    else {
+        $f->action( $self->getUrl );
+    }
+    $output .= $f->toHtml;
 
     # TODO: Asset Helper
     #$self->getAdminConsole->addSubmenuItem($self->getUrl('func=styleWizard'),$i18n->get("style wizard")) if ($self->get("namespace") eq "style");
