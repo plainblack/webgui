@@ -583,7 +583,7 @@ sub update {
 		$self->setStorageLocation;
 	}
 	if ($self->get("ownerUserId") ne $before{owner} || $self->get("groupIdEdit") ne $before{edit} || $self->get("groupIdView") ne $before{view}) {
-		$self->getStorageLocation->setPrivileges($self->get("ownerUserId"),$self->get("groupIdView"),$self->get("groupIdEdit"));
+        $self->setPrivileges;
 	}
 }
 

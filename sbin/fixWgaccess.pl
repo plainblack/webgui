@@ -45,11 +45,7 @@ ASSET: while (1) {
         next ASSET;
     }
     last ASSET unless $file;
-    $file->getStorageLocation->setPrivileges(
-        $file->get('ownerUserId'), 
-        $file->get('groupIdView'), 
-        $file->get('groupIdEdit'),
-    );
+    $file->setPrivileges;
 }
 
 finish($session);
