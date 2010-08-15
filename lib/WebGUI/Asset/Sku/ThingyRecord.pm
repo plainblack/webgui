@@ -356,7 +356,7 @@ Get a row of data from a thing. Returns a hashref
 
 sub getThingRecord {
     my ( $self, $thingId, $recordId ) = @_;
-    my $table = $self->session->db->dbh->quote_identifier( "Thingy_" . $thingId );
+    my $table = $self->session->db->quote_identifier( "Thingy_" . $thingId );
     return $self->session->db->quickHashRef( "SELECT * FROM " . $table . " WHERE thingDataId=?", [$recordId] );
 }
 

@@ -1392,7 +1392,7 @@ sub update {
         if ( exists $properties->{$key} ) {
             # Delete the value because it's not a profile field
             my $value   = delete $properties->{$key};
-            push @userFields, $db->dbh->quote_identifier( $key ) . " = ?";
+            push @userFields, $db->quote_identifier( $key ) . " = ?";
             push @userValues, $value;
             $self->{_user}->{$key} = $value;
         }
@@ -1412,7 +1412,7 @@ sub update {
             $self->session->errorHandler->warn("No such profile field: $key");
             next;
         }
-        push @profileFields, $db->dbh->quote_identifier( $key ) . " = ?";
+        push @profileFields, $db->quote_identifier( $key ) . " = ?";
         push @profileValues, $properties->{ $key };
         $self->{_profile}->{$key} = $properties->{ $key };
     }

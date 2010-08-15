@@ -171,7 +171,7 @@ sub create {
 
     # Add the column to the userProfileData table
     $db->write(
-        "ALTER TABLE userProfileData ADD " . $db->dbh->quote_identifier($id)
+        "ALTER TABLE userProfileData ADD " . $db->quote_identifier($id)
         . $dbDataType
     );
     
@@ -194,7 +194,7 @@ sub delete {
     my $db      = $self->session->db;
     
     # Remove the column from the userProfileData table
-    $db->write("ALTER TABLE userProfileData DROP " . $db->dbh->quote_identifier($self->getId));
+    $db->write("ALTER TABLE userProfileData DROP " . $db->quote_identifier($self->getId));
 
     # Remove the record
     $db->deleteRow("userProfileField","fieldName",$self->getId);
@@ -808,8 +808,8 @@ sub rename {
 
     $self->session->db->write(
         "ALTER TABLE userProfileData "
-        . "CHANGE " . $db->dbh->quote_identifier($self->getId) 
-        . $db->dbh->quote_identifier($newName) . " " . $dbDataType
+        . "CHANGE " . $db->quote_identifier($self->getId) 
+        . $db->quote_identifier($newName) . " " . $dbDataType
     );
 
     # Update the record
@@ -928,7 +928,7 @@ sub set {
 
         my $sql 
         = "ALTER TABLE userProfileData MODIFY COLUMN " 
-        . $db->dbh->quote_identifier($self->getId) . q{ }
+        . $db->quote_identifier($self->getId) . q{ }
         . $dbDataType
         ;
 

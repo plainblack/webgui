@@ -199,10 +199,10 @@ sub secure_identifier {
     if(scalar(@parts) > 1) {
         my $table  = $parts[0];
         my $column = $parts[1];
-        $identifier = $db->dbh->quote_identifier($table).".".$db->dbh->quote_identifier($column);
+        $identifier = $db->quote_identifier($table).".".$db->dbh->quote_identifier($column);
     }
     else {
-        $identifier = $db->dbh->quote_identifier($identifier);
+        $identifier = $db->quote_identifier($identifier);
     }
     
     return $identifier;

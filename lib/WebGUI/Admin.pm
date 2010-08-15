@@ -254,7 +254,7 @@ sub getTreePaginator {
 
     my $p           = WebGUI::Paginator->new( $session, '', $rowsPerPage, 'pn', $currentPage );
 
-    my $orderBy     = $session->db->dbh->quote_identifier( $orderByColumn ) . ' ' . $orderByDirection;
+    my $orderBy     = $session->db->quote_identifier( $orderByColumn ) . ' ' . $orderByDirection;
     $p->setDataByArrayRef( $asset->getLineage( ['children'], { orderByClause => $orderBy } ) );
     
     return $p;

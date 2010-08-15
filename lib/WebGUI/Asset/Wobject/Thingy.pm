@@ -96,8 +96,8 @@ sub addField {
     my $thingyTableName = "Thingy_".$field->{thingId};
     my $columnName = "field_".$newFieldId;
     $db->write(
-        "ALTER TABLE ".$db->dbh->quote_identifier($thingyTableName)
-        ." ADD ".$db->dbh->quote_identifier($columnName)." ". $dbDataType
+        "ALTER TABLE ".$db->quote_identifier($thingyTableName)
+        ." ADD ".$db->quote_identifier($columnName)." ". $dbDataType
             );
 
     return $newFieldId;
@@ -154,7 +154,7 @@ sub addThing {
         }
     }
 
-    $db->write("create table ".$db->dbh->quote_identifier("Thingy_".$newThingId)."(
+    $db->write("create table ".$db->quote_identifier("Thingy_".$newThingId)."(
         thingDataId CHAR(22) binary not null,
         dateCreated int not null,
         createdById CHAR(22) not null,
@@ -250,7 +250,7 @@ sub badOtherThing {
     my ($otherThingTableExists) = $db->quickArray('show tables like ?',[$tableName]);
     return $i18n->get('other thing missing message') unless $otherThingTableExists;
     my ($otherThingFieldExists) = $db->quickArray(
-        sprintf('show columns from %s like ?', $db->dbh->quote_identifier($tableName)),
+        sprintf('show columns from %s like ?', $db->quote_identifier($tableName)),
         [$fieldName]);
     return $i18n->get('other thing field missing message') unless $otherThingFieldExists;
     return undef;
@@ -389,11 +389,11 @@ sub deleteField {
             ,[$deletedSequenceNumber]);
     }
 
-    my ($columnExists) = $db->quickArray("show columns from ".$db->dbh->quote_identifier("Thingy_".$thingId)
+    my ($columnExists) = $db->quickArray("show columns from ".$db->quote_identifier("Thingy_".$thingId)
         ." like ".$db->quote("field_".$fieldId));
     if ($columnExists){
-        $db->write("ALTER TABLE ".$db->dbh->quote_identifier("Thingy_".$thingId)." DROP "
-            .$db->dbh->quote_identifier("field_".$fieldId));
+        $db->write("ALTER TABLE ".$db->quote_identifier("Thingy_".$thingId)." DROP "
+            .$db->quote_identifier("field_".$fieldId));
     }
     $error->info("Deleted field: $fieldId in thing: $thingId.");
     return undef;
@@ -525,7 +525,7 @@ sub deleteThing {
 
     $self->deleteCollateral("Thingy_things","thingId",$thingId);
     $self->deleteCollateral("Thingy_fields","thingId",$thingId);
-    $session->db->write("drop table if exists ".$session->db->dbh->quote_identifier("Thingy_".$thingId));
+    $session->db->write("drop table if exists ".$session->db->quote_identifier("Thingy_".$thingId));
     
     $error->info("Deleted thing: $thingId.");
     return undef;
@@ -568,7 +568,7 @@ sub editThingDataSave {
         $thingData{ipAddress} = $session->request->address;
     }
     else {
-        %thingData = $session->db->quickHash("select * from ".$session->db->dbh->quote_identifier("Thingy_".$thingId)
+        %thingData = $session->db->quickHash("select * from ".$session->db->quote_identifier("Thingy_".$thingId)
             ." where thingDataId = ?",[$thingDataId]);
     }
 
@@ -1125,7 +1125,7 @@ sub getViewThingVars {
 
     return undef unless ($thingId && $thingDataId);
     
-    my %thingData = $db->quickHash("select * from ".$db->dbh->quote_identifier("Thingy_".$thingId)
+    my %thingData = $db->quickHash("select * from ".$db->quote_identifier("Thingy_".$thingId)
         ." where thingDataId = ?",[$thingDataId]);
 
     if (%thingData) {
@@ -1212,7 +1212,7 @@ sub hasEnteredMaxPerUser {
     return 0 unless $maxEntriesPerUser;
      
     my $numberOfEntries = $session->db->quickScalar("select count(*) "
-        ."from ".$session->db->dbh->quote_identifier("Thingy_".$thingId)." where createdById=?",[$session->user->userId]);   
+        ."from ".$session->db->quote_identifier("Thingy_".$thingId)." where createdById=?",[$session->user->userId]);   
 
     if($numberOfEntries < $maxEntriesPerUser){
         return 0;
@@ -1362,7 +1362,7 @@ override purge => sub {
 	my $db = $self->session->db;
     my @thingIds = $db->buildArray("select thingId from Thingy_things where assetId = ?", [$self->getId]);
     foreach my $thingId (@thingIds){
-        $db->write("drop table if exists ".$db->dbh->quote_identifier("Thingy_".$thingId));        
+        $db->write("drop table if exists ".$db->quote_identifier("Thingy_".$thingId));        
     }
     $db->write("delete from Thingy_things where assetId = ?",[$self->getId]);
     $db->write("delete from Thingy_fields where assetId = ?",[$self->getId]);
@@ -1450,9 +1450,9 @@ sub _updateFieldType {
             my $columnName = "field_".$fieldId;
             $error->info("changing column: $columnName, table: $thingyTableName");
             $self->session->db->write(
-                "ALTER TABLE ".$db->dbh->quote_identifier($thingyTableName).
-                " CHANGE ".$db->dbh->quote_identifier($columnName)." "
-                .$db->dbh->quote_identifier($columnName)." ".$dbDataType
+                "ALTER TABLE ".$db->quote_identifier($thingyTableName).
+                " CHANGE ".$db->quote_identifier($columnName)." "
+                .$db->quote_identifier($columnName)." ".$dbDataType
             );
         }
     return undef;
@@ -2320,7 +2320,7 @@ sub canEditThingData {
     else {
         if ($thingProperties->{groupIdEdit} eq 'owner'){
             my $owner = $session->db->quickScalar("select createdById "
-                ."from ".$session->db->dbh->quote_identifier("Thingy_".$thingId)
+                ."from ".$session->db->quote_identifier("Thingy_".$thingId)
                 ." where thingDataId = ?",[$thingDataId]);
             if ($session->user->userId eq $owner || $self->canEdit){
                 return 1;
@@ -2366,7 +2366,7 @@ sub canViewThingData {
 
     if ($thingProperties->{groupIdView} eq 'owner'){
         my $owner = $session->db->quickScalar("select createdById "
-            ."from ".$session->db->dbh->quote_identifier("Thingy_".$thingId)
+            ."from ".$session->db->quote_identifier("Thingy_".$thingId)
             ." where thingDataId = ?",[$thingDataId]);
         if ($session->user->userId eq $owner || $self->canEdit){
             return 1;
@@ -2447,7 +2447,7 @@ sub editThingData {
     
     if ($thingDataId ne "new"){
         # Get Field Values
-        %thingData = $session->db->quickHash("select * from ".$session->db->dbh->quote_identifier("Thingy_".$thingId)
+        %thingData = $session->db->quickHash("select * from ".$session->db->quote_identifier("Thingy_".$thingId)
         ." where thingDataId = ?",[$thingDataId]);
     }
 

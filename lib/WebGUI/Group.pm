@@ -1598,8 +1598,8 @@ sub resetGroupFields {
     foreach my $tableName (keys %{ $tableCache }) {
         foreach my $fieldName (@{ $tableCache->{$tableName} }) {
             my $sql = sprintf 'UPDATE %s SET %s=3 where %s=?',
-                $db->dbh->quote_identifier($tableName),
-                (($db->dbh->quote_identifier($fieldName)) x 2);
+                $db->quote_identifier($tableName),
+                (($db->quote_identifier($fieldName)) x 2);
             $db->write($sql, [ $gid ]);
         }
     }

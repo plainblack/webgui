@@ -112,11 +112,11 @@ sub copyCollateral {
     my $newId = $self->session->id->generate;
 
     my $temp = $self->session->db->buildArrayRefOfHashRefs(
-        "select * from ".$db->dbh->quote_identifier($table)." where ".$db->dbh->quote_identifier($keyName)."=".$db->quote($keyValue));
+        "select * from ".$db->quote_identifier($table)." where ".$db->dbh->quote_identifier($keyName)."=".$db->quote($keyValue));
     my $hash = $temp->[0];
     $hash->{$keyName} = $newId;
     my @keys = keys %$hash;
-    my $sql = "insert into ".$db->dbh->quote_identifier($table)
+    my $sql = "insert into ".$db->quote_identifier($table)
             ." (".join(',',map("`$_`",@keys)).") values(".join(',',map("?",@keys)).")";
     $self->session->db->write($sql,[map($hash->{$_},@keys)]);
 }
@@ -147,8 +147,8 @@ sub deleteCollateral {
 	my $keyName = shift;
 	my $keyValue = shift;
     my $db = $self->session->db;
-        $self->session->db->write("delete from ".$db->dbh->quote_identifier($table)
-            ." where ".$db->dbh->quote_identifier($keyName)."=".$db->quote($keyValue));
+        $self->session->db->write("delete from ".$db->quote_identifier($table)
+            ." where ".$db->quote_identifier($keyName)."=".$db->quote($keyValue));
 	$self->updateHistory("deleted collateral item ".$keyName." ".$keyValue);
 }
 
@@ -220,8 +220,8 @@ sub getCollateral {
 	if ($keyValue eq "new" || $keyValue eq "") {
 		return {$keyName=>"new"};
 	} else {
-		return $db->quickHashRef("select * from ".$db->dbh->quote_identifier($table)
-            ." where ".$db->dbh->quote_identifier($keyName)."=?",[$keyValue]);
+		return $db->quickHashRef("select * from ".$db->quote_identifier($table)
+            ." where ".$db->quote_identifier($keyName)."=?",[$keyValue]);
 	}
 }
 
@@ -453,13 +453,13 @@ sub setCollateral {
 	
     if ($properties->{$keyName} eq "new" || $properties->{$keyName} eq "") {
 		$properties->{$keyName} = $self->session->id->generate();
-		$sql = "insert into ".$db->dbh->quote_identifier($table)." (";
+		$sql = "insert into ".$db->quote_identifier($table)." (";
 		my $dbkeys = "";
      		my $dbvalues = "";
 		unless ($useSequence eq "0") {
 			unless (exists $properties->{sequenceNumber}) {
 				my ($seq) = $self->session->db->quickArray("select max(sequenceNumber) "
-                    ." from ".$db->dbh->quote_identifier($table)." where $setName=?",[$setValue]);
+                    ." from ".$db->quote_identifier($table)." where $setName=?",[$setValue]);
 				$properties->{sequenceNumber} = $seq+1;
 			}
 		}
@@ -471,20 +471,20 @@ sub setCollateral {
 				$dbkeys .= ',';
 				$dbvalues .= ',';
 			}
-			$dbkeys .= $db->dbh->quote_identifier($key);
+			$dbkeys .= $db->quote_identifier($key);
 			$dbvalues .= $self->session->db->quote($properties->{$key});
 		}
 		$sql .= $dbkeys.') values ('.$dbvalues.')';
 		$self->updateHistory("added collateral item ".$table." ".$properties->{$keyName});
 	} else {
-		$sql = "update ".$db->dbh->quote_identifier($table)." set ";
+		$sql = "update ".$db->quote_identifier($table)." set ";
 		foreach my $key (keys %{$properties}) {
 			unless ($key eq "sequenceNumber" && $updateSequence ne "1") {
 				$sql .= ',' if ($counter++ > 0);
-				$sql .= $db->dbh->quote_identifier($key)."=".$db->quote($properties->{$key});
+				$sql .= $db->quote_identifier($key)."=".$db->quote($properties->{$key});
 			}
 		}
-		$sql .= " where ".$db->dbh->quote_identifier($keyName)."=".$db->quote($properties->{$keyName});
+		$sql .= " where ".$db->quote_identifier($keyName)."=".$db->quote($properties->{$keyName});
 		$self->updateHistory("edited collateral item ".$table." ".$properties->{$keyName});
 	}
   	$self->session->db->write($sql);

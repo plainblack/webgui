@@ -264,7 +264,7 @@ sub getAdjacentThread {
     my $sortCompareValue = $self->get($sortByField);
 
     # make sortBy safe to include directly in SQL
-    $sortBy = join('.', map { $session->db->dbh->quote_identifier($_) } split(/\./, $sortBy));
+    $sortBy = join('.', map { $session->db->quote_identifier($_) } split(/\./, $sortBy));
 
     my $versionTag = WebGUI::VersionTag->getWorking($session, 'nocreate');
     my $tagId = $versionTag ? $versionTag->getId : undef;

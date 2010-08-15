@@ -1330,7 +1330,7 @@ sub www_getAllSubmissions {
     $rules->{'joinClass'         } = "WebGUI::Asset::EMSSubmission";
     $rules->{'whereClause'       } = $whereClause;
     $rules->{'includeOnlyClasses'} = ['WebGUI::Asset::EMSSubmission'];
-    $rules->{'orderByClause'     } = $session->db->dbh->quote_identifier( $orderByColumn ) . ' ' . $orderByDirection if $orderByColumn;
+    $rules->{'orderByClause'     } = $session->db->quote_identifier( $orderByColumn ) . ' ' . $orderByDirection if $orderByColumn;
 
     my $sql  = "";
     

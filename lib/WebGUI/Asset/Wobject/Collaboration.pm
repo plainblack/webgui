@@ -1201,7 +1201,7 @@ sub getThreadsPaginator {
         }
         $self->session->scratch->set($scratchSortOrder, $sortOrder);
     }
-    $sortBy = join('.', map { $self->session->db->dbh->quote_identifier($_) } split(/\./, $sortBy));
+    $sortBy = join('.', map { $self->session->db->quote_identifier($_) } split(/\./, $sortBy));
     $sortOrder ||= 'desc';
 
     my $sql = "
