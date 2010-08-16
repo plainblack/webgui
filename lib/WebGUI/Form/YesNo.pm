@@ -15,8 +15,7 @@ package WebGUI::Form::YesNo;
 =cut
 
 use strict;
-use base 'WebGUI::Form::Control';
-use WebGUI::Form::Radio;
+use base 'WebGUI::Form::RadioList';
 use WebGUI::International;
 
 =head1 NAME
@@ -36,6 +35,18 @@ This is a subclass of WebGUI::Form::Control.
 The following methods are specifically available from this class. Check the superclass for additional methods.
 
 =cut
+
+#-------------------------------------------------------------------
+
+=head2 areOptionsSettable ( )
+
+Options are predefined for a Yes/No.
+
+=cut
+
+sub areOptionsSettable {
+    return 0;
+}
 
 #-------------------------------------------------------------------
 
@@ -92,6 +103,24 @@ sub getName {
 
 #-------------------------------------------------------------------
 
+=head2 getOptions
+
+Return the options, set to defaults for the Yes/No.  These options are not overridable.
+
+=cut
+
+sub getOptions {
+    my $self = shift;
+	my $i18n = WebGUI::International->new($self->session);
+    $self->set('options',{
+        1 => $i18n->get(138),
+        0 => $i18n->get(139),
+    });
+    return $self->SUPER::getOptions;
+}
+
+#-------------------------------------------------------------------
+
 =head2 getValue ( [ value ] )
 
 If value is present, we will process it, otherwise the superclass will handle the request.
@@ -137,44 +166,5 @@ sub isDynamicCompatible {
     return 1;
 }
 
-#-------------------------------------------------------------------
-
-=head2 toHtml ( )
-
-Renders a yes/no question field.
-
-=cut
-
-sub toHtml {
-	my $self = shift;
-	my $i18n = WebGUI::International->new($self->session);
-        my ($checkYes, $checkNo);
-        if ($self->getOriginalValue) {
-            $checkYes = 1;
-        } else {
-            $checkNo = 1;
-        }
-        my $output = '<fieldset style="border:none;margin:0;padding:0">'
-            . WebGUI::Form::Radio->new($self->session,
-                checked => $checkYes,
-                name    => $self->get("name"),
-                value   => 1,
-                extras  => $self->get("extras"),
-                label   => $i18n->get(138),
-            )->toHtml
-            . '&nbsp;&nbsp;&nbsp;'
-            . WebGUI::Form::Radio->new($self->session,
-                checked => $checkNo,
-                name    => $self->get("name"),
-                value   => 0,
-                extras  => $self->get("extras"),
-                label   => $i18n->get(139),
-            )->toHtml
-            . '</fieldset>'
-            ;
-        return $output;
-}
-
 
 1;
-

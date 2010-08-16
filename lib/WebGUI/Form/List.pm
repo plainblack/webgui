@@ -52,7 +52,7 @@ sub alignmentSeparator {
 		return "<br />\n";
 	}
 	else {
-		return " &nbsp; &nbsp;\n";
+		return "&nbsp;&nbsp;";
 	}
 }
 

@@ -3,6 +3,7 @@
  - fixed #11781: Thingy wrong retorn value from Ajax method
  - fixed #11780: fixFilenames regex needs an anchor in ZipArchive asset
  - fixed #11782: Attachments all showing duplicated first thumbnail
+ - fixed #11777: Thingy search on yes no field fails
 
 7.9.12
  - webgui.org homepage gives 404  (#11778)
