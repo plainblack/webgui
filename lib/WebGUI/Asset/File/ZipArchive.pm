@@ -135,7 +135,8 @@ sub fixFilenames {
         my $extension = $storage->getFileExtension($file);
         next FILE unless isIn($extension, qw/pl perl pm cgi php asp sh/);
         my $newFile = $file;
-        $newFile =~ s/\.$extension/_$extension.txt/;
+        #$newFile =~ s/\.$extension$/_$extension.txt/;
+        $newFile =~ s/\.$extension$/_$extension.txt/;
         $storage->renameFile($file, $newFile);
     }
 }
