@@ -2587,9 +2587,10 @@ sub www_editThingDataSaveViaAjax {
     }
 
     my $thingProperties = $self->getThing($thingId);
+    use Data::Dumper;
+    warn $thingId;
+    warn Dumper $thingProperties;
     if ($thingProperties->{thingId}){
-        my ($privilegedGroup,$workflowId);
-	    
         return $session->privilege->insufficient() unless $self->canEditThingData($thingId, $thingDataId
             ,$thingProperties);
 
@@ -2600,12 +2601,15 @@ sub www_editThingDataSaveViaAjax {
 
     	my ($newThingDataId,$errors) = $self->editThingDataSave($thingId,$thingDataId);
 
-    	if ($errors){
+    	if (@{ $errors }) {
 	    $session->http->setStatus(400);
             return JSON->new->encode($errors);
     	}
+        $session->http->setStatus("200");
+        return '{}';
     }
     else {
+        warn "thingId not found in thingProperties\n";
         $session->http->setStatus(404);
         return JSON->new->encode({message => "The thingId you requested can not be found."});
     }

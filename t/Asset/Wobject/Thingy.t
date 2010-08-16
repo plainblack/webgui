@@ -17,7 +17,7 @@ use lib "$FindBin::Bin/../../lib";
 use WebGUI::Test;
 use WebGUI::Test::MockAsset;
 use WebGUI::Session;
-use Test::More tests => 28; # increment this value for each test you create
+use Test::More tests => 30; # increment this value for each test you create
 use Test::Deep;
 use JSON;
 use WebGUI::Asset::Wobject::Thingy;
@@ -404,6 +404,7 @@ is($table, undef, '... drops thing specific table');
 # getFieldValue
 #
 #################################################################
+
 {
     my %newThingProperties             = %thingProperties;
     my $newThingId                     = $thingy->addThing(\%newThingProperties, 0); 
@@ -419,3 +420,22 @@ is($table, undef, '... drops thing specific table');
     like($datetime, qr{^\d+/\d+/\d+\s+\d+:\d+}, "... DateTime field also returns data in user's format");
 }
 
+#################################################################
+#
+# www_editThingDataSaveViaAjax
+#
+#################################################################
+
+$session->request->setup_body({
+    thingId     => $thingId,
+    thingDataId => 'new',
+});
+
+$session->user({userId => '3'});
+$session->http->setStatus(200);
+my $json = $thingy->www_editThingDataSaveViaAjax();
+diag "json: ".$json;
+is $json, '{}', 'www_editThingDataSaveViaAjax: Empty JSON hash';
+is $session->http->getStatus, 200, '... http status=200';
+
+$session->request->setup_body({ });
