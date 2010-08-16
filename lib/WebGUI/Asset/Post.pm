@@ -790,11 +790,11 @@ sub getTemplateVars {
 				$gotAttachment = 1;
        			}	
 			push(@{$var{"attachment_loop"}}, {
-				url       =>$fileUrl,
-				icon      =>$var{"attachment.icon"},
-				filename  =>$filename,
-				thumbnail =>$var{"image.thumbnail"},
-				isImage   =>$isImage
+				url       => $fileUrl,
+				icon      => $storage->getFileIconUrl($filename),
+				filename  => $filename,
+				thumbnail => $isImage ? $storage->getThumbnailUrl($filename) : '',
+				isImage   => $isImage,
 				});
 		}
 	}

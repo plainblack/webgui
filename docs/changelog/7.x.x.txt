@@ -2,6 +2,7 @@
  - fixed #11783: Instances deleted during realtime run
  - fixed #11781: Thingy wrong retorn value from Ajax method
  - fixed #11780: fixFilenames regex needs an anchor in ZipArchive asset
+ - fixed #11782: Attachments all showing duplicated first thumbnail
 
 7.9.12
  - webgui.org homepage gives 404  (#11778)
