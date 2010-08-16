@@ -19,7 +19,8 @@ use strict;
 use lib "$FindBin::Bin/../lib";
 use WebGUI::Test;
 use WebGUI::Session;
-use Test::More tests => 17; # increment this value for each test you create
+use Test::More tests => 18; # increment this value for each test you create
+use Test::Deep;
 use WebGUI::Asset::Wobject::Collaboration;
 use WebGUI::Asset::Post;
 use WebGUI::Asset::Post::Thread;
@@ -166,5 +167,41 @@ ok( !$variables->{'hideProfileUrl'}, 'show profile url');
 $variables = $post2->getTemplateVars();
 is(  $variables->{'ownerUserId'}, 1, 'first post owned by admin');
 ok(  $variables->{'hideProfileUrl'}, 'hide profile url, since poster is visitor');
+
+##Check for attachments
+
+my $storage = $post1->getStorageLocation();
+$storage->addFileFromFilesystem(WebGUI::Test->getTestCollateralPath('gooey.jpg'));
+$storage->addFileFromFilesystem(WebGUI::Test->getTestCollateralPath('lamp.jpg'));
+$storage->addFileFromFilesystem(WebGUI::Test->getTestCollateralPath('littleTextFile'));
+my $attachment_loop = $post1->getTemplateVars()->{attachment_loop};
+
+cmp_bag(
+    $attachment_loop,
+    [
+        {
+            filename  => 'gooey.jpg',
+            url       => $storage->getUrl('gooey.jpg'),
+            icon      => $session->url->extras('fileIcons/jpg.gif'),
+            thumbnail => $storage->getThumbnailUrl('gooey.jpg'),
+            isImage   => bool(1),
+        },
+        {
+            filename  => 'lamp.jpg',
+            url       => $storage->getUrl('lamp.jpg'),
+            icon      => $session->url->extras('fileIcons/jpg.gif'),
+            thumbnail => $storage->getThumbnailUrl('lamp.jpg'),
+            isImage   => bool(1),
+        },
+        {
+            filename  => 'littleTextFile',
+            url       => $storage->getUrl('littleTextFile'),
+            icon      => $session->url->extras('fileIcons/unknown.gif'),
+            thumbnail => '',
+            isImage   => bool(0),
+        },
+    ],
+    'checking attachment loop with multiple attachments for handling of image and non-image types'
+);
 
 # vim: syntax=perl filetype=perl
