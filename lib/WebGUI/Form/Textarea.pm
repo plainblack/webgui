@@ -77,7 +77,7 @@ sub definition {
 			defaultValue=> 150
         },
 		width=>{
-			defaultValue=> 400
+			defaultValue=> '100%',
         },
 		style=>{
 			defaultValue => undef,
@@ -140,10 +140,16 @@ Renders an input tag of type text.
 sub toHtml {
 	my $self = shift;
  	my $value = $self->fixMacros($self->fixTags($self->fixSpecialCharacters(scalar $self->getOriginalValue)));
-	my $width = $self->get('width') || 400;
-	my $height = $self->get('height') || 150;
+	my $width = $self->get('width') || '100%';
+        if ( $width !~ /%|px/ ) {
+            $width .= 'px';
+        }
+	my $height = $self->get('height') || '100%';
+        if ( $height !~ /%|px/ ) {
+            $height .= 'px';
+        }
 	my ($style, $url, $stow) = $self->session->quick(qw(style url stow));
-    my $sizeStyle =  ' width: ' . $width . 'px; height: ' . $height . 'px;';
+    my $sizeStyle =  ' width: ' . $width . '; height: ' . $height . ';';
     my $out
         = '<textarea id="' . $self->get('id') . '"'
         . ' name="' . $self->get("name") . '"'
