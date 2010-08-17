@@ -5,6 +5,7 @@
  - fixed #11782: Attachments all showing duplicated first thumbnail
  - fixed #11777: Thingy search on yes no field fails
  - fixed #11787: Gallery resolutions wrongly ordered
+ - fixed #11785: Article title / URL with äÄöÖüÜ (reopen #11683)
 
 7.9.12
  - webgui.org homepage gives 404  (#11778)
