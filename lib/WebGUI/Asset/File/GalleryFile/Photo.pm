@@ -279,7 +279,7 @@ sub getResolutions {
     my $storage     = $self->getStorageLocation;
 
     # Return a list not including the web view image.
-    return [ sort { $a cmp $b } grep { $_ ne $self->filename } @{ $storage->getFiles } ];
+    return [ sort { $a <=> $b } grep { $_ ne $self->get("filename") } @{ $storage->getFiles } ];
 }
 
 #----------------------------------------------------------------------------

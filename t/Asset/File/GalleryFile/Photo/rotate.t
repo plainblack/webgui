@@ -37,7 +37,7 @@ addToCleanup($versionTag);
 my $gallery
     = $node->addChild({
         className           => "WebGUI::Asset::Wobject::Gallery",
-        imageResolutions    => "1024x768",
+        imageResolutions    => "1024",
     },
     undef,
     undef,
