@@ -73,10 +73,10 @@ sub definition {
 	my $definition = shift || [];
 	push(@{$definition}, {
 		height=>{
-			defaultValue=> 450 
+			defaultValue=> '200px'
 			},
 		width=>{
-			defaultValue=> 550 
+			defaultValue=> '100%'
 			},
 		style=>{
 			defaultValue => undef,
@@ -152,8 +152,15 @@ sub toHtml {
     my ($style, $url, $stow) = $self->session->quick(qw(style url stow));
 
     my $value = encode_entities( $self->fixMacros($self->fixTags($self->fixSpecialCharacters(scalar $self->getOriginalValue))) );
-    my $width = $self->get('width') || 400;
-    my $height = $self->get('height') || 150;
+    my $width = $self->get('width');
+    if ( $width !~ /%|px/ ) {
+        $width  .= 'px';
+    }
+    my $height = $self->get('height');
+    if ( $height !~ /%|px/ ) {
+        $height .= 'px';
+    }
+
     my $id = $self->get('id');
     my $name = $self->get('name');
     my $extras = $self->get('extras');
@@ -178,7 +185,7 @@ sub toHtml {
 <script type="text/javascript">
 (function(){
     YAHOO.util.Event.onDOMReady( function () {
-        var myeditor = new YAHOO.widget.CodeEditor('${id}', { toggleButton: true, handleSubmit: true, css_url: '${codeCss}', height: '${height}px', width: '${width}px', status: true, resize: true });
+        var myeditor = new YAHOO.widget.CodeEditor('${id}', { toggleButton: true, handleSubmit: true, css_url: '${codeCss}', height: '${height}', width: '${width}', status: true, resize: true });
         myeditor.render();
 
         //var myLogReader = new YAHOO.widget.LogReader();
