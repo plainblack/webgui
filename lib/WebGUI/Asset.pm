@@ -2805,7 +2805,7 @@ sub www_add {
 		isHidden => $self->get("isHidden"),
 		className=>$class,
 		assetId=>"new",
-		url=>$self->session->form->param("url")
+		url=>scalar($self->session->form->param("url")),
 		);
 	$properties{isHidden} = 1 unless $self->session->config->get("assets/".$class."/isContainer");
 	my $newAsset = WebGUI::Asset->newByPropertyHashRef($self->session,\%properties);
