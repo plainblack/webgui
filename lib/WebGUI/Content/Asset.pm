@@ -19,7 +19,6 @@ use LWP::MediaTypes qw(guess_media_type);
 use Time::HiRes;
 use WebGUI::Asset;
 use WebGUI::PassiveAnalytics::Logging;
-use URI;
 
 =head1 NAME
 
@@ -143,9 +142,7 @@ sub getUrlPermutations {
         push @permutations, $url;
         $url =~ s/\.\w+$//;
     }
-    my $uri       = URI->new($url);
-    my @fragments = $uri->path_segments();
-    use Data::Dumper;
+    my @fragments = split /\//, $url;
     FRAG: while (@fragments) {
         last FRAG if $fragments[-1] eq '';
         push @permutations, join "/", @fragments;
