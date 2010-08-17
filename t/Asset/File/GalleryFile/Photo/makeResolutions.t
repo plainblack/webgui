@@ -49,7 +49,7 @@ $album
 
 #----------------------------------------------------------------------------
 # Tests
-plan tests => 13;
+plan tests => 14;
 
 #----------------------------------------------------------------------------
 # makeResolutions gets default resolutions from a parent Photo Gallery asset
@@ -78,6 +78,12 @@ cmp_deeply(
     $photo->getStorageLocation->getFiles, 
     bag( '1024.jpg', '1600.jpg', '640.jpg', '800.jpg', 'page_title.jpg' ),
     "makeResolutions makes all the required resolutions with the appropriate names.",
+);
+
+cmp_deeply(
+    $photo->getResolutions,
+    [qw/640.jpg 800.jpg 1024.jpg 1600.jpg/],
+    'getResolutions: sorts numerically'
 );
 
 TODO: {
