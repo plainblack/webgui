@@ -305,8 +305,14 @@ sub getResolutions {
     my $self        = shift;
     my $storage     = $self->getStorageLocation;
 
+    ##Filter out the web view image and thumbnail files.
+    my @resolutions = grep { $_ ne $self->get("filename") } @{ $storage->getFiles };
+
     # Return a list not including the web view image.
-    return [ sort { $a <=> $b } grep { $_ ne $self->get("filename") } @{ $storage->getFiles } ];
+    @resolutions = map  { $_->[1] }
+                   sort { $a->[0] <=> $b->[0] }
+                   map  { my $number = $_; $number =~ s/\.\w+$//; [ $number, $_ ] } @resolutions;
+    return \@resolutions;
 }
 
 #----------------------------------------------------------------------------
