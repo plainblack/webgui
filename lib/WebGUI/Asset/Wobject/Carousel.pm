@@ -76,7 +76,7 @@ override getEditForm => sub {
         .'    <input type="button" value="Add item" onClick="javascript:addItem()"></input><br />'
         ."    <br />\n";
 
-    $tabform->getTab("properties")->raw($tableRowStart);
+    $tabform->getTab("properties")->addField('ReadOnly', value => $tableRowStart);
 
     if($self->items){
         my @items = @{JSON->new->decode($self->items)->{items}};
@@ -103,7 +103,7 @@ onClick='javascript:deleteItem(this.id)'></input>\n"
                 .'myEditor'.$itemNr.".render()\n"
                 ."</script>\n"
                 ."</div>\n";
-            $tabform->getTab("properties")->raw($itemHTML);
+            $tabform->getTab("properties")->addField('ReadOnly', value => $itemHTML);
         }
     }
     else{
@@ -121,13 +121,13 @@ onClick='javascript:deleteItem(this.id)'></input>\n"
                 ."var myEditor1 = new YAHOO.widget.SimpleEditor('item1', {height: '80px', width: '500px', handleSubmit: true});\n"
                 ."myEditor1.render()\n"
                 ."</script>\n";
-        $tabform->getTab("properties")->raw($itemHTML);
+        $tabform->getTab("properties")->addField('ReadOnly', value => $itemHTML);
     }
     my $tableRowEnd = qq|
             </td>
         </tr>
     |;
-    $tabform->getTab("properties")->raw($tableRowEnd);
+    $tabform->getTab("properties")->addField('ReadOnly', value => $tableRowEnd);
     
     return $tabform;
 };
