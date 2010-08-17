@@ -289,7 +289,11 @@ override getEditForm => sub {
 			value		=> $self->generateGraph,
 		);
                 # TODO: Fix graphing plugins to use FormBuilder API
-		$fb->getTab('graph')->raw(WebGUI::Image::Graph->getGraphingTab($self->session, $config));
+		$fb->getTab('graph')->addField(
+            'ReadOnly', 
+            value => WebGUI::Image::Graph->getGraphingTab($self->session, $config)
+        );
+
 	}
 
 	return $fb;
