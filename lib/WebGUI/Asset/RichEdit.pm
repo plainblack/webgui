@@ -492,8 +492,8 @@ sub getRichEditor {
 	}
 	$config{language} = $language;
 	$config{content_css} = $self->cssFile || $self->session->url->extras('tinymce-webgui/defaultcontent.css');
-	$config{width} = $self->editorWidth if ($self->editorWidth > 0);
-	$config{height} = $self->editorHeight if ($self->editorHeight > 0);
+	$config{width} = $self->editorWidth || "100%";
+	$config{height} = $self->editorHeight || "100%";
 	$config{plugins} = join(",",@plugins);
 
     $self->session->style->setScript($self->session->url->extras('yui/build/yahoo/yahoo-min.js'));
