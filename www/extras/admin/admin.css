@@ -1,4 +1,8 @@
 
+* {
+    font: 12pt Helvetica, sans-serif;
+}
+
 #wrapper {
     margin-left: 160px; /* move out of the adminbar's way */
     min-width:   850px; /* min width for 1024x browsers */

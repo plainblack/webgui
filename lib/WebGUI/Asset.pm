@@ -2680,6 +2680,7 @@ sub www_edit {
     # TODO: Make this whole thing a template instead!
     $self->session->style->setRawHeadTags(<<'ENDHTML'); 
         <style type="text/css">
+            * { font: 12pt Helvetica, sans-serif; }
             label.formDescription { display: block; margin-top: 1em; font-weight: bold }
             .saveButtons { position: absolute; top: 3px; right: 5px; z-index: 9001; }
         </style>
