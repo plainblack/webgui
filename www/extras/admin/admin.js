@@ -56,7 +56,7 @@ WebGUI.Admin = function(cfg){
         self.afterNavigate.subscribe( self.requestUpdateCurrentVersionTag, self );
         self.requestUpdateCurrentVersionTag();
 
-        self.tree           = new WebGUI.Admin.Tree();
+        self.tree           = new WebGUI.Admin.Tree(self);
     };
 
     // Get I18N
@@ -1012,7 +1012,8 @@ WebGUI.Admin.LocationBar.prototype.swapForwardToBack
  */
 
 WebGUI.Admin.Tree 
-= function(){
+= function(admin){
+    this.admin = admin;
     var selectAllCheck = document.createElement( 'input' );
     selectAllCheck.id = 'treeSelectAllCheckbox';
     selectAllCheck.type = "checkbox";
