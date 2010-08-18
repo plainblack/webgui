@@ -1012,6 +1012,16 @@ WebGUI.Admin.LocationBar.prototype.swapForwardToBack
 
 WebGUI.Admin.Tree 
 = function(){
+    var selectAllCheck = document.createElement( 'input' );
+    selectAllCheck.id = 'treeSelectAllCheckbox';
+    selectAllCheck.type = "checkbox";
+    // Add the event handler in onDataTableInitializeRows because innerHTML won't
+    // save event handlers
+
+    // Create a span so we can get innerHTML to put in DataTable's label
+    var selectAllSpan = document.createElement( 'span' );
+    selectAllSpan.appendChild( selectAllCheck );
+
     this.moreMenusDisplayed = {};
     this.crumbMoreMenu = null;
     this.defaultSortBy = {
@@ -1058,7 +1068,7 @@ WebGUI.Admin.Tree
 
     this.columnDefs 
         = [ 
-            { key: 'assetId', label: 'Select All Button', formatter: this.formatAssetIdCheckbox },
+            { key: 'assetId', label: selectAllSpan.innerHTML, formatter: this.formatAssetIdCheckbox },
             { key: 'lineage', label: window.admin.i18n.get('Asset','rank'), sortable: true, formatter: this.formatRank },
             { key: 'actions', label: "", formatter: this.formatActions },
             { key: 'title', label: window.admin.i18n.get('Asset', '99'), formatter: this.formatTitle, sortable: true },
@@ -1178,6 +1188,21 @@ WebGUI.Admin.Tree.prototype.findRow
             return node;
         }
         node = node.parentNode;
+    }
+};
+
+
+/**
+ * findCheckbox( row )
+ * Find the checkbox in the row for the assetId field
+ */
+WebGUI.Admin.Tree.prototype.findCheckbox
+= function ( row ) {
+    var inputs   = row.getElementsByTagName( "input" );
+    for ( var i = 0; i < inputs.length; i++ ) {
+        if ( inputs[i].name == "assetId" ) {
+            return inputs[i];
+        }
     }
 };
 
@@ -1346,12 +1371,34 @@ WebGUI.Admin.Tree.prototype.goto
 };
 
 /**
+ * toggleAllRows( )
+ * Toggle all the rows in the data table to the state of the Select All 
+ * Checkbox
+ */
+WebGUI.Admin.Tree.prototype.toggleAllRows
+= function ( ) {
+    var state   = document.getElementById( 'treeSelectAllCheckbox' ).checked ? true : false;
+    var row = this.dataTable.getFirstTrEl();
+    while ( row ) {
+        if ( state ) { 
+            this.selectRow( row );
+        }
+        else {
+            this.deselectRow( row );
+        }
+        row = this.dataTable.getNextTrEl( row );
+    }
+};
+
+/**
  * onDataReturnInitializeTable ( sRequest, oResponse, oPayload )
  * Initialize the table with a new response from the server
  */
 WebGUI.Admin.Tree.prototype.onDataReturnInitializeTable
 = function ( sRequest, oResponse, oPayload ) {
     this.dataTable.onDataReturnInitializeTable.call( this.dataTable, sRequest, oResponse, oPayload );
+
+    YAHOO.util.Event.addListener( 'treeSelectAllCheckbox', "click", this.toggleAllRows, this, true );
 
     // Rebuild the crumbtrail
     var crumb       = oResponse.meta.crumbtrail;
@@ -1400,18 +1447,18 @@ WebGUI.Admin.Tree.prototype.removeHighlightFromRow
  */
 WebGUI.Admin.Tree.prototype.selectRow 
 = function ( child ) {
-    // First find the row
-    var node    = this.findRow( child );
     this.addHighlightToRow( child );
+    this.findCheckbox( this.findRow( child ) ).checked = true;
+};
 
-    // Now find the assetId checkbox in the first element
-    var inputs   = node.getElementsByTagName( "input" );
-    for ( var i = 0; i < inputs.length; i++ ) {
-        if ( inputs[i].name == "assetId" ) {
-            inputs[i].checked = true;
-            break;
-        }
-    }
+/**
+ * deselectRow( child )
+ * Uncheck the checkbox and toggle the highlight
+ */
+WebGUI.Admin.Tree.prototype.deselectRow
+= function ( child ) {
+    this.removeHighlightFromRow( child );
+    this.findCheckbox( this.findRow( child ) ).checked = false;
 };
 
 /**
