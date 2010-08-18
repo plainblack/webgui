@@ -21,14 +21,19 @@ sub list_of_tables {
      return [qw/assetData FileAsset ImageAsset/];
 }
 
+sub dynamic_form_labels { return 'New file to upload', 'Approved'; }
+
 sub t_11_getEditForm : Tests( 2 ) {
     my $test    = shift;
-    $test->SUPER::getEditForm( @_ );
+    $test->SUPER::t_11_getEditForm( @_ );
     my $session = $test->session;
     my ( $tag, $asset, @parents ) = $test->getAnchoredAsset();
 
+    $asset->filename('abc.jpg'); # the thumbnail and imageSize read-only form elements only get added if there is a filename
+
     # Test extra fields
     my $f   = $asset->getEditForm;
+# do { local $Data::Dumper::Maxdepth = 7; use Data::Dumper; warn Dumper $f; };
     isa_ok( $f->getTab("properties")->getField("thumbnail"), "WebGUI::Form::ReadOnly" );
     isa_ok( $f->getTab("properties")->getField("imageSize"), "WebGUI::Form::ReadOnly" );
 
