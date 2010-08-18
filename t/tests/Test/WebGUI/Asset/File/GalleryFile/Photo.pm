@@ -21,4 +21,18 @@ sub list_of_tables {
      return [qw/assetData FileAsset GalleryFile Photo/];
 }
 
+sub dynamic_form_labels { return 'New file to upload' };
+
+sub constructorExtras {
+    my $test = shift;
+    my $session = shift or die;
+    my $storage = WebGUI::Storage->create($session);
+    WebGUI::Test->addToCleanup($storage);
+    my $filename = $storage->addFileFromFilesystem(WebGUI::Test->getTestCollateralPath('gooey.jpg'));
+    # return storageId => $storage->getId;
+    warn "XXX filename: $filename";
+    # return filename => $filename;
+    return filename => $filename, storageId => $storage->getId;
+}
+
 1;
