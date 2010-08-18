@@ -91,29 +91,29 @@ foreach my $asset ($collab, $t1p1, $t1p2, $t2p1, $t2p2, $first_thread, $second_t
 
 is $collab->getChildCount, 2, 'collab has correct number of children';
 
-is $collab->get('lastPostId'),   $t2p2->getId, 'lastPostId set in collab';
-is $collab->get('lastPostDate'), $t2p2->get('creationDate'), 'lastPostDate, too';
+is $collab->lastPostId,   $t2p2->getId, 'lastPostId set in collab';
+is $collab->lastPostDate, $t2p2->creationDate, 'lastPostDate, too';
 
 $t2p2->setStatusArchived;
-is $t2p2->get('status'), 'archived', 'setStatusArchived set the post to be archived';
+is $t2p2->status, 'archived', 'setStatusArchived set the post to be archived';
 
 $second_thread = $second_thread->cloneFromDb;
-is $second_thread->get('lastPostId'),   $t2p1->getId, '.. updated lastPostId in the thread';
-is $second_thread->get('lastPostDate'), $t2p1->get('creationDate'), '... lastPostDate, too';
+is $second_thread->lastPostId,   $t2p1->getId, '.. updated lastPostId in the thread';
+is $second_thread->lastPostDate, $t2p1->creationDate, '... lastPostDate, too';
 
 $collab = $collab->cloneFromDb;
-is $collab->get('lastPostId'),   $t2p1->getId, '.. updated lastPostId in the CS';
-is $collab->get('lastPostDate'), $t2p1->get('creationDate'), '... lastPostDate, too';
+is $collab->lastPostId,   $t2p1->getId, '.. updated lastPostId in the CS';
+is $collab->lastPostDate, $t2p1->creationDate, '... lastPostDate, too';
 
 $t2p2->setStatusUnarchived;
-is $t2p2->get('status'), 'approved', 'setStatusUnarchived sets the post back to approved';
+is $t2p2->status), 'approved', 'setStatusUnarchived sets the post back to approved';
 
 $second_thread = $second_thread->cloneFromDb;
-is $second_thread->get('lastPostId'),   $t2p2->getId, '.. updated lastPostId in the thread';
-is $second_thread->get('lastPostDate'), $t2p2->get('creationDate'), '... lastPostDate, too';
+is $second_thread->lastPostId,   $t2p2->getId, '.. updated lastPostId in the thread';
+is $second_thread->lastPostDate, $t2p2->creationDate, '... lastPostDate, too';
 
 $collab = $collab->cloneFromDb;
-is $collab->get('lastPostId'),   $t2p2->getId, '.. updated lastPostId in the CS';
-is $collab->get('lastPostDate'), $t2p2->get('creationDate'), '... lastPostDate, too';
+is $collab->lastPostId,   $t2p2->getId, '.. updated lastPostId in the CS';
+is $collab->lastPostDate, $t2p2->creationDate, '... lastPostDate, too';
 
 #vim:ft=perl
