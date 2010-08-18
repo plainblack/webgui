@@ -33,6 +33,7 @@ use Moose::Role;
 
 sub _set_ownerUserId {
     my ($self, $new, $old) = @_;
+    $old ||= '';
     if ($new ne $old) {
 		$self->getStorageLocation->setPrivileges($self->ownerUserId, $self->groupIdView, $self->groupIdEdit);
     }
@@ -40,6 +41,7 @@ sub _set_ownerUserId {
 
 sub _set_groupIdView {
     my ($self, $new, $old) = @_;
+    $old ||= '';
     if ($new ne $old) {
 		$self->getStorageLocation->setPrivileges($self->ownerUserId, $self->groupIdView, $self->groupIdEdit);
     }
@@ -47,6 +49,7 @@ sub _set_groupIdView {
 
 sub _set_groupIdEdit {
     my ($self, $new, $old) = @_;
+    $old ||= '';
     if ($new ne $old) {
 		$self->getStorageLocation->setPrivileges($self->ownerUserId, $self->groupIdView, $self->groupIdEdit);
     }

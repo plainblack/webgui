@@ -127,7 +127,7 @@ property  ownerUserId => (
             uiLevel         => 6,
             fieldType       => 'user',
             default         => '3',
-            trigger         => \&_set_ownerUserId,
+            trigger         => sub { shift->_set_ownerUserId(@_) } ,
           );
 sub _set_ownerUserId {
     return;
@@ -139,7 +139,7 @@ property  groupIdView  => (
             uiLevel         => 6,
             fieldType       => 'group',
             default         => '7',
-            trigger         => \&_set_groupIdView,
+            trigger         => sub { shift->_set_groupIdView(@_) },
           );
 sub _set_groupIdView {
     return;
@@ -152,7 +152,7 @@ property  groupIdEdit => (
             uiLevel         => 6,
             fieldType       => 'group',
             default         => '4',
-            trigger         => \&_set_groupIdEdit,
+            trigger         => sub { shift->_set_groupIdEdit(@_) } ,
           );
 sub _set_groupIdEdit {
     return;
