@@ -1206,13 +1206,83 @@ WebGUI.Admin.Tree.prototype.formatHelpers
         elCell.appendChild( document.createTextNode( " | " ) );
     }
 
-    var more    = document.createElement( 'a' );
+    var more    = document.createElement( 'span' );
+    more.className = 'clickable';
     elCell.appendChild( more );
     more.appendChild( document.createTextNode( window.admin.i18n.get('Asset','More' ) ) );
     more.href   = '#';
 
     // Build onclick handler to show more menu
+    // These format functions do not have the right context
+    window.admin.tree.addMenuOpenHandler( more, oRecord.getData( 'assetId' ), oRecord.getData( 'helpers' ) );
 
+};
+
+/**
+ * addMenuOpenHandler( elem, assetId, helpers ) 
+ * Add a handler that will open a menu for the given assetId with the given
+ * helpers
+ */
+WebGUI.Admin.Tree.prototype.addMenuOpenHandler
+= function ( elem, assetId, helpers ) {
+    var self = this;
+    YAHOO.util.Event.addListener( elem, "click", function(){
+        self.showHelperMenu( elem, assetId, helpers );
+    } );
+};
+
+/**
+ * showHelperMenu( elem, assetId, helpers )
+ * Show the Helper menu for the given assetId with the given helpers
+ */
+WebGUI.Admin.Tree.prototype.showHelperMenu 
+= function ( elem, assetId, helpers ) {
+    if ( this.helperMenu ) {
+        // destroy the old helper menu!
+        this.helperMenu.destroy();
+    }
+    this.helperMenu = new YAHOO.widget.Menu( "treeHelperMenu", {
+        position : "dynamic",
+        clicktohide : true,
+        constraintoviewport : true,
+        context : [ elem, 'tl', 'bl' ],
+        effect: { effect: YAHOO.widget.ContainerEffect.FADE, duration:0.25 }
+    } );
+
+    // Add all the items with appropriate onclick handlers
+    for ( var i = 0; i < helpers.length; i++ ) {
+        var helper = helpers[i];
+        var item   = { 
+            text : helper["label"], 
+            icon : helper["icon"],
+            onclick : {
+                fn : this.clickHelper,
+                obj : [ assetId, helper ],
+                scope : this
+            }
+        };
+        this.helperMenu.addItem( item );
+    }
+
+    this.helperMenu.render( document.body );
+    this.helperMenu.show();
+    this.helperMenu.focus();
+};
+
+/**
+ * clickHelper( type, event, args, menuItem )
+ * Request the helper. args is an array of [ assetId, helperData ]
+ */
+WebGUI.Admin.Tree.prototype.clickHelper
+= function ( type, e, args, menuItem ) {
+    var assetId = args[0];
+    var helper  = args[1];
+    if ( helper.url ) {
+        this.admin.showView( helper.url );
+    }
+    else if ( helper['class'] ) {
+        this.admin.requestHelper( helper['class'], assetId );
+    }
 };
 
 /**
