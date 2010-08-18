@@ -951,25 +951,39 @@ sub getEditForm {
     ###
     # Buttons
     my $buttonGroup = $f->addField( 'ButtonGroup', name => "saveButtons", rowClass => 'saveButtons' );
+
+    # Approved status
+    $buttonGroup->addButton( 'checkbox', {
+        name        => 'approved',
+        id          => 'approveCheckbox',
+        value       => 'approved',
+        label       => 'Approved',
+        checked     => ( $session->setting->get( 'versionTagMode' ) eq 'autoCommit' ? 1 : 0 ),
+    } );
+
     $buttonGroup->addButton( "submit", {
         name        => "save",
+        id          => 'saveButton',
         value       => $i18n->get('save'),
     } );
 
     if ( $session->config->get("enableSaveAndCommit") ) {
         $buttonGroup->addButton( 'Submit', {
             name  => "saveAndCommit",
+            id    => 'saveAndCommitButton',
             value => $i18n->get("save and commit"),
         } );
     }
 
     $buttonGroup->addButton( 'Submit', {
         name  => "saveAndReturn",
+        id    => 'saveAndReturnButton',
         value => $i18n->get("apply"),
     } );
 
     $buttonGroup->addButton( 'Submit', {
         name    => 'cancel',
+        id      => 'cancelButton',
         value   => $i18n->get('cancel','WebGUI'),
     } );
 
@@ -2661,6 +2675,8 @@ Renders an AdminConsole EditForm, unless canEdit returns False.
 
 sub www_edit {
     my $self = shift;
+    my $session = $self->session;
+    my ( $style, $url ) = $session->quick(qw( style url ));
     return $self->session->privilege->insufficient() unless $self->canEdit;
     return $self->session->privilege->locked() unless $self->canEditIfLocked;
     my $func    = $self->session->form->get('func');
@@ -2678,12 +2694,26 @@ sub www_edit {
     }
 
     # TODO: Make this whole thing a template instead!
-    $self->session->style->setRawHeadTags(<<'ENDHTML'); 
+    $style->setLink($url->extras('yui/build/button/assets/skins/sam/button.css'),{rel => 'stylesheet', type => 'text/css' });
+    $style->setScript($url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'));
+    $style->setScript($url->extras('yui/build/element/element-min.js'));
+    $style->setScript($url->extras('yui/build/button/button-min.js'));
+    $style->setRawHeadTags(<<'ENDHTML'); 
         <style type="text/css">
             * { font: 12pt Helvetica, sans-serif; }
             label.formDescription { display: block; margin-top: 1em; font-weight: bold }
             .saveButtons { position: absolute; top: 3px; right: 5px; z-index: 9001; }
         </style>
+        <script type="text/javascript">
+            YAHOO.util.Event.onDOMReady( function() {
+                new YAHOO.widget.Button( "saveButton" );
+                new YAHOO.widget.Button( "cancelButton" );
+                new YAHOO.widget.Button( "saveAndReturnButton" );
+                if ( document.getElementById( 'saveAndCommitButton' ) ) {
+                    new YAHOO.widget.Button('saveAndCommitButton');
+                }
+            } );
+        </script>
 ENDHTML
 
     if ( $func ne 'add' ) {
