@@ -37,6 +37,11 @@ WebGUI.Admin = function(cfg){
             'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August',
             'September', 'October', 'November', 'December'
         ];
+        self.tabBar         = new YAHOO.widget.TabView( self.cfg.tabBarId );
+        // Keep track of View and Tree tabs
+        self.tabBar.getTab(0).addListener('click',self.afterShowViewTab,self,true);
+        self.tabBar.getTab(1).addListener('click',self.afterShowTreeTab,self,true);
+
         self.adminBar       = new WebGUI.Admin.AdminBar( self.cfg.adminBarId, { expandMax : true } );
         self.adminBar.afterShow.subscribe( self.updateAdminBar, self );
         YAHOO.util.Event.on( window, 'load', function(){ self.adminBar.show( self.adminBar.dt[0].id ) } );
@@ -51,10 +56,6 @@ WebGUI.Admin = function(cfg){
         self.requestUpdateCurrentVersionTag();
 
         self.tree           = new WebGUI.Admin.Tree();
-        self.tabBar         = new YAHOO.widget.TabView( self.cfg.tabBarId );
-        // Keep track of View and Tree tabs
-        self.tabBar.getTab(0).addListener('click',self.afterShowViewTab,self,true);
-        self.tabBar.getTab(1).addListener('click',self.afterShowTreeTab,self,true);
     };
 
     // Get I18N
