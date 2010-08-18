@@ -25,6 +25,12 @@ WebGUI.Admin = function(cfg){
         this.cfg.adminBarId = "adminBar";
     }
 
+    // TODO: This should be i18n
+    this.localeMonths   = [
+        'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August',
+        'September', 'October', 'November', 'December'
+    ];
+
     // Custom events
     this.afterNavigate = new YAHOO.util.CustomEvent( "afterNavigate", this );
 
@@ -32,11 +38,6 @@ WebGUI.Admin = function(cfg){
     var self = this;
     // Initialize these things AFTER the i18n is fetched
     var _init = function () {
-        // TODO: This should be i18n
-        self.localeMonths   = [
-            'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August',
-            'September', 'October', 'November', 'December'
-        ];
         self.tabBar         = new YAHOO.widget.TabView( self.cfg.tabBarId );
         // Keep track of View and Tree tabs
         self.tabBar.getTab(0).addListener('click',self.afterShowViewTab,self,true);
