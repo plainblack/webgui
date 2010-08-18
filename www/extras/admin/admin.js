@@ -1459,9 +1459,15 @@ WebGUI.Admin.Tree.prototype.onDataReturnInitializeTable
     }
 
     // Final crumb item has a menu
+    var currentAssetId  = oResponse.meta.currentAsset.assetId;
+    var currentHelpers  = oResponse.meta.currentAsset.helpers;
     var elItem  = document.createElement( "span" );
     elItem.className    = "clickable";
-    YAHOO.util.Event.addListener( elItem, "click", function(){ alert( "TOADO" ) }, this, true );
+    var self = this;
+    var crumbMenu = function () {
+        self.showHelperMenu( elItem, currentAssetId, currentHelpers );
+    };
+    YAHOO.util.Event.addListener( elItem, "click", crumbMenu, this, true );
     elItem.appendChild( document.createTextNode( oResponse.meta.currentAsset.title ) );
     elCrumb.appendChild( elItem );
 
