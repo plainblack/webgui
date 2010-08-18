@@ -1023,8 +1023,6 @@ WebGUI.Admin.Tree
     var selectAllSpan = document.createElement( 'span' );
     selectAllSpan.appendChild( selectAllCheck );
 
-    this.moreMenusDisplayed = {};
-    this.crumbMoreMenu = null;
     this.defaultSortBy = {
         "key"       : "lineage",
         "dir"       : YAHOO.widget.DataTable.CLASS_ASC
@@ -1051,6 +1049,7 @@ WebGUI.Admin.Tree
                 { key: 'assetId' },
                 { key: 'lineage' },
                 { key: 'canEdit' },
+                { key: 'helpers' },
                 { key: 'title' },
                 { key: 'className' },
                 { key: 'revisionDate' },
@@ -1071,7 +1070,7 @@ WebGUI.Admin.Tree
         = [ 
             { key: 'assetId', label: selectAllSpan.innerHTML, formatter: this.formatAssetIdCheckbox },
             { key: 'lineage', label: window.admin.i18n.get('Asset','rank'), sortable: true, formatter: this.formatRank },
-            { key: 'actions', label: "", formatter: this.formatActions },
+            { key: 'helpers', label: "", formatter: this.formatHelpers },
             { key: 'title', label: window.admin.i18n.get('Asset', '99'), formatter: this.formatTitle, sortable: true },
             { key: 'className', label: window.admin.i18n.get('Asset','type'), sortable: true, formatter: this.formatClassName },
             { key: 'revisionDate', label: window.admin.i18n.get('Asset','revision date' ), formatter: this.formatRevisionDate, sortable: true },
@@ -1114,35 +1113,6 @@ WebGUI.Admin.Tree.prototype.addHighlightToRow
     if ( !YAHOO.util.Dom.hasClass( row, "highlight" ) ) {
         YAHOO.util.Dom.addClass( row, "highlight" );
     }
-};
-
-/**
- * buildMoreMenu ( url, linkElement )
- * Build a WebGUI style "More" menu for the asset referred to by url
- */
-WebGUI.Admin.Tree.prototype.buildMoreMenu 
-= function ( url, linkElement, isNotLocked ) {
-    var rawItems    = this.moreMenuItems;
-    var menuItems   = [];
-    var isLocked    = !isNotLocked;
-    for ( var i = 0; i < rawItems.length; i++ ) {
-        var itemUrl     = rawItems[i].url
-                        ? appendToUrl(url, rawItems[i].url)
-                        : url
-                        ;
-        if (! (itemUrl.match( /func=edit;/) && isLocked )) {
-            menuItems.push( { "url" : itemUrl, "text" : rawItems[i].label } );
-        }
-    }
-    var options = {
-        "zindex"                    : 1000,
-        "clicktohide"               : true,
-        "position"                  : "dynamic",
-        "context"                   : [ linkElement, "tl", "bl", ["beforeShow", "windowResize"] ],
-        "itemdata"                  : menuItems
-    };
-
-    return options;
 };
 
 /**
@@ -1208,10 +1178,10 @@ WebGUI.Admin.Tree.prototype.findCheckbox
 };
 
 /**
- * formatActions ( )
+ * formatHelpers ( )
  * Format the Edit and More links for the row
  */
-WebGUI.Admin.Tree.prototype.formatActions 
+WebGUI.Admin.Tree.prototype.formatHelpers
 = function ( elCell, oRecord, oColumn, orderNumber ) {
     if ( oRecord.getData( 'canEdit' ) ) {
         var edit    = document.createElement("span");
@@ -1224,23 +1194,13 @@ WebGUI.Admin.Tree.prototype.formatActions
         elCell.appendChild( document.createTextNode( " | " ) );
     }
 
-    return; // TODO
     var more    = document.createElement( 'a' );
     elCell.appendChild( more );
     more.appendChild( document.createTextNode( window.admin.i18n.get('Asset','More' ) ) );
     more.href   = '#';
 
-    // Delete the old menu
-    if ( document.getElementById( 'moreMenu' + oRecord.getData( 'assetId' ) ) ) {
-        var oldMenu = document.getElementById( 'moreMenu' + oRecord.getData( 'assetId' ) );
-        oldMenu.parentNode.removeChild( oldMenu );
-    }
+    // Build onclick handler to show more menu
 
-    var options = this.buildMoreMenu(oRecord.getData( 'url' ), more, oRecord.getData( 'canEdit' ));
-
-    var menu    = new YAHOO.widget.Menu( "moreMenu" + oRecord.getData( 'assetId' ), options );
-    YAHOO.util.Event.onDOMReady( function () { menu.render( document.getElementById( 'assetManager' ) ); } );
-    YAHOO.util.Event.addListener( more, "click", function (e) { YAHOO.util.Event.stopEvent(e); menu.show(); menu.focus(); }, null, menu );
 };
 
 /**
