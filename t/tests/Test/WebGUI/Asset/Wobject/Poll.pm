@@ -21,4 +21,8 @@ sub list_of_tables {
      return [qw/assetData wobject Poll/];
 }
 
+sub dynamic_form_labels { 
+    return 'Reset votes?', 'Answers', 'Generate image graph', 'Approved';
+}
+
 1;
