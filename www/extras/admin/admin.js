@@ -163,15 +163,7 @@ appendToUrl
  */
 WebGUI.Admin.prototype.editAsset
 = function ( url ) {
-    // Show the view tab
-    this.tabBar.selectTab( 0 );
-    this.currentTab = "view";
-
-    // Open the edit form
-    window.frames["view"].location.href = appendToUrl( url, "func=edit" );
-
-    // Mark undirty, as we'll clean it ourselves
-    this.viewDirty = 0;
+    this.showView( appendToUrl( url, "func=edit" ) );
 };
 
 /**
@@ -188,6 +180,25 @@ WebGUI.Admin.prototype.gotoAsset
         // Make tree request
         this.tree.goto( url );
         this.viewDirty = 1;
+    }
+};
+
+/**
+ * showView ( [url] )
+ * Open the view tab, optionally navigating to the given URL
+ */
+WebGUI.Admin.prototype.showView
+= function (url) {
+    // Show the view tab
+    this.tabBar.selectTab( 0 );
+    this.currentTab = "view";
+
+    if ( url ) {
+        // Open the URL
+        window.frames["view"].location.href = url;
+
+        // Mark undirty, as we'll clean it ourselves
+        this.viewDirty = 0;
     }
 };
 
