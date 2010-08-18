@@ -602,14 +602,18 @@ sub processConfigurationForm {
 	my $class = shift;
 	my $session = shift;
 
-	return undef unless ($class->getPluginList($session));
+	if (! $class->getPluginList($session)) {
+	     WebGUI::Error->throw(error => "No graphing plugins listed in config")
+    }
 	
 	my $namespace = "WebGUI::Image::".$session->form->process('graphingPlugin');
 	$namespace =~ s/_/::/g;
 
-	return undef unless (isIn($namespace, @{$class->getPluginList($session)}));
+     if (! isIn($namespace, @{$class->getPluginList($session)})) {
+	     WebGUI::Error->throw(error => "Graphing plugin not available")
+     }
 
-my	$graph = $class->load($session, $namespace);
+    my $graph = $class->load($session, $namespace);
 	
 	$graph->setConfiguration($session->form->paramsHashRef);
 
