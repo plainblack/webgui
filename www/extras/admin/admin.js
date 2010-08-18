@@ -1075,7 +1075,7 @@ WebGUI.Admin.Tree
             { key: 'className', label: window.admin.i18n.get('Asset','type'), sortable: true, formatter: this.formatClassName },
             { key: 'revisionDate', label: window.admin.i18n.get('Asset','revision date' ), formatter: this.formatRevisionDate, sortable: true },
             { key: 'assetSize', label: window.admin.i18n.get('Asset','size' ), formatter: this.formatAssetSize, sortable: true },
-            { key: 'lockedBy', label: window.admin.i18n.get('Asset','locked' ), formatter: this.formatLockedBy }
+            { key: 'lockedBy', label: '<img src="' + window.getWebguiProperty('extrasURL') + '/icon/lock.png" />', formatter: this.formatLockedBy }
         ];
 
     // Initialize the data table
