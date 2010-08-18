@@ -21,4 +21,6 @@ sub list_of_tables {
      return [qw/assetData FileAsset ZipArchiveAsset/];
 }
 
+sub dynamic_form_labels { return 'New file to upload' };
+
 1;
