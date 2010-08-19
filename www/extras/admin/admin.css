@@ -182,11 +182,14 @@ a:link {
 dl.accordion-menu dt.a-m-t {
     color: black;
     margin: 0;
-    padding: 0;
+    padding: 0 0 0 0.5em;
     background: #dddddd url(../yui/build/assets/skins/sam/sprite.png) repeat-x;
     height: 20px;
     border: 1px solid #ACACAC; 
-    text-align:center;
+}
+
+dl.accordion-menu dl.accordion-menu dt.a-m-t {
+    padding: 0 0 0 1.5em;
 }
 
 dl.accordion-menu dt.a-m-t:hover {
