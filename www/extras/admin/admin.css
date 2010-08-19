@@ -199,3 +199,31 @@ dl.accordion-menu dt.a-m-t.selected {
     border-color: black;
 }
 
+dl#adminBar {
+    position:fixed;
+    _position:absolute;
+    top:0;
+        /*
+    _top:expression(eval((document.documentElement && document.documentElement.scrollTop) ? document.documentElement.scrollTop : document.body.scrollTop)); */
+    left:0;
+    width: 160px;
+}
+
+dl.accordion-menu {
+    margin: 0;
+    padding: 0;
+    background: #eeeeee;
+}
+
+dl.accordion-menu dd.a-m-d {
+    margin: 0;
+    padding: 0;
+    overflow: auto;
+    background-color: #eeeeee;
+    background-image: url(panel_bg.jpg);
+    background-repeat: repeat-x;
+    font-weight: normal;
+    overflow-x: hidden;
+}
+
+
