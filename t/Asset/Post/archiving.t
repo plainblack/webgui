@@ -106,7 +106,7 @@ is $collab->lastPostId,   $t2p1->getId, '.. updated lastPostId in the CS';
 is $collab->lastPostDate, $t2p1->creationDate, '... lastPostDate, too';
 
 $t2p2->setStatusUnarchived;
-is $t2p2->status), 'approved', 'setStatusUnarchived sets the post back to approved';
+is $t2p2->status, 'approved', 'setStatusUnarchived sets the post back to approved';
 
 $second_thread = $second_thread->cloneFromDb;
 is $second_thread->lastPostId,   $t2p2->getId, '.. updated lastPostId in the thread';
