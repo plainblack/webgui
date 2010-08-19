@@ -33,7 +33,6 @@ they relate and function.
 
 our $VERSION = '0.0.1';
 
-#use Class::InsideOut qw(readonly private public id register);
 use Moose;
 use Scalar::Util qw/blessed/;
 use WebGUI::Exception;
