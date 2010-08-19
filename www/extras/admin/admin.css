@@ -99,6 +99,9 @@
     cursor: pointer;
     color: blue;
 }
+.clickable:hover {
+    text-decoration: underline;
+}
 
 img.icon {
     vertical-align: baseline;
@@ -161,4 +164,19 @@ a:link {
 #newContentBar a:link, #newContentBar a:visited, #newContentBar a:active {
     text-decoration: none;
     color: black;
+}
+
+#helper_list, #history_list {
+    list-style-type: none;
+    margin: 0 0 0 1.5em;
+    padding: 0;
+}
+
+#helper_list li, #history_list li {
+    color: black;
+}
+
+#helper_list li.clickable:hover, #history_list li.clickable:hover {
+    text-decoration: underline;
+    color: blue;
 }
