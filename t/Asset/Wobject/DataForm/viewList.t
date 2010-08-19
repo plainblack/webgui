@@ -29,7 +29,7 @@ my $df = WebGUI::Asset->getImportNode($session)->addChild( {
     className => 'WebGUI::Asset::Wobject::DataForm', 
 } );
 
-addToCleanup( WebGUI::VersionTag->getWorking( $session ) );
+WebGUI::Test->addToCleanup( WebGUI::VersionTag->getWorking( $session ) );
 
 # Add fields to the dataform
 $df->createField( "name",    { type => "text", } );
