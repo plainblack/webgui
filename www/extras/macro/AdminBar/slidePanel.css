@@ -2,10 +2,7 @@ dl.accordion-menu dd.a-m-d div.ncmct {
         width: 140px;
         border-bottom: 1px solid #bbbbbb;
         color: black;
-        font-weight: bold;
-        font-size: 12px;
         margin-bottom: 5px;
-    font-family: sans-serif;
 }
 
 dl.accordion-menu {
@@ -23,27 +20,6 @@ dl#adminBar {
     _top:expression(eval((document.documentElement && document.documentElement.scrollTop) ? document.documentElement.scrollTop : document.body.scrollTop)); */
     left:0;
     width: 160px;
-}
-
-dl.accordion-menu dt.a-m-t {
-        margin: 0;
-        padding: 0;
-    background-color:#dddddd;
-    background-image: url(btn_bg.jpg);
-    font-weight: bold;
-    height: 20px;
-        color: #444444;
-    border: 1px solid #ACACAC; 
-    line-height: 20px;
-    font-size: 12px;
-    text-align:center;
-    font-family: sans-serif;
-}
-
-dl.accordion-menu dt.a-m-t-hover{
-        margin: 0;
-        padding: 0;
-        background:#cdcdcd;
 }
 
 
@@ -71,6 +47,7 @@ dl.accordion-menu dd.a-m-d {
     background-image: url(panel_bg.jpg);
     background-repeat: repeat-x;
     font-weight: normal;
+    overflow-x: hidden;
 }
 
 dl.accordion-menu dd.a-m-d .link,
@@ -86,13 +63,11 @@ dl.accordion-menu dd.a-m-d .wgButton {
     font-family: sans-serif;
     cursor: pointer;
     font-weight: normal;
-    font-size: 12px;
         margin-bottom:5px;
         margin-left:2px;
         letter-spacing:0px;
         text-transform:none;
         font-variant:normal;
-        line-height:12px;
 }
 
 dl.accordion-menu dd.a-m-d .wgButton {
@@ -104,58 +79,6 @@ dl.accordion-menu dd.a-m-d .wgButton {
     width: auto;
     -moz-user-select: text;
 }
-
-dl.accordion-menu dd.a-m-d .link img {
-margin-left:-20px;
-}
-
-dl.accordion-menu dd.a-m-d .link:hover,
-dl.accordion-menu dd.a-m-d button.wgButton:hover span {
-    color: blue;
-    background-color: #F5F5F5;
-}
-
-html.accordion-menu-js dd.a-m-d{
-        margin: 0;
-        padding: 0;
-        display:none;
-}
-
-
-html.accordion-menu-js dd.a-m-d-expand {
-        margin: 0;
-        padding: 0;
-        display:block;
-}
-
-html.accordion-menu-js dd.a-m-d-before-expand {
-        margin: 0;
-        padding: 0;
-        display:block;
-        position:relative;
-        z-index:-1;
-        opacity:0;
-        height:auto !important;
-        visibility:hidden;
-        overflow:visible;
-}
-
-
-html.accordion-menu-js dt.a-m-t-expand {
-        margin: 0;
-        padding: 0;
-        border-left-color:#222222;
-        color:black;
-        background:#c0c0c0;
-}
-
-html.accordion-menu-js dd.a-m-d-anim {
-        margin: 0;
-        padding: 0;
-        overflow:hidden;
-        display:block;  
-}
-
 
 dl.accordion-menu dl.accordion-menu dt.a-m-t {
     background: #aaa;

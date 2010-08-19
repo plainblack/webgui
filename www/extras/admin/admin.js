@@ -46,7 +46,7 @@ WebGUI.Admin = function(cfg){
         self.adminBar       = new WebGUI.Admin.AdminBar( self.cfg.adminBarId, { expandMax : true } );
         self.adminBar.afterShow.subscribe( self.updateAdminBar, self );
         YAHOO.util.Event.on( window, 'load', function(){ self.adminBar.show( self.adminBar.dt[0].id ) } );
-        self.newContentBar  = new WebGUI.Admin.AdminBar( "newContentBar" );
+        self.newContentBar  = new WebGUI.Admin.AdminBar( "newContentBar", { expandMax : true } );
         self.locationBar    = new WebGUI.Admin.LocationBar( self.cfg.locationBarId );
         self.afterNavigate.subscribe( self.locationBar.afterNavigate, self.locationBar );
         if ( self.currentAssetDef ) {
@@ -445,7 +445,7 @@ WebGUI.Admin.prototype.updateAssetHelpers
     for ( var i = 0; i < assetDef.helpers.length; i++ ) {
         var helper  = assetDef.helpers[i];
         var li      = document.createElement('li');
-        li.className = "clickable";
+        li.className = "clickable with_icon";
         li.appendChild( document.createTextNode( helper.label ) );
         this.addHelperHandler( li, helper );
         helperEl.appendChild( li );
@@ -687,7 +687,7 @@ WebGUI.Admin.prototype.updateAssetHistory
     for ( var i = 0; i < assetDef.revisions.length; i++ ) {
         var revisionDate    = assetDef.revisions[i];
         var li              = document.createElement('li');
-        li.className        = "clickable";
+        li.className        = "clickable with_icon";
 
         // Create a descriptive date string
         var rDate           = new Date( revisionDate * 1000 ); // JS requires milliseconds
@@ -1677,6 +1677,7 @@ WebGUI.Admin.AdminBar.prototype.show
     if ( this.currentId ) {
         // Close the current
         var old         = this.ddById[ this.currentId ];
+        YAHOO.util.Dom.removeClass( this.currentId, "selected" );
         var oldHeight   = this.getExpandHeight( old );
         if ( !old.anim ) {
             old.anim = this.getAnim(this.current);
@@ -1699,6 +1700,7 @@ WebGUI.Admin.AdminBar.prototype.show
     }
 
     var dd  = this.ddById[ id ];
+    YAHOO.util.Dom.addClass( id, "selected" );
 
     if ( !dd.anim ) {
         dd.anim     = this.getAnim(dd);

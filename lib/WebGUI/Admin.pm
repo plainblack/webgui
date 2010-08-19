@@ -486,7 +486,7 @@ sub www_view {
     $style->setLink( $url->extras('yui/build/datatable/assets/skins/sam/datatable.css'), {rel=>'stylesheet', type=>'text/css'});
     $style->setLink( $url->extras('yui/build/container/assets/skins/sam/container.css'), {rel=>'stylesheet', type=>'text/css'});
     $style->setLink( $url->extras('yui/build/menu/assets/skins/sam/menu.css'), {rel=>'stylesheet', type=>'text/css'});
-    $style->setLink( $url->extras('yui-webgui/build/assetManager/assetManager.css' ), { rel => "stylesheet", type => 'text/css' } );
+    #$style->setLink( $url->extras('yui-webgui/build/assetManager/assetManager.css' ), { rel => "stylesheet", type => 'text/css' } );
     $style->setLink( $url->extras('macro/AdminBar/slidePanel.css'), {type=>'text/css', rel=>'stylesheet'});
     $style->setLink( $url->extras('admin/admin.css'), { type=>'text/css', rel=>'stylesheet'} );
     $style->setScript($url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'));
@@ -521,12 +521,13 @@ __DATA__
 <dl id="adminBar" class="accordion-menu">
     <dt id="adminConsole" class="a-m-t clickable">^International("admin console","AdminConsole");</dt>
     <dd class="a-m-d"><div class="bd">
-        <TMPL_LOOP adminPlugins>
-        <a class="link" target="view" href="<tmpl_var url>">
-            <img src="<tmpl_var icon.small>" style="border: 0px; vertical-align: middle;" alt="icon" />
-            <tmpl_var title>
-        </a>
-        </TMPL_LOOP>
+        <ul id="admin_list">
+            <TMPL_LOOP adminPlugins>
+            <li class="clickable with_icon" style="background-image: url(<tmpl_var icon.small default="^Extras('icon/cog.png');">);">
+                <a href="<tmpl_var url>" target="view"><tmpl_var title></a>
+            </li>
+            </TMPL_LOOP>
+        </ul>
     </div></dd>
     <!-- placeholder for version tags -->
     <dt id="versionTags" class="a-m-t clickable">^International('version tags','VersionTag');</dt>
@@ -543,26 +544,27 @@ __DATA__
     <!-- placeholder for asset helpers -->
     <dt id="assetHelpers" class="a-m-t clickable">^International('asset helpers','WebGUI');</dt>
     <dd id="assetHelpers_pane" class="a-m-d"><div class="bd">
-        <h1 id="helper_asset_name"></h1>
+        <h1 class="with_icon" id="helper_asset_name"></h1>
         <ul id="helper_list">
         </ul>
-        <h2 style="background-image: url(^Extras(icon/clock.png););">^International('history','Asset');</h2>
+        <h2 class="with_icon" style="background-image: url(^Extras(icon/clock.png););">^International('history','Asset');</h2>
         <ul id="history_list">
         </ul>
     </div></dd>
     <!-- placeholder for new content menu -->
     <dt id="newContent" class="a-m-t clickable">^International('1083','Macro_AdminBar');</dt>
     <dd class="a-m-d"><div class="bd" style="margin: 0; padding: 0">
-        <dl id="newContentBar" class="accordion-menu" style="height: 500px">
+        <dl id="newContentBar" class="accordion-menu">
             <tmpl_loop newContentTabs>
             <dt class="a-m-t clickable" id="<tmpl_var id>"><tmpl_var title></dt>
             <dd class="a-m-d"><div class="bd">
+                <ul class="new_content_list">
                 <tmpl_loop items>
-                    <a href="#" onclick="window.admin.addNewContent('<tmpl_var url>'); return false">
-                        <img src="<tmpl_var icon>" />
+                    <li class="clickable with_icon" onclick="window.admin.addNewContent('<tmpl_var url>'); return false" style="background-image: url(<tmpl_var icon default="^Extras('icon/cog.png');">);">
                         <tmpl_var title>
-                    </a>
+                    </li>
                 </tmpl_loop>
+                </ul>
             </div></dd>
             </tmpl_loop>
         </dl>
@@ -571,22 +573,21 @@ __DATA__
 
 <div id="wrapper" class="yui-skin-sam">
     <div id="infoMessageContainer" style="display: none" >
-        <div id="infoMessage" style="background-image: url(^Extras(icon/information.png););"></div>
+        <div id="infoMessage" class="with_icon" style="background-image: url(^Extras(icon/information.png););"></div>
     </div>
     <div id="versionTag" style="display: none">
         <div style="float: right">
             <span href="#" target="view" id="publishTag" class="clickable">^International('publish','VersionTag');</span>
             | <span href="#" target="view" id="leaveTag" class="clickable">^International('leave','VersionTag');</span>
         </div>
-        <a href="#" id="editTag" target="view" style="background-image: ^Extras(icon/tag_blue.png);;"></a>
+        <a href="#" id="editTag" class="with_icon" target="view" style="background-image: ^Extras(icon/tag_blue.png);;"></a>
     </div>
     <div id="user">
         <div style="float: right">
             <a href="<tmpl_var homeUrl>^International('back to site','VersionTag');</a> 
             | <a href="<tmpl_var logoutUrl>">^International('log out','WebGUI');</a>
         </div>
-        <a href="<tmpl_var userEditUrl>" target="view">
-            <img src="^Extras(icon/user.png);" class="icon" />
+        <a href="<tmpl_var userEditUrl>" target="view" class="with_icon" style="background-image: url(^Extras(icon/user.png););">
             <tmpl_var userName>
         </a>
     </div>

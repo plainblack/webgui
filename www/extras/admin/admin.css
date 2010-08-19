@@ -103,6 +103,11 @@
     text-decoration: underline;
 }
 
+.with_icon {
+    padding: 0 0 0 20px;
+    background: no-repeat 2px 50%;
+}
+
 img.icon {
     vertical-align: baseline;
 }
@@ -114,17 +119,11 @@ a:link {
 #helper_asset_name {
     font-size:          14pt;
     margin-left:        5px;
-    padding-left:       20px;
-    background-repeat:  no-repeat;
-    background-position: 0 50%;
 }
 
 #assetHelpers_pane h2 {
     font-size:          14pt;
     margin-left:        5px;
-    padding-left:       20px;
-    background-repeat:  no-repeat;
-    background-position: 0 50%;
 }
 
 #infoMessageContainer {
@@ -139,9 +138,6 @@ a:link {
     width:          100%;
     height:         100%;
     background-color: #ccf;
-    background-position: 0 50%;
-    background-repeat: no-repeat;
-    padding-left:   20px;
 }
 
 #infoMessage * {
@@ -154,29 +150,52 @@ a:link {
     padding: 2px;
 }
 
-#newContentBar a {
-    display:    block;
-    height:     24px;
-    font-size:  12px;
-    padding-left: 4px;
-}
-
-#newContentBar a:link, #newContentBar a:visited, #newContentBar a:active {
+#adminBar a:link, #adminBar a:visited, #adminBar a:active {
     text-decoration: none;
     color: black;
 }
 
-#helper_list, #history_list {
+#helper_list, #history_list, #admin_list, .new_content_list {
     list-style-type: none;
-    margin: 0 0 0 1.5em;
+    margin: 0;
     padding: 0;
 }
 
-#helper_list li, #history_list li {
+#helper_list li, #history_list li, #admin_list a, .new_content_list li {
     color: black;
+    margin: 0;
+    line-height: 18px;
+    font-size: 10pt;
+    white-space: nowrap;
 }
 
-#helper_list li.clickable:hover, #history_list li.clickable:hover {
+#helper_list li.clickable:hover, #history_list li.clickable:hover, #admin_list li.clickable:hover, 
+.new_content_list li.clickable:hover, #adminBar a:hover, #adminBar li:hover a {
     text-decoration: underline;
     color: blue;
 }
+
+#helper_list li, #history_list li {
+    margin-left: 10px;
+}
+
+dl.accordion-menu dt.a-m-t {
+    color: black;
+    margin: 0;
+    padding: 0;
+    background: #dddddd url(../yui/build/assets/skins/sam/sprite.png) repeat-x;
+    height: 20px;
+    border: 1px solid #ACACAC; 
+    text-align:center;
+}
+
+dl.accordion-menu dt.a-m-t:hover {
+    background: #dddddd url(../yui/build/assets/skins/sam/sprite.png) repeat-x 0% -1300px;
+}
+
+dl.accordion-menu dt.a-m-t.selected {
+    color: white;
+    background: #ddd url(../yui/build/assets/skins/sam/sprite.png) repeat-x 0% -1400px;
+    border-color: black;
+}
+
