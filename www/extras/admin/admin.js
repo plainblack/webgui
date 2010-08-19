@@ -1684,6 +1684,7 @@ WebGUI.Admin.AdminBar.prototype.show
     if ( this.currentId ) {
         // Close the current
         var old         = this.ddById[ this.currentId ];
+        old.style.overflowY = "hidden";
         YAHOO.util.Dom.removeClass( this.currentId, "selected" );
         var oldHeight   = this.getExpandHeight( old );
         if ( !old.anim ) {
@@ -1696,7 +1697,9 @@ WebGUI.Admin.AdminBar.prototype.show
             old.anim.onComplete.unsubscribe( hideContent );
         };
         old.anim.onComplete.subscribe( hideContent, this, true );
-        old.anim.attributes.height = { to : 0 };
+        // Subtract a few px initially to avoid a scrollbar appearing in the 
+        // parent due to race conditions with the opening bar
+        old.anim.attributes.height = { from: oldHeight - 5, to : 0 };
         old.anim.animate();
 
         // Let user close by clicking again
@@ -1715,6 +1718,12 @@ WebGUI.Admin.AdminBar.prototype.show
     dd.anim.attributes.height = { from: 0, to : this.getExpandHeight( dd ) };
     dd.style.height  = "0px";
     dd.style.display = "block";
+    dd.style.overflow = "hidden";
+    var showScrollbars = function () {
+        dd.style.overflowY = "auto";
+        dd.anim.onComplete.unsubscribe( showScrollbars );
+    }
+    dd.anim.onComplete.subscribe( showScrollbars, this, true );
     dd.anim.animate();
     this.currentId = id;
 
