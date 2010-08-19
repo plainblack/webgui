@@ -479,7 +479,7 @@ sub t_11_getEditForm : Tests {
     my $session = $test->session;
     my ( $tag, $asset, @parents ) = $test->getAnchoredAsset();
 
-local $SIG{__DIE__} = sub { use Carp; Carp::confess "@_"; };
+    # local $SIG{__DIE__} = sub { use Carp; Carp::confess "@_"; };
 
     my $f   = $asset->getEditForm;
 
@@ -504,13 +504,12 @@ local $SIG{__DIE__} = sub { use Carp; Carp::confess "@_"; };
     # Properties
     use Data::Dumper;
 
-    # note( "f: " . Dumper $f->getFieldsRecursive );
-
-    # $asset->getProperties vs $asset->getEditForm->getFieldsRecursive
+    # compare $asset->getProperties to $asset->getEditForm->getFieldsRecursive
 
     my @properties = (
         List::MoreUtils::uniq                # no dups, please
         $test->dynamic_form_labels,          # per-test hard-coded labels known to be added at runtime vs with property blocks
+        grep { ($_ ne 'Mobile Template') xor $session->setting->get('useMobileStyle') }
         grep $_,                             # a rare few property blocks have niether noFormPost nor label? XXX TODO tests/fix
         map { $asset->getFormProperties($_)->{label} }   # getFormProperties returns a plain hash
         grep { ! $asset->meta->find_attribute_by_name( $_ )->noFormPost } 
@@ -519,13 +518,13 @@ local $SIG{__DIE__} = sub { use Carp; Carp::confess "@_"; };
 
     my @form = (
         List::MoreUtils::uniq
-        grep { $_ and $_ ne 'Keywords' and $_ ne 'Class Name' and $_ ne 'Asset ID' }
+        grep { $_ and $_ ne 'Keywords' and $_ ne 'Class Name' and $_ ne 'Asset ID' and $_ ne 'Approved' }
         map $_->get('label'),
         flattenFormObjects($f->getFieldsRecursive)    # mixture of arrays of Form objects and arrays-of-arrays of them; flatten it out
     );
 
     my %superlist = map { ( $_ => 1 ) } @form, @properties;
-    note "all labels: " . join ', ', keys %superlist;
+    # note "all labels: " . join ', ', keys %superlist;
 
     for my $label (keys %superlist) {
         no warnings 'uninitialized';

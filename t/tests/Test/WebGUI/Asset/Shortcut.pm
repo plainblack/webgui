@@ -24,4 +24,6 @@ sub list_of_tables {
      return [qw/assetData Shortcut/];
 }
 
+sub dynamic_form_labels { return 'Asset to Mirror' }
+
 1;

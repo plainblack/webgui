@@ -21,7 +21,7 @@ sub list_of_tables {
      return [qw/assetData FileAsset ImageAsset/];
 }
 
-sub dynamic_form_labels { return 'New file to upload', 'Approved'; }
+sub dynamic_form_labels { return 'New file to upload'; }
 
 sub t_11_getEditForm : Tests( 2 ) {
     my $test    = shift;

@@ -22,7 +22,7 @@ sub list_of_tables {
 }
 
 sub dynamic_form_labels { 
-    return 'Reset votes?', 'Answers', 'Generate image graph', 'Approved';
+    return 'Reset votes?', 'Answers', 'Generate image graph';
 }
 
 1;

@@ -25,4 +25,6 @@ sub parent_list {
     return [qw/WebGUI::Asset::Wobject::Gallery WebGUI::Asset::Wobject::GalleryAlbum /];
 }
 
+sub dynamic_form_labels { return 'New file to upload' };
+
 1;

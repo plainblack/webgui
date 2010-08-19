@@ -21,4 +21,14 @@ sub list_of_tables {
      return [qw/assetData template/];
 }
 
+sub postProcessMergedProperties {
+    my $test = shift;
+    my $properties = shift;
+    if( exists $properties->{attachmentsJson} and ! defined $properties->{attachmentsJson} ) {
+        $properties->{attachmentsJson} = '[{"url":"/webgui.css","type":"stylesheet"}]';
+    }
+}
+
+sub dynamic_form_labels { return 'Template Type' };
+
 1;

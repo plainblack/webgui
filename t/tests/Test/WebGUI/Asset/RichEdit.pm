@@ -25,4 +25,6 @@ sub list_of_tables {
      return [qw/assetData RichEdit/];
 }
 
+sub dynamic_form_labels { return 'Toolbar Buttons' }
+
 1;
