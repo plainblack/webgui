@@ -4698,6 +4698,23 @@ Users may override this setting in their profile.
         context     => 'Description for pick style template page',
     },
 
+    'show all' => {
+        message     => q{Show All},
+        lastUpdated => 0,
+        context     => q{Label to remove filtering and show all items in a list. Used by the Admin bar Clipboard pane.},
+    },
+    
+    'asset helpers' => {
+        message     => q{Asset Helpers},
+        lastUpdated => 0,
+        context     => q{Label for the asset helpers list. Used by the Admin bar.},
+    },
+
+    'log out' => {
+        message     => q{Log Out},
+        lastUpdated => 0,
+        context     => q{Label for button to log out.},
+    },
 };
 
 1;

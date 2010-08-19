@@ -445,6 +445,7 @@ WebGUI.Admin.prototype.updateAssetHelpers
     for ( var i = 0; i < assetDef.helpers.length; i++ ) {
         var helper  = assetDef.helpers[i];
         var li      = document.createElement('li');
+        li.className = "clickable";
         li.appendChild( document.createTextNode( helper.label ) );
         this.addHelperHandler( li, helper );
         helperEl.appendChild( li );
@@ -686,6 +687,7 @@ WebGUI.Admin.prototype.updateAssetHistory
     for ( var i = 0; i < assetDef.revisions.length; i++ ) {
         var revisionDate    = assetDef.revisions[i];
         var li              = document.createElement('li');
+        li.className        = "clickable";
 
         // Create a descriptive date string
         var rDate           = new Date( revisionDate * 1000 ); // JS requires milliseconds

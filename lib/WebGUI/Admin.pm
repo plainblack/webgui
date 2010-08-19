@@ -519,7 +519,7 @@ sub www_view {
 
 __DATA__
 <dl id="adminBar" class="accordion-menu">
-    <dt id="adminConsole" class="a-m-t">^International("admin console","AdminConsole");</dt>
+    <dt id="adminConsole" class="a-m-t clickable">^International("admin console","AdminConsole");</dt>
     <dd class="a-m-d"><div class="bd">
         <TMPL_LOOP adminPlugins>
         <a class="link" target="view" href="<tmpl_var url>">
@@ -529,33 +529,33 @@ __DATA__
         </TMPL_LOOP>
     </div></dd>
     <!-- placeholder for version tags -->
-    <dt id="versionTags" class="a-m-t">Version Tags (i18n)</dt>
+    <dt id="versionTags" class="a-m-t clickable">^International('version tags','VersionTag');</dt>
     <dd class="a-m-d"><div class="bd">
         <div id="versionTagItems"></div>
     </div></dd>
     <!-- placeholder for clipboard -->
-    <dt id="clipboard" class="a-m-t">Clipboard (i18n)</dt>
+    <dt id="clipboard" class="a-m-t clickable">^International('1082','Asset');</dt>
     <dd class="a-m-d"><div class="bd">
         <input type="checkbox" id="clipboardShowAll" />
-        <label for="clipboardShowAll" id="clipboardShowAllLabel">Show All (i18n)</label>
+        <label for="clipboardShowAll" id="clipboardShowAllLabel">^International('show all','WebGUI');</label>
         <div id="clipboardItems"></div>
     </div></dd>
     <!-- placeholder for asset helpers -->
-    <dt id="assetHelpers" class="a-m-t">Asset Helpers (i18n)</dt>
+    <dt id="assetHelpers" class="a-m-t clickable">^International('asset helpers','WebGUI');</dt>
     <dd id="assetHelpers_pane" class="a-m-d"><div class="bd">
-        <h1 id="helper_asset_name">Asset</h1>
+        <h1 id="helper_asset_name"></h1>
         <ul id="helper_list">
         </ul>
-        <h2 style="background-image: url(^Extras(icon/clock.png););">History (i18n)</h2>
+        <h2 style="background-image: url(^Extras(icon/clock.png););">^International('history','Asset');</h2>
         <ul id="history_list">
         </ul>
     </div></dd>
     <!-- placeholder for new content menu -->
-    <dt id="newContent" class="a-m-t">New Content (i18n)</dt>
+    <dt id="newContent" class="a-m-t clickable">^International('1083','Macro_AdminBar');</dt>
     <dd class="a-m-d"><div class="bd" style="margin: 0; padding: 0">
         <dl id="newContentBar" class="accordion-menu" style="height: 500px">
             <tmpl_loop newContentTabs>
-            <dt class="a-m-t" id="<tmpl_var id>"><tmpl_var title></dt>
+            <dt class="a-m-t clickable" id="<tmpl_var id>"><tmpl_var title></dt>
             <dd class="a-m-d"><div class="bd">
                 <tmpl_loop items>
                     <a href="#" onclick="window.admin.addNewContent('<tmpl_var url>'); return false">
@@ -575,15 +575,15 @@ __DATA__
     </div>
     <div id="versionTag" style="display: none">
         <div style="float: right">
-            <a href="#" target="view" id="publishTag">Publish (i18n)</span>
-            | <a href="#" target="view" id="leaveTag">Leave (i18n)</span>
+            <span href="#" target="view" id="publishTag" class="clickable">^International('publish','VersionTag');</span>
+            | <span href="#" target="view" id="leaveTag" class="clickable">^International('leave','VersionTag');</span>
         </div>
         <a href="#" id="editTag" target="view" style="background-image: ^Extras(icon/tag_blue.png);;"></a>
     </div>
     <div id="user">
         <div style="float: right">
-            <a href="<tmpl_var homeUrl>">Back to Site</a> 
-            | <a href="<tmpl_var logoutUrl>">Log Out</a>
+            <a href="<tmpl_var homeUrl>^International('back to site','VersionTag');</a> 
+            | <a href="<tmpl_var logoutUrl>">^International('log out','WebGUI');</a>
         </div>
         <a href="<tmpl_var userEditUrl>" target="view">
             <img src="^Extras(icon/user.png);" class="icon" />

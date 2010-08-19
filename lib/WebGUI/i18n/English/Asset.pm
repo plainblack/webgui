@@ -1469,6 +1469,12 @@ Couldn't open %-s because %-s <br />
         context     => q{Class, as in name of class, or type of asset},
     },
 
+    'history' => {
+        message     => q{History},
+        lastUpdated => 0,
+        context     => q{Label for list of asset's revisions},
+    },
+
 };
 
 1;

@@ -483,6 +483,18 @@ our $I18N = {
         context     => q{},
     },
 
+    'publish' => {
+        message     => q{Publish},
+        lastUpdated => 0,
+        context     => q{Label to commit/publish a version tag},
+    },
+
+    'leave' => {
+        message     => q{Leave},
+        lastUpdated => 0,
+        context     => q{Label to leave a version tag},
+    },
+
 };
 
 1;
