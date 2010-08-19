@@ -21,7 +21,8 @@ Package WebGUI::Role::Asset::SetStoragePermissions
 =head1 DESCRIPTION
 
 Provide methods for the triggers on ownerUserId, groupIdEdit and groupIdView that update
-the file permissions on storage locations for an Asset.
+the file permissions on storage locations for an Asset.  Consumers of SetStoragePermissions
+must have a getStorageLocation method, so that it can find the storage location.
 
 =head1 SYNOPSIS
 
@@ -31,9 +32,11 @@ with WebGUI::Role::Asset::SetStoragePermissions;
 
 use Moose::Role;
 
+requires qw/getStorageLocation/;
+
 sub _set_ownerUserId {
     my ($self, $new, $old) = @_;
-    $old ||= '';
+    return unless $old;
     if ($new ne $old) {
 		$self->getStorageLocation->setPrivileges($self->ownerUserId, $self->groupIdView, $self->groupIdEdit);
     }
@@ -41,7 +44,7 @@ sub _set_ownerUserId {
 
 sub _set_groupIdView {
     my ($self, $new, $old) = @_;
-    $old ||= '';
+    return unless $old;
     if ($new ne $old) {
 		$self->getStorageLocation->setPrivileges($self->ownerUserId, $self->groupIdView, $self->groupIdEdit);
     }
@@ -49,7 +52,7 @@ sub _set_groupIdView {
 
 sub _set_groupIdEdit {
     my ($self, $new, $old) = @_;
-    $old ||= '';
+    return unless $old;
     if ($new ne $old) {
 		$self->getStorageLocation->setPrivileges($self->ownerUserId, $self->groupIdView, $self->groupIdEdit);
     }
