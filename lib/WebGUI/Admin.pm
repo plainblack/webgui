@@ -487,7 +487,6 @@ sub www_view {
     $style->setLink( $url->extras('yui/build/container/assets/skins/sam/container.css'), {rel=>'stylesheet', type=>'text/css'});
     $style->setLink( $url->extras('yui/build/menu/assets/skins/sam/menu.css'), {rel=>'stylesheet', type=>'text/css'});
     #$style->setLink( $url->extras('yui-webgui/build/assetManager/assetManager.css' ), { rel => "stylesheet", type => 'text/css' } );
-    $style->setLink( $url->extras('macro/AdminBar/slidePanel.css'), {type=>'text/css', rel=>'stylesheet'});
     $style->setLink( $url->extras('admin/admin.css'), { type=>'text/css', rel=>'stylesheet'} );
     $style->setScript($url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'));
     $style->setScript($url->extras('yui/build/utilities/utilities.js'));
