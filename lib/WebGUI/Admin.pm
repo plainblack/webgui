@@ -520,7 +520,7 @@ sub www_view {
 __DATA__
 <dl id="adminBar" class="accordion-menu">
     <dt id="adminConsole" class="a-m-t clickable">^International("admin console","AdminConsole");</dt>
-    <dd class="a-m-d"><div class="bd">
+    <dd class="a-m-d">
         <ul id="admin_list">
             <TMPL_LOOP adminPlugins>
             <li class="clickable with_icon" style="background-image: url(<tmpl_var icon.small default="^Extras('icon/cog.png');">);">
@@ -528,32 +528,32 @@ __DATA__
             </li>
             </TMPL_LOOP>
         </ul>
-    </div></dd>
+    </dd>
     <!-- placeholder for version tags -->
     <dt id="versionTags" class="a-m-t clickable">^International('version tags','VersionTag');</dt>
-    <dd class="a-m-d"><div class="bd">
+    <dd class="a-m-d">
         <div id="versionTagItems"></div>
-    </div></dd>
+    </dd>
     <!-- placeholder for clipboard -->
     <dt id="clipboard" class="a-m-t clickable">^International('1082','Asset');</dt>
-    <dd class="a-m-d"><div class="bd">
+    <dd class="a-m-d">
         <input type="checkbox" id="clipboardShowAll" />
         <label for="clipboardShowAll" id="clipboardShowAllLabel">^International('show all','WebGUI');</label>
         <div id="clipboardItems"></div>
-    </div></dd>
+    </dd>
     <!-- placeholder for asset helpers -->
     <dt id="assetHelpers" class="a-m-t clickable">^International('asset helpers','WebGUI');</dt>
-    <dd id="assetHelpers_pane" class="a-m-d"><div class="bd">
+    <dd id="assetHelpers_pane" class="a-m-d">
         <h1 class="with_icon" id="helper_asset_name"></h1>
         <ul id="helper_list">
         </ul>
         <h2 class="with_icon" style="background-image: url(^Extras(icon/clock.png););">^International('history','Asset');</h2>
         <ul id="history_list">
         </ul>
-    </div></dd>
+    </dd>
     <!-- placeholder for new content menu -->
     <dt id="newContent" class="a-m-t clickable">^International('1083','Macro_AdminBar');</dt>
-    <dd class="a-m-d"><div class="bd" style="margin: 0; padding: 0">
+    <dd class="a-m-d">
         <dl id="newContentBar" class="accordion-menu">
             <tmpl_loop newContentTabs>
             <dt class="a-m-t clickable" id="<tmpl_var id>"><tmpl_var title></dt>
@@ -568,7 +568,7 @@ __DATA__
             </div></dd>
             </tmpl_loop>
         </dl>
-    </div></dd>
+    </dd>
 </dl>
 
 <div id="wrapper" class="yui-skin-sam">

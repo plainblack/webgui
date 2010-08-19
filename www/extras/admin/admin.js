@@ -1619,10 +1619,6 @@ WebGUI.Admin.AdminBar
         this.addClickHandler( dt, dd );
     }
 
-    // Precalculate dtHeight and maxHeight
-    this.dtHeight   = WebGUI.Admin.getRealHeight( this.dt[0] ) * this.dt.length;
-    this.maxHeight  = YAHOO.util.Dom.getViewportHeight() - this.dtHeight;
-
     // Add custom event when showing an AdminBar pane
     this.afterShow  = new YAHOO.util.CustomEvent("afterShow", this);
 };
@@ -1655,17 +1651,28 @@ WebGUI.Admin.AdminBar.prototype.getAnim
  */
 WebGUI.Admin.AdminBar.prototype.getExpandHeight
 = function ( elem ) {
+    var maxHeight   = this.getMaxHeight();
     if ( this.cfg.expandMax ) {
-        return this.maxHeight;
+        return maxHeight;
     }
 
     var height  = WebGUI.Admin.getRealHeight( elem );
 
     // Make sure not more than maxHeight
-    if ( height > this.maxHeight ) {
-        return this.maxHeight;
+    if ( height > maxHeight ) {
+        return maxHeight;
     }
     return height;
+};
+
+/**
+ * getMaxHeight( )
+ * Get the maximum possible height for the DD
+ */
+WebGUI.Admin.AdminBar.prototype.getMaxHeight 
+= function () {
+    var dtHeight   = WebGUI.Admin.getRealHeight( this.dt[0] ) * this.dt.length;
+    return WebGUI.Admin.getRealHeight( this.dl.parentNode ) - dtHeight;
 };
 
 /**
