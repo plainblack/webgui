@@ -2350,7 +2350,7 @@ sub publish {
 
 =head2 purgeCache ( )
 
-Purges all cache entries associated with this asset.
+Purges all cache entries associated with this asset, CHI, Session->stow and object caches
 
 =cut
 
@@ -2361,6 +2361,7 @@ sub purgeCache {
 	$stow->delete('assetClass');
 	$stow->delete('assetRevision');
     $self->session->cache->remove("asset".$self->getId.$self->revisionDate);
+    $self->{_parent};
 }
 
 

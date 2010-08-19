@@ -293,30 +293,23 @@ the parent thread.
 =cut
 
 override cut => sub {
-    warn "post's cut";
     my $self = shift;
 
     # Fetch the Thread and CS before cutting the asset.
     my $thread  = $self->getThread;
-    warn "got thread";
     my $cs      = $thread->getParent;
-    warn "got cs";
 
     # Cut the asset
     my $result = super();
-    warn "called super";
 
     # If a post is being cut update the thread reply count first
     if ($thread->getId ne $self->getId) {
-        warn "calling _fixReplyCount on thread";
         $self->_fixReplyCount( $thread );
     }
 
     # Update the CS reply count. This step is also necessary when a Post is cut since the Thread's incrementReplies
     # also calls the CS's incrementReplies, possibly with the wrong last post Id.
-    warn "calling _fixReplyCount on cs";
     $self->_fixReplyCount( $cs );
-    warn "all should be well...?";
 
     return $result;
 };
@@ -790,6 +783,8 @@ sub getThread {
                 }
                 $self->{_thread} = WebGUI::Asset::Post::Thread->newById($self->session, $threadId);
 	}
+    else {
+    }
 	return $self->{_thread};	
 }
 
@@ -1202,6 +1197,7 @@ override purgeCache => sub {
 	my $self = shift;
 	$self->session->cache->remove("view_".$self->getThread->getId) if ($self->getThread);
 	super();
+    delete $self->{_thread};
 };
 
 #-------------------------------------------------------------------
