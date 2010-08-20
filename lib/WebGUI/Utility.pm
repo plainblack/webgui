@@ -23,7 +23,7 @@ use Net::CIDR::Lite;
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw(&isInSubnet
-	&sortHash &isIn &randint &round &scalarEquals
+	&sortHash &isIn &randint &round
 	);
 
 
@@ -160,32 +160,6 @@ B<NOTE:> If you set this higher than 0 then you'll get back another floating poi
 sub round {
 	my $significantDigits = $_[1] || 0;
         return sprintf(('%.'.$significantDigits.'f'), $_[0]);
-}
-
-#-------------------------------------------------------------------
-
-=head2 scalarEquals ( $a, $b, .. )
-
-Checks an arbitrary number of scalars for strict equality.
-
-Lets perl do all the work for us, via clever use of hash keys.
-
-Credit goes to davido on perlmonks: http://www.perlmonks.org/?node_id=525349
-
-Be aware that this may actually be more strict than you want. See Utility.t 
-for the full list of scalars that are considered equal and not equal.
-
-=cut
-
-sub scalarEquals {
-    # False when < 2 defined args
-    return 0 if ( grep { defined($_) } @_ ) < 2;
-    
-    # Use args as hash keys, all equal if we end up with only 1 key
-    no warnings qw/uninitialized/;
-    my %gadget;
-    @gadget{@_} = ();
-    return scalar keys %gadget == 1 ? 1 : 0;
 }
 
 #-------------------------------------------------------------------

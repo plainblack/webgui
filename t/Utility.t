@@ -50,40 +50,6 @@ is(WebGUI::Utility::round(47.6, 0), 48, 'round() - rounds up, too');
 	is_deeply([keys %hash2], [qw/e c b d a/], 'sortHash');
 }
 
-#####################################################################
-#
-# scalarEquals
-#
-#####################################################################
-{
-    my %eq = (
-        0 => 0,
-        "0" => "0",
-        0.1 => 0.1,
-        "0.1" => "0.1",
-        "0 but true" => "0 but true",
-        "string" => "string",
-    );
-    while (my($a, $b) = each %eq) {
-        ok(WebGUI::Utility::scalarEquals($a, $b), "scalarEquals($a, $b) truthy");
-    }
-    
-    my %ne = (
-        0 => "0",
-        "0.0" => "0",
-        "0.1" => "0.10",
-        "0" => "0 but true",
-        "1" => "0 but true",
-        0 => "0 but true",
-        1 => "0 but true",
-    );
-    while (my($a, $b) = each %ne) {
-        ok(!WebGUI::Utility::scalarEquals($a, $b), "scalarEquals($a, $b) falsy");
-    }
-    ok(!WebGUI::Utility::scalarEquals(), "scalarEquals() falsy when no args");
-    ok(!WebGUI::Utility::scalarEquals(1), "falsy for 1 arg");
-    ok(!WebGUI::Utility::scalarEquals(1, undef, 1), "falsy for 3 args");
-}
 
 # isInSubnets
 is(WebGUI::Utility::isInSubnet('192.168.0.1', []), 0, 'isInSubnet: comparing against an empty array ref');

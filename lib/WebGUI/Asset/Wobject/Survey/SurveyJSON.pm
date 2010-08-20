@@ -659,19 +659,19 @@ sub compress {
                 my $newA = {};
                 while (my($key, $value) = each %$a) {
                     next if ref $value;
-                    $newA->{$key} = $value unless WebGUI::Utility::scalarEquals($value, $amold->{$key});
+                    $newA->{$key} = $value unless $value eq $amold->{$key};
                 }
                 push @{$newQ->{answers}}, $newA;
             }
             while (my($key, $value) = each %$q) {
                 next if ref $value;
-                $newQ->{$key} = $value unless WebGUI::Utility::scalarEquals($value, $qmold->{$key});
+                $newQ->{$key} = $value unless $value eq $qmold->{$key};
             }
             push @{$newS->{questions}}, $newQ;
         }
         while (my($key, $value) = each %$s) {
             next if ref $value;
-            $newS->{$key} = $value unless WebGUI::Utility::scalarEquals($value, $smold->{$key});
+            $newS->{$key} = $value unless $value eq $smold->{$key};
         }
         push @sections, $newS;
     }
