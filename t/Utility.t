@@ -34,12 +34,6 @@ ok($number >= 0 && $number <= 1, 'randint() with default params');
 my $number = WebGUI::Utility::randint(10,5);
 ok($number >= 5 && $number <= 10, 'randint() auto reverses params if they are backwards');
 
-# randomizeArray
-SKIP: {
-	skip("Don't know how to test randomizeArray.",1);
-	ok(undef, 'randomizeArray()');
-	}
-
 # round
 is(WebGUI::Utility::round(47.133984233, 0), 47, 'round() - 0 significant digits');
 is(WebGUI::Utility::round(47.133984233, 3), 47.134, 'round() - multiple significant digits');

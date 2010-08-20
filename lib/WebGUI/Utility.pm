@@ -22,7 +22,7 @@ use Tie::IxHash;
 use Net::CIDR::Lite;
 
 our @ISA = qw(Exporter);
-our @EXPORT = qw(&randomizeArray &isInSubnet
+our @EXPORT = qw(&isInSubnet
 	&sortHashDescending &sortHash &isIn &randint &round &scalarEquals
 	);
 
@@ -138,25 +138,6 @@ sub randint {
 	$high = 1 unless defined $high;
 	($low, $high) = ($high,$low) if $low > $high;
 	return $low + int( rand( $high - $low + 1 ) );
-}
-
-#-------------------------------------------------------------------
-
-=head2 randomizeArray (  )
-
-Don't use this function, it is depricated and will be removed at some point in the future. Instead use List::Util::shuffle()
-
-=cut
-
-sub randomizeArray {
-	my $array = shift;
-	if ($#$array > 0) {
-		for (my $i = @$array; --$i; ) {
-			my $j = int rand ($i+1);
-			next if $i == $j;
-			@$array[$i,$j] = @$array[$j,$i];
-		}
-	}
 }
 
 #-------------------------------------------------------------------
