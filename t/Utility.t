@@ -27,11 +27,6 @@ is(WebGUI::Utility::commify(10), "10", 'commify() - no comma needed');
 is(WebGUI::Utility::commify(1000), "1,000", 'commify() - single comma');
 is(WebGUI::Utility::commify(10000000), "10,000,000", 'commify() - multiple commas');
 
-# formatBytes
-is(WebGUI::Utility::formatBytes(10), '10 B', 'formatBytes() - bytes');
-is(WebGUI::Utility::formatBytes(4300), '4 kB', 'formatBytes() - kilobytes');
-is(WebGUI::Utility::formatBytes(1700000), '2 MB', 'formatBytes() - megabytes');
-
 # isBetween 
 ok(WebGUI::Utility::isBetween(0,-1,1), 'isBetween() - negative and positive range'); 
 ok(WebGUI::Utility::isBetween(0,1,-1), 'isBetween() - negative and positive range, reversed'); 

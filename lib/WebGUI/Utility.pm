@@ -23,7 +23,7 @@ use Net::CIDR::Lite;
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw(&isBetween &makeTabSafe &makeArrayTabSafe &randomizeHash &commify &randomizeArray &isInSubnet
-	&formatBytes &sortHashDescending &sortHash &isIn &makeCommaSafe &makeArrayCommaSafe &randint &round &scalarEquals
+	&sortHashDescending &sortHash &isIn &makeCommaSafe &makeArrayCommaSafe &randint &round &scalarEquals
 	);
 
 
@@ -39,7 +39,6 @@ This package provides miscellaneous but useful utilities to the WebGUI programme
 
  use WebGUI::Utility;
  $string = commify($integer);
- $size = formatBytes($integer);
  $boolean = isBetween($value, $first, $second);
  $boolean = isIn($value, @array);
  $boolean = isInSubnet($ip, \@subnets);
@@ -89,30 +88,6 @@ Returns a regex object that can be used to validate email addresses.
 
 sub emailRegex {
 	return qr/^([0-9a-zA-Z]+[-._+&])*\w+@([-0-9a-zA-Z]+[.])+[a-zA-Z]{2,7}$/;
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 formatBytes ( integer )
-
-Returns a formatted file size like "3MB" or "44kB".
-
-=head3 integer
-
-An integer representing the number of bytes to format.
-
-=cut
-
-sub formatBytes {
-	my $size = shift;
-        if ($size > 1048576) {
-                return round($size/1048576).' MB';
-        } elsif ($size > 1024) {
-                return round($size/1024).' kB';
-        } else {
-		return $size.' B';
-        }
 }
 
 

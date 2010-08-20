@@ -15,7 +15,8 @@ package WebGUI::Asset;
 =cut
 
 use strict;
-use WebGUI::Utility qw(isIn formatBytes);
+use WebGUI::Utility qw(isIn);
+use Number::Format ();
 use JSON;
 
 =head1 NAME
@@ -437,7 +438,7 @@ sub www_manageTrash {
                 .'" style="vertical-align:middle;border-style:none;" alt='
                 .$child->getName .'" /></p> ' . $child->getName,
                 $self->session->datetime->epochToHuman($child->get("revisionDate")),
-                formatBytes($child->get("assetSize"))
+                Number::Format::format_bytes($child->get("assetSize"))
             );
             $amethod->('AddLineSortData',
                 '', $title, $child->getName,

@@ -15,7 +15,7 @@ package WebGUI::Asset;
 =cut
 
 use strict;
-use WebGUI::Utility qw(formatBytes);
+use Number::Format ();
 
 =head1 NAME
 
@@ -593,7 +593,7 @@ sub www_manageClipboard {
                         ."','" . $plus . "<a href=\"".$child->getUrl("op=assetManager")."\">" . $title
                         ."</a>','<p style=\"display:inline;vertical-align:middle;\"><img src=\"".$child->getIcon(1)."\" style=\"border-style:none;vertical-align:middle;\" alt=\"".$child->getName."\" /></p> ".$child->getName
                         ."','".$self->session->datetime->epochToHuman($child->get("revisionDate"))
-                        ."','".formatBytes($child->get("assetSize"))."');\n";
+                        ."','".Number::Format::format_bytes($child->get("assetSize"))."');\n";
                 $output .= "assetManager.AddLineSortData('','".$title."','".$child->getName
                         ."','".$child->get("revisionDate")."','".$child->get("assetSize")."');\n";
         }

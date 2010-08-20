@@ -17,7 +17,7 @@ package WebGUI::Asset::File;
 use strict;
 use Carp;
 
-
+use Number::Format ();
 use Moose;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset';
@@ -573,7 +573,7 @@ sub view {
 	$var{controls} = $self->getToolbar;
 	$var{fileUrl} = $self->getFileUrl;
 	$var{fileIcon} = $self->getFileIconUrl;
-	$var{fileSize} = formatBytes($self->get("assetSize"));
+	$var{fileSize} = Number::Format::format_bytes($self->get("assetSize"));
     my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
 	if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
 		$self->session->cache->set($self->getViewCacheKey, $out, $self->get("cacheTimeout"));

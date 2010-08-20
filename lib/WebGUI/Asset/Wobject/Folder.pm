@@ -71,6 +71,7 @@ has '+uiLevel' => (
 );
 
 use WebGUI::Utility;
+use Number::Format ();
 
 =head1 NAME
 
@@ -237,7 +238,7 @@ sub view {
 				title           => $child->title,
 				menuTitle       => $child->menuTitle,
 				synopsis        => $child->synopsis || '',
-				size            => WebGUI::Utility::formatBytes($child->assetSize),
+				size            => Number::Format::format_bytes($child->assetSize),
 				"date.epoch"    => $child->revisionDate,
 				"icon.small"    => $child->getIcon(1),
 				"icon.big"      => $child->getIcon,
