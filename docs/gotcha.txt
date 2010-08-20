@@ -63,6 +63,13 @@ save you many hours of grief.
      * The Cart will now work without javascript.  Javascript is used to make parts of the cart easier,
      and to automatically update the user's cart so they don't have to manually update it.
 
+     * All custom Payment drivers have to be rewritten.  Please read the POD for
+     WebGUI::Shop::PayDriver for information about the update.  The upgrade script for 7.9.4
+     is designed to die if a non-core payment driver is detected, so after updating your custom
+     driver you will need to change the upgrade script.
+
+     * Custom cart templates will need to be updated to accomodate the new cart design.
+
 7.9.3
 --------------------------------------------------------------------
      * Test:Deep, which had been an optional dependency for testing, has been used

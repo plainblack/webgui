@@ -783,5 +783,20 @@ sub www_editSave {
     return undef;
 }
 
+=head2 CHANGES ( )
+
+=head3 7.9.4
+
+In 7.9.4, the base PayDriver class was changed to accomodate the new Cart.  The Cart is now in
+charge of gathering billing information.  The PayDriver's job is to summarize all the payment
+information for the user to review (www_getCredentials) and provide the user a button to complete
+the checkout process (getButton), and then to complete the checkout.  PayDrivers can
+do additional things beyond those steps, like the PayPal driver.
+
+PayDrivers also now have a defult template for displaying that screen, the summaryTemplate.
+While each core driver has its own template, custom drivers can use any existing one that
+meets its needs.
+
+=cut
 
 1;
