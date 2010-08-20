@@ -23,15 +23,15 @@ our $VERSION = '0.0.1';
 
 =head1 NAME
 
-Package WebGUI::Definition::Meta::Property
+Package WebGUI::Definition::Meta::Settable
 
 =head1 DESCRIPTION
 
-Moose-based meta class for all properties in WebGUI::Definition.
+Role to tag properties as being settable, or not.
 
 =head1 SYNOPSIS
 
-WebGUI::Definition::Meta::Property extends Moose::Meta::Attribute to include
+WebGUI::Definition::Meta::Settable.
 a read-only form method, that provides the form properties for the attribute.
 
 =cut
