@@ -182,7 +182,7 @@ sub gateway {
         my $url = $self->make_urlmap_work($self->session->config->get("gateway")).'/'.$pageUrl;
 	$url =~ s/\/+/\//g;
         if ($self->session->setting->get("preventProxyCache") == 1 and !$skipPreventProxyCache) {
-                $url = $self->append($url,"noCache=".randint(0,1000).':'.time());
+                $url = $self->append($url,"noCache=".int(rand(1001)).':'.time());
         }
 	if ($pairs) {
 		$url = $self->append($url,$pairs);

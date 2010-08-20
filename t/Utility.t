@@ -26,14 +26,6 @@ my $session = WebGUI::Test->session;
 ok(WebGUI::Utility::isIn("webgui", qw(cars trucks webgui trains)), 'isIn()');
 
 
-# randint
-my $number = WebGUI::Utility::randint(50,75);
-ok($number >= 50 && $number <= 75, 'randint()');
-$number = WebGUI::Utility::randint();
-ok($number >= 0 && $number <= 1, 'randint() with default params');
-my $number = WebGUI::Utility::randint(10,5);
-ok($number >= 5 && $number <= 10, 'randint() auto reverses params if they are backwards');
-
 # round
 is(WebGUI::Utility::round(47.133984233, 0), 47, 'round() - 0 significant digits');
 is(WebGUI::Utility::round(47.133984233, 3), 47.134, 'round() - multiple significant digits');

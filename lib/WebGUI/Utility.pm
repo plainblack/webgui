@@ -23,7 +23,7 @@ use Net::CIDR::Lite;
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw(&isInSubnet
-	&sortHash &isIn &randint &round
+	&sortHash &isIn &round
 	);
 
 
@@ -40,7 +40,6 @@ This package provides miscellaneous but useful utilities to the WebGUI programme
  use WebGUI::Utility;
  $boolean = isIn($value, @array);
  $boolean = isInSubnet($ip, \@subnets);
- $integer = randint($low,$high);
  $rounded = round($number, $digits);
  %hash = sortHash(%hash);
 
@@ -113,30 +112,6 @@ sub isInSubnet {
 	} else {
 		return 0;
 	}
-}
-
-#-------------------------------------------------------------------
-
-=head2 randint ( low, high )
-
-Returns an integer between the low and high number.
-
-=head3 low
-
-The lowest possible value. Defaults to 0.
-
-=head3 high
-
-The highest possible value. Defaults to 1.
-
-=cut
-
-sub randint {
-	my ($low, $high) = @_;
-	$low = 0 unless defined $low;
-	$high = 1 unless defined $high;
-	($low, $high) = ($high,$low) if $low > $high;
-	return $low + int( rand( $high - $low + 1 ) );
 }
 
 #-------------------------------------------------------------------
