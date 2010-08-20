@@ -40,12 +40,6 @@ SKIP: {
 	ok(undef, 'randomizeArray()');
 	}
 
-# randomizeHash
-SKIP: {
-	skip("Don't know how to test randomizeHash.",1);
-	ok(undef, 'randomizeHash()');
-	}
-
 # round
 is(WebGUI::Utility::round(47.133984233, 0), 47, 'round() - 0 significant digits');
 is(WebGUI::Utility::round(47.133984233, 3), 47.134, 'round() - multiple significant digits');

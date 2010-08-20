@@ -22,7 +22,7 @@ use Tie::IxHash;
 use Net::CIDR::Lite;
 
 our @ISA = qw(Exporter);
-our @EXPORT = qw(&randomizeHash &randomizeArray &isInSubnet
+our @EXPORT = qw(&randomizeArray &isInSubnet
 	&sortHashDescending &sortHash &isIn &randint &round &scalarEquals
 	);
 
@@ -41,7 +41,6 @@ This package provides miscellaneous but useful utilities to the WebGUI programme
  $boolean = isIn($value, @array);
  $boolean = isInSubnet($ip, \@subnets);
  $integer = randint($low,$high);
- $hashRef = randomizeHash(\%hash);
  $rounded = round($number, $digits);
  %hash = sortHash(%hash);
  %hash = sortHashDescending(%hash);
@@ -158,29 +157,6 @@ sub randomizeArray {
 			@$array[$i,$j] = @$array[$j,$i];
 		}
 	}
-}
-
-#-------------------------------------------------------------------
-
-=head2 randomizeHash ( hashRef )
-
-Resorts a hash tied to IxHash in random order. Returns a hash reference.
-
-=head3 hashRef
-
-A reference hash to randomize.
-
-=cut
-
-sub randomizeHash {
-	my $hash = $_[0];
-	my @keys = keys %$hash;
-	randomizeArray(\@keys);
-	tie my %temp, 'Tie::IxHash';
-	foreach my $key (@keys) {
-		$temp{$key} = $hash->{$key};
-	}
-	return \%temp;
 }
 
 #-------------------------------------------------------------------
