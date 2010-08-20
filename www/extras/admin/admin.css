@@ -26,8 +26,15 @@ html,body { margin: 0; padding: 0; height: 100% }
     bottom: 0px;
     left: 0px;
     right: 0px;
-    margin-top: 44px; /* below the location bar, easier to change this in JS */
     overflow: hidden;
+}
+
+#tab_content_wrapper {
+    position: absolute;
+    top: 44px; /* below the location bar */
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
 }
 
 #versionTag {

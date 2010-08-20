@@ -596,25 +596,27 @@ __DATA__
             <li class="selected"><a href="#tab1"><em>View</em></a></li>
             <li><a href="#tab2"><em>Tree</em></a></li>
         </ul>
-        <div id="locationBar">
-            <span id="left">
-                <input type="button" id="backButton" value="&lt;" /><input type="button" id="forwardButton" value="&gt;" />
-            </span>
-            <div id="location">
-                <input type="text" id="locationUrl" value="" />
-                <span id="locationTitle"></span>
+        <div id="tab_wrapper">
+            <div id="locationBar">
+                <span id="left">
+                    <input type="button" id="backButton" value="&lt;" /><input type="button" id="forwardButton" value="&gt;" />
+                </span>
+                <div id="location">
+                    <input type="text" id="locationUrl" value="" />
+                    <span id="locationTitle"></span>
+                </div>
+                <span id="right">
+                    <input type="button" id="searchButton" value="S" /><input type="button" id="homeButton" value="H" />
+                </span>
+                <div id="search"></div>
             </div>
-            <span id="right">
-                <input type="button" id="searchButton" value="S" /><input type="button" id="homeButton" value="H" />
-            </span>
-            <div id="search"></div>
-        </div>
-        <div id="tab_wrapper" class="yui-content">
-            <div id="viewTab"><iframe src="<tmpl_var viewUrl>" name="view"></iframe></div>
-            <div id="treeTab">
-                <div id="treeCrumbtrail"></div>
-                <div id="treeDataTableContainer"></div>
-                <div id="treePagination"></div>
+            <div id="tab_content_wrapper" class="yui-content">
+                <div id="viewTab"><iframe src="<tmpl_var viewUrl>" name="view"></iframe></div>
+                <div id="treeTab">
+                    <div id="treeCrumbtrail"></div>
+                    <div id="treeDataTableContainer"></div>
+                    <div id="treePagination"></div>
+                </div>
             </div>
         </div>
     </div>
