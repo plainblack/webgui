@@ -25,15 +25,6 @@ my $session = WebGUI::Test->session;
 # isIn
 ok(WebGUI::Utility::isIn("webgui", qw(cars trucks webgui trains)), 'isIn()');
 
-# makeArrayCommaSafe
-my @commaFilledArray = ("this,that", "foo,bar", "x-y");
-WebGUI::Utility::makeArrayCommaSafe(\@commaFilledArray);
-my $noCommaFound = 1;
-foreach my $row (@commaFilledArray) {
-	$noCommaFound = 0 if ($row =~ m/,/);
-}
-ok($noCommaFound, 'makeArrayCommaSafe()');
-
 # makeCommaSafe
 unlike(WebGUI::Utility::makeCommaSafe("this,that,foo,,bar"),  qr/,/, 'makeCommaSafe()');
 is(
