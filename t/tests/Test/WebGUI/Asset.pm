@@ -463,7 +463,7 @@ sub t_10_addRevision : Tests {
     # copied this code
     SKIP: {
         no strict 'refs';
-        skip 'Added to existing working tag / class does something magical to tagId using a custom getAutoCommitWorkflowId method', 1, if grep $_ eq 'getAutoCommitWorkflowId', keys %{$test->class . '::'};
+        skip 'Added to existing working tag / class does something magical to tagId using a custom getAutoCommitWorkflowId method', 1, if exists ${$test->class . '::'}{getAutoCommitWorkflowId};
         is( $newRevision->tagId, $tag->getId, 'Added to existing working tag' );
     };
 
@@ -587,7 +587,7 @@ warn "XXX mergedProperties: " . Dumper \%mergedProperties;
 
     SKIP: {
         no strict 'refs';
-        skip 'class does something magical to tagId using a custom getAutoCommitWorkflowId method', 1, if grep $_ eq 'getAutoCommitWorkflowId', keys %{$test->class . '::'};
+        skip 'class does something magical to tagId using a custom getAutoCommitWorkflowId method', 1, if exists ${$test->class . '::'}{getAutoCommitWorkflowId};
         is( $newRevision->tagId, $tag->getId, 'new revision tagId is current working tag' );
     };
 
