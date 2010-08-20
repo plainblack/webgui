@@ -47,7 +47,9 @@ WebGUI.Admin = function(cfg){
         self.adminBar.afterShow.subscribe( self.updateAdminBar, self );
         YAHOO.util.Event.on( window, 'load', function(){ self.adminBar.show( self.adminBar.dt[0].id ) } );
         self.newContentBar  = new WebGUI.Admin.AdminBar( "newContentBar", { expandMax : true } );
-        self.locationBar    = new WebGUI.Admin.LocationBar( self.cfg.locationBarId );
+        self.locationBar    = new WebGUI.Admin.LocationBar( self.cfg.locationBarId, {
+            homeUrl : self.cfg.homeUrl
+        } );
         self.afterNavigate.subscribe( self.locationBar.afterNavigate, self.locationBar );
         if ( self.currentAssetDef ) {
             self.locationBar.navigate( self.currentAssetDef );
@@ -1018,6 +1020,14 @@ WebGUI.Admin.LocationBar.prototype.swapForwardToBack
     }
 };
 
+/**
+ * goHome ( )
+ * Go to the correct home URL
+ */
+WebGUI.Admin.LocationBar.prototype.goHome
+= function ( ) {
+    window.admin.gotoAsset( this.cfg.homeUrl );
+};
 
 /****************************************************************************
  *
