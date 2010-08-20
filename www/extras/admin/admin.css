@@ -3,31 +3,57 @@
     font: 12pt Helvetica, sans-serif;
 }
 
+html,body { margin: 0; padding: 0; height: 100% }
+
 #wrapper {
-    margin-left: 160px; /* move out of the adminbar's way */
-    min-width:   850px; /* min width for 1024x browsers */
+    position: relative;
+    margin-left: 165px; /* move out of the adminbar's way */
+    min-width:   400px; /* min width for 1024x browsers */
+    height: 100%;
+}
+
+#tabBar {
+    position: absolute;
+    top: 28px;    /* Below the versionTag and user boxes */
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+}
+
+#tabBar #tab_wrapper {
+    position: absolute;
+    top: 34px; /* Below the tabs. */
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+    margin-top: 44px; /* below the location bar, easier to change this in JS */
+    overflow: hidden;
 }
 
 #versionTag {
     float: left;
     width: 57%;
     padding: 2px 1%;
+    margin: 2px;
     border: 1px solid #339;
     border-radius: 5px;
     -moz-border-radius: 5px;
     -webkit-border-radius: 5px;
     line-height: 16px;
+    height: 16px;
 }
 
 #user {
     float: right;
     width: 38%;
     padding: 2px 1%;
+    margin: 2px 2px 2px 0px; /* No margin for side next to version tag box */
     border: 1px solid #339;
     border-radius: 5px;
     -moz-border-radius: 5px;
     -webkit-border-radius: 5px;
     line-height: 16px;
+    height: 16px;
 }
 
 #locationBar {
@@ -83,16 +109,18 @@
     text-align: right;
 }
 
-#tabBar {
-    clear: both;
-}
-
 #wrapper .yui-content {
     margin: 0; padding: 0;
 }
 
 #viewTab * { 
     margin: 0; padding: 0;
+}
+
+#viewTab iframe { 
+    border: none;
+    width: 100%;
+    height: 100%;
 }
 
 .clickable {

@@ -609,8 +609,8 @@ __DATA__
             </span>
             <div id="search"></div>
         </div>
-        <div class="yui-content">
-            <div id="viewTab"><iframe src="<tmpl_var viewUrl>" name="view" style="width: 100%; height: 80%"></iframe></div>
+        <div id="tab_wrapper" class="yui-content">
+            <div id="viewTab"><iframe src="<tmpl_var viewUrl>" name="view"></iframe></div>
             <div id="treeTab">
                 <div id="treeCrumbtrail"></div>
                 <div id="treeDataTableContainer"></div>
