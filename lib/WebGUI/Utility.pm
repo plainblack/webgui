@@ -22,7 +22,7 @@ use Tie::IxHash;
 use Net::CIDR::Lite;
 
 our @ISA = qw(Exporter);
-our @EXPORT = qw(&makeTabSafe &makeArrayTabSafe &randomizeHash &randomizeArray &isInSubnet
+our @EXPORT = qw(&makeTabSafe &randomizeHash &randomizeArray &isInSubnet
 	&sortHashDescending &sortHash &isIn &makeCommaSafe &randint &round &scalarEquals
 	);
 
@@ -40,7 +40,6 @@ This package provides miscellaneous but useful utilities to the WebGUI programme
  use WebGUI::Utility;
  $boolean = isIn($value, @array);
  $boolean = isInSubnet($ip, \@subnets);
- makeArrayTabSafe(\@array); 
  $string = makeCommaSafe($string);
  $string = makeTabSafe($string);
  $integer = randint($low,$high);
@@ -118,24 +117,6 @@ sub isInSubnet {
 	} else {
 		return 0;
 	}
-}
-
-#-------------------------------------------------------------------
-
-=head2 makeArrayTabSafe ( array )
-
-Searches through an array looking for tabs and replaces them with four spaces. Also replaces carriage returns with a space. This is useful for exporting tab separated data.
-
-=head3 array
-
- A reference to the array to look through.  The array itself is modified, rather than
- returning useful data.
-
-=cut
-
-sub makeArrayTabSafe {
-	my $array = $_[0];
-	$_ = makeTabSafe($_) for @$array;
 }
 
 #-------------------------------------------------------------------

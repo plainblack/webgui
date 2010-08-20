@@ -759,12 +759,24 @@ sub quickTab {
     my $self = shift;
     my $sql = shift;
     my $params = shift;
+
     my $sth = $self->prepare($sql);
     $sth->execute(@{$params});
-    my $output = join("\t", $sth->getColumnNames) . "\n";
+
+    my $csv = Text::CSV_XS->new({
+        eol => "\n",
+        quote_char => undef,
+        escape_char => undef,
+        sep_char => "\t",
+    });
+
+    return undef
+        unless $csv->combine($sth->getColumnNames);
+
+    my $output = $csv->string;
     while (my @data = $sth->fetchrow_array) {
-        WebGUI::Utility::makeArrayTabSafe(\@data);
-        $output .= join("\t", @data) . "\n";
+        return undef unless $csv->combine(@data);
+        $output .= $csv->string;
     }
     $sth->finish;
     return $output;

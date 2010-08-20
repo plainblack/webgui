@@ -51,15 +51,6 @@ is(
     'makeCommaSafe(): clearing tabs, newlines and carriage returns'
 );
 
-# makeArrayTabSafe -- modifies an array in place
-my $tabbedArray = ["this\tthat", "these\nthose"];
-WebGUI::Utility::makeArrayTabSafe($tabbedArray);
-cmp_deeply(
-    $tabbedArray,
-    ["this    that", "these those"],
-    'makeArrayTabSafe'
-);
-
 # randint
 my $number = WebGUI::Utility::randint(50,75);
 ok($number >= 50 && $number <= 75, 'randint()');
