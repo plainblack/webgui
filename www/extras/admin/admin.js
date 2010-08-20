@@ -38,15 +38,21 @@ WebGUI.Admin = function(cfg){
     var self = this;
     // Initialize these things AFTER the i18n is fetched
     var _init = function () {
+        self.afterNavigate.subscribe( self.requestUpdateCurrentVersionTag, self );
+        self.requestUpdateCurrentVersionTag();
+
         self.tabBar         = new YAHOO.widget.TabView( self.cfg.tabBarId );
         // Keep track of View and Tree tabs
         self.tabBar.getTab(0).addListener('click',self.afterShowViewTab,self,true);
         self.tabBar.getTab(1).addListener('click',self.afterShowTreeTab,self,true);
 
+        self.tree           = new WebGUI.Admin.Tree(self);
+
         self.adminBar       = new WebGUI.Admin.AdminBar( self.cfg.adminBarId, { expandMax : true } );
         self.adminBar.afterShow.subscribe( self.updateAdminBar, self );
         YAHOO.util.Event.on( window, 'load', function(){ self.adminBar.show( self.adminBar.dt[0].id ) } );
         self.newContentBar  = new WebGUI.Admin.AdminBar( "newContentBar", { expandMax : true } );
+
         self.locationBar    = new WebGUI.Admin.LocationBar( self.cfg.locationBarId, {
             homeUrl : self.cfg.homeUrl
         } );
@@ -55,10 +61,6 @@ WebGUI.Admin = function(cfg){
             self.locationBar.navigate( self.currentAssetDef );
         }
 
-        self.afterNavigate.subscribe( self.requestUpdateCurrentVersionTag, self );
-        self.requestUpdateCurrentVersionTag();
-
-        self.tree           = new WebGUI.Admin.Tree(self);
     };
 
     // Get I18N
@@ -766,15 +768,32 @@ WebGUI.Admin.LocationBar
         onclick         : { fn: this.goForward, scope: this },
         menu            : []
     } );
-    this.btnSearch  = new YAHOO.widget.Button( "searchButton", {
+    this.btnSearchDialog  = new YAHOO.widget.Button( "searchDialogButton", {
         label       : '<img src="' + getWebguiProperty("extrasURL") + 'icon/magnifier.png" />',
-        onclick     : { fn: this.clickSearchButton, scope: this }
+        onclick     : { fn: this.toggleSearchDialog, scope: this }
     } );
     this.btnHome    = new YAHOO.widget.Button( "homeButton", {
         type        : "button",
         label       : '<img src="' + getWebguiProperty("extrasURL") + 'icon/house.png" />',
         onclick     : { fn: this.goHome, scope: this }
     } );
+
+    this.btnSearch  = new YAHOO.widget.Button( "searchButton", {
+        onclick     : { fn: this.requestSearch, scope: this }
+    } );
+
+    this.filterSelect = new YAHOO.widget.Button( "searchFilterAdd", {
+        type : "menu",
+        menu : 'searchFilterSelect'
+    } );
+    var self = this;
+    YAHOO.util.Event.onDOMReady( 'searchFilterSelect', function () {
+        self.filterSelect.getMenu().subscribe( "click", self.addFilter, self, true );
+    } );
+
+    YAHOO.util.Event.on( 'searchKeywords', 'focus', this.focusKeywords, this, true );
+    YAHOO.util.Event.on( 'searchKeywords', 'blur', this.blurKeywords, this, true );
+
     // Take control of the location input
     this.klInput = new YAHOO.util.KeyListener( "locationUrl", { keys: 13 }, {
         fn: this.doInputSearch,
@@ -837,8 +856,9 @@ WebGUI.Admin.LocationBar.prototype.clickForwardMenuItem
 WebGUI.Admin.LocationBar.prototype.doInputSearch
 = function ( ) {
     var input = document.getElementById("locationUrl").value;
-    // If input starts with a / and doesn't contain a ? go to the asset
+    // If input starts with a / it's a URL
     if ( input.match(/^\//) ) {
+        // If it doesn't have a ?, just go to the asset
         if ( !input.match(/\?/) ) {
             window.admin.gotoAsset( input );
         }
@@ -849,7 +869,7 @@ WebGUI.Admin.LocationBar.prototype.doInputSearch
     }
     // Otherwise ask WebGUI what do
     else {
-        alert("TODO");
+        this.requestSearch();
     }
 };
 
@@ -1027,6 +1047,70 @@ WebGUI.Admin.LocationBar.prototype.swapForwardToBack
 WebGUI.Admin.LocationBar.prototype.goHome
 = function ( ) {
     window.admin.gotoAsset( this.cfg.homeUrl );
+};
+
+/**
+ * toggleSearchDialog ( )
+ * Show or hide the search dialog as necessary
+ */
+WebGUI.Admin.LocationBar.prototype.toggleSearchDialog
+= function ( ) {
+    if ( this.searchDialog == true ) {
+        this.hideSearchDialog();
+        this.searchDialog = false;
+    }
+    else {
+        this.showSearchDialog();
+        this.searchDialog = true;
+    }
+};
+
+/**
+ * showSearchDialog ( )
+ * Show the search dialog, dimming the content behind it
+ */
+WebGUI.Admin.LocationBar.prototype.showSearchDialog
+= function ( ) {
+    // Dim the content
+    //window.admin.dim( 'tab_content_wrapper' );
+
+    // Roll out the dialog
+    var searchDialog = document.getElementById( 'search' );
+    var height       = WebGUI.Admin.getRealHeight( searchDialog );
+    searchDialog.style.top      = -1 * height + 'px';
+    searchDialog.style.display  = "block";
+
+    var anim = new YAHOO.util.Anim( searchDialog );
+    anim.duration  = 0.25;
+    anim.method    = YAHOO.util.Easing.easeOut;
+    anim.attributes.top = { to: 0 };
+    anim.animate();
+};
+
+/**
+ * hideSearchDialog ( )
+ * Hide the search dialog, undimming the content behind it
+ */
+WebGUI.Admin.LocationBar.prototype.hideSearchDialog
+= function ( ) {
+    // Undim the content
+    //window.admin.undim( 'tab_content_wrapper' );
+
+    // Roll up the dialog
+    var searchDialog = document.getElementById( 'search' );
+    var height       = WebGUI.Admin.getRealHeight( searchDialog );
+    searchDialog.style.display  = "block";
+
+    var anim = new YAHOO.util.Anim( searchDialog );
+    anim.duration  = 0.25;
+    anim.method    = YAHOO.util.Easing.easeOut;
+    anim.attributes.top = { to: -1 * height };
+    var hideContent = function () {
+        searchDialog.style.display = "none";
+        anim.onComplete.unsubscribe( hideContent );
+    };
+    anim.onComplete.subscribe( hideContent, this );
+    anim.animate();
 };
 
 /****************************************************************************

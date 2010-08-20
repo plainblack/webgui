@@ -606,16 +606,29 @@ __DATA__
                     <span id="locationTitle"></span>
                 </div>
                 <span id="right">
-                    <input type="button" id="searchButton" value="S" /><input type="button" id="homeButton" value="H" />
+                    <input type="checkbox" id="searchDialogButton" value="S" /><input type="button" id="homeButton" value="H" />
                 </span>
-                <div id="search"></div>
             </div>
-            <div id="tab_content_wrapper" class="yui-content">
-                <div id="viewTab"><iframe src="<tmpl_var viewUrl>" name="view"></iframe></div>
-                <div id="treeTab">
-                    <div id="treeCrumbtrail"></div>
-                    <div id="treeDataTableContainer"></div>
-                    <div id="treePagination"></div>
+            <div id="tab_content_wrapper">
+                <div id="search" style="display: none">
+                    <input type="button" id="searchButton" value="^International("search","Asset");" />
+                    <input type="text" id="searchKeywords" />
+                    <ul id="searchFilters"></ul>
+                    <input type="button" id="searchFilterAdd" value="Add Filter" />
+                    <select id="searchFilterSelect">
+                        <option value="ownerUserId">Owner</option>
+                        <option value="lineage">Parent</option>
+                        <option value="title">Title</option>
+                        <option value="className">Type</option>
+                    </select>
+                </div>
+                <div id="yui-tabs" class="yui-content">
+                    <div id="viewTab"><iframe src="<tmpl_var viewUrl>" name="view"></iframe></div>
+                    <div id="treeTab">
+                        <div id="treeCrumbtrail"></div>
+                        <div id="treeDataTableContainer"></div>
+                        <div id="treePagination"></div>
+                    </div>
                 </div>
             </div>
         </div>

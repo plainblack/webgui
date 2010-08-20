@@ -64,9 +64,14 @@ html,body { margin: 0; padding: 0; height: 100% }
 }
 
 #locationBar {
-    position: relative;
-    height: 2em;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    z-index: 9000;
+    height: 34px;
     padding: 5px 0;
+    background-color: white; /* masks what lies beneath! */
 }
 
 #locationBar .yui-button { 
@@ -114,6 +119,40 @@ html,body { margin: 0; padding: 0; height: 100% }
     margin-right: 5px;
     font: 14px Verdana, sans-serif;
     text-align: right;
+}
+
+#search {
+    position: absolute;
+    z-index: 6000;
+    background-color: white;
+    width: 70%;
+    left: 15%;
+    right: 15%;
+    padding: 5px;
+    border: ridge #777;
+    border-width: 0 4px 4px 4px;
+}
+
+#searchKeywords {
+    display: block;
+    width:  83%;
+    height: 1.70em;
+    margin-bottom: 5px;
+}
+
+#searchButton {
+    display: block;
+    float: right;
+    width: 14%;
+}
+
+#searchButton-button {
+    display: block;
+    width: 100%;
+}
+
+#searchFilters {
+    clear: both;
 }
 
 #wrapper .yui-content {
