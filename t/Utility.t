@@ -22,11 +22,6 @@ use Test::Deep;
 
 my $session = WebGUI::Test->session;
 
-# commify
-is(WebGUI::Utility::commify(10), "10", 'commify() - no comma needed');
-is(WebGUI::Utility::commify(1000), "1,000", 'commify() - single comma');
-is(WebGUI::Utility::commify(10000000), "10,000,000", 'commify() - multiple commas');
-
 # isBetween 
 ok(WebGUI::Utility::isBetween(0,-1,1), 'isBetween() - negative and positive range'); 
 ok(WebGUI::Utility::isBetween(0,1,-1), 'isBetween() - negative and positive range, reversed'); 

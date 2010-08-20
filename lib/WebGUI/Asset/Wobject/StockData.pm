@@ -16,6 +16,7 @@ use WebGUI::Utility;
 use WebGUI::Asset::Wobject;
 use Finance::Quote;
 use Tie::IxHash;
+use Number::Format ();
 
 use Moose;
 use WebGUI::Definition::Asset;
@@ -110,7 +111,7 @@ sub _appendStockVars {
    $hash->{'stocks.volume.millions'} = _na(WebGUI::Utility::round(($hash->{'stocks.volume'}/1000000),2));
    $hash->{'stocks.avg_vol'} = _na($data->{$symbol,"avg_vol"});
    $hash->{'stocks.bid'} = _na($data->{$symbol,"bid"});
-   $hash->{'stocks.ask'} = _na(WebGUI::Utility::commify($data->{$symbol,"ask"}));
+   $hash->{'stocks.ask'} = _na(Number:Format::format_number($data->{$symbol,"ask"}));
    $hash->{'stocks.close'} = _na($data->{$symbol,"close"});
    $hash->{'stocks.open'} = _na($data->{$symbol,"open"});
    $hash->{'stocks.day_range'} = _na($data->{$symbol,"day_range"});

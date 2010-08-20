@@ -22,7 +22,7 @@ use Tie::IxHash;
 use Net::CIDR::Lite;
 
 our @ISA = qw(Exporter);
-our @EXPORT = qw(&isBetween &makeTabSafe &makeArrayTabSafe &randomizeHash &commify &randomizeArray &isInSubnet
+our @EXPORT = qw(&isBetween &makeTabSafe &makeArrayTabSafe &randomizeHash &randomizeArray &isInSubnet
 	&sortHashDescending &sortHash &isIn &makeCommaSafe &makeArrayCommaSafe &randint &round &scalarEquals
 	);
 
@@ -38,7 +38,6 @@ This package provides miscellaneous but useful utilities to the WebGUI programme
 =head1 SYNOPSIS
 
  use WebGUI::Utility;
- $string = commify($integer);
  $boolean = isBetween($value, $first, $second);
  $boolean = isIn($value, @array);
  $boolean = isInSubnet($ip, \@subnets);
@@ -57,25 +56,6 @@ This package provides miscellaneous but useful utilities to the WebGUI programme
 These subroutines are available from this package:
 
 =cut
-
-
-#-------------------------------------------------------------------
-
-=head2 commify ( integer )
-
-Returns a number with commas applied at each third character.
-
-=head3 integer
-
-Any old number will do.
-
-=cut
-
-sub commify {
-	my $text = reverse $_[0];
-	$text =~ s/(\d\d\d)(?=\d)(?!\d*\.)/$1,/g;
-	return scalar reverse $text;
-}
 
 
 #-------------------------------------------------------------------

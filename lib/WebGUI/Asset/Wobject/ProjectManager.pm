@@ -17,6 +17,7 @@ use DateTime;
 use Tie::IxHash;
 use WebGUI::International;
 use WebGUI::Utility;
+use Number::Format ();
 use WebGUI::HTML;
 use POSIX qw(ceil floor);
 use Moose;
@@ -762,8 +763,8 @@ sub view {
 	   $hash->{'project.description.data'} = $project->{description};
 	   $hash->{'project.startDate.data'} = $project->{startDate}?$datetime->epochToSet($project->{startDate}):$i18n->get("N_A");
 	   $hash->{'project.endDate.data'} = $project->{endDate}?$datetime->epochToSet($project->{endDate}):$i18n->get("N_A");
-	   $hash->{'project.cost.data.int'} = WebGUI::Utility::commify(int($project->{targetBudget}));
-	   $hash->{'project.cost.data.float'} = WebGUI::Utility::commify($project->{targetBudget});
+	   $hash->{'project.cost.data.int'} = Number::Format::format_number($project->{targetBudget}, 0);
+	   $hash->{'project.cost.data.float'} = Number::Format::format_number($project->{targetBudget});
 	   $hash->{'project.complete.data.int'} = int($project->{percentComplete});
 	   $hash->{'project.complete.data.int'} = 100 if($hash->{'project.complete.data.int'} > 100);
 	   $hash->{'project.complete.data.float'} = sprintf("%2.2f",$project->{percentComplete});
