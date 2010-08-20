@@ -25,6 +25,7 @@ use WebGUI::Asset;
 use WebGUI::Asset::WikiPage;
 use WebGUI::Exception;
 use WebGUI::Shop::Pay;
+use WebGUI::Utility qw/isIn/;
 
 
 my $toVersion = '7.9.4';
@@ -182,7 +183,8 @@ sub addPayDriverTemplates {
             $properties->{summaryTemplateId} = 'GqnZPB0gLoZmqQzYFaq7bg';
         }
         else {
-            die "Unknown payment driver type found.  Unable to automatically upgrade.\n";
+            warn "Unknown payment driver type found.  Unable to automatically upgrade.\n";
+            next GATEWAY;
         }
         $gateway->update($properties);
     }
@@ -232,6 +234,17 @@ sub start {
     );
     my $session = WebGUI::Session->open($webguiRoot,$configFile);
     $session->user({userId=>3});
+
+    my $pay = WebGUI::Shop::Pay->new($session);
+    my @gateways = @{ $pay->getPaymentGateways };
+    GATEWAY: foreach my $gateway (@gateways) {
+        next GATEWAY unless $gateway;
+        if (! isIn ($gateway->className, qw/WebGUI::Shop::PayDriver::Cash WebGUI::Shop::PayDriver::Ogone WebGUI::Shop::PayDriver::ITransact WebGUI::Shop::PayDriver::PayPal::PayPalStd WebGUI::Shop::PayDriver::PayPal::ExpressCheckout/) ) {
+            $session->close;
+            die "Custom payment driver found:".$gateway->className.".  Please read the gotchas.txt file and the POD in WebGUI::Shop::PayDriver on how to update it for the new Cart.  Then, you can safely disable this check.\n";
+        }
+    }
+
     my $versionTag = WebGUI::VersionTag->getWorking($session);
     $versionTag->set({name=>"Upgrade to ".$toVersion});
     return $session;

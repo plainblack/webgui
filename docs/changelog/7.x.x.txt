@@ -6,6 +6,7 @@
  - fixed #11777: Thingy search on yes no field fails
  - fixed #11787: Gallery resolutions wrongly ordered
  - fixed #11785: Article title / URL with äÄöÖüÜ (reopen #11683)
+ - fixed #11799: 7.8.24->7.9.11 upgrade breaks on custom Paydrivers
 
 7.9.12
  - webgui.org homepage gives 404  (#11778)
