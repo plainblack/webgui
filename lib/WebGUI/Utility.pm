@@ -23,7 +23,7 @@ use Net::CIDR::Lite;
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw(&isInSubnet
-	&sortHashDescending &sortHash &isIn &randint &round &scalarEquals
+	&sortHash &isIn &randint &round &scalarEquals
 	);
 
 
@@ -43,7 +43,6 @@ This package provides miscellaneous but useful utilities to the WebGUI programme
  $integer = randint($low,$high);
  $rounded = round($number, $digits);
  %hash = sortHash(%hash);
- %hash = sortHashDescending(%hash);
 
 =head1 METHODS
 
@@ -206,28 +205,6 @@ sub sortHash {
 	my %hash = @_;
 	tie my %newHash, 'Tie::IxHash';
 	for my $key ( sort { $hash{$a} cmp $hash{$b} } keys %hash ) {
-		$newHash{ $key } = $hash{ $key };
-	}
-	return %newHash;
-}
-
-#-------------------------------------------------------------------
-
-=head2 sortHashDescending ( hash )
-
-Sorts a hash in decending order by its values.  Returns a Tie::IxHash.
-You must assign this to a similarly tied hash to preserve the order.
-
-=head3 hash
-
-A hash to be sorted.
-
-=cut
-
-sub sortHashDescending {
-	my %hash = @_;
-	tie my %newHash, 'Tie::IxHash';
-	for my $key ( sort { $hash{$b} cmp $hash{$a} } keys %hash ) {
 		$newHash{ $key } = $hash{ $key };
 	}
 	return %newHash;

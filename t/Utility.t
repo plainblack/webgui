@@ -47,9 +47,7 @@ is(WebGUI::Utility::round(47.6, 0), 48, 'round() - rounds up, too');
 	tie my %hash2, 'Tie::IxHash';
 	tie my %hash3, 'Tie::IxHash';
 	%hash2 = WebGUI::Utility::sortHash(%hash1);
-	%hash3 = WebGUI::Utility::sortHashDescending(%hash1);
 	is_deeply([keys %hash2], [qw/e c b d a/], 'sortHash');
-	is_deeply([keys %hash3], [qw/a d b c e/], 'sortHashDescending');
 }
 
 #####################################################################
