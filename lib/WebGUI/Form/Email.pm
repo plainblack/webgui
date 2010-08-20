@@ -18,6 +18,7 @@ use strict;
 use base 'WebGUI::Form::Text';
 use WebGUI::International;
 use WebGUI::Utility;
+use Email::Valid;
 
 =head1 NAME
 
@@ -66,7 +67,7 @@ An optional value to process instead of POST input.
 sub getValue {
 	my $self = shift;
 	my $value = @_ ? shift : $self->session->form->param($self->get("name"));
-	if ($value =~ WebGUI::Utility::emailRegex) {
+	if (Email::Valid->address($value)) {
 		return $value;
 	}
 	return undef;
