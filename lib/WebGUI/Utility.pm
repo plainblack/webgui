@@ -23,7 +23,7 @@ use Net::CIDR::Lite;
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw(&makeTabSafe &randomizeHash &randomizeArray &isInSubnet
-	&sortHashDescending &sortHash &isIn &makeCommaSafe &randint &round &scalarEquals
+	&sortHashDescending &sortHash &isIn &randint &round &scalarEquals
 	);
 
 
@@ -40,7 +40,6 @@ This package provides miscellaneous but useful utilities to the WebGUI programme
  use WebGUI::Utility;
  $boolean = isIn($value, @array);
  $boolean = isInSubnet($ip, \@subnets);
- $string = makeCommaSafe($string);
  $string = makeTabSafe($string);
  $integer = randint($low,$high);
  $hashRef = randomizeHash(\%hash);
@@ -117,24 +116,6 @@ sub isInSubnet {
 	} else {
 		return 0;
 	}
-}
-
-#-------------------------------------------------------------------
-
-=head2 makeCommaSafe ( text )
-
-Replaces commas with semi-colons and carriage returns with spaces.
-
-=head3 text
-
-The text to search through.
-
-=cut
-
-sub makeCommaSafe {
-	my $text = $_[0];
-	$text =~ tr/,\r\n/; /;
-	return $text;
 }
 
 #-------------------------------------------------------------------

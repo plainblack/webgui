@@ -25,18 +25,6 @@ my $session = WebGUI::Test->session;
 # isIn
 ok(WebGUI::Utility::isIn("webgui", qw(cars trucks webgui trains)), 'isIn()');
 
-# makeCommaSafe
-unlike(WebGUI::Utility::makeCommaSafe("this,that,foo,,bar"),  qr/,/, 'makeCommaSafe()');
-is(
-    WebGUI::Utility::makeCommaSafe("this,that,foo,,bar"),
-    'this;that;foo;;bar', 
-    'makeCommaSafe()'
-);
-is(
-    WebGUI::Utility::makeCommaSafe("this,that\nfoo\rbar\r\n"),
-    'this;that foo bar  ', 
-    'makeCommaSafe()'
-);
 
 # makeTabSafe
 unlike(WebGUI::Utility::makeTabSafe("this\tthat\tfoo\tbar\t"), qr/\t/, 'makeTabSafe()');
