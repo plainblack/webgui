@@ -26,19 +26,6 @@ my $session = WebGUI::Test->session;
 ok(WebGUI::Utility::isIn("webgui", qw(cars trucks webgui trains)), 'isIn()');
 
 
-# makeTabSafe
-unlike(WebGUI::Utility::makeTabSafe("this\tthat\tfoo\tbar\t"), qr/\t/, 'makeTabSafe()');
-is(
-    WebGUI::Utility::makeTabSafe("this\tthat\tfoo\tbar\t"),
-    "this    that    foo    bar    ", 
-    'makeCommaSafe(): clearing tabs'
-);
-is(
-    WebGUI::Utility::makeTabSafe("this\nthat\tfoo\rbar\r\n"),
-    "this that    foo bar  ", 
-    'makeCommaSafe(): clearing tabs, newlines and carriage returns'
-);
-
 # randint
 my $number = WebGUI::Utility::randint(50,75);
 ok($number >= 50 && $number <= 75, 'randint()');

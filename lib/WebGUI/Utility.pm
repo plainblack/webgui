@@ -22,7 +22,7 @@ use Tie::IxHash;
 use Net::CIDR::Lite;
 
 our @ISA = qw(Exporter);
-our @EXPORT = qw(&makeTabSafe &randomizeHash &randomizeArray &isInSubnet
+our @EXPORT = qw(&randomizeHash &randomizeArray &isInSubnet
 	&sortHashDescending &sortHash &isIn &randint &round &scalarEquals
 	);
 
@@ -40,7 +40,6 @@ This package provides miscellaneous but useful utilities to the WebGUI programme
  use WebGUI::Utility;
  $boolean = isIn($value, @array);
  $boolean = isInSubnet($ip, \@subnets);
- $string = makeTabSafe($string);
  $integer = randint($low,$high);
  $hashRef = randomizeHash(\%hash);
  $rounded = round($number, $digits);
@@ -116,25 +115,6 @@ sub isInSubnet {
 	} else {
 		return 0;
 	}
-}
-
-#-------------------------------------------------------------------
-
-=head2 makeTabSafe ( text )
-
-Replaces tabs with four spaces and carriage returns with a space each.
-
-=head3 text
-
-The text to search through.
-
-=cut
-
-sub makeTabSafe {
-	my $text = $_[0];
-	$text =~ tr/\r\n/ /;
-	$text =~ s/\t/    /g;
-	return $text;
 }
 
 #-------------------------------------------------------------------
