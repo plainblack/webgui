@@ -22,7 +22,7 @@ use Tie::IxHash;
 use Net::CIDR::Lite;
 
 our @ISA = qw(Exporter);
-our @EXPORT = qw(&isBetween &makeTabSafe &makeArrayTabSafe &randomizeHash &randomizeArray &isInSubnet
+our @EXPORT = qw(&makeTabSafe &makeArrayTabSafe &randomizeHash &randomizeArray &isInSubnet
 	&sortHashDescending &sortHash &isIn &makeCommaSafe &makeArrayCommaSafe &randint &round &scalarEquals
 	);
 
@@ -38,7 +38,6 @@ This package provides miscellaneous but useful utilities to the WebGUI programme
 =head1 SYNOPSIS
 
  use WebGUI::Utility;
- $boolean = isBetween($value, $first, $second);
  $boolean = isIn($value, @array);
  $boolean = isInSubnet($ip, \@subnets);
  makeArrayCommaSafe(\@array); 
@@ -56,39 +55,6 @@ This package provides miscellaneous but useful utilities to the WebGUI programme
 These subroutines are available from this package:
 
 =cut
-
-#-------------------------------------------------------------------
-
-=head2 isBetween ( value, first, second )
-
-Returns true if value is between two other values (inclusive). Otherwise returns false.
-
-=head3 value
-
-An integer to compare against first and second.
-
-=head3 first
-
-An integer to compare value against.
-
-=head3 second
-
-Another integer to compare value against.
-
-=cut
-
-sub isBetween {
-	my $value = shift;
-	my $first = shift;
-	my $second = shift;
-	if ($first > $second) {
-		($first,$second) = ($second,$first);
-	}
-	if ($value >= $first && $value <= $second) {
-		return 1;
-	}
-	return 0;
-}
 
 #-------------------------------------------------------------------
 

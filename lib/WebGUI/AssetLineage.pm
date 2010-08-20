@@ -1013,7 +1013,9 @@ sub setRank {
                 next;
             }
             last unless $sibling;
-		if (isBetween($sibling->getRank, $newRank, $currentRank)) {
+            my $rank = $sibling->getRank;
+            if ($rank >= $newRank && $rank <= $currentRank
+                || $rank >= $currentRank && $rank <= $newRank) {
             $outputSub->('moving %s', $sibling->getTitle);
 			$sibling->cascadeLineage($previous);
 			$previous = $sibling->lineage;

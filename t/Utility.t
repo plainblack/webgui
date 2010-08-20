@@ -22,14 +22,6 @@ use Test::Deep;
 
 my $session = WebGUI::Test->session;
 
-# isBetween 
-ok(WebGUI::Utility::isBetween(0,-1,1), 'isBetween() - negative and positive range'); 
-ok(WebGUI::Utility::isBetween(0,1,-1), 'isBetween() - negative and positive range, reversed'); 
-ok(WebGUI::Utility::isBetween(11,1,15), 'isBetween() - positive range'); 
-ok(WebGUI::Utility::isBetween(-5,-10,-2), 'isBetween() - negative range'); 
-ok(!WebGUI::Utility::isBetween(+5,-10,-2), 'isBetween() - not in range on high side'); 
-ok(!WebGUI::Utility::isBetween(-15,-10,-2), 'isBetween() - not in range on low side'); 
-
 # isIn
 ok(WebGUI::Utility::isIn("webgui", qw(cars trucks webgui trains)), 'isIn()');
 
