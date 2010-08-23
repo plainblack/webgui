@@ -7,6 +7,7 @@
  - fixed #11787: Gallery resolutions wrongly ordered
  - fixed #11785: Article title / URL with äÄöÖüÜ (reopen #11683)
  - fixed #11799: 7.8.24->7.9.11 upgrade breaks on custom Paydrivers
+ - fixed #11798: Gallery request non existent image
 
 7.9.12
  - webgui.org homepage gives 404  (#11778)
