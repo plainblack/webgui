@@ -121,7 +121,7 @@ sub _build_exports {
     push @cleanups, $cleanup;
     weaken $cleanups[-1];
 
-    my $indent = 0;
+    my $indent = 1;
     my $just_started;
 
     my $subs = {
