@@ -43,7 +43,7 @@ These functions are available from this package:
 =cut
 
 #-------------------------------------------------------------------
-our $macro_re = qr{
+my $macro_re = qr{
     (                               # capture #1 - entire macro call
         \^                              # start with carat
         ([-a-zA-Z0-9_@#/*]{1,64})       # capture #2 - macro name
@@ -61,6 +61,35 @@ our $macro_re = qr{
         ;                               # End with a semicolon.
     )
 }msx;
+
+my $quote_re = qr{
+    (?<!\z)                             # don't try to match if we are at the end of the string
+    (?:                                 # either
+        \s* "                               # white space followed by a double quote
+        ( (?:                               # capture inside
+            [^"\\]                              # something other than backslash or double quote
+        |                                   # or
+            \\.                                 # a backslash followed by any character
+        ) * )                               # as many times as needed
+        " \s*                              # end quote and any white space
+    |                                   # or
+        \s* '                               # same as above, but with single quotes
+        ( (?:
+            [^'\\]
+        |
+            \\.
+        ) * )
+        ' \s*
+    |                                   # or
+        ([^,]*)                             # anything but a comma
+    )
+    (?:                                 # followed by
+        \z                                  # end of the string
+    |                                   # or
+        ,                                   # a comma
+    )
+}msx;
+
 
 =head2 filter ( html )
 
@@ -141,7 +170,7 @@ sub process {
 sub _processMacro {
     my $session = shift;
     my $macroname = shift;
-    my $parameters = shift;
+    my $parameterString = shift;
     if ($macroname =~ /^[-0-9]$/) {    # ^0; ^1; ^2; and ^-; have special uses, don't replace
         return;
     }
@@ -160,48 +189,16 @@ sub _processMacro {
         $session->log->error("Macro has no process sub: $macropackage.");
         return;
     }
-    $parameters =~ s/^\(//;
-    $parameters =~ s/\)$//;
 
-    my @params;
-    while ($parameters =~ m{
-        (?<!\z)                             # don't try to match if we are at the end of the string
-        (?:                                 # either
-            \s* "                               # white space followed by a double quote
-            ( (?:                               # capture inside
-                [^"\\]                              # something other than backslash or double quote
-            |                                   # or
-                \\.                                 # a backslash followed by any character
-            ) * )                               # as many times as needed
-            " \s*                              # end quote and any white space
-        |                                   # or
-            \s* '                               # same as above, but with single quotes
-            ( (?:
-                [^'\\]
-            |
-                \\.
-            ) * )
-            ' \s*
-        |                                   # or
-            ([^,]*)                             # anything but a comma
-        )
-        (?:                                 # followed by
-            \z                                  # end of the string
-        |                                   # or
-            ,                                   # a comma
-        )
-    }xg) {
-        # three matches, only one will exist per run
-        push @params, $+;
-    }
+    my $params = _processParameters($parameterString);
 
-    for my $param (@params) {
-        $param =~ s/\\(.)/$1/xmsg;      # deal with backslash escapes
+    for my $param (@$params) {
         process($session, \$param)
             if ($param);                # process any macros
     }
+
     my $output;
-    unless ( eval { $output = $process->($session, @params); 1 } ) {         # call process sub with parameters
+    unless ( eval { $output = $process->($session, @$params); 1 } ) {         # call process sub with parameters
         $session->log->error("Unable to process macro '$macroname': $@");
         return;
     }
@@ -209,6 +206,61 @@ sub _processMacro {
         if !defined $output;
     process($session, \$output);                                            # also need to process macros on output
     return $output;
+}
+
+sub _processParameters {
+    my $parameters = shift;
+
+    $parameters =~ s/^\(//;
+    $parameters =~ s/\)$//;
+
+    my @params;
+    while ($parameters =~ m{$quote_re}msxg) {
+        # three matches, only one will exist per run
+        my $param = $+;
+        $param =~ s/\\(.)/$1/xmsg;      # deal with backslash escapes
+        push @params, $param;
+    }
+
+    return \@params;
+}
+
+sub transform {
+    my $session = shift;
+    my $content = shift;
+    my $sub = shift;
+
+    ${ $content } =~ s{$macro_re}{
+        my $initialText = $1;
+        my $replaceText = _transformMacro($session, $sub, $initialText, $2, $3);
+        # _processMacro returns undef on failure, use original text
+        defined $replaceText ? $replaceText : $initialText;
+    }ge;
+}
+
+sub _transformMacro {
+    my $session = shift;
+    my $sub = shift;
+    my $original = shift;
+    my $macro = shift;
+    my $paramString = shift;
+
+    my $macroPackage = "WebGUI::Macro::" . $session->config->get("macros")->{$macro};
+    my $params = _processParameters($paramString);
+    return $sub->({
+        session         => $session,
+        macro           => $macro,
+        macroPackage    => $macroPackage,
+        originalText    => $original,
+        parameters      => $params,
+        parameterString => $paramString,
+    });
+}
+
+sub quote {
+    my $text = shift;
+    $text =~ s/([\\'])/\\$1/g;
+    return "'$text'";
 }
 
 1;

@@ -1,15 +1,19 @@
-
 use WebGUI::Upgrade::Script;
 
-report "\tRemoving Admin Bar... ";
-
-session->config->delete( 'macros/AdminBar' );
-
-report "\tEditing templates to remove AdminBar macro calls...";
+start_step "Editing templates to remove AdminBar macro calls";
 
 use WebGUI::Macro;
 use WebGUI::Asset::Template;
 
+my $removeAdminBar = sub {
+    my $macro = shift;
+    if ($macro->{macroPackage} eq 'WebGUI::Macro::AdminBar') {
+        return '';
+    }
+    else {
+        return;
+    }
+};
 my $iter    = WebGUI::Asset::Template->getIsa( session );
 ASSET: while (1) {
     my $template = eval { $iter->() };
@@ -20,17 +24,15 @@ ASSET: while (1) {
     last ASSET unless $template;
 
     my $content = $template->template;
-    while ( $content =~ m/$WebGUI::Macro::macro_re/g ) {
-        my $macroCall   = $1;
-        my $macroName   = $2;
-        if ( $macroName eq 'AdminBar' ) {
-            $content    =~ s/\Q$macroCall//g;
-        }
-    }
-
+    WebGUI::Macro::transform( session, \$content, $removeAdminBar );
     $template->template( $content );
     $template->write;
 }
 
+done;
+
+start_step "Removing Admin Bar";
+
+session->config->delete( 'macros/AdminBar' );
 
 done;
