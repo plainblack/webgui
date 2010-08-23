@@ -1345,10 +1345,14 @@ sub processPropertiesFromFormPost {
         WebGUI::VersionTag->new($session, $self->get('tagId'))->setWorking;
     }
 
-    ### Form is verified
-    # Events are always hidden from navigation
+    ### Form is verified, fix properties
+    if (!$session->form->hasParam('groupIdView')) {
+        $self->update({
+            groupIdView     => $self->getParent->get('groupIdView'),
+        });
+    }
 
-    if (!$self->get("groupIdEdit")) {
+    if (!$session->form->hasParam('groupIdEdit')) {
         my $groupIdEdit =  $self->getParent->get("groupIdEventEdit")
                         || $self->getParent->get("groupIdEdit")
                         ;

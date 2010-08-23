@@ -118,6 +118,7 @@ $properties = {
     %{ $properties },
     ownerUserId     => $user->userId,
     createdBy       => $user->userId,
+    groupIdEdit     => '2',
 };
 
 cmp_deeply( $event->get, superhashof( $properties ), 'Event properties saved correctly' );
@@ -164,6 +165,7 @@ $properties = {
     %{ $properties },
     ownerUserId     => $user->userId,
     createdBy       => $user->userId,
+    groupIdEdit     => '2',
 };
 
 cmp_deeply( $event->get, superhashof( $properties ), 'Events properties saved correctly' );
