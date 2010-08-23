@@ -78,7 +78,7 @@ my $td
         url             => 'testdispatch',
     } );
 
-my $utf8_url = "viel-spa\x{00DF}";
+my $utf8_url = "Viel-spa\x{00DF}";
 utf8::upgrade $utf8_url;
 my $utf8
     = WebGUI::Asset->getImportNode( $session )->addChild( {
