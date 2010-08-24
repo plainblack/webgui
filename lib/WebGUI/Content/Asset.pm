@@ -72,7 +72,6 @@ sub dispatch {
              && !$session->http->ifModifiedSince($asset->getContentLastModified, $session->setting->get('maxCacheTimeout'))) {
                 $session->http->setStatus("304","Content Not Modified");
                 $session->http->sendHeader;
-                $session->close;
                 return "chunked";
             } 
 
