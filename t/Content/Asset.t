@@ -82,7 +82,7 @@ WebGUI::Test->addToCleanup( WebGUI::VersionTag->getWorking( $session ) );
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 17;        # Increment this number for each test you create
+plan tests => 22;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # test getUrlPermutation( url ) method
@@ -183,5 +183,33 @@ $session->setting->set('defaultPage', $td->getId);
 $output  = WebGUI::Content::Asset::dispatch( $session );
 is $output, 'www_view one', 'an empty URL returns the default asset';
 $session->setting->set('defaultPage', $originalDefaultPage);
+
+#----------------------------------------------------------------------------
+# 304 Content Not Modified response
+
+my $newAsset = WebGUI::Asset->getImportNode( $session )->addChild( {
+    className       => 'WebGUI::Asset::Wobject::Article',
+} );
+
+my $tag = WebGUI::VersionTag->getWorking( $session );
+$tag->commit;
+WebGUI::Test->addToCleanup( $tag );
+
+my $http_request = HTTP::Request::Common::GET('http://'.$session->config->get('sitename')->[0]);
+$http_request->header('If-Modified-Since' => $session->datetime->epochToHttp(time + 20)); # 20 seconds into the future!
+my $notModifiedSession  = WebGUI::Test->newSession( undef, $http_request);
+WebGUI::Test->addToCleanup( $notModifiedSession );
+
+my $output = WebGUI::Content::Asset::handler( $notModifiedSession );
+is( $output, "chunked", "304 returns chunked" );
+is( $notModifiedSession->http->getStatus, "304", "http status code set" );
+ok( !$notModifiedSession->closed, "session is not closed" );
+
+$notModifiedSession  = WebGUI::Test->newSession( undef, $http_request);
+WebGUI::Test->addToCleanup( $notModifiedSession );
+$notModifiedSession->user({ userId => 3});
+my $output = WebGUI::Content::Asset::handler( $notModifiedSession );
+isnt( $notModifiedSession->http->getStatus, "304", "logged in user doesn't get 304" );
+ok( !$notModifiedSession->closed, "session is not closed" );
 
 #vim:ft=perl
