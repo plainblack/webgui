@@ -22,7 +22,7 @@ use Tie::IxHash;
 use Net::CIDR::Lite;
 
 our @ISA = qw(Exporter);
-our @EXPORT = qw(&isInSubnet
+our @EXPORT = qw(
 	&sortHash &isIn &round
 	);
 
@@ -39,7 +39,6 @@ This package provides miscellaneous but useful utilities to the WebGUI programme
 
  use WebGUI::Utility;
  $boolean = isIn($value, @array);
- $boolean = isInSubnet($ip, \@subnets);
  $rounded = round($number, $digits);
  %hash = sortHash(%hash);
 
@@ -69,49 +68,6 @@ sub isIn {
 	my $key = shift;
 	$_ eq $key and return 1 for @_;
 	return 0;
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 isInSubnet ( ipAddress, subnets ) 
-
-Verifies whether an IP address is in a given subnet. Returns a 1 if it
-is, undef if there's a formatting error, or 0 if the IP is not in the
-list of subnets.
-
-=head3 ipAddress
-
-A scalar containing an IP address.
-
-=head3 subnets
-
-An array reference containing subnets in CIDR format. Example: 127.0.0.1/32
-
-=cut
-
-sub isInSubnet {
-	my $ip = shift;
-	my $subnets = shift;
-    return 0 unless @{ $subnets };
-	for my $cidr ( @{ $subnets } ) {
-        my @parts = $cidr =~ /^(\d+)\.(\d+)\.(\d+)\.(\d+)\/(\d+)$/;
-        unless ( 5 == @parts ) { # cidr has 5 parts
-            return undef;
-        }
-        unless ( 4 == grep { $_ <= 255 } @parts[0..3] ) { # each octet needs to be between 0 and 255
-            return undef;
-        }
-        unless ( $parts[4] <= 32 ) { # the subnet needs to be less than or equal to 32, as 32 represents only 1 ip address
-            return undef;
-        }
-	}
-	my $net   = Net::CIDR::Lite->new(@{ $subnets });
-	if ($net->find($ip)) {
-		return 1;
-	} else {
-		return 0;
-	}
 }
 
 #-------------------------------------------------------------------

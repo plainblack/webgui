@@ -21,6 +21,7 @@ use WebGUI::Workflow::Instance;
 use WebGUI::Utility;
 use POE::Component::IKC::ClientLite;
 use JSON qw/ decode_json /;
+use Net::CIDR::Lite;
 
 =head1 NAME
 
@@ -482,7 +483,7 @@ sub www_runWorkflow {
         my $session = shift;
 	$session->http->setMimeType("text/plain");
 	$session->http->setCacheControl("none");
-	unless (isInSubnet($session->request->address, $session->config->get("spectreSubnets")) || canRunWorkflow($session)) {
+	unless (Net::CIDR::Lite->new(@{ $session->config->get('spectreSubnets')} )->find($session->request->address) || canRunWorkflow($session)) {
 		$session->errorHandler->security("make a Spectre workflow runner request, but we're only allowed to accept requests from ".join(",",@{$session->config->get("spectreSubnets")}).".");
         	return "error";
 	}

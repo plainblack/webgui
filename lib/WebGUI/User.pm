@@ -22,6 +22,7 @@ use JSON ();
 use WebGUI::ProfileField;
 use Tie::CPHash;
 use Scalar::Util qw( weaken );
+use Net::CIDR::Lite;
 
 =head1 NAME
 
@@ -299,7 +300,7 @@ sub canUseAdminMode {
 	my $pass = 1;
 	my $subnets = $self->session->config->get("adminModeSubnets") || [];
 	if (scalar(@$subnets)) {
-		$pass = WebGUI::Utility::isInSubnet($self->session->request->address, $subnets);
+		$pass = Net::CIDR::Lite->new(@$subnets)->find($self->session->request->address);
 	}
 
 	return $pass && $self->isInGroup(12)

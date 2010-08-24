@@ -18,6 +18,7 @@ use WebGUI::International;
 use WebGUI::Workflow::Cron;
 use WebGUI::Workflow::Instance;
 use WebGUI::Utility;
+use Net::CIDR::Lite;
 
 =head1 NAME
 
@@ -271,7 +272,7 @@ sub www_runCronJob {
         my $session = shift;
 	$session->http->setMimeType("text/plain");
 	$session->http->setCacheControl("none");
-	unless (isInSubnet($session->request->address, $session->config->get("spectreSubnets")) || canView($session)) {
+	unless (Net::CIDR::Lite->new(@{ $session->config->get('spectreSubnets') })->find($session->request->address) || canView($session)) {
 		$session->errorHandler->security("make a Spectre cron job runner request, but we're only allowed to accept requests from ".join(",",@{$session->config->get("spectreSubnets")}).".");
         	return "error";
 	}

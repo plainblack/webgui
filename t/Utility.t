@@ -43,21 +43,6 @@ is(WebGUI::Utility::round(47.6, 0), 48, 'round() - rounds up, too');
 }
 
 
-# isInSubnets
-is(WebGUI::Utility::isInSubnet('192.168.0.1', []), 0, 'isInSubnet: comparing against an empty array ref');
-is(WebGUI::Utility::isInSubnet('192.168.0.1', ['192.168.0.1/32']), 1, 'isInSubnet: comparing against an exact match');
-is(WebGUI::Utility::isInSubnet('192.168.0.2', ['192.168.0.1/32']), 0, 'isInSubnet: comparing against a mismatch');
-is(WebGUI::Utility::isInSubnet('192.168.0.2', ['192.168.0.1/30']), 1, 'isInSubnet: comparing against a match with mask');
-is(WebGUI::Utility::isInSubnet('256.168.0.2', ['192.168.0.1/30']), 0, 'isInSubnet: ip is out of range');
-is(WebGUI::Utility::isInSubnet('192.168.0.1', ['192.168.0.1/33']), undef, 'isInSubnet: mask is out of range');
-is(WebGUI::Utility::isInSubnet('192.168.0.1', ['192.168.0.0.1/33']), undef, 'isInSubnet: ip has too many dots');
-is(WebGUI::Utility::isInSubnet('192.168.0.1', ['0.0.1/33']), undef, 'isInSubnet: ip has too few dots');
-is(WebGUI::Utility::isInSubnet('192.168.0.1', ['192.168.0.1']), undef, 'isInSubnet: ip is missing mask');
-is(WebGUI::Utility::isInSubnet('192.168.0.1', ['256.168.0.1/32']), undef, 'isInSubnet: ip has an out of range quad');
-is(WebGUI::Utility::isInSubnet('192.168.0.1', ['192.257.0.1/32']), undef, 'isInSubnet: ip has an out of range quad');
-is(WebGUI::Utility::isInSubnet('192.168.0.1', ['192.168.258.1/32']), undef, 'isInSubnet: ip has an out of range quad');
-is(WebGUI::Utility::isInSubnet('192.168.0.1', ['192.168.0.259/32']), undef, 'isInSubnet: ip has an out of range quad');
-
 TODO: {
     local $TODO = 'Things to do';
     ok(0, 'Move email validation tests out of Form/Email into here');

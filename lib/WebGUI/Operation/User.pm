@@ -26,6 +26,7 @@ use WebGUI::User;
 use WebGUI::Utility;
 use JSON;
 use XML::Simple;
+use Net::CIDR::Lite;
 
 =head1 NAME
 
@@ -141,7 +142,7 @@ sub canUseService {
     my ( $session ) = @_;
     my $subnets = $session->config->get('serviceSubnets');
     return 1 if !$subnets || !@{$subnets};
-    return 1 if WebGUI::Utility::isInSubnet( $session->request->address, $subnets );
+    return 1 if Net::CIDR::Lite->new(@$subnets)->find($session->request->address);
     return 0; # Don't go away mad, just go away
 }
 

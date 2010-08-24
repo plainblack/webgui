@@ -23,6 +23,7 @@ require WebGUI::Asset;
 use WebGUI::International;
 use WebGUI::DatabaseLink;
 use Scalar::Util qw( weaken );
+use Net::CIDR::Lite;
 
 =head1 NAME
 
@@ -773,7 +774,7 @@ sub getIpUsers {
 	my @ipUsers = ();
 	while (my ($userId, $lastIP) = $sth->array() ) {
 		if (!exists $localCache{$lastIP}) {
-			$localCache{$lastIP} = isInSubnet($lastIP, \@filters);	
+			$localCache{$lastIP} = Net::CIDR::Lite->new(@filters)->find($lastIP);
 		}
 		push @ipUsers, $userId if $localCache{$lastIP};
 	}
@@ -1082,7 +1083,7 @@ sub hasIpUser {
     );
 
 	foreach my $ip (@ips) {
-        return 1 if (isInSubnet($ip,\@filters));
+        return 1 if Net::CIDR::Lite->new(@filters)->find($ip);
     }
     
     return 0;
