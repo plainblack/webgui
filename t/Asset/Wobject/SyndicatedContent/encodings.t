@@ -19,7 +19,6 @@ use lib "$FindBin::Bin/../../../lib";
 use WebGUI::Test;
 use Test::More; # increment this value for each test you create
 use WebGUI::Session;
-plan skip_all => 'set TEST_ENCODINGS to enable this test' unless $ENV{TEST_ENCODINGS};
 plan tests    => 13; # increment this value for each test you create
 use Test::Deep;
 use WebGUI::Asset::Wobject::SyndicatedContent;
@@ -103,6 +102,7 @@ is $syndicated_content->generateFeed->title, $es_title, 'No encoding in prolog, 
 
 $cache->set($iso_8859_1, 60);
 is $syndicated_content->generateFeed->title, $es_title, 'ISO-8859-1 encoded';
+
 $cache->set($iso_8859_5, 60);
 is $syndicated_content->generateFeed->title, $ru_title, 'ISO-8859-5 encoded';
 
