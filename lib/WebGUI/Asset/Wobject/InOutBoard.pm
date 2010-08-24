@@ -199,15 +199,20 @@ sub view {
 
 	my $f = WebGUI::HTMLForm->new($session,-action=>$self->getUrl);
 	if (@users) {
-		my %nameHash;
-		tie %nameHash, "Tie::IxHash";
-		%nameHash = $self->_fetchNames(@users);
-		$nameHash{""} = $i18n->get('myself');
-		%nameHash = WebGUI::Utility::sortHash(%nameHash);
+        my %names = (
+            $self->_fetchNames(@users),
+            "" => $i18n->get('myself'),
+        );
+        my @options =
+            map { @$_ }
+            sort { $a->[1] cmp $b->[1] }
+            map { [ $_, $names{$_} ] }
+            keys %names
+            ;
 
 		$f->selectBox(
 			-name=>"delegate",
-			-options=>\%nameHash,
+			-options=>\@options,
 			-value=>[ $session->scratch->get("userId") ],
 			-label=>$i18n->get('delegate'),
 			-hoverHelp=>$i18n->get('delegate description'),

@@ -165,7 +165,10 @@ sub getOptions {
     my %options = ();
     tie %options, 'Tie::IxHash';
     if (ref $possibleValues eq "HASH") {
-       %options = %{$possibleValues};
+        %options = %{$possibleValues};
+    }
+    elsif (ref $possibleValues eq 'ARRAY') {
+        %options = @$possibleValues;
     }
     else {
         foreach my $line (split "\n", $possibleValues) {
