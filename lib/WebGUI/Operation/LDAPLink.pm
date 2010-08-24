@@ -11,7 +11,6 @@ package WebGUI::Operation::LDAPLink;
 #-------------------------------------------------------------------
 
 use strict;
-use Tie::CPHash;
 use Tie::IxHash;
 use WebGUI::AdminConsole;
 use WebGUI::LDAPLink;
@@ -139,7 +138,6 @@ sub www_copyLDAPLink {
 	my $session = shift;
 	return $session->privilege->insufficient unless canView($session);
 	my (%db);
-	tie %db, 'Tie::CPHash';
 	%db = $session->db->quickHash("select * from ldapLink where ldapLinkId=".$session->db->quote($session->form->process("llid")));
 	$db{ldapLinkId} = "new";
 	$db{ldapLinkName} = "Copy of ".$db{ldapLinkName};
@@ -186,7 +184,6 @@ sub www_editLDAPLink {
     my ($output, %db, $f);
 
 
-    tie %db, 'Tie::CPHash';
     %db = $session->db->quickHash("select * from ldapLink where ldapLinkId=".$session->db->quote($session->form->process("llid")));
    
     my $i18n = WebGUI::International->new($session,"AuthLDAP");

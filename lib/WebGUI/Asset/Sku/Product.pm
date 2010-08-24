@@ -11,7 +11,6 @@ package WebGUI::Asset::Sku::Product;
 #-------------------------------------------------------------------
 
 use strict;
-use Tie::CPHash;
 use Tie::IxHash;
 use WebGUI::HTMLForm;
 use WebGUI::Storage;
@@ -1660,8 +1659,7 @@ sub view {
         my $out = $cache->get( $cacheKey );
         return $out if $out;
     }
-    my (%data, $segment, %var, @featureloop, @benefitloop, @specificationloop, @accessoryloop, @relatedloop);
-    tie %data, 'Tie::CPHash';
+    my ($segment, %var, @featureloop, @benefitloop, @specificationloop, @accessoryloop, @relatedloop);
     my $brochure = $self->get("brochure");
     my $manual   = $self->get("manual");
     my $warranty = $self->get("warranty");

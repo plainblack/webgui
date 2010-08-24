@@ -84,7 +84,6 @@ checkModule("Net::SMTP",                    2.31         );
 checkModule("MIME::Tools",                  5.427        );
 checkModule("Net::POP3",                    2.29         );
 checkModule("Tie::IxHash",                  1.21         );
-checkModule("Tie::CPHash",                  1.04         );
 checkModule("XML::Simple",                  2.18         );
 checkModule("DateTime",                     0.4501       );
 checkModule("Time::HiRes",                  1.9719       );

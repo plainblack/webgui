@@ -20,7 +20,6 @@ use WebGUI::Utility;
 use WebGUI::Workflow::Instance;
 use JSON ();
 use WebGUI::ProfileField;
-use Tie::CPHash;
 use Scalar::Util qw( weaken );
 use Net::CIDR::Lite;
 
@@ -1075,7 +1074,6 @@ sub new {
     weaken( $self->{_session} );
     unless ($self->{_userId} && $self->{_user}{username}) {
         my %user;
-        tie %user, 'Tie::CPHash';
         %user = $session->db->quickHash("select * from users where userId=?",[$userId]);
         my %profile 
             = $session->db->quickHash(

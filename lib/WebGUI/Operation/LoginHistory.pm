@@ -15,7 +15,6 @@ use WebGUI::AdminConsole;
 use WebGUI::International;
 use WebGUI::Paginator;
 use WebGUI::SQL;
-use Tie::CPHash;
 
 =head1 NAME
 
@@ -54,7 +53,6 @@ sub www_viewLoginHistory {
         return $session->privilege->adminOnly() unless canView($session);
 	my ($output, $p, @row, $i, $sth, %data);
 	my $i18n = WebGUI::International->new($session);
-	tie %data, 'Tie::CPHash';
 	$sth = $session->db->read("select * from users,userLoginLog where users.userId=userLoginLog.userId order by userLoginLog.timeStamp desc");	
 	while (%data = $sth->hash) {
 		$data{username} = $i18n->get('unknown user') if ($data{userId} eq "0");

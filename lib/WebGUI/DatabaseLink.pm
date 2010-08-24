@@ -16,7 +16,6 @@ package WebGUI::DatabaseLink;
 
 
 use strict;
-use Tie::CPHash;
 use WebGUI::SQL;
 use WebGUI::International;
 use WebGUI::Utility;
@@ -339,7 +338,7 @@ sub new {
 	my $class          = shift;
 	my $session        = shift;
 	my $databaseLinkId = shift;
-	tie my %databaseLink, 'Tie::CPHash';
+	my %databaseLink;
 	unless ($databaseLinkId eq "") {
 		if ($databaseLinkId eq "0") {
 			%databaseLink = (

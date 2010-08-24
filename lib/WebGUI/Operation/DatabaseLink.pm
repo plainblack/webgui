@@ -11,7 +11,6 @@ package WebGUI::Operation::DatabaseLink;
 #-------------------------------------------------------------------
 
 use strict;
-use Tie::CPHash;
 use WebGUI::AdminConsole;
 use WebGUI::DatabaseLink;
 use WebGUI::Exception;
@@ -157,7 +156,6 @@ sub www_editDatabaseLink {
 	my $session = shift;
         return $session->privilege->insufficient unless canView($session);
         my ($output, %db, $f);
-	tie %db, 'Tie::CPHash';
 	if ($session->form->process("dlid") eq "new") {
 		# Default values are SELECT, DESCRIBE and SHOW
 		$db{allowedKeywords} = "select\ndescribe\nshow";		
