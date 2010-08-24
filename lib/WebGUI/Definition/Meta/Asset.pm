@@ -71,7 +71,7 @@ around add_property => sub {
 
 =head2 get_tables ( )
 
-Returns an array of the names of all tables in every class used by this class.
+Returns an array of the names of all tables in every property used by this class.
 
 =cut
 
