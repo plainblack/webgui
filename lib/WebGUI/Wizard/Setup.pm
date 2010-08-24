@@ -99,6 +99,11 @@ h1 {
     padding: 10px;
 }
 
+/* From asset www_edit */
+* { font: 12pt Helvetica, sans-serif; }
+label.formDescription { display: block; margin-top: 1em; font-weight: bold }
+/* End from asset www_edit */
+
 .stylePicker img {
     margin: 1em 0;
     float: right;
@@ -243,7 +248,6 @@ sub www_companyInformation {
     my $output = '<h1>' . $i18n->get('company information') . '</h1>';
 
     my $f = $self->getForm;
-    $f->hidden( name => "step", value => "3" );
     $f->text(
         name      => "companyName",
         value     => $session->setting->get("companyName"),
