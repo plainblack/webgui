@@ -22,7 +22,7 @@ use DateTime::TimeZone;
 use Scalar::Util qw( weaken );
 use Tie::IxHash;
 use WebGUI::International;
-use WebGUI::Utility qw(round isIn);
+use WebGUI::Utility qw(isIn);
 use Scalar::Util qw(weaken);
 
 
@@ -815,40 +815,25 @@ The number of seconds in the interval.
 
 =cut
 
+my %intervals = (
+    31536000    => "703", # years
+    2592000     => "702", # months
+    604800      => "701", # weeks
+    86400       => "700", # days
+    3600        => "706", # hours
+    60          => "705", # minutes
+);
+
 sub secondsToInterval {
-	my $self = shift;
-	my $seconds = shift;
+    my $self = shift;
+    my $seconds = shift;
     my $i18n = WebGUI::International->new($self->session, 'WebGUI');
-	my ($interval, $units);
-	if ($seconds >= 31536000) {
-		$interval = round($seconds/31536000);
-		$units = $i18n->get("703");
-	}
-    elsif ($seconds >= 2592000) {
-        $interval = round($seconds/2592000);
-        $units = $i18n->get("702");
-	}
-    elsif ($seconds >= 604800) {
-        $interval = round($seconds/604800);
-        $units = $i18n->get("701");
-	}
-    elsif ($seconds >= 86400) {
-        $interval = round($seconds/86400);
-        $units = $i18n->get("700");
+    for my $unit (sort { $b <=> $a } keys %intervals) {
+        if ($seconds > $unit) {
+            return (sprintf('%.0f', $seconds / $unit), $i18n->get($intervals{$unit}));
+        }
     }
-    elsif ($seconds >= 3600) {
-        $interval = round($seconds/3600);
-        $units = $i18n->get("706");
-    }
-    elsif ($seconds >= 60) {
-        $interval = round($seconds/60);
-        $units = $i18n->get("705");
-    }
-    else {
-        $interval = $seconds;
-        $units = $i18n->get("704");
-	}
-	return ($interval, $units);
+    return ($seconds, $i18n->get("704")); # seconds
 }
 
 #-------------------------------------------------------------------
@@ -867,17 +852,9 @@ sub secondsToExactInterval {
     my $self = shift;
     my $seconds = shift;
     my $i18n = WebGUI::International->new($self->session, 'WebGUI');
-    my %units = (
-        31536000    => "703", # years
-        2592000     => "702", # months
-        604800      => "701", # weeks
-        86400       => "700", # days
-        3600        => "706", # hours
-        60          => "705", # minutes
-    );
-    for my $unit (sort { $b <=> $a } keys %units) {
+    for my $unit (sort { $b <=> $a } keys %intervals) {
         if ($seconds % $unit == 0) {
-            return ($seconds / $unit, $i18n->get($units{$unit}));
+            return ($seconds / $unit, $i18n->get($intervals{$unit}));
         }
     }
     return ($seconds, $i18n->get("704")); # seconds

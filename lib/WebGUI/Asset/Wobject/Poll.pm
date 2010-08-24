@@ -502,9 +502,9 @@ sub view {
                 	push(@answers,{
 				"answer.form"=>WebGUI::Form::radio($self->session,{name=>"answer",value=>"a".$i}),
 				"answer.text"=>$self->get('a'.$i),
-				"answer.graphWidth"=>round($self->get("graphWidth")*$tally/$totalResponses),
+				"answer.graphWidth"=>sprintf('%.0f', $self->get("graphWidth")*$tally/$totalResponses),
 				"answer.number"=>$i,
-				"answer.percent"=>round(100*$tally/$totalResponses),
+				"answer.percent"=>sprintf('%0.f', 100*$tally/$totalResponses),
 				"answer.total"=>($tally+0)
                         	});
 			push(@dataset, ($tally+0));

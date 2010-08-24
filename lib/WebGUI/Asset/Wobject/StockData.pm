@@ -108,7 +108,7 @@ sub _appendStockVars {
    }
    $hash->{'stocks.p_change'} = _na($data->{$symbol,"p_change"});
    $hash->{'stocks.volume'} = _na($data->{$symbol,"volume"});
-   $hash->{'stocks.volume.millions'} = _na(WebGUI::Utility::round(($hash->{'stocks.volume'}/1000000),2));
+   $hash->{'stocks.volume.millions'} = _na(sprintf('%.2f', $hash->{'stocks.volume'}/1000000));
    $hash->{'stocks.avg_vol'} = _na($data->{$symbol,"avg_vol"});
    $hash->{'stocks.bid'} = _na($data->{$symbol,"bid"});
    $hash->{'stocks.ask'} = _na(Number::Format::format_number($data->{$symbol,"ask"}));

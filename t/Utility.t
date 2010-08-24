@@ -25,12 +25,6 @@ my $session = WebGUI::Test->session;
 # isIn
 ok(WebGUI::Utility::isIn("webgui", qw(cars trucks webgui trains)), 'isIn()');
 
-
-# round
-is(WebGUI::Utility::round(47.133984233, 0), 47, 'round() - 0 significant digits');
-is(WebGUI::Utility::round(47.133984233, 3), 47.134, 'round() - multiple significant digits');
-is(WebGUI::Utility::round(47.6, 0), 48, 'round() - rounds up, too');
-
 {
 	# Just some basic tests for now.
 

@@ -1500,7 +1500,7 @@ sub recalculateRating {
             [$self->getId]
         );
 
-    my $average = round($sum/$count);
+    my $average = sprintf('%.0f', $sum/$count);
     $self->update({rating=>$average});
 }
 

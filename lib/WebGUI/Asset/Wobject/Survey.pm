@@ -2252,7 +2252,7 @@ END_SQL
                 && WebGUI::DateTime->new( $self->session, $row->{endDate} )->toUserTimeZone,
             response_user_name => ( $row->{userId} eq '1' ) ? $row->{ipAddress} : $row->{username},
             response_count_correct => $correctCount,
-            response_percent       => round( ( $correctCount / $var->{question_count} ) * 100 ),
+            response_percent       => sprintf('%.0f', ( $correctCount / $var->{question_count} ) * 100 ),
             };
     }
     $var->{response_loop} = \@responseloop;
@@ -2302,7 +2302,7 @@ sub www_viewStatisticalOverview {
                     [$sectionIndex,$questionIndex,$answerIndex]);
                 my $responsePercent;
                 if ($totalResponses) {
-                    $responsePercent = round(($numResponses/$totalResponses)*100);
+                    $responsePercent = sprintf('%.0f', ($numResponses/$totalResponses)*100);
                 } else {
                     $responsePercent = 0;
                 }

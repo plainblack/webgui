@@ -23,7 +23,7 @@ use Net::CIDR::Lite;
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw(
-	&sortHash &isIn &round
+	&sortHash &isIn
 	);
 
 
@@ -39,7 +39,6 @@ This package provides miscellaneous but useful utilities to the WebGUI programme
 
  use WebGUI::Utility;
  $boolean = isIn($value, @array);
- $rounded = round($number, $digits);
  %hash = sortHash(%hash);
 
 =head1 METHODS
@@ -68,29 +67,6 @@ sub isIn {
 	my $key = shift;
 	$_ eq $key and return 1 for @_;
 	return 0;
-}
-
-#-------------------------------------------------------------------
-
-=head2 round ( float [, significantDigits ] )
-
-Returns an integer after rounding a floating point number.
-
-=head3 float
-
-Any floating point number.
-
-=head3 significantDigits
-
-The number of digits to leave after the decimal point. Defaults to 0.
-
-B<NOTE:> If you set this higher than 0 then you'll get back another floating point number rather than an integer.
-
-=cut
-
-sub round {
-	my $significantDigits = $_[1] || 0;
-        return sprintf(('%.'.$significantDigits.'f'), $_[0]);
 }
 
 #-------------------------------------------------------------------

@@ -193,7 +193,7 @@ Returns the HTML needed to render the average rating icon.
 
 sub getAverageCommentRatingIcon {
 	my $self = shift;
-	return q{<img src="}.$self->session->url->extras('form/CommentRating/'.round($self->get('averageCommentRating'),0).'.png').q{" style="vertical-align: middle;" alt="}.$self->get('averageCommentRating').q{" />};
+	return q{<img src="}.$self->session->url->extras('form/CommentRating/'.sprintf('%.0f', $self->get('averageCommentRating')).'.png').q{" style="vertical-align: middle;" alt="}.$self->get('averageCommentRating').q{" />};
 	
 }
 

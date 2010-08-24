@@ -251,7 +251,7 @@ sub getAnchorSpacing {
 
 	my $numberOfGroups = List::Util::max(map {scalar @$_} @{$self->getDataset});
 
-	my $spacing = round(($self->getChartWidth - ($numberOfGroups-1) * $self->getGroupSpacing) / $numberOfGroups + $self->getGroupSpacing);
+	my $spacing = sprintf('%.0f', ($self->getChartWidth - ($numberOfGroups-1) * $self->getGroupSpacing) / $numberOfGroups + $self->getGroupSpacing);
 
 	return {
 		x	=> $spacing,
@@ -320,7 +320,7 @@ sub getFirstAnchorLocation {
 	my $self = shift;
 
 	return {
-		x	=> round($self->getChartOffset->{x} + ($self->getAnchorSpacing->{x} - $self->getGroupSpacing) / 2),
+		x	=> sprintf('%.0f', $self->getChartOffset->{x} + ($self->getAnchorSpacing->{x} - $self->getGroupSpacing) / 2),
 		y	=> $self->getChartOffset->{y} + $self->getChartHeight
 	}
 }

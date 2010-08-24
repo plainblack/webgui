@@ -235,7 +235,7 @@ sub formatDuration {
         if ($hours[0]) {
             $formattedDuration = join ' ', @hours;
         }
-        my $minutes = round(($duration - $hours)/60)*60;
+        my $minutes = sprintf('%.0f', ($duration - $hours) / 60 ) * 60;
         my @minutes = $datetime->secondsToInterval($minutes);
         if ($minutes[0]) {
             $formattedDuration .= ', ', if $formattedDuration;
