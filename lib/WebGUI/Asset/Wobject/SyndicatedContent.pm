@@ -165,9 +165,9 @@ sub generateFeed {
         # if the content can be downgraded, it is either valid latin1 or didn't have
         # an HTTP Content-Encoding header.  In the second case, XML::FeedPP will take
         # care of any encoding specified in the XML prolog
-        utf8::downgrade($value, 1);
+        utf8::downgrade($value, 1) ? 1 : 0;
         eval {
-            my $singleFeed = XML::FeedPP->new($value, utf8_flag => 1, -type => 'string', %opt);
+            my $singleFeed = XML::FeedPP->new($value, utf8_flag => 1, -type => 'string', xml_deref => 1, %opt);
             $feed->merge_channel($singleFeed);
             $feed->merge_item($singleFeed);
         };
@@ -175,7 +175,6 @@ sub generateFeed {
             $log->warn("Syndicated Content asset (".$self->getId.") has a bad feed URL (".$url."). Failed with ".$@);
         }
 	}
-
 
 	# build a new feed that matches the term the user is interested in
 	if ($self->hasTerms ne '') {

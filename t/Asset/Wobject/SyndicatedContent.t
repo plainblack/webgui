@@ -190,20 +190,6 @@ Rich Text editor in the first sentence of the description.",
 #
 ####################################################################
 
-sub withCachedFeed {
-    my ($url, $path, $block) = @_;
-    $syndicated_content->update({ rssUrl => $url });
-
-    open my $file, '<', WebGUI::Test->getTestCollateralPath($path)
-        or die "Unable to get RSS file: $path";
-    my $content = do { local $/; <$file> };
-    close $file;
-
-    $session->cache->set($url, $content, 60);
-    $block->();
-    $session->cache->remove($url);
-}
-
 sub titles_are {
     my ($expected, $message) = @_;
     my $feed = $syndicated_content->generateFeed;
@@ -211,18 +197,23 @@ sub titles_are {
     cmp_deeply \@got, $expected, $message;
 }
 
-$syndicated_content->update({ hasTerms => 'WebGUI' });
+$syndicated_content->update({ hasTerms => 'WebGUI', });
+my $testFeedUrl = 'http://www.example.com/feed.rss';
+$syndicated_content->update({ rssUrl => $testFeedUrl, });
+my $cache = WebGUI::Cache->new($session, $testFeedUrl, 'RSS');
+$cache->set(slurp_rss('tbb.rss'), 60);
 
-withCachedFeed 'http://www.plainblack.com/tbb.rss', 'tbb.rss', sub {
-    titles_are(
-        [
-            'Google Picasa Plugin for WebGUI Gallery',
-            'WebGUI Roadmap',
-            'WebGUI 8 Performance',
-        ],
-        'generateFeed: filters items based on the terms being in title, or description'
-    );
-};
+my $feed = $syndicated_content->generateFeed;
+
+titles_are(
+    [
+        'Google Picasa Plugin for WebGUI Gallery',
+        'WebGUI Roadmap',
+        'WebGUI 8 Performance',
+    ],
+    'generateFeed: filters items based on the terms being in title, or description'
+);
+
 
 ####################################################################
 #
@@ -235,13 +226,11 @@ $syndicated_content->update({
     hasTerms     => '',
     maxHeadlines => 50,
 });
+$cache->set(slurp_rss('duplicate-link.rss'), 60);
 
-withCachedFeed 'http://www.oncp.gob.ve/oncp.xml', 'oncp.xml', sub {
-    my $oddFeed1 = $syndicated_content->generateFeed();
-
-    my @oddItems = $oddFeed1->get_item();
-    is (@oddItems, 13, 'feed has items even without pubDates or links');
-};
+my $oddFeed1 = $syndicated_content->generateFeed();
+my @oddItems = $oddFeed1->get_item();
+is (@oddItems, 2, 'feed has items even without pubDates or links');
 
 ####################################################################
 #
@@ -249,27 +238,36 @@ withCachedFeed 'http://www.oncp.gob.ve/oncp.xml', 'oncp.xml', sub {
 #
 ####################################################################
 
-withCachedFeed 'http://www.plainblack.com/tbb.rss', 'tbb_odd.rss', sub {
-    my @ascending  = (
-        'I have arrived in Lisboa!',
-        'WebGUI 8 Performance',
-        'WebGUI Roadmap',
-        'Google Picasa Plugin for WebGUI Gallery',
-    );
-    my @descending = reverse @ascending;
-    my @feed       = (
-        'WebGUI Roadmap',
-        'Google Picasa Plugin for WebGUI Gallery',
-        'I have arrived in Lisboa!',
-        'WebGUI 8 Performance',
-    );
+$cache->set(slurp_rss('tbb_odd.rss'), 60);
+my @ascending  = (
+    'I have arrived in Lisboa!',
+    'WebGUI 8 Performance',
+    'WebGUI Roadmap',
+    'Google Picasa Plugin for WebGUI Gallery',
+);
+my @descending = reverse @ascending;
+my @feed       = (
+    'WebGUI Roadmap',
+    'Google Picasa Plugin for WebGUI Gallery',
+    'I have arrived in Lisboa!',
+    'WebGUI 8 Performance',
+);
 
-    $syndicated_content->update({ sortItems => 'pubDate_asc' });
-    titles_are \@ascending, 'ascending sort';
+$syndicated_content->update({ sortItems => 'pubDate_asc' });
+titles_are \@ascending, 'ascending sort';
 
-    $syndicated_content->update({ sortItems => 'pubDate_des' });
-    titles_are \@descending, 'descending sort';
+$syndicated_content->update({ sortItems => 'pubDate_des' });
+titles_are \@descending, 'descending sort';
 
-    $syndicated_content->update({ sortItems => 'feed' });
-    titles_are \@feed, 'feed order';
-};
+$syndicated_content->update({ sortItems => 'feed' });
+titles_are \@feed, 'feed order';
+
+sub slurp_rss {
+    my $file = shift;
+    my $filepath = WebGUI::Test->getTestCollateralPath('rss/' . $file);
+    open my $fh, '<', $filepath
+        or die "Unable to get RSS file $file: $!";
+    my $content = do { local $/; <$fh> };
+    close $fh;
+    return $content;
+}
