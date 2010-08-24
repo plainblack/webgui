@@ -208,7 +208,7 @@ sub get_property_list {
 
 #-------------------------------------------------------------------
 
-=head2 property_traits ( )
+=head2 property_metaroles ( )
 
 Returns the name of the class for properties.
 
