@@ -1157,6 +1157,7 @@ WebGUI.Admin.LocationBar.prototype.addFilter
         inputElem.type = "text";
         li.appendChild( inputElem );
         YAHOO.util.Event.on( inputElem, 'keyup', this.updateLocationBarQuery, this, true );
+        inputElem.focus();
     }
 };
 
