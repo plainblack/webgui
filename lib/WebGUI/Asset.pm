@@ -1756,7 +1756,7 @@ sub loadModule {
         return $className;
     }
 
-    WebGUI::Error::Compile->throw(class => $className, cause => $@);
+    WebGUI::Error::Compile->throw(class => $className, error => $@);
     return undef;
 }
 
