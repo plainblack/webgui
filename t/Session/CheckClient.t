@@ -20,8 +20,7 @@
 
 use FindBin;
 use strict;
-use lib "$FindBin::Bin/lib";
-use lib '/data/WebGUI/t/lib';
+use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
 use WebGUI::Session;
