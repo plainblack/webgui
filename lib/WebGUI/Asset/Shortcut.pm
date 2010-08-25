@@ -686,9 +686,7 @@ Return the asset that this Shortcut points to.
 
 sub getShortcutDefault {
 	my $self = shift;
-use Carp; $self->get('shortcutToAssetId') or Carp::confess('no ShortcutToAssetId; our getId says: ' . $self->getId);
-warn "getShortcutDefault has a shortcutToAssetId of: " . $self->get('shortcutToAssetId');
-	return WebGUI::Asset->newById($self->session, $self->get("shortcutToAssetId")); # XXX "newById must get an assetId"
+	return WebGUI::Asset->newById($self->session, $self->get("shortcutToAssetId"));
 }
 
 #-------------------------------------------------------------------
