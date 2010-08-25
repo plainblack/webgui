@@ -1133,6 +1133,13 @@ WebGUI.Admin.LocationBar.prototype.addFilter
     var li          = document.createElement( 'li' );
     filter.li       = li;
 
+    var type        = menuitem.value;
+    filter.type     = type;
+    li.className    = "filter_" + filter.type;
+
+    var ul = document.getElementById( 'searchFilters' );
+    ul.appendChild( li );
+
     var delIcon     = document.createElement('img');
     delIcon.className = "clickable";
     YAHOO.util.Event.on( delIcon, "click", function(){ 
@@ -1144,17 +1151,13 @@ WebGUI.Admin.LocationBar.prototype.addFilter
     nameElem.appendChild( document.createTextNode( name ) );
     li.appendChild( nameElem );
 
-    if ( menuitem.value == "title" ) {
-        filter.type = "title";
+    if ( filter.type == "title" ) {
         var inputElem   = document.createElement('input');
         filter.inputElem = inputElem;
         inputElem.type = "text";
         li.appendChild( inputElem );
         YAHOO.util.Event.on( inputElem, 'keyup', this.updateLocationBarQuery, this, true );
     }
-
-    var ul = document.getElementById( 'searchFilters' );
-    ul.appendChild( li );
 };
 
 /**
