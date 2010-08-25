@@ -21,7 +21,7 @@ sub list_of_tables {
 }
 
 sub parent_list {
-    return ['WebGUI::Asset::Wobject::StoryArchive'];
+    return ['WebGUI::Asset::Wobject::StoryArchive', 'WebGUI::Asset::Wobject::Folder'];
 }
 
 sub t_11_getEditForm : Tests {
