@@ -602,7 +602,7 @@ __DATA__
                     <input type="button" id="backButton" value="&lt;" /><input type="button" id="forwardButton" value="&gt;" />
                 </span>
                 <div id="location">
-                    <input type="text" id="locationUrl" value="" />
+                    <input type="text" id="locationInput" value="" />
                     <span id="locationTitle"></span>
                 </div>
                 <span id="right">

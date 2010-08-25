@@ -103,7 +103,7 @@ html,body { margin: 0; padding: 0; height: 100% }
     -webkit-border-radius: 3px;
 }
 
-#locationBar #locationUrl { 
+#locationBar #locationInput { 
     width: 99%;
     height: 90%;
     border: none;

@@ -746,6 +746,7 @@ WebGUI.Admin.LocationBar
     this.currentAssetDef    = null; // Object containing assetId, title, url, icon
     this.backAssetDefs      = [ ];  // Asset defs to go back to
     this.forwardAssetDefs   = [ ];  // Asset defs to go forward to
+    this.filters            = [ ];  // search filters
 
     // Private members
     var self = this;
@@ -787,7 +788,7 @@ WebGUI.Admin.LocationBar
         menu : 'searchFilterSelect'
     } );
     var self = this;
-    YAHOO.util.Event.onDOMReady( 'searchFilterSelect', function () {
+    YAHOO.util.Event.on( window, "load", function () {
         self.filterSelect.getMenu().subscribe( "click", self.addFilter, self, true );
     } );
 
@@ -795,13 +796,13 @@ WebGUI.Admin.LocationBar
     YAHOO.util.Event.on( 'searchKeywords', 'blur', this.blurKeywords, this, true );
 
     // Take control of the location input
-    this.klInput = new YAHOO.util.KeyListener( "locationUrl", { keys: 13 }, {
+    this.klInput = new YAHOO.util.KeyListener( "locationInput", { keys: 13 }, {
         fn: this.doInputSearch,
         scope: this,
         correctScope: true
     } );
-    YAHOO.util.Event.addListener( "locationUrl", "focus", this.inputFocus, this, true );
-    YAHOO.util.Event.addListener( "locationUrl", "blur", this.inputBlur, this, true );
+    YAHOO.util.Event.addListener( "locationInput", "focus", this.inputFocus, this, true );
+    YAHOO.util.Event.addListener( "locationInput", "blur", this.inputBlur, this, true );
 
 };
 
@@ -855,7 +856,7 @@ WebGUI.Admin.LocationBar.prototype.clickForwardMenuItem
  */
 WebGUI.Admin.LocationBar.prototype.doInputSearch
 = function ( ) {
-    var input = document.getElementById("locationUrl").value;
+    var input = document.getElementById("locationInput").value;
     // If input starts with a / it's a URL
     if ( input.match(/^\//) ) {
         // If it doesn't have a ?, just go to the asset
@@ -984,7 +985,7 @@ WebGUI.Admin.LocationBar.prototype.setTitle
  */
 WebGUI.Admin.LocationBar.prototype.setUrl
 = function ( url ) {
-    var input = document.getElementById( "locationUrl" );
+    var input = document.getElementById( "locationInput" );
     input.value = url;
 };
 
@@ -1111,6 +1112,82 @@ WebGUI.Admin.LocationBar.prototype.hideSearchDialog
     };
     anim.onComplete.subscribe( hideContent, this );
     anim.animate();
+};
+
+/**
+ * addFilter ( eventType, args )
+ * Add the selected filter into the filter list
+ */
+WebGUI.Admin.LocationBar.prototype.addFilter
+= function ( eventType, args ) {
+    var self        = this;
+    var ev          = args[0];
+    var menuitem    = args[1];
+    var keys = {}; // Listen for all keys
+
+    // Keep track of our filters
+    var filter = { }; 
+    this.filters.push( filter );
+
+    var li          = document.createElement( 'li' );
+    filter.li       = li;
+
+    var delIcon     = document.createElement('img');
+    delIcon.className = "clickable";
+    YAHOO.util.Event.on( delIcon, "click", function(){ 
+        self.removeFilter( filter.li );
+    } );
+
+    var name        = menuitem.cfg.getProperty('text');
+    var nameElem    = document.createElement('span');
+    nameElem.appendChild( document.createTextNode( name ) );
+    li.appendChild( nameElem );
+
+    if ( menuitem.value == "title" ) {
+        filter.type = "title";
+        var inputElem   = document.createElement('input');
+        filter.inputElem = inputElem;
+        inputElem.type = "text";
+        li.appendChild( inputElem );
+        YAHOO.util.Event.on( inputElem, 'keyup', this.updateLocationBarQuery, this, true );
+    }
+
+    var ul = document.getElementById( 'searchFilters' );
+    ul.appendChild( li );
+};
+
+/**
+ * updateLocationBarQuery( )
+ * Update the location bar text with the filters in the search box
+ */
+WebGUI.Admin.LocationBar.prototype.updateLocationBarQuery
+= function () {
+    var query   = "";
+
+    // First add filters
+    var filterVals = [];
+    for ( var i = 0; i < this.filters.length; i++ ) {
+        var filter = this.filters[i];
+        if ( filter.type == "title" ) {
+            var value = filter.inputElem.value;
+            var quote = "";
+            if ( value.match(/\s/) ) {
+                quote = '"';
+            }
+            filterVals.push( "title:" + quote + filter.inputElem.value + quote );
+        }
+    }
+    query += filterVals.join(" ");
+
+
+    // Then add keywords
+    if ( query != "" ) {
+        query += " "; // Add a space between filters and keywords
+    }
+    query += document.getElementById( 'searchKeywords' ).value;
+
+    // Set the new value
+    document.getElementById( 'locationInput' ).value = query;
 };
 
 /****************************************************************************
