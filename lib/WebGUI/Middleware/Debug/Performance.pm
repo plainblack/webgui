@@ -57,8 +57,8 @@ my $log_template = __PACKAGE__->build_template(<<'EOTMPL');
                     <%= $event->{message} %>
 %     }
 %     if ($event->{assetTitle}) {
-                    <a href="<%= $event->{viewUrl} %>">View</a>
-                    <a href="<%= $event->{editUrl} %>">Edit</a>
+                    <a style="color: #00a; text-decoration: underline" href="<%= $event->{viewUrl} %>">View</a>
+                    <a style="color: #00a; text-decoration: underline" href="<%= $event->{editUrl} %>">Edit</a>
                     <%= $event->{assetTitle} %>
 %     }
                 </td>
