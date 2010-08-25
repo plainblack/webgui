@@ -10,6 +10,13 @@ input.disabled {
     color: #555;
 }
 
+.with_avatar {
+    background-position: 0 0;
+    background-repeat: no-repeat;
+    padding-left: 50px;
+    min-height: 50px;
+}
+
 #wrapper {
     position: relative;
     margin-left: 165px; /* move out of the adminbar's way */
@@ -168,7 +175,9 @@ input.disabled {
     display: block;
 }
 
-#searchFilters span {
+#searchFilters li { height: 28px; } /* autocomplete is position: absolute, so pretend some height */
+
+#searchFilters span.name {
     display: block;
     float: left;
     width: 9%;
@@ -181,10 +190,23 @@ input.disabled {
     clear: both;
 }
 
-.filter_title input {
+.filter_title input, .filter_ownerUserId div.autocomplete {
     display: block;
     float: left;
     width: 89%;
+}
+
+#searchFilters .yui-ac-bd li {
+    height: 50px;
+}
+
+.autocomplete_value {
+    font-size:  larger;
+    font-weight: bold;
+}
+
+.autocomplete_subtext {
+    font-size: smaller;
 }
 
 #wrapper .yui-content {

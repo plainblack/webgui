@@ -1158,6 +1158,7 @@ WebGUI.Admin.LocationBar.prototype.addFilter
 
     var name        = menuitem.cfg.getProperty('text');
     var nameElem    = document.createElement('span');
+    nameElem.className = "name";
     nameElem.appendChild( document.createTextNode( name ) );
     li.appendChild( nameElem );
 
@@ -1167,6 +1168,48 @@ WebGUI.Admin.LocationBar.prototype.addFilter
         inputElem.type = "text";
         li.appendChild( inputElem );
         YAHOO.util.Event.on( inputElem, 'keyup', this.updateLocationBarQuery, this, true );
+        inputElem.focus();
+    }
+    else if ( filter.type == "ownerUserId" ) {
+        var container       = document.createElement( 'div' );
+        container.className = "autocomplete";
+        li.appendChild( container );
+
+        var inputElem       = document.createElement('input');
+        filter.inputElem    = inputElem;
+        inputElem.type      = "text";
+        container.appendChild( inputElem );
+        filter.dataSource   = new YAHOO.util.XHRDataSource( '?op=admin;method=findUser;' );
+        filter.dataSource.responseType = YAHOO.util.XHRDataSource.TYPE_JSON;
+        filter.dataSource.responseSchema = {
+            resultsList : "results",
+            fields : [ 'username', 'name', 'userId', 'avatar', 'email' ]
+        };
+
+        // Auto-complete container
+        var acDiv    = document.createElement('div');
+        filter.acDiv = acDiv;
+        container.appendChild( acDiv );
+
+        filter.autocomplete = new YAHOO.widget.AutoComplete( inputElem, acDiv, filter.dataSource );
+        filter.autocomplete.queryQuestionMark = false;
+        filter.autocomplete.animVert = true;
+        filter.autocomplete.animSpeed = 0.1;
+        filter.autocomplete.minQueryLength = 1;
+        filter.autocomplete.queryDelay = 0.2;
+        filter.autocomplete.typeAhead = true;
+        filter.autocomplete.resultTypeList = false;
+        filter.autocomplete.applyLocalFilter = true;
+        filter.autocomplete.formatResult = function ( result, query, match ) {
+            var subtext = ( result.name ? result.name : "" )
+                        + ( result.email ? " &lt;" + result.email + "&gt;" : "" )
+                        ;
+            return '<div style="float: left; width: 50px; height: 50px; background: url(' + result.avatar + ') no-repeat 50% 50%;"></div>'
+                    + '<div class="autocomplete_value">' + result.username + "</div>"
+                    + '<div class="autocomplete_subtext">' + subtext + '</div>';
+
+        };
+
         inputElem.focus();
     }
 };
