@@ -17,7 +17,7 @@ use Tie::IxHash;
 use WebGUI::Test;
 use WebGUI::Session;
 
-use Test::More tests => 57; # increment this value for each test you create
+use Test::More tests => 2; # increment this value for each test you create
 use Test::Deep;
 
 my $session = WebGUI::Test->session;
@@ -34,12 +34,6 @@ ok(WebGUI::Utility::isIn("webgui", qw(cars trucks webgui trains)), 'isIn()');
 	tie my %hash3, 'Tie::IxHash';
 	%hash2 = WebGUI::Utility::sortHash(%hash1);
 	is_deeply([keys %hash2], [qw/e c b d a/], 'sortHash');
-}
-
-
-TODO: {
-    local $TODO = 'Things to do';
-    ok(0, 'Move email validation tests out of Form/Email into here');
 }
 
 # Local variables:
