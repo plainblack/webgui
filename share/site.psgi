@@ -37,10 +37,10 @@ builder {
     enable_if { $_[0]->{'webgui.debug'} } 'StackTrace';
     enable_if { $_[0]->{'webgui.debug'} } 'Debug', panels => [
         'Environment',
-        'Response',
         'Timer',
         'Memory',
         'Session',
+        'Parameters',
         'PerlConfig',
         [ 'MySQLTrace', skip_packages => qr/\AWebGUI::SQL(?:\z|::)/ ],
         'Response',
