@@ -22,6 +22,7 @@ use WebGUI::Asset::Wobject;
 use WebGUI::Image::Graph;
 use WebGUI::Storage;
 use JSON;
+use Try::Tiny;
 
 use Moose;
 use WebGUI::Definition::Asset;
@@ -376,8 +377,15 @@ override processEditForm => sub {
     }
 
 	if (WebGUI::Image::Graph->getPluginList($self->session)) {
-		my $graph = WebGUI::Image::Graph->processConfigurationForm($self->session);
-		$self->setGraphConfig( $graph->getConfiguration );
+        my $graph;
+        try {
+		    $graph = WebGUI::Image::Graph->processConfigurationForm($self->session);
+        } catch {
+            $self->session->log->error( "Graph plugin not available or not functional:  Error: ``$_''" );
+        };
+        if( $graph ) {
+		    $self->setGraphConfig( $graph->getConfiguration );
+        }
 	}
 
 	$self->update($property);
