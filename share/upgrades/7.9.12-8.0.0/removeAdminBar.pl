@@ -7,7 +7,7 @@ use WebGUI::Asset::Template;
 
 my $removeAdminBar = sub {
     my $macro = shift;
-    if ($macro->{macroPackage} eq 'WebGUI::Macro::AdminBar') {
+    if ($macro->{macro} eq 'AdminBar' || $macro->{macroPackage} eq 'WebGUI::Macro::AdminBar' ) {
         return '';
     }
     else {
