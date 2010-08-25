@@ -792,6 +792,7 @@ WebGUI.Admin.LocationBar
         self.filterSelect.getMenu().subscribe( "click", self.addFilter, self, true );
     } );
 
+    YAHOO.util.Event.on( 'searchKeywords', 'keyup', this.updateLocationBarQuery, this, true );
     YAHOO.util.Event.on( 'searchKeywords', 'focus', this.focusKeywords, this, true );
     YAHOO.util.Event.on( 'searchKeywords', 'blur', this.blurKeywords, this, true );
 
