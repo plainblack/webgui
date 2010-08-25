@@ -2668,7 +2668,7 @@ sub www_editThingDataSaveViaAjax {
         return '{}';
     }
     else {
-        warn "thingId not found in thingProperties\n";
+        $session->log->warn("thingId ".$thingProperties->{thingId}." not found in thingProperties");
         $session->http->setStatus("404", "Not Found");
         return JSON->new->encode({message => "The thingId you requested can not be found."});
     }
