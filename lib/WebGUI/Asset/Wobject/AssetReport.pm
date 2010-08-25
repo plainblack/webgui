@@ -23,7 +23,7 @@ use Moose;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Wobject';
 
-define   assetName         => ['assetName', 'Asset_AssetReport.pm'];
+define   assetName         => ['assetName', 'Asset_AssetReport'];
 define   tableName         => 'AssetReport';
 property settings => (
             tab          => 'properties',
@@ -36,15 +36,15 @@ property templateId => (
             fieldType    => "template",
             namespace    => "AssetReport",
             default      => "sJtcUCfn0CVbKdb4QM61Yw",
-            label        => ["templateId label", 'Asset_AssetReport.pm'],
-            hoverHelp    => ["templateId description", 'Asset_AssetReport.pm'],
+            label        => ["templateId label", 'Asset_AssetReport'],
+            hoverHelp    => ["templateId description", 'Asset_AssetReport'],
          );
 property paginateAfter => (
             tab             => 'display',
             fieldType       => 'integer',
             default         => 25,
-            label           => [ 'paginateAfter label' , 'Asset_AssetReport.pm'],
-            hoverHelp       => [ 'paginateAfter description' , 'Asset_AssetReport.pm'],
+            label           => [ 'paginateAfter label' , 'Asset_AssetReport'],
+            hoverHelp       => [ 'paginateAfter description' , 'Asset_AssetReport'],
          );
 
 
