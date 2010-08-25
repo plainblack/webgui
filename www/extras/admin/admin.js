@@ -1175,6 +1175,7 @@ WebGUI.Admin.LocationBar.prototype.updateLocationBarQuery
         var filter = this.filters[i];
         if ( filter.type == "title" ) {
             var value = filter.inputElem.value;
+            if ( !value ) continue;
             var quote = "";
             if ( value.match(/\s/) ) {
                 quote = '"';
