@@ -24,32 +24,16 @@ use WebGUI::Storage;
 use WebGUI::Asset;
 
 
-my $toVersion = '7.9.1';
+my $toVersion = '7.10.0';
 my $quiet; # this line required
 
 
 my $session = start(); # this line required
-addDeactivateAccountTemplateSettings($session);
 
 # upgrade functions go here
 
 finish($session); # this line required
 
-#----------------------------------------------------------------------------
-# Describe what our function does
-sub addDeactivateAccountTemplateSettings {
-    my $session = shift;
-    print "\tAdd settings for deactivate account... " unless $quiet;
-    # and here's our code
-    $session->setting->add('webguiDeactivateAccountTemplate', 'zaHUYsE_PgKk8hnVd8ffEQ');
-    $session->db->write(<<EOSQL);
-ALTER TABLE ldapLink ADD COLUMN ldapDeactivateAccountTemplate CHAR(22) NOT NULL
-EOSQL
-    $session->db->write(<<EOSQL);
-UPDATE ldapLink SET ldapDeactivateAccountTemplate='_P4PMiraGsLTfOjK4fYQPQ'
-EOSQL
-    print "DONE!\n" unless $quiet;
-}
 
 #----------------------------------------------------------------------------
 # Describe what our function does
