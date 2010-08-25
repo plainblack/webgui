@@ -1057,13 +1057,23 @@ WebGUI.Admin.LocationBar.prototype.goHome
  */
 WebGUI.Admin.LocationBar.prototype.toggleSearchDialog
 = function ( ) {
+    var input = document.getElementById( 'locationInput' );
     if ( this.searchDialog == true ) {
         this.hideSearchDialog();
         this.searchDialog = false;
+        input.value = this.savedLocationInput;
+        this.savedLocationInput = "";
+        input.readonly = false;
+        YAHOO.util.Dom.removeClass( input, 'disabled' );
     }
     else {
         this.showSearchDialog();
         this.searchDialog = true;
+        this.savedLocationInput = input.value;
+        input.value = "";
+        this.updateLocationBarQuery();
+        input.readonly = true;
+        YAHOO.util.Dom.addClass( input, 'disabled' );
     }
 };
 

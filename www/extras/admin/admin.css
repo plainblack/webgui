@@ -5,6 +5,11 @@
 
 html,body { margin: 0; padding: 0; height: 100% }
 
+input.disabled {
+    font-style: italic;
+    color: #555;
+}
+
 #wrapper {
     position: relative;
     margin-left: 165px; /* move out of the adminbar's way */
@@ -107,7 +112,8 @@ html,body { margin: 0; padding: 0; height: 100% }
     width: 99%;
     height: 90%;
     border: none;
-    font: 14px Verdana, sans-serif;
+    font-size: 14px;
+    font-family: Verdana, sans-serif;
 }
 
 #locationBar #locationTitle {
