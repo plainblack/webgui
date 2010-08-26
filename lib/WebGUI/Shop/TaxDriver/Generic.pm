@@ -8,7 +8,9 @@ use WebGUI::Exception::Shop;
 use List::Util qw{ sum };
 use Tie::IxHash;
 
-use base qw{ WebGUI::Shop::TaxDriver };
+use Moose;
+use WebGUI::Definition;
+extends 'WebGUI::Shop::TaxDriver';
 
 
 =head1 NAME
@@ -138,18 +140,6 @@ sub getTaxRate {
     my $itemTax = sum @{ $taxables };
     
     return $itemTax;
-}
-
-#-------------------------------------------------------------------
-
-=head2 className
-
-Returns the name of this class.
-
-=cut
-
-sub className {
-    return 'WebGUI::Shop::TaxDriver::Generic';
 }
 
 #-------------------------------------------------------------------
@@ -469,7 +459,8 @@ sub www_getTaxesAsJson {
     my ($db, $form) = $session->quick(qw(db form));
     my $startIndex      = $form->get('startIndex') || 0;
     my $numberOfResults = $form->get('results')    || 25;
-    my %goodKeys = qw/country 1 state 1 city 1 code 1 'tax rate' 1/;
+    my %goodKeys = qw/country 1 state 1 city 1 code 1/;
+    $goodKeys{'tax rate'} = 1;
     my $sortKey = $form->get('sortKey');
     $sortKey = $goodKeys{$sortKey} == 1 ? $sortKey : 'country';
     my $sortDir = $form->get('sortDir');
