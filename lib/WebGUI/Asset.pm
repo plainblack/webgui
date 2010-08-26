@@ -957,7 +957,7 @@ sub getEditForm {
         name        => 'approved',
         id          => 'approveCheckbox',
         value       => 'approved',
-        label       => 'Approved',
+        label       => $i18n->get('560', 'WebGUI'),
         checked     => ( $session->setting->get( 'versionTagMode' ) eq 'autoCommit' ? 1 : 0 ),
     } );
 
