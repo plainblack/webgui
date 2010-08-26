@@ -16,6 +16,14 @@ L<WebGUI::URL::Snoop> described itself as "A URL handler that should never be ca
 
 You might find this middleware useful as a template for creating other simple classes.
 
+=head2 call ($env)
+
+Interface method for Plack to call, for this class.
+
+=head3 $env
+
+A Plack environment hash
+
 =cut
 
 sub call {

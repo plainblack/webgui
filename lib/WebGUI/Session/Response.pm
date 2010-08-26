@@ -18,11 +18,19 @@ is created.
 
 =cut
 
+=head2 stream
+
+=cut
+
 sub stream {
     my $self = shift;
     $self->streamer(shift);
     $self->streaming(1);
 }
+
+=head2 stream_write
+
+=cut
 
 sub stream_write {
     my $self = shift;

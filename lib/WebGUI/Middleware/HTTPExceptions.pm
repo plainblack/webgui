@@ -18,6 +18,17 @@ use Try::Tiny;
 use Scalar::Util 'blessed';
 use HTTP::Status ();
 
+=head2 transform_error ($env)
+
+Transforms exceptions of the class WebGUI::Error::Fatal into HTTP 500 error messages, displaying
+the contents of the exception to the user.
+
+=head3 $env
+
+A Plack environment hash
+
+=cut
+
 sub transform_error {
     my $self = shift;
     my ($e, $env) = @_;

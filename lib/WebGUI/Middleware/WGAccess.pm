@@ -17,6 +17,14 @@ awareness.
 This middleware should really only be used in development, for production you want
 to be serving static files with something a lot faster.
 
+=head2 call ($env)
+
+Interface subroutine to implement the privilege checks inside the WGaccess files.
+
+=head3 $env
+
+A Plack environment hash
+
 =cut
 
 sub call {
