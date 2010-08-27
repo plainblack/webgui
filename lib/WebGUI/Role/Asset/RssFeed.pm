@@ -593,23 +593,4 @@ sub www_viewRss {
     return $self->getFeed( XML::FeedPP::RSS->new )->to_string;
 }
 
-#-------------------------------------------------------------------
-
-=head2 getEditTabs ()
-
-Adds an RSS tab to the Edit Tabs.
-
-
-around getEditTabs => sub {
-    my $orig = shift;
-    my $self = shift;
-    my $tabs = $self->$orig(@_);
-    my $i18n = WebGUI::International->new($self->session,'AssetAspect_RssFeed');
-    push @{ $tabs }, ['rss', $i18n->get('RSS tab'), 1];
-    return $tabs;
-};
-
-=cut
-
 1;
-

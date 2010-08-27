@@ -141,21 +141,6 @@ sub getDateFormat {
 
 #----------------------------------------------------------------------------
 
-=head2 getEditTabs ( )
-
-Add a tab for the data table.
-
-=cut
-
-sub getEditTabs {
-    my $self = shift;
-    my $i18n = WebGUI::International->new( $self->session, "Asset_DataTable" );
-
-    return ( $self->SUPER::getEditTabs, [ "data" => $i18n->get("tab label data") ], );
-}
-
-#----------------------------------------------------------------------------
-
 =head2 getTemplateVars ( )
 
 Get the template vars for this asset.

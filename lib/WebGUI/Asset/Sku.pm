@@ -214,21 +214,6 @@ override getEditForm => sub {
 
 #-------------------------------------------------------------------
 
-=head2 getEditTabs ( )
-
-Not to be modified, just defines a new tab.
-
-
-override getEditTabs => sub {
-	my $self = shift;
-	my $i18n = WebGUI::International->new($self->session,"Asset_Sku");
-	return (super(), ['shop', $i18n->get('shop'), 9]);
-};
-
-=cut
-
-#-------------------------------------------------------------------
-
 =head2 getOptions ( )
 
 Returns a hash reference of configuration data that can return this sku to a configured state. See also applyOptions().

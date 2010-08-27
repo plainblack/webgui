@@ -534,20 +534,6 @@ sub deleteFeed {
 
 #----------------------------------------------------------------------------
 
-=head2 getEditTabs ( )
-
-Add the feeds tab to the edit form
-
-=cut
-
-sub getEditTabs {
-    my ( $self ) = @_;
-    my $i18n    = WebGUI::International->new($self->session,"Asset_Calendar");
-    return $self->SUPER::getEditTabs, ["feeds",$i18n->get("feeds"), 6];
-}
-
-#----------------------------------------------------------------------------
-
 =head2 getEvent ( assetId )
 
 Gets an Event object from the database. Returns a WebGUI::Asset::Event object
