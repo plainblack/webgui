@@ -541,7 +541,7 @@ sub new {
 
 Accessor for the driver properties.  This returns a hashref
 any driver specific properties.  To set the properties, use
-the C<set> method.
+the C<update> method.
 
 =cut
 
