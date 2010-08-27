@@ -19,7 +19,7 @@ use WebGUI::Asset::File::ZipArchive;
 use WebGUI::Test;
 use Test::More; # increment this value for each test you create
 use Test::Deep;
-plan tests => 2;
+plan tests => 3;
 
 my $session = WebGUI::Test->session;
 
@@ -41,4 +41,13 @@ cmp_bag(
     $storage->getFiles, 
     [ qw{ extensions.tar extension_pm.txt extension_perl.txt extension.html extensions extensions/extension.html }], 
     'files after fixFilenames, html files left alone'
+);
+
+$storage->addFileFromScalar('file.pm.pm','content');
+$arch->fixFilenames();
+
+cmp_bag(
+    $storage->getFiles, 
+    [ qw{ extensions.tar extension_pm.txt extension_perl.txt extension.html extensions extensions/extension.html file_pm.pm.txt}], 
+    'fixFilenames: anchors replacements to the end of the string'
 );

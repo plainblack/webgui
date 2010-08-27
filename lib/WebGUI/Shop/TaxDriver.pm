@@ -36,8 +36,52 @@ These subroutines are available from this package:
 
 use strict;
 
-use Class::InsideOut qw{ :std };
+use Moose;
+use WebGUI::Definition;
+use Scalar::Util qw/blessed/;
+
+has session => (
+    is       => 'ro',
+    required => 1,
+);
+
+has messages => (
+    is      => 'rw',
+    default => sub { [] },
+);
+
 use JSON qw{ from_json to_json };
+
+#-------------------------------------------------------------------
+
+=head2 new ( $session )
+
+Constructor
+
+=head3 session
+
+Instanciated WebGUI::Session object.
+
+=cut
+
+around BUILDARGS => sub {
+    my $orig    = shift;
+    my $class   = shift;
+    my $session = shift;
+
+    if (! (blessed $session && $session->isa('WebGUI::Session'))) {
+        WebGUI::Error::InvalidObject->throw(expected=>"WebGUI::Session", got=>(ref $session), error=>"Need a session.");
+    }
+
+    my $optionsJSON = $session->db->quickScalar( 'select options from taxDriver where className=?', [
+        $class,
+    ] );
+
+    my $options = $optionsJSON ? from_json( $optionsJSON ) : {};
+    $options->{session} = $session;
+
+    return $class->$orig($options);
+};
 
 =head1 NAME
 
@@ -58,11 +102,6 @@ Base class for all modules which do tax calculations in the Shop.
 These subroutines are available from this package:
 
 =cut
-
-readonly session    => my %session;
-readonly messages   => my %messages;
-private  options    => my %options;
-
 
 =head2 appendCartItemVars ( var, cartItem ) 
 
@@ -121,47 +160,20 @@ sub canManage {
 
 =head2 className {
 
-Returns the class name of your plugin. You must overload this method in you own plugin.
+Returns the class name of your plugin.
 
 =cut
 
 sub className {
     my $self = shift;
 
-    $self->session->log->fatal( "Tax plugin (".$self->className.") is required to overload the className method" );
+    my $className = ref $self;
+    $self->session->log->fatal( "Tax plugin (".$self->className.") is required to overload the className method" )
+        if $className eq 'WebGUI::Shop::TaxDriver';
 
-    return 'WebGUI::Shop::TaxDriver';
+    return $className;
 }
 
-#-----------------------------------------------------------
-
-=head2 get ( [ property ] )
-
-Returns the value of the requested configuration property. Returns a hash ref of all property/value pairs when no
-specific property is passed.
-
-=head3 property
-
-The property whose value should be returned.
-
-=cut
-
-sub get {
-    my $self    = shift;
-    my $key     = shift;
-
-    my $options = $options{ id $self };
-
-    # Return safe copy of options hash if no key is passed.
-    return { %{ $options } }  unless $key;
-
-    # Return option if key is passed.
-    return $options->{ $key } if exists $options->{ $key };
-
-    # Key does not exist.
-    $self->session->log->warn( "Non-existant option [$key] was queried by tax plugin $self" );
-    return undef;
-}
 
 #-----------------------------------------------------------
 
@@ -252,42 +264,6 @@ sub skuFormDefinition {
 
 #-------------------------------------------------------------------
 
-=head2 new ( $session )
-
-Constructor
-
-=head3 session
-
-Instanciated WebGUI::Session object.
-
-=cut
-
-sub new {
-    my $class   = shift;
-    my $session = shift;
-
-    WebGUI::Error::InvalidObject->throw( expected => "WebGUI::Session", got => (ref $session), error => "Need a session." )
-        unless $session && $session->isa( 'WebGUI::Session' );
-
-    my $self    = {};
-    bless $self, $class;
-    register $self;
-
-    my $id = id $self;
-    $session{  $id } = $session;
-    $messages{ $id } = [];
-
-    # Load plugin configuration
-    my $optionsJSON = $session->db->quickScalar( 'select options from taxDriver where className=?', [
-        $self->className,
-    ] );
-    $options{  $id } = $optionsJSON ? from_json( $optionsJSON ) : {};
-
-    return $self;
-}
-
-#-------------------------------------------------------------------
-
 =head2 processSkuFormPost ( )
 
 Processes the form parameters defined in the skuFormDefinition method and returns a hash ref containing the result.
@@ -312,28 +288,21 @@ sub processSkuFormPost {
 
 #-----------------------------------------------------------
 
-=head2 update ( properties )
+=head2 write ( )
 
-Updates the properties of the tax driver according to those passed.
-
-=head3 properties
-
-Hash ref containing the properties to set.
+Store the properties of this object to the database, as a JSON blob.
 
 =cut
 
-sub update {
+sub write {
     my $self    = shift;
-    my $update  = shift;
-    my $db      = $self->session->db;
 
-    # update local options hash
-    $options{ id $self } = { %{ $options{ id $self } }, %{ $update } };
+    my $options = $self->get();
 
     # Persist to db
-    $db->write( 'replace into taxDriver (className, options) values (?,?)', [
+    $self->session->db->write( 'replace into taxDriver (className, options) values (?,?)', [
         $self->className,
-        to_json( $options{ id $self } ),
+        to_json( $options ),
     ] );
 }
 

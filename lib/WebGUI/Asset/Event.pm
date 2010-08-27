@@ -1352,10 +1352,14 @@ override processEditForm => sub {
         WebGUI::VersionTag->new($session, $self->tagId)->setWorking;
     }
 
-    ### Form is verified
-    # Events are always hidden from navigation
+    ### Form is verified, fix properties
+    if (!$session->form->hasParam('groupIdView')) {
+        $self->update({
+            groupIdView     => $self->getParent->get('groupIdView'),
+        });
+    }
 
-    if (!$self->get("groupIdEdit")) {
+    if (!$session->form->hasParam('groupIdEdit')) {
         my $groupIdEdit =  $self->getParent->groupIdEventEdit
                         || $self->getParent->groupIdEdit
                         ;

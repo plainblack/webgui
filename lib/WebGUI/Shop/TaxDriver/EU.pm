@@ -26,6 +26,45 @@ use JSON qw{ to_json };
 use Tie::IxHash;
 
 use base qw{ WebGUI::Shop::TaxDriver };
+use Moose;
+use WebGUI::Definition;
+extends 'WebGUI::Shop::TaxDriver';
+
+property taxGroups => (
+    fieldType  => 'text',
+    noFormPost => 1,
+    default    => sub { [] },
+);
+
+property shopCountry => (
+    fieldType  => 'text',
+    noFormPost => 1,
+    default    => '',
+);
+
+property userTemplateId => (
+    fieldType  => 'text',
+    noFormPost => 1,
+    default    => '',
+);
+
+property automaticViesApproval => (
+    fieldType  => 'text',
+    noFormPost => 1,
+    default    => '',
+);
+
+property acceptOnViesUnavailable => (
+    fieldType  => 'text',
+    noFormPost => 1,
+    default    => '',
+);
+
+property defaultGroup => (
+    fieldType  => 'text',
+    noFormPost => 1,
+    default    => '',
+);
 
 =head1 NAME
 
@@ -196,18 +235,6 @@ sub appendCartItemVars {
         }
     }
 
-}
-
-#-------------------------------------------------------------------
-
-=head2 className
-
-Returns the name of this class.
-
-=cut
-
-sub className {
-    return 'WebGUI::Shop::TaxDriver::EU';
 }
 
 #-------------------------------------------------------------------

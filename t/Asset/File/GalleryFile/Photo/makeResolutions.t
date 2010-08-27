@@ -35,7 +35,7 @@ my ($gallery, $album, $photo);
 $gallery
     = $node->addChild({
         className           => "WebGUI::Asset::Wobject::Gallery",
-        imageResolutions    => "1600x1200\n1024x768\n800x600\n640x480",
+        imageResolutions    => "1600\n1024\n800\n640",
     });
 $album
     = $gallery->addChild({
@@ -49,7 +49,7 @@ $album
 
 #----------------------------------------------------------------------------
 # Tests
-plan tests => 13;
+plan tests => 14;
 
 #----------------------------------------------------------------------------
 # makeResolutions gets default resolutions from a parent Photo Gallery asset
@@ -76,8 +76,14 @@ diag( $@ )
 
 cmp_deeply(
     $photo->getStorageLocation->getFiles, 
-    bag( '1024x768.jpg', '1600x1200.jpg', '640x480.jpg', '800x600.jpg', 'page_title.jpg' ),
+    bag( '1024.jpg', '1600.jpg', '640.jpg', '800.jpg', 'page_title.jpg' ),
     "makeResolutions makes all the required resolutions with the appropriate names.",
+);
+
+cmp_deeply(
+    $photo->getResolutions,
+    [qw/640.jpg 800.jpg 1024.jpg 1600.jpg/],
+    'getResolutions: sorts numerically'
 );
 
 TODO: {
@@ -92,7 +98,7 @@ WebGUI::Test->addToCleanup($versionTags[-1]);
 $gallery
     = $node->addChild({
         className           => "WebGUI::Asset::Wobject::Gallery",
-        imageResolutions    => "1600x1200\n1024x768\n800x600\n640x480",
+        imageResolutions    => "1600\n1024\n800\n640",
     });
 $album
     = $gallery->addChild({
@@ -117,12 +123,12 @@ $photo->getStorageLocation->addFileFromFilesystem( WebGUI::Test->getTestCollater
 $photo->update({ filename => 'page_title.jpg' });
 
 ok(
-    !eval{ $photo->makeResolutions('100x100','200x200'); 1 },
+    !eval{ $photo->makeResolutions('100','200'); 1 },
     "makeResolutions fails when first argument is not array reference",
 );
 
 ok(
-    eval{ $photo->makeResolutions(['100x100','200x200']); 1 },
+    eval{ $photo->makeResolutions(['100','200']); 1 },
     "makeResolutions succeeds when first argument is array reference of resolutions to make",
 );
 diag( $@ )
@@ -130,7 +136,7 @@ diag( $@ )
 
 is_deeply(
     [ sort({ $a cmp $b} @{ $photo->getStorageLocation->getFiles }) ], 
-    ['100x100.jpg', '200x200.jpg', 'page_title.jpg'],
+    ['100.jpg', '200.jpg', 'page_title.jpg'],
     "makeResolutions makes all the required resolutions with the appropriate names.",
 );
 
@@ -158,18 +164,18 @@ $photo->getStorageLocation->addFileFromFilesystem( WebGUI::Test->getTestCollater
 $photo->update({ filename => 'page_title.jpg' });
 
 ok(
-    !eval{ $photo->makeResolutions('100x100','200x200'); 1 },
+    !eval{ $photo->makeResolutions('100','200'); 1 },
     "makeResolutions fails when first argument is not array reference",
 );
 
 ok(
-    eval{ $photo->makeResolutions(['100x100','200x200']); 1 },
+    eval{ $photo->makeResolutions(['100','200']); 1 },
     "makeResolutions succeeds when first argument is array reference of resolutions to make",
 );
 
 is_deeply(
     [ sort({ $a cmp $b} @{ $photo->getStorageLocation->getFiles }) ], 
-    ['100x100.jpg', '200x200.jpg', 'page_title.jpg'],
+    ['100.jpg', '200.jpg', 'page_title.jpg'],
     "makeResolutions makes all the required resolutions with the appropriate names.",
 );
 

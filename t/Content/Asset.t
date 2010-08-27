@@ -18,9 +18,11 @@ use strict;
 use lib "$FindBin::Bin/../lib";
 use Test::More;
 use Test::Deep;
+use Data::Dumper;
 use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
 use WebGUI::Content::Asset;
+use Encode;
 
 my $output;
 
@@ -76,7 +78,15 @@ my $td
         url             => 'testdispatch',
     } );
 
-diag $td->getId;
+my $utf8_url = "Viel-spa\x{00DF}";
+utf8::upgrade $utf8_url;
+my $utf8
+    = WebGUI::Asset->getImportNode( $session )->addChild( {
+        title           => "utf8",
+        className       => 'WebGUI::Asset::TestDispatch',
+        url             => $utf8_url,
+    } );
+
 WebGUI::Test->addToCleanup( WebGUI::VersionTag->getWorking( $session ) );
 
 #----------------------------------------------------------------------------
@@ -122,7 +132,11 @@ cmp_deeply(
     [ '/one/two/three.rss', '/one/two/three', '/one/two', '/one', ],
     ".ext is a seperate URL permutation",
 );
-
+cmp_deeply(
+    WebGUI::Content::Asset::getUrlPermutations( $utf8_url ),
+    [ $utf8_url ],
+    "UTF-8 handling for URLs",
+);
 
 #----------------------------------------------------------------------------
 # test dispatch( session, url ) method
@@ -131,6 +145,12 @@ $output = WebGUI::Content::Asset::dispatch( $session, "testdispatch" );
 is $output, "www_view one", "Regular www_view";
 
 is $session->asset && $session->asset->getId, $td->getId, 'dispatch set the session asset';
+
+my $_asset = WebGUI::Asset->newByUrl($session, $utf8_url);
+isa_ok $_asset, 'WebGUI::Asset::TestDispatch';
+
+$output = WebGUI::Content::Asset::dispatch( $session, $utf8_url );
+is $output, "www_view utf8", "dispatch for utf8 urls";
 
 $output = WebGUI::Content::Asset::dispatch( $session, "testdispatch/foo" );
 is $output, "bar", "special /foo handler";

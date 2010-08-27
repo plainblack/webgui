@@ -38,9 +38,15 @@ These subroutines are available from this package:
 
 #-------------------------------------------------------------------
 
-=head2 handler ( session ) 
+=head2 call ( $env ) 
 
-The content handler for this package.
+Interface method for this middleware.  It checks the settings for the special entry, upgradeState.
+If this is set, then it returns an HTTP 503.  It will also clear the maintenance state when the
+upgrade is complete.
+
+=head3 $env
+
+A Plack environment hash.  This is used to access the WebGUI Session object.
 
 =cut
 

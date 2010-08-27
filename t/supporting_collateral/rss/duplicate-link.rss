@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<rss version="2.0"><channel>
+    <title>Duplicate Link Feed Title</title>
+    <link>http://www.example.com/</link>
+    <description>Duplicate Link Feed Description</description>
+    <item>
+        <title>Duplicate Link Feed Item 1</title>
+        <link>http://www.example.com/</link>
+        <description>Duplicate Link Feed Item 1</description>
+        <guid isPermaLink="true">http://www.example.com/</guid>
+    </item>
+    <item>
+        <title>Duplicate Link Feed Item 2</title>
+        <link>http://www.example.com/</link>
+        <description>Duplicate Link Feed Item 2</description>
+        <guid isPermaLink="true">http://www.example.com/</guid>
+    </item>
+</channel>
+</rss>

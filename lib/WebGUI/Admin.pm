@@ -263,6 +263,44 @@ sub getTreePaginator {
 
 #----------------------------------------------------------------------
 
+=head2 www_findUser ( )
+
+Find a user based on a partial name, username, alias, or e-mail address
+
+=cut
+
+sub www_findUser {
+    my ( $self ) = @_;
+    my $session = $self->session;
+    my ( $form, $db, $url ) = $session->quick(qw( form db url ));
+
+    my $query   = '%' . $form->get('query') . '%';
+
+    my @places; # Places to look
+    for my $col ( 'username', 'alias', 'firstName', 'lastName', 'CONCAT(firstName," ",lastName)' ) {
+        push @places, $col . " LIKE ?";
+    }
+
+    my $sql     = 'SELECT userId, CONCAT(firstName,lastName) AS name, username, alias, avatar
+                FROM users JOIN userProfileData USING (userId) WHERE ' . join( ' || ', @places );
+    my $params  = [ ( $query ) x scalar @places ];
+    $session->log->warn( 'SQL: ' . $sql );
+    $session->log->warn( 'PARAM: ' . join ", ", @$params );
+
+    my $sth = $db->read( $sql, $params );
+    my @results;
+    while ( my $result = $sth->hashRef ) {
+        $result->{avatar} ||= $url->extras('icon/user.png');
+        push @results, $result;
+    }
+
+    my $output = JSON->new->encode( { results => \@results } );
+    $session->log->warn( $output );
+    return $output;
+}
+
+#----------------------------------------------------------------------
+
 =head2 www_getClipboard ( ) 
 
 Get the assets currently on the user's clipboard
@@ -485,6 +523,7 @@ sub www_view {
     $style->setLink( $url->extras('yui/build/paginator/assets/skins/sam/paginator.css'), {rel=>'stylesheet', type=>'text/css'});
     $style->setLink( $url->extras('yui/build/datatable/assets/skins/sam/datatable.css'), {rel=>'stylesheet', type=>'text/css'});
     $style->setLink( $url->extras('yui/build/container/assets/skins/sam/container.css'), {rel=>'stylesheet', type=>'text/css'});
+    $style->setLink( $url->extras('yui/build/autocomplete/assets/skins/sam/autocomplete.css'), {rel=>'stylesheet', type=>'text/css'});
     $style->setLink( $url->extras('yui/build/menu/assets/skins/sam/menu.css'), {rel=>'stylesheet', type=>'text/css'});
     #$style->setLink( $url->extras('yui-webgui/build/assetManager/assetManager.css' ), { rel => "stylesheet", type => 'text/css' } );
     $style->setLink( $url->extras('admin/admin.css'), { type=>'text/css', rel=>'stylesheet'} );
@@ -501,6 +540,7 @@ sub www_view {
     $style->setScript($url->extras('yui/build/tabview/tabview-min.js'));
     $style->setScript($url->extras('yui/build/menu/menu-min.js'));
     $style->setScript($url->extras('yui/build/button/button-min.js'));
+    $style->setScript($url->extras('yui/build/autocomplete/autocomplete-min.js'));
     $style->setScript( $url->extras( 'yui/build/json/json-min.js' ) );
     $style->setScript( $url->extras( 'yui-webgui/build/i18n/i18n.js' ) );
     $style->setScript($url->extras('admin/admin.js'));
@@ -602,7 +642,7 @@ __DATA__
                     <input type="button" id="backButton" value="&lt;" /><input type="button" id="forwardButton" value="&gt;" />
                 </span>
                 <div id="location">
-                    <input type="text" id="locationUrl" value="" />
+                    <input type="text" id="locationInput" value="" />
                     <span id="locationTitle"></span>
                 </div>
                 <span id="right">

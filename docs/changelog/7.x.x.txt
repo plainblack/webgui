@@ -1,4 +1,18 @@
+7.10.0
+
 7.9.13
+ - fixed #11783: Instances deleted during realtime run
+ - fixed #11781: Thingy wrong retorn value from Ajax method
+ - fixed #11780: fixFilenames regex needs an anchor in ZipArchive asset
+ - fixed #11782: Attachments all showing duplicated first thumbnail
+ - fixed #11777: Thingy search on yes no field fails
+ - fixed #11787: Gallery resolutions wrongly ordered
+ - fixed #11785: Article title / URL with äÄöÖüÜ (reopen #11683)
+ - fixed #11799: 7.8.24->7.9.11 upgrade breaks on custom Paydrivers
+ - fixed #11798: Gallery request non existent image
+ - fixed #11800: Group to view for new events defaults to 'Everyone'
+ - fixed #11796: Gallery Drag & Drop broken in IE 7
+ - fixed #11795: Wrong display UTF8 chars in Syndicated content (#12621)
 
 7.9.12
  - webgui.org homepage gives 404  (#11778)

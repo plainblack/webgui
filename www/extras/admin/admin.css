@@ -5,6 +5,18 @@
 
 html,body { margin: 0; padding: 0; height: 100% }
 
+input.disabled {
+    font-style: italic;
+    color: #555;
+}
+
+.with_avatar {
+    background-position: 0 0;
+    background-repeat: no-repeat;
+    padding-left: 50px;
+    min-height: 50px;
+}
+
 #wrapper {
     position: relative;
     margin-left: 165px; /* move out of the adminbar's way */
@@ -103,11 +115,12 @@ html,body { margin: 0; padding: 0; height: 100% }
     -webkit-border-radius: 3px;
 }
 
-#locationBar #locationUrl { 
+#locationBar #locationInput { 
     width: 99%;
     height: 90%;
     border: none;
-    font: 14px Verdana, sans-serif;
+    font-size: 14px;
+    font-family: Verdana, sans-serif;
 }
 
 #locationBar #locationTitle {
@@ -153,6 +166,47 @@ html,body { margin: 0; padding: 0; height: 100% }
 
 #searchFilters {
     clear: both;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+#searchFilters .deleteIcon {
+    display: block;
+}
+
+#searchFilters li { height: 28px; } /* autocomplete is position: absolute, so pretend some height */
+
+#searchFilters span.name {
+    display: block;
+    float: left;
+    width: 9%;
+    text-align: right;
+    padding-right: 1%;
+    line-height: 24px;
+}
+
+#searchFilterAdd {
+    clear: both;
+}
+
+.filter_title input, .filter_ownerUserId div.autocomplete {
+    display: block;
+    float: left;
+    width: 89%;
+}
+
+#searchFilters .yui-ac-bd li {
+    height: 50px;
+}
+
+.autocomplete_value {
+    font-size:  larger;
+    font-weight: bold;
+}
+
+.autocomplete_subtext {
+    font-size: smaller;
 }
 
 #wrapper .yui-content {

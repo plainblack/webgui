@@ -24,6 +24,14 @@ and not worry about closing it.
 
 It also sets C<webgui.debug> as appropriate.
 
+=head2 call ($env)
+
+Interface method for this Middleware class.
+
+=head3 $env
+
+A plack environment hash
+
 =cut
 
 sub call {
@@ -76,6 +84,17 @@ sub call {
         }
     );
 }
+
+=head2 canShowDebug ($env)
+
+Checks to see whether or not the owner of this session can see debug output.  It checks
+WebGUI settings showDebug and ipDebug for this.
+
+=head3 $env
+
+A Plack environment hash.
+
+=cut
 
 sub canShowDebug {
     my $self = shift;

@@ -257,6 +257,16 @@ sub _transformMacro {
     });
 }
 
+=head2 quote ($text)
+
+Escape backslashes and single quotes, and then return the text wrapped in single quotes.
+
+=head3 $text
+
+Text to quote.
+
+=cut
+
 sub quote {
     my $text = shift;
     $text =~ s/([\\'])/\\$1/g;

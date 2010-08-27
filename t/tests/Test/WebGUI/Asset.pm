@@ -34,6 +34,13 @@ sub postProcessMergedProperties {
     return;
 }
 
+sub dump_assets {
+    my $session = shift;
+    # my $assets = WebGUI::Asset->getRoot($session)->getLineage(['descendants'], { returnObjects => 1, } );
+    my $assets = WebGUI::Asset->getRoot($session)->getLineage(['descendants']);
+    warn "all assets: " . Dumper $assets;
+}
+
 sub debug {
 
     # if the last eval { } caught something, give full diagnostics on that and stop the tests.
@@ -42,17 +49,19 @@ sub debug {
     my $e = Exception::Class->caught() or return;
     my $line = (caller)[2];
     
-    if( Scalar::Util::blessed( $e ) ) {
-        note( $line . ': ' . $e->error . "\n" . $e->full_message . "\n" . $e->trace->as_string );
-    } else {
-        note( $line . ': ' . "\n(non-object error:) $e" );
-    }
+    # XXX redundant with $SIG{__DIE__} handlers
+    #if( Scalar::Util::blessed( $e ) ) {
+    #    note( $line . ': ' . $e->error . "\n" . $e->full_message . "\n" . $e->trace->as_string );
+    #} else {
+    #    note( $line . ': ' . "\n(non-object error:) $e" );
+    #}
 
-    return; # XXX enable/disable aborting tests on failure
+    # return; # XXX enable/disable aborting tests on failure
 
+    # system '/home/scott/bin/perl', '/home/scott/plainblack/dumplineage.pl'; # XXX
     warn "going to exit in ... a whole bunch... of seconds";  
-    sleep 10;
-    # system 'sleep 6000'; # sleep 10; # this way, we can control-c it!
+    # sleep 10;
+    system 'sleep 6000'; # sleep 10; # this way, we can control-c it!
     exit;
 }
 
@@ -453,7 +462,6 @@ sub t_10_addRevision : Tests {
     my $newRevision = $asset->addRevision( 
         { title => "Newly Revised Title" }, 
         $asset->revisionDate+2, 
-        # {skipNotification => 1, skipAutoCommitWorkflows => 1,}  # XXX don't commit these until first inspecting the default implementation of getAutoCommitWorkflowId to see if explicitly thawrting it really is called for ... yeah, what's going on is getAutoCommitWorkflowId returns undef in the default case but certain classes override it XXX commenting this out is making the MapPoint tests fail again... but we aren't doing the skip thing
     );
     isa_ok( $newRevision, Scalar::Util::blessed( $asset ), "addRevision returns new revision of asset object" );
     is( $newRevision->title, "Newly Revised Title", "properties set correctly" );
@@ -480,6 +488,7 @@ sub t_11_getEditForm : Tests {
     my ( $tag, $asset, @parents ) = $test->getAnchoredAsset();
 
     # local $SIG{__DIE__} = sub { use Carp; Carp::confess "@_"; };
+    # local $SIG{__DIE__} = sub { use wth; wth::wth "@_"; };  # wth.pm is in a gist of scrottie's on github
 
     my $f   = $asset->getEditForm;
 
@@ -558,8 +567,7 @@ sub t_20_www_editSave : Tests {
 
     $tag->setWorking;
 
-# $tag = WebGUI::VersionTag->create($session, {}); $tag->setWorking; # XXXXXX
-sleep 2; # also XXXX
+sleep 2; # XXXX Todo -- investigate whether this is actually fixing duplicate commit problems
 
     my %mergedProperties = (   
         formProperties($asset),  
@@ -568,13 +576,12 @@ sleep 2; # also XXXX
 
     $test->postProcessMergedProperties(\%mergedProperties);
 
-warn "XXX mergedProperties: " . Dumper \%mergedProperties;
-
-# local $SIG{__DIE__} = sub { use Carp; Carp::confess "@_"; };
+    # local $SIG{__DIE__} = sub { use Carp; Carp::confess "@_"; };
+    # local $SIG{__DIE__} = sub { use wth; wth::wth "@_"; };  # see note above about wth
 
     $session->request->setup_body( \%mergedProperties );
 
-    ok(eval { $asset->www_editSave; }, 'www_editSave returns true'); # "DBD::mysql::db do failed: Duplicate entry ... for key 'PRIMARY' [for Statement "insert into assetData (assetId,revisionDate) values (?,?)"]" ... getting ready to insert into tables... assetId is: dinQXqxuUyrO0DmooZe4bg at /data/WebGUI/lib/WebGUI/AssetVersioning.pm line 123.  XXX does that sleep 2 actually fix this or did I imagine that?
+    ok(eval { $asset->www_editSave; }, 'www_editSave returns true');
     debug($@);
     undef $@;
 
@@ -607,6 +614,27 @@ warn "XXX mergedProperties: " . Dumper \%mergedProperties;
     debug($@);
     undef $@;
 }
+
+#sub asserts : Test(shutdown) {
+#    # XXX Todo these should be moved into the appropriate Test::Class subclasses and be made more explicit, if they are to be kept
+#    # XXX debugging garbage to track down corruption of the asset tree
+#    my $test = shift;
+#    my $session = $test->session;
+#    my $assets = WebGUI::Asset->getRoot($session)->getLineage(['descendants'], {returnObjects=>1});
+#    # local $SIG{__DIE__} = sub { use wth; wth::wth "@_"; }; # see note above about wth
+#    for my $asset (@$assets) {
+#        #if(ref($asset) eq 'WebGUI::Asset::Wobject::Layout') {
+#        #    note "running view on Wobject::Layout of Id: " . $asset->getId;
+#        #    # make sure any WG::A::Story objects created check out before testing gets any further along
+#        #    $asset->view; 
+#        #}
+#        if(ref($asset) eq 'WebGUI::Asset::Story') {
+#            note "running canEdit on Asset::Story of Id: " . $asset->getId;
+#            # make sure any WG::A::Story objects created check out before testing gets any further along
+#            $asset->canEdit; 
+#        }
+#    }
+#}
 
 1;
 
