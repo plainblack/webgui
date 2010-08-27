@@ -43,8 +43,6 @@ foreach my $macro (qw/
 }
 $session->config->addToHash('macros', "Ex'tras", "Extras");
 
-plan tests => 51;
-
 my $macroText = "CompanyName: ^c;";
 my $companyName = $session->setting->get('companyName');
 WebGUI::HTML::makeParameterSafe( \$companyName );
@@ -337,3 +335,31 @@ is (
     '@MacroCall[`1`.` 2`.`3`]:',
     'internal spaces are okay'
 );
+
+my $macroText = 'before ^VisualMacro("1", 2,); after';
+my $macroData;
+WebGUI::Macro::transform($session, \$macroText, sub {
+    $macroData = shift;
+    return "replace";
+});
+
+is (
+    $macroText,
+    'before replace after',
+    'transform replaces macro calls'
+);
+
+is_deeply($macroData, {
+    session => $session,
+    macro => 'VisualMacro',
+    macroPackage => 'WebGUI::Macro::VisualMacro',
+    originalString => '^VisualMacro("1", 2,);',
+    parameters => [
+        '1',
+        ' 2',
+    ],
+    parameterString => '("1", 2,)',
+}, 'transform passes sub correct data');
+
+done_testing;
+

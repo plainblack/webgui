@@ -257,7 +257,7 @@ The name of the macro called.
 
 The module name for the macro from the config file.
 
-=item originalText
+=item originalString
 
 The full original text of the macro call.
 
@@ -299,7 +299,7 @@ sub _transformMacro {
         session         => $session,
         macro           => $macro,
         macroPackage    => $macroPackage,
-        originalText    => $original,
+        originalString  => $original,
         parameters      => $params,
         parameterString => $paramString,
     });
