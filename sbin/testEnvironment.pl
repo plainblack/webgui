@@ -157,6 +157,7 @@ checkModule('HTTP::Exception',                           );
 checkModule('Net::Twitter',                 "3.13006"    );
 checkModule('Number::Format',                            );
 checkModule('Email::Valid',                              );
+checkModule('Facebook::Graph',              '0.0505'     );
 
 failAndExit("Required modules are missing, running no more checks.") if $missingModule;
 

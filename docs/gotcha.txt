@@ -16,6 +16,7 @@ save you many hours of grief.
  * WebGUI now requires the following modules
     - Moose
     - CHI
+    - Facebook::Graph
 
 7.9.8
 --------------------------------------------------------------------

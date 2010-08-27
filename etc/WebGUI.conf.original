@@ -190,7 +190,7 @@
 # List the authentication plug-ins you wish to be available on
 # this site.
 
-"authMethods" : [ "LDAP", "WebGUI" ],
+"authMethods" : [ "LDAP", "WebGUI", "Twitter", "Facebook"],
 
 # List the merchant gateways you have installed and wish to be
 # available on this site.
@@ -821,6 +821,7 @@
     "EditableToggle"   : "EditableToggle", 
     "e"                : "e_companyEmail", 
     "Extras"           : "Extras", 
+    "FacebookLogin"    : "FacebookLogin",
     "FetchMimeType"    : "FetchMimeType", 
     "FilePump"         : "FilePump", 
     "FileUrl"          : "FileUrl", 
