@@ -148,6 +148,15 @@ sub get_all_property_list {
     return @names;
 }
 
+#-------------------------------------------------------------------
+
+=head2 get_all_settable_list ( )
+
+Returns an array of the names of all Properties, in all classes, in the order they were
+created in the Definition, that have the WebGUI::Definition::Meta::Settable role applied.
+
+=cut
+
 sub get_all_settable_list {
     my $self       = shift;
     my @names = ();
