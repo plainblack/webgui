@@ -531,7 +531,7 @@ WebGUI.Admin.prototype.requestHelper
     var callback = {
         success : function (o) {
             var resp = YAHOO.lang.JSON.parse( o.responseText );
-            this.processHelper( resp );
+            this.processPlugin( resp );
         },
         failure : function (o) {
 
@@ -544,8 +544,8 @@ WebGUI.Admin.prototype.requestHelper
 };
 
 /**
- * processHelper( response )
- * Process the helper response. Possible responses include:
+ * processPlugin( response )
+ * Process the plugin response. Possible responses include:
  *      message     : A message to the user
  *      error       : An error message
  *      openDialog  : Open a dialog with the given URL
@@ -554,7 +554,7 @@ WebGUI.Admin.prototype.requestHelper
  *      scriptFunc  : Run a JS function. Used with scriptFile
  *      scriptArgs  : Arguments to scriptFunc. Used with scriptFile
  */
-WebGUI.Admin.prototype.processHelper
+WebGUI.Admin.prototype.processPlugin
 = function ( resp ) {
     if ( resp.openTab ) {
         this.openTab( resp.openTab );
@@ -572,7 +572,7 @@ WebGUI.Admin.prototype.processHelper
         this.showInfoMessage( resp.error );
     }
     else {
-        alert( "Unknown helper response: " + YAHOO.lang.JSON.stringify(resp) );
+        alert( "Unknown plugin response: " + YAHOO.lang.JSON.stringify(resp) );
     }
 };
 
