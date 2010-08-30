@@ -1,4 +1,5 @@
 7.10.0
+ - fixed #11812: Checking www_ajaxSave's response in the cart js
 
 7.9.13
  - fixed #11783: Instances deleted during realtime run
