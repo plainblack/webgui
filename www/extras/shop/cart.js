@@ -300,6 +300,11 @@
                 var id = o.responseText,
                      d = self.elements.dropdowns;
 
+                if (!id.match(/^[A-Za-z0-9_-]{22}$/)) {
+                    alert('Error: bad response trying to save address.');
+                    return;
+                }
+
                 function updateOne(dropdown) {
                     var opt = _.detect(dropdown.options, function (o) {
                         return o.text === label;
