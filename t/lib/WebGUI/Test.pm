@@ -42,7 +42,6 @@ use List::MoreUtils qw(any);
 use File::Copy ();
 use File::Temp ();
 use Try::Tiny;
-use WebGUI::PseudoRequest;
 use Scope::Guard;
 use Try::Tiny;
 use WebGUI::Paths -inc;
