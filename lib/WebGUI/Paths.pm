@@ -204,6 +204,7 @@ sub preloadExclude {
     my $class = shift;
     my @excludes = _readTextLines($class->preloadExclusions);
     push @excludes, 'WebGUI::Upgrade', 'WebGUI::Upgrade::*';
+    push @excludes, 'WebGUI::Test', 'WebGUI::Test::*';
     return @excludes;
 }
 
