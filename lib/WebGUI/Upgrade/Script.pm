@@ -41,11 +41,17 @@ my @cleanups;
 sub _build_exports {
     my $configFile   = $ENV{WEBGUI_CONFIG}
         or die 'WEBGUI_CONFIG environment variable must be specified';
-    my $version      = $ENV{WEBGUI_UPGRADE_VERSION}
-        or die 'WEBGUI_UPGRADE_VERSION must be set';
+    my $version      = $ENV{WEBGUI_UPGRADE_VERSION};
     my $upgrade_file = $caller_upgrade_file;
     (my $vol, my $dir, my $shortname) = File::Spec->splitpath( $upgrade_file );
     $shortname =~ s/\.[^.]*$//;
+    my $last_dir = (File::Spec->splitdir($dir))[-1];
+    if ( !$version && $last_dir =~ /\A\d+\.\d+\.\d+-(\d+\.\d+\.\d+)\z/msx ) {
+        $version = $1;
+    }
+    if (! $version) {
+        die 'WEBGUI_UPGRADE_VERSION must be set';
+    }
 
     # need to be able to reference these directly in the cleanup code
     my $session;
