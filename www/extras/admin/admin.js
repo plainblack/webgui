@@ -549,6 +549,7 @@ WebGUI.Admin.prototype.requestHelper
  *      message     : A message to the user
  *      error       : An error message
  *      openDialog  : Open a dialog with the given URL
+ *      openTab     : Open a tab with the given URL
  *      redirect    : Redirect the View pane to the given URL
  *      scriptFile  : Load a JS file
  *      scriptFunc  : Run a JS function. Used with scriptFile
@@ -733,6 +734,41 @@ WebGUI.Admin.prototype.addHistoryHandler
     var self = this;
     var url  = appendToUrl( assetDef.url, 'func=view;revision=' + revisionDate );
     YAHOO.util.Event.on( elem, "click", function(){ self.gotoAsset( url ) }, self, true );
+};
+
+/**
+ * openTab ( url )
+ * Open a new tab with an iframe and the given URL
+ */
+WebGUI.Admin.prototype.openTab
+= function ( url ) {
+    // Prepare the iframe first
+    var iframe = document.createElement( 'iframe' );
+    iframe.src = url;
+    YAHOO.util.Event.on( iframe, 'load', function(){ this.updateTabLabel(newTab); }, this, true );
+
+    // Prepare the tab
+    var newTab = new YAHOO.widget.Tab({
+        label : "Loading...",
+        content : ''
+    });
+    newTab.get('contentEl').appendChild( iframe );
+
+    // Fire when ready, Gridley
+    this.tabBar.addTab( newTab );
+
+};
+
+/**
+ * updateTabLabel( tab )
+ * Update the tab's label with the title from the iframe inside
+ */
+WebGUI.Admin.prototype.updateTabLabel
+= function ( tab ) {
+    // Find the iframe
+    var iframe = tab.get('contentEl').getElementsByTagName( 'iframe' )[0];
+    var title = iframe.contentDocument.title;
+    tab.set( 'label', title );
 };
 
 /****************************************************************************
