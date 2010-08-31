@@ -418,7 +418,7 @@ $tarStorage->addFileFromFilesystem(WebGUI::Test->getTestCollateralPath('extensio
 my $extensionStorage = $tarStorage->untar('extensions.tar');
 WebGUI::Test->addToCleanup($extensionStorage);
 use Data::Dumper;
-diag Dumper $extensionStorage->getFiles;
+note Dumper $extensionStorage->getFiles;
 cmp_bag(
     $extensionStorage->getFiles, 
     [ qw{ extension_pm.txt extension_perl.txt extension_html.txt extensions extensions/extension_html.txt }], 
