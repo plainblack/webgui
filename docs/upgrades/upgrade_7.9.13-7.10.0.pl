@@ -47,7 +47,7 @@ sub addAddonsToAdminConsole {
       icon    => "addons.png",
       uiLevel => 1,
       group   => "12",
-      url     => "http://www.webgui.org/community/addons",
+      url     => "http://www.webgui.org/addons",
       title   => "Addons"
     });
     print "DONE!\n" unless $quiet;
