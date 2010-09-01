@@ -8,9 +8,7 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../../../lib";
 
 ##The goal of this test is to diagnose problems in DataForms.
 ##  Orphaned DataForms with no Asset table entries

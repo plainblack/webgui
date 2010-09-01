@@ -8,9 +8,7 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../../../lib";
 
 # Test of the Gallery basic and advanced search. In non-live tests, the Gallery 
 # search is accessed via the "search" method. Form parameters are passed in via

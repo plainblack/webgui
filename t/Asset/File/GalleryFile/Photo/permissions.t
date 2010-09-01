@@ -10,9 +10,7 @@
 
 # Test permissions of Photo assets
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../../../../lib";
 
 use WebGUI::Test;
 use WebGUI::Session;

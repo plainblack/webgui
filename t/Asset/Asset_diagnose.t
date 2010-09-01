@@ -8,9 +8,7 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../lib";
 
 ##The goal of this test is to look for orphaned assetIds across
 ##all assets in the Asset's main table, and the asset and assetData tables.

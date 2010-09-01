@@ -11,9 +11,7 @@
 # The goal of this test is to test the makeShortcut method and www_makeShortcut
 # pages
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../../../../lib";
 
 use Scalar::Util;
 use WebGUI::Test;

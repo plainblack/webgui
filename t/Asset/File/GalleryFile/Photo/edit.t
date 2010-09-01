@@ -11,9 +11,7 @@
 
 # This script tests the edit and saving of Photo assets
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../../../../lib";
 
 use Test::More;
 use Test::Deep;

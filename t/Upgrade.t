@@ -2,9 +2,7 @@ use strict;
 use warnings;
 no warnings 'redefine';
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/lib";
 
 use WebGUI::Test import => [qw(collateral addToCleanup)];
 use Test::More;

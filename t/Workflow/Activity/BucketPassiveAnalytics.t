@@ -1,7 +1,5 @@
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../../lib";
 #use DB;
 
 use WebGUI::Test;

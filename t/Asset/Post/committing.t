@@ -10,9 +10,7 @@
 
 ## Test that committing a post works, and doesn't affect the parent thread.
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../../lib";
 use Test::More;
 use WebGUI::Test;
 use WebGUI::Session;

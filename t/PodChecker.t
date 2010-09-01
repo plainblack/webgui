@@ -9,8 +9,6 @@
 #-------------------------------------------------------------------
 
 use strict;
-use FindBin qw($Bin);
-use lib "$FindBin::Bin/lib";
 
 use File::Find;
 use Pod::Checker;

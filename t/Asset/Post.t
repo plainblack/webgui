@@ -14,9 +14,7 @@
 # 2. The tests for the features I've implemented; namely, functionality and
 # general access controls on who can edit a post.
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../lib";
 use WebGUI::Test;
 use WebGUI::Session;
 use Test::More tests => 18; # increment this value for each test you create

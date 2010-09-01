@@ -11,9 +11,7 @@
 # The goal of this test is to test the getDownloadFileUrl and www_download()
 # methods
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../../../../lib";
 
 use WebGUI::Test;
 use WebGUI::Session;

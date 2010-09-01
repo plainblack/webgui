@@ -12,8 +12,6 @@ use strict;
 use warnings;
 no warnings qw(uninitialized);
 
-use FindBin;
-use lib "$FindBin::Bin/../lib";
 
 use Test::More;
 use Test::Deep;

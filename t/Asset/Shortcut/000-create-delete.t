@@ -8,9 +8,7 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../../lib";
 
 ## The goal of this test is to test the creation and deletion of shortcut assets
 

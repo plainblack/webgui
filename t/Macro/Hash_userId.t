@@ -10,9 +10,7 @@
 
 ##The goal of this test is to make sure the Hash_userId macro works.
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
 use WebGUI::Session;

@@ -9,9 +9,7 @@
 #-------------------------------------------------------------------
 
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/lib";
 use Tie::IxHash;
 
 use WebGUI::Test;

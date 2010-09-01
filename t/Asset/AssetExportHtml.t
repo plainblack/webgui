@@ -12,9 +12,7 @@
 #  These tests are for the shiny rewritten export functionality. it tries
 #  really hard to test every permutation of the code.
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../lib";
 use Test::More;
 use WebGUI::Test; # Must use this before any other WebGUI modules
 

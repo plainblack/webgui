@@ -13,9 +13,7 @@
 # 
 #
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../../../lib";
 use WebGUI::Test; # Must use this before any other WebGUI modules
 use Test::More;
 use Test::Deep;

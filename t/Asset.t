@@ -8,11 +8,9 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use FindBin;
 use strict;
 use warnings;
 no warnings qw(uninitialized);
-use lib "$FindBin::Bin/lib";
 
 use WebGUI::Test;
 

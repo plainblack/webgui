@@ -2,8 +2,6 @@
 
 use strict;
 use warnings;
-use FindBin qw($Bin);
-use lib "$FindBin::Bin/../../lib";
 use WebGUI::Test;
 use Test::More;
 

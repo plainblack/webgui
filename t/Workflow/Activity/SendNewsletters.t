@@ -9,9 +9,7 @@
 # http://www.plainblack.com                     info@plainblack.com
 #------------------------------------------------------------------
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../../lib";
 use Test::More;
 use Test::Deep;
 use Data::Dumper;

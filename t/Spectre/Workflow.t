@@ -9,13 +9,11 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use FindBin;
 use strict;
 use warnings;
 
 use Test::More;
 
-use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
 use WebGUI::Paths;

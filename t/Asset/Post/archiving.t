@@ -11,9 +11,7 @@
 ## Test that archiving a post works, and checking side effects like updating
 ## lastPost information in the Thread, and CS.
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../../lib";
 use WebGUI::Test;
 use WebGUI::Session;
 use Test::More tests => 13; # increment this value for each test you create

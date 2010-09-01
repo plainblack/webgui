@@ -14,9 +14,7 @@
 # 
 #
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../../../lib";
 use Test::More;
 use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;

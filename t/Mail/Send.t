@@ -12,8 +12,6 @@
 # This script tests the creation, sending, and queuing of mail messages
 # TODO: There is plenty left to do in this script.
 use strict;
-use FindBin;
-use lib "$FindBin::Bin/../lib";
 use JSON qw( from_json to_json );
 use Test::More;
 use Test::Deep;

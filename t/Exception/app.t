@@ -1,7 +1,5 @@
 # Test what happens when the WebGUI PSGI app throws exceptions
 use strict;
-use FindBin;
-use lib "$FindBin::Bin/../lib";
 use WebGUI;
 use WebGUI::Test;
 use Plack::Test;

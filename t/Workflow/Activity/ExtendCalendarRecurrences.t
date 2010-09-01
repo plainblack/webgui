@@ -9,10 +9,7 @@
 # http://www.plainblack.com                     info@plainblack.com
 #------------------------------------------------------------------
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../../lib";
-use lib "$FindBin::Bin/../../t/lib";
 use Test::More;
 use WebGUI::Test;
 use WebGUI::Session;

@@ -18,9 +18,7 @@
 # so 100 will test all items, 75 will
 # test 75% or 3 out of four items
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/lib";
 use lib '/data/WebGUI/t/lib';
 
 use WebGUI::Test;

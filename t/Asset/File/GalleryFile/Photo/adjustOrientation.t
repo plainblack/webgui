@@ -8,9 +8,7 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../../../../lib";
 
 # Test the 'adjustOrientation' method called by 'applyConstraints'. It is 
 # responsible for rotating JPEG images according to orientation information

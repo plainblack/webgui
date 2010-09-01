@@ -8,9 +8,7 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../../../../lib";
 
 # The goal of this test is to confirm correct rotation of all files attached
 # to a Photo asset after calling the rotate method.

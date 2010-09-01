@@ -12,9 +12,7 @@
 # Tests for WebGUI::Workflow::Instance
 #
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../lib";
 use Test::More;
 use Test::Deep;
 use Test::Exception;

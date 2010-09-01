@@ -8,10 +8,8 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use FindBin;
 use strict;
 use warnings;
-use lib "$FindBin::Bin/lib"; ##t/lib
 
 use WebGUI::Test;
 use WebGUI::Session;

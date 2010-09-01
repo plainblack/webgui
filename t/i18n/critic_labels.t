@@ -14,9 +14,7 @@
 #
 
 use Path::Class;
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../lib";
 use Test::More;
 plan skip_all => 'set CODE_COP to enable this test' unless $ENV{CODE_COP};
 
@@ -33,6 +31,5 @@ if ($@) {
 # Init
 my $session         = WebGUI::Test->session;
 
-my $label_profile = Path::Class::File->new( $FindBin::Bin )->parent->file('i18n', 'perlcriticrc');
 Test::Perl::Critic->import(-profile => $label_profile->stringify);
 all_critic_ok(WebGUI::Test->lib);

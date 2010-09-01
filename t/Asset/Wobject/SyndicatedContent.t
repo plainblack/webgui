@@ -8,10 +8,8 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use FindBin;
 use strict;
 use File::Spec;
-use lib "$FindBin::Bin/../../lib";
 
 use Data::Dumper;
 
