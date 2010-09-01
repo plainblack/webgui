@@ -54,6 +54,7 @@ sub process {
     my $self = shift;
     my $template = shift;
     my $vars = $self->addSessionVars(shift);
+    $self->downgrade($vars);
     my $t;
     eval {
         $t = HTML::Template->new(

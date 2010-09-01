@@ -2,6 +2,9 @@
  - fixed #11812: Checking www_ajaxSave's response in the cart js, urlencoding post parameters
  - added: Link in the Admin Console to the Addons section on webgui.org
  - added: Labels in the Shopping Cart addresses are optional.
+ - added: template variable downgrading so that using we can safely pass
+   template variables TT would understand to HTML::Template templates -- see
+   WebGUI::Asset::Template::Parser->downgrade for details.
 
 7.9.13
  - fixed #11783: Instances deleted during realtime run

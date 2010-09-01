@@ -16,6 +16,7 @@ package WebGUI::Asset::Template::Parser;
 
 use strict;
 use WebGUI::International;
+use Scalar::Util qw(blessed);
 
 
 #-------------------------------------------------------------------
@@ -59,6 +60,49 @@ sub addSessionVars {
 	$vars->{"webgui.version"} = $WebGUI::VERSION;
 	$vars->{"webgui.status"} = $WebGUI::STATUS;
 	return $vars;
+}
+
+#-------------------------------------------------------------------
+
+=head2 downgrade ( vars )
+
+Removes or converts things HTML::Template-like engines can't handle.  Coderefs
+are removed, blessed objects are removed, and hashes are recursively flattened
+by appending keys separated by dots (e.g. { foo => { bar => 'baz' } } becomes
+{ 'foo.bar' => 'baz' }.  Also, array elements that aren't hashes are converted
+to hashes via { value => $bareValue }.
+
+=cut
+
+sub downgrade {
+    my ($self, $vars) = @_;
+    for my $k (keys %$vars) {
+        my $v = $vars->{$k};
+        if (blessed($v) || ref $v eq 'CODE') {
+            delete $vars->{$k};
+        }
+        elsif (ref $v eq 'ARRAY') {
+            for my $i (0..$#$v) {
+                if (ref $v->[$i] eq 'HASH') {
+                    $self->downgrade($v->[$i]);
+                }
+                else {
+                    my %hash = ( value => $v->[$i] );
+                    $self->downgrade(\%hash);
+                    $v->[$i] = \%hash;
+                }
+            }
+        }
+        elsif (ref $v eq 'HASH') {
+            delete $vars->{$k};
+            my %flatter;
+            for my $subkey (keys %$v) {
+                $flatter{"$k.$subkey"}  = $v->{$subkey};
+            }
+            $self->downgrade(\%flatter);
+            @{$vars}{keys %flatter} = values %flatter;
+        }
+    }
 }
 
 #-------------------------------------------------------------------
