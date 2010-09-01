@@ -305,6 +305,11 @@
                     return;
                 }
 
+                if (!id.match(/^[A-Za-z0-9_-]{22}$/)) {
+                    alert('Error: bad response trying to save address.');
+                    return;
+                }
+
                 function updateOne(dropdown) {
                     var opt = _.detect(dropdown.options, function (o) {
                         return o.text === label;
@@ -406,7 +411,7 @@
             var url   = this.baseUrl,
                 cb    = { success: success },
                 query = _(params).map(function (v, k) {
-                    return [k, v].join('=');
+                    return [k, escape(v)].join('=');
                 }).join('&');
 
             if (method === 'GET') {
