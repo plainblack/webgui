@@ -34,7 +34,7 @@ any other work that was needed.
 
 To cut down on the amount of boilerplate code and allow for more
 flexible upgrades, this has been changed.  Multiple upgrade files
-are placed in the directory F<var/upgrades/X.X.X-X.X.X/>, and are
+are placed in the directory F<share/upgrades/X.X.X-X.X.X/>, and are
 processed in alphabetical order, with the file extension determining
 how to process the file.
 
