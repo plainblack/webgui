@@ -1003,6 +1003,7 @@
     "WebGUI::Content::Wizard",
     "WebGUI::Content::Operation",
     "WebGUI::Content::Setup",
+    "WebGUI::Content::FacebookAuth",
     "WebGUI::Content::Shop",
     "WebGUI::Content::SiteIndex",
     "WebGUI::Content::Asset",
