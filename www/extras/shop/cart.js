@@ -38,9 +38,18 @@
 
     var Cart = {
         attachAddressBlurHandlers: function (name) {
-            var fields  = _.values(this.elements[name]),
+            var els     = this.elements[name],
+                label   = els.label,
+                addr    = els.address1,
+                fields  = _.values(els),
                 handler = this.createAddressBlurHandler(name);
             this.event.on(fields, 'focusout', handler);
+            this.event.on(addr, 'focusout', function () {
+                if (!label.value) {
+                    label.value = addr.value;
+                    label.blur();
+                }
+            });
         },
 
         attachAddressSelectHandler: function (name) {
