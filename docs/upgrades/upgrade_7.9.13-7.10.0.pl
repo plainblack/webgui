@@ -31,9 +31,27 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+addAddonsToAdminConsole($session);
 
 finish($session); # this line required
 
+
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub addAddonsToAdminConsole {
+    my $session = shift;
+    print "\tAdd the Addons icon to the Admin Console... " unless $quiet;
+    # and here's our code
+    $session->config->addToHash('adminConsole', 
+    addons => {
+      icon    => "addons.png",
+      uiLevel => 1,
+      group   => "12",
+      url     => "http://www.webgui.org/community/addons",
+      title   => "Addons"
+    });
+    print "DONE!\n" unless $quiet;
+}
 
 #----------------------------------------------------------------------------
 # Describe what our function does
