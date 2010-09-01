@@ -3,6 +3,7 @@ package WebGUI::Account;
 use strict;
 
 use Moose;
+use WebGUI::BestPractices;
 
 has session => (
     is       => 'ro',
