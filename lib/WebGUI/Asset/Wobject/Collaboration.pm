@@ -978,21 +978,6 @@ sub duplicateBranch {
 
 #-------------------------------------------------------------------
 
-=head2 getEditTabs
-
-Add a tab for the mail interface.
-
-
-sub getEditTabs {
-	my $self = shift;
-	my $i18n = WebGUI::International->new($self->session,"Asset_Collaboration");
-	return ($self->next::method, ['mail', $i18n->get('mail'), 9]);
-}
-
-=cut
-
-#-------------------------------------------------------------------
-
 =head2 getNewThreadUrl(  )
 
 Formats the url to start a new thread.

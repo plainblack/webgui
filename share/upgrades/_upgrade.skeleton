@@ -1,8 +1,6 @@
 use WebGUI::Upgrade::Script;
 
-report "\tRunning an upgrade step...";
-
-# if (! quiet) { ... }
+start_step "Running an upgrade step";
 
 # clear_cache;
 

@@ -531,7 +531,7 @@ WebGUI.Admin.prototype.requestHelper
     var callback = {
         success : function (o) {
             var resp = YAHOO.lang.JSON.parse( o.responseText );
-            this.processHelper( resp );
+            this.processPlugin( resp );
         },
         failure : function (o) {
 
@@ -544,17 +544,18 @@ WebGUI.Admin.prototype.requestHelper
 };
 
 /**
- * processHelper( response )
- * Process the helper response. Possible responses include:
+ * processPlugin( response )
+ * Process the plugin response. Possible responses include:
  *      message     : A message to the user
  *      error       : An error message
  *      openDialog  : Open a dialog with the given URL
+ *      openTab     : Open a tab with the given URL
  *      redirect    : Redirect the View pane to the given URL
  *      scriptFile  : Load a JS file
  *      scriptFunc  : Run a JS function. Used with scriptFile
  *      scriptArgs  : Arguments to scriptFunc. Used with scriptFile
  */
-WebGUI.Admin.prototype.processHelper
+WebGUI.Admin.prototype.processPlugin
 = function ( resp ) {
     if ( resp.openTab ) {
         this.openTab( resp.openTab );
@@ -572,7 +573,7 @@ WebGUI.Admin.prototype.processHelper
         this.showInfoMessage( resp.error );
     }
     else {
-        alert( "Unknown helper response: " + YAHOO.lang.JSON.stringify(resp) );
+        alert( "Unknown plugin response: " + YAHOO.lang.JSON.stringify(resp) );
     }
 };
 
@@ -733,6 +734,41 @@ WebGUI.Admin.prototype.addHistoryHandler
     var self = this;
     var url  = appendToUrl( assetDef.url, 'func=view;revision=' + revisionDate );
     YAHOO.util.Event.on( elem, "click", function(){ self.gotoAsset( url ) }, self, true );
+};
+
+/**
+ * openTab ( url )
+ * Open a new tab with an iframe and the given URL
+ */
+WebGUI.Admin.prototype.openTab
+= function ( url ) {
+    // Prepare the iframe first
+    var iframe = document.createElement( 'iframe' );
+    iframe.src = url;
+    YAHOO.util.Event.on( iframe, 'load', function(){ this.updateTabLabel(newTab); }, this, true );
+
+    // Prepare the tab
+    var newTab = new YAHOO.widget.Tab({
+        label : "Loading...",
+        content : ''
+    });
+    newTab.get('contentEl').appendChild( iframe );
+
+    // Fire when ready, Gridley
+    this.tabBar.addTab( newTab );
+
+};
+
+/**
+ * updateTabLabel( tab )
+ * Update the tab's label with the title from the iframe inside
+ */
+WebGUI.Admin.prototype.updateTabLabel
+= function ( tab ) {
+    // Find the iframe
+    var iframe = tab.get('contentEl').getElementsByTagName( 'iframe' )[0];
+    var title = iframe.contentDocument.title;
+    tab.set( 'label', title );
 };
 
 /****************************************************************************

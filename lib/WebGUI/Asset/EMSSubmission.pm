@@ -478,24 +478,6 @@ sub www_view { $_[0]->ems->www_viewSubmissionQueue }
 
 #-------------------------------------------------------------------
 
-=head2 getEditTabs ( )
-
-defines 2 new tabs.
-the shop tab is created here to mimic the function of the sku-created 
-shop tab.  this class holds data like Sku assets so that they can be assigned
-in the future when the sku asset is created from this data.
-
-
-override getEditTabs => sub {
-    my $self = shift;
-    my $sku_i18n = WebGUI::International->new($self->session,"Asset_Sku");
-    return (super(), ['shop', $sku_i18n->get('shop'), 9],);
-};
-
-=cut
-
-#-------------------------------------------------------------------
-
 =head2 getQueueUrl
 
 returns the URL for the submission queue page with the submisison id in the hash part

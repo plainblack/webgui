@@ -1131,6 +1131,8 @@ Get the AssetHelpers for this asset.
 
 sub getHelpers {
     my ( $self ) = @_;
+    my $session = $self->session;
+    my ( $conf ) = $session->quick(qw{ config });
 
     my $default = [
         {
@@ -1170,6 +1172,20 @@ sub getHelpers {
             label   => 'Lock',
         },
     ];
+
+
+    # Get additional helpers for this class from config
+    my $confHelpers = $conf->get('assets/' . $self->className . '/helpers');
+    # Merge on label
+    for my $helper ( @$confHelpers ) {
+        WebGUI::Macro::process( \$helper->{label} );
+        if ( my $replace = first { $_->{label} eq $helper->{label} } @$default ) {
+            $replace = $helper; # replace in the default arrayref
+        }
+        else {
+            push @$default, $helper;
+        }
+    }
 
     return $default;
 }

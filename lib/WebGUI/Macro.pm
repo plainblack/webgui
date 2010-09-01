@@ -225,6 +225,54 @@ sub _processParameters {
     return \@params;
 }
 
+=head2 transform ( $session, \$content, $sub )
+
+Transforms the macro calls in $content accoring to $sub.  For each macro call found, $sub will be called with a hash of information about the call.  The return value of the sub should be either undef to leave the macro call untouched, or a string to replace the macro call with.  Macros are not processed recursively.  If recursive processing is needed, trannsform can be called again inside $sub.
+
+=head3 $session
+
+The WebGUI session to use.
+
+=head3 \$content
+
+A reference to a string to transform macros in.  The string will be modified in place.
+
+=head3 $sub
+
+A sub reference to call for each macro call.
+
+The hash passed to $sub will contain:
+
+=over 4
+
+=item session
+
+The session passed in.
+
+=item macro
+
+The name of the macro called.
+
+=item macroPackage
+
+The module name for the macro from the config file.
+
+=item originalString
+
+The full original text of the macro call.
+
+=item parameters
+
+An array reference to the parameters passed to the macro.
+
+=item parameterString
+
+The full original text of the parameters.
+
+=back
+
+=cut
+
 sub transform {
     my $session = shift;
     my $content = shift;
@@ -251,7 +299,7 @@ sub _transformMacro {
         session         => $session,
         macro           => $macro,
         macroPackage    => $macroPackage,
-        originalText    => $original,
+        originalString  => $original,
         parameters      => $params,
         parameterString => $paramString,
     });

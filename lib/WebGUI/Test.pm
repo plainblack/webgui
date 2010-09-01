@@ -26,42 +26,54 @@ use strict;
 use warnings;
 use base qw(Test::Builder::Module);
 
-use Log::Log4perl;
-use Test::MockObject;
-use Test::MockObject::Extends;
 use Log::Log4perl;  # load early to ensure proper order of END blocks
+use Test::MockObject::Extends;
 use Clone               qw(clone);
 use File::Basename      qw(dirname fileparse);
-use File::Spec::Functions qw(abs2rel rel2abs catdir catfile updir);
+use File::Spec::Functions qw(abs2rel rel2abs catdir catfile updir splitdir);
 use IO::Handle          ();
 use IO::Select          ();
-use Cwd                 ();
+use Cwd                 qw( realpath );
 use Scalar::Util        qw( blessed );
 use Carp                qw( carp croak );
 use List::MoreUtils qw(any);
 use File::Copy ();
 use File::Temp ();
 use Try::Tiny;
-use WebGUI::PseudoRequest;
 use Scope::Guard;
 use Try::Tiny;
 use WebGUI::Paths -inc;
 use namespace::clean;
-
-our $WEBGUI_TEST_ROOT = rel2abs( catdir( dirname( __FILE__ ), (updir) x 2 ) );
-
-our $WEBGUI_TEST_COLLATERAL = catdir(
-    $WEBGUI_TEST_ROOT,
-    'supporting_collateral'
-);
 
 our @EXPORT = qw(cleanupGuard addToCleanup);
 our @EXPORT_OK = qw(session config collateral);
 
 my $CLASS = __PACKAGE__;
 
+my $test_collateral;
 my $original_config_file;
 sub import {
+    my $test_dir = realpath( dirname( rel2abs( (caller 0)[1] ) ) );
+    while ( 1 ) {
+        if ( (splitdir($test_dir))[-1] eq 't') {
+            my $lib_dir = catdir($test_dir, 'lib');
+            if ( -d $lib_dir ) {
+                $test_collateral = catdir(
+                    $test_dir,
+                    'supporting_collateral'
+                );
+
+                unshift @INC, $lib_dir;
+            }
+            last;
+        }
+        my $next_dir = realpath( catdir( $test_dir, updir ) );
+        if ( $test_dir eq $next_dir ) {
+            last;
+        }
+        $test_dir = $next_dir;
+    }
+
     if ( ! $original_config_file ) {
         my $config = $ENV{WEBGUI_CONFIG};
         die "Enviroment variable WEBGUI_CONFIG must be set to the full path to a WebGUI config file.\n"
@@ -395,7 +407,7 @@ Optionally adds a filename to the end.
 sub getTestCollateralPath {
     my $class           = shift;
     my @path            = @_;
-    return catfile(our $WEBGUI_TEST_COLLATERAL, @path);
+    return catfile($test_collateral, @path);
 }
 
 sub collateral {
@@ -410,8 +422,9 @@ Returns the full path to the WebGUI lib directory, usually /data/WebGUI/lib.
 
 =cut
 
+my $webgui_lib = realpath( catdir( dirname( __FILE__ ), (updir) x 3 ) );
 sub lib {
-    return catdir( $WEBGUI_TEST_ROOT, updir, 'lib' );
+    return $webgui_lib;
 }
 
 #----------------------------------------------------------------------------

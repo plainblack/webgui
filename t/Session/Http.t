@@ -13,7 +13,6 @@ use strict;
 use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
-use WebGUI::PseudoRequest;
 use WebGUI::Session;
 use HTML::TokeParser;
 use DateTime;
