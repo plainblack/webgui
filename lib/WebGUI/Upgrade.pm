@@ -244,7 +244,9 @@ sub upgradeSite {
     for my $step ( @steps ) {
         $i++;
         print "Running upgrades for $step (step $i/@{[ scalar @steps ]}):\n";
-        $self->createBackup($configFile);
+        if ($self->createBackups) {
+            $self->createBackup($configFile);
+        }
         $self->runUpgradeStep($configFile, $step);
     }
 }
