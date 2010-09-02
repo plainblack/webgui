@@ -18,6 +18,7 @@ use strict;
 use lib "$FindBin::Bin/../lib";
 use Test::More;
 use Test::Deep;
+use Data::Dumper;
 use JSON;
 use HTML::Form;
 
@@ -32,7 +33,7 @@ my $session = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 54;
+plan tests => 55;
 
 #----------------------------------------------------------------------------
 # figure out if the test can actually run
@@ -451,6 +452,63 @@ TODO: {
     local $TODO = 'tests for canUse';
     ok(0, 'Test other users and groups');
 }
+
+#######################################################################
+#
+# appendCartVariables
+#
+#######################################################################
+
+my $versionTag = WebGUI::VersionTag->getWorking($session);
+my $node    = WebGUI::Asset->getImportNode($session);
+my $widget  = $node->addChild({
+    className          => 'WebGUI::Asset::Sku::Product',
+    title              => 'Test product for cart template variables in the Product',
+    isShippingRequired => 1,
+});
+my $blue_widget  = $widget->setCollateral('variantsJSON', 'variantId', 'new',
+    {
+        shortdesc => 'Blue widget',   price     => 5.00,
+        varSku    => 'blue-widget',  weight    => 1.0,
+        quantity  => 9999,
+    }
+);
+
+$versionTag->commit;
+my $cart = WebGUI::Shop::Cart->newBySession($session);
+WebGUI::Test->addToCleanup($versionTag, $cart);
+my $addressBook = $cart->getAddressBook;
+my $workAddress = $addressBook->addAddress({
+    label => 'work',
+    organization => 'Plain Black Corporation',
+    address1 => '1360 Regent St. #145',
+    city => 'Madison', state => 'WI', code => '53715',
+    country => 'United States',
+});
+$cart->update({
+    billingAddressId  => $workAddress->getId,
+    shippingAddressId => $workAddress->getId,
+});
+$widget->addToCart($widget->getCollateral('variantsJSON', 'variantId', $blue_widget));
+
+my $cart_variables = {};
+$driver->appendCartVariables($cart_variables);
+diag Dumper($cart_variables);
+
+cmp_deeply(
+    $cart_variables,
+    {
+        taxes                 => ignore(),
+        shippableItemsInCart  => 1,
+        totalPrice            => '5.00',
+        inShopCreditDeduction => ignore(),
+        inShopCreditAvailable => ignore(),
+        subtotal              => '5.00',
+        shipping              => ignore(),
+
+    },
+    'appendCartVariables: checking shippableItemsInCart and totalPrice & subtotal formatting'
+);
 
 #######################################################################
 #

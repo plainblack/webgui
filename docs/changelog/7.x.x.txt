@@ -5,6 +5,7 @@
  - added: template variable downgrading so that using we can safely pass
    template variables TT would understand to HTML::Template templates -- see
    WebGUI::Asset::Template::Parser->downgrade for details.
+ - fixed #11813: Payment confirmation screen dollar amount
 
 7.9.13
  - fixed #11783: Instances deleted during realtime run
