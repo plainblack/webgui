@@ -62,7 +62,6 @@ sub appendCommonVars {
 
     eval { WebGUI::Shop::Vendor->newByUserId($session, $session->user->userId); };
     $var->{ 'userIsVendor'              } = ! Exception::Class->caught();
-    $session->log->warn($@);
 }
 
 #-------------------------------------------------------------------
