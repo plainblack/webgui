@@ -86,7 +86,7 @@ sub www_viewActiveSessions {
         and users.userId<>1 order by users.username,userSession.lastPageView desc");
     my $pn = $p->getPageNumber;
     foreach my $data (@{ $p->getPageData() }) {
-        $output  = '<tr class="tableData"><td>'.$data->{username}.' ('.$data->{userId}.')</td>';
+        $output .= '<tr class="tableData"><td>'.$data->{username}.' ('.$data->{userId}.')</td>';
         $output .= '<td>'.$data->{sessionId}.'</td>';
         $output .= '<td>'.$session->datetime->epochToHuman($data->{expires}).'</td>';
         $output .= '<td>'.$session->datetime->epochToHuman($data->{lastPageView}).'</td>';

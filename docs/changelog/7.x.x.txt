@@ -1,6 +1,7 @@
 7.9.14
  - fixed #11812: Checking www_ajaxSave's response in the cart js
  - fixed #11813: Payment confirmation screen dollar amount
+ - fixed #11832: Admin Session Interface broken
 
 7.9.13
  - fixed #11783: Instances deleted during realtime run
