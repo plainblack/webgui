@@ -195,12 +195,14 @@ sub upgradeSites {
         $i++;
         my $bareFilename = $configFile;
         $bareFilename =~ s{.*/}{};
-        print "Upgrading $bareFilename (site $i/@{[ scalar @configs ]}):\n";
+            if ! $self->quiet;
+        print "Upgrading $bareFilename (site $i/@{[ scalar @configs ]}):\n"
+            if ! $self->quiet;
         try {
             $self->upgradeSite($configFile);
         }
         catch {
-            print "Error upgrading $bareFilename: $_\n";
+            warn "Error upgrading $bareFilename: $_\n";
         };
     }
     return 1;
@@ -238,12 +240,14 @@ sub upgradeSite {
         $dbh->do('REPLACE INTO settings (name, value) VALUES (?, ?)', {}, 'upgradeState', 'started');
     }
     if (! @steps) {
-        print "No upgrades needed.\n";
+        print "No upgrades needed.\n"
+            if ! $self->quiet;
     }
     my $i = 0;
     for my $step ( @steps ) {
         $i++;
-        print "Running upgrades for $step (step $i/@{[ scalar @steps ]}):\n";
+        print "Running upgrades for $step (step $i/@{[ scalar @steps ]}):\n"
+            if ! $self->quiet;
         if ($self->createBackups) {
             $self->createBackup($configFile);
         }
@@ -434,7 +438,8 @@ sub createBackup {
         $self->backupPath,
         $configFile . '_' . $self->getCurrentVersion($config) . '_' . time . '.sql',
     );
-    print "Backing up to $resultFile\n";
+    print "Backing up to $resultFile\n"
+        if ! $self->quiet;
     my @command_line = (
         $self->mysqldump,
         $self->mysqlCommandLine($config),
