@@ -195,7 +195,6 @@ sub upgradeSites {
         $i++;
         my $bareFilename = $configFile;
         $bareFilename =~ s{.*/}{};
-            if ! $self->quiet;
         print "Upgrading $bareFilename (site $i/@{[ scalar @configs ]}):\n"
             if ! $self->quiet;
         try {
