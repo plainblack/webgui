@@ -405,7 +405,124 @@ sub getEditForm {
 	return $tabform;
 }
 
+# Get a list of all the buttons in this MCE
+sub getAllButtons {
+    my ( $self ) = @_;
+    my @toolbarRows = map{[split "\n", $self->getValue("toolbarRow$_")]} (1..3);
+    my @toolbarButtons = map{ @{$_} } @toolbarRows;
+    return @toolbarButtons;
+}
 
+# Get a hashref of configuration to create this MCE. You must run the code
+# from getLoadPlugins before you can successfully initialize an MCE. You 
+# must also specify the "elements" key so TinyMCE knows what textarea to 
+# replace.
+sub getConfig {
+    my ($self) = @_;
+    my $i18n = WebGUI::International->new($self->session, 'Asset_RichEdit');
+    my @plugins;
+    push @plugins, "safari";
+    push @plugins, "contextmenu"
+        if $self->getValue("enableContextMenu");
+    push @plugins, "inlinepopups"
+        if $self->getValue("inlinePopups");
+    push @plugins, "media"
+        if $self->getValue( 'allowMedia' );
+
+    my @toolbarRows = map{[split "\n", $self->getValue("toolbarRow$_")]} (1..3);
+    my @toolbarButtons = map{ @{$_} } @toolbarRows;
+    my %config = (
+        mode                    => 'exact',
+        theme                   => "advanced",
+        relative_urls           => JSON::false(),
+        remove_script_host      => JSON::true(),
+        auto_reset_designmode   => JSON::true(),
+        cleanup_callback        => "tinyMCE_WebGUI_Cleanup",
+        urlconverter_callback   => "tinyMCE_WebGUI_URLConvertor",
+        theme_advanced_resizing => JSON::true(),
+        ( map { "theme_advanced_buttons" . ( $_ + 1 ) => ( join ',', @{ $toolbarRows[$_] } ) } ( 0 .. $#toolbarRows ) ),
+
+        ask               => JSON::false(),
+        preformatted      => $self->getValue("preformatted") ? JSON::true() : JSON::false(),
+        force_br_newlines => $self->getValue("useBr") ? JSON::true() : JSON::false(),
+        force_p_newlines  => $self->getValue("useBr") ? JSON::false() : JSON::true(),
+        $self->getValue("useBr") ? ( forced_root_block => JSON::false() ) : (),
+        remove_linebreaks => $self->getValue("removeLineBreaks") ? JSON::true() : JSON::false(),
+        nowrap            => $self->getValue("nowrap")           ? JSON::true() : JSON::false(),
+        directionality    => $self->getValue("directionality"),
+        theme_advanced_toolbar_location   => $self->getValue("toolbarLocation"),
+        theme_advanced_statusbar_location => "bottom",
+        valid_elements                    => $self->getValue("validElements"),
+        wg_userIsVisitor                  => $self->session->user->isVisitor ? JSON::true() : JSON::false(),
+    );
+    foreach my $button (@toolbarButtons) {
+        if ( $button eq "spellchecker" && $self->session->config->get('availableDictionaries') ) {
+            push( @plugins, "-wgspellchecker" );
+            $config{spellchecker_rpc_url} = $self->session->url->gateway( '', "op=spellCheck" );
+            $config{spellchecker_languages} = join( ',',
+                map { ( $_->{default} ? '+' : '' ) . $_->{name} . '=' . $_->{id} }
+                    @{ $self->session->config->get('availableDictionaries') } );
+        }
+        push( @plugins, "table" )      if ( $button eq "tablecontrols" );
+        push( @plugins, "save" )       if ( $button eq "save" );
+        push( @plugins, "advhr" )      if ( $button eq "advhr" );
+        push( @plugins, "fullscreen" ) if ( $button eq "fullscreen" );
+        if ( $button eq "advimage" ) {
+            push( @plugins, "advimage" );
+            $config{external_link_list_url} = "";
+        }
+        if ( $button eq "advlink" ) {
+            $config{external_image_list_url} = "";
+            $config{file_browser_callback}   = "mcFileManager.filebrowserCallBack";
+            push( @plugins, "advlink" );
+        }
+        push( @plugins, "emotions" ) if ( $button eq "emotions" );
+        push( @plugins, "iespell" )  if ( $button eq "iespell" );
+        $config{gecko_spellcheck} = 'true' if ( $button eq "iespell" );
+        if ( $button eq "paste" || $button eq "pastetext" || $button eq "pasteword" ) {
+            push( @plugins, "paste" );
+        }
+        if ( $button eq "insertdate" || $button eq "inserttime" || $button eq "insertdatetime" ) {
+            $config{plugin_insertdate_dateFormat} = "%Y-%m-%d";
+            $config{plugin_insertdate_timeFormat} = "%H:%M:%S";
+            push( @plugins, "insertdatetime" );
+        }
+        push( @plugins, "preview" ) if ( $button eq "preview" );
+        if ( $button eq "media" ) {
+            push( @plugins, "media" );
+        }
+        push( @plugins, "searchreplace" )
+            if ( $button eq "search" || $button eq "replace" || $button eq "searchreplace" );
+        push( @plugins, "print" ) if ( $button eq "print" );
+        if ( $button eq "wginsertimage" ) {
+            push @plugins, "-wginsertimage";
+        }
+        if ( $button eq "wgpagetree" ) {
+            push @plugins, "-wgpagetree";
+        }
+        if ( $button eq "wgmacro" ) {
+            push @plugins, "-wgmacro";
+        }
+        if ( $button eq "code" ) {
+            $config{theme_advanced_source_editor_width} = $self->getValue("sourceEditorWidth")
+                if ( $self->getValue("sourceEditorWidth") > 0 );
+            $config{theme_advanced_source_editor_height} = $self->getValue("sourceEditorHeight")
+                if ( $self->getValue("sourceEditorHeight") > 0 );
+        }
+    } ## end foreach my $button (@toolbarButtons)
+    my $language = $i18n->getLanguage( '', "languageAbbreviation" );
+    unless ($language) {
+        $language = $i18n->getLanguage( "English", "languageAbbreviation" );
+    }
+    $config{language}    = $language;
+    $config{content_css} = $self->getValue("cssFile")
+        || $self->session->url->extras('tinymce-webgui/defaultcontent.css');
+    $config{width}  = $self->getValue("editorWidth")  if ( $self->getValue("editorWidth") > 0 );
+    $config{height} = $self->getValue("editorHeight") if ( $self->getValue("editorHeight") > 0 );
+    $config{plugins} = join( ",", @plugins );
+
+    return \%config;
+} ## end sub getConfig
 
 #-------------------------------------------------------------------
 
@@ -429,6 +546,33 @@ my $sql = "select asset.assetId, assetData.revisionDate from RichEdit left join 
 	}
 	$sth->finish;
 	return \%richEditors;
+}
+
+# Get the JS code to load the plugins for this MCE. Needs to be called once
+# on the page this MCE will be on
+sub getLoadPlugins {
+    my ( $self ) = @_;
+    my %loadPlugins;
+    for my $button ( $self->getAllButtons ) {
+        if ( $button eq 'spellchecker' ) {
+            $loadPlugins{wgspellchecker} = $self->session->url->extras("tinymce-webgui/plugins/wgspellchecker/editor_plugin.js");
+        }
+        if ( $button eq 'wginsertimage' ) {
+            $loadPlugins{wginsertimage} = $self->session->url->extras("tinymce-webgui/plugins/wginsertimage/editor_plugin.js");
+        }
+        if ( $button eq 'wgpagetree' ) {
+            $loadPlugins{wgpagetree} = $self->session->url->extras("tinymce-webgui/plugins/wgpagetree/editor_plugin.js");
+        }
+        if ( $button eq 'wgmacro' ) {
+            $loadPlugins{wgmacro} = $self->session->url->extras("tinymce-webgui/plugins/wgmacro/editor_plugin.js");
+        }
+    }
+
+    my $out = '';
+    while (my ($plugin, $path) = each %loadPlugins) {
+        $out .= "tinymce.PluginManager.load('$plugin', '$path');\n";
+    }
+    return $out;
 }
 
 #-------------------------------------------------------------------
@@ -464,114 +608,11 @@ sub getRichEditor {
 	my $self = shift;
 	return '' if ($self->getValue('disableRichEditor'));
 	my $nameId = shift;
-    my @plugins;
-    my %loadPlugins;
-    push @plugins, "safari";
-    push @plugins, "contextmenu"
-        if $self->getValue("enableContextMenu");
-    push @plugins, "inlinepopups"
-        if $self->getValue("inlinePopups");
-    push @plugins, "media"
-        if $self->getValue( 'allowMedia' );
-
-    my @toolbarRows = map{[split "\n", $self->getValue("toolbarRow$_")]} (1..3);
-    my @toolbarButtons = map{ @{$_} } @toolbarRows;
 	my $i18n = WebGUI::International->new($self->session, 'Asset_RichEdit');
     my $ask = $self->getValue("askAboutRichEdit");
-	my %config = (
-		mode     => $ask ? "none" : "exact",
-		elements => $nameId,
-		theme    => "advanced",
-		relative_urls => JSON::false(),
-		remove_script_host => JSON::true(),
-		auto_reset_designmode => JSON::true(),
-		cleanup_callback => "tinyMCE_WebGUI_Cleanup",
-		urlconverter_callback => "tinyMCE_WebGUI_URLConvertor",
-		theme_advanced_resizing => JSON::true(),
-		      (map { "theme_advanced_buttons".($_+1) => (join ',', @{$toolbarRows[$_]}) }
-		       (0..$#toolbarRows)),
-		#ask => $self->getValue("askAboutRichEdit") ? JSON::true() : JSON::false(),
-		ask => JSON::false(),
-		preformatted => $self->getValue("preformatted") ? JSON::true() : JSON::false(),
-		force_br_newlines => $self->getValue("useBr") ? JSON::true() : JSON::false(),
-		force_p_newlines => $self->getValue("useBr") ? JSON::false() : JSON::true(),
-        $self->getValue("useBr") ? ( forced_root_block => JSON::false() ) : (),
-		remove_linebreaks => $self->getValue("removeLineBreaks") ? JSON::true() : JSON::false(),
-		nowrap => $self->getValue("nowrap") ? JSON::true() : JSON::false(),
-		directionality => $self->getValue("directionality"),
-		theme_advanced_toolbar_location => $self->getValue("toolbarLocation"),
-		theme_advanced_statusbar_location => "bottom",
-		valid_elements => $self->getValue("validElements"),
-		wg_userIsVisitor => $self->session->user->isVisitor ? JSON::true() : JSON::false(),
-		);
 #    if ($ask) {
 #        $config{oninit} = 'turnOffTinyMCE_'.$nameId;
 #    }
-	foreach my $button (@toolbarButtons) {
-		if ($button eq "spellchecker" && $self->session->config->get('availableDictionaries')) {
-            push(@plugins,"-wgspellchecker");
-            $loadPlugins{wgspellchecker} = $self->session->url->extras("tinymce-webgui/plugins/wgspellchecker/editor_plugin.js");
-			$config{spellchecker_rpc_url} = $self->session->url->gateway('', "op=spellCheck");
-			$config{spellchecker_languages} = 
-			join(',', map { ($_->{default} ? '+' : '').$_->{name}.'='.$_->{id} } @{$self->session->config->get('availableDictionaries')});
-		}
-		push(@plugins,"table") if ($button eq "tablecontrols");
-		push(@plugins,"save") if ($button eq "save");
-		push(@plugins,"advhr") if ($button eq "advhr");
-		push(@plugins,"fullscreen") if ($button eq "fullscreen");
-		if ($button eq "advimage") {
-			push(@plugins,"advimage");
-			$config{external_link_list_url} = "";
-		}
-		if ($button eq "advlink") {
-			$config{external_image_list_url} = "";
-			$config{file_browser_callback} = "mcFileManager.filebrowserCallBack";
-			push(@plugins,"advlink");
-		}
-		push(@plugins,"emotions") if ($button eq "emotions");
-		push(@plugins,"iespell") if ($button eq "iespell");
-		$config{gecko_spellcheck} = 'true' if ($button eq "iespell");
-		if ($button eq "paste" || $button eq "pastetext" || $button eq "pasteword") {
-			push(@plugins,"paste");
-		}
-		if ($button eq "insertdate" || $button eq "inserttime" || $button eq "insertdatetime") {
-			$config{plugin_insertdate_dateFormat} = "%Y-%m-%d";
-			$config{plugin_insertdate_timeFormat} = "%H:%M:%S";
-			push(@plugins,"insertdatetime");
-		}
-		push(@plugins,"preview") if ($button eq "preview");
-		if ($button eq "media") {
-			push(@plugins,"media");
-		}
-		push(@plugins,"searchreplace") if ($button eq "search" || $button eq "replace" || $button eq "searchreplace");
-		push(@plugins,"print") if ($button eq "print");
-        if ($button eq "wginsertimage") {
-            push @plugins, "-wginsertimage";
-            $loadPlugins{wginsertimage} = $self->session->url->extras("tinymce-webgui/plugins/wginsertimage/editor_plugin.js");
-        }
-        if ($button eq "wgpagetree") {
-            push @plugins, "-wgpagetree";
-            $loadPlugins{wgpagetree} = $self->session->url->extras("tinymce-webgui/plugins/wgpagetree/editor_plugin.js");
-        }
-        if ($button eq "wgmacro") {
-            push @plugins, "-wgmacro";
-            $loadPlugins{wgmacro} = $self->session->url->extras("tinymce-webgui/plugins/wgmacro/editor_plugin.js");
-        }
-		if ($button eq "code") {
-			$config{theme_advanced_source_editor_width} = $self->getValue("sourceEditorWidth") if ($self->getValue("sourceEditorWidth") > 0);
-			$config{theme_advanced_source_editor_height} = $self->getValue("sourceEditorHeight") if ($self->getValue("sourceEditorHeight") > 0);
-		}
-	}
-	my $language  = $i18n->getLanguage('' ,"languageAbbreviation");
-	unless ($language) {
-		$language = $i18n->getLanguage("English","languageAbbreviation");
-	}
-	$config{language} = $language;
-	$config{content_css} = $self->getValue("cssFile") || $self->session->url->extras('tinymce-webgui/defaultcontent.css');
-	$config{width} = $self->getValue("editorWidth") if ($self->getValue("editorWidth") > 0);
-	$config{height} = $self->getValue("editorHeight") if ($self->getValue("editorHeight") > 0);
-	$config{plugins} = join(",",@plugins);
-
     $self->session->style->setScript($self->session->url->extras('yui/build/yahoo/yahoo-min.js'),{type=>"text/javascript"});
     $self->session->style->setScript($self->session->url->extras('yui/build/event/event-min.js'),{type=>"text/javascript"});
     $self->session->style->setScript($self->session->url->extras('tinymce/jscripts/tiny_mce/tiny_mce_src.js'),{type=>"text/javascript"});
@@ -596,11 +637,16 @@ EOHTML1
 #    }
 #}
 #YAHOO.util.Event.onDOMReady(turnOffTinyMCE_$nameId);
+    } 
+
+    my $config  = $self->getConfig;
+    $config->{ elements } = $nameId;
+    if ( $ask ) {
+        $config->{mode} = "none";
     }
-    while (my ($plugin, $path) = each %loadPlugins) {
-        $out .= "tinymce.PluginManager.load('$plugin', '$path');\n";
-    }
-    $out    .= "\ttinyMCE.init(" . JSON->new->pretty->encode(\%config) . " );\n";
+
+    $out    .= $self->getLoadPlugins;
+    $out    .= "\ttinyMCE.init(" . JSON->new->pretty->encode( $config ) . " );\n";
     $out    .= "</script>";
 }
 

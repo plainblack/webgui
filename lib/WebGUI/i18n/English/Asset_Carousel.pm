@@ -50,6 +50,12 @@ our $I18N = {
         lastUpdated => 0,
         context => q|Description of the carousel template field, used as hover help.|
     },
+    
+    'delete' => {
+        message     => q{Delete},
+        lastUpdated => 0,
+        context     => q{Label for button to delete an item from the carousel},
+    },
 
     'slideHeight' => {
         message => q|The height set for each slide in the Carousel|,
