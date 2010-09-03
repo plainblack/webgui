@@ -1085,6 +1085,7 @@
  - fixed #10158: Matrix 2.0 - Screenshots rendering poorly
  - administer.js now has a much improved handling of the slider algorithm, plus some refactored code.  Users will not notice anything.
  - Survey slider answer updates, now update all the answers for max,min,step settings since only the first answers values are used anyways.
+
 7.7.3
  - fixed #10094: double explanation in thread help
  - rfe #9612: Carousel Wobject (was Widget Wobject) (SDH Consulting Group)
