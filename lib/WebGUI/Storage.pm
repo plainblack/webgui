@@ -254,50 +254,58 @@ Note: captcha images will NOT be synchronized to a CDN, even if other files are.
 
 =cut 
 
+use Imager;
 sub addFileFromCaptcha {
-	my $self = shift;
+    my $self = shift;
     my $error = "";
-	my $challenge;
-	$challenge .= ('A'..'Z')[rand(26)] foreach (1..6);
-	my $filename = "captcha.".$self->session->id->generate().".gif";
-	my $image = Image::Magick->new();
-	$error = $image->Set(size=>'200x50');
-	if($error) {
-        $self->session->log->warn("Error setting captcha image size: $error");
-    }
-    $error = $image->ReadImage('xc:white');
-	if($error) {
-        $self->session->log->warn("Error initializing image: $error");
-    }
-    $error = $image->AddNoise(noise=>"Multiplicative");
-	if($error) {
-        $self->session->log->warn("Error adding noise: $error");
-    }
-    # AddNoise generates a different average color depending on library.  This is ugly, but the best I can see for now
-    $error = $image->Annotate(font=>WebGUI::Paths->share.'/default.ttf', pointsize=>40, skewY=>0, skewX=>0, gravity=>'center', fill=>'#ffffff', antialias=>'true', text=>$challenge);
-	if($error) {
-        $self->session->log->warn("Error Annotating image: $error");
-    }
-    $error = $image->Draw(primitive=>"line", points=>"5,5 195,45", stroke=>'#ffffff', antialias=>'true', strokewidth=>2);
-	if($error) {
-        $self->session->log->warn("Error drawing line: $error");
-    }
-    $error = $image->Blur(geometry=>"9");
-	if($error) {
-        $self->session->log->warn("Error blurring image: $error");
-    }
-    $error = $image->Set(type=>"Grayscale");
-	if($error) {
-        $self->session->log->warn("Error setting grayscale: $error");
-    }
-    $error = $image->Border(fill=>'black', width=>1, height=>1);
-	if($error) {
-        $self->session->log->warn("Error setting border: $error");
-    }
-    $error = $image->Write($self->getPath($filename));
-	if($error) {
-        $self->session->log->warn("Error writing image: $error");
-    }
+    my $challenge;
+    $challenge .= ('A'..'Z')[rand(26)] foreach (1..6);
+    my $filename = "captcha.".$self->session->id->generate().".png";
+    my $image = Imager->new(xsize => 200, ysize => 50
+    ) || warn Imager->errstr;
+    $image->box(
+        filled => 1,
+        color => 'grey',
+    ) || warn $image->errstr;
+    $image->filter(
+        type => 'noise',
+        amount => 100,
+        subtype => 1,
+    ) || warn $image->errstr;
+    $image->filter(
+        type => 'autolevels',
+        usat => 0.5,
+    );
+
+    my $font = Imager::Font->new(file => WebGUI::Paths->share . '/default.ttf');
+    $image->align_string(
+        string => $challenge,
+        font => $font,
+        color => 'white',
+        x => $image->getwidth / 2,
+        y => $image->getheight / 2,
+        halign => 'center',
+        valign => 'center',
+        size => 40,
+    ) || warn $image->errstr;
+    $image->line(
+        color => 'white',
+        x1 => 5, y1 => 5,
+        x2 => 195, y2 => 45,
+        endp => 1,
+        aa => 1,
+    ) || warn $image->errstr;
+    $image->filter(
+        type => 'gaussian',
+        stddev => 1,
+    ) || warn $image->errstr;
+    $image = $image->convert(
+        preset => 'gray',
+    ) || warn $image->errstr;
+    $image->box(color => 'black'
+    ) || warn $image->errstr;
+    $image->write(file => $self->getPath($filename)
+    ) || warn $image->errstr;
     return ($filename, $challenge);
 }
 
@@ -851,29 +859,15 @@ sub generateThumbnail {
 		$self->session->log->warn("Can't generate a thumbnail for something that's not an image.");
 		return 0;
 	}
-        my $image = Image::Magick->new;
-        my $error = $image->Read($self->getPath($filename));
-	if ($error) {
-		$self->session->log->error("Couldn't read image for thumbnail creation: ".$error);
-		return 0;
-	}
-        my ($x, $y) = $image->Get('width','height');
-        my $n = $thumbnailSize;
-        if ($x > $n || $y > $n) {
-                my $r = $x>$y ? $x / $n : $y / $n;
-                $x /= $r;
-                $y /= $r;
-                if($x < 1) { $x = 1 } # Dimentions < 1 cause Scale to fail
-                if($y < 1) { $y = 1 }
-                $image->Scale(width=>$x,height=>$y);
-		$image->Sharpen('0.0x1.0');
-        }
-        $error = $image->Write($self->getPath.'/'.'thumb-'.$filename);
-	if ($error) {
-		$self->session->log->error("Couldn't create thumbnail: ".$error);
-		return 0;
-	}
-	return 1;
+    my $image = Imager->new;
+    $image->read( file => $self->getPath($filename) );
+    my ($x, $y) = ($image->getwidth, $image->getheight);
+    my $n = $thumbnailSize;
+    if ($x > $n || $y > $n) {
+        $image->scale(xpixels => $n, ypixels => $n, type => 'min');
+    }
+    $image->write(file => $self->getPath . '/thumb-' . $filename);
+    return 1;
 }
 
 
@@ -938,15 +932,9 @@ The file to generate a thumbnail for.
 sub getSize {
 	my $self = shift;
 	my $filename = shift;
-        my $image = Image::Magick->new;
-        my $error = $image->Read($self->getPath($filename));
-	if ($error) {
-		$self->session->log->error("Couldn't read image for size reading: ".$error);
-		return 0;
-	}
-        my ($x, $y) = $image->Get('width','height');
-
-	return($x, $y);
+    my $image = Imager->new;
+    $image->read(file => $self->getPath($filename));
+    return ($image->getwidth, $image->getheight);
 }
 
 
@@ -1266,13 +1254,8 @@ sub getSizeInPixels {
 		$self->session->log->error("Can't check the size of something that's not an image.");
 		return 0;
 	}
-        my $image = Image::Magick->new;
-        my $error = $image->Read($self->getPath($filename));
-	if ($error) {
-		$self->session->log->error("Couldn't read image to check the size of it: ".$error);
-		return 0;
-	}
-        return $image->Get('width','height');
+    $image->read(file => $self->getPath($filename));
+    return ($image->getwidth, $image->getheight);
 }
 
 
