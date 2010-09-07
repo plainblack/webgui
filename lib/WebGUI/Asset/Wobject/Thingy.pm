@@ -696,22 +696,18 @@ sub getEditFieldForm {
     my $self = shift;
     my $session = $self->session;
     my $field = shift;
-    my (%fieldStatus, $f, %fieldTypes, $things);
     my $fieldId = $field->{fieldId} || "new";
     my $i18n = WebGUI::International->new($session, 'Asset_Thingy');
     my $defaultValue;
-    tie %fieldStatus, 'Tie::IxHash';
-    tie %fieldTypes, 'Tie::IxHash';
     
-    %fieldStatus = (
+    my @fieldStatus = (
         "hidden" => $i18n->get('fieldstatus hidden label'),
         "visible" => $i18n->get('fieldstatus visible label'),
         "editable" => $i18n->get('fieldstatus editable label'),
         "required" => $i18n->get('fieldstatus required label'),
     );
     
-    %fieldTypes = %{WebGUI::Form::FieldType->new($session)->getTypes}; 
-    %fieldTypes = WebGUI::Utility::sortHash(%fieldTypes);
+    my %fieldTypes = %{WebGUI::Form::FieldType->new($session)->getTypes};
     
     $things = $self->session->db->read('select thingId, Thingy_things.label, count(*) from Thingy_things '
         .'left join Thingy_fields using(thingId) where Thingy_things.assetId = ? and fieldId != "" '
@@ -720,6 +716,11 @@ sub getEditFieldForm {
         my $fieldType = "otherThing_".$thing->{thingId};
         $fieldTypes{$fieldType} = $thing->{label};
     }
+    my @fieldTypes =
+        map { @$_ }
+        sort { $a->[1] cmp $b->[1] }
+        map { [ $_, $fieldTypes{$_} ] }
+        keys %fieldTypes;
     
     my $dialogPrefix;
     if ($field->{oldFieldId}){
@@ -759,7 +760,7 @@ sub getEditFieldForm {
         -label=>$i18n->get('field type label'),
         -hoverHelp=>$i18n->get('field type description'),
         -value=>$field->{fieldType} || "Text",
-        -options=>\%fieldTypes,
+        -options=>\@fieldTypes,
         -id=>$dialogPrefix."_fieldType_formId",
         );
     $f->raw($self->getHtmlWithModuleWrapper($dialogPrefix."_fieldInThing_module"));
@@ -793,7 +794,7 @@ sub getEditFieldForm {
         );
     $f->selectBox(
         -name=>"status",
-        -options=>\%fieldStatus,
+        -options=>\@fieldStatus,
         -label=>$i18n->get('field status label'),
         -hoverHelp=>$i18n->get('field status description'),
         -value=> [ $field->{status} || "editable" ] ,

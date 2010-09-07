@@ -668,8 +668,12 @@ sub www_buildTimeTable {
 	   my ($pmAssetId) = $db->quickArray("select a.assetId from PM_wobject a, asset b where a.assetId=b.assetId and b.state not like 'trash%'");   
 	   if($pmAssetId) {
 	      $pmAsset = WebGUI::Asset->newById($session,$pmAssetId);
-	      my %pmProjectList = %{$pmAsset->getProjectList($user->userId)};
-		  %projectList = WebGUI::Utility::sortHash((%projectList,%pmProjectList));
+            my %pmProjectList = (%projectList, %{$pmAsset->getProjectList($user->userId)});
+            %projectList =
+                map { @$_ }
+                sort { $a->[1] cmp $b->[1] }
+                map { [ $_, $pmProjectList{$_} ] }
+                keys %pmProjectList;
 	   }
 	} 
 	

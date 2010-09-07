@@ -232,11 +232,16 @@ sub toHtml {
             foreach my $property (keys %{$properties}) {
                 my $key = $tableName.".".$property;
                 $fields{$key} = qq{$property ($tableName)};
-            }   
+            }
         }
 
         %fields = (%asset,%fields);
-        %fields = WebGUI::Utility::sortHash(%fields);
+        %fields =
+            map { @$_ }
+            sort { $a->[1] cmp $b->[1] }
+            map { [ $_, $fields{$_} ] }
+            keys %fields;
+
         $json->{$class} = \%fields;
     }
 
