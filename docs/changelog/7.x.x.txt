@@ -11,6 +11,7 @@
  - fixed #11810: Attachment list broken in template
  - fixed #11814: upgrade script removes cache too aggresively (Ernesto Hernández-Novich)
  - fixed #11827: CS rich edit bug
+ - fixed #11825: Questionable attachmentsJson in AssetReport template
 
 7.9.13
  - fixed #11783: Instances deleted during realtime run
