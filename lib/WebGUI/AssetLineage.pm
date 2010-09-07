@@ -639,12 +639,12 @@ sub getLineageSql {
     my $lineage   = $self->lineage;
     my @whereModifiers;
     # let's get those siblings
-    if (isIn("siblings",@{$relatives})) {
+    if ("siblings" ~~ $relatives) {
         push(@whereModifiers, " (asset.parentId=".$db->quote($self->parentId)." and asset.assetId<>".$db->quote($self->getId).")");
     }
     # ancestors too
     my @specificFamilyMembers = ();
-    if (isIn("ancestors",@{$relatives})) {
+    if ("ancestors" ~~ $relatives) {
         my $i = 1;
         my @familyTree = ($lineage =~ /(.{6})/g);
         while (pop(@familyTree)) {
@@ -654,14 +654,14 @@ sub getLineageSql {
         }
 	}
 	# let's add ourself to the list
-	if (isIn("self",@{$relatives})) {
+	if ("self" ~~ $relatives) {
 		push(@specificFamilyMembers, $self->lineage);
 	}
 	if (scalar(@specificFamilyMembers) > 0) {
 		push(@whereModifiers,"(asset.lineage in (".$db->quoteAndJoin(\@specificFamilyMembers)."))");
 	}
 	# we need to include descendants
-	if (isIn("descendants",@{$relatives})) {
+	if ("descendants" ~~ $relatives) {
 		my $mod = "(asset.lineage like ".$db->quote($lineage.'_%'); 
 		if (exists $rules->{endingLineageLength}) {
 			$mod .= " and length(asset.lineage) <= ".($rules->{endingLineageLength}*6);
@@ -670,11 +670,11 @@ sub getLineageSql {
 		push(@whereModifiers,$mod);
 	}
 	# we need to include children
-	if (isIn("children",@{$relatives})) {
+	if ("children" ~~ $relatives) {
 		push(@whereModifiers,"(asset.parentId=".$db->quote($self->getId).")");
 	}
 	# now lets add in all of the siblings in every level between ourself and the asset we wish to pedigree
-	if (isIn("pedigree",@{$relatives}) && exists $rules->{assetToPedigree}) {
+	if ("pedigree" ~~ $relatives && exists $rules->{assetToPedigree}) {
         my $pedigreeLineage = $rules->{assetToPedigree}->lineage;
         if (substr($pedigreeLineage,0,length($lineage)) eq $lineage) {
             my @mods;
@@ -712,8 +712,8 @@ sub getLineageSql {
 	
     my $statusCodes = $rules->{statusToInclude} || [];
     if($rules->{includeArchived}) {
-	        push(@{$statusCodes},'archived') if(!WebGUI::Utility::isIn('archived',@{$statusCodes}));
-          	push(@{$statusCodes},'approved') if(!WebGUI::Utility::isIn('approved',@{$statusCodes}));
+	        push(@{$statusCodes},'archived') if(!'archived' ~~ $statusCodes);
+          	push(@{$statusCodes},'approved') if(!'approved' ~~ $statusCodes);
     }
     
     my $status = "assetData.status='approved'";

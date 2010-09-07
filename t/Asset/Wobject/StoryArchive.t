@@ -247,7 +247,7 @@ cmp_deeply(
 );
 
 KEY: foreach my $key (keys %{ $templateVars }) {
-    next KEY if isIn($key, qw/canPostStories addStoryUrl date_loop mode/);
+    next KEY if $key ~~ [qw/canPostStories addStoryUrl date_loop mode/];
     delete $templateVars->{$key};
 }
 
@@ -305,7 +305,7 @@ $session->user({userId => 3});
 
 $templateVars = $archive->viewTemplateVariables();
 KEY: foreach my $key (keys %{ $templateVars }) {
-    next KEY if isIn($key, qw/canPostStories addStoryUrl date_loop/);
+    next KEY if $key ~~ [qw/canPostStories addStoryUrl date_loop/];
     delete $templateVars->{$key};
 }
 

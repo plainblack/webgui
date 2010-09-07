@@ -249,7 +249,7 @@ The userId to check against this user.
 sub isFriend {
     my $self = shift;
     my $userId = shift;
-    return isIn($userId, @{$self->user->friends->getUsers});    
+    return $userId ~~ $self->user->friends->getUsers;
 }
 
 #-------------------------------------------------------------------

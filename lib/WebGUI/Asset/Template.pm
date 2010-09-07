@@ -486,7 +486,7 @@ sub prepare {
 
 	my $id   = $self->getId;
 	# don't send head block if we've already sent it for this template
-	return if isIn($id, @$sent);
+	return if $id ~~ $sent;
 
 	my $session      = $self->session;
 	my ($db, $style) = $session->quick(qw(db style));
@@ -587,7 +587,7 @@ override processEditForm => sub {
     my $needsUpdate = 0;
 	if ($self->parser ne $self->session->form->process("parser","className") && ($self->session->form->process("parser","className") ne "")) {
         $needsUpdate = 1;
-		if (isIn($self->session->form->process("parser","className"),@{$self->session->config->get("templateParsers")})) {
+		if ($self->session->form->process("parser","className") ~~ $self->session->config->get("templateParsers") ) {
 			%data = ( parser => $self->session->form->process("parser","className") );
 		} else {
 			%data = ( parser => $self->session->config->get("defaultTemplateParser") );

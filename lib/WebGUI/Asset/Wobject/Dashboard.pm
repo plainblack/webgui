@@ -270,7 +270,7 @@ override prepareView => sub {
                 next;
             }
             last unless $child;
-		unless (isIn($child->getId, @hidden) || !($child->canView)) {
+        unless ( $child->getId ~~ @hidden || !$child->canView) {
 			$self->session->style->setRawHeadTags($child->getExtraHeadTags);
 			$child->prepareView;
 		}
@@ -341,7 +341,7 @@ sub view {
 		push(@hidden,$child->shortcutToAssetId) if ref $child eq 'WebGUI::Asset::Shortcut';
 		#the following loop will initially place just-dashletted assets.
 		for (my $i = 0; $i < scalar(@positions); $i++) {
-			next unless isIn($child->shortcutToAssetId,@hidden);
+			next unless $child->shortcutToAssetId ~~ @hidden;
 			my $newChildId = $child->getId;
 			my $oldChildId = $child->shortcutToAssetId;
 			$positions[$i] =~ s/${oldChildId}/${newChildId}/g;
@@ -362,7 +362,7 @@ sub view {
 		foreach my $asset (@assets) {
 			foreach my $child (@{$children}) {
 				if ($asset eq $child->getId) {
-					unless (isIn($asset,@hidden) || !($child->canView)) {
+					unless ($asset ~~ @hidden || !$child->canView) {
 						$self->session->style->setRawHeadTags($child->getExtraHeadTags);
 						$child->{_properties}{title} = $child->getTitle;
 						$child->{_properties}{title} = $child->getShortcut->getTitle if (ref $child eq 'WebGUI::Asset::Shortcut');
@@ -400,7 +400,7 @@ sub view {
 	}
 	# deal with unplaced children
 	foreach my $child (@{$children}) {
-		unless (isIn($child->getId, @found)||isIn($child->getId,@hidden)) {
+		unless ($child->getId ~~ @found || $child->getId ~~ @hidden) {
 			if ($child->canView) {
 				$child->{_properties}{title} = $child->getShortcut->title if (ref $child eq 'WebGUI::Asset::Shortcut');
 				push(@{$vars{"position1_loop"}},{

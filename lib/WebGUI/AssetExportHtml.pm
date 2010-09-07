@@ -250,11 +250,11 @@ sub exportAsHtml {
 
     # extrasUploadAction and rootUrlAction must have values matching something
     # in the arrays defined above
-    if( defined $extrasUploadAction && !WebGUI::Utility::isIn($extrasUploadAction, @extraUploadActions) ) {
+    if( defined $extrasUploadAction && !$extrasUploadAction ~~ @extraUploadActions ) {
         WebGUI::Error->throw(error => "'$extrasUploadAction' is not a valid extrasUploadAction");
     }
 
-    if( defined $rootUrlAction && !WebGUI::Utility::isIn($rootUrlAction, @rootUrlActions) ) {
+    if( defined $rootUrlAction && !$rootUrlAction ~~ @rootUrlActions ) {
         WebGUI::Error->throw(error => "'$rootUrlAction' is not a valid rootUrlAction");
     }
 
@@ -607,7 +607,7 @@ sub exportGetUrlAsPath {
     my $filename        = pop @pathComponents; 
 
     my ($extension) = $filename =~ /\.([^.]+)$/;
-    if ($extension && WebGUI::Utility::isIn($extension, @{ $fileTypes }) ) {
+    if ($extension && $extension ~~ $fileTypes ) {
         return Path::Class::File->new($exportPath, @pathComponents, $filename);
     }
     else {

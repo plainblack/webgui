@@ -800,7 +800,7 @@ Returns whether or not a method is callable
 
 sub isCallable {
 	my $self = shift;
-	return 1 if isIn($_[0],@{$self->{callable}});
+	return 1 if $_[0] ~~ $self->{callable};
         return 1 if $self->can( 'www_' . $_[0] );
         return 0;
 }

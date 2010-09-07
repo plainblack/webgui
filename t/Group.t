@@ -485,10 +485,10 @@ is( $session->stow->get('isInGroup'), undef, 'setting dbQuery clears cached isIn
 is( $mob[0]->isInGroup($gY->getId), 1, 'mob[0] is in group Y after setting dbQuery');
 is( $mob[0]->isInGroup($gZ->getId), 1, 'mob[0] isInGroup Z');
 
-ok( isIn($mob[0]->userId, @{ $gY->getAllUsers() }), 'mob[0] in list of group Y users');
-ok( !isIn($mob[0]->userId, @{ $gZ->getUsers() }), 'mob[0] not in list of group Z users');
+ok( $mob[0]->userId ~~ $gY->getAllUsers, 'mob[0] in list of group Y users');
+ok( ! $mob[0]->userId ~~ $gZ->getUsers, 'mob[0] not in list of group Z users');
 
-ok( isIn($mob[0]->userId, @{ $gZ->getAllUsers() }), 'mob[0] in list of group Z users, recursively');
+ok( $mob[0]->userId ~~ $gZ->getAllUsers, 'mob[0] in list of group Z users, recursively');
 
 $gY->clearCaches;
 

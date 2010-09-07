@@ -1177,7 +1177,7 @@ sub www_sendMessage {
                 $activeFriendCount++;
             }
 
-            my $isChecked  = WebGUI::Utility::isIn($friendId,@friendsChecked);            
+            my $isChecked  = $friendId ~~ @friendsChecked;
             my $friendHash = {
                 'friend_id'        => $friendId,
                 'friend_name'      => $friends->{$friendId},

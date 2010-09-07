@@ -87,7 +87,7 @@ sub _create {
     foreach my $field (@fields) {
         #$session->errorHandler->warn('getting privacy setting for field: '.$fieldName);
         my $privacySetting = $field->get('defaultPrivacySetting');
-        next unless (WebGUI::Utility::isIn($privacySetting,qw(all none friends)));
+        next unless $privacySetting ~~ [qw(all none friends)];
         $privacy->{$field->get('fieldName')} = $privacySetting;
     }
     my $json = JSON->new->encode($privacy);
@@ -210,7 +210,7 @@ sub authInstance {
     else {
         $authMethod = $self->authMethod || $session->setting->get("authMethod");
     }
-    if ( ! isIn($authMethod, @{ $session->config->get('authMethods') } ) ) {
+    if ( ! $authMethod ~~ $session->config->get('authMethods') ) {
         $authMethod = $session->config->get('authMethods')->[0] || 'WebGUI';
     }
     my $authClass = 'WebGUI::Auth::' . $authMethod;
@@ -333,7 +333,7 @@ sub canViewField {
     return 1 if ($self->userId eq $user->userId);
     
     my $privacySetting = $self->getProfileFieldPrivacySetting($field);
-    return 0 unless (WebGUI::Utility::isIn($privacySetting,qw(all none friends)));
+    return 0 unless $privacySetting ~~ [qw(all none friends)];
     return 1 if ($privacySetting eq "all");
     return 0 if ($privacySetting eq "none");
 
@@ -1286,7 +1286,7 @@ sub setProfileFieldPrivacySetting {
     
     foreach my $fieldId (keys %{$settings}) {
         my $privacySetting = $settings->{$fieldId};
-        next unless (WebGUI::Utility::isIn($privacySetting,qw(all none friends)));
+        next unless $privacySetting ~~ [qw(all none friends)];
         $currentSettings->{$fieldId} = $settings->{$fieldId};
     }
     

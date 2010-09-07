@@ -67,7 +67,7 @@ Return true iff fieldName is reserved and therefore not usable as a profile fiel
 sub isReservedFieldName {
     my $class = shift;
     my $fieldName = shift;
-    return isIn($fieldName, qw/userId shop specialState func op wg_privacySettings username authMethod dateCreated lastUpdated karma status referringAffiliate friendsGroup/);
+    return $fieldName ~~ [qw/userId shop specialState func op wg_privacySettings username authMethod dateCreated lastUpdated karma status referringAffiliate friendsGroup/];
 }
 
 #-------------------------------------------------------------------

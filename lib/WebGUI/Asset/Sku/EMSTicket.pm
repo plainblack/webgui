@@ -328,7 +328,7 @@ sub getPrice {
 	my $discount = 0;
 	my $badgeId = $self->getOptions->{badgeId};
 	my $ribbonId = $self->session->db->quickScalar("select ribbonAssetId from EMSRegistrantRibbon where badgeId=? limit 1",[$badgeId]);
-	if (defined $ribbonId && isIn($ribbonId, @ribbonIds)) {
+	if (defined $ribbonId && $ribbonId ~~ @ribbonIds) {
 		my $ribbon = WebGUI::Asset->newById($self->session, $ribbonId);
 		$discount = $ribbon->percentageDiscount;
 	}
@@ -536,7 +536,10 @@ sub www_delete {
 	my ($self) = @_;
 	return $self->session->privilege->insufficient() unless ($self->canEdit && $self->canEditIfLocked);
     return $self->session->privilege->vitalComponent() if $self->isSystem;
-    return $self->session->privilege->vitalComponent() if (isIn($self->getId, $self->session->setting->get("defaultPage"), $self->session->setting->get("notFoundPage")));
+    return $self->session->privilege->vitalComponent() if $self->getId ~~ [
+        $self->session->setting->get("defaultPage"),
+        $self->session->setting->get("notFoundPage"),
+    ];
     $self->trash;
 	return $self->getParent->www_buildBadge(undef,'tickets');
 }

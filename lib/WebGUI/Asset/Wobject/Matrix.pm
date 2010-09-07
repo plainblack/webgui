@@ -1185,7 +1185,7 @@ sub www_getCompareFormData {
     }
     else {
         foreach my $result (@{$self->getListings}) {
-            if(WebGUI::Utility::isIn($result->{assetId},@listingIds)){
+            if($result->{assetId} ~~ @listingIds){
                 $result->{checked} = 'checked';
             }
             push @results, $result;

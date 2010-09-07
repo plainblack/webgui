@@ -52,7 +52,7 @@ sub appendCommonVars {
     my $method  = $session->form->get("do");
     
     $var->{ 'manage_purchases_url'      } = $self->getUrl("module=shop;do=managePurchases");
-    $var->{ 'managesPurchasesIsActive'  } = WebGUI::Utility::isIn($method,("","managePurchases","view","viewTransaction"));
+    $var->{ 'managesPurchasesIsActive'  } = $method ~~ ["","managePurchases","view","viewTransaction"];
 
     $var->{ 'view_sales_url'            } = $self->getUrl( 'module=shop;do=viewSales' );
     $var->{ 'viewSalesIsActive'         } = $method eq 'viewSales';

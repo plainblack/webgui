@@ -422,7 +422,7 @@ sub view {
 
 	my %rules;
 	$rules{endingLineageLength} = $start->getLineageLength+$self->descendantEndPoint;
-	$rules{assetToPedigree} = $current if (isIn("pedigree",@includedRelationships));
+	$rules{assetToPedigree} = $current if ("pedigree" ~~ @includedRelationships);
 	$rules{ancestorLimit} = $self->ancestorEndPoint;
 	$rules{orderByClause} = 'rpad(asset.lineage, 255, 9) desc' if ($self->reversePageLoop);
 	my $assetIter = $start->getLineageIterator(\@includedRelationships,\%rules);	

@@ -399,13 +399,6 @@ sub installModule {
 }
 
 #----------------------------------------
-sub isIn {
-        my $key = shift;
-        $_ eq $key and return 1 for @_;
-        return 0;
-}
-
-#----------------------------------------
 sub isRootRequirementMet {
     if (getOs() eq "Linuxish")	 {
 	return ($< == 0);	
@@ -437,7 +430,7 @@ sub prompt {
         my $answer = <STDIN>;
         chomp $answer;
         $answer = $default if ($answer eq "");
-        $answer = prompt($question,$default,@answers) if (($#answers > 0 && !(isIn($answer,@answers))) || $answer eq "");
+        $answer = prompt($question,$default,@answers) if (($#answers > 0 && !($answer ~~ @answers)) || $answer eq "");
         return $answer;
 }
 

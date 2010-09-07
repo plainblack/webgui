@@ -375,7 +375,7 @@ sub getMessagesPaginator {
     my $whereClause   = $properties->{whereClause} || '';
 
     #Make sure a valid sortBy is passed in
-    if($sortBy && !WebGUI::Utility::isIn($sortBy,qw( subject sentBy dateStamp status ))) {
+    if($sortBy && !$sortBy ~~ [qw( subject sentBy dateStamp status )]) {
         $sortBy = q{dateStamp}
     }
     #Sort by fullname if user wants to sort by who sent the message

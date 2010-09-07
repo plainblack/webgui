@@ -43,7 +43,7 @@ my @notEnabled = qw/Button Control List MimeType SubscriptionGroup Slider Submit
 foreach my $formType (@formTypes) {
 	my $form = WebGUI::Form::DynamicField->new($session, fieldType => $formType);
 	my $ref = (split /::/, ref $form)[-1];
-	if (isIn($ref, @notEnabled)) {
+	if ($ref ~~ @notEnabled) {
 		ok(!$form->isDynamicCompatible, " $ref should not be profile enabled");
 	}
 	else {

@@ -20,9 +20,6 @@ use Test::Deep;
 
 my $session = WebGUI::Test->session;
 
-# isIn
-ok(WebGUI::Utility::isIn("webgui", qw(cars trucks webgui trains)), 'isIn()');
-
 {
 	# Just some basic tests for now.
 

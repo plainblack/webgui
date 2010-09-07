@@ -75,7 +75,7 @@ sub process {
 	}
 
 	$relatives = lc($relatives);
-	unless ( isIn($relatives, ('siblings','children','ancestors','self','descendants','pedigree')) ) {
+	unless ( $relatives ~~ ['siblings','children','ancestors','self','descendants','pedigree'] ) {
 		$session->errorHandler->warn('Error: invalid relatives specified. Must be one of siblings, children, ancestors, self, descendants, pedigree. Check parameters of macro on page '.$session->asset->url);
 		return '';
 	}

@@ -46,7 +46,6 @@ use Archive::Tar;
 use Archive::Zip;
 use Cwd ();
 use Scope::Guard ();
-use WebGUI::Utility qw/isIn/;
 
 
 =head1 NAME
@@ -133,7 +132,7 @@ sub fixFilenames {
     my $files   = $storage->getFiles('all');
     FILE: foreach my $file (@{ $files }) {
         my $extension = $storage->getFileExtension($file);
-        next FILE unless isIn($extension, qw/pl perl pm cgi php asp sh/);
+        next FILE unless $extension ~~ [qw/pl perl pm cgi php asp sh/];
         my $newFile = $file;
         #$newFile =~ s/\.$extension$/_$extension.txt/;
         $newFile =~ s/\.$extension$/_$extension.txt/;

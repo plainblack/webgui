@@ -975,7 +975,7 @@ sub getFormPlugin {
         }
     }
 
-    if ( WebGUI::Utility::isIn( $data->{fieldType}, qw(SelectList CheckList SelectBox Attachments) ) ) {
+    if ( $data->{fieldType} ~~ [qw(SelectList CheckList SelectBox Attachments) ] ) {
         my @values;
         if ( $useFormPostData && $session->form->param($name) ) {
             $param{ value } = [ $session->form->process( $name, $data->{fieldType} ) ];
@@ -1285,7 +1285,7 @@ sub importAssetCollateralData {
     # delete deleted things
     my $thingsInDatabase = $self->getThings;
     while (my $thingInDataBase = $thingsInDatabase->hashRef) {
-        if (!WebGUI::Utility::isIn($thingInDataBase->{thingId},@importThings)){
+        if (!$thingInDataBase->{thingId} ~~ @importThings){
         # delete thing
             $self->deleteThing($thingInDataBase->{thingId});
         }
@@ -1312,7 +1312,7 @@ sub importAssetCollateralData {
     my $fieldsInDatabase = $session->db->read('select fieldId, thingId from Thingy_fields where assetId = ?',
         [$self->getId]);
     while (my $fieldInDataBase = $fieldsInDatabase->hashRef) {
-        if (!WebGUI::Utility::isIn($fieldInDataBase->{fieldId},@importFields)){
+        if (!$fieldInDataBase->{fieldId} ~~ @importFields){
             # delete field
             $self->deleteField($fieldInDataBase->{fieldId},$fieldInDataBase->{thingId},"1");        
         }

@@ -15,7 +15,7 @@ package WebGUI::Asset;
 =cut
 
 use strict;
-use WebGUI::Utility qw(isIn);
+use WebGUI::Utility qw();
 use Number::Format ();
 use JSON;
 
@@ -326,7 +326,7 @@ sub www_delete {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless ($self->canEdit && $self->canEditIfLocked);
 	return $self->session->privilege->vitalComponent() if $self->get('isSystem');
-	return $self->session->privilege->vitalComponent() if (isIn($self->getId, $self->session->setting->get("defaultPage"), $self->session->setting->get("notFoundPage")));
+	return $self->session->privilege->vitalComponent() if ($self->getId ~~ [$self->session->setting->get("defaultPage"), $self->session->setting->get("notFoundPage")]);
 	$self->trash;
     my $asset = $self->getContainer;
     if ($self->getId eq $asset->getId) {

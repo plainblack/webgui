@@ -106,10 +106,10 @@ sub checkPrivileges {
     }
 
 	# Check if all required privs are present.
-	return 1 if (isIn('ALL PRIVILEGES', @privileges));
+	return 1 if ('ALL PRIVILEGES' ~~ @privileges);
 	
 	foreach (@{ $requestedPrivileges }) {
-		return 0 unless (isIn(uc($_), @privileges));
+		return 0 unless (uc($_) ~~ @privileges);
 	}
 
     return 1;
@@ -386,7 +386,7 @@ sub queryIsAllowed {
 
     my ($firstWord) = $query =~ /(\w+)/;
     $firstWord = lc $firstWord;
-    return isIn($firstWord, split(/\s+/, lc $self->{_databaseLink}{allowedKeywords})) ? 1 : 0;
+    return $firstWord ~~ [split(/\s+/, lc $self->{_databaseLink}{allowedKeywords})] ? 1 : 0;
 }
 
 #-------------------------------------------------------------------

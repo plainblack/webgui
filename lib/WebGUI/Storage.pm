@@ -25,7 +25,7 @@ use File::Spec;
 use Image::Magick;
 use Path::Class::Dir;
 use Storable ();
-use WebGUI::Utility qw(isIn);
+use WebGUI::Utility qw();
 use WebGUI::Paths;
 use JSON ();
 
@@ -507,7 +507,7 @@ sub block_extensions {
     my $self = shift;
     my $file = shift;
     my $extension = $self->getFileExtension($file);
-    if (isIn($extension, qw(pl perl sh cgi php asp pm html htm))) {
+    if ($extension ~~ [qw(pl perl sh cgi php asp pm html htm)]) {
         $file =~ s/\.$extension/\_$extension/;
         $file .= ".txt";
     }
@@ -570,7 +570,7 @@ sub copy {
     my $newStorage = shift || WebGUI::Storage->create($self->session);
     my $filelist   = shift || $self->getFiles('all');
     FILE: foreach my $file (@{$filelist}) {
-        next if isIn($file, '.cdn', '.');
+        next if $file ~~ ['.cdn', '.'];
         my $origFile = $self->getPath($file);
         my $copyFile = $newStorage->getPath($file);
         if (-d $origFile) {
@@ -1332,7 +1332,7 @@ The file to check.
 sub isImage {
 	my $self = shift;
 	my $filename = shift;
-	return isIn($self->getFileExtension($filename), qw(jpeg jpg gif png))
+	return $self->getFileExtension($filename) ~~ [qw(jpeg jpg gif png)];
 }
 
 

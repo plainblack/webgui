@@ -437,7 +437,7 @@ Returns true if the DataForm uses a captcha as one of the fields.
 
 sub hasCaptcha {
     my $self = shift;
-    return isIn('Captcha', map { $_->{type} } map { $self->getFieldConfig($_) } @{ $self->getFieldOrder });
+    return 'Captcha' ~~ [map { $_->{type} } map { $self->getFieldConfig($_) } @{ $self->getFieldOrder })];
 }
 
 #-------------------------------------------------------------------

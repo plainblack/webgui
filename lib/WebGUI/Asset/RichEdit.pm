@@ -288,9 +288,9 @@ override getEditForm => sub {
     my $evenOddToggle = 0;
     foreach my $key (keys %buttons) {
             $evenOddToggle = $evenOddToggle ? 0 : 1;
-            my $checked1 = isIn($key,@toolbarRow1);
-            my $checked2 = isIn($key,@toolbarRow2);
-            my $checked3 = isIn($key,@toolbarRow3);
+            my $checked1 = $key ~~ @toolbarRow1;
+            my $checked2 = $key ~~ @toolbarRow2;
+            my $checked3 = $key ~~ @toolbarRow3;
             $buttonGrid .= '
     <tr'.($evenOddToggle ? ' style="background-color: #eeeeee;"' : undef).'>
             <td>'.$buttons{$key}.'</td>

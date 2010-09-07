@@ -349,7 +349,7 @@ sub getSiteURL {
         my $site = "";
         my $sitenames = $self->session->config->get("sitename");
         my ($http_host,$currentPort) = split(':', $self->session->request->env->{"HTTP_HOST"});
-        if ($self->session->setting->get("hostToUse") eq "HTTP_HOST" and isIn($http_host,@{$sitenames})) {
+        if ($self->session->setting->get("hostToUse") eq "HTTP_HOST" and $http_host ~~ $sitenames) {
                 $site = $http_host;
         } else {
                 $site = $sitenames->[0];

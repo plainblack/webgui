@@ -43,7 +43,7 @@ print "\nLooking for orphans...\n" unless ($quiet);
 my $orphansFound = 0;
 my $rs = $session->db->read("select assetId from asset order by lineage");
 while (my ($id) = $rs->array) {
-	unless (isIn($id, @found)) {
+	unless ($id ~~ @found) {
 		print "\tFound an orphan with an assetId of $id. Moving it to the import node.\n";
 		$session->db->write("update asset set parentId='PBasset000000000000002' where assetId=?",[$id]);
 		getDescendants($id);
@@ -80,7 +80,7 @@ print "\nDon't forget to clear your cache.\n" unless ($quiet);
 sub getDescendants {
 	my $parentId = shift;
     my $depth = shift || 0;
-    if (isIn($parentId, @found)) {
+    if ($parentId ~~ @found) {
 		print "\nFound circular relationships involving $parentId. This requires manual intervention.\n" unless ($quiet);
 		exit;
 	}

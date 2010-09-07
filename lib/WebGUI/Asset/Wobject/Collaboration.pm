@@ -1162,7 +1162,7 @@ sub getThreadsPaginator {
     $sortBy =~ s/^\w+\.//;
     # Sort by the thread rating instead of the post rating.  other places don't care about threads.
     $sortBy = $sortBy eq 'rating' ? 'threadRating' : $sortBy;
-    if (! WebGUI::Utility::isIn($sortBy, qw/userDefined1 userDefined2 userDefined3 userDefined4 userDefined5 title lineage revisionDate creationDate karmaRank threadRating views replies lastPostDate/)) {
+    if (! $sortBy ~~ [qw/userDefined1 userDefined2 userDefined3 userDefined4 userDefined5 title lineage revisionDate creationDate karmaRank threadRating views replies lastPostDate/]) {
         $sortBy = 'revisionDate';
     }
     if ($sortBy eq 'assetId' || $sortBy eq 'revisionDate') {

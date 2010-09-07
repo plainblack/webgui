@@ -72,7 +72,7 @@ sub createThumbnail {
         ($x, $y) = $image->Get('width','height');
         $r = $x>$y ? $x / $thumbnailSize : $y / $thumbnailSize;
         $image->Scale(width=>($x/$r),height=>($y/$r)) if ($r > 0);
-        if (isIn($type, qw(tif tiff bmp))) {
+        if ( $type ~~ [qw(tif tiff bmp)] ) {
                 $image->Write('thumb-'.$fileName.'.png');
         } else {
                 $image->Write($_[1].'/thumb-'.$fileName);
@@ -88,7 +88,7 @@ sub shouldThumbnail {
     return 0 if $fileName =~ m/thumb-/;
 
     ##I am not a graphics file, skip me
-    return 0 if !isIn($fileType, qw(jpg jpeg gif png tif tiff bmp));
+    return 0 if ! $fileType ~~ [qw(jpg jpeg gif png tif tiff bmp)];
 
     ##My thumbnail already exists and I was told not to do it again
     return 0 if ($onlyMissingThumbnails && -e 'thumb-'.$fileName);

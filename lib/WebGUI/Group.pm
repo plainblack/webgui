@@ -136,7 +136,7 @@ sub addGroups {
 		my ($isIn) = $self->session->db->quickArray("select count(*) from groupGroupings where groupId=? and inGroup=?", [$gid, $self->getId]);
         next GROUP if $isIn;
 		my $group = WebGUI::Group->new($self->session, $gid);
-		my $recursive = isIn($self->getId, @{$group->getGroupsIn(1)});
+		my $recursive = $self->getId ~~ $group->getGroupsIn(1);
         next GROUP if $recursive;
         $self->session->db->write("insert into groupGroupings (groupId,inGroup) values (?,?)",[$gid, $self->getId]);
 	}
@@ -1981,7 +1981,7 @@ sub vitalGroup {
     if (! $groupId && ref $class ) {
         $groupId = $class->getId;
     }
-    return isIn ( $groupId, (1..17), qw/pbgroup000000000000015 pbgroup000000000000016 pbgroup000000000000017 / );
+    return $groupId ~~ [ map { "$_" } (1..17), qw/pbgroup000000000000015 pbgroup000000000000016 pbgroup000000000000017 /];
 }
 
 1;

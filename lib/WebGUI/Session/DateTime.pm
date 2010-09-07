@@ -22,7 +22,7 @@ use DateTime::TimeZone;
 use Scalar::Util qw( weaken );
 use Tie::IxHash;
 use WebGUI::International;
-use WebGUI::Utility qw(isIn);
+use WebGUI::Utility qw();
 use Scalar::Util qw(weaken);
 
 
@@ -609,7 +609,7 @@ sub getTimeZone {
 	my $zone = $self->session->user->profileField('timeZone');
 	$zone =~ s/ /\_/g;
 	if ($zone) {
-        if (isIn($zone, @zones)) {
+        if ( $zone ~~ @zones ) {
 				$self->session->user->{_timeZone} = $zone;
 				return $zone;
 		}

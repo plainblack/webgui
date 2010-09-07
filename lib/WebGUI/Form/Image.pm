@@ -19,7 +19,7 @@ use base 'WebGUI::Form::File';
 use WebGUI::International;
 use WebGUI::Storage;
 use WebGUI::Form::YesNo;
-use WebGUI::Utility qw/isIn/;
+use WebGUI::Utility qw//;
 
 =head1 NAME
 
@@ -141,7 +141,7 @@ sub getValue {
 			my @files = @{$storage->getFiles};
 			my @images = grep{$storage->isImage($_)} @files; # Put all filenames that isImage returns true for into @images
 			if ($self->get('forceImageOnly')) {
-				$storage->deleteFile($_) for grep{!isIn($_, @images)} @files; # Search @files for filenames that are not in @images and delete them
+				$storage->deleteFile($_) for grep{ ! $_ ~~ @images } @files; # Search @files for filenames that are not in @images and delete them
 				@files = @images;
 			}
 

@@ -609,7 +609,7 @@ sub processConfigurationForm {
 	my $namespace = "WebGUI::Image::".$session->form->process('graphingPlugin');
 	$namespace =~ s/_/::/g;
 
-     if (! isIn($namespace, @{$class->getPluginList($session)})) {
+     if (! $namespace ~~ $class->getPluginList($session)) {
 	     WebGUI::Error->throw(error => "Graphing plugin not available")
      }
 

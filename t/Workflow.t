@@ -13,7 +13,6 @@ use WebGUI::Test;
 use WebGUI::Session;
 use WebGUI::Workflow;
 use WebGUI::Workflow::Cron;
-use WebGUI::Utility qw/isIn/;
 use Test::More tests => 75; # increment this value for each test you create
 use Test::Deep;
 

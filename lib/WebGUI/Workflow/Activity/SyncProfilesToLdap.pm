@@ -163,9 +163,9 @@ sub execute {
 		my $result = $ldap->search(base => $userData->{connectDN},
 					   filter => "&(objectClass=*)");
 
-		if ($result->code && !isIn($result->code, @noResultsCodes)) {
+		if ($result->code && ! $result->code ~~ @noResultsCodes) {
 			$self->session->errorHandler->error("SyncProfilesToLdap: Couldn't search LDAP link $ldapUrl ($currentLinkId) to find user $username ($userId) with DN ".$userData->{connectDN}.": LDAP returned: ".$ldapStatusCode{$result->code});
-		} elsif (isIn($result->code, @noResultsCodes) || $result->count == 0) {
+		} elsif ($result->code ~~ @noResultsCodes || $result->count == 0) {
 			$self->session->errorHandler->warn("SyncProfilesToLdap: No results returned by LDAP server for user with dn ".$userData->{connectDN});
 		} else {
 			my $entry = $result->entry(0);

@@ -21,7 +21,7 @@ use Test::Deep;
 
 my $session = WebGUI::Test->session;
 
-my @assets = grep { !isIn($_, qw/WebGUI::Asset::FilePile/) } (
+my @assets = grep { $_ ne 'WebGUI::Asset::FilePile' } (
     keys %{ $session->config->get('assets') }
 );
 

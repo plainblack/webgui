@@ -23,7 +23,7 @@ use Net::CIDR::Lite;
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw(
-	&sortHash &isIn
+	&sortHash
 	);
 
 
@@ -38,7 +38,6 @@ This package provides miscellaneous but useful utilities to the WebGUI programme
 =head1 SYNOPSIS
 
  use WebGUI::Utility;
- $boolean = isIn($value, @array);
  %hash = sortHash(%hash);
 
 =head1 METHODS
@@ -46,28 +45,6 @@ This package provides miscellaneous but useful utilities to the WebGUI programme
 These subroutines are available from this package:
 
 =cut
-
-#-------------------------------------------------------------------
-
-=head2 isIn ( value, list )
-
-Returns a boolean value as to whether the value is in the array.
-
-=head3 value
-
-The value to check for.
-
-=head3 list
-
-An array to look for the value in.
-
-=cut
-
-sub isIn {
-	my $key = shift;
-	$_ eq $key and return 1 for @_;
-	return 0;
-}
 
 #-------------------------------------------------------------------
 
