@@ -144,10 +144,10 @@ foreach my $filename (keys %{$configs}) {
 			unless ($skipDelete) {
 				print "\tDeleting temp files.\n" unless ($quiet);
 				my $path = $configs->{$filename}->get("uploadsPath").$slash."temp";
-				File::Path::rmtree($path) unless ($path eq "" || $path eq "/" || $path eq "/data");
+				File::Path::rmtree($path, {keep_root => 1, }) unless ($path eq "" || $path eq "/" || $path eq "/data");
 				print "\tDeleting file cache.\n" unless ($quiet);
 				$path = $configs->{$filename}->get("fileCacheRoot")||"/tmp/WebGUICache";
-				File::Path::rmtree($path)  unless ($path eq "" || $path eq "/" || $path eq "/data");
+				File::Path::rmtree($path, {keep_root => 1, })  unless ($path eq "" || $path eq "/" || $path eq "/data");
 			}
 		}
 		$session->close();

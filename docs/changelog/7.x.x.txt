@@ -9,6 +9,7 @@
  - fixed #11832: Admin Session Interface broken
  - fixed: Attachment label in the Template is missing
  - fixed #11810: Attachment list broken in template
+ - fixed #11814: upgrade script removes cache too aggresively (Ernesto Hernández-Novich)
 
 7.9.13
  - fixed #11783: Instances deleted during realtime run
