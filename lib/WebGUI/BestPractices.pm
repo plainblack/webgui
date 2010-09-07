@@ -33,11 +33,12 @@ This module is the equivalent of adding the following to your module:
 =cut
 
 sub import {
+    my $caller = caller;
     strict->import;
     warnings->import;
     warnings->unimport('uninitialized');
     feature->import(':5.10');
-    namespace::autoclean->import;
+    namespace::autoclean->import( -cleanee => $caller );
 }
 
 1;
