@@ -3,6 +3,7 @@
  - fixed #11813: Payment confirmation screen dollar amount
  - fixed #11832: Admin Session Interface broken
  - fixed: Attachment label in the Template is missing
+ - fixed #11811: Template attachment order lost during upgrade
 
 7.9.13
  - fixed #11783: Instances deleted during realtime run

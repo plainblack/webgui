@@ -377,7 +377,7 @@ sub migrateAttachmentsToJson {
 
     my $attach;     # hashref (template) of hashrefs (revisionDate)
                     # of arrayrefs (attachments) of hashrefs (attachment)
-    my $sth = $session->db->read( "SELECT * FROM template_attachments" );
+    my $sth = $session->db->read( "SELECT * FROM template_attachments order by templateId, sequence" );
     while ( my $row = $sth->hashRef ) {
         push @{ $attach->{ $row->{templateId} }{ $row->{revisionDate} } }, {
             url         => $row->{url},
