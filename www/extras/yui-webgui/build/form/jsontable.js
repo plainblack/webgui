@@ -143,7 +143,7 @@ WebGUI.Form.JsonTable.prototype.init
 
         // Fill in values based on field type
         var cells   = newRow.getElementsByTagName( "td" );
-        for ( var i = 0; i < this.columns.length - 1; i++ ) { // Last cell is for buttons
+        for ( var i = 0; i < this.columns.length; i++ ) { // Last cell is for buttons
             var cell        = cells[i];
             var column      = this.columns[i];
             var field       = cell.childNodes[0];
