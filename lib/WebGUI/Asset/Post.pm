@@ -1679,8 +1679,12 @@ sub www_edit {
 			});
 		$var{'userDefined'.$x.'.form.htmlarea'} 
             = WebGUI::Form::HTMLArea($session, {
-			    name    => "userDefined".$x,
-			    value   => $userDefinedValue,
+			    name       =>  "userDefined".$x,
+			    value      =>  $userDefinedValue,
+                richEditId => ($self->isa("WebGUI::Asset::Post::Thread")
+                               ? $self->getThread->getParent->get("richEditor")
+                               : $self->getThread->getParent->get("replyRichEditor")
+                              ),
 			});
 		$var{'userDefined'.$x.'.form.float'} 
             = WebGUI::Form::Float($session, {
