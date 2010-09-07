@@ -37,6 +37,24 @@ WebGUI::Session::Env has been moved into WebGUI::Session::Request.  A listing of
 $session->env->getIp => $session->request->address
 
 
+WebGUI::Utility
+===============
+This module has been removed.  It had many functions that weren't used, and others have better replacements.
+
+    formatBytes       -> Number::Format::format_bytes
+    commify           -> Number::Format::format_number
+    emailRegex        -> Email::Valid->address()
+    isBetween         -> <= / >=
+    makeArrayTabSafe  -> Text::CSV_XS methods
+    scalarEquals      -> eq
+    randint           -> int( rand( $x ) )
+    isInSubnet        -> Net::CIDR::Lite->new(@filters)->find($ip)
+    round             -> sprintf '%.0f', $x
+    isIn              -> smart match
+    sortHash          -> sort with map
+
+All other subs were unused and were just removed.
+
 
 WebGUI::Cache
 =============
