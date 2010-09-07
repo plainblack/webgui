@@ -22,7 +22,6 @@ use WebGUI::International;
 use WebGUI::Pluggable;
 use WebGUI::Shop::Admin;
 #use WebGUI::Shop::PayDriver;
-use WebGUI::Utility;
 use Tie::IxHash;
 use Scalar::Util;
 

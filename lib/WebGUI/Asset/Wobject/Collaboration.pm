@@ -467,7 +467,6 @@ use WebGUI::Group;
 use WebGUI::HTML;
 use WebGUI::International;
 use WebGUI::Paginator;
-use WebGUI::Utility;
 use WebGUI::Asset::Wobject;
 use WebGUI::Workflow::Cron;
 

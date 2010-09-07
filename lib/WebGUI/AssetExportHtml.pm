@@ -20,7 +20,6 @@ use Path::Class ();
 use Scalar::Util qw(looks_like_number);
 use WebGUI::International;
 use WebGUI::Exception;
-use WebGUI::Utility ();
 use WebGUI::Session;
 use URI::URL ();
 use Scope::Guard;

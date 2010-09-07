@@ -117,7 +117,6 @@ property lastUpdated => (
          );
 
 with 'WebGUI::Role::Asset::Comments';
-use WebGUI::Utility;
 
 
 =head1 NAME

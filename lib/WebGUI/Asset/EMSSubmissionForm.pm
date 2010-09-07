@@ -78,7 +78,6 @@ property formDescription => (
 
 use Tie::IxHash;
 use JSON;
-use WebGUI::Utility;
 with 'WebGUI::Role::Asset::AlwaysHidden';
 
 =head1 NAME

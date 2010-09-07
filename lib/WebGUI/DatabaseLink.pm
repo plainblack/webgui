@@ -18,7 +18,6 @@ package WebGUI::DatabaseLink;
 use strict;
 use WebGUI::SQL;
 use WebGUI::International;
-use WebGUI::Utility;
 use DBI;
 
 =head1 NAME

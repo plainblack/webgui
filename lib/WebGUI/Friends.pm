@@ -34,7 +34,6 @@ use WebGUI::HTML;
 use WebGUI::Inbox;
 use WebGUI::International;
 use WebGUI::User;
-use WebGUI::Utility;
 
 =head1 NAME
 

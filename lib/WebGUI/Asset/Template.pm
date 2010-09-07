@@ -110,7 +110,6 @@ property attachmentsJson => (
 
 use WebGUI::International;
 use WebGUI::Asset::Template::HTMLTemplate;
-use WebGUI::Utility;
 use WebGUI::Form;
 use WebGUI::Exception;
 use List::MoreUtils qw{ any };

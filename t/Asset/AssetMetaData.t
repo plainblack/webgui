@@ -15,7 +15,6 @@ use strict;
 
 use WebGUI::Test;
 use WebGUI::Session;
-use WebGUI::Utility;
 use WebGUI::Asset;
 use WebGUI::VersionTag;
 

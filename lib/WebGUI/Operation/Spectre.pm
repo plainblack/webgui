@@ -13,7 +13,6 @@ package WebGUI::Operation::Spectre;
 use strict;
 use JSON;
 use POE::Component::IKC::ClientLite;
-use WebGUI::Utility;
 use WebGUI::Workflow::Cron;
 use WebGUI::Workflow::Instance;
 use Net::CIDR::Lite;

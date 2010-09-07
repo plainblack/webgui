@@ -19,7 +19,6 @@ use base 'WebGUI::Form::File';
 use WebGUI::International;
 use WebGUI::Storage;
 use WebGUI::Form::YesNo;
-use WebGUI::Utility qw//;
 
 =head1 NAME
 

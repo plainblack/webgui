@@ -16,7 +16,6 @@ package WebGUI::User;
 
 use strict;
 use WebGUI::Group;
-use WebGUI::Utility;
 use WebGUI::Workflow::Instance;
 use JSON ();
 use WebGUI::ProfileField;

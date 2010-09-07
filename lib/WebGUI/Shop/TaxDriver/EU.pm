@@ -18,7 +18,6 @@ use strict;
 
 use WebGUI::Content::Account;
 use WebGUI::TabForm;
-use WebGUI::Utility qw{};
 use WebGUI::International;
 
 use Business::Tax::VAT::Validation;

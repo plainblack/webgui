@@ -12,7 +12,6 @@ use strict;
 
 use WebGUI::Test;
 use WebGUI::Session;
-use WebGUI::Utility;
 use WebGUI::Workflow::Activity::RemoveOldCarts;
 use WebGUI::Shop::Cart;
 

@@ -16,7 +16,6 @@ our $VERSION = "2.0.0";
 use Tie::IxHash;
 use JSON;
 use WebGUI::International;
-use WebGUI::Utility;
 use Moose;
 use WebGUI::Definition::Asset;
 use feature ":5.10";

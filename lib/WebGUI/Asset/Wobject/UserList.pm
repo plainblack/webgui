@@ -13,7 +13,6 @@ package WebGUI::Asset::Wobject::UserList;
 use strict;
 use HTML::Entities;
 use Tie::IxHash;
-use WebGUI::Utility;
 use WebGUI::Asset::Wobject;
 use WebGUI::Operation::Shared;
 use WebGUI::International;
@@ -550,7 +549,7 @@ sub view {
                     # Handle special case of alias, which does not have a default value but is set to the username by default
                     $value = $user->{userName} if ($profileFieldName eq 'alias' && $value eq '');
                     my %profileFieldValues;
-                    if ((ucfirst $profileField->{fieldType}) ~~ [qw(File Image)]) && $value ne ''){
+                    if ((ucfirst $profileField->{fieldType}) ~~ [qw(File Image)] && $value ne ''){
                         my $file = WebGUI::Form::DynamicField->new($self->session,
                             fieldType=>$profileField->{fieldType},
                             value=>$value

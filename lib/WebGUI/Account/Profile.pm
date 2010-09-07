@@ -7,7 +7,6 @@ use WebGUI::International;
 use WebGUI::Pluggable;
 use WebGUI::ProfileCategory;
 use WebGUI::ProfileField;
-use WebGUI::Utility;
 use base qw/WebGUI::Account/;
 
 =head1 NAME

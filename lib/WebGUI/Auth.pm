@@ -17,7 +17,6 @@ package WebGUI::Auth;
 use strict qw(subs vars);
 use WebGUI::International;
 use WebGUI::Asset::Template;
-use WebGUI::Utility;
 use WebGUI::User;
 use WebGUI::Workflow::Instance;
 use WebGUI::Inbox;

@@ -91,7 +91,6 @@ around BUILDARGS => sub {
 use WebGUI::Shop::Admin;
 use WebGUI::Exception::Shop;
 use WebGUI::International;
-use WebGUI::Utility qw{};
 use List::Util qw{ sum };
 use JSON qw{ encode_json };
 

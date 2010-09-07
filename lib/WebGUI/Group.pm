@@ -17,7 +17,6 @@ package WebGUI::Group;
 use strict;
 use WebGUI::LDAPLink;
 use WebGUI::Macro;
-use WebGUI::Utility;
 use WebGUI::Pluggable;
 require WebGUI::Asset;
 use WebGUI::International;

@@ -17,7 +17,6 @@ use WebGUI::HTMLForm;
 use WebGUI::International;
 use WebGUI::Workflow::Cron;
 use WebGUI::Workflow::Instance;
-use WebGUI::Utility;
 use Net::CIDR::Lite;
 
 =head1 NAME

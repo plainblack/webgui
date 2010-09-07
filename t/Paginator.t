@@ -12,7 +12,6 @@ use strict;
 
 use WebGUI::Test;
 use WebGUI::Session;
-use WebGUI::Utility;
 
 use WebGUI::Paginator;
 use Test::More; # increment this value for each test you create

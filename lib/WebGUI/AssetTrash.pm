@@ -15,7 +15,6 @@ package WebGUI::Asset;
 =cut
 
 use strict;
-use WebGUI::Utility qw();
 use Number::Format ();
 use JSON;
 

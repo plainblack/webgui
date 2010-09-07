@@ -35,7 +35,6 @@ property averageCommentRating => (
 use WebGUI::Exception;
 use WebGUI::Form;
 use WebGUI::HTML;
-use WebGUI::Utility;
 
 =head1 NAME
 

@@ -17,7 +17,6 @@ use WebGUI::Form;
 use WebGUI::International;
 use WebGUI::SQL;
 use WebGUI::User;
-use WebGUI::Utility;
 use WebGUI::Asset::Wobject;
 use WebGUI::Image::Graph;
 use WebGUI::Storage;

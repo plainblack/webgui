@@ -15,7 +15,6 @@ use Tie::IxHash;
 use WebGUI::HTMLForm;
 use WebGUI::Storage;
 use WebGUI::SQL;
-use WebGUI::Utility;
 use JSON;
 
 use Moose;

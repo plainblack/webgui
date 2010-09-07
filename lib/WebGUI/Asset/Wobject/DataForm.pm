@@ -223,7 +223,6 @@ has '+uiLevel' => (
 use WebGUI::Pluggable;
 use WebGUI::DateTime;
 use WebGUI::User;
-use WebGUI::Utility;
 use WebGUI::Group;
 use WebGUI::AssetCollateral::DataForm::Entry;
 use WebGUI::Form::SelectRichEditor;
@@ -437,7 +436,7 @@ Returns true if the DataForm uses a captcha as one of the fields.
 
 sub hasCaptcha {
     my $self = shift;
-    return 'Captcha' ~~ [map { $_->{type} } map { $self->getFieldConfig($_) } @{ $self->getFieldOrder })];
+    return 'Captcha' ~~ [map { $_->{type} } map { $self->getFieldConfig($_) } @{ $self->getFieldOrder } ];
 }
 
 #-------------------------------------------------------------------

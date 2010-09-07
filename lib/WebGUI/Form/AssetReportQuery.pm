@@ -4,7 +4,6 @@ use strict;
 use base 'WebGUI::Form::Control';
 use JSON;
 use WebGUI::International;
-use WebGUI::Utility;
 
 =head1 NAME
 

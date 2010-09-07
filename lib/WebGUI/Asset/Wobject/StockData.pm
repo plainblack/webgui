@@ -12,7 +12,6 @@ package WebGUI::Asset::Wobject::StockData;
 
 use strict;
 use WebGUI::International;
-use WebGUI::Utility;
 use WebGUI::Asset::Wobject;
 use Finance::Quote;
 use Tie::IxHash;

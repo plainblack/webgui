@@ -22,7 +22,6 @@ use WebGUI::Asset::File;
 use WebGUI::Asset::File::Image;
 use WebGUI::Session;
 use WebGUI::Storage;
-use WebGUI::Utility;
 
 $| = 1;
 

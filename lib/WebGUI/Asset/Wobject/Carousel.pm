@@ -15,7 +15,6 @@ $VERSION = "1.0.0";
 use strict;
 use JSON;
 use WebGUI::International;
-use WebGUI::Utility;
 use Moose;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Wobject';

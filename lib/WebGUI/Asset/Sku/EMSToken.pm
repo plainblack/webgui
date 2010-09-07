@@ -29,7 +29,6 @@ property price => (
             hoverHelp       => ["price help", 'Asset_EMSToken'],
          );
 
-use WebGUI::Utility;
 
 
 =head1 NAME

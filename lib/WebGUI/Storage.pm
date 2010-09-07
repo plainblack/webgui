@@ -25,7 +25,6 @@ use File::Spec;
 use Image::Magick;
 use Path::Class::Dir;
 use Storable ();
-use WebGUI::Utility qw();
 use WebGUI::Paths;
 use JSON ();
 

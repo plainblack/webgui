@@ -195,7 +195,6 @@ with 'WebGUI::Role::Asset::RssFeed';
 use WebGUI::International;
 use HTML::Parser;
 use URI::Escape;
-use WebGUI::Utility qw//;
 use WebGUI::Form;
 use Clone qw/clone/;
 

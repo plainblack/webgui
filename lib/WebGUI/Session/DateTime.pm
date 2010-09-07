@@ -22,7 +22,6 @@ use DateTime::TimeZone;
 use Scalar::Util qw( weaken );
 use Tie::IxHash;
 use WebGUI::International;
-use WebGUI::Utility qw();
 use Scalar::Util qw(weaken);
 
 

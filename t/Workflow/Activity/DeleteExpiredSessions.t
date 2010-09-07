@@ -12,7 +12,6 @@ use strict;
 
 use WebGUI::Test;
 use WebGUI::Session;
-use WebGUI::Utility;
 use WebGUI::Workflow::Activity::DeleteExpiredSessions;
 
 use Test::More;

@@ -16,7 +16,6 @@ our $VERSION = "1.0.0";
 use DateTime;
 use Tie::IxHash;
 use WebGUI::International;
-use WebGUI::Utility;
 use POSIX qw(ceil floor);
 use Moose;
 use WebGUI::Definition::Asset;

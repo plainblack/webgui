@@ -8,7 +8,6 @@ use WebGUI::International;
 use WebGUI::Pluggable;
 use WebGUI::Shop::Admin;
 use WebGUI::Shop::ShipDriver;
-use WebGUI::Utility;
 use Scalar::Util;
 
 =head1 NAME

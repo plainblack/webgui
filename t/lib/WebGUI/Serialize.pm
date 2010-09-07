@@ -1,7 +1,6 @@
 package WebGUI::Serialize;
 
 use base qw/WebGUI::Crud/;
-use WebGUI::Utility;
 
 #-------------------------------------------------------------------
 

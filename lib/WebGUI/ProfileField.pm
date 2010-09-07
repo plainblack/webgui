@@ -21,7 +21,6 @@ use WebGUI::Form::DynamicField;
 use WebGUI::Operation::Shared;
 use WebGUI::HTML;
 use WebGUI::User;
-use WebGUI::Utility;
 use WebGUI::Pluggable;
 use Tie::IxHash;
 

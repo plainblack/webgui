@@ -20,7 +20,6 @@ use URI;
 use URI::Escape;
 use Scalar::Util qw( weaken );
 use WebGUI::International;
-use WebGUI::Utility;
 use Scalar::Util qw(weaken);
 use Encode;
 

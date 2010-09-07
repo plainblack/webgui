@@ -62,7 +62,6 @@ with 'WebGUI::Role::Asset::SetStoragePermissions';
 
 use WebGUI::Storage;
 use WebGUI::SQL;
-use WebGUI::Utility;
 
 
 =head1 NAME

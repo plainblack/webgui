@@ -15,7 +15,6 @@ use Getopt::Long;
 use Pod::Usage;
 use WebGUI::Paths -inc;
 use WebGUI::Session;
-use WebGUI::Utility;
 
 $| = 1;
 my $configFile;

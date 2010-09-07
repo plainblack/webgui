@@ -16,7 +16,6 @@ package WebGUI::Asset::RichEdit;
 
 use strict;
 use WebGUI::Form;
-use WebGUI::Utility;
 use WebGUI::International;
 use JSON;
 use Tie::IxHash;

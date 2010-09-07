@@ -202,7 +202,6 @@ use WebGUI::Exception;
 use WebGUI::FormValidator;
 use WebGUI::HTMLForm;
 use WebGUI::International;
-use WebGUI::Utility;
 use WebGUI::Workflow::Instance;
 use Data::Dumper;
 

@@ -20,7 +20,6 @@ use WebGUI::Operation::Shared;
 use WebGUI::Pluggable;
 use WebGUI::SQL;
 use WebGUI::User;
-use WebGUI::Utility;
 
 
 #-------------------------------------------------------------------

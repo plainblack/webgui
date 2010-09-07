@@ -18,7 +18,6 @@ use strict;
 use DBI ();
 use Tie::IxHash ();
 use Text::CSV_XS ();
-use WebGUI::Utility ();
 use WebGUI::SQL::ResultSet ();
 use WebGUI::Exception;
 use Scalar::Util ();

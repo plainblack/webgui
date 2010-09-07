@@ -24,7 +24,6 @@ use Image::Magick;
 
 
 use WebGUI::Paths -inc;
-use WebGUI::Utility;
 
 my $thumbnailSize;
 my $onlyMissingThumbnails;

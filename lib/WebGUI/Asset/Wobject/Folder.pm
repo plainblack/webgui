@@ -70,7 +70,6 @@ has '+uiLevel' => (
     default => 5,
 );
 
-use WebGUI::Utility;
 use Number::Format ();
 
 =head1 NAME

@@ -12,7 +12,6 @@ use strict;
 
 use WebGUI::Test;
 use WebGUI::Session;
-use WebGUI::Utility;
 use WebGUI::Workflow::Activity::CalendarUpdateFeeds;
 use WebGUI::Asset::Wobject::Calendar;
 

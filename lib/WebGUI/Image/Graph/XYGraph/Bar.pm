@@ -4,7 +4,6 @@ use strict;
 use WebGUI::Image::Graph::XYGraph;
 use List::Util;
 use POSIX;
-use WebGUI::Utility;
 
 our @ISA = qw(WebGUI::Image::Graph::XYGraph);
 

@@ -92,7 +92,6 @@ property eventMetaData => (
          );
 
 use JSON ();
-use WebGUI::Utility;
 
 =head1 NAME
 

@@ -298,7 +298,6 @@ sub _workflowIdCommit_builder {
     return shift->session->setting->get('defaultVersionTagWorkflow'),
 }
 
-use WebGUI::Utility;
 use WebGUI::International;
 use WebGUI::Search;
 use WebGUI::Form;

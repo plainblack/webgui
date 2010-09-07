@@ -14,7 +14,6 @@ use strict;
 use Tie::IxHash;
 use JSON;
 use WebGUI::International;
-use WebGUI::Utility;
 use WebGUI::Text;
 use WebGUI::Form::File;
 use WebGUI::DateTime;
@@ -709,7 +708,7 @@ sub getEditFieldForm {
     
     my %fieldTypes = %{WebGUI::Form::FieldType->new($session)->getTypes};
     
-    $things = $self->session->db->read('select thingId, Thingy_things.label, count(*) from Thingy_things '
+    my $things = $self->session->db->read('select thingId, Thingy_things.label, count(*) from Thingy_things '
         .'left join Thingy_fields using(thingId) where Thingy_things.assetId = ? and fieldId != "" '
         .'group by thingId',[$self->getId]);
     while (my $thing = $things->hashRef) {
@@ -733,7 +732,7 @@ sub getEditFieldForm {
         $dialogPrefix = "edit_".$fieldId."_Dialog";
     }
     
-    $f = WebGUI::HTMLForm->new($self->session,{
+    my $f = WebGUI::HTMLForm->new($self->session,{
             action=>$self->getUrl,
             tableExtras=>' cellpadding="0" cellspacing="0"'
             });

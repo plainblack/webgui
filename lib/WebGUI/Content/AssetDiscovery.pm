@@ -17,7 +17,6 @@ package WebGUI::Content::AssetDiscovery;
 use strict;
 use JSON;
 use WebGUI::Asset;
-use WebGUI::Utility;
 use XML::Simple;
 
 =head1 NAME

@@ -16,7 +16,6 @@ use strict;
 use Tie::IxHash;
 use WebGUI::International;
 use WebGUI::Paginator;
-use WebGUI::Utility;
 use WebGUI::Form::AssetReportQuery;
 
 use Moose;

@@ -37,7 +37,6 @@ property percentageDiscount => (
          );
 
 use WebGUI::HTMLForm;
-use WebGUI::Utility;
 
 =head1 NAME
 

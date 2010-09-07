@@ -5,7 +5,6 @@ use strict;
 use WebGUI::Exception;
 use WebGUI::International;
 use WebGUI::Pluggable;
-use WebGUI::Utility;
 use WebGUI::Shop::Vendor;
 use JSON qw{ from_json };
 

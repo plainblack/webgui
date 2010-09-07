@@ -15,7 +15,6 @@ use WebGUI::AdminConsole;
 use WebGUI::International;
 use WebGUI::Asset::Template;
 use WebGUI::Macro;
-use WebGUI::Utility;
 use WebGUI::TabForm;
 use WebGUI::Pluggable;
 

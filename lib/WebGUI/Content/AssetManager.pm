@@ -6,7 +6,6 @@ use JSON qw( from_json to_json );
 use URI;
 use WebGUI::Form;
 use WebGUI::Paginator;
-use WebGUI::Utility;
 use WebGUI::Macro::AdminBar;
 use Tie::IxHash;
 use Number::Format ();

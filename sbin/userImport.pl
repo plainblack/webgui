@@ -19,7 +19,6 @@ use WebGUI::DateTime;
 use WebGUI::Group;
 use WebGUI::Session;
 use WebGUI::User;
-use WebGUI::Utility;
 
 $|=1;
 

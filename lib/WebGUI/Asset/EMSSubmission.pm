@@ -143,7 +143,6 @@ with 'WebGUI::Role::Asset::Comments';
 
 use Tie::IxHash;
 use base qw(WebGUI::Asset);
-use WebGUI::Utility;
 use WebGUI::Inbox;
 
 =head1 NAME

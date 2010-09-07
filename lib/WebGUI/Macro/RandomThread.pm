@@ -18,7 +18,6 @@ use strict;
 use WebGUI::Asset;
 use WebGUI::Asset::Wobject::Collaboration;
 use WebGUI::Asset::Template;
-use WebGUI::Utility;
 
 =head1 NAME
 

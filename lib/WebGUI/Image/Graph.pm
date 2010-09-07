@@ -5,7 +5,6 @@ use WebGUI::Image;
 use WebGUI::Image::Palette;
 use WebGUI::Image::Font;
 use List::Util;
-use WebGUI::Utility;
 
 our @ISA = qw(WebGUI::Image);
 

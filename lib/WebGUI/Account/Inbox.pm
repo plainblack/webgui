@@ -6,7 +6,6 @@ use WebGUI::Form;
 use WebGUI::Exception;
 use WebGUI::International;
 use WebGUI::Pluggable;
-use WebGUI::Utility;
 use Tie::IxHash;
 use Email::Valid;
 use base qw/WebGUI::Account/;

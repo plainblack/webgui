@@ -18,7 +18,6 @@ use WebGUI::Pluggable;
 use WebGUI::Workflow;
 use WebGUI::Workflow::Activity;
 use WebGUI::Workflow::Instance;
-use WebGUI::Utility;
 use POE::Component::IKC::ClientLite;
 use JSON qw/ decode_json /;
 use Net::CIDR::Lite;

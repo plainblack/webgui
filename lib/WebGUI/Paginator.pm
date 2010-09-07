@@ -16,7 +16,6 @@ package WebGUI::Paginator;
 
 use strict;
 use WebGUI::International;
-use WebGUI::Utility;
 use List::Util qw/min/;
 
 =head1 NAME

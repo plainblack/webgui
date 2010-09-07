@@ -23,7 +23,6 @@ use Tie::IxHash;
 use Clone qw/clone/;
 use WebGUI::DateTime;
 use WebGUI::Exception;
-use WebGUI::Utility;
 
 private objectData => my %objectData;
 readonly session => my %session;

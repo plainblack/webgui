@@ -23,7 +23,6 @@ use WebGUI::Paginator;
 use WebGUI::SQL;
 use WebGUI::TabForm;
 use WebGUI::User;
-use WebGUI::Utility;
 use JSON;
 use XML::Simple;
 use Net::CIDR::Lite;

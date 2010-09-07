@@ -16,7 +16,6 @@ use WebGUI::Form;
 use WebGUI::International;
 use WebGUI::SQL;
 use WebGUI::TabForm;
-use WebGUI::Utility;
 
 use Moose;
 use WebGUI::Definition::Asset;

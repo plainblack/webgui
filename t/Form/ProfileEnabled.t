@@ -14,7 +14,6 @@ use WebGUI::Test;
 use WebGUI::Form::FieldType;
 use WebGUI::Form::DynamicField;
 use WebGUI::Session;
-use WebGUI::Utility;
 
 #The goal of this test is to verify that the isDynamicCompatible setting
 #works on all form elements and that only the correct forms are profile

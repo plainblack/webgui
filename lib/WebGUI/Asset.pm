@@ -394,7 +394,6 @@ use WebGUI::Keyword;
 require WebGUI::ProgressBar;
 use WebGUI::Search::Index;
 use WebGUI::TabForm;
-use WebGUI::Utility;
 use WebGUI::PassiveAnalytics::Logging;
 
 =head1 NAME
@@ -1046,7 +1045,7 @@ sub getEditForm {
                             };
 
         # Kludge...
-        if ( $fieldHash->{fieldType} ~~ ['selectBox', 'workflow'] ) and ref $fieldHash->{value} ne 'ARRAY' ) {
+        if ( $fieldHash->{fieldType} ~~ ['selectBox', 'workflow'] and ref $fieldHash->{value} ne 'ARRAY' ) {
             $fieldHash->{value} = [ $fieldHash->{value} ];
         }
 

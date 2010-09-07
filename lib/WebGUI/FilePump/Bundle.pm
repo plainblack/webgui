@@ -5,7 +5,6 @@ use strict;
 use WebGUI::Asset;
 use WebGUI::International;
 use WebGUI::Exception;
-use WebGUI::Utility;
 use WebGUI::Macro;
 use URI;
 use Path::Class;

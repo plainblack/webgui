@@ -25,7 +25,6 @@ use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Test::Maker::Permission;
 use WebGUI::Session;
 use WebGUI::Text;
-use WebGUI::Utility;
 use WebGUI::DateTime;
 use DateTime;
 

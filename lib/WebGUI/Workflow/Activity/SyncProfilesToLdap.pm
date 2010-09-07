@@ -21,7 +21,6 @@ use Net::LDAP;
 use Time::HiRes;
 use WebGUI::Auth;
 use WebGUI::User;
-use WebGUI::Utility;
 
 =head1 NAME
 

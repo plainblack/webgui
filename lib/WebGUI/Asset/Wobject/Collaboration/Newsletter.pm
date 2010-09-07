@@ -71,7 +71,6 @@ sub _newsletterCategories_options {
 
 use WebGUI::Form;
 use WebGUI::International;
-use WebGUI::Utility;
 
 #-------------------------------------------------------------------
 
@@ -192,7 +191,7 @@ sub www_mySubscriptions {
     my @userPrefs = $self->getUserSubscriptions;
     foreach my $id (keys %{$meta}) {
         my @options = ();
-        if ($id ~~ [split("\n", $self->newsletterCategories))]) {
+        if ($id ~~ [split("\n", $self->newsletterCategories)]) {
             foreach my $option (split("\n", $meta->{$id}{possibleValues})) {
                 $option =~ s/\s+$//;    # remove trailing spaces
                 next if $option eq "";  # skip blank values

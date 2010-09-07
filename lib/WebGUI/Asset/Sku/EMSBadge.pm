@@ -85,7 +85,6 @@ use JSON;
 use WebGUI::HTMLForm;
 use WebGUI::International;
 use WebGUI::Shop::AddressBook;
-use WebGUI::Utility;
 
 =head1 NAME
 
