@@ -623,7 +623,7 @@ __DATA__
     </div>
     <div id="user">
         <div style="float: right">
-            <a href="<tmpl_var homeUrl>^International('back to site','VersionTag');</a> 
+            <a href="<tmpl_var homeUrl>">^International('back to site','VersionTag');</a> 
             | <a href="<tmpl_var logoutUrl>">^International('log out','WebGUI');</a>
         </div>
         <a href="<tmpl_var userEditUrl>" target="view" class="with_icon" style="background-image: url(^Extras(icon/user.png););">
