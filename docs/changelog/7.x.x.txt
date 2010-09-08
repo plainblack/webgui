@@ -1,3 +1,5 @@
+7.10.1
+
 7.10.0
  - fixed #11812: Checking www_ajaxSave's response in the cart js, urlencoding post parameters
  - added: Link in the Admin Console to the Addons section on webgui.org
