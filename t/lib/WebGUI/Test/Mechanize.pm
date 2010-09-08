@@ -11,9 +11,6 @@ use WebGUI::Session;
 use WebGUI::Middleware::Session;
 use Plack::Middleware::NullLogger;
 use Try::Tiny;
-BEGIN {
-    @Plack::Middleware::NullLogger::ISA = qw(Plack::Middleware);
-}
 
 sub new {
     my $class = shift;
