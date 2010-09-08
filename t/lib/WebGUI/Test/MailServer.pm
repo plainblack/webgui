@@ -52,14 +52,13 @@ use strict;
 use warnings;
 
 use JSON ();
-use File::Spec::Functions qw(catdir updir);
-use File::Basename qw(dirname);
 use IO::Select;
 use Net::SMTP::Server;
 use Net::SMTP::Server::Client;
 use MIME::Parser;
 use Scope::Guard;
 use MIME::Parser;
+use POSIX ();
 
 my $smtpdPid;
 my $smtpdStream;
@@ -94,15 +93,18 @@ sub _setup_server {
     my $host = 'localhost';
     my $port = 54921;
 
-    # make sure the lib path for this file is available
-    my $lib_path = catdir( dirname(__FILE__), (updir) x 2 );
-    my @command_line = (
-        $^X, "-I$lib_path", '-M' . __PACKAGE__,
-        '-e' . __PACKAGE__ . '::_run_server(@ARGV)', $host, $port,
-    );
-
-    $smtpdPid = open $smtpdStream, '-|', @command_line
-        or die "Could not open pipe to SMTPD: $!";
+    $smtpdPid = open $smtpdStream, '-|';
+    if ( ! defined $smtpdPid ) {
+        die "Could not open pipe to SMTPD: $!";
+    }
+    # child
+    elsif ( ! $smtpdPid ) {
+        $SIG{INT} = sub {
+            POSIX::_exit(0);
+        };
+        _run_server($host, $port);
+        POSIX::_exit(0);
+    }
     die "Could not open pipe to SMTPD: $!"
         unless $smtpdStream;
 
