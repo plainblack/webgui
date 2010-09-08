@@ -92,10 +92,16 @@ You say <tmpl_var his.yes>, I say <tmpl_var my.yes>.
 You say <tmpl_var his.stop>, and I say <tmpl_var my.stop>.
 END_HT
 
+my $gotExpr = use_ok('WebGUI::Asset::Template::HTMLTemplateExpr');
+SKIP: {
+    skip 'No HTML::Template::Expr module', 1 unless $gotExpr;
+    WebGUI::Test->originalConfig('templateParsers');
+    $session->config->addToArray('templateParsers', 'WebGUI::Asset::Template::HTMLTemplateExpr');
 processed_ok( 'WebGUI::Asset::Template::HTMLTemplateExpr', <<'END_HTE', 'HTML::Template::Expr' );
 You say <tmpl_var his_yes>, I say <tmpl_var my_yes>.
 You say <tmpl_var his_stop>, and I say <tmpl_var my_stop>.
 END_HTE
+}
 
 done_testing;
 
