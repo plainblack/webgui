@@ -11,4 +11,17 @@ templates, you will need to apply these changes manually to your copies.
      toggle.url  => toggle_url
      toggle.text => toggle_text
 
+7.9.14
+
+  *  Asset Report Template - asset-report/asset-report-default-template
+     Remove the empty template attachment
+
+  *  Gallery Album Edit Template
+     Update the inline javascript in the script tag to make drag & drop sorting work in IE7
+
+    if (typeof Gallery == "undefined") {
+        Gallery = {};
+        Gallery.DDSorting = {};
+    }
+    Gallery.DDSorting.url = '<tmpl_var url escape="js">';
 
