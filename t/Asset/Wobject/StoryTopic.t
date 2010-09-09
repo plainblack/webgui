@@ -108,11 +108,6 @@ cmp_deeply(
     $templateVars->{story_loop},
     [
         {
-            title        => 'bogs',
-            url          => $session->url->append($topic->getUrl, 'func=viewStory;assetId='.$storyHandler->{'bogs'}->getId),
-            creationDate => $now,
-        },
-        {
             title        => 'red',
             url          => $session->url->append($topic->getUrl, 'func=viewStory;assetId='.$storyHandler->{'red'}->getId),
             creationDate => $now,
@@ -127,11 +122,11 @@ cmp_deeply(
 );
 
 ok(
-    ! exists $templateVars->{topStoryTitle}
- && ! exists $templateVars->{topStoryUrl}
- && ! exists $templateVars->{topStoryCreationDate}
- && ! exists $templateVars->{topStorySubtitle},
-    'topStory variables not present unless in standalone mode'
+    exists $templateVars->{topStoryTitle}
+ && exists $templateVars->{topStoryUrl}
+ && exists $templateVars->{topStoryCreationDate}
+ && exists $templateVars->{topStorySubtitle},
+    'topStory variables present in standalone mode'
 );
 ok(! $templateVars->{standAlone}, 'viewTemplateVars: not in standalone mode');
 
@@ -230,8 +225,9 @@ $topic->update({
 
 $topic->{_standAlone} = 0;
 
-$templateVars = $topic->viewTemplateVariables;
+$templateVars    = $topic->viewTemplateVariables;
 my @topicInmates = map { $_->{title} } @{ $templateVars->{story_loop} };
+unshift @topicInmates, $templateVars->{topStoryTitle};
 cmp_deeply(
     \@topicInmates,
     [@inmates, 'Yesterday is history'], #extra for pastStory
@@ -246,11 +242,6 @@ $templateVars = $topic->viewTemplateVariables;
 cmp_deeply(
     $templateVars->{story_loop},
     [
-        {
-            title        => 'bogs',
-            url          => $storyHandler->{'bogs'}->getUrl,
-            creationDate => $now,
-        },
         {
             title        => 'red',
             url          => $storyHandler->{'red'}->getUrl,
@@ -331,7 +322,14 @@ $topic->update( { storySortOrder => 'Alphabetically' } );
 $templateVars = $topic->viewTemplateVariables();
 
 cmp_deeply(
-    $templateVars->{story_loop},
+    [
+        {
+            title        => $templateVars->{topStoryTitle},
+            url          => $templateVars->{topStoryUrl},
+            creationDate => $templateVars->{topStoryCreationDate},
+        },
+        @{ $templateVars->{story_loop} },
+    ],
     [
         {
             title        => "aaaay was history but isn't any more",

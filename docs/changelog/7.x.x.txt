@@ -1,4 +1,5 @@
 7.10.1
+ - fixed #11851: Story Topic: top story variables should be available all the time
 
 7.10.0
  - fixed #11812: Checking www_ajaxSave's response in the cart js, urlencoding post parameters
