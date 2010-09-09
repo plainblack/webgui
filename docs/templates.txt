@@ -15,3 +15,15 @@ templates, you will need to apply these changes manually to your copies.
     }
     Gallery.DDSorting.url = '<tmpl_var url escape="js">';
 
+  *  Story Topic Template
+     Since topStory template variables are available all the time, manually add the topStory into the list of
+     stories when the topic is no viewed standalone.  Also note the new template variables for the the delete
+     and edit icons for the top story.
+
+     <ul>
+     <tmpl_unless standAlone>
+     <li><tmpl_var topStoryDeleteIcon><tmpl_var topStoryEditIcon> <a href="<tmpl_var topStoryUrl>"><tmpl_var topStoryTitle></a></li>
+     </tmpl_unless>
+     <tmpl_loop story_loop>
+
+

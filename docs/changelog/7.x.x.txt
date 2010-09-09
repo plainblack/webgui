@@ -9,6 +9,7 @@
  - fixed #11827: CS rich edit bug
  - fixed #11825: Questionable attachmentsJson in AssetReport template
  - fixed #11796: Gallery Drag & Drop broken in IE 7 (again)
+ - fixed #11851: Story Topic: top story variables should be available all the time
 
 7.9.13
  - fixed #11783: Instances deleted during realtime run
