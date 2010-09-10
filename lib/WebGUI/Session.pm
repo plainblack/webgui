@@ -153,6 +153,18 @@ sub cache {
         $self->{_cache} = $cache;
     }
     return $self->{_cache};
+
+#-------------------------------------------------------------------
+
+=head2 clearAsset ( )
+
+Clears out the session asset.
+
+=cut
+
+sub clearAsset {
+    my $self        = shift;
+    $self->{_asset} = undef;
 }
 
 #-------------------------------------------------------------------
