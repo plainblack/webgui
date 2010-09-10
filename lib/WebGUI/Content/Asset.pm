@@ -84,6 +84,7 @@ sub dispatch {
             return $output if defined $output;
         }
     }
+    $session->clearAsset;
     if ($session->var->isAdminOn) {
         my $asset = WebGUI::Asset->newByUrl($session, $session->url->getRefererUrl) || WebGUI::Asset->getDefault($session);
         return $asset->addMissing($assetUrl);

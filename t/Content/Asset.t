@@ -17,6 +17,7 @@ use FindBin;
 use strict;
 use lib "$FindBin::Bin/../lib";
 use Test::More;
+use Test::MockObject::Extends;
 use Test::Deep;
 use Data::Dumper;
 use WebGUI::Test; # Must use this before any other WebGUI modules
@@ -92,7 +93,7 @@ WebGUI::Test->addToCleanup( WebGUI::VersionTag->getWorking( $session ) );
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 20;        # Increment this number for each test you create
+plan tests => 22;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # test getUrlPermutation( url ) method
@@ -203,5 +204,17 @@ $session->setting->set('defaultPage', $td->getId);
 $output  = WebGUI::Content::Asset::dispatch( $session );
 is $output, 'www_view one', 'an empty URL returns the default asset';
 $session->setting->set('defaultPage', $originalDefaultPage);
+
+# Test that requesting a URL that doesn't exist, but one of the permutations does exist, returns undef
+#my $default     = WebGUI::Asset->getDefault($session);
+#my $mockDefault = Test::MockObject::Extends->new($default);
+#$mockDefault->mock('addMissing', sub { return "add missing" });
+
+$session->request->setup_body({ });
+my $nonexistant_url = WebGUI::Asset->getDefault($session)->get('url');
+$nonexistant_url = join '/', $nonexistant_url, 'nothing_here_to_see';
+$output  = WebGUI::Content::Asset::dispatch( $session, $nonexistant_url );
+is $output, undef, 'getting a URL which does not exist returns undef';
+is $session->asset, undef, '... session asset is not set';
 
 #vim:ft=perl

@@ -110,6 +110,19 @@ sub asset {
 
 #-------------------------------------------------------------------
 
+=head2 clearAsset ( )
+
+Clears out the session asset.
+
+=cut
+
+sub clearAsset {
+    my $self        = shift;
+    $self->{_asset} = undef;
+}
+
+#-------------------------------------------------------------------
+
 =head2 close
 
 Cleans up a WebGUI session information from memory and disconnects from any resources opened by the session.
