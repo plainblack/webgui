@@ -160,7 +160,7 @@ sub dispatch {
     elsif ($fragment eq '.rdf') {
         return $self->www_viewRdf;
     }
-    return $self->next::method();
+    return $self->next::method($fragment);
 }
 
 #-------------------------------------------------------------------
