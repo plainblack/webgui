@@ -326,7 +326,7 @@ sub www_annotate {
 
     my $image = '<div align="center" class="yui-skin-sam"><img src="'.$self->getStorageLocation->getUrl($self->filename).'" style="border-style:none;" alt="'.$self->filename.'" id="yui_img" /></div>';
 
-	my ($width, $height) = $self->getStorageLocation->getSize($self->filename);
+	my ($width, $height) = $self->getStorageLocation->getSizeInPixels($self->filename);
 
 	my @checkboxes = ();
 	my $i18n = WebGUI::International->new($session,"Asset_Image");

@@ -22,7 +22,7 @@ use File::Copy ();
 use File::Find ();
 use File::Path ();
 use File::Spec;
-use Image::Magick;
+use Imager;
 use Path::Class::Dir;
 use Storable ();
 use WebGUI::Paths;
@@ -254,28 +254,26 @@ Note: captcha images will NOT be synchronized to a CDN, even if other files are.
 
 =cut 
 
-use Imager;
 sub addFileFromCaptcha {
     my $self = shift;
     my $error = "";
     my $challenge;
     $challenge .= ('A'..'Z')[rand(26)] foreach (1..6);
     my $filename = "captcha.".$self->session->id->generate().".png";
-    my $image = Imager->new(xsize => 200, ysize => 50
-    ) || warn Imager->errstr;
+    my $image = Imager->new(xsize => 200, ysize => 50) || die Imager->errstr;
     $image->box(
         filled => 1,
         color => 'grey',
-    ) || warn $image->errstr;
+    ) or die $image->errstr;
     $image->filter(
         type => 'noise',
         amount => 100,
         subtype => 1,
-    ) || warn $image->errstr;
+    ) or die $image->errstr;
     $image->filter(
         type => 'autolevels',
         usat => 0.5,
-    );
+    ) or die $image->errstr;
 
     my $font = Imager::Font->new(file => WebGUI::Paths->share . '/default.ttf');
     $image->align_string(
@@ -287,25 +285,25 @@ sub addFileFromCaptcha {
         halign => 'center',
         valign => 'center',
         size => 40,
-    ) || warn $image->errstr;
+    ) or die $image->errstr;
     $image->line(
         color => 'white',
         x1 => 5, y1 => 5,
         x2 => 195, y2 => 45,
         endp => 1,
         aa => 1,
-    ) || warn $image->errstr;
+    ) or die $image->errstr;
     $image->filter(
         type => 'gaussian',
         stddev => 1,
-    ) || warn $image->errstr;
+    ) or die $image->errstr;
     $image = $image->convert(
         preset => 'gray',
-    ) || warn $image->errstr;
+    ) or die $image->errstr;
     $image->box(color => 'black'
-    ) || warn $image->errstr;
+    ) or die $image->errstr;
     $image->write(file => $self->getPath($filename)
-    ) || warn $image->errstr;
+    ) or die $image->errstr;
     return ($filename, $challenge);
 }
 
@@ -864,7 +862,7 @@ sub generateThumbnail {
     my ($x, $y) = ($image->getwidth, $image->getheight);
     my $n = $thumbnailSize;
     if ($x > $n || $y > $n) {
-        $image->scale(xpixels => $n, ypixels => $n, type => 'min');
+        $image = $image->scale(xpixels => $n, ypixels => $n, type => 'min');
     }
     $image->write(file => $self->getPath . '/thumb-' . $filename);
     return 1;
@@ -916,27 +914,6 @@ sub getCdnFileIterator {
         }
     } ## end if ( $cdnCfg and $cdnCfg...
 } ## end sub getCdnFileIterator
-
-#-------------------------------------------------------------------
-
-=head2 getSize ( filename ) 
-
-Returns width and height of image.
-
-=head3 filename
-
-The file to generate a thumbnail for.
-
-=cut
-
-sub getSize {
-	my $self = shift;
-	my $filename = shift;
-    my $image = Imager->new;
-    $image->read(file => $self->getPath($filename));
-    return ($image->getwidth, $image->getheight);
-}
-
 
 #-------------------------------------------------------------------
 
@@ -1377,7 +1354,7 @@ sub renameFile {
 
 =head2 crop ( filename [, width, height ] )
 
-Resizes the specified image by the specified height and width. If either is omitted the iamge will be scaleed proportionately to the non-omitted one.
+Resizes the specified image by the specified height and width. If either is omitted the iamge will be scaled proportionately to the non-omitted one.
 
 =head3 filename
 
@@ -1422,25 +1399,20 @@ sub crop {
         $self->session->log->error("Can't resize with no resizing parameters.");
         return 0;
     }
-    my $image = Image::Magick->new;
-    my $error = $image->Read($self->getPath($filename));
-    if ($error) {
-        $self->session->log->error("Couldn't read image for resizing: ".$error);
-        return 0;
-    }
+    my $image = Imager->new;
+    $image->read($self->getPath($filename))
+        or die $image->errstr;
 
     # Next, resize dimensions
     if ( $width || $height || $x || $y ) {
-        $self->session->log->info( "Resizing $filename to w:$width h:$height x:$x y:$y" );
-        $image->Crop( height => $height, width => $width, x => $x, y => $y );
+        $self->session->errorHandler->info( "Resizing $filename to w:$width h:$height x:$x y:$y" );
+        $image = $image->crop( height => $height, width => $width, top => $x, left => $y )
+            or die $image->errstr;
     }
 
     # Write our changes to disk
-    $error = $image->Write($self->getPath($filename));
-    if ($error) {
-        $self->session->log->error("Couldn't resize image: ".$error);
-        return 0;
-    }
+    $image->write($self->getPath($filename))
+        or die $image->errstr;
 
     return 1;
 }
@@ -1554,22 +1526,18 @@ sub rotate {
         $self->session->log->error("Can't rotate something that's not an image.");
         return 0;
     }
-    my $image = Image::Magick->new;
-    my $error = $image->Read($self->getPath($filename));
-    if ($error) {
-        $self->session->log->error("Couldn't read image for resizing: ".$error);
-        return 0;
-    }
+    my $image = Imager->new;
+    $image->read(file => $self->getPath($filename))
+        or die $image->errstr;
 
-    $self->session->log->info( "Rotating $filename by $degree degrees" );
-    $image->Rotate( $degree );
+    $self->session->errorHandler->info( "Rotating $filename by $degree degrees" );
+
+    $image = $image->rotate(degrees => $degree)
+        or die $image->errstr;
 
     # Write our changes to disk
-    $error = $image->Write($self->getPath($filename));
-    if ($error) {
-        $self->session->log->error("Couldn't rotate image: ".$error);
-        return 0;
-    }
+    $image->write(file => $self->getPath($filename))
+        or die $image->errstr;
 
     return 1;
 }
@@ -1618,17 +1586,15 @@ sub resize {
         $self->session->log->error("Can't resize with no resizing parameters.");
         return 0;
     }
-    my $image = Image::Magick->new;
-    my $error = $image->Read($self->getPath($filename));
-    if ($error) {
-        $self->session->log->error("Couldn't read image for resizing: ".$error);
-        return 0;
-    }
+    my $image = Imager->new;
+    $image->read(file => $self->getPath($filename))
+        or die $image->errstr;
 
     # First, change image density
     if ( $density ) {
-        $self->session->log->info( "Setting $filename to $density" );
-        $image->Set( density => "${density}x${density}" );
+        $self->session->errorHandler->info( "Setting $filename to $density" );
+        $image->settag(name => 'i_xres', value => $density);
+        $image->settag(name => 'i_yres', value => $density);
     }
 
     # Next, resize dimensions
@@ -1637,23 +1603,21 @@ sub resize {
             $width = $1;
             $height = $2;
         }
-        my ($x, $y) = $image->Get('width','height');
+        my ($x, $y) = ($image->getwidth, $image->getheight);
         if (!$height) { # proportional scale by width
             $height = $width / $x * $y;
         }
         elsif (!$width) { # proportional scale by height
             $width = $height * $x / $y;
         }
-        $self->session->log->info( "Resizing $filename to w:$width h:$height" );
-        $image->Resize( height => $height, width => $width );
+        $self->session->errorHandler->info( "Resizing $filename to w:$width h:$height" );
+        $image = $image->scale(xpixels => $n, ypixels => $n, type => 'nonprop')
+            or die $image->errstr;
     }
 
     # Write our changes to disk
-    $error = $image->Write($self->getPath($filename));
-    if ($error) {
-        $self->session->log->error("Couldn't resize image: ".$error);
-        return 0;
-    }
+    $image->write(file => $self->getPath($filename))
+        or die $image->errstr;
 
     return 1;
 }
