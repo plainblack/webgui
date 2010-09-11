@@ -1044,7 +1044,7 @@ sub www_drawGanttChart {
 		}
 		
 		#Adjust top for MSIE
-		my $isMSIE = ($session->env->request->user_agent =~ /msie/i);
+		my $isMSIE = $session->request->browser->ie;
 		my $divTop =  $isMSIE ? 45 : 45;
 		#Start at 45 px and add 20px as the start of the new task
 		#Set the propert mutiplier

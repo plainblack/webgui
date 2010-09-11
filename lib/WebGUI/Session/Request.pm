@@ -2,6 +2,7 @@ package WebGUI::Session::Request;
 use strict;
 use parent qw(Plack::Request);
 use WebGUI::Session::Response;
+use HTTP::BrowserDetect;
 
 =head1 SYNOPSIS
 
@@ -21,6 +22,19 @@ is created.
 
 #-------------------------------------------------------------------
 
+=head2 browser
+
+Returns a HTTP::BrowserDetect object for the request.
+
+=cut
+
+sub browser {
+    my $self = shift;
+    return $self->env->{'webgui.browser'} ||= HTTP::BrowserDetect->new($self->user_agent);
+}
+
+#-------------------------------------------------------------------
+
 =head2 clientIsSpider ( )
 
 Returns true is the client/agent is a spider/indexer or some other non-human interface, determined
@@ -29,29 +43,12 @@ by checking the user agent against a list of known spiders.
 =cut
 
 sub clientIsSpider {
-
     my $self = shift;
-    my $userAgent = $self->user_agent;
 
-    return 1 if $userAgent eq ''
-             || $userAgent =~ m<(^wre\/|      # the WRE wget's http://localhost/ every 2-3 minutes 24 hours a day...
-                                 ^morpheus|
-                                 libwww|
-                                 s[pb]ider|
-                                 bot|
-                                 robo|
-                                 sco[ou]t|
-                                 crawl|
-                                 miner|
-                                 reaper|
-                                 finder|
-                                 search|
-                                 engine|
-                                 download|
-                                 fetch|
-                                 scan|
-                                 slurp)>ix;
-
+    return 1
+        if $self->user_agent eq ''
+            || $self->user_agent =~ /^wre/
+            || $self->browser->robot;
     return 0;
 
 }

@@ -90,7 +90,7 @@ sub process {
         # Fix box size
         my $boxSize = $param[0];
         $boxSize = 12 unless ($boxSize);
-        if (index(lc($session->request->user_agent),"msie") < 0) {
+        if ($session->request->browser->ie) {
         	$boxSize = int($boxSize=$boxSize*2/3);
         }
 

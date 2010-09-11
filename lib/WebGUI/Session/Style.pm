@@ -130,11 +130,9 @@ sub useMobileStyle {
     if (! $session->setting->get('useMobileStyle')) {
         return $self->{_useMobileStyle} = 0;
     }
-    my $ua = $session->request->user_agent;
-    for my $mobileUA (@{ $self->session->config->get('mobileUserAgents') }) {
-        if ($ua =~ m/$mobileUA/) {
-            return $self->{_useMobileStyle} = 1;
-        }
+
+    if ($session->request->browser->mobile) {
+        return $self->{_useMobileStyle} = 1;
     }
     return $self->{_useMobileStyle} = 0;
 }
