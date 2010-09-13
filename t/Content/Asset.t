@@ -227,9 +227,6 @@ isnt( $notModifiedSession->http->getStatus, "304", "logged in user doesn't get 3
 ok( !$notModifiedSession->closed, "session is not closed" );
 
 # Test that requesting a URL that doesn't exist, but one of the permutations does exist, returns undef
-#my $default     = WebGUI::Asset->getDefault($session);
-#my $mockDefault = Test::MockObject::Extends->new($default);
-#$mockDefault->mock('addMissing', sub { return "add missing" });
 
 $session->request->setup_body({ });
 my $nonexistant_url = WebGUI::Asset->getDefault($session)->get('url');
@@ -237,6 +234,18 @@ $nonexistant_url = join '/', $nonexistant_url, 'nothing_here_to_see';
 $output  = WebGUI::Content::Asset::dispatch( $session, $nonexistant_url );
 is $output, undef, 'getting a URL which does not exist returns undef';
 is $session->asset, undef, '... session asset is not set';
+
+use WebGUI::Asset::RssAspectDummy;
+my $dummy = WebGUI::Asset->getImportNode($session)->addChild({
+    className   => 'WebGUI::Asset::RssAspectDummy',
+    url         => '/home/shawshank',
+    title       => 'Dummy Title',
+    synopsis    => 'Dummy Synopsis',
+    description => 'Dummy Description',
+});
+WebGUI::Test->addToCleanup($dummy);
+$output  = WebGUI::Content::Asset::dispatch( $session, '/home/shawshank/no-child-here' );
+is $output, undef, 'RSS Aspect propagates the fragment';
 
 done_testing;
 
