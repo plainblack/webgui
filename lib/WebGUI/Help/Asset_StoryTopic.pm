@@ -31,7 +31,7 @@ our $HELP = {
             },
             { name => 'topStoryDeleteIcon',
               description => 'deleteIcon', },
-            { name => 'topStoryEditIcon'
+            { name => 'topStoryEditIcon',
               description => 'editIcon', },
             { name => 'topStoryTitle'        },
             { name => 'topStorySubtitle'     },
