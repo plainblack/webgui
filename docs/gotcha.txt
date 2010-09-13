@@ -9,6 +9,8 @@ save you many hours of grief.
 
 7.9.14
 --------------------------------------------------------------------
+     * WebGUI now depends on PerlIO::eol, for doing line ending translation.
+
      * Due to a bug in the 7.8.24-7.9.11 upgrade, the ordering of template
        attachments has been lost.  The bug has been fixed in 7.9.14 for sites
        that have not been upgraded yet.  Unfortunately, due to the nature of
