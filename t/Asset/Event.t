@@ -19,7 +19,7 @@ use WebGUI::Asset::Event;
 
 use Test::More; # increment this value for each test you create
 use Test::Deep;
-plan tests => 18;
+plan tests => 22;
 
 my $session = WebGUI::Test->session;
 
@@ -122,12 +122,24 @@ my $eventStorage = WebGUI::Storage->create($session);
 WebGUI::Test->addToCleanup($eventStorage);
 $properties3->{storageId} = $eventStorage->getId;
 
-my $event6 = $cal->addChild($properties3, $properties3->{id});
-
-sleep 2;
+my $event6 = $cal->addChild($properties3, $properties3->{id}, time()-5);
 
 my $event6a = $event6->addRevision({ title => 'Event with storage', }, undef, { skipAutoCommitWorkflows => 1, });
 ok($session->id->valid($event6a->get('storageId')), 'addRevision gives the new revision a valid storageId');
 isnt($event6a->get('storageId'), $event6->get('storageId'), '... and it is different from the previous revision');
 my $versionTag2 = WebGUI::VersionTag->getWorking($session);
 WebGUI::Test->addToCleanup($versionTag2);
+
+my $event7 = $cal->addChild({
+    className => 'WebGUI::Asset::Event',
+    startDate => '2000-08-31',
+    startTime => '24:00:00',
+    endDate   => '2000-09-01',
+    endTime   => '24:00:00',
+});
+
+is ($event7->get('startTime'), '00:00:00',   'startTime set to 00:00:00 if the hour is more than 23');
+is ($event7->get('startDate'), '2000-09-01', 'startDate bumped by 1 day');
+
+is ($event7->get('endTime'), '00:00:00',   'endTime set to 00:00:00 if the hour is more than 23');
+is ($event7->get('endDate'), '2000-09-02', 'endDate bumped by 1 day');
