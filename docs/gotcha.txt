@@ -7,6 +7,10 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+7.10.1
+--------------------------------------------------------------------
+     * WebGUI now depends on PerlIO::eol, for doing line ending translation.
+
 7.10.0
 --------------------------------------------------------------------
      * Due to a bug in the 7.8.24-7.9.11 upgrade, the ordering of template
