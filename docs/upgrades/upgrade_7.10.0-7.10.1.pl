@@ -31,9 +31,38 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+uniqueProductLocations($session);
 
 finish($session); # this line required
 
+
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub uniqueProductLocations {
+    my $session = shift;
+    print "\tMake sure each Product revision has its own storage location... " unless $quiet;
+    use WebGUI::Asset::Sku::Product;
+    my $get_product = WebGUI::Asset::Sku::Product->getIsa($session);
+    # and here's our code
+    PRODUCT: while (1) {
+        my $product = eval { $get_product->(); };
+        next PRODUCT if Exception::Class->caught();
+        last PRODUCT unless $product;
+        next PRODUCT unless $product->getRevisionCount > 1;
+        my $products = $product->getRevisions;
+        ##We already have the first revision, so remove it.
+        shift @{ $products };
+        foreach my $property (qw/image1 image2 image3 brochure manual warranty/) {
+            ##Check each property.  If there's a duplicate, then make copy of the storage location and update the older version.
+            foreach my $revision (@{ $products }) {
+                if ($revision->get($property) eq $product->get($property)) {
+                    $product->_duplicateFile($revision, $property,);
+                }
+            }
+        }
+    }
+    print "DONE!\n" unless $quiet;
+}
 
 #----------------------------------------------------------------------------
 # Describe what our function does
