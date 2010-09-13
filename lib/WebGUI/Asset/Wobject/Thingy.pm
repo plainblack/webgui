@@ -17,6 +17,7 @@ use WebGUI::International;
 use WebGUI::Text;
 use WebGUI::Form::File;
 use WebGUI::DateTime;
+use PerlIO::eol qw/NATIVE/;
 use Moose;
 use WebGUI::Definition::Asset;
 
@@ -2797,7 +2798,7 @@ sub www_import {
         next unless ($storage->getFileExtension($file) eq "csv");
         
         $error->info("Found import file $file");
-        open my $importFile,"<",$storage->getPath($file);
+        open my $importFile,"<:raw:eol(NATIVE)",$storage->getPath($file);
         my $lineNumber = 0;
         my @data = ();
         

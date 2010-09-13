@@ -21,6 +21,10 @@ save you many hours of grief.
        Account Macro template
        Admin Toggle Macro template
 
+7.10.1
+--------------------------------------------------------------------
+     * WebGUI now depends on PerlIO::eol, for doing line ending translation.
+
 7.10.0
 --------------------------------------------------------------------
      * Due to a bug in the 7.8.24-7.9.11 upgrade, the ordering of template

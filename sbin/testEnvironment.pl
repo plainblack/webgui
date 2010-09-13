@@ -156,6 +156,7 @@ checkModule('IO::Socket::SSL',                           );
 checkModule('Package::Stash',                            );
 checkModule('HTTP::Exception',                           );
 checkModule('Net::Twitter',                 "3.13006"    );
+checkModule('PerlIO::eol',                  "0.14"       );
 checkModule('Number::Format',                            );
 checkModule('Email::Valid',                              );
 checkModule('Facebook::Graph',              '0.0505'     );
