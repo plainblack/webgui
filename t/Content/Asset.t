@@ -93,7 +93,7 @@ WebGUI::Test->addToCleanup( WebGUI::VersionTag->getWorking( $session ) );
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 23;        # Increment this number for each test you create
+plan tests => 25;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # test getUrlPermutation( url ) method
@@ -138,14 +138,22 @@ cmp_deeply(
     [ $utf8_url ],
     "UTF-8 handling for URLs",
 );
+cmp_deeply(
+    WebGUI::Content::Asset::getUrlPermutations( "/one/two/three/" ),
+    [ '/one/two/three', '/one/two', '/one', ],
+    "trailing slashes are ignored",
+);
 
 #----------------------------------------------------------------------------
 # test dispatch( session, url ) method
 is ($session->asset, undef, 'session asset is not defined, yet');
 $output = WebGUI::Content::Asset::dispatch( $session, "testdispatch" );
 is $output, "www_view one", "Regular www_view";
-
 is $session->asset && $session->asset->getId, $td->getId, 'dispatch set the session asset';
+
+$output = WebGUI::Content::Asset::dispatch( $session, "testdispatch/" );
+is $output, "www_view one", "trailing slashes are ignored";
+
 
 my $_asset = WebGUI::Asset->newByUrl($session, $utf8_url);
 isa_ok $_asset, 'WebGUI::Asset::TestDispatch';

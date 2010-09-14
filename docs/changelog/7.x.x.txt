@@ -15,6 +15,7 @@
  - fixed #11833: Recheck for losing Product Images
  - fixed #11788: Calendar - Can't enter Midnight - Broke page layout
  - fixed #11855: Purging Shortcut from Trash causes loop
+ - fixed #11865: URL with slash no longer works.
 
 7.9.13
  - fixed #11783: Instances deleted during realtime run
