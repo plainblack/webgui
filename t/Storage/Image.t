@@ -63,7 +63,7 @@ my $extensionTests = [
 	},
 ];
 
-plan tests => 54 + scalar @{ $extensionTests }; # increment this value for each test you create
+plan tests => 55 + scalar @{ $extensionTests }; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -209,6 +209,8 @@ is($thumbStore->getThumbnailUrl('round.png'), '', 'getThumbnailUrl returns undef
 is($log_data->{error}, q/Can't find a thumbnail for a file named 'round.png' that is not in my storage location./, 'getThumbnailUrl logs an error message for not sending a filename');
 
 is($thumbStore->getThumbnailUrl('square.png'), $thumbStore->getUrl('thumb-square.png'), 'getThumbnailUrl returns the correct url');
+
+is($thumbStore->getThumbnailUrl('file.pdf'), '', '... return empty string for a file that is not an image');
 
 ####################################################
 #
