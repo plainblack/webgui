@@ -169,6 +169,20 @@ sub getValue {
 
 #-------------------------------------------------------------------
 
+=head2 headTags
+
+Sets the JS for this form plugin
+
+=cut
+
+sub headTags {
+    my $self    = shift;
+    my $session = $self->session;
+    $session->style->setScript($session->url->extras("yui-webgui/build/form/assetReportQuery.js"),{ type=>"text/javascript" });    
+}
+
+#-------------------------------------------------------------------
+
 =head2 i18n
 
 Returns the i18n object for the form
@@ -186,6 +200,7 @@ sub i18n {
    
    return $self->{_i18n};
 }
+
 #----------------------------------------------------------------------------
 
 =head2 toHtml
@@ -246,7 +261,6 @@ sub toHtml {
     $style->setRawHeadTags(qq|<script type="text/javascript">var classValues = $jsonStr; </script>|);
     my $jsonData            = $self->get("value") || q|{ "isNew" : "true" }|;
     $style->setRawHeadTags(qq|<script type="text/javascript">var dataValues  = $jsonData; var first_row_error_msg = '$first_row_error_msg';</script>|);
-    $session->style->setScript($session->url->extras("yui-webgui/build/form/assetReportQuery.js"),{ type=>"text/javascript" });    
 
     #Decode JSON data for filling in some of the fields
     my $jsonDataHash = JSON->new->decode($jsonData);
