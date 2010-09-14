@@ -345,6 +345,19 @@ sub getTableHtml {
 
 #-------------------------------------------------------------------
 
+=head2 headTags ()
+
+Set head tags for this form plugin
+
+=cut
+
+sub headTags {
+    my $self = shift;
+    $self->prepare;
+}
+
+#-------------------------------------------------------------------
+
 =head2 prepare ( )
 
 Load all the script and css files we need. Call this in prepareView() if needed.
