@@ -72,6 +72,19 @@ sub getValue {
 
 #-------------------------------------------------------------------
 
+=head2 headTags ( )
+
+Set the head tags for this form plugin
+
+=cut
+
+sub headTags {
+    my $self = shift;
+	$self->session->style->setScript($self->session->url->extras('inputCheck.js'));
+}
+
+#-------------------------------------------------------------------
+
 =head2 isDynamicCompatible ( )
 
 A class method that returns a boolean indicating whether this control is compatible with the DynamicField control.
@@ -92,7 +105,6 @@ Renders a phone number field.
 
 sub toHtml {
         my $self = shift;
-	$self->session->style->setScript($self->session->url->extras('inputCheck.js'));
         $self->set("extras", $self->get('extras') . ' onkeyup="doInputCheck(document.getElementById(\''.$self->get("id").'\'),\'x.0123456789-()+ \')" ');
 	return $self->SUPER::toHtml;
 }

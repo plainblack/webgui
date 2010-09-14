@@ -199,6 +199,31 @@ sub getValueAsHtml {
 
 #-------------------------------------------------------------------
 
+=head2 headTags ( )
+
+Set the head tags for this form plugin
+
+=cut
+
+sub headTags {
+    my $self = shift;
+    my $session = $self->session;
+
+    my $style   = $session->style;
+    my $url     = $session->url;
+    $style->setLink($url->extras('yui/build/calendar/assets/skins/sam/calendar.css'), { rel=>"stylesheet", type=>"text/css", media=>"all" });
+    $style->setScript($url->extras('/yui/build/utilities/utilities.js'));
+    $style->setScript($url->extras('yui/build/json/json-min.js'));
+    $style->setScript($url->extras('yui/build/yahoo/yahoo-min.js'));
+    $style->setScript($url->extras('yui/build/dom/dom-min.js'));
+    $style->setScript($url->extras('yui/build/event/event-min.js'));
+    $style->setScript($url->extras('yui/build/calendar/calendar-min.js'));
+    $style->setScript($url->extras('yui-webgui/build/i18n/i18n.js' ));
+    $style->setScript($url->extras('yui-webgui/build/datepicker/datepicker.js'));
+}
+
+#-------------------------------------------------------------------
+
 =head2 isDynamicCompatible ( )
 
 A class method that returns a boolean indicating whether this control is compatible with the DynamicField control.
@@ -224,18 +249,7 @@ sub toHtml {
     $value      = WebGUI::DateTime->new($session,0) if $value eq '';
     $value      = $value->set_time_zone($self->get("timeZone"))->strftime("%Y-%m-%d %H:%M:%S");
 
-    my $style   = $session->style;
-    my $url     = $session->url;
-    $style->setLink($url->extras('yui/build/calendar/assets/skins/sam/calendar.css'), { rel=>"stylesheet", type=>"text/css", media=>"all" });
-    $style->setScript($url->extras('/yui/build/utilities/utilities.js'));
-    $style->setScript($url->extras('yui/build/json/json-min.js'));
-    $style->setScript($url->extras('yui/build/yahoo/yahoo-min.js'));
-    $style->setScript($url->extras('yui/build/dom/dom-min.js'));
-    $style->setScript($url->extras('yui/build/event/event-min.js'));
-    $style->setScript($url->extras('yui/build/calendar/calendar-min.js'));
-    $style->setScript($url->extras('yui-webgui/build/i18n/i18n.js' ));
-    $style->setScript($url->extras('yui-webgui/build/datepicker/datepicker.js'));
-
+    $self->headTags;
     return WebGUI::Form::Text->new($self->session,
             name      => $self->get("name"),
             value     => $value,
