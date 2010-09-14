@@ -100,8 +100,6 @@ sub getSelectAllButton {
     my $formName    = $self->get('name');
     my $i18n        = WebGUI::International->new($self->session, "Form_CheckList");
 
-    $self->session->style->setScript( $self->session->url->extras("yui-webgui/build/form/form.js"));
-
     return WebGUI::Form::Button->new($self->session, {
         name        => $self->privateName('selectAllButton'),
         value       => $i18n->get("selectAll label"),
@@ -112,6 +110,19 @@ sub getSelectAllButton {
         })->toHtml
         . q{<br />}
         ;   
+}
+
+#-------------------------------------------------------------------
+
+=head2 headTags ( )
+
+Set the head tags for this form plugin
+
+=cut
+
+sub headTags {
+    my $self = shift;
+    $self->session->style->setScript( $self->session->url->extras("yui-webgui/build/form/form.js"));
 }
 
 #-------------------------------------------------------------------
@@ -148,6 +159,7 @@ Renders a series of checkboxes.
 
 sub toHtml {
 	my $self    = shift;
+    $self->headTags;
     my $session = $self->session;
     my $output = '<fieldset style="border:none;margin:0;padding:0">';
     $output .= WebGUI::Form::Hidden($session, { name => $self->privateName('isIn'), value => 1, });
