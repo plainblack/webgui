@@ -6,6 +6,7 @@
  - fixed #11788: Calendar - Can't enter Midnight - Broke page layout
  - fixed #11855: Purging Shortcut from Trash causes loop
  - fixed #11865: URL with slash no longer works.
+ - fixed #11861: addAttachment method removed from WebGUI 7 thus breaking the API
 
 7.10.0
  - fixed #11812: Checking www_ajaxSave's response in the cart js, urlencoding post parameters
