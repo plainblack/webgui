@@ -63,6 +63,7 @@ The URL for this request.
 sub dispatch {
     my $session      = shift;
 	my $assetUrl     = shift;
+    $assetUrl        =~ s{/$}{};
     my $permutations = getUrlPermutations($assetUrl);
     foreach my $url (@{ $permutations }) {
         if (my $asset = getAsset($session, $url)) {
