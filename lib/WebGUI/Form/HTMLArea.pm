@@ -148,6 +148,19 @@ sub getValueAsHtml {
 
 #-------------------------------------------------------------------
 
+=head2 headTags ( )
+
+Set the head tags for this form plugin
+
+=cut
+
+sub headTags {
+    my $self = shift;
+    $self->session->style->setScript($self->session->url->extras('textFix.js'),{ type=>'text/javascript' });
+}
+
+#-------------------------------------------------------------------
+
 =head2 isDynamicCompatible ( )
 
 A class method that returns a boolean indicating whether this control is compatible with the DynamicField control.
@@ -171,7 +184,6 @@ sub toHtml {
 	my $i18n = WebGUI::International->new($self->session);
 	my $richEdit = eval { WebGUI::Asset::RichEdit->newById($self->session, $self->get("richEditId")); };
 	if (! Exception::Class->caught() ) {
-       $self->session->style->setScript($self->session->url->extras('textFix.js'));
 	   $self->set("extras", $self->get('extras') . q{ onblur="fixChars(this.form['}.$self->get("name").q{'])" mce_editable="true" });
 	   $self->set("resizable", 0);
 	   return $self->SUPER::toHtml.$richEdit->getRichEditor($self->get('id'));
