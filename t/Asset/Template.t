@@ -16,7 +16,7 @@ use WebGUI::Test;
 use WebGUI::Session;
 use WebGUI::Asset::Template;
 use Exception::Class;
-use Test::More tests => 53; # increment this value for each test you create
+use Test::More tests => 57; # increment this value for each test you create
 use Test::Deep;
 use Data::Dumper;
 use Test::Exception;
@@ -132,6 +132,34 @@ is($att4->[0]->{url}, 'foo', 'rev still has foo');
 is($att4->[1]->{url}, 'bar', 'rev still has bar');
 is($att4->[2]->{url}, 'baz', 'rev does have new thing') or diag( $template3rev->get('attachmentsJson') );
 is(@$att4, 3, 'rev is proper size');
+
+$template3rev->addAttachments([{ url => 'box', type => 'headScript', }, { url => 'bux', type => 'headScript', }, ]);
+cmp_deeply(
+    [ map { $_->{url} } @{ $template3rev->getAttachments('headScript') } ],
+    [qw/foo bar baz box bux/],
+    'addAttachments appends to the end'
+) or diag $template3rev->get('attachmentsJson');
+
+$template3rev->removeAttachments(['box']);
+cmp_deeply(
+    [ map { $_->{url} } @{ $template3rev->getAttachments('headScript') } ],
+    [qw/foo bar baz bux/],
+    'removeAttachments will remove urls by exact URL match'
+) or diag $template3rev->get('attachmentsJson');
+
+$template3rev->removeAttachments(['bu']);
+cmp_deeply(
+    [ map { $_->{url} } @{ $template3rev->getAttachments('headScript') } ],
+    [qw/foo bar baz bux/],
+    '... checking that it is not treated like a wildcard'
+) or diag $template3rev->get('attachmentsJson');
+
+$template3rev->removeAttachments();
+cmp_deeply(
+    [ map { $_->{url} } @{ $template3rev->getAttachments('headScript') } ],
+    [ ],
+    '... checking that all attachments are removed'
+) or diag $template3rev->get('attachmentsJson');
 
 $template3rev->purgeRevision();
 
