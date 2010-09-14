@@ -464,6 +464,18 @@ sub getValueFromPost {
 
 #-------------------------------------------------------------------
 
+=head2 headTags ( )
+
+Set any head tags that this form plugin needs for CSS or Javascript.
+
+=cut
+
+sub headTags {
+    return '';
+}
+
+#-------------------------------------------------------------------
+
 =head2 isDynamicCompatible ( )
 
 A class method that returns a boolean indicating whether this control is compatible with the DynamicField control. Returns 0.
