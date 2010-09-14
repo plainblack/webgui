@@ -109,7 +109,7 @@ sub toHtml {
 
     my $name = $self->generateIdParameter($self->get('name'));
     my $autocompleteDiv = $self->privateName('autocomplete');
-    my $pageUrl = $url->page;
+    my $pageUrl = $self->session->url->page;
     my $output
         = '<div class="yui-skin-sam webgui-keywords-autocomplete"><div>' . $self->SUPER::toHtml
         . '<div id="' . $autocompleteDiv . '"></div>'
