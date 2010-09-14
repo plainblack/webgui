@@ -110,6 +110,19 @@ sub getValue {
 
 #-------------------------------------------------------------------
 
+=head2 headTags ( )
+
+A class method that returns a boolean indicating whether this control is compatible with the DynamicField control.
+
+=cut
+
+sub headTags {
+    my $self = shift;
+	$self->session->style->setScript($self->session->url->extras('inputCheck.js'),{ type=>'text/javascript' });
+}
+
+#-------------------------------------------------------------------
+
 =head2 isDynamicCompatible ( )
 
 A class method that returns a boolean indicating whether this control is compatible with the DynamicField control.
@@ -130,7 +143,6 @@ Renders an integer field.
 
 sub toHtml {
         my $self = shift;
-	$self->session->style->setScript($self->session->url->extras('inputCheck.js'),{ type=>'text/javascript' });
 	$self->set("extras", $self->get('extras') . ' onkeyup="doInputCheck(document.getElementById(\''.$self->get("id").'\'),\'0123456789abcdef\')"');
 	return $self->SUPER::toHtml;
 }
