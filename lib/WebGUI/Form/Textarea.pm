@@ -119,6 +119,29 @@ sub getName {
 
 #-------------------------------------------------------------------
 
+=head2 headTags ( )
+
+Set the head tags for this form plugin
+
+=cut
+
+sub headTags {
+    my $self = shift;
+	my ($style, $url) = $self->session->quick(qw(style url));
+    if ($self->get("resizable")) {
+        $style->setLink($url->extras("yui/build/resize/assets/skins/sam/resize.css"), {type=>"text/css", rel=>"stylesheet"});
+        $style->setScript($url->extras("yui/build/utilities/utilities.js"));
+        $style->setScript($url->extras("yui/build/resize/resize-min.js"));
+    }
+    if ($self->get('maxlength')) {
+        # Add the maxlength script
+        $style->setScript( $url->extras( 'yui/build/yahoo-dom-event/yahoo-dom-event.js' ));
+        $style->setScript( $url->extras( 'yui-webgui/build/form/textarea.js' ));
+    }
+}
+
+#-------------------------------------------------------------------
+
 =head2 isDynamicCompatible ( )
 
 A class method that returns a boolean indicating whether this control is compatible with the DynamicField control.
@@ -161,9 +184,6 @@ sub toHtml {
         . '>' . $value . '</textarea>';
 
     if ($self->get("resizable")) {
-        $style->setLink($url->extras("yui/build/resize/assets/skins/sam/resize.css"), {type=>"text/css", rel=>"stylesheet"});
-        $style->setScript($url->extras("yui/build/utilities/utilities.js"));
-        $style->setScript($url->extras("yui/build/resize/resize-min.js"));
         $out = sprintf <<'END_HTML', $self->get('id'), $out, $sizeStyle;
 <div id="%1$s_resizewrapper" style="padding-right: 6px; padding-bottom: 6px; %3$s">%2$s</div>
 <script type="text/javascript">
@@ -178,6 +198,7 @@ sub toHtml {
 </script>
 END_HTML
     }
+<<<<<<< HEAD
     elsif ($self->get('maxlength')) {
         $style->setScript( $url->extras( 'yui/build/yahoo-dom-event/yahoo-dom-event.js' ));
     }
@@ -185,6 +206,9 @@ END_HTML
         # Add the maxlength script
         $style->setScript( $url->extras( 'yui-webgui/build/form/textarea.js' ));
     }
+=======
+    $self->headTags;
+>>>>>>> Convert Textarea over to headTags
     return $out;
 }
 
