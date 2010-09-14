@@ -119,6 +119,35 @@ sub getName {
 
 #-------------------------------------------------------------------
 
+=head2 headTags ( )
+
+Set the head tags for this form plugin
+
+=cut
+
+sub headTags {
+    my $self = shift;
+	my ($style, $url) = $self->session->quick(qw(style url));
+    if ($self->get("resizable")) {
+        $style->setLink($url->extras("yui/build/resize/assets/skins/sam/resize.css"), {type=>"text/css", rel=>"stylesheet"});
+        $style->setScript($url->extras("yui/build/utilities/utilities.js"), {type=>"text/javascript"});
+        $style->setScript($url->extras("yui/build/resize/resize-min.js"), {type=>"text/javascript"});
+    }
+    if ($self->get('maxlength')) {
+        # Add the maxlength script
+        $style->setScript(
+            $url->extras( 'yui/build/yahoo-dom-event/yahoo-dom-event.js' ),
+            { type => 'text/javascript' },
+        );
+        $style->setScript(
+            $url->extras( 'yui-webgui/build/form/textarea.js' ),
+            { type => 'text/javascript' },
+        );
+    }
+}
+
+#-------------------------------------------------------------------
+
 =head2 isDynamicCompatible ( )
 
 A class method that returns a boolean indicating whether this control is compatible with the DynamicField control.
@@ -142,7 +171,6 @@ sub toHtml {
  	my $value = $self->fixMacros($self->fixTags($self->fixSpecialCharacters(scalar $self->getOriginalValue)));
 	my $width = $self->get('width') || 400;
 	my $height = $self->get('height') || 150;
-	my ($style, $url, $stow) = $self->session->quick(qw(style url stow));
     my $sizeStyle =  ' width: ' . $width . 'px; height: ' . $height . 'px;';
     my $out
         = '<textarea id="' . $self->get('id') . '"'
@@ -155,9 +183,6 @@ sub toHtml {
         . '>' . $value . '</textarea>';
 
     if ($self->get("resizable")) {
-        $style->setLink($url->extras("yui/build/resize/assets/skins/sam/resize.css"), {type=>"text/css", rel=>"stylesheet"});
-        $style->setScript($url->extras("yui/build/utilities/utilities.js"), {type=>"text/javascript"});
-        $style->setScript($url->extras("yui/build/resize/resize-min.js"), {type=>"text/javascript"});
         $out = sprintf <<'END_HTML', $self->get('id'), $out, $sizeStyle;
 <div id="%1$s_resizewrapper" style="padding-right: 6px; padding-bottom: 6px; %3$s">%2$s</div>
 <script type="text/javascript">
@@ -172,19 +197,7 @@ sub toHtml {
 </script>
 END_HTML
     }
-    elsif ($self->get('maxlength')) {
-        $style->setScript(
-            $url->extras( 'yui/build/yahoo-dom-event/yahoo-dom-event.js' ),
-            { type => 'text/javascript' },
-        );
-    }
-    if ($self->get('maxlength')) {
-        # Add the maxlength script
-        $style->setScript(
-            $url->extras( 'yui-webgui/build/form/textarea.js' ),
-            { type => 'text/javascript' },
-        );
-    }
+    $self->headTags;
     return $out;
 }
 
