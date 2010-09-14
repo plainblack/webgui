@@ -129,6 +129,31 @@ sub getValue {
 
 #-------------------------------------------------------------------
 
+=head2 headTags ( )
+
+Send JS required for this plugin.
+
+=cut
+
+sub headTags {
+    my $self = shift;
+    my ( $url, $style ) = $self->session->quick(qw( url style ));
+    $style->setScript(
+        $url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'),
+        { type => 'text/javascript' },
+    );
+    $style->setScript(
+        $url->extras('yui/build/json/json-min.js'),
+        { type => 'text/javascript' },
+    );
+    $style->setScript(
+        $url->extras('yui-webgui/build/form/jsontable.js'),
+        { type => 'text/javascript' },
+    );
+}
+
+#-------------------------------------------------------------------
+
 =head2 toHtml ( )
 
 Renders an input tag of type text.
@@ -193,21 +218,12 @@ sub toHtml {
     $output .= '<input type="hidden" name="' . $self->get('name') . '" value="' . $value . '" />';
 
     # Existing rows are entirely built in javascript from the JSON in the hidden field
-    $style->setScript(
-        $url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'),
-        { type => 'text/javascript' },
-    );
-    $style->setScript(
-        $url->extras('yui/build/json/json-min.js'),
-        { type => 'text/javascript' },
-    );
-    $output .= sprintf '<script src="%s" type="text/javascript"></script>', 
-                $url->extras('yui-webgui/build/form/jsontable.js');
     $output .= '<script type="text/javascript">'
             . q{new WebGUI.Form.JsonTable("} . $self->get('name') . q{","} . $self->get( 'id' ) . q{", }
             . JSON->new->encode( $self->get('fields') ) . q{ );}
             . '</script>';
 
+    $self->headTags;
     return $output;
 }
 
