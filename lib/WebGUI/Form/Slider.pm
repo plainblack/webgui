@@ -259,6 +259,22 @@ sub getSliderVariable {
 
 #-------------------------------------------------------------------
 
+=head2 headTags ( )
+
+Set the head tags for this form plugin
+
+=cut
+
+sub headTags {
+    my $self = shift;
+	$self->session->style->setScript($self->session->url->extras("slider/js/range.js"), {type=>"text/javascript"});
+	$self->session->style->setScript($self->session->url->extras("slider/js/timer.js"), {type=>"text/javascript"});
+	$self->session->style->setScript($self->session->url->extras("slider/js/slider.js"), {type=>"text/javascript"});
+	$self->session->style->setLink($self->session->url->extras("slider/css/bluecurve/bluecurve.css"), {rel=>"stylesheet", type=>"text/css"});
+}
+
+#-------------------------------------------------------------------
+
 =head2 toHtml ( )
 
 Renders an input tag of type text.
@@ -267,10 +283,6 @@ Renders an input tag of type text.
 
 sub toHtml {
 	my $self = shift;
-	$self->session->style->setScript($self->session->url->extras("slider/js/range.js"), {type=>"text/javascript"});
-	$self->session->style->setScript($self->session->url->extras("slider/js/timer.js"), {type=>"text/javascript"});
-	$self->session->style->setScript($self->session->url->extras("slider/js/slider.js"), {type=>"text/javascript"});
-	$self->session->style->setLink($self->session->url->extras("slider/css/bluecurve/bluecurve.css"), {rel=>"stylesheet", type=>"text/css"});
 
 	# We need to make the variables unique because javascript does not have block scope. Also js cannot 
 	# have dashes in identifiers, so we convert those to dollars, which are allowed in identifiers.
@@ -337,6 +349,7 @@ sub toHtml {
 	|;
 	$output .= '</script>';
 
+    $self->headTags;
 	return $output;
 }
 
