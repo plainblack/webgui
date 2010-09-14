@@ -213,7 +213,8 @@ sub paste {
     return 0 unless ($pastedAsset->canPaste());  ##Allow pasted assets to have a say about pasting.
 
     # Don't allow a shortcut to create an endless loop
-	return 0 if ($pastedAsset->get("className") eq "WebGUI::Asset::Shortcut" && $pastedAsset->get("shortcutToAssetId") eq $self->getId);
+    ##Do not paste a shortcut immediately below the original asset
+    return 0 if $pastedAsset->isa('WebGUI::Asset::Shortcut') && $pastedAsset->get("shortcutToAssetId") eq $self->getId;
     my $i18n=WebGUI::International->new($session, 'Asset');
     $outputSub->(sprintf $i18n->get('pasting %s'), $pastedAsset->getTitle) if defined $outputSub;
 	if ($self->getId eq $pastedAsset->get("parentId") || $pastedAsset->setParent($self)) {

@@ -22,7 +22,7 @@ use WebGUI::Asset;
 use WebGUI::VersionTag;
 
 use Test::More; # increment this value for each test you create
-plan tests => 27;
+plan tests => 29;
 
 my $session = WebGUI::Test->session;
 $session->user({userId => 3});
@@ -156,3 +156,38 @@ for my $i (0..2) {
     is_tree_of_folders($clip, $i+1, $meth);
     $clip->purge;
 }
+
+####################################################
+#
+# paste
+#
+####################################################
+
+my $versionTag2 = WebGUI::VersionTag->getWorking($session);
+WebGUI::Test->addToCleanup($versionTag2);
+
+my $page = $tempspace->addChild({
+    className => 'WebGUI::Asset::Wobject::Layout',
+    title     => 'Parent asset',
+});
+
+my $shortcut = $tempspace->addChild({
+    className         => 'WebGUI::Asset::Shortcut',
+    shortcutToAssetId => $page->getId,
+});
+
+$versionTag2->commit;
+
+foreach my $asset ($page, $shortcut, ) {
+    $asset = $asset->cloneFromDb;
+}
+
+$shortcut->cut;
+
+is $page->paste($shortcut->getId), 0, 'cannot paste a shortcut immediately below the asset it shortcuts';
+
+$shortcut->publish;
+
+$page->cut;
+
+is $shortcut->paste($page->getId), 0, 'cannot paste below shortcuts';
