@@ -4,6 +4,7 @@
  - fixed #11746: Thingy import CSV only supports one line ending
  - fixed #11833: Recheck for losing Product Images
  - fixed #11788: Calendar - Can't enter Midnight - Broke page layout
+ - fixed #11855: Purging Shortcut from Trash causes loop
 
 7.10.0
  - fixed #11812: Checking www_ajaxSave's response in the cart js, urlencoding post parameters

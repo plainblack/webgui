@@ -786,6 +786,19 @@ sub notLinked {
 
 #-------------------------------------------------------------------
 
+=head2 paste ( )
+
+Pasting assets under a Shortcut can cause lots of problems, including infinite loops
+for operations like paste, and purge.
+
+=cut
+
+sub paste {
+    return 0;
+}
+
+#-------------------------------------------------------------------
+
 =head2 prepareView ( )
 
 See WebGUI::Asset::prepareView() for details.  Extends the base class to call prepareView
