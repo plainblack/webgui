@@ -90,6 +90,24 @@ sub getValue {
 
 #-------------------------------------------------------------------
 
+=head2 headTags ( )
+
+Set the head tags for this form plugin
+
+=cut
+
+sub headTags {
+    my $self = shift;
+    $self->session->style->setScript($self->session->url->extras('form/fieldCheck.js'),{ type=>'text/javascript' });
+    $self->session->style->setScript($self->session->url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'), {type=>'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/connection/connection-min.js'), {type => 'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/json/json-min.js'),                   {type=>'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/datasource/datasource-min.js'),       {type=>'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('yui-webgui/build/i18n/i18n.js'), {type=>'text/javascript'});
+}
+
+#-------------------------------------------------------------------
+
 =head2 toHtml ( )
 
 Renders a user name field.
@@ -98,15 +116,9 @@ Renders a user name field.
 
 sub toHtml {
   my $self = shift;
-  $self->session->style->setScript($self->session->url->extras('form/fieldCheck.js'),{ type=>'text/javascript' });
-  $self->session->style->setScript($self->session->url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'), {type=>'text/javascript'});
-  $self->session->style->setScript($self->session->url->extras('yui/build/connection/connection-min.js'), {type => 'text/javascript'});
-  $self->session->style->setScript($self->session->url->extras('yui/build/json/json-min.js'),                   {type=>'text/javascript'});
-  $self->session->style->setScript($self->session->url->extras('yui/build/datasource/datasource-min.js'),       {type=>'text/javascript'});
-  $self->session->style->setScript($self->session->url->extras('yui-webgui/build/i18n/i18n.js'), {type=>'text/javascript'});
   my $value = $self->fixMacros($self->fixQuotes($self->fixSpecialCharacters(scalar $self->getOriginalValue)));
   $self->set("extras", $self->get('extras') . ' onblur="new WebGUI.FieldCheck(\''. $self->get("id").'\',\'Username\',1);"');
-  return '<input id="'.$self->get('id').'" type="text" name="'.$self->get("name").'" value="'.$value.'" size="'.$self->get("size").'" maxlength="'.$self->get("maxlength").'" '.$self->get("extras").' />';
+  return $self->SUPER::toHtml;
 }
 
 #-------------------------------------------------------------------
