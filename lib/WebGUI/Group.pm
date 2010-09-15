@@ -1993,7 +1993,7 @@ sub vitalGroup {
     if (! $groupId && ref $class ) {
         $groupId = $class->getId;
     }
-    return isIn ( $groupId, (1..17), qw/pbgroup000000000000015 pbgroup000000000000016 pbgroup000000000000017 / );
+    return isIn ( $groupId, (1..13), 15,16,17, qw/pbgroup000000000000015 pbgroup000000000000016 pbgroup000000000000017 / );
 }
 
 1;
