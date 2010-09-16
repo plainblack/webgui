@@ -955,7 +955,6 @@ sub getRecordTemplateVars {
 	if ($field->{type} eq "HTMLArea") { 
 		$field->{htmlAreaRichEditor} = $self->htmlAreaRichEditor ;
 	}
-        my $form = $self->_createForm($field, $value);
         $value = $form->getValueAsHtml;
         my %fieldProperties = (
             "form"          => $form->toHtml,
