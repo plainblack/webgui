@@ -25,6 +25,7 @@ use POE::Component::IKC::Specifier;
 use Spectre::Cron;
 use Spectre::Workflow;
 use WebGUI::Paths;
+use WebGUI::Config;
 
 
 #-------------------------------------------------------------------
