@@ -667,11 +667,11 @@ __DATA__
     search is requested -->
 <div id="searchForm" style="display: none">
     <form>
-        <input type="button" id="searchButton" value="^International("search","Asset");" />
-        <input type="text" id="searchKeywords" />
-        <ul id="searchFilters"></ul>
-        <input type="button" id="searchFilterAdd" value="Add Filter" />
-        <select id="searchFilterSelect">
+        <input type="button" class="searchButton" name="searchButton" value="^International("search","Asset");" />
+        <input type="text" class="searchKeywords" name="searchKeywords" />
+        <ul class="searchFilters"></ul>
+        <input type="button" name="searchFilterAdd" class="searchFilterAdd" value="Add Filter" />
+        <select name="searchFilterSelect">
             <option value="ownerUserId">Owner</option>
             <option value="lineage">Parent</option>
             <option value="title">Title</option>
