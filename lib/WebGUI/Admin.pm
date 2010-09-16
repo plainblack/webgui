@@ -650,18 +650,6 @@ __DATA__
                 </span>
             </div>
             <div id="tab_content_wrapper">
-                <div id="search" style="display: none">
-                    <input type="button" id="searchButton" value="^International("search","Asset");" />
-                    <input type="text" id="searchKeywords" />
-                    <ul id="searchFilters"></ul>
-                    <input type="button" id="searchFilterAdd" value="Add Filter" />
-                    <select id="searchFilterSelect">
-                        <option value="ownerUserId">Owner</option>
-                        <option value="lineage">Parent</option>
-                        <option value="title">Title</option>
-                        <option value="className">Type</option>
-                    </select>
-                </div>
                 <div id="yui-tabs" class="yui-content">
                     <div id="viewTab"><iframe src="<tmpl_var viewUrl>" name="view"></iframe></div>
                     <div id="treeTab">
@@ -674,6 +662,23 @@ __DATA__
         </div>
     </div>
 
+<!-- placeholder for search form
+    this form is cloned by javascript and placed into the tab div when a
+    search is requested -->
+<div id="searchForm" style="display: none">
+    <form>
+        <input type="button" id="searchButton" value="^International("search","Asset");" />
+        <input type="text" id="searchKeywords" />
+        <ul id="searchFilters"></ul>
+        <input type="button" id="searchFilterAdd" value="Add Filter" />
+        <select id="searchFilterSelect">
+            <option value="ownerUserId">Owner</option>
+            <option value="lineage">Parent</option>
+            <option value="title">Title</option>
+            <option value="className">Type</option>
+        </select>
+    </form>
+</div>
 
 </div>
 
