@@ -156,7 +156,12 @@ Set the head tags for this form plugin
 
 sub headTags {
     my $self = shift;
-    $self->session->style->setScript($self->session->url->extras('textFix.js'),{ type=>'text/javascript' });
+    if (! $self->{_richEdit}) {
+        $self->{_richEdit} = eval { WebGUI::Asset->newById($self->session,$self->get("richEditId")) };
+        return if Exception::Class->caught();
+    }
+    $self->session->style->setScript($self->session->url->extras('textFix.js'));
+    $self->{_richEdit}->richedit_headTags;
 }
 
 #-------------------------------------------------------------------
@@ -182,15 +187,16 @@ Renders an HTML area field.
 sub toHtml {
 	my $self = shift;
 	my $i18n = WebGUI::International->new($self->session);
-	my $richEdit = eval { WebGUI::Asset::RichEdit->newById($self->session, $self->get("richEditId")); };
-	if (! Exception::Class->caught() ) {
-	   $self->set("extras", $self->get('extras') . q{ onblur="fixChars(this.form['}.$self->get("name").q{'])" mce_editable="true" });
-	   $self->set("resizable", 0);
-	   return $self->SUPER::toHtml.$richEdit->getRichEditor($self->get('id'));
-    } else {
-	   $self->session->errorHandler->warn($i18n->get('rich editor load error','Form_HTMLArea'));
-	   return $self->SUPER::toHtml;
-	}
+    if (! $self->{_richEdit}) {
+        my $richEdit = eval { WebGUI::Asset::RichEdit->newById($self->session, $self->get("richEditId")); };
+        if (Exception::Class->caught() ) {
+            $self->session->errorHandler->warn($i18n->get('rich editor load error','Form_HTMLArea'));
+            return $self->SUPER::toHtml;
+        }
+    }
+    $self->set("extras", $self->get('extras') . q{ onblur="fixChars(this.form['}.$self->get("name").q{'])" mce_editable="true" });
+    $self->set("resizable", 0);
+    return $self->SUPER::toHtml.$self->{_richEdit}->getRichEditor($self->get('id'));
 
 }
 

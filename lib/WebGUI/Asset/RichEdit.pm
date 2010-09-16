@@ -493,14 +493,11 @@ sub getRichEditor {
 	$config{height} = $self->editorHeight || "100%";
 	$config{plugins} = join(",",@plugins);
 
-    $self->session->style->setScript($self->session->url->extras('yui/build/yahoo/yahoo-min.js'));
-    $self->session->style->setScript($self->session->url->extras('yui/build/event/event-min.js'));
-    $self->session->style->setScript($self->session->url->extras('tinymce/jscripts/tiny_mce/tiny_mce_src.js'));
-    $self->session->style->setScript($self->session->url->extras("tinymce-webgui/callbacks.js"));
     my $out = '';
     if ($ask) {
         $out = q|<a style="display: block;" href="javascript:toggleEditor('|.$nameId.q|')">|.$i18n->get('Toggle editor').q|</a>|;
     }
+    $self->richedit_headTags;
     $out .= qq|<script type="text/javascript">\n|;
     if ($ask) {
         $out .= <<"EOHTML1";
@@ -525,6 +522,25 @@ EOHTML1
     $out    .= "</script>";
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 richedit_headTags ( )
+
+Similar to the headTags method for Form plugins, this sets all Javascript and CSS links for the
+richeditor to work.
+
+=cut
+
+sub richedit_headTags {
+	my $self = shift;
+    my $style = $self->session->style;
+    my $url   = $self->session->url;
+    $style->setScript($url->extras('yui/build/yahoo/yahoo-min.js'));
+    $style->setScript($url->extras('yui/build/event/event-min.js'));
+    $style->setScript($url->extras('tinymce/jscripts/tiny_mce/tiny_mce_src.js'));
+    $style->setScript($url->extras("tinymce-webgui/callbacks.js"));
+}
 
 #-------------------------------------------------------------------
 
