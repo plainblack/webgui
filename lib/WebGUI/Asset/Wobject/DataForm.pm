@@ -277,6 +277,53 @@ sub _createForm {
 }
 
 #-------------------------------------------------------------------
+
+=head2 _getFormFields ($entry, @orderedFields)
+
+Return a list of form fields for this DataForm.
+
+=head3 $entry
+
+A WebGUI::AssetCollateral::DataForm::Entry collateral object, with data for an entry in the DataForm.
+
+=head3 @orderedFields
+
+Field configurations for this DataForm
+
+=cut
+
+sub _getFormFields {
+    my $self          = shift;
+    my $session       = $self->session;
+    my $entry         = shift;
+    my @orderedFields = map { $self->getFieldConfig($_) } @{ $self->getFieldOrder };
+    my $func       = $session->form->process('func');
+    my $ignoreForm = $func eq 'editSave' || $func eq 'editFieldSave';
+    my @forms      = ();
+    for my $field (@orderedFields) {
+        my $value;
+        if ($entry) {
+            $value = $entry->field( $field->{name} );
+        }
+        elsif (!$ignoreForm && defined (my $formValue = $self->session->form->process($field->{name}))) {
+            $value = $formValue;
+        }
+        my $hidden
+            = ($field->{status} eq 'hidden' && !$session->var->isAdminOn)
+            || ($field->{isMailField} && !$self->get('mailData'));
+	
+        # populate Rich Editor field if the field is an HTMLArea
+        if ($field->{type} eq "HTMLArea") { 
+            $field->{htmlAreaRichEditor} = $self->get("htmlAreaRichEditor") ;
+        }
+        my $form = $self->_createForm($field, $value);
+        $form->headTags();
+        push @forms, [$field, $form];
+    }
+    return @forms;
+}
+
+#-------------------------------------------------------------------
 sub _fieldAdminIcons {
     my $self = shift;
     my $fieldName = shift;
@@ -862,8 +909,6 @@ sub getRecordTemplateVars {
         $var->{'delete.label'   } = $i18n->get(90);
         $var->{'entryId'        } = $entryId;
     }
-    my $func = $session->form->process('func');
-    my $ignoreForm = $func eq 'editSave' || $func eq 'editFieldSave';
 
     my %tabById;
     my @tabLoop;
@@ -886,10 +931,16 @@ sub getRecordTemplateVars {
     }
 
     my @fieldLoop;
-    my @fields = map { $self->getFieldConfig($_) } @{ $self->getFieldOrder };
-    for my $field (@fields) {
+    if (!$self->{_cached_forms}) {
+        $self->{_cached_forms} = [ $self->_getFormFields($entry) ];
+    }
+    my @fields = @{ $self->{_cached_forms} };
+    for my $field_form (@fields) {
+        my ($field, $form) = @{ $field_form };
         # need a copy
         my $value;
+        my $func       = $session->form->process('func');
+        my $ignoreForm = $func eq 'editSave' || $func eq 'editFieldSave';
         if ($entry) {
             $value = $entry->field( $field->{name} );
         }
@@ -1242,6 +1293,12 @@ sub prepareViewForm {
             templateId => $templateId,
             assetId    => $self->getId,
         );
+    }
+    ##Check to see if this already exists, since in www_process, getRecordTemplateVars is
+    ##called before prepareViewForm.  Normally, however, this prepareViewForm will be called
+    ##first.
+    if (!$self->{_cached_forms}) {
+        $self->{_cached_forms} = [ $self->_getFormFields() ];
     }
     $template->prepare($self->getMetaDataAsTemplateVariables);
     $self->{_viewFormTemplate} = $template;
