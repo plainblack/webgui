@@ -157,6 +157,8 @@ Set the head tags for this form plugin
 sub headTags {
     my $self = shift;
     $self->session->style->setScript($self->session->url->extras('textFix.js'),{ type=>'text/javascript' });
+    $self->{_richEdit} ||= WebGUI::Asset::RichEdit->new($self->session,$self->get("richEditId")); 
+    $self->{_richEdit}->richedit_headTags if $self->{_richEdit};
 }
 
 #-------------------------------------------------------------------
@@ -182,7 +184,8 @@ Renders an HTML area field.
 sub toHtml {
 	my $self = shift;
 	my $i18n = WebGUI::International->new($self->session);
-	my $richEdit = WebGUI::Asset::RichEdit->new($self->session,$self->get("richEditId"));
+	my $richEdit = $self->{_richEdit};
+    $richEdit ||= WebGUI::Asset::RichEdit->new($self->session,$self->get("richEditId")); 
 	if (defined $richEdit) {
 	   $self->set("extras", $self->get('extras') . q{ onblur="fixChars(this.form['}.$self->get("name").q{'])" mce_editable="true" });
 	   $self->set("resizable", 0);
