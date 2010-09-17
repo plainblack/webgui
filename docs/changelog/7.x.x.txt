@@ -17,6 +17,8 @@
  - fixed #11877: Criteria Builder on "shortcut by alternate criteria" gets ugly with many checkbox items
  - fixed #11878: Addons title not internationalized
  - added Thingy template variable to permit Javascript visualisation of search results (Patrick Donelan, SDH Consulting Group)
+ - fixed #11846: Dataform fail HeadBlock inclusions
+ - added #10333: Head tags for dataform form fields
 
 7.10.0
  - fixed #11812: Checking www_ajaxSave's response in the cart js, urlencoding post parameters
