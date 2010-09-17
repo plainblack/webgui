@@ -135,7 +135,6 @@ Add JS.
 
 sub headTags {
     my $self = shift;
-    return if $self->headTagsSent;
 	$self->session->style->setScript($self->session->url->extras('addHTTP.js'),{ type=>'text/javascript' });
     $self->SUPER::headTags();
     return;
