@@ -85,20 +85,16 @@ sub _createForm {
 
 #-------------------------------------------------------------------
 
-=head2 _getFormFields ($entry)
+=head2 _getFormFields ( )
 
 Return a list of form fields for this DataForm.
-
-=head3 $entry
-
-A WebGUI::AssetCollateral::DataForm::Entry collateral object, with data for an entry in the DataForm.
 
 =cut
 
 sub _getFormFields {
     my $self          = shift;
     my $session       = $self->session;
-    my $entry         = shift;
+    my $entry         = $self->entry;
     my @orderedFields = map { $self->getFieldConfig($_) } @{ $self->getFieldOrder };
     my $func       = $session->form->process('func');
     my $ignoreForm = $func eq 'editSave' || $func eq 'editFieldSave';
@@ -274,6 +270,31 @@ sub getContentLastModified {
         return time;
     }
     return $self->SUPER::getContentLastModified;
+}
+
+#-------------------------------------------------------------------
+
+=head2 entry ( [ $entry ] )
+
+Returns a DataForm Entry object.  If one is cached in the object, it will return it.
+If the current request object has an entryId, then it will fetch the Entry from the database.
+Otherwise, it will return an empty DataForm Entry object.
+
+=head3 $entry
+
+A DataForm Entry object.  If passed, it will set the cache in this object.  This takes precedence
+over any other option.
+
+=cut
+
+sub entry {
+    my $self = shift;
+    my $entry = shift;
+    $self->{_entry} = $entry if defined $entry;
+    return $self->{_entry} if $self->{_entry};
+    my $entryId = $self->session->form->process("entryId");
+    $self->{_entry} = $self->entryClass->new($self, ($entryId && $self->canEdit) ? $entryId : ());
+    return $self->{_entry};
 }
 
 #-------------------------------------------------------------------
@@ -1317,8 +1338,7 @@ sub viewForm {
     my $entry       = shift;
     my $var         = $self->getTemplateVars;
     if (!$entry) {
-        my $entryId = $self->session->form->process("entryId");
-        $entry = $self->entryClass->new($self, ($entryId && $self->canEdit) ? $entryId : ());
+        $entry = $self->entry;
     }
     $var = $passedVars || $self->getRecordTemplateVars($var, $entry);
     if ($self->hasCaptcha) {
@@ -2135,8 +2155,7 @@ sub www_process {
         unless $self->canView;
     my $session = $self->session;
     my $i18n    = WebGUI::International->new($session,"Asset_DataForm");
-    my $entryId = $session->form->process('entryId');
-    my $entry   = $self->entryClass->new($self, ( $entryId ? $entryId : () ) );
+    my $entry   = $self->entry;
 
     my $var = $self->getTemplateVars;
 
@@ -2194,7 +2213,7 @@ sub www_process {
     }
 
     # Send email
-    if ($self->get("mailData") && !$entryId) {
+    if ($self->get("mailData") && !$entry->entryId) {
         $self->sendEmail($var, $entry);
     }
 
