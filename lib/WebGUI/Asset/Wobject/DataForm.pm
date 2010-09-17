@@ -85,17 +85,13 @@ sub _createForm {
 
 #-------------------------------------------------------------------
 
-=head2 _getFormFields ($entry, @orderedFields)
+=head2 _getFormFields ($entry)
 
 Return a list of form fields for this DataForm.
 
 =head3 $entry
 
 A WebGUI::AssetCollateral::DataForm::Entry collateral object, with data for an entry in the DataForm.
-
-=head3 @orderedFields
-
-Field configurations for this DataForm
 
 =cut
 
@@ -941,24 +937,14 @@ sub getRecordTemplateVars {
     for my $field_form (@fields) {
         my ($field, $form) = @{ $field_form };
         # need a copy
-        my $value;
-        my $func       = $session->form->process('func');
-        my $ignoreForm = $func eq 'editSave' || $func eq 'editFieldSave';
-        if ($entry) {
-            $value = $entry->field( $field->{name} );
-        }
-        elsif (!$ignoreForm && defined (my $formValue = $self->session->form->process($field->{name}))) {
-            $value = $formValue;
-        }
-        my $hidden
-            = ($field->{status} eq 'hidden' && !$session->var->isAdminOn)
-            || ($field->{isMailField} && !$self->get('mailData'));
+        my $hidden =  ($field->{status} eq 'hidden' && !$session->var->isAdminOn)
+                   || ($field->{isMailField} && !$self->get('mailData'));
 	
-	# populate Rich Editor field if the field is an HTMLArea
-	if ($field->{type} eq "HTMLArea") { 
-		$field->{htmlAreaRichEditor} = $self->get("htmlAreaRichEditor") ;
-	}
-        $value = $form->getValueAsHtml;
+        # populate Rich Editor field if the field is an HTMLArea
+        if ($field->{type} eq "HTMLArea") { 
+            $field->{htmlAreaRichEditor} = $self->get("htmlAreaRichEditor") ;
+        }
+        my $value = $form->getValueAsHtml;
         my %fieldProperties = (
             "form"          => $form->toHtml,
             "name"          => $field->{name},
