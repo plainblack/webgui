@@ -105,8 +105,9 @@ sub _drawQueryBuilder {
 
 		# Table row with field info
         my $disabled = $self->{_disabled};
+        my $odd_row = $i % 2 ? q{class="qbtr_alt"} : "";
 		$output .= qq|
-		<tr>
+		<tr $odd_row>
 		<td class="qbtdleft"><p class="qbfieldLabel">$fieldLabel</p></td>
 		<td class="qbtd">
 		$opField

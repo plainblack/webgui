@@ -6,6 +6,7 @@
  - fixed #11866: Default ordering for Zip files is wrong
  - fixed: typo in the Gallery Add Archive default templateId.
  - fixed #11876: packing templates, snippets, headtags removes conditional CSS comments
+ - fixed #11877: Criteria Builder on "shortcut by alternate criteria" gets ugly with many checkbox items
 
 7.9.14
  - fixed #11812: Checking www_ajaxSave's response in the cart js
