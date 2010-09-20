@@ -1,20 +1,22 @@
+.qbtr_alt {
+    background-color:#DCE4EE;
+}
+
 .qbtd {
-	height: 20px;
-	background-image: url(hline.gif);
 	padding-left: 5px;
 	padding-right: 5px;
+    height: 20px;
 }
 
 .qbtdleft {
-	height: 20px;
-	background-image: url(hline.gif);
 	padding-right: 5px;
+    height: 20px;
 }
 
 .qbtdright {
-	height: 20px;
 	background-image: url(vline.gif);
 	background-repeat: repeat-y;
+    height: 20px;
 	align: right;
 }
 
