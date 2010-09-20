@@ -132,6 +132,9 @@ while ( my %row = $sth->hash ) {
                 printf "%10s: %s\n", "revised", scalar( localtime $row{revisionDate} );
             }
 
+            # Classname
+            printf "%10s: %s\n", "class", $row{className};
+
             # Parent
             if ( my $parent = WebGUI::Asset->newByDynamicClass( $session, $row{parentId} ) ) {
                 printf "%10s: %s (%s)\n", "parent", $parent->getTitle, $parent->getId;
