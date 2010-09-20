@@ -672,6 +672,12 @@ our $I18N = {
         context     => 'label for progress bar in addArchive',
     },
 
+    'Getting list of files for sorting purposes' => {
+        message     => 'Getting list of files for sorting purposes',
+        lastUpdated => 1237403498,
+        context     => 'label for progress bar in addArchive',
+    },
+
     'Found file: %s' => {
         message     => 'Found file %s',
         lastUpdated => 1237403498,

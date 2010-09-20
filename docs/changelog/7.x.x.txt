@@ -3,6 +3,7 @@
  - fixed #11875: Error loading empty module
  - fixed #11873: findBrokenAssets.pl doesn't support custom assets
  - added findBrokenAssets.pl shows the classname of broken assets (William McKee, Knowmad Technologies)
+ - fixed #11866: Default ordering for Zip files is wrong
 
 7.9.14
  - fixed #11812: Checking www_ajaxSave's response in the cart js
