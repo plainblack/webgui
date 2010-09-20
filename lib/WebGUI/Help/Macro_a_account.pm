@@ -7,7 +7,16 @@ our $HELP = {
         title     => 'account title',
         body      => '',
         fields    => [],
-        variables => [ { 'name' => 'account.url' }, { 'name' => 'account.text' } ],
+        variables => [
+            {
+                name => 'account_url',
+                description => 'account.url',
+            },
+            {
+                name => 'account_text',
+                description => 'account.text',
+            }
+        ],
         related   => []
     },
 

@@ -44,8 +44,8 @@ sub process {
 	my  @param = @_;
 	return $session->url->page("op=auth;method=init") if ($param[0] eq "linkonly");
 	my $i18n = WebGUI::International->new($session,'Macro_a_account');
-	$var{'account.url'} = $session->url->page('op=auth;method=init');
-	$var{'account.text'} = $param[0] || $i18n->get(46);
+	$var{'account_url'} = $session->url->page('op=auth;method=init');
+	$var{'account_text'} = $param[0] || $i18n->get(46);
 	if ($param[1]) {
 		return  WebGUI::Asset::Template->newByUrl($session,$param[1])->process(\%var);
 	} else {

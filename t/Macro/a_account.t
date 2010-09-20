@@ -92,7 +92,7 @@ sub addTemplate {
 		className => 'WebGUI::Asset::Template',
 		url => 'a_account-test',
 		namespace => 'Macro/a_account',
-		template => "HREF=<tmpl_var account.url>\nLABEL=<tmpl_var account.text>",
+		template => "HREF=<tmpl_var account_url>\nLABEL=<tmpl_var account_text>",
 		id => 'testTemplatea_account1',
         usePacked => 1,
 	};

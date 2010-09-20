@@ -52,12 +52,12 @@ sub process {
     my $i18n = WebGUI::International->new($session,'Macro_AdminToggle');
     my %var;
     if ($session->var->isAdminOn) {
-        $var{'toggle.url'} = $session->url->page('op=switchOffAdmin');
-        $var{'toggle.text'} = $turnOff || $i18n->get(517);
+        $var{'toggle_url'} = $session->url->page('op=switchOffAdmin');
+        $var{'toggle_text'} = $turnOff || $i18n->get(517);
     }
     else {
-        $var{'toggle.url'} = $session->url->page('op=switchOnAdmin');
-        $var{'toggle.text'} = $turnOn || $i18n->get(516);
+        $var{'toggle_url'} = $session->url->page('op=switchOnAdmin');
+        $var{'toggle_text'} = $turnOn || $i18n->get(516);
     }
     my $template = $templateName    ? WebGUI::Asset::Template->newByUrl($session, $templateName)
                                     : WebGUI::Asset::Template->new($session, "PBtmpl0000000000000036");

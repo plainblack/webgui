@@ -3,6 +3,14 @@ templates, you will need to apply these changes manually to your copies.
 
 7.10.1
 
+  *  Account Macro template variables renamed:
+     account.url  => account_url
+     account.text => account_text
+
+  *  AdminToggle Macro template variables renamed:
+     toggle.url  => toggle_url
+     toggle.text => toggle_text
+
   *  Asset Report Template - asset-report/asset-report-default-template
      Remove the empty template attachment
 

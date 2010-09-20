@@ -33,7 +33,6 @@ my $session = start(); # this line required
 # upgrade functions go here
 uniqueProductLocations($session);
 removeBadSpanishFile($session);
-repackTemplates( $session );
 
 finish($session); # this line required
 
@@ -82,7 +81,7 @@ sub removeBadSpanishFile {
 sub repackTemplates {
     my $session = shift;
 
-    print "\n\t\tRepacking all templates, this may take a while..." unless $quiet;
+    print "\tRepacking all templates, this may take a while..." unless $quiet;
     my $sth = $session->db->read( "SELECT assetId, revisionDate FROM template" );
     while ( my ($assetId, $revisionDate) = $sth->array ) {
         my $asset       = WebGUI::Asset->newByDynamicClass( $session, $assetId, $revisionDate );
@@ -91,8 +90,9 @@ sub repackTemplates {
             template        => $asset->get('template'),
         });
     }
+    print "\t... DONE!\n" unless $quiet;
 
-    print "\n\t\tRepacking head tags in all assets, this may take a while..." unless $quiet;
+    print "\tRepacking head tags in all assets, this may take a while..." unless $quiet;
     $sth = $session->db->read( "SELECT assetId, revisionDate FROM assetData where usePackedHeadTags=1" );
     while ( my ($assetId, $revisionDate) = $sth->array ) {
         my $asset       = WebGUI::Asset->newByDynamicClass( $session, $assetId, $revisionDate );
@@ -101,8 +101,9 @@ sub repackTemplates {
             extraHeadTags       => $asset->get('extraHeadTags'),
         });
     }
+    print "\t... DONE!\n" unless $quiet;
 
-    print "\n\t\tRepacking all snippets, this may take a while..." unless $quiet;
+    print "\tRepacking all snippets, this may take a while..." unless $quiet;
     $sth = $session->db->read( "SELECT assetId, revisionDate FROM snippet" );
     while ( my ($assetId, $revisionDate) = $sth->array ) {
         my $asset       = WebGUI::Asset->newByDynamicClass( $session, $assetId, $revisionDate );
@@ -112,9 +113,49 @@ sub repackTemplates {
         });
     }
 
-    print "\n\t... DONE!\n" unless $quiet;
+    print "\t... DONE!\n" unless $quiet;
 }
 
+
+#----------------------------------------------------------------------------
+# Rename template variables
+sub renameAccountMacroTemplateVariables {
+    my $session = shift;
+
+    print "\tRename Account Macro template variables..." unless $quiet;
+    my $sth = $session->db->read( q|SELECT assetId, revisionDate FROM template where namespace="Macro/a_account"| );
+    while ( my ($assetId, $revisionDate) = $sth->array ) {
+        my $asset       = WebGUI::Asset->newByDynamicClass( $session, $assetId, $revisionDate );
+        next unless $asset;
+        my $template = $asset->get('template');
+        $template =~ s/account\.url/account_url/msg;
+        $template =~ s/account\.text/account_text/msg;
+        $asset->update({
+            template        => $template,
+        });
+    }
+    print "\t... DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+# Rename template variables
+sub renameAdminToggleMacroTemplateVariables {
+    my $session = shift;
+
+    print "\tRename Admin Toggle Macro template variables..." unless $quiet;
+    my $sth = $session->db->read( q|SELECT assetId, revisionDate FROM template where namespace="Macro/AdminToggle"| );
+    while ( my ($assetId, $revisionDate) = $sth->array ) {
+        my $asset       = WebGUI::Asset->newByDynamicClass( $session, $assetId, $revisionDate );
+        next unless $asset;
+        my $template = $asset->get('template');
+        $template =~ s/toggle\.url/toggle_url/msg;
+        $template =~ s/toggle\.text/toggle_text/msg;
+        $asset->update({
+            template        => $template,
+        });
+    }
+    print "\t... DONE!\n" unless $quiet;
+}
 
 #----------------------------------------------------------------------------
 # Describe what our function does
@@ -178,6 +219,9 @@ sub start {
 sub finish {
     my $session = shift;
     updateTemplates($session);
+    repackTemplates( $session );
+    renameAccountMacroTemplateVariables( $session );
+    renameAdminToggleMacroTemplateVariables( $session );
     my $versionTag = WebGUI::VersionTag->getWorking($session);
     $versionTag->commit;
     $session->db->write("insert into webguiVersion values (".$session->db->quote($toVersion).",'upgrade',".time().")");
