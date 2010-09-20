@@ -41,6 +41,14 @@ pod2usage( verbose => 1 ) if $help;
 pod2usage( verbose => 2 ) if $man;
 pod2usage( msg => "Must specify a config file!" ) unless $configFile;
 
+foreach my $libDir ( readLines( "preload.custom" ) ) {
+    if ( !-d $libDir ) {
+        warn "WARNING: Not adding lib directory '$libDir' from preload.custom: Directory does not exist.\n";
+        next;
+    }
+    unshift @INC, $libDir;
+}
+
 my $session = start( $webguiRoot, $configFile );
 
 sub progress {
@@ -188,6 +196,24 @@ print "\n";
 
 #----------------------------------------------------------------------------
 # Your sub here
+
+#-------------------------------------------------
+sub readLines {
+    my $file = shift;
+    my @lines;
+    if (open(my $fh, '<', $file)) {
+        while (my $line = <$fh>) {
+            $line =~ s/#.*//;
+            $line =~ s/^\s+//;
+            $line =~ s/\s+$//;
+            next if !$line;
+            push @lines, $line;
+        }
+        close $fh;
+    }
+    return @lines;
+}
+
 
 #----------------------------------------------------------------------------
 sub start {
