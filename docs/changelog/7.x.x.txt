@@ -7,6 +7,7 @@
  - fixed #11855: Purging Shortcut from Trash causes loop
  - fixed #11865: URL with slash no longer works.
  - fixed #11861: addAttachment method removed from WebGUI 7 thus breaking the API
+ - fixed #11868: WebGUI::Session::Form::validToken throws unnecessary warnings
 
 7.10.0
  - fixed #11812: Checking www_ajaxSave's response in the cart js, urlencoding post parameters
