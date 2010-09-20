@@ -31,8 +31,20 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+removeBadSpanishFile($session);
 
 finish($session); # this line required
+
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub removeBadSpanishFile {
+    my $session = shift;
+    print "\tRemove a bad Spanish translation file... " unless $quiet;
+    use File::Spec;
+    unlink File::Spec->catfile($webguiRoot, qw/lib WebGUi i18n Spanish .pm/);
+    # and here's our code
+    print "DONE!\n" unless $quiet;
+}
 
 
 #----------------------------------------------------------------------------
