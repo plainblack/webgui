@@ -1,4 +1,5 @@
 7.9.15
+ - fixed #11868: WebGUI::Session::Form::validToken throws unnecessary warnings
 
 7.9.14
  - fixed #11812: Checking www_ajaxSave's response in the cart js
