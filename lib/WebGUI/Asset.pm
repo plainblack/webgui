@@ -181,7 +181,6 @@ around extraHeadTags => sub {
         my $unpacked = $_[0];
         my $packed   = $unpacked;  ##Undo magic aliasing since a reference is passed below
         HTML::Packer::minify( \$packed, {
-            remove_comments     => 1,
             remove_newlines     => 1,
             do_javascript       => "shrink",
             do_stylesheet       => "minify",

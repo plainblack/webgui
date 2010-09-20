@@ -59,7 +59,6 @@ sub _build_snippetPacked {
     }
     elsif ( $self->mimeType eq "text/html" ) {
         HTML::Packer::minify( \$snippet, {
-            remove_comments     => 1,
             do_javascript       => "shrink",
             do_stylesheet       => "minify",
         } );

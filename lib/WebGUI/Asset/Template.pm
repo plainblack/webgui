@@ -82,7 +82,6 @@ sub _build_templatePacked {
     my $template = $self->template;
     if (defined $template) {
         HTML::Packer::minify( \$template, {
-            remove_comments     => 1,
             do_javascript       => 'shrink',
             do_stylesheet       => 'minify',
         } );
