@@ -525,7 +525,6 @@ sub packTemplate {
     my ( $self, $template ) = @_;
     my $packed  = $template;
     HTML::Packer::minify( \$packed, {
-        remove_comments     => 1,
         do_javascript       => "shrink",
         do_stylesheet       => "minify",
     } );

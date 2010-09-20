@@ -2256,7 +2256,6 @@ sub packExtraHeadTags {
     return $unpacked if !$unpacked;
     my $packed  = $unpacked;
     HTML::Packer::minify( \$packed, {
-        remove_comments     => 1,
         remove_newlines     => 1,
         do_javascript       => "shrink",
         do_stylesheet       => "minify",
