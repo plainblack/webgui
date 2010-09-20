@@ -2,6 +2,7 @@
  - fixed #11868: WebGUI::Session::Form::validToken throws unnecessary warnings
  - fixed #11875: Error loading empty module
  - fixed #11873: findBrokenAssets.pl doesn't support custom assets
+ - added findBrokenAssets.pl shows the classname of broken assets (William McKee, Knowmad Technologies)
 
 7.9.14
  - fixed #11812: Checking www_ajaxSave's response in the cart js
