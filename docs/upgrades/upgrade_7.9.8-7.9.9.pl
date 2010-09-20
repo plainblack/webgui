@@ -66,6 +66,7 @@ sub addHeightToCarousel {
     print "DONE!\n" unless $quiet;
 }
 
+
 #----------------------------------------------------------------------------
 # Describe what our function does
 sub synchronizeUserProfileTables {

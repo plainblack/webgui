@@ -32,6 +32,7 @@ my $session = start(); # this line required
 
 # upgrade functions go here
 removeBadSpanishFile($session);
+repackTemplates( $session );
 
 finish($session); # this line required
 
@@ -44,6 +45,44 @@ sub removeBadSpanishFile {
     unlink File::Spec->catfile($webguiRoot, qw/lib WebGUi i18n Spanish .pm/);
     # and here's our code
     print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+# Repack all templates since the packed columns may have been wiped out due to the bug.
+sub repackTemplates {
+    my $session = shift;
+
+    print "\n\t\tRepacking all templates, this may take a while..." unless $quiet;
+    my $sth = $session->db->read( "SELECT assetId, revisionDate FROM template" );
+    while ( my ($assetId, $revisionDate) = $sth->array ) {
+        my $asset       = WebGUI::Asset->newByDynamicClass( $session, $assetId, $revisionDate );
+        next unless $asset;
+        $asset->update({
+            template        => $asset->get('template'),
+        });
+    }
+
+    print "\n\t\tRepacking head tags in all assets, this may take a while..." unless $quiet;
+    $sth = $session->db->read( "SELECT assetId, revisionDate FROM assetData where usePackedHeadTags=1" );
+    while ( my ($assetId, $revisionDate) = $sth->array ) {
+        my $asset       = WebGUI::Asset->newByDynamicClass( $session, $assetId, $revisionDate );
+        next unless $asset;
+        $asset->update({
+            extraHeadTags       => $asset->get('extraHeadTags'),
+        });
+    }
+
+    print "\n\t\tRepacking all snippets, this may take a while..." unless $quiet;
+    $sth = $session->db->read( "SELECT assetId, revisionDate FROM snippet" );
+    while ( my ($assetId, $revisionDate) = $sth->array ) {
+        my $asset       = WebGUI::Asset->newByDynamicClass( $session, $assetId, $revisionDate );
+        next unless $asset;
+        $asset->update({
+            snippet         => $asset->get('snippet'),
+        });
+    }
+
+    print "\n\t... DONE!\n" unless $quiet;
 }
 
 
