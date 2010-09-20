@@ -155,7 +155,7 @@ sub definition {
         templateIdAddArchive => {
             tab             => "display",
             fieldType       => "template",
-            defaultValue    => "i0X4Q3tBWUb_thsVbsYz9xQ",
+            defaultValue    => "0X4Q3tBWUb_thsVbsYz9xQ",
             namespace       => "GalleryAlbum/AddArchive",
             label           => $i18n->get("templateIdAddArchive label"),
             hoverHelp       => $i18n->get("templateIdAddArchive description"),
