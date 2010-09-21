@@ -126,6 +126,11 @@ our $I18N = {
 		context=>"Settings hover help"
 	},
 
+	'Addons title' => {
+		message => q|Addons|,
+		lastUpdated => 1285067064,
+		context => "Link title for addons link in adminconsole"
+	},
 	'purge workflow' => {
 		message => q|Purge Workflow|,
 		lastUpdated => 1162242500,
