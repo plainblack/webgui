@@ -3407,6 +3407,7 @@ sequenceNumber');
         push(@searchResult_loop,\%templateVars);
     }
     $var->{searchResult_loop} = \@searchResult_loop;    
+    $var->{searchResult_json} = JSON->new->encode(\@searchResult_loop);
     $p->appendTemplateVars($var);
 
     $var->{"form_start"} = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl,method=>'GET'})
