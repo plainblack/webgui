@@ -66,6 +66,20 @@ sub uniqueProductLocations {
 }
 
 #----------------------------------------------------------------------------
+# This internationalizes the link text of the addons link in the adminconsole
+sub i18nForAddonsTitle {
+	my $session = shift;
+	my $adminConsole = $session->config->get('adminConsole');
+	$adminConsole->{'addons'} = {
+	      icon    => "addons.png",
+	      uiLevel => 1,
+	      group   => "12",
+		url     => "http://www.webgui.org/addons",
+	      title   => "^International(Addons title,WebGUI);"	
+	};
+	$session->config->set('adminConsole',$adminConsole);
+}
+#----------------------------------------------------------------------------
 # Describe what our function does
 sub removeBadSpanishFile {
     my $session = shift;
