@@ -32,7 +32,16 @@ sub _constructor : Test(2) {
     isa_ok $form->session, 'WebGUI::Session';
 }
 
-sub t_00_get_set : Test(2) {
+sub t_00_method_check : Test(1) {
+    my $test    = shift;
+    my $session = $test->session;
+    my $form = $test->class->new($session);
+
+    can_ok $form, qw/get set headTags toHtml prepareWrapper toHtmlAsHidden toHtmlWithWrapper isInRequest isDynamicCompatible getName/;
+}
+
+
+sub t_01_get_set : Test(2) {
     my $test    = shift;
     my $session = $test->session;
 
@@ -43,7 +52,7 @@ sub t_00_get_set : Test(2) {
 
 }
 
-sub t_01_instanced : Test(1) {
+sub t_02_instanced : Test(1) {
     my $test    = shift;
     my $session = $test->session;
 
@@ -52,15 +61,6 @@ sub t_01_instanced : Test(1) {
     });
 
     is $form->get('name'), 'form1', 'name set on instanciation';
-}
-
-sub t_02_method_check : Test(1) {
-    my $test    = shift;
-    my $session = $test->session;
-
-    my $form = $test->class->new($session);
-
-    can_ok $form, 'headTags';
 }
 
 1;
