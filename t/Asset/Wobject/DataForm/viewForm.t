@@ -44,7 +44,7 @@ $df = $df->cloneFromDb;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 3;    # Increment this number for each test you create
+plan tests => 4;    # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # Test getListTemplateVars
@@ -54,6 +54,7 @@ my $output = $df->view();
 
 ok $output, 'got some output';
 ok $output !~ m/<link   [^>+] href/msx, 'no CSS link tags in the output';
-ok $output !~ m/<script [^>+] src/msx, 'no JavaScript script tags with src in the output';
+ok $output !~ m/<script [^>+] src /msx, 'no JavaScript script tags with src in the output';
+ok $output !~ m/    <style>       /msx, 'no JavaScript script tags with src in the output';
 
 #vim:ft=perl
