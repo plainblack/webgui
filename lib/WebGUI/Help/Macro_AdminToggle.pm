@@ -6,16 +6,7 @@ our $HELP = {
     'admin toggle' => {
         title     => 'admin toggle title',
         body      => '',
-        variables => [
-            {
-                name => 'toggle_url',
-                description => 'toggle.url',
-            },
-            {
-                name => 'toggle_text',
-                description => 'toggle.text',
-            },
-        ],
+        variables => [ { 'name' => 'toggle.url' }, { 'name' => 'toggle.text' } ],
         fields    => [],
         related   => []
     },
