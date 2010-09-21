@@ -646,7 +646,7 @@ __DATA__
                     <span id="locationTitle"></span>
                 </div>
                 <span id="right">
-                    <input type="checkbox" id="searchDialogButton" value="S" /><input type="button" id="homeButton" value="H" />
+                    <input type="button" id="searchDialogButton" value="S" /><input type="button" id="homeButton" value="H" />
                 </span>
             </div>
             <div id="tab_content_wrapper">
