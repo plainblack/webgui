@@ -1076,165 +1076,7 @@ WebGUI.Admin.LocationBar.prototype.goHome
  */
 WebGUI.Admin.LocationBar.prototype.createSearchTab
 = function ( ) {
-    // Prepare the tab
-    var newForm = document.getElementById( 'searchForm' ).cloneNode( true );
-    newForm.id = null; // Duplicate IDs are baaaad
-    newForm.style.display = "block";
-
-    var newTab = new YAHOO.widget.Tab({
-        label : "Loading...",
-        content : ''
-    });
-    newTab.get('contentEl').appendChild( newForm );
-
-    // Fire when ready, Gridley
-    window.admin.tabBar.addTab( newTab );
-
-    var searchForm      = newForm.getElementsByTagName('form')[0];
-    var searchButton    = searchForm.elements['searchButton'];
-    new YAHOO.widget.Button( searchButton, {
-        onclick     : { fn: this.requestSearch, scope: newTab }
-    } );
-
-    var searchFilterSelect  = searchForm.elements['searchFilterSelect'];
-    var searchFilterAdd     = searchForm.elements['searchFilterAdd'];
-    new YAHOO.widget.Button( searchFilterAdd, {
-        type : "menu",
-        menu : searchFilterSelect
-    } );
-    var self = this;
-    YAHOO.util.Event.on( window, "load", function () {
-        self.filterSelect.getMenu().subscribe( "click", self.addFilter, newTab, true );
-    } );
-
-    var searchKeywords = searchForm.elements['searchKeywords'];
-    YAHOO.util.Event.on( searchKeywords, 'keyup', this.updateLocationBarQuery, newTab, true );
-    YAHOO.util.Event.on( searchKeywords, 'focus', this.focusKeywords, newTab, true );
-    YAHOO.util.Event.on( searchKeywords, 'blur', this.blurKeywords, newTab, true );
-};
-
-/**
- * addFilter ( eventType, args )
- * Add the selected filter into the filter list
- */
-WebGUI.Admin.LocationBar.prototype.addFilter
-= function ( eventType, args ) {
-    var self        = this;
-    var ev          = args[0];
-    var menuitem    = args[1];
-    var keys = {}; // Listen for all keys
-
-    // Keep track of our filters
-    var filter = { }; 
-    this.filters.push( filter );
-
-    var li          = document.createElement( 'li' );
-    filter.li       = li;
-
-    var type        = menuitem.value;
-    filter.type     = type;
-    li.className    = "filter_" + filter.type;
-
-    var ul = document.getElementById( 'searchFilters' );
-    ul.appendChild( li );
-
-    var delIcon     = document.createElement('img');
-    delIcon.className = "clickable";
-    YAHOO.util.Event.on( delIcon, "click", function(){ 
-        self.removeFilter( filter.li );
-    } );
-
-    var name        = menuitem.cfg.getProperty('text');
-    var nameElem    = document.createElement('span');
-    nameElem.className = "name";
-    nameElem.appendChild( document.createTextNode( name ) );
-    li.appendChild( nameElem );
-
-    if ( filter.type == "title" ) {
-        var inputElem   = document.createElement('input');
-        filter.inputElem = inputElem;
-        inputElem.type = "text";
-        li.appendChild( inputElem );
-        YAHOO.util.Event.on( inputElem, 'keyup', this.updateLocationBarQuery, this, true );
-        inputElem.focus();
-    }
-    else if ( filter.type == "ownerUserId" ) {
-        var container       = document.createElement( 'div' );
-        container.className = "autocomplete";
-        li.appendChild( container );
-
-        var inputElem       = document.createElement('input');
-        filter.inputElem    = inputElem;
-        inputElem.type      = "text";
-        container.appendChild( inputElem );
-        filter.dataSource   = new YAHOO.util.XHRDataSource( '?op=admin;method=findUser;' );
-        filter.dataSource.responseType = YAHOO.util.XHRDataSource.TYPE_JSON;
-        filter.dataSource.responseSchema = {
-            resultsList : "results",
-            fields : [ 'username', 'name', 'userId', 'avatar', 'email' ]
-        };
-
-        // Auto-complete container
-        var acDiv    = document.createElement('div');
-        filter.acDiv = acDiv;
-        container.appendChild( acDiv );
-
-        filter.autocomplete = new YAHOO.widget.AutoComplete( inputElem, acDiv, filter.dataSource );
-        filter.autocomplete.queryQuestionMark = false;
-        filter.autocomplete.animVert = true;
-        filter.autocomplete.animSpeed = 0.1;
-        filter.autocomplete.minQueryLength = 1;
-        filter.autocomplete.queryDelay = 0.2;
-        filter.autocomplete.typeAhead = true;
-        filter.autocomplete.resultTypeList = false;
-        filter.autocomplete.applyLocalFilter = true;
-        filter.autocomplete.formatResult = function ( result, query, match ) {
-            var subtext = ( result.name ? result.name : "" )
-                        + ( result.email ? " &lt;" + result.email + "&gt;" : "" )
-                        ;
-            return '<div style="float: left; width: 50px; height: 50px; background: url(' + result.avatar + ') no-repeat 50% 50%;"></div>'
-                    + '<div class="autocomplete_value">' + result.username + "</div>"
-                    + '<div class="autocomplete_subtext">' + subtext + '</div>';
-
-        };
-
-        inputElem.focus();
-    }
-};
-
-/**
- * updateLocationBarQuery( )
- * Update the location bar text with the filters in the search box
- */
-WebGUI.Admin.LocationBar.prototype.updateLocationBarQuery
-= function () {
-    var query   = "";
-
-    // First add filters
-    var filterVals = [];
-    for ( var i = 0; i < this.filters.length; i++ ) {
-        var filter = this.filters[i];
-        if ( filter.type == "title" ) {
-            var value = filter.inputElem.value;
-            if ( !value ) continue;
-            var quote = "";
-            if ( value.match(/\s/) ) {
-                quote = '"';
-            }
-            filterVals.push( "title:" + quote + filter.inputElem.value + quote );
-        }
-    }
-    query += filterVals.join(" ");
-
-
-    // Then add keywords
-    if ( query != "" ) {
-        query += " "; // Add a space between filters and keywords
-    }
-    query += document.getElementById( 'searchKeywords' ).value;
-
-    // Set the new value
-    document.getElementById( 'locationInput' ).value = query;
+    new WebGUI.Admin.Search( window.admin, {} );
 };
 
 /****************************************************************************
@@ -1952,4 +1794,186 @@ WebGUI.Admin.AdminBar.prototype.show
     // explicit height on parent
 };
 
+
+/**********************************************************************
+ * WebGUI.Admin.Search( admin, cfg )
+ *
+ * Search for assets
+ */
+WebGUI.Admin.Search
+= function (admin, cfg) {
+    this.admin  = admin;
+    this.cfg    = cfg;
+
+    // Prepare the tab
+    var newForm = document.getElementById( 'searchForm' ).cloneNode( true );
+    this.formContainer = newForm;
+    newForm.id = null; // Duplicate IDs are baaaad
+    newForm.style.display = "block";
+
+    var newTab = new YAHOO.widget.Tab({
+        label : "Loading...",
+        content : ''
+    });
+    this.tab = newTab;
+    newTab.get('contentEl').appendChild( newForm );
+
+    // Fire when ready, Gridley
+    this.admin.tabBar.addTab( newTab );
+
+    var searchForm      = newForm.getElementsByTagName('form')[0];
+    this.form           = searchForm;
+    var searchButton    = searchForm.elements['searchButton'];
+    this.searchButton   = searchButton;
+    new YAHOO.widget.Button( searchButton, {
+        onclick     : { fn: this.requestSearch, scope: this }
+    } );
+
+    var searchFilterSelect  = searchForm.elements['searchFilterSelect'];
+    this.searchFilterSelect = searchFilterSelect;
+    var searchFilterAdd     = searchForm.elements['searchFilterAdd'];
+    this.searchFilterAdd    = searchFilterAdd;
+    new YAHOO.widget.Button( searchFilterAdd, {
+        type : "menu",
+        menu : searchFilterSelect
+    } );
+    var self = this;
+    YAHOO.util.Event.on( window, "load", function () {
+        self.filterSelect.getMenu().subscribe( "click", self.addFilter, newTab, true );
+    } );
+
+    var searchKeywords = searchForm.elements['searchKeywords'];
+    this.searchKeywords = searchKeywords;
+    YAHOO.util.Event.on( searchKeywords, 'keyup', this.updateLocationBarQuery, this, true );
+    YAHOO.util.Event.on( searchKeywords, 'focus', this.focusKeywords, this, true );
+    YAHOO.util.Event.on( searchKeywords, 'blur', this.blurKeywords, this, true );
+
+    var searchFiltersContainer  = searchForm.getElementsByTagName('ul')[0];
+    this.searchFiltersContainer = searchFiltersContainer;
+};
+
+
+/**
+ * addFilter ( eventType, args )
+ * Add the selected filter into the filter list
+ */
+WebGUI.Admin.Search.prototype.addFilter
+= function ( eventType, args ) {
+    var self        = this;
+    var ev          = args[0];
+    var menuitem    = args[1];
+    var keys = {}; // Listen for all keys
+
+    // Keep track of our filters
+    var filter = { }; 
+    this.filters.push( filter );
+
+    var li          = document.createElement( 'li' );
+    filter.li       = li;
+
+    var type        = menuitem.value;
+    filter.type     = type;
+    li.className    = "filter_" + filter.type;
+
+    var ul = this.searchFiltersContainer;
+    ul.appendChild( li );
+
+    var delIcon     = document.createElement('img');
+    delIcon.className = "clickable";
+    YAHOO.util.Event.on( delIcon, "click", function(){ 
+        self.removeFilter( filter.li );
+    } );
+
+    var name        = menuitem.cfg.getProperty('text');
+    var nameElem    = document.createElement('span');
+    nameElem.className = "name";
+    nameElem.appendChild( document.createTextNode( name ) );
+    li.appendChild( nameElem );
+
+    if ( filter.type == "title" ) {
+        var inputElem   = document.createElement('input');
+        filter.inputElem = inputElem;
+        inputElem.type = "text";
+        li.appendChild( inputElem );
+        YAHOO.util.Event.on( inputElem, 'keyup', this.updateLocationBarQuery, this, true );
+        inputElem.focus();
+    }
+    else if ( filter.type == "ownerUserId" ) {
+        var container       = document.createElement( 'div' );
+        container.className = "autocomplete";
+        li.appendChild( container );
+
+        var inputElem       = document.createElement('input');
+        filter.inputElem    = inputElem;
+        inputElem.type      = "text";
+        container.appendChild( inputElem );
+        filter.dataSource   = new YAHOO.util.XHRDataSource( '?op=admin;method=findUser;' );
+        filter.dataSource.responseType = YAHOO.util.XHRDataSource.TYPE_JSON;
+        filter.dataSource.responseSchema = {
+            resultsList : "results",
+            fields : [ 'username', 'name', 'userId', 'avatar', 'email' ]
+        };
+
+        // Auto-complete container
+        var acDiv    = document.createElement('div');
+        filter.acDiv = acDiv;
+        container.appendChild( acDiv );
+
+        filter.autocomplete = new YAHOO.widget.AutoComplete( inputElem, acDiv, filter.dataSource );
+        filter.autocomplete.queryQuestionMark = false;
+        filter.autocomplete.animVert = true;
+        filter.autocomplete.animSpeed = 0.1;
+        filter.autocomplete.minQueryLength = 1;
+        filter.autocomplete.queryDelay = 0.2;
+        filter.autocomplete.typeAhead = true;
+        filter.autocomplete.resultTypeList = false;
+        filter.autocomplete.applyLocalFilter = true;
+        filter.autocomplete.formatResult = function ( result, query, match ) {
+            var subtext = ( result.name ? result.name : "" )
+                        + ( result.email ? " &lt;" + result.email + "&gt;" : "" )
+                        ;
+            return '<div style="float: left; width: 50px; height: 50px; background: url(' + result.avatar + ') no-repeat 50% 50%;"></div>'
+                    + '<div class="autocomplete_value">' + result.username + "</div>"
+                    + '<div class="autocomplete_subtext">' + subtext + '</div>';
+
+        };
+
+        inputElem.focus();
+    }
+};
+
+/**
+ * updateLocationBarQuery( )
+ * Update the location bar text with the filters in the search box
+ */
+WebGUI.Admin.Search.prototype.updateLocationBarQuery
+= function () {
+    var query   = "";
+
+    // First add filters
+    var filterVals = [];
+    for ( var i = 0; i < this.filters.length; i++ ) {
+        var filter = this.filters[i];
+        if ( filter.type == "title" ) {
+            var value = filter.inputElem.value;
+            if ( !value ) continue;
+            var quote = "";
+            if ( value.match(/\s/) ) {
+                quote = '"';
+            }
+            filterVals.push( "title:" + quote + filter.inputElem.value + quote );
+        }
+    }
+    query += filterVals.join(" ");
+
+
+    // Then add keywords
+    if ( query != "" ) {
+        query += " "; // Add a space between filters and keywords
+    }
+    query += document.getElementById( 'searchKeywords' ).value;
+
+    // Set the new value
+    document.getElementById( 'locationInput' ).value = query;
+};
 
