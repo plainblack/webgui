@@ -323,6 +323,7 @@ sub runUpgradeStep {
 
     my ($version) = $step =~ /-(\d+\.\d+\.\d+)$/;
     my $upgradesDir = File::Spec->catdir(WebGUI::Paths->upgrades, $step);
+    my @files;
     opendir my($dh), $upgradesDir or die "Can't get upgrades for $step: $!\n";
     while ( my $upgradeFile = readdir $dh ) {
         next
@@ -330,9 +331,12 @@ sub runUpgradeStep {
         my $filename = File::Spec->catfile($upgradesDir, $upgradeFile);
         next
             unless -f $filename;
-        $self->runUpgradeFile($configFile, $version, $filename);
+        push @files, $filename;
     }
     closedir $dh;
+    for my $filename ( sort @files ) {
+        $self->runUpgradeFile($configFile, $version, $filename);
+    }
     $self->markVersionUpgrade($configFile, $version);
 }
 
