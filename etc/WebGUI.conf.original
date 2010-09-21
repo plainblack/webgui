@@ -406,7 +406,7 @@
       "uiLevel" : 1,
       "group" : "12",
       "url" : "http://www.webgui.org/addons",
-      "title" : "Addons"
+      "title" : "^International(Addons title,WebGUI);"
    },
    "contentFilters" : {
       "icon" : "contentFilters.gif",

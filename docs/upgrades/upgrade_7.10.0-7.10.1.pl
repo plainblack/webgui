@@ -33,6 +33,7 @@ my $session = start(); # this line required
 # upgrade functions go here
 uniqueProductLocations($session);
 removeBadSpanishFile($session);
+i18nForAddonsTitle($session);
 
 finish($session); # this line required
 
@@ -68,16 +69,18 @@ sub uniqueProductLocations {
 #----------------------------------------------------------------------------
 # This internationalizes the link text of the addons link in the adminconsole
 sub i18nForAddonsTitle {
-	my $session = shift;
-	my $adminConsole = $session->config->get('adminConsole');
-	$adminConsole->{'addons'} = {
-	      icon    => "addons.png",
-	      uiLevel => 1,
-	      group   => "12",
-		url     => "http://www.webgui.org/addons",
-	      title   => "^International(Addons title,WebGUI);"	
-	};
-	$session->config->set('adminConsole',$adminConsole);
+    my $session = shift;
+    print "\tInternationalize the text of the addons link in the adminconsole... " unless $quiet;
+    $session->config->set('adminConsole/addons',
+        {
+            icon    => "addons.png",
+            uiLevel => 1,
+            group   => "12",
+            url     => "http://www.webgui.org/addons",
+            title   => "^International(Addons title,WebGUI);"	
+        }
+    );
+    print "DONE!\n" unless $quiet;
 }
 #----------------------------------------------------------------------------
 # Describe what our function does
