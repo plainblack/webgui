@@ -25,14 +25,6 @@ save you many hours of grief.
 --------------------------------------------------------------------
      * WebGUI now depends on PerlIO::eol, for doing line ending translation.
 
-     * As part of the migration to Template::Toolkit, we will be changing template
-       variables from using dots to underscores.  All templates using that namespace were
-       automatically upgraded to use the new variables.
-
-       In this version, these templates were updated:
-           Account Macro template
-           Admin Toggle Macro template
-
 7.10.0
 --------------------------------------------------------------------
      * Due to a bug in the 7.8.24-7.9.11 upgrade, the ordering of template
