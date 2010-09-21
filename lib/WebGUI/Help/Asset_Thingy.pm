@@ -236,6 +236,8 @@ our $HELP = {
                     },
                 ]
             },
+            {   'name'     => 'searchResult_json',
+            },
         ],
         related => [
             {   tag       => 'edit thing template',

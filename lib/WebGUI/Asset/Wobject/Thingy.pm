@@ -3349,7 +3349,11 @@ sequenceNumber');
         push(@searchResult_loop,\%templateVars);
     }
     $var->{searchResult_loop} = \@searchResult_loop;    
+    
+    # Also expose the search results in the template as a json-encoded string
+    # so that people can e.g. visualise the results via Javascript
     $var->{searchResult_json} = JSON->new->encode(\@searchResult_loop);
+    
     $p->appendTemplateVars($var);
 
     $var->{"form_start"} = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl,method=>'GET'})

@@ -36,4 +36,38 @@ templates, you will need to apply these changes manually to your copies.
      </tmpl_unless>
      <tmpl_loop story_loop>
 
+  *  Thingy searchResults_json
+     This is a JSON-encoded version of searchResults_loop, which allows people to access Thingy search results
+     in Javascript/Flash/etc.. For example, you can use OpenFlashCharts2 (http://teethgrinder.co.uk/open-flash-chart-2)
+     and SWFObject to access the data and then display it as a pretty custom chart via the following:
+     
+        <tmpl_if searchResult_loop>
+            <div id="chart-container">
+                <div id="chart">Loading..</div>
+            </div>
+            <script type="text/javascript">
+                function open_flash_chart_data() {
+                    var data_json = "<tmpl_var searchResult_json ESCAPE=JS>";
+                    var data = YAHOO.lang.JSON.parse(data_json);
+                    var chart = {
+                        elements: [
+                            // populate dynamically from data object
+                        ]
+                    };
+                    return YAHOO.lang.JSON.stringify(chart);
+                }
+                // Embed the chart
+                swfobject.embedSWF(
+                    '/path/to/open-flash-chart.swf',         // url
+                    'chart',                                 // container element id
+                    '100%',                                  // width
+                    '100%',                                  // height
+                    '9.0.0',                                 // version
+                    '/path/to/swfobject/expressInstall.swf', // expressInstall
+                    { loading: 'Loading...' },               // flashvars
+                    {},                                      // params
+                    {}                                       // attributes
+                );
+            </script>
+        </tmpl_if>
 
