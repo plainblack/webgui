@@ -14,6 +14,6 @@ use warnings;
 
 use Test::More;
 
-use base qw/Test::WebGUI::Form::Control/;
+use base qw/Test::WebGUI::Form::ReadOnly/;
 
 1;
