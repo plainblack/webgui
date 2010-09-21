@@ -807,30 +807,13 @@ WebGUI.Admin.LocationBar
     } );
     this.btnSearchDialog  = new YAHOO.widget.Button( "searchDialogButton", {
         label       : '<img src="' + getWebguiProperty("extrasURL") + 'icon/magnifier.png" />',
-        onclick     : { fn: this.toggleSearchDialog, scope: this }
+        onclick     : { fn: this.createSearchTab, scope: this }
     } );
     this.btnHome    = new YAHOO.widget.Button( "homeButton", {
         type        : "button",
         label       : '<img src="' + getWebguiProperty("extrasURL") + 'icon/house.png" />',
         onclick     : { fn: this.goHome, scope: this }
     } );
-
-    this.btnSearch  = new YAHOO.widget.Button( "searchButton", {
-        onclick     : { fn: this.requestSearch, scope: this }
-    } );
-
-    this.filterSelect = new YAHOO.widget.Button( "searchFilterAdd", {
-        type : "menu",
-        menu : 'searchFilterSelect'
-    } );
-    var self = this;
-    YAHOO.util.Event.on( window, "load", function () {
-        self.filterSelect.getMenu().subscribe( "click", self.addFilter, self, true );
-    } );
-
-    YAHOO.util.Event.on( 'searchKeywords', 'keyup', this.updateLocationBarQuery, this, true );
-    YAHOO.util.Event.on( 'searchKeywords', 'focus', this.focusKeywords, this, true );
-    YAHOO.util.Event.on( 'searchKeywords', 'blur', this.blurKeywords, this, true );
 
     // Take control of the location input
     this.klInput = new YAHOO.util.KeyListener( "locationInput", { keys: 13 }, {
@@ -1159,6 +1142,49 @@ WebGUI.Admin.LocationBar.prototype.hideSearchDialog
     };
     anim.onComplete.subscribe( hideContent, this );
     anim.animate();
+};
+
+/**
+ * createSearchTab ( )
+ * Create a new search tab and clone the searchForm node into it
+ */
+WebGUI.Admin.LocationBar.prototype.createSearchTab
+= function ( ) {
+    // Prepare the tab
+    var newForm = document.getElementById( 'searchForm' ).cloneNode( true );
+    newForm.id = null; // Duplicate IDs are baaaad
+    newForm.style.display = "block";
+
+    var newTab = new YAHOO.widget.Tab({
+        label : "Loading...",
+        content : ''
+    });
+    newTab.get('contentEl').appendChild( newForm );
+
+    // Fire when ready, Gridley
+    window.admin.tabBar.addTab( newTab );
+
+    var searchForm      = newForm.getElementsByTagName('form')[0];
+    var searchButton    = searchForm.elements['searchButton'];
+    new YAHOO.widget.Button( searchButton, {
+        onclick     : { fn: this.requestSearch, scope: newTab }
+    } );
+
+    var searchFilterSelect  = searchForm.elements['searchFilterSelect'];
+    var searchFilterAdd     = searchForm.elements['searchFilterAdd'];
+    new YAHOO.widget.Button( searchFilterAdd, {
+        type : "menu",
+        menu : searchFilterSelect
+    } );
+    var self = this;
+    YAHOO.util.Event.on( window, "load", function () {
+        self.filterSelect.getMenu().subscribe( "click", self.addFilter, newTab, true );
+    } );
+
+    var searchKeywords = searchForm.elements['searchKeywords'];
+    YAHOO.util.Event.on( searchKeywords, 'keyup', this.updateLocationBarQuery, newTab, true );
+    YAHOO.util.Event.on( searchKeywords, 'focus', this.focusKeywords, newTab, true );
+    YAHOO.util.Event.on( searchKeywords, 'blur', this.blurKeywords, newTab, true );
 };
 
 /**
