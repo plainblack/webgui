@@ -1,4 +1,4 @@
-package Test::WebGUI::Form::SelectBox;
+package Test::WebGUI::Form::AdSpace;
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------
@@ -14,6 +14,6 @@ use warnings;
 
 use Test::More;
 
-use base qw/Test::WebGUI::Form::List/;
+use base qw/Test::WebGUI::Form::SelectBox/;
 
 1;
