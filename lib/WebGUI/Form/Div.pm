@@ -24,7 +24,7 @@ Package WebGUI::Form::Div
 
 =head1 DESCRIPTION
 
-dreates a HTML div element with contents provided by caller
+Creates a HTML div element with contents provided by caller
 
 =head1 SEE ALSO
 
