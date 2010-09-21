@@ -13,10 +13,13 @@ save you many hours of grief.
    code, chances are you'll need to update it to make it work with
    WebGUI 8.
 
- * WebGUI now requires the following modules
-    - Moose
-    - CHI
-    - Facebook::Graph
+ * As part of the migration to Template::Toolkit, we will be changing template
+   variables from using dots to underscores.  All templates using that namespace were
+   automatically upgraded to use the new variables.
+
+   In this version, these templates were updated:
+       Account Macro template
+       Admin Toggle Macro template
 
 7.9.8
 --------------------------------------------------------------------

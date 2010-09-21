@@ -102,7 +102,7 @@ sub addTemplate {
 		className => 'WebGUI::Asset::Template',
 		url => 'admintoggle-test',
 		namespace => 'Macro/AdminToggle',
-		template => "HREF=<tmpl_var toggle.url>\nLABEL=<tmpl_var toggle.text>",
+		template => "HREF=<tmpl_var toggle_url>\nLABEL=<tmpl_var toggle_text>",
 		id => 'AdminToggleTemplate--Z',
         usePacked => 0,
 	};
