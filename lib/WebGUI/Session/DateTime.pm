@@ -828,7 +828,7 @@ sub secondsToInterval {
     my $seconds = shift;
     my $i18n = WebGUI::International->new($self->session, 'WebGUI');
     for my $unit (sort { $b <=> $a } keys %intervals) {
-        if ($seconds > $unit) {
+        if ($seconds >= $unit) {
             return (sprintf('%.0f', $seconds / $unit), $i18n->get($intervals{$unit}));
         }
     }
