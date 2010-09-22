@@ -90,7 +90,7 @@ WebGUI::Test->addToCleanup( WebGUI::VersionTag->getWorking( $session ) );
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 22;        # Increment this number for each test you create
+plan tests => 25;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # test getUrlPermutation( url ) method
