@@ -21,7 +21,7 @@ my $threshold = $ENV{POD_COVERAGE} == 2 ? 0.9999
               : 0;
 
 my @modules = ();
-find(\&countModules, File::Spec->catdir( WebGUI::Test->lib, 'WebGUI' ) );
+find(\&countModules, WebGUI::Test->lib );
 my $moduleCount = scalar(@modules);
 plan tests => $moduleCount;
 use Data::Dumper;
