@@ -102,24 +102,15 @@ sub calculate {
         unless ref($cart) eq 'WebGUI::Shop::Cart';
     my $book = $cart->getAddressBook;
 
-    # Fetch the default shipping address for each item in the cart that hasn't set its own.
-    my $shippingAddress = $book->getAddress( $cart->get('shippingAddressId') ) if $cart->get('shippingAddressId');
-
     my $driver  = $self->getDriver;
     my $tax     = 0;
 
     foreach my $item (@{ $cart->getItems }) {
         my $sku         = $item->getSku;
-        my $quantity    = $item->get('quantity');
+        my $quantity    = $item->quantity;
         my $unitPrice   = $sku->getPrice;
 
-        # Check if this cart item overrides the shipping address. If it doesn't, use the default shipping address.
-        my $itemAddress = $shippingAddress;
-        if (defined $item->get('shippingAddressId')) {
-            $itemAddress = $book->getAddress($item->get('shippingAddressId'));
-        }
-
-        my $taxRate = $driver->getTaxRate( $sku, $itemAddress );            
+        my $taxRate = $driver->getTaxRate( $sku, $item->getShippingAddress );
 
         # Calc the monetary tax for the given quantity of this item and add it to the total.
         $tax += $unitPrice * $quantity * $taxRate / 100;
