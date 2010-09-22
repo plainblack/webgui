@@ -249,11 +249,11 @@ sub exportAsHtml {
 
     # extrasUploadAction and rootUrlAction must have values matching something
     # in the arrays defined above
-    if( defined $extrasUploadAction && !$extrasUploadAction ~~ @extraUploadActions ) {
+    if( defined $extrasUploadAction && !($extrasUploadAction ~~ @extraUploadActions) ) {
         WebGUI::Error->throw(error => "'$extrasUploadAction' is not a valid extrasUploadAction");
     }
 
-    if( defined $rootUrlAction && !$rootUrlAction ~~ @rootUrlActions ) {
+    if( defined $rootUrlAction && !($rootUrlAction ~~ @rootUrlActions) ) {
         WebGUI::Error->throw(error => "'$rootUrlAction' is not a valid rootUrlAction");
     }
 
