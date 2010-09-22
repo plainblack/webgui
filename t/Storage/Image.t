@@ -105,7 +105,8 @@ cmp_bag($imageStore->getFiles(1), $expectedFiles, '... even when the allFiles sw
 ####################################################
 
 foreach my $extTest ( @{ $extensionTests } ) {
-	is( $imageStore->isImage($extTest->{filename}), $extTest->{isImage}, $extTest->{comment} );
+    my $isImage = $imageStore->isImage($extTest->{filename}) ? 1 : 0;
+	is( $isImage, $extTest->{isImage}, $extTest->{comment} );
 }
 
 ####################################################
