@@ -198,8 +198,7 @@ sub titles_are {
 $syndicated_content->update({ hasTerms => 'WebGUI', });
 my $testFeedUrl = 'http://www.example.com/feed.rss';
 $syndicated_content->update({ rssUrl => $testFeedUrl, });
-my $cache = WebGUI::Cache->new($session, $testFeedUrl, 'RSS');
-$cache->set(slurp_rss('tbb.rss'), 60);
+$session->cache->set($testFeedUrl, slurp_rss('tbb.rss'), 60);
 
 my $feed = $syndicated_content->generateFeed;
 
@@ -224,7 +223,7 @@ $syndicated_content->update({
     hasTerms     => '',
     maxHeadlines => 50,
 });
-$cache->set(slurp_rss('duplicate-link.rss'), 60);
+$session->cache->set($testFeedUrl, slurp_rss('duplicate-link.rss'), 60);
 
 my $oddFeed1 = $syndicated_content->generateFeed();
 my @oddItems = $oddFeed1->get_item();
@@ -236,7 +235,7 @@ is (@oddItems, 2, 'feed has items even without pubDates or links');
 #
 ####################################################################
 
-$cache->set(slurp_rss('tbb_odd.rss'), 60);
+$session->cache->set($testFeedUrl, slurp_rss('tbb_odd.rss'), 60);
 my @ascending  = (
     'I have arrived in Lisboa!',
     'WebGUI 8 Performance',
