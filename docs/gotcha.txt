@@ -11,6 +11,10 @@ save you many hours of grief.
 --------------------------------------------------------------------
      * WebGUI now depends on PerlIO::eol, for doing line ending translation.
 
+     * The UK Flash player has been removed due to licensing issues with Debian
+       and the GPL.  If you need this functionality, try using the Carousel
+       Asset instead.
+
 7.10.0
 --------------------------------------------------------------------
      * Due to a bug in the 7.8.24-7.9.11 upgrade, the ordering of template
