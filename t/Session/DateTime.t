@@ -17,7 +17,7 @@ use File::Spec;
 use WebGUI::Test;
 use WebGUI::Session;
 
-use Test::More tests => 90; # increment this value for each test you create
+use Test::More tests => 92; # increment this value for each test you create
 
 installBadLocale();
 WebGUI::Test->addToCleanup(sub { unlink File::Spec->catfile(WebGUI::Test->lib, qw/WebGUI i18n BadLocale.pm/); });
@@ -218,16 +218,18 @@ cmp_ok(
 ####################################################
 
 is(join(" ",$dt->secondsToInterval(60*60*24*365*2)),   "2 Year(s)",     "secondsToInterval(), years");
-is(join(" ",$dt->secondsToInterval(60*60*24*180)),     "6 Month(s)",    "secondsToInterval(), months");
-is(join(" ",$dt->secondsToInterval(60*60*24*7*3)),     "3 Week(s)",     "secondsToInterval(), weeks");
-is(join(" ",$dt->secondsToInterval(60*60*24*5)),       "5 Day(s)",      "secondsToInterval(), days");
-is(join(" ",$dt->secondsToInterval(60*60*24*8)),       "1 Week(s)",     "secondsToInterval(), days, longer than a week");
-is(join(" ",$dt->secondsToInterval(60*60*24*363)),     "12 Month(s)",   "secondsToInterval(), days, longer than a month");
-is(join(" ",$dt->secondsToInterval(60*60*24*365*2.4)), "2 Year(s)",     "secondsToInterval(), days, longer than a year");
-is(join(" ",$dt->secondsToInterval(60*60*18)),         "18 Hour(s)",    "secondsToInterval(), hours");
-is(join(" ",$dt->secondsToInterval(60*60*24*365*2.9)), "3 Year(s)",     "secondsToInterval(), hours, longer than a year");
-is(join(" ",$dt->secondsToInterval(60*27)),            "27 Minute(s)",  "secondsToInterval(), minutes");
-is(join(" ",$dt->secondsToInterval(59)),               "59 Second(s)",  "secondsToInterval(), seconds");
+is(join(" ",$dt->secondsToInterval(60*60*24*180)),     "6 Month(s)",    "... months");
+is(join(" ",$dt->secondsToInterval(60*60*24*7*3)),     "3 Week(s)",     "... weeks");
+is(join(" ",$dt->secondsToInterval(60*60*24*5)),       "5 Day(s)",      "... days");
+is(join(" ",$dt->secondsToInterval(60*60*24*8)),       "1 Week(s)",     "... days, longer than a week");
+is(join(" ",$dt->secondsToInterval(60*60*24*363)),     "12 Month(s)",   "... days, longer than a month");
+is(join(" ",$dt->secondsToInterval(60*60*24*365*2.4)), "2 Year(s)",     "... days, longer than a year");
+is(join(" ",$dt->secondsToInterval(60*60*18)),         "18 Hour(s)",    "... hours");
+is(join(" ",$dt->secondsToInterval(60*60*24*365*2.9)), "3 Year(s)",     "... hours, longer than a year");
+is(join(" ",$dt->secondsToInterval(60*27)),            "27 Minute(s)",  "... minutes");
+is(join(" ",$dt->secondsToInterval(59)),               "59 Second(s)",  "... seconds");
+is(join(" ",$dt->secondsToInterval(3600)),             "1 Hour(s)",     "... exactly 1 hour");
+is(join(" ",$dt->secondsToInterval(60)),               "1 Minute(s)",   "... exactly 1 minute");
 
 ####################################################
 #
