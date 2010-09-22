@@ -422,7 +422,7 @@ Returns the full path to the WebGUI lib directory, usually /data/WebGUI/lib.
 
 =cut
 
-my $webgui_lib = realpath( catdir( dirname( __FILE__ ), (updir) x 3 ) );
+my $webgui_lib = realpath( catdir( dirname( __FILE__ ), (updir) x 1 ) );
 sub lib {
     return $webgui_lib;
 }
