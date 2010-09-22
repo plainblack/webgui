@@ -26,15 +26,14 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 9;        # Increment this number for each test you create
+plan tests => 8;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # Creation, accessors and mutators
 use_ok( 'WebGUI::FormBuilder::Tab' );
-my $tab = WebGUI::FormBuilder::Tab->new( $session );
+my $tab = WebGUI::FormBuilder::Tab->new( $session, name => 'no name', );
 isa_ok( $tab, 'WebGUI::FormBuilder::Tab' );
 
-ok( !$tab->name, 'no default' );
 ok( !$tab->label, 'no default' );
 is( $tab->session, $session );
 
