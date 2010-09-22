@@ -108,6 +108,7 @@ checkModule("Finance::Quote",               1.15         );
 checkModule("POE",                          1.005        );
 checkModule("POE::Component::IKC::Server",  0.2001       );
 checkModule("POE::Component::Client::HTTP", 0.88         );
+checkModule("Plack",                        0.9949       );
 checkModule("Plack::Request");
 checkModule("Plack::Response");
 checkModule("Plack::Middleware::Status");
