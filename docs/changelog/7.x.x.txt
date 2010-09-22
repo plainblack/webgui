@@ -1,3 +1,5 @@
+7.10.2
+
 7.10.1
  - fixed #11851: Story Topic: top story variables should be available all the time
  - fixed #11854: CS doesn't return Not Found page
