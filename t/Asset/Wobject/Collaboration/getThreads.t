@@ -86,14 +86,13 @@ $session->db->write(
     'UPDATE Collaboration SET sortBy=NULL,sortOrder=NULL WHERE assetId=?',
     [$collab->getId]
 );
-my $collab2 = WebGUI::Asset::Wobject::Collaboration->new( $session, $collab->getId );
+my $collab2 = WebGUI::Asset::Wobject::Collaboration->newById( $session, $collab->getId );
 $p      = $collab2->getThreadsPaginator;
 $page   = $p->getPageData;
 $expect = sortThreads( sub { $b->get('revisionDate') <=> $a->get('revisionDate') }, @threads );
 cmp_deeply( $page, $expect, 'getThreadsPaginator sort by no default' )
 or diag( "GOT: " . Dumper $page ), diag( "EXPECTED: " . Dumper $expect );
 undef $collab2;
-
 # sortBy default from asset
 $collab->update({ 
     sortBy      => 'assetData.revisionDate',
