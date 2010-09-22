@@ -247,7 +247,7 @@ isnt(
 my $cart = $driver->getCart;
 WebGUI::Test->addToCleanup($cart);
 isa_ok      ($cart, 'WebGUI::Shop::Cart', 'getCart returns an instantiated WebGUI::Shop::Cart object');
-addToCleanup($cart);
+WebGUI::Test->addToCleanup($cart);
 
 #######################################################################
 #
@@ -474,6 +474,9 @@ my $blue_widget  = $widget->setCollateral('variantsJSON', 'variantId', 'new',
 );
 
 $versionTag->commit;
+$widget = $widget->cloneFromDb;
+
+$session->user({userId => 3});
 my $cart = WebGUI::Shop::Cart->newBySession($session);
 WebGUI::Test->addToCleanup($versionTag, $cart);
 my $addressBook = $cart->getAddressBook;
@@ -488,11 +491,11 @@ $cart->update({
     billingAddressId  => $workAddress->getId,
     shippingAddressId => $workAddress->getId,
 });
+
 $widget->addToCart($widget->getCollateral('variantsJSON', 'variantId', $blue_widget));
 
 my $cart_variables = {};
 $driver->appendCartVariables($cart_variables);
-diag Dumper($cart_variables);
 
 cmp_deeply(
     $cart_variables,
