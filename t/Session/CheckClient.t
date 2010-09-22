@@ -19,7 +19,7 @@
 # test 75% or 3 out of four items
 
 use strict;
-use lib '/data/WebGUI/t/lib';
+use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
 use WebGUI::Session;

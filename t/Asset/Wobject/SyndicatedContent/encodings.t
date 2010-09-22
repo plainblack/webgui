@@ -8,8 +8,10 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
+use FindBin;
 use strict;
 use File::Spec;
+use lib "$FindBin::Bin/../../../lib";
 
 # The goal of this test is to test the creation of 
 # and expose any bugs of SyndicatedContent Wobjects.

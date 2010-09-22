@@ -21,6 +21,19 @@ save you many hours of grief.
        Account Macro template
        Admin Toggle Macro template
 
+7.10.0
+--------------------------------------------------------------------
+     * Due to a bug in the 7.8.24-7.9.11 upgrade, the ordering of template
+       attachments has been lost.  The bug has been fixed in 7.9.14 for sites
+       that have not been upgraded yet.  Unfortunately, due to the nature of
+       the bug, the correct ordering cannot be automatically restored.
+
+       Another bug, in the new attachments javascript, will change all attachments
+       to type CSS when the template is saved.  Since there are 2 types of Javascript
+       attachments, there's no way of recovering the original type.  If you are using
+       template attachments and have upgraded to 7.9.13 directly, you will need to
+       check each template and update the types.
+
 7.9.8
 --------------------------------------------------------------------
      * Starting in WebGUI 7.9.4, the Net::Twitter module is required.

@@ -419,6 +419,13 @@
       "url" : "^PageUrl(\"\",op=switchOffAdmin);",
       "title" : "^International(12,WebGUI);"
    },
+   "addons" : {
+      "icon" : "addons.png",
+      "uiLevel" : 1,
+      "group" : "12",
+      "url" : "http://www.webgui.org/addons",
+      "title" : "Addons"
+   },
    "contentFilters" : {
       "icon" : "contentFilters.gif",
       "uiLevel" : 3,

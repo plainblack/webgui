@@ -404,7 +404,7 @@ sub missingFields {
         $addressData = $address;
     }
     my @missingFields = ();
-    FIELD: foreach my $field (qw/label firstName lastName address1 city state code country phoneNumber/) {
+    FIELD: foreach my $field (qw/firstName lastName address1 city state code country phoneNumber/) {
         push @missingFields, $field if $addressData->{$field} eq '';
     }
     return @missingFields;
@@ -495,11 +495,10 @@ sub processAddressForm {
         email           => $form->get($prefix . "email",       "email"),
         organization    => $form->get($prefix . "organization"),
     );
-    #my $label = $field eq 'address1'    ? 'address'
-    #          : $field eq 'phoneNumber' ? 'phone number'
-    #          : $field
-    #          ;
 
+    ##Label is optional in the form, but required for the UI and API.
+    ##Use the first address line in its place if it's missing
+    $addressData{label} = $addressData{address1} if ! $addressData{label};
     return %addressData;
 }
 

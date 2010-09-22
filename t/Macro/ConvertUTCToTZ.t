@@ -31,7 +31,6 @@ SKIP: {
   $today->set_time_zone('UTC');
   my $yesterday = $today->clone;
   $yesterday->subtract( days => 1 );
-  $yesterday->set_formatter($formatter);
 
   my $out1 = WebGUI::Macro::ConvertUTCToTZ::process($session);
   like( $out1, qr/\d{2}\/\d{2}\/\d{2}\/\d{2}\/\d{2}/, 'No parameters passed, check pattern');

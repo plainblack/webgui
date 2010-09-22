@@ -133,8 +133,8 @@ sub generateFeed {
 	my $cache   = $session->cache;
 	my $sort    = $self->sortItems;
 
-	my %opt   = (use_ixhash => 1) if $sort eq 'feed';
-	my $feed  = XML::FeedPP::Atom->new(%opt);
+	my @opt   = (use_ixhash => 1) if $sort eq 'feed';
+	my $feed  = XML::FeedPP::Atom->new(@opt);
 
 	# build one feed out of many
     my $newlyCached = 0;
@@ -163,7 +163,7 @@ sub generateFeed {
             }, $self->cacheTimeout );
 
         eval {
-            my $singleFeed = XML::FeedPP->new($value, utf8_flag => 1, -type => 'string', xml_deref => 1, %opt);
+            my $singleFeed = XML::FeedPP->new($value, utf8_flag => 1, -type => 'string', xml_deref => 1, @opt);
             $feed->merge_channel($singleFeed);
             $feed->merge_item($singleFeed);
         };

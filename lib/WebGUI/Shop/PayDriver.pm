@@ -94,7 +94,7 @@ sub appendCartVariables {
     $var      ||= {};
     my $cart    = $self->getCart;
     $var->{shippableItemsInCart} = $cart->requiresShipping;
-    $var->{subtotal} = $cart->calculateSubtotal;
+    $var->{subtotal} = $cart->formatCurrency($cart->calculateSubtotal);
     $var->{shipping} = $cart->calculateShipping;
     $var->{taxes}    = $cart->calculateTaxes;
     my $totalPrice   = $var->{subtotal} + $var->{shipping} + $var->{taxes};

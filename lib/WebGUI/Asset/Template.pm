@@ -294,7 +294,7 @@ override getEditForm => sub {
     $tabform->getTab('properties')->addField( "jsonTable",
         name        => 'attachmentsJson', 
         value       => $self->get('attachmentsJson'),
-        label       => $i18n->get("attachments display label"),
+        label       => $i18n->get("attachment display label"),
         fields      => [
             {
                 type            => "text",

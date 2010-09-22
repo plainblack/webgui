@@ -1,4 +1,17 @@
 7.10.0
+ - fixed #11812: Checking www_ajaxSave's response in the cart js, urlencoding post parameters
+ - added: Link in the Admin Console to the Addons section on webgui.org
+ - added: Labels in the Shopping Cart addresses are optional.
+ - added: template variable downgrading so that using we can safely pass
+   template variables TT would understand to HTML::Template templates -- see
+   WebGUI::Asset::Template::Parser->downgrade for details.
+ - fixed #11813: Payment confirmation screen dollar amount
+ - fixed #11832: Admin Session Interface broken
+ - fixed: Attachment label in the Template is missing
+ - fixed #11810: Attachment list broken in template
+ - fixed #11814: upgrade script removes cache too aggresively (Ernesto Hernández-Novich)
+ - fixed #11827: CS rich edit bug
+ - fixed #11825: Questionable attachmentsJson in AssetReport template
 
 7.9.13
  - fixed #11783: Instances deleted during realtime run
@@ -1076,6 +1089,7 @@
  - fixed #10158: Matrix 2.0 - Screenshots rendering poorly
  - administer.js now has a much improved handling of the slider algorithm, plus some refactored code.  Users will not notice anything.
  - Survey slider answer updates, now update all the answers for max,min,step settings since only the first answers values are used anyways.
+
 7.7.3
  - fixed #10094: double explanation in thread help
  - rfe #9612: Carousel Wobject (was Widget Wobject) (SDH Consulting Group)

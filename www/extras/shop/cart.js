@@ -38,9 +38,18 @@
 
     var Cart = {
         attachAddressBlurHandlers: function (name) {
-            var fields  = _.values(this.elements[name]),
+            var els     = this.elements[name],
+                label   = els.label,
+                addr    = els.address1,
+                fields  = _.values(els),
                 handler = this.createAddressBlurHandler(name);
             this.event.on(fields, 'focusout', handler);
+            this.event.on(addr, 'focusout', function () {
+                if (!label.value) {
+                    label.value = addr.value;
+                    label.blur();
+                }
+            });
         },
 
         attachAddressSelectHandler: function (name) {
@@ -300,6 +309,16 @@
                 var id = o.responseText,
                      d = self.elements.dropdowns;
 
+                if (!id.match(/^[A-Za-z0-9_-]{22}$/)) {
+                    alert('Error: bad response trying to save address.');
+                    return;
+                }
+
+                if (!id.match(/^[A-Za-z0-9_-]{22}$/)) {
+                    alert('Error: bad response trying to save address.');
+                    return;
+                }
+
                 function updateOne(dropdown) {
                     var opt = _.detect(dropdown.options, function (o) {
                         return o.text === label;
@@ -401,7 +420,7 @@
             var url   = this.baseUrl,
                 cb    = { success: success },
                 query = _(params).map(function (v, k) {
-                    return [k, v].join('=');
+                    return [k, escape(v)].join('=');
                 }).join('&');
 
             if (method === 'GET') {

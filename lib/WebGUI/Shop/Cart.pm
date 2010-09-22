@@ -425,7 +425,6 @@ sub getI18nError {
     my $i18n   = WebGUI::International->new($self->session, 'Shop');
     return $error eq 'no billing address'     ? $i18n->get('no billing address')
          : $error eq 'no shipping address'    ? $i18n->get('no shipping address')
-         : $error eq 'billing label'          ? $i18n->get('billing label')
          : $error eq 'billing firstName'      ? $i18n->get('billing firstName')
          : $error eq 'billing lastName'       ? $i18n->get('billing lastName')
          : $error eq 'billing address1'       ? $i18n->get('billing address1')
@@ -434,7 +433,6 @@ sub getI18nError {
          : $error eq 'billing state'          ? $i18n->get('billing state')
          : $error eq 'billing country'        ? $i18n->get('billing country')
          : $error eq 'billing phoneNumber'    ? $i18n->get('billing phoneNumber')
-         : $error eq 'shipping label'         ? $i18n->get('shipping label')
          : $error eq 'shipping firstName'     ? $i18n->get('shipping firstName')
          : $error eq 'shipping lastName'      ? $i18n->get('shipping lastName')
          : $error eq 'shipping address1'      ? $i18n->get('shipping address1')

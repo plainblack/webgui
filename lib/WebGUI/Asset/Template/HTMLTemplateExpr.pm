@@ -81,6 +81,7 @@ sub process {
     my $class = shift;
     my $template = shift;
     my $vars = $class->addSessionVars(shift);
+    $class->downgrade($vars);
     my $t;
     eval {
         $t = HTML::Template::Expr->new(scalarref=>\$template,
