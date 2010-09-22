@@ -56,7 +56,7 @@ is(
 	$vars{'password.form'},
 	WebGUI::Form::password($session,{
 		name=>"identifier",
-		size=>8,
+		size=>12,
 		extras=>'class="loginBoxField"'
 		}),
 	'password.form'
@@ -66,7 +66,7 @@ is(
 	$vars{'username.form'},
 	WebGUI::Form::text($session,{
 		name=>"username",
-		size=>8,
+		size=>12,
 		extras=>'class="loginBoxField"'
 	}),
 	'username.form'
@@ -113,8 +113,8 @@ $output = WebGUI::Macro::L_loginBox::process($session,24,'Log In',$template->get
 %vars = simpleTextParser($output);
 
 is($vars{'customText'}, 'Log In', 'custom text sent');
-like($vars{'username.form'}, qr/size="16"/, 'boxSize set in username.form');
-like($vars{'password.form'}, qr/size="16"/, 'boxSize set in password.form');
+like($vars{'username.form'}, qr/size="24"/, 'boxSize set in username.form');
+like($vars{'password.form'}, qr/size="24"/, 'boxSize set in password.form');
 
 ##Change browser to be MSIE like and watch boxSize change
 $session->request->headers->user_agent('msie');
