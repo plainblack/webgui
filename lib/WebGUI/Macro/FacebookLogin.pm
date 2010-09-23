@@ -24,6 +24,13 @@ Works with the Facebook Auth plugin to allow users to log in using facebook.
 
 
 #-------------------------------------------------------------------
+
+=head2 process
+
+Return an image with a link to login into Facebook.
+
+=cut
+
 sub process {
 	my $session = shift;
 	my $url = $session->url;
