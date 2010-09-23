@@ -198,17 +198,7 @@ sub toHtml {
 </script>
 END_HTML
     }
-<<<<<<< HEAD
-    elsif ($self->get('maxlength')) {
-        $style->setScript( $url->extras( 'yui/build/yahoo-dom-event/yahoo-dom-event.js' ));
-    }
-    if ($self->get('maxlength')) {
-        # Add the maxlength script
-        $style->setScript( $url->extras( 'yui-webgui/build/form/textarea.js' ));
-    }
-=======
     $self->headTags;
->>>>>>> Convert Textarea over to headTags
     return $out;
 }
 
