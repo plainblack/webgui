@@ -31,5 +31,6 @@ if ($@) {
 # Init
 my $session         = WebGUI::Test->session;
 
+my $label_profile = Path::Class->dir(WebGUI::Test->lib)->parent->subdir('t')->subdir('i18n')->file('perlcritic');
 Test::Perl::Critic->import(-profile => $label_profile->stringify);
 all_critic_ok(WebGUI::Test->lib);
