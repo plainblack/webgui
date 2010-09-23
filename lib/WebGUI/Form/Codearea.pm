@@ -176,6 +176,7 @@ Renders a code area field.
 sub toHtml {
     my $self = shift;
 
+    $self->headTags;
     my $value = encode_entities( $self->fixMacros($self->fixTags($self->fixSpecialCharacters(scalar $self->getOriginalValue))) );
     my $width = $self->get('width') || 400;
     my $height = $self->get('height') || 150;

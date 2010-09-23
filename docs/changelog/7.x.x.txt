@@ -1,4 +1,5 @@
 7.10.2
+ - fixed #11884: Editing Templates impossible / Code editor not loaded
 
 7.10.1
  - fixed #11851: Story Topic: top story variables should be available all the time
