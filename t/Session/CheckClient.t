@@ -41,26 +41,26 @@ my @testArray = (
            output => 1,
            comment => "UnChaos hybrid search engine"
     },
-    {
-           agent => "(DreamPassport/3.0; isao/MyDiGiRabi)",
-           output => 0,
-           comment => "DreamCast DreamPassport browser"
-    },
-    {
-           agent => "Privoxy web proxy",     # I think proxy's whould be considered browsers?
-           output => 0,
-           comment => "s.also Privoxy/3.0 (Anonymous)"
-    },
+#    {
+#           agent => "(DreamPassport/3.0; isao/MyDiGiRabi)",
+#           output => 0,
+#           comment => "DreamCast DreamPassport browser"
+#    },
+#    {
+#           agent => "Privoxy web proxy",     # I think proxy's whould be considered browsers?
+#           output => 0,
+#           comment => "s.also Privoxy/3.0 (Anonymous)"
+#    },
     {
            agent => "123spider-Bot (Version: 1.02&#44; powered by www.123spider.de",
            output => 1,
            comment => "123spider.de (Germany) web directory link checking"
     },
-    {
-           agent => "1st ZipCommander (Net) - http://www.zipcommander.com/",
-           output => 0,
-           comment => "1st ZipCommander Net - IE based browser"
-    },
+#    {
+#           agent => "1st ZipCommander (Net) - http://www.zipcommander.com/",
+#           output => 0,
+#           comment => "1st ZipCommander Net - IE based browser"
+#    },
     {
            agent => "2Bone_LinkChecker/1.0 libwww-perl/5.64",
            output => 1,
@@ -71,11 +71,11 @@ my @testArray = (
            output => 1,
            comment => "A-Online.at robot - now Jet2Web Search"
     },
-    {
-           agent => "Advanced Browser (http://www.avantbrowser.com)",
-           output => 0,
-           comment => "Avant Browser - IE based browser"
-    },
+#    {
+#           agent => "Advanced Browser (http://www.avantbrowser.com)",
+#           output => 0,
+#           comment => "Avant Browser - IE based browser"
+#    },
     {
            agent => "AESOP_com_SpiderMan",
            output => 1,
@@ -91,21 +91,21 @@ my @testArray = (
            output => 1,
            comment => "Mozilla/5.0 (compatible;MAINSEEK_BOT)"
     },
-    {
-           agent => "Mozilla/5.0 (Macintosh; U; PPC Mac OS X Mach-O; en-US; rv:1.0.1) Gecko/20021219 Chimera/0.6",
-           output => 0,
-           comment => "Chimera browser (Mozilla/Gecko engine) - now Camino Mac PowerPC"
-    },
-    {
-           agent => "Mozilla/5.0 (Macintosh; U; PPC Mac OS X; en-US) AppleWebKit/xx (KHTML like Gecko) OmniWeb/v5xx.xx",
-           output => 0,
-           comment => "OmniWeb 5.x.x Mac OS X browser"
-    },
-    {
-           agent => "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:x.x.x) Gecko/20041107 Firefox/x.x",
-           output => 0,
-           comment => "Firefox browser (Mozilla/Gecko engine) - ex Firebird WinXP"
-    },
+#    {
+#           agent => "Mozilla/5.0 (Macintosh; U; PPC Mac OS X Mach-O; en-US; rv:1.0.1) Gecko/20021219 Chimera/0.6",
+#           output => 0,
+#           comment => "Chimera browser (Mozilla/Gecko engine) - now Camino Mac PowerPC"
+#    },
+#    {
+#           agent => "Mozilla/5.0 (Macintosh; U; PPC Mac OS X; en-US) AppleWebKit/xx (KHTML like Gecko) OmniWeb/v5xx.xx",
+#           output => 0,
+#           comment => "OmniWeb 5.x.x Mac OS X browser"
+#    },
+#    {
+#           agent => "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:x.x.x) Gecko/20041107 Firefox/x.x",
+#           output => 0,
+#           comment => "Firefox browser (Mozilla/Gecko engine) - ex Firebird WinXP"
+#    },
     {
            agent => "Mozilla/5.0 (Windows; U; Windows NT 5.1; fr; rv:1.8.1) VoilaBot BETA 1.2 (support.voilabotorange-ftgroup.com)",
            output => 1,
@@ -116,11 +116,11 @@ my @testArray = (
            output => 1,
            comment => "Healthline health related search robot (72.5.115.xx)"
     },
-    {
-           agent => "Mozilla/5.0 (X11; U; Linux i686; de-AT; rv:1.8.0.2) Gecko/20060309 SeaMonkey/1.0",
-           output => 0,
-           comment => "SeaMonkey browser suite (ex Mozilla) on Linux"
-    },
+#    {
+#           agent => "Mozilla/5.0 (X11; U; Linux i686; de-AT; rv:1.8.0.2) Gecko/20060309 SeaMonkey/1.0",
+#           output => 0,
+#           comment => "SeaMonkey browser suite (ex Mozilla) on Linux"
+#    },
     {
            agent => "Mozilla/5.0 [en] (compatible; Gulper Web Bot 0.2.4 www.ecsl.cs.sunysb.edu/~maxim/cgi-bin/Link/GulperBot)",
            output => 1,
