@@ -11,6 +11,7 @@ use Test::MockObject;
 use Test::MockObject::Extends;
 use File::Temp;
 use File::Path qw(make_path);
+use File::Basename qw(basename);
 
 use WebGUI::Paths;
 use WebGUI::Upgrade;
@@ -70,12 +71,17 @@ capture {
     ok $res, 'upgradeSites runs';
 };
 
-$upgrade->called_pos_ok(1, 'getCurrentVersion');
-$upgrade->called_pos_ok(2, 'getCodeVersion');
+$upgrade->called_ok('getCurrentVersion', '... and checked current version');
+$upgrade->called_ok('getCodeVersion', '... and checked code version');
 SKIP: {
-    $upgrade->called_pos_ok(4, 'runUpgradeFile') || skip 'upgrade not run', 1;
-    my $upgradeFile = $upgrade->call_args_pos(4, 4);
-    ok $upgradeFile =~ /\b00_simple\.pl$/, 'correct upgrade file run';
+    $upgrade->called_ok('runUpgradeFile', '... and checked code version')
+        or skip 'upgrade file not run', 1;
+    while ( my ($name, $args) = $upgrade->next_call ) {
+        if ($name eq 'runUpgradeFile') {
+            my $upgradeFile = $args->[3] && basename($args->[3]);
+            is $upgradeFile, '00_simple.pl', '... correct upgrade file';
+        }
+    }
 }
 
 $upgrade->clear;
