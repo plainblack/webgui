@@ -111,7 +111,8 @@ around BUILDARGS => sub {
         unless exists $properties->{options} and $properties->{options};
 
     my $options = from_json($properties->{options});
-    $options->{session} = $session;
+    $options->{session}          = $session;
+    $options->{paymentGatewayId} = $paymentGatewayId;
     return $class->$orig($options);
 };
 
@@ -241,7 +242,7 @@ to do calculations.
 =cut
 
 sub className {
-    return ref $_->[0];
+    return ref $_[0];
 }
 
 #-------------------------------------------------------------------
@@ -670,6 +671,7 @@ sub write {
 
     my $properties  = $self->get();
     delete $properties->{session};
+    delete $properties->{paymentGatewayId};
     my $jsonOptions = to_json($properties);
     $self->session->db->setRow($self->tableName, 'paymentGatewayId', {
         paymentGatewayId => $self->paymentGatewayId,
