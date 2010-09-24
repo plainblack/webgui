@@ -31,7 +31,7 @@ use Clone qw/clone/;
 use Scalar::Util qw/blessed/;
 
 use Moose;
-use WebGUI::Definition;
+use WebGUI::Definition::Shop;
 
 =head1 NAME
 
@@ -53,10 +53,32 @@ These subroutines are available from this package:
 
 =cut
 
-readonly session            => my %session;
-readonly className          => my %className;
-readonly paymentGatewayId   => my %paymentGatewayId;
-readonly options            => my %options;
+define tableName  => 'paymentGateway';
+define pluginName => 'Payment Driver';
+
+property label => (
+            fieldType       => 'text',
+            label           => ['label', 'PayDriver'],
+            hoverHelp       => ['label help', 'PayDriver'],
+            default         => "Credit Card",
+         );
+property enabled => (
+            fieldType       => 'yesNo',
+            label           => ['enabled', 'PayDriver'],
+            hoverHelp       => ['enabled help', 'PayDriver'],
+            default         => 1,
+         );
+property groupToUse => (
+            fieldType       => 'group',
+            label           => ['who can use', 'PayDriver'],
+            hoverHelp       => ['who can use help', 'PayDriver'],
+            default         => 7,
+         );
+
+has [ qw/session paymentGatewayId/ ] => (
+    is       => ro,
+    required => 1,
+);
 
 #-------------------------------------------------------------------
 
@@ -238,45 +260,6 @@ the object by the user, and to automatically generate the edit form to show
 the user.
 
 =cut
-
-sub definition {
-    my $class      = shift;
-    my $session    = shift;
-    WebGUI::Error::InvalidParam->throw(error => q{Must provide a session variable})
-        unless ref $session eq 'WebGUI::Session';
-    my $definition = shift || [];
-    my $i18n = WebGUI::International->new($session, 'PayDriver');
-
-    tie my %fields, 'Tie::IxHash';
-    %fields = (
-        label           => {
-            fieldType       => 'text',
-            label           => $i18n->get('label'),
-            hoverHelp       => $i18n->get('label help'),
-            defaultValue    => "Credit Card",
-        },
-        enabled         => {
-            fieldType       => 'yesNo',
-            label           => $i18n->get('enabled'),
-            hoverHelp       => $i18n->get('enabled help'),
-            defaultValue    => 1,
-        },
-        groupToUse      => {
-            fieldType       => 'group',
-            label           => $i18n->get('who can use'),
-            hoverHelp       => $i18n->get('who can use help'),
-            defaultValue    => 7,
-        },
-    );
-
-    my %properties = (
-        name        => 'Payment Driver',
-        properties  => \%fields,
-    );
-    push @{ $definition }, \%properties;
-
-    return $definition;
-}
 
 #-------------------------------------------------------------------
 
