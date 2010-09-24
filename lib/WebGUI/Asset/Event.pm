@@ -63,12 +63,46 @@ property startTime => (
             format          => 'mysql',
             
         );
+around startTime => sub {
+    my $orig = shift;
+    my $self = shift;
+    return $self->$orig unless @_;
+    my $startTime = shift;
+    my ($startHour, $startMinute, $startSecond) = $startTime =~ /^ (\d+) : (\d+) (?: :(\d+)) /x;
+    if ($startHour > 23) {
+        $startHour    = 0;
+        my $startDate = $self->startDate;
+        my $startDt   = WebGUI::DateTime->new($self->session, $startDate);
+        $startDt->add(days => 1);
+        $self->startDate($startDt->toMysqlDate);
+        $startSecond = '00' if ! $startSecond;
+        $startTime   = sprintf '%02d:%02d:%02d', $startHour, $startMinute, $startSecond;
+    }
+    return $self->$orig($startTime);
+};
 property endTime => (
             label           => ['end', 'Asset_Event'],
             fieldType       => "TimeField",
             default         => undef,
             format          => 'mysql',
         );
+around endTime => sub {
+    my $orig = shift;
+    my $self = shift;
+    return $self->$orig unless @_;
+    my $endTime = shift;
+    my ($endHour, $endMinute, $endSecond) = $endTime =~ /^ (\d+) : (\d+) (?: :(\d+)) /x;
+    if ($endHour > 23) {
+        $endHour    = 0;
+        my $endDate = $self->endDate;
+        my $endDt   = WebGUI::DateTime->new($self->session, $endDate);
+        $endDt->add(days => 1);
+        $self->endDate($endDt->toMysqlDate);
+        $endSecond = '00' if ! $endSecond;
+        $endTime   = sprintf '%02d:%02d:%02d', $endHour, $endMinute, $endSecond;
+    }
+    return $self->$orig($endTime);
+};
 
 property recurId => (
             label           => ['recurrence', 'Asset_Event'],
