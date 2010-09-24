@@ -54,7 +54,7 @@ These subroutines are available from this package:
 =cut
 
 define tableName  => 'paymentGateway';
-define pluginName => 'Payment Driver';
+define pluginName => ['Payment Driver', 'PayDriver'];
 
 property label => (
             fieldType       => 'text',
@@ -76,9 +76,44 @@ property groupToUse => (
          );
 
 has [ qw/session paymentGatewayId/ ] => (
-    is       => ro,
+    is       => 'ro',
     required => 1,
 );
+
+around BUILDARGS => sub {
+    my $orig  = shift;
+    my $class = shift;
+    if(ref $_[0] eq 'HASH') {
+        ##Standard Moose invocation for creating a new object
+        return $class->$orig(@_);
+    }
+    my $session = shift;
+    WebGUI::Error::InvalidParam->throw(error => q{Must provide a session variable})
+        unless blessed $session && $session->isa('WebGUI::Session');
+    if (ref $_[0] eq 'HASH') {
+        ##Create an object from a hashref of options
+        my $options = shift;
+        $options->{session} = $session;
+        $options->{paymentGatewayId} = $session->id->generate;
+        return $class->$orig($options);
+    }
+    ##Must be a paymentGatewayId, look it up in the database
+    my $paymentGatewayId = shift;
+    WebGUI::Error::InvalidParam->throw(error => q{Must provide a paymentGatewayId})
+        unless defined $paymentGatewayId;
+    my $properties = $session->db->quickHashRef('select * from paymentGateway where paymentGatewayId=?', [
+        $paymentGatewayId,
+    ]);
+    WebGUI::Error::ObjectNotFound->throw(error => q{paymentGatewayId not found in db}, id => $paymentGatewayId)
+        unless scalar keys %{ $properties };
+
+    croak "Somehow, the options property of this object, $paymentGatewayId, got broken in the db"
+        unless exists $properties->{options} and $properties->{options};
+
+    my $options = from_json($properties->{options});
+    $options->{session} = $session;
+    return $class->$orig($options);
+};
 
 #-------------------------------------------------------------------
 
@@ -88,21 +123,21 @@ Private method used to build objects, shared by new and create.
 
 =cut
 
-sub _buildObj {
-    my ($class, $session, $requestedClass, $paymentGatewayId, $options) = @_;
-    my $self    = {};
-    bless $self, $requestedClass;
-    register $self;
-
-    my $id                      = id $self;
-
-    $session{ $id }             = $session;
-    $options{ $id }             = $options;
-    $className{ $id }           = $requestedClass;
-    $paymentGatewayId{ $id }    = $paymentGatewayId;
-
-    return $self;
-}
+#sub _buildObj {
+#    my ($class, $session, $requestedClass, $paymentGatewayId, $options) = @_;
+#    my $self    = {};
+#    bless $self, $requestedClass;
+#    register $self;
+#
+#    my $id                      = id $self;
+#
+#    $session{ $id }             = $session;
+#    $options{ $id }             = $options;
+#    $className{ $id }           = $requestedClass;
+#    $paymentGatewayId{ $id }    = $paymentGatewayId;
+#
+#    return $self;
+#}
 
 
 #-------------------------------------------------------------------
@@ -205,6 +240,10 @@ to do calculations.
 
 =cut
 
+sub className {
+    return ref $_->[0];
+}
+
 #-------------------------------------------------------------------
 
 =head2 create ( $session, $options )
@@ -222,44 +261,32 @@ A list of properties to assign to this PayDriver.  See C<definition> for details
 
 =cut
 
-sub create {
-    my $class   = shift;
-    my $session = shift;
-    WebGUI::Error::InvalidParam->throw(error => q{Must provide a session variable})
-        unless ref $session eq 'WebGUI::Session';
-    my $options = shift;
-    WebGUI::Error::InvalidParam->throw(error => q{Must provide a hashref of options})
-        unless ref $options eq 'HASH' and scalar keys %{ $options };
-    WebGUI::Error::InvalidParam->throw(error => q{Must provide a human readable label in the hashref of options})
-        unless exists $options->{label} && $options->{label};
-
-    # Generate a unique id for this payment
-    my $paymentGatewayId = $session->id->generate;
-
-    # Build object
-    my $self = WebGUI::Shop::PayDriver->_buildObj($session, $class, $paymentGatewayId, $options);
-
-    # and persist this instance in the db
-    $session->db->write('insert into paymentGateway (paymentGatewayId, className) VALUES (?,?)', [
-        $paymentGatewayId, 
-        $class,
-    ]);
-    
-    # Set the options via the update method because update() will automatically serialize the options hash
-    $self->update($options);
-
-    return $self;
-}
-
-#-------------------------------------------------------------------
-
-=head2 definition ( $session )
-
-This subroutine returns an arrayref of hashrefs, used to validate data put into
-the object by the user, and to automatically generate the edit form to show
-the user.
-
-=cut
+#sub create {
+#    my $class   = shift;
+#    my $session = shift;
+#    my $options = shift;
+#    WebGUI::Error::InvalidParam->throw(error => q{Must provide a hashref of options})
+#        unless ref $options eq 'HASH' and scalar keys %{ $options };
+#    WebGUI::Error::InvalidParam->throw(error => q{Must provide a human readable label in the hashref of options})
+#        unless exists $options->{label} && $options->{label};
+#
+#    # Generate a unique id for this payment
+#    my $paymentGatewayId = $session->id->generate;
+#
+#    # Build object
+#    my $self = WebGUI::Shop::PayDriver->_buildObj($session, $class, $paymentGatewayId, $options);
+#
+#    # and persist this instance in the db
+#    $session->db->write('insert into paymentGateway (paymentGatewayId, className) VALUES (?,?)', [
+#        $paymentGatewayId, 
+#        $class,
+#    ]);
+#    
+#    # Set the options via the update method because update() will automatically serialize the options hash
+#    $self->update($options);
+#
+#    return $self;
+#}
 
 #-------------------------------------------------------------------
 
@@ -296,34 +323,6 @@ sub displayPaymentError {
                 . q{<p><a href="?shop=cart;method=checkout">} . $i18n->get( 'try again' ) . q{</a></p>}
                 ;
     return $self->session->style->userStyle($output);
-}
-
-#-------------------------------------------------------------------
-
-=head2 get ( [ $param ] )
-
-This is an enhanced accessor for the options property.  By default,
-it returns all the options as a hashref.  If the name of a key
-in the hash is passed, it will only return that value from the
-options hash.
-
-=head3 $param
-
-An optional parameter.  If it matches the key of a hash, it will
-return the value from the options hash.
-
-=cut
-
-sub get {
-    my $self  = shift;
-    my $param = shift;
-    my $options = $self->options;
-    if (defined $param) {
-        return $options->{ $param };
-    }
-    else {
-        return { %{ $options } };
-    }
 }
 
 #-------------------------------------------------------------------
@@ -468,9 +467,8 @@ sub getName {
     WebGUI::Error::InvalidParam->throw(error => q{Must provide a session variable})
         unless ref $session eq 'WebGUI::Session';
 
-    my $definition  = $class->definition($session);
-
-    return $definition->[0]->{name};
+    my $definition  = $class->meta->pluginName;
+    return WebGUI::International->new($session, 'Asset')->get(@{ $class->meta->pluginName });
 }
 
 #-------------------------------------------------------------------
@@ -495,41 +493,31 @@ that object.
 
 =cut
 
-sub new {
-    my $class               = shift;
-    my $session             = shift;
-    WebGUI::Error::InvalidParam->throw(error => q{Must provide a session variable})
-        unless ref $session eq 'WebGUI::Session';
-    my $paymentGatewayId    = shift;
-    WebGUI::Error::InvalidParam->throw(error => q{Must provide a paymentGatewayId})
-        unless defined $paymentGatewayId;
-
-    # Fetch the instance data from the db
-    my $properties = $session->db->quickHashRef('select * from paymentGateway where paymentGatewayId=?', [
-        $paymentGatewayId,
-    ]);
-    WebGUI::Error::ObjectNotFound->throw(error => q{paymentGatewayId not found in db}, id => $paymentGatewayId)
-        unless scalar keys %{ $properties };
-
-    croak "Somehow, the options property of this object, $paymentGatewayId, got broken in the db"
-        unless exists $properties->{options} and $properties->{options};
-
-    my $options = from_json($properties->{options});
-
-    my $self = WebGUI::Shop::PayDriver->_buildObj($session, $class, $paymentGatewayId, $options);
-
-    return $self;
-}
-
-#-------------------------------------------------------------------
-
-=head2 options (  )
-
-Accessor for the driver properties.  This returns a hashref
-any driver specific properties.  To set the properties, use
-the C<update> method.
-
-=cut
+#sub new {
+#    my $class               = shift;
+#    my $session             = shift;
+#    WebGUI::Error::InvalidParam->throw(error => q{Must provide a session variable})
+#        unless ref $session eq 'WebGUI::Session';
+#    my $paymentGatewayId    = shift;
+#    WebGUI::Error::InvalidParam->throw(error => q{Must provide a paymentGatewayId})
+#        unless defined $paymentGatewayId;
+#
+#    # Fetch the instance data from the db
+#    my $properties = $session->db->quickHashRef('select * from paymentGateway where paymentGatewayId=?', [
+#        $paymentGatewayId,
+#    ]);
+#    WebGUI::Error::ObjectNotFound->throw(error => q{paymentGatewayId not found in db}, id => $paymentGatewayId)
+#        unless scalar keys %{ $properties };
+#
+#    croak "Somehow, the options property of this object, $paymentGatewayId, got broken in the db"
+#        unless exists $properties->{options} and $properties->{options};
+#
+#    my $options = from_json($properties->{options});
+#
+#    my $self = WebGUI::Shop::PayDriver->_buildObj($session, $class, $paymentGatewayId, $options);
+#
+#    return $self;
+#}
 
 #-------------------------------------------------------------------
 
@@ -666,7 +654,7 @@ Accessor for the session object.  Returns the session object.
 
 #-------------------------------------------------------------------
 
-=head2 update ( $options )
+=head2 write ( $options )
 
 Setter for user configurable options in the payment objects.
 
@@ -677,20 +665,16 @@ flattened into JSON and stored in the database as text.  There is no content che
 
 =cut
 
-sub update {
+sub write {
     my $self        = shift;
-    my $properties  = shift;
-    WebGUI::Error::InvalidParam->throw(error => 'update was not sent a hashref of options to store in the database')
-        unless ref $properties eq 'HASH' and scalar keys %{ $properties };
 
+    my $properties  = $self->get();
+    delete $properties->{session};
     my $jsonOptions = to_json($properties);
-    $self->session->db->write('update paymentGateway set options=? where paymentGatewayId=?', [
-        $jsonOptions,
-        $self->paymentGatewayId
-    ]);
-    my $storedProperties = clone $properties;
-    $options{ id $self } = $storedProperties;
-
+    $self->session->db->setRow($self->tableName, 'paymentGatewayId', {
+        paymentGatewayId => $self->paymentGatewayId,
+        options          => $jsonOptions,
+    });
     return;
 }
 
