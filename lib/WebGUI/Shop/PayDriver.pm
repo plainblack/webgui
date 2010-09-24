@@ -455,7 +455,7 @@ sub getId {
 =head2 getName ( )
 
 Return a human readable name for this driver. Never overridden in the
-subclass, instead specified in definition with the name "name".
+subclass, instead specified via WebGUI::Definition::Shop with the name "pluginName".
 
 This is a class method.
 
@@ -673,6 +673,7 @@ sub write {
     my $jsonOptions = to_json($properties);
     $self->session->db->setRow($self->tableName, 'paymentGatewayId', {
         paymentGatewayId => $self->paymentGatewayId,
+        className        => $self->className,
         options          => $jsonOptions,
     });
     return;
