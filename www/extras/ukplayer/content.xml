@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<content>
+	<slides>
+		<slide>
+			<width>400</width>
+			<height>300</height>
+			<title><![CDATA[Slide One]]></title>
+			<description><![CDATA[This is the United Knowledge Player for WebGUI!]]></description>
+			<image_source>dummycontent/explain.jpg</image_source>
+			<duration>5</duration>
+			<thumb_source>dummycontent/explain.jpg</thumb_source>
+			<sound_source></sound_source>
+		</slide>
+		<slide>
+			<width>400</width>
+			<height>300</height>
+			<title><![CDATA[Slide Two]]></title>
+			<description><![CDATA[This is the United Knowledge Player for WebGUI!]]></description>
+			<image_source>dummycontent/united-knowledge-logo.jpg</image_source>
+			<duration>5</duration>
+			<thumb_source>dummycontent/united-knowledge-logo.jpg</thumb_source>
+			<sound_source></sound_source>
+		</slide>
+	</slides>
+</content>

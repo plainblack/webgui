@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+	<content_url>content.xml</content_url>
+	
+	<width>400</width>
+	<height>300</height>
+	<background_color>0xE0E0E0</background_color>
+	<default_duration>5</default_duration>
+	<default_slidewidth>400</default_slidewidth>
+	<default_slideheight>300</default_slideheight>
+	
+	<font>Verdana</font>
+	<font_size>12</font_size>
+	<font_color>0xFFFFFF</font_color>
+	
+	<text_border_color>0x888888</text_border_color>
+	<text_bg_color>0x000000</text_bg_color>
+	<text_autohide>true</text_autohide>
+	<text_display>over</text_display> <!--over|above|none-->
+	<text_height>0</text_height>
+	
+	<controls_color>0xFFFFFF</controls_color>
+	<controls_border_color>0x888888</controls_border_color>
+	<controls_bg_color>0x000000</controls_bg_color>
+	<controls_autohide>true</controls_autohide>
+	
+	<playbutton_percent_width>20</playbutton_percent_width>
+	<playbutton_max_width>200</playbutton_max_width>
+	
+	<thumbnail_width>60</thumbnail_width>
+	<thumbnail_height>45</thumbnail_height>
+	<thumbnail_border_color>0x888888</thumbnail_border_color>
+	<thumbnails_hide>false</thumbnails_hide>
+	<menu_autohide>true</menu_autohide>
+	<menu_dead_zone_width>100</menu_dead_zone_width>
+	<menu_gaps>8</menu_gaps>
+	
+	<sound>off</sound> <!-- on|off -->
+	<mute_at_start>false</mute_at_start>
+	<autostart>true</autostart>
+	<autopause>false</autopause>
+	<loop>true</loop>
+	<error_message_content><![CDATA[XML not found: ]]></error_message_content>
+	<error_message_image><![CDATA[Image not found]]></error_message_image>
+	
+	<skin>rounded</skin> <!--simple|rounded-->
+</config>
