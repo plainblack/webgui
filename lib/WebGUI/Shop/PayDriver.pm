@@ -30,6 +30,9 @@ use JSON;
 use Clone qw/clone/;
 use Scalar::Util qw/blessed/;
 
+use Moose;
+use WebGUI::Definition;
+
 =head1 NAME
 
 Package WebGUI::Shop::PayDriver
