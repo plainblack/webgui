@@ -8,6 +8,13 @@ http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt
 SWFObject 2, the code used to display the Slideshow, is licensed under the MIT License
 http://www.opensource.org/licenses/mit-license.php
 
+Check out the latest source on:
+http://git.st.unitedknowledge.org/git/ukplayer.git
+git clone git://git.st.unitedknowledge.org/ukplayer.git
+git clone http://git.st.unitedknowledge.org/git/ukplayer.git
+
+More information about licences can be found in the file licences.txt in this directory. 
+
 
 **********************************************************************************************
 *                                                                                            *
