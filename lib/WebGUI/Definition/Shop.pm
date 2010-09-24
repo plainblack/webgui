@@ -101,7 +101,7 @@ sub init_meta {
         );
         Moose::Util::apply_all_roles(
             $for_class,
-            'WebGUI::Definition::Role',
+            'WebGUI::Definition::Role::Object',
         );
     }
     else {
