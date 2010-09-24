@@ -1720,21 +1720,9 @@ sub www_viewProject {
     
 	
 	#Set page styles
-	$style->setLink($assetExtras."/subModal.css", { 
-                        rel=>"stylesheet", 
-                        type=>"text/css", 
-                    }
-    );
-    $style->setLink($assetExtras."/taskEdit.css", {
-                        rel=>"stylesheet",
-                        type=>"text/css",
-                    }
-    );
-    $style->setLink($assetExtras."/cMenu.css",{
-                        rel=>"stylesheet",
-                        type=>"text/css",
-                    }
-    );
+	$style->setCss($assetExtras."/subModal.css");
+    $style->setCss($assetExtras."/taskEdit.css");
+    $style->setCss($assetExtras."/cMenu.css");
 	
     #Set page scripts
 	$style->setScript($assetExtras."/cMenu.js");

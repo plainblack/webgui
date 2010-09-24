@@ -177,7 +177,7 @@ Sets the JS for this form plugin
 sub headTags {
     my $self    = shift;
     my $session = $self->session;
-    $session->style->setScript($session->url->extras("yui-webgui/build/form/assetReportQuery.js"),{ type=>"text/javascript" });    
+    $session->style->setScript($session->url->extras("yui-webgui/build/form/assetReportQuery.js"));    
 }
 
 #-------------------------------------------------------------------

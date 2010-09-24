@@ -220,8 +220,8 @@ sub view {
     if ($crop_js) {
         my ($style, $url) = $session->quick(qw(style url));
 
-        $style->setLink($url->extras('yui/build/fonts/fonts-min.css'), {rel=>'stylesheet', type=>'text/css'});
-        $style->setLink($url->extras('yui/container/assets/container.css'), {rel=>'stylesheet', type=>'text/css'});
+        $style->setCss($url->extras('yui/build/fonts/fonts-min.css'));
+        $style->setCss($url->extras('yui/container/assets/container.css'));
         $style->setScript($url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'));
         $style->setScript($url->extras('yui/build/container/container-min.js'));
     }
@@ -332,9 +332,9 @@ sub www_annotate {
 
     my ($style, $url) = $session->quick(qw(style url));
 
-	$style->setLink($url->extras('yui/build/resize/assets/skins/sam/resize.css'), {rel=>'stylesheet', type=>'text/css'});
-	$style->setLink($url->extras('yui/build/fonts/fonts-min.css'), {rel=>'stylesheet', type=>'text/css'});
-	$style->setLink($url->extras('yui/build/imagecropper/assets/skins/sam/imagecropper.css'), {rel=>'stylesheet', type=>'text/css'});
+	$style->setCss($url->extras('yui/build/resize/assets/skins/sam/resize.css'));
+	$style->setCss($url->extras('yui/build/fonts/fonts-min.css'));
+	$style->setCss($url->extras('yui/build/imagecropper/assets/skins/sam/imagecropper.css'));
 
 	$style->setScript($url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'));
 	$style->setScript($url->extras('yui/build/element/element-min.js'));
@@ -613,8 +613,8 @@ sub www_resize {
 	##YUI specific datatable CSS
 	my ($style, $url) = $session->quick(qw(style url));
 
-	$style->setLink($url->extras('yui/build/fonts/fonts-min.css'), {rel=>'stylesheet', type=>'text/css'});
-	$style->setLink($url->extras('yui/build/resize/assets/skins/sam/resize.css'), {rel=>'stylesheet', type=>'text/css'});
+	$style->setCss($url->extras('yui/build/fonts/fonts-min.css'));
+	$style->setCss($url->extras('yui/build/resize/assets/skins/sam/resize.css'));
 	$style->setScript($url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'));
 	$style->setScript($url->extras('yui/build/element/element-min.js'));
 	$style->setScript($url->extras('yui/build/dragdrop/dragdrop-min.js'));
@@ -753,9 +753,9 @@ sub www_crop {
 		</script>
     );
 
-	$style->setLink($url->extras('yui/build/resize/assets/skins/sam/resize.css'), {rel=>'stylesheet', type=>'text/css'});
-	$style->setLink($url->extras('yui/build/fonts/fonts-min.css'), {rel=>'stylesheet', type=>'text/css'});
-	$style->setLink($url->extras('yui/build/imagecropper/assets/skins/sam/imagecropper.css'), {rel=>'stylesheet', type=>'text/css'});
+	$style->setCss($url->extras('yui/build/resize/assets/skins/sam/resize.css'));
+	$style->setCss($url->extras('yui/build/fonts/fonts-min.css'));
+	$style->setCss($url->extras('yui/build/imagecropper/assets/skins/sam/imagecropper.css'));
 	$style->setScript($url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'));
 	$style->setScript($url->extras('yui/build/element/element-min.js'));
 	$style->setScript($url->extras('yui/build/dragdrop/dragdrop-min.js'));

@@ -39,7 +39,7 @@ sub process {
 	my ($url, $style, $asset, $user, $config) = $session->quick(qw(url style asset user config));
 	$style->setScript($url->extras('yui/build/utilities/utilities.js'));
 	$style->setScript($url->extras('accordion/accordion.js'));
-	$style->setLink($url->extras('macro/AdminBar/slidePanel.css'), {type=>'text/css', rel=>'stylesheet'});
+	$style->setCss($url->extras('macro/AdminBar/slidePanel.css'));
 
 	my $out = q{<dl class="accordion-menu">};
 

@@ -138,18 +138,9 @@ Send JS required for this plugin.
 sub headTags {
     my $self = shift;
     my ( $url, $style ) = $self->session->quick(qw( url style ));
-    $style->setScript(
-        $url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'),
-        { type => 'text/javascript' },
-    );
-    $style->setScript(
-        $url->extras('yui/build/json/json-min.js'),
-        { type => 'text/javascript' },
-    );
-    $style->setScript(
-        $url->extras('yui-webgui/build/form/jsontable.js'),
-        { type => 'text/javascript' },
-    );
+    $style->setScript( $url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'));
+    $style->setScript( $url->extras('yui/build/json/json-min.js'));
+    $style->setScript( $url->extras('yui-webgui/build/form/jsontable.js'));
 }
 
 #-------------------------------------------------------------------

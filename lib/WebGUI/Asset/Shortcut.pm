@@ -123,7 +123,7 @@ sub _drawQueryBuilder {
 
 	# html
 	$session->style->setScript($session->url->extras('wobject/Shortcut/querybuilder.js'));
-	$session->style->setLink($session->url->extras('wobject/Shortcut/querybuilder.css'), {type=>"text/css", rel=>"stylesheet"});
+	$session->style->setCss($session->url->extras('wobject/Shortcut/querybuilder.css'));
 	my $output;
 	$output .= qq|<table cellspacing="0" cellpadding="0" border="0"><tr><td colspan="5" align="right">$shortcutCriteriaField</td></tr><tr><td></td><td></td><td></td><td></td><td class="qbtdright"></td></tr><tr><td></td><td></td><td></td><td></td><td class="qbtdright">$conjunctionField</td></tr>|;
 

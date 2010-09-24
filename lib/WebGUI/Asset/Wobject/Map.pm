@@ -296,8 +296,8 @@ sub loadMapApiTags {
     my $style   = $self->session->style;
     my $url     = $self->session->url;
 
-    $style->setLink($url->extras('yui/build/container/assets/skins/sam/container.css'),{type=>'text/css',rel=>'stylesheet'});
-    $style->setLink($url->extras('yui/build/button/assets/skins/sam/button.css'),{type=>'text/css',rel=>'stylesheet'});
+    $style->setCss($url->extras('yui/build/container/assets/skins/sam/container.css'));
+    $style->setCss($url->extras('yui/build/button/assets/skins/sam/button.css'));
     $style->setScript("http://www.google.com/jsapi?key=" . $self->mapApiKey);
     $style->setRawHeadTags(<<'ENDHTML');
 <script type="text/javascript">

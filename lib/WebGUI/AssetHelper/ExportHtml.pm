@@ -68,7 +68,7 @@ sub www_export {
     my $session = $asset->session;
     return $session->privilege->insufficient() unless ($session->user->isInGroup(13));
     my ( $style, $url ) = $session->quick(qw{ style url });
-    $style->setLink( $url->extras('hoverhelp.css'), { rel => "stylesheet", type => "text/css" } );
+    $style->setCss( $url->extras('hoverhelp.css'));
     $style->setScript( $url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js') );
     $style->setScript( $url->extras('yui/build/container/container-min.js') );
     $style->setScript( $url->extras('hoverhelp.js') );

@@ -165,7 +165,7 @@ Set the head tags for this form plugin
 
 sub headTags {
     my $self = shift;
-	$self->session->style->setScript($self->session->url->extras('inputCheck.js'),{ type=>'text/javascript' });
+	$self->session->style->setScript($self->session->url->extras('inputCheck.js'));
 }
 
 #-------------------------------------------------------------------

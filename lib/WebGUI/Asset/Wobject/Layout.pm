@@ -243,7 +243,7 @@ sub prepareView {
         $session->style->setScript($session->url->extras("yui/build/dragdrop/dragdrop.js"));
         $session->style->setScript($session->url->extras("yui-webgui/build/layout/draggable.js"));
 
-        $session->style->setLink($session->url->extras("draggable.css"),{ type=>"text/css", rel=>"stylesheet", media=>"all" });
+        $session->style->setCss($session->url->extras("draggable.css"));
         $session->style->setRawHeadTags('
             <style type="text/css">
             .dragging, .empty {

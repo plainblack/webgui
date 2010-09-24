@@ -211,7 +211,7 @@ Asset picker for the rich editor.
 sub www_pageTree {
     my $session = shift;
     $session->http->setCacheControl("none");
-    $session->style->setLink($session->url->extras('/tinymce-webgui/plugins/wgpagetree/css/pagetree.css'),{ type=>'text/css', rel=>"stylesheet" });
+    $session->style->setCss($session->url->extras('/tinymce-webgui/plugins/wgpagetree/css/pagetree.css'));
     $session->style->setRawHeadTags(<<"JS");
 <style type="text/css">body { margin: 0 }</style>
 <script type="text/javascript">//<![CDATA[
@@ -268,7 +268,7 @@ Each link display a thumbnail of the image via www_viewThumbnail.
 sub www_imageTree {
     my $session = shift;
     $session->http->setCacheControl("none");
-    $session->style->setLink($session->url->extras('/tinymce-webgui/plugins/wginsertimage/css/insertimage.css'),{ type=>'text/css', rel=>"stylesheet" });
+    $session->style->setCss($session->url->extras('/tinymce-webgui/plugins/wginsertimage/css/insertimage.css'));
     $session->style->setRawHeadTags(<<"JS");
 <style type="text/css">body { margin: 0 }</style>
 <script type="text/javascript">//<![CDATA[
@@ -347,7 +347,7 @@ URL in the session object is used to determine which Image is used.
 sub www_viewThumbnail {
     my $session = shift;
     $session->http->setCacheControl("none");
-    $session->style->setLink($session->url->extras('/tinymce-webgui/plugins/wginsertimage/css/insertimage.css'),{ type=>'text/css', rel=>"stylesheet" });
+    $session->style->setCss($session->url->extras('/tinymce-webgui/plugins/wginsertimage/css/insertimage.css'));
     my $image = WebGUI::Asset->newByUrl($session);
     my $i18n = WebGUI::International->new($session);
     my $output = '<div class="preview">';

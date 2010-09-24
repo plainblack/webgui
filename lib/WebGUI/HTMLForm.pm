@@ -269,8 +269,8 @@ sub print {
 	my $self = shift;
     my $style = $self->session->style;
     my $url = $self->session->url;
-    $style->setLink($url->extras('/yui/build/container/assets/container.css'),{ type=>'text/css', rel=>"stylesheet" });
-    $style->setLink($url->extras('/hoverhelp.css'),{ type=>'text/css', rel=>"stylesheet" });
+    $style->setCss($url->extras('/yui/build/container/assets/container.css'));
+    $style->setCss($url->extras('/hoverhelp.css'));
     $style->setScript($url->extras('/yui/build/yahoo/yahoo-min.js'));
     $style->setScript($url->extras('/yui/build/dom/dom-min.js'));
     $style->setScript($url->extras('/yui/build/event/event-min.js'));

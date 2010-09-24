@@ -320,8 +320,8 @@ override getToolbar => sub {
             $toolbar = $self->session->icon->edit('func=edit'.$returnUrl,$self->url)
                 if ($userUiLevel >= $uiLevels->{"edit"});
         }
-        $self->session->style->setLink($self->session->url->extras('assetToolbar/assetToolbar.css'), {rel=>"stylesheet",type=>"text/css"});
-        $self->session->style->setLink($self->session->url->extras('yui/build/menu/assets/skins/sam/menu.css'), {rel=>"stylesheet",type=>"text/css"});
+        $self->session->style->setCss($self->session->url->extras('assetToolbar/assetToolbar.css'));
+        $self->session->style->setCss($self->session->url->extras('yui/build/menu/assets/skins/sam/menu.css'));
         $self->session->style->setScript($self->session->url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'));
         $self->session->style->setScript($self->session->url->extras('yui/build/container/container_core-min.js'));
         $self->session->style->setScript($self->session->url->extras('yui/build/menu/menu-min.js'));

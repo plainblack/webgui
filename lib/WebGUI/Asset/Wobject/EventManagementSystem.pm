@@ -2443,7 +2443,7 @@ sub www_manageRegistrant {
 	|;
 
 	# render
-	$session->style->setLink($session->url->extras('/yui/build/reset-fonts-grids/reset-fonts-grids.css'), {rel=>"stylesheet", type=>"text/css"});
+	$session->style->setCss($session->url->extras('/yui/build/reset-fonts-grids/reset-fonts-grids.css'));
 	$session->style->setRawHeadTags(q|
 		<style type="text/css">
 		.manageRegistrant tbody tr td { padding: 2px;}

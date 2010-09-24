@@ -64,7 +64,7 @@ sub toHtml {
     my ( $self ) = @_;
     my ( $style, $url ) = $self->session->quick(qw( style url ));
 
-    $style->setLink( $url->extras("yui/build/tabview/assets/skins/sam/tabview.css"), { rel => "stylesheet", type => "text/css" } );
+    $style->setCss( $url->extras("yui/build/tabview/assets/skins/sam/tabview.css"));
     $style->setScript( $url->extras("yui/build/yahoo-dom-event/yahoo-dom-event.js") );
     $style->setScript( $url->extras("yui/build/element/element-min.js") );
     $style->setScript( $url->extras("yui/build/tabview/tabview-min.js") );

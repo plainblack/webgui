@@ -67,7 +67,7 @@ sub www_editBranch {
     my ($class, $asset) = @_;
     my $session = $asset->session;
     my ( $style, $url ) = $session->quick( qw( style url ) );
-    $style->setLink( $url->extras('hoverhelp.css'), { rel => "stylesheet", type => "text/css" } );
+    $style->setCss( $url->extras('hoverhelp.css'));
     $style->setScript( $url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js') );
     $style->setScript( $url->extras('yui/build/container/container-min.js') );
     $style->setScript( $url->extras('hoverhelp.js') );

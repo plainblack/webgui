@@ -356,10 +356,10 @@ sub www_manage {
     );
 
     # Add script and stylesheets
-    $session->style->setLink( $session->url->extras('yui/build/paginator/assets/skins/sam/paginator.css'), {rel=>'stylesheet', type=>'text/css'});
-    $session->style->setLink( $session->url->extras('yui/build/datatable/assets/skins/sam/datatable.css'), {rel=>'stylesheet', type=>'text/css'});
-    $session->style->setLink( $session->url->extras('yui/build/menu/assets/skins/sam/menu.css'), {rel=>'stylesheet', type=>'text/css'});
-    $session->style->setLink( $session->url->extras('yui-webgui/build/assetManager/assetManager.css' ), { rel => "stylesheet", type => 'text/css' } );
+    $session->style->setCss( $session->url->extras('yui/build/paginator/assets/skins/sam/paginator.css'));
+    $session->style->setCss( $session->url->extras('yui/build/datatable/assets/skins/sam/datatable.css'));
+    $session->style->setCss( $session->url->extras('yui/build/menu/assets/skins/sam/menu.css'));
+    $session->style->setCss( $session->url->extras('yui-webgui/build/assetManager/assetManager.css' ));
 
     $session->style->setScript( $session->url->extras( 'yui/build/utilities/utilities.js' ) );
     $session->style->setScript( $session->url->extras( 'yui/build/paginator/paginator-min.js ' ) );
@@ -541,7 +541,7 @@ sub www_search {
     my $currentAsset = getCurrentAsset($session);
     my $output       = '<div id="assetSearch">' . getHeader( $session );
     
-    $session->style->setLink( $session->url->extras( 'yui-webgui/build/assetManager/assetManager.css' ), { rel => "stylesheet", type => 'text/css' } );
+    $session->style->setCss( $session->url->extras( 'yui-webgui/build/assetManager/assetManager.css' ));
     $session->style->setScript( $session->url->extras( 'yui/build/yahoo-dom-event/yahoo-dom-event.js' ) );
     $session->style->setScript( $session->url->extras( 'yui-webgui/build/assetManager/assetManager.js' ) );
     $session->style->setScript( $session->url->extras( 'yui-webgui/build/form/form.js' ) );

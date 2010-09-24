@@ -230,11 +230,11 @@ sub print {
 	my $self = shift;
     my $style = $self->session->style;
     my $url = $self->session->url;
-	$style->setLink($self->{_css},{rel=>"stylesheet", rel=>"stylesheet",type=>"text/css"});
-	$style->setLink($url->extras('/yui/build/fonts/fonts-min.css'),{type=>"text/css", rel=>"stylesheet"});
-	$style->setLink($url->extras('/yui/build/tabview/assets/skins/sam/tabview.css'),{type=>"text/css", rel=>"stylesheet"});
-    $style->setLink($url->extras('/yui/build/container/assets/container.css'),{ type=>'text/css', rel=>"stylesheet" });
-    $style->setLink($url->extras('/hoverhelp.css'),{ type=>'text/css', rel=>"stylesheet" });
+	$style->setCss($self->{_css});
+	$style->setCss($url->extras('/yui/build/fonts/fonts-min.css'));
+	$style->setCss($url->extras('/yui/build/tabview/assets/skins/sam/tabview.css'));
+    $style->setCss($url->extras('/yui/build/container/assets/container.css'));
+    $style->setCss($url->extras('/hoverhelp.css'));
     $style->setScript($url->extras('/yui/build/utilities/utilities.js'));
     $style->setScript($url->extras('/yui/build/container/container-min.js'));
     $style->setScript($url->extras('/yui/build/tabview/tabview-min.js'));

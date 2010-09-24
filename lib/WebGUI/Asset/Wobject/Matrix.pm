@@ -590,8 +590,7 @@ sub view {
     my $i18n    = WebGUI::International->new($session, 'Asset_Matrix');
 
     # javascript and css files for compare form datatable
-    $style->setLink($url->extras('yui/build/datatable/assets/skins/sam/datatable.css'), 
-        {type =>'text/css', rel=>'stylesheet'});
+    $style->setCss($url->extras('yui/build/datatable/assets/skins/sam/datatable.css'));
 
     $style->setScript($url->extras('yui/build/utilities/utilities.js'));
     $style->setScript($url->extras('yui/build/json/json-min.js'));
@@ -848,9 +847,9 @@ sub www_compare {
     $style->setScript($url->extras('yui/build/datatable/datatable-min.js'));
     $style->setScript($url->extras('yui/build/button/button-min.js'));
     $style->setScript($url->extras('yui/build/container/container-min.js'));
-    $style->setLink($url->extras('yui/build/datatable/assets/skins/sam/datatable.css'), {type =>'text/css', rel=>'stylesheet'});
+    $style->setCss($url->extras('yui/build/datatable/assets/skins/sam/datatable.css'));
     $style->setScript($url->extras('hoverhelp.js'));
-    $style->setLink($url->extras('hoverhelp.css'), {type =>'text/css', rel=>'stylesheet'});
+    $style->setCss($url->extras('hoverhelp.css'));
 
     my $maxComparisons;
     if($self->session->user->isVisitor){
@@ -1363,7 +1362,7 @@ sub www_search {
     $style->setScript($url->extras('yui/build/datasource/datasource-min.js'));
     $style->setScript($url->extras('yui/build/datatable/datatable-min.js'));
     $style->setScript($url->extras('yui/build/button/button-min.js'));
-    $style->setLink($url->extras('yui/build/datatable/assets/skins/sam/datatable.css'), {type =>'text/css', rel=>'stylesheet'});
+    $style->setCss($url->extras('yui/build/datatable/assets/skins/sam/datatable.css'));
 
     foreach my $category (keys %{$self->getCategories}) {
         my $attributes;

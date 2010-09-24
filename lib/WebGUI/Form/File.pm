@@ -245,8 +245,8 @@ Set the head tags for this form plugin
 
 sub headTags {
     my $self = shift;
-    $self->session->style->setScript($self->session->url->extras('FileUploadControl.js'),{type=>"text/javascript"});
-    $self->session->style->setScript($self->session->url->extras('fileIcons.js'),{type=>"text/javascript"});
+    $self->session->style->setScript($self->session->url->extras('FileUploadControl.js'));
+    $self->session->style->setScript($self->session->url->extras('fileIcons.js'));
 }
 
 #-------------------------------------------------------------------

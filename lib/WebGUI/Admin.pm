@@ -517,16 +517,16 @@ sub www_view {
     $var->{homeUrl} = WebGUI::Asset->getDefault( $session )->getUrl;
 
     # All this needs to be template attachments
-    $style->setLink( $url->extras('yui/build/button/assets/skins/sam/button.css'), {type=>"text/css",rel=>"stylesheet"});
-    $style->setLink( $url->extras('yui/build/menu/assets/skins/sam/menu.css'), {type=>"text/css",rel=>"stylesheet"});
-    $style->setLink( $url->extras('yui/build/tabview/assets/skins/sam/tabview.css'), {type=>"text/css",rel=>"stylesheet"});
-    $style->setLink( $url->extras('yui/build/paginator/assets/skins/sam/paginator.css'), {rel=>'stylesheet', type=>'text/css'});
-    $style->setLink( $url->extras('yui/build/datatable/assets/skins/sam/datatable.css'), {rel=>'stylesheet', type=>'text/css'});
-    $style->setLink( $url->extras('yui/build/container/assets/skins/sam/container.css'), {rel=>'stylesheet', type=>'text/css'});
-    $style->setLink( $url->extras('yui/build/autocomplete/assets/skins/sam/autocomplete.css'), {rel=>'stylesheet', type=>'text/css'});
-    $style->setLink( $url->extras('yui/build/menu/assets/skins/sam/menu.css'), {rel=>'stylesheet', type=>'text/css'});
-    #$style->setLink( $url->extras('yui-webgui/build/assetManager/assetManager.css' ), { rel => "stylesheet", type => 'text/css' } );
-    $style->setLink( $url->extras('admin/admin.css'), { type=>'text/css', rel=>'stylesheet'} );
+    $style->setCss( $url->extras('yui/build/button/assets/skins/sam/button.css'));
+    $style->setCss( $url->extras('yui/build/menu/assets/skins/sam/menu.css'));
+    $style->setCss( $url->extras('yui/build/tabview/assets/skins/sam/tabview.css'));
+    $style->setCss( $url->extras('yui/build/paginator/assets/skins/sam/paginator.css'));
+    $style->setCss( $url->extras('yui/build/datatable/assets/skins/sam/datatable.css'));
+    $style->setCss( $url->extras('yui/build/container/assets/skins/sam/container.css'));
+    $style->setCss( $url->extras('yui/build/autocomplete/assets/skins/sam/autocomplete.css'));
+    $style->setCss( $url->extras('yui/build/menu/assets/skins/sam/menu.css'));
+    #$style->setCss( $url->extras('yui-webgui/build/assetManager/assetManager.css' ));
+    $style->setCss( $url->extras('admin/admin.css'));
     $style->setScript($url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'));
     $style->setScript($url->extras('yui/build/utilities/utilities.js'));
     $style->setScript($url->extras('yui/build/element/element-min.js'));

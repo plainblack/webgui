@@ -1715,7 +1715,7 @@ sub www_editThing {
     $self->session->style->setScript($self->session->url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'));
     $self->session->style->setScript($self->session->url->extras('yui/build/connection/connection-min.js'));
     $self->session->style->setScript($self->session->url->extras('wobject/Thingy/thingy.js'));
-    $self->session->style->setLink($self->session->url->extras('wobject/Thingy/thingy.css'), {type =>'text/css', rel=>'stylesheet'});
+    $self->session->style->setCss($self->session->url->extras('wobject/Thingy/thingy.css'));
 
     $tab = $tabForm->getTab('fields');
     foreach my $fieldType ( keys %{ WebGUI::Form::FieldType->new($session)->getTypes }) {

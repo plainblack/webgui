@@ -370,13 +370,13 @@ sub getConfigurationScreen {
 
     # Wrap output in a YUI Tab widget.
     my ($style, $url) = $session->quick( qw{ style url } );
-	$style->setLink($self->{_css},{rel=>"stylesheet", rel=>"stylesheet",type=>"text/css"});
-	$style->setLink($url->extras('/yui/build/fonts/fonts-min.css'),{type=>"text/css", rel=>"stylesheet"});
-	$style->setLink($url->extras('/yui/build/tabview/assets/skins/sam/tabview.css'),{type=>"text/css", rel=>"stylesheet"});
-	$style->setLink($url->extras('/yui/build/button/assets/skins/sam/button.css'),{type=>"text/css", rel=>"stylesheet"});
-    $style->setLink($url->extras('/yui/build/container/assets/container.css'),{ type=>'text/css', rel=>"stylesheet" });
-    $style->setLink($url->extras('/hoverhelp.css'),{ type=>'text/css', rel=>"stylesheet" });
-    $style->setLink($url->extras('yui/build/datatable/assets/skins/sam/datatable.css'), {rel=>'stylesheet', type => 'text/CSS'});
+	$style->setCss($self->{_css});
+	$style->setCss($url->extras('/yui/build/fonts/fonts-min.css'));
+	$style->setCss($url->extras('/yui/build/tabview/assets/skins/sam/tabview.css'));
+	$style->setCss($url->extras('/yui/build/button/assets/skins/sam/button.css'));
+    $style->setCss($url->extras('/yui/build/container/assets/container.css'));
+    $style->setCss($url->extras('/hoverhelp.css'));
+    $style->setCss($url->extras('yui/build/datatable/assets/skins/sam/datatable.css'));
     $style->setScript($url->extras('/yui/build/utilities/utilities.js'));
     $style->setScript($url->extras('/yui/build/container/container-min.js'));
     $style->setScript($url->extras('/yui/build/tabview/tabview-min.js'));

@@ -37,11 +37,7 @@ sub process {
 
     # add CSS and JS to the page
     my $style           = $session->style;
-    $style->setLink($extras."/yui/build/container/assets/container.css",{
-                        rel=>"stylesheet",
-                        type=>"text/css",
-                    }
-    );
+    $style->setCss($extras."/yui/build/container/assets/container.css");
     
     # and the JS
     $style->setScript($extras."/wgwidget.js");

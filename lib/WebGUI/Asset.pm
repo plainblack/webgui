@@ -1577,8 +1577,8 @@ sub getToolbar {
     $toolbar .= $self->session->icon->shortcut('func=createShortcut',$self->get("url"))
         if ($userUiLevel >= $uiLevels->{"shortcut"} && !$self->isa('WebGUI::Asset::Shortcut'));
 
-    $self->session->style->setLink($self->session->url->extras('assetToolbar/assetToolbar.css'), {rel=>"stylesheet",type=>"text/css"});
-    $self->session->style->setLink($self->session->url->extras('yui/build/menu/assets/skins/sam/menu.css'), {rel=>"stylesheet",type=>"text/css"});
+    $self->session->style->setCss($self->session->url->extras('assetToolbar/assetToolbar.css'));
+    $self->session->style->setCss($self->session->url->extras('yui/build/menu/assets/skins/sam/menu.css'));
     $self->session->style->setScript($self->session->url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'));
     $self->session->style->setScript($self->session->url->extras('yui/build/container/container_core-min.js'));
     $self->session->style->setScript($self->session->url->extras('yui/build/menu/menu-min.js'));
@@ -2709,7 +2709,7 @@ sub www_edit {
     }
 
     # TODO: Make this whole thing a template instead!
-    $style->setLink($url->extras('yui/build/button/assets/skins/sam/button.css'),{rel => 'stylesheet', type => 'text/css' });
+    $style->setCss($url->extras('yui/build/button/assets/skins/sam/button.css'));
     $style->setScript($url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'));
     $style->setScript($url->extras('yui/build/element/element-min.js'));
     $style->setScript($url->extras('yui/build/button/button-min.js'));

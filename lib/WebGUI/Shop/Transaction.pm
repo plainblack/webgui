@@ -1089,9 +1089,9 @@ sub www_manage {
     my ($style, $url) = $session->quick(qw(style url));
     
     # set up all the files that we need
-    $style->setLink($url->extras('/yui/build/fonts/fonts-min.css'), {rel=>'stylesheet', type=>'text/css'});
-    $style->setLink($url->extras('/yui/build/datatable/assets/skins/sam/datatable.css'), {rel=>'stylesheet', type=>'text/css'});
-    $style->setLink($url->extras('/yui/build/paginator/assets/skins/sam/paginator.css'), {rel=>'stylesheet', type=>'text/css'});
+    $style->setCss($url->extras('/yui/build/fonts/fonts-min.css'));
+    $style->setCss($url->extras('/yui/build/datatable/assets/skins/sam/datatable.css'));
+    $style->setCss($url->extras('/yui/build/paginator/assets/skins/sam/paginator.css'));
     $style->setScript($url->extras('/yui/build/utilities/utilities.js'));
     $style->setScript($url->extras('/yui/build/json/json-min.js'));
     $style->setScript($url->extras('/yui/build/paginator/paginator-min.js'));

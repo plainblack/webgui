@@ -64,7 +64,7 @@ override getEditForm => sub {
     my $i18n    = WebGUI::International->new($self->session, "Asset_Carousel");
 
     $self->session->style->setScript($self->session->url->extras('yui/build/editor/editor-min.js'));
-    $self->session->style->setLink($self->session->url->extras('yui/build/editor/assets/skins/sam/editor.css'), {type =>'text/css', rel=>'stylesheet'});
+    $self->session->style->setCss($self->session->url->extras('yui/build/editor/assets/skins/sam/editor.css'));
     $self->session->style->setScript($self->session->url->extras('wobject/Carousel/carousel.js'));
 
     my $tableRowStart = 

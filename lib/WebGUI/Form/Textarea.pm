@@ -129,7 +129,7 @@ sub headTags {
     my $self = shift;
 	my ($style, $url) = $self->session->quick(qw(style url));
     if ($self->get("resizable")) {
-        $style->setLink($url->extras("yui/build/resize/assets/skins/sam/resize.css"), {type=>"text/css", rel=>"stylesheet"});
+        $style->setCss($url->extras("yui/build/resize/assets/skins/sam/resize.css"));
         $style->setScript($url->extras("yui/build/utilities/utilities.js"));
         $style->setScript($url->extras("yui/build/resize/resize-min.js"));
     }

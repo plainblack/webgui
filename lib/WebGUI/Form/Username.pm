@@ -98,12 +98,13 @@ Set the head tags for this form plugin
 
 sub headTags {
     my $self = shift;
-    $self->session->style->setScript($self->session->url->extras('form/fieldCheck.js'),{ type=>'text/javascript' });
-    $self->session->style->setScript($self->session->url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'), {type=>'text/javascript'});
-    $self->session->style->setScript($self->session->url->extras('yui/build/connection/connection-min.js'), {type => 'text/javascript'});
-    $self->session->style->setScript($self->session->url->extras('yui/build/json/json-min.js'),                   {type=>'text/javascript'});
-    $self->session->style->setScript($self->session->url->extras('yui/build/datasource/datasource-min.js'),       {type=>'text/javascript'});
-    $self->session->style->setScript($self->session->url->extras('yui-webgui/build/i18n/i18n.js'), {type=>'text/javascript'});
+    my ($style, $url) = $self->session->quick(qw/style url/);
+    $style->setScript($url->extras('form/fieldCheck.js'));
+    $style->setScript($url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'));
+    $style->setScript($url->extras('yui/build/connection/connection-min.js'));
+    $style->setScript($url->extras('yui/build/json/json-min.js'));
+    $style->setScript($url->extras('yui/build/datasource/datasource-min.js'));
+    $style->setScript($url->extras('yui-webgui/build/i18n/i18n.js'));
 }
 
 #-------------------------------------------------------------------

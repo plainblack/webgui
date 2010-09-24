@@ -348,6 +348,27 @@ sub sent {
 
 #-------------------------------------------------------------------
 
+=head2 setCss ( url )
+
+Sets a <link> tag into the <head> of this rendered page for this page
+view. This is a shortcut for setLink with the parameters set for the
+standard CSS defaults
+
+=head3 url
+
+The URL to the stylesheet you are linking.  Only one link can be set per url.  If a link to this URL exists,
+the old link will remain and this method will return undef.
+
+=cut
+
+sub setCss {
+	my $self = shift;
+	my $url = shift;
+    return $self->setLink($url, { type=>'text/css', rel=>"stylesheet" });
+}
+
+#-------------------------------------------------------------------
+
 =head2 setLink ( url, params )
 
 Sets a <link> tag into the <head> of this rendered page for this page

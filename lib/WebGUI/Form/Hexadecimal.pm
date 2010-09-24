@@ -118,7 +118,7 @@ A class method that returns a boolean indicating whether this control is compati
 
 sub headTags {
     my $self = shift;
-	$self->session->style->setScript($self->session->url->extras('inputCheck.js'),{ type=>'text/javascript' });
+	$self->session->style->setScript($self->session->url->extras('inputCheck.js'));
 }
 
 #-------------------------------------------------------------------

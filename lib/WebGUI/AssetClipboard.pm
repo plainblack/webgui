@@ -569,7 +569,7 @@ sub www_manageClipboard {
         $ac->addSubmenuItem($self->getUrl('func=emptyClipboard'), $i18n->get(950),
             'onclick="return window.confirm(\''.$i18n->get(951,"WebGUI").'\')"',"Asset");
     }
-    $self->session->style->setLink($self->session->url->extras('assetManager/assetManager.css'), {rel=>"stylesheet",type=>"text/css"});
+    $self->session->style->setCss($self->session->url->extras('assetManager/assetManager.css'));
     $self->session->style->setScript($self->session->url->extras('assetManager/assetManager.js'));
         my $output = "
    <script type=\"text/javascript\">

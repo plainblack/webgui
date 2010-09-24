@@ -273,7 +273,7 @@ sub www_viewHelp {
 	my $session = shift;
 	return $session->privilege->insufficient() unless canView($session);
 	my $ac = WebGUI::AdminConsole->new($session,"help");
-	$session->style->setLink($session->url->extras("/help.css"), {rel=>"stylesheet", type=>"text/css"});
+	$session->style->setCss($session->url->extras("/help.css"));
 	my $namespace = $session->form->process("namespace","className") || "WebGUI";
     my $i18n = WebGUI::International->new($session, $namespace);
 	my $help = _get($session,$session->form->process("hid"),$namespace);

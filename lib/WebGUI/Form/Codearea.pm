@@ -138,8 +138,8 @@ Set the head tags for this form plugin
 sub headTags {
     my $self = shift;
     my ($style, $url) = $self->session->quick(qw(style url));
-    $style->setLink($url->extras("yui/build/resize/assets/skins/sam/resize.css"), {type=>"text/css", rel=>"stylesheet"});
-    $style->setLink($url->extras("yui/build/assets/skins/sam/skin.css"), {type=>"text/css", rel=>"stylesheet"});
+    $style->setCss($url->extras("yui/build/resize/assets/skins/sam/resize.css"));
+    $style->setCss($url->extras("yui/build/assets/skins/sam/skin.css"));
     $style->setScript($url->extras("yui/build/utilities/utilities.js"));
     $style->setScript($url->extras("yui/build/container/container_core-min.js"));
     $style->setScript($url->extras("yui/build/menu/menu-min.js"));
@@ -147,8 +147,8 @@ sub headTags {
     $style->setScript($url->extras("yui/build/resize/resize-min.js"));
     $style->setScript($url->extras("yui/build/editor/editor-min.js"));
     $style->setScript($url->extras("yui-webgui/build/code-editor/code-editor.js"));
-    #$style->setLink($url->extras("yui/build/logger/assets/logger.css"), {type=>"text/css", rel=>"stylesheet"});
-    #$style->setLink($url->extras("yui/build/logger/assets/skins/sam/logger.css"), {type=>"text/css", rel=>"stylesheet"});
+    #$style->setCss($url->extras("yui/build/logger/assets/logger.css"));
+    #$style->setCss($url->extras("yui/build/logger/assets/skins/sam/logger.css"));
     #$style->setScript($url->extras("yui/build/logger/logger.js"));
     $self->SUPER::headTags();
 }

@@ -215,7 +215,7 @@ sub www_show {
     }
 	$session->http->setCacheControl("none");
     $style->setScript($url->extras("/AttachmentsControl/AttachmentsControl.js"));
-    $style->setLink($url->extras("/AttachmentsControl/AttachmentsControl.css"), {type=>"text/css", rel=>"stylesheet"});
+    $style->setCss($url->extras("/AttachmentsControl/AttachmentsControl.css"));
     my $uploadControl = '';
 	my $i18n = WebGUI::International->new($session);
 	my $maxFiles = $form->param('maxAttachments') - scalar(@assetIds) ;

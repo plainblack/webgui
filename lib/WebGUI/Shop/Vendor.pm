@@ -536,9 +536,9 @@ sub www_managePayouts {
     return $session->privilege->adminOnly() unless ($admin->canManage);
     
     # Load the required YUI stuff.
-    $style->setLink($url->extras('yui/build/paginator/assets/skins/sam/paginator.css'), {type=>'text/css', rel=>'stylesheet'});
-    $style->setLink($url->extras('yui/build/datatable/assets/skins/sam/datatable.css'), {type=>'text/css', rel=>'stylesheet'});
-    $style->setLink($url->extras('yui/build/button/assets/skins/sam/button.css'),       {type=>'text/css', rel=>'stylesheet'});
+    $style->setCss($url->extras('yui/build/paginator/assets/skins/sam/paginator.css'));
+    $style->setCss($url->extras('yui/build/datatable/assets/skins/sam/datatable.css'));
+    $style->setCss($url->extras('yui/build/button/assets/skins/sam/button.css'));
 
     $style->setScript($url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'));
     $style->setScript($url->extras('yui/build/element/element-min.js'));

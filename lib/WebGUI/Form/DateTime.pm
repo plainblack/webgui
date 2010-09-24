@@ -211,7 +211,7 @@ sub headTags {
 
     my $style   = $session->style;
     my $url     = $session->url;
-    $style->setLink($url->extras('yui/build/calendar/assets/skins/sam/calendar.css'), { rel=>"stylesheet", type=>"text/css", media=>"all" });
+    $style->setCss($url->extras('yui/build/calendar/assets/skins/sam/calendar.css'));
     $style->setScript($url->extras('/yui/build/utilities/utilities.js'));
     $style->setScript($url->extras('yui/build/json/json-min.js'));
     $style->setScript($url->extras('yui/build/yahoo/yahoo-min.js'));
