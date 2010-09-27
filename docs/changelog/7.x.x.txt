@@ -1,6 +1,7 @@
 7.10.2
  - fixed #11884: Editing Templates impossible / Code editor not loaded
  - recommitted ukplayer. Removal broke Matrix. Licencing information was available but overlooked. 
+ - fixed #11883: Wiki "Add page" link does not encode special chars
 
 7.10.1
  - fixed #11851: Story Topic: top story variables should be available all the time
