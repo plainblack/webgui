@@ -9,6 +9,11 @@
 #-------------------------------------------------------------------
 
 use File::Spec::Functions qw( catdir rel2abs );
-use File::Basename qw( dirname );
-use Test::Class::Load rel2abs( catdir ( dirname( __FILE__ ), 'tests' ) );
+use File::Basename;
+use Test::Class;
+use Module::Find;
+use lib rel2abs( catdir ( dirname( __FILE__ ), 'tests' ) );
+
+useall('Test::WebGUI::Form');
 Test::Class->runtests;
+
