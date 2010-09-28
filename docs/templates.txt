@@ -3,6 +3,10 @@ templates, you will need to apply these changes manually to your copies.
 
 7.10.1
 
+  *  Profile templates - root/import/account/profile/default-view-profile-template
+                       - root/import/account/profile/profile-account-layout
+     Moved the "back to profile" link from the Profile View template to the Profile Layout template.
+
   *  Asset Report Template - asset-report/asset-report-default-template
      Remove the empty template attachment
 
