@@ -3,12 +3,12 @@ package WebGUI::BackgroundProcess;
 use warnings;
 use strict;
 
-use Config;
+use JSON;
 use POSIX;
+use Config;
+use IO::Pipe;
 use WebGUI::Session;
 use WebGUI::Pluggable;
-use JSON;
-use Getopt::Long qw(GetOptionsFromArray);
 use Time::HiRes qw(sleep);
 
 =head1 NAME
@@ -74,58 +74,6 @@ status of.
 
 #-----------------------------------------------------------------
 
-=head2 argv ($module, $subname, $data)
-
-Produces an argv suitable for passing to exec (after the initial executable
-name and perl switches) for running the given user routine with the supplied
-data.
-
-=cut
-
-sub argv {
-    my ( $self, $module, $subname, $data ) = @_;
-    my $class   = ref $self;
-    my $session = $self->session;
-    my $config  = $session->config;
-    my $id      = $self->getId;
-    return (
-        '--webguiRoot' => $config->getWebguiRoot,
-        '--configFile' => $config->getFilename,
-        '--sessionId'  => $session->getId,
-        '--module'     => $module,
-        '--subname'    => $subname,
-        '--id'         => $self->getId,
-        '--data'       => JSON::encode_json($data),
-    );
-} ## end sub argv
-
-#-----------------------------------------------------------------
-
-=head2 argvToHash ($argv)
-
-Class method. Processes the passed array with GetOptions -- intended for use
-from the exec() in start.  Don't call unless you know what you're doing.
-
-=cut
-
-sub argvToHash {
-    my ( $class, $argv ) = @_;
-    my $hash = {};
-    GetOptionsFromArray( $argv, $hash,
-        'webguiRoot=s',
-        'configFile=s',
-        'sessionId=s',
-        'module=s',
-        'subname=s',
-        'id=s',
-        'data=s'
-    );
-    $hash->{data} = JSON::decode_json( $hash->{data} );
-    return $hash;
-}
-
-#-----------------------------------------------------------------
-
 =head2 canView ($user?)
 
 Returns whether the current user (or the user passed in, if there is one) has
@@ -168,8 +116,8 @@ sub contentPairs {
 
 =head2 create ( )
 
-Creates a new BackgroundProcess object and inserts a blank row of data into
-the db.  You probably shouldn't call this -- see start().
+Internal class method. Creates a new BackgroundProcess object and inserts a
+blank row of data into the db.
 
 =cut
 
@@ -177,8 +125,70 @@ sub create {
     my ( $class, $session ) = @_;
     my $id = $session->id->generate;
     $session->db->setRow( $class->tableName, 'id', {}, $id );
-    bless { session => $session, id => $id };
+    bless { session => $session, id => $id }, $class;
 }
+
+#-----------------------------------------------------------------
+
+=head2 daemonize ( $stdin, $sub )
+
+Internal lass method.  Runs the given $sub in daemon, and prints $stdin to its
+stdin.
+
+=cut
+
+sub daemonize {
+    my ( $class, $stdin, $sub ) = @_;
+    my $pid = fork();
+    die "Cannot fork: $!" unless defined $pid;
+    if ($pid) {
+
+        # The child process will fork again and exit immediately, so we can
+        # wait for it (and thus not have zombie processes).
+        waitpid( $pid, 0 );
+        return;
+    }
+
+    eval {
+
+        # detach from controlling terminal, get us into a new process group
+        die "Cannot become session leader: $!" if POSIX::setsid() < 0;
+
+        # Fork again so we never get a controlling terminal
+        my $worker = IO::Pipe->new;
+        my $pid    = fork();
+        die "Child cannot fork: $!" unless defined $pid;
+
+        # We don't want to call any destructors, as it would mess with the
+        # parent's mysql connection, etc.
+        if ($pid) {
+            $worker->writer;
+            $worker->printflush($stdin);
+            POSIX::_exit(0);
+        }
+
+        # We're now in the final target process.  STDIN should be whatever the
+        # parent printed to us, and all output should go to /dev/null.
+        $worker->reader();
+        open STDIN,  '<&', $worker     or die "Cannot dup stdin: $!";
+        open STDOUT, '>',  '/dev/null' or die "Cannot write /dev/null: $!";
+        open STDERR, '>&', \*STDOUT    or die "Cannot dup stdout: $!";
+
+        # Standard daemon-y things...
+        $SIG{HUP} = 'IGNORE';
+        chdir '/';
+        umask 0;
+
+        # Forcibly close any non-std open file descriptors that remain
+        my $max = POSIX::sysconf(&POSIX::_SC_OPEN_MAX) || 1024;
+        POSIX::close($_) for ( $^F .. $max );
+
+        # Do whatever we're supposed to do
+        &$sub();
+    };
+
+    POSIX::_exit(-1) if ($@);
+} ## end sub daemonize
 
 #-----------------------------------------------------------------
 
@@ -241,12 +251,36 @@ sub finish {
 
 #-----------------------------------------------------------------
 
+=head2 forkAndExec ($request)
+
+Internal method. Forks and execs a new perl process to run $request. This is
+used as a fallback if the master daemon runner is not working.
+
+=cut
+
+sub forkAndExec {
+    my ( $self, $request ) = @_;
+    my $id    = $self->getId;
+    my $class = ref $self;
+    $class->daemonize(
+        JSON::encode_json($request),
+        sub {
+            exec { $Config{perlpath} }
+                ( "webgui-background-$id", ( map {"-I$_"} @INC ), "-M$class", "-e$class->runCmd();", )
+                or die "Could not exec: $!";
+        }
+    );
+}
+
+#-----------------------------------------------------------------
+
 =head2 get ( @keys )
 
 Get data from the database record for this process (returned as a simple list,
 not an arrayref).  Valid keys are: id, status, error, startTime, endTime,
 finished, groupId.  They all have more specific accessors, but you can use
-this to get several at once.
+this to get several at once if you're very careful.  You should probably use
+the accessors, though, since some of them have extra logic.
 
 =cut
 
@@ -327,6 +361,42 @@ sub getStatus {
 
 #-----------------------------------------------------------------
 
+=head2 init ( )
+
+Spawn a master process from which background processes will fork. The intent
+is for this to be called once at server startup time, after you've preloaded
+modules and before you start listening for requests. Returns a filehandle that
+can be used to print requests to the master process, and which you almost
+certainly shouldn't use (it's mostly for testing).
+
+=cut
+
+my $pipe;
+
+sub init {
+    my $class = shift;
+    $pipe = IO::Pipe->new;
+
+    my $pid = fork();
+    die "Cannot fork: $!" unless defined $pid;
+
+    if ($pid) {
+        $pipe->writer;
+        return $pipe;
+    }
+
+    $0 = 'webgui-background-master';
+    $pipe->reader;
+    local $/ = "\x{0}";
+    while ( my $request = $pipe->getline ) {
+        chomp $request;
+        $class->daemonize( $request, sub { $class->runCmd } );
+    }
+    exit 0;
+} ## end sub init
+
+#-----------------------------------------------------------------
+
 =head2 isFinished ( )
 
 A simple flag indicating that background process is no longer running.
@@ -378,24 +448,9 @@ See get() for a list of valid keys.
 
 sub set {
     my ( $self, $values ) = @_;
-    my @keys = keys %$values;
-    return unless @keys;
-
-    my $db   = $self->session->db;
-    my $dbh  = $db->dbh;
-    my $tbl  = $dbh->quote_identifier( $self->tableName );
-    my $sets = join(
-        ',',
-        map {
-            my $ident = $dbh->quote_identifier($_);
-            my $value = $dbh->quote( $values->{$_} );
-            "$ident = $value";
-            } @keys
-    );
-
-    my $id = $dbh->quote( $self->getId );
-    $db->write("UPDATE $tbl SET $sets WHERE id = $id");
-} ## end sub set
+    my %row = ( id => $self->getId, %$values );
+    $self->session->db->setRow( $self->tableName, 'id', \%row );
+}
 
 #-----------------------------------------------------------------
 
@@ -414,39 +469,87 @@ sub setGroup {
 
 #-----------------------------------------------------------------
 
-=head2 runCmd ($hashref)
+=head2 request ($module, $subname, $data)
 
-Class method.  Processes ARGV and passes it to runFromHash.  Don't call this
-unless you're the start() method.
+Internal method. Generates a hashref suitable for passing to runRequest.
+
+=cut
+
+sub request {
+    my ( $self, $module, $subname, $data ) = @_;
+    my $class   = ref $self;
+    my $session = $self->session;
+    my $config  = $session->config;
+    my $id      = $self->getId;
+    return {
+        webguiRoot => $config->getWebguiRoot,
+        configFile => $config->getFilename,
+        sessionId  => $session->getId,
+        module     => $module,
+        subname    => $subname,
+        id         => $self->getId,
+        data       => $data,
+    };
+} ## end sub request
+
+#-----------------------------------------------------------------
+
+=head2 runCmd ()
+
+Internal class method.  Decodes json off of stdin and passes it to runRequest.
 
 =cut
 
 sub runCmd {
     my $class = shift;
-    $class->runFromHash( $class->argvToHash( \@ARGV ) );
+    my $slurp = do { local $/; <STDIN> };
+    $class->runRequest( JSON::decode_json($slurp) );
+    exit 0;
 }
 
 #-----------------------------------------------------------------
 
-=head2 runFromHash ($hashref)
+=head2 runRequest ($hashref)
 
-Class method. Expects a hash of arguments describing what to run.  Don't call
-this unless you know what you're doing.
+Internal class method. Expects a hash of arguments describing what to run.
 
 =cut
 
-sub runFromHash {
+sub runRequest {
     my ( $class, $args ) = @_;
-    my $module = $args->{module};
-    WebGUI::Pluggable::load($module);
-    my $code = $module->can( $args->{subname} );
-    my $session = WebGUI::Session->open( $args->{webguiRoot}, $args->{configFile}, undef, undef, $args->{sessionId} );
-
+    my ( $root, $config, $sid ) = @{$args}{qw(webguiRoot configFile sessionId)};
+    my $session = WebGUI::Session->open( $root, $config, undef, undef, $sid );
     my $self = $class->new( $session, $args->{id} );
     $self->set( { startTime => time } );
-    eval { $self->$code( $args->{data} ) };
+    eval {
+        my ( $module, $subname, $data ) = @{$args}{qw(module subname data)};
+        WebGUI::Pluggable::run( $module, $subname, [ $self, $data ] );
+    };
     $self->error($@) if $@;
     $self->finish();
+}
+
+#-----------------------------------------------------------------
+
+=head2 sendRequestToMaster ($request)
+
+Internal method. Attempts to send a request to the master daemon runner.
+Returns 1 on success and 0 on failure.
+
+=cut
+
+sub sendRequestToMaster {
+    my ( $self, $request ) = @_;
+    my $json = JSON::encode_json($request);
+    eval {
+        die 'pipe' unless $pipe && $pipe->isa('IO::Handle');
+        local $SIG{PIPE} = sub { die 'pipe' };
+        $pipe->printflush("$json\x{0}") or die 'pipe';
+    };
+    return 1 unless $@;
+    undef $pipe;
+    $self->session->log->error('Problems talking to master daemon process.  Please restart the web server.');
+    return 0;
 }
 
 #-----------------------------------------------------------------
@@ -466,16 +569,14 @@ sub setWait { $_[0]->{interval} = $_[1] }
 
 =head2 start ( $session, $module, $subname, $data )
 
-Class method. The first thing this method does is daemonize (double-fork,
-setsid, chdir /, umask 0, all that good stuff).  It then executes
-$module::subname in a fresh perl interpreter (exec'd $^X) with ($process,
+Class method. Executes $module::subname in a background thread with ($process,
 $data) as its arguments.  The only restriction on $data is that it be
 serializable by JSON.
 
 =head3 $0
 
 The process name (as it appears in ps) will be set to webgui-background-$id,
-where $id is the value returned by $process->getId.  It thus won't look like a
+where $id is the value returned by $process->getId. It thus won't look like a
 modperl process to anyone monitoring the process table (wremonitor.pl, for
 example).
 
@@ -484,59 +585,10 @@ example).
 sub start {
     my ( $class, $session, $module, $subname, $data ) = @_;
     my $self = $class->create($session);
-    my $id   = $self->getId;
-
-    my $pid = fork();
-    die "Cannot fork: $!" unless defined $pid;
-    if ($pid) {
-
-        # The child process will fork again and exit immediately, so we can
-        # wait for it (and thus not have zombie processes).
-        waitpid( $pid, 0 );
-
-        return $self;
-    }
-
-    # We don't want destructors called, so POSIX exit on errors.
-    eval {
-
-        # detach from controlling terminal, get us into a new process group
-        die "Cannot become session leader: $!" if POSIX::setsid() < 0;
-
-        # Fork again so we never get a controlling terminal
-        $pid = fork();
-        die "Child cannot fork: $!" unless defined $pid;
-
-        # We don't want to call any destructors, as it would mess with the
-        # parent's mysql connection, etc.
-        POSIX::_exit(0) if $pid;
-
-        # We're now in the final target process. Standard daemon-y things...
-        $SIG{HUP} = 'IGNORE';
-        chdir '/';
-        umask 0;
-
-        # Forcibly close any open file descriptors that remain
-        my $max = POSIX::sysconf(&POSIX::_SC_OPEN_MAX) || 1024;
-        POSIX::close($_) for ( 0 .. $max );
-
-        # Get us some reasonable STD handles
-        my $null = '/dev/null';
-        open STDIN,  '<', $null or die "Cannot read $null: $!";
-        open STDOUT, '>', $null or die "Cannot write $null: $!";
-        open STDERR, '>', $null or die "Cannot write $null: $!";
-
-        # Now we're ready to run the user's code.
-        my $perl = $Config{perlpath};
-        exec {$perl} (
-            "webgui-background-$id",
-            ( map {"-I$_"} @INC ),
-            "-M$class", "-e$class->runCmd();",
-            '--', $self->argv( $module, $subname, $data )
-        ) or POSIX::_exit(-1);
-    };
-    POSIX::_exit(-1) if ($@);
-} ## end sub start
+    my $request = $self->request( $module, $subname, $data );
+    $self->sendRequestToMaster($request) or $self->forkAndExec($request);
+    return $self;
+}
 
 #-----------------------------------------------------------------
 

@@ -27,26 +27,25 @@ use WebGUI::Test;
 use WebGUI::Session;
 use WebGUI::BackgroundProcess;
 
-my $session   = WebGUI::Test->session;
 my $class     = 'WebGUI::BackgroundProcess';
 my $testClass = 'WebGUI::Test::BackgroundProcess';
+my $pipe      = $class->init();
+my $session   = WebGUI::Test->session;
 
 # test simplest (non-forking) case
 
 my $process = $class->create($session);
-my @argv    = $process->argv( $testClass, 'simple', ['data'] );
-my $hash    = $class->argvToHash( \@argv );
+my $request = $process->request( $testClass, 'simple', ['data'] );
 
-is ref $hash, 'HASH', 'got hash from argv';
 cmp_bag(
-    [ keys %$hash ],
-    [ qw(webguiRoot configFile sessionId id module subname data) ],
-    'argvToHash has the right keys'
+    [ keys %$request ],
+    [qw(webguiRoot configFile sessionId id module subname data)],
+    'request hash has the right keys'
 );
 
 my $now = time;
 
-$class->runFromHash($hash);
+$class->runRequest($request);
 ok $process->isFinished, 'finished';
 my $error = $process->getError;
 ok( !$error, 'no errors' ) or diag "  Expected nothing, got: $error\n";
@@ -60,9 +59,8 @@ $process->delete;
 
 note "Testing error case\n";
 $process = $class->create($session);
-@argv    = $process->argv( $testClass, 'error', ['error'] );
-$hash    = $class->argvToHash( \@argv );
-$class->runFromHash($hash);
+$request = $process->request( $testClass, 'error', ['error'] );
+$class->runRequest($request);
 ok $process->isFinished, 'finished';
 is $process->getError, "error\n", 'has error code';
 $process->setWait(0);
@@ -70,17 +68,38 @@ my $status = $process->getStatus;
 ok( !$status, 'no discernable status' ) or diag $status;
 ok( ( $process->endTime >= $started ), 'sane endTime' );
 
-note "Testing with actual fork\n";
-$process = $class->start( $session, $testClass, 'complex', ['data'] );
-my $sleeping;
-while ( !$process->isFinished && $sleeping++ < 10 ) {
-    sleep 1;
-}
-ok $process->isFinished, 'finished';
-is $process->getStatus, 'baz', 'correct status'
-    or diag $process->getError . "\n";
+my $forkCount   = 0;
+my $forkAndExec = $class->can('forkAndExec');
+my $replace     = sub {
+    my $self = shift;
+    $forkCount++;
+    $self->$forkAndExec(@_);
+};
 
-$process->delete;
+{
+    no strict 'refs';
+    no warnings 'redefine';
+    *{ $class . '::forkAndExec' } = $replace;
+}
+
+sub backgroundTest {
+    note "$_[0]\n";
+    $process = $class->start( $session, $testClass, 'complex', ['data'] );
+    my $sleeping;
+    while ( !$process->isFinished && $sleeping++ < 10 ) {
+        sleep 1;
+    }
+    ok $process->isFinished, 'finished';
+    is $process->getStatus, 'baz', 'correct status'
+        or diag $process->getError . "\n";
+
+    $process->delete;
+}
+backgroundTest('talk to background');
+is $forkCount, 0, 'we did not fork';
+close $pipe;
+backgroundTest('On-demand fork');
+is $forkCount, 1, 'we did fork';
 
 done_testing;
 

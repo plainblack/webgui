@@ -18,19 +18,6 @@ unshift @INC, grep {
 } readLines($webguiRoot."/sbin/preload.custom");
 
 #----------------------------------------
-# Logger
-#----------------------------------------
-require Log::Log4perl;
-Log::Log4perl->init( $webguiRoot."/etc/log.conf" );
-
-#----------------------------------------
-# Database connectivity.
-#----------------------------------------
-#require Apache::DBI; # Uncomment if you want to enable connection pooling. Not recommended on servers with many sites, or those using db slaves.
-require DBI;
-DBI->install_driver("mysql"); # Change to match your database driver.
-
-#----------------------------------------
 # WebGUI modules.
 #----------------------------------------
 require WebGUI;
@@ -48,6 +35,29 @@ WebGUI::Pluggable::findAndLoad( "WebGUI",
     }
 );
 
+#----------------------------------------
+# Preload all site configs.
+#----------------------------------------
+WebGUI::Config->loadAllConfigs($webguiRoot);
+
+#----------------------------------------
+# WebGUI::BackgroundProcess initialization
+#----------------------------------------
+WebGUI::BackgroundProcess->init();
+
+#----------------------------------------
+# Logger
+#----------------------------------------
+require Log::Log4perl;
+Log::Log4perl->init( $webguiRoot."/etc/log.conf" );
+
+#----------------------------------------
+# Database connectivity.
+#----------------------------------------
+#require Apache::DBI; # Uncomment if you want to enable connection pooling. Not recommended on servers with many sites, or those using db slaves.
+require DBI;
+DBI->install_driver("mysql"); # Change to match your database driver.
+
 require APR::Request::Apache2;
 require Apache2::Cookie;
 require Apache2::ServerUtil;
@@ -63,12 +73,6 @@ if ( $ENV{MOD_PERL} ) {
 $| = 1;
 
 print "\nStarting WebGUI ".$WebGUI::VERSION."\n";
-
-#----------------------------------------
-# Preload all site configs.
-#----------------------------------------
-WebGUI::Config->loadAllConfigs($webguiRoot);
-
 
 # reads lines from a file into an array, trimming white space and ignoring commented lines
 sub readLines {
