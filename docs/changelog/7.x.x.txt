@@ -8,6 +8,7 @@
  - fixed #11876: packing templates, snippets, headtags removes conditional CSS comments
  - fixed #11877: Criteria Builder on "shortcut by alternate criteria" gets ugly with many checkbox items
  - fixed #11883: Wiki "Add page" link does not encode special chars
+ - fixed #11886: profile knows it's me, but doesn't display edit
 
 7.9.14
  - fixed #11812: Checking www_ajaxSave's response in the cart js

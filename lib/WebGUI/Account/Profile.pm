@@ -83,7 +83,8 @@ sub appendCategoryVars {
     $var->{'profile_category_'.$categoryId."_shortLabel"} = $shortCategoryLabel;
     $var->{'profile_category_'.$categoryId."_index"     } = $index;
     $var->{'profile_category_'.$categoryId."_fields"    } = $fields;
-    
+
+    $var->{'can_edit_profile'  } = $self->uid eq $self->session->user->userId;
 
     #Update the isActive flag to determine the default active tab
     $self->store->{hasActiveTab} = ($self->store->{hasActiveTab} || $isActive);
@@ -471,8 +472,6 @@ sub www_view {
     my $user     = WebGUI::User->new($session,$uid);
 
     $self->appendCommonVars($var);
-
-    $var->{'can_edit_profile'  } = $uid eq $session->user->userId;
 
     my $privacySetting = $user->profileField('publicProfile') || 'none';
     $var->{"profile_privacy_$privacySetting"} = "true";
