@@ -1,4 +1,4 @@
-package WebGUI::i18n::English::Workflow_Activity_RemoveOldBackgroundProcesses;
+package WebGUI::i18n::English::Workflow_Activity_RemoveOldForks;
 
 use strict;
 
@@ -12,7 +12,7 @@ our $I18N = {
 		lastUpdated => 1285358250,
 	},
 	'activityName' => {
-		message     => q|Remove Old Background Processes|,
+		message     => q|Remove Old Forks|,
 		lastUpdated => 1285358250,
 	},
 };

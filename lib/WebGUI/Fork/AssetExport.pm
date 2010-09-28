@@ -1,4 +1,4 @@
-package WebGUI::BackgroundProcess::AssetExport;
+package WebGUI::Fork::AssetExport;
 
 =head1 LEGAL
 
@@ -19,7 +19,7 @@ use warnings;
 
 =head1 NAME
 
-WebGUI::BackgroundProcess::AssetExport
+WebGUI::Fork::AssetExport
 
 =head1 DESCRIPTION
 
@@ -149,7 +149,7 @@ STYLESHEET
 
 =head2 handler ( process )
 
-See WebGUI::Operation::BackgroundProcess.
+See WebGUI::Operation::Fork.
 
 =cut
 

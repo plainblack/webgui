@@ -1,4 +1,4 @@
-package WebGUI::Test::BackgroundProcess;
+package WebGUI::Test::Fork;
 
 sub simple {
     my ( $self, $arr ) = @_;

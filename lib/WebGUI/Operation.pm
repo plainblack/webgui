@@ -76,7 +76,7 @@ Returns a hash reference containing operation and package names.
 
 sub getOperations {
 	return {
-		'background' => 'BackgroundProcess',
+		'fork' => 'Fork',
 		'killSession' => 'ActiveSessions',
 		'viewActiveSessions' => 'ActiveSessions',
 

@@ -1,4 +1,4 @@
-package WebGUI::BackgroundProcess::Status;
+package WebGUI::Fork::Status;
 
 use JSON;
 
@@ -21,7 +21,7 @@ use warnings;
 
 =head1 NAME
 
-WebGUI::BackgroundProcess::Status
+WebGUI::Fork::Status
 
 =head1 DESCRIPTION
 

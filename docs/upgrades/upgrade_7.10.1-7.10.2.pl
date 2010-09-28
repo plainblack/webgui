@@ -31,21 +31,21 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
-addBackgroundProcessTable($session);
-installBackgroundProcessCleanup($session);
+addForkTable($session);
+installForkCleanup($session);
 
 finish($session); # this line required
 
 #----------------------------------------------------------------------------
 # Creates a new table for tracking background processes
-sub addBackgroundProcessTable {
+sub addForkTable {
     my $session = shift;
     my $db      = $session->db;
-    my $sth     = $db->dbh->table_info('', '', 'BackgroundProcess', 'TABLE');
+    my $sth     = $db->dbh->table_info('', '', 'Fork', 'TABLE');
     return if ($sth->fetch);
-    print "\tAdding BackgroundProcess table..." unless $quiet;
+    print "\tAdding Fork table..." unless $quiet;
     my $sql = q{
-        CREATE TABLE BackgroundProcess (
+        CREATE TABLE Fork (
             id        CHAR(22),
             groupId   CHAR(22),
             status    LONGTEXT,
@@ -64,16 +64,16 @@ sub addBackgroundProcessTable {
 
 #----------------------------------------------------------------------------
 # install a workflow to clean up old background processes
-sub installBackgroundProcessCleanup {
+sub installForkCleanup {
     my $session = shift;
-    print "\tInstalling Background Process Cleanup workflow..." unless $quiet;
-    my $class = 'WebGUI::Workflow::Activity::RemoveOldBackgroundProcesses';
+    print "\tInstalling Fork Cleanup workflow..." unless $quiet;
+    my $class = 'WebGUI::Workflow::Activity::RemoveOldForks';
     $session->config->addToArray('workflowActivities/None', $class);
     my $wf = WebGUI::Workflow->new($session, 'pbworkflow000000000001');
     my $a  = first { ref $_ eq $class } @{ $wf->getActivities };
     unless ($a) {
         $a = $wf->addActivity($class);
-        $a->set(title => 'Remove Old Background Processes');
+        $a->set(title => 'Remove Old Forks');
     };
     print "DONE!\n" unless $quiet;
 }

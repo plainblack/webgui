@@ -1,4 +1,4 @@
-package WebGUI::Operation::BackgroundProcess;
+package WebGUI::Operation::Fork;
 
 =head1 LEGAL
 
@@ -17,16 +17,16 @@ package WebGUI::Operation::BackgroundProcess;
 use strict;
 use warnings;
 
-use WebGUI::BackgroundProcess;
+use WebGUI::Fork;
 use WebGUI::Pluggable;
 
 =head1 NAME
 
-WebGUI::Operation::BackgroundProcess
+WebGUI::Operation::Fork
 
 =head1 DESCRIPTION
 
-URL dispatching for WebGUI::BackgroundProcess monitoring
+URL dispatching for WebGUI::Fork monitoring
 
 =head1 SUBROUTINES
 
@@ -39,18 +39,18 @@ These subroutines are available from this package:
 =head2 handler ( session )
 
 Dispatches to the proper module based on the module form parameter if op is
-background.  Returns insufficient privilege page if the user doesn't pass
-canView on the process before dispatching.
+fork.  Returns insufficient privilege page if the user doesn't pass canView on
+the process before dispatching.
 
 =cut
 
-sub www_background {
+sub www_fork {
     my $session = shift;
     my $form    = $session->form;
     my $module  = $form->get('module') || 'Status';
     my $pid     = $form->get('pid') || return undef;
 
-    my $process = WebGUI::BackgroundProcess->new( $session, $pid );
+    my $process = WebGUI::Fork->new( $session, $pid );
 
     return $session->privilege->insufficient unless $process->canView;
 
@@ -61,7 +61,7 @@ sub www_background {
         return undef;
     }
 
-    my $output = eval { WebGUI::Pluggable::run( "WebGUI::BackgroundProcess::$module", 'handler', [$process] ); };
+    my $output = eval { WebGUI::Pluggable::run( "WebGUI::Fork::$module", 'handler', [$process] ); };
 
     if ($@) {
         $log->error($@);
@@ -69,6 +69,6 @@ sub www_background {
     }
 
     return $output;
-} ## end sub www_background
+} ## end sub www_fork
 
 1;

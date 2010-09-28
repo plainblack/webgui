@@ -658,14 +658,14 @@ sub exportGetUrlAsPath {
 
 #-------------------------------------------------------------------
 
-=head2 exportInBackground
+=head2 exportInFork
 
-Intended to be called by WebGUI::BackgroundProcess.  Runs exportAsHtml on the
+Intended to be called by WebGUI::Fork.  Runs exportAsHtml on the
 specified asset and keeps a json structure as the status.
 
 =cut
 
-sub exportInBackground {
+sub exportInFork {
     my ($process, $args) = @_;
     my $self = WebGUI::Asset->new($process->session, delete $args->{assetId});
     $args->{indexFileName} = delete $args->{index};
@@ -685,12 +685,12 @@ sub exportInBackground {
     my %reports = (
         'bad user privileges' => sub { shift->{badUserPrivileges} = 1 },
         'not exportable'      => sub { shift->{notExportable} = 1 },
-        'exporting page'      => sub { shift->{current} = 1 },
-        'done'                => sub {
+        'done'                => sub { shift->{done} = 1 },
+        'exporting page'      => sub {
             my $hash = shift;
+            $hash->{current} = 1;
             delete $last->{current};
             $last = $hash;
-            $hash->{done} = 1;
         },
         'collateral notes' => sub {
             my ($hash, $text) = @_;
@@ -705,6 +705,8 @@ sub exportInBackground {
         $process->update(sub { JSON::encode_json($tree) });
     };
     $self->exportAsHtml($args);
+    delete $last->{current};
+    $process->update(JSON::encode_json($tree));
 }
 
 #-------------------------------------------------------------------
@@ -1027,8 +1029,8 @@ sub www_exportStatus {
     my @vars    = qw(
         index depth userId extrasUploadsAction rootUrlAction exportUrl
     );
-    my $process = WebGUI::BackgroundProcess->start(
-        $session, 'WebGUI::Asset', 'exportInBackground', {
+    my $process = WebGUI::Fork->start(
+        $session, 'WebGUI::Asset', 'exportInFork', {
             assetId => $self->getId,
             map { $_ => scalar $form->get($_) } @vars
         }

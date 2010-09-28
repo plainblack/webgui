@@ -1,4 +1,4 @@
-package WebGUI::Workflow::Activity::RemoveOldBackgroundProcesses;
+package WebGUI::Workflow::Activity::RemoveOldForks;
 
 =head1 LEGAL
 
@@ -20,15 +20,15 @@ use strict;
 use base 'WebGUI::Workflow::Activity';
 
 use WebGUI::International;
-use WebGUI::BackgroundProcess;
+use WebGUI::Fork;
 
 =head1 NAME
 
-WebGUI::Workflow::Activity::RemoveOldBackgroundProcesses
+WebGUI::Workflow::Activity::RemoveOldForks
 
 =head1 DESCRIPTION
 
-Remove background processes that are older than a configurable threshold.
+Remove forks that are older than a configurable threshold.
 
 =head1 METHODS
 
@@ -46,7 +46,7 @@ See WebGUI::Workflow::Activity::definition() for details.
 
 sub definition {
     my ( $class, $session, $definition ) = @_;
-    my $i18n = WebGUI::International->new( $session, 'Workflow_Activity_RemoveOldBackgroundProcesses' );
+    my $i18n = WebGUI::International->new( $session, 'Workflow_Activity_RemoveOldForks' );
     my %def = (
         name       => $i18n->get('activityName'),
         properties => {
@@ -73,7 +73,7 @@ See WebGUI::Workflow::Activity::execute() for details.
 sub execute {
     my $self = shift;
     my $db   = $self->session->db;
-    my $tbl  = $db->dbh->quote_identifier( WebGUI::BackgroundProcess->tableName );
+    my $tbl  = $db->dbh->quote_identifier( WebGUI::Fork->tableName );
     my $time = time - $self->get('interval');
     $db->write( "DELETE FROM $tbl WHERE endTime <= ?", [$time] );
     return $self->COMPLETE;

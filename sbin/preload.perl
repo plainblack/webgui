@@ -41,9 +41,9 @@ WebGUI::Pluggable::findAndLoad( "WebGUI",
 WebGUI::Config->loadAllConfigs($webguiRoot);
 
 #----------------------------------------
-# WebGUI::BackgroundProcess initialization
+# WebGUI::Fork initialization
 #----------------------------------------
-WebGUI::BackgroundProcess->init();
+WebGUI::Fork->init();
 
 #----------------------------------------
 # Logger

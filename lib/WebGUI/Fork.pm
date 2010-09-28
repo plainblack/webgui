@@ -1,4 +1,4 @@
-package WebGUI::BackgroundProcess;
+package WebGUI::Fork;
 
 use warnings;
 use strict;
@@ -13,7 +13,7 @@ use Time::HiRes qw(sleep);
 
 =head1 NAME
 
-WebGUI::BackgroundProcess
+WebGUI::Fork
 
 =head1 DESCRIPTION
 
@@ -36,16 +36,16 @@ status of.
     sub www_doWork {
         my $self = shift;
         my $session = $self->session;
-        my $process = WebGUI::BackgroundProcess->start(
+        my $process = WebGUI::Fork->start(
             $session, 'WebGUI::Some::Class', 'doWork', { some => 'data' }
         );
-        # See WebGUI::Content::BackgroundProcess
+        # See WebGUI::Operation::Fork
         my $pairs = $process->contentPairs('DoWork');
         $session->http->setRedirect($self->getUrl($pairs));
         return 'redirect';
     }
 
-    package WebGUI::Content::BackgroundProcess::DoWork;
+    package WebGUI::Operation::Fork::DoWork;
 
     sub handler {
         my $process = shift;
@@ -77,8 +77,8 @@ status of.
 =head2 canView ($user?)
 
 Returns whether the current user (or the user passed in, if there is one) has
-permission to view the status of the background process.  By default, only
-admins can view, but see setGroup.
+permission to view the status of the fork.  By default, only admins can view,
+but see setGroup.
 
 =cut
 
@@ -98,25 +98,24 @@ sub canView {
 =head2 contentPairs ($module, $pid)
 
 Returns a bit of query string useful for redirecting to a
-WebGUI::Content::BackgroundProcess plugin.  $module should be the bit that
-comes after WebGUI::Content::BackgroundProcess, e.g.
-$process->contentPairs('Foo') should return something like
-"op=background;module=Foo;pid=adlfjafo87ad9f78a7", which will get dispatched
-to WebGUI::Content::BackgroundProcess::Foo::handler($process)
+WebGUI::Operation::Fork plugin.  $module should be the bit that comes after
+WebGUI::Operation::Fork, e.g.  $process->contentPairs('Foo') should return
+something like "op=fork;module=Foo;pid=adlfjafo87ad9f78a7", which will
+get dispatched to WebGUI::Operation::Fork::Foo::handler($process)
 
 =cut
 
 sub contentPairs {
     my ( $self, $module ) = @_;
     my $pid = $self->getId;
-    return "op=background;module=$module;pid=$pid";
+    return "op=fork;module=$module;pid=$pid";
 }
 
 #-----------------------------------------------------------------
 
 =head2 create ( )
 
-Internal class method. Creates a new BackgroundProcess object and inserts a
+Internal class method. Creates a new Fork object and inserts a
 blank row of data into the db.
 
 =cut
@@ -266,7 +265,7 @@ sub forkAndExec {
         JSON::encode_json($request),
         sub {
             exec { $Config{perlpath} }
-                ( "webgui-background-$id", ( map {"-I$_"} @INC ), "-M$class", "-e$class->runCmd();", )
+                ( "webgui-fork-$id", ( map {"-I$_"} @INC ), "-M$class", "-e$class->runCmd();", )
                 or die "Could not exec: $!";
         }
     );
@@ -295,7 +294,7 @@ sub get {
         : '*';
     my $id     = $dbh->quote( $self->getId );
     my @values = $db->quickArray("SELECT $key FROM $tbl WHERE id = $id");
-    return wantarray ? @values : $values[0];
+    return (@values > 1) ? @values : $values[0];
 }
 
 #-----------------------------------------------------------------
@@ -326,8 +325,7 @@ sub getGroupId {
 
 =head2 getId ( )
 
-The unique id for this background process. Note: this is NOT the pid, but a
-WebGUI guid.
+The unique id for this fork. Note: this is NOT the pid, but a WebGUI guid.
 
 =cut
 
@@ -337,11 +335,11 @@ sub getId { shift->{id} }
 
 =head2 getStatus()
 
-Signals the background process that it should report its next status, then
-polls at $interval (can be fractional) seconds (default: .1) waiting for the
-background process to claim that its status has been updated.  Returns the
-updated status.  See setWait() for a way to change the interval (or disable
-the waiting procedure entirely).
+Signals the fork that it should report its next status, then polls at
+$interval (can be fractional) seconds (default: .1) waiting for the fork to
+claim that its status has been updated.  Returns the updated status.  See
+setWait() for a way to change the interval (or disable the waiting procedure
+entirely).
 
 =cut
 
@@ -363,7 +361,7 @@ sub getStatus {
 
 =head2 init ( )
 
-Spawn a master process from which background processes will fork. The intent
+Spawn a master process from which Forks will fork(). The intent
 is for this to be called once at server startup time, after you've preloaded
 modules and before you start listening for requests. Returns a filehandle that
 can be used to print requests to the master process, and which you almost
@@ -385,7 +383,7 @@ sub init {
         return $pipe;
     }
 
-    $0 = 'webgui-background-master';
+    $0 = 'webgui-fork-master';
     $pipe->reader;
     local $/ = "\x{0}";
     while ( my $request = $pipe->getline ) {
@@ -399,7 +397,7 @@ sub init {
 
 =head2 isFinished ( )
 
-A simple flag indicating that background process is no longer running.
+A simple flag indicating that the fork is no longer running.
 
 =cut
 
@@ -409,8 +407,8 @@ sub isFinished { $_[0]->get('finished') }
 
 =head2 new ( $session, $id )
 
-Returns an object capable of checking on the status of the background process
-indicated by $id.  Returns undef if there is no such process.
+Returns an object capable of checking on the status of the fork indicated by
+$id.  Returns undef if there is no such process.
 
 =cut
 
@@ -558,8 +556,8 @@ sub sendRequestToMaster {
 
 Use this to control the pace at which getStatus will poll for updated
 statuses.  By default, this is a tenth of a second.  If you set it to 0,
-getStatus will still signal the background process for an update, but will
-take whatever is currently recorded as the status and return immediately.
+getStatus will still signal the fork for an update, but will take whatever is
+currently recorded as the status and return immediately.
 
 =cut
 
@@ -569,13 +567,13 @@ sub setWait { $_[0]->{interval} = $_[1] }
 
 =head2 start ( $session, $module, $subname, $data )
 
-Class method. Executes $module::subname in a background thread with ($process,
+Class method. Executes $module::subname in a forked process with ($process,
 $data) as its arguments.  The only restriction on $data is that it be
 serializable by JSON.
 
 =head3 $0
 
-The process name (as it appears in ps) will be set to webgui-background-$id,
+The process name (as it appears in ps) will be set to webgui-fork-$id,
 where $id is the value returned by $process->getId. It thus won't look like a
 modperl process to anyone monitoring the process table (wremonitor.pl, for
 example).
@@ -609,18 +607,18 @@ data is stored in.
 
 =cut
 
-sub tableName {'BackgroundProcess'}
+sub tableName {'Fork'}
 
 #-----------------------------------------------------------------
 
 =head2 update ( $msg )
 
-Set a new status for the background process.  This can be anything, and will
-overwrite the old status.  JSON is recommended for complex statuses.
-Optionally, $msg can be a subroutine that returns the new status -- if your
-status may take a long time to compute, you should use this, as you may be
-able to avoid computing some (or all) of your status updates, depending on how
-often they're being asked for.  See the getStatus method for details.
+Set a new status for the fork.  This can be anything, and will overwrite the
+old status.  JSON is recommended for complex statuses.  Optionally, $msg can
+be a subroutine that returns the new status -- if your status may take a long
+time to compute, you should use this, as you may be able to avoid computing
+some (or all) of your status updates, depending on how often they're being
+asked for.  See the getStatus method for details.
 
 =cut
 

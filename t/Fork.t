@@ -9,7 +9,7 @@
 # http://www.plainblack.com                     info@plainblack.com
 #------------------------------------------------------------------
 
-# WebGUI::BackgroundProcess tests
+# WebGUI::Fork tests
 
 use strict;
 use warnings;
@@ -25,10 +25,10 @@ use JSON;
 
 use WebGUI::Test;
 use WebGUI::Session;
-use WebGUI::BackgroundProcess;
+use WebGUI::Fork;
 
-my $class     = 'WebGUI::BackgroundProcess';
-my $testClass = 'WebGUI::Test::BackgroundProcess';
+my $class     = 'WebGUI::Fork';
+my $testClass = 'WebGUI::Test::Fork';
 my $pipe      = $class->init();
 my $session   = WebGUI::Test->session;
 
