@@ -23,6 +23,7 @@ use HTML::Form;
 use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
 use WebGUI::Shop::PayDriver;
+use Clone;
 
 #----------------------------------------------------------------------------
 # Init
@@ -59,7 +60,7 @@ my $options = {
     groupToUse      => 3,
 };
 
-$driver = WebGUI::Shop::PayDriver->new( $session, $options );
+$driver = WebGUI::Shop::PayDriver->new( $session, Clone::clone($options) );
 
 isa_ok  ($driver, 'WebGUI::Shop::PayDriver', 'new creates WebGUI::Shop::PayDriver object');
 like($driver->getId, $session->id->getValidator, 'driver id is a valid GUID');
@@ -138,7 +139,17 @@ can_ok $driver, qw/get set update write getName className label enabled paymentG
 #
 #######################################################################
 
-cmp_deeply  ($driver->get,          $options,            'get works like the options method with no param passed');
+use Data::Dumper;
+
+cmp_deeply(
+    $driver->get,
+    {
+        %{ $options },
+        paymentGatewayId => ignore(),
+    },
+    $options,
+    'get works like the options method with no param passed'
+);
 is          ($driver->get('label'), 'Fast and harmless', 'get the label entry from the options');
 
 my $optionsCopy = $driver->get;
@@ -297,22 +308,10 @@ TODO: {
 #
 #######################################################################
 
-eval { $driver->update(); };
-$e = Exception::Class->caught();
-isa_ok      ($e, 'WebGUI::Error::InvalidParam', 'update takes exception to not giving it a hashref of options');
-cmp_deeply  (
-    $e,
-    methods(
-        error => 'update was not sent a hashref of options to store in the database',
-    ),
-    'update takes exception to not giving it a hashref of options',
-);
-
 my $newOptions = {
     label           => 'Yet another label',
     enabled         => 0,
-    group           => 4,
-    receiptMessage  => 'Dropjes!',
+    groupToUse      => 4,
 };
 
 $driver->update($newOptions);
@@ -325,8 +324,7 @@ cmp_deeply(
     'update() actually stores data',
 );
 
-is( $driver->get('receiptMessage'), 'Dropjes!', '... updates object, receiptMessage');
-is( $driver->get('group'),          4,          '... updates object, group');
+is( $driver->get('groupToUse'),     4,          '... updates object, group');
 is( $driver->get('enabled'),        0,          '... updates object, enabled');
 is( $driver->get('label'),          'Yet another label', '... updates object, label');
 
