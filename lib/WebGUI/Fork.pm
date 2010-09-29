@@ -89,8 +89,7 @@ sub canView {
     $user = WebGUI::User->new( $session, $user )
         unless eval { $user->isa('WebGUI::User') };
     return 1 if $user->isAdmin;
-    my $group = $self->get('groupId');
-    return $group && $user->isInGroup($group);
+    return $user->isInGroup( $self->getGroupId );
 }
 
 #-------------------------------------------------------------------
@@ -186,7 +185,7 @@ sub daemonize {
         &$sub();
     };
 
-    POSIX::_exit(-1) if ($@);
+    POSIX::_exit( $@ ? -1 : 0 );
 } ## end sub daemonize
 
 #-----------------------------------------------------------------
@@ -199,9 +198,7 @@ Clean up the information for this process from the database.
 
 sub delete {
     my $self = shift;
-    my $db   = $self->session->db;
-    my $tbl  = $db->dbh->quote_identifier( $self->tableName );
-    $db->write( "DELETE FROM $tbl WHERE id = ?", [ $self->getId ] );
+    $self->session->db->deleteRow( $self->tableName, 'id', $self->getId );
 }
 
 #-----------------------------------------------------------------
@@ -261,12 +258,13 @@ sub forkAndExec {
     my ( $self, $request ) = @_;
     my $id    = $self->getId;
     my $class = ref $self;
+    my $json  = JSON::encode_json($request);
+    my @inc   = map {"-I$_"} @INC;
+    my @argv  = ( "webgui-fork-$id", @inc, "-M$class", "-e$class->runCmd()" );
     $class->daemonize(
-        JSON::encode_json($request),
+        $json,
         sub {
-            exec { $Config{perlpath} }
-                ( "webgui-fork-$id", ( map {"-I$_"} @INC ), "-M$class", "-e$class->runCmd();", )
-                or die "Could not exec: $!";
+            exec { $Config{perlpath} } @argv or die "Could not exec: $!";
         }
     );
 }
@@ -294,7 +292,7 @@ sub get {
         : '*';
     my $id     = $dbh->quote( $self->getId );
     my @values = $db->quickArray("SELECT $key FROM $tbl WHERE id = $id");
-    return (@values > 1) ? @values : $values[0];
+    return ( @values > 1 ) ? @values : $values[0];
 }
 
 #-----------------------------------------------------------------
@@ -335,18 +333,17 @@ sub getId { shift->{id} }
 
 =head2 getStatus()
 
-Signals the fork that it should report its next status, then polls at
-$interval (can be fractional) seconds (default: .1) waiting for the fork to
-claim that its status has been updated.  Returns the updated status.  See
+Signals the fork that it should report its next status, then polls at a
+configurable, fractional interval (default: .1 seconds) waiting for the fork
+to claim that its status has been updated.  Returns the updated status.  See
 setWait() for a way to change the interval (or disable the waiting procedure
 entirely).
 
 =cut
 
 sub getStatus {
-    my $self     = shift;
-    my $interval = $self->{interval};
-    if ($interval) {
+    my $self = shift;
+    if ( my $interval = $self->{interval} ) {
         $self->set( { latch => 1 } );
         while (1) {
             sleep $interval;
@@ -388,7 +385,9 @@ sub init {
     local $/ = "\x{0}";
     while ( my $request = $pipe->getline ) {
         chomp $request;
-        $class->daemonize( $request, sub { $class->runCmd } );
+        eval {
+            $class->daemonize( $request, sub { $class->runCmd } );
+        };
     }
     exit 0;
 } ## end sub init
@@ -475,10 +474,8 @@ Internal method. Generates a hashref suitable for passing to runRequest.
 
 sub request {
     my ( $self, $module, $subname, $data ) = @_;
-    my $class   = ref $self;
     my $session = $self->session;
     my $config  = $session->config;
-    my $id      = $self->getId;
     return {
         webguiRoot => $config->getWebguiRoot,
         configFile => $config->getFilename,
@@ -488,7 +485,7 @@ sub request {
         id         => $self->getId,
         data       => $data,
     };
-} ## end sub request
+}
 
 #-----------------------------------------------------------------
 
@@ -502,7 +499,6 @@ sub runCmd {
     my $class = shift;
     my $slurp = do { local $/; <STDIN> };
     $class->runRequest( JSON::decode_json($slurp) );
-    exit 0;
 }
 
 #-----------------------------------------------------------------
