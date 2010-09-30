@@ -62,6 +62,16 @@ property label => (
             hoverHelp       => ['label help', 'PayDriver'],
             default         => "Credit Card",
          );
+around label => sub {
+    my $orig = shift;
+    my $self = shift;
+    if (@_ > 0) {
+        my $label = shift;
+        $label = $self->getName($self->session) if $label eq '' || lc($label) eq 'untitled';
+        unshift @_, $label;
+    }
+    $self->$orig(@_);
+};
 property enabled => (
             fieldType       => 'yesNo',
             label           => ['enabled', 'PayDriver'],
@@ -476,7 +486,6 @@ sub getName {
     WebGUI::Error::InvalidParam->throw(error => q{Must provide a session variable})
         unless ref $session eq 'WebGUI::Session';
 
-    my $definition  = $class->meta->pluginName;
     return WebGUI::International->new($session, 'Asset')->get(@{ $class->meta->pluginName });
 }
 

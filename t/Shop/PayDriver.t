@@ -135,6 +135,20 @@ can_ok $driver, qw/get set update write getName className label enabled paymentG
 
 #######################################################################
 #
+# default label
+#
+#######################################################################
+
+$driver->label('');
+is $driver->label, $driver->getName($session), 'empty label replaced with plugin name';
+$driver->label('untitled');
+is $driver->label, $driver->getName($session), 'label=untitled replaced with plugin name';
+$driver->label('uNtItLeD');
+is $driver->label, $driver->getName($session), '...regardless of case';
+$driver->label('Fast and harmless');
+
+#######################################################################
+#
 # get
 #
 #######################################################################
@@ -147,7 +161,6 @@ cmp_deeply(
         %{ $options },
         paymentGatewayId => ignore(),
     },
-    $options,
     'get works like the options method with no param passed'
 );
 is          ($driver->get('label'), 'Fast and harmless', 'get the label entry from the options');
