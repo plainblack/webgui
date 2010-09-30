@@ -12,11 +12,12 @@ use FindBin;
 use strict;
 use lib "$FindBin::Bin/../../lib";
 
+use WebGUI::Test;
+
 use WebGUI::Storage;
 use WebGUI::Asset;
 use WebGUI::Asset::File::ZipArchive;
 
-use WebGUI::Test;
 use Test::More; # increment this value for each test you create
 use Test::Deep;
 plan tests => 3;
