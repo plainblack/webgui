@@ -448,4 +448,32 @@ is ($count, 0, 'delete deleted the object');
 
 undef $driver;
 
+#######################################################################
+#
+# processPropertiesFromFormPost
+#
+#######################################################################
+
+$session->request->setup_body({
+    label      => 'form processed driver',
+    enabled    => 1,
+    groupToUse => 7,
+});
+
+my $form_driver = WebGUI::Shop::PayDriver->new($session, {});
+WebGUI::Test->addToCleanup($form_driver);
+
+$form_driver->processPropertiesFromFormPost;
+
+cmp_deeply(
+    $form_driver->get(),
+    {
+        label            => 'form processed driver',
+        enabled          => 1,
+        groupToUse       => 7,
+        paymentGatewayId => $form_driver->paymentGatewayId,
+    },
+    'form contents processed.  Missing form properties inherit defaults'
+);
+
 done_testing;

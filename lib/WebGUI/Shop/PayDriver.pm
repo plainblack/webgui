@@ -128,31 +128,6 @@ around BUILDARGS => sub {
 
 #-------------------------------------------------------------------
 
-=head2 _buildObj (  )
-
-Private method used to build objects, shared by new and create.
-
-=cut
-
-#sub _buildObj {
-#    my ($class, $session, $requestedClass, $paymentGatewayId, $options) = @_;
-#    my $self    = {};
-#    bless $self, $requestedClass;
-#    register $self;
-#
-#    my $id                      = id $self;
-#
-#    $session{ $id }             = $session;
-#    $options{ $id }             = $options;
-#    $className{ $id }           = $requestedClass;
-#    $paymentGatewayId{ $id }    = $paymentGatewayId;
-#
-#    return $self;
-#}
-
-
-#-------------------------------------------------------------------
-
 =head2 appendCartVariables ( $var )
 
 Append the subtotal, shipping, tax, and shop credeductions to a set of template
@@ -254,50 +229,6 @@ to do calculations.
 sub className {
     return ref $_[0];
 }
-
-#-------------------------------------------------------------------
-
-=head2 create ( $session, $options )
-
-Constructor for new WebGUI::Shop::PayDriver objects.  Returns a WebGUI::Shop::PayDriver object.
-To access driver objects that have already been configured, use C<new>.
-
-=head3 $session
-
-A WebGUI::Session object.
-
-=head4 $options
-
-A list of properties to assign to this PayDriver.  See C<definition> for details.
-
-=cut
-
-#sub create {
-#    my $class   = shift;
-#    my $session = shift;
-#    my $options = shift;
-#    WebGUI::Error::InvalidParam->throw(error => q{Must provide a hashref of options})
-#        unless ref $options eq 'HASH' and scalar keys %{ $options };
-#    WebGUI::Error::InvalidParam->throw(error => q{Must provide a human readable label in the hashref of options})
-#        unless exists $options->{label} && $options->{label};
-#
-#    # Generate a unique id for this payment
-#    my $paymentGatewayId = $session->id->generate;
-#
-#    # Build object
-#    my $self = WebGUI::Shop::PayDriver->_buildObj($session, $class, $paymentGatewayId, $options);
-#
-#    # and persist this instance in the db
-#    $session->db->write('insert into paymentGateway (paymentGatewayId, className) VALUES (?,?)', [
-#        $paymentGatewayId, 
-#        $class,
-#    ]);
-#    
-#    # Set the options via the update method because update() will automatically serialize the options hash
-#    $self->update($options);
-#
-#    return $self;
-#}
 
 #-------------------------------------------------------------------
 
@@ -511,32 +442,6 @@ that object.
 
 =cut
 
-#sub new {
-#    my $class               = shift;
-#    my $session             = shift;
-#    WebGUI::Error::InvalidParam->throw(error => q{Must provide a session variable})
-#        unless ref $session eq 'WebGUI::Session';
-#    my $paymentGatewayId    = shift;
-#    WebGUI::Error::InvalidParam->throw(error => q{Must provide a paymentGatewayId})
-#        unless defined $paymentGatewayId;
-#
-#    # Fetch the instance data from the db
-#    my $properties = $session->db->quickHashRef('select * from paymentGateway where paymentGatewayId=?', [
-#        $paymentGatewayId,
-#    ]);
-#    WebGUI::Error::ObjectNotFound->throw(error => q{paymentGatewayId not found in db}, id => $paymentGatewayId)
-#        unless scalar keys %{ $properties };
-#
-#    croak "Somehow, the options property of this object, $paymentGatewayId, got broken in the db"
-#        unless exists $properties->{options} and $properties->{options};
-#
-#    my $options = from_json($properties->{options});
-#
-#    my $self = WebGUI::Shop::PayDriver->_buildObj($session, $class, $paymentGatewayId, $options);
-#
-#    return $self;
-#}
-
 #-------------------------------------------------------------------
 
 =head2 processPayment ()
@@ -589,20 +494,18 @@ Updates ship driver with data from Form.
 
 sub processPropertiesFromFormPost {
     my $self = shift;
-    my %properties;
-    my $fullDefinition = $self->definition($self->session);
 
-    foreach my $definition (@{$fullDefinition}) {
-        foreach my $property (keys %{$definition->{properties}}) {
-            $properties{$property} = $self->session->form->process(
-                $property,
-                $definition->{properties}{$property}{fieldType},
-                $definition->{properties}{$property}{defaultValue}
-            );
-        }
+    my $form = $self->session->form;
+    foreach my $property_name ($self->getProperties) {
+        my $property = $self->meta->find_attribute_by_name($property_name);
+        my $value    = $form->process(
+            $property_name,
+            $property->form->{fieldType},
+            $self->$property_name,
+        );
+        $self->$property_name($value);
     }
-    $properties{label} = $fullDefinition->[0]{name} if ($properties{label} eq "" || lc($properties{label}) eq "untitled");
-    $self->update(\%properties);
+    $self->write;
 }
 
 #-------------------------------------------------------------------
@@ -774,6 +677,12 @@ sub www_editSave {
 }
 
 =head2 CHANGES ( )
+
+=head3 8.0.0
+
+In 8.0.0, the base PayDriver class was modified so that it uses WebGUI::Definition::Shop as its base,
+rather than Class::InsideOut.  All PayDriver subclasses from 7.x will need to do the same.
+The current PayDriver subclasses, like Cash and ITransact, can be used as examples on what to do.
 
 =head3 7.9.4
 
