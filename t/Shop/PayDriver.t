@@ -176,77 +176,77 @@ isa_ok      ($cart, 'WebGUI::Shop::Cart', 'getCart returns an instantiated WebGU
 #
 #######################################################################
 
-#my $form = $driver->getEditForm;
-#
-#isa_ok      ($form, 'WebGUI::HTMLForm', 'getEditForm returns an HTMLForm object');
-#
-#my $html = $form->print;
-#
-###Any URL is fine, really
-#my @forms = HTML::Form->parse($html, 'http://www.webgui.org');
-#is          (scalar @forms, 1, 'getEditForm generates just 1 form');
-#
-#my @inputs = $forms[0]->inputs;
-#is          (scalar @inputs, 11, 'getEditForm: the form has 11 controls');
-#
-#my @interestingFeatures;
-#foreach my $input (@inputs) {
-#    my $name = $input->name;
-#    my $type = $input->type;
-#    push @interestingFeatures, { name => $name, type => $type };
-#}
-#
-#cmp_deeply(
-#    \@interestingFeatures,
-#    [
-#        {
-#            name    => 'webguiCsrfToken',
-#            type    => 'hidden',
-#        },
-#        {
-#            name    => undef,
-#            type    => 'submit',
-#        },
-#        {
-#            name    => 'shop',
-#            type    => 'hidden',
-#        },
-#        {
-#            name    => 'method',
-#            type    => 'hidden',
-#        },
-#        {
-#            name    => 'do',
-#            type    => 'hidden',
-#        },
-#        {
-#            name    => 'paymentGatewayId',
-#            type    => 'hidden',
-#        },
-#        {
-#            name    => 'className',
-#            type    => 'hidden',
-#        },
-#        {
-#            name    => 'label',
-#            type    => 'text',
-#        },
-#        {
-#            name    => 'enabled',
-#            type    => 'radio',
-#        },
-#        {
-#            name    => 'groupToUse',
-#            type    => 'option',
-#        },
-#        {
-#            name    => '__groupToUse_isIn',
-#            type    => 'hidden',
-#        },
-#    ],
-#    'getEditForm made the correct form with all the elements'
-#
-#);
+my $form = $driver->getEditForm;
+
+isa_ok      ($form, 'WebGUI::HTMLForm', 'getEditForm returns an HTMLForm object');
+
+my $html = $form->print;
+
+##Any URL is fine, really
+my @forms = HTML::Form->parse($html, 'http://www.webgui.org');
+is          (scalar @forms, 1, 'getEditForm generates just 1 form');
+
+my @inputs = $forms[0]->inputs;
+is          (scalar @inputs, 11, 'getEditForm: the form has 11 controls');
+
+my @interestingFeatures;
+foreach my $input (@inputs) {
+    my $name = $input->name;
+    my $type = $input->type;
+    push @interestingFeatures, { name => $name, type => $type };
+}
+
+cmp_deeply(
+    \@interestingFeatures,
+    [
+        {
+            name    => 'webguiCsrfToken',
+            type    => 'hidden',
+        },
+        {
+            name    => undef,
+            type    => 'submit',
+        },
+        {
+            name    => 'shop',
+            type    => 'hidden',
+        },
+        {
+            name    => 'method',
+            type    => 'hidden',
+        },
+        {
+            name    => 'do',
+            type    => 'hidden',
+        },
+        {
+            name    => 'paymentGatewayId',
+            type    => 'hidden',
+        },
+        {
+            name    => 'className',
+            type    => 'hidden',
+        },
+        {
+            name    => 'label',
+            type    => 'text',
+        },
+        {
+            name    => 'enabled',
+            type    => 'radio',
+        },
+        {
+            name    => 'groupToUse',
+            type    => 'option',
+        },
+        {
+            name    => '__groupToUse_isIn',
+            type    => 'hidden',
+        },
+    ],
+    'getEditForm made the correct form with all the elements'
+
+);
 
 
 #######################################################################

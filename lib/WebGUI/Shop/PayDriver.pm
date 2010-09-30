@@ -423,7 +423,6 @@ Returns the configuration form for the options of this plugin.
 sub getEditForm {
     my $self = shift;
     
-    my $definition = $self->definition($self->session);
     my $form = WebGUI::HTMLForm->new($self->session);
     $form->submit;
     
@@ -432,6 +431,15 @@ sub getEditForm {
         name  => 'className',
         value => $self->className,
     );
+    tie my %form_options, 'Tie::IxHash';
+    foreach my $property_name ($self->getProperties) {
+        my $property = $self->meta->find_attribute_by_name($property_name);
+        $form_options{$property_name} = {
+            value => $self->$property_name,
+            %{ $self->getFormProperties($property_name)},
+        };
+    }
+    my $definition = [ { properties => \%form_options }, ];
     $form->dynamicForm($definition, 'properties', $self);
 
     return $form;
@@ -535,9 +543,9 @@ sub processPayment {
 
 #-------------------------------------------------------------------
 
-=head2 processPropertiesFromFormPost ( )
+=head2 processTemplate ( )
 
-Updates pay driver with data from Form.
+Common code for processing a template and doing exception handling.
 
 =cut
 
