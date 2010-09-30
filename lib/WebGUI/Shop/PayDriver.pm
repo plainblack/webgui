@@ -197,7 +197,7 @@ A user object that will be used directly.
 
 sub canUse {
     my $self = shift;
-    return 0 unless $self->get('enabled');
+    return 0 unless $self->enabled;
     my $user = shift;
     my $userObject;
     if (!defined $user or ref($user) ne 'HASH') {
@@ -214,7 +214,7 @@ sub canUse {
             WebGUI::Error::InvalidParam->throw(error => q{Must provide user information})
         }
     }
-    return $userObject->isInGroup($self->get('groupToUse'));
+    return $userObject->isInGroup($self->groupToUse);
 }
 
 #-------------------------------------------------------------------
@@ -631,7 +631,7 @@ sub www_getCredentials {
     };
     $self->appendCartVariables($var);
 
-    my $output   = $self->processTemplate($self->get("summaryTemplateId"), $var);
+    my $output   = $self->processTemplate($self->summaryTemplateId, $var);
     return $session->style->userStyle($output);
 }
 
