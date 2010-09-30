@@ -581,7 +581,7 @@ Setter for user configurable options in the payment objects.
 
 =head4 $options
 
-A list of properties to assign to this PayDriver.  See C<definition> for details.  The options are
+A list of properties to assign to this PayDriver.  See C<new> for details.  The options are
 flattened into JSON and stored in the database as text.  There is no content checking performed.
 
 =cut
