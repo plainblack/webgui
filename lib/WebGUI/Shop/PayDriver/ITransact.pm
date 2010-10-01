@@ -21,7 +21,37 @@ use Tie::IxHash;
 use LWP::UserAgent;
 use HTTP::Request;
 
-use base qw/WebGUI::Shop::PayDriver/;
+use Moose;
+use WebGUI::Definition::Shop;
+extends 'WebGUI::Shop::PayDriver';
+define pluginName => [qw/label PayDriver_ITransact/];
+property vendorId => (
+           fieldType    => 'text',
+           label        => ['vendorId', 'PayDriver_ITransact'],
+           hoverHelp    => ['vendorId help', 'PayDriver_ITransact'],
+         );
+property password => (
+            fieldType   => 'password',
+            label       => ['password', 'PayDriver_ITransact'],
+            hoverHelp   => ['password help', 'PayDriver_ITransact'],
+         );
+property useCVV2 => (
+            fieldType   => 'yesNo',
+            label       => ['use cvv2', 'PayDriver_ITransact'],
+            hoverHelp   => ['use cvv2 help', 'PayDriver_ITransact'],
+         );
+property credentialsTemplateId => (
+            fieldType    => 'template',
+            label        => ['credentials template', 'PayDriver_ITransact'],
+            hoverHelp    => ['credentials template help', 'PayDriver_ITransact'],
+            namespace    => 'Shop/Credentials',
+            default      => 'itransact_credentials1',    
+         );
+property emailMessage => (
+            fieldType   => 'textarea',
+            label       => ['emailMessage', 'PayDriver_ITransact'],
+            hoverHelp   => ['emailMessage help', 'PayDriver_ITransact'],
+         );
 
 #-------------------------------------------------------------------
 sub _generateCancelRecurXml {
@@ -30,8 +60,8 @@ sub _generateCancelRecurXml {
 
     # Construct xml
     my $vendorIdentification;
-    $vendorIdentification->{ VendorId           } = $self->get('vendorId');
-    $vendorIdentification->{ VendorPassword     } = $self->get('password');
+    $vendorIdentification->{ VendorId           } = $self->vendorId;
+    $vendorIdentification->{ VendorPassword     } = $self->password;
     $vendorIdentification->{ HomePage           } = $self->session->setting->get("companyURL");
     
     my $recurUpdate;
@@ -82,7 +112,7 @@ sub _generatePaymentRequestXML {
     $cardInfo->{ CCNum      } = $cardData->{ acct       };
     $cardInfo->{ CCMo       } = $cardData->{ expMonth   };
     $cardInfo->{ CCYr       } = $cardData->{ expYear    };
-    $cardInfo->{ CVV2Number } = $cardData->{ cvv2       } if $self->get('useCVV2');
+    $cardInfo->{ CVV2Number } = $cardData->{ cvv2       } if $self->useCVV2;
 
     my $customerData;
     $customerData->{ Email                          } = $paymentAddress->{ email };
@@ -92,7 +122,7 @@ sub _generatePaymentRequestXML {
     # --- Transaction data part ---
     my $emailText;
     $emailText->{ EmailTextItem     } = [
-        $self->get('emailMessage'),
+        $self->emailMessage,
         'ID: '. $transaction->getId,
     ];
 
@@ -155,8 +185,8 @@ sub _generatePaymentRequestXML {
     $vendorData->{ Element  }->{ Value  } = $transaction->getId;
 
     my $transactionData;
-    $transactionData->{ VendorId        } = $self->get('vendorId');
-    $transactionData->{ VendorPassword  } = $self->get('password');
+    $transactionData->{ VendorId        } = $self->vendorId;
+    $transactionData->{ VendorPassword  } = $self->password;
     $transactionData->{ VendorData      } = $vendorData;
     $transactionData->{ HomePage        } = $self->session->setting->get("companyURL");
     $transactionData->{ RecurringData   } = $recurringData if $recurringData;
@@ -320,8 +350,8 @@ sub checkRecurringTransaction {
     my $xmlStructure = {
         GatewayInterface => {
             VendorIdentification    => {
-                VendorId        => $self->get('vendorId'),
-                VendorPassword  => $self->get('password'),
+                VendorId        => $self->vendorId,
+                VendorPassword  => $self->password,
                 HomePage        => ,
             },
             RecurDetails            => {
@@ -375,56 +405,6 @@ sub checkRecurringTransaction {
 
         return 0;
 	}
-}
-
-#-------------------------------------------------------------------
-sub definition {
-    my $class       = shift;
-    my $session     = shift;
-    WebGUI::Error::InvalidParam->throw(error => q{Must provide a session variable})
-        unless ref $session eq 'WebGUI::Session';
-    my $definition  = shift;
-
-    my $i18n = WebGUI::International->new($session, 'PayDriver_ITransact');
-
-    tie my %fields, 'Tie::IxHash';
-    %fields = (
-        vendorId        => {
-           fieldType    => 'text',
-           label        => $i18n->get('vendorId'),
-           hoverHelp    => $i18n->get('vendorId help'),
-        },
-        password        => {
-            fieldType   => 'password',
-            label       => $i18n->get('password'),
-            hoverHelp   => $i18n->get('password help'),
-        },
-        useCVV2         => {
-            fieldType   => 'yesNo',
-            label       => $i18n->get('use cvv2'),
-            hoverHelp   => $i18n->get('use cvv2 help'),
-        },
-        credentialsTemplateId  => {
-            fieldType    => 'template',
-            label        => $i18n->get('credentials template'),
-            hoverHelp    => $i18n->get('credentials template help'),
-            namespace    => 'Shop/Credentials',
-            defaultValue => 'itransact_credentials1',	
-        },
-        emailMessage    => {
-            fieldType   => 'textarea',
-            label       => $i18n->get('emailMessage'),
-            hoverHelp   => $i18n->get('emailMessage help'),
-        },
-        # readonly stuff from old plugin here?
-    );
- 
-    push @{ $definition }, {
-        name        => $i18n->get('Itransact'),
-        properties  => \%fields,
-    };
-
-    return $class->SUPER::definition($session, $definition);
 }
 
 #-------------------------------------------------------------------
@@ -599,16 +579,17 @@ sub www_edit {
     my $form = $self->getEditForm;
     $form->submit;
 
+    ##Form to let the user log into their ITransact account from here.
     my $terminal = WebGUI::HTMLForm->new($session, action=>"https://secure.paymentclearing.com/cgi-bin/rc/sess.cgi", extras=>'target="_blank"');
     $terminal->hidden(name=>"ret_addr", value=>"/cgi-bin/rc/sure/sure.cgi?sure_template_code=session_check&sure_use_session_mid=1");
     $terminal->hidden(name=>"override", value=>1);
     $terminal->hidden(name=>"cookie_precheck", value=>0);
-    $terminal->hidden(name=>"mid", value=>$self->get('vendorId'));
-    $terminal->hidden(name=>"pwd", value=>$self->get('password'));
+    $terminal->hidden(name=>"mid", value=>$self->vendorId);
+    $terminal->hidden(name=>"pwd", value=>$self->password);
     $terminal->submit(value=>$i18n->get('show terminal'));
     
     my $output = '<br />';
-    if ($self->get('vendorId')) {
+    if ($self->vendorId) {
         $output .= $terminal->print.'<br />';
     }
     $output .= $i18n->get('extra info').'<br />'
@@ -664,7 +645,7 @@ sub www_getCredentials {
     $var->{cvv2Field} = WebGUI::Form::integer($session, {
         name  => 'cvv2',
         value => $self->session->form->process("cvv2"),
-    }) if $self->get('useCVV2');
+    }) if $self->useCVV2;
 
     $var->{checkoutButton} = WebGUI::Form::submit($session, {
         value => $i18n->get('checkout button', 'Shop'),
@@ -672,7 +653,7 @@ sub www_getCredentials {
     });
     $self->appendCartVariables($var);
 
-    my $output   = $self->processTemplate($self->get("credentialsTemplateId"), $var);
+    my $output   = $self->processTemplate($self->credentialsTemplateId, $var);
     return $session->style->userStyle($output);
 }
 
