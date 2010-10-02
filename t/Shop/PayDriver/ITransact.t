@@ -99,11 +99,34 @@ $cart->update({
     shipperId         => $shipper->getId,
 });
 
+my $vendorId = $session->config->get("testing/ITransact/vendorId");
+my $password = $session->config->get("testing/ITransact/password");
+my $hasTestAccount = $vendorId && $password;
+
+if (!$vendorId) {
+    $vendorId = "joeUser";
+}
+if (!$password) {
+    $password = "joePass";
+}
+
 #######################################################################
 #
 # _generatePaymentRequestXML
 #
 #######################################################################
+
+my $options = {
+    label           => 'Fast and harmless',
+    enabled         => 1,
+    groupToUse      => 3,
+    vendorId        => $vendorId,
+    password        => $password,
+    useCVV2         => 1,
+};
+my $driver = WebGUI::Shop::PayDriver::ITransact->new( $session, $options );
+$driver->write;
+WebGUI::Test->addToCleanup($driver);
 
 my $dt = WebGUI::DateTime->new($session, time());
 $dt->add({ years => 1, });
@@ -139,7 +162,9 @@ TODO: {
 SKIP: {
     skip "Skipping XML requests to ITransact due to lack of real userId and password", 2 unless $hasTestAccount;
     note 'doXmlrequest';
+    diag $xml;
     my $response = eval { $driver->doXmlRequest($xml) };
+    diag "got reponse";
     my $ok_response = isa_ok($response, 'HTTP::Response', 'returns a HTTP::Response object');
     SKIP: {
         skip "Skipping response check since we did not get a response", 1 unless $ok_response;
