@@ -35,7 +35,8 @@ readonly userId => my %userId;
 
 =head2 adjust ( amount, [ comment ] )
 
-Adjusts the amount of credit this user has by a specified amount.
+Adjusts the amount of credit this user has by a specified amount.  Returns 0 if the current user is Visitor.
+Otherwise, returns the amount set.
 
 =head3 amount
 
@@ -150,6 +151,20 @@ sub new {
     $session{ $id } = $session;
     $userId{ $id } = $userId;
     return $self;
+}
+
+#-------------------------------------------------------------------
+
+=head2 purge ( )
+
+Removes all shop credit for the current user.
+
+=cut
+
+sub purge {
+    my ($self) = @_;
+    $self->session->db->write("delete from shopCredit where userId = ?",[$self->userId]);
+    return 1;
 }
 
 #-------------------------------------------------------------------
