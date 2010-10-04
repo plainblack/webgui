@@ -1,4 +1,4 @@
-package WebGUI::Fork::AssetExport;
+package WebGUI::Fork::ProgressTree;
 
 =head1 LEGAL
 
@@ -19,12 +19,12 @@ use warnings;
 
 =head1 NAME
 
-WebGUI::Fork::AssetExport
+WebGUI::Fork::ProgressTree
 
 =head1 DESCRIPTION
 
 Renders an admin console page that polls ::Status to draw a friendly graphical
-representation of how an export is coming along.
+representation of how progress on a tree of assets is coming along.
 
 =head1 SUBROUTINES
 
@@ -33,77 +33,99 @@ These subroutines are available from this package:
 =cut
 
 use Template;
+use HTML::Entities;
+use JSON;
 
 my $template = <<'TEMPLATE';
 <p>
-Currently exporting <span id='current'></span>
+<div id='meter'>
+    <div id='meter-bar'>
+        <div id='meter-text'></div>
+    </div>
+</div>
+Current asset: <span id='focus'></span>
 (<span id='finished'></span>/<span id='total'></span>).<br />
 <span id='elapsed'></span> seconds elapsed.
-</p>
 <ul id='tree'></ul>
-[% MACRO yui(file) BLOCK %]
-<script src="$extras/yui/build/$file"></script>
-[% END %]
+[% MACRO inc(file) BLOCK %]<script src="$extras/$file"></script>[% END %]
+[% MACRO yui(file) BLOCK %][% inc("yui/build/$file") %][% END %]
 [% yui("yahoo/yahoo-min.js") %]
 [% yui("json/json-min.js") %]
 [% yui("event/event-min.js") %]
 [% yui("connection/connection_core-min.js") %]
+[% inc("underscore/underscore-min.js") %]
 <script>
-(function (statusUrl) {
-    var JSON = YAHOO.lang.JSON;
+(function (params) {
+    var JSON = YAHOO.lang.JSON, statusUrl = params.statusUrl;
+
+    function finish() {
+        var redir = params.redirect;
+        if (redir) {
+            setTimeout(function() {
+                // The idea here is to only allow local redirects
+                var loc = window.location;
+                loc.href = loc.protocol + '//' + loc.host + redir;
+            }, 1000);
+        }
+    }
     function error(msg) {
         alert(msg);
     }
+    function setHtml(id, html) {
+        document.getElementById(id).innerHTML = html;
+    }
     function draw(data) {
-        var ul, old, finished = 0, total = 0, current;
+        var tree, finished = 0, total = 0, focus, pct;
         function recurse(asset, node) {
             var li = document.createElement('li'), txt, notes, ul, i;
 
             total += 1;
 
             txt = asset.url;
-            if (asset.current) {
-                li.className += 'current';
-                current = asset.url;
+            if (asset.focus) {
+                li.className += 'focus';
+                focus = asset.url;
             }
-            else if (asset.badUserPrivileges) {
-                li.className = 'error';
-                txt += ' (bad user privileges)';
+            else if (asset.failure) {
+                li.className = 'failure';
+                txt += ' (' + asset.failure + ')';
                 finished += 1;
             }
-            else if (asset.notExportable) {
-                li.className = 'error';
-                txt += ' (not exportable)';
-                finished += 1;
-            }
-            else if (asset.done) {
-                li.className = 'done';
+            else if (asset.success) {
+                li.className = 'success';
                 finished += 1;
             }
             li.appendChild(document.createTextNode(txt));
-            if (asset.collateralNotes) {
-                notes = document.createElement('p');
-                notes.innerHTML = asset.collateralNotes;
-                li.appendChild(notes);
+            if (notes = asset.notes) {
+                _.each(notes, function (note) {
+                    var p = document.createElement('p');
+                    p.innerHTML = note;
+                    li.appendChild(p);
+                });
             }
             if (asset.children) {
                 ul = document.createElement('ul');
-                for (i = 0; i < asset.children.length; i += 1) {
-                    recurse(asset.children[i], ul);
-                    li.appendChild(ul);
-                }
+                _.each(asset.children, function (child) {
+                    recurse(child, ul);
+                });
+                li.appendChild(ul);
             }
             node.appendChild(li);
         }
-        ul = document.createElement('ul');
-        old = document.getElementById('tree');
-        ul.id = old.id;
-        recurse(JSON.parse(data.status), ul);
-        old.parentNode.replaceChild(ul, old);
-        document.getElementById('total').innerHTML = total;
-        document.getElementById('finished').innerHTML = finished;
-        document.getElementById('current').innerHTML = current || 'nothing';
-        document.getElementById('elapsed').innerHTML = data.elapsed;
+        tree = document.getElementById('tree');
+        tree.innerHTML = '';
+        _.each(JSON.parse(data.status), function (root) {
+            recurse(root, tree);
+        });
+        pct = Math.floor((finished/total)*100) + '%';
+
+        setHtml('meter-text', pct);
+        document.getElementById('meter-bar').style.width = pct;
+
+        setHtml('total', total);
+        setHtml('finished', finished);
+        setHtml('focus', focus || 'nothing');
+        setHtml('elapsed', data.elapsed);
     }
     function fetch() {
         var callback = {
@@ -119,6 +141,7 @@ Currently exporting <span id='current'></span>
                 }
                 else if (data.finished) {
                     draw(data);
+                    finish();
                 }
                 else {
                     draw(data);
@@ -132,16 +155,21 @@ Currently exporting <span id='current'></span>
         YAHOO.util.Connect.asyncRequest('GET', statusUrl, callback, null);
     }
     YAHOO.util.Event.onDOMReady(fetch);
-}("$statusUrl"));
+}([% params %]));
 </script>
 TEMPLATE
 
 my $stylesheet = <<'STYLESHEET';
 <style>
+#meter           { border: thin solid black; position: relative }
+#meter-bar       { background-color: lime; font-size: 18pt;
+                   height: 20pt; line-height: 20pt }
+#meter-text      { position: absolute; top: 0; left: 0; width: 100%;
+                   text-align: center }
 #tree li         { color: black }
-#tree li.current { color: cyan }
-#tree li.error   { color: red }
-#tree li.done    { color: green }
+#tree li.focus   { color: cyan }
+#tree li.failure { color: red }
+#tree li.success { color: green }
 </style>
 STYLESHEET
 
@@ -157,17 +185,21 @@ sub handler {
     my $process = shift;
     my $session = $process->session;
     my $url     = $session->url;
+    my $form    = $session->form;
     my $tt      = Template->new( { INTERPOLATE => 1 } );
     my %vars    = (
-        statusUrl => $url->page( $process->contentPairs('Status') ),
-        extras    => $session->url->extras,
+        params => JSON::encode_json( {
+                statusUrl => $url->page( $process->contentPairs('Status') ),
+                redirect  => scalar $form->get('proceed'),
+            }
+        ),
+        extras => $url->extras,
     );
     $tt->process( \$template, \%vars, \my $content ) or die $tt->error;
 
-    my $console = WebGUI::AdminConsole->new( $process->session, 'assets' );
+    my $console = WebGUI::AdminConsole->new( $session, $form->get('icon') );
     $session->style->setRawHeadTags($stylesheet);
-    my $i18n = WebGUI::International->new( $session, 'Asset' );
-    return $console->render( $content, $i18n->get('Page Export Status') );
+    return $console->render( $content, encode_entities( $form->get('title') ) );
 } ## end sub handler
 
 1;

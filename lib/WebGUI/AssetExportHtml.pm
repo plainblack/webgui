@@ -24,6 +24,7 @@ use WebGUI::Utility ();
 use WebGUI::Session;
 use URI::URL;
 use Scope::Guard qw(guard);
+use WebGUI::ProgressTree;
 
 =head1 NAME
 
@@ -400,7 +401,7 @@ sub exportBranch {
                 close $handle;
                 $cs->var->end;
                 $cs->close();
-                $asset->$report('collateral notes', $output);
+                $asset->$report('collateral notes', $output) if $output;
             };
             my $path = $asset->exportGetUrlAsPath;
             eval { $asset->exportAssetCollateral($path, $options, $cs) };
@@ -666,48 +667,33 @@ specified asset and keeps a json structure as the status.
 =cut
 
 sub exportInFork {
-    my ($process, $args) = @_;
-    my $self = WebGUI::Asset->new($process->session, delete $args->{assetId});
+    my ( $process, $args ) = @_;
+    my $session = $process->session;
+    my $self = WebGUI::Asset->new( $session, delete $args->{assetId} );
     $args->{indexFileName} = delete $args->{index};
-    my %flat;
-
-    my $hashify; $hashify = sub {
-        my ($asset, $depth) = @_;
-        return if $depth < 1;
-        my $hash = { url => $asset->getUrl };
-        my $children = $asset->getLineage(['children'], { returnObjects => 1 });
-        $hash->{children} = [ map { $hashify->($_, $depth - 1) } @$children ];
-        $flat{$asset->getId} = $hash;
-        return $hash;
-    };
-    my $tree = $hashify->($self, $args->{depth});
-    my $last = $tree;
+    my $assetIds = $self->exportGetDescendants( undef, $args->{depth} );
+    my $tree = WebGUI::ProgressTree->new( $session, $assetIds );
     my %reports = (
-        'bad user privileges' => sub { shift->{badUserPrivileges} = 1 },
-        'not exportable'      => sub { shift->{notExportable} = 1 },
-        'done'                => sub { shift->{done} = 1 },
-        'exporting page'      => sub {
-            my $hash = shift;
-            $hash->{current} = 1;
-            delete $last->{current};
-            $last = $hash;
+        'done'                => sub { $tree->success(shift) },
+        'exporting page'      => sub { $tree->focus(shift) },
+        'collateral notes'    => sub { $tree->note(@_) },
+        'bad user privileges' => sub {
+            $tree->failure( shift, 'Bad User Privileges' );
         },
-        'collateral notes' => sub {
-            my ($hash, $text) = @_;
-            $hash->{collateralNotes} = $text if $text;
+        'not exportable' => sub {
+            $tree->failure( shift, 'Not Exportable' );
         },
     );
     $args->{report} = sub {
-        my ($asset, $key, @args) = @_;
+        my ( $asset, $key, @args ) = @_;
         my $code = $reports{$key};
-        my $hash = $flat{$asset->getId};
-        $code->($hash, @args);
-        $process->update(sub { JSON::encode_json($tree) });
+        $code->( $asset->getId, @args );
+        $process->update( sub { $tree->json } );
     };
     $self->exportAsHtml($args);
-    delete $last->{current};
-    $process->update(JSON::encode_json($tree));
-}
+    $tree->focus(undef);
+    $process->update( $tree->json );
+} ## end sub exportInFork
 
 #-------------------------------------------------------------------
 
@@ -1036,7 +1022,12 @@ sub www_exportStatus {
         }
     );
     $process->setGroup(13);
-    my $pairs = $process->contentPairs('AssetExport');
+    my $i18n = WebGUI::International->new( $session, 'Asset' );
+    my $pairs = $process->contentPairs('ProgressTree', {
+            icon  => 'assets',
+            title => $i18n->get('Page Export Status'),
+        }
+    );
     $session->http->setRedirect($self->getUrl($pairs));
     return 'redirect';
 }

@@ -19,6 +19,8 @@ save you many hours of grief.
        is in WebGUI again. Licencing information was overlooked. An 
        upgrade to 7.10.1 will break the Matrix. This is fixed now.
 
+     * WebGUI now depends on Monkey::Patch for sanely scoped monkeypatching.
+
 7.10.1
 --------------------------------------------------------------------
      * WebGUI now depends on PerlIO::eol, for doing line ending translation.

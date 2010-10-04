@@ -37,6 +37,9 @@ use WebGUI::HTML;
 use WebGUI::HTMLForm;
 use WebGUI::Keyword;
 use WebGUI::ProgressBar;
+use WebGUI::ProgressTree;
+use Monkey::Patch;
+use WebGUI::Fork;
 use WebGUI::Search::Index;
 use WebGUI::TabForm;
 use WebGUI::Utility;
@@ -2555,6 +2558,34 @@ sub setSize {
     $self->{_properties}{assetSize} = $size;
 }
 	
+#-------------------------------------------------------------------
+
+=head2 setState ( $state )
+
+Updates the asset table with the new state of the asset.
+
+=cut
+
+sub setState {
+    my ($self, $state) = @_;
+    my $sql = q{
+        UPDATE asset
+        SET    state          = ?,
+               stateChangedBy = ?,
+               stateChanged   = ?
+        WHERE  assetId = ?
+    };
+    $self->session->db->write(
+        $sql, [
+            $state,
+            $self->session->user->userId,
+            time,
+            $self->getId,
+        ]
+    );
+	$self->{_properties}->{state} = $state;
+    $self->purgeCache;
+}
 
 #-------------------------------------------------------------------
 

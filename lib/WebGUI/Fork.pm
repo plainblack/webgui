@@ -88,41 +88,59 @@ sub canView {
     my $user    = shift || $session->user;
     $user = WebGUI::User->new( $session, $user )
         unless eval { $user->isa('WebGUI::User') };
-    return 1 if $user->isAdmin;
-    return $user->isInGroup( $self->getGroupId );
+    return
+           $user->isAdmin
+        || $user->userId eq $self->getUserId
+        || $user->isInGroup( $self->getGroupId );
 }
 
 #-------------------------------------------------------------------
 
-=head2 contentPairs ($module, $pid)
+=head2 contentPairs ($module, $pid, $extra)
 
 Returns a bit of query string useful for redirecting to a
 WebGUI::Operation::Fork plugin.  $module should be the bit that comes after
 WebGUI::Operation::Fork, e.g.  $process->contentPairs('Foo') should return
 something like "op=fork;module=Foo;pid=adlfjafo87ad9f78a7", which will
-get dispatched to WebGUI::Operation::Fork::Foo::handler($process)
+get dispatched to WebGUI::Operation::Fork::Foo::handler($process).
+
+$extra is an optional hashref that will add further parameters onto the list
+of pairs, e.g. { foo => 'bar' } becomes ';foo=bar'
 
 =cut
 
 sub contentPairs {
-    my ( $self, $module ) = @_;
-    my $pid = $self->getId;
-    return "op=fork;module=$module;pid=$pid";
-}
+    my ( $self, $module, $extra ) = @_;
+    my $url    = $self->session->url;
+    my $pid    = $self->getId;
+    my %params = (
+        op     => 'fork',
+        module => $module,
+        pid    => $self->getId,
+        $extra ? %$extra : ()
+    );
+    return join(
+        ';',
+        map {
+            my $k = $_;
+            join( '=', map { $url->escape($_) } ( $k, $params{$k} ) );
+            } keys %params
+    );
+} ## end sub contentPairs
 
 #-----------------------------------------------------------------
 
 =head2 create ( )
 
-Internal class method. Creates a new Fork object and inserts a
-blank row of data into the db.
+Internal class method. Creates a new Fork object inserts it into the db.
 
 =cut
 
 sub create {
     my ( $class, $session ) = @_;
     my $id = $session->id->generate;
-    $session->db->setRow( $class->tableName, 'id', {}, $id );
+    my %data = ( userId => $session->user->userId );
+    $session->db->setRow( $class->tableName, 'id', \%data, $id );
     bless { session => $session, id => $id }, $class;
 }
 
@@ -275,9 +293,9 @@ sub forkAndExec {
 
 Get data from the database record for this process (returned as a simple list,
 not an arrayref).  Valid keys are: id, status, error, startTime, endTime,
-finished, groupId.  They all have more specific accessors, but you can use
-this to get several at once if you're very careful.  You should probably use
-the accessors, though, since some of them have extra logic.
+finished, groupId, userId.  They all have more specific accessors, but you can
+use this to get several at once if you're very careful.  You should probably
+use the accessors, though, since some of them have extra logic.
 
 =cut
 
@@ -353,6 +371,16 @@ sub getStatus {
     }
     return $self->get('status');
 }
+
+#-----------------------------------------------------------------
+
+=head2 getUserId
+
+Returns the userId of the user who initiated this Fork.
+
+=cut
+
+sub getUserId { $_[0]->get('userId') }
 
 #-----------------------------------------------------------------
 

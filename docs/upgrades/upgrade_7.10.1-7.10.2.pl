@@ -47,6 +47,7 @@ sub addForkTable {
     my $sql = q{
         CREATE TABLE Fork (
             id        CHAR(22),
+            userId    CHAR(22),
             groupId   CHAR(22),
             status    LONGTEXT,
             error     TEXT,
