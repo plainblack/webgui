@@ -1892,15 +1892,8 @@ WebGUI.Admin.Search.prototype.addFilter
     nameElem.appendChild( document.createTextNode( name ) );
     li.appendChild( nameElem );
 
-    if ( filter.type == "title" ) {
-        var inputElem   = document.createElement('input');
-        filter.inputElem = inputElem;
-        inputElem.type = "text";
-        li.appendChild( inputElem );
-        YAHOO.util.Event.on( inputElem, 'keyup', this.updateLocationBarQuery, this, true );
-        inputElem.focus();
-    }
-    else if ( filter.type == "ownerUserId" ) {
+    // Function to create an autocomplete field
+    var createAutocomplete = function ( li, filter ) {
         var container       = document.createElement( 'div' );
         container.className = "autocomplete";
         li.appendChild( container );
@@ -1909,12 +1902,6 @@ WebGUI.Admin.Search.prototype.addFilter
         filter.inputElem    = inputElem;
         inputElem.type      = "text";
         container.appendChild( inputElem );
-        filter.dataSource   = new YAHOO.util.XHRDataSource( '?op=admin;method=findUser;' );
-        filter.dataSource.responseType = YAHOO.util.XHRDataSource.TYPE_JSON;
-        filter.dataSource.responseSchema = {
-            resultsList : "results",
-            fields : [ 'username', 'name', 'userId', 'avatar', 'email' ]
-        };
 
         // Auto-complete container
         var acDiv    = document.createElement('div');
@@ -1930,6 +1917,26 @@ WebGUI.Admin.Search.prototype.addFilter
         filter.autocomplete.typeAhead = true;
         filter.autocomplete.resultTypeList = false;
         filter.autocomplete.applyLocalFilter = true;
+    };
+
+    if ( filter.type == "title" ) {
+        var inputElem   = document.createElement('input');
+        filter.inputElem = inputElem;
+        inputElem.type = "text";
+        li.appendChild( inputElem );
+        YAHOO.util.Event.on( inputElem, 'keyup', this.updateLocationBarQuery, this, true );
+        inputElem.focus();
+    }
+    else if ( filter.type == "ownerUserId" ) {
+        filter.dataSource   = new YAHOO.util.XHRDataSource( '?op=admin;method=findUser;' );
+        filter.dataSource.responseType = YAHOO.util.XHRDataSource.TYPE_JSON;
+        filter.dataSource.responseSchema = {
+            resultsList : "results",
+            fields : [ 'username', 'name', 'userId', 'avatar', 'email' ]
+        };
+
+        createAutocomplete( li, filter );
+
         filter.autocomplete.formatResult = function ( result, query, match ) {
             var subtext = ( result.name ? result.name : "" )
                         + ( result.email ? " &lt;" + result.email + "&gt;" : "" )
@@ -1940,7 +1947,27 @@ WebGUI.Admin.Search.prototype.addFilter
 
         };
 
-        inputElem.focus();
+        filter.inputElem.focus();
+    }
+    else if ( filter.type == 'lineage' ) {
+        // lineage has autocomplete box and pop-up dialog button
+        filter.dataSource   = new YAHOO.util.XHRDataSource( '?op=admin;method=findAsset;' );
+        filter.dataSource.responseType = YAHOO.util.XHRDataSource.TYPE_JSON;
+        filter.dataSource.responseSchema = {
+            resultsList : "results",
+            fields : [ 'className', 'title', 'icon' ]
+        };
+
+        createAutocomplete( li, filter );
+
+        filter.autocomplete.formatResult = function ( result, query, match ) {
+            return '<div style="float: left; width: 50px; height: 50px; background: url(' + result.icon + ') no-repeat 50% 50%;"></div>'
+                    + '<div class="autocomplete_value">' + result.name + "</div>"
+                    + '<div class="autocomplete_subtext">' + result.className + '</div>';
+
+        };
+
+        filter.inputElem.focus();
     }
 };
 
