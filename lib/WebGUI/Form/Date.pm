@@ -18,6 +18,7 @@ use strict;
 use base 'WebGUI::Form::Text';
 use WebGUI::Form::Hidden;
 use WebGUI::International;
+use Scalar::Util qw/blessed/;
 
 my $isaEpoch = qr/^-?\d+$/;
 
@@ -241,8 +242,11 @@ sub toHtml {
         $value = $self->set("value",'');
     }
     else {
-        $value = eval { WebGUI::DateTime->new($session, $self->getOriginalValue)->toMysqlDate; };
-        $value = WebGUI::DateTime->new($session,0)->toMysqlDate if $value eq '';
+        my $originalValue = $self->getOriginalValue;
+        my $dt = eval { WebGUI::DateTime->new($session, $originalValue); };
+        $dt = WebGUI::DateTime->new($session,0) if ! (blessed $dt && $dt->isa('DateTime'));  ##Parsing error
+        $dt->set_time_zone($session->datetime->getTimeZone);
+        $value = $dt->toMysqlDate;
     }
 
 
