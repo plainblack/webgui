@@ -380,7 +380,6 @@ sub getFieldsList {
 	foreach my $field (@{WebGUI::ProfileField->getFields($session)}) {
 		my $fieldId = $field->getId;
 		next if $fieldId =~ /contentPositions/;
-        $session->log->warn($fieldId);
 		$fieldNames{$fieldId} = $field->getLabel.' ['.$fieldId.']';
 	}
 	$output .= '<table cellspacing="0" cellpadding="3" border="1"><tr><td><table cellspacing="0" cellpadding="3" border="0">';
@@ -394,8 +393,6 @@ sub getFieldsList {
 		-vertical=>1,
 		-uiLevel=>9
 	);
-    $session->log->warn($list->get('uiLevel'));
-    $session->log->warn($list->passUiLevelCheck);
 	$output .= $list->toHtmlWithWrapper;
 	$output .= '</table></td><td><table cellspacing="0" cellpadding="3" border="0">';
 	my @prefFieldsToImport = $self->getPrefFieldsToImport;
