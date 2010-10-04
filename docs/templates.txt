@@ -1,6 +1,13 @@
 This is a running list of template changes made during upgrades.  If you have copied the default
 templates, you will need to apply these changes manually to your copies.
 
+7.9.16
+
+  * The Make Page Printable template has changed (as per bug #11857). The HTML
+    is now consistent with other default Style templates. The Plain Black logo and
+    copyright info have been removed and a stylesheet was added to provide very
+    simple default formatting for text, header and footer (makepageprintable.css).
+
 7.9.15
 
   *  Profile templates - root/import/account/profile/default-view-profile-template
