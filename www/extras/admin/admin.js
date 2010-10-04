@@ -1820,27 +1820,27 @@ WebGUI.Admin.Search
 
     // Fire when ready, Gridley
     this.admin.tabBar.addTab( newTab );
+    this.admin.tabBar.selectTab( this.admin.tabBar.get('tabs').length - 1 );
 
     var searchForm      = newForm.getElementsByTagName('form')[0];
     this.form           = searchForm;
+    this.form.className = "searchForm";
     var searchButton    = searchForm.elements['searchButton'];
-    this.searchButton   = searchButton;
-    new YAHOO.widget.Button( searchButton, {
+    this.searchSubmitButton   = new YAHOO.widget.Button( searchButton, {
         onclick     : { fn: this.requestSearch, scope: this }
     } );
+    this.searchSubmitButton.addClass( searchButton.className );
 
     var searchFilterSelect  = searchForm.elements['searchFilterSelect'];
     this.searchFilterSelect = searchFilterSelect;
     var searchFilterAdd     = searchForm.elements['searchFilterAdd'];
     this.searchFilterAdd    = searchFilterAdd;
-    new YAHOO.widget.Button( searchFilterAdd, {
-        type : "menu",
-        menu : searchFilterSelect
-    } );
-    var self = this;
-    YAHOO.util.Event.on( window, "load", function () {
-        self.filterSelect.getMenu().subscribe( "click", self.addFilter, newTab, true );
-    } );
+    this.searchFilterButton 
+        = new YAHOO.widget.Button( searchFilterAdd, {
+            type : "menu",
+            menu : searchFilterSelect
+        } );
+    this.searchFilterButton.getMenu().subscribe( "click", this.addFilter, this, true );
 
     var searchKeywords = searchForm.elements['searchKeywords'];
     this.searchKeywords = searchKeywords;
@@ -1850,6 +1850,8 @@ WebGUI.Admin.Search
 
     var searchFiltersContainer  = searchForm.getElementsByTagName('ul')[0];
     this.searchFiltersContainer = searchFiltersContainer;
+
+    this.filters    = [];
 };
 
 
