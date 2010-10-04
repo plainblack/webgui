@@ -23,6 +23,7 @@ use WebGUI::Utility;
 use WebGUI::Operation::Shared;
 use WebGUI::Workflow::Instance;
 use WebGUI::Shop::AddressBook;
+use WebGUI::Shop::Credit;
 use JSON;
 use WebGUI::Exception;
 use WebGUI::ProfileField;
@@ -423,6 +424,9 @@ sub delete {
         next BOOK if (my $e = Exception::Class->caught);
         $book->delete;
     }
+
+    my $credit = WebGUI::Shop::Credit->new($session, $userId);
+    $credit->purge;
 
     # remove user itself
     $db->write("DELETE FROM userProfileData WHERE userId=?",[$userId]);
