@@ -278,11 +278,11 @@ sub forkAndExec {
     my $class = ref $self;
     my $json  = JSON::encode_json($request);
     my @inc   = map {"-I$_"} @INC;
-    my @argv  = ( "webgui-fork-$id", @inc, "-M$class", "-e$class->runCmd()" );
+    my @argv  = (@inc, "-M$class", "-e$class->runCmd()" );
     $class->daemonize(
         $json,
         sub {
-            exec { $Config{perlpath} } @argv or die "Could not exec: $!";
+            exec ($Config{perlpath}, @argv) or die "Could not exec: $!";
         }
     );
 }
@@ -541,8 +541,10 @@ sub runRequest {
     my ( $class, $args ) = @_;
     my ( $root, $config, $sid ) = @{$args}{qw(webguiRoot configFile sessionId)};
     my $session = WebGUI::Session->open( $root, $config, undef, undef, $sid );
-    my $self = $class->new( $session, $args->{id} );
+    my $id = $args->{id};
+    my $self = $class->new( $session, $id );
     $self->set( { startTime => time } );
+    $0 = "webgui-fork-$id";
     eval {
         my ( $module, $subname, $data ) = @{$args}{qw(module subname data)};
         WebGUI::Pluggable::run( $module, $subname, [ $self, $data ] );

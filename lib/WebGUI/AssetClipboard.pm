@@ -51,13 +51,13 @@ sub canPaste {
 
 #-------------------------------------------------------------------
 
-=head2 copyInBackground ( $process, $args )
+=head2 copyInFork ( $process, $args )
 
 WebGUI::Fork method called by www_copy
 
 =cut
 
-sub copyInBackground {
+sub copyInFork {
     my ($process, $args) = @_;
     my $session = $process->session;
     my $asset = WebGUI::Asset->new($session, $args->{assetId});
@@ -72,23 +72,26 @@ sub copyInBackground {
     }
     my $ids   = $asset->getLineage(\@pedigree);
     my $tree  = WebGUI::ProgressTree->new($session, $ids);
-    my $patch = Monkey::Patch::patch_class 'WebGUI::Asset', 'duplicate', sub {
-        my $duplicate = shift;
-        my $self      = shift;
-        my $id        = $self->getId;
-        my $asset     = eval { $self->$duplicate(@_) };
-        my $e         = $@;
-        if ($e) {
-            $tree->note($id, $e);
-            $tree->failure($id, 'Died');
+    my $patch = Monkey::Patch::patch_class(
+        'WebGUI::Asset', 'duplicate', sub {
+            my $duplicate = shift;
+            my $self      = shift;
+            my $id        = $self->getId;
+            $tree->focus($id);
+            my $asset     = eval { $self->$duplicate(@_) };
+            my $e         = $@;
+            if ($e) {
+                $tree->note($id, $e);
+                $tree->failure($id, 'Died');
+            }
+            else {
+                $tree->success($id);
+            }
+            $process->update(sub { $tree->json });
+            die $e if $e;
+            return $asset;
         }
-        else {
-            $tree->success($id);
-        }
-        $process->update(sub { $tree->json });
-        die $e if $e;
-        return $asset;
-    };
+    );
     my $newAsset = $asset->duplicateBranch($childrenOnly, 'clipboard');
     $newAsset->update({ title => $newAsset->getTitle . ' (copy)'});
     if ($args->{commit}) {
@@ -303,53 +306,50 @@ sub paste {
 
 #-------------------------------------------------------------------
 
-=head2 pasteInBackground ( )
+=head2 pasteInFork ( )
 
 WebGUI::Fork method called by www_pasteList
 
 =cut
 
-sub pasteInBackground {
-    my ($process, $args) = @_;
+sub pasteInFork {
+    my ( $process, $args ) = @_;
     my $session = $process->session;
-    my $self    = WebGUI::Asset->new($session, $args->{assetId});
+    my $self    = WebGUI::Asset->new( $session, $args->{assetId} );
     my @roots   = grep { $_ && $_->canEdit }
-                  map  { WebGUI::Asset->newPending($session, $_) }
-                  @{ $args->{list} };
+        map { WebGUI::Asset->newPending( $session, $_ ) } @{ $args->{list} };
 
-    my @ids;
-    for my $r (@roots) {
-        my $these = $r->getLineage(
-            ['self', 'descendants'], {
-                statesToInclude => ['clipboard', 'clipboard-limbo']
-            }
-        );
-        push(@ids, @$these);
-    }
+    my @ids = map {
+        my $list
+            = $_->getLineage( [ 'self', 'descendants' ], { statesToInclude => [ 'clipboard', 'clipboard-limbo' ] } );
+        @$list;
+    } @roots;
 
-    my $tree = WebGUI::ProgressTree->new($session, \@ids);
+    my $tree = WebGUI::ProgressTree->new( $session, \@ids );
     my $patch = Monkey::Patch::patch_class(
-        'WebGUI::Asset', 'indexContent', sub {
+        'WebGUI::Asset',
+        'indexContent',
+        sub {
             my $indexContent = shift;
             my $self         = shift;
             my $id           = $self->getId;
             $tree->focus($id);
             my $ret = eval { $self->$indexContent(@_) };
-            my $e   = $@;
+            my $e = $@;
             if ($e) {
-                $tree->note($id, $e);
-                $tree->failure($id, 'Died');
+                $tree->note( $id, $e );
+                $tree->failure( $id, 'Died' );
             }
             else {
                 $tree->success($id);
             }
-            $process->update(sub { $tree->json });
+            $process->update( sub { $tree->json } );
             die $e if $e;
             return $ret;
         }
     );
-    $self->paste($_->getId) for @roots;
-}
+    $self->paste( $_->getId ) for @roots;
+} ## end sub pasteInFork
 
 
 #-------------------------------------------------------------------
@@ -400,19 +400,13 @@ sub www_copy {
     }
 
     $args{assetId} = $self->getId;
-    my $process = WebGUI::Fork->start(
-        $session, 'WebGUI::Asset', 'copyInBackground', \%args
-    );
-    my $i18n = WebGUI::International->new($session, 'Asset');
-    my $pairs = $process->contentPairs(
-        'ProgressTree', {
-            title   => $i18n->get('Copy Assets'),
-            icon    => 'assets',
-            proceed => $redir
+    $self->forkWithProgressTree({
+            title    => 'Copy Assets',
+            redirect => $redir,
+            method   => 'copyInFork',
+            args     => \%args
         }
     );
-    $http->setRedirect($self->getUrl($pairs));
-    return 'redirect';
 }
 
 #-------------------------------------------------------------------
@@ -730,30 +724,24 @@ the Asset Manager.
 sub www_pasteList {
     my $self    = shift;
     my $session = $self->session;
+    my $form    = $session->form;
     return $session->privilege->insufficient() unless $self->canEdit && $session->form->validToken;
 
-    my $form    = $session->form;
-    my $process = WebGUI::Fork->start(
-        $session, 'WebGUI::Asset', 'pasteInBackground', {
-            assetId => $self->getId,
-            list    => [ $form->get('assetId') ],
+    $self->forkWithProgressTree( {
+            title    => 'Paste Assets',
+            redirect => $self->getUrl(
+                $form->get('proceed') eq 'manageAssets'
+                ? 'op=assetManager'
+                : ()
+            ),
+            method => 'pasteInFork',
+            args   => {
+                assetId => $self->getId,
+                list    => [ $form->get('assetId') ],
+            }
         }
     );
-
-    my $redir = $self->getUrl(
-        ($form->get('proceed') eq 'manageAssets') ? 'op=assetManager' : ()
-    );
-    my $i18n = WebGUI::International->new($session, 'Asset');
-    my $pairs = $process->contentPairs(
-        'ProgressTree', {
-            title   => $i18n->get('Paste Assets'),
-            icon    => 'assets',
-            proceed => $redir,
-        }
-    );
-    $session->http->setRedirect($self->getUrl($pairs));
-    return 'redirect';
-}
+} ## end sub www_pasteList
 
 1;
 

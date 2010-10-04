@@ -4,6 +4,7 @@
  - Added WebGUI::Fork api
  - Moved html export to Fork
  - Moved clipboard functions to Fork
+ - Moved trash functions to Fork
  - fixed #11884: Editing Templates impossible / Code editor not loaded
  - recommitted ukplayer. Removal broke Matrix. Licencing information was available but overlooked. 
  - fixed #11883: Wiki "Add page" link does not encode special chars

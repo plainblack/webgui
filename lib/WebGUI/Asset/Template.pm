@@ -212,7 +212,7 @@ copy.
 
 sub duplicate {
 	my $self = shift;
-	my $newTemplate = $self->SUPER::duplicate;
+	my $newTemplate = $self->SUPER::duplicate(@_);
     $newTemplate->update({isDefault => 0});
     if ( my $storageId = $self->get('storageIdExample') ) {
         my $newStorage  = WebGUI::Storage->get( $self->session, $storageId )->copy;

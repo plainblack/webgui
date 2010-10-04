@@ -1015,21 +1015,16 @@ sub www_exportStatus {
     my @vars    = qw(
         index depth userId extrasUploadsAction rootUrlAction exportUrl
     );
-    my $process = WebGUI::Fork->start(
-        $session, 'WebGUI::Asset', 'exportInFork', {
-            assetId => $self->getId,
-            map { $_ => scalar $form->get($_) } @vars
+    $self->forkWithProgressTree({
+            title    => 'Page Export Status',
+            method   => 'exportInFork',
+            groupId  => 13,
+            args     => {
+                assetId => $self->getId,
+                map { $_ => scalar $form->get($_) } @vars
+            }
         }
     );
-    $process->setGroup(13);
-    my $i18n = WebGUI::International->new( $session, 'Asset' );
-    my $pairs = $process->contentPairs('ProgressTree', {
-            icon  => 'assets',
-            title => $i18n->get('Page Export Status'),
-        }
-    );
-    $session->http->setRedirect($self->getUrl($pairs));
-    return 'redirect';
 }
 
 #-------------------------------------------------------------------
