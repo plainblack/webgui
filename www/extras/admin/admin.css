@@ -192,6 +192,11 @@ input.disabled {
     height: 50px;
 }
 
+.searchForm p {
+    margin: 0;
+    padding: 0;
+}
+
 .autocomplete_value {
     font-size:  larger;
     font-weight: bold;
