@@ -24,7 +24,10 @@ use HTML::Form;
 
 use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
+use WebGUI::Shop::Cart;
+use WebGUI::Shop::Credit;
 use WebGUI::Shop::PayDriver;
+use WebGUI::User;
 
 #----------------------------------------------------------------------------
 # Init
@@ -33,7 +36,7 @@ my $session = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 55;
+plan tests => 56;
 
 #----------------------------------------------------------------------------
 # figure out if the test can actually run
@@ -475,8 +478,10 @@ my $blue_widget  = $widget->setCollateral('variantsJSON', 'variantId', 'new',
 );
 
 $versionTag->commit;
+my $credited_user = WebGUI::User->create($session);
+$session->user({user => $credited_user});
 my $cart = WebGUI::Shop::Cart->newBySession($session);
-WebGUI::Test->addToCleanup($versionTag, $cart);
+WebGUI::Test->addToCleanup($versionTag, $cart, $credited_user);
 my $addressBook = $cart->getAddressBook;
 my $workAddress = $addressBook->addAddress({
     label => 'work',
@@ -493,7 +498,6 @@ $widget->addToCart($widget->getCollateral('variantsJSON', 'variantId', $blue_wid
 
 my $cart_variables = {};
 $driver->appendCartVariables($cart_variables);
-diag Dumper($cart_variables);
 
 cmp_deeply(
     $cart_variables,
@@ -509,6 +513,26 @@ cmp_deeply(
     },
     'appendCartVariables: checking shippableItemsInCart and totalPrice & subtotal formatting'
 );
+
+my $credit = WebGUI::Shop::Credit->new($session, $credited_user->userId);
+$credit->adjust('1', 'credit for testing');
+$cart_variables = {};
+$driver->appendCartVariables($cart_variables);
+cmp_deeply(
+    $cart_variables,
+    {
+        taxes                 => ignore(),
+        shippableItemsInCart  => 1,
+        subtotal              => '5.00',
+        inShopCreditDeduction => '-1.00',
+        inShopCreditAvailable => '1.00',
+        totalPrice            => '4.00',
+        shipping              => ignore(),
+
+    },
+    '... checking credit display'
+);
+
 
 #######################################################################
 #
