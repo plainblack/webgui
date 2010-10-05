@@ -49,6 +49,12 @@ our $I18N = {
 		lastUpdated => 1053183804
 	},
 
+	'contains' => {
+		message => q|contains|,
+		lastUpdated => 1053183804,
+        context => q|to be a member of a set, inclusive|,
+	},
+
 	'1' => {
 		message => q|Asset to Mirror|,
 		lastUpdated => 1031514049
