@@ -5,6 +5,7 @@
  - fixed #11891: Shop credit not displayed in payment method screen
  - fixed #11871: Metadata display and criteria builder problems
  - fixed #10189: pbworkflow000000000007 Hanging
+ - fixed #11897: Continue to the site link loses current page
 
 7.9.15
  - fixed #11868: WebGUI::Session::Form::validToken throws unnecessary warnings

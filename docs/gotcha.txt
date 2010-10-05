@@ -7,6 +7,14 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+7.9.16
+--------------------------------------------------------------------
+     * The URL used by Display Message on Login always returns the user to 
+       the page where they logged in.  If your site depended on the old,
+       buggy behavior of returning the user to the home page after showing
+       a message, then in the Settings you can assign Redirect After Login Url
+       to /.
+
 7.9.14
 --------------------------------------------------------------------
      * WebGUI now depends on PerlIO::eol, for doing line ending translation.

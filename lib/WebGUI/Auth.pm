@@ -1066,10 +1066,13 @@ sub showMessageOnLogin {
     WebGUI::Macro::process( $self->session, \$output );
 
     # Add the link to continue
+    my $session = $self->session;
+    $session->log->warn("returnUrl: >".$self->session->form->get( 'returnUrl' )."<");
+    $session->log->warn("redirectAfterLoginUrl: >".$self->session->form->get( 'returnUrl' )."<");
     my $redirectUrl =  $self->session->form->get( 'returnUrl' )
                     || $self->session->setting->get("redirectAfterLoginUrl")
                     || $self->session->scratch->get( 'redirectAfterLogin' )
-                    || $self->session->url->getSiteURL . $self->session->url->gateway()
+                    || $self->session->url->getBackToSiteURL
                     ;
 
     $output     .= '<p><a href="' . $redirectUrl . '">' . $i18n->get( 'showMessageOnLogin return' ) 
