@@ -10,6 +10,7 @@
  - fixed #11871: Metadata display and criteria builder problems
  - fixed #10189: pbworkflow000000000007 Hanging
  - fixed #11897: Continue to the site link loses current page
+ - fixed #11618: Code Editor: Content loses it's whitespace formatting
 
 7.10.1
  - fixed #11851: Story Topic: top story variables should be available all the time
