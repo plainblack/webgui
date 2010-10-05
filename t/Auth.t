@@ -49,6 +49,25 @@ $auth           = WebGUI::Auth->new( $session, $AUTH_METHOD );
 my $username    = $session->id->generate;
 push @cleanupUsernames, $username;
 $output         = $auth->createAccountSave( $username, { }, "PASSWORD" ); 
+WebGUI::Test->addToCleanup(sub {
+    for my $username ( @cleanupUsernames ) {
+        # We don't create actual, real users, so we have to cleanup by hand
+        my $userId  = $session->db->quickScalar(
+            "SELECT userId FROM users WHERE username=?",
+            [ $username ]
+        );
+        
+        my @tableList
+            = qw{authentication users userProfileData groupings inbox userLoginLog};
+
+        for my $table ( @tableList ) {
+            $session->db->write(
+                "DELETE FROM $table WHERE userId=?",
+                [ $userId ]
+            );
+        }
+    }
+});
 
 is(
     $session->http->getRedirectLocation, 'REDIRECT_URL',
@@ -83,25 +102,3 @@ is $output, undef, 'login returns undef when showMessageOnLogin is false';
 # Session Cleanup
 $session->{_request} = $oldRequest;
 
-
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-    for my $username ( @cleanupUsernames ) {
-        # We don't create actual, real users, so we have to cleanup by hand
-        my $userId  = $session->db->quickScalar(
-            "SELECT userId FROM users WHERE username=?",
-            [ $username ]
-        );
-        
-        my @tableList
-            = qw{authentication users userProfileData groupings inbox userLoginLog};
-
-        for my $table ( @tableList ) {
-            $session->db->write(
-                "DELETE FROM $table WHERE userId=?",
-                [ $userId ]
-            );
-        }
-    }
-}
