@@ -9,6 +9,7 @@
  - fixed #11891: Shop credit not displayed in payment method screen
  - fixed #11871: Metadata display and criteria builder problems
  - fixed #10189: pbworkflow000000000007 Hanging
+ - fixed #11897: Continue to the site link loses current page
 
 7.10.1
  - fixed #11851: Story Topic: top story variables should be available all the time
