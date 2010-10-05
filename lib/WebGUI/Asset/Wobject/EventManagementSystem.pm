@@ -2016,7 +2016,7 @@ sub www_importEvents {
 		-label   => $i18n->get('ignore first line'),
 		-name    => 'ignore_first_line',
 		-hoverHelp => $i18n->get('import hoverhelp first line'),
-		-defaultValue   => $form->param('ignore_first_line'),
+		-defaultValue   => scalar $form->param('ignore_first_line'),
 	);
 
 	# create the std & meta fields part of the form
@@ -2033,7 +2033,7 @@ sub www_importEvents {
 		name				=> 'fieldsToImport',
 		defaultValue		=> \@defaultImportableFields,
 		options				=> \%importableFields,
-		value				=> $form->get('fieldsToImport'),
+		value				=> scalar $form->get('fieldsToImport'),
 	);
 
 	$f->submit(-value=>$i18n->get('import events'));

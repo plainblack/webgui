@@ -1399,7 +1399,7 @@ sub processPropertiesFromFormPost {
     my $assetId = $self->get('assetId');
     my $revisionDate = $self->get('revisionDate');
 
-    $session->db->write("UPDATE Event SET sequenceNumber =? WHERE assetId = ? AND revisionDate =?",[($form->param('sequenceNumber') || $top_val), $assetId, $revisionDate]);
+    $session->db->write("UPDATE Event SET sequenceNumber =? WHERE assetId = ? AND revisionDate =?",[(scalar($form->param('sequenceNumber')) || $top_val), $assetId, $revisionDate]);
 
 
     # Pre-process Related Links and manage changes
