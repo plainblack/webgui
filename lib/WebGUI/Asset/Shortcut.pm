@@ -38,6 +38,9 @@ sub _drawQueryBuilder {
 			"!=" => $i18n->get("isnt")
 		};
 	}
+	$operator{checkList} = {
+		"+~" => $i18n->get("contains"),
+	};
 	$operator{integer} = {
 		"=" => $i18n->get("equal to"),
 		"!=" => $i18n->get("not equal to"),
@@ -93,6 +96,8 @@ sub _drawQueryBuilder {
 		# The value select field
 		my $valFieldName = "val_field".$i;
         my $options = $fields->{$field}{possibleValues};
+        ##Only allow one at a time to be selected, and work with current JS for choosing which one.
+        $fieldType = 'radioList' if $fieldType eq 'checkList';
 		my $valueField = WebGUI::Form::dynamicField($session,
 			fieldType=>$fieldType,
 			name=>$valFieldName,
@@ -601,8 +606,8 @@ sub getShortcutByCriteria {
 	# |              |             |
 	# |- $field      |_ $operator  |- $value
 	# |_ $attribute                |_ $attribute
-	my $operator = qr/<>|!=|=|>=|<=|>|<|like/i;
-	my $attribute = qr/['"][^()|=><!]+['"]|[^()|=><!\s]+/i; 
+    my $operator = qr/<>|!=|=|>=|<=|>|<|like|\+~/i;
+    my $attribute = qr/['"][^()|=><!]+['"]|[^()|=><!\s]+/i; 
                                                                                                       
 	my $constraint = $criteria;
 	
@@ -610,6 +615,7 @@ sub getShortcutByCriteria {
 	my $db = $self->session->db;
 	my $counter = "b";
 	my @joins = ();
+    ##Transform the expression into valid SQL
 	foreach my $expression ($criteria =~ /($attribute\s*$operator\s*$attribute)/gi) {
 		# $expression will match "State = Wisconsin"
 
@@ -617,9 +623,10 @@ sub getShortcutByCriteria {
 						# We need it later.
 		push(@joins," left join metaData_values ".$counter."_v on a.assetId=".$counter."_v.assetId ");
 		# Get the field (State) and the value (Wisconsin) from the $expression.
-	        $expression =~ /($attribute)\s*$operator\s*($attribute)/gi;
+	        $expression =~ /($attribute)\s*($operator)\s*($attribute)/gi;
 	        my $field = $1;
-	        my $value = $2;
+            my $current_operator = $2;
+	        my $value = $3;
 
 		# quote the field / value variables.
 		my $quotedField = $field;
@@ -627,18 +634,21 @@ sub getShortcutByCriteria {
 		unless ($field =~ /^\s*['"].*['"]\s*/) {
 			$quotedField = $db->quote($field);
 		}
-                unless ($value =~ /^\s*['"].*['"]\s*/) {
-                        $quotedValue = $db->quote($value);
-                }
+        unless ($value =~ /^\s*['"].*['"]\s*/) {
+            $quotedValue = $db->quote($value);
+        }
 		
 		# transform replacement from "State = Wisconsin" to 
 		# "(fieldname=State and value = Wisconsin)"
 		my $clause = "(".$counter."_p.fieldName=".$quotedField." and ".$counter."_v.value ";
-	        $replacement =~ s/\Q$field/$clause/;
-	        $replacement =~ s/\Q$value/$quotedValue )/i;
+        $replacement =~ s/\Q$field/$clause/;
+        $replacement =~ s/\Q$value/$quotedValue )/i;
 
 		# replace $expression with the new $replacement in $constraint.
-	        $constraint =~ s/\Q$expression/$replacement/;
+        $constraint =~ s/\Q$expression/$replacement/;
+        if ($current_operator eq '+~') {
+            $constraint =~ s/and ${counter}_v\.value\s*\+~\s*$quotedValue/and FIND_IN_SET($quotedValue, REPLACE(${counter}_v.value,"\\n",","))/;
+        }
 		push (@joins, " left join metaData_properties ".$counter."_p on ".$counter."_p.fieldId=".$counter."_v.fieldId ");
 		$counter++;
 	}
