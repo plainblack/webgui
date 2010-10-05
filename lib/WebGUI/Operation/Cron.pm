@@ -308,6 +308,9 @@ sub www_runCronJob {
                 # Run the instance
         my $error = $instance->start( 1 );
         if ($error) {
+            ##Unable to communicate with spectre.  Delete this instance to it does not get stuck.
+            $session->log->error("Unable to communicate with spectre: $error about taskId: $taskId.  Deleting instanceId: ". $instance->getId);
+            $instance->delete();
             return "error";
         }
         $task->delete( 1 ) if ( $task->get("runOnce") );
