@@ -91,6 +91,48 @@ sub getAdminPluginTemplateVars {
 
 #----------------------------------------------------------------------
 
+=head2 getAssetTypes ( )
+
+Get a hash of className => info pairs containing information about the
+asset class. Info will include at least the following keys:
+
+    title       => The i18n title of the asset
+    icon        => The small icon
+    icon_full   => The full sized icon
+    uiLevel     => The UI Level of the asset
+    canAdd      => True if the current user can add the asset
+    url         => URL to add the asset
+
+=cut
+
+sub getAssetTypes {
+    my ( $self ) = @_;
+    my $session = $self->session;
+    my ( $config ) = $session->quick(qw( config ));
+
+    my %configList = %{ $config->get('assets') };
+    my %assetList  = ();
+    for my $class ( keys %configList ) {
+        my $assetConfig = $configList{ $class };
+
+        # Create a dummy asset
+        my $dummy = WebGUI::Asset->newByPropertyHashRef( $session, { dummy => 1, className => $class } );
+        next unless defined $dummy;
+
+        $assetList{ $class } = {
+            url         => 'func=add;className=' . $class,
+            icon        => $dummy->getIcon(1), # default icon is small for back-compat
+            icon_full   => $dummy->getIcon,
+            title       => $dummy->getTitle,
+            uiLevel     => $dummy->getUiLevel( $assetConfig->{uiLevel} ),
+            canAdd      => $dummy->canAdd( $session ),
+        };
+    }
+
+    return %assetList;
+}
+#----------------------------------------------------------------------
+
 =head2 getNewContentTemplateVars 
 
 Get an array of tabs for the new content menu. Each tab contains items
@@ -129,32 +171,19 @@ sub getNewContentTemplateVars {
     }
 
     # assets
-    my %assetList = %{ $config->get('assets') };
+    my %assetList   = $self->getAssetTypes;
     foreach my $assetClass ( keys %assetList ) {
-        # Create a dummy asset
-        my $dummy = WebGUI::Asset->newByPropertyHashRef( $session, { dummy => 1, className => $assetClass } );
-        next unless defined $dummy;
         my $assetConfig = $assetList{$assetClass};
 
-        # Check UI Level
-        next if $dummy->getUiLevel( $assetConfig->{uiLevel} ) > $userUiLevel;
-
-        # Check add permissions
-        next unless ( $dummy->canAdd($session) );
-
-        my $assetInfo = {
-            className   => $assetClass,
-            url         => 'func=add;className=' . $assetClass,
-            icon        => $dummy->getIcon(1),
-            title       => $dummy->getTitle,
-        };
+        next unless $assetConfig->{canAdd};
+        next unless $assetConfig->{uiLevel} > $userUiLevel;
 
         # Add the asset to all categories it should appear in
         my @assetCategories = ref $assetConfig->{category} ? @{ $assetConfig->{category} } : $assetConfig->{category};
         for my $category (@assetCategories) {
             next unless exists $categories{$category};
             $categories{$category}{items} ||= [];
-            push @{ $categories{$category}{items} }, $assetInfo;
+            push @{ $categories{$category}{items} }, $assetConfig;
         }
     } ## end foreach my $assetClass ( keys...)
 
@@ -516,6 +545,9 @@ sub www_view {
     $var->{viewUrl} = $url->page;
     $var->{homeUrl} = WebGUI::Asset->getDefault( $session )->getUrl;
 
+    # Asset types for later use
+    $var->{assetTypesJson} = JSON->new->encode( { $self->getAssetTypes } );
+
     # All this needs to be template attachments
     $style->setCss( $url->extras('yui/build/button/assets/skins/sam/button.css'));
     $style->setCss( $url->extras('yui/build/menu/assets/skins/sam/menu.css'));
@@ -687,7 +719,8 @@ __DATA__
 <script type="text/javascript">
 YAHOO.util.Event.onDOMReady( function() { 
     window.admin = new WebGUI.Admin( {
-        homeUrl : '<tmpl_var homeUrl>'
+        homeUrl : '<tmpl_var homeUrl>',
+        assetTypes : <tmpl_var assetTypesJson>
     } );
     document.body.className="yui-skin-sam";
 } );
