@@ -2017,38 +2017,3 @@ WebGUI.Admin.Search.prototype.addFilter
     }
 };
 
-/**
- * updateLocationBarQuery( )
- * Update the location bar text with the filters in the search box
- */
-WebGUI.Admin.Search.prototype.updateLocationBarQuery
-= function () {
-    var query   = "";
-
-    // First add filters
-    var filterVals = [];
-    for ( var i = 0; i < this.filters.length; i++ ) {
-        var filter = this.filters[i];
-        if ( filter.type == "title" ) {
-            var value = filter.inputElem.value;
-            if ( !value ) continue;
-            var quote = "";
-            if ( value.match(/\s/) ) {
-                quote = '"';
-            }
-            filterVals.push( "title:" + quote + filter.inputElem.value + quote );
-        }
-    }
-    query += filterVals.join(" ");
-
-
-    // Then add keywords
-    if ( query != "" ) {
-        query += " "; // Add a space between filters and keywords
-    }
-    query += document.getElementById( 'searchKeywords' ).value;
-
-    // Set the new value
-    document.getElementById( 'locationInput' ).value = query;
-};
-
