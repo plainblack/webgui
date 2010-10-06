@@ -167,7 +167,7 @@ input.disabled {
     display: block;
 }
 
-.searchFilters li { height: 28px; } /* autocomplete is position: absolute, so pretend some height */
+.searchFilters li { height: 38px; } /* autocomplete is position: absolute, so pretend some height */
 
 .searchFilters span.name {
     display: block;

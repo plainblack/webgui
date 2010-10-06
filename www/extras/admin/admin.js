@@ -1812,7 +1812,7 @@ WebGUI.Admin.Search
     newForm.style.display = "block";
 
     var newTab = new YAHOO.widget.Tab({
-        label : "Loading...",
+        label : "Search",
         content : ''
     });
     this.tab = newTab;
@@ -1968,6 +1968,52 @@ WebGUI.Admin.Search.prototype.addFilter
         };
 
         filter.inputElem.focus();
+    }
+    else if ( filter.type == 'className' ) {
+        // Create a menu from the asset types
+        var container   = document.createElement('div');
+        filter.menu = new YAHOO.widget.Menu( container, { } );
+        var onMenuItemClick = function (type, args, item) {
+            var text = item.cfg.getProperty("text");
+            filter.button.set("label", text);
+            // Get the right span to add the background to
+            var button  = filter.button.getElementsByClassName( "first-child" )[0];
+            YAHOO.util.Dom.addClass( button, "with_icon" );
+            button.style.backgroundImage = item.element.style.backgroundImage;
+        };
+
+        var items = [];
+        for ( className in this.admin.cfg['assetTypes'] ) {
+            var assetDef    = this.admin.cfg.assetTypes[className];
+            var menuItem    = new YAHOO.widget.MenuItem( assetDef.title, {
+                onclick     : { fn: onMenuItemClick }
+            } );
+            menuItem.value = className;
+
+            YAHOO.util.Dom.addClass( menuItem.element, 'with_icon' );
+            menuItem.element.style.backgroundImage = 'url(' + assetDef.icon + ')';
+            items.push( menuItem );
+        }
+
+        // Sort the items first
+        items   = items.sort( function(a,b) { 
+            var aText = a.cfg.getProperty('text');
+            var bText = b.cfg.getProperty('text');
+            if ( aText > bText ) { return 1; }
+            else if ( aText < bText ) { return -1; }
+            else { return 0; }
+        } );
+
+        filter.menu.addItems( items );
+        filter.menu.render(document.body);
+
+        filter.button   = new YAHOO.widget.Button( {
+            name        : "className",
+            type        : "menu",
+            label       : "Choose...",
+            container   : li,
+            menu        : filter.menu
+        } );
     }
 };
 
