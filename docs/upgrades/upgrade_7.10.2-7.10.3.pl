@@ -22,7 +22,7 @@ use Getopt::Long;
 use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::Asset;
-
+use List::Util qw(first);
 
 my $toVersion = '7.10.3';
 my $quiet; # this line required
