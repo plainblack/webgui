@@ -102,6 +102,7 @@ asset class. Info will include at least the following keys:
     uiLevel     => The UI Level of the asset
     canAdd      => True if the current user can add the asset
     url         => URL to add the asset
+    category    => A string or an arrayref of categories
 
 =cut
 
@@ -120,6 +121,7 @@ sub getAssetTypes {
         next unless defined $dummy;
 
         $assetList{ $class } = {
+            ( %$assetConfig ),
             url         => 'func=add;className=' . $class,
             icon        => $dummy->getIcon(1), # default icon is small for back-compat
             icon_full   => $dummy->getIcon,
@@ -176,7 +178,7 @@ sub getNewContentTemplateVars {
         my $assetConfig = $assetList{$assetClass};
 
         next unless $assetConfig->{canAdd};
-        next unless $assetConfig->{uiLevel} > $userUiLevel;
+        next unless $assetConfig->{uiLevel} <= $userUiLevel;
 
         # Add the asset to all categories it should appear in
         my @assetCategories = ref $assetConfig->{category} ? @{ $assetConfig->{category} } : $assetConfig->{category};
