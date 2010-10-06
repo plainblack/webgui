@@ -7,6 +7,10 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+7.10.3
+--------------------------------------------------------------------
+     * WebGUI now depends on Monkey::Patch for sanely scoped monkeypatching.
+
 7.10.2
 --------------------------------------------------------------------
      * The URL used by Display Message on Login always returns the user to 
@@ -18,8 +22,6 @@ save you many hours of grief.
      * The UKPLayer - a slideshow that displays images as a movie - 
        is in WebGUI again. Licencing information was overlooked. An 
        upgrade to 7.10.1 will break the Matrix. This is fixed now.
-
-     * WebGUI now depends on Monkey::Patch for sanely scoped monkeypatching.
 
 7.10.1
 --------------------------------------------------------------------
