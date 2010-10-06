@@ -1,3 +1,5 @@
+7.10.3
+
 7.10.2
  - fixed #11884: Editing Templates impossible / Code editor not loaded
  - recommitted ukplayer. Removal broke Matrix. Licencing information was available but overlooked. 
