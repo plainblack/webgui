@@ -38,11 +38,14 @@ use JSON;
 use WebGUI::Fork::ProgressBar;
 
 my $template = <<'TEMPLATE';
-<div id='meter'></div>
-Current asset: <span id='focus'></span>
-(<span id='finished'></span>/<span id='total'></span>).<br />
-<span id='elapsed'></span> seconds elapsed.
-<ul id='tree'></ul>
+<div id='loading'>Loading...</div>
+<div id='ui' style='display: none'>
+    <div id='meter'></div>
+    Current asset: <span id='focus'></span>
+    (<span id='finished'></span>/<span id='total'></span>).<br />
+    <span id='elapsed'></span> seconds elapsed.
+    <ul id='tree'></ul>
+</div>
 <script>
 (function (params) {
     var bar = new YAHOO.WebGUI.Fork.ProgressBar();
@@ -104,6 +107,10 @@ Current asset: <span id='focus'></span>
         YAHOO.WebGUI.Fork.poll({
             url    : params.statusUrl,
             draw   : draw,
+            first  : function () {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('ui').style.display = 'block';
+            },
             finish : function () {
                 YAHOO.WebGUI.Fork.redirect(params.redirect);
             },

@@ -37,9 +37,12 @@ use HTML::Entities;
 use JSON;
 
 my $template = <<'TEMPLATE';
-<p id='message'></p>
-<div id='meter'></div>
-<p>Time elapsed: <span id='elapsed'></span> seconds.</p>
+<div id='loading'>Loading...</div>
+<div id='ui' style='display: none'>
+    <p id='message'></p>
+    <div id='meter'></div>
+    <p>Time elapsed: <span id='elapsed'></span> seconds.</p>
+</div>
 <script>
 (function (params) {
     var bar = new YAHOO.WebGUI.Fork.ProgressBar();
@@ -52,6 +55,10 @@ my $template = <<'TEMPLATE';
                 bar.update(status.finished, status.total);
                 document.getElementById('message').innerHTML = status.message;
                 document.getElementById('elapsed').innerHTML = data.elapsed;
+            },
+            first  : function () {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('ui').style.display = 'block';
             },
             finish : function() {
                 YAHOO.WebGUI.Fork.redirect(params.redirect);
