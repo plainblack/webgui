@@ -701,8 +701,6 @@ __DATA__
     <form>
         <input type="button" class="searchButton" name="searchButton" value="^International("search","Asset");" />
         <input type="text" class="searchKeywords" name="searchKeywords" />
-        <p>Match <select name="searchMatch"><option value="any">Any</option><option value="all">All</option></select> of the 
-        following criteria:</p>
         <ul class="searchFilters"></ul>
         <input type="button" name="searchFilterAdd" class="searchFilterAdd" value="Add Filter" />
         <select name="searchFilterSelect">
