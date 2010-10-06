@@ -81,7 +81,7 @@ is($input->name, 'TestDate', 'Checking input name');
 is($input->type, 'text', 'Checking input type');
 is(
     $input->value,
-    WebGUI::DateTime->new($session, $defaultTime)->toMysqlDate,
+    WebGUI::DateTime->new($session, $defaultTime)->set_time_zone($session->user->get('timeZone'))->toMysqlDate,
     "Checking default value"
 );
 is($input->{size}, 10, 'Checking size param, default');
