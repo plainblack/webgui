@@ -400,7 +400,8 @@ sub www_copy {
     }
 
     $args{assetId} = $self->getId;
-    $self->forkWithProgressTree({
+    $self->forkWithStatusPage({
+            plugin   => 'ProgressTree',
             title    => 'Copy Assets',
             redirect => $redir,
             method   => 'copyInFork',
@@ -727,7 +728,8 @@ sub www_pasteList {
     my $form    = $session->form;
     return $session->privilege->insufficient() unless $self->canEdit && $session->form->validToken;
 
-    $self->forkWithProgressTree( {
+    $self->forkWithStatusPage( {
+            plugin   => 'ProgressTree',
             title    => 'Paste Assets',
             redirect => $self->getUrl(
                 $form->get('proceed') eq 'manageAssets'

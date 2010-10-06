@@ -355,7 +355,7 @@ Signals the fork that it should report its next status, then polls at a
 configurable, fractional interval (default: .1 seconds) waiting for the fork
 to claim that its status has been updated.  Returns the updated status.  See
 setWait() for a way to change the interval (or disable the waiting procedure
-entirely).
+entirely). We will only wait for a maximum of 100 intervals.
 
 =cut
 
@@ -363,7 +363,8 @@ sub getStatus {
     my $self = shift;
     if ( my $interval = $self->{interval} ) {
         $self->set( { latch => 1 } );
-        while (1) {
+        my $maxWait;
+        while ($maxWait++ < 100) {
             sleep $interval;
             my ( $finished, $latch ) = $self->get( 'finished', 'latch' );
             last if $finished || !$latch;

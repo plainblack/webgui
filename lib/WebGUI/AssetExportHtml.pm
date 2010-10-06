@@ -1015,7 +1015,8 @@ sub www_exportStatus {
     my @vars    = qw(
         index depth userId extrasUploadsAction rootUrlAction exportUrl
     );
-    $self->forkWithProgressTree({
+    $self->forkWithStatusPage({
+            plugin   => 'ProgressTree',
             title    => 'Page Export Status',
             method   => 'exportInFork',
             groupId  => 13,

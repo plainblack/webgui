@@ -387,7 +387,8 @@ sub www_delete {
     if ($self->getId eq $asset->getId) {
         $asset = $self->getParent;
     }
-    $self->forkWithProgressTree({
+    $self->forkWithStatusPage({
+            plugin   => 'ProgressTree',
             title    => 'Delete Assets',
             redirect => $asset->getUrl,
             method   => 'trashInFork',
@@ -448,7 +449,8 @@ sub www_deleteList {
     my $form    = $session->form;
     return $session->privilege->insufficient() unless $session->form->validToken;
     my $method = $form->get('proceed') || 'manageTrash';
-    $self->forkWithProgressTree({
+    $self->forkWithStatusPage({
+            plugin   => 'ProgressTree',
             title    => 'Delete Assets',
             redirect => $self->getUrl("func=$method"),
             method   => 'trashInFork',
@@ -566,7 +568,8 @@ sub www_purgeList {
     return $session->privilege->insufficient() unless $session->form->validToken;
     my $method = $form->get('proceed') || 'manageTrash';
     $method .= ';systemTrash=1' if $form->get('systemTrash');
-    $self->forkWithProgressTree({
+    $self->forkWithStatusPage({
+            plugin   => 'ProgressTree',
             title    => 'purge',
             redirect => $self->getUrl("func=$method"),
             method   => 'purgeInFork',

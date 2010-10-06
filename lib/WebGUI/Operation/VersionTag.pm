@@ -21,6 +21,9 @@ use WebGUI::International;
 use WebGUI::VersionTag;
 use WebGUI::HTMLForm;
 use WebGUI::Paginator;
+use WebGUI::Fork;
+use Monkey::Patch;
+use JSON;
 
 =head1 NAME
 
@@ -136,6 +139,50 @@ sub getVersionTagOptions {
 
     return %tag;
 }
+
+#----------------------------------------------------------------------------
+
+=head2 rollbackInFork ($process, $tagId)
+
+WebGUI::Fork method called by www_rollbackVersionTag
+
+=cut
+
+sub rollbackInFork {
+    my ( $process, $tagId ) = @_;
+    my $session = $process->session;
+    my $tag = WebGUI::VersionTag->new( $session, $tagId );
+    my %status = (
+        finished => 0,
+        total    => $process->session->db->quickScalar( 'SELECT count(*) FROM assetData WHERE tagId = ?', [$tagId] ),
+        message  => '',
+    );
+    my $update = sub {
+        $process->update( sub { JSON::encode_json( \%status ) } );
+    };
+    my $patch = Monkey::Patch::patch_class(
+        'WebGUI::Asset',
+        'purgeRevision',
+        sub {
+            my $purgeRevision = shift;
+            my $self          = shift;
+            $self->$purgeRevision(@_);
+            $status{finished}++;
+            $update->();
+        }
+    );
+    $tag->rollback( {
+            outputSub => sub {
+                $status{message} = shift;
+                $update->();
+            }
+        }
+    );
+
+    # need to get at least one of these in for the degenerate case of no
+    # revisions in tag
+    $update->();
+} ## end sub rollbackInFork
 
 #-------------------------------------------------------------------
 
@@ -853,16 +900,27 @@ sub www_rollbackVersionTag {
 	return $session->privilege->adminOnly() unless canView($session);
 	my $tagId = $session->form->process("tagId");
 	return $session->privilege->vitalComponent() if ($tagId eq "pbversion0000000000001");
-    my $pb      = WebGUI::ProgressBar->new($session);
-    my $i18n    = WebGUI::International->new($session, 'VersionTag');
-    $pb->start($i18n->get('rollback version tag'), $session->url->extras('adminConsole/versionTags.gif'));
-	if ($tagId) {
-		my $tag = WebGUI::VersionTag->new($session, $tagId);
-		$tag->rollback({ outputSub => sub { $pb->update(@_) }, }) if defined $tag;
-	}
+
+    my $process = WebGUI::Fork->start(
+        $session, 'WebGUI::Operation::VersionTag', 'rollbackInFork', $tagId
+    );
+
+    my $i18n = WebGUI::International->new($session, 'VersionTag');
 	my $method = $session->form->process("proceed");
     $method    = $method eq "manageCommittedVersions" ? $method : 'manageVersions';
-    $pb->finish(WebGUI::Asset->getDefault($session)->getUrl('op='.$method));
+    my $redir = WebGUI::Asset->getDefault($session)->getUrl("op=$method");
+    $session->http->setRedirect(
+        $session->url->page(
+            $process->contentPairs(
+                'ProgressBar', {
+                    icon    => 'versions',
+                    title   => $i18n->get('rollback version tag'),
+                    proceed => $redir,
+                }
+            )
+        )
+    );
+    return 'redirect';
 }
 
 

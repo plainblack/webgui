@@ -837,7 +837,7 @@ sub fixUrlFromParent {
 
 #-------------------------------------------------------------------
 
-=head2 forkWithProgressTree ($args)
+=head2 forkWithStatusPage ($args)
 
 Kicks off a WebGUI::Fork running $method with $args (from the args hashref)
 and redirects to a ProgressTree status page to show the progress. The
@@ -851,6 +851,10 @@ The name of the WebGUI::Asset method to call
 
 The arguments to pass that method (see WebGUI::Fork)
 
+=head3 plugin
+
+The WebGUI::Operation::Fork plugin to render (e.g. ProgressTree)
+
 =head3 title
 
 An key in Asset's i18n hash for the title of the rendered console page
@@ -861,7 +865,7 @@ The full url to redirect to after the fork has finished.
 
 =cut
 
-sub forkWithProgressTree {
+sub forkWithStatusPage {
     my ( $self, $args ) = @_;
     my $session = $self->session;
 
@@ -874,7 +878,7 @@ sub forkWithProgressTree {
     my $method = $session->form->get('proceed') || 'manageTrash';
     my $i18n = WebGUI::International->new( $session, 'Asset' );
     my $pairs = $process->contentPairs(
-        'ProgressTree', {
+        $args->{plugin}, {
             title   => $i18n->get( $args->{title} ),
             icon    => 'assets',
             proceed => $args->{redirect} || '',
@@ -882,7 +886,7 @@ sub forkWithProgressTree {
     );
     $session->http->setRedirect( $self->getUrl($pairs) );
     return 'redirect';
-} ## end sub forkWithProgressTree
+} ## end sub forkWithStatusPage
 
 #-------------------------------------------------------------------
 
