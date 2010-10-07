@@ -343,6 +343,50 @@ sub trash {
     return 1;
 }
 
+#-------------------------------------------------------------------
+
+=head2 trashInFork
+
+WebGUI::Fork method called by www_deleteList and www_delete to move assets
+into the trash.
+
+=cut
+
+sub trashInFork {
+    my ( $process, $list ) = @_;
+    my $session = $process->session;
+    my @roots = grep { $_->canEdit && $_->canEditIfLocked }
+        map {
+        eval { WebGUI::Asset->newPending( $session, $_ ) }
+        } @$list;
+
+    my @ids = map {
+        my $list = $_->getLineage(
+            [ 'self', 'descendants' ], {
+                statesToInclude => [qw(published clipboard clipboard-limbo trash trash-limbo)],
+                statusToInclude => [qw(approved archived pending)],
+            }
+        );
+        @$list;
+    } @roots;
+
+    my $tree = WebGUI::ProgressTree->new( $session, \@ids );
+    my $patch = Monkey::Patch::patch_class(
+        'WebGUI::Asset',
+        'setState',
+        sub {
+            my ( $setState, $self, $state ) = @_;
+            my $id = $self->getId;
+            $tree->focus($id);
+            my $ret = $self->$setState($state);
+            $tree->success($id);
+            $process->update(sub { $tree->json });
+            return $ret;
+        }
+    );
+    $_->trash() for @roots;
+} ## end sub trashInFork
+
 require WebGUI::Workflow::Activity::DeleteExportedFiles;
 sub _invokeWorkflowOnExportedFiles {
 	my $self = shift;
@@ -406,42 +450,8 @@ Checks to see if a valid CSRF token was received.  If not, then it returns insuf
 Moves list of assets to trash, checking each to see if the user canEdit,
 and canEditIfLocked.  Returns the user to manageTrash, or to the screen set
 by the form variable C<proceeed>.
+
 =cut
-
-sub trashInFork {
-    my ( $process, $list ) = @_;
-    my $session = $process->session;
-    my @roots = grep { $_->canEdit && $_->canEditIfLocked }
-        map {
-        eval { WebGUI::Asset->newPending( $session, $_ ) }
-        } @$list;
-
-    my @ids = map {
-        my $list = $_->getLineage(
-            [ 'self', 'descendants' ], {
-                statesToInclude => [qw(published clipboard clipboard-limbo trash trash-limbo)],
-                statusToInclude => [qw(approved archived pending)],
-            }
-        );
-        @$list;
-    } @roots;
-
-    my $tree = WebGUI::ProgressTree->new( $session, \@ids );
-    my $patch = Monkey::Patch::patch_class(
-        'WebGUI::Asset',
-        'setState',
-        sub {
-            my ( $setState, $self, $state ) = @_;
-            my $id = $self->getId;
-            $tree->focus($id);
-            my $ret = $self->$setState($state);
-            $tree->success($id);
-            $process->update(sub { $tree->json });
-            return $ret;
-        }
-    );
-    $_->trash() for @roots;
-} ## end sub trashInFork
 
 sub www_deleteList {
     my $self    = shift;
