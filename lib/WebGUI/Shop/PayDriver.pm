@@ -417,7 +417,7 @@ sub getName {
     WebGUI::Error::InvalidParam->throw(error => q{Must provide a session variable})
         unless ref $session eq 'WebGUI::Session';
 
-    return WebGUI::International->new($session, 'Asset')->get(@{ $class->meta->pluginName });
+    return WebGUI::International->new($session)->get(@{ $class->meta->pluginName });
 }
 
 #-------------------------------------------------------------------
