@@ -21,9 +21,56 @@ use WebGUI::Exception;
 use Digest::SHA qw{ sha1_hex };
 use WebGUI::International;
 use Data::Dumper;
-use Tie::IxHash;
 
-use base qw{ WebGUI::Shop::PayDriver };
+use Moose;
+use WebGUI::Definition::Shop;
+extends 'WebGUI::Shop::PayDriver';
+define pluginName => [qw/label PayDriver_Ogone/];
+property pspid => (
+            fieldType       => 'text',
+            label           => ['psp id', 'PayDriver_Ogone'],
+            hoverHelp       => ['psp id help', 'PayDriver_Ogone'],
+            default         => '',
+         );
+property shaSecret => (
+            fieldType       => 'password',
+            label           => ['sha secret', 'PayDriver_Ogone'],
+            hoverHelp       => ['sha secret help', 'PayDriver_Ogone'],
+         );
+property postbackSecret => (
+            fieldType       => 'password',
+            label           => ['postback secret', 'PayDriver_Ogone'],
+            hoverHelp       => ['postback secret help', 'PayDriver_Ogone'],
+         );
+property locale => (
+            fieldType       => 'text',
+            label           => ['locale', 'PayDriver_Ogone'],
+            hoverHelp       => ['locale help', 'PayDriver_Ogone'],
+            default         => 'en_US',
+            maxlength       => 5,
+            size            => 5,
+         );
+property currency => (
+            fieldType       => 'text',
+            label           => ['currency', 'PayDriver_Ogone'],
+            hoverHelp       => ['currency help', 'PayDriver_Ogone'],
+            default         => 'EUR',
+            maxlength       => 3,
+            size            => 3,
+         );
+property useTestMode => (
+            fieldType       => 'yesNo',
+            label           => ['use test mode', 'PayDriver_Ogone'],
+            hoverHelp       => ['use test mode help', 'PayDriver_Ogone'],
+            default         => 1,
+         );
+property summaryTemplateId => (
+            fieldType    => 'template',
+            label        => ['summary template', 'PayDriver_Ogone'],
+            hoverHelp    => ['summary template help', 'PayDriver_Ogone'],
+            namespace    => 'Shop/Credentials',
+            default      => 'jysVZeUR0Bx2NfrKs5sulg',
+         );
 
 #-------------------------------------------------------------------
 
@@ -45,89 +92,13 @@ sub canCheckoutCart {
 
 #-------------------------------------------------------------------
 
-=head2 definition ( session, definition )
-
-See WebGUI::Shop::PayDriver->definition.
-
-=cut
-
-sub definition {
-    my $class       = shift;
-    my $session     = shift;
-    my $definition  = shift;
-
-    WebGUI::Error::InvalidParam->throw( error => q{Must provide a session variable} )
-        unless $session && ref $session eq 'WebGUI::Session';
-
-    my $i18n = WebGUI::International->new($session, 'PayDriver_Ogone');
-
-    tie my %fields, 'Tie::IxHash';
-    
-    %fields = (
-		pspid => {
-		    fieldType       => 'text',
-		    label           => $i18n->get('psp id'),
-		    hoverHelp       => $i18n->get('psp id help'),
-		    defaultValue    => '',
-		},
-        shaSecret => {
-            fieldType       => 'password',
-            label           => $i18n->get('sha secret'),
-            hoverHelp       => $i18n->get('sha secret help'),
-        },
-        postbackSecret  => {
-            fieldType       => 'password',
-            label           => $i18n->get('postback secret'),
-            hoverHelp       => $i18n->get('postback secret help'),
-        },
-        locale => {
-            fieldType       => 'text',
-            label           => $i18n->get('locale'),
-            hoverHelp       => $i18n->get('locale help'),
-            defaultValue    => 'en_US',
-            maxlength       => 5,
-            size            => 5,
-        },
-        currency => {
-            fieldType       => 'text',
-            label           => $i18n->get('currency'),
-            hoverHelp       => $i18n->get('currency help'),
-            defaultValue    => 'EUR',
-            maxlength       => 3,
-            size            => 3,
-        },
-        useTestMode => {
-            fieldType       => 'yesNo',
-            label           => $i18n->get('use test mode'),
-            hoverHelp       => $i18n->get('use test mode help'),
-            defaultValue    => 1,
-        },
-        summaryTemplateId  => {
-            fieldType    => 'template',
-            label        => $i18n->get('summary template'),
-            hoverHelp    => $i18n->get('summary template help'),
-            namespace    => 'Shop/Credentials',
-            defaultValue => 'jysVZeUR0Bx2NfrKs5sulg',
-        },
-    );
-
-    push @{ $definition }, {
-	    name        => $i18n->get('Ogone'),
-    	properties  => \%fields,
-    };
-
-    return $class->SUPER::definition($session, $definition);
-}
-
-#-------------------------------------------------------------------
-
 =head2 getCart 
 
-Returns the cart for either the current user or the transaction passed back by Ogone.
+Overrides the base method to use the locally cached cardId.
 
 =cut
 
-sub getCart {
+override getCart => sub {
     my $self = shift;
     my $cart;
 
@@ -135,8 +106,8 @@ sub getCart {
         $cart = WebGUI::Shop::Cart->new( $self->session, $self->{_cartId} );
     }
 
-    return $cart || $self->SUPER::getCart;
-}
+    return $cart || super();
+};
 
 #-------------------------------------------------------------------
 
