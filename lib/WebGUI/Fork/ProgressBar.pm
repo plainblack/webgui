@@ -37,11 +37,14 @@ use HTML::Entities;
 use JSON;
 
 my $template = <<'TEMPLATE';
-<div id='loading'>Loading...</div>
+<div id='loading'>[% i18n('WebGUI', 'Loading...') %]</div>
 <div id='ui' style='display: none'>
     <p id='message'></p>
     <div id='meter'></div>
-    <p>Time elapsed: <span id='elapsed'></span> seconds.</p>
+    <p>
+        [% i18n('Fork_ProgressBar', 'time elapsed') %]:
+        <span id='elapsed'></span> [% i18n('Fork_ProgressBar', 'seconds') %].
+    </p>
 </div>
 <script>
 (function (params) {
@@ -87,10 +90,10 @@ sub handler { renderBar( shift, $template ) }
 =head2 renderBar ( process, template )
 
 Renders $template, passing a "params" variable to it that is JSON of a
-statusUrl to poll and a page to redirect to. Includes WebGUI.Fork.redirect,
-poll, and ProgressBar js and CSS (as well as all their YUI dependancies), and
-puts the whole template inside an adminConsole rendered based off some form
-parameters.
+statusUrl to poll and a page to redirect to and an i18n function. Includes
+WebGUI.Fork.redirect, poll, and ProgressBar js and CSS (as well as all their
+YUI dependancies), and puts the whole template inside an adminConsole rendered
+based off some form parameters.
 
 =cut
 
@@ -102,6 +105,10 @@ sub renderBar {
     my $style   = $session->style;
     my $tt      = Template->new;
     my %vars    = (
+        i18n   => sub {
+            my ($namespace, $key) = @_;
+            return WebGUI::International->new($session, $namespace)->get($key);
+        },
         params => JSON::encode_json( {
                 statusUrl => $url->page( $process->contentPairs('Status') ),
                 redirect  => scalar $form->get('proceed'),

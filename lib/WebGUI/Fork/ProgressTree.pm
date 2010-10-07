@@ -38,12 +38,14 @@ use JSON;
 use WebGUI::Fork::ProgressBar;
 
 my $template = <<'TEMPLATE';
-<div id='loading'>Loading...</div>
+<div id='loading'>[% i18n('WebGUI', 'Loading...') %]</div>
 <div id='ui' style='display: none'>
     <div id='meter'></div>
-    Current asset: <span id='focus'></span>
+    [% i18n('Fork_ProgressBar', 'current asset') %]: <span id='focus'></span>
     (<span id='finished'></span>/<span id='total'></span>).<br />
-    <span id='elapsed'></span> seconds elapsed.
+    [% i18n('Fork_ProgressBar', 'time elapsed') %]: 
+    <span id='elapsed'></span> 
+    [% i18n('Fork_ProgressBar', 'seconds') %].
     <ul id='tree'></ul>
 </div>
 <script>
