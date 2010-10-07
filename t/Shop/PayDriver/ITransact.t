@@ -164,11 +164,11 @@ SKIP: {
     note 'doXmlrequest';
     diag $xml;
     my $response = eval { $driver->doXmlRequest($xml) };
-    diag "got reponse";
     my $ok_response = isa_ok($response, 'HTTP::Response', 'returns a HTTP::Response object');
     SKIP: {
         skip "Skipping response check since we did not get a response", 1 unless $ok_response;
         ok( $response->is_success, '... was successful');
+        diag $response->content;
     }
 }
 
@@ -183,9 +183,15 @@ TODO: {
 
 SKIP: {
     skip "Skipping XML requests to ITransact due to lack of userId and password", 2 unless $hasTestAccount;
+    diag $xml;
     my $response = eval { $driver->doXmlRequest($xml) };
-    isa_ok($response, 'HTTP::Response', 'returns a HTTP::Response object');
-    ok( $response->is_success, '... was successful');
+    my $ok_response = isa_ok($response, 'HTTP::Response', 'returns a HTTP::Response object');
+    ok( $response->is_success, '... was successful for two item transaction');
+    SKIP: {
+        skip "Skipping response check since we did not get a response", 1 unless $ok_response;
+        ok( $response->is_success, '... was successful for two item transaction');
+        diag $response->content;
+    }
 }
 
 done_testing;
