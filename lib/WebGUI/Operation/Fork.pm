@@ -36,7 +36,7 @@ These subroutines are available from this package:
 
 #-------------------------------------------------------------------
 
-=head2 handler ( session )
+=head2 www_fork ( session )
 
 Dispatches to the proper module based on the module form parameter if op is
 fork.  Returns insufficient privilege page if the user doesn't pass canView on
