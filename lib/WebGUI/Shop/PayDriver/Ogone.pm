@@ -25,7 +25,7 @@ use Data::Dumper;
 use Moose;
 use WebGUI::Definition::Shop;
 extends 'WebGUI::Shop::PayDriver';
-define pluginName => [qw/label PayDriver_Ogone/];
+define pluginName => [qw/Ogone PayDriver_Ogone/];
 property pspid => (
             fieldType       => 'text',
             label           => ['psp id', 'PayDriver_Ogone'],
@@ -164,14 +164,14 @@ sub ogoneCheckoutButton {
 
     my $orderId     = $transaction->getId;
 	my $description = "Transaction ID: $orderId";
-	my $pspId       = $self->get('pspid');
+	my $pspId       = $self->pspid;
 	my $name    	= join " ", $address->get( 'firstName' ), $address->get( 'lastName' );
 	my $email 		= $address->get('email');
 
-    my $currency    = $self->get('currency');
+    my $currency    = $self->currency;
 
     # Generate sha signature the payment data
-    my $passphrase      = join '', $orderId, $amount, $currency, $pspId, $self->get('shaSecret');
+    my $passphrase      = join '', $orderId, $amount, $currency, $pspId, $self->shaSecret;
     my $shaSignature    = uc sha1_hex( $passphrase ); 
 
     # Define the data to be sent to ogone
@@ -180,7 +180,7 @@ sub ogoneCheckoutButton {
         orderID         => $orderId,
         amount          => $amount,
         currency        => $currency,
-        language        => $self->get('locale'),
+        language        => $self->locale,
         CN              => join( " ", $address->get('firstName'), $address->get('lastName') ),
         EMAIL           => $email,
         ownerZIP        => $address->get( 'code' ),
@@ -209,7 +209,7 @@ sub ogoneCheckoutButton {
 
     # Construct actual checkout form
     
-    my $action  = $self->get('useTestMode')
+    my $action  = $self->useTestMode
                 ? 'https://secure.ogone.com/ncol/test/orderstandard.asp'
                 : 'https://secure.ogone.com/ncol/prod/orderstandard.asp'
                 ;
@@ -252,13 +252,13 @@ sub checkPostbackSHA {
     # Fetch and format amount from transaction
     my $amount      = $transaction->get('amount');
     $amount         =~ s/\.00$//;                 # remove trailing .00
-    my $currency    = $self->get('currency');
+    my $currency    = $self->currency;
 
     # Construct the passphrase...
     my $passphrase  = join '', 
         $transactionId, $currency, $amount, 
         map( { $url->unescape( $form->process( $_ ) ) } qw{ PM ACCEPTANCE STATUS CARDNO PAYID NCERROR BRAND } ),
-        $self->get('postbackSecret');
+        $self->postbackSecret;
 
     # and obtain its sha-1 hash in uppercase
     my $shaSignature    = uc sha1_hex( $passphrase ); 
@@ -457,7 +457,7 @@ sub www_getCredentials {
     };
     $self->appendCartVariables($var);
 
-    my $output = $self->processTemplate($self->get("summaryTemplateId"), $var);
+    my $output = $self->processTemplate($self->summaryTemplateId, $var);
     return $session->style->userStyle($output);
 }
 
