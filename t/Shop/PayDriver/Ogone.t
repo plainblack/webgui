@@ -9,10 +9,6 @@
 # http://www.plainblack.com                     info@plainblack.com
 #------------------------------------------------------------------
 
-# Write a little about what this script tests.
-#
-#
-
 use strict;
 use Test::More;
 use Test::Deep;
@@ -39,132 +35,13 @@ my $e;
 
 #######################################################################
 #
-# definition
-#
-#######################################################################
-
-note('Testing definition');
-my $definition;
-
-eval { $definition = WebGUI::Shop::PayDriver::Ogone->definition(); };
-$e = Exception::Class->caught();
-isa_ok      ($e, 'WebGUI::Error::InvalidParam', 'definition takes an exception to not giving it a session variable');
-cmp_deeply  (
-    $e,
-    methods(
-        error => 'Must provide a session variable',
-    ),
-    'definition: requires a session variable',
-);
-
-$definition = WebGUI::Shop::PayDriver::Ogone->definition($session);
-
-use Data::Dumper;
-my $expectDefinition =  {
-    name        => 'Ogone',
-    properties  => {
-        pspid => {
-            fieldType       => 'text',
-            label           => ignore(),
-            hoverHelp       => ignore(),
-            defaultValue    => q{}
-        },
-        shaSecret => {
-            fieldType       => 'password',
-            label           => ignore(),
-            hoverHelp       => ignore(),
-        },
-        postbackSecret => {
-            fieldType       => 'password',
-            label           => ignore(),
-            hoverHelp       => ignore(),
-        },
-        locale => {
-            fieldType       => 'text',
-            label           => ignore(),
-            hoverHelp       => ignore(),
-            defaultValue    => 'en_US',
-            maxlength       => 5,
-            size            => 5,
-        },
-        currency => {
-            fieldType       => 'text',
-            label           => ignore(),
-            hoverHelp       => ignore(),
-            defaultValue    => 'EUR',
-            maxlength       => 3,
-            size            => 3,
-        },
-        useTestMode => {
-            fieldType       => 'yesNo',
-            label           => ignore(),
-            hoverHelp       => ignore(),
-            defaultValue    => 1,
-        },
-        summaryTemplateId => {
-            fieldType       => 'template',
-            label           => ignore(),
-            hoverHelp       => ignore(),
-            defaultValue    => ignore(),
-            namespace       => 'Shop/Credentials',
-        },
-    },
-};
-
-cmp_deeply  ( $definition->[0], $expectDefinition, 'Definition returns an array of hashrefs' );
-
-$definition = WebGUI::Shop::PayDriver::Ogone->definition($session, [ { name => 'Ogone First' }]);
-
-cmp_deeply  (
-    $definition,
-    [
-        {
-            name        => 'Ogone First',
-        },
-        {
-            name        => 'Ogone',
-            properties  => ignore(),
-        },
-        {
-            name        => 'Payment Driver',
-            properties  => ignore(),
-        }
-    ],
-    ,
-    'New data is appended correctly',
-);
-
-#######################################################################
-#
-# create
+# new
 #
 #######################################################################
 
 my $driver;
 
 # Test incorrect for parameters
-
-eval { $driver = WebGUI::Shop::PayDriver::Ogone->create(); };
-$e = Exception::Class->caught();
-isa_ok      ($e, 'WebGUI::Error::InvalidParam', 'create takes exception to not giving it a session object');
-cmp_deeply  (
-    $e,
-    methods(
-        error => 'Must provide a session variable',
-    ),
-    'create takes exception to not giving it a session object',
-);
-
-eval { $driver = WebGUI::Shop::PayDriver::Ogone->create($session,  {}); };
-$e = Exception::Class->caught();
-isa_ok      ($e, 'WebGUI::Error::InvalidParam', 'create takes exception to giving it an empty hashref of options');
-cmp_deeply  (
-    $e,
-    methods(
-        error => 'Must provide a hashref of options',
-    ),
-    'create takes exception to not giving it an empty hashref of options',
-);
 
 # Test functionality
 my $signature = '-----BEGIN PKCS7-----
@@ -230,8 +107,7 @@ BOu+vkC1g+HRToc=
 my $options = {
     label           => 'Fast and harmless',
     enabled         => 1,
-    group           => 3,
-    receiptMessage  => 'Pannenkoeken zijn nog lekkerder met kaas',
+    groupToUse      => 3,
     vendorId        => 'oqapi',
     signature       => $signature,
     currency        => 'EUR',
@@ -239,9 +115,10 @@ my $options = {
     emailMessage    => 'Thank you very very much'
 };
 
-$driver = WebGUI::Shop::PayDriver::Ogone->create( $session, $options );
+$driver = WebGUI::Shop::PayDriver::Ogone->new( $session, $options );
+WebGUI::Test->addToCleanup($driver);
 
-isa_ok  ($driver, 'WebGUI::Shop::PayDriver::Ogone', 'create creates WebGUI::Shop::PayDriver object');
+isa_ok  ($driver, 'WebGUI::Shop::PayDriver::Ogone', 'new creates WebGUI::Shop::PayDriver object');
 like($driver->getId, $session->id->getValidator, 'driver id is a valid GUID');
 
 my $dbData = $session->db->quickHashRef('select * from paymentGateway where paymentGatewayId=?', [ $driver->getId ]);
@@ -259,8 +136,7 @@ my $paymentGatewayOptions = from_json($dbData->{'options'});
 cmp_deeply (
     $paymentGatewayOptions,
     {
-        "group"             => 3,
-        "receiptMessage"    => 'Pannenkoeken zijn nog lekkerder met kaas',
+        "groupToUse"        => 3,
         "label"             => 'Fast and harmless',
         "enabled"           => 1,
         "vendorId"          => 'oqapi',
@@ -272,40 +148,6 @@ cmp_deeply (
     'Correct options are written to the db'
 
 );
-
-#######################################################################
-#
-# session
-#
-#######################################################################
-
-isa_ok      ($driver->session,  'WebGUI::Session',          'session method returns a session object');
-is          ($session->getId,   $driver->session->getId,    'session method returns OUR session object');
-
-#######################################################################
-#
-# paymentGatewayId, getId
-#
-#######################################################################
-
-like        ($driver->paymentGatewayId, $session->id->getValidator, 'got a valid GUID for paymentGatewayId');
-is          ($driver->getId,            $driver->paymentGatewayId,  'getId returns the same thing as paymentGatewayId');
-
-#######################################################################
-#
-# className
-#
-#######################################################################
-
-is          ($driver->className, ref $driver, 'className property set correctly');
-
-#######################################################################
-#
-# options
-#
-#######################################################################
-
-cmp_deeply  ($driver->options, $options, 'options accessor works');
 
 #######################################################################
 #
@@ -325,24 +167,6 @@ cmp_deeply  (
 );
 
 is (WebGUI::Shop::PayDriver::Ogone->getName($session), 'Ogone', 'getName returns the human readable name of this driver');
-
-#######################################################################
-#
-# get
-#
-#######################################################################
-
-cmp_deeply  ($driver->get,              $driver->options,       'get works like the options method with no param passed');
-is          ($driver->get('enabled'),   1,                      'get the enabled entry from the options');
-is          ($driver->get('label'),     'Fast and harmless',    'get the label entry from the options');
-
-my $optionsCopy = $driver->get;
-$optionsCopy->{label} = 'And now for something completely different';
-isnt(
-    $driver->get('label'),
-    'And now for something completely different',
-    'hashref returned by get() is a copy of the internal hashref'
-);
 
 #######################################################################
 #
@@ -460,124 +284,5 @@ cmp_deeply(
     'getEditForm made the correct form with all the elements'
 
 );
-
-#######################################################################
-#
-# new
-#
-#######################################################################
-
-my $oldDriver;
-
-eval { $oldDriver = WebGUI::Shop::PayDriver::Ogone->new(); };
-$e = Exception::Class->caught();
-isa_ok      ($e, 'WebGUI::Error::InvalidParam', 'new takes exception to not giving it a session object');
-cmp_deeply  (
-    $e,
-    methods(
-        error => 'Must provide a session variable',
-    ),
-    'new takes exception to not giving it a session object',
-);
-
-eval { $oldDriver = WebGUI::Shop::PayDriver::Ogone->new($session); };
-$e = Exception::Class->caught();
-isa_ok      ($e, 'WebGUI::Error::InvalidParam', 'new takes exception to not giving it a paymentGatewayId');
-cmp_deeply  (
-    $e,
-    methods(
-        error => 'Must provide a paymentGatewayId',
-    ),
-    'new takes exception to not giving it a paymentGatewayId',
-);
-
-eval { $oldDriver = WebGUI::Shop::PayDriver::Ogone->new($session, 'notEverAnId'); };
-$e = Exception::Class->caught();
-isa_ok      ($e, 'WebGUI::Error::ObjectNotFound', 'new croaks unless the requested paymentGatewayId object exists in the db');
-cmp_deeply  (
-    $e,
-    methods(
-        error => 'paymentGatewayId not found in db',
-        id    => 'notEverAnId',
-    ),
-    'new croaks unless the requested paymentGatewayId object exists in the db',
-);
-
-my $driverCopy = WebGUI::Shop::PayDriver::Ogone->new($session, $driver->getId);
-
-is          ($driver->getId,           $driverCopy->getId,     'same id');
-is          ($driver->className,       $driverCopy->className, 'same className');
-cmp_deeply  ($driver->options, $driverCopy->options,   'same options');
-
-#######################################################################
-#
-# update
-#
-#######################################################################
-
-eval { $driver->update(); };
-$e = Exception::Class->caught();
-isa_ok      ($e, 'WebGUI::Error::InvalidParam', 'update takes exception to not giving it a hashref of options');
-cmp_deeply  (
-    $e,
-    methods(
-        error => 'update was not sent a hashref of options to store in the database',
-    ),
-    'update takes exception to not giving it a hashref of options',
-);
-
-my $newOptions = {
-    label           => 'Yet another label',
-    enabled         => 0,
-    group           => 4,
-    receiptMessage  => 'Dropjes!',
-};
-
-$driver->update($newOptions);
-my $storedOptions = $session->db->quickScalar('select options from paymentGateway where paymentGatewayId=?', [
-    $driver->getId,
-]);
-cmp_deeply(
-    $newOptions,
-    from_json($storedOptions),
-    ,
-    'update() actually stores data',
-);
-
-
-#######################################################################
-#
-# canUse
-#
-#######################################################################
-
-my $newOptions = {
-    label           => 'Yet another label',
-    enabled         => 1,
-    group           => 4,
-    receiptMessage  => 'Dropjes!',
-};
-
-$driver->update($newOptions);
-$session->user({userId => 3});
-ok($driver->canUse, 'canUse: session->user is used if no argument is passed');
-ok(!$driver->canUse({userId => 1}), 'canUse: userId explicit works, visitor cannot use this driver');
-
-
-#######################################################################
-#
-# delete
-#
-#######################################################################
-
-$driver->delete;
-
-my $count = $session->db->quickScalar('select count(*) from paymentGateway where paymentGatewayId=?', [
-    $driver->paymentGatewayId
-]);
-
-is ($count, 0, 'delete deleted the object');
-
-undef $driver;
 
 #vim:ft=perl
