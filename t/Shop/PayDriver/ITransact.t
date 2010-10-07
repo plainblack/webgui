@@ -25,6 +25,7 @@ use WebGUI::Shop::PayDriver::ITransact;
 use JSON;
 use HTML::Form;
 use WebGUI::Shop::PayDriver::ITransact;
+use XML::Simple;
 
 #----------------------------------------------------------------------------
 # Init
@@ -88,6 +89,7 @@ my $foreignHammer = $rockHammer->setCollateral('variantsJSON', 'variantId', 'new
 $versionTag->commit;
 WebGUI::Test->addToCleanup($versionTag);
 $rockHammer = $rockHammer->cloneFromDb;
+my $hammerItem = $rockHammer->addToCart($rockHammer->getCollateral('variantsJSON', 'variantId', $smallHammer));
 
 my $ship = WebGUI::Shop::Ship->new($session);
 my $cart = WebGUI::Shop::Cart->newBySession($session);
@@ -162,13 +164,14 @@ TODO: {
 SKIP: {
     skip "Skipping XML requests to ITransact due to lack of real userId and password", 2 unless $hasTestAccount;
     note 'doXmlrequest';
-    diag $xml;
     my $response = eval { $driver->doXmlRequest($xml) };
     my $ok_response = isa_ok($response, 'HTTP::Response', 'returns a HTTP::Response object');
     SKIP: {
         skip "Skipping response check since we did not get a response", 1 unless $ok_response;
-        ok( $response->is_success, '... was successful');
-        diag $response->content;
+        ok( $response->is_success, '... response was successful');
+        my $transactionResult = XMLin( $response->content,  SuppressEmpty => '' );
+        ok defined($transactionResult->{TransactionData}), '... transaction was successful'
+            or diag $xml.$response->content;
     }
 }
 
@@ -189,8 +192,10 @@ SKIP: {
     ok( $response->is_success, '... was successful for two item transaction');
     SKIP: {
         skip "Skipping response check since we did not get a response", 1 unless $ok_response;
-        ok( $response->is_success, '... was successful for two item transaction');
-        diag $response->content;
+        ok( $response->is_success, '... response was successful for a two item transaction');
+        my $transactionResult = XMLin( $response->content,  SuppressEmpty => '' );
+        ok defined($transactionResult->{TransactionData}), '... transaction was successful'
+            or diag $xml.$response->content;
     }
 }
 
