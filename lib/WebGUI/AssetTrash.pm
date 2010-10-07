@@ -328,7 +328,16 @@ sub trash {
         $outputSub->($i18n->get('Clearing cache'));
         $asset->purgeCache;
         $asset->updateHistory("trashed");
-        $asset->setState($asset->getId eq $rootId ? 'trash' : 'trash-limbo');
+        if ($asset->getId eq $rootId) {
+            $asset->setState('trash');
+            # setState will take care of _properties in $asset, but not in
+            # $self (whooops!), so we need to manually update.
+            my @keys = qw(state stateChangedBy stateChanged);
+            @{$self->{_properties}}{@keys} = @{$asset->{_properties}}{@keys};
+        }
+        else {
+            $asset->setState('trash-limbo');
+        }
     }
     $db->commit;
 

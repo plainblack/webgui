@@ -20,6 +20,7 @@ use WebGUI::Session;
 use WebGUI::Utility;
 use WebGUI::Asset;
 use WebGUI::VersionTag;
+use Test::MockObject;
 
 use Test::More; # increment this value for each test you create
 plan tests => 29;
@@ -148,12 +149,20 @@ sub copied {
     return undef;
 }
 
-my @methods = qw(Single Children Descendants);
+my $process = Test::MockObject->new->mock(update => sub {});
+my @methods = (
+    # single duplicate doesn't fork, so we can just test the www method to
+    # make sure it gets it right
+    sub { shift->www_copy },
+    sub { shift->duplicateBranch(1, 'clipboard') },
+    sub { shift->duplicateBranch(0, 'clipboard') },
+);
+my @prefixes = qw(single children descendants);
 for my $i (0..2) {
-    my $meth = "_wwwCopy$methods[$i]";
+    my $meth = $methods[$i];
     $root->$meth();
     my $clip = copied();
-    is_tree_of_folders($clip, $i+1, $meth);
+    is_tree_of_folders($clip, $i+1, @prefixes[$i]);
     $clip->purge;
 }
 

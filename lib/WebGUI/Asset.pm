@@ -2627,15 +2627,14 @@ sub setState {
                stateChanged   = ?
         WHERE  assetId = ?
     };
+    my @props = ($state, $self->session->user->userId, time);
     $self->session->db->write(
         $sql, [
-            $state,
-            $self->session->user->userId,
-            time,
+            @props,
             $self->getId,
         ]
     );
-	$self->{_properties}->{state} = $state;
+    @{$self->{_properties}}{qw(state stateChangedBy stateChanged)} = @props;
     $self->purgeCache;
 }
 
