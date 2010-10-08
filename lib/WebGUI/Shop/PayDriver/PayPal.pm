@@ -16,7 +16,9 @@ package WebGUI::Shop::PayDriver::PayPal;
 
 ## this holds some shared functionality, and MUST be overridden for a full payment driver
 use strict;
-use base qw/WebGUI::Shop::PayDriver/;
+use Moose;
+use WebGUI::Definition::Shop;
+extends qw/WebGUI::Shop::PayDriver/;
 
 =head1 NAME
 

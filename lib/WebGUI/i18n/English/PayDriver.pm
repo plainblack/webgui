@@ -118,6 +118,12 @@ our $I18N = {
         context => q|Status message|,
     },
 
+    'Payment Driver' => {
+        message => q|Payment Driver|,
+        lastUpdated => 0,
+        context => q|Name of the base Payment Driver|,
+    },
+
 };
 
 1;
