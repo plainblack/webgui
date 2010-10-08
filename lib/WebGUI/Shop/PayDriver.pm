@@ -16,7 +16,6 @@ package WebGUI::Shop::PayDriver;
 
 use strict;
 
-use Class::InsideOut qw{ :std };
 use Carp qw(croak);
 use Tie::IxHash;
 use WebGUI::Exception::Shop;
