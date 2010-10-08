@@ -186,7 +186,6 @@ TODO: {
 
 SKIP: {
     skip "Skipping XML requests to ITransact due to lack of userId and password", 2 unless $hasTestAccount;
-    diag $xml;
     my $response = eval { $driver->doXmlRequest($xml) };
     my $ok_response = isa_ok($response, 'HTTP::Response', 'returns a HTTP::Response object');
     ok( $response->is_success, '... was successful for two item transaction');
