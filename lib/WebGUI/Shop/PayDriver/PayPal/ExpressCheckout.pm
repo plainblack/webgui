@@ -29,9 +29,9 @@ use Data::Dumper;
 Readonly my $I18N => 'PayDriver_ExpressCheckout';
 use Moose;
 use WebGUI::Definition::Shop;
-extends qw/WebGUI::Shop::PayDriver PayDriver_ExpressCheckout/;
+extends qw/WebGUI::Shop::PayDriver::PayPal/;
 
-define pluginName => [];
+define pluginName => [qw/name PayDriver_ExpressCheckout/];
 
 property paypal => (
         fieldType    => 'text',
@@ -153,7 +153,7 @@ sub getButton {
     my $payForm
         = WebGUI::Form::formHeader($session)
         . $self->getDoFormTags('sendToPayPal')
-        . WebGUI::Form::submit( $session, { value => $self->name } )
+        . WebGUI::Form::submit( $session, { value => $self->pluginName } )
         . WebGUI::Form::formFooter($session);
 
     return $payForm;
