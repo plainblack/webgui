@@ -3,6 +3,9 @@
 /**
  *  WebGUI.Admin -- The WebGUI Admin Console
  */
+bind = function ( scope, func ) {
+    return function() { func.apply( scope, arguments ) }
+};
 
 if ( typeof WebGUI == "undefined" ) {
     WebGUI = {};
@@ -1143,56 +1146,46 @@ WebGUI.Admin.AssetTable
             }
         };
 
-    var makeScopedFormatter = function ( scope, func ) {
-        return function() { func.apply( scope, arguments ) }
-    };
-
     this.columnDefs 
         = [ 
             {
                 key: 'assetId', 
                 label: selectAllSpan.innerHTML, 
-                formatter: makeScopedFormatter( this, this.formatAssetIdCheckbox )
-            },
-            {
-                key: 'lineage', 
-                label: window.admin.i18n.get('Asset','rank'), 
-                sortable: true, 
-                formatter: makeScopedFormatter( this, this.formatRank )
+                formatter: bind( this, this.formatAssetIdCheckbox )
             },
             { 
                 key: 'helpers', 
                 label: "", 
-                formatter: makeScopedFormatter( this, this.formatHelpers )
+                formatter: bind( this, this.formatHelpers )
             },
             { 
                 key: 'title', 
                 label: window.admin.i18n.get('Asset', '99'), 
-                formatter: makeScopedFormatter( this, this.formatTitle ),
+                formatter: bind( this, this.formatTitle ),
                 sortable: true 
             },
             { 
                 key: 'className', 
                 label: window.admin.i18n.get('Asset','type'), 
                 sortable: true, 
-                formatter: makeScopedFormatter( this, this.formatClassName )
+                formatter: bind( this, this.formatClassName )
             },
             { 
                 key: 'revisionDate', 
                 label: window.admin.i18n.get('Asset','revision date' ), 
-                formatter: makeScopedFormatter( this, this.formatRevisionDate ), 
+                formatter: bind( this, this.formatRevisionDate ), 
                 sortable: true 
             },
             { 
                 key: 'assetSize', 
                 label: window.admin.i18n.get('Asset','size' ), 
-                formatter: makeScopedFormatter( this, this.formatAssetSize ),
+                formatter: bind( this, this.formatAssetSize ),
                 sortable: true 
             },
             { 
                 key: 'lockedBy', 
                 label: '<img src="' + window.getWebguiProperty('extrasURL') + '/icon/lock.png" />', 
-                formatter: makeScopedFormatter( this, this.formatLockedBy )
+                formatter: bind( this, this.formatLockedBy )
             }
         ];
 };
@@ -1601,6 +1594,14 @@ WebGUI.Admin.Tree
         dataSourceUrl   : '?op=admin;method=getTreeData;',
         dataTableId     : 'treeDataTableContainer',
         paginatorIds    : [ 'treePaginator' ]
+    } );
+
+    // Add Rank column for ordering
+   this.columnDefs.splice( 1, 0, {
+        key: 'lineage', 
+        label: window.admin.i18n.get('Asset','rank'), 
+        sortable: true, 
+        formatter: bind( this, this.formatRank )
     } );
 
     this.init();
