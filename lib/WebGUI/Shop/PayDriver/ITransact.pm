@@ -24,7 +24,7 @@ use HTTP::Request;
 use Moose;
 use WebGUI::Definition::Shop;
 extends 'WebGUI::Shop::PayDriver';
-define pluginName => [qw/label PayDriver_ITransact/];
+define pluginName => [qw/ITransact PayDriver_ITransact/];
 property vendorId => (
            fieldType    => 'text',
            label        => ['vendorId', 'PayDriver_ITransact'],
