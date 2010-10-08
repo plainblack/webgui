@@ -446,8 +446,6 @@ sub copyThingData {
     return undef unless $self->canEditThingData($thingId, $thingDataId);
 
     my $origCollateral = $self->getCollateral("Thingy_".$thingId, "thingDataId", $thingDataId);
-    use Data::Dumper;
-    $session->log->warn(Dumper $origCollateral);
     $origCollateral->{thingDataId} = "new";
     ##Get all fields
     my $fields = $db->buildArrayRefOfHashRefs('select * from Thingy_fields where assetId=? and thingId=?'
@@ -2646,9 +2644,6 @@ sub www_editThingDataSaveViaAjax {
     }
 
     my $thingProperties = $self->getThing($thingId);
-    use Data::Dumper;
-    warn $thingId;
-    warn Dumper $thingProperties;
     if ($thingProperties->{thingId}){
         return $session->privilege->insufficient() unless $self->canEditThingData($thingId, $thingDataId
             ,$thingProperties);
