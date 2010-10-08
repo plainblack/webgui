@@ -15,7 +15,6 @@ package WebGUI::Shop::PayDriver::PayPal::ExpressCheckout;
 =cut
 
 use strict;
-use base qw/WebGUI::Shop::PayDriver/;
 
 use LWP::UserAgent;
 use Tie::IxHash;
@@ -26,6 +25,80 @@ use URI::Split;
 use URI;
 use Readonly;
 use Data::Dumper;
+
+Readonly my $I18N => 'PayDriver_ExpressCheckout';
+use Moose;
+use WebGUI::Definition::Shop;
+extends qw/WebGUI::Shop::PayDriver PayDriver_ExpressCheckout/;
+
+define pluginName => [];
+
+property paypal => (
+        fieldType    => 'text',
+        label        => ['paypal', 'PayDriver_ExpressCheckout'],
+        hoverHelp    => ['paypal help', 'PayDriver_ExpressCheckout'],
+        default      => 'https://www.paypal.com/webscr',
+         );
+
+property sandbox => (
+        fieldType    => 'text',
+        label        => ['sandbox', 'PayDriver_ExpressCheckout'],
+        hoverHelp    => ['sandbox help', 'PayDriver_ExpressCheckout'],
+        default      => 'https://www.sandbox.paypal.com/webscr',
+         );
+
+property api => (
+        fieldType    => 'text',
+        label        => ['api', 'PayDriver_ExpressCheckout'],
+        hoverHelp    => ['api help', 'PayDriver_ExpressCheckout'],
+        default      => 'https://api-3t.payPal.com/nvp',
+         );
+
+property apiSandbox => (
+        fieldType    => 'text',
+        label        => ['apiSandbox', 'PayDriver_ExpressCheckout'],
+        hoverHelp    => ['apiSandbox help', 'PayDriver_ExpressCheckout'],
+        default      => 'https://api-3t.sandbox.payPal.com/nvp',
+         );
+
+property user => (
+        fieldType    => 'text',
+        label        => ['user', 'PayDriver_ExpressCheckout'],
+        hoverHelp    => ['user help', 'PayDriver_ExpressCheckout'],
+         );
+
+property password => (
+        fieldType    => 'text',
+        label        => ['password', 'PayDriver_ExpressCheckout'],
+        hoverHelp    => ['password help', 'PayDriver_ExpressCheckout'],
+         );
+
+property currency => (
+        fieldType    => 'text',
+        label        => ['currency', 'PayDriver_ExpressCheckout'],
+        hoverHelp    => ['currency help', 'PayDriver_ExpressCheckout'],
+        default      => 'USD',
+         );
+
+property testMode => (
+        fieldType    => 'yesNo',
+        label        => ['testMode', 'PayDriver_ExpressCheckout'],
+        hoverHelp    => ['testMode help', 'PayDriver_ExpressCheckout'],
+         );
+
+property signature => (
+        fieldType    => 'text',
+        label        => ['signature', 'PayDriver_ExpressCheckout'],
+        hoverHelp    => ['signature help', 'PayDriver_ExpressCheckout'],
+         );
+
+property summaryTemplateId => (
+        fieldType    => 'template',
+        label        => ['summary template', 'PayDriver_ExpressCheckout'],
+        hoverHelp    => ['summary template help', 'PayDriver_ExpressCheckout'],
+        namespace    => 'Shop/Credentials',
+        default      => 'GqnZPB0gLoZmqQzYFaq7bg',
+         );
 
 =head1 NAME
 
@@ -51,8 +124,6 @@ The following methods are available from this class:
 
 =cut
 
-Readonly my $I18N => 'PayDriver_ExpressCheckout';
-
 #-------------------------------------------------------------------
 
 =head2 apiUrl
@@ -64,63 +135,8 @@ use the sandbox)
 
 sub apiUrl {
     my $self = shift;
-    return $self->get( $self->get('testMode') ? 'apiSandbox' : 'api' );
+    return $self->get( $self->testMode ? 'apiSandbox' : 'api' );
 }
-
-#-------------------------------------------------------------------
-
-=head2 definition
-
-Standard definition method.
-
-=cut
-
-sub definition {
-    my ( $class, $session, $definition ) = @_;
-    my $i18n = WebGUI::International->new( $session, $I18N );
-
-    tie my %fields, 'Tie::IxHash';
-    my @fieldNames = qw(
-        paypal   sandbox
-        api      apiSandbox
-        user     password
-        currency testMode
-        signature
-    );
-
-    foreach my $f (@fieldNames) {
-        $fields{$f} = {
-            fieldType => 'text',
-            label     => $i18n->get($f),
-            hoverHelp => $i18n->get("$f help"),
-        };
-    }
-
-    $fields{currency}{defaultValue} = 'USD';
-
-    $fields{testMode}{fieldType} = 'YesNo';
-
-    $fields{sandbox}{defaultValue}    = 'https://www.sandbox.paypal.com/webscr';
-    $fields{apiSandbox}{defaultValue} = 'https://api-3t.sandbox.payPal.com/nvp';
-
-    $fields{paypal}{defaultValue} = 'https://www.paypal.com/webscr';
-    $fields{api}{defaultValue}    = 'https://api-3t.payPal.com/nvp';
-
-    $fields{summaryTemplateId}  = {
-        fieldType    => 'template',
-        label        => $i18n->get('summary template'),
-        hoverHelp    => $i18n->get('summary template help'),
-        namespace    => 'Shop/Credentials',
-        defaultValue => 'GqnZPB0gLoZmqQzYFaq7bg',
-    },
-
-    push @{$definition}, {
-        name       => $i18n->get('name'),
-        properties => \%fields,
-        };
-
-    return $class->SUPER::definition( $session, $definition );
-} ## end sub definition
 
 #-------------------------------------------------------------------
 
@@ -137,7 +153,7 @@ sub getButton {
     my $payForm
         = WebGUI::Form::formHeader($session)
         . $self->getDoFormTags('sendToPayPal')
-        . WebGUI::Form::submit( $session, { value => $self->get('name') } )
+        . WebGUI::Form::submit( $session, { value => $self->name } )
         . WebGUI::Form::formFooter($session);
 
     return $payForm;
@@ -157,9 +173,9 @@ sub payPalForm {
     my $self = shift;
     my $args = ref $_[0] eq 'HASH' ? shift : {@_};
     $args->{VERSION}   = '58.0';
-    $args->{USER}      = $self->get('user');
-    $args->{PWD}       = $self->get('password');
-    $args->{SIGNATURE} = $self->get('signature');
+    $args->{USER}      = $self->user;
+    $args->{PWD}       = $self->password;
+    $args->{SIGNATURE} = $self->signature;
 
     return $args;
 }
@@ -175,7 +191,7 @@ use the sandbox)
 
 sub payPalUrl {
     my $self = shift;
-    return $self->get( $self->get('testMode') ? 'sandbox' : 'paypal' );
+    return $self->get( $self->testMode ? 'sandbox' : 'paypal' );
 }
 
 #-------------------------------------------------------------------
@@ -197,7 +213,7 @@ sub processPayment {
         PAYERID       => $self->session->form->process('PayerId'),
         TOKEN         => $self->session->form->process('token'),
         AMT           => $self->getCart->calculateTotal,
-        CURRENCYCODE  => $self->get('currency'),
+        CURRENCYCODE  => $self->currency,
         PAYMENTACTION => 'SALE',
     );
     my $response = LWP::UserAgent->new->post( $self->apiUrl, $form );
@@ -286,13 +302,13 @@ sub www_sendToPayPal {
     my $form = $self->payPalForm(
         METHOD        => 'SetExpressCheckout',
         AMT           => $self->getCart->calculateTotal,
-        CURRENCYCODE  => $self->get('currency'),
+        CURRENCYCODE  => $self->currency,
         RETURNURL     => $returnUrl->as_string,
         CANCELURL     => $cancelUrl->as_string,
         PAYMENTACTION => 'SALE',
     );
 
-    my $testMode = $self->get('testMode');
+    my $testMode = $self->testMode;
     my $response = LWP::UserAgent->new->post( $self->apiUrl, $form );
     my $params   = $self->responseHash($response);
     my $i18n     = WebGUI::International->new( $self->session, $I18N );
