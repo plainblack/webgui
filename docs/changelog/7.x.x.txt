@@ -12,6 +12,7 @@
  - fixed #11909: Wrong message count in the inbox
  - fixed #11773: Form injection in the EMS event ordering code.
  - fixed #11773: SQL injection vulnerability in Edit Thing form processing code.
+ - fixed #11906: Carousel slide height problems
 
 7.9.15
  - fixed #11868: WebGUI::Session::Form::validToken throws unnecessary warnings

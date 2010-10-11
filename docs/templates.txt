@@ -8,6 +8,9 @@ templates, you will need to apply these changes manually to your copies.
     copyright info have been removed and a stylesheet was added to provide very
     simple default formatting for text, header and footer (makepageprintable.css).
 
+  * Carousel Default Template - root/import/carousel/carousel-default
+    Add a height parameter to the template.
+    
 7.9.15
 
   *  Profile templates - root/import/account/profile/default-view-profile-template
