@@ -22,6 +22,7 @@ use Getopt::Long;
 use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::Asset;
+use WebGUI::Inbox;
 
 
 my $toVersion = '7.9.16';
@@ -31,18 +32,33 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+pruneInboxMessagesFromDeletedUsers($session);
 
 finish($session); # this line required
 
 
 #----------------------------------------------------------------------------
 # Describe what our function does
-#sub exampleFunction {
-#    my $session = shift;
-#    print "\tWe're doing some stuff here that you should know about... " unless $quiet;
-#    # and here's our code
-#    print "DONE!\n" unless $quiet;
-#}
+sub pruneInboxMessagesFromDeletedUsers {
+    my $session = shift;
+    print "\tPruning inbox messages from deleted users.  This may take a while... " unless $quiet;
+    my $sth = $session->db->prepare(<<EOSQL);
+select messageId, inbox.userId
+    from inbox_messageState
+    join inbox using (messageId)
+    left outer join users on inbox.userId=users.userId
+    where users.userId IS NULL
+EOSQL
+    $sth->execute([]);
+    my $inbox = WebGUI::Inbox->new($session);
+    while (my ($messageId, $userId) = $sth->array) {
+        my $message = $inbox->getMessage($messageId, $userId);
+        if ($message) {
+            $message->delete;
+        }
+    }
+    print "...DONE!\n" unless $quiet;
+}
 
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
