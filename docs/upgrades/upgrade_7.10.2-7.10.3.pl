@@ -49,6 +49,7 @@ select messageId, inbox.userId
     where users.userId IS NULL
 EOSQL
     $sth->execute([]);
+    use WebGUI::Inbox;
     my $inbox = WebGUI::Inbox->new($session);
     while (my ($messageId, $userId) = $sth->array) {
         my $message = $inbox->getMessage($messageId, $userId);
