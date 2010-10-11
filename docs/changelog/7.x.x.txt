@@ -9,6 +9,7 @@
  - fixed #11618: Code Editor: Content loses it's whitespace formatting
  - fixed #11903: Unnecessary debug in Thingy
  - fixed #11908: Inbox messages linger after deleting a user
+ - fixed #11909: Wrong message count in the inbox
 
 7.9.15
  - fixed #11868: WebGUI::Session::Form::validToken throws unnecessary warnings
