@@ -429,13 +429,14 @@ sub new {
     return undef unless $messageId;
 
     my $inbox = $session->db->getRow("inbox","messageId",$messageId);
+
+    #Don't return messages that don't exist
+    return undef unless (scalar(keys %{$inbox}));
+
     my $statusValues = $session->db->quickHashRef(
         q{ select isRead, repliedTo, deleted from inbox_messageState where messageId=? and userId=? },
         [$messageId,$userId]
     );
-
-    #Don't return messages that don't exist
-    return undef unless (scalar(keys %{$inbox}));
 
     #Don't return deleted messages
     return undef if($statusValues->{deleted});
