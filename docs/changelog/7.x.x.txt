@@ -1,5 +1,6 @@
 7.10.3
  - fixed #11903: Unnecessary debug in Thingy
+ - fixed #11908: Inbox messages linger after deleting a user
 
 7.10.2
  - fixed #11884: Editing Templates impossible / Code editor not loaded
