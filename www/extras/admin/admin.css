@@ -138,6 +138,10 @@ input.disabled {
     margin: 1em 8% 0;
 }
 
+.searchResults table {
+    width:  100%;
+}
+
 .searchKeywords {
     display: block;
     width:  90%;

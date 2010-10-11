@@ -6,8 +6,10 @@ use Moose;
 use JSON qw( from_json to_json );
 use namespace::autoclean;
 use Scalar::Util;
+use Search::QueryParser;
 use WebGUI::Pluggable;
 use WebGUI::Macro;
+use WebGUI::Search;
 
 has 'session' => (
     is          => 'ro',
@@ -133,6 +135,42 @@ sub getAssetTypes {
 
     return %assetList;
 }
+
+#----------------------------------------------------------------------
+
+=head2 getKeywordString ( keywordString )
+
+Munge the keyword string from the user into something mysql will Do The
+Right Thing with
+
+=cut
+
+# Stolen from WebGUI::Search->search
+sub getKeywordString {
+    my ( $self, $keywords ) = @_;
+
+    # do wildcards for people like they'd expect unless they are doing it themselves
+    unless ($keywords =~ m/"|\*/) {
+        # split into 'words'.  Ideographic characters (such as Chinese) are
+        # treated as distinct words.  Everything else is space delimited.
+        my @terms = grep { $_ ne q{} } split /\s+|(\p{Ideographic})/, $keywords;
+        for my $term (@terms) {
+            # we add padding to ideographic characters to avoid minimum word length limits on indexing
+            if ($term =~ /\p{Ideographic}/) {
+                $term = q{''}.$term.q{''};
+            }
+            $term .= q{*};
+            next if WebGUI::Search->_isStopword( $term );
+            next
+                if $term =~ /^[+-]/;
+            $term = q{+} . $term;
+        }
+        $keywords = join q{ }, @terms;
+    }
+
+    return $keywords;
+}
+
 #----------------------------------------------------------------------
 
 =head2 getNewContentTemplateVars 
@@ -256,6 +294,80 @@ sub getNewContentTemplateVars {
     delete $session->{_asset};
 
     return $tabs;
+}
+
+#----------------------------------------------------------------------------
+
+=head2 getSearchPaginator ( queryString )
+
+Get a paginator for searching with the given queryString. 
+
+=cut
+
+sub getSearchPaginator {
+    my ( $self, $queryString ) = @_;
+    my $session = $self->session;
+
+    my $sql = 'SELECT assetId FROM assetIndex JOIN asset USING (assetId) WHERE '
+            . ' ( ' . $self->getSqlFromQueryString( $queryString ) . ' ) '
+            ;
+
+    my $p   = WebGUI::Paginator->new( $session );
+    $p->setDataByQuery( $sql );
+    return $p;
+}
+
+#----------------------------------------------------------------------------
+
+=head2 getSqlFromQueryString ( queryString )
+
+Parse the query string and return a SQL boolean clause suitable to be used
+as a WHERE clause. Does not return WHERE, as you could also use it for HAVING
+
+=cut
+
+sub getSqlFromQueryString {
+    my ( $self, $queryString ) = @_;
+
+    my $sqp         = Search::QueryParser->new( defField => 'keywords' );
+    my $query       = $sqp->parse( $queryString );
+
+    # Recursion is recursive
+    my $part        = sub { 
+        my ( $query, $conj ) = @_;
+        my @parts;
+        for my $part ( @$query ) {
+            if ( ref $part->{value} ) { 
+                push @parts, $self->getSqlFromQueryString( $_ );
+            } 
+            elsif ( $part->{field} eq 'keywords' ) {
+                push @parts, "MATCH ($part->{field}) AGAINST ('" 
+                            . $self->getKeywordString( $part->{value} ) 
+                            . "')";
+            }
+            else {
+                # TODO: Add op validation
+                # TODO: Add field quoting
+                # TODO: Add value quoting
+                if ( $part->{op} eq ':' ) {
+                    my $value   = '%' . $part->{value} . '%';
+                    push @parts, "$part->{field} LIKE '$value'";
+                }
+                else {
+                    push @parts, "$part->{field} $part->{op} '$part->{value}'"
+                }
+            }
+        }
+        return join " $conj ", @parts;
+    };
+    my $must    = $query->{'+'} ? '(' . $part->( $query->{'+'}, 'AND' ) . ')' : undef;
+    my $mustNot = $query->{'-'} ? 'NOT ( ' . $part->( $query->{'-'}, 'OR' ) . ')' : undef;
+    my $may     = $query->{''}  ? $part->( $query->{''}, 'OR' ) : undef;
+
+    my $sql     = $must . ( $must && $mustNot ? " AND " : '' ) . $mustNot
+                . ( $must || $mustNot ? " OR " : '' ) . $may
+                ;
+    return $sql;
 }
 
 #----------------------------------------------------------------------------
@@ -514,6 +626,64 @@ sub www_processAssetHelper {
     WebGUI::Pluggable::load( $class );
     my $asset   = WebGUI::Asset->newById( $session, $assetId );
     return JSON->new->encode( $class->process( $asset ) );
+}
+
+#----------------------------------------------------------------------
+
+=head2 www_searchAssets ( ) 
+
+Search the asset tree for the given keywords and filters
+
+=cut
+
+sub www_searchAssets {
+    my ( $self ) = @_;
+    my $session = $self->session;
+    my ( $user, $form ) = $session->quick(qw{ user form });
+
+    # Get the search
+    my $queryString = $form->get('query');
+    return to_json( {} ) unless $queryString;
+
+    my $i18n        = WebGUI::International->new( $session, "Asset" );
+    my $assetInfo   = { assets => [] };
+    my $p           = $self->getSearchPaginator( $queryString );
+
+    for my $result ( @{ $p->getPageData } ) {
+        my $assetId = $result->{assetId};
+        my $asset       = WebGUI::Asset->newById( $session, $assetId );
+
+        # Populate the required fields to fill in
+        my %fields      = (
+            assetId         => $asset->getId,
+            url             => $asset->getUrl,
+            lineage         => $asset->lineage,
+            title           => $asset->menuTitle,
+            revisionDate    => $asset->revisionDate,
+            childCount      => $asset->getChildCount,
+            assetSize       => $asset->assetSize,
+            lockedBy        => ($asset->isLockedBy ? $asset->lockedBy->username : ''),
+            canEdit         => $asset->canEdit && $asset->canEditIfLocked,
+            helpers         => $asset->getHelpers,
+        );
+
+        $fields{ className } = {};
+        # The asset icon
+        $fields{ icon } = $asset->getIcon("small");
+
+        # The asset type (i18n name)
+        $fields{ className } = $asset->getName;
+
+        push @{ $assetInfo->{ assets } }, \%fields;
+    }
+
+    $assetInfo->{ totalAssets   } = $p->getRowCount;
+    $assetInfo->{ sort          } = $session->form->get( 'orderByColumn' );
+    $assetInfo->{ dir           } = lc $session->form->get( 'orderByDirection' );
+
+    $session->http->setMimeType( 'application/json' );
+
+    return to_json( $assetInfo );
 }
 
 #----------------------------------------------------------------------

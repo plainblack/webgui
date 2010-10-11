@@ -179,6 +179,10 @@ WebGUI.Admin.prototype.editAsset
  */
 WebGUI.Admin.prototype.gotoAsset
 = function ( url ) {
+    if ( this.tabBar.get('activeIndex') > 1 ) {
+        this.tabBar.selectTab( 0 );
+        this.currentTab = "view";
+    }
     if ( this.currentTab == "view" ) {
         window.frames[ "view" ].location.href = url;
         this.treeDirty = 1;
@@ -1268,7 +1272,7 @@ WebGUI.Admin.AssetTable.prototype.showHelperMenu
         // destroy the old helper menu!
         this.helperMenu.destroy();
     }
-    this.helperMenu = new YAHOO.widget.Menu( {
+    this.helperMenu = new YAHOO.widget.Menu( document.createElement('div'), {
         position : "dynamic",
         clicktohide : true,
         constraintoviewport : true,
@@ -1939,11 +1943,13 @@ WebGUI.Admin.Search
 
     // Create a container for the datatable
     this.dataTableContainer = document.createElement('div');
+    this.dataTableContainer.style.display = "none";
+    this.dataTableContainer.className = "searchResults";
     this.dataTableContainer.id  = YAHOO.util.Dom.generateId();
     this.formContainer.appendChild( this.dataTableContainer );
 
     // Create a container for the paginator
-    // ...
+    // TODO
     WebGUI.Admin.Search.superclass.constructor.call( this, admin, {
         dataSourceUrl   : '?op=admin;method=searchAssets;',
         dataTableId     : this.dataTableContainer.id,
@@ -2141,9 +2147,9 @@ WebGUI.Admin.Search.prototype.buildQueryString
 WebGUI.Admin.Search.prototype.requestSearch
 = function ( ) {
     // Build the new search URL
-    var searchUrl   = ';keywords=' + encodeURIComponent( this.searchKeywords.value );
+    var query   = 'query=' + encodeURIComponent( this.searchKeywords.value );
     for ( var i = 0; i < this.filters.length; i++ ) {
-        searchUrl += ';' + filter.type + '=' + filter.getValue();
+        query += ' ' + encodeURIComponent( filter.type + ':' + filter.getValue() );
     }
 
     var callback = {
@@ -2157,10 +2163,20 @@ WebGUI.Admin.Search.prototype.requestSearch
         this.buildQueryString( 
             this.dataTable.getState(),
             this.dataTable,
-            searchUrl
+            query
         ),
         callback
     );
+};
+
+/**
+ * onDataReturnInitializeTable ( sRequest, oResponse, oPayload )
+ * Initialize the table with a new response from the server
+ */
+WebGUI.Admin.Search.prototype.onDataReturnInitializeTable
+= function ( sRequest, oResponse, oPayload ) {
+    this.dataTableContainer.style.display = "block";
+    WebGUI.Admin.Tree.superclass.onDataReturnInitializeTable.call( this, sRequest, oResponse, oPayload );
 };
 
 
