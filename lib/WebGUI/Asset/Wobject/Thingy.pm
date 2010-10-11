@@ -2203,7 +2203,7 @@ sub www_editThingSave {
         my $displayInSearch = $self->session->form->process("displayInSearch_".$field->{fieldId}) || 0;
         my $searchIn = $self->session->form->process("searchIn_".$field->{fieldId}) || 0;
 
-        $self->session->db->write("update Thingy_fields set display = ".$display.", viewScreenTitle = ".$viewScreenTitle.", displayinSearch = ".$displayInSearch.", searchIn = ".$searchIn." where fieldId = ".$self->session->db->quote($field->{fieldId})." and thingId = ".$self->session->db->quote($thingId));
+        $self->session->db->write("update Thingy_fields set display = ?, viewScreenTitle = ?, displayinSearch = ?, searchIn = ? where fieldId = ? and thingId = ?",[$display, $viewScreenTitle, $displayInSearch, $searchIn, $field->{fieldId}, $thingId]);
     }
     return $self->www_manage;
 }
