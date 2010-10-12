@@ -5,6 +5,7 @@
  - fixed #11773: Form injection in the EMS event ordering code.
  - fixed #11773: SQL injection vulnerability in Edit Thing form processing code.
  - fixed #11906: Carousel slide height problems
+ - fixed #11900: Request Approval for Version Tag Workflow activity can't select --Continue with this workflow
 
 7.10.2
  - fixed #11884: Editing Templates impossible / Code editor not loaded
