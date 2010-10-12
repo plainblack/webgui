@@ -315,7 +315,7 @@ sub new {
 	my %data = (%{$main}, %{$sub});
     for my $definition (reverse @{$class->definition($session)}) {
         for my $property (keys %{$definition->{properties}}) {
-            if(!defined $data{$property} || $data{$property} eq '' && $definition->{properties}{$property}{defaultValue}) {
+            if(!defined $data{$property}) {
                 $data{$property} = $definition->{properties}{$property}{defaultValue};
             }
         }
