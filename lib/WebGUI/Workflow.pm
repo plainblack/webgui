@@ -566,6 +566,14 @@ sub set {
 	$self->session->db->setRow("Workflow","workflowId",$self->{_data});
 }
 
+=head1 SEE ALSO
+
+L<WebGUI::Workflow::Instance>
+
+After creating a workflow, you need to create an instance of that workflow to kick off activities in it.
+
+=cut
+
 
 1;
 
