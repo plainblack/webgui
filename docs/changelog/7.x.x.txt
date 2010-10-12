@@ -14,6 +14,7 @@
  - fixed #11773: SQL injection vulnerability in Edit Thing form processing code.
  - fixed #11906: Carousel slide height problems
  - fixed #11900: Request Approval for Version Tag Workflow activity can't select --Continue with this workflow
+ - fixed #11898: String eval used in Image::Graph
 
 7.9.15
  - fixed #11868: WebGUI::Session::Form::validToken throws unnecessary warnings
