@@ -6,6 +6,7 @@
  - fixed #11773: SQL injection vulnerability in Edit Thing form processing code.
  - fixed #11906: Carousel slide height problems
  - fixed #11900: Request Approval for Version Tag Workflow activity can't select --Continue with this workflow
+ - fixed #11898: String eval used in Image::Graph
 
 7.10.2
  - fixed #11884: Editing Templates impossible / Code editor not loaded
