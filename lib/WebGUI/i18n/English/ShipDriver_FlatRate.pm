@@ -48,6 +48,11 @@ our $I18N = {
 		lastUpdated => 1203569582,
 	},
 
+	'Flat Rate' => {
+		message => q|Flat Rate|,
+		lastUpdated => 1203569582,
+	},
+
 };
 
 1;
