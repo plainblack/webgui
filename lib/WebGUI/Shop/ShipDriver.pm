@@ -2,13 +2,15 @@ package WebGUI::Shop::ShipDriver;
 
 use strict;
 
-use Class::InsideOut qw{ :std };
 use Carp qw(croak);
 use Tie::IxHash;
 use WebGUI::International;
 use WebGUI::HTMLForm;
 use WebGUI::Exception::Shop;
 use JSON;
+
+use Moose;
+use WebGUI::Definition::Shop;
 
 =head1 NAME
 
@@ -31,9 +33,78 @@ These subroutines are available from this package:
 
 =cut
 
-readonly session   => my %session;
-private  options   => my %options;
-private  shipperId => my %shipperId;
+define tableName  => 'shipper';
+define pluginName => ['Shipping Driver', 'ShipDriver'];
+
+property label => (
+            fieldType       => 'text',
+            label           => ['label', 'ShipDriver'],
+            hoverHelp       => ['label help', 'ShipDriver'],
+            default         => "Credit Card",
+         );
+around label => sub {
+    my $orig = shift;
+    my $self = shift;
+    if (@_ > 0) {
+        my $label = shift;
+        $label = $self->getName($self->session) if $label eq '' || lc($label) eq 'untitled';
+        unshift @_, $label;
+    }
+    $self->$orig(@_);
+};
+property enabled => (
+            fieldType       => 'yesNo',
+            label           => ['enabled', 'ShipDriver'],
+            hoverHelp       => ['enabled help', 'ShipDriver'],
+            default         => 1,
+         );
+property groupToUse => (
+            fieldType       => 'group',
+            label           => ['who can use', 'ShipDriver'],
+            hoverHelp       => ['who can use help', 'ShipDriver'],
+            default         => 7,
+         );
+
+has [ qw/session shipperId/ ] => (
+    is       => 'ro',
+    required => 1,
+);
+
+around BUILDARGS => sub {
+    my $orig  = shift;
+    my $class = shift;
+    if(ref $_[0] eq 'HASH') {
+        ##Standard Moose invocation for creating a new object
+        return $class->$orig(@_);
+    }
+    my $session = shift;
+    WebGUI::Error::InvalidParam->throw(error => q{Must provide a session variable})
+        unless blessed $session && $session->isa('WebGUI::Session');
+    if (ref $_[0] eq 'HASH') {
+        ##Create an object from a hashref of options
+        my $options = shift;
+        $options->{session}   = $session;
+        $options->{shipperId} = $session->id->generate;
+        return $class->$orig($options);
+    }
+    ##Must be a paymentGatewayId, look it up in the database
+    my $shipperId = shift;
+    WebGUI::Error::InvalidParam->throw(error => q{Must provide a shipperId})
+        unless defined $shipperId;
+    my $properties = $session->db->quickHashRef('select * from shipper where shipperId=?', [
+        $shipperId,
+    ]);
+    WebGUI::Error::ObjectNotFound->throw(error => q{shipperId not found in db}, id => $shipperId)
+        unless scalar keys %{ $properties };
+
+    croak "Somehow, the options property of this object, $shipperId, got broken in the db"
+        unless exists $properties->{options} and $properties->{options};
+
+    my $options = from_json($properties->{options});
+    $options->{session}   = $session;
+    $options->{shipperId} = $shipperId;
+    return $class->$orig($options);
+};
 
 #-------------------------------------------------------------------
 
@@ -88,88 +159,20 @@ sub canUse {
             WebGUI::Error::InvalidParam->throw(error => q{Must provide user information})
         }
     }
-    return $userObject->isInGroup($self->get('groupToUse'));
+    return $userObject->isInGroup($self->groupToUse);
 }
 
 #-------------------------------------------------------------------
 
-=head2 create ( $session, $options )
+=head2 className (  )
 
-Constructor for new WebGUI::Shop::ShipperDriver objects.  Returns a WebGUI::Shop::ShipperDriver object.
-To access driver objects that have already been configured, use C<new>.
-
-=head3 $session
-
-A WebGUI::Session object.
-
-=head4 $options
-
-A list of properties to assign to this ShipperDriver.  See C<definition> for details.
+Accessor for the className of the object.  This is the name of the driver that is used
+to do calculations.
 
 =cut
 
-sub create {
-    my $class   = shift;
-    my $session = shift;
-    WebGUI::Error::InvalidParam->throw(error => q{Must provide a session variable})
-        unless ref $session eq 'WebGUI::Session';
-    my $options = shift;
-    WebGUI::Error::InvalidParam->throw(error => q{Must provide a hashref of options})
-        unless ref $options eq 'HASH' and scalar keys %{ $options };
-    my $shipperId = $session->id->generate;
-    $session->db->write('insert into shipper (shipperId,className) VALUES (?,?)', [$shipperId, $class]);
-    my $self = $class->new($session, $shipperId);
-    $self->update($options);
-    return $self;
-}
-
-#-------------------------------------------------------------------
-
-=head2 definition ( $session )
-
-This subroutine returns an arrayref of hashrefs, used to validate data put into
-the object by the user, and to automatically generate the edit form to show
-the user.
-
-The optional hash key noFormProcess may be added to any field definition.
-This will prevent that field from being processed by processPropertiesFromFormPost.
-
-=cut
-
-sub definition {
-    my $class      = shift;
-    my $session    = shift;
-    WebGUI::Error::InvalidParam->throw(error => q{Must provide a session variable})
-        unless ref $session eq 'WebGUI::Session';
-    my $definition = shift || [];
-    my $i18n = WebGUI::International->new($session, 'ShipDriver');
-    tie my %fields, 'Tie::IxHash';
-    %fields = (
-        label => {
-            fieldType    => 'text',
-            label        => $i18n->get('label'),
-            hoverHelp    => $i18n->get('label help'),
-            defaultValue => undef,
-        },
-        enabled => {
-            fieldType    => 'yesNo',
-            label        => $i18n->get('enabled'),
-            hoverHelp    => $i18n->get('enabled help'),
-            defaultValue => 1,
-        },
-        groupToUse      => {
-            fieldType       => 'group',
-            label           => $i18n->get('who can use'),
-            hoverHelp       => $i18n->get('who can use help'),
-            defaultValue    => 7,
-        },
-    );
-    my %properties = (
-        name        => 'Shipper Driver',
-        properties  => \%fields,
-    );
-    push @{ $definition }, \%properties;
-    return $definition;
+sub className {
+    return ref $_[0];
 }
 
 #-------------------------------------------------------------------
@@ -182,65 +185,46 @@ Removes this ShipDriver object from the db.
 
 sub delete {
     my $self = shift;
-    $self->session->db->write('delete from shipper where shipperId=?',[$self->getId]);
+    $self->session->db->write('delete from shipper where shipperId=?', [$self->getId]);
     return;
-}
-
-#-------------------------------------------------------------------
-
-=head2 get ( [ $param ] )
-
-This is an enhanced accessor for the options property.  By default,
-it returns all the options as a hashref.  If the name of a key
-in the hash is passed, it will only return that value from the
-options hash.
-
-=head3 $param
-
-An optional parameter.  If it matches the key of a hash, it will
-return the value from the options hash.
-
-=cut
-
-sub get {
-    my $self  = shift;
-    my $param = shift;
-	my $opts = $options{id $self};
-    if ($opts eq "") {
-        $opts = {};
-    }
-    else {
-        $opts = JSON::from_json($opts);
-    }
-    if (defined $param) {
-        return $opts->{$param};
-    }
-	my %copy = %{$opts};
-	return \%copy;
 }
 
 #-------------------------------------------------------------------
 
 =head2 getEditForm ( )
 
-Dynamically generate an HTMLForm based on the contents
-of the definition sub, and return the form.
+Returns the configuration form for the options of this plugin.
 
 =cut
 
 sub getEditForm {
-    my $self  = shift;
-    my $definition = $self->definition($self->session);
+    my $self = shift;
+    
     my $form = WebGUI::HTMLForm->new($self->session);
     $form->submit;
+    
+    $form->hidden(name  => 'shop',value => "ship");
+    $form->hidden(name  => 'method',value => "do");
+    $form->hidden(name  => 'do',value => "editSave");
+    $form->hidden(
+        name  => 'className',
+        value => $self->className,
+    );
     $form->hidden(
         name  => 'driverId',
         value => $self->getId,
     );
-    $form->hidden(name  => 'shop',value => "ship");
-    $form->hidden(name  => 'method',value => "do");
-    $form->hidden(name  => 'do',value => "editSave");
+    tie my %form_options, 'Tie::IxHash';
+    foreach my $property_name ($self->getProperties) {
+        my $property = $self->meta->find_attribute_by_name($property_name);
+        $form_options{$property_name} = {
+            value => $self->$property_name,
+            %{ $self->getFormProperties($property_name)},
+        };
+    }
+    my $definition = [ { properties => \%form_options }, ];
     $form->dynamicForm($definition, 'properties', $self);
+
     return $form;
 }
 
@@ -255,7 +239,7 @@ since a lot of WebGUI classes have a getId method.
 
 sub getId {
 	my $self = shift;
-    return $shipperId{id $self};
+    return $self->shipperId;
 }
 
 #-------------------------------------------------------------------
@@ -270,39 +254,13 @@ This is a class method.
 =cut
 
 sub getName {
-    my ($class, $session) = @_;
-    my $definition = $class->definition($session);
-    return $definition->[0]->{name};
-}
-
-#-------------------------------------------------------------------
-
-=head2 new ( $session, $shipperId )
-
-Looks up an existing ShipperDriver in the db by shipperId and returns
-that object.
-
-=cut
-
-sub new {
-    my $class     = shift;
-    my $session   = shift;
+    my $class       = shift;
+    my $session     = shift;
     WebGUI::Error::InvalidParam->throw(error => q{Must provide a session variable})
         unless ref $session eq 'WebGUI::Session';
-    my $shipperId = shift;
-    WebGUI::Error::InvalidParam->throw(error => q{Must provide a shipperId})
-        unless defined $shipperId;
-    my $properties = $session->db->quickHashRef('select * from shipper where shipperId=?',[$shipperId]);
-    WebGUI::Error::ObjectNotFound->throw(error => q{shipperId not found in db}, id => $shipperId)
-        unless scalar keys %{ $properties };
-    my $self = register $class;
-    my $id        = id $self;
-    $session{ $id }   = $session;
-    $options{ $id }   = $properties->{options};
-    $shipperId{ $id }   = $shipperId;
-    return $self;
-}
 
+    return WebGUI::International->new($session)->get(@{ $class->meta->pluginName });
+}
 
 #-------------------------------------------------------------------
 
@@ -313,23 +271,19 @@ Updates ship driver with data from Form.
 =cut
 
 sub processPropertiesFromFormPost {
-    my $self    = shift;
-    my $session = $self->session;
-    my $form    = $session->form;
-    my %properties;
-    my $fullDefinition = $self->definition($session);
-    foreach my $definition (@{$fullDefinition}) {
-        PROPERTY: foreach my $property (keys %{$definition->{properties}}) {
-            next PROPERTY if $definition->{properties}{$property}->{noFormProcess};
-            $properties{$property} = $form->process(
-                $property,
-                $definition->{properties}{$property}{fieldType},
-                $definition->{properties}{$property}{defaultValue}
-            );
-        }
+    my $self = shift;
+
+    my $form = $self->session->form;
+    foreach my $property_name ($self->getProperties) {
+        my $property = $self->meta->find_attribute_by_name($property_name);
+        my $value    = $form->process(
+            $property_name,
+            $property->form->{fieldType},
+            $self->$property_name,
+        );
+        $self->$property_name($value);
     }
-    $properties{title} = $fullDefinition->[0]{name} if ($properties{title} eq "" || lc($properties{title}) eq "untitled");
-    $self->update(\%properties);
+    $self->write;
 }
 
 #-------------------------------------------------------------------
@@ -342,27 +296,25 @@ Accessor for the session object.  Returns the session object.
 
 #-------------------------------------------------------------------
 
-=head2 update ( $options )
+=head2 write ( $options )
 
-Setter for user configurable options in the ship objects.  It does not support updating subsets
-of the options.  If a currently set option is missing from the set of passed in options, it will be lost.
-
-=head4 $options
-
-A list of properties to assign to this ShipperDriver.  See C<definition> for details.  The options are
-flattened into JSON and stored in the database as text.  There is no content checking performed.
+Setter for user configurable options in the payment objects.
 
 =cut
 
-sub update {
-    my $self    = shift;
-    my $options = shift || {};
-    WebGUI::Error::InvalidParam->throw(error => 'update was not sent a hashref of options to store in the database')
-        unless ref $options eq 'HASH' and scalar keys %{ $options };
-    my $jsonOptions = JSON::to_json($options);
-    $options{id $self} = $jsonOptions;
-    $self->session->db->write('update shipper set options=? where shipperId=?', [$jsonOptions, $self->getId]);
-    return undef;
+sub write {
+    my $self        = shift;
+
+    my $properties  = $self->get();
+    delete $properties->{session};
+    delete $properties->{shipperId};
+    my $jsonOptions = to_json($properties);
+    $self->session->db->setRow($self->tableName, 'shipperId', {
+        shipperId => $self->shipperId,
+        className => $self->className,
+        options   => $jsonOptions,
+    });
+    return;
 }
 
 
