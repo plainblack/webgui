@@ -161,6 +161,7 @@ checkModule('Number::Format',                            );
 checkModule('Email::Valid',                              );
 checkModule('Facebook::Graph',              '0.0505'     );
 checkModule('HTTP::BrowserDetect',                       );
+checkModule('Search::QueryParser',                       );
 
 failAndExit("Required modules are missing, running no more checks.") if $missingModule;
 
