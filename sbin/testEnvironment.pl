@@ -142,6 +142,8 @@ checkModule("Locales",                      "0.10"       );
 checkModule("Test::Harness",                "3.17"       );
 checkModule("DateTime::Event::ICal",        "0.10"       );
 checkModule("Cache::FastMmap",              "1.35"       );
+checkModule("Test::Tester",                 "0"          );
+checkModule("Test::Log::Dispatch",          "0"          );
 checkModule("CHI",                          "0.34"       );
 checkModule('IO::Socket::SSL',                           );
 checkModule('Net::Twitter',                 "3.13006"    );
