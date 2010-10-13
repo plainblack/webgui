@@ -207,10 +207,6 @@ sub getEditForm {
     $form->hidden(name  => 'method',value => "do");
     $form->hidden(name  => 'do',value => "editSave");
     $form->hidden(
-        name  => 'className',
-        value => $self->className,
-    );
-    $form->hidden(
         name  => 'driverId',
         value => $self->getId,
     );
