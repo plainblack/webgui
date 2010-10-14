@@ -1,12 +1,61 @@
 package WebGUI::Shop::ShipDriver::USPSInternational;
 
 use strict;
-use base qw/WebGUI::Shop::ShipDriver/;
+use Moose;
+use WebGUI::Definition::Shop;
+extends qw/WebGUI::Shop::ShipDriver/;
 use WebGUI::Exception;
 use XML::Simple;
 use LWP;
 use Tie::IxHash;
-use Data::Dumper;
+
+define pluginName => ['U.S. Postal Service, International', 'ShipDriver_USPSInternational'],
+property instructions => (
+            fieldType     => 'readOnly',
+            label         => ['instructions', 'ShipDriver_USPS'],
+            builder       => '_instructions_default',
+            lazy          => 1,
+            noFormProcess => 1,
+         );
+sub _instructions_default {
+    my $session = shift->session;
+    my $i18n = WebGUI::International->new($session, 'ShipDriver_USPS');
+    return $i18n->get('instructions');
+}
+property userId => (
+            fieldType    => 'text',
+            label        => ['userid', 'ShipDriver_USPS'],
+            hoverHelp    => ['userid help', 'ShipDriver_USPS'],
+            default      => '',
+         );
+property shipType => (
+            fieldType    => 'selectBox',
+            label        => ['ship type', 'ShipDriver_USPS'],
+            hoverHelp    => ['ship type help', 'ShipDriver_USPS'],
+            options      => \&_shipType_options,
+            default      => 'PARCEL',
+         );
+sub _shipType_options {
+    my $session = shift->session;
+    my $i18n2 = WebGUI::International->new($session, 'ShipDriver_USPSInternational');
+    tie my %shippingTypes, 'Tie::IxHash';
+    ##Note, these keys are used by buildXML
+    $shippingTypes{1}     = $i18n2->get('express mail international');
+    $shippingTypes{2}     = $i18n2->get('priority mail international');
+    $shippingTypes{6}     = $i18n2->get('global express guaranteed rectangular');
+    $shippingTypes{7}     = $i18n2->get('global express guaranteed non-rectangular');
+    $shippingTypes{9}     = $i18n2->get('priority mail flat rate box');
+    $shippingTypes{11}    = $i18n2->get('priority mail large flat rate box');
+    $shippingTypes{15}    = $i18n2->get('first class mail international parcels');
+    $shippingTypes{16}    = $i18n2->get('priority mail small flat rate box');
+    return \%shippingTypes;
+}
+property addInsurance => (
+            fieldType    => 'yesNo',
+            label        => ['add insurance', 'ShipDriver_USPS'],
+            hoverHelp    => ['add insurance help', 'ShipDriver_USPS'],
+            default      => 0,
+         );
 
 =head1 NAME
 
@@ -50,7 +99,7 @@ sub buildXML {
     tie my %xmlHash, 'Tie::IxHash';
     %xmlHash = ( IntlRateRequest => {}, );
     my $xmlTop = $xmlHash{IntlRateRequest};
-    $xmlTop->{USERID}  = $self->get('userId');
+    $xmlTop->{USERID}  = $self->userId;
     $xmlTop->{Package} = [];
     ##Do a request for each package.
     my $packageIndex;
@@ -86,7 +135,7 @@ sub buildXML {
         $packageData{Ounces}     = [ $ounces   ];
         $packageData{Machinable} = [ 'true'    ];
         $packageData{MailType}   = [ 'Package' ];
-        if ($self->get('addInsurance')) {
+        if ($self->addInsurance) {
             $packageData{ValueOfContents} = [ $value ];
         }
         $packageData{Country}    = [ $country  ];
@@ -121,7 +170,7 @@ costs are assessed.
 
 sub calculate {
     my ($self, $cart) = @_;
-    if (! $self->get('userId')) {
+    if (! $self->userId) {
         WebGUI::Error::InvalidParam->throw(error => q{Driver configured without a USPS userId.});
     }
     if ($cart->getShippingAddress->get('country') eq 'United States') {
@@ -201,9 +250,9 @@ sub _calculateFromXML {
         my $unit = $shippableUnits[$id];
         my $rate;
         SERVICE: foreach my $service (@{ $package->{Service} }) {
-            next SERVICE unless $service->{ID} eq $self->get('shipType');
+            next SERVICE unless $service->{ID} eq $self->shipType;
             $rate = $service->{Postage};
-            if ($self->get('addInsurance')) {
+            if ($self->addInsurance) {
                 if (exists $service->{InsComment}) {
                     WebGUI::Error::Shop::RemoteShippingRate->throw(error => "No insurance because of: ".$service->{InsComment});
                 }
@@ -262,79 +311,6 @@ sub correctCountry {
          : $country eq q{Viet Nam}                               ? q{Vietnam} 
          : $country eq q{Virgin Islands (U.S.)}                  ? q{Virgin Islands U.S.} 
          : $country;
-}
-
-#-------------------------------------------------------------------
-
-=head2 definition ( $session )
-
-This subroutine returns an arrayref of hashrefs, used to validate data put into
-the object by the user, and to automatically generate the edit form to show
-the user.
-
-=cut
-
-sub definition {
-    my $class      = shift;
-    my $session    = shift;
-    WebGUI::Error::InvalidParam->throw(error => q{Must provide a session variable})
-        unless ref $session eq 'WebGUI::Session';
-    my $definition = shift || [];
-    my $i18n  = WebGUI::International->new($session, 'ShipDriver_USPS');
-    my $i18n2 = WebGUI::International->new($session, 'ShipDriver_USPSInternational');
-    tie my %shippingTypes, 'Tie::IxHash';
-    ##Note, these keys are used by buildXML
-    $shippingTypes{1}     = $i18n2->get('express mail international');
-    $shippingTypes{2}     = $i18n2->get('priority mail international');
-    $shippingTypes{6}     = $i18n2->get('global express guaranteed rectangular');
-    $shippingTypes{7}     = $i18n2->get('global express guaranteed non-rectangular');
-    $shippingTypes{9}     = $i18n2->get('priority mail flat rate box');
-    $shippingTypes{11}    = $i18n2->get('priority mail large flat rate box');
-    $shippingTypes{15}    = $i18n2->get('first class mail international parcels');
-    $shippingTypes{16}    = $i18n2->get('priority mail small flat rate box');
-    tie my %fields, 'Tie::IxHash';
-    %fields = (
-        instructions => {
-            fieldType     => 'readOnly',
-            label         => $i18n->get('instructions'),
-            defaultValue  => $i18n->get('usps instructions'),
-            noFormProcess => 1,
-        },
-        userId => {
-            fieldType    => 'text',
-            label        => $i18n->get('userid'),
-            hoverHelp    => $i18n->get('userid help'),
-            defaultValue => '',
-        },
-        shipType => {
-            fieldType    => 'selectBox',
-            label        => $i18n->get('ship type'),
-            hoverHelp    => $i18n->get('ship type help'),
-            options      => \%shippingTypes,
-            defaultValue => 'PARCEL',
-        },
-        addInsurance => {
-            fieldType    => 'yesNo',
-            label        => $i18n->get('add insurance'),
-            hoverHelp    => $i18n->get('add insurance help'),
-            defaultValue => 0,
-        },
-##Note, if a flat fee is added to this driver, then according to the license
-##terms the website must display a note to the user (shop customer) that additional
-##fees have been added.
-#        flatFee => {
-#            fieldType    => 'float',
-#            label        => $i18n->get('flatFee'),
-#            hoverHelp    => $i18n->get('flatFee help'),
-#            defaultValue => 0,
-#        },
-    );
-    my %properties = (
-        name        => $i18n2->get('U.S. Postal Service, International'),
-        properties  => \%fields,
-    );
-    push @{ $definition }, \%properties;
-    return $class->SUPER::definition($session, $definition);
 }
 
 #-------------------------------------------------------------------
