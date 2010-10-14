@@ -37,7 +37,7 @@ $session->user({user => $user});
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 41;
+plan tests => 36;
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -114,33 +114,6 @@ foreach my $asset($rockHammer, $bible, $feather) {
 
 #######################################################################
 #
-# definition
-#
-#######################################################################
-
-my $definition;
-my $e; ##Exception variable, used throughout the file
-
-eval { $definition = WebGUI::Shop::ShipDriver::UPS->definition(); };
-$e = Exception::Class->caught();
-isa_ok($e, 'WebGUI::Error::InvalidParam', 'definition takes an exception to not giving it a session variable');
-cmp_deeply(
-    $e,
-    methods(
-        error => 'Must provide a session variable',
-    ),
-    '... checking error message',
-);
-
-
-isa_ok(
-    $definition = WebGUI::Shop::ShipDriver::UPS->definition($session),
-    'ARRAY'
-);
-
-
-#######################################################################
-#
 # create
 #
 #######################################################################
@@ -150,7 +123,7 @@ my $options = {
                 enabled => 1,
               };
 
-$driver = WebGUI::Shop::ShipDriver::UPS->create($session, $options);
+$driver = WebGUI::Shop::ShipDriver::UPS->new($session, $options);
 
 isa_ok($driver, 'WebGUI::Shop::ShipDriver::UPS');
 isa_ok($driver, 'WebGUI::Shop::ShipDriver');
@@ -183,7 +156,9 @@ undef $driver;
 #
 #######################################################################
 
-$driver = WebGUI::Shop::ShipDriver::UPS->create($session, {
+my $e;
+
+$driver = WebGUI::Shop::ShipDriver::UPS->new($session, {
     label    => 'Shipping from Shawshank',
     enabled  => 1,
     shipType => 'PARCEL',
@@ -365,7 +340,7 @@ $properties->{customerClassification} = '04';
 $properties->{residentialIndicator}   = 'residential';
 $driver->update($properties);
 
-$driver->testMode(1);
+#$driver->testMode(1);
 
 my $rockItem = $rockHammer->addToCart($rockHammer->getCollateral('variantsJSON', 'variantId', $smallHammer));
 my @shippableUnits = $driver->_getShippableUnits($cart);
