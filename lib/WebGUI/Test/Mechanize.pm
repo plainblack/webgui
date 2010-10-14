@@ -3,6 +3,30 @@ package WebGUI::Test::Mechanize;
 use strict;
 use warnings;
 
+=head1 NAME
+
+WebGUI::Test::Mechanize - Test from the user's perspective
+
+=head1 SYNOPSIS
+
+  use WebGUI::Test;
+  my $mech  = WebGUI::Test::Mechanize->new( config => WebGUI::Test->file );
+  $mech->get_ok( '/home?func=edit' );
+
+  # ... See Test::WWW::Mechanize::PSGI for more
+
+=head1 DESCRIPTION
+
+Use a Test::WWW::Mechanize syntax to test your PSGI app without having another 
+process running!
+
+=head1 SEE ALSO
+
+ Test::WWW::Mechanize::PSGI
+ WebGUI::Test
+
+=cut
+
 use parent 'Test::WWW::Mechanize::PSGI';
 
 use WebGUI;
