@@ -4,10 +4,78 @@ use strict;
 use Moose;
 use MooseX::Storage;
 
+=head1 NAME
+
+WebGUI::FormBuilder - Build a form. Really.
+
+=head1 SYNOPSIS
+
+ my $f  = WebGUI::FormBuilder->new( $session, action => "/save", method => "GET" );
+ $f->addField( 'Button',        # See WebGUI::Form::Button
+    name    => 'Submit',
+    label   => 'Submit',
+ );
+
+ my $tab = $f->addTab( "properties", "Properties" ); # "default" tabset
+ $tab->addField( 'Text', name => "title" );
+ $tab->addField( 'Text', name => "url" );
+
+ my $html   = $f->toHtml;
+ my $var    = $f->toTemplateVars;
+
+=head1 DESCRIPTION
+
+FormBuilder is used to build forms. Forms are made up of fields, tabsets, and fieldsets.
+
+Forms can be exported directly to HTML, or they can be exported to template variables.
+
+=head1 SEE ALSO
+
+ WebGUI::FormBuilder::Tabset
+ WebGUI::FormBuilder::Fieldset
+ WebGUI::FormBuilder::Role::HasFields
+
+=head1 ATTRIBUTES
+
+=head2 action
+
+The URL to submit the form to
+
+=cut
+
 has 'action' => ( is => 'rw' );
+
+=head2 enctype
+
+The encoding type to use for the form. Defaults to "multipart/form-data". The 
+other possible value is "application/x-www-form-urlencoded".
+
+=cut
+
 has 'enctype' => ( is => 'rw', default => 'multipart/form-data' );
+
+=head2 method
+
+The HTTP method for the form. Defaults to POST.
+
+=cut
+
 has 'method' => ( is => 'rw', default => 'POST' );
+
+=head2 name
+
+The name of the form. Not required, but recommended.
+
+=cut
+
 has 'name' => ( is => 'rw' );
+
+=head2 session
+
+A WebGUI::Session object. Required.
+
+=cut
+
 has 'session' => ( 
     is => 'ro', 
     isa => 'WebGUI::Session', 
@@ -31,28 +99,8 @@ use WebGUI::FormBuilder::Fieldset;
 
 =head2 new ( session, properties )
 
-Create a new FormBuilder object. C<properties> is a list of name => value pairs
-
-=over 4
-
-=item name
-
-The name of the form. Optional, but recommended.
-
-=item action
-
-The URL to submit the form to.
-
-=item method
-
-The HTTP method to submit the form with. Defaults to POST. 
-
-=item enctype
-
-The encoding type to use for the form. Defaults to "multipart/form-data". The 
-other possible value is "application/x-www-form-urlencoded".
-
-=back
+Create a new FormBuilder object. C<properties> is a list of name => value pairs of
+attributes.
 
 =cut
 
@@ -61,14 +109,6 @@ sub BUILDARGS {
     $properties{ session    } = $session;
     return \%properties;
 }
-
-#----------------------------------------------------------------------------
-
-=head2 action ( [ newAction ] )
-
-Get or set the action property / HTML attribute.
-
-=cut
 
 #----------------------------------------------------------------------------
 
@@ -81,14 +121,6 @@ Create a clone of this Form
 sub clone {
     # TODO
 }
-
-#----------------------------------------------------------------------------
-
-=head2 enctype ( [ newEnctype ] )
-
-Get or set the enctype property / HTML attribute.
-
-=cut
 
 #----------------------------------------------------------------------------
 
@@ -124,30 +156,6 @@ sub getHeader {
     
     return $html;
 }
-
-#----------------------------------------------------------------------------
-
-=head2 method ( [ newMethod ] )
-
-Get or set the method property / HTML attribute.
-
-=cut
-
-#----------------------------------------------------------------------------
-
-=head2 name ( [ newName ] )
-
-Get or set the name property / HTML attribute.
-
-=cut
-
-#----------------------------------------------------------------------------
-
-=head2 session ( )
-
-Get the WebGUI::Session attached to this object
-
-=cut
 
 #----------------------------------------------------------------------------
 
