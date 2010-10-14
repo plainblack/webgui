@@ -2,6 +2,26 @@ package WebGUI::Admin;
 
 # The new WebGUI Admin console
 
+=head1 NAME
+
+WebGUI::Admin - The WebGUI Admin Console
+
+=head1 DESCRIPTION
+
+The WebGUI Admin Console handles editing the Assets in the site, as well
+as administrative tasks like managing Users and Groups.
+
+The base Admin Console does Assets and displays the list of Admin Plugins.
+Admin Plugins do the administrative tasks.
+
+=head1 SEE ALSO
+
+ WebGUI::Admin::Plugin
+ WebGUI::Operation
+ WebGUI::AssetHelper
+
+=cut
+
 use Moose;
 use JSON qw( from_json to_json );
 use namespace::autoclean;
@@ -25,7 +45,18 @@ sub BUILDARGS {
 # Use the template data located in our DATA block
 my $tdata   = do { local $/ = undef; <WebGUI::Admin::DATA> };
 
+=head1 METHODS
+
+=cut
+
 #----------------------------------------------------------------------
+
+=head2 getAdminPluginTemplateVars
+
+Return an arrayref of hashrefs to define the Admin Plugins the current 
+user is allowed to use.
+
+=cut
 
 sub getAdminPluginTemplateVars {
     my $self    = shift;
