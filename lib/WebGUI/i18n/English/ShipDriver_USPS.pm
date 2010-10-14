@@ -118,6 +118,12 @@ our $I18N = {
         context => q|Help for the insurance rate field.|,
     },
 
+    'United States Postal Service' => {
+        message => q|United States Postal Service|,
+        lastUpdated => 1257369016,
+        context => q|Label for the shipping driver.|,
+    },
+
 };
 
 1;
