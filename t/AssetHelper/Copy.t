@@ -20,6 +20,7 @@ use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
 use WebGUI::Asset;
 use WebGUI::AssetHelper::Copy;
+use WebGUI::Test::Mechanize;
 
 #----------------------------------------------------------------------------
 # Init
@@ -44,31 +45,20 @@ my $root = WebGUI::Asset->getRoot($session);
     cmp_deeply(
         $output, 
         {
-            message  => re('was copied to the clipboard'),
+            openDialog  => all(
+                            re('method=copy'),
+                            re('assetId=' . $home->getId ),
+                        ),
         },
-        'AssetHelper/Copy redirects the back to the copied asset'
+        'AssetHelper/Copy opens a dialog for the copy method'
     );
-
-    my $clippies = $root->getLineage(["descendants"], {statesToInclude => [qw{clipboard clipboard-limbo}], returnObjects => 1,});
-    is @{ $clippies }, 1, '... only copied 1 asset to the clipboard, no children';
-    addToCleanup(@{ $clippies });
 }
 
-{
-    $session->setting->set('skipCommitComments', 0);
+my $mech    = WebGUI::Test::Mechanize->new( config => WebGUI::Test->file );
+$mech->get_ok( '/?op=assetHelper;className=WebGUI::AssetHelper::Copy;method=copy;assetId=' . $home->getId );
 
-    $output = WebGUI::AssetHelper::Copy->process($home);
-    cmp_deeply(
-        $output, 
-        {
-            message  => re('was copied to the clipboard'),
-            open_tab => re('^'.$home->getUrl),
-        },
-        'AssetHelper/Copy opens a tab for commit comments'
-    );
-
-    my $clippies = $root->getLineage(["descendants"], {statesToInclude => [qw{clipboard clipboard-limbo}], returnObjects => 1,});
-    addToCleanup(@{ $clippies });
-}
+my $clippies = $root->getLineage(["descendants"], {statesToInclude => [qw{clipboard clipboard-limbo}], returnObjects => 1,});
+is @{ $clippies }, 1, '... only copied 1 asset to the clipboard, no children';
+addToCleanup(@{ $clippies });
 
 #vim:ft=perl
