@@ -7,6 +7,7 @@
  - fixed #11906: Carousel slide height problems
  - fixed #11900: Request Approval for Version Tag Workflow activity can't select --Continue with this workflow
  - fixed #11898: String eval used in Image::Graph
+ - fixed #11913: Editing the survey doesn't work
 
 7.10.2
  - fixed #11884: Editing Templates impossible / Code editor not loaded
