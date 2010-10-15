@@ -13,6 +13,12 @@ WebGUI::Test::Mechanize - Test from the user's perspective
   my $mech  = WebGUI::Test::Mechanize->new( config => WebGUI::Test->file );
   $mech->get_ok( '/home?func=edit' );
 
+  # To change the user running
+  $mech     = WebGUI::Test::Mechanize->new( config => WebGUI::Test->file );
+  $mech->get_ok( '/' ); # Open a session
+  $mech->session->user({ userId => 3 });
+  # Continue on our merry way
+
   # ... See Test::WWW::Mechanize::PSGI for more
 
 =head1 DESCRIPTION
