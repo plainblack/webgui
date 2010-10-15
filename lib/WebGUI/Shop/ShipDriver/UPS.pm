@@ -89,7 +89,7 @@ property shipService => (
             options      => \&_shippingServices_options,
             default      => '03',
          );
-sub _shipService_options {
+sub _shippingServices_options {
     my $session = shift->session;
     my $i18n = WebGUI::International->new($session, 'ShipDriver_UPS');
     tie my %shippingServices, 'Tie::IxHash';
