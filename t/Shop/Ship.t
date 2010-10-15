@@ -124,13 +124,13 @@ cmp_deeply(
 
 eval { $shipper = $ship->addShipper('WebGUI::Shop::ShipDriver::FlatRate', {}); };
 $e = Exception::Class->caught();
-isa_ok($e, 'WebGUI::Error::InvalidParam', 'addShipper croaks without options to build a object with');
+isa_ok($e, 'WebGUI::Error::InvalidParam', 'addShipper croaks with empty options to build a object with');
 cmp_deeply(
     $e,
     methods(
         error => 'You must pass a hashref of options to create a new ShipDriver object',
     ),
-    'addShipper croaks without options to build a object with',
+    'addShipper croaks with empty options to build a object with',
 );
 
 my $driver = $ship->addShipper('WebGUI::Shop::ShipDriver::FlatRate', { enabled=>1, label=>q{Jake's Jailbird Airmail}, groupToUse=>7});
