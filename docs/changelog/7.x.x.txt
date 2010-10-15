@@ -1,4 +1,5 @@
 7.9.17
+ - fixed #11913: Editing the survey doesn't work
 
 7.9.16
  - fixed #11789: Date form reports 1 day earlier on Edit for the time zone corresponding to Europe/Berlin.
