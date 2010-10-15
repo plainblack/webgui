@@ -21,6 +21,8 @@ use HTML::Form;
 
 use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
+use WebGUI::Shop::ShipDriver;
+use Clone;
 
 #----------------------------------------------------------------------------
 # Init
@@ -29,125 +31,41 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 44;
-plan tests => 1 + $tests;
+plan tests => 32;
 
 #----------------------------------------------------------------------------
 # put your tests here
 
 my $e;
 
-my $loaded = use_ok('WebGUI::Shop::ShipDriver');
-
-my $storage;
-
 #######################################################################
 #
-# definition
-#
-#######################################################################
-
-my $definition;
-
-eval { $definition = WebGUI::Shop::ShipDriver->definition(); };
-$e = Exception::Class->caught();
-isa_ok($e, 'WebGUI::Error::InvalidParam', 'definition takes an exception to not giving it a session variable');
-cmp_deeply(
-    $e,
-    methods(
-        error => 'Must provide a session variable',
-    ),
-    'definition: requires a session variable',
-);
-
-$definition = WebGUI::Shop::ShipDriver->definition($session);
-
-cmp_deeply(
-    $definition,
-    [ {
-        name => 'Shipper Driver',
-        properties => {
-            label => {
-                fieldType => 'text',
-                label => ignore(),
-                hoverHelp => ignore(),
-                defaultValue => undef,
-            },
-            enabled => {
-                fieldType => 'yesNo',
-                label => ignore(),
-                hoverHelp => ignore(),
-                defaultValue => 1,
-            },
-            groupToUse => {
-                fieldType => 'group',
-                label => ignore(),
-                hoverHelp => ignore(),
-                defaultValue => 7,
-            },
-        }
-    } ],
-    ,
-    'Definition returns an array of hashrefs',
-);
-
-$definition = WebGUI::Shop::ShipDriver->definition($session, [ { name => 'Red' }]);
-
-cmp_deeply(
-    $definition,
-    [
-        {
-            name => 'Red',
-        },
-        {
-            name => 'Shipper Driver',
-            properties => ignore(),
-        }
-    ],
-    ,
-    'New data is appended correctly',
-);
-
-#######################################################################
-#
-# create
+# new
 #
 #######################################################################
 
 my $driver;
 
-eval { $driver = WebGUI::Shop::ShipDriver->create(); };
+eval { $driver = WebGUI::Shop::ShipDriver->new(); };
 $e = Exception::Class->caught();
-isa_ok($e, 'WebGUI::Error::InvalidParam', 'create takes exception to not giving it a session object');
+isa_ok($e, 'WebGUI::Error::InvalidParam', 'new takes exception to not giving it a session object');
 cmp_deeply(
     $e,
     methods(
         error => 'Must provide a session variable',
     ),
-    'create takes exception to not giving it a session object',
+    'new takes exception to not giving it a session object',
 );
 
-eval { $driver = WebGUI::Shop::ShipDriver->create($session); };
+eval { $driver = WebGUI::Shop::ShipDriver->new($session); };
 $e = Exception::Class->caught();
-isa_ok($e, 'WebGUI::Error::InvalidParam', 'create takes exception to not giving it a hashref of options');
+isa_ok($e, 'WebGUI::Error::InvalidParam', 'new takes exception to not giving it a hashref of options');
 cmp_deeply(
     $e,
     methods(
-        error => 'Must provide a hashref of options',
+        error => 'Must provide a shipperId',
     ),
-    'create takes exception to not giving it a hashref of options',
-);
-
-
-eval { $driver = WebGUI::Shop::ShipDriver->create($session, {}); };
-$e = Exception::Class->caught();
-isa_ok($e, 'WebGUI::Error::InvalidParam', 'create takes exception to not giving it an empty hashref of options');
-cmp_deeply(
-    $e,
-    methods(
-        error => 'Must provide a hashref of options',
-    ),
-    'create takes exception to not giving it an empty hashref of options',
+    'new takes exception to not giving it a shipperId',
 );
 
 my $options = {
@@ -156,7 +74,8 @@ my $options = {
                 groupToUse => 7,
               };
 
-$driver = WebGUI::Shop::ShipDriver->create( $session, $options );
+$driver = WebGUI::Shop::ShipDriver->new( $session, Clone::clone($options) );
+$driver->write;
 WebGUI::Test->addToCleanup($driver);
 
 isa_ok($driver, 'WebGUI::Shop::ShipDriver');
@@ -167,8 +86,7 @@ is($session->getId, $driver->session->getId, 'session method returns OUR session
 
 like($driver->getId, $session->id->getValidator, 'got a valid GUID for shipperId');
 
-
-cmp_deeply($driver->get, $options, 'options accessor works');
+cmp_deeply($driver->get, { %{$options}, shipperId=>ignore()} , 'get works');
 
 my $dbData = $session->db->quickHashRef('select * from shipper where shipperId=?',[$driver->getId]);
 cmp_deeply(
@@ -187,7 +105,7 @@ cmp_deeply(
 #
 #######################################################################
 
-is (WebGUI::Shop::ShipDriver->getName($session), 'Shipper Driver', 'getName returns the human readable name of this driver');
+is (WebGUI::Shop::ShipDriver->getName($session), 'Shipping Driver', 'getName returns the human readable name of this driver');
 
 #######################################################################
 #
@@ -239,10 +157,6 @@ cmp_deeply(
             type => 'submit',
         },
         {
-            name => 'driverId',
-            type => 'hidden',
-        },
-        {
             name => 'shop',
             type => 'hidden',
         },
@@ -252,6 +166,10 @@ cmp_deeply(
         },
         {
             name => 'do',
+            type => 'hidden',
+        },
+        {
+            name => 'driverId',
             type => 'hidden',
         },
         {
@@ -283,28 +201,6 @@ cmp_deeply(
 #######################################################################
 
 my $oldDriver;
-
-eval { $oldDriver = WebGUI::Shop::ShipDriver->new(); };
-$e = Exception::Class->caught();
-isa_ok($e, 'WebGUI::Error::InvalidParam', 'new takes exception to not giving it a session object');
-cmp_deeply(
-    $e,
-    methods(
-        error => 'Must provide a session variable',
-    ),
-    'new takes exception to not giving it a session object',
-);
-
-eval { $oldDriver = WebGUI::Shop::ShipDriver->new($session); };
-$e = Exception::Class->caught();
-isa_ok($e, 'WebGUI::Error::InvalidParam', 'new takes exception to not giving it a shipperId');
-cmp_deeply(
-    $e,
-    methods(
-        error => 'Must provide a shipperId',
-    ),
-    'new takes exception to not giving it a shipperId',
-);
 
 eval { $oldDriver = WebGUI::Shop::ShipDriver->new($session, 'notEverAnId'); };
 $e = Exception::Class->caught();
@@ -338,17 +234,6 @@ like ($@, qr/^You must override the calculate method/, 'calculate croaks to forc
 # update, get
 #
 #######################################################################
-
-eval { $driver->update(); };
-$e = Exception::Class->caught();
-isa_ok($e, 'WebGUI::Error::InvalidParam', 'update takes exception to not giving it a hashref of options');
-cmp_deeply(
-    $e,
-    methods(
-        error => 'update was not sent a hashref of options to store in the database',
-    ),
-    'update takes exception to not giving it a hashref of options',
-);
 
 isa_ok( $driver->get(), 'HASH', 'get returns a hashref if called with no param');
 

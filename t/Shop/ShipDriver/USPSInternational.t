@@ -23,7 +23,7 @@ use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
 use WebGUI::Shop::ShipDriver::USPSInternational;
 
-plan tests => 40;
+plan tests => 37;
 
 #----------------------------------------------------------------------------
 # Init
@@ -113,33 +113,6 @@ foreach my $asset ($rockHammer, $bible) {
 
 #######################################################################
 #
-# definition
-#
-#######################################################################
-
-my $definition;
-my $e; ##Exception variable, used throughout the file
-
-eval { $definition = WebGUI::Shop::ShipDriver::USPSInternational->definition(); };
-$e = Exception::Class->caught();
-isa_ok($e, 'WebGUI::Error::InvalidParam', 'definition takes an exception to not giving it a session variable');
-cmp_deeply(
-    $e,
-    methods(
-        error => 'Must provide a session variable',
-    ),
-    '... checking error message',
-);
-
-
-isa_ok(
-    $definition = WebGUI::Shop::ShipDriver::USPSInternational->definition($session),
-    'ARRAY'
-);
-
-
-#######################################################################
-#
 # create
 #
 #######################################################################
@@ -149,7 +122,7 @@ my $options = {
                 enabled => 1,
               };
 
-$driver2 = WebGUI::Shop::ShipDriver::USPSInternational->create($session, $options);
+$driver2 = WebGUI::Shop::ShipDriver::USPSInternational->new($session, $options);
 addToCleanup($driver2);
 
 isa_ok($driver2, 'WebGUI::Shop::ShipDriver::USPSInternational');
@@ -183,12 +156,13 @@ undef $driver2;
 #
 #######################################################################
 
-my $driver = WebGUI::Shop::ShipDriver::USPSInternational->create($session, {
+my $driver = WebGUI::Shop::ShipDriver::USPSInternational->new($session, {
     label    => 'Shipping from Shawshank',
     enabled  => 1,
 });
 addToCleanup($driver);
 
+my $e;
 eval { $driver->calculate() };
 $e = Exception::Class->caught();
 isa_ok($e, 'WebGUI::Error::InvalidParam', 'calculate throws an exception when no userId');

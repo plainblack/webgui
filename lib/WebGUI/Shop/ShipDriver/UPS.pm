@@ -1,17 +1,171 @@
 package WebGUI::Shop::ShipDriver::UPS;
 
 use strict;
-use base qw/WebGUI::Shop::ShipDriver/;
+use Moose;
+use WebGUI::Definition::Shop;
+extends qw/WebGUI::Shop::ShipDriver/;
 use WebGUI::Exception;
 use WebGUI::Exception::Shop;
 use XML::Simple;
 use LWP;
 use Tie::IxHash;
 use Locales; 
-use Class::InsideOut qw/ :std /;
 use Data::Dumper;
 
-public testMode => my %testMode;
+#public testMode => my %testMode;
+
+define pluginName => [qw/UPS ShipDriver_UPS/];
+property instructions => (
+            fieldType     => 'readOnly',
+            label         => ['instructions', 'ShipDriver_UPS'],
+            builder       => '_instructions_default',
+            lazy          => 1,
+            noFormProcess => 1,
+         );
+sub _instructions_default {
+    my $session = shift->session;
+    my $i18n = WebGUI::International->new($session, 'ShipDriver_UPS');
+    return $i18n->get('ups instructions');
+}
+property userId => (
+            fieldType    => 'text',
+            label        => ['userid', 'ShipDriver_UPS'],
+            hoverHelp    => ['userid help', 'ShipDriver_UPS'],
+            default      => '',
+         );
+property password => (
+            fieldType    => 'password',
+            label        => ['password', 'ShipDriver_UPS'],
+            hoverHelp    => ['password help', 'ShipDriver_UPS'],
+            default      => '',
+         );
+property licenseNo => (
+            fieldType    => 'text',
+            label        => ['license', 'ShipDriver_UPS'],
+            hoverHelp    => ['license help', 'ShipDriver_UPS'],
+            default      => '',
+         );
+property sourceZip => (
+            fieldType    => 'zipcode',
+            label        => ['source zipcode', 'ShipDriver_UPS'],
+            hoverHelp    => ['source zipcode help', 'ShipDriver_UPS'],
+            default      => '',
+         );
+property sourceCountry => (
+            fieldType    => 'selectBox',
+            label        => ['source country', 'ShipDriver_UPS'],
+            hoverHelp    => ['source country help', 'ShipDriver_UPS'],
+            options      => \&_sourceCountry_options,
+            default      => 'US',
+         );
+sub _sourceCountry_options {
+    my $localizedCountries = Locales->new('en'); ##Note, for future i18n change the locale
+    tie my %localizedCountries, 'Tie::IxHash';
+    %localizedCountries = map { $_ => $_ } grep { !ref $_ } $localizedCountries->get_territory_names();
+    return \%localizedCountries;
+}
+property shipType => (
+            fieldType    => 'selectBox',
+            label        => ['ship type', 'ShipDriver_UPS'],
+            hoverHelp    => ['ship type help', 'ShipDriver_UPS'],
+            options      => \&_shipType_options,
+            default      => 'us domestic',
+            extras       => q{onchange="WebGUI.ShipDriver.UPS.changeServices(this.options[this.selectedIndex].value,'shipService_formId')"},
+         );
+sub _shipType_options {
+    my $session = shift->session;
+    my $i18n = WebGUI::International->new($session, 'ShipDriver_UPS');
+    tie my %shippingTypes, 'Tie::IxHash';
+    ##Other shipping types can be added below, but also need to be handled by the
+    ##javascript.
+    $shippingTypes{'us domestic'}      = $i18n->get('us domestic');
+    $shippingTypes{'us international'} = $i18n->get('us international');
+    return \%shippingTypes;
+}
+property shipService => (
+            fieldType    => 'selectBox',
+            label        => ['ship service', 'ShipDriver_UPS'],
+            hoverHelp    => ['ship service help', 'ShipDriver_UPS'],
+            options      => \&_shippingServices_options,
+            default      => '03',
+         );
+sub _shippingServices_options {
+    my $session = shift->session;
+    my $i18n = WebGUI::International->new($session, 'ShipDriver_UPS');
+    tie my %shippingServices, 'Tie::IxHash';
+    ##Note, these keys are required XML keywords in the UPS XML API.
+    ##It needs a one of every key, regardless of the correct label.
+    ##The right set of options is set via JavaScript in the form.
+    $shippingServices{'01'} = $i18n->get('us domestic 01');
+    $shippingServices{'02'} = $i18n->get('us domestic 02');
+    $shippingServices{'03'} = $i18n->get('us domestic 03');
+    $shippingServices{'07'} = $i18n->get('us international 07');
+    $shippingServices{'08'} = $i18n->get('us international 08');
+    $shippingServices{'11'} = $i18n->get('us international 11');
+    $shippingServices{'12'} = $i18n->get('us domestic 12');
+    $shippingServices{'13'} = $i18n->get('us domestic 13');
+    $shippingServices{'14'} = $i18n->get('us domestic 14');
+    $shippingServices{'54'} = $i18n->get('us international 54');
+    $shippingServices{'59'} = $i18n->get('us domestic 59');
+    $shippingServices{'65'} = $i18n->get('us international 65');
+    return \%shippingServices;
+}
+property pickupType => (
+            fieldType    => 'selectBox',
+            label        => ['pickup type', 'ShipDriver_UPS'],
+            hoverHelp    => ['pickup type help', 'ShipDriver_UPS'],
+            options      => \&_pickupTypes_options,
+            default      => '01',
+         );
+sub _pickupTypes_options {
+    my $session = shift->session;
+    my $i18n = WebGUI::International->new($session, 'ShipDriver_UPS');
+
+    tie my %pickupTypes, 'Tie::IxHash';
+    ##Note, these keys are required XML keywords in the UPS XML API.
+    $pickupTypes{'01'} = $i18n->get('pickup code 01');
+    $pickupTypes{'03'} = $i18n->get('pickup code 03');
+    $pickupTypes{'06'} = $i18n->get('pickup code 06');
+    $pickupTypes{'07'} = $i18n->get('pickup code 07');
+    $pickupTypes{'11'} = $i18n->get('pickup code 11');
+    $pickupTypes{'19'} = $i18n->get('pickup code 19');
+    $pickupTypes{'20'} = $i18n->get('pickup code 20');
+    return \%pickupTypes;
+}
+property customerClassification => (
+            fieldType    => 'selectBox',
+            label        => ['customer classification', 'ShipDriver_UPS'],
+            hoverHelp    => ['customer classification help', 'ShipDriver_UPS'],
+            options      => \&_customerClassification_options,
+            default      => '01',
+         );
+sub _customerClassification_options {
+    my $session = shift->session;
+    my $i18n = WebGUI::International->new($session, 'ShipDriver_UPS');
+
+    tie my %customerClassification, 'Tie::IxHash';
+    ##Note, these keys are required XML keywords in the UPS XML API.
+    $customerClassification{'01'} = $i18n->get('customer classification 01');
+    $customerClassification{'03'} = $i18n->get('customer classification 03');
+    $customerClassification{'04'} = $i18n->get('customer classification 04');
+    return \%customerClassification;
+}
+property residentialIndicator => (
+            fieldType    => 'radioList',
+            label        => ['residential', 'ShipDriver_UPS'],
+            hoverHelp    => ['residential help', 'ShipDriver_UPS'],
+            options      => \&_residentialIndicator_options,
+            default      => 'commercial',
+         );
+sub _residentialIndicator_options {
+    my $session = shift->session;
+    my $i18n = WebGUI::International->new($session, 'ShipDriver_UPS');
+    my %residentialIndicators = (
+        residential => $i18n->get('residential'),
+        commercial  => $i18n->get('commercial'),
+    );
+    return \%residentialIndicators;
+}
 
 =head1 NAME
 
@@ -61,9 +215,9 @@ sub buildXML {
     );
     my $xmlAcc = $xmlHash{AccessRequest};
     $xmlAcc->{'xml:lang'}          = 'en-US';
-    $xmlAcc->{AccessLicenseNumber} = [ $self->get('licenseNo') ]; 
-    $xmlAcc->{UserId}              = [ $self->get('userId')    ];
-    $xmlAcc->{Password}            = [ $self->get('password')  ];
+    $xmlAcc->{AccessLicenseNumber} = [ $self->licenseNo ]; 
+    $xmlAcc->{UserId}              = [ $self->userId    ];
+    $xmlAcc->{Password}            = [ $self->password  ];
     my $localizedCountry = Locales->new('en');
     my $xml = XMLout(\%xmlHash,
         KeepRoot    => 1,
@@ -87,16 +241,16 @@ sub buildXML {
 #       RequestOption => [ 'shop' ],
     };
     $xmlRate->{PickupType} = {
-        Code => [ $self->get('pickupType') ],
+        Code => [ $self->pickupType ],
     };
     $xmlRate->{CustomerClassification} = {
-        Code => [ $self->get('customerClassification') ],
+        Code => [ $self->customerClassification ],
     };
     $xmlRate->{Shipment} = {
         Shipper => {
             Address => [ {
-                PostalCode  => [ $self->get('sourceZip') ],
-                CountryCode => [ $localizedCountry->get_code_from_territory($self->get('sourceCountry')) ],
+                PostalCode  => [ $self->sourceZip ],
+                CountryCode => [ $localizedCountry->get_code_from_territory($self->sourceCountry) ],
             }, ],
         },
         ShipTo => {
@@ -106,11 +260,11 @@ sub buildXML {
             } ],
         },
         Service => {
-            Code => [ $self->get('shipService') ],
+            Code => [ $self->shipService ],
         },
         Package => [],
     };
-    if ($self->get('residentialIndicator') eq 'residential') {
+    if ($self->residentialIndicator eq 'residential') {
         $xmlRate->{Shipment}->{ShipTo}->{Address}->[0]->{ResidentialAddressIndicator} = [''];
     }
     my $packHash = $xmlRate->{Shipment}->{Package};
@@ -171,19 +325,19 @@ costs are assessed.
 
 sub calculate {
     my ($self, $cart) = @_;
-    if (! $self->get('sourceZip')) {
+    if (! $self->sourceZip) {
         WebGUI::Error::InvalidParam->throw(error => q{Driver configured without a source zipcode.});
     }
-    if (! $self->get('sourceCountry')) {
+    if (! $self->sourceCountry) {
         WebGUI::Error::InvalidParam->throw(error => q{Driver configured without a source country.});
     }
-    if (! $self->get('userId')) {
+    if (! $self->userId) {
         WebGUI::Error::InvalidParam->throw(error => q{Driver configured without a UPS userId.});
     }
-    if (! $self->get('password')) {
+    if (! $self->password) {
         WebGUI::Error::InvalidParam->throw(error => q{Driver configured without a UPS password.});
     }
-    if (! $self->get('licenseNo')) {
+    if (! $self->licenseNo) {
         WebGUI::Error::InvalidParam->throw(error => q{Driver configured without a UPS license number.});
     }
     my $cost = 0;
@@ -246,163 +400,6 @@ sub _calculateFromXML {
 
 #-------------------------------------------------------------------
 
-=head2 definition ( $session )
-
-This subroutine returns an arrayref of hashrefs, used to validate data put into
-the object by the user, and to automatically generate the edit form to show
-the user.
-
-=cut
-
-sub definition {
-    my $class      = shift;
-    my $session    = shift;
-    WebGUI::Error::InvalidParam->throw(error => q{Must provide a session variable})
-        unless ref $session eq 'WebGUI::Session';
-    my $definition = shift || [];
-    my $i18n = WebGUI::International->new($session, 'ShipDriver_UPS');
-
-    tie my %shippingTypes, 'Tie::IxHash';
-    ##Other shipping types can be added below, but also need to be handled by the
-    ##javascript.
-    $shippingTypes{'us domestic'}      = $i18n->get('us domestic');
-    $shippingTypes{'us international'} = $i18n->get('us international');
-
-    tie my %shippingServices, 'Tie::IxHash';
-    ##Note, these keys are required XML keywords in the UPS XML API.
-    ##It needs a one of every key, regardless of the correct label.
-    ##The right set of options is set via JavaScript in the form.
-    $shippingServices{'01'} = $i18n->get('us domestic 01');
-    $shippingServices{'02'} = $i18n->get('us domestic 02');
-    $shippingServices{'03'} = $i18n->get('us domestic 03');
-    $shippingServices{'07'} = $i18n->get('us international 07');
-    $shippingServices{'08'} = $i18n->get('us international 08');
-    $shippingServices{'11'} = $i18n->get('us international 11');
-    $shippingServices{'12'} = $i18n->get('us domestic 12');
-    $shippingServices{'13'} = $i18n->get('us domestic 13');
-    $shippingServices{'14'} = $i18n->get('us domestic 14');
-    $shippingServices{'54'} = $i18n->get('us international 54');
-    $shippingServices{'59'} = $i18n->get('us domestic 59');
-    $shippingServices{'65'} = $i18n->get('us international 65');
-
-    tie my %pickupTypes, 'Tie::IxHash';
-    ##Note, these keys are required XML keywords in the UPS XML API.
-    $pickupTypes{'01'} = $i18n->get('pickup code 01');
-    $pickupTypes{'03'} = $i18n->get('pickup code 03');
-    $pickupTypes{'06'} = $i18n->get('pickup code 06');
-    $pickupTypes{'07'} = $i18n->get('pickup code 07');
-    $pickupTypes{'11'} = $i18n->get('pickup code 11');
-    $pickupTypes{'19'} = $i18n->get('pickup code 19');
-    $pickupTypes{'20'} = $i18n->get('pickup code 20');
-
-    tie my %customerClassification, 'Tie::IxHash';
-    ##Note, these keys are required XML keywords in the UPS XML API.
-    $customerClassification{'01'} = $i18n->get('customer classification 01');
-    $customerClassification{'03'} = $i18n->get('customer classification 03');
-    $customerClassification{'04'} = $i18n->get('customer classification 04');
-
-    my $localizedCountries = Locales->new('en'); ##Note, for future i18n change the locale
-    tie my %localizedCountries, 'Tie::IxHash';
-    %localizedCountries = map { $_ => $_ } grep { !ref $_ } $localizedCountries->get_territory_names();
-
-    tie my %fields, 'Tie::IxHash';
-    %fields = (
-        instructions => {
-            fieldType     => 'readOnly',
-            label         => $i18n->get('instructions'),
-            defaultValue  => $i18n->get('ups instructions'),
-            noFormProcess => 1,
-        },
-        userId => {
-            fieldType    => 'text',
-            label        => $i18n->get('userid'),
-            hoverHelp    => $i18n->get('userid help'),
-            defaultValue => '',
-        },
-        password => {
-            fieldType    => 'password',
-            label        => $i18n->get('password'),
-            hoverHelp    => $i18n->get('password help'),
-            defaultValue => '',
-        },
-        licenseNo => {
-            fieldType    => 'text',
-            label        => $i18n->get('license'),
-            hoverHelp    => $i18n->get('license help'),
-            defaultValue => '',
-        },
-        sourceZip => {
-            fieldType    => 'zipcode',
-            label        => $i18n->get('source zipcode'),
-            hoverHelp    => $i18n->get('source zipcode help'),
-            defaultValue => '',
-        },
-        sourceCountry => {
-            fieldType    => 'selectBox',
-            label        => $i18n->get('source country'),
-            hoverHelp    => $i18n->get('source country help'),
-            options      => \%localizedCountries,
-            defaultValue => 'US',
-        },
-        shipType => {
-            fieldType    => 'selectBox',
-            label        => $i18n->get('ship type'),
-            hoverHelp    => $i18n->get('ship type help'),
-            options      => \%shippingTypes,
-            defaultValue => 'us domestic',
-            extras       => q{onchange="WebGUI.ShipDriver.UPS.changeServices(this.options[this.selectedIndex].value,'shipService_formId')"},
-        },
-        shipService => {
-            fieldType    => 'selectBox',
-            label        => $i18n->get('ship service'),
-            hoverHelp    => $i18n->get('ship service help'),
-            options      => \%shippingServices,
-            defaultValue => '03',
-        },
-        pickupType => {
-            fieldType    => 'selectBox',
-            label        => $i18n->get('pickup type'),
-            hoverHelp    => $i18n->get('pickup type help'),
-            options      => \%pickupTypes,
-            defaultValue => '01',
-        },
-        customerClassification => {
-            fieldType    => 'selectBox',
-            label        => $i18n->get('customer classification'),
-            hoverHelp    => $i18n->get('customer classification help'),
-            options      => \%customerClassification,
-            defaultValue => '01',
-        },
-        residentialIndicator => {
-            fieldType    => 'radioList',
-            label        => $i18n->get('residential'),
-            hoverHelp    => $i18n->get('residential help'),
-            options      => {
-                residential => $i18n->get('residential'),
-                commercial  => $i18n->get('commercial'),
-            },
-            defaultValue => 'commercial',
-        },
-##Note, if a flat fee is added to this driver, then according to the license
-##terms the website must display a note to the user (shop customer) that additional
-##fees have been added.
-#        flatFee => {
-#            fieldType    => 'float',
-#            label        => $i18n->get('flatFee'),
-#            hoverHelp    => $i18n->get('flatFee help'),
-#            defaultValue => 0,
-#        },
-    );
-    my %properties = (
-        name        => 'UPS',
-        properties  => \%fields,
-    );
-    push @{ $definition }, \%properties;
-    return $class->SUPER::definition($session, $definition);
-}
-
-#-------------------------------------------------------------------
-
 =head2 _doXmlRequest ( $xml )
 
 Contact the UPS website and submit the XML for a shipping rate lookup.
@@ -421,13 +418,7 @@ sub _doXmlRequest {
     $userAgent->env_proxy;
     $userAgent->agent('WebGUI');
     #
-    my $url;
-    if ($self->testMode) {
-        $url = 'https://wwwcie.ups.com/ups.app/xml/Rate';
-    }
-    else {
-        $url = 'https://wwwcie.ups.com/ups.app/xml/Rate';
-    }
+    my $url = 'https://wwwcie.ups.com/ups.app/xml/Rate';
     my $request = HTTP::Request->new(POST => $url);
 	$request->content_type( 'text/xml' );
 	$request->content( $xml );

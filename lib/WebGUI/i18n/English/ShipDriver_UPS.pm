@@ -290,6 +290,12 @@ our $I18N = {
         context => q|Label for a type of shipping from the UPS.|,
     },
 
+    'UPS' => {
+        message => q|UPS|,
+        lastUpdated => 1242166045,
+        context => q|Label for the plugin, the acronym United Parcel Service|,
+    },
+
 };
 
 1;

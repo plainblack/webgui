@@ -29,93 +29,12 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 19;
-plan tests => 1 + $tests;
+plan tests => 17;
 
 #----------------------------------------------------------------------------
 # put your tests here
 
 use_ok('WebGUI::Shop::ShipDriver::FlatRate');
-
-#######################################################################
-#
-# definition
-#
-#######################################################################
-
-my $definition;
-my $e; ##Exception variable, used throughout the file
-
-eval { $definition = WebGUI::Shop::ShipDriver::FlatRate->definition(); };
-$e = Exception::Class->caught();
-isa_ok($e, 'WebGUI::Error::InvalidParam', 'definition takes an exception to not giving it a session variable');
-cmp_deeply(
-    $e,
-    methods(
-        error => 'Must provide a session variable',
-    ),
-    'definition: requires a session variable',
-);
-
-
-$definition = WebGUI::Shop::ShipDriver::FlatRate->definition($session);
-
-cmp_deeply(
-    $definition,
-    [ {
-        name => 'Flat Rate',
-        properties => {
-            flatFee => {
-                fieldType => 'float',
-                label => ignore(),
-                hoverHelp => ignore(),
-                defaultValue => 0,
-            },
-            percentageOfPrice => {
-                fieldType => 'float',
-                label => ignore(),
-                hoverHelp => ignore(),
-                defaultValue => 0,
-            },
-            pricePerWeight => {
-                fieldType => 'float',
-                label => ignore(),
-                hoverHelp => ignore(),
-                defaultValue => 0,
-            },
-            pricePerItem => {
-                fieldType => 'float',
-                label => ignore(),
-                hoverHelp => ignore(),
-                defaultValue => 0,
-            },
-        }
-    },
-    {
-        name => 'Shipper Driver',
-        properties => {
-            label => {
-                fieldType => 'text',
-                label => ignore(),
-                hoverHelp => ignore(),
-                defaultValue => undef,
-            },
-            enabled => {
-                fieldType => 'yesNo',
-                label => ignore(),
-                hoverHelp => ignore(),
-                defaultValue => 1,
-            },
-            groupToUse => {
-                fieldType => 'group',
-                label => ignore(),
-                hoverHelp => ignore(),
-                defaultValue => 7,
-            },
-        }
-    } ],
-    'Definition returns an array of hashrefs',
-);
 
 #######################################################################
 #
@@ -132,7 +51,9 @@ my $options = {
                 pricePerItem      => 0.1,
               };
 
-my $driver2 = WebGUI::Shop::ShipDriver::FlatRate->create($session, $options);
+my $driver2 = WebGUI::Shop::ShipDriver::FlatRate->new($session, $options);
+$driver2->write;
+WebGUI::Test->addToCleanup($driver2);
 
 isa_ok($driver2, 'WebGUI::Shop::ShipDriver::FlatRate');
 
@@ -184,10 +105,6 @@ cmp_deeply(
             type => 'submit',
         },
         {
-            name => 'driverId',
-            type => 'hidden',
-        },
-        {
             name => 'shop',
             type => 'hidden',
         },
@@ -197,6 +114,10 @@ cmp_deeply(
         },
         {
             name => 'do',
+            type => 'hidden',
+        },
+        {
+            name => 'driverId',
             type => 'hidden',
         },
         {
@@ -306,7 +227,7 @@ $options = {
     pricePerItem      => 10,
 };
 
-my $driver = WebGUI::Shop::ShipDriver::FlatRate->create($session, $options);
+my $driver = WebGUI::Shop::ShipDriver::FlatRate->new($session, $options);
 WebGUI::Test->addToCleanup($driver);
 
 my $cart = WebGUI::Shop::Cart->newBySession($session);
@@ -372,7 +293,6 @@ my $boughtCar = $car->addToCart($car->getCollateral('variantsJSON', 'variantId',
 my $firstKey  = $key->addToCart($key->getCollateral('variantsJSON', 'variantId', $metalKey));
 is($driver->calculate($cart), 2, 'shipsSeparately: returns two, one for ships separately, one for ships bundled');
 
-diag $boughtCar->getSku->getMaxAllowedInCart;
 $boughtCar->adjustQuantity();
 is($driver->calculate($cart), 2, '... returns two, one for ships separately, one for ships bundled, even for two items');
 

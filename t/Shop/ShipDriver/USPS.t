@@ -23,7 +23,7 @@ use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
 use WebGUI::Shop::ShipDriver::USPS;
 
-plan tests => 69;
+plan tests => 66;
 
 #----------------------------------------------------------------------------
 # Init
@@ -113,34 +113,7 @@ foreach my $asset ($bible, $rockHammer) {
 
 #######################################################################
 #
-# definition
-#
-#######################################################################
-
-my $definition;
-my $e; ##Exception variable, used throughout the file
-
-eval { $definition = WebGUI::Shop::ShipDriver::USPS->definition(); };
-$e = Exception::Class->caught();
-isa_ok($e, 'WebGUI::Error::InvalidParam', 'definition takes an exception to not giving it a session variable');
-cmp_deeply(
-    $e,
-    methods(
-        error => 'Must provide a session variable',
-    ),
-    '... checking error message',
-);
-
-
-isa_ok(
-    $definition = WebGUI::Shop::ShipDriver::USPS->definition($session),
-    'ARRAY'
-);
-
-
-#######################################################################
-#
-# create
+# new
 #
 #######################################################################
 
@@ -149,7 +122,7 @@ my $options = {
                 enabled => 1,
               };
 
-$driver2 = WebGUI::Shop::ShipDriver::USPS->create($session, $options);
+$driver2 = WebGUI::Shop::ShipDriver::USPS->new($session, $options);
 addToCleanup($driver2);
 
 isa_ok($driver2, 'WebGUI::Shop::ShipDriver::USPS');
@@ -161,7 +134,7 @@ isa_ok($driver2, 'WebGUI::Shop::ShipDriver');
 #
 #######################################################################
 
-is (WebGUI::Shop::ShipDriver::USPS->getName($session), 'U.S. Postal Service', 'getName returns the human readable name of this driver');
+is (WebGUI::Shop::ShipDriver::USPS->getName($session), 'United States Postal Service', 'getName returns the human readable name of this driver');
 
 #######################################################################
 #
@@ -183,13 +156,14 @@ undef $driver2;
 #
 #######################################################################
 
-my $driver = WebGUI::Shop::ShipDriver::USPS->create($session, {
+my $driver = WebGUI::Shop::ShipDriver::USPS->new($session, {
     label    => 'Shipping from Shawshank',
     enabled  => 1,
     shipType => 'PARCEL',
 });
 addToCleanup($driver);
 
+my $e;
 eval { $driver->calculate() };
 $e = Exception::Class->caught();
 isa_ok($e, 'WebGUI::Error::InvalidParam', 'calculate throws an exception when no zipcode has been set');

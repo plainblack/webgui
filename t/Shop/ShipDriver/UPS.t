@@ -37,7 +37,7 @@ $session->user({user => $user});
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 41;
+plan tests => 38;
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -114,33 +114,6 @@ foreach my $asset($rockHammer, $bible, $feather) {
 
 #######################################################################
 #
-# definition
-#
-#######################################################################
-
-my $definition;
-my $e; ##Exception variable, used throughout the file
-
-eval { $definition = WebGUI::Shop::ShipDriver::UPS->definition(); };
-$e = Exception::Class->caught();
-isa_ok($e, 'WebGUI::Error::InvalidParam', 'definition takes an exception to not giving it a session variable');
-cmp_deeply(
-    $e,
-    methods(
-        error => 'Must provide a session variable',
-    ),
-    '... checking error message',
-);
-
-
-isa_ok(
-    $definition = WebGUI::Shop::ShipDriver::UPS->definition($session),
-    'ARRAY'
-);
-
-
-#######################################################################
-#
 # create
 #
 #######################################################################
@@ -150,7 +123,7 @@ my $options = {
                 enabled => 1,
               };
 
-$driver = WebGUI::Shop::ShipDriver::UPS->create($session, $options);
+$driver = WebGUI::Shop::ShipDriver::UPS->new($session, $options);
 
 isa_ok($driver, 'WebGUI::Shop::ShipDriver::UPS');
 isa_ok($driver, 'WebGUI::Shop::ShipDriver');
@@ -183,7 +156,9 @@ undef $driver;
 #
 #######################################################################
 
-$driver = WebGUI::Shop::ShipDriver::UPS->create($session, {
+my $e;
+
+$driver = WebGUI::Shop::ShipDriver::UPS->new($session, {
     label    => 'Shipping from Shawshank',
     enabled  => 1,
     shipType => 'PARCEL',
@@ -201,9 +176,8 @@ cmp_deeply(
     '... checking error message',
 );
 
-my $properties = $driver->get();
-$properties->{sourceZip} = '97123';
-$driver->update($properties);
+$driver->sourceZip(97123);
+$driver->sourceCountry('');
 eval { $driver->calculate() };
 $e = Exception::Class->caught();
 isa_ok($e, 'WebGUI::Error::InvalidParam', 'calculate throws an exception when no source country');
@@ -215,9 +189,7 @@ cmp_deeply(
     '... checking error message',
 );
 
-$properties = $driver->get();
-$properties->{sourceCountry} = 'United States';
-$driver->update($properties);
+$driver->sourceCountry('US');
 eval { $driver->calculate() };
 $e = WebGUI::Error->caught();
 isa_ok($e, 'WebGUI::Error::InvalidParam', 'calculate throws an exception when no userId');
@@ -229,9 +201,7 @@ cmp_deeply(
     '... checking error message',
 );
 
-$properties = $driver->get();
-$properties->{userId} = 'Me';
-$driver->update($properties);
+$driver->userId('Me');
 eval { $driver->calculate() };
 $e = Exception::Class->caught();
 isa_ok($e, 'WebGUI::Error::InvalidParam', 'calculate throws an exception when no password');
@@ -243,9 +213,7 @@ cmp_deeply(
     '... checking error message',
 );
 
-$properties = $driver->get();
-$properties->{password} = 'knock knock';
-$driver->update($properties);
+$driver->password('knock knock');
 eval { $driver->calculate() };
 $e = Exception::Class->caught();
 isa_ok($e, 'WebGUI::Error::InvalidParam', 'calculate throws an exception when no license number');
@@ -353,19 +321,17 @@ if (! $license) {
     $license = "bogey";
 }
 
-$properties = $driver->get();
-$properties->{userId}                 = $userId;
-$properties->{password}               = $password;
-$properties->{licenseNo}              = $license;
-$properties->{sourceZip}              = '97123';
-$properties->{sourceCountry}          = 'United States';
-$properties->{shipService}            = '03';
-$properties->{pickupType}             = '01';
-$properties->{customerClassification} = '04';
-$properties->{residentialIndicator}   = 'residential';
-$driver->update($properties);
+$driver->userId($userId);
+$driver->password($password);
+$driver->licenseNo($license);
+$driver->sourceZip('97123');
+$driver->sourceCountry('United States');
+$driver->shipService('03');
+$driver->pickupType('01');
+$driver->customerClassification('04');
+$driver->residentialIndicator('residential');
 
-$driver->testMode(1);
+#$driver->testMode(1);
 
 my $rockItem = $rockHammer->addToCart($rockHammer->getCollateral('variantsJSON', 'variantId', $smallHammer));
 my @shippableUnits = $driver->_getShippableUnits($cart);
