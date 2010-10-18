@@ -325,7 +325,7 @@ sub epochToHuman {
 		"d" => "d",
 		"D" => "_varday_",
 		"h" => "I",
-		"H" => "l",
+		"H" => "_varhour_",
 		"j" => "H",
 		"J" => "k",
 		"m" => "m",
@@ -351,11 +351,15 @@ sub epochToHuman {
 	$output = $dt->strftime($output);
 	
   #--- %M
-	$temp = int($dt->month);
+	$temp = $dt->month;
 	$output =~ s/\%_varmonth_/$temp/g;
   #-- %D
-	$temp = int($dt->day);
+	$temp = $dt->day;
 	$output =~ s/\%_varday_/$temp/g;
+  #-- %H, variable digit hour, 12 hour clock
+	$temp = $dt->hour;
+    $temp -= 12 if ($temp > 12); 
+	$output =~ s/\%_varhour_/$temp/g;
   #--- return
 	return $output;
 }
