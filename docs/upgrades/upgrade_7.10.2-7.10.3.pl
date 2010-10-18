@@ -32,6 +32,7 @@ my $session = start(); # this line required
 
 # upgrade functions go here
 pruneInboxMessagesFromDeletedUsers($session);
+addTemplateToNotifyAboutVersionTag($session);
 
 finish($session); # this line required
 
@@ -56,6 +57,27 @@ EOSQL
         if ($message) {
             $message->delete;
         }
+    }
+    print "...DONE!\n" unless $quiet;
+}
+
+
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub addTemplateToNotifyAboutVersionTag {
+    my $session = shift;
+    print "\tAdd template to Notify About Version Tag workflow activities." unless $quiet;
+    use WebGUI::Workflow::Activity;
+    use WebGUI::Workflow::Activity::NotifyAboutVersionTag;
+    my $templateId = WebGUI::Workflow::Activity::NotifyAboutVersionTag->definition($session)->[0]->{properties}->{templateId}->{defaultValue};
+    my $activityList = $session->db->read(q|select activityId from WorkflowActivity|);
+    while (my ($activityId) = $activityList->array) {
+        my $activity = WebGUI::Workflow::Activity->new($session, $activityId);
+        next unless $activity;
+        next unless $activity->isa('WebGUI::Workflow::Activity::NotifyAboutVersionTag')
+                 || $activity->isa('WebGUI::Workflow::Activity::RequestApprovalForVersionTag')
+                  ;
+        $activity->set('templateId', $templateId);
     }
     print "...DONE!\n" unless $quiet;
 }
