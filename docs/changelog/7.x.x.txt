@@ -8,6 +8,7 @@
  - fixed #11900: Request Approval for Version Tag Workflow activity can't select --Continue with this workflow
  - fixed #11898: String eval used in Image::Graph
  - fixed #11913: Editing the survey doesn't work
+ - fixed #11915: Date macro returns hour value w/ leading space
 
 7.10.2
  - fixed #11884: Editing Templates impossible / Code editor not loaded
