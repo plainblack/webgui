@@ -28,6 +28,7 @@ use Apache2::RequestUtil ();
 use Apache2::ServerUtil ();
 use APR::Request::Apache2;
 use MIME::Base64 ();
+use Scalar::Util qw/blessed/;
 use WebGUI::Config;
 use WebGUI::Pluggable;
 use WebGUI::Session;
@@ -94,7 +95,13 @@ sub authen {
 	}
 
 	$config ||= WebGUI::Config->new($server->dir_config('WebguiRoot'),$request->dir_config('WebguiConfig'));
-	my $cookies = APR::Request::Apache2->handle($request)->jar();
+	my $cookies = eval { APR::Request::Apache2->handle($request)->jar(); };
+    if (blessed $@ && $@->isa('APR::Request::Error')) {
+        $cookies = $@->jar;
+    }
+    else {
+        $cookies = {};
+    }
    
 	# determine session id
 	my $sessionId = $cookies->{$config->getCookieName};
