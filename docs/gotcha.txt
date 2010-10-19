@@ -7,6 +7,14 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+7.10.3
+--------------------------------------------------------------------
+     * In the Collaboration System, previously the Group to Post group
+       was also allowed to view the CS.  This made it difficult to
+       make the CS not viewable to regular users, so the behavior was
+       removed in 7.10.3.  If your site depended on the Group To Post being
+       able to view the CS, then make the it a sub-group of Group To View.
+
 7.10.2
 --------------------------------------------------------------------
      * The URL used by Display Message on Login always returns the user to 
