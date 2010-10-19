@@ -735,8 +735,9 @@ Settings screen, displayed as hoverhelp.|,
 	},
 
 	'recover password email text1' => {
-		message => q|We have received your request to change the password for |,
+		message => q|We have received your request to change the password for %s.|,
 		lastUpdated => 1189780432,
+        context => q|%s is the URL of the site|,
 	},
 	
 	'recover password email text2' => {
@@ -823,6 +824,31 @@ Settings screen, displayed as hoverhelp.|,
         lastUpdated => 0,
         context => q|Description of the webguiUseEmailAsUsername field, used as hoverhelp on the Auth tab of the Edit Settings screen.|,
     },
+
+    'Password Recovery Email Template' => {
+        message     => 'Password Recovery Email Template',
+        lastUpdated => 0,
+        context => q|Label in the auth settings|,
+    },
+
+    'password recovery email template help' => {
+        message     => 'Choose a template to style the emails sent out for recovering passwords',
+        lastUpdated => 0,
+        context => q|Label in the auth settings|,
+    },
+
+    'recovery email template title' => {
+        message     => 'WebGUI Authentication Password Recovery Email Template',
+        lastUpdated => 0,
+        context => q|template help|,
+    },
+
+    'recoverPasswordUrl' => {
+        message     => 'The URL for the user to visit to reset their password.',
+        lastUpdated => 0,
+        context => q|template help|,
+    },
+
 };
 
 1;
