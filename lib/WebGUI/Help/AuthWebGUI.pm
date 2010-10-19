@@ -129,6 +129,16 @@ our $HELP = {
         related => []
     },
 
+    'webgui authentication password recovery email template' => {
+        title     => 'recovery email template title',
+        body      => '',
+        variables => [
+            { 'name' => 'recoverPasswordUrl',    },
+        ],
+        fields  => [],
+        related => []
+    },
+
     'webgui authentication password expiration template' => {
         title     => 'expired template title',
         body      => '',

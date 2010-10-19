@@ -34,6 +34,7 @@ my $session = start(); # this line required
 # upgrade functions go here
 pruneInboxMessagesFromDeletedUsers($session);
 addTemplateToNotifyAboutVersionTag($session);
+addPasswordRecoveryEmailTemplate($session);
 
 finish($session); # this line required
 
@@ -79,6 +80,16 @@ sub addTemplateToNotifyAboutVersionTag {
                   ;
         $activity->set('templateId', $templateId);
     }
+    print "...DONE!\n" unless $quiet;
+}
+
+
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub addPasswordRecoveryEmailTemplate {
+    my $session = shift;
+    print "\tAdd a template for the password recovery email." unless $quiet;
+    $session->setting->add('webguiPasswordRecoveryEmailTemplate', 'sK_0zVw4kwdJ1sqREIsSzA');
     print "...DONE!\n" unless $quiet;
 }
 
