@@ -2,6 +2,7 @@
  - fixed #11913: Editing the survey doesn't work
  - fixed #11915: Date macro returns hour value w/ leading space
  - fixed #11901: NotifyAboutVersionTag includes URL, even when inappropriate
+ - fixed #11902: forums bug
 
 7.9.16
  - fixed #11789: Date form reports 1 day earlier on Edit for the time zone corresponding to Europe/Berlin.
