@@ -183,7 +183,11 @@ Renders an HTML area field.
 
 sub toHtml {
 	my $self = shift;
-	my $i18n = WebGUI::International->new($self->session);
+    ##Do not display a rich editor on any mobile browser.
+    if ($self->session->style->useMobileStyle) {
+        return $self->SUPER::toHtml;
+    }
+    my $i18n = WebGUI::International->new($self->session);
 	my $richEdit = $self->{_richEdit};
     $richEdit ||= WebGUI::Asset::RichEdit->new($self->session,$self->get("richEditId")); 
 	if (defined $richEdit) {
