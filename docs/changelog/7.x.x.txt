@@ -4,6 +4,7 @@
  - fixed #11901: NotifyAboutVersionTag includes URL, even when inappropriate
  - fixed #11902: forums bug
  - fixed #11912: Corrupt cookie causes server 500 errors
+ - fixed #11919: Survey rendering with section text
 
 7.9.16
  - fixed #11789: Date form reports 1 day earlier on Edit for the time zone corresponding to Europe/Berlin.
