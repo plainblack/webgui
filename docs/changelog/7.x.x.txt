@@ -12,6 +12,7 @@
  - fixed #11901: NotifyAboutVersionTag includes URL, even when inappropriate
  - fixed #11902: forums bug
  - fixed #11912: Corrupt cookie causes server 500 errors
+ - fixed #11919: Survey rendering with section text
 
 7.10.2
  - fixed #11884: Editing Templates impossible / Code editor not loaded
