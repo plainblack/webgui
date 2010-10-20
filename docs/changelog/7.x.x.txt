@@ -7,6 +7,7 @@
  - fixed #11919: Survey rendering with section text
  - fixed #11916: Collaboration System security
  - fixed #11918: Make password recovery email templatable
+ - fixed #11920: Defaul DataForm emails missing entries.
 
 7.9.16
  - fixed #11789: Date form reports 1 day earlier on Edit for the time zone corresponding to Europe/Berlin.
