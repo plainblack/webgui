@@ -1,5 +1,6 @@
 7.10.4
  - fixed #11920: Defaul DataForm emails missing entries.
+ - fixed #11921: DataForm emails contain 1 table per field
 
 7.10.3
  - fixed #11903: Unnecessary debug in Thingy

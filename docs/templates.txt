@@ -3,9 +3,15 @@ templates, you will need to apply these changes manually to your copies.
 
 7.10.3
 
+  * DataForm email template - default_email
+    Do HTML escaping on field values.  Move table tags outside of the loops so only one table
+    is generated.
+
+7.10.3
+
   * Carousel Default Template - root/import/carousel/carousel-default
     Add a height parameter to the template.
-    
+
   * survey.css
     Removed relative positioning and offset from top.
 
@@ -15,7 +21,6 @@ templates, you will need to apply these changes manually to your copies.
 
   * root/import/workflow-activity-templates
     Added a folder to hold the assorted Workflow Activity templates.
-
 
 7.10.2
 
