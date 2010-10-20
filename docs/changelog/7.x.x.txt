@@ -15,6 +15,7 @@
  - fixed #11919: Survey rendering with section text
  - fixed #11916: Collaboration System security
  - fixed #11918: Make password recovery email templatable
+ - fixed #11905: CrystalX nav breaks with 3rd level assets
 
 7.10.2
  - fixed #11884: Editing Templates impossible / Code editor not loaded
