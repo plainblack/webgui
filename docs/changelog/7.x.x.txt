@@ -1,3 +1,5 @@
+7.10.4
+
 7.10.3
  - fixed #11903: Unnecessary debug in Thingy
  - fixed #11908: Inbox messages linger after deleting a user
