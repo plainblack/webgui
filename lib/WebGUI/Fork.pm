@@ -3,6 +3,7 @@ package WebGUI::Fork;
 use warnings;
 use strict;
 
+use File::Spec;
 use JSON;
 use POSIX;
 use Config;
@@ -277,7 +278,7 @@ sub forkAndExec {
     my $id    = $self->getId;
     my $class = ref $self;
     my $json  = JSON::encode_json($request);
-    my @inc   = map {"-I$_"} @INC;
+    my @inc   = map {"-I$_"} map { File::Spec->rel2abs($_) } grep { !ref } @INC;
     my @argv  = (@inc, "-M$class", "-e$class->runCmd()" );
     $class->daemonize(
         $json,
