@@ -51,11 +51,11 @@ The normal way to use WebGUI::Crud is to create a subclass that defines a specif
 	$definition->{tableKey} = 'ambassadorId';
 	$definition->{properties}{name} = {
 			fieldType		=> 'text',
-			defaultValue	=> undef,
+			default	=> undef,
 		};
 	$definition->{properties}{emailAddress} = {
 			fieldType		=> 'email',
-			defaultValue	=> undef,
+			default	=> undef,
 		};
 	return $definition;
  }
@@ -86,7 +86,7 @@ Once you have a crud class, you can use it's methods like this:
  $sequenceKey = WebGUI::Crud::Subclass->meta->sequenceKey($session);
  $tableKey = WebGUI::Crud::Subclass->meta->tableKey($session);
  $tableName = WebGUI::Crud::Subclass->meta->tableName($session);
- $propertiesHashRef = WebGUI::Crud::Subclass->crud_getProperties($session);
+ $propertiesHashRef = WebGUI::Crud::Subclass->meta->get_all_property_list($session);
  $definitionHashRef = WebGUI::Crud::Subclass->crud_definition($session);
 
  $crud = WebGUI::Crud::Subclass->create($session, $properties);
@@ -154,10 +154,9 @@ sub create {
     }
 
 	# initialize
-	my $definition = $class->crud_definition($session);
-	my $tableKey = $class->meta->tableKey($session);
-	my $tableName = $class->meta->tableName($session);
-	my $db = $session->db;
+	my $tableKey  = $class->meta->tableKey();
+	my $tableName = $class->meta->tableName();
+	my $db  = $session->db;
 	my $dbh = $db->dbh;
 
 	# get creation date
@@ -165,11 +164,11 @@ sub create {
 	$data->{lastUpdated} = $now;
 
 	# add defaults
-	my $properties = $class->crud_getProperties($session);
+	my $properties = $class->meta->get_all_property_list($session);
 	foreach my $property (keys %{$properties}) {
 	    # set a default value if it's empty or undef (as per L<update>)
         if ($data->{$property} eq "") {
-            $data->{$property} = $properties->{$property}{defaultValue};
+            $data->{$property} = $properties->{$property}{default};
         }
 	}
 
@@ -272,18 +271,18 @@ properties is a hash reference tied to IxHash so that it maintains its order. It
  {
 	companyName	=> {
 		fieldType		=> 'text',
-		defaultValue	=> 'Acme Widgets',
+		default	=> 'Acme Widgets',
 		label			=> 'Company Name',
 		serialize		=> 0,
 	},
 	companyWebSite	=> {
 		fieldType		=> 'url',
-		defaultValue	=> undef,
+		default	=> undef,
 		serialize		=> 0,
 	},
 	presidentUserId	=> {
 		fieldType		=> 'guid',
-		defaultValue	=> undef,
+		default	=> undef,
 		isQueryKey		=> 1,
 	}
  }
@@ -350,10 +349,7 @@ A reference to a WebGUI::Session.
 
 sub crud_getProperties {
 	my ($class, $session) = @_;
-	unless (defined $session && $session->isa('WebGUI::Session')) {
-        WebGUI::Error::InvalidObject->throw(expected=>'WebGUI::Session', got=>(ref $session), error=>'Need a session.');
-    }
-	return $class->crud_definition($session)->{properties};
+    return $class->meta->get_all_property_list;
 }
 
 #-------------------------------------------------------------------
@@ -443,19 +439,19 @@ sub crud_updateTable {
 	}
 
 	# update existing and create new fields
-	my $properties = $class->crud_getProperties($session);
+	my $properties = $class->meta->get_all_property_list($session);
 	foreach my $property (keys %{$properties}) {
 		my $control = WebGUI::Form::DynamicField->new( $session, %{ $properties->{ $property } });
 		my $fieldType = $control->getDatabaseFieldType;
 		my $isKey = $properties->{$property}{isQueryKey};
-		my $defaultValue =  $properties->{$property}{defaultValue};
+		my $default =  $properties->{$property}{default};
         if ($properties->{$property}{serialize}) {
-            $defaultValue = JSON->new->canonical->encode($defaultValue);
+            $default = JSON->new->canonical->encode($default);
         }
-		my $notNullClause = ($isKey || $defaultValue ne "") ? "not null" : "";
+		my $notNullClause = ($isKey || $default ne "") ? "not null" : "";
 		my $defaultClause = '';
         if ($fieldType !~ /(?:text|blob)$/i) {
-            $defaultClause = "default ".$dbh->quote($defaultValue) if ($defaultValue ne "");
+            $defaultClause = "default ".$dbh->quote($default) if ($default ne "");
         }
 		if (exists $tableFields{$property}) {
 			my $changed = 0;
@@ -472,7 +468,7 @@ sub crud_updateTable {
 			$changed = 1 if ($tableFieldType ne $formFieldType);
 			$changed = 1 if ($tableFieldLength ne $formFieldLength);
 			$changed = 1 if ($tableFields{$property}{null} eq "YES" && $isKey);
-			$changed = 1 if ($tableFields{$property}{default} ne $defaultValue);
+			$changed = 1 if ($tableFields{$property}{default} ne $default);
 
 			# modify if necessary
 			if ($changed) {
@@ -820,7 +816,7 @@ sub new {
     }
 
 	# deserialize data
-	my $properties = $class->crud_getProperties($session);
+	my $properties = $class->meta->get_all_property_list($session);
 	foreach my $name (keys %{$properties}) {
 		if ($properties->{$name}{serialize} && $data->{$name} ne "") {
 			$data->{$name} = JSON->new->canonical->decode($data->{$name});
@@ -940,7 +936,7 @@ B<WARNING:> As part of it's validation mechanisms, update() will delete any elem
 #    my $session = $self->session;
 #
 #	# validate incoming data
-#	my $properties = $self->crud_getProperties($session);
+#	my $properties = $self->meta->get_all_property_list($session);
 #    my $dbData = { $self->meta->tableKey($session) => $self->getId };
 #	foreach my $property (keys %{$data}) {
 #
@@ -952,7 +948,7 @@ B<WARNING:> As part of it's validation mechanisms, update() will delete any elem
 #
 #		# set a default value if it's empty or undef
 #        if ($data->{$property} eq "") {
-#            $data->{$property} = $properties->{$property}{defaultValue};
+#            $data->{$property} = $properties->{$property}{default};
 #        }
 #
 #		# serialize if needed
@@ -989,9 +985,9 @@ sub updateFromFormPost {
 	my $session = $self->session;
 	my $form = $session->form;
 	my %data;
-	my $properties = $self->crud_getProperties($session);
+	my $properties = $self->meta->get_all_property_list($session);
 	foreach my $property ($form->param) {
-		$data{$property} = $form->get($property, $properties->{$property}{fieldType}, $properties->{$property}{defaultValue});
+		$data{$property} = $form->get($property, $properties->{$property}{fieldType}, $properties->{$property}{default});
 	}
 	return $self->update(\%data);
 }
