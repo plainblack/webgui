@@ -153,7 +153,7 @@ sub create {
         $session = $someObject->session;
     }
 
-    # validate 
+    # validate
     unless (defined $session && $session->isa('WebGUI::Session')) {
         WebGUI::Error::InvalidObject->throw(expected=>'WebGUI::Session', got=>(ref $session), error=>'Need a session.');
     }
@@ -220,7 +220,7 @@ sub crud_createOrUpdateTable {
 
 =head2 crud_createTable ( session )
 
-A management class method used to create the database table using the crud_definition(). Returns 1 on successful completion. 
+A management class method used to create the database table using the crud_definition(). Returns 1 on successful completion.
 
 =head3 session
 
@@ -453,15 +453,15 @@ sub crud_updateTable {
         }
 		if (exists $tableFields{$property}) {
 			my $changed = 0;
-			
+
 			# parse database table field type
 			$tableFields{$property}{type} =~ m/^(\w+)(\([\d\s,]+\))?$/;
 			my ($tableFieldType, $tableFieldLength) = ($1, $2);
-			
+
 			# parse form field type
 			$fieldType =~ m/^(\w+)(\([\d\s,]+\))?\s*(binary)?$/;
 			my ($formFieldType, $formFieldLength) = ($1, $2);
-			
+
 			# compare table parts to definition
 			$changed = 1 if ($tableFieldType ne $formFieldType);
 			$changed = 1 if ($tableFieldLength ne $formFieldLength);
@@ -485,9 +485,9 @@ sub crud_updateTable {
 	# delete fields that are no longer in the definition
 	foreach my $property (keys %tableFields) {
 		if ($tableFields{$property}{key}) {
-			$db->write("alter table $tableName drop index ".$dbh->quote_identifier($property));	
+			$db->write("alter table $tableName drop index ".$dbh->quote_identifier($property));
 		}
-		$db->write("alter table $tableName drop column ".$dbh->quote_identifier($property));	
+		$db->write("alter table $tableName drop column ".$dbh->quote_identifier($property));
 	}
 	return 1;
 }
@@ -681,12 +681,12 @@ sub getAllSql {
 		foreach my $joint (@{$options->{joinUsing}}) {
 			my ($table) = keys %{$joint};
 			push @joins, " left join ".$dbh->quote_identifier($table)." using (".$dbh->quote_identifier($joint->{$table}).")";
-		}		
+		}
 	}
 	if (exists $options->{join}) {
 		foreach my $thejoin (@{$options->{join}}) {
 			push @joins, " left join ".$thejoin;
-		}		
+		}
 	}
 	$sql .= join(" ", @joins);
 
@@ -704,9 +704,9 @@ sub getAllSql {
 			else {
 				push @params, $value;
 			}
-		}		
+		}
 	}
-	
+
 	# limit to our sequence
 	my $sequenceKey = $class->crud_getSequenceKey($session);
 	if (exists $options->{sequenceKeyValue} && $sequenceKey) {
@@ -725,7 +725,7 @@ sub getAllSql {
 		$order = " order by ".$options->{orderBy};
 	}
 	$sql .= $order;
-	
+
 	# construct a record limit
 	my $limit;
 	if ( exists $options->{limit}) {
@@ -855,7 +855,7 @@ sub reorder {
 	my $tableKey = $self->crud_getTableKey($self->session);
 	my $tableName = $self->crud_getTableName($self->session);
 	my $sequenceKey = $self->crud_getSequenceKey($self->session);
-	my $sequenceKeyValue = $self->get($sequenceKey);	
+	my $sequenceKeyValue = $self->get($sequenceKey);
 	my $i = 1;
 	my $db = $self->session->db;
 	my $dbh = $db->dbh;
