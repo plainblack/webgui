@@ -17,15 +17,14 @@ package WebGUI::Crud;
 
 
 use strict;
-use Class::InsideOut qw(readonly private id register);
+use Moose;
+use Definition::Crud;
 use JSON;
 use Tie::IxHash;
 use Clone qw/clone/;
 use WebGUI::DateTime;
 use WebGUI::Exception;
 
-private objectData => my %objectData;
-readonly session => my %session;
 
 =head1 NAME
 
@@ -370,12 +369,8 @@ A reference to a WebGUI::Session.
 =cut
 
 sub crud_getSequenceKey {
-	my ($class, $session) = @_;
-	unless (defined $session && $session->isa('WebGUI::Session')) {
-        WebGUI::Error::InvalidObject->throw(expected=>'WebGUI::Session', got=>(ref $session), error=>'Need a session.');
-    }
-	my $definition = $class->crud_definition($session);
-	return $definition->{sequenceKey};
+	my ($class) = @_;
+    return $class->meta->sequenceKey;
 }
 
 #-------------------------------------------------------------------
@@ -391,11 +386,8 @@ A reference to a WebGUI::Session.
 =cut
 
 sub crud_getTableName {
-	my ($class, $session) = @_;
-	unless (defined $session && $session->isa('WebGUI::Session')) {
-        WebGUI::Error::InvalidObject->throw(expected=>'WebGUI::Session', got=>(ref $session), error=>'Need a session.');
-    }
-	return $class->crud_definition($session)->{tableName};
+	my ($class) = @_;
+    return $class->meta->tableName;
 }
 
 #-------------------------------------------------------------------
@@ -411,11 +403,8 @@ A reference to a WebGUI::Session.
 =cut
 
 sub crud_getTableKey {
-	my ($class, $session) = @_;
-	unless (defined $session && $session->isa('WebGUI::Session')) {
-        WebGUI::Error::InvalidObject->throw(expected=>'WebGUI::Session', got=>(ref $session), error=>'Need a session.');
-    }
-	return $class->crud_definition($session)->{tableKey};
+	my ($class) = @_;
+    return $class->meta->tableKey;
 }
 
 #-------------------------------------------------------------------
@@ -792,7 +781,8 @@ Returns a guid, this object's unique identifier.
 
 sub getId {
 	my $self = shift;
-	return $objectData{id $self}{$self->crud_getTableKey($self->session)};
+    my $tableKey = $self->meta->tableKey;
+    return $self->$tableKey;
 }
 
 #-------------------------------------------------------------------
@@ -945,46 +935,46 @@ B<WARNING:> As part of it's validation mechanisms, update() will delete any elem
 
 =cut
 
-sub update {
-	my ($self, $data) = @_;
-    my $session = $self->session;
-
-	# validate incoming data
-	my $properties = $self->crud_getProperties($session);
-    my $dbData = { $self->crud_getTableKey($session) => $self->getId };
-	foreach my $property (keys %{$data}) {
-
-		# don't save fields that aren't part of our definition
-		unless (exists $properties->{$property} || $property eq 'lastUpdated') {
-			delete $data->{$property};
-			next;
-		}
-
-		# set a default value if it's empty or undef
-        if ($data->{$property} eq "") {
-            $data->{$property} = $properties->{$property}{defaultValue};
-        }
-
-		# serialize if needed
-		if ($properties->{$property}{serialize} && $data->{$property} ne "") {
-			$dbData->{$property} = JSON->new->canonical->encode($data->{$property});
-		}
-        else {
-            $dbData->{$property} = $data->{$property};
-        }
-	}
-
-	# set last updated
-	$data->{lastUpdated} ||= WebGUI::DateTime->new($session, time())->toDatabase;
-
-	# update memory
-	my $refId = id $self;
-	%{$objectData{$refId}} = (%{$objectData{$refId}}, %{$data});
-
-	# update the database
-	$session->db->setRow($self->crud_getTableName($session), $self->crud_getTableKey($session), $dbData);
-	return 1;
-}
+#sub update {
+#	my ($self, $data) = @_;
+#    my $session = $self->session;
+#
+#	# validate incoming data
+#	my $properties = $self->crud_getProperties($session);
+#    my $dbData = { $self->crud_getTableKey($session) => $self->getId };
+#	foreach my $property (keys %{$data}) {
+#
+#		# don't save fields that aren't part of our definition
+#		unless (exists $properties->{$property} || $property eq 'lastUpdated') {
+#			delete $data->{$property};
+#			next;
+#		}
+#
+#		# set a default value if it's empty or undef
+#        if ($data->{$property} eq "") {
+#            $data->{$property} = $properties->{$property}{defaultValue};
+#        }
+#
+#		# serialize if needed
+#		if ($properties->{$property}{serialize} && $data->{$property} ne "") {
+#			$dbData->{$property} = JSON->new->canonical->encode($data->{$property});
+#		}
+#        else {
+#            $dbData->{$property} = $data->{$property};
+#        }
+#	}
+#
+#	# set last updated
+#	$data->{lastUpdated} ||= WebGUI::DateTime->new($session, time())->toDatabase;
+#
+#	# update memory
+#	my $refId = id $self;
+#	%{$objectData{$refId}} = (%{$objectData{$refId}}, %{$data});
+#
+#	# update the database
+#	$session->db->setRow($self->crud_getTableName($session), $self->crud_getTableKey($session), $dbData);
+#	return 1;
+#}
 
 #-------------------------------------------------------------------
 
