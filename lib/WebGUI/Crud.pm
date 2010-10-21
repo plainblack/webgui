@@ -25,6 +25,44 @@ use Clone qw/clone/;
 use WebGUI::DateTime;
 use WebGUI::Exception;
 
+has session => (
+    is       => 'ro',
+    required => 1,
+)
+
+around BUILDARGS => sub {
+    my $orig  = shift;
+    my $class = shift;
+    if(ref $_[0] eq 'HASH') {
+        ##Standard Moose invocation for creating a new object
+        return $class->$orig(@_);
+    }
+
+    # dynamic recognition of object or session
+    my $session = shift;
+    unless ($session->isa('WebGUI::Session')) {
+        $session = $session->session;
+    }
+
+    my $identifier = shift;
+    if(ref $_[0] eq 'HASH') {
+        ##Creating a new object
+        return $class->$orig(@_);
+    }
+    ##Grabbing an object from the database
+	my $tableKey = $class->meta->tableKey;
+    unless ($session->id->valid($identifier)) {
+        WebGUI::Error::InvalidParam->throw(error=>'need a '.$tableKey);
+    }
+
+	# retrieve object data
+	my $data = $session->db->getRow($class->meta->tableName($session), $tableKey, $identifier);
+	if ($data->{$tableKey} eq '') {
+        WebGUI::Error::ObjectNotFound->throw(error=>'no such '.$tableKey, id=>$identifier);
+    }
+    $data->{session} = $session;
+    return $class->$orig(@_);
+};
 
 =head1 NAME
 
@@ -162,15 +200,6 @@ sub create {
 	# get creation date
 	my $now = WebGUI::DateTime->new($session, time())->toDatabase;
 	$data->{lastUpdated} = $now;
-
-	# add defaults
-	my $properties = $class->meta->get_all_property_list($session);
-	foreach my $property (keys %{$properties}) {
-	    # set a default value if it's empty or undef (as per L<update>)
-        if ($data->{$property} eq "") {
-            $data->{$property} = $properties->{$property}{default};
-        }
-	}
 
 	# determine sequence
 	my $sequenceKey = $class->meta->sequenceKey($session);
@@ -796,40 +825,6 @@ A reference to a WebGUI::Session.
 A guid, the unique identifier for this object.
 
 =cut
-
-sub new {
-	my ($class, $session, $id) = @_;
-	my $tableKey = $class->meta->tableKey($session);
-
-	# validate
-	unless (defined $session && $session->isa('WebGUI::Session')) {
-        WebGUI::Error::InvalidObject->throw(expected=>'WebGUI::Session', got=>(ref $session), error=>'Need a session.');
-    }
-    unless (defined $id && $id =~ m/^[A-Za-z0-9_-]{22}$/) {
-        WebGUI::Error::InvalidParam->throw(error=>'need a '.$tableKey);
-    }
-
-	# retrieve object data
-	my $data = $session->db->getRow($class->meta->tableName($session), $tableKey, $id);
-	if ($data->{$tableKey} eq '') {
-        WebGUI::Error::ObjectNotFound->throw(error=>'no such '.$tableKey, id=>$id);
-    }
-
-	# deserialize data
-	my $properties = $class->meta->get_all_property_list($session);
-	foreach my $name (keys %{$properties}) {
-		if ($properties->{$name}{serialize} && $data->{$name} ne "") {
-			$data->{$name} = JSON->new->canonical->decode($data->{$name});
-		}
-	}
-
-	# set up object
-	my $self = register($class);
-	my $refId = id $self;
-	$objectData{$refId} = $data;
-	$session{$refId} = $session;
-	return $self;
-}
 
 #-------------------------------------------------------------------
 
