@@ -83,9 +83,9 @@ Once you have a crud class, you can use it's methods like this:
 
  use WebGUI::Crud::Subclass;
 
- $sequenceKey = WebGUI::Crud::Subclass->crud_getSequenceKey($session);
- $tableKey = WebGUI::Crud::Subclass->crud_getTableKey($session);
- $tableName = WebGUI::Crud::Subclass->crud_getTableName($session);
+ $sequenceKey = WebGUI::Crud::Subclass->meta->sequenceKey($session);
+ $tableKey = WebGUI::Crud::Subclass->meta->tableKey($session);
+ $tableName = WebGUI::Crud::Subclass->meta->tableName($session);
  $propertiesHashRef = WebGUI::Crud::Subclass->crud_getProperties($session);
  $definitionHashRef = WebGUI::Crud::Subclass->crud_definition($session);
 
@@ -155,8 +155,8 @@ sub create {
 
 	# initialize
 	my $definition = $class->crud_definition($session);
-	my $tableKey = $class->crud_getTableKey($session);
-	my $tableName = $class->crud_getTableName($session);
+	my $tableKey = $class->meta->tableKey($session);
+	my $tableName = $class->meta->tableName($session);
 	my $db = $session->db;
 	my $dbh = $db->dbh;
 
@@ -174,7 +174,7 @@ sub create {
 	}
 
 	# determine sequence
-	my $sequenceKey = $class->crud_getSequenceKey($session);
+	my $sequenceKey = $class->meta->sequenceKey($session);
 	my $clause;
 	my @params;
 	if ($sequenceKey) {
@@ -205,7 +205,7 @@ A reference to a WebGUI::Session.
 
 sub crud_createOrUpdateTable {
     my ( $class, $session ) = @_;
-    my $tableName   = $class->crud_getTableName($session);
+    my $tableName   = $class->meta->tableName($session);
     my $tableExists = $session->db->dbh->do("show tables like '$tableName'");
 
     return ( $tableExists ne '0E0' ? $class->crud_updateTable($session) : $class->crud_createTable($session) );
@@ -227,16 +227,16 @@ sub crud_createTable {
 	my ($class, $session) = @_;
 	my $db = $session->db;
 	my $dbh = $db->dbh;
-	my $tableName = $class->crud_getTableName($session);
+	my $tableName = $class->meta->tableName($session);
 	$class->crud_dropTable($session);
 	$db->write('create table '.$dbh->quote_identifier($tableName).' (
-		'.$dbh->quote_identifier($class->crud_getTableKey($session)).' CHAR(22) binary not null primary key,
+		'.$dbh->quote_identifier($class->meta->tableKey($session)).' CHAR(22) binary not null primary key,
 		sequenceNumber int not null default 1,
 		dateCreated datetime,
 		lastUpdated datetime
 		)');
 	$class->crud_updateTable($session);
-	my $sequenceKey = $class->crud_getSequenceKey($session);
+	my $sequenceKey = $class->meta->sequenceKey($session);
 	if ($sequenceKey) {
 		$db->write('alter table '.$dbh->quote_identifier($tableName).'
 			add index '.$dbh->quote_identifier($sequenceKey).' ('.$dbh->quote_identifier($sequenceKey).')');
@@ -332,7 +332,7 @@ sub crud_dropTable {
     }
 	my $db = $session->db;
 	my $dbh = $db->dbh;
-	$db->write("drop table if exists ".$dbh->quote_identifier($class->crud_getTableName($session)));
+	$db->write("drop table if exists ".$dbh->quote_identifier($class->meta->tableName($session)));
 	return 1;
 }
 
@@ -358,9 +358,9 @@ sub crud_getProperties {
 
 #-------------------------------------------------------------------
 
-=head2 crud_getSequenceKey ( session )
+=head2 meta->sequenceKey ( session )
 
-A management class method that returns just the 'sequenceKey' from crud_definition().
+A management class method that returns just the 'sequenceKey' from the meta class.
 
 =head3 session
 
@@ -368,16 +368,16 @@ A reference to a WebGUI::Session.
 
 =cut
 
-sub crud_getSequenceKey {
+sub meta->sequenceKey {
 	my ($class) = @_;
     return $class->meta->sequenceKey;
 }
 
 #-------------------------------------------------------------------
 
-=head2 crud_getTableName ( session )
+=head2 meta->tableName ( session )
 
-A management class method that returns just the 'tableName' from crud_definition().
+A management class method that returns just the 'tableName'.
 
 =head3 session
 
@@ -385,16 +385,16 @@ A reference to a WebGUI::Session.
 
 =cut
 
-sub crud_getTableName {
+sub meta->tableName {
 	my ($class) = @_;
     return $class->meta->tableName;
 }
 
 #-------------------------------------------------------------------
 
-=head2 crud_getTableKey ( session )
+=head2 meta->tableKey ( session )
 
-A management class method that returns just the 'tableKey' from crud_definition().
+A management class method that returns just the 'tableKey'.
 
 =head3 session
 
@@ -402,7 +402,7 @@ A reference to a WebGUI::Session.
 
 =cut
 
-sub crud_getTableKey {
+sub meta->tableKey {
 	my ($class) = @_;
     return $class->meta->tableKey;
 }
@@ -426,12 +426,12 @@ sub crud_updateTable {
     }
 	my $db = $session->db;
 	my $dbh = $db->dbh;
-	my $tableName = $dbh->quote_identifier($class->crud_getTableName($session));
+	my $tableName = $dbh->quote_identifier($class->meta->tableName($session));
 
 	# find out what fields already exist
 	my %tableFields = ();
 	my $sth = $db->read("DESCRIBE ".$tableName);
-	my $tableKey = $class->crud_getTableKey($session);
+	my $tableKey = $class->meta->tableKey($session);
 	while (my ($col, $type, $null, $key, $default) = $sth->array) {
 		next if ($col ~~ [$tableKey, 'lastUpdated', 'dateCreated','sequenceNumber']);
 		$tableFields{$col} = {
@@ -508,7 +508,7 @@ Deletes this object from the database. Returns 1 on success.
 
 sub delete {
 	my $self = shift;
-	$self->session->db->deleteRow($self->crud_getTableName($self->session), $self->crud_getTableKey($self->session), $self->getId);
+	$self->session->db->deleteRow($self->meta->tableName($self->session), $self->meta->tableKey($self->session), $self->getId);
 	$self->reorder;
 	return 1;
 }
@@ -523,9 +523,9 @@ Moves this object one position closer to the end of its sequence. If the object 
 
 sub demote {
 	my $self = shift;
-	my $tableKey = $self->crud_getTableKey($self->session);
-	my $tableName = $self->crud_getTableName($self->session);
-	my $sequenceKey = $self->crud_getSequenceKey($self->session);
+	my $tableKey = $self->meta->tableKey($self->session);
+	my $tableName = $self->meta->tableName($self->session);
+	my $sequenceKey = $self->meta->sequenceKey($self->session);
 	my @params = ($self->get('sequenceNumber') + 1);
 	my $db = $self->session->db;
 	my $dbh = $db->dbh;
@@ -700,10 +700,10 @@ sub getAllSql {
 
 	# setup
 	my $dbh = $session->db->dbh;
-	my $tableName = $class->crud_getTableName($session);
+	my $tableName = $class->meta->tableName($session);
 
 	# the base query
-	my $sql = "select ".$dbh->quote_identifier($tableName, $class->crud_getTableKey($session))." from ".$dbh->quote_identifier($tableName);
+	my $sql = "select ".$dbh->quote_identifier($tableName, $class->meta->tableKey($session))." from ".$dbh->quote_identifier($tableName);
 
 	# process joins
 	my @joins;
@@ -738,7 +738,7 @@ sub getAllSql {
 	}
 	
 	# limit to our sequence
-	my $sequenceKey = $class->crud_getSequenceKey($session);
+	my $sequenceKey = $class->meta->sequenceKey($session);
 	if (exists $options->{sequenceKeyValue} && $sequenceKey) {
 		push @params, $options->{sequenceKeyValue};
 		push @where, $dbh->quote_identifier($tableName, $sequenceKey)."=?";
@@ -803,7 +803,7 @@ A guid, the unique identifier for this object.
 
 sub new {
 	my ($class, $session, $id) = @_;
-	my $tableKey = $class->crud_getTableKey($session);
+	my $tableKey = $class->meta->tableKey($session);
 
 	# validate
 	unless (defined $session && $session->isa('WebGUI::Session')) {
@@ -814,7 +814,7 @@ sub new {
     }
 
 	# retrieve object data
-	my $data = $session->db->getRow($class->crud_getTableName($session), $tableKey, $id);
+	my $data = $session->db->getRow($class->meta->tableName($session), $tableKey, $id);
 	if ($data->{$tableKey} eq '') {
         WebGUI::Error::ObjectNotFound->throw(error=>'no such '.$tableKey, id=>$id);
     }
@@ -845,9 +845,9 @@ Moves this object one position closer to the beginning of its sequence. If the o
 
 sub promote {
 	my $self = shift;
-	my $tableKey = $self->crud_getTableKey($self->session);
-	my $tableName = $self->crud_getTableName($self->session);
-	my $sequenceKey = $self->crud_getSequenceKey($self->session);
+	my $tableKey = $self->meta->tableKey($self->session);
+	my $tableName = $self->meta->tableName($self->session);
+	my $sequenceKey = $self->meta->sequenceKey($self->session);
 	my $sequenceKeyValue = $self->get($sequenceKey);
 	my @params = ($self->get('sequenceNumber')-1);
 	my $clause = '';
@@ -882,12 +882,12 @@ Removes gaps in the sequence. Usually only called by delete(), but may be useful
 
 sub reorder {
 	my ($self) = @_;
-	my $tableKey = $self->crud_getTableKey($self->session);
-	my $tableName = $self->crud_getTableName($self->session);
-	my $sequenceKey = $self->crud_getSequenceKey($self->session);
-	my $sequenceKeyValue = $self->get($sequenceKey);	
-	my $i = 1;
-	my $db = $self->session->db;
+	my $tableKey         = $self->meta->tableKey;
+	my $tableName        = $self->meta->tableName;
+	my $sequenceKey      = $self->meta->sequenceKey;
+	my $sequenceKeyValue = $self->$sequenceKey;
+	my $i   = 1;
+	my $db  = $self->session->db;
 	my $dbh = $db->dbh;
 
 	# find all the items in this sequence
@@ -941,7 +941,7 @@ B<WARNING:> As part of it's validation mechanisms, update() will delete any elem
 #
 #	# validate incoming data
 #	my $properties = $self->crud_getProperties($session);
-#    my $dbData = { $self->crud_getTableKey($session) => $self->getId };
+#    my $dbData = { $self->meta->tableKey($session) => $self->getId };
 #	foreach my $property (keys %{$data}) {
 #
 #		# don't save fields that aren't part of our definition
@@ -972,7 +972,7 @@ B<WARNING:> As part of it's validation mechanisms, update() will delete any elem
 #	%{$objectData{$refId}} = (%{$objectData{$refId}}, %{$data});
 #
 #	# update the database
-#	$session->db->setRow($self->crud_getTableName($session), $self->crud_getTableKey($session), $dbData);
+#	$session->db->setRow($self->meta->tableName($session), $self->meta->tableKey($session), $dbData);
 #	return 1;
 #}
 
