@@ -358,7 +358,7 @@ sub crud_getProperties {
 
 #-------------------------------------------------------------------
 
-=head2 meta->sequenceKey ( session )
+=head2 crud_getSequenceKey ( session )
 
 A management class method that returns just the 'sequenceKey' from the meta class.
 
@@ -368,14 +368,14 @@ A reference to a WebGUI::Session.
 
 =cut
 
-sub meta->sequenceKey {
+sub crud_getSequenceKey {
 	my ($class) = @_;
     return $class->meta->sequenceKey;
 }
 
 #-------------------------------------------------------------------
 
-=head2 meta->tableName ( session )
+=head2 crud_getTableName ( session )
 
 A management class method that returns just the 'tableName'.
 
@@ -385,14 +385,14 @@ A reference to a WebGUI::Session.
 
 =cut
 
-sub meta->tableName {
+sub crud_getTableName {
 	my ($class) = @_;
     return $class->meta->tableName;
 }
 
 #-------------------------------------------------------------------
 
-=head2 meta->tableKey ( session )
+=head2 crud_getTableKey ( session )
 
 A management class method that returns just the 'tableKey'.
 
@@ -402,7 +402,7 @@ A reference to a WebGUI::Session.
 
 =cut
 
-sub meta->tableKey {
+sub crud_getTableKey {
 	my ($class) = @_;
     return $class->meta->tableKey;
 }
