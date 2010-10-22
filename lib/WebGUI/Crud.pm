@@ -952,5 +952,29 @@ sub updateFromFormPost {
 	return $self->update(\%data);
 }
 
+#-------------------------------------------------------------------
+
+=head2 write ( )
+
+Serializes the object's data to the database.  Automatically handles deserializing property values to javascript,
+if necessary.
+
+=cut
+
+
+sub write {
+    my $self    = shift;
+    my $session = $self->session;
+    my $data = {};
+    PROPERTY: foreach my $property_name ($self->meta->get_all_property_list) {
+        my $property  = $self->meta->find_attribute_by_name($property_name);
+        my $value     = $self->$property_name;
+        if ($property->does('WebGUI::Definition::Meta::Property::Serialize')) {
+            $value    = eval { JSON::to_json($value); } || '';
+        }
+        $data->{$property_name} = $value;
+    }
+    $session->db->setRow($self->tableName, $self->tableKey, $data);
+}
 
 1;
