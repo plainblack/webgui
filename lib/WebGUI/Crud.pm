@@ -28,15 +28,15 @@ use WebGUI::Exception;
 has session => (
     is       => 'ro',
     required => 1,
-)
+);
 
 has lastUpdated => (
     is       => 'rw',
-)
+);
 
 has sequenceNumber => (
     is       => 'rw',
-)
+);
 
 around BUILDARGS => sub {
     my $orig  = shift;
@@ -69,7 +69,7 @@ around BUILDARGS => sub {
             $clause = "where ".$db->quote_identifier($sequenceKey)."=?";
             push @params, $data->{$sequenceKey};
         }
-        my $sequenceNumber = $db->quickScalar("select max(sequenceNumber) from ".$dbh->quote_identifier($tableName)." $clause", \@params);
+        my $sequenceNumber = $db->quickScalar("select max(sequenceNumber) from ".$db->quote_identifier($tableName)." $clause", \@params);
         $sequenceNumber++;
 
         my $now = WebGUI::DateTime->new($session, time())->toDatabase;
@@ -557,7 +557,7 @@ sub demote {
     if ($id ne "") {
         $db->write("update ".$dbh->quote_identifier($tableName)." set sequenceNumber=sequenceNumber+1 where ".$dbh->quote_identifier($tableKey)."=?",[$self->getId]);
         $db->write("update ".$dbh->quote_identifier($tableName)." set sequenceNumber=sequenceNumber-1 where ".$dbh->quote_identifier($tableKey)."=?",[$id]);
-		$objectData{id $self}{sequenceNumber}++;
+		$self->sequenceNumber($self->sequenceNumber++);
     }
 	$db->commit;
 	return 1;
@@ -822,7 +822,7 @@ sub promote {
     if ($id ne "") {
         $db->write("update ".$dbh->quote_identifier($tableName)." set sequenceNumber=sequenceNumber-1 where ".$dbh->quote_identifier($tableKey)."=?", [$self->getId]);
         $db->write("update ".$dbh->quote_identifier($tableName)." set sequenceNumber=sequenceNumber+1 where ".$dbh->quote_identifier($tableKey)."=?", [$id]);
-		$objectData{id $self}{sequenceNumber}--;
+		$self->sequenceNumber($self->sequenceNumber--);
     }
 	$db->commit;
 	return 1;
