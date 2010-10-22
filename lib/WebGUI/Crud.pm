@@ -30,6 +30,14 @@ has session => (
     required => 1,
 )
 
+has lastUpdated => (
+    is       => 'rw',
+)
+
+has sequenceNumber => (
+    is       => 'rw',
+)
+
 around BUILDARGS => sub {
     my $orig  = shift;
     my $class = shift;
@@ -47,7 +55,30 @@ around BUILDARGS => sub {
     my $identifier = shift;
     if(ref $_[0] eq 'HASH') {
         ##Creating a new object
-        return $class->$orig(@_);
+        my $data    = shift;
+        my $options = shift;
+        my $tableKey  = $class->meta->tableKey();
+        my $tableName = $class->meta->tableName();
+        my $db        = $session->db;
+
+        # determine sequence
+        my $sequenceKey = $class->meta->sequenceKey($session);
+        my $clause;
+        my @params;
+        if ($sequenceKey) {
+            $clause = "where ".$db->quote_identifier($sequenceKey)."=?";
+            push @params, $data->{$sequenceKey};
+        }
+        my $sequenceNumber = $db->quickScalar("select max(sequenceNumber) from ".$dbh->quote_identifier($tableName)." $clause", \@params);
+        $sequenceNumber++;
+
+        my $now = WebGUI::DateTime->new($session, time())->toDatabase;
+        $data->{lastUpdated}    = $now;
+        $data->{session}        = $session;
+        $data->{sequenceNumber} = $sequenceNumber;
+        $data->{$tableKey}      = $options->{id} || $session->id->generate;
+
+        return $class->$orig($data);
     }
     ##Grabbing an object from the database
 	my $tableKey = $class->meta->tableKey;
@@ -176,48 +207,6 @@ A hash reference of creation options.
 A guid. Use this to force the row's table key to a specific ID.
 
 =cut
-
-sub create {
-	my ($class, $someObject, $data, $options) = @_;
-
-	# dynamic recognition of object or session
-	my $session = $someObject;
-	unless ($session->isa('WebGUI::Session')) {
-		$session = $someObject->session;
-	}
-
-	# validate 
-	unless (defined $session && $session->isa('WebGUI::Session')) {
-        WebGUI::Error::InvalidObject->throw(expected=>'WebGUI::Session', got=>(ref $session), error=>'Need a session.');
-    }
-
-	# initialize
-	my $tableKey  = $class->meta->tableKey();
-	my $tableName = $class->meta->tableName();
-	my $db  = $session->db;
-	my $dbh = $db->dbh;
-
-	# get creation date
-	my $now = WebGUI::DateTime->new($session, time())->toDatabase;
-	$data->{lastUpdated} = $now;
-
-	# determine sequence
-	my $sequenceKey = $class->meta->sequenceKey($session);
-	my $clause;
-	my @params;
-	if ($sequenceKey) {
-		$clause = "where ".$dbh->quote_identifier($sequenceKey)."=?";
-		push @params, $data->{$sequenceKey};
-	}
-	my $sequenceNumber = $db->quickScalar("select max(sequenceNumber) from ".$dbh->quote_identifier($tableName)." $clause", \@params);
-	$sequenceNumber++;
-
-	# create object
-	my $id = $db->setRow($tableName, $tableKey, {$tableKey=>'new', dateCreated=>$now, sequenceNumber=>$sequenceNumber}, $options->{id});
-	my $self = $class->new($someObject, $id);
-	$self->update($data);
-	return $self;
-}
 
 #-------------------------------------------------------------------
 
@@ -572,30 +561,6 @@ sub demote {
     }
 	$db->commit;
 	return 1;
-}
-
-#-------------------------------------------------------------------
-
-=head2 get ( [ property ] )
-
-Returns a hash reference of all the properties of this object.
-
-=head3 property
-
-If specified, returns the value of the property associated with this this property name. Returns undef if the property doesn't exist. See crud_definition() in the subclass of this class for a complete list of properties.
-
-=cut
-
-sub get {
-	my ($self, $name) = @_;
-
-	# return a specific property
-	if (defined $name) {
-		return clone $objectData{id $self}{$name};
-	}
-
-	# return a copy of all properties
-	return clone $objectData{id $self};
 }
 
 #-------------------------------------------------------------------
