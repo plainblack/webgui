@@ -22,7 +22,7 @@ use WebGUI::PassiveAnalytics::Logging;
 
 =head1 NAME
 
-Package WebGUI::Content::MyHandler
+Package WebGUI::Content::Asset
 
 =head1 DESCRIPTION
 
