@@ -21,6 +21,7 @@ use WebGUI::DateTime;
 use base 'WebGUI::Asset::Wobject';
 use Data::Dumper;
 use PerlIO::eol qw/NATIVE/;
+use WebGUI::ProgressBar;
 
 
 #-------------------------------------------------------------------
@@ -2686,6 +2687,11 @@ sub www_export {
     my $thingProperties = $self->getThing($thingId);
     return $session->privilege->insufficient() unless $self->hasPrivileges($thingProperties->{groupIdExport});
    
+    my $i18n = WebGUI::International->new($session, 'Asset_Thingy');
+    my $pb = WebGUI::ProgressBar->new($session);
+    $pb->start($i18n->get('export label').' '.$thingProperties->{label}, $session->url->extras('assets/thingy.gif'));
+    $pb->update($i18n->get('Creating column headers'));
+    my $tempStorage = WebGUI::Storage->createTemp($session);
     $fields = $session->db->read('select * from Thingy_fields where assetId =? and thingId = ? order by sequenceNumber',
         [$self->get("assetId"),$thingId]);
     while (my $field = $fields->hashRef) {
@@ -2707,9 +2713,13 @@ sub www_export {
 
     ### Loop through the returned structure and put it through Text::CSV
     # Column heads
-    $out = WebGUI::Text::joinCSV(@fieldLabels);
+    my $csv_filename = 'export_'.$thingProperties->{label}.'.csv';
+    $tempStorage->addFileFromScalar($csv_filename, WebGUI::Text::joinCSV(@fieldLabels));
+    open my $CSV, '>', $tempStorage->getPath($csv_filename);
 
     # Data lines
+    $pb->update($i18n->get('Writing data'));
+    my $rowCounter = 0;
     while (my $data = $sth->hashRef) {
         my @fieldValues;
         foreach my $field (@fields){
@@ -2723,14 +2733,15 @@ sub www_export {
                 push(@fieldValues,$data->{$metaDataField});
             }
         }
-        $out .= "\n".WebGUI::Text::joinCSV( @fieldValues );
+        print $CSV "\n".WebGUI::Text::joinCSV( @fieldValues );
+        #if (! ++$rowCounter % 25) {
+            $pb->update($i18n->get('Writing data'));
+        #}
     }
-    
-    $fileName = "export_".$thingProperties->{label}.".csv";
-    $self->session->http->setFilename($fileName,"application/octet-stream");
-    $self->session->http->sendHeader;
-    return $out;
+    close $CSV;
 
+    $pb->update(sprintf q|<a href="%s">%s</a>|, $self->getUrl, sprintf($i18n->get('Return to %s'), $thingProperties->{label}));
+    return $pb->finish($tempStorage->getUrl($csv_filename));
 }
 
 #-------------------------------------------------------------------

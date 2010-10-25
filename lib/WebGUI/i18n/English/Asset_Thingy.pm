@@ -1121,6 +1121,24 @@ search has been done.|,
         lastUpdated => 1231180362,
     },
 
+    'Creating column headers' => {
+        message => q|Creating column headers.|,
+        lastUpdated => 1231180362,
+        context => q|Status message in the Export Thingy progress bar.|,
+    },
+
+    'Writing data' => {
+        message => q|Writing data.|,
+        lastUpdated => 1231180362,
+        context => q|Status message in the Export Thingy progress bar.|,
+    },
+
+    'Return to %s' => {
+        message => q|Return to %s.|,
+        lastUpdated => 1231180362,
+        context => q|Status message in the Export Thingy progress bar. %s is the name of the Thing that is being exported.|,
+    },
+
 };
 
 1;

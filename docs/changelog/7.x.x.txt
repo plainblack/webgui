@@ -12,6 +12,7 @@
  - fixed #11922: Help tempalte is squatting on a good URL
  - fixed #11923: Collaboration System Mail Cron Errors
  - fixed #11925: Some problems in Thingy export (metaData values in CSV export)
+ - fixed #11925: Some problems in Thingy export (export times out on Things with many rows)
 
 7.9.16
  - fixed #11789: Date form reports 1 day earlier on Edit for the time zone corresponding to Europe/Berlin.
