@@ -184,7 +184,7 @@ Renders an HTML area field.
 sub toHtml {
 	my $self = shift;
     ##Do not display a rich editor on any mobile browser.
-    if ($self->session->style->useMobileStyle) {
+    if ($self->session->style->mobileBrowser) {
         return $self->SUPER::toHtml;
     }
     my $i18n = WebGUI::International->new($self->session);
