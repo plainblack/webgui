@@ -168,7 +168,12 @@ Renders an HTML area field.
 
 sub toHtml {
 	my $self = shift;
+<<<<<<< HEAD
     if ($self->session->style->useMobileStyle) {
+=======
+    ##Do not display a rich editor on any mobile browser.
+    if ($self->session->style->mobileBrowser) {
+>>>>>>> 6fced77... Make the display of a textarea instead of an HTMLarea independent of whether mobile styles are configured for the site.  Refixes #11902.
         return $self->SUPER::toHtml;
     }
 	my $i18n = WebGUI::International->new($self->session);

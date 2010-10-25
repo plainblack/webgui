@@ -13,6 +13,7 @@
  - fixed #11923: Collaboration System Mail Cron Errors
  - fixed #11925: Some problems in Thingy export (metaData values in CSV export)
  - fixed #11925: Some problems in Thingy export (export times out on Things with many rows)
+ - refixed #11902: forums bug (works without mobile style being set)
 
 7.9.16
  - fixed #11789: Date form reports 1 day earlier on Edit for the time zone corresponding to Europe/Berlin.
