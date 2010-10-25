@@ -7,6 +7,10 @@ templates, you will need to apply these changes manually to your copies.
     Do HTML escaping on field values.  Move table tags outside of the loops so only one table
     is generated.
 
+  * Template Variable template
+    The URL for that template has been changed from "help" to "root/import/adminconsole/help", making
+    the short URL Help available for WebGUI content use.
+
   * survey.css
     Removed relative positioning and offset from top.
 
