@@ -31,6 +31,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+changeTemplateHelpUrl($session);
 
 finish($session); # this line required
 
@@ -43,6 +44,27 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub changeTemplateHelpUrl {
+    my $session = shift;
+    print "\tChange the URL for the template that displays help variables... " unless $quiet;
+    # and here's our code
+    my $template = WebGUI::Asset->newByDynamicClass($session, 'PBtmplHelp000000000001');
+    if ($template) {
+        $template->update({url => 'root/import/adminconsole/help'});
+        my $rs = $template->session->db->read("select revisionDate from assetData where assetId=? and revisionDate<>?",[$template->getId, $template->get("revisionDate")]);
+        while (my ($version) = $rs->array) {
+            my $old = WebGUI::Asset->new($session, $template->getId, $template->get("className"), $version);
+            $old->purgeRevision if defined $old;
+        }
+    }
+    else {
+        print "\n\tNO TEMPLATE FOR DISPLAYING TEMPLATE VARIABLES...";
+    }
+    print "DONE!\n" unless $quiet;
+}
 
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
