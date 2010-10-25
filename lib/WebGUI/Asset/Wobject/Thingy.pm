@@ -2718,12 +2718,12 @@ sub www_export {
             my $value = $self->getFieldValue($data->{"field_".$fieldId},$field->{properties},"%y-%m-%d","%y-%m-%d %j:%n:%s");
             push(@fieldValues, $value);
         }
-        foreach my $metaDataField (@metaDataFields){
-            push(@fieldValues,$data->{$metaDataField});
+        if ($thingProperties->{exportMetaData}) {
+            foreach my $metaDataField (@metaDataFields){
+                push(@fieldValues,$data->{$metaDataField});
+            }
         }
-        $out .= "\n".WebGUI::Text::joinCSV(
-        @fieldValues
-        );
+        $out .= "\n".WebGUI::Text::joinCSV( @fieldValues );
     }
     
     $fileName = "export_".$thingProperties->{label}.".csv";

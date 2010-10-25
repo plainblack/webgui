@@ -3,6 +3,7 @@
  - fixed #11921: DataForm emails contain 1 table per field
  - fixed #11922: Help tempalte is squatting on a good URL
  - fixed #11923: Collaboration System Mail Cron Errors
+ - fixed #11925: Some problems in Thingy export (metaData values in CSV export)
 
 7.10.3
  - fixed #11903: Unnecessary debug in Thingy
