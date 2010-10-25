@@ -400,7 +400,8 @@ sub editUserForm {
    $f->password(
 	name=>"authWebGUI.identifier",
 	label=>$i18n->get(51),
-	value=>"password"
+	value=>"password",
+    extras=>'autocomplete="off"',
 	);
    $f->interval(
 	-name=>"authWebGUI.passwordTimeout",
