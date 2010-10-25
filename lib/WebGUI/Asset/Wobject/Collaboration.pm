@@ -556,6 +556,7 @@ sub definition {
 			tab=>'mail',
 			label=>$i18n->get("mail account"),
 			hoverHelp=>$i18n->get("mail account help"),
+            extras => 'autocomplete="off"',
 			},
 		mailPassword=>{
 			fieldType=>"password",
@@ -563,6 +564,7 @@ sub definition {
 			tab=>'mail',
 			label=>$i18n->get("mail password"),
 			hoverHelp=>$i18n->get("mail password help"),
+            extras => 'autocomplete="off"',
 			},
 		mailAddress=>{
 			fieldType=>"email",

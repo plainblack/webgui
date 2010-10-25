@@ -10,6 +10,7 @@
  - fixed #11920: Defaul DataForm emails missing entries.
  - fixed #11921: DataForm emails contain 1 table per field
  - fixed #11922: Help tempalte is squatting on a good URL
+ - fixed #11923: Collaboration System Mail Cron Errors
 
 7.9.16
  - fixed #11789: Date form reports 1 day earlier on Edit for the time zone corresponding to Europe/Berlin.
