@@ -9,6 +9,9 @@ save you many hours of grief.
 
 7.9.17
 --------------------------------------------------------------------
+     * WebGUI now depends on Monkey::Patch for doing sanely scoped
+       monkeypatches.
+
      * In the Collaboration System, previously the Group to Post group
        was also allowed to view the CS.  This made it difficult to
        make the CS not viewable to regular users, so the behavior was

@@ -367,9 +367,14 @@ Constructs a url for a subfolder with the given name.
 
 sub getFolderUrl {
     my ($self, $name) = @_;
-    my $base = $self->getUrl;
-    $base    =~ s/(.*)\..*/$1/;
-    return "$base/$name";
+    my $session = $self->session;
+    my $base    = $self->getUrl;
+    $base       =~ s/(.*)\..*/$1/;
+    my $url     = "$base/$name";
+    if (my $ext = $session->setting->get('urlExtension')) {
+        $url .= ".$ext";
+    }
+    return $session->url->urlize($url);
 }
 
 #-------------------------------------------------------------------
