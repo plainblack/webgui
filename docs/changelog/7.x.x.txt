@@ -1,4 +1,5 @@
 7.9.17
+ - fixed #11928: Story Archive breaks if url has extension
  - fixed #11913: Editing the survey doesn't work
  - fixed #11915: Date macro returns hour value w/ leading space
  - fixed #11901: NotifyAboutVersionTag includes URL, even when inappropriate
