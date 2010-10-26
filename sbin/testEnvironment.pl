@@ -148,6 +148,7 @@ checkModule("CHI",                          "0.34"       );
 checkModule('IO::Socket::SSL',                           );
 checkModule('Net::Twitter',                 "3.13006"    );
 checkModule('PerlIO::eol',                  "0.14"       );
+checkModule('Monkey::Patch',                '0.03'       );
 
 failAndExit("Required modules are missing, running no more checks.") if $missingModule;
 

@@ -7,6 +7,11 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+7.10.4
+--------------------------------------------------------------------
+    * WebGUI now depends on Monkey::Patch for doing sanely scoped
+      monkeypatches.
+
 7.10.3
 --------------------------------------------------------------------
      * In the Collaboration System, previously the Group to Post group

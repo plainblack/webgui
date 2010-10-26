@@ -39,6 +39,7 @@ use Scalar::Util        qw( blessed );
 use List::MoreUtils     qw( any );
 use Carp                qw( carp croak );
 use JSON                qw( from_json to_json );
+use Monkey::Patch       qw( patch_object );
 use Scope::Guard;
 
 BEGIN {
@@ -683,6 +684,24 @@ sub getMailFromQueue {
     $mail->send;
 
     return $class->getMail;
+}
+
+#----------------------------------------------------------------------------
+
+=head2 overrideSetting (name, val)
+
+Overrides WebGUI::Test->session->setting->get($name) to return $val until the
+handle this method returns goes out of scope.
+
+=cut
+
+sub overrideSetting {
+    my ($class, $name, $val) = @_;
+    patch_object $class->session->setting => get => sub {
+        my $get = shift;
+        return $val if $_[1] eq $name;
+        goto &$get;
+    };
 }
 
 #----------------------------------------------------------------------------
