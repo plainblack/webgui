@@ -1,4 +1,5 @@
 7.10.4
+ - fixed #11928: Story Archive breaks if url has extension
  - fixed #11920: Defaul DataForm emails missing entries.
  - fixed #11921: DataForm emails contain 1 table per field
  - fixed #11922: Help tempalte is squatting on a good URL
