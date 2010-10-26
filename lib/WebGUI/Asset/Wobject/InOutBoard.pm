@@ -115,6 +115,24 @@ sub definition {
 
 #-------------------------------------------------------------------
 
+=head2 getStatusList
+
+Returns the statusList property as an array
+
+=cut
+
+sub getStatusList {
+	my $self = shift;
+	my $text = $self->get('statusList');
+
+	return
+		grep { $_ }                     # no empty lines
+		map  { s/^\s+//; s/\s+$//; $_ } # trim
+		split(/\r\n|\r|\n/, $text);     # seperated by any kind of newline
+}
+
+#-------------------------------------------------------------------
+
 =head2 prepareView ( )
 
 See WebGUI::Asset::prepareView() for details.
@@ -180,16 +198,9 @@ sub view {
     }
 	
 	my $statusUserId = $self->session->scratch->get("userId") || $self->session->user->userId;
-	my $statusListString = $self->getValue("statusList");
-	my @statusListArray = split("\n",$statusListString);
-	my $statusListHashRef;
-	tie %$statusListHashRef, 'Tie::IxHash';
-
-	foreach my $status (@statusListArray) {
-		chomp($status);
-        next if $status eq "";
-		$statusListHashRef->{$status} = $status;
-	}
+	tie my %statusOptions, 'Tie::IxHash', (
+		map { $_ => $_ } $self->getStatusList
+	);
 
 	#$self->session->log->warn("VIEW: userId: ".$statusUserId."\n" );
 	my ($status) = $session->db->quickArray(
@@ -223,7 +234,7 @@ sub view {
 	$f->radioList(
 		-name=>"status",
 		-value=>$status,
-		-options=>$statusListHashRef,
+		-options=>\%statusOptions,
 		-label=>$i18n->get(5),
 		-hoverHelp=>$i18n->get('5 description'),
 		);
