@@ -44,6 +44,23 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 
+=head2 cleanup ( )
+
+Override this activity to add a cleanup routine to be run if an instance
+is deleted with this activity currently in a waiting state.  This is a stub
+and will do nothing unless overridden.
+
+=cut
+
+sub cleanup {
+	my $self     = shift;
+	my $instance = shift;
+    $self->setMessageCompleted($instance);
+	return 1;
+}
+
+#-------------------------------------------------------------------
+
 =head2 definition ( session, definition )
 
 See WebGUI::Workflow::Activity::definition() for details.
