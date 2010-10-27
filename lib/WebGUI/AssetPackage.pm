@@ -192,7 +192,7 @@ sub importAssetData {
            && $properties{'status'} ne 'pending' ) {
            delete $properties{status};
         }
-        $error->info("Updating an existing revision of asset $id");	
+        $log->info("Updating an existing revision of asset $id");	
         $asset->update(\%properties);
         ##Pending assets are assigned a new version tag
         if ($properties{status} eq 'pending') {
