@@ -9,6 +9,7 @@
  - fixed #11925: Some problems in Thingy export (export times out on Things with many rows)
  - refixed #11902: forums bug (works without mobile style being set)
  - fixed #11924: Deleting version tags leaves pending inbox messages in a permanent state
+ - intalled YUI fix for flash files.
 
 7.10.3
  - fixed #11903: Unnecessary debug in Thingy
