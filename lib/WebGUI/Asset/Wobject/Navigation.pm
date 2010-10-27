@@ -431,7 +431,7 @@ sub view {
     my $absoluteDepthOfFirstPage;   # Will set on first iteration of loop, below
 	my %lastChildren;
 	my $previousPageData = undef;
-	my $eh = $self->session->log;
+	my $log = $self->session->log;
         while ( 1 ) {
             my $asset;
             eval { $asset = $assetIter->() };

@@ -90,7 +90,7 @@ property groupToAdd => (
 sub _addDaysForMonth {
    my $self = shift;
    my $dt = $self->session->datetime;
-   my $eh = $self->session->log;
+   my $log = $self->session->log;
    
    my $days_loop = $_[0];
    my $hash = $_[1];
@@ -108,13 +108,13 @@ sub _addDaysForMonth {
    while ($monday < $monthEnd) {
       my $hash = {};
 	  $hash->{'day.number'} = $dt->epochToHuman($monday,"%d");
-	  #$eh->warn($hash->{'day.number'});
+	  #$log->warn($hash->{'day.number'});
 	  $monday += 604800; # Add one week to the first monday of the month
 	  push(@{$days_loop},$hash);
 	  $colCount++;
    }
    $hash->{'month.colspan'} = $colCount;
-   #$eh->warn($dt->epochToHuman($firstMonday));
+   #$log->warn($dt->epochToHuman($firstMonday));
 }
 
 #-------------------------------------------------------------------
@@ -655,7 +655,7 @@ sub setSessionVars {
 sub updateProjectTask {
 	my $self = shift;
 	my $db = $self->session->db;
-	my $eh = $self->session->log;
+	my $log = $self->session->log;
    
 	my $taskId = $_[0];
 	my $projectId = $_[1];
@@ -726,7 +726,7 @@ sub view {
 	
 	my ($session,$privilege,$form,$db,$datetime,$i18n,$user) = $self->setSessionVars;
 	my $config = $session->config;
-	my $eh = $session->log;
+	my $log = $session->log;
 	
 	$var->{'extras'} = $session->url->make_urlmap_work($config->get("extrasURL"))."/wobject/ProjectManager"; 
 	$var->{'project.create'} = $self->getUrl("func=editProject;projectId=new");
@@ -839,18 +839,18 @@ sub www_deleteTask {
    #Reorder dependants and tasks
    my $tasks = $db->buildArrayRefOfHashRefs("select * from PM_task where projectId=? order by sequenceNumber",[$projectId]);
    my $taskLen = scalar(@{$tasks});
-   #$eh->warn("Task Length = $taskLen");
+   #$log->warn("Task Length = $taskLen");
    foreach my $tsk (@{$tasks}) {
       my $seqNum = $tsk->{sequenceNumber};
       next unless ($seqNum >= $taskRank);
-	  #$eh->warn("Fixing task $seqNum");		 
+	  #$log->warn("Fixing task $seqNum");		 
 	  my $dependant = $tsk->{dependants};
-	  #$eh->warn("Dependant is $dependant");
+	  #$log->warn("Dependant is $dependant");
 	  #Only decrement the dependant if it's greater than the rank point of the deleted task
 	  if($dependant >= $taskRank){
 	     $dependant--;
 	  }
-	  #$eh->warn("New dependant is $dependant");
+	  #$log->warn("New dependant is $dependant");
 	  $db->write("update PM_task set dependants=? where taskId=?",[$dependant,$tsk->{taskId}]);
    }
    $self->reorderCollateral("PM_task","taskId","projectId",$projectId);
@@ -871,7 +871,7 @@ sub www_drawGanttChart {
 	my ($session,$privilege,$form,$db,$dt,$i18n,$user) = $self->setSessionVars;
 	my $config = $session->config;
 	my $style = $session->style;
-	my $eh = $session->log;
+	my $log = $session->log;
 	
 	#Set up some the task data
 	my $projectId = $_[0];
@@ -908,7 +908,7 @@ sub www_drawGanttChart {
 	   ($startMonth) = $db->quickArray("select min(startDate) from PM_task where projectId=".$db->quote($projectId));
 	   ($endMonth) = $db->quickArray("select max(endDate) from PM_task where projectId=".$db->quote($projectId));
 	   
-	   #$eh->warn("Interval is: ".$dt->getDaysInInterval($startMonth,$endMonth));
+	   #$log->warn("Interval is: ".$dt->getDaysInInterval($startMonth,$endMonth));
 	   if($dt->getDaysInInterval($startMonth,$endMonth) < 60) {
 	      $endMonth = $dt->addToDate($startMonth,0,3);
 	   }
@@ -917,8 +917,8 @@ sub www_drawGanttChart {
 	   $endMonth = $dt->addToDate($startMonth,0,3);
 	}
 	
-	#$eh->warn($dt->epochToSet($startMonth));
-	#$eh->warn($dt->epochToSet($endMonth));
+	#$log->warn($dt->epochToSet($startMonth));
+	#$log->warn($dt->epochToSet($endMonth));
 	#Build the loops of weeks and days
 	my @monthsLoop = ();
 	my @daysLoop = ();
@@ -939,8 +939,8 @@ sub www_drawGanttChart {
 					$i18n->get("friday label"),
 					$i18n->get("saturday label"),
 				   ); 
-	   #$eh->warn($dt->epochToSet($sundayOfFirstWeek));
-	   #$eh->warn($dt->epochToSet($endMonth));
+	   #$log->warn($dt->epochToSet($sundayOfFirstWeek));
+	   #$log->warn($dt->epochToSet($endMonth));
 	   my $datecounter = $startMonth;
 	   my $counter = 0;
 	   while($datecounter <= $endMonth || $counter++ == 1000) {
@@ -952,7 +952,7 @@ sub www_drawGanttChart {
 		  foreach (@days) {
 		     push(@daysLoop,{'day.number' => $_ });
 		  }
-		  #$eh->warn($dt->epochToSet($datecounter));
+		  #$log->warn($dt->epochToSet($datecounter));
 		  $datecounter = $dt->addToDateTime($datecounter,0,0,7);
 	   }
 	
@@ -1053,15 +1053,15 @@ sub www_drawGanttChart {
 		
 		my $daysFromStart = $dt->getDaysInInterval($startMonth,$startDate);
 		#Add day part of predecessor if necessary
-		#$eh->warn("Task $seq is currently $daysFromStart days from the first day on ".$dt->epochToHuman($startDate));
+		#$log->warn("Task $seq is currently $daysFromStart days from the first day on ".$dt->epochToHuman($startDate));
 		my $daysLeft = $daysFromStart;
 		#Only adjust for predecessor if the start date of the task falls on the same day as it's predecessors end date
 		if($startDate eq $predEndDate) {
 		   $daysLeft += $predDayPart;
-		   #$eh->warn("Adjusting this by $predDayPart days");
+		   #$log->warn("Adjusting this by $predDayPart days");
 		}
 		$hash->{'task.div.left'} = int(($daysLeft * $pixelSize));  #Each day is 23 pixels so calculate the days and round
-		#$eh->warn("Starts at: $daysLeft * $pixelSize :".$hash->{'task.div.left'});
+		#$log->warn("Starts at: $daysLeft * $pixelSize :".$hash->{'task.div.left'});
 		
 		# Buggo.  Refactor.
 		$hash->{'task.isUntimed'} = ($task->{taskType} ne 'timed');
@@ -1075,7 +1075,7 @@ sub www_drawGanttChart {
 		my $rduration = $task->{duration};
 		
 		#Adjust duration of days to only include the part of the day used
-		#$eh->warn("day part is being set to: $duration - ".floor($duration)." : ".($duration-floor($duration)));
+		#$log->warn("day part is being set to: $duration - ".floor($duration)." : ".($duration-floor($duration)));
         $duration = $duration - floor($duration);
 		
 		$hash->{'task.div.percentComplete'} = $task->{percentComplete} || 0;
@@ -1236,7 +1236,7 @@ sub www_editProjectSave {
 	my $self = shift;
     #Set Method Helpers
     my ($session,$privilege,$form,$db,$dt,$i18n,$user) = $self->setSessionVars;
-    my $eh = $session->log;
+    my $log = $session->log;
 	
     #Check Privileges
     return $privilege->insufficient unless $self->_userCanManageProjectList($user);
@@ -1509,7 +1509,7 @@ sub www_editTaskSave {
    #Set Method Helpers
    my ($session,$privilege,$form,$db,$dt,$i18n,$user) = $self->setSessionVars;
    my $config = $session->config;
-   my $eh = $session->log;
+   my $log = $session->log;
 
    my $projectId = $form->get("projectId");
    my $project = $db->quickHashRef("select * from PM_project where projectId=".$db->quote($projectId));
@@ -1560,26 +1560,26 @@ sub www_editTaskSave {
    #Reorder tasks if task is inserted
    my $insertAt = $form->get("insertAt");
    if($insertAt) {
-      #$eh->warn("Inserting at $insertAt");
+      #$log->warn("Inserting at $insertAt");
 	  my $tasks = $db->buildArrayRefOfHashRefs("select * from PM_task where projectId=? order by sequenceNumber",[$projectId]);
 	  my $taskLen = scalar(@{$tasks});
-	  #$eh->warn("Task Length = $taskLen");
+	  #$log->warn("Task Length = $taskLen");
 	  foreach my $task (@{$tasks}) {
 	     my $seqNum = $task->{sequenceNumber};
 		 next unless ($seqNum >= $insertAt);
-		 #$eh->warn("Fixing task $seqNum");		 
+		 #$log->warn("Fixing task $seqNum");		 
 		 my $newSeq = $seqNum + 1;
 		 if($seqNum eq $taskLen) {
 		    $newSeq = $insertAt;
 		 }
-		 #$eh->warn("New seqNum is $newSeq");
+		 #$log->warn("New seqNum is $newSeq");
 		 my $dependant = $task->{dependants};
-		 #$eh->warn("Dependant is $dependant");
+		 #$log->warn("Dependant is $dependant");
 		 #Only increment the dependant if it's greater than or equal to the insertAt point
 		 if($dependant >= $insertAt){
 		    $dependant++;
 		 }
-		 #$eh->warn("New dependant is $dependant");
+		 #$log->warn("New dependant is $dependant");
 		 $db->write("update PM_task set sequenceNumber=?, dependants=? where taskId=?",[$newSeq,$dependant,$task->{taskId}]);
 	  }
 	  $self->reorderCollateral("PM_task","taskId","projectId",$projectId);
@@ -1706,7 +1706,7 @@ sub www_viewProject {
     my $user        = $session->user;
     my $config      = $session->config;
 	my $style       = $session->style;
-	my $eh          = $session->log;
+	my $log          = $session->log;
 	my $projectId   = shift || $form->get("projectId");
 		
     #Check Privileges

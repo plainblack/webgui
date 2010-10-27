@@ -71,10 +71,10 @@ sub addField {
     my $dbDataType = shift || $self->_getDbDataType($field->{fieldType});
     my $session    = $self->session;
     my $db         = $session->db;
-    my $error      = $session->log;
+    my $log        = $session->log;
     my ($oldFieldId, $newFieldId,$useAssetId,$useSequence);
 
-    $error->info("Adding Field, label: ".$field->{label}.", fieldId: ".$field->{fieldId}.",thingId: ".$field->{thingId});
+    $log->info("Adding Field, label: ".$field->{label}.", fieldId: ".$field->{fieldId}.",thingId: ".$field->{thingId});
 
     if ($isImport){
         $oldFieldId = $field->{fieldId};
@@ -125,10 +125,10 @@ sub addThing {
     my $thing = shift;
     my $isImport = shift;
     my $db = $self->session->db;
-    my $error = $self->session->log;
+    my $log = $self->session->log;
     my ($oldThingId, $newThingId,$useAssetId);
 
-    $error->info("Adding Thing, label: ".$thing->{label}.", id: ".$thing->{thingId});
+    $log->info("Adding Thing, label: ".$thing->{label}.", id: ".$thing->{thingId});
     
     if ($isImport){
         $oldThingId = $thing->{thingId};
@@ -376,7 +376,7 @@ sub deleteField {
     my $thingId = shift;
     my $keepSequenceNumbers = shift;
     my $db = $self->session->db;
-    my $error = $self->session->log;
+    my $log = $self->session->log;
     my $deletedSequenceNumber;
 
     if ($keepSequenceNumbers ne "1"){
@@ -395,7 +395,7 @@ sub deleteField {
         $db->write("ALTER TABLE ".$db->quote_identifier("Thingy_".$thingId)." DROP "
             .$db->quote_identifier("field_".$fieldId));
     }
-    $error->info("Deleted field: $fieldId in thing: $thingId.");
+    $log->info("Deleted field: $fieldId in thing: $thingId.");
     return undef;
 }
 
@@ -521,13 +521,13 @@ sub deleteThing {
     my $self = shift;
     my $thingId = shift;
     my $session = $self->session;
-    my $error = $session->log;
+    my $log = $session->log;
 
     $self->deleteCollateral("Thingy_things","thingId",$thingId);
     $self->deleteCollateral("Thingy_fields","thingId",$thingId);
     $session->db->write("drop table if exists ".$session->db->quote_identifier("Thingy_".$thingId));
     
-    $error->info("Deleted thing: $thingId.");
+    $log->info("Deleted thing: $thingId.");
     return undef;
 }
 
@@ -1260,14 +1260,14 @@ sub importAssetCollateralData {
     
     my $self = shift;
     my $session = $self->session;
-    my $error = $session->log;
+    my $log = $session->log;
     my $data = shift;
     my $id = $data->{properties}{assetId};
     my $class = $data->{properties}{className};
     my $version = $data->{properties}{revisionDate};
     my $assetExists = WebGUI::Asset->newById($self->session, $id, $version);
     
-    $error->info("Importing Things for Thingy ".$data->{properties}{title});
+    $log->info("Importing Things for Thingy ".$data->{properties}{title});
     my @importThings;
     foreach my $thing (@{$data->{things}}) {
         push(@importThings,$thing->{thingId});
@@ -1275,7 +1275,7 @@ sub importAssetCollateralData {
             [$thing->{thingId}]);
         if ($assetExists && $thingIdExists){
             # update existing thing
-            $error->info("Updating Thing, label: ".$thing->{label}.", id: ".$thing->{thingId});
+            $log->info("Updating Thing, label: ".$thing->{label}.", id: ".$thing->{thingId});
             $self->setCollateral("Thingy_things","thingId",$thing,0,0);
         }
         else{
@@ -1299,7 +1299,7 @@ sub importAssetCollateralData {
         my ($fieldIdExists) = $session->db->quickArray("select fieldId from Thingy_fields where fieldId = ? and thingId = ? ",[$field->{fieldId},$field->{thingId}]);
         if ($assetExists && $fieldIdExists){
             # update existing field
-            $error->info("Updating Field, label: ".$field->{label}.", id: ".$field->{fieldId}.",seq :"
+            $log->info("Updating Field, label: ".$field->{label}.", id: ".$field->{fieldId}.",seq :"
                 .$field->{sequenceNumber});
             $self->_updateFieldType($field->{fieldType},$field->{fieldId},$field->{thingId},$field->{assetId},$dbDataType);
             $self->setCollateral("Thingy_fields","fieldId",$field,1,0,"","",1);
@@ -1433,7 +1433,7 @@ sub _updateFieldType {
 
         my $self = shift;
         my $session = $self->session;
-        my $error = $session->log;
+        my $log = $session->log;
         
         my $newFieldType = shift;
         my $fieldId = shift;
@@ -1449,7 +1449,7 @@ sub _updateFieldType {
         if($newFieldType ne $fieldType){
             my $thingyTableName = "Thingy_".$thingId;
             my $columnName = "field_".$fieldId;
-            $error->info("changing column: $columnName, table: $thingyTableName");
+            $log->info("changing column: $columnName, table: $thingyTableName");
             $self->session->db->write(
                 "ALTER TABLE ".$db->quote_identifier($thingyTableName).
                 " CHANGE ".$db->quote_identifier($columnName)." "
@@ -2789,7 +2789,7 @@ sub www_import {
         push(@insertColumns, $field) if ($session->form->process("fileContains_".$field->{fieldId}));
     }
 
-    my $error = $self->session->log;
+    my $log = $self->session->log;
     my $storage = WebGUI::Storage->createTemp($self->session);
     $handleDuplicates = $session->form->process("handleDuplicates");
 
@@ -2797,7 +2797,7 @@ sub www_import {
     foreach my $file (sort(@{$storage->getFiles})) {
         next unless ($storage->getFileExtension($file) eq "csv");
         
-        $error->info("Found import file $file");
+        $log->info("Found import file $file");
         open my $importFile,"<:raw:eol(NATIVE)",$storage->getPath($file);
         my $lineNumber = 0;
         my @data = ();
@@ -2805,10 +2805,10 @@ sub www_import {
         while ( my $row = WebGUI::Text::readCSV($importFile) ) {
             if ($lineNumber == 0 && $session->form->process('ignoreFirstLine')){
                 $lineNumber++;
-                $error->info("Skipping first line");
+                $log->info("Skipping first line");
                 next;
             }
-            $error->info("Reading line $lineNumber: @{ $row }");
+            $log->info("Reading line $lineNumber: @{ $row }");
             $lineNumber++;
             @data = @{ $row };
             
@@ -2834,7 +2834,7 @@ sub www_import {
                 $query .= " limit 1";
                 ($foundDuplicateId) = $session->db->quickArray($query);
                 if ($foundDuplicateId){
-                    $error->info("found duplicate record: ".$foundDuplicateId." for data: ". @{ $row });
+                    $log->info("found duplicate record: ".$foundDuplicateId." for data: ". @{ $row });
                 }
             }
 
@@ -2864,14 +2864,14 @@ sub www_import {
             }
             if ($foundDuplicateId && $handleDuplicates eq "overwrite"){
                 $thingData{thingDataId} = $foundDuplicateId;
-                $error->info("Overwriting, thingDataId = ".$thingData{thingDataId});
+                $log->info("Overwriting, thingDataId = ".$thingData{thingDataId});
             }
             elsif ($foundDuplicateId eq ""){
                 $thingData{thingDataId} = "new";
-                $error->info("Importing new line");
+                $log->info("Importing new line");
             }
             else{
-                $error->info("Skipping line");
+                $log->info("Skipping line");
                 next;
             }
             $thingData{lastUpdated} = time();
@@ -3038,13 +3038,13 @@ sub www_moveFieldConfirm {
     my $session = $self->session;
     return $session->privilege->insufficient() unless $self->canEdit;
 
-    my $error = $self->session->log;
+    my $log = $self->session->log;
     my $direction = $session->form->process('direction');
     my $assetId = $self->getId;
     my $fieldId = $session->form->process('fieldId');
     my $targetFieldId = $session->form->process('targetFieldId');
    
-    $error->info("moving $fieldId to target  $targetFieldId, direction: $direction"); 
+    $log->info("moving $fieldId to target  $targetFieldId, direction: $direction"); 
     
     my ($thingId,$originalRank) = $session->db->quickArray(
         "select thingId, sequenceNumber from Thingy_fields where fieldId = ".$session->db->quote($fieldId)." and assetId = ".$session->db->quote($assetId));

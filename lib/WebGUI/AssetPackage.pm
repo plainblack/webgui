@@ -154,7 +154,7 @@ sub importAssetData {
     my $session     = $self->session;
     my $data        = shift;
     my $options     = shift || {};
-    my $error       = $session->log;
+    my $log       = $session->log;
     my $id          = $data->{properties}{assetId};
     my $class       = $data->{properties}{className};
     my $version     = $options->{overwriteLatest} ? time : $data->{properties}{revisionDate};
@@ -207,11 +207,11 @@ sub importAssetData {
             $asset = WebGUI::Asset->newPending($session, $id);
         };
         if (! Exception::Class->caught()) {   # create a new revision of an existing asset
-            $error->info("Creating a new revision of asset $id");
+            $log->info("Creating a new revision of asset $id");
             $asset = $asset->addRevision(\%properties, $version, {skipAutoCommitWorkflows => 1});
         }
         else {  # add an entirely new asset
-            $error->info("Adding $id that didn't previously exist.");
+            $log->info("Adding $id that didn't previously exist.");
             $asset = $self->addChild(\%properties, $id, $version, {skipAutoCommitWorkflows => 1});
         }
     }
@@ -264,12 +264,12 @@ sub importPackage {
     return undef
         if $storage->getErrorCount;
     my $package         = undef;            # The asset package
-    my $error           = $self->session->log;
+    my $log           = $self->session->log;
 
     # The debug output for long requests would be too long, and we'd have to
     # keep it all in memory.
-    $error->preventDebugOutput();
-    $error->info("Importing package.");
+    $log->preventDebugOutput();
+    $log->info("Importing package.");
 
     # Your parent is on this stack somewhere because we're going through these
     # assets depth-first.  This way we only have to keep one branch in-memory
@@ -279,15 +279,15 @@ sub importPackage {
 
     foreach my $file (sort(@{$decompressed->getFiles})) {
         next unless ($decompressed->getFileExtension($file) eq "json");
-        $error->info("Found data file $file");
+        $log->info("Found data file $file");
         my $data = eval {
             $json->decode($decompressed->getFileContentsAsScalar($file))
         };
         if ($@ || $data->{properties}{assetId} eq "" || $data->{properties}{className} eq "" || $data->{properties}{revisionDate} eq "") {
-            $error->error("package corruption: ".$@) if ($@);
+            $log->error("package corruption: ".$@) if ($@);
             return "corrupt";
         }
-        $error->info("Data file $file is valid and represents asset ".$data->{properties}{assetId});
+        $log->info("Data file $file is valid and represents asset ".$data->{properties}{assetId});
         foreach my $storageId (@{$data->{storage}}) {
             my $assetStorage = WebGUI::Storage->get($self->session, $storageId);
             $decompressed->untar($storageId.".storage", $assetStorage);

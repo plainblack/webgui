@@ -57,7 +57,7 @@ sub notify {
 	my $self = shift;
 	my $module = shift;
 	my $params = shift;
-	my ($config, $error) = $self->session->quick("config", "log");
+	my ($config, $log) = $self->session->quick("config", "log");
 	my $remote = create_ikc_client(
                 port=>$config->get("spectrePort"),
                 ip=>$config->get("spectreIp"),
@@ -67,12 +67,12 @@ sub notify {
 	if (defined $remote) {
         	my $result = $remote->post($module, $params);
 		unless (defined $result) {
-			$error->warn("Couldn't send command to Spectre because ".$POE::Component::IKC::ClientLite::error);
+			$log->warn("Couldn't send command to Spectre because ".$POE::Component::IKC::ClientLite::error);
 		}
 		$remote->disconnect;
 		undef $remote;
 	} else {
-		$error->warn("Couldn't connect to Spectre because ".$POE::Component::IKC::ClientLite::error);
+		$log->warn("Couldn't connect to Spectre because ".$POE::Component::IKC::ClientLite::error);
 	}
 }
 

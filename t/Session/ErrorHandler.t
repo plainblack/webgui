@@ -27,7 +27,7 @@ my $session = WebGUI::Test->session;
 my $env = $session->request->env;
 $env->{REMOTE_ADDR} = '192.168.0.6';
 
-my $eh = $session->log;
+my $log = $session->log;
 
 ####################################################
 #
@@ -39,11 +39,11 @@ WebGUI::Test->interceptLogging( sub {
     my $log_data = shift;
 
     my $accumulated_warn = "";
-    $eh->warn("This is a warning");
+    $log->warn("This is a warning");
     is($log_data->{warn}, "This is a warning", "warn: Log4perl called");
-    $eh->warn("Second warning");
+    $log->warn("Second warning");
     is($log_data->{warn}, "Second warning", "warn: Log4perl called again");
-    $eh->security('Shields up, red alert');
+    $log->security('Shields up, red alert');
     my $security = sprintf '%s (%d) connecting from %s attempted to %s',
         $session->user->username, $session->user->userId, $session->request->address, 'Shields up, red alert';
     is($log_data->{warn}, $security, 'security: calls warn with username, userId and IP address');
@@ -57,11 +57,11 @@ WebGUI::Test->interceptLogging( sub {
 
 WebGUI::Test->interceptLogging( sub {
     my $log_data = shift;
-    $eh->info("This is informative");
+    $log->info("This is informative");
     is($log_data->{info}, "This is informative", "info: Log4perl called");
-    $eh->info("More info");
+    $log->info("More info");
     is($log_data->{info}, "More info", "info: Log4perl called again");
-    $eh->audit('Check this out');
+    $log->audit('Check this out');
     my $audit = sprintf '%s (%d) %s', $session->user->username, $session->user->userId, 'Check this out';
     is($log_data->{info}, $audit, 'audit: calls info with username and userId');
 });
@@ -74,9 +74,9 @@ WebGUI::Test->interceptLogging( sub {
 
 WebGUI::Test->interceptLogging( sub {
     my $log_data = shift;
-    $eh->debug("This is a bug");
+    $log->debug("This is a bug");
     is($log_data->{debug}, "This is a bug", "debug: Log4perl called");
-    $eh->debug("More bugs");
+    $log->debug("More bugs");
     is($log_data->{debug}, "More bugs", "debug: Log4perl called again");
 });
 
@@ -88,9 +88,9 @@ WebGUI::Test->interceptLogging( sub {
 
 WebGUI::Test->interceptLogging( sub {
     my $log_data = shift;
-    $eh->error("ERROR");
+    $log->error("ERROR");
     is($log_data->{error}, "ERROR", "error: Log4perl called error");
-    $eh->error("More errors");
+    $log->error("More errors");
     is($log_data->{error}, "More errors", "error: Log4perl called error again");
 });
 
@@ -103,7 +103,7 @@ WebGUI::Test->interceptLogging( sub {
 WebGUI::Test->interceptLogging( sub {
     my $log_data = shift;
     my $thrown = try {
-        $eh->fatal('Bad things are happenning');
+        $log->fatal('Bad things are happenning');
         fail 'fatal throws exception';
         fail ' ... exception isa WebGUI::Exception::Fatal';
     }
