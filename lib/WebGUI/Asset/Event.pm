@@ -494,9 +494,9 @@ sub getDateTimeStart {
     my $time    = $self->startTime;
     my $tz      = $self->session->datetime->getTimeZone;
 
-    #$self->session->errorHandler->warn($self->getId.":: Date: $date -- Time: $time");
+    #$self->session->log->warn($self->getId.":: Date: $date -- Time: $time");
     if (!$date) {
-        $self->session->errorHandler->warn("Event::getDateTimeStart -- This event (".$self->get("assetId").") has no start date.");
+        $self->session->log->warn("Event::getDateTimeStart -- This event (".$self->get("assetId").") has no start date.");
         return undef;
     }
 
@@ -533,9 +533,9 @@ sub getDateTimeEnd {
     my $time    = $self->endTime;
     my $tz      = $self->session->datetime->getTimeZone;
 
-    #$self->session->errorHandler->warn($self->getId.":: Date: $date -- Time: $time");
+    #$self->session->log->warn($self->getId.":: Date: $date -- Time: $time");
     if (!$date) {
-        $self->session->errorHandler->warn("Event::getDateTimeEnd -- This event (".$self->get("assetId").") has no end date.");
+        $self->session->log->warn("Event::getDateTimeEnd -- This event (".$self->get("assetId").") has no end date.");
         return undef;
     }
 
@@ -855,7 +855,7 @@ sub getRecurrence {
 
     return $self->{recurrence} ||= do {
         #use Data::Dumper;
-        #$self->session->errorHandler->warn("recurId: ".$self->recurId);
+        #$self->session->log->warn("recurId: ".$self->recurId);
 
         my %data
             = $self->session->db->quickHash(

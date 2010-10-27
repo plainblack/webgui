@@ -255,7 +255,7 @@ sub getExifData {
     # isn't perfect, so handle errors gracefully
     my $exif    = eval { from_json( $self->exifData ) };
     if ( $@ ) {
-        $self->session->errorHandler->warn( 
+        $self->session->log->warn( 
             "Could not parse JSON data for EXIF in Photo '" . $self->title 
             . "' (" . $self->getId . "): " . $@
         );
@@ -400,7 +400,7 @@ sub makeResolutions {
     $resolutions    ||= $self->getGallery->getImageResolutions;
     
     my $storage     = $self->getStorageLocation;
-    $self->session->errorHandler->info(" Making resolutions for '" . $self->filename . q{'});
+    $self->session->log->info(" Making resolutions for '" . $self->filename . q{'});
 
     for my $res ( @$resolutions ) {
         # carp if resolution is bad

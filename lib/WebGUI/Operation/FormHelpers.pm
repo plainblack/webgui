@@ -48,7 +48,7 @@ sub www_formHelper {
     return "ERROR" unless (defined $sub && defined $class);
     my $output = eval { WebGUI::Pluggable::run($class, "www_".$sub, [$session]) }; 
     if ($@) {
-        $session->errorHandler->error($@); 
+        $session->log->error($@); 
         return "ERROR";
     }
     return $output;

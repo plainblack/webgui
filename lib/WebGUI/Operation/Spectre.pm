@@ -60,7 +60,7 @@ sub www_spectreGetSiteData {
         $subnets = [];
     }
 	if (!Net::CIDR::Lite->new(@$subnets)->find($session->request->address)) {
-		$session->errorHandler->security("Tried to make a Spectre workflow data load request, but we're only allowed to accept requests from "
+		$session->log->security("Tried to make a Spectre workflow data load request, but we're only allowed to accept requests from "
 			.join(",",@{$subnets}).".");
 	} 
   	else {
@@ -183,7 +183,7 @@ sub www_spectreTest {
 
     my $sessionIp = $session->request->address;
 	unless (Net::CIDR::Lite->new(@$subnets)->find($sessionIp)) {
-		$session->errorHandler->security(
+		$session->log->security(
             sprintf "Tried to make a Spectre workflow runner request from %s, but we're only allowed to accept requests from %s",
                 $sessionIp, join(",",@{$subnets})
         );

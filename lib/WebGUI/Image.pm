@@ -52,7 +52,7 @@ sub getFilename {
 	if (exists $self->{_properties}->{filename}) {
 		return $self->{_properties}->{filename};
 	}
-	$self->session->errorHandler->fatal('Attempted to retrieve filename before one was set');
+	$self->session->log->fatal('Attempted to retrieve filename before one was set');
 	return '';
 }
 

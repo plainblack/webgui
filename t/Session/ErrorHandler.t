@@ -27,7 +27,7 @@ my $session = WebGUI::Test->session;
 my $env = $session->request->env;
 $env->{REMOTE_ADDR} = '192.168.0.6';
 
-my $eh = $session->errorHandler;
+my $eh = $session->log;
 
 ####################################################
 #

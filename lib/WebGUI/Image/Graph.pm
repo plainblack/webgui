@@ -576,7 +576,7 @@ sub loadByConfiguration {
 	my $namespace = "WebGUI::Image::".$config->{graph_formNamespace};
 	$namespace =~ s/_/::/g;
 	
-	$session->errorHandler->fatal("wrong namespace: [$namespace]") unless ($config->{graph_formNamespace} =~ /^[\w\d_]+$/);
+	$session->log->fatal("wrong namespace: [$namespace]") unless ($config->{graph_formNamespace} =~ /^[\w\d_]+$/);
 	
 	my $plugin = $self->load($session, $namespace);
 	$plugin->setConfiguration($config);

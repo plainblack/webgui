@@ -75,7 +75,7 @@ sub AUTOLOAD {
 	$params = {name=>$params} if ref ($params) ne "HASH";
     my $control = eval { WebGUI::Pluggable::instanciate("WebGUI::Form::".$name, "new", [ $self->session, $params ]) };
     if ($@) {
-        $self->session->errorHandler->error($@);
+        $self->session->log->error($@);
         return undef;
     }
 	return $control->getValue(@args);

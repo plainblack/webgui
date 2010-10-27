@@ -279,7 +279,7 @@ sub cancelRecurringPayment {
 
     # Get the payment definition XML
     my $xml = $self->_generateCancelRecurXml( $transaction );
-    $session->errorHandler->debug("XML Request: $xml");
+    $session->log->debug("XML Request: $xml");
 
     # Post the xml to ITransact 
     my $response = $self->doXmlRequest( $xml, 1 );
@@ -287,11 +287,11 @@ sub cancelRecurringPayment {
     # Process response
 	if ($response->is_success) {
 		# We got some XML back from iTransact, now parse it.
-        $session->errorHandler->info('Starting request');
+        $session->log->info('Starting request');
         my $transactionResult = XMLin( $response->content );
 		unless (defined $transactionResult->{ RecurUpdateResponse }) {
 			# GatewayFailureResponse: This means the xml is invalid or has the wrong mime type
-            $session->errorHandler->info( "GatewayFailureResponse: result: [" . $response->content . "]" );
+            $session->log->info( "GatewayFailureResponse: result: [" . $response->content . "]" );
             return( 
                 0, 
                 "Status: "      . $transactionResult->{ Status }
@@ -301,7 +301,7 @@ sub cancelRecurringPayment {
 		} else {
             # RecurUpdateResponse: We have succesfully sent the XML and it was correct. Note that this doesn't mean
             # that the cancellation has succeeded. It only has if Status is set to OK and the remaining terms is 0.
-            $session->errorHandler->info( "RecurUpdateResponse: result: [" . $response->content . "]" );
+            $session->log->info( "RecurUpdateResponse: result: [" . $response->content . "]" );
             my $transactionData = $transactionResult->{ RecurUpdateResponse };
 
             my $status          = $transactionData->{ Status            };
@@ -316,7 +316,7 @@ sub cancelRecurringPayment {
 		}
 	} else {
 		# Connection Error
-        $session->errorHandler->info("Connection error");
+        $session->log->info("Connection error");
 
         return ( 0, undef, 'ConnectionError', $response->status_line );
 	}
@@ -371,26 +371,26 @@ sub checkRecurringTransaction {
     my $response = $self->doXmlRequest( $xml, 1 );
 
     if ($response->is_success) {
-        $session->errorHandler->info("Check recurring postback response: [".$response->content."]"); 
+        $session->log->info("Check recurring postback response: [".$response->content."]"); 
 		# We got some XML back from iTransact, now parse it.
         my $transactionResult = XMLin( $response->content || '<empty></empty>');
 
         unless (defined $transactionResult->{ RecurDetailsResponse }) {
             # Something went wrong.
-            $session->errorHandler->info("Check recurring postback failed!");
+            $session->log->info("Check recurring postback failed!");
 
             return 0;
 		} else {
-            $session->errorHandler->info("Check recurring postback! Response: [".$response->content."]");
+            $session->log->info("Check recurring postback! Response: [".$response->content."]");
             
             my $data    = $transactionResult->{ RecurDetailsResponse };
 
             my $status  = $data->{ Status       };
             my $amount  = $data->{ RecurDetails }->{ RecurTotal };
 
-            $session->errorHandler->info("Check recurring postback! Status: $status");
+            $session->log->info("Check recurring postback! Status: $status");
             if ( $amount != $expectedAmount ) {
-                $session->errorHandler->info(
+                $session->log->info(
                     "Check recurring postback, received amount: $amount not equal to expected amount: $expectedAmount"
                 );
 
@@ -401,7 +401,7 @@ sub checkRecurringTransaction {
 		}
 	} else {
 		# Connection Error
-        $session->errorHandler->info("Connection error");
+        $session->log->info("Connection error");
 
         return 0;
 	}
@@ -529,7 +529,7 @@ sub processPayment {
 #### TODO: More checking: price, address, etc
 		unless (defined $transactionResult->{ TransactionData }) {
 			# GatewayFailureResponse: This means the xml is invalid or has the wrong mime type
-            $session->errorHandler->info("GatewayFailureResponse: result: [".$response->content."]");
+            $session->log->info("GatewayFailureResponse: result: [".$response->content."]");
             return( 
                 0, 
                 undef, 
@@ -539,7 +539,7 @@ sub processPayment {
 		} else {
             # SaleResponse: We have succesfully sent the XML and it was correct. Note that this doesn't mean that
             # the transaction has succeeded. It only has if Status is set to OK.
-            $session->errorHandler->info("SaleResponse: result: [".$response->content."]");
+            $session->log->info("SaleResponse: result: [".$response->content."]");
             my $transactionData = $transactionResult->{ TransactionData };
 
             my $status          = $transactionData->{ Status            };
@@ -554,7 +554,7 @@ sub processPayment {
 		}
 	} else {
 		# Connection Error
-        $session->errorHandler->info("Connection error");
+        $session->log->info("Connection error");
 
         return ( 0, undef, 'ConnectionError', $response->status_line );
 	}
@@ -714,7 +714,7 @@ sub www_processRecurringTransactionPostback {
     #---- Check the validity of the request -------
     # First check whether the original transaction actualy exists
     if (WebGUI::Error->caught || !(defined $baseTransaction) ) {   
-        $session->errorHandler->warn("Check recurring postback: No base transction for XID: [$originatingXid]");
+        $session->log->warn("Check recurring postback: No base transction for XID: [$originatingXid]");
         $session->http->setStatus(500);
         return "Check recurring postback. No base transction for XID: [$originatingXid]";
     }
@@ -722,7 +722,7 @@ sub www_processRecurringTransactionPostback {
     # Secondly check if the postback is coming from secure.paymentclearing.com
     # This will most certainly fail on mod_proxied webgui instances
 #    unless ( $ENV{ HTTP_HOST } eq 'secure.paymentclearing.com') {
-#        $session->errorHandler->info('ITransact Recurring Payment Postback is coming from host: ['.$ENV{ HTTP_HOST }.']');
+#        $session->log->info('ITransact Recurring Payment Postback is coming from host: ['.$ENV{ HTTP_HOST }.']');
 #        return;
 #    }
 
@@ -731,7 +731,7 @@ sub www_processRecurringTransactionPostback {
 #        $baseTransaction->get('amount') + $baseTransaction->get('taxes') + $baseTransaction->get('shippingPrice') );
 
 #    unless ( $self->checkRecurringTransaction( $xid, $expectedAmount ) ) {
-#        $session->errorHandler->warn('Check recurring postback: transaction check failed.');
+#        $session->log->warn('Check recurring postback: transaction check failed.');
  #       return 'Check recurring postback: transaction check failed.';
 #    }
     #---- Passed all test, continue ---------------

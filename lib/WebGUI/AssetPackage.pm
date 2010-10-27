@@ -154,7 +154,7 @@ sub importAssetData {
     my $session     = $self->session;
     my $data        = shift;
     my $options     = shift || {};
-    my $error       = $session->errorHandler;
+    my $error       = $session->log;
     my $id          = $data->{properties}{assetId};
     my $class       = $data->{properties}{className};
     my $version     = $options->{overwriteLatest} ? time : $data->{properties}{revisionDate};
@@ -264,7 +264,7 @@ sub importPackage {
     return undef
         if $storage->getErrorCount;
     my $package         = undef;            # The asset package
-    my $error           = $self->session->errorHandler;
+    my $error           = $self->session->log;
 
     # The debug output for long requests would be too long, and we'd have to
     # keep it all in memory.
@@ -335,7 +335,7 @@ sub www_deployPackage {
 	if (defined $packageMasterAssetId) {
 		my $packageMasterAsset = WebGUI::Asset->newById($session, $packageMasterAssetId);
 		unless ($packageMasterAsset->get('isPackage')) { #only deploy packages
-		 	$session->errorHandler->security('deploy an asset as a package which was not set as a package.');
+		 	$session->log->security('deploy an asset as a package which was not set as a package.');
 		 	return undef;
 		}
 		my $masterLineage = $packageMasterAsset->get("lineage");

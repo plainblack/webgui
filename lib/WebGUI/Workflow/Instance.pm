@@ -191,7 +191,7 @@ sub getAllInstances {
             push(@instances, $instance);
         }
         else {
-            $session->errorHandler->warn('Tried to instance instanceId '.$instanceId.' but it returned undef');
+            $session->log->warn('Tried to instance instanceId '.$instanceId.' but it returned undef');
         }
     }
     return \@instances;	
@@ -361,7 +361,7 @@ sub run {
     }
     my $activity = $self->getNextActivity;
 	unless  (defined $activity)  {
-        $session->errorHandler->error(
+        $session->log->error(
             sprintf q{Unable to load Workflow Activity for activity after id %s in workflow %s},
                 $self->get('currentActivityId'),
                 $workflow->getId
@@ -369,7 +369,7 @@ sub run {
         $self->set({lastStatus=>"error"}, 1);
         return "error";
 	}
-	$session->errorHandler->info("Running workflow activity ".$activity->getId.", which is a ".(ref $activity).", for instance ".$self->getId.".");
+	$session->log->info("Running workflow activity ".$activity->getId.", which is a ".(ref $activity).", for instance ".$self->getId.".");
     my $object = eval { $self->getObject };
     if ( my $e = WebGUI::Error::ObjectNotFound->caught ) {
         $session->log->warn(
@@ -379,7 +379,7 @@ sub run {
         return "done";
     }
     elsif ($@) {
-        $session->errorHandler->error(
+        $session->log->error(
             q{Error on workflow instance '} . $self->getId . q{': }. $@
         );
         $self->set({lastStatus=>"error"}, 1);
@@ -388,7 +388,7 @@ sub run {
 
 	my $status = eval { $activity->execute($object, $self) };
 	if ($@) {
-		$session->errorHandler->error("Caught exception executing workflow activity ".$activity->getId." for instance ".$self->getId." which reported ".$@);
+		$session->log->error("Caught exception executing workflow activity ".$activity->getId." for instance ".$self->getId." which reported ".$@);
 		$self->set({lastStatus=>"error"}, 1);
 		return "error";
 	}
@@ -639,7 +639,7 @@ When a workflow instance is started WebGUI tries to run it immediately to see if
 
 sub start {
 	my ($self, $skipRealtime) = @_;
-	my $log = $self->session->errorHandler;
+	my $log = $self->session->log;
 	$self->{_started} = 1;
 	
 	# run the workflow in realtime to start.

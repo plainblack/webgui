@@ -1048,7 +1048,7 @@ sub updateThreadRating {
         $parent->recalculateRating;
     }
     else {
-        $self->session->errorHandler->error("Couldn't get parent for thread ".$self->getId);
+        $self->session->log->error("Couldn't get parent for thread ".$self->getId);
     }    
 }
 

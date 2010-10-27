@@ -81,7 +81,7 @@ sub _alias {
 	}
 	#Print an error message if no aliases are found
 	unless (scalar(keys %{$alias}) > 0) {
-	   $session->errorHandler->warn("SynchProfilesToLdap: ldapAlias is not configured properly in your WebGUI config file.  Please check to make sure that this setting is enabled and contains alias mappings");
+	   $session->log->warn("SynchProfilesToLdap: ldapAlias is not configured properly in your WebGUI config file.  Please check to make sure that this setting is enabled and contains alias mappings");
 	}
 	#Return the value of the key passed in
 	return $alias->{$key} || $key;
@@ -137,7 +137,7 @@ sub execute {
 		if ($rowLinkId ne $currentLinkId) {
 			$link->unbind if defined $link;
 			$skippingLink = 0;
-#			$self->session->errorHandler->warn("DEBUG: SyncProfilesToLdap: Switching to link $rowLinkId");
+#			$self->session->log->warn("DEBUG: SyncProfilesToLdap: Switching to link $rowLinkId");
 
 			$currentLinkId = $rowLinkId;
 			$link = WebGUI::LDAPLink->new($self->session, $rowLinkId);
@@ -146,14 +146,14 @@ sub execute {
 			$ldap = $link->bind;
 
 			if (my $error = $link->getErrorMessage) {
-				$self->session->errorHandler->error("SyncProfilesToLdap: Couldn't bind to LDAP link $ldapUrl ($currentLinkId), skipping: $error");
+				$self->session->log->error("SyncProfilesToLdap: Couldn't bind to LDAP link $ldapUrl ($currentLinkId), skipping: $error");
 				$skippingLink = 1;
 				next;
 			}
 		} elsif ($skippingLink) {
 			next;
 		}
-#		$self->session->errorHandler->warn("DEBUG: SyncProfilesToLdap: Syncing profile for user $userId");
+#		$self->session->log->warn("DEBUG: SyncProfilesToLdap: Syncing profile for user $userId");
 
 		my $user = WebGUI::User->new($self->session, $userId);
 		my $username = $user->username;
@@ -163,16 +163,16 @@ sub execute {
 					   filter => "&(objectClass=*)");
 
 		if ($result->code && ! $result->code ~~ @noResultsCodes) {
-			$self->session->errorHandler->error("SyncProfilesToLdap: Couldn't search LDAP link $ldapUrl ($currentLinkId) to find user $username ($userId) with DN ".$userData->{connectDN}.": LDAP returned: ".$ldapStatusCode{$result->code});
+			$self->session->log->error("SyncProfilesToLdap: Couldn't search LDAP link $ldapUrl ($currentLinkId) to find user $username ($userId) with DN ".$userData->{connectDN}.": LDAP returned: ".$ldapStatusCode{$result->code});
 		} elsif ($result->code ~~ @noResultsCodes || $result->count == 0) {
-			$self->session->errorHandler->warn("SyncProfilesToLdap: No results returned by LDAP server for user with dn ".$userData->{connectDN});
+			$self->session->log->warn("SyncProfilesToLdap: No results returned by LDAP server for user with dn ".$userData->{connectDN});
 		} else {
 			my $entry = $result->entry(0);
 			
 			foreach my $fieldName (@fieldNames) {
 				my $value = $entry->get_value($self->_alias($fieldName));
 				next unless length $value;
-#				$self->session->errorHandler->warn("DEBUG: SyncProfilesToLdap: Got data for profile field '$fieldName'");
+#				$self->session->log->warn("DEBUG: SyncProfilesToLdap: Got data for profile field '$fieldName'");
 				$user->profileField($fieldName, $value);
 			}
 		}
@@ -180,7 +180,7 @@ sub execute {
 		$index++;
 
 		if (time - $startTime >= $ttl) {
-#			$self->session->errorHandler->warn("DEBUG: SyncProfilesToLdap: next round");
+#			$self->session->log->warn("DEBUG: SyncProfilesToLdap: next round");
 			$link->unbind if defined $link;
 			$instance->setScratch('ldapSelectIndex', $index);
 			$sth->finish;
@@ -188,7 +188,7 @@ sub execute {
 		}
 	}
 	
-#	$self->session->errorHandler->warn("DEBUG: SyncProfilesToLdap: done");
+#	$self->session->log->warn("DEBUG: SyncProfilesToLdap: done");
 	$link->unbind if defined $link;
 	$instance->deleteScratch('ldapSelectIndex');
 	return $self->COMPLETE;

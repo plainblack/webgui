@@ -47,7 +47,7 @@ sub getInstance {
 	#Create Auth Object
     my $auth = eval { WebGUI::Pluggable::instanciate("WebGUI::Auth::".$authMethod, "new", [ $session, $authMethod, $userId ] ) };
     if ($@) {
-        $session->errorHandler->fatal($@);
+        $session->log->fatal($@);
     }
     else {
         return $auth;
@@ -75,7 +75,7 @@ sub www_auth {
 	my $authMethod = getInstance($session,$auth);
 	my $methodCall = shift || $session->form->process("method") || "init";
 	if(!$authMethod->isCallable($methodCall)){
-		$session->errorHandler->security("access uncallable auth method: $methodCall");
+		$session->log->security("access uncallable auth method: $methodCall");
 		my $i18n = WebGUI::International->new($session);
 		return $i18n->get(1077);
 	}

@@ -545,7 +545,7 @@ sub getEvent {
     my $self    = shift;
     my $assetId = shift;
     # Warn and return undef if no assetId
-    $self->session->errorHandler->warn("WebGUI::Asset::Wobject::Calendar->getEvent :: No asset ID."), return
+    $self->session->log->warn("WebGUI::Asset::Wobject::Calendar->getEvent :: No asset ID."), return
         unless $assetId;
 
     # ? Perhaps use Stow to cache events ?
@@ -553,11 +553,11 @@ sub getEvent {
     my $event = WebGUI::Asset->newById($self->session, $assetId);
 
     unless ( $event ) {
-        $self->session->errorHandler->warn("Event '$assetId' doesn't exist!");
+        $self->session->log->warn("Event '$assetId' doesn't exist!");
         return undef;
     }
 
-    $self->session->errorHandler->warn("WebGUI::Asset::Wobject::Calendar->getEvent :: Event '$assetId' not a child of calendar '".$self->getId."'"), return
+    $self->session->log->warn("WebGUI::Asset::Wobject::Calendar->getEvent :: Event '$assetId' not a child of calendar '".$self->getId."'"), return
         unless $event->parentId eq $self->getId;
 
     return $event;
@@ -609,7 +609,7 @@ sub getEventsIn {
 
     # Warn and return undef if no startDate or endDate
     unless ($start && $end) {
-        $self->session->errorHandler->warn("WebGUI::Asset::Wobject::Calendar->getEventsIn() called with not enough arguments at ".join('::',(caller)[1,2]));
+        $self->session->log->warn("WebGUI::Asset::Wobject::Calendar->getEventsIn() called with not enough arguments at ".join('::',(caller)[1,2]));
         return undef;
     }
 
@@ -823,7 +823,7 @@ sub prepareView {
         $self->session->style->makePrintable(1);
     }
 
-    #$self->session->errorHandler->warn("Prepare view ".$view." with template ".$self->get("templateId".$view));
+    #$self->session->log->warn("Prepare view ".$view." with template ".$self->get("templateId".$view));
 
     my $template = WebGUI::Asset::Template->newById($self->session, $self->get("templateId".$view));
     if (!$template) {
@@ -951,7 +951,7 @@ sub view {
             : lc $params->{type} eq "week"      ? $self->viewWeek( $params )
             : lc $params->{type} eq "day"       ? $self->viewDay( $params )
             : lc $params->{type} eq "list"      ? $self->viewList( $params )
-            : return $self->errorHandler->error("Calendar invalid 'type=' url parameter")
+            : return $self->log->error("Calendar invalid 'type=' url parameter")
             ;
 
     ##### Process the template

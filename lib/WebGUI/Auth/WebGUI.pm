@@ -108,7 +108,7 @@ sub _isValidPassword {
 
 sub _logSecurityMessage {
 	my $self = shift;
-    $self->session->errorHandler->security("change password.  Password changed successfully");
+    $self->session->log->security("change password.  Password changed successfully");
 }
 
 #-------------------------------------------------------------------
@@ -215,7 +215,7 @@ sub createAccountSave {
 
     # Make sure anonymous registration is enabled 
     if (!$setting->get("anonymousRegistration") && !$setting->get("inboxInviteUserEnabled")) {    
-        $session->errorHandler->security($i18n->get("no registration hack", "AuthWebGUI"));
+        $session->log->security($i18n->get("no registration hack", "AuthWebGUI"));
         return $self->displayLogin;
     }
     my $username;
@@ -776,7 +776,7 @@ sub login {
    my $self = shift;
    if(!$self->authenticate($self->session->form->process("username"),$self->session->form->process("identifier"))){
       $self->session->http->setStatus(401);
-      $self->session->errorHandler->security("login to account ".$self->session->form->process("username")." with invalid information.");
+      $self->session->log->security("login to account ".$self->session->form->process("username")." with invalid information.");
 	my $i18n = WebGUI::International->new($self->session);
 	  return $self->displayLogin("<h1>".$i18n->get(70)."</h1>".$self->error);
    }

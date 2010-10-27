@@ -555,7 +555,7 @@ sub _processQuery {
 	}
 
     if (! $self->{_query}{$nr}{dbQuery} || $self->{_query}{$nr}{dbQuery} =~ m{\A \s* \Z}msx) {
-        $self->session->errorHandler->warn("No query specified for query $nr on '" . $self->getId . "'");
+        $self->session->log->warn("No query specified for query $nr on '" . $self->getId . "'");
         push @{$self->{_debug_loop}}, { 'debug.output' => sprintf($i18n->get('No query specified for query'), $nr) };
         return \%var;
     }
@@ -575,7 +575,7 @@ sub _processQuery {
         push(@{$self->{_debug_loop}},{'debug.output'=>$i18n->get('debug placeholder parameters').join(",",@$placeholderParams)});
         my $dbLink = WebGUI::DatabaseLink->new($self->session,$self->{_query}{$nr}{databaseLinkId});
         if (!$dbLink) {
-            $self->session->errorHandler->error("Could not find database link for query #$nr: '".$self->{_query}{$nr}{databaseLinkId}."'. Has it been created?");
+            $self->session->log->error("Could not find database link for query #$nr: '".$self->{_query}{$nr}{databaseLinkId}."'. Has it been created?");
             push @{$self->{_debug_loop}}, { 'debug.output' => 'Could not find database link'};
             return \%var;
         }
@@ -618,7 +618,7 @@ sub _processQuery {
                         my $p = WebGUI::Paginator->new($self->session,$url,$paginateAfter, undef, $paginatePage);
                         my $error = $p->setDataByQuery($query,$dbh,1,$placeholderParams);
                         if ($error ne "") {
-                                $self->session->errorHandler->warn("There was a problem with the query: ".$error);
+                                $self->session->log->warn("There was a problem with the query: ".$error);
                                 push(@{$self->{_debug_loop}},{'debug.output'=>$i18n->get(11)." ".$error});
                         } 
 			else {
@@ -670,12 +670,12 @@ sub _processQuery {
                         }
                 } else {
                         push(@{$self->{_debug_loop}},{'debug.output'=>$i18n->get(10)});
-                        $self->session->errorHandler->warn("SQLReport [".$self->getId."] The SQL query is improperly formatted.");
+                        $self->session->log->warn("SQLReport [".$self->getId."] The SQL query is improperly formatted.");
                 }
                 $dbLink->disconnect;
         } else {
                 push(@{$self->{_debug_loop}},{'debug.output'=>$i18n->get(12)});
-                $self->session->errorHandler->warn("SQLReport [".$self->getId."] Could not connect to database.");
+                $self->session->log->warn("SQLReport [".$self->getId."] Could not connect to database.");
         }
 	return \%var;
 }

@@ -96,7 +96,7 @@ test_psgi $fatal_app, sub {
 test_psgi $fatal_app, sub {
     my $cb  = shift;
     
-    local *WebGUI::Session::ErrorHandler::canShowDebug = sub {1};
+    local *WebGUI::Session::Log::canShowDebug = sub {1};
     my $res = $cb->( GET "/" );
     is $res->code, 500, 'generic dead app, debug, status code';
     

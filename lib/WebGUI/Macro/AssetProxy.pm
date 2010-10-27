@@ -53,7 +53,7 @@ sub process {
         $asset = eval { WebGUI::Asset->newByUrl($session,$identifier); };
     }
     if (Exception::Class->caught()) {
-        $session->errorHandler->warn('AssetProxy macro called invalid asset: '.$identifier
+        $session->log->warn('AssetProxy macro called invalid asset: '.$identifier
             .'. The macro was called through this url: '.$session->asset->get('url'));
         if ($session->var->isAdminOn) {
             my $i18n = WebGUI::International->new($session, 'Macro_AssetProxy');
@@ -61,7 +61,7 @@ sub process {
         }
     }
     elsif ($asset->get('state') =~ /^trash/) {
-        $session->errorHandler->warn('AssetProxy macro called on asset in trash: '.$identifier
+        $session->log->warn('AssetProxy macro called on asset in trash: '.$identifier
             .'. The macro was called through this url: '.$session->asset->get('url'));
         if ($session->var->isAdminOn) {
             my $i18n = WebGUI::International->new($session, 'Macro_AssetProxy');
@@ -69,7 +69,7 @@ sub process {
         }
     }
     elsif ($asset->get('state') =~ /^clipboard/) {
-        $session->errorHandler->warn('AssetProxy macro called on asset in clipboard: '.$identifier
+        $session->log->warn('AssetProxy macro called on asset in clipboard: '.$identifier
             .'. The macro was called through this url: '.$session->asset->get('url'));
         if ($session->var->isAdminOn) {
             my $i18n = WebGUI::International->new($session, 'Macro_AssetProxy');

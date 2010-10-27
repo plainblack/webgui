@@ -1596,7 +1596,7 @@ sub view {
     my $cache = $self->session->cache;
 	if ($self->_visitorCacheOk) {
 		my $out = $cache->get($self->_visitorCacheKey);
-		$self->session->errorHandler->debug("HIT") if $out;
+		$self->session->log->debug("HIT") if $out;
 		return $out if $out;
 	}
 

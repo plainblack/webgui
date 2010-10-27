@@ -299,7 +299,7 @@ sub view {
     PRODUCT: foreach my $id (@productIds) {
 		my $asset = WebGUI::Asset->newById($session, $id);
         if (!defined $asset) {
-			$session->errorHandler->error(q|Couldn't instanciate SKU with assetId |.$id.q| on shelf with assetId |.$self->getId);
+			$session->log->error(q|Couldn't instanciate SKU with assetId |.$id.q| on shelf with assetId |.$self->getId);
             next PRODUCT;
         }
         push @products, $asset if $asset->canView;

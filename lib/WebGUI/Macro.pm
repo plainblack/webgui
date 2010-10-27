@@ -150,7 +150,7 @@ sub process {
     local $macrodepth = $macrodepth + 1;
     ${ $content } =~ s{$macro_re}{
         if ( $macrodepth > 16 ) {
-            $session->errorHandler->error($2 . " : Too many levels of macro recursion.  Stopping.");
+            $session->log->error($2 . " : Too many levels of macro recursion.  Stopping.");
             "Too many levels of macro recursion. Stopping.";
         }
         else {
@@ -176,7 +176,7 @@ sub _processMacro {
     }
     my $macrofile = $session->config->get("macros")->{$macroname};
     if (!$macrofile) {
-        $session->errorHandler->error("No macro with name $macroname defined.");
+        $session->log->error("No macro with name $macroname defined.");
         return;
     }
     my $macropackage = "WebGUI::Macro::$macrofile";

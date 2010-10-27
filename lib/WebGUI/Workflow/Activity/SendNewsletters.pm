@@ -66,7 +66,7 @@ See WebGUI::Workflow::Activity::execute() for details.
 
 sub execute {
 	my $self = shift;
-    my ($db,$eh) = $self->session->quick(qw(db errorHandler));
+    my ($db,$eh) = $self->session->quick(qw(db log));
     
     my $time = time();
     my $newsletter = undef;

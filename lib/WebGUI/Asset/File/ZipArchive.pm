@@ -98,7 +98,7 @@ sub unzip {
 	if ($filename =~ m/\.zip$/i) {
 		my $zip = Archive::Zip->new();
 		unless ($zip->read($filename) == $zip->AZ_OK){
-			$self->session->errorHandler->warn($i18n->get("zip_error"));
+			$self->session->log->warn($i18n->get("zip_error"));
 			return 0;
 		}
 		$zip->extractTree();
@@ -106,12 +106,12 @@ sub unzip {
 	} elsif ($filename =~ m/\.tar$/i) {
 		Archive::Tar->extract_archive($filepath.'/'.$filename,1);
 		if (Archive::Tar->error) {
-			$self->session->errorHandler->warn(Archive::Tar->error);
+			$self->session->log->warn(Archive::Tar->error);
 			return 0;
 		}
         $self->fixFilenames;
 	} else {
-		$self->session->errorHandler->warn($i18n->get("bad_archive"));
+		$self->session->log->warn($i18n->get("bad_archive"));
 	}
 
 	return 1;
@@ -191,7 +191,7 @@ override processEditForm => sub {
 	}
 	
 	unless ($self->unzip($storage,$self->filename)) {
-		$self->session->errorHandler->warn($i18n->get("unzip_error"));
+		$self->session->log->warn($i18n->get("unzip_error"));
 	}
 };
 
@@ -214,7 +214,7 @@ sub view {
 		return $out if $out;
 	}
 	my %var = %{$self->get};
-	#$self->session->errorHandler->warn($self->getId);
+	#$self->session->log->warn($self->getId);
 	$var{controls} = $self->getToolbar;
 	if($self->session->scratch->get("za_error")) {
 	   $var{error} = $self->session->scratch->get("za_error");

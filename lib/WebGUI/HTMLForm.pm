@@ -86,7 +86,7 @@ sub AUTOLOAD {
 	$params{rowClass} ||= $self->{_class};
     my $control = eval { WebGUI::Pluggable::instanciate("WebGUI::Form::".$name, "new", [ $self->session, %params ]) };
     if ($@) {
-        $self->session->errorHandler->error($@);
+        $self->session->log->error($@);
         return undef;
     }
 	$self->{_data} .= $control->toHtmlWithWrapper;

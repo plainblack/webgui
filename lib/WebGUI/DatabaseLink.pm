@@ -95,7 +95,7 @@ sub checkPrivileges {
 
     # Check if we found any privileges at all
     if (! scalar @privileges) {
-        $self->session->errorHandler->warn(
+        $self->session->log->warn(
             sprintf( "DatabaseLink: Could not find SQL privileges or no privileges on database '%s' for user '%s' with database link ID '%s' using DSN '%s'",
                 $self->databaseName, $self->get->{username},
                 $self->getId, $self->get->{DSN},
@@ -242,13 +242,13 @@ sub db {
         if ($driver) {
             my $dbh = WebGUI::SQL->connect($self->session,$dsn,$username,$identifier,$parameters);
             unless (defined $dbh) {
-                $self->session->errorHandler->warn("Cannot connect to DatabaseLink [".$self->getId."]");
+                $self->session->log->warn("Cannot connect to DatabaseLink [".$self->getId."]");
             }
             $self->{_dbh} = $dbh;
             return $self->{_dbh};
         }
 	}
-    $self->session->errorHandler->warn("DatabaseLink [".$self->getId."] The DSN specified is of an improper format.");
+    $self->session->log->warn("DatabaseLink [".$self->getId."] The DSN specified is of an improper format.");
 	return undef;
 }
 
@@ -357,7 +357,7 @@ sub new {
 	
 	unless (defined($databaseLink{databaseLinkId}))
 	{
-		$session->errorHandler->warn("Could not find database link '".$databaseLinkId."'");
+		$session->log->warn("Could not find database link '".$databaseLinkId."'");
 		return undef;
 	}
 	

@@ -165,7 +165,7 @@ sub addArchive {
         my $class       = $gallery->getAssetClassForFile( $filePath );
         next unless $class; # class is undef for those files the Gallery can't handle
 
-        $session->errorHandler->info( "Adding $filename to album!" );
+        $session->log->info( "Adding $filename to album!" );
         $outputSub->('Adding %s to album', $filename);
         # Remove the file extension
         $filename   =~ s{\.[^.]+}{};
@@ -1417,7 +1417,7 @@ sub www_edit {
             $asset->promote;
         }
         else {
-            $session->errorHandler->error("Couldn't promote asset '$assetId' because we couldn't instantiate it.");
+            $session->log->error("Couldn't promote asset '$assetId' because we couldn't instantiate it.");
         }
     }
     # Demote the file
@@ -1429,7 +1429,7 @@ sub www_edit {
             $asset->demote;
         }
         else {
-            $session->errorHandler->error("Couldn't demote asset '$assetId' because we couldn't instantiate it.");
+            $session->log->error("Couldn't demote asset '$assetId' because we couldn't instantiate it.");
         }
     }
     # Rotate to the left
@@ -1477,7 +1477,7 @@ sub www_edit {
             $asset->purge;
         }
         else {
-            $session->errorHandler->error( "Couldn't delete asset '$assetId' because we couldn't instanciate it.");
+            $session->log->error( "Couldn't delete asset '$assetId' because we couldn't instanciate it.");
         }
     }
 

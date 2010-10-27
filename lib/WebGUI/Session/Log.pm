@@ -1,4 +1,4 @@
-package WebGUI::Session::ErrorHandler;
+package WebGUI::Session::Log;
 
 =head1 LEGAL
 
@@ -23,7 +23,7 @@ use Scalar::Util qw(weaken);
 
 =head1 NAME
 
-Package WebGUI::Session::ErrorHandler
+Package WebGUI::Session::Log
 
 =head1 DESCRIPTION
 
@@ -31,22 +31,22 @@ This package provides simple but effective error handling, debugging,  and loggi
 
 =head1 SYNOPSIS
 
- use WebGUI::Session::ErrorHandler;
+ use WebGUI::Session::Log;
 
- my $errorHandler = WebGUI::Session::ErrorHandler->new($session);
+ my $log = WebGUI::Session::Log->new($session);
 
- $errorHandler->audit($message);
- $errorHandler->debug($message);
- $errorHandler->error($message);
- $errorHandler->fatal($message);
- $errorHandler->info($message);
- $errorHandler->security($message);
- $errorHandler->warn($message);
+ $log->audit($message);
+ $log->debug($message);
+ $log->error($message);
+ $log->fatal($message);
+ $log->info($message);
+ $log->security($message);
+ $log->warn($message);
 
- $logger = $errorHandler->getLogger;
+ $logger = $log->getLogger;
 
- $text = $errorHandler->getStackTrace;
- $html = $errorHandler->showDebug;
+ $text = $log->getStackTrace;
+ $html = $log->showDebug;
 
 =head1 METHODS
 

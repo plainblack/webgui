@@ -82,7 +82,7 @@ sub www_activityHelper {
 
     my $output = eval {WebGUI::Pluggable::instanciate($class, "www_".$sub, [$session])};
     if ($@) {
-        $session->errorHandler->error($@); 
+        $session->log->error($@); 
         return "ERROR";
     }
     return $output;
@@ -483,7 +483,7 @@ sub www_runWorkflow {
 	$session->http->setMimeType("text/plain");
 	$session->http->setCacheControl("none");
 	unless (Net::CIDR::Lite->new(@{ $session->config->get('spectreSubnets')} )->find($session->request->address) || canRunWorkflow($session)) {
-		$session->errorHandler->security("make a Spectre workflow runner request, but we're only allowed to accept requests from ".join(",",@{$session->config->get("spectreSubnets")}).".");
+		$session->log->security("make a Spectre workflow runner request, but we're only allowed to accept requests from ".join(",",@{$session->config->get("spectreSubnets")}).".");
         	return "error";
 	}
 	my $instanceId = $session->form->param("instanceId");
@@ -496,7 +496,7 @@ sub www_runWorkflow {
 		}
 		return "complete";
 	}
-	$session->errorHandler->warn("No instance ID passed to workflow runner.");
+	$session->log->warn("No instance ID passed to workflow runner.");
 	return "error";
 }
 

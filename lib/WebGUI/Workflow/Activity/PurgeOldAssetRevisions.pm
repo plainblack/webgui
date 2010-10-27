@@ -78,7 +78,7 @@ See WebGUI::Workflow::Activity::execute() for details.
 sub execute {
 	my ($self, $nothing, $instance) = @_;
     my $session = $self->session;
-    my $log = $session->errorHandler;
+    my $log = $session->log;
 
     # keep track of how much time it's taking
     my $start = time();

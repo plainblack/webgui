@@ -54,7 +54,7 @@ sub handler {
         $output = eval { $notFound->www_view };
 	} 
     else {
-        $session->errorHandler->error("The notFound page could not be instanciated!");
+        $session->log->error("The notFound page could not be instanciated!");
 		$output = "An error was encountered while processing your request.";
 	}
 	$output = "An error was encountered while processing your request." if $output eq '';

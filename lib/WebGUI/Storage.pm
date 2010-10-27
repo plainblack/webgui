@@ -104,7 +104,7 @@ sub _addError {
 	my $self = shift;
 	my $errorMessage = shift;
 	push(@{$self->{_errors}},$errorMessage);
-	$self->session->errorHandler->error($errorMessage);
+	$self->session->log->error($errorMessage);
 }
 
 #-------------------------------------------------------------------
@@ -247,40 +247,40 @@ sub addFileFromCaptcha {
 	my $image = Image::Magick->new();
 	$error = $image->Set(size=>'200x50');
 	if($error) {
-        $self->session->errorHandler->warn("Error setting captcha image size: $error");
+        $self->session->log->warn("Error setting captcha image size: $error");
     }
     $error = $image->ReadImage('xc:white');
 	if($error) {
-        $self->session->errorHandler->warn("Error initializing image: $error");
+        $self->session->log->warn("Error initializing image: $error");
     }
     $error = $image->AddNoise(noise=>"Multiplicative");
 	if($error) {
-        $self->session->errorHandler->warn("Error adding noise: $error");
+        $self->session->log->warn("Error adding noise: $error");
     }
     # AddNoise generates a different average color depending on library.  This is ugly, but the best I can see for now
     $error = $image->Annotate(font=>WebGUI::Paths->share.'/default.ttf', pointsize=>40, skewY=>0, skewX=>0, gravity=>'center', fill=>'#ffffff', antialias=>'true', text=>$challenge);
 	if($error) {
-        $self->session->errorHandler->warn("Error Annotating image: $error");
+        $self->session->log->warn("Error Annotating image: $error");
     }
     $error = $image->Draw(primitive=>"line", points=>"5,5 195,45", stroke=>'#ffffff', antialias=>'true', strokewidth=>2);
 	if($error) {
-        $self->session->errorHandler->warn("Error drawing line: $error");
+        $self->session->log->warn("Error drawing line: $error");
     }
     $error = $image->Blur(geometry=>"9");
 	if($error) {
-        $self->session->errorHandler->warn("Error blurring image: $error");
+        $self->session->log->warn("Error blurring image: $error");
     }
     $error = $image->Set(type=>"Grayscale");
 	if($error) {
-        $self->session->errorHandler->warn("Error setting grayscale: $error");
+        $self->session->log->warn("Error setting grayscale: $error");
     }
     $error = $image->Border(fill=>'black', width=>1, height=>1);
 	if($error) {
-        $self->session->errorHandler->warn("Error setting border: $error");
+        $self->session->log->warn("Error setting border: $error");
     }
     $error = $image->Write($self->getPath($filename));
 	if($error) {
-        $self->session->errorHandler->warn("Error writing image: $error");
+        $self->session->log->warn("Error writing image: $error");
     }
     return ($filename, $challenge);
 }
@@ -364,7 +364,7 @@ sub addFileFromFormPost {
     my $filename;
     my $attachmentCount = 1;
     foreach my $upload ($session->request->upload($formVariableName)) {
-        $session->errorHandler->info("Trying to get " . $upload->filename." from ".$formVariableName);
+        $session->log->info("Trying to get " . $upload->filename." from ".$formVariableName);
         if ( $attachmentCount > $attachmentLimit ) {
             $self->_cdnAdd;
             return $filename;
@@ -384,7 +384,7 @@ sub addFileFromFormPost {
         $attachmentCount++;
         if (File::Copy::move($upload->path, $filePath)) {
             $self->_changeOwner($filePath);
-            $self->session->errorHandler->info("Got ".$upload->filename);
+            $self->session->log->info("Got ".$upload->filename);
         }
         else {
             $self->_addError("Couldn't open file ".$self->getPath($filename)." for writing due to error: ".$!);
@@ -638,7 +638,7 @@ sub create {
     my $self = $class->get($session,$id);
     $self->_makePath;
 
-    $session->errorHandler->info("Created storage location $id as a $class");
+    $session->log->info("Created storage location $id as a $class");
     return $self;
 }
 
@@ -690,7 +690,7 @@ sub delete {
     }
     # Delete the content from the CDN - enqueue
     $self->_cdnDel(0);
-    $self->session->errorHandler->info("Deleted storage ".$self->getId);
+    $self->session->log->info("Deleted storage ".$self->getId);
     return undef;
 }
 
@@ -814,17 +814,17 @@ sub generateThumbnail {
 	my $filename = shift;
 	my $thumbnailSize = shift || $self->session->setting->get("thumbnailSize") || 100;
 	unless (defined $filename) {
-		$self->session->errorHandler->error("Can't generate a thumbnail when you haven't specified a file.");
+		$self->session->log->error("Can't generate a thumbnail when you haven't specified a file.");
 		return 0;
 	}
 	unless ($self->isImage($filename)) {
-		$self->session->errorHandler->warn("Can't generate a thumbnail for something that's not an image.");
+		$self->session->log->warn("Can't generate a thumbnail for something that's not an image.");
 		return 0;
 	}
         my $image = Image::Magick->new;
         my $error = $image->Read($self->getPath($filename));
 	if ($error) {
-		$self->session->errorHandler->error("Couldn't read image for thumbnail creation: ".$error);
+		$self->session->log->error("Couldn't read image for thumbnail creation: ".$error);
 		return 0;
 	}
         my ($x, $y) = $image->Get('width','height');
@@ -840,7 +840,7 @@ sub generateThumbnail {
         }
         $error = $image->Write($self->getPath.'/'.'thumb-'.$filename);
 	if ($error) {
-		$self->session->errorHandler->error("Couldn't create thumbnail: ".$error);
+		$self->session->log->error("Couldn't create thumbnail: ".$error);
 		return 0;
 	}
 	return 1;
@@ -884,11 +884,11 @@ sub getCdnFileIterator {
                 return $sub;
             }
             else {
-                $session->errorHandler->warn("CDN: cannot read directory $cdnCfg->{'queuePath'}");
+                $session->log->warn("CDN: cannot read directory $cdnCfg->{'queuePath'}");
             }
         }
         else {
-            $session->errorHandler->warn("CDN: enabled but no queuePath");
+            $session->log->warn("CDN: enabled but no queuePath");
         }
     } ## end if ( $cdnCfg and $cdnCfg...
 } ## end sub getCdnFileIterator
@@ -911,7 +911,7 @@ sub getSize {
         my $image = Image::Magick->new;
         my $error = $image->Read($self->getPath($filename));
 	if ($error) {
-		$self->session->errorHandler->error("Couldn't read image for size reading: ".$error);
+		$self->session->log->error("Couldn't read image for size reading: ".$error);
 		return 0;
 	}
         my ($x, $y) = $image->Get('width','height');
@@ -1229,17 +1229,17 @@ sub getSizeInPixels {
 	my $self = shift;
 	my $filename = shift;
 	unless (defined $filename) {
-		$self->session->errorHandler->error("Can't check the size when you haven't specified a file.");
+		$self->session->log->error("Can't check the size when you haven't specified a file.");
 		return 0;
 	}
 	unless ($self->isImage($filename)) {
-		$self->session->errorHandler->error("Can't check the size of something that's not an image.");
+		$self->session->log->error("Can't check the size of something that's not an image.");
 		return 0;
 	}
         my $image = Image::Magick->new;
         my $error = $image->Read($self->getPath($filename));
 	if ($error) {
-		$self->session->errorHandler->error("Couldn't read image to check the size of it: ".$error);
+		$self->session->log->error("Couldn't read image to check the size of it: ".$error);
 		return 0;
 	}
         return $image->Get('width','height');
@@ -1262,7 +1262,7 @@ sub getThumbnailUrl {
     my $self     = shift;
     my $filename = shift;
 	if (! defined $filename) {
-		$self->session->errorHandler->error("Can't find a thumbnail url without a filename.");
+		$self->session->log->error("Can't find a thumbnail url without a filename.");
 		return '';
 	}
     if (! $self->isImage($filename)) {
@@ -1270,7 +1270,7 @@ sub getThumbnailUrl {
     }
     my $thumbname = 'thumb-' . $filename;
     if (! -e $self->getPath($thumbname)) {
-        $self->session->errorHandler->error("Can't find a thumbnail for a file named '$filename' that is not in my storage location.");
+        $self->session->log->error("Can't find a thumbnail for a file named '$filename' that is not in my storage location.");
         return '';
     }
 	return $self->getUrl($thumbname);
@@ -1398,34 +1398,34 @@ sub crop {
     my $x           = shift;
     my $y           = shift;
     unless (defined $filename) {
-        $self->session->errorHandler->error("Can't resize when you haven't specified a file.");
+        $self->session->log->error("Can't resize when you haven't specified a file.");
         return 0;
     }
     unless ($self->isImage($filename)) {
-        $self->session->errorHandler->error("Can't resize something that's not an image.");
+        $self->session->log->error("Can't resize something that's not an image.");
         return 0;
     }
     unless ($width || $height || $x || $y) {
-        $self->session->errorHandler->error("Can't resize with no resizing parameters.");
+        $self->session->log->error("Can't resize with no resizing parameters.");
         return 0;
     }
     my $image = Image::Magick->new;
     my $error = $image->Read($self->getPath($filename));
     if ($error) {
-        $self->session->errorHandler->error("Couldn't read image for resizing: ".$error);
+        $self->session->log->error("Couldn't read image for resizing: ".$error);
         return 0;
     }
 
     # Next, resize dimensions
     if ( $width || $height || $x || $y ) {
-        $self->session->errorHandler->info( "Resizing $filename to w:$width h:$height x:$x y:$y" );
+        $self->session->log->info( "Resizing $filename to w:$width h:$height x:$x y:$y" );
         $image->Crop( height => $height, width => $width, x => $x, y => $y );
     }
 
     # Write our changes to disk
     $error = $image->Write($self->getPath($filename));
     if ($error) {
-        $self->session->errorHandler->error("Couldn't resize image: ".$error);
+        $self->session->log->error("Couldn't resize image: ".$error);
         return 0;
     }
 
@@ -1458,19 +1458,19 @@ sub annotate {
     my $asset       = shift;
     my $form        = shift;
     unless (defined $filename) {
-        $self->session->errorHandler->error("Can't rotate when you haven't specified a file.");
+        $self->session->log->error("Can't rotate when you haven't specified a file.");
         return 0;
     }
     unless ($self->isImage($filename)) {
-        $self->session->errorHandler->error("Can't rotate something that's not an image.");
+        $self->session->log->error("Can't rotate something that's not an image.");
         return 0;
     }
     # unless ($annotate_text) {
-    # $self->session->errorHandler->error("Can't annotate with no text.");
+    # $self->session->log->error("Can't annotate with no text.");
     # return 0;
     # }
     # unless ($annotate_top && $annotate_left && $annotate_width && $annotate_height) {
-    # $self->session->errorHandler->error("Can't annotate with no dimensions.");
+    # $self->session->log->error("Can't annotate with no dimensions.");
     # return 0;
     # }
 
@@ -1534,27 +1534,27 @@ sub rotate {
     my $filename    = shift;
     my $degree      = shift || 0;
     unless (defined $filename) {
-        $self->session->errorHandler->error("Can't rotate when you haven't specified a file.");
+        $self->session->log->error("Can't rotate when you haven't specified a file.");
         return 0;
     }
     unless ($self->isImage($filename)) {
-        $self->session->errorHandler->error("Can't rotate something that's not an image.");
+        $self->session->log->error("Can't rotate something that's not an image.");
         return 0;
     }
     my $image = Image::Magick->new;
     my $error = $image->Read($self->getPath($filename));
     if ($error) {
-        $self->session->errorHandler->error("Couldn't read image for resizing: ".$error);
+        $self->session->log->error("Couldn't read image for resizing: ".$error);
         return 0;
     }
 
-    $self->session->errorHandler->info( "Rotating $filename by $degree degrees" );
+    $self->session->log->info( "Rotating $filename by $degree degrees" );
     $image->Rotate( $degree );
 
     # Write our changes to disk
     $error = $image->Write($self->getPath($filename));
     if ($error) {
-        $self->session->errorHandler->error("Couldn't rotate image: ".$error);
+        $self->session->log->error("Couldn't rotate image: ".$error);
         return 0;
     }
 
@@ -1594,27 +1594,27 @@ sub resize {
     my $height      = shift;
     my $density     = shift;
     unless (defined $filename) {
-        $self->session->errorHandler->error("Can't resize when you haven't specified a file.");
+        $self->session->log->error("Can't resize when you haven't specified a file.");
         return 0;
     }
     unless ($self->isImage($filename)) {
-        $self->session->errorHandler->error("Can't resize something that's not an image.");
+        $self->session->log->error("Can't resize something that's not an image.");
         return 0;
     }
     unless ($width || $height || $density) {
-        $self->session->errorHandler->error("Can't resize with no resizing parameters.");
+        $self->session->log->error("Can't resize with no resizing parameters.");
         return 0;
     }
     my $image = Image::Magick->new;
     my $error = $image->Read($self->getPath($filename));
     if ($error) {
-        $self->session->errorHandler->error("Couldn't read image for resizing: ".$error);
+        $self->session->log->error("Couldn't read image for resizing: ".$error);
         return 0;
     }
 
     # First, change image density
     if ( $density ) {
-        $self->session->errorHandler->info( "Setting $filename to $density" );
+        $self->session->log->info( "Setting $filename to $density" );
         $image->Set( density => "${density}x${density}" );
     }
 
@@ -1631,14 +1631,14 @@ sub resize {
         elsif (!$width) { # proportional scale by height
             $width = $height * $x / $y;
         }
-        $self->session->errorHandler->info( "Resizing $filename to w:$width h:$height" );
+        $self->session->log->info( "Resizing $filename to w:$width h:$height" );
         $image->Resize( height => $height, width => $width );
     }
 
     # Write our changes to disk
     $error = $image->Write($self->getPath($filename));
     if ($error) {
-        $self->session->errorHandler->error("Couldn't resize image: ".$error);
+        $self->session->log->error("Couldn't resize image: ".$error);
         return 0;
     }
 

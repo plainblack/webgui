@@ -294,7 +294,7 @@ sub appendRecentChanges {
 	while (my ($id, $version) = $revisions->array) {
 		my $asset = WebGUI::Asset->newById($self->session, $id, $version);
 		unless (defined $asset) {
-			$self->session->errorHandler->error("Asset $id $version could not be instanciated.");
+			$self->session->log->error("Asset $id $version could not be instanciated.");
 			next;
 		}
 		my $user = WebGUI::User->new($self->session, $asset->actionTakenBy);

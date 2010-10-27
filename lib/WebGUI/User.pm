@@ -84,7 +84,7 @@ sub _create {
     my @fields     = @{WebGUI::ProfileField->getFields($session)};
     my $privacy  = {};
     foreach my $field (@fields) {
-        #$session->errorHandler->warn('getting privacy setting for field: '.$fieldName);
+        #$session->log->warn('getting privacy setting for field: '.$fieldName);
         my $privacySetting = $field->get('defaultPrivacySetting');
         next unless $privacySetting ~~ [qw(all none friends)];
         $privacy->{$field->get('fieldName')} = $privacySetting;
@@ -152,7 +152,7 @@ sub acceptsPrivateMessages {
     if($pmSetting eq "friends") {
         my $friendsGroup = $self->friends;
         my $sentBy       = WebGUI::User->new($self->session,$userId);
-        #$self->session->errorHandler->warn($self->isInGroup($friendsGroup->getId));
+        #$self->session->log->warn($self->isInGroup($friendsGroup->getId));
         return $sentBy->isInGroup($friendsGroup->getId);
     }
 
@@ -571,7 +571,7 @@ sub get {
             # XXX Should the defaults be set in new() ...
             if ( !exists $self->{_profile}->{$field} ) {
                 if ( !WebGUI::ProfileField->exists( $session, $field ) ) {
-                    $self->session->errorHandler->warn("No such profile field: $field");
+                    $self->session->log->warn("No such profile field: $field");
                 }
 
                 my $default = $session->db->quickScalar("SELECT dataDefault FROM userProfileField WHERE fieldName=?", [$field]);
@@ -1407,7 +1407,7 @@ sub update {
     my @profileValues   = ();
     for my $key ( keys %{$properties} ) {
         if (!exists $self->{_profile}{$key} && !WebGUI::ProfileField->exists($session,$key)) {
-            $self->session->errorHandler->warn("No such profile field: $key");
+            $self->session->log->warn("No such profile field: $key");
             next;
         }
         push @profileFields, $db->quote_identifier( $key ) . " = ?";

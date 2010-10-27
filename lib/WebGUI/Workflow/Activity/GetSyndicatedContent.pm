@@ -73,7 +73,7 @@ sub execute {
     my $object = shift;
     my $instance = shift;
     unless (defined $instance) {
-        $self->session->errorHandler->error("Could not instanciate Workflow Instance in GetSyndicatedContent Activity");
+        $self->session->log->error("Could not instanciate Workflow Instance in GetSyndicatedContent Activity");
         return $self->ERROR;
     }
 	my $log = $self->session->log;

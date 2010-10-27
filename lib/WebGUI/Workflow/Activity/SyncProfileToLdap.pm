@@ -132,11 +132,11 @@ sub execute {
                 filter =>$ldapLink->getValue("ldapIdentity").'='.$userObject->username
             );
 		    if($search->code) {
-		        $self->session->errorHandler->warn("Couldn't search LDAP ".$uri->host." to find user ".$userObject->username." (".$userId.").\nError Message from LDAP: ".$ldapStatusCode{$search->code});
+		        $self->session->log->warn("Couldn't search LDAP ".$uri->host." to find user ".$userObject->username." (".$userId.").\nError Message from LDAP: ".$ldapStatusCode{$search->code});
 			    return $self->COMPLETE;
             }
 			elsif ($search->count == 0) {
-                $self->session->errorHandler->warn("No results returned for user with dn ".$userData->{connectDN});
+                $self->session->log->warn("No results returned for user with dn ".$userData->{connectDN});
                 return $self->COMPLETE;
             }
             else {
@@ -149,7 +149,7 @@ sub execute {
             }
             $ldap->unbind;
         } else {
-            $self->session->errorHandler->warn("Error connecting to LDAP: ".$ldapLink->getErrorMessage);
+            $self->session->log->warn("Error connecting to LDAP: ".$ldapLink->getErrorMessage);
             return $self->ERROR;
         }
 	}

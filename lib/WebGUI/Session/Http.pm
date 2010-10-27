@@ -504,7 +504,7 @@ sub setRedirect {
     my $type = shift || 302;
 	my @params = $self->session->form->param;
 	return undef if ($url eq $self->session->url->page() && scalar(@params) < 1); # prevent redirecting to self
-	$self->session->errorHandler->info("Redirecting to $url");
+	$self->session->log->info("Redirecting to $url");
 	$self->setRedirectLocation($url);
 	$self->setStatus($type);
 	$self->session->style->setMeta({"http-equiv"=>"refresh",content=>"0; URL=".$url});

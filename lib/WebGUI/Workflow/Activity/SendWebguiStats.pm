@@ -96,7 +96,7 @@ sub execute {
     my $request = POST 'https://www.webgui.org/stats', [ func => 'receiveStats', stats => $statsAsJson ];
     my $response = $userAgent->request($request);
     if ($response->is_error) {
-        $self->session->errorHandler->error("WebGUI Stats could not be sent.");
+        $self->session->log->error("WebGUI Stats could not be sent.");
     }
     return $self->COMPLETE;
 }

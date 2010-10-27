@@ -186,7 +186,7 @@ sub authenticate {
             $auth = $ldap->bind(dn=>$self->{_connectDN}, password=>$identifier);
             my $message = "DN has been changed for user ".$_[0]." from \"".$userData->{connectDN}."\" to \"".$self->{_connectDN}."\"";
             $self->saveParams($self->user->userId, $self->authMethod, { connectDN => $self->{_connectDN} });
-            $self->session->errorHandler->warn($message);
+            $self->session->log->warn($message);
         }
         
         # Authentication failed

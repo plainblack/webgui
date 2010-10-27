@@ -837,7 +837,7 @@ sub www_addSubmission {
     }
     $form = eval { WebGUI::Asset->newById($session, $formId); };
     if (Exception::Class->caught()) {
-        $session->errorHandler->error(__PACKAGE__ . " - failed to instanciate asset with assetId $formId");
+        $session->log->error(__PACKAGE__ . " - failed to instanciate asset with assetId $formId");
     }
     return $form->www_addSubmission;
 }
@@ -1863,7 +1863,7 @@ className='WebGUI::Asset::Sku::EMSTicket' and state='published' and revisionDate
 		
 		# skip borked tickets
 		unless (defined $ticket) {
-			$session->errorHandler->warn("EMSTicket $id couldn't be instanciated by EMS ".$self->getId.".");
+			$session->log->warn("EMSTicket $id couldn't be instanciated by EMS ".$self->getId.".");
 			$totalTickets--;
 			next;
 		}

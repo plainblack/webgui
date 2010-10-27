@@ -862,7 +862,7 @@ sub login {
 	if ($command ne "") {
 		WebGUI::Macro::process($self->session,\$command);
 		my $error = qx($command);
-		$self->session->errorHandler->warn($error) if $error;
+		$self->session->log->warn($error) if $error;
 	}
 	
 
@@ -912,7 +912,7 @@ sub logout {
     if ($command ne "") {
        WebGUI::Macro::process($self->session,\$command);
        my $error = qx($command);
-       $self->session->errorHandler->warn($error) if $error;
+       $self->session->log->warn($error) if $error;
     }
 
     # Do not allow caching of the logout page (to ensure the page gets requested)
@@ -1093,7 +1093,7 @@ sub timeRecordSession {
     } else {
         # If something strange happened and we ended up with > 1 matching rows, cut our losses and remove offending userLoginLog rows (otherwise we
         # could end up with ridiculously long user recorded times)
-        $self->session->errorHandler->warn("More than 1 old userLoginLog rows found, removing offending rows");
+        $self->session->log->warn("More than 1 old userLoginLog rows found, removing offending rows");
         $self->session->db->write("delete from userLoginLog where lastPageViewed = timeStamp and sessionId = ? ", [$self->session->getId] );
     }
 }

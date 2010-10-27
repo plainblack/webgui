@@ -348,7 +348,7 @@ sub www_editSubmission {
         if( $assetId ne 'new' ) {
             $self ||= eval { WebGUI::Asset->newById($session,$assetId); };
             if (Exception::Class->caught()) {
-                $session->errorHandler->error(__PACKAGE__ . " - failed to instanciate asset with assetId $assetId");
+                $session->log->error(__PACKAGE__ . " - failed to instanciate asset with assetId $assetId");
             }
         }
         my $asset = $self || $parent;

@@ -26,7 +26,7 @@ use WebGUI::Config;
 use WebGUI::SQL;
 use WebGUI::User;
 use WebGUI::Session::DateTime;
-use WebGUI::Session::ErrorHandler;
+use WebGUI::Session::Log;
 use WebGUI::Session::Form;
 use WebGUI::Session::Http;
 use WebGUI::Session::Icon;
@@ -182,7 +182,7 @@ sub close {
 
 	# Kill circular references.  The literal list is so that the order
 	# can be explicitly shuffled as necessary.
-	foreach my $key (qw/_asset _datetime _icon _slave _db _form _http _id _output _privilege _scratch _setting _stow _style _url _user _var _cache _errorHandler _response _request/) {
+	foreach my $key (qw/_asset _datetime _icon _slave _db _form _http _id _output _privilege _scratch _setting _stow _style _url _user _var _cache _log _response _request/) {
 		delete $self->{$key};
 	}
     $self->{closed} = 1;
@@ -241,7 +241,7 @@ sub db {
 	unless (exists $self->{_db}) {
 		my $db = WebGUI::SQL->connect($self,$self->config->get("dsn"), $self->config->get("dbuser"), $self->config->get("dbpass"));
 		if (!defined $db && defined $self->config->get("failoverdb")) {
-			$self->errorHandler->warn("Main DB down, resorting to using failover.");
+			$self->log->warn("Main DB down, resorting to using failover.");
 			my $failover = $self->config->get("failoverdb");
 			$db = WebGUI::SQL->connect($self,$failover->{dsn}, $failover->{user}, $failover->{password});
 		}
@@ -253,7 +253,7 @@ sub db {
 				return undef;
 			}
 			else { 	
-				$self->errorHandler->fatal("Couldn't connect to WebGUI database, and can't continue without it.");
+				$self->log->fatal("Couldn't connect to WebGUI database, and can't continue without it.");
 			}
 		}
 	}
@@ -435,16 +435,16 @@ sub id {
 
 =head2 log ( )
 
-Returns a WebGUI::Session::ErrorHandler object, which is used for logging.
+Returns a WebGUI::Session::Log object, which is used for logging.
 
 =cut
 
 sub log {
 	my $self = shift;
-	unless (exists $self->{_errorHandler}) {
-		$self->{_errorHandler}  = WebGUI::Session::ErrorHandler->new($self);
+	unless (exists $self->{_log}) {
+		$self->{_log}  = WebGUI::Session::Log->new($self);
 	}
-	return $self->{_errorHandler};
+	return $self->{_log};
 }
 
 #-------------------------------------------------------------------

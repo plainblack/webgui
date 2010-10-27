@@ -562,13 +562,13 @@ sub process {
 
     if ($self->state =~ /^trash/) {
         my $i18n = WebGUI::International->new($session, 'Asset_Template');
-        $session->errorHandler->warn('process called on template in trash: '.$self->getId
+        $session->log->warn('process called on template in trash: '.$self->getId
             .'. The template was called through this url: '.$session->asset->url);
         return $session->var->isAdminOn ? $i18n->get('template in trash') : '';
     }
     elsif ($self->state =~ /^clipboard/) {
         my $i18n = WebGUI::International->new($session, 'Asset_Template');
-        $session->errorHandler->warn('process called on template in clipboard: '.$self->getId
+        $session->log->warn('process called on template in clipboard: '.$self->getId
             .'. The template was called through this url: '.$session->asset->url);
         return $session->var->isAdminOn ? $i18n->get('template in clipboard') : '';
     }

@@ -84,7 +84,7 @@ sub execute {
         } else {
             # If something strange happened and we ended up with > 1 matching rows, cut our losses and remove offending userLoginLog rows (otherwise we
             # could end up with ridiculously long user recorded times)
-            $self->session->errorHandler->warn("More than 1 old userLoginLog rows found, removing offending rows");
+            $self->session->log->warn("More than 1 old userLoginLog rows found, removing offending rows");
             $self->session->db->write("delete from userLoginLog where lastPageViewed = timeStamp and sessionId = ? ", [$sessionId] );
         }
 		my $session = WebGUI::Session->open($self->session->config, undef, $sessionId, 1);

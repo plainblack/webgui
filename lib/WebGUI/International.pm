@@ -171,7 +171,7 @@ sub getLanguage {
         no strict 'refs';
         ${"$pack\::LANGUAGE"};
     };
-    $self->session->errorHandler->warn("Failed to retrieve language properties because ".$@) if ($@);
+    $self->session->log->warn("Failed to retrieve language properties because ".$@) if ($@);
     if ($property) {
         return $langInfo->{$property};
     }

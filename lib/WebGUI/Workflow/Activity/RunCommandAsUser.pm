@@ -83,7 +83,7 @@ sub execute {
 	$self->session->user({user=>$user});
 	WebGUI::Macro::process($self->session, \$cmd);
 	if (system($cmd)) {
-		$self->session->errorHandler->error("Workflow: RunCommandAsUser failed because: $!");
+		$self->session->log->error("Workflow: RunCommandAsUser failed because: $!");
         $self->session->user({user=>$previousUser});
 		return $self->ERROR;
 	} else {

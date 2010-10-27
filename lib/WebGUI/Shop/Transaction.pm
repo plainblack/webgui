@@ -1226,7 +1226,7 @@ sub www_refundItem {
     my $form = $session->form;
     my $item = eval { $self->getItem($form->get("itemId")) };
     if (WebGUI::Error->caught()) {
-        $session->errorHandler->error("Can't get item ".$form->get("itemId"));
+        $session->log->error("Can't get item ".$form->get("itemId"));
         return $class->www_view($session);
     }
     $item->issueCredit;
@@ -1461,7 +1461,7 @@ sub www_viewItem {
     my $self = $class->new($session, $session->form->get("transactionId"));
     my $item = eval { $self->getItem($session->form->get("itemId")) };
     if (WebGUI::Error->caught()) {
-        $session->errorHandler->error("Can't get item ".$session->form->get("itemId"));
+        $session->log->error("Can't get item ".$session->form->get("itemId"));
         return $class->www_view($session);
     }
     return $item->getSku->www_view;
@@ -1516,7 +1516,7 @@ sub www_updateItem {
     my $form = $session->form;
     my $item = eval { $self->getItem($form->get("itemId")) };
     if (WebGUI::Error->caught()) {
-        $session->errorHandler->error("Can't get item ".$form->get("itemId"));
+        $session->log->error("Can't get item ".$form->get("itemId"));
         return $class->www_view($session);
     }
     $item->update({

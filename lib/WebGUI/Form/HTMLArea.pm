@@ -190,7 +190,7 @@ sub toHtml {
     if (! $self->{_richEdit}) {
         my $richEdit = eval { WebGUI::Asset::RichEdit->newById($self->session, $self->get("richEditId")); };
         if (Exception::Class->caught() ) {
-            $self->session->errorHandler->warn($i18n->get('rich editor load error','Form_HTMLArea'));
+            $self->session->log->warn($i18n->get('rich editor load error','Form_HTMLArea'));
             return $self->SUPER::toHtml;
         }
     }

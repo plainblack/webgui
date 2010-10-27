@@ -124,7 +124,7 @@ sub getAssets {
 	while (my ($id, $class, $version) = $rs->array) {
 		my $asset = eval { WebGUI::Asset->newById($self->session, $id, $version); };
 		if (Exception::Class->caught()) {
-			$self->session->errorHandler->warn("Search index contains assetId $id even though it no longer exists.");
+			$self->session->log->warn("Search index contains assetId $id even though it no longer exists.");
 			next;
 		}
 		push(@assets, $asset);		
@@ -445,7 +445,7 @@ sub search {
             my $join        = [ "left join assetData on assetIndex.assetId=assetData.assetId" ];
             for my $className ( @{ $rules->{ joinClass } } ) {
                 if ( ! eval { WebGUI::Pluggable::load($className) } ) {
-                    $self->session->errorHandler->fatal($@);
+                    $self->session->log->fatal($@);
                 }
                 TABLE: foreach my $tableName ($className->meta->get_tables) {
                     next TABLE if $tableName eq 'assetData';

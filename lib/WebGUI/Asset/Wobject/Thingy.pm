@@ -71,7 +71,7 @@ sub addField {
     my $dbDataType = shift || $self->_getDbDataType($field->{fieldType});
     my $session    = $self->session;
     my $db         = $session->db;
-    my $error      = $session->errorHandler;
+    my $error      = $session->log;
     my ($oldFieldId, $newFieldId,$useAssetId,$useSequence);
 
     $error->info("Adding Field, label: ".$field->{label}.", fieldId: ".$field->{fieldId}.",thingId: ".$field->{thingId});
@@ -125,7 +125,7 @@ sub addThing {
     my $thing = shift;
     my $isImport = shift;
     my $db = $self->session->db;
-    my $error = $self->session->errorHandler;
+    my $error = $self->session->log;
     my ($oldThingId, $newThingId,$useAssetId);
 
     $error->info("Adding Thing, label: ".$thing->{label}.", id: ".$thing->{thingId});
@@ -376,7 +376,7 @@ sub deleteField {
     my $thingId = shift;
     my $keepSequenceNumbers = shift;
     my $db = $self->session->db;
-    my $error = $self->session->errorHandler;
+    my $error = $self->session->log;
     my $deletedSequenceNumber;
 
     if ($keepSequenceNumbers ne "1"){
@@ -521,7 +521,7 @@ sub deleteThing {
     my $self = shift;
     my $thingId = shift;
     my $session = $self->session;
-    my $error = $session->errorHandler;
+    my $error = $session->log;
 
     $self->deleteCollateral("Thingy_things","thingId",$thingId);
     $self->deleteCollateral("Thingy_fields","thingId",$thingId);
@@ -1260,7 +1260,7 @@ sub importAssetCollateralData {
     
     my $self = shift;
     my $session = $self->session;
-    my $error = $session->errorHandler;
+    my $error = $session->log;
     my $data = shift;
     my $id = $data->{properties}{assetId};
     my $class = $data->{properties}{className};
@@ -1433,7 +1433,7 @@ sub _updateFieldType {
 
         my $self = shift;
         my $session = $self->session;
-        my $error = $session->errorHandler;
+        my $error = $session->log;
         
         my $newFieldType = shift;
         my $fieldId = shift;
@@ -1721,7 +1721,7 @@ sub www_editThing {
     foreach my $fieldType ( keys %{ WebGUI::Form::FieldType->new($session)->getTypes }) {
         my $form = eval { WebGUI::Pluggable::instanciate("WebGUI::Form::".$fieldType, "new", [$session]) };
         if ($@) {
-            $session->errorHandler->error($@);
+            $session->log->error($@);
             next;
         }
         my $definition = $form->definition($session);
@@ -2789,7 +2789,7 @@ sub www_import {
         push(@insertColumns, $field) if ($session->form->process("fileContains_".$field->{fieldId}));
     }
 
-    my $error = $self->session->errorHandler;
+    my $error = $self->session->log;
     my $storage = WebGUI::Storage->createTemp($self->session);
     $handleDuplicates = $session->form->process("handleDuplicates");
 
@@ -3038,7 +3038,7 @@ sub www_moveFieldConfirm {
     my $session = $self->session;
     return $session->privilege->insufficient() unless $self->canEdit;
 
-    my $error = $self->session->errorHandler;
+    my $error = $self->session->log;
     my $direction = $session->form->process('direction');
     my $assetId = $self->getId;
     my $fieldId = $session->form->process('fieldId');
@@ -3290,7 +3290,7 @@ sequenceNumber');
         }
     }
     else{
-        $self->session->errorHandler->warn("The default Thing has no fields selected to display in the search.");
+        $self->session->log->warn("The default Thing has no fields selected to display in the search.");
         $noFields = 1;
     }
 

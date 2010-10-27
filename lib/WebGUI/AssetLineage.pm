@@ -77,7 +77,7 @@ sub addChild {
 
 	# Check if it is possible to add a child to this asset. If not add it as a sibling of this asset.
 	if (length($self->lineage) >= 252) {
-		$session->errorHandler->warn('Tried to add child to asset "'.$self->getId.'" which is already on the deepest level. Adding it as a sibling instead.');
+		$session->log->warn('Tried to add child to asset "'.$self->getId.'" which is already on the deepest level. Adding it as a sibling instead.');
 		return $self->getParent->addChild($properties, $id, $now, $options);
 	}
 
@@ -483,7 +483,7 @@ sub getLineage {
 			} else {
 				$asset = WebGUI::Asset->newById($session, $id, $version);
 				if (!defined $asset) { # won't catch everything, but it will help some if an asset blows up
-					$session->errorHandler->error("AssetLineage::getLineage - failed to instanciate asset with assetId $id, className $class, and revision $version");
+					$session->log->error("AssetLineage::getLineage - failed to instanciate asset with assetId $id, className $class, and revision $version");
 					next ASSET;
 				}
 			}
@@ -693,7 +693,7 @@ sub getLineageSql {
 		my $className = $rules->{joinClass};
         (my $module = $className . '.pm') =~ s{::|'}{/}g;
         if ( ! eval { require $module; 1 }) {
-            $self->session->errorHandler->fatal("Couldn't compile asset package: ".$className.". Root cause: ".$@) if ($@);
+            $self->session->log->fatal("Couldn't compile asset package: ".$className.". Root cause: ".$@) if ($@);
         }
         foreach my $table ($className->meta->get_tables) {
             unless ($table eq "asset" || $table eq "assetData") {
@@ -780,7 +780,7 @@ sub getNextChildRank {
 	my $rank;
 	if (defined $lineage) {
 		$rank = $self->getRank($lineage);
-		$self->session->errorHandler->fatal("Asset ".$self->getId." has too many children.") if ($rank >= 999998);
+		$self->session->log->fatal("Asset ".$self->getId." has too many children.") if ($rank >= 999998);
 		$rank++;
 	} else {
 		$rank = 1;

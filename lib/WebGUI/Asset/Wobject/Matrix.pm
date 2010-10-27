@@ -1290,7 +1290,7 @@ sub www_getCompareListData {
                         { value=>$result->{$listingId_safe} },defaultValue=>0)->getValueAsHtml;
                 }
                 if($session->scratch->get('stickied_'.$result->{attributeId})){
-                    # $self->session->errorHandler->warn("found checked stickie: ".$result->{attributeId});
+                    # $self->session->log->warn("found checked stickie: ".$result->{attributeId});
                     $result->{checked} = 'checked';
                 }
                 else{

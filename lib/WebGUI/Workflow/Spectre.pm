@@ -57,7 +57,7 @@ sub notify {
 	my $self = shift;
 	my $module = shift;
 	my $params = shift;
-	my ($config, $error) = $self->session->quick("config", "errorHandler");
+	my ($config, $error) = $self->session->quick("config", "log");
 	my $remote = create_ikc_client(
                 port=>$config->get("spectrePort"),
                 ip=>$config->get("spectreIp"),

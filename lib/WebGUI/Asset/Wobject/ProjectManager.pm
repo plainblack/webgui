@@ -90,7 +90,7 @@ property groupToAdd => (
 sub _addDaysForMonth {
    my $self = shift;
    my $dt = $self->session->datetime;
-   my $eh = $self->session->errorHandler;
+   my $eh = $self->session->log;
    
    my $days_loop = $_[0];
    my $hash = $_[1];
@@ -273,7 +273,7 @@ sub _htmlOfResourceList {
 			$subvar->{resourceName} = WebGUI::HTML::format($displayName, 'text');
 			$subvar->{resourceIcon} = 'users.gif';
 		} else {
-			$self->session->errorHandler->fatal("Unknown kind of resource '$resourceKind'!");
+			$self->session->log->fatal("Unknown kind of resource '$resourceKind'!");
 		}
 
 		push @{$var->{resourceLoop}}, $subvar;
@@ -423,7 +423,7 @@ sub _updateDependantDates {
 			my $pred = $taskHash->{$predecessor};
 			unless ($pred) {
 				# Predecessor has to have a lower sequence number, right?  Right?
-				$self->session->errorHandler->error("Internal: predecessor '$predecessor' of task with seqNum '$seqNum' not in task hash?!");
+				$self->session->log->error("Internal: predecessor '$predecessor' of task with seqNum '$seqNum' not in task hash?!");
 				next;
 			}
 
@@ -655,7 +655,7 @@ sub setSessionVars {
 sub updateProjectTask {
 	my $self = shift;
 	my $db = $self->session->db;
-	my $eh = $self->session->errorHandler;
+	my $eh = $self->session->log;
    
 	my $taskId = $_[0];
 	my $projectId = $_[1];
@@ -726,7 +726,7 @@ sub view {
 	
 	my ($session,$privilege,$form,$db,$datetime,$i18n,$user) = $self->setSessionVars;
 	my $config = $session->config;
-	my $eh = $session->errorHandler;
+	my $eh = $session->log;
 	
 	$var->{'extras'} = $session->url->make_urlmap_work($config->get("extrasURL"))."/wobject/ProjectManager"; 
 	$var->{'project.create'} = $self->getUrl("func=editProject;projectId=new");
@@ -871,7 +871,7 @@ sub www_drawGanttChart {
 	my ($session,$privilege,$form,$db,$dt,$i18n,$user) = $self->setSessionVars;
 	my $config = $session->config;
 	my $style = $session->style;
-	my $eh = $session->errorHandler;
+	my $eh = $session->log;
 	
 	#Set up some the task data
 	my $projectId = $_[0];
@@ -1236,7 +1236,7 @@ sub www_editProjectSave {
 	my $self = shift;
     #Set Method Helpers
     my ($session,$privilege,$form,$db,$dt,$i18n,$user) = $self->setSessionVars;
-    my $eh = $session->errorHandler;
+    my $eh = $session->log;
 	
     #Check Privileges
     return $privilege->insufficient unless $self->_userCanManageProjectList($user);
@@ -1509,7 +1509,7 @@ sub www_editTaskSave {
    #Set Method Helpers
    my ($session,$privilege,$form,$db,$dt,$i18n,$user) = $self->setSessionVars;
    my $config = $session->config;
-   my $eh = $session->errorHandler;
+   my $eh = $session->log;
 
    my $projectId = $form->get("projectId");
    my $project = $db->quickHashRef("select * from PM_project where projectId=".$db->quote($projectId));
@@ -1706,7 +1706,7 @@ sub www_viewProject {
     my $user        = $session->user;
     my $config      = $session->config;
 	my $style       = $session->style;
-	my $eh          = $session->errorHandler;
+	my $eh          = $session->log;
 	my $projectId   = shift || $form->get("projectId");
 		
     #Check Privileges

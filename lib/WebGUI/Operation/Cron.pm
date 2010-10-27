@@ -272,7 +272,7 @@ sub www_runCronJob {
 	$session->http->setMimeType("text/plain");
 	$session->http->setCacheControl("none");
 	unless (Net::CIDR::Lite->new(@{ $session->config->get('spectreSubnets') })->find($session->request->address) || canView($session)) {
-		$session->errorHandler->security("make a Spectre cron job runner request, but we're only allowed to accept requests from ".join(",",@{$session->config->get("spectreSubnets")}).".");
+		$session->log->security("make a Spectre cron job runner request, but we're only allowed to accept requests from ".join(",",@{$session->config->get("spectreSubnets")}).".");
         	return "error";
 	}
 	my $taskId = $session->form->param("taskId");
@@ -292,13 +292,13 @@ sub www_runCronJob {
                     });
                 if ( !$instance ) {
                     if ($session->stow->get('singletonWorkflowClash')) {
-                        $session->errorHandler->warn( 
+                        $session->log->warn( 
                             "Could not create workflow instance for workflowId '" . $task->get( "workflowId" )
                             . "' from taskId '".$taskId."': It is a singleton workflow and is still running from the last invocation."
                         );
                         return "done";
                     }
-                    $session->errorHandler->error( 
+                    $session->log->error( 
                         "Could not create workflow instance for workflowId '" . $task->get( "workflowId" )
                         . "' from taskId '".$taskId."': The result was undefined"
                     );
@@ -313,7 +313,7 @@ sub www_runCronJob {
         $task->delete( 1 ) if ( $task->get("runOnce") );
         return "done";
 	}
-	$session->errorHandler->warn("No task ID passed to cron job runner.");
+	$session->log->warn("No task ID passed to cron job runner.");
 	return "error";
 }
 

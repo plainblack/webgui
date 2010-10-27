@@ -390,7 +390,7 @@ sub www_listLDAPLinks {
             $ldapLink->unbind;
         }
         else {
-            $session->errorHandler->warn($ldapLink->getErrorMessage());
+            $session->log->warn($ldapLink->getErrorMessage());
             $status .= ": ".$ldapLink->getErrorMessage();
         }
 		$row[$i] .= '<td valign="top" class="tableData">'.$status.'</td>';

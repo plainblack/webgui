@@ -371,7 +371,7 @@ sub getAssets {
 	ASSETID: while (my ($id,$version) = $sth->array) {
 		my $asset = eval { WebGUI::Asset->newById($self->session,$id,$version); };
             unless (defined $asset) {
-                $self->session->errorHandler->error("Asset $id $version could not be instanciated by version tag ".$self->getId.". Perhaps it is corrupt.");
+                $self->session->log->error("Asset $id $version could not be instanciated by version tag ".$self->getId.". Perhaps it is corrupt.");
                 next ASSETID;
             }
             push(@assets, $asset);
@@ -736,7 +736,7 @@ sub rollback {
     my $outputSub = exists $options->{outputSub} ? $options->{outputSub} : sub {};
     my $tagId     = $self->getId;
     if ($tagId eq "pbversion0000000000001") {
-        $session->errorHandler->warn("You cannot rollback a tag that is required for the system to operate.");	
+        $session->log->warn("You cannot rollback a tag that is required for the system to operate.");	
         return 0;
     }
     my $sth = $session->db->read("select asset.assetId, assetData.revisionDate from assetData left join asset using(assetId) where assetData.tagId = ? order by asset.lineage desc, assetData.revisionDate desc", [ $tagId ]);

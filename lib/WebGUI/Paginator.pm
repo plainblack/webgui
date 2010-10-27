@@ -757,7 +757,7 @@ sub setDataByQuery {
         $sql =~ s/;?\s*$/ LIMIT $start,$rowsPerPage/;
     }
     
-    #$self->session->errorHandler->warn($sql);    
+    #$self->session->log->warn($sql);    
     #Get only the data necessary from the database
 	my $sth;
 	if ($unconditional) {

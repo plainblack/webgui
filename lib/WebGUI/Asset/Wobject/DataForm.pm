@@ -1151,7 +1151,7 @@ sub sendEmail {
             $groupId = $group->getId;
         }
         else {
-            $self->session->errorHandler->warn($self->getId . ": Unable to send message, no user or group found.");
+            $self->session->log->warn($self->getId . ": Unable to send message, no user or group found.");
             return;
         }
         WebGUI::Inbox->new($self->session)->addMessage({

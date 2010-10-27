@@ -721,7 +721,7 @@ sub mailToEpoch {
 	my $parser = DateTime::Format::Mail->new->loose;
 	my $dt = eval {$parser->parse_datetime($date)};
 	if ($@) {
-		$self->session->errorHandler->warn($date." is not a valid date for email, and is so poorly formatted, we can't even guess what it is.");
+		$self->session->log->warn($date." is not a valid date for email, and is so poorly formatted, we can't even guess what it is.");
 		return undef;
 	}
 	return $dt->epoch;
@@ -919,7 +919,7 @@ sub setToEpoch {
 		$dt = $parser->parse_datetime($set);
 	}
 	unless ($dt) {
-		$self->session->errorHandler->warn("Could not format date $set for epoch.  Returning current time");
+		$self->session->log->warn("Could not format date $set for epoch.  Returning current time");
 		return time();
 	}
 	return $dt->epoch;

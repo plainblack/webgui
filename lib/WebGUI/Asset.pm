@@ -358,7 +358,7 @@ around BUILDARGS => sub {
         # fetch properties
         $properties = $session->db->quickHashRef($sql.$where, $placeHolders);
         unless (exists $properties->{assetId}) {
-            $session->errorHandler->error("Asset $assetId $className $revisionDate is missing properties. Consult your database tables for corruption. ");
+            $session->log->error("Asset $assetId $className $revisionDate is missing properties. Consult your database tables for corruption. ");
             return undef;
         }
         $session->cache->set("asset".$assetId.$revisionDate, $properties, 60*60*24);
@@ -368,7 +368,7 @@ around BUILDARGS => sub {
         $properties->{session} = $session;
         return $className->$orig($properties);
     }
-    $session->errorHandler->error("Something went wrong trying to instanciate a '$className' with assetId '$assetId', but I don't know what!");
+    $session->log->error("Something went wrong trying to instanciate a '$className' with assetId '$assetId', but I don't know what!");
     return undef;
 };
 
@@ -2256,7 +2256,7 @@ sub processTemplate {
 
     # Sanity checks
     if (ref $var ne "HASH") {
-        $session->errorHandler->error("First argument to processTemplate() should be a hash reference.");
+        $session->log->error("First argument to processTemplate() should be a hash reference.");
         return "Error: Can't process template for asset ".$self->getId." of type ".$self->get("className");
     }
     if (!defined $template) {
@@ -2275,7 +2275,7 @@ sub processTemplate {
         return $template->process(\%vars);
     }
     else {
-        $session->errorHandler->error("Can't instantiate template $templateId for asset ".$self->getId);
+        $session->log->error("Can't instantiate template $templateId for asset ".$self->getId);
         my $i18n = WebGUI::International->new($self->session, 'Asset');
         return $i18n->get('Error: Cannot instantiate template').' '.$templateId;
     }

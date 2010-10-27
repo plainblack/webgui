@@ -229,7 +229,7 @@ sub www_editSubmissionForm {
     elsif ( $assetId ne 'new' ) {
         $self ||= WebGUI::Asset->newById( $session, $assetId );
         if ( !defined($self) ) {
-            $session->errorHandler->error( __PACKAGE__ . " - failed to instanciate asset with assetId $assetId" );
+            $session->log->error( __PACKAGE__ . " - failed to instanciate asset with assetId $assetId" );
         }
     }
     my $asset   = $self || $parent;

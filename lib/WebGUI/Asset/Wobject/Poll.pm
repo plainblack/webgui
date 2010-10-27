@@ -537,7 +537,7 @@ sub view {
             $var{graphUrl} = $storage->getUrl($filename);
             $var{hasImageGraph} = 1;
         } else {
-            $self->session->errorHandler->error('The graph configuration hash of the Poll ('.$self->getUrl.') is corrupt.');
+            $self->session->log->error('The graph configuration hash of the Poll ('.$self->getUrl.') is corrupt.');
         }
 	}
 	

@@ -103,7 +103,7 @@ sub getAsset {
 	my $assetUrl = shift;
 	my $asset = eval{WebGUI::Asset->newByUrl($session,$assetUrl,$session->form->process("revision"))};
 	if (Exception::Class->caught()) {
-		$session->errorHandler->warn("Couldn't instantiate asset for url: ".$assetUrl." Root cause: ".$@);
+		$session->log->warn("Couldn't instantiate asset for url: ".$assetUrl." Root cause: ".$@);
 	}
     return $asset;
 }
@@ -163,9 +163,9 @@ The content handler for this package.
 
 sub handler {
     my ($session) = @_;
-    my ($errorHandler, $http, $var, $asset, $request, $config) = $session->quick(qw(errorHandler http var asset request config));
+    my ($log, $http, $var, $asset, $request, $config) = $session->quick(qw(errorHandler http var asset request config));
     my $output = "";
-    if (my $perfLog = $errorHandler->performanceLogger) { #show performance indicators if required
+    if (my $perfLog = $log->performanceLogger) { #show performance indicators if required
         my $t = [Time::HiRes::gettimeofday()];
         $output = dispatch($session, getRequestedAssetUrl($session));
         $perfLog->({ time => Time::HiRes::tv_interval($t), type => 'Page' });

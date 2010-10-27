@@ -242,7 +242,7 @@ sub formProperties {
     = WebGUI::Operation::Shared::secureEval($self->session,$self->get("possibleValues"));
     unless (ref $values eq 'HASH') {
         if ($self->get('possibleValues') =~ /\S/) {
-            $self->session->errorHandler->warn("Could not get a hash out of possible values for profile field ".$self->getId);
+            $self->session->log->warn("Could not get a hash out of possible values for profile field ".$self->getId);
         }
         $values = {};
     }

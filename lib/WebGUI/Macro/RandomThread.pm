@@ -69,26 +69,26 @@ sub process {
 	# Sanity check of parameters:
 	my $startAsset = eval { WebGUI::Asset->newByUrl($session, $startURL); };
 	if (Exception::Class->caught()) {
-		$session->errorHandler->warn('Error: invalid startURL. Check parameters of macro on page '.$session->asset->url);
+		$session->log->warn('Error: invalid startURL. Check parameters of macro on page '.$session->asset->url);
 		return '';
 	}
 
 	$relatives = lc($relatives);
 	unless ( $relatives ~~ ['siblings','children','ancestors','self','descendants','pedigree'] ) {
-		$session->errorHandler->warn('Error: invalid relatives specified. Must be one of siblings, children, ancestors, self, descendants, pedigree. Check parameters of macro on page '.$session->asset->url);
+		$session->log->warn('Error: invalid relatives specified. Must be one of siblings, children, ancestors, self, descendants, pedigree. Check parameters of macro on page '.$session->asset->url);
 		return '';
 	}
 
 	my $template = eval { $templateURL ? WebGUI::Asset::Template->newByUrl($session,$templateURL) : WebGUI::Asset::Template->newById($session,'WVtmpl0000000000000001'); };
 	if (Exception::Class->caught()) {
-		$session->errorHandler->warn('Error: invalid template URL. Check parameters of macro on page '.$session->asset->url);
+		$session->log->warn('Error: invalid template URL. Check parameters of macro on page '.$session->asset->url);
 		return '';
 	}
 
 	# Get all CS's that we'll use to pick a thread from:
 	my $lineage = $startAsset->getLineage([$relatives],{includeOnlyClasses => ['WebGUI::Asset::Wobject::Collaboration']});
 	unless ( scalar(@{$lineage}) ) {
-		$session->errorHandler->warn('Error: no Collaboration Systems found with current parameters. Check parameters of macro on page '.$session->asset->url);
+		$session->log->warn('Error: no Collaboration Systems found with current parameters. Check parameters of macro on page '.$session->asset->url);
 		return '';
 	}
 	
@@ -104,7 +104,7 @@ sub process {
 	$lineage = \@llist;
 	
 	unless ( scalar(@{$lineage}) ) {
-		$session->errorHandler->warn('Error: no Collaboration Systems found have any threads to display.'.$session->asset->url);
+		$session->log->warn('Error: no Collaboration Systems found have any threads to display.'.$session->asset->url);
 		return '';
 	}
 	
@@ -124,7 +124,7 @@ sub process {
 		}
 	}
 	# If we reach this point, we had no success in finding an asset the user can view:
-	$session->errorHandler->warn("Could not find a random thread that was viewable by the user ".$session->user->username." after $numberOfTries tries. Check parameters of macro on page ".$session->asset->url);
+	$session->log->warn("Could not find a random thread that was viewable by the user ".$session->user->username." after $numberOfTries tries. Check parameters of macro on page ".$session->asset->url);
 	return '';
 }
 

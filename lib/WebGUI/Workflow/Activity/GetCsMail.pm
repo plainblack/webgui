@@ -181,10 +181,10 @@ sub execute {
 		unless (defined $user) { #if no user
 			unless ($postGroup eq 1 || $postGroup eq 7) { #reject mail if no registered email, unless post group is Visitors (1) or Everyone (7)
 				if ($message->{from} eq "") {
-					$self->session->errorHandler->error("For some reason the message ".$message->{subject}." (".$message->{messageId}.") has no from address.");
+					$self->session->log->error("For some reason the message ".$message->{subject}." (".$message->{messageId}.") has no from address.");
 				}
 				elsif ($message->{from} eq $cs->get("mailAddress")) {
-					$self->session->errorHandler->error("For some reason the message ".$message->{subject}." (".$message->{messageId}.") has the same from address as the collaboration system's mail address.");
+					$self->session->log->error("For some reason the message ".$message->{subject}." (".$message->{messageId}.") has the same from address as the collaboration system's mail address.");
 				} 
 				else { 
 					my $send = WebGUI::Mail::Send->create($self->session, {

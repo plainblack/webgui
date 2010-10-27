@@ -293,7 +293,7 @@ sub new {
 	$class = $main->{className};
     eval { WebGUI::Pluggable::load($class) };
     if ($@) {
-        $session->errorHandler->error($@);
+        $session->log->error($@);
         return undef;
     }  
 	my $sub = $session->db->buildHashRef("select name,value from WorkflowActivityData where activityId=?",[$activityId]);
@@ -333,7 +333,7 @@ sub newByPropertyHashRef {
     my $className = $properties->{className};
     eval { WebGUI::Pluggable::load($className) };
     if ($@) {
-        $session->errorHandler->error($@);
+        $session->log->error($@);
         return undef;
     }  
     bless {_session=>$session, _id=>$properties->{activityId}, _data => $properties}, $className;

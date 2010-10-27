@@ -117,7 +117,7 @@ sub purge {
     # can't delete if it's one of these things
 	if ($self->getId eq $session->setting->get("defaultPage") || $self->getId eq $session->setting->get("notFoundPage") || $self->get("isSystem")) {
         $outputSub->(sprintf $i18n->get('Trying to delete system page %s.  Aborting'), $self->getTitle);
-        $session->errorHandler->security("delete a system protected page (".$self->getId.")");
+        $session->log->security("delete a system protected page (".$self->getId.")");
         return 0;
     }
 
@@ -135,7 +135,7 @@ sub purge {
             }
             last unless $child;
             unless ($child->purge) {
-                $session->errorHandler->security("delete one of (".$self->getId.")'s children which is a system protected page");
+                $session->log->security("delete one of (".$self->getId.")'s children which is a system protected page");
                 $outputSub->(sprintf $i18n->get('Trying to delete system page %s.  Aborting'), $self->getTitle);
                 return 0;
             }
@@ -242,7 +242,7 @@ sub trash {
 
     if ($self->getId eq $session->setting->get("defaultPage") || $self->getId eq $session->setting->get("notFoundPage") || $self->get('isSystem')) {
         $outputSub->(sprintf $i18n->get('Trying to delete system page %s.  Aborting'), $self->getTitle);
-        $session->errorHandler->security("delete a system protected page (".$self->getId.")");
+        $session->log->security("delete a system protected page (".$self->getId.")");
         return undef;
     }
 

@@ -315,7 +315,7 @@ sub getStorageFromPost {
     my $self      = shift;
     my $storageId = shift;
     my $fileStorageId = WebGUI::Form::File->new($self->session, {name => 'newFile', value=>$storageId })->getValue;
-    $self->session->errorHandler->info( "File Storage Id: $fileStorageId" );
+    $self->session->log->info( "File Storage Id: $fileStorageId" );
     return $self->getStorageClass->get($self->session, $fileStorageId);
 }
 
@@ -388,7 +388,7 @@ override processEditForm => sub {
     return $errors if @$errors;
 
     if (my $storageId = $session->form->get('newFile','File')) {
-        $session->errorHandler->info("Got a new file for asset " . $self->getId);
+        $session->log->info("Got a new file for asset " . $self->getId);
         my $storage     = $self->getStorageClass->get( $session, $storageId);
         my $filePath    = $storage->getPath( $storage->getFiles->[0] );
         $self->setFile( $filePath );
@@ -547,7 +547,7 @@ sub updatePropertiesFromStorage {
     my $self        = shift;
     my $storage     = $self->getStorageLocation; 
     my $filename    = $storage->getFiles->[0];
-    $self->session->errorHandler->info("Updating file asset filename to $filename");
+    $self->session->log->info("Updating file asset filename to $filename");
     $self->update({
         filename        => $filename,
     });

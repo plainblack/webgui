@@ -513,7 +513,7 @@ sub getOverrides {
         $sth->finish;
     }
     else {
-        $self->session->errorHandler->warn("Original asset could not be instanciated by shortcut ".$self->getId);
+        $self->session->log->warn("Original asset could not be instanciated by shortcut ".$self->getId);
     }
     if ($self->isDashlet) {
         my @userPrefs = $self->getPrefFieldsToImport;
@@ -780,7 +780,7 @@ Returns an I18n'ed error message that the Asset that this Shortcut points to no 
 
 sub notLinked {
 	my $self = shift;
-	$self->session->errorHandler->warn("Shortcut ".$self->getId." is linked to an asset ".$self->get("shortcutToAssetId").", which no longer exists.");
+	$self->session->log->warn("Shortcut ".$self->getId." is linked to an asset ".$self->get("shortcutToAssetId").", which no longer exists.");
     my $i18n = WebGUI::International->new($self->session, 'Asset_Shortcut');
 	return $i18n->get('no longer exists');
 }

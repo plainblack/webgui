@@ -372,8 +372,8 @@ sub view {
 				}
 				### DEBUG
 				#require Data::Dumper;
-				#$self->session->errorHandler->warn("DEBUG: ".Data::Dumper::Dumper($params));
-				#$self->session->errorHandler->warn("URL: $proxiedUrl");
+				#$self->session->log->warn("DEBUG: ".Data::Dumper::Dumper($params));
+				#$self->session->log->warn("URL: $proxiedUrl");
 				
 				$request = HTTP::Request->new(GET => $proxiedUrl, $header) || return "wrong url"; # Create GET request
 			} else { # It's a POST

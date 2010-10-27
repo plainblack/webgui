@@ -81,7 +81,7 @@ sub process {
             POST_CHOMP   => 1,               # cleanup whitespace 
             EVAL_PERL    => 0,               # evaluate Perl code blocks
         });
-        $t->process( \$template, _rewriteVars($vars),\$output) || $self->session->errorHandler->error($t->error());
+        $t->process( \$template, _rewriteVars($vars),\$output) || $self->session->log->error($t->error());
     };
     if ($@) {
         WebGUI::Error::Template->throw( error => $@ );

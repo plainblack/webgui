@@ -243,7 +243,7 @@ sub getFormElement {
         my $values = WebGUI::Operation::Shared::secureEval($self->session,$data->{possibleValues});
         unless (ref $values eq 'HASH') {
             if ($self->possibleValues =~ /\S/) {
-                $self->session->errorHandler->warn("Could not get a hash out of possible values for profile field "
+                $self->session->log->warn("Could not get a hash out of possible values for profile field "
                 .$self->getId);
             }
             $values = {};

@@ -604,7 +604,7 @@ sub getAllUsers {
 	;
 	++$loopCount;
 	if ($loopCount > 99) {
-		$self->session->errorHandler->fatal("Endless recursive loop detected while determining groups in group.\nRequested groupId: ".$self->getId);
+		$self->session->log->fatal("Endless recursive loop detected while determining groups in group.\nRequested groupId: ".$self->getId);
 	}
 	my $groups = $self->getGroupsIn();
 	foreach my $groupId (@{ $groups }) {
@@ -644,7 +644,7 @@ sub getDatabaseUsers {
 				my $sth = $dbh->unconditionalRead($query);
 				if (defined $sth) {
 					unless ($sth->errorCode < 1) {
-						$self->session->errorHandler->warn("There was a problem with the database query for group ID $gid.");
+						$self->session->log->warn("There was a problem with the database query for group ID $gid.");
 					} else {
 						while(my ($userId)=$sth->array) {
 							push @dbUsers, $userId;
@@ -652,12 +652,12 @@ sub getDatabaseUsers {
 					}
 					$sth->finish;
 				} else {
-					$self->session->errorHandler->error("Couldn't process unconditional read for database group with group id $gid.");
+					$self->session->log->error("Couldn't process unconditional read for database group with group id $gid.");
 				}
 				$dbLink->disconnect;
        	 	        }
 		} else {
-			$self->session->errorHandler->warn("The database link ".$self->get("databaseLinkId")." no longer exists even though group ".$gid." references it.");
+			$self->session->log->warn("The database link ".$self->get("databaseLinkId")." no longer exists even though group ".$gid." references it.");
 		}
         }
 	return \@dbUsers;
@@ -712,7 +712,7 @@ sub getGroupsIn {
         if ($isRecursive) {
                 $loopCount++;
                 if ($loopCount > 99) {
-                        $self->session->errorHandler->fatal("Endless recursive loop detected while determining groups in group.\nRequested groupId: ".$self->getId."\nGroups in that group: ".join(",",@$groups));
+                        $self->session->log->fatal("Endless recursive loop detected while determining groups in group.\nRequested groupId: ".$self->getId."\nGroups in that group: ".join(",",@$groups));
                 }
                 my @groupsOfGroups = @$groups;
                 foreach my $group (@$groups) {
@@ -821,7 +821,7 @@ sub getLDAPUsers {
 	
 	my $ldapLink = WebGUI::LDAPLink->new($self->session,$ldapLinkId);
 	unless ($ldapLink && $ldapLink->bind) {
-	   $self->session->errorHandler->warn("There was a problem connecting to LDAP link $ldapLinkId for group ID $gid.");
+	   $self->session->log->warn("There was a problem connecting to LDAP link $ldapLinkId for group ID $gid.");
 	   return [];
 	}
 	
@@ -843,7 +843,7 @@ sub getLDAPUsers {
 	   if($userId) {
 	      push(@ldapUsers,$userId);
 	   } else {
-	      $self->session->errorHandler->warn("Could not find matching userId for dn/uid $person in WebGUI for group $gid");
+	      $self->session->log->warn("Could not find matching userId for dn/uid $person in WebGUI for group $gid");
 	   }
 	}
 	
@@ -1154,7 +1154,7 @@ sub hasLDAPUser {
 
 	my $ldapLink = WebGUI::LDAPLink->new($session,$ldapLinkId);
 	unless ($ldapLink && $ldapLink->bind) {
-	   $self->session->errorHandler->warn("There was a problem connecting to LDAP link $ldapLinkId for group ID $gid.");
+	   $self->session->log->warn("There was a problem connecting to LDAP link $ldapLinkId for group ID $gid.");
 	   return 0;
 	}
 		
@@ -1528,7 +1528,7 @@ sub new {
             $self->{_groupId},
         ]);
         unless ($groupExists) {
-            $session->errorHandler->warn('WebGUI::Group->new called with a non-existant groupId:'
+            $session->log->warn('WebGUI::Group->new called with a non-existant groupId:'
                 .'['.$self->{_groupId}.']');
             return undef;
         }

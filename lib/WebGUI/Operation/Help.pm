@@ -42,7 +42,7 @@ sub _loadHelp {
 	my $helpPackage = shift;
         eval { WebGUI::Pluggable::load( $helpPackage ); };
 	if ($@) {
-		$session->errorHandler->error("Help failed to compile: $helpPackage. ".$@);
+		$session->log->error("Help failed to compile: $helpPackage. ".$@);
 		return {};
 	}
 	if (defined *{"$helpPackage\::HELP"}) {  ##Symbol table lookup
@@ -153,7 +153,7 @@ sub _get {
 		return $help->{$id};
 	}
 	else {
-		$session->errorHandler->warn("Unable to load help for $namespace -> $id");
+		$session->log->warn("Unable to load help for $namespace -> $id");
 		return undef;
 	}
 }
