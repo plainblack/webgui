@@ -360,8 +360,12 @@ as a WHERE clause. Does not return WHERE, as you could also use it for HAVING
 sub getSqlFromQueryString {
     my ( $self, $queryString ) = @_;
 
+    my $dbh         = $self->session->db->dbh;
     my $sqp         = Search::QueryParser->new( defField => 'keywords' );
     my $query       = $sqp->parse( $queryString );
+
+    my %isValidOp;
+    @isValidOp{qw( = != < > <= >= : )} = 1;
 
     # Recursion is recursive
     my $part        = sub { 
@@ -372,20 +376,26 @@ sub getSqlFromQueryString {
                 push @parts, $self->getSqlFromQueryString( $_ );
             } 
             elsif ( $part->{field} eq 'keywords' ) {
-                push @parts, "MATCH ($part->{field}) AGAINST ('" 
-                            . $self->getKeywordString( $part->{value} ) 
-                            . "')";
+                push @parts, "MATCH (" . $dbh->quote_identifier($part->{field}) . ") AGAINST ("
+                            . $dbh->quote( $self->getKeywordString( $part->{value} ) )
+                            . ")";
             }
             else {
-                # TODO: Add op validation
-                # TODO: Add field quoting
-                # TODO: Add value quoting
+                next unless $isValidOp{ $part->{op} };
                 if ( $part->{op} eq ':' ) {
                     my $value   = '%' . $part->{value} . '%';
-                    push @parts, "$part->{field} LIKE '$value'";
+                    push @parts, join " ",
+                        $dbh->quote_identifier($part->{field}), 
+                        'LIKE',
+                        $dbh->quote($value),
+                        ;
                 }
-                else {
-                    push @parts, "$part->{field} $part->{op} '$part->{value}'"
+                elsif  {
+                    push @parts, join " ",
+                        $dbh->quote_identifier($part->{field}),
+                        $part->{op},
+                        $dbh->quote($part->{value}),
+                        ;
                 }
             }
         }
