@@ -197,7 +197,6 @@ sub toHtml {
     $self->set("extras", $self->get('extras') . q{ onblur="fixChars(this.form['}.$self->get("name").q{'])" mce_editable="true" });
     $self->set("resizable", 0);
     return $self->SUPER::toHtml.$self->{_richEdit}->getRichEditor($self->get('id'));
-
 }
 
 #-------------------------------------------------------------------

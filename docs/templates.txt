@@ -11,7 +11,18 @@ templates, you will need to apply these changes manually to your copies.
      toggle.url  => toggle_url
      toggle.text => toggle_text
 
+7.10.2
+
+  * The Make Page Printable template has changed (as per bug #11857). The HTML
+    is now consistent with other default Style templates. The Plain Black logo and
+    copyright info have been removed and a stylesheet was added to provide very
+    simple default formatting for text, header and footer (makepageprintable.css).
+
 7.10.1
+
+  *  Profile templates - root/import/account/profile/default-view-profile-template
+                       - root/import/account/profile/profile-account-layout
+     Moved the "back to profile" link from the Profile View template to the Profile Layout template.
 
   *  Asset Report Template - asset-report/asset-report-default-template
      Remove the empty template attachment

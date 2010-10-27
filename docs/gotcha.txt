@@ -21,6 +21,19 @@ save you many hours of grief.
        Account Macro template
        Admin Toggle Macro template
 
+7.10.2
+--------------------------------------------------------------------
+     * The URL used by Display Message on Login always returns the user to 
+       the page where they logged in.  If your site depended on the old,
+       buggy behavior of returning the user to the home page after showing
+       a message, then in the Settings you can assign Redirect After Login Url
+       to /.
+
+     * The UKPLayer - a slideshow that displays images as a movie - 
+       is in WebGUI again. Licencing information was overlooked. An 
+       upgrade to 7.10.1 will break the Matrix. This is fixed now.
+
+
 7.10.1
 --------------------------------------------------------------------
      * WebGUI now depends on PerlIO::eol, for doing line ending translation.

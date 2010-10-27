@@ -1440,7 +1440,7 @@ override processEditForm => sub {
     my $assetId = $self->getId;
     my $revisionDate = $self->revisionDate;
 
-    $session->db->write("UPDATE Event SET sequenceNumber =? WHERE assetId = ? AND revisionDate =?",[($form->param('sequenceNumber') || $top_val), $assetId, $revisionDate]);
+    $session->db->write("UPDATE Event SET sequenceNumber =? WHERE assetId = ? AND revisionDate =?",[(scalar($form->param('sequenceNumber')) || $top_val), $assetId, $revisionDate]);
 
 
     # Pre-process Related Links and manage changes

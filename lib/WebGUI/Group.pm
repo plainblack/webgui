@@ -1980,7 +1980,7 @@ sub vitalGroup {
     if (! $groupId && ref $class ) {
         $groupId = $class->getId;
     }
-    return $groupId ~~ [ map { "$_" } (1..17), 15, 16, 17, qw/pbgroup000000000000015 pbgroup000000000000016 pbgroup000000000000017 /];
+    return $groupId ~~ [ map { "$_" } (1..13), 15, 16, 17, qw/pbgroup000000000000015 pbgroup000000000000016 pbgroup000000000000017 /];
 }
 
 1;

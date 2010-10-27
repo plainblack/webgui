@@ -65,7 +65,7 @@ See WebGUI::Workflow::Activity::execute() for details.
 
 sub execute {
     my ( $self, $obj, $instance ) = @_;
-    my $timeLimit = time + 55;
+    my $timeLimit = time + $self->getTTL;
 
     my $piped = $instance->getScratch('recurrences')
         || $self->generateRecurrenceList();

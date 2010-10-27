@@ -1,3 +1,17 @@
+7.10.2
+ - fixed #11884: Editing Templates impossible / Code editor not loaded
+ - recommitted ukplayer. Removal broke Matrix. Licencing information was available but overlooked. 
+ - fixed #11883: Wiki "Add page" link does not encode special chars
+ - fixed #11886: profile knows it's me, but doesn't display edit
+ - fixed #11789: Date form reports 1 day earlier on Edit for the time zone corresponding to Europe/Berlin.
+ - fixed #11894: Europe London timezone decrements birth date
+ - fixed #11857: make page printable?
+ - fixed #11891: Shop credit not displayed in payment method screen
+ - fixed #11871: Metadata display and criteria builder problems
+ - fixed #10189: pbworkflow000000000007 Hanging
+ - fixed #11897: Continue to the site link loses current page
+ - fixed #11618: Code Editor: Content loses it's whitespace formatting
+
 7.10.1
  - fixed #11851: Story Topic: top story variables should be available all the time
  - fixed #11854: CS doesn't return Not Found page

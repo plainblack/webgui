@@ -111,7 +111,7 @@ sub execute {
         $msg->addHtml( $self->get('notificationMessage') );
         $msg->queue;
 
-        if ( time - $time > 60 ) {
+        if ( time - $time > $self->getTTL ) {
             return $self->WAITING(1);
         }
     }

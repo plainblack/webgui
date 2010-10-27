@@ -53,7 +53,8 @@ around BUILDARGS => sub {
 
 =head2 adjust ( amount, [ comment ] )
 
-Adjusts the amount of credit this user has by a specified amount.
+Adjusts the amount of credit this user has by a specified amount.  Returns 0 if the current user is Visitor.
+Otherwise, returns the amount set.
 
 =head3 amount
 
@@ -154,6 +155,20 @@ A reference to the current session.
 A unique id for a user that you want to adjust the credit of. Defaults to the current user.
 
 =cut
+
+#-------------------------------------------------------------------
+
+=head2 purge ( )
+
+Removes all shop credit for the current user.
+
+=cut
+
+sub purge {
+    my ($self) = @_;
+    $self->session->db->write("delete from shopCredit where userId = ?",[$self->userId]);
+    return 1;
+}
 
 #-------------------------------------------------------------------
 

@@ -276,7 +276,7 @@ sub headTags {
 
 =head2 toHtml ( )
 
-Renders an input tag of type text.
+Set the head tags for this form plugin
 
 =cut
 

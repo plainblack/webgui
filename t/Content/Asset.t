@@ -206,6 +206,7 @@ $output  = WebGUI::Content::Asset::dispatch( $session );
 is $output, 'www_view one', 'an empty URL returns the default asset';
 $session->setting->set('defaultPage', $originalDefaultPage);
 
+<<<<<<< HEAD
 #----------------------------------------------------------------------------
 # 304 Content Not Modified response
 

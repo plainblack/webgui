@@ -18,6 +18,7 @@ use strict;
 use WebGUI::Group;
 use WebGUI::Workflow::Instance;
 use JSON ();
+use WebGUI::Exception;
 use WebGUI::ProfileField;
 use Scalar::Util qw( weaken );
 use Net::CIDR::Lite;
@@ -417,6 +418,10 @@ sub delete {
         next BOOK if (my $e = Exception::Class->caught);
         $book->delete;
     }
+
+    require WebGUI::Shop::Credit;
+    my $credit = WebGUI::Shop::Credit->new($session, $userId);
+    $credit->purge;
 
     # remove user itself
     $db->write("DELETE FROM userProfileData WHERE userId=?",[$userId]);

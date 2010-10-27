@@ -16,7 +16,6 @@ package WebGUI::Form::Codearea;
 
 use strict;
 use base 'WebGUI::Form::Textarea';
-use HTML::Entities qw(encode_entities decode_entities);
 use WebGUI::International;
 
 =head1 NAME
@@ -90,18 +89,6 @@ sub definition {
 
 #-------------------------------------------------------------------
 
-=head2  getDatabaseFieldType ( )
-
-Returns "MEDIUMTEXT".
-
-=cut 
-
-sub getDatabaseFieldType {
-    return "MEDIUMTEXT";
-}
-
-#-------------------------------------------------------------------
-
 =head2 getName ( session )
 
 Returns the human readable name of this control.
@@ -113,101 +100,4 @@ sub getName {
     return WebGUI::International->new($session, 'WebGUI')->get('codearea');
 }
 
-#-------------------------------------------------------------------
-
-=head2 getValue ( [value] )
-
-Return the value, HTML decoded
-
-=cut
-
-sub getValue {
-    my ( $self, @args ) = @_;
-    my $value = $self->SUPER::getValue( @args );
-    return decode_entities( $value );
-}
-
-#-------------------------------------------------------------------
-
-=head2 headTags ( )
-
-Set the head tags for this form plugin
-
-=cut
-
-sub headTags {
-    my $self = shift;
-    my ($style, $url) = $self->session->quick(qw(style url));
-    $style->setCss($url->extras("yui/build/resize/assets/skins/sam/resize.css"));
-    $style->setCss($url->extras("yui/build/assets/skins/sam/skin.css"));
-    $style->setScript($url->extras("yui/build/utilities/utilities.js"));
-    $style->setScript($url->extras("yui/build/container/container_core-min.js"));
-    $style->setScript($url->extras("yui/build/menu/menu-min.js"));
-    $style->setScript($url->extras("yui/build/button/button-min.js"));
-    $style->setScript($url->extras("yui/build/resize/resize-min.js"));
-    $style->setScript($url->extras("yui/build/editor/editor-min.js"));
-    $style->setScript($url->extras("yui-webgui/build/code-editor/code-editor.js"));
-    #$style->setCss($url->extras("yui/build/logger/assets/logger.css"));
-    #$style->setCss($url->extras("yui/build/logger/assets/skins/sam/logger.css"));
-    #$style->setScript($url->extras("yui/build/logger/logger.js"));
-    $self->SUPER::headTags();
-}
-
-#-------------------------------------------------------------------
-
-=head2 isDynamicCompatible ( )
-
-A class method that returns a boolean indicating whether this control is compatible with the DynamicField control.
-
-=cut
-
-sub isDynamicCompatible {
-    return 1;
-}
-
-#-------------------------------------------------------------------
-
-=head2 toHtml ( )
-
-Renders a code area field.
-
-=cut
-
-sub toHtml {
-    my $self = shift;
-
-    my $value = encode_entities( $self->fixMacros($self->fixTags($self->fixSpecialCharacters(scalar $self->getOriginalValue))) );
-    my $width = $self->get('width');
-    if ( $width !~ /%|px/ ) {
-        $width  .= 'px';
-    }
-    my $height = $self->get('height');
-    if ( $height !~ /%|px/ ) {
-        $height .= 'px';
-    }
-
-    my $id = $self->get('id');
-    my $name = $self->get('name');
-    my $extras = $self->get('extras');
-    my $syntax = $self->get('syntax');
-    my $styleAttr = $self->get('style');
-
-    my $codeCss = $self->session->url->extras("yui-webgui/build/code-editor/code.css");
-    my $out = <<"END_HTML";
-<textarea id="$id" name="$name" $extras rows="10" cols="60" style="font-family: monospace; $styleAttr; height: 100%; width: 100%; resize: none;">$value</textarea>
-<script type="text/javascript">
-(function(){
-    YAHOO.util.Event.onDOMReady( function () {
-        var myeditor = new YAHOO.widget.CodeEditor('${id}', { toggleButton: true, handleSubmit: true, css_url: '${codeCss}', height: '${height}', width: '${width}', status: true, resize: true });
-        myeditor.render();
-
-        //var myLogReader = new YAHOO.widget.LogReader();
-    } );
-}());
-</script>
-END_HTML
-    return $out;
-}
-
 1;
-

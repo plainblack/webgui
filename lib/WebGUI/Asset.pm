@@ -2642,7 +2642,7 @@ sub www_changeUrl {
 	my $i18n = WebGUI::International->new($self->session, "Asset");
 	my $f = WebGUI::HTMLForm->new($self->session, action=>$self->getUrl);
 	$f->hidden(name=>"func", value=>"changeUrlConfirm");
-	$f->hidden(name=>"proceed", value=>$self->session->form->param("proceed"));
+	$f->hidden(name=>"proceed", value=>scalar($self->session->form->param("proceed")));
 	$f->text(name=>"url", value=>$self->get('url'), label=>$i18n->get("104"), hoverHelp=>$i18n->get('104 description'));
 	$f->yesNo(name=>"confirm", value=>0, label=>$i18n->get("confirm change"), hoverHelp=>$i18n->get("confirm change url message"), subtext=>'<br />'.$i18n->get("confirm change url message"));
 	$f->submit;

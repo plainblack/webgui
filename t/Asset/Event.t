@@ -127,24 +127,6 @@ isnt($event6a->get('storageId'), $event6->get('storageId'), '... and it is diffe
 
 my $versionTag2 = WebGUI::VersionTag->getWorking($session);
 WebGUI::Test->addToCleanup($versionTag2);
-$versionTag2->commit;
-
-my $event7 = $cal->addChild(
-    {
-        className => 'WebGUI::Asset::Event',
-        assetId   => 'EventAssetTestStorage6',
-        url       => 'hidden_event',
-    }, undef, undef, { skipNotifications => 1, skipAutoCommitWorkflows => 1 },
-);
-
-my $tag = WebGUI::VersionTag->getWorking($session);
-$tag->commit;
-addToCleanup($tag);
-
-is $event7->isHidden, 1, 'isHidden set to 1 by default';
-
-$event7->isHidden(0);
-is $event7->isHidden, 1, 'isHidden cannot be set to 0';
 
 my $event7 = $cal->addChild({
     className => 'WebGUI::Asset::Event',
