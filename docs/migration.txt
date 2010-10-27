@@ -36,6 +36,11 @@ WebGUI::Session::Env has been moved into WebGUI::Session::Request.  A listing of
 
 $session->env->getIp => $session->request->address
 
+WebGUI::Session::ErrorHandler
+=============================
+
+ErrorHandler has been changed to "log" in all circumstances. $session->errorHandler no longer exists,
+use $session->log. WebGUI::Session::ErrorHandler no longer exists, use WebGUI::Session::Log
 
 WebGUI::Utility
 ===============
