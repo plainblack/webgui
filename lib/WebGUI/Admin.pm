@@ -468,8 +468,6 @@ sub www_findUser {
     my $sql     = 'SELECT userId, CONCAT(firstName,lastName) AS name, username, alias, avatar
                 FROM users JOIN userProfileData USING (userId) WHERE ' . join( ' || ', @places );
     my $params  = [ ( $query ) x scalar @places ];
-    $session->log->warn( 'SQL: ' . $sql );
-    $session->log->warn( 'PARAM: ' . join ", ", @$params );
 
     my $sth = $db->read( $sql, $params );
     my @results;
@@ -479,7 +477,6 @@ sub www_findUser {
     }
 
     my $output = JSON->new->encode( { results => \@results } );
-    $session->log->warn( $output );
     return $output;
 }
 
@@ -770,7 +767,6 @@ sub www_view {
     $style->setCss( $url->extras('yui/build/container/assets/skins/sam/container.css'));
     $style->setCss( $url->extras('yui/build/autocomplete/assets/skins/sam/autocomplete.css'));
     $style->setCss( $url->extras('yui/build/menu/assets/skins/sam/menu.css'));
-    #$style->setCss( $url->extras('yui-webgui/build/assetManager/assetManager.css' ));
     $style->setCss( $url->extras('admin/admin.css'));
     $style->setScript($url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'));
     $style->setScript($url->extras('yui/build/utilities/utilities.js'));
