@@ -20,6 +20,7 @@
  - refixed #11902: forums bug (works without mobile style being set)
  - fixed #11924: Deleting version tags leaves pending inbox messages in a permanent state
  - intalled YUI fix for flash files.
+ - fixed #11932: Bad URL in the newly templated recover password email
 
 7.9.16
  - fixed #11789: Date form reports 1 day earlier on Edit for the time zone corresponding to Europe/Berlin.
