@@ -10,6 +10,7 @@
  - refixed #11902: forums bug (works without mobile style being set)
  - fixed #11924: Deleting version tags leaves pending inbox messages in a permanent state
  - intalled YUI fix for flash files.
+ - fixed #11932: Bad URL in the newly templated recover password email
 
 7.10.3
  - fixed #11903: Unnecessary debug in Thingy
