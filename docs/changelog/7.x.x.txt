@@ -1,3 +1,5 @@
+7.9.18
+
 7.9.17
  - fixed #11929: In/Out board breaks in Chrome sometimes
  - fixed #11928: Story Archive breaks if url has extension
