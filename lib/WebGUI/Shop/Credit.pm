@@ -5,8 +5,8 @@ use Moose;
 use Scalar::Util qw/blessed/;
 
 has [ qw/session userId/ ] => (
-    is       => 'ro',
     required => 1,
+    is       => 'ro',
 );
 
 use WebGUI::Shop::Admin;
@@ -42,11 +42,9 @@ around BUILDARGS => sub {
     ##Original arguments start here.
     my $protoSession = $_[0];
     if (blessed $protoSession && $protoSession->isa('WebGUI::Session')) {
-        warn "got a session\n";
         my $userId = $_[1] ? $_[1] : $protoSession->user->userId;
         return $className->$orig(session => $protoSession, userId => $userId, );
     }
-    warn "no session\n";
     return $className->$orig(@_);
 };
 
