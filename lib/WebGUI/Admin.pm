@@ -72,19 +72,20 @@ sub getAdminPluginTemplateVars {
 
         # If we have a class name, we've got a new WebGUI::Admin::Plugin
         if ( $funcDef->{className} ) {
-            my $plugin = $funcDef->{className}->new( $session, $funcId, $funcDef );
-            next unless $plugin->canUse;
+            my $plugin = $funcDef->{className}->new( $session, id => $funcId, $funcDef );
+            next unless $plugin->canView;
             $var = {
-                title           => $plugin->getTitle,
-                icon            => $plugin->getIcon,
-                'icon.small'    => $plugin->getIconSmall,
-                url             => $plugin->getUrl,
+                id              => $funcId,
+                title           => $plugin->title,
+                icon            => $plugin->icon,
+                'icon.small'    => $plugin->iconSmall,
             };
 
             # build the list of processed items
-            $processed{$plugin->getTitle} = $var;
+            $processed{$plugin->title} = $var;
         }
         # Don't know what we have (old admin console functions)
+        # NOTE: This usage is deprecated and will be removed in a future version
         else {
             # make title
             my $title = $funcDef->{title};
@@ -390,7 +391,7 @@ sub getSqlFromQueryString {
                         $dbh->quote($value),
                         ;
                 }
-                elsif  {
+                elsif ( $isValidOp{ $part->{op} } ) {
                     push @parts, join " ",
                         $dbh->quote_identifier($part->{field}),
                         $part->{op},
@@ -668,6 +669,28 @@ sub www_processAssetHelper {
 
 #----------------------------------------------------------------------
 
+=head2 www_processPlugin ( )
+
+Process the given admin console plugin
+
+=cut
+
+sub www_processPlugin {
+    my ( $self ) = @_;
+    my $session = $self->session;
+    my ( $form ) = $session->quick(qw{ form });
+
+    my $id      = $form->get('id');
+    my $def     = $session->config->get('adminConsole/' . $id );
+    return JSON->new->encode( { error => 'No such admin plugin: ' . $id } )
+        unless $def;
+    my $class   = $def->{className};
+    WebGUI::Pluggable::load( $class );
+    return JSON->new->encode( $class->process( $session ) );
+}
+
+#----------------------------------------------------------------------
+
 =head2 www_searchAssets ( ) 
 
 Search the asset tree for the given keywords and filters
@@ -804,7 +827,13 @@ __DATA__
         <ul id="admin_list">
             <TMPL_LOOP adminPlugins>
             <li class="clickable with_icon" style="background-image: url(<tmpl_var icon.small default="^Extras('icon/cog.png');">);">
-                <a href="<tmpl_var url>" target="view"><tmpl_var title></a>
+                <TMPL_IF className>
+                    <span onclick="window.admin.requestPlugin({ className : '<tmpl_var className>' })">
+                        <tmpl_var title>
+                    </span>
+                <TMPL_ELSE>
+                    <a href="<tmpl_var url>" target="view"><tmpl_var title></a>
+                </TMPL_IF>
             </li>
             </TMPL_LOOP>
         </ul>

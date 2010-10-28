@@ -49,9 +49,24 @@ sub handler {
 
     if ( $session->form->get("op") eq "admin" ) {
         if ( $session->form->get("plugin") ) {
-            # Load the requested plugin if necessary
-            # Default page is "view"
-            # Pass control to the right page
+            my $id      = $session->form->get('id');
+            my $props   = $session->config->get('adminConsole')->{ $id };
+
+            if ( !$props ) {
+                return "ERROR"; # die here
+            }
+
+            my $class   = $props->{ className };
+            WebGUI::Pluggable::load( $class );
+            my $method  = $session->form->get('method') || "view";
+
+            if ( $class->can( "www_" . $method ) ) {
+                return $class->can( "www_" . $method )->($session);
+            }
+            else {
+                return "ERROR"; # die here
+            }
+
         }
         else {
             my $admin   = WebGUI::Admin->new( $session );
@@ -61,7 +76,7 @@ sub handler {
                 return $admin->can( "www_" . $method )->($admin);
             }
             else {
-                return $admin->www_view;
+                return "ERROR"; # die here
             }
         }
     }
