@@ -45,7 +45,7 @@ around BUILDARGS => sub {
         my $userId = $_[1] ? $_[1] : $protoSession->user->userId;
         return $className->$orig(session => $protoSession, userId => $userId, );
     }
-    return $className->$orig(@_);
+    WebGUI::Error::InvalidParam->throw(error => "Need a session.");
 };
 
 
