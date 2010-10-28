@@ -3,6 +3,21 @@ WebGUI 8 Migration Guide
 
 The information contained herein documents the API changes that have occurred in the WebGUI 8 development effort and how to migrate your code to accomodate the new APIs.
 
+WebGUI::Auth
+==========================
+
+The API for new() has changed: new( $session, $userId );
+
+editUserSettingsForm deprecated. Use editSettingsForm
+editUserSettingsFormSave is deprecated. Use editSettingsFormSave
+deleteParams is deprecated. use delete()
+deleteSingleParam is deprecated. use delete("param")
+saveParams is deprecated. use update()
+getParams is deprecated. use get()
+init() is deprecated. Use www_view()
+isAdmin, isVisitor, isRegistered are all deprecated. use user->is* instead
+setCallable and isCallable are deprecated. use www_ prefix instead.
+
 WebGUI::Macro::AdminBar
 ==========================
 There is no Admin Bar for normal pages. Only the admin mode can see the admin bar.
