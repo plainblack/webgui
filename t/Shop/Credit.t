@@ -37,11 +37,6 @@ my $session = WebGUI::Test->session;
 
 plan tests => 27;
 
-#----------------------------------------------------------------------------
-# figure out if the test can actually run
-
-my $e;
-
 #######################################################################
 #
 # new
@@ -53,6 +48,8 @@ my $credit_user = WebGUI::User->create($session);
 WebGUI::Test->addToCleanup($credit_user);
 
 # Test incorrect for parameters
+
+my $e;
 
 eval { $credit = WebGUI::Shop::Credit->new(); };
 $e = Exception::Class->caught();

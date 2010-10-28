@@ -9,7 +9,6 @@ has [ qw/session userId/ ] => (
     required => 1,
 );
 
-
 use WebGUI::Shop::Admin;
 use WebGUI::Exception::Shop;
 use WebGUI::International;
@@ -43,8 +42,11 @@ around BUILDARGS => sub {
     ##Original arguments start here.
     my $protoSession = $_[0];
     if (blessed $protoSession && $protoSession->isa('WebGUI::Session')) {
-        return $className->$orig(session => $protoSession, userId => $_[1], );
+        warn "got a session\n";
+        my $userId = $_[1] ? $_[1] : $protoSession->user->userId;
+        return $className->$orig(session => $protoSession, userId => $userId, );
     }
+    warn "no session\n";
     return $className->$orig(@_);
 };
 

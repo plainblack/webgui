@@ -19,6 +19,7 @@ use lib "$FindBin::Bin/../../../lib";
 use Test::More;
 use Test::Deep;
 use WebGUI::Test; # Must use this before any other WebGUI modules
+use WebGUI::Test::MockAsset;
 use WebGUI::Session;
 
 #----------------------------------------------------------------------------
@@ -28,9 +29,9 @@ my $import          = WebGUI::Asset->getImportNode( $session );
 
 my $templateId = 'WIKIMASTER_TEMPLATE___';
 
-my $templateMock = Test::MockObject->new({});
-$templateMock->set_isa('WebGUI::Asset::Template');
-$templateMock->set_always('getId', $templateId);
+my $templateMock = WebGUI::Test::MockAsset->new('WebGUI::Asset::Template');
+$templateMock->mock_id($templateId);
+$templateMock->set_true('prepare');
 my $templateVars;
 $templateMock->mock('process', sub { $templateVars = $_[1]; } );
 
@@ -52,9 +53,7 @@ $session->request->setup_body({
 });
 
 {
-    WebGUI::Test->mockAssetId($templateId, $templateMock);
     $wiki->www_search();
-    WebGUI::Test->unmockAssetId($templateId);
 }
 
 is $templateVars->{addPageUrl},
