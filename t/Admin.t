@@ -50,6 +50,7 @@ BEGIN { $INC{'WebGUI/Admin/Plugin/Test.pm'} = __FILE__; }
 my $session         = WebGUI::Test->session;
 $session->user({ userId => 3 });
 
+my $import          = WebGUI::Asset->getImportNode( $session );
 # Add a couple admin plugins to the config file
 WebGUI::Test->originalConfig( "adminConsole" );
 $session->config->addToHash('adminConsole', 'test', {
@@ -60,16 +61,21 @@ $session->config->addToHash('adminConsole', 'test2', {
 } );
 
 # Add some assets
-my $snip = WebGUI::Asset->getImportNode( $session )->addChild( {
+my $snip = $import->addChild( {
     className       => 'WebGUI::Asset::Snippet',
     title           => 'test',
     groupIdEdit     => '3',
+    synopsis        => "aReallyLongWordToGetIndexed",
+    keywords        => "AKeywordToGetIndexed",
 } );
 
 # Commit the tag
 my $tag  = WebGUI::VersionTag->getWorking( $session );
 $tag->commit;
 addToCleanup( $tag );
+
+# Reload snippet to get correct size
+$snip   = $snip->cloneFromDb;
 
 #----------------------------------------------------------------------------
 # Tests
@@ -108,6 +114,136 @@ cmp_deeply(
     } ) ) },
     'found the Admin user',
 ) || diag( $output );
+
+# www_getClipboard
+$snip->cut;
+$mech->get_ok( '/?op=admin;method=getClipboard' );
+$output = $mech->content;
+cmp_deeply(
+    JSON->new->decode( $output ),
+    superbagof({
+        assetId         => $snip->getId,
+        url             => $snip->getUrl,
+        title           => $snip->menuTitle,
+        revisionDate    => $snip->revisionDate,
+        icon            => $snip->getIcon("small"),
+    }),
+    'getClipboard found our snippet',
+);
+
+# www_getCurrentVersionTag
+# no current tag
+$mech->get_ok( '/?op=admin;method=getCurrentVersionTag' );
+$output = $mech->content;
+cmp_deeply(
+    JSON->new->decode( $output ),
+    { },
+    'www_getCurrentVersionTag no current version tag',
+);
+ok( !WebGUI::VersionTag->getWorking( $mech->session, "nocreate" ), "doesn't create a tag" );
+
+# current tag
+my $newtag = WebGUI::VersionTag->getWorking( $mech->session );
+addToCleanup( $newtag );
+$mech->get_ok( '/?op=admin;method=getCurrentVersionTag' );
+$output = $mech->content;
+cmp_deeply(
+    JSON->new->decode( $output ),
+    {
+        tagId       => $newtag->getId,
+        name        => $newtag->get('name'),
+        editUrl     => $newtag->getEditUrl,
+        commitUrl   => $newtag->getCommitUrl,
+        leaveUrl    => '?op=leaveVersionTag',
+    },
+    'www_getCurrentVersionTag',
+);
+
+# www_getVersionTags
+$mech->get_ok( '/?op=admin;method=getVersionTags' );
+$output = $mech->content;
+cmp_deeply(
+    JSON->new->decode( $output ),
+    superbagof( {
+        tagId       => $newtag->getId,
+        name        => $newtag->get("name"),
+        isCurrent   => 1,
+        joinUrl     => $newtag->getJoinUrl,
+        editUrl     => $newtag->getEditUrl,
+        icon        => $session->url->extras( 'icon/tag_green.png' ),
+    } ),
+    'www_getVersionTags',
+);
+
+# www_getTreeData
+$mech->get_ok( '/?op=admin;method=getTreeData;assetUrl=' . $import->url );
+$output = $mech->content;
+cmp_deeply(
+    JSON->new->decode( $output ),
+    {
+        totalAssets     => $import->getChildCount,
+        sort            => ignore(),
+        dir             => ignore(),
+        assets          => [
+            map { {
+                assetId         => $_->getId,
+                url             => $_->getUrl,
+                lineage         => $_->lineage,
+                title           => $_->menuTitle,
+                revisionDate    => $_->revisionDate,
+                childCount      => $_->getChildCount,
+                assetSize       => $_->assetSize,
+                lockedBy        => ($_->isLockedBy ? $_->lockedBy->username : ''),
+                canEdit         => $_->canEdit && $_->canEditIfLocked,
+                helpers         => $_->getHelpers,
+                icon            => $_->getIcon("small"),
+                className       => $_->getName,
+            } } @{ $import->getLineage( ['children'], { returnObjects => 1, maxAssets => 25 } ) }
+        ],
+        currentAsset    => {
+            assetId => $import->getId,
+            url     => $import->getUrl,
+            title   => $import->getTitle,
+            icon    => $import->getIcon("small"),
+            helpers => $import->getHelpers,
+        },
+        crumbtrail      => [
+            map { { title => $_->getTitle, url => $_->getUrl } } 
+                @{ $import->getLineage( ['ancestors'], { returnObjects => 1 } ) }
+        ],
+    },
+    'www_getTreeData',
+);
+
+# www_searchAssets
+$mech->get_ok( '/?op=admin;method=searchAssets;query=aReallyLongWordToGetIndexed' );
+$output = $mech->content;
+cmp_deeply(
+    JSON->new->decode( $output ),
+    {
+        totalAssets     => 1,
+        sort            => undef,
+        dir             => "",
+        assets          => [
+            {
+                assetId         => $snip->getId,
+                url             => $snip->getUrl,
+                lineage         => $snip->lineage,
+                title           => $snip->menuTitle,
+                revisionDate    => $snip->revisionDate,
+                childCount      => $snip->getChildCount,
+                assetSize       => $snip->assetSize,
+                lockedBy        => ($snip->isLockedBy ? $snip->lockedBy->username : ''),
+                canEdit         => $snip->canEdit && $snip->canEditIfLocked,
+                helpers         => $snip->getHelpers,
+                icon            => $snip->getIcon('small'),
+                className       => $snip->getName,
+            }
+        ],
+    },
+    'www_searchAssets',
+);
+
 
 done_testing;
 

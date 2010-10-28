@@ -573,14 +573,9 @@ sub www_getTreeData {
             lockedBy        => ($asset->isLockedBy ? $asset->lockedBy->username : ''),
             canEdit         => $asset->canEdit && $asset->canEditIfLocked,
             helpers         => $asset->getHelpers,
+            icon            => $asset->getIcon("small"),
+            className       => $asset->getName,
         );
-
-        $fields{ className } = {};
-        # The asset icon
-        $fields{ icon } = $asset->getIcon("small");
-
-        # The asset type (i18n name)
-        $fields{ className } = $asset->getName;
 
         push @{ $assetInfo->{ assets } }, \%fields;
     }
@@ -726,14 +721,9 @@ sub www_searchAssets {
             lockedBy        => ($asset->isLockedBy ? $asset->lockedBy->username : ''),
             canEdit         => $asset->canEdit && $asset->canEditIfLocked,
             helpers         => $asset->getHelpers,
+            icon            => $asset->getIcon('small'),
+            className       => $asset->getName,
         );
-
-        $fields{ className } = {};
-        # The asset icon
-        $fields{ icon } = $asset->getIcon("small");
-
-        # The asset type (i18n name)
-        $fields{ className } = $asset->getName;
 
         push @{ $assetInfo->{ assets } }, \%fields;
     }
