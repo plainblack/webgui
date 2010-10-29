@@ -154,7 +154,9 @@ sub authenticate {
 
     my $userId = $self->userId;
     my $identifier = $_[1];
-    my $userData = $self->getParams;
+    my $userData = $self->get;
+
+    $self->session->log->error( "USERID: " . $userId );
 
     $error .= '<li>'.$i18n->get(12,'AuthLDAP').'</li>' if ($userData->{ldapUrl} eq "");
     $error .= '<li>'.$i18n->get(11,'AuthLDAP').'</li>' if ($userData->{connectDN} eq "");
@@ -185,7 +187,7 @@ sub authenticate {
             # _isValidLDAPUser will set _connectDN to new correct value
             $auth = $ldap->bind(dn=>$self->{_connectDN}, password=>$identifier);
             my $message = "DN has been changed for user ".$_[0]." from \"".$userData->{connectDN}."\" to \"".$self->{_connectDN}."\"";
-            $self->saveParams($self->user->userId, $self->authMethod, { connectDN => $self->{_connectDN} });
+            $self->update( connectDN => $self->{_connectDN} );
             $self->session->log->warn($message);
         }
         
@@ -453,7 +455,7 @@ sub displayLogin {
 
 sub editUserForm {
     my $self = shift;
-    my $userData = $self->getParams;
+    my $userData = $self->get;
 	my $connection = $self->getLDAPConnection;
     return '' unless $connection;
     my $ldapUrl = $self->session->form->process('authLDAP_ldapUrl') || $userData->{ldapUrl} || $connection->{ldapUrl};
@@ -729,20 +731,21 @@ sub login {
 
 #-------------------------------------------------------------------
 
-=head2 new ( session, authMethod, userId )
+=head2 new ( session, userId )
 
-Create a new Auth instance. C<authMethod> is the name of this auth method ("ldap").
-C<userId> is the ID of the user to be authenticated.
+Create a new Auth instance. C<userId> is the ID of the user to be authenticated.
 
 =cut
 
 sub new {
    my $class = shift;
 	my $session = shift;
-   my $authMethod = $_[0];
-   my $userId = $_[1];
-   my @callable = ('createAccount','deactivateAccount','displayAccount','displayLogin','login','logout','createAccountSave','deactivateAccountConfirm');
-   my $self = WebGUI::Auth->new($session,$authMethod,$userId,\@callable);
+   my $userId = shift;
+   my $self = $class->SUPER::new($session,$userId);
+   $self->setCallable([
+        'createAccount','deactivateAccount','displayAccount','displayLogin',
+        'login','logout','createAccountSave','deactivateAccountConfirm',
+   ]);
    #my $connection = $session->scratch->get("ldapConnection") || $session->setting->get("ldapConnection");
    #my $ldaplink = WebGUI::LDAPLink->new($session,$connection); 
    #$self->{_connection} = $ldaplink->get if $ldaplink;
@@ -751,7 +754,7 @@ sub new {
 	my %ldapStatusCode = map { $_ => $i18n->get("LDAPLink_".$_) }
 			     (0..21, 32,33,34,36, 48..54, 64..71, 80);
 	$self->{_statusCode} = \%ldapStatusCode;
-   bless $self, $class;
+    return $self;
 }
 
 #-------------------------------------------------------------------

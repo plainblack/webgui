@@ -34,19 +34,6 @@ These methods are available from this class:
 
 #----------------------------------------------------------------------------
 
-=head2 new ( ... )
-
-Create a new object
-
-=cut
-
-sub new {
-    my $self    = shift->SUPER::new(@_);
-    return bless $self, __PACKAGE__; # Auth requires rebless
-}
-
-#----------------------------------------------------------------------------
-
 =head2 createFacebookUser ( fbuser )
 
     my $user    = $self->createFacebookUser(  $fb->fetch('me') );
@@ -62,9 +49,9 @@ sub createFacebookUser {
     $user->profileField('email', $fbuser->{email});
     $user->profileField('firstName', $fbuser->{first_name});
     $user->profileField('lastName', $fbuser->{last_name});
-    $self->saveParams( $user->userId, $self->authMethod, { 
+    $self->update(
         "facebookUserId" => $fbuser->{id},
-    } );
+    );
     return $user;
 }
 

@@ -47,9 +47,9 @@ WebGUI::Test->addToCleanup($user);
 $user->username( $USERNAME );
 $user->addToGroups( ['3'] );
 my $auth        = WebGUI::Operation::Auth::getInstance( $session, $user->authMethod, $user->userId );
-$auth->saveParams( $user->userId, $user->authMethod, {
+$auth->update( 
     'identifier'    => $auth->hashPassword($IDENTIFIER)
-});
+);
 
 my ($redirect, $response, $url);
 
@@ -115,8 +115,6 @@ $mech->get_ok( $assetUrl . "?op=auth;method=displayLogin" );
 $mech->submit_form_ok( 
     {
         with_fields => {
-            op              => 'auth',
-            method          => 'login',
             username        => $USERNAME,
             identifier      => $IDENTIFIER,
         },

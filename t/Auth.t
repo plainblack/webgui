@@ -24,7 +24,6 @@ use WebGUI::Session;
 my $session         = WebGUI::Test->session;
 
 my @cleanupUsernames    = ();   # Will be cleaned up when we're done
-my $AUTH_METHOD     = "TEST";   # Used as second argument to WebGUI::Auth->new
 my $auth;   # will be used to create auth instances
 my ($request, $oldRequest, $output);
 
@@ -40,7 +39,7 @@ my $createAccountSession = WebGUI::Test->newSession(0, {
     returnUrl       => 'REDIRECT_URL',
 });
 
-$auth           = WebGUI::Auth->new( $createAccountSession, $AUTH_METHOD );
+$auth           = WebGUI::Auth->new( $createAccountSession );
 my $username    = $createAccountSession->id->generate;
 push @cleanupUsernames, $username;
 $output         = $auth->createAccountSave( $username, { }, "PASSWORD" ); 
@@ -77,7 +76,7 @@ my $loginSession = WebGUI::Test->newSession(0, {
     returnUrl       => 'REDIRECT_LOGIN_URL',
 });
 
-$auth           = WebGUI::Auth->new( $loginSession, $AUTH_METHOD, 3 );
+$auth           = WebGUI::Auth->new( $loginSession, 3 );
 my $username    = $loginSession->id->generate;
 push @cleanupUsernames, $username;
 $session->setting->set('showMessageOnLogin', 0);

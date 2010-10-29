@@ -20,6 +20,7 @@ use WebGUI::Workflow::Instance;
 use JSON ();
 use WebGUI::Exception;
 use WebGUI::ProfileField;
+use WebGUI::Inbox;
 use Scalar::Util qw( weaken );
 use Net::CIDR::Lite;
 
@@ -195,10 +196,14 @@ sub acceptsFriendsRequests {
 
 =head2 authInstance
 
+NOTE: This method is deprecated. Users may have any number of auth methods.
+Instead, instantiate the desired auth method and give it the user's ID.
+
 Returns an instance of the authentication object for this user.
 
 =cut
 
+# DEPRECATED. Remove in 9.0
 sub authInstance {
     my $self    = shift;
     my $session = $self->session;
@@ -215,7 +220,7 @@ sub authInstance {
     }
     my $authClass = 'WebGUI::Auth::' . $authMethod;
     WebGUI::Pluggable::load($authClass);
-    my $auth = $authClass->new($session, $authMethod, $self->getId);
+    my $auth = $authClass->new($session, $self->getId);
     return $auth;
 }
 
@@ -380,8 +385,8 @@ sub delete {
         $group->deleteUsers([$userId]) if $group;
     }
 
-    my $auth = $self->authInstance;
-    $auth->deleteParams($userId);
+    # Delete all auth instances for this user
+    $db->write( "DELETE FROM authentication WHERE userId=?", [ $userId ] );
 
     $self->friends->delete
         if ($self->{_user}{"friendsGroup"} ne "");

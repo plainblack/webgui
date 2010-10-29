@@ -302,7 +302,7 @@ sub createAccountSave {
 	$u->authMethod($self->authMethod);
 	$u->karma($self->session->setting->get("karmaPerLogin"),"Login","Just for logging in.") if ($self->session->setting->get("useKarma"));
 	$u->updateProfileFields($profile) if ($profile);
-    $self->saveParams($userId,$self->authMethod,$properties);
+    $self->update($properties);
 
 	if ($self->getSetting("sendWelcomeMessage")){
         my $var;
@@ -433,7 +433,35 @@ sub deactivateAccountConfirm {
 
 #-------------------------------------------------------------------
 
+=head2 delete ( [param] )
+
+Delete one or all parameters for this auth method. Deleting all parameters
+effectively removes this auth method from the user.
+
+=cut
+
+sub delete {
+    my ( $self, $param ) = @_;
+    my ( $db ) = $self->session->quick(qw( db ));
+
+    if ( $param ) {
+        $db->write( "DELETE FROM authentication WHERE userId=? AND authMethod=? AND fieldName=?",
+            [ $self->userId, $self->authMethod, $param ]
+        );
+    }
+    else {
+        $db->write( "DELETE FROM authentication WHERE userId=? AND authMethod=?", 
+            [ $self->userId, $self->authMethod ]
+        );
+    }
+}
+
+#-------------------------------------------------------------------
+
 =head2 deleteParams (  )
+
+NOTE: This method is deprecated and will be removed in a future version. Instead,
+use delete() to delete this auth method from the user.
 
 Removes the user's authentication parameters from the database for all 
 authentication methods. This is primarily useful when deleting the user's 
@@ -441,24 +469,29 @@ account.
 
 =cut
 
+# DEPRECATED. Remove in 9.0
 sub deleteParams {
 	my $self = shift;
-	$self->session->db->write("delete from authentication where userId=".$self->session->db->quote($self->userId));
+	$self->delete;
 }
 
 #-------------------------------------------------------------------
 
 =head2 deleteSingleParam ( )
 
+NOTE: This method is deprecated and will be removed in a future version. Instead,
+use delete("param") to delete a single param from this auth method.
+
 Removes a single authentication parameter from the database.
 
 =cut
 
+# DEPRECATED. Remove in 9.0
 sub deleteSingleParam {
        my $self = shift;
        my ($userId, $authMethod, $fieldName) = @_;
 
-       $self->session->db->write('delete from authentication where userId = ? and authMethod = ? and fieldName = ?', [$userId, $authMethod, $fieldName]);
+       $self->delete( $fieldName );
 
 }
 
@@ -579,37 +612,48 @@ sub editUserForm {
 
 #-------------------------------------------------------------------
 
-=head2 editUserFormSave ( properties )
+=head2 editUserFormSave ( )
 
 Saves user elements unique to this authentication method
 
 =cut
 
 sub editUserFormSave {
-	my $self = shift;
-	$self->saveParams($self->userId,$self->authMethod,$_[0]);
+        # Added for interface purposes only. Needs to be implemented in the subclass
 }
 
 #-------------------------------------------------------------------
 
-=head2 editUserSettingsForm ( )
+=head2 editSettingsForm ( )
 
 You need to override this method in your auth module. It needs to return a the rows in a form for the stuff you want to be configured through webgui settings.
 
 =cut
 
+sub editSettingsForm {
+}
+
+# Backwards compatiblity for method renaming
 sub editUserSettingsForm {
+    my $self = shift;
+    return $self->editSettingsForm( @_ );
 }
 
 #-------------------------------------------------------------------
 
-=head2 editUserSettingsFormSave ( )
+=head2 editSettingsFormSave ( )
 
-You need to override this method in your auth module. It's the save for the editUserSettingsFormSave method.
+You need to override this method in your auth module. It's the save for the editSettingsFormSave method.
 
 =cut
 
+sub editSettingsFormSave {
+}
+
+# Backwards compatiblity for method renaming
 sub editUserSettingsFormSave {
+    my $self = shift;
+    return $self->editSettingsFormSave( @_ );
 }
 
 #-------------------------------------------------------------------
@@ -623,7 +667,35 @@ Sets or returns the error currently stored in the object
 sub error {
 	my $self = shift;
 	return $self->{error} if (!$_[0]);
+        $self->session->log->error( $_[0] );
 	$self->{error} = $_[0];
+}
+
+#----------------------------------------------------------------------------
+
+=head2 get ( [param] )
+
+Get one or all parameters for this auth instance. Returns either a hashref or a 
+single scalar.
+
+=cut
+
+sub get {
+    my ( $self, $param ) = @_;
+    my ( $db ) = $self->session->quick(qw( db ));
+
+    if ( $param ) {
+        return $db->quickScalar(
+            "SELECT fieldData FROM authentication WHERE userId=? AND authMethod=? AND fieldName=?",
+            [ $self->userId, $self->authMethod, $param ],
+        );
+    }
+    else {
+        return $db->buildHashRef(
+            "SELECT fieldName, fieldData FROM authentication WHERE userId=? AND authMethod=?",
+            [ $self->userId, $self->authMethod ],
+        );
+    }
 }
 
 #-------------------------------------------------------------------
@@ -732,10 +804,13 @@ sub getLoginTemplateId {
 
 =head2 getParams ( )
 
+NOTE: This method is deprecated and will be removed in a future version. Use get() instead.
+
 Returns a hash reference with the user's authentication information.  This method uses data stored in the instance of the object.
 
 =cut
 
+# DEPRECATED. Remove in 9.0
 sub getParams {
 	my $self       = shift;
 	my $userId     = $_[0] || $self->userId;
@@ -780,23 +855,29 @@ sub init {
 
 =head2 isAdmin ()
 
+NOTE: This method is deprecated. Use user->isAdmin instead.
+
 Returns 1 if the user is user 3 (admin).
 
 =cut
 
+# DEPRECATED. Remove in 9.0
 sub isAdmin {
 	my $self = shift;
-	return $self->userId eq '3';
+	return $self->user->isAdmin;
 }
 
 #-------------------------------------------------------------------
 
 =head2 isCallable ( method )
 
+NOTE: Deprecated. Unnecessary when setCallable is removed.
+
 Returns whether or not a method is callable
 
 =cut
 
+# DEPRECATED. Remove in 9.0
 sub isCallable {
 	my $self = shift;
 	return 1 if $_[0] ~~ $self->{callable};
@@ -808,23 +889,29 @@ sub isCallable {
 
 =head2 isRegistered ()
 
+NOTE: Deprecated. Use user->isRegistered instead.
+
 Returns 1 if the user is not a visitor.
 
 =cut
 
+# DEPRECATED. Remove in 9.0
 sub isRegistered {
 	my $self = shift;
-	return $self->userId ne '1';
+	return $self->user->isRegistered;
 }
 
 #-------------------------------------------------------------------
 
 =head2 isVisitor ()
 
+NOTE: Deprecated. Use user->isVisitor instead.
+
 Returns 1 if the user is a visitor.
 
 =cut
 
+# DEPRECATED. Remove in 9.0
 sub isVisitor {
 	my $self = shift;
 	return $self->userId eq '1';
@@ -843,7 +930,6 @@ Open version tag is reclaimed if user is in site wide or singlePerUser mode.
 
 sub login {
 	my $self = shift;
-
 	#Create a new user
 	my $uid = $self->userId;
 	my $u = WebGUI::User->new($self->session,$uid);
@@ -923,57 +1009,33 @@ sub logout {
 
 #-------------------------------------------------------------------
 
-=head2 new ( session, authMethod [,userId,callable] )
+=head2 new ( session, [ userId ] )
 
 Constructor.
 
 =head3 session
 
-=head3 authMethod
-
-This object's authentication method
-
 =head3 userId
 
 userId for the user requesting authentication.  This defaults to $self->session->user->userId
 
-=head3 callable
-
-Array reference of methods allowed to be called externally;
-
 =cut
 
 sub new {
-	my $self = {};
 	my $class = shift;
+	my $self = bless {}, $class;
 	$self->{_session} = shift;
-	$self->{authMethod} = shift;
 	my $userId = shift || $self->{_session}->user->userId;
-	# Can't do this... if you're updating the account of a user that's not you, this will not work
-	#$self->{user} = $self->{_session}->user;
 	$self->{user} = WebGUI::User->new($self->{_session}, $userId);
 	$self->{error} = "";
 	$self->{profile} = ();
-	$self->{warning} = "";
-	my $call = shift;
-	my @callable = ('init', 'showMessageOnLogin', @{$call});
-	$self->{callable} = \@callable;
-	bless $self, $class;
+
+    # Determine the authmethod from the classname
+    ($self->{authMethod}) = $class =~ m/^WebGUI::Auth::(.+)/;
+
+    $self->setCallable([qw( init showMessageOnLogin )]);
+
 	return $self;
-}
-
-#-------------------------------------------------------------------
-
-=head2 profile ( )
-
-Sets or returns the Profile hash for a user.
-
-=cut
-
-sub profile {
-	my $self = shift;
-	return $self->{profile} if (!$_[0]);
-	$self->{profile} = $_[0];
 }
 
 #-------------------------------------------------------------------
@@ -987,6 +1049,9 @@ sub session {
 
 =head2 setCallable ( callableMethods )
 
+NOTE: This method is deprecated and will be removed in a future version. Instead, 
+any method prefixed with www_ is available from the web interface.
+
 adds elements to the callable routines list.  This list determines whether or not a method in this instance is 
 allowed to be called externally
 
@@ -996,6 +1061,7 @@ Array reference containing a list of methods for this authentication instance th
 
 =cut
 
+# DEPRECATED. Remove in 9.0
 sub setCallable {
 	my $self = shift;
 	my @callable = @{$self->{callable}};
@@ -1006,6 +1072,9 @@ sub setCallable {
 #-------------------------------------------------------------------
 
 =head2 saveParams ( userId, authMethod, data )
+
+NOTE: This method is deprecated and will be removed in a future version. Instead,
+use update() to update the parameters of this auth instance.
 
 Saves the user's authentication parameters to the database.
 
@@ -1023,13 +1092,11 @@ A hash reference containing parameter names and values to be saved.
 
 =cut
 
+# DEPRECATED. Remove in 9.0
 sub saveParams {
 	my $self = shift;
 	my ($uid, $authMethod, $data) = @_;
-	foreach (keys %{$data}) {
-		$self->session->db->write("delete from authentication where userId=".$self->session->db->quote($uid)." and authMethod=".$self->session->db->quote($authMethod)." and fieldName=".$self->session->db->quote($_));
-		$self->session->db->write("insert into authentication (userId,authMethod,fieldData,fieldName) values (".$self->session->db->quote($uid).",".$self->session->db->quote($authMethod).",".$self->session->db->quote($data->{$_}).",".$self->session->db->quote($_).")");
-	}
+    return $self->update( $data );
 }
 
 #----------------------------------------------------------------------------
@@ -1057,8 +1124,6 @@ sub showMessageOnLogin {
 
     # Add the link to continue
     my $session = $self->session;
-    $session->log->warn("returnUrl: >".$self->session->form->get( 'returnUrl' )."<");
-    $session->log->warn("redirectAfterLoginUrl: >".$self->session->form->get( 'returnUrl' )."<");
     my $redirectUrl =  $self->session->form->get( 'returnUrl' )
                     || $self->session->setting->get("redirectAfterLoginUrl")
                     || $self->session->scratch->get( 'redirectAfterLogin' )
@@ -1098,6 +1163,39 @@ sub timeRecordSession {
         # could end up with ridiculously long user recorded times)
         $self->session->log->warn("More than 1 old userLoginLog rows found, removing offending rows");
         $self->session->db->write("delete from userLoginLog where lastPageViewed = timeStamp and sessionId = ? ", [$self->session->getId] );
+    }
+}
+
+#----------------------------------------------------------------------------
+
+=head2 update ( params )
+
+Update the parameters for this auth instance. Params is a list of name => value pairs.
+
+=cut
+
+sub update {
+    my $self    = shift;
+    my ( $db ) = $self->session->quick(qw( db ));
+    my %params;
+
+    # Allow both hashref and hash
+    if ( @_ == 1 ) {
+        %params = %{ $_[0] };
+    }
+    else {
+        %params = @_;
+    }
+
+    foreach my $param (keys %params) {
+        $db->write(
+            "delete from authentication where userId=? and authMethod=? and fieldName=?",
+            [ $self->userId, $self->authMethod, $param ],
+        );
+        $db->write(
+            "insert into authentication (userId,authMethod,fieldName,fieldData) values (?,?,?,?)",
+            [ $self->userId, $self->authMethod, $param, $params{ $param } ],
+        );
     }
 }
 
@@ -1166,20 +1264,6 @@ sub validUsername {
 
 	$self->error($error);
 	return $error eq "";
-}
-
-#-------------------------------------------------------------------
-
-=head2 warning ( [warningMsg] )
-
-Sets or Returns a warning in the object
-
-=cut
-
-sub warning {
-	my $self = shift;
-	return $self->{warning} if (!$_[0]);
-	$self->{warning} = $_[0];
 }
 
 1;

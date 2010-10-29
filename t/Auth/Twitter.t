@@ -88,8 +88,9 @@ my $userId  = $session->db->quickScalar(
                 "SELECT userId FROM authentication WHERE authMethod=? AND fieldName=? AND fieldData=?",
                 [ "Twitter", "twitterUserId", "2345" ],
             );
-ok( $userId, 'user exists in authentication table' );
 $user = WebGUI::User->new( $session, $userId );
+note( $userId );
+isnt( $user->userId, 1, 'user exists in authentication table' );
 is( $user->username, "RedHerring", "correct username is set" );
 WebGUI::Test->addToCleanup( $user );
 

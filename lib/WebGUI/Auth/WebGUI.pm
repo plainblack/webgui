@@ -120,7 +120,7 @@ sub authenticate {
 	return 0 if !$auth;
 	
 	$identifier = $_[1];
-	$userData = $self->getParams;
+	$userData = $self->get;
 	if (($self->hashPassword($identifier) eq $$userData{identifier}) && ($identifier ne "")) {
 		return 1;
 	} 
@@ -275,7 +275,7 @@ sub createAccountSave {
     # Send validation e-mail if required
     if ($setting->get("webguiValidateEmail")) {
         my $key = $session->id->generate;
-        $self->saveParams($self->userId,"WebGUI",{emailValidationKey=>$key});
+        $self->update(emailValidationKey=>$key);
         my $mail = WebGUI::Mail::Send->create($self->session, {
             to      => $profile->{email},
             subject => $i18n->get('email address validation email subject','AuthWebGUI')
@@ -344,7 +344,7 @@ sub displayAccount {
    my $vars;
    return $self->displayLogin($_[0]) if ($self->isVisitor);
 	my $i18n = WebGUI::International->new($self->session);
-   my $userData = $self->getParams;
+   my $userData = $self->get;
    $vars->{'account.message'} = $_[0] if ($_[0]);
    $vars->{'account.noform'} = 1;
    if($userData->{changeUsername}  || (!defined $userData->{changeUsername} && $self->session->setting->get("webguiChangeUsername"))){
@@ -393,7 +393,7 @@ sub displayLogin {
 
 sub editUserForm {
    my $self = shift;
-   my $userData = $self->getParams;
+   my $userData = $self->get;
    my $f = WebGUI::HTMLForm->new($self->session);
 	my $i18n = WebGUI::International->new($self->session);
    $f->password(
@@ -440,7 +440,7 @@ sub editUserFormSave {
    my $self = shift;
    my $userId = $self->session->form->get("uid");
    my $properties;
-   my $userData = $self->getParams($userId);
+   my $userData = $self->get;
    my $identifier = $self->session->form->process('authWebGUI.identifier');
    unless (!$identifier || $identifier eq "password") {
       $properties->{identifier} = $self->hashPassword($self->session->form->process('authWebGUI.identifier'));
@@ -781,7 +781,7 @@ sub login {
 	  return $self->displayLogin("<h1>".$i18n->get(70)."</h1>".$self->error);
    }
    
-   my $userData = $self->getParams;
+   my $userData = $self->get;
    if($self->getSetting("passwordTimeout") && $userData->{passwordTimeout}){
       my $expireTime = $userData->{passwordLastUpdated} + $userData->{passwordTimeout};
       if (time() >= $expireTime){
@@ -798,11 +798,16 @@ sub login {
 sub new {
     my $class = shift;
     my $session = shift;
-    my $authMethod = $_[0];
-    my $userId = $_[1];
-    my @callable = ('validateEmail','createAccount','deactivateAccount','displayAccount','displayLogin','login','logout','recoverPassword','resetExpiredPassword','recoverPasswordFinish','createAccountSave','deactivateAccountConfirm','resetExpiredPasswordSave','updateAccount', 'emailResetPassword', 'emailResetPasswordFinish');
-    my $self = WebGUI::Auth->new($session,$authMethod,$userId,\@callable);
-    bless $self, $class;
+    my $userId = $_[0];
+    my $self = $class->SUPER::new($session,$userId);
+    $self->setCallable([
+        'validateEmail','createAccount','deactivateAccount','displayAccount',
+        'displayLogin','login','logout','recoverPassword','resetExpiredPassword',
+        'recoverPasswordFinish','createAccountSave','deactivateAccountConfirm',
+        'resetExpiredPasswordSave','updateAccount', 'emailResetPassword', 
+        'emailResetPasswordFinish',
+    ]);
+    return $self;
 }
 
 #-------------------------------------------------------------------
@@ -1060,9 +1065,9 @@ sub profileRecoverPasswordFinish {
 
 	if ($self->_isValidPassword($password, $passwordConfirm)) {
 		$self->user( $user );
-		$self->saveParams($userId, $self->authMethod,
-				  { identifier => $self->hashPassword($password),
-				    passwordLastUpdated => time });
+		$self->update(
+				  identifier => $self->hashPassword($password),
+				    passwordLastUpdated => time);
 		$self->_logSecurityMessage;
 		return $self->SUPER::login;
 	} else {
@@ -1110,10 +1115,10 @@ sub emailRecoverPasswordFinish {
         return $self->recoverPassword( $i18n->get( 'no email address', 'AuthWebGUI' ) );
     }
 
-    my $authsettings = $self->getParams($userId);
+    my $authsettings = $self->get;
     $authsettings->{emailRecoverPasswordVerificationNumber} = $recoveryGuid;
 
-    $self->saveParams($userId, 'WebGUI', $authsettings);
+    $self->update($authsettings);
 
     my $mail = WebGUI::Mail::Send->create($session, { to=>$email, subject=>$i18n->get('WebGUI password recovery')});
     $mail->addText($i18n->get('recover password email text1', 'AuthWebGUI') . $url. ". \n\n".$i18n->get('recover password email text2', 'AuthWebGUI')." \n\n ".$url."?op=auth;method=emailResetPassword;token=$recoveryGuid"."\n\n ". $i18n->get('recover password email text3', 'AuthWebGUI'));
@@ -1211,13 +1216,13 @@ sub emailResetPasswordFinish {
 
        if ($self->_isValidPassword($password, $passwordConfirm)) {
                $self->user(WebGUI::User->new($self->session, $userId));
-               $self->saveParams($userId, $self->authMethod,
-                                 { identifier => $self->hashPassword($password),
-                                   passwordLastUpdated => time });
+               $self->update(
+                                 identifier => $self->hashPassword($password),
+                                   passwordLastUpdated => time);
                $self->_logSecurityMessage;
 
 #              delete the emailRecoverPasswordVerificationNumber
-               $self->deleteSingleParam($userId, $self->authMethod, 'emailRecoverPasswordVerificationNumber');
+               $self->delete('emailRecoverPasswordVerificationNumber');
                return $self->SUPER::login;
        } else {
                return $self->emailResetPassword($self->error);
@@ -1269,7 +1274,7 @@ sub resetExpiredPasswordSave {
    $properties->{identifier} = $self->hashPassword($self->session->form->process("identifier"));
    $properties->{passwordLastUpdated} =time();
    
-   $self->saveParams($u->userId,$self->authMethod,$properties);
+   $self->update($properties);
    $self->_logSecurityMessage();
    return $self->SUPER::login();
 }
@@ -1340,7 +1345,7 @@ sub updateAccount {
 	     $u->username($username);
 	  }
 	  if($password){
-	     my $userData = $self->getParams;
+	     my $userData = $self->get;
          unless ($password eq "password") {
             $properties->{identifier} = $self->hashPassword($password);
 			$self->_logSecurityMessage();
@@ -1350,7 +1355,7 @@ sub updateAccount {
          }
       }
    }
-   $self->saveParams($u->userId,$self->authMethod,$properties);
+   $self->update($properties);
    $self->session->user(undef,undef,$u);
    
   return $self->displayAccount($display);

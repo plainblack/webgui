@@ -34,19 +34,6 @@ These methods are available from this class:
 
 #----------------------------------------------------------------------------
 
-=head2 new ( ... )
-
-Create a new object
-
-=cut
-
-sub new {
-    my $self    = shift->SUPER::new(@_);
-    return bless $self, __PACKAGE__; # Auth requires rebless
-}
-
-#----------------------------------------------------------------------------
-
 =head2 createTwitterUser ( twitterUserId, username )
 
     my $user    = $self->createTwitterUser( $twitterUserId, $username );
@@ -59,9 +46,10 @@ sub createTwitterUser {
     my ( $self, $twitterUserId, $username ) = @_;
     my $user    = WebGUI::User->create( $self->session );
     $user->username( $username );
-    $self->saveParams( $user->userId, $self->authMethod, { 
+    $self->user( $user );
+    $self->update( 
         "twitterUserId" => $twitterUserId,
-    } );
+    );
     return $user;
 }
 
@@ -281,7 +269,6 @@ sub www_setUsername {
     if ( !WebGUI::User->newByUsername( $session, $username ) ) {
         my $twitterUserId = $scratch->get( "AuthTwitterUserId" );
         my $user = $self->createTwitterUser( $twitterUserId, $username );
-        $self->user( $user );
         return $self->login;
     }
 

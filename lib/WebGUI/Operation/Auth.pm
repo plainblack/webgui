@@ -45,7 +45,7 @@ sub getInstance {
 
 	my $userId = $_[1];
 	#Create Auth Object
-    my $auth = eval { WebGUI::Pluggable::instanciate("WebGUI::Auth::".$authMethod, "new", [ $session, $authMethod, $userId ] ) };
+    my $auth = eval { WebGUI::Pluggable::instanciate("WebGUI::Auth::".$authMethod, "new", [ $session, $userId ] ) };
     if ($@) {
         $session->log->fatal($@);
     }

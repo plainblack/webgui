@@ -55,11 +55,11 @@ $user->update({
     username        => "Andy Dufresne",
 });
 my $auth    = $user->authInstance;
-$auth->saveParams( $user->getId, $user->get('authMethod'), {
+$auth->update( 
     ldapUrl         => $ldapProps->{ldapUrl},
     connectDN       => "uid=Andy Dufresne,o=shawshank",
     ldapConnection  => $ldapProps->{ldapLinkId},
-} );
+);
 
 $session->request->setup_body({
     username        => 'Andy Dufresne',
@@ -134,7 +134,7 @@ $auth   = WebGUI::Auth::LDAP->new( $session, 'LDAP' );
 $out    = $auth->login;
 is $session->user->get('username'), 'Brooks Hatley', 'Brooks was created';
 cmp_deeply(
-    $auth->getParams,
+    $auth->get,
     {
         connectDN      => 'uid=Brooks Hatley,o=shawshank',
         ldapConnection => '00000000000000testlink',
@@ -167,7 +167,7 @@ $auth   = WebGUI::Auth::LDAP->new( $session, 'LDAP' );
 $out    = $auth->login;
 is $session->user->get('username'), 'Brooks Hatley', 'Brooks was logged in after name change';
 cmp_deeply(
-    $auth->getParams,
+    $auth->get,
     {
         connectDN      => 'uid=Brooks Hatlen,o=shawshank',
         ldapConnection => '00000000000000testlink',
