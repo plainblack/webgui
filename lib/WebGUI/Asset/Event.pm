@@ -360,6 +360,22 @@ sub canEdit {
 
 #-------------------------------------------------------------------
 
+=head2 duplicate ( )
+
+Extend the super class to duplicate the storage location.
+
+=cut
+
+sub duplicate {
+	my $self = shift;
+	my $newAsset = $self->SUPER::duplicate(@_);
+	my $newStorage = $self->getStorageLocation->copy;
+	$newAsset->update({storageId=>$newStorage->getId});
+	return $newAsset;
+}
+
+#-------------------------------------------------------------------
+
 =head2 generateRecurrence (date)
 
 Creates an recurrence event in the parent calendar for the given date
