@@ -113,7 +113,6 @@ sub getValue {
     my ( $self, $value ) = @_;
     $value ||= $self->SUPER::getValue;
 
-    $self->session->log->info( "JsonTable Got $value from form" );
     $value  = JSON->new->decode( $value );
 
     for my $row ( @{$value} ) {
