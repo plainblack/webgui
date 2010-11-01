@@ -271,7 +271,9 @@ foreach my $filename (keys %config) {
     chdir($currentPath);
 	my $session = WebGUI::Session->open($webguiRoot,$filename);
 	print "\tSetting site upgrade completed..." unless ($quiet);
-	$session->setting->remove('specialState');
+    unless ($skipMaintenance) {
+        $session->setting->remove('specialState');
+    }
 	$session->close();
 	print "OK\n" unless ($quiet);
 }
