@@ -679,7 +679,7 @@ sub quickCSV {
 	my $params = shift;
 	my ($sth, $output, @data);
 
-	my $csv = Text::CSV_XS->new({ eol => "\n" });
+	my $csv = Text::CSV_XS->new({ eol => "\n", binary => 1 });
 
 	$sth = $self->prepare($sql);
 	$sth->execute($params);
@@ -688,7 +688,10 @@ sub quickCSV {
 	$output = $csv->string();
 
 	while (@data = $sth->array) {
-		return undef unless $csv->combine(@data);
+		if ( ! $csv->combine(@data) ) {
+                    $self->session->log->error( "Problem creating CSV row: " . $csv->error_diag );
+                    return undef;
+                }
 		$output .= $csv->string();
 	}
 

@@ -17,7 +17,7 @@ use WebGUI::Session;
 use Data::Dumper;
 use Test::Deep;
 
-use Test::More tests => 56; # increment this value for each test you create
+use Test::More tests => 57; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -298,4 +298,14 @@ cmp_deeply(
     },
     'Check table structure',
 );
+
+#----------------------------------------------------------------------------
+# REGRESSIONS
+
+# 11940 : quickCSV chokes on newlines
+$session->db->write( 
+    'INSERT INTO testTable (myIndex,message,myKey) VALUES (?,?,?)',
+    [ 10, "a\ntest", 'B' ],
+);
+ok( $session->db->quickCSV( 'SELECT * FROM testTable' ), 'get some output even with newlines in data' );
 
