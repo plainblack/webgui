@@ -22,6 +22,7 @@
  - fixed #11940: quickCSV chokes on newlines in data
  - fixed #11933: EMS shows a dollar currency symbol on Badge Listing
  - fixed #11941: cannot edit default templates in some browsers
+ - fixed #11926: Version Tag: Delete
 
 7.10.3
  - fixed #11903: Unnecessary debug in Thingy

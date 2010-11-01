@@ -702,8 +702,9 @@ sub www_manageRevisionsInTag {
 
     # Process any actions
     my $action     = lc $session->form->get('action');
+    my $form       = $session->form;
     my $validToken = $session->form->validToken;
-    if ( $action eq "purge" && $validToken) {
+    if ( $form->get('purge') && $validToken) {
         # Purge these revisions
         my @assetInfo       = $session->form->get('assetInfo'); 
         for my $assetInfo ( @assetInfo ) {
@@ -718,7 +719,7 @@ sub www_manageRevisionsInTag {
             return www_manageVersions( $session );
         }
     }
-    elsif ( $action eq "move to:" && $validToken) {
+    elsif ( $form->get('moveto') && $validToken) {
         # Get the new version tag
         my $moveToTagId = $session->form->get('moveToTagId');
         my $moveToTag;
@@ -746,7 +747,7 @@ sub www_manageRevisionsInTag {
             return www_manageVersions( $session );
         }
     }
-    elsif ( $action eq "update version tag" && $validToken) {
+    elsif ( $form->get('update') && $validToken) {
         my $startTime = WebGUI::DateTime->new($session,$session->form->process("startTime","dateTime"))->toDatabase;
         my $endTime   = WebGUI::DateTime->new($session,$session->form->process("endTime","dateTime"))->toDatabase;
         
@@ -832,19 +833,19 @@ sub www_manageRevisionsInTag {
             value => WebGUI::DateTime->new($session,$filterEndTime)->epoch,
         })
         . '<br />'
-        . '<input type="submit" name="action" value="'. $i18n->get('manageRevisionsInTag update') . '" />'
+        . '<input type="submit" name="update" value="'. $i18n->get('manageRevisionsInTag update') . '" />'
         . '</td>'
         . '</tr>'
         . '<tr><td colspan="5">&nbsp;</td></tr>'
         . '<tr>'
         . '<td colspan="5">'
         . $i18n->get("manageRevisionsInTag with selected")
-        . '<input type="submit" name="action" value="'. $i18n->get("manageRevisionsInTag move")  . '" />'
+        . '<input type="submit" name="moveto" value="'. $i18n->get("manageRevisionsInTag move")  . '" />'
         . WebGUI::Form::SelectBox( $session, {
             name        => 'moveToTagId',
             options     => \%moveToTagOptions,
         } )
-        . '&nbsp;<input type="submit" name="action" value="'. $i18n->get('manageRevisionsInTag purge') . '" class="red" />'
+        . '&nbsp;<input type="submit" name="purge" value="'. $i18n->get('manageRevisionsInTag purge') . '" class="red" />'
         . '</td>'
         . '</tr>'
         . '<tr>'
