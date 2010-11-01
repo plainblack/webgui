@@ -11,6 +11,9 @@ templates, you will need to apply these changes manually to your copies.
     The URL for that template has been changed from "help" to "root/import/adminconsole/help", making
     the short URL Help available for WebGUI content use.
 
+  * EMS Badge Listing template - root/import/ems/ems-badge-listing-default
+    Changed the javascript to use a custom formatter for the Badge price.
+
 7.10.3
 
   * Carousel Default Template - root/import/carousel/carousel-default
