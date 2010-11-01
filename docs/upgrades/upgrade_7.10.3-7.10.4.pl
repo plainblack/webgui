@@ -22,7 +22,7 @@ use Getopt::Long;
 use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::Asset;
-
+use List::Util qw(first);
 
 my $toVersion = '7.10.4';
 my $quiet; # this line required
@@ -32,6 +32,8 @@ my $session = start(); # this line required
 
 # upgrade functions go here
 changeTemplateHelpUrl($session);
+addForkTable($session);
+installForkCleanup($session);
 
 finish($session); # this line required
 
@@ -63,6 +65,49 @@ sub changeTemplateHelpUrl {
     else {
         print "\n\tNO TEMPLATE FOR DISPLAYING TEMPLATE VARIABLES...";
     }
+    print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+# Creates a new table for tracking background processes
+sub addForkTable {
+    my $session = shift;
+    my $db      = $session->db;
+    my $sth     = $db->dbh->table_info('', '', 'Fork', 'TABLE');
+    return if ($sth->fetch);
+    print "\tAdding Fork table..." unless $quiet;
+    my $sql = q{
+        CREATE TABLE Fork (
+            id        CHAR(22),
+            userId    CHAR(22),
+            groupId   CHAR(22),
+            status    LONGTEXT,
+            error     TEXT,
+            startTime BIGINT(20),
+            endTime   BIGINT(20),
+            finished  BOOLEAN DEFAULT FALSE,
+            latch     BOOLEAN DEFAULT FALSE,
+
+            PRIMARY KEY(id)
+        );
+    };
+    $db->write($sql);
+    print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+# install a workflow to clean up old background processes
+sub installForkCleanup {
+    my $session = shift;
+    print "\tInstalling Fork Cleanup workflow..." unless $quiet;
+    my $class = 'WebGUI::Workflow::Activity::RemoveOldForks';
+    $session->config->addToArray('workflowActivities/None', $class);
+    my $wf = WebGUI::Workflow->new($session, 'pbworkflow000000000001');
+    my $a  = first { ref $_ eq $class } @{ $wf->getActivities };
+    unless ($a) {
+        $a = $wf->addActivity($class);
+        $a->set(title => 'Remove Old Forks');
+    };
     print "DONE!\n" unless $quiet;
 }
 

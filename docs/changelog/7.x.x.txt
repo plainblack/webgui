@@ -1,4 +1,9 @@
 7.10.4
+ - Added WebGUI::Fork api
+ - Moved html export to Fork
+ - Moved clipboard functions to Fork
+ - Moved trash functions to Fork
+ - Moved version tag rollback to Fork
  - fixed #11929: In/Out board breaks in Chrome sometimes
  - fixed #11928: Story Archive breaks if url has extension
  - fixed #11920: Defaul DataForm emails missing entries.
