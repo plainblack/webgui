@@ -15,6 +15,7 @@ package WebGUI::Auth;
 =cut
 
 use strict qw(subs vars);
+use Scalar::Util qw( blessed );
 use WebGUI::International;
 use WebGUI::Asset::Template;
 use WebGUI::User;
@@ -1009,15 +1010,16 @@ sub logout {
 
 #-------------------------------------------------------------------
 
-=head2 new ( session, [ userId ] )
+=head2 new ( session, [ user|userId ] )
 
 Constructor.
 
 =head3 session
 
-=head3 userId
+=head3 user|userId
 
-userId for the user requesting authentication.  This defaults to $self->session->user->userId
+A WebGUI::User object, or userId for the user requesting authentication.
+This defaults to $self->session->user->userId
 
 =cut
 
@@ -1025,8 +1027,17 @@ sub new {
 	my $class = shift;
 	my $self = bless {}, $class;
 	$self->{_session} = shift;
-	my $userId = shift || $self->{_session}->user->userId;
-	$self->{user} = WebGUI::User->new($self->{_session}, $userId);
+
+        if ( blessed $_[0] && $_[0]->isa('WebGUI::User') ) {
+            $self->{user} = shift;
+        }
+        elsif ( my $userId = shift ) {
+            $self->{user} = WebGUI::User->new($self->{_session}, $userId);
+        }
+        else {
+            $self->{user} = $self->session->user;
+        }
+
 	$self->{error} = "";
 	$self->{profile} = ();
 
