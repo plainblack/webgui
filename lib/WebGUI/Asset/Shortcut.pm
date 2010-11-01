@@ -278,7 +278,7 @@ sub getContentLastModified {
     my $shortcut = $self->getShortcut;
     my $shortcuttedRev;
     if (defined $shortcut) {
-        $shortcuttedRev = $shortcut->get('revisionDate');
+        $shortcuttedRev = $shortcut->getContentLastModified;
         return $assetRev > $shortcuttedRev ? $assetRev : $shortcuttedRev;
     } else {
         return 0;

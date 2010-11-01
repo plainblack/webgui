@@ -1,6 +1,7 @@
 7.9.18
  - fixed #11938: upgrade script always removes specialState
  - fixed #11937: Duplicating events does not duplicate storage locations
+ - fixed #11935: shortcut uses wrong value for getContentLastModified
 
 7.9.17
  - fixed #11929: In/Out board breaks in Chrome sometimes
