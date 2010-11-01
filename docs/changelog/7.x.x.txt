@@ -17,6 +17,7 @@
  - intalled YUI fix for flash files.
  - fixed #11932: Bad URL in the newly templated recover password email
  - fixed #11938: upgrade script always removes specialState
+ - fixed #11937: Duplicating events does not duplicate storage locations
 
 7.10.3
  - fixed #11903: Unnecessary debug in Thingy
