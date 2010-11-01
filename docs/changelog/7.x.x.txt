@@ -19,6 +19,7 @@
  - fixed #11938: upgrade script always removes specialState
  - fixed #11937: Duplicating events does not duplicate storage locations
  - fixed #11935: shortcut uses wrong value for getContentLastModified
+ - fixed #11940: quickCSV chokes on newlines in data
 
 7.10.3
  - fixed #11903: Unnecessary debug in Thingy
