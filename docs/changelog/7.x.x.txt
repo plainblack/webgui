@@ -5,6 +5,7 @@
  - fixed #11940: quickCSV chokes on newlines in data
  - fixed #11933: EMS shows a dollar currency symbol on Badge Listing
  - fixed #11941: cannot edit default templates in some browsers
+ - fixed #11926: Version Tag: Delete
 
 7.9.17
  - fixed #11929: In/Out board breaks in Chrome sometimes
