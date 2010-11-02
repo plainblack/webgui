@@ -21,6 +21,7 @@ use WebGUI::Mail::Send;
 use WebGUI::Storage;
 use WebGUI::User;
 use WebGUI::Form::Captcha;
+use WebGUI::Macro;
 use Encode ();
 use Tie::IxHash;
 
@@ -610,6 +611,13 @@ sub editUserSettingsForm {
 		-hoverHelp => $i18n->get("password recovery template help")
     );
     $f->template(
+        -name      => "webguiPasswordRecoveryEmailTemplate",
+        -value     => $self->session->setting->get('webguiPasswordRecoveryEmailTemplate'),
+        -label     => $i18n->get('Password Recovery Email Template'),
+		-hoverHelp => $i18n->get("password recovery email template help"),
+		-namespace => "Auth/WebGUI/RecoveryEmail",
+    );
+    $f->template(
         -name      => "webguiWelcomeMessageTemplate",
         -value     => $self->session->setting->get("webguiWelcomeMessageTemplate"),
         -namespace => "Auth/WebGUI/Welcome",
@@ -678,6 +686,8 @@ sub editUserSettingsFormSave {
 	$s->set("webguiPasswordRecoveryTemplate",        $f->process("webguiPasswordRecoveryTemplate","template"));
     $s->set("webguiWelcomeMessageTemplate",          $f->process("webguiWelcomeMessageTemplate","template"));
     $s->set("webguiAccountActivationTemplate",       $f->process("webguiAccountActivationTemplate","template")); 
+	$s->set("webguiPasswordRecoveryTemplate",        $f->process("webguiPasswordRecoveryTemplate","template"));
+	$s->set("webguiPasswordRecoveryEmailTemplate",   $f->process("webguiPasswordRecoveryEmailTemplate","template"));
 
     if (@errors) {
         return \@errors;
@@ -1107,7 +1117,6 @@ sub emailRecoverPasswordFinish {
 
     # generate information necessry to proceed
     my $recoveryGuid = $session->id->generate();
-    my $url = $session->url->getSiteURL;
     my $userId = $user->userId; #get the user guid
     $email = $user->profileField('email');
 
@@ -1121,7 +1130,12 @@ sub emailRecoverPasswordFinish {
     $self->update($authsettings);
 
     my $mail = WebGUI::Mail::Send->create($session, { to=>$email, subject=>$i18n->get('WebGUI password recovery')});
-    $mail->addText($i18n->get('recover password email text1', 'AuthWebGUI') . $url. ". \n\n".$i18n->get('recover password email text2', 'AuthWebGUI')." \n\n ".$url."?op=auth;method=emailResetPassword;token=$recoveryGuid"."\n\n ". $i18n->get('recover password email text3', 'AuthWebGUI'));
+    my $vars = { };
+    $vars->{recoverPasswordUrl} = $session->url->append($session->url->getSiteURL,'?op=auth;method=emailResetPassword;token='.$recoveryGuid);
+    my $template  = WebGUI::Asset->newByDynamicClass($session, $session->setting->get('webguiPasswordRecoveryEmailTemplate'));
+    my $emailText = $template->process($vars);
+    WebGUI::Macro::process($session, \$emailText);
+    $mail->addText($emailText);
     $mail->queue;
     return "<h1>". $i18n->get('recover password banner', 'AuthWebGUI')." </h1> <br> <br> <h3>". $i18n->get('email recover password finish message', 'AuthWebGUI') . "</h3>";
 }

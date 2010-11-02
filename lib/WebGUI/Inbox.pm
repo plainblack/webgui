@@ -486,20 +486,13 @@ ibox.messageId, ibox.subject, ibox.sentBy, ibox.dateStamp,
 SELECT
     }
 
-    my $messageLimit = 20_000;
-    my $limitHalf    = $messageLimit / 2;
-    my $limitQuarter = $messageLimit / 4;
-    my $userGroups   = $session->db->quoteAndJoin( $user->getGroupIdsRecursive );
-    $userGroups      = "''" if $userGroups eq "";
-
-    # for performance purposes don't use datasets larger than 20000 no matter how man messages are in the inbox
     my $sql = qq{
         SELECT
             $select
         FROM inbox_messageState
         JOIN inbox ibox USING (messageId)
-        JOIN users on users.userId = ibox.sentBy
-        JOIN userProfileData on userProfileData.userId = ibox.sentBy
+        LEFT OUTER JOIN users on users.userId = ibox.sentBy
+        LEFT OUTER JOIN userProfileData on userProfileData.userId = ibox.sentBy
         WHERE inbox_messageState.messageId = ibox.messageId 
         AND   inbox_messageState.userId    = '$userId' 
         AND   inbox_messageState.deleted   = 0

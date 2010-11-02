@@ -22,28 +22,76 @@ use Getopt::Long;
 use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::Asset;
-use WebGUI::Inbox;
 
 
-my $toVersion = '7.10.2';
+my $toVersion = '7.10.3';
 my $quiet; # this line required
 
 
 my $session = start(); # this line required
 
 # upgrade functions go here
+pruneInboxMessagesFromDeletedUsers($session);
+addTemplateToNotifyAboutVersionTag($session);
+addPasswordRecoveryEmailTemplate($session);
 
 finish($session); # this line required
 
 
 #----------------------------------------------------------------------------
 # Describe what our function does
-#sub exampleFunction {
-#    my $session = shift;
-#    print "\tWe're doing some stuff here that you should know about... " unless $quiet;
-#    # and here's our code
-#    print "DONE!\n" unless $quiet;
-#}
+sub pruneInboxMessagesFromDeletedUsers {
+    my $session = shift;
+    print "\tPruning inbox messages from deleted users.  This may take a while... " unless $quiet;
+    my $sth = $session->db->prepare(<<EOSQL);
+select messageId, inbox.userId
+    from inbox_messageState
+    join inbox using (messageId)
+    left outer join users on inbox.userId=users.userId
+    where users.userId IS NULL
+EOSQL
+    $sth->execute([]);
+    use WebGUI::Inbox;
+    my $inbox = WebGUI::Inbox->new($session);
+    while (my ($messageId, $userId) = $sth->array) {
+        my $message = $inbox->getMessage($messageId, $userId);
+        if ($message) {
+            $message->delete;
+        }
+    }
+    print "...DONE!\n" unless $quiet;
+}
+
+
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub addTemplateToNotifyAboutVersionTag {
+    my $session = shift;
+    print "\tAdd template to Notify About Version Tag workflow activities." unless $quiet;
+    use WebGUI::Workflow::Activity;
+    use WebGUI::Workflow::Activity::NotifyAboutVersionTag;
+    my $templateId = WebGUI::Workflow::Activity::NotifyAboutVersionTag->definition($session)->[0]->{properties}->{templateId}->{defaultValue};
+    my $activityList = $session->db->read(q|select activityId from WorkflowActivity|);
+    while (my ($activityId) = $activityList->array) {
+        my $activity = WebGUI::Workflow::Activity->new($session, $activityId);
+        next unless $activity;
+        next unless $activity->isa('WebGUI::Workflow::Activity::NotifyAboutVersionTag')
+                 || $activity->isa('WebGUI::Workflow::Activity::RequestApprovalForVersionTag')
+                  ;
+        $activity->set('templateId', $templateId);
+    }
+    print "...DONE!\n" unless $quiet;
+}
+
+
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub addPasswordRecoveryEmailTemplate {
+    my $session = shift;
+    print "\tAdd a template for the password recovery email." unless $quiet;
+    $session->setting->add('webguiPasswordRecoveryEmailTemplate', 'sK_0zVw4kwdJ1sqREIsSzA');
+    print "...DONE!\n" unless $quiet;
+}
 
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------

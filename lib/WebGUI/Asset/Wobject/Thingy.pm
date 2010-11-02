@@ -424,8 +424,6 @@ sub copyThingData {
     return undef unless $self->canEditThingData($thingId, $thingDataId);
 
     my $origCollateral = $self->getCollateral("Thingy_".$thingId, "thingDataId", $thingDataId);
-    use Data::Dumper;
-    $session->log->warn(Dumper $origCollateral);
     $origCollateral->{thingDataId} = "new";
     ##Get all fields
     my $fields = $db->buildArrayRefOfHashRefs('select * from Thingy_fields where assetId=? and thingId=?'
@@ -2147,7 +2145,7 @@ sub www_editThingSave {
         my $displayInSearch = $self->session->form->process("displayInSearch_".$field->{fieldId}) || 0;
         my $searchIn = $self->session->form->process("searchIn_".$field->{fieldId}) || 0;
 
-        $self->session->db->write("update Thingy_fields set display = ".$display.", viewScreenTitle = ".$viewScreenTitle.", displayinSearch = ".$displayInSearch.", searchIn = ".$searchIn." where fieldId = ".$self->session->db->quote($field->{fieldId})." and thingId = ".$self->session->db->quote($thingId));
+        $self->session->db->write("update Thingy_fields set display = ?, viewScreenTitle = ?, displayinSearch = ?, searchIn = ? where fieldId = ? and thingId = ?",[$display, $viewScreenTitle, $displayInSearch, $searchIn, $field->{fieldId}, $thingId]);
     }
     return $self->www_manage;
 }
@@ -2588,9 +2586,6 @@ sub www_editThingDataSaveViaAjax {
     }
 
     my $thingProperties = $self->getThing($thingId);
-    use Data::Dumper;
-    warn $thingId;
-    warn Dumper $thingProperties;
     if ($thingProperties->{thingId}){
         return $session->privilege->insufficient() unless $self->canEditThingData($thingId, $thingDataId
             ,$thingProperties);

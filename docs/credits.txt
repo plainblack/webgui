@@ -7,7 +7,8 @@ The following people/companies are responsible for WebGUI:
 
 WebGUI Core..........................JT Smith / Plain Black
 
-Contributing Developers..............Meg O'Keefe Andrea / Plain Black
+Contributing Developers..............C.J. Adams-Collier / <cjac@colliertech.org>
+                                     Meg O'Keefe Andrea / Plain Black
                                      Lucas Bartholemy
                                      Peter Beardsley / Appropriate Solutions
                                      Doug Bell / Plain Black

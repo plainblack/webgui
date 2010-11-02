@@ -1,6 +1,7 @@
 This is a running list of template changes made during upgrades.  If you have copied the default
 templates, you will need to apply these changes manually to your copies.
 
+
 7.8.0
 
   *  Account Macro template variables renamed:
@@ -10,6 +11,21 @@ templates, you will need to apply these changes manually to your copies.
   *  AdminToggle Macro template variables renamed:
      toggle.url  => toggle_url
      toggle.text => toggle_text
+
+7.10.3
+
+  * Carousel Default Template - root/import/carousel/carousel-default
+    Add a height parameter to the template.
+    
+  * survey.css
+    Removed relative positioning and offset from top.
+
+  * root/import/survey/surveyedit.css
+    Reexported the package from the default content due to potential issues with earlier upgrades
+    not installing correctly.
+
+  * root/import/workflow-activity-templates
+    Added a folder to hold the assorted Workflow Activity templates.
 
 7.10.2
 

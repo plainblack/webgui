@@ -27,7 +27,7 @@ my @testSets = (
 	},
 	{
 		format => '',
-		output =>'8/16/2001  8:00 am',
+		output =>'8/16/2001 8:00 am',
 	},
 );
 
@@ -59,7 +59,7 @@ is($output, $session->datetime->epochToHuman($time1), 'checking default time and
 
 ##Checking for edge case, time=0
 is WebGUI::Macro::D_date::process($session, '', 0),
-    '12/31/1969  6:00 pm',
+    '12/31/1969 6:00 pm',
     '...checking for handling time=0';
 
 lives_ok { WebGUI::Macro::D_date::process($session, '', '   0') }

@@ -19,6 +19,7 @@ use strict;
 use base 'WebGUI::Workflow::Activity';
 use WebGUI::VersionTag;
 use WebGUI::Inbox;
+use WebGUI::Asset;
 
 =head1 NAME
 
@@ -71,8 +72,15 @@ sub definition {
 				label=> $i18n->get("notify message"),
 				hoverHelp => $i18n->get("notify message help")
 				},
-			}
-		});
+			templateId => {
+				fieldType    =>"template",
+				defaultValue => "lYhMheuuLROK_iNjaQuPKg",
+                namespace    => 'NotifyAboutVersionTag',
+				label        => $i18n->get("email template", 'Workflow_Activity_NotifyAboutVersionTag'),
+				hoverHelp    => $i18n->get("email template help", 'Workflow_Activity_NotifyAboutVersionTag')
+            },
+        }
+    });
 	return $class->SUPER::definition($session,$definition);
 }
 
@@ -95,11 +103,18 @@ sub execute {
 		my $asset = $versionTag->getAssets->[0];	
 		$urlOfSingleAsset = "\n\n".$self->session->url->getSiteURL().$asset->getUrl("func=view;revision=".$asset->get("revisionDate"));
 	}
+    my $var = {
+        message  => $self->get('message'),
+        comments => $versionTag->get('comments'),
+        url      => $urlOfSingleAsset,
+    };
+    my $template   = WebGUI::Asset->newByDynamicClass($self->session, $self->get('templateId'));
+    my $message    = $template->process($var);
 	my $properties = {
 		status=>"completed",
 		subject=>$versionTag->get("name"),
-		message=>$self->get("message")."\n\n".$versionTag->get("comments").$urlOfSingleAsset,
-		};	
+		message=>$message,
+    };
 	if ($self->get("who") eq "committer") {
 		$properties->{userId} = $versionTag->get("committedBy");
 	} elsif ($self->get("who") eq "creator") {

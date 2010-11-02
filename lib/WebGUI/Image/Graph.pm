@@ -5,6 +5,7 @@ use WebGUI::Image;
 use WebGUI::Image::Palette;
 use WebGUI::Image::Font;
 use List::Util;
+use WebGUI::Pluggable;
 
 our @ISA = qw(WebGUI::Image);
 
@@ -544,11 +545,9 @@ sub load {
 	my $session = shift;
 	my $namespace = shift;
 
-	my $cmd = "use $namespace";
-	eval($cmd);
-
-	$cmd = $namespace.'->new($session)';
-	my $plugin = eval($cmd);
+	my $plugin = eval { 
+        WebGUI::Pluggable::instanciate($namespace, 'new', [$session, ]);
+    };
 	return $plugin;
 }
 

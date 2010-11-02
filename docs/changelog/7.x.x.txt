@@ -1,3 +1,22 @@
+7.10.3
+ - fixed #11903: Unnecessary debug in Thingy
+ - fixed #11908: Inbox messages linger after deleting a user
+ - fixed #11909: Wrong message count in the inbox
+ - fixed #11773: Form injection in the EMS event ordering code.
+ - fixed #11773: SQL injection vulnerability in Edit Thing form processing code.
+ - fixed #11906: Carousel slide height problems
+ - fixed #11900: Request Approval for Version Tag Workflow activity can't select --Continue with this workflow
+ - fixed #11898: String eval used in Image::Graph
+ - fixed #11913: Editing the survey doesn't work
+ - fixed #11915: Date macro returns hour value w/ leading space
+ - fixed #11901: NotifyAboutVersionTag includes URL, even when inappropriate
+ - fixed #11902: forums bug
+ - fixed #11912: Corrupt cookie causes server 500 errors
+ - fixed #11919: Survey rendering with section text
+ - fixed #11916: Collaboration System security
+ - fixed #11918: Make password recovery email templatable
+ - fixed #11905: CrystalX nav breaks with 3rd level assets
+
 7.10.2
  - fixed #11884: Editing Templates impossible / Code editor not loaded
  - recommitted ukplayer. Removal broke Matrix. Licencing information was available but overlooked. 

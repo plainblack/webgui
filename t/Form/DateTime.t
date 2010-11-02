@@ -128,7 +128,7 @@ is(
 );
 
 $date2 = WebGUI::Form::DateTime->new($session, {defaultValue => -1});
-is($date2->getValueAsHtml(), '12/31/1969  5:59 pm', "getValueAsHtml: defaultValue as negative epoch, returns as user's format");
+is($date2->getValueAsHtml(), '12/31/1969 5:59 pm', "getValueAsHtml: defaultValue as negative epoch, returns as user's format");
 is(
     getValueFromForm($session, $date2->toHtmlAsHidden),
     '1969-12-31 17:59:59',
@@ -156,7 +156,7 @@ is(
 
 
 $date2 = WebGUI::Form::DateTime->new($session, {defaultValue => '2008-08-01 11:34:26', value => $bday, });
-is($date2->getValueAsHtml(), '8/16/2001  8:00 am', "getValueAsHtml: defaultValue in mysql format, value as epoch returns value in user's format");
+is($date2->getValueAsHtml(), '8/16/2001 8:00 am', "getValueAsHtml: defaultValue in mysql format, value as epoch returns value in user's format");
 is(
     getValueFromForm($session, $date2->toHtmlAsHidden),
     '2001-08-16 08:00:00',

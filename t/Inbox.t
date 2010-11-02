@@ -15,13 +15,13 @@ use WebGUI::Session;
 use WebGUI::Inbox;
 use WebGUI::User;
 
-use Test::More tests => 15; # increment this value for each test you create
+use Test::More tests => 20; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
 # get a user so we can test retrieving messages for a specific user
 my $admin = WebGUI::User->new($session, 3);
-WebGUI::Test->addToCleanup(sub { WebGUI::Test->cleanupAdminInbox; });
+WebGUI::Test->addToCleanup(sub { WebGUI::Test->cleanupAdminInbox($session); });
 
 # Begin tests by getting an inbox object
 my $inbox = WebGUI::Inbox->new($session); 
@@ -129,5 +129,26 @@ is($inbox->getUnreadMessageCount($admin->userId), 4, 'getUnreadMessageCount');
 my $messages = $inbox->getMessagesForUser($admin);
 $messages->[0]->setRead($admin->userId);
 is($inbox->getUnreadMessageCount($admin->userId), 3, '... really tracks unread messages');
+
+is(scalar @{ $inbox->getMessagesForUser($admin) }, 4, 'Four messages in the inbox');
+$inbox->deleteMessagesForUser($admin);
+is(scalar @{ $inbox->getMessagesForUser($admin) }, 0, 'deleteMessagesForUser removed all messages');
+
+my $dead_user = WebGUI::User->create($session);
+WebGUI::Test->addToCleanup($dead_user);
+$inbox->addMessage({
+    message => "This method should be removed",
+    userId  => 3,
+    sentBy  => $dead_user->userId,
+    status  => 'unread',
+},{
+    no_email => 1,
+});
+
+is(scalar @{ $inbox->getMessagesForUser($admin) }, 1, 'one message from dead_user in the inbox');
+$dead_user->delete;
+is(scalar @{ $inbox->getMessagesForUser($admin) }, 1, '... after deleting the user, still 1 message');
+$inbox->deleteMessagesForUser($admin);
+is(scalar @{ $inbox->getMessagesForUser($admin) }, 0, '... after deleteMessagesForUser, all messages gone again');
 
 #vim:ft=perl

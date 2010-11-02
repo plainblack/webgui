@@ -22,6 +22,7 @@ our $STATUS = 'beta';
 use strict;
 use Moose;
 use MooseX::NonMoose;
+use Scalar::Util qw/blessed/;
 use WebGUI::Config;
 use WebGUI::Pluggable;
 use WebGUI::Paths;

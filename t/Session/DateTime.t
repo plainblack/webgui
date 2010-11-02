@@ -15,7 +15,7 @@ use File::Spec;
 use WebGUI::Test;
 use WebGUI::Session;
 
-use Test::More tests => 92; # increment this value for each test you create
+use Test::More tests => 95; # increment this value for each test you create
 
 local @INC = @INC;
 unshift @INC, File::Spec->catdir( WebGUI::Test->getTestCollateralPath, 'Session-DateTime', 'lib' );
@@ -298,7 +298,13 @@ cmp_ok(
 
 $dude->profileField('language', 'BadLocale');
 $session->user({user => $dude});
-is($dt->epochToHuman($wgbday), '8/16/2001  9:00 pm', 'epochToHuman: constructs a default locale if the language does not provide one.');
+is($dt->epochToHuman($wgbday), '8/16/2001 9:00 pm', 'epochToHuman: constructs a default locale if the language does not provide one.');
 $session->user({userId => 1});
+
+##Variable digit days, months and hours
+is($dt->epochToHuman($wgbday,'%M'), '8', '... single digit month');
+my $dayEpoch = DateTime->from_epoch(epoch => $wgbday)->subtract(days => 10)->epoch;
+is($dt->epochToHuman($dayEpoch,'%D'), '6', '... single digit day');
+is($dt->epochToHuman($dayEpoch,'%H'), '8', '... single digit hour');
 
 #vim:ft=perl

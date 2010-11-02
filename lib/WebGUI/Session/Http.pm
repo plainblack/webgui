@@ -16,7 +16,7 @@ package WebGUI::Session::Http;
 
 
 use strict;
-use Scalar::Util qw(weaken);
+use Scalar::Util qw( weaken blessed );
 use HTTP::Date ();
 
 sub _deprecated {

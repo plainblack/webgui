@@ -2463,7 +2463,8 @@ Method to move an event down one position in display order
 sub www_moveEventMetaFieldDown {
 	my $self = shift;
 	return $self->session->privilege->insufficient unless ($self->canEdit);
-	$self->moveCollateralDown('EMSEventMetaField', 'fieldId', $self->session->form->get("fieldId"));
+    my $fieldId = $self->session->form->get("fieldId");
+	$self->moveCollateralDown('EMSEventMetaField', 'fieldId', $fieldId);
 	return $self->www_manageEventMetaFields;
 }
 
@@ -2478,7 +2479,8 @@ Method to move an event metdata field up one position in display order
 sub www_moveEventMetaFieldUp {
 	my $self = shift;
 	return $self->session->privilege->insufficient unless ($self->canEdit);
-	$self->moveCollateralUp('EMSEventMetaField', 'fieldId', $self->session->form->get("fieldId"));
+    my $fieldId = $self->session->form->get("fieldId");
+	$self->moveCollateralUp('EMSEventMetaField', 'fieldId', $fieldId);
 	return $self->www_manageEventMetaFields;
 }
 
