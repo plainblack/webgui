@@ -23,6 +23,7 @@ use WebGUI::ProfileField;
 use WebGUI::Inbox;
 use Scalar::Util qw( weaken );
 use Net::CIDR::Lite;
+use WebGUI::Friends;
 
 =head1 NAME
 
