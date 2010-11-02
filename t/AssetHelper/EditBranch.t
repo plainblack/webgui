@@ -50,7 +50,7 @@ my $grand   = $child->addChild({
 });
 my $tag = WebGUI::VersionTag->getWorking( $session );
 $tag->commit;
-addToCleanup( $tag );
+WebGUI::Test->addToCleanup( $top, $child, $grand );
 
 { 
 
@@ -82,9 +82,9 @@ $top = WebGUI::Asset->newPending( $session, $top->getId );
 $child = WebGUI::Asset->newPending( $session, $child->getId );
 $grand  = WebGUI::Asset->newPending( $session, $grand->getId );
 
-is( $top->ownerUserId, '3' );
-is( $child->ownerUserId, '3' );
-is( $grand->ownerUserId, '3' );
+is( $top->ownerUserId,   '3', 'top changed' );
+is( $child->ownerUserId, '3', 'child changed' );
+is( $grand->ownerUserId, '3', 'child changed' );
 
 done_testing();
 
