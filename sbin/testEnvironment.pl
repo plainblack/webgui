@@ -132,7 +132,7 @@ checkModule('JavaScript::Packer',           '0.04'       );
 checkModule('CSS::Packer',                  '0.2'        );
 checkModule('Business::Tax::VAT::Validation', '0.20'     );
 checkModule('Crypt::SSLeay',                '0.57'       );
-checkModule('Scope::Guard',                 '0.03'       );
+checkModule('Scope::Guard',                 '0.20'       );
 checkModule('Digest::SHA',                  '5.47'       );
 checkModule("CSS::Minifier::XS",            "0.03"       );
 checkModule("JavaScript::Minifier::XS",     "0.05"       );

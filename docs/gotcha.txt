@@ -12,6 +12,8 @@ save you many hours of grief.
     * WebGUI now depends on Monkey::Patch for doing sanely scoped
       monkeypatches.
 
+    * WebGUI now depends on version 0.20 of Scope::Guard.
+
 7.10.3
 --------------------------------------------------------------------
      * In the Collaboration System, previously the Group to Post group
