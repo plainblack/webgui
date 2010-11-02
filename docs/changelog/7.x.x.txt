@@ -6,6 +6,7 @@
  - fixed #11933: EMS shows a dollar currency symbol on Badge Listing
  - fixed #11941: cannot edit default templates in some browsers
  - fixed #11926: Version Tag: Delete
+ - fixed #11939: WebGUI replacements are not anchored.
 
 7.9.17
  - fixed #11929: In/Out board breaks in Chrome sometimes

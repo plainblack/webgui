@@ -387,20 +387,18 @@ sub processReplacements {
 	my $session = shift;
 	my ($content) = @_;
 	my $replacements = $session->stow->get("replacements");
-	if (defined $replacements) {
-		foreach my $searchFor (keys %{$replacements}) {
-			my $replaceWith = $replacements->{$searchFor};
-			$content =~ s/\Q$searchFor/$replaceWith/gs;
-		}
-	} else {
+	if (! defined $replacements) {
 		my $sth = $session->dbSlave->read("select searchFor,replaceWith from replacements");
-        	while (my ($searchFor,$replaceWith) = $sth->array) {
+        while (my ($searchFor,$replaceWith) = $sth->array) {
 			$replacements->{$searchFor} = $replaceWith;
-        		$content =~ s/\Q$searchFor/$replaceWith/gs;
-        	}
-        	$sth->finish;
-		$session->stow->set("replacements",$replacements);
+        }
+        $sth->finish;
+        $session->stow->set("replacements",$replacements);
 	}
+    foreach my $searchFor (keys %{$replacements}) {
+        my $replaceWith = $replacements->{$searchFor};
+        $content =~ s/\b\Q$searchFor\E\b/$replaceWith/gs;
+    }
 	return $content;
 }
 

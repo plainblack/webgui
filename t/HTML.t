@@ -129,6 +129,7 @@ my @htmlTextSets = (
 my $numTests = scalar @filterSets
              + scalar @macroParamSets
              + scalar @htmlTextSets
+             + 3
              ;
 
 plan tests => $numTests;
@@ -147,3 +148,7 @@ foreach my $testSet (@htmlTextSets) {
 	my $text = WebGUI::HTML::html2text($testSet->{inputText});
 	is($text, $testSet->{output}, $testSet->{comment});
 }
+
+is(WebGUI::HTML::processReplacements($session, 'grass'), 'grass', 'processReplacements: grass is not replaced');
+is(WebGUI::HTML::processReplacements($session, 'shitake'), 'shitake', '... shitake is not replaced');
+is(WebGUI::HTML::processReplacements($session, 'This is shit.'), 'This is crap.', '... shit is replaced');
