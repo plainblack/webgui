@@ -19,7 +19,6 @@ use lib "$FindBin::Bin/lib";
 use JSON;
 use Test::More;
 use Test::Deep;
-use Monkey::Patch;
 use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
 use WebGUI::Test::Mechanize;
