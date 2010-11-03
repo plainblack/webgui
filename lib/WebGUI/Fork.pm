@@ -507,7 +507,7 @@ sub request {
     my $session = $self->session;
     my $config  = $session->config;
     return {
-        configFile => $config->getFilename,
+        configFile => $config->pathToFile,
         sessionId  => $session->getId,
         module     => $module,
         subname    => $subname,

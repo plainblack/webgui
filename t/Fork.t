@@ -39,7 +39,7 @@ my $request = $process->request( $testClass, 'simple', ['data'] );
 
 cmp_bag(
     [ keys %$request ],
-    [qw(webguiRoot configFile sessionId id module subname data)],
+    [qw(configFile sessionId id module subname data)],
     'request hash has the right keys'
 );
 
