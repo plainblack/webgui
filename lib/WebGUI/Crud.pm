@@ -18,7 +18,7 @@ package WebGUI::Crud;
 
 use strict;
 use Moose;
-use Definition::Crud;
+use WebGUI::Definition::Crud;
 use JSON;
 use Tie::IxHash;
 use Clone qw/clone/;
@@ -62,7 +62,7 @@ around BUILDARGS => sub {
         my $db        = $session->db;
 
         # determine sequence
-        my $sequenceKey = $class->meta->sequenceKey($session);
+        my $sequenceKey = $class->meta->sequenceKey();
         my $clause;
         my @params;
         if ($sequenceKey) {
@@ -87,7 +87,7 @@ around BUILDARGS => sub {
     }
 
 	# retrieve object data
-	my $data = $session->db->getRow($class->meta->tableName($session), $tableKey, $identifier);
+	my $data = $session->db->getRow($class->meta->tableName(), $tableKey, $identifier);
 	if ($data->{$tableKey} eq '') {
         WebGUI::Error::ObjectNotFound->throw(error=>'no such '.$tableKey, id=>$identifier);
     }
@@ -222,7 +222,7 @@ A reference to a WebGUI::Session.
 
 sub crud_createOrUpdateTable {
     my ( $class, $session ) = @_;
-    my $tableName   = $class->meta->tableName($session);
+    my $tableName   = $class->meta->tableName();
     my $tableExists = $session->db->dbh->do("show tables like '$tableName'");
 
     return ( $tableExists ne '0E0' ? $class->crud_updateTable($session) : $class->crud_createTable($session) );
@@ -244,7 +244,7 @@ sub crud_createTable {
 	my ($class, $session) = @_;
 	my $db = $session->db;
 	my $dbh = $db->dbh;
-	my $tableName = $class->meta->tableName($session);
+	my $tableName = $class->meta->tableName();
 	$class->crud_dropTable($session);
 	$db->write('create table '.$dbh->quote_identifier($tableName).' (
 		'.$dbh->quote_identifier($class->meta->tableKey($session)).' CHAR(22) binary not null primary key,
@@ -253,7 +253,7 @@ sub crud_createTable {
 		lastUpdated datetime
 		)');
 	$class->crud_updateTable($session);
-	my $sequenceKey = $class->meta->sequenceKey($session);
+	my $sequenceKey = $class->meta->sequenceKey();
 	if ($sequenceKey) {
 		$db->write('alter table '.$dbh->quote_identifier($tableName).'
 			add index '.$dbh->quote_identifier($sequenceKey).' ('.$dbh->quote_identifier($sequenceKey).')');
@@ -349,7 +349,7 @@ sub crud_dropTable {
     }
 	my $db = $session->db;
 	my $dbh = $db->dbh;
-	$db->write("drop table if exists ".$dbh->quote_identifier($class->meta->tableName($session)));
+	$db->write("drop table if exists ".$dbh->quote_identifier($class->meta->tableName()));
 	return 1;
 }
 
@@ -440,12 +440,14 @@ sub crud_updateTable {
     }
 	my $db = $session->db;
 	my $dbh = $db->dbh;
-	my $tableName = $dbh->quote_identifier($class->meta->tableName($session));
+	my $tableName = $dbh->quote_identifier($class->meta->tableName());
 
 	# find out what fields already exist
 	my %tableFields = ();
 	my $sth = $db->read("DESCRIBE ".$tableName);
-	my $tableKey = $class->meta->tableKey($session);
+	my $tableKey = $class->meta->tableKey();
+    use Data::Dumper;
+    warn Dumper ($tableKey);
 	while (my ($col, $type, $null, $key, $default) = $sth->array) {
 		next if ($col ~~ [$tableKey, 'lastUpdated', 'dateCreated','sequenceNumber']);
 		$tableFields{$col} = {
@@ -522,7 +524,7 @@ Deletes this object from the database. Returns 1 on success.
 
 sub delete {
 	my $self = shift;
-	$self->session->db->deleteRow($self->meta->tableName($self->session), $self->meta->tableKey($self->session), $self->getId);
+	$self->session->db->deleteRow($self->meta->tableName(), $self->meta->tableKey(), $self->getId);
 	$self->reorder;
 	return 1;
 }
@@ -537,9 +539,9 @@ Moves this object one position closer to the end of its sequence. If the object 
 
 sub demote {
 	my $self = shift;
-	my $tableKey = $self->meta->tableKey($self->session);
-	my $tableName = $self->meta->tableName($self->session);
-	my $sequenceKey = $self->meta->sequenceKey($self->session);
+	my $tableKey = $self->meta->tableKey();
+	my $tableName = $self->meta->tableName();
+	my $sequenceKey = $self->meta->sequenceKey();
 	my @params = ($self->get('sequenceNumber') + 1);
 	my $db = $self->session->db;
 	my $dbh = $db->dbh;
@@ -690,10 +692,10 @@ sub getAllSql {
 
 	# setup
 	my $dbh = $session->db->dbh;
-	my $tableName = $class->meta->tableName($session);
+	my $tableName = $class->meta->tableName();
 
 	# the base query
-	my $sql = "select ".$dbh->quote_identifier($tableName, $class->meta->tableKey($session))." from ".$dbh->quote_identifier($tableName);
+	my $sql = "select ".$dbh->quote_identifier($tableName, $class->meta->tableKey())." from ".$dbh->quote_identifier($tableName);
 
 	# process joins
 	my @joins;
@@ -728,7 +730,7 @@ sub getAllSql {
 	}
 	
 	# limit to our sequence
-	my $sequenceKey = $class->meta->sequenceKey($session);
+	my $sequenceKey = $class->meta->sequenceKey();
 	if (exists $options->{sequenceKeyValue} && $sequenceKey) {
 		push @params, $options->{sequenceKeyValue};
 		push @where, $dbh->quote_identifier($tableName, $sequenceKey)."=?";
@@ -801,9 +803,9 @@ Moves this object one position closer to the beginning of its sequence. If the o
 
 sub promote {
 	my $self = shift;
-	my $tableKey = $self->meta->tableKey($self->session);
-	my $tableName = $self->meta->tableName($self->session);
-	my $sequenceKey = $self->meta->sequenceKey($self->session);
+	my $tableKey = $self->meta->tableKey();
+	my $tableName = $self->meta->tableName();
+	my $sequenceKey = $self->meta->sequenceKey();
 	my $sequenceKeyValue = $self->get($sequenceKey);
 	my @params = ($self->get('sequenceNumber')-1);
 	my $clause = '';
@@ -833,6 +835,7 @@ sub promote {
 =head2 reorder ()
 
 Removes gaps in the sequence. Usually only called by delete(), but may be useful if you randomize a sequence.
+This method will not update the current object.
 
 =cut
 
@@ -863,9 +866,6 @@ sub reorder {
 	# make the changes
 	$db->beginTransaction;
     while (my ($id) = $current->array) {
-		if ($id eq $self->getId) {
-			$objectData{id $self} = $i;
-		}
 		my @params = ($i, $id);
 		if ($sequenceKey) {
 			push @params, $sequenceKeyValue;
