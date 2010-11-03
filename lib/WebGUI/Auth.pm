@@ -22,6 +22,7 @@ use WebGUI::User;
 use WebGUI::Workflow::Instance;
 use WebGUI::Inbox;
 use WebGUI::Friends;
+use WebGUI::Deprecate;
 
 # Profile field name for the number of times the showMessageOnLogin has been
 # seen.
@@ -178,262 +179,6 @@ sub authMethod {
 
 #-------------------------------------------------------------------
 
-=head2 createAccount ( method [,vars] )
-
-Superclass method that performs general functionality for creating new accounts.
-
-=head3 method
-
-Auth method that the form for creating users should call
-
-=head3 vars
-
-Array ref of template vars from subclass
-
-=cut
-
-sub createAccount {
-    my $self    = shift;
-    my $method  = shift;
-    my $vars    = shift;
-    my $i18n    = WebGUI::International->new($self->session);
-    $vars->{title} = $i18n->get(54);
-    
-    $vars->{'create.form.header'}
-        = WebGUI::Form::formHeader($self->session)
-        . WebGUI::Form::hidden($self->session,{"name"=>"op","value"=>"auth"})
-        . WebGUI::Form::hidden($self->session,{"name"=>"method","value"=>$method})
-        ;
-    
-    # User Defined Options
-    my $userInvitation = $self->session->setting->get('inboxInviteUserEnabled');
-    $vars->{'create.form.profile'} = [];
-    foreach my $field (@{WebGUI::ProfileField->getRegistrationFields($self->session)}) {
-        my $id         = $field->getId;
-        my $label      = $field->getLabel;
-        my $required   = $field->isRequired;
-        
-        my $properties = {};
-        if ($required) {
-            my $fieldValue = $self->session->form->process($field->getId,$field->get("fieldType"));
-            $properties->{extras} = $self->getExtrasStyle($fieldValue);
-        }
-
-        my $formField;
-        # Get the default email from the invitation
-        if ($field->get('fieldName') eq "email" && $userInvitation ) {
-            my $code = $self->session->form->get('code')
-                    || $self->session->form->get('uniqueUserInvitationCode');
-            my $defaultValue 
-                = $self->session->db->quickScalar(
-                    'SELECT email FROM userInvitations WHERE inviteId=?',
-                    [$code]
-                );
-            $vars->{'create.form.header'} .= WebGUI::Form::hidden($self->session, {name=>"uniqueUserInvitationCode", value=>$code});
-            $formField   = $field->formField($properties, undef, undef, undef, $defaultValue);
-        }
-        else {
-            $formField   = $field->formField($properties);
-        }
-       
-
-        # Old-style field loop.
-        push @{$vars->{'create.form.profile'}}, { 
-            'profile.formElement'       => $formField,
-            'profile.formElement.label' => $label,
-            'profile.required'          => $required,
-        };
-
-        # Individual field template vars.
-        my $prefix = 'create.form.profile.'.$id.'.';
-        $vars->{ $prefix . 'formElement'        } = $formField;
-        $vars->{ $prefix . 'formElement.label'  } = $label;
-        $vars->{ $prefix . 'required'           } = $required;
-    }
-
-    $vars->{'create.form.submit'} = WebGUI::Form::submit($self->session,{});
-    $vars->{'create.form.footer'} = WebGUI::Form::formFooter($self->session,);
-
-    $vars->{'login.url'} = $self->session->url->page('op=auth;method=init');
-    $vars->{'login.label'} = $i18n->get(58);
-
-    return WebGUI::Asset::Template->newById($self->session,$self->getCreateAccountTemplateId)->process($vars);
-}
-
-#-------------------------------------------------------------------
-
-=head2 createAccountSave ( username,properties [,password,profile] )
-
-Superclass method that performs general functionality for saving new accounts.  Based
-on various settings and user actions, it may return output that should be displayed
-to the user.
-
-=head3 username
-
-Username for the account being created
-
-=head3 properties
-
-Properties from the subclass that should be saved as authentication parameters
-
-=head3 password
-
-Password entered by the user.  This is only used in for sending the user a notification by email of his/her username/password
-
-=head3 profile
-
-Hashref of profile values returned by the function WebGUI::User::validateProfileDataFromForm($fields);
-
-=cut
-
-sub createAccountSave {
-	my $self = shift;
-	my $username = $_[0];
-	my $properties = $_[1];
-	my $password = $_[2];
-	my $profile = $_[3];
-	
-	my $i18n = WebGUI::International->new($self->session);
-	
-	
-	my $u = WebGUI::User->new($self->session,"new");
-	$self->user($u);
-	my $userId = $u->userId;
-	$u->username($username);
-	$u->authMethod($self->authMethod);
-	$u->karma($self->session->setting->get("karmaPerLogin"),"Login","Just for logging in.") if ($self->session->setting->get("useKarma"));
-	$u->updateProfileFields($profile) if ($profile);
-    $self->update($properties);
-
-	if ($self->getSetting("sendWelcomeMessage")){
-        my $var;
-        $var->{welcomeMessage}      = $self->getSetting("welcomeMessage");
-        $var->{newUser_username}    = $username;
-        $var->{newUser_password}    = $password;
-        my $message = WebGUI::Asset::Template->newById($self->session,$self->getSetting('welcomeMessageTemplate'))->process($var);
-        WebGUI::Macro::process($self->session,\$message);
-        WebGUI::Inbox->new($self->session)->addMessage({
-            message => $message,
-			subject	=> $i18n->get(870),
-			userId	=> $self->userId,
-            status  => 'completed',
-		});
-	}
-
-	$self->session->user({user=>$u});
-	$self->_logLogin($userId,"success");
-
-	if ($self->session->setting->get("runOnRegistration")) {
-		WebGUI::Workflow::Instance->create($self->session, {
-			workflowId=>$self->session->setting->get("runOnRegistration"),
-			methodName=>"new",
-			className=>"WebGUI::User",
-			parameters=>$self->session->user->userId,
-			priority=>1
-			})->start;
-	}
-
-    ##Finalize the record in the user invitation table.
-    my $inviteId = $self->session->form->get('uniqueUserInvitationCode');
-    if ($inviteId) {
-        $self->session->db->setRow('userInvitations','inviteId',{
-            inviteId    => $inviteId,
-            newUserId   => $u->userId,
-            dateCreated => WebGUI::DateTime->new($self->session, time)->toMysqlDate,
-        });
-        #Get the invite record
-        my $inviteRecord = $self->session->db->getRow('userInvitations','inviteId',$inviteId);
-        #Get the user
-        my $inviteUser   = WebGUI::User->new($self->session,$inviteRecord->{userId});
-        #Automatically add the friend that invited the user and vice versa if the friend has friends enabled
-        if($inviteUser->acceptsFriendsRequests($u)) {
-            my $friends  = WebGUI::Friends->new($self->session,$u);
-            $friends->add([$inviteUser->userId]);
-        }
-    }
-
-    # If we have something to do after login, do it
-    if ( $self->session->setting->get( 'showMessageOnLogin' ) ) {
-        return $self->showMessageOnLogin;
-    }
-    elsif ($self->session->form->get('returnUrl')) {
-        $self->session->http->setRedirect( $self->session->form->get('returnUrl') );
-        $self->session->scratch->delete("redirectAfterLogin");
-    }
-    elsif ($self->session->scratch->get("redirectAfterLogin")) {
-        my $url = $self->session->scratch->delete("redirectAfterLogin");
-        $self->session->http->setRedirect($url);
-        return undef;
-    } 
-    else {
-        $self->session->http->setStatus(201);
-    }
-
-	return undef;
-}
-
-#-------------------------------------------------------------------
-
-=head2 deactivateAccount ( method )
-
-Superclass method that displays a confirm message for deactivating a user's account.
-
-=head3 method
-
-Auth method that the form for creating users should call
-
-=cut
-
-sub deactivateAccount {
-	my $self = shift;
-	my $method = $_[0];
-	return $self->session->privilege->vitalComponent() if($self->isVisitor || $self->isAdmin);
-	return $self->session->privilege->adminOnly() if(!$self->session->setting->get("selfDeactivation"));
-	my $i18n = WebGUI::International->new($self->session);
-	my %var;
-  	$var{title} = $i18n->get(42);
-   	$var{question} =  $i18n->get(60);
-   	$var{'yes.url'} = $self->session->url->page('op=auth;method='.$method);
-	$var{'yes.label'} = $i18n->get(44);
-   	$var{'no.url'} = $self->session->url->page();
-	$var{'no.label'} = $i18n->get(45);
-	return WebGUI::Asset::Template->new($self->session,$self->getDeactivateAccountTemplateId)->process(\%var);
-}
-
-#-------------------------------------------------------------------
-
-=head2 deactivateAccountConfirm ( )
-
-Superclass method that performs general functionality for deactivating accounts.
-
-=cut
-
-sub deactivateAccountConfirm {
-    my $self = shift;
-    
-    # Cannot deactivate "Visitor" or "Admin" users this way
-    return $self->session->privilege->vitalComponent 
-        if $self->isVisitor || $self->isAdmin;
-
-    my $i18n    = WebGUI::International->new($self->session);
-
-    # Change user's status
-    my $user    = $self->user;
-    $user->status("Selfdestructed");
-    
-    # TODO: Fix displayLogin in all subclasses to have the same prototype. THIS WILL BREAK API!
-    # Show the login form 
-    #$self->logout;
-    #return $self->displayLogin(undef, {
-        #'login.message' => sprintf( $i18n->get("deactivateAccount success"), $user->username )
-    #});
-
-    $self->logout;
-    return undef;
-}
-
-#-------------------------------------------------------------------
-
 =head2 delete ( [param] )
 
 Delete one or all parameters for this auth method. Deleting all parameters
@@ -498,109 +243,6 @@ sub deleteSingleParam {
 
 #-------------------------------------------------------------------
 
-=head2 displayAccount ( method [,vars] )
-
-Superclass method that performs general functionality for viewing editable fields related to a user's account.
-
-=head3 method
-
-Auth method that the form for updating a user's account should call
-
-=head3 vars
-
-Array ref of template vars from subclass
-
-=cut
-
-sub displayAccount {
-	my $self   = shift;
-	my $method = shift;
-	my $vars   = shift;
-    
-	my $i18n = WebGUI::International->new($self->session);
-	$vars->{title} = $i18n->get(61);
-
-	$vars->{'account.form.header'} = WebGUI::Form::formHeader($self->session,{});
-	$vars->{'account.form.header'} .= WebGUI::Form::hidden($self->session,{"name"=>"op","value"=>"auth"});
-	$vars->{'account.form.header'} .= WebGUI::Form::hidden($self->session,{"name"=>"method","value"=>$method});
-	if ($self->session->setting->get("useKarma")) {
-		$vars->{'account.form.karma'} = $self->session->user->karma;
-		$vars->{'account.form.karma.label'} = $i18n->get(537);
-	}
-	$vars->{'account.form.submit'} = WebGUI::Form::submit($self->session,{});
-	$vars->{'account.form.footer'} = WebGUI::Form::formFooter($self->session,);
-    
-    ########### ACCOUNT SHUNT
-    #The following is a shunt which allows the displayAccount page to be displayed in the
-    #Account system.  This shunt will be replaced in WebGUI 8 when the API can be broken
-    my $output = WebGUI::Asset::Template->newById($self->session,$self->getAccountTemplateId)->process($vars);
-    #If the account system is calling this method, just return the template
-    my $op = $self->session->form->get("op");
-    if($op eq "account") {
-        return $output;
-    }
-    #Otherwise wrap the template into the account layout
-    my $instance = WebGUI::Content::Account->createInstance($self->session,"user");
-    return $instance->displayContent($output,1);
-}
-
-#-------------------------------------------------------------------
-
-=head2 displayLogin ( [method,vars] )
-
-Superclass method that performs general functionality for creating new accounts.
-
-=head3 method
-
-Auth method that the form for performing the login routine should call
-
-=head3 vars
-
-Array ref of template vars from subclass
-
-=cut
-
-sub displayLogin {
-    my $self = shift;
-    my $method = $_[0] || "login";
-    my $vars = $_[1];
-    # Automatically set redirectAfterLogin unless we've linked here directly
-    # or it's already been set to perform another operation
-    unless (
-        $self->session->form->process("op") eq "auth" 
-            || ($self->session->scratch->get("redirectAfterLogin") =~ /op=\w+/) 
-        ) {
-        my $returnUrl
-            = $self->session->form->get('returnUrl')
-            || $self->session->url->page( $self->session->request->env->{'QUERY_STRING'} )
-            ;
-        $self->session->scratch->set("redirectAfterLogin", $returnUrl);
-    }
-    my $i18n = WebGUI::International->new($self->session);
-    $vars->{title} = $i18n->get(66);
-    my $action;
-    if ($self->session->setting->get("encryptLogin")) {
-        $action = $self->session->url->page(undef,1);
-        $action =~ s/http:/https:/;
-    }
-    $vars->{'login.form.header'} = WebGUI::Form::formHeader($self->session,{action=>$action});
-    $vars->{'login.form.hidden'} = WebGUI::Form::hidden($self->session,{"name"=>"op","value"=>"auth"});
-    $vars->{'login.form.hidden'} .= WebGUI::Form::hidden($self->session,{"name"=>"method","value"=>$method});
-    $vars->{'login.form.username'} = WebGUI::Form::text($self->session,{"name"=>"username"});
-    $vars->{'login.form.username.label'} = $i18n->get(50);
-    $vars->{'login.form.password'} = WebGUI::Form::password($self->session,{"name"=>"identifier"});
-    $vars->{'login.form.password.label'} = $i18n->get(51);
-    $vars->{'login.form.submit'} = WebGUI::Form::submit($self->session,{"value"=>$i18n->get(52)});
-    $vars->{'login.form.footer'} = WebGUI::Form::formFooter($self->session,);
-    $vars->{'anonymousRegistration.isAllowed'} = ($self->session->setting->get("anonymousRegistration"));
-    $vars->{'createAccount.url'} = $self->session->url->page('op=auth;method=createAccount');
-    $vars->{'createAccount.label'} = $i18n->get(67);
-    my $template = $self->getLoginTemplate;
-    return $template->process($vars);
-}
-
-#-------------------------------------------------------------------
-
 =head2 editUserForm (  )
 
 Creates user form elements specific to this Auth Method.
@@ -634,11 +276,7 @@ You need to override this method in your auth module. It needs to return a the r
 sub editSettingsForm {
 }
 
-# Backwards compatiblity for method renaming
-sub editUserSettingsForm {
-    my $self = shift;
-    return $self->editSettingsForm( @_ );
-}
+deprecate editUserSettingsForm => 'editSettingsForm';
 
 #-------------------------------------------------------------------
 
@@ -652,10 +290,7 @@ sub editSettingsFormSave {
 }
 
 # Backwards compatiblity for method renaming
-sub editUserSettingsFormSave {
-    my $self = shift;
-    return $self->editSettingsFormSave( @_ );
-}
+deprecate editSettingsFormSave => 'editSettingsFormSave';
 
 #-------------------------------------------------------------------
 
@@ -840,20 +475,6 @@ sub getSetting {
 
 #-------------------------------------------------------------------
 
-=head2 init ( )
-
-Initialization function for these auth routines.  Default is a superclass function called displayLogin.
-Override this method in your subclass to change the initialization for custom authentication methods
-
-=cut
-
-sub init {
-	my $self = shift;
-	return $self->displayLogin;
-}
-
-#-------------------------------------------------------------------
-
 =head2 isAdmin ()
 
 NOTE: This method is deprecated. Use user->isAdmin instead.
@@ -916,96 +537,6 @@ Returns 1 if the user is a visitor.
 sub isVisitor {
 	my $self = shift;
 	return $self->userId eq '1';
-}
-
-#-------------------------------------------------------------------
-
-=head2 login ( )
-
-Superclass method that performs standard login routines.  This is what should happen after a user has been authenticated.
-Authentication should always happen in the subclass routine.
-
-Open version tag is reclaimed if user is in site wide or singlePerUser mode.
-
-=cut
-
-sub login {
-	my $self = shift;
-	#Create a new user
-	my $uid = $self->userId;
-	my $u = WebGUI::User->new($self->session,$uid);
-   	$self->session->user({user=>$u});
-	$u->karma($self->session->setting->get("karmaPerLogin"),"Login","Just for logging in.") if ($self->session->setting->get("useKarma"));
-	$self->_logLogin($uid,"success");
-
-	if ($self->session->setting->get('encryptLogin')) {
-		my $currentUrl = $self->session->url->page(undef,1);
-		$currentUrl =~ s/^https:/http:/;
-		$self->session->http->setRedirect($currentUrl);
-	}
-
-        # Run on login
-	my $command = $self->session->config->get("runOnLogin");
-	if ($command ne "") {
-		WebGUI::Macro::process($self->session,\$command);
-		my $error = qx($command);
-		$self->session->log->warn($error) if $error;
-	}
-	
-
-    # Set the proper redirect
-    if ( $self->session->setting->get( 'showMessageOnLogin' ) 
-        && $self->user->profileField( $LOGIN_MESSAGE_SEEN ) 
-            < $self->session->setting->get( 'showMessageOnLoginTimes' ) 
-    ) {
-        return $self->showMessageOnLogin;
-    }
-    elsif ( $self->session->form->get('returnUrl') ) {
-		$self->session->http->setRedirect( $self->session->form->get('returnUrl') );
-	  	$self->session->scratch->delete("redirectAfterLogin");
-    }
-	elsif ( my $url = $self->session->scratch->delete("redirectAfterLogin") ) {
-		$self->session->http->setRedirect($url);
-	}
-    elsif ( $self->session->setting->get("redirectAfterLoginUrl") ) {
-        $self->session->http->setRedirect($self->session->setting->get("redirectAfterLoginUrl"));
-        $self->session->scratch->delete("redirectAfterLogin");
-    }
-
-    # Get open version tag. This is needed if we want
-    # to reclaim a version right after login (singlePerUser and siteWide mode)
-    # and to have the correct version displayed.
-    WebGUI::VersionTag->getWorking($self->session(), q{noCreate});
-
-	return undef;
-}
-
-#-------------------------------------------------------------------
-
-=head2 logout ( )
-
-Superclass method that performs standard logout routines.
-
-=cut
-
-sub logout {
-	my $self = shift;
-	$self->session->var->end($self->session->var->get("sessionId"));
-	$self->session->user({userId=>'1'});
-	my $u = WebGUI::User->new($self->session,1);
-	$self->{user} = $u;
-	
-	my $command = $self->session->config->get("runOnLogout");
-    if ($command ne "") {
-       WebGUI::Macro::process($self->session,\$command);
-       my $error = qx($command);
-       $self->session->log->warn($error) if $error;
-    }
-
-    # Do not allow caching of the logout page (to ensure the page gets requested)
-    $self->session->http->setCacheControl( "none" );
-   
-	return undef;
 }
 
 #-------------------------------------------------------------------
@@ -1110,46 +641,6 @@ sub saveParams {
     return $self->update( $data );
 }
 
-#----------------------------------------------------------------------------
-
-=head2 showMessageOnLogin ( )
-
-Show the requested message after the user logs in. Add another tally to the 
-number of times the message has been displayed. Show a link to the next
-stage for the user.
-
-=cut
-
-sub showMessageOnLogin {
-    my $self        = shift;
-    my $i18n        = WebGUI::International->new( $self->session, 'Auth' );
-
-    # Increment the number of time seen.
-    $self->user->profileField( $LOGIN_MESSAGE_SEEN, 
-        $self->user->profileField( $LOGIN_MESSAGE_SEEN ) + 1
-    );
-
-    # Show the message, processing for macros
-    my $output  =  $self->session->setting->get( 'showMessageOnLoginBody' );
-    WebGUI::Macro::process( $self->session, \$output );
-
-    # Add the link to continue
-    my $session = $self->session;
-    my $redirectUrl =  $self->session->form->get( 'returnUrl' )
-                    || $self->session->setting->get("redirectAfterLoginUrl")
-                    || $self->session->scratch->get( 'redirectAfterLogin' )
-                    || $self->session->url->getBackToSiteURL
-                    ;
-
-    $output     .= '<p><a href="' . $redirectUrl . '">' . $i18n->get( 'showMessageOnLogin return' ) 
-                .  '</a></p>'
-                ;
-
-    # No matter what, we won't be redirecting after this
-    $self->session->scratch->delete( 'redirectAfterLogin' );
-
-    return $output;
-}
 
 #----------------------------------------------------------------------------
 
@@ -1276,5 +767,530 @@ sub validUsername {
 	$self->error($error);
 	return $error eq "";
 }
+
+#-------------------------------------------------------------------
+
+=head2 www_createAccount ( method [,vars] )
+
+Superclass method that performs general functionality for creating new accounts.
+
+=head3 method
+
+Auth method that the form for creating users should call
+
+=head3 vars
+
+Array ref of template vars from subclass
+
+=cut
+
+sub www_createAccount {
+    my $self    = shift;
+    my $method  = shift;
+    my $vars    = shift;
+    my $i18n    = WebGUI::International->new($self->session);
+    $vars->{title} = $i18n->get(54);
+    
+    $vars->{'create.form.header'}
+        = WebGUI::Form::formHeader($self->session)
+        . WebGUI::Form::hidden($self->session,{"name"=>"op","value"=>"auth"})
+        . WebGUI::Form::hidden($self->session,{"name"=>"method","value"=>$method})
+        ;
+    
+    # User Defined Options
+    my $userInvitation = $self->session->setting->get('inboxInviteUserEnabled');
+    $vars->{'create.form.profile'} = [];
+    foreach my $field (@{WebGUI::ProfileField->getRegistrationFields($self->session)}) {
+        my $id         = $field->getId;
+        my $label      = $field->getLabel;
+        my $required   = $field->isRequired;
+        
+        my $properties = {};
+        if ($required) {
+            my $fieldValue = $self->session->form->process($field->getId,$field->get("fieldType"));
+            $properties->{extras} = $self->getExtrasStyle($fieldValue);
+        }
+
+        my $formField;
+        # Get the default email from the invitation
+        if ($field->get('fieldName') eq "email" && $userInvitation ) {
+            my $code = $self->session->form->get('code')
+                    || $self->session->form->get('uniqueUserInvitationCode');
+            my $defaultValue 
+                = $self->session->db->quickScalar(
+                    'SELECT email FROM userInvitations WHERE inviteId=?',
+                    [$code]
+                );
+            $vars->{'create.form.header'} .= WebGUI::Form::hidden($self->session, {name=>"uniqueUserInvitationCode", value=>$code});
+            $formField   = $field->formField($properties, undef, undef, undef, $defaultValue);
+        }
+        else {
+            $formField   = $field->formField($properties);
+        }
+       
+
+        # Old-style field loop.
+        push @{$vars->{'create.form.profile'}}, { 
+            'profile.formElement'       => $formField,
+            'profile.formElement.label' => $label,
+            'profile.required'          => $required,
+        };
+
+        # Individual field template vars.
+        my $prefix = 'create.form.profile.'.$id.'.';
+        $vars->{ $prefix . 'formElement'        } = $formField;
+        $vars->{ $prefix . 'formElement.label'  } = $label;
+        $vars->{ $prefix . 'required'           } = $required;
+    }
+
+    $vars->{'create.form.submit'} = WebGUI::Form::submit($self->session,{});
+    $vars->{'create.form.footer'} = WebGUI::Form::formFooter($self->session,);
+
+    $vars->{'login.url'} = $self->session->url->page('op=auth;method=init');
+    $vars->{'login.label'} = $i18n->get(58);
+
+    return WebGUI::Asset::Template->newById($self->session,$self->getCreateAccountTemplateId)->process($vars);
+}
+
+deprecate createAccount => 'www_createAccount';
+
+#-------------------------------------------------------------------
+
+=head2 www_createAccountSave ( username,properties [,password,profile] )
+
+Superclass method that performs general functionality for saving new accounts.  Based
+on various settings and user actions, it may return output that should be displayed
+to the user.
+
+=head3 username
+
+Username for the account being created
+
+=head3 properties
+
+Properties from the subclass that should be saved as authentication parameters
+
+=head3 password
+
+Password entered by the user.  This is only used in for sending the user a notification by email of his/her username/password
+
+=head3 profile
+
+Hashref of profile values returned by the function WebGUI::User::validateProfileDataFromForm($fields);
+
+=cut
+
+sub www_createAccountSave {
+	my $self = shift;
+	my $username = $_[0];
+	my $properties = $_[1];
+	my $password = $_[2];
+	my $profile = $_[3];
+	
+	my $i18n = WebGUI::International->new($self->session);
+	
+	
+	my $u = WebGUI::User->new($self->session,"new");
+	$self->user($u);
+	my $userId = $u->userId;
+	$u->username($username);
+	$u->authMethod($self->authMethod);
+	$u->karma($self->session->setting->get("karmaPerLogin"),"Login","Just for logging in.") if ($self->session->setting->get("useKarma"));
+	$u->updateProfileFields($profile) if ($profile);
+    $self->update($properties);
+
+	if ($self->getSetting("sendWelcomeMessage")){
+        my $var;
+        $var->{welcomeMessage}      = $self->getSetting("welcomeMessage");
+        $var->{newUser_username}    = $username;
+        $var->{newUser_password}    = $password;
+        my $message = WebGUI::Asset::Template->newById($self->session,$self->getSetting('welcomeMessageTemplate'))->process($var);
+        WebGUI::Macro::process($self->session,\$message);
+        WebGUI::Inbox->new($self->session)->addMessage({
+            message => $message,
+			subject	=> $i18n->get(870),
+			userId	=> $self->userId,
+            status  => 'completed',
+		});
+	}
+
+	$self->session->user({user=>$u});
+	$self->_logLogin($userId,"success");
+
+	if ($self->session->setting->get("runOnRegistration")) {
+		WebGUI::Workflow::Instance->create($self->session, {
+			workflowId=>$self->session->setting->get("runOnRegistration"),
+			methodName=>"new",
+			className=>"WebGUI::User",
+			parameters=>$self->session->user->userId,
+			priority=>1
+			})->start;
+	}
+
+    ##Finalize the record in the user invitation table.
+    my $inviteId = $self->session->form->get('uniqueUserInvitationCode');
+    if ($inviteId) {
+        $self->session->db->setRow('userInvitations','inviteId',{
+            inviteId    => $inviteId,
+            newUserId   => $u->userId,
+            dateCreated => WebGUI::DateTime->new($self->session, time)->toMysqlDate,
+        });
+        #Get the invite record
+        my $inviteRecord = $self->session->db->getRow('userInvitations','inviteId',$inviteId);
+        #Get the user
+        my $inviteUser   = WebGUI::User->new($self->session,$inviteRecord->{userId});
+        #Automatically add the friend that invited the user and vice versa if the friend has friends enabled
+        if($inviteUser->acceptsFriendsRequests($u)) {
+            my $friends  = WebGUI::Friends->new($self->session,$u);
+            $friends->add([$inviteUser->userId]);
+        }
+    }
+
+    # If we have something to do after login, do it
+    if ( $self->session->setting->get( 'showMessageOnLogin' ) ) {
+        return $self->showMessageOnLogin;
+    }
+    elsif ($self->session->form->get('returnUrl')) {
+        $self->session->http->setRedirect( $self->session->form->get('returnUrl') );
+        $self->session->scratch->delete("redirectAfterLogin");
+    }
+    elsif ($self->session->scratch->get("redirectAfterLogin")) {
+        my $url = $self->session->scratch->delete("redirectAfterLogin");
+        $self->session->http->setRedirect($url);
+        return undef;
+    } 
+    else {
+        $self->session->http->setStatus(201);
+    }
+
+	return undef;
+}
+
+deprecate createAccountSave => 'www_createAccountSave';
+
+#-------------------------------------------------------------------
+
+=head2 www_deactivateAccount ( method )
+
+Superclass method that displays a confirm message for deactivating a user's account.
+
+=head3 method
+
+Auth method that the form for creating users should call
+
+=cut
+
+sub www_deactivateAccount {
+	my $self = shift;
+	my $method = $_[0];
+	return $self->session->privilege->vitalComponent() if($self->isVisitor || $self->isAdmin);
+	return $self->session->privilege->adminOnly() if(!$self->session->setting->get("selfDeactivation"));
+	my $i18n = WebGUI::International->new($self->session);
+	my %var;
+  	$var{title} = $i18n->get(42);
+   	$var{question} =  $i18n->get(60);
+   	$var{'yes.url'} = $self->session->url->page('op=auth;method='.$method);
+	$var{'yes.label'} = $i18n->get(44);
+   	$var{'no.url'} = $self->session->url->page();
+	$var{'no.label'} = $i18n->get(45);
+	return WebGUI::Asset::Template->new($self->session,$self->getDeactivateAccountTemplateId)->process(\%var);
+}
+
+deprecate deactivateAccount => 'www_deactivateAccount';
+
+#-------------------------------------------------------------------
+
+=head2 www_deactivateAccountConfirm ( )
+
+Superclass method that performs general functionality for deactivating accounts.
+
+=cut
+
+sub www_deactivateAccountConfirm {
+    my $self = shift;
+    
+    # Cannot deactivate "Visitor" or "Admin" users this way
+    return $self->session->privilege->vitalComponent 
+        if $self->isVisitor || $self->isAdmin;
+
+    my $i18n    = WebGUI::International->new($self->session);
+
+    # Change user's status
+    my $user    = $self->user;
+    $user->status("Selfdestructed");
+    
+    # TODO: Fix displayLogin in all subclasses to have the same prototype. THIS WILL BREAK API!
+    # Show the login form 
+    #$self->logout;
+    #return $self->displayLogin(undef, {
+        #'login.message' => sprintf( $i18n->get("deactivateAccount success"), $user->username )
+    #});
+
+    $self->logout;
+    return undef;
+}
+
+deprecate deactivateAccountConfirm => 'www_deactivateAccountConfirm';
+
+#-------------------------------------------------------------------
+
+=head2 www_displayAccount ( method [,vars] )
+
+Superclass method that performs general functionality for viewing editable fields related to a user's account.
+
+=head3 method
+
+Auth method that the form for updating a user's account should call
+
+=head3 vars
+
+Array ref of template vars from subclass
+
+=cut
+
+sub www_displayAccount {
+	my $self   = shift;
+	my $method = shift;
+	my $vars   = shift;
+    
+	my $i18n = WebGUI::International->new($self->session);
+	$vars->{title} = $i18n->get(61);
+
+	$vars->{'account.form.header'} = WebGUI::Form::formHeader($self->session,{});
+	$vars->{'account.form.header'} .= WebGUI::Form::hidden($self->session,{"name"=>"op","value"=>"auth"});
+	$vars->{'account.form.header'} .= WebGUI::Form::hidden($self->session,{"name"=>"method","value"=>$method});
+	if ($self->session->setting->get("useKarma")) {
+		$vars->{'account.form.karma'} = $self->session->user->karma;
+		$vars->{'account.form.karma.label'} = $i18n->get(537);
+	}
+	$vars->{'account.form.submit'} = WebGUI::Form::submit($self->session,{});
+	$vars->{'account.form.footer'} = WebGUI::Form::formFooter($self->session,);
+    
+    ########### ACCOUNT SHUNT
+    #The following is a shunt which allows the displayAccount page to be displayed in the
+    #Account system.  This shunt will be replaced in WebGUI 8 when the API can be broken
+    my $output = WebGUI::Asset::Template->newById($self->session,$self->getAccountTemplateId)->process($vars);
+    #If the account system is calling this method, just return the template
+    my $op = $self->session->form->get("op");
+    if($op eq "account") {
+        return $output;
+    }
+    #Otherwise wrap the template into the account layout
+    my $instance = WebGUI::Content::Account->createInstance($self->session,"user");
+    return $instance->displayContent($output,1);
+}
+
+deprecate displayAccount => 'www_displayAccount';
+
+#-------------------------------------------------------------------
+
+=head2 www_displayLogin ( [method,vars] )
+
+Superclass method that performs general functionality for creating new accounts.
+
+=head3 method
+
+Auth method that the form for performing the login routine should call
+
+=head3 vars
+
+Array ref of template vars from subclass
+
+=cut
+
+sub www_displayLogin {
+    my $self = shift;
+    my $method = $_[0] || "login";
+    my $vars = $_[1];
+        print "Auth->www_displayLogin\n";
+    # Automatically set redirectAfterLogin unless we've linked here directly
+    # or it's already been set to perform another operation
+    unless (
+        $self->session->form->process("op") eq "auth" 
+            || ($self->session->scratch->get("redirectAfterLogin") =~ /op=\w+/) 
+        ) {
+        my $returnUrl
+            = $self->session->form->get('returnUrl')
+            || $self->session->url->page( $self->session->request->env->{'QUERY_STRING'} )
+            ;
+        $self->session->scratch->set("redirectAfterLogin", $returnUrl);
+    }
+    my $i18n = WebGUI::International->new($self->session);
+    $vars->{title} = $i18n->get(66);
+    my $action;
+    if ($self->session->setting->get("encryptLogin")) {
+        $action = $self->session->url->page(undef,1);
+        $action =~ s/http:/https:/;
+    }
+    $vars->{'login.form.header'} = WebGUI::Form::formHeader($self->session,{action=>$action});
+    $vars->{'login.form.hidden'} = WebGUI::Form::hidden($self->session,{"name"=>"op","value"=>"auth"});
+    $vars->{'login.form.hidden'} .= WebGUI::Form::hidden($self->session,{"name"=>"method","value"=>$method});
+    $vars->{'login.form.username'} = WebGUI::Form::text($self->session,{"name"=>"username"});
+    $vars->{'login.form.username.label'} = $i18n->get(50);
+    $vars->{'login.form.password'} = WebGUI::Form::password($self->session,{"name"=>"identifier"});
+    $vars->{'login.form.password.label'} = $i18n->get(51);
+    $vars->{'login.form.submit'} = WebGUI::Form::submit($self->session,{"value"=>$i18n->get(52)});
+    $vars->{'login.form.footer'} = WebGUI::Form::formFooter($self->session,);
+    $vars->{'anonymousRegistration.isAllowed'} = ($self->session->setting->get("anonymousRegistration"));
+    $vars->{'createAccount.url'} = $self->session->url->page('op=auth;method=createAccount');
+    $vars->{'createAccount.label'} = $i18n->get(67);
+    my $template = $self->getLoginTemplate;
+    return $template->process($vars);
+}
+
+deprecate displayLogin => 'www_displayLogin';
+
+#-------------------------------------------------------------------
+
+=head2 www_login ( )
+
+Superclass method that performs standard login routines.  This is what should happen after a user has been authenticated.
+Authentication should always happen in the subclass routine.
+
+Open version tag is reclaimed if user is in site wide or singlePerUser mode.
+
+=cut
+
+sub www_login {
+	my $self = shift;
+	#Create a new user
+	my $uid = $self->userId;
+	my $u = WebGUI::User->new($self->session,$uid);
+   	$self->session->user({user=>$u});
+	$u->karma($self->session->setting->get("karmaPerLogin"),"Login","Just for logging in.") if ($self->session->setting->get("useKarma"));
+	$self->_logLogin($uid,"success");
+
+	if ($self->session->setting->get('encryptLogin')) {
+		my $currentUrl = $self->session->url->page(undef,1);
+		$currentUrl =~ s/^https:/http:/;
+		$self->session->http->setRedirect($currentUrl);
+	}
+
+        # Run on login
+	my $command = $self->session->config->get("runOnLogin");
+	if ($command ne "") {
+		WebGUI::Macro::process($self->session,\$command);
+		my $error = qx($command);
+		$self->session->log->warn($error) if $error;
+	}
+	
+
+    # Set the proper redirect
+    if ( $self->session->setting->get( 'showMessageOnLogin' ) 
+        && $self->user->profileField( $LOGIN_MESSAGE_SEEN ) 
+            < $self->session->setting->get( 'showMessageOnLoginTimes' ) 
+    ) {
+        return $self->showMessageOnLogin;
+    }
+    elsif ( $self->session->form->get('returnUrl') ) {
+		$self->session->http->setRedirect( $self->session->form->get('returnUrl') );
+	  	$self->session->scratch->delete("redirectAfterLogin");
+    }
+	elsif ( my $url = $self->session->scratch->delete("redirectAfterLogin") ) {
+		$self->session->http->setRedirect($url);
+	}
+    elsif ( $self->session->setting->get("redirectAfterLoginUrl") ) {
+        $self->session->http->setRedirect($self->session->setting->get("redirectAfterLoginUrl"));
+        $self->session->scratch->delete("redirectAfterLogin");
+    }
+
+    # Get open version tag. This is needed if we want
+    # to reclaim a version right after login (singlePerUser and siteWide mode)
+    # and to have the correct version displayed.
+    WebGUI::VersionTag->getWorking($self->session(), q{noCreate});
+
+	return undef;
+}
+
+deprecate login => 'www_login';
+
+#-------------------------------------------------------------------
+
+=head2 www_logout ( )
+
+Superclass method that performs standard logout routines.
+
+=cut
+
+sub www_logout {
+	my $self = shift;
+	$self->session->var->end($self->session->var->get("sessionId"));
+	$self->session->user({userId=>'1'});
+	my $u = WebGUI::User->new($self->session,1);
+	$self->{user} = $u;
+	
+	my $command = $self->session->config->get("runOnLogout");
+    if ($command ne "") {
+       WebGUI::Macro::process($self->session,\$command);
+       my $error = qx($command);
+       $self->session->log->warn($error) if $error;
+    }
+
+    # Do not allow caching of the logout page (to ensure the page gets requested)
+    $self->session->http->setCacheControl( "none" );
+   
+	return undef;
+}
+
+deprecate logout => 'www_logout';
+
+#----------------------------------------------------------------------------
+
+=head2 www_showMessageOnLogin ( )
+
+Show the requested message after the user logs in. Add another tally to the 
+number of times the message has been displayed. Show a link to the next
+stage for the user.
+
+=cut
+
+sub www_showMessageOnLogin {
+    my $self        = shift;
+    my $i18n        = WebGUI::International->new( $self->session, 'Auth' );
+
+    # Increment the number of time seen.
+    $self->user->profileField( $LOGIN_MESSAGE_SEEN, 
+        $self->user->profileField( $LOGIN_MESSAGE_SEEN ) + 1
+    );
+
+    # Show the message, processing for macros
+    my $output  =  $self->session->setting->get( 'showMessageOnLoginBody' );
+    WebGUI::Macro::process( $self->session, \$output );
+
+    # Add the link to continue
+    my $session = $self->session;
+    my $redirectUrl =  $self->session->form->get( 'returnUrl' )
+                    || $self->session->setting->get("redirectAfterLoginUrl")
+                    || $self->session->scratch->get( 'redirectAfterLogin' )
+                    || $self->session->url->getBackToSiteURL
+                    ;
+
+    $output     .= '<p><a href="' . $redirectUrl . '">' . $i18n->get( 'showMessageOnLogin return' ) 
+                .  '</a></p>'
+                ;
+
+    # No matter what, we won't be redirecting after this
+    $self->session->scratch->delete( 'redirectAfterLogin' );
+
+    return $output;
+}
+
+deprecate 'showMessageOnLogin' => 'www_showMessageOnLogin';
+
+#-------------------------------------------------------------------
+
+=head2 www_view ( )
+
+Initialization function for these auth routines.  Default is a superclass function called displayLogin.
+Override this method in your subclass to change the initialization for custom authentication methods
+
+=cut
+
+sub www_view {
+	my $self = shift;
+	return $self->displayLogin;
+}
+
+deprecate init => 'www_view';
 
 1;

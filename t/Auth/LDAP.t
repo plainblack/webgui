@@ -65,7 +65,7 @@ $session->request->setup_body({
     username        => 'Andy Dufresne',
     identifier      => 'AndyDufresne',
 });
-my $out = $auth->login();
+my $out = $auth->www_login();
 
 is( $session->user->getId, $user->getId, 'Andy is logged in' );
 
@@ -82,7 +82,7 @@ $session->request->setup_body({
 });
 $auth   = WebGUI::Auth::LDAP->new( $session, 'LDAP' );
 
-$out = $auth->createAccountSave;
+$out = $auth->www_createAccountSave;
 
 is( $session->user->get('username'), 'Ellis Redding', 'Ellis was created' );
 WebGUI::Test->addToCleanup( $session->user );
@@ -98,7 +98,7 @@ $session->request->setup_body({
     identifier      => 'BogsDiamond',
 });
 $auth   = WebGUI::Auth::LDAP->new( $session, 'LDAP' );
-$out    = $auth->login;
+$out    = $auth->www_login;
 
 is( $session->user->get('username'), 'Bogs Diamond', 'Bogs was created' )
 or diag( $auth->error );
@@ -131,7 +131,7 @@ $session->request->setup_body({
     identifier      => 'BrooksHatley',
 });
 $auth   = WebGUI::Auth::LDAP->new( $session, 'LDAP' );
-$out    = $auth->login;
+$out    = $auth->www_login;
 is $session->user->get('username'), 'Brooks Hatley', 'Brooks was created';
 cmp_deeply(
     $auth->get,
@@ -143,7 +143,7 @@ cmp_deeply(
     'authentication information set after creating account'
 );
 WebGUI::Test->addToCleanup( $session->user, );
-$out    = $auth->logout;
+$out    = $auth->www_logout;
 is $session->user->get('username'), 'Visitor', 'Brooks was logged out';
 
 $ldap->moddn( 'uid=Brooks Hatley,o=shawshank',
@@ -164,7 +164,7 @@ $session->request->setup_body({
 });
 
 $auth   = WebGUI::Auth::LDAP->new( $session, 'LDAP' );
-$out    = $auth->login;
+$out    = $auth->www_login;
 is $session->user->get('username'), 'Brooks Hatley', 'Brooks was logged in after name change';
 cmp_deeply(
     $auth->get,

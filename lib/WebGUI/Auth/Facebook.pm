@@ -223,13 +223,13 @@ sub www_callback {
     if ( $userId ) {
         my $user    = WebGUI::User->new( $session, $userId );
         $self->user( $user );
-        return $self->login;
+        return $self->SUPER::www_login;
     }
     # Otherwise see if their screen name exists and create a user
     elsif ( !WebGUI::User->newByUsername( $session, $fbuser->{name}) ) {
         my $user = $self->createFacebookUser( $fbuser );
         $self->user( $user );
-        return $self->login;
+        return $self->SUPER::www_login;
     }
 
     # Otherwise ask them for a new username to use
@@ -267,7 +267,7 @@ sub www_setUsername {
     if ( !WebGUI::User->newByUsername( $session, $fbuser->{name} ) ) {
         my $user = $self->createFacebookUser( $fbuser );
         $self->user( $user );
-        return $self->login;
+        return $self->www_login;
     }
 
     # Username is again taken! Noooooo!
