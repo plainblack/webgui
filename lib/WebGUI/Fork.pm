@@ -507,7 +507,6 @@ sub request {
     my $session = $self->session;
     my $config  = $session->config;
     return {
-        webguiRoot => $config->getWebguiRoot,
         configFile => $config->getFilename,
         sessionId  => $session->getId,
         module     => $module,
@@ -541,8 +540,8 @@ Internal class method. Expects a hash of arguments describing what to run.
 
 sub runRequest {
     my ( $class, $args ) = @_;
-    my ( $root, $config, $sid ) = @{$args}{qw(webguiRoot configFile sessionId)};
-    my $session = WebGUI::Session->open( $root, $config, undef, undef, $sid );
+    my ( $config, $sid ) = @{$args}{qw(configFile sessionId)};
+    my $session = WebGUI::Session->open( $config, undef, $sid );
     my $id = $args->{id};
     my $self = $class->new( $session, $id );
     $self->set( { startTime => time } );
