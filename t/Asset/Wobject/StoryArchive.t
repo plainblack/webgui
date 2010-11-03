@@ -129,7 +129,7 @@ is($todayFolder->get('styleTemplateId'), $archive->get('styleTemplateId'),  '...
 {
     my $undo = WebGUI::Test->overrideSetting(urlExtension => 'ext');
     my $arch2 = $home->addChild({
-        className => $class,
+        className => 'WebGUI::Asset::Wobject::StoryArchive',
         title     => 'Extension Tester',
     });
     addToCleanup($arch2);
