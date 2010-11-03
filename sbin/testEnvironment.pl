@@ -163,7 +163,7 @@ checkModule('PerlIO::eol',                  "0.14"       );
 checkModule('Number::Format',                            );
 checkModule('Email::Valid',                              );
 checkModule('Facebook::Graph',              '0.0505'     );
-checkModule('HTTP::BrowserDetect',                       );
+checkModule('HTTP::BrowserDetect',          '1.19'       );
 checkModule('Search::QueryParser',                       );
 checkModule('Monkey::Patch',                '0.03'       );
 
