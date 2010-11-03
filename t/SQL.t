@@ -13,9 +13,8 @@ use strict;
 use WebGUI::Test;
 use WebGUI::Session;
 use Data::Dumper;
+use Test::More;
 use Test::Deep;
-
-use Test::More tests => 57; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -309,3 +308,4 @@ $session->db->write(
 );
 ok( $session->db->quickCSV( 'SELECT * FROM testTable' ), 'get some output even with newlines in data' );
 
+done_testing();
