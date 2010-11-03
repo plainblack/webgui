@@ -17,7 +17,7 @@ use Test::MockObject::Extends;
 use WebGUI::Test;
 use WebGUI::Test::MockAsset;
 use WebGUI::Session;
-use Test::More tests => 8; # increment this value for each test you create
+use Test::More tests => 9; # increment this value for each test you create
 use Test::Deep;
 use Data::Dumper;
 
@@ -125,6 +125,14 @@ cmp_deeply(
 
 $session->request->setup_body({ });
 $session->scratch->delete('userId');
+
+################################################################
+#
+#  getStatusList
+#
+################################################################
+$board->update({statusList => "In\r\nOut\rHome\nLunch"});
+is_deeply [$board->getStatusList], [qw(In Out Home Lunch)], 'getStatusList';
 
 ################################################################
 #

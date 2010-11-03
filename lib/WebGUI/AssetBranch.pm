@@ -46,13 +46,26 @@ Duplicates this asset and the entire subtree below it.  Returns the root of the 
 
 If true, then only children, and not descendants, will be duplicated.
 
+=head3 $state
+
+Set this to "clipboard" if you want the resulting asset to be on the clipboard
+(rather than published) when we're done.
+
 =cut
 
 sub duplicateBranch {
-    my $self         = shift;
-    my $childrenOnly = shift;
+    my ($self, $childrenOnly, $state) = @_;
+    my $session   = $self->session;
+    my $log       = $session->log;
+    my $clipboard = $state && $state =~ /^clipboard/;
 
-    my $newAsset = $self->duplicate({skipAutoCommitWorkflows=>1,skipNotification=>1});
+    my $newAsset = $self->duplicate(
+        {   skipAutoCommitWorkflows => 1,
+            skipNotification        => 1,
+            state                   => $state,
+        }
+    );
+
     # Correctly handle positions for Layout assets
     my $contentPositions = $self->get("contentPositions");
     my $assetsToHide     = $self->get("assetsToHide");
@@ -66,7 +79,21 @@ sub duplicateBranch {
             next;
         }
         last unless $child;
-        my $newChild = $childrenOnly ? $child->duplicate({skipAutoCommitWorkflows=>1, skipNotification=>1}) : $child->duplicateBranch;
+        my $newChild;
+        if ($childrenOnly) {
+            $newChild = $child->duplicate(
+                {   skipAutoCommitWorkflows => 1,
+                    skipNotification        => 1,
+                    state                   => $clipboard && 'clipboard-limbo',
+                }
+            );
+        }
+        elsif($clipboard) {
+            $newChild = $child->duplicateBranch(0, 'clipboard-limbo');
+        }
+        else {
+            $newChild = $child->duplicateBranch;
+        }
         $newChild->setParent($newAsset);
         my ($oldChildId, $newChildId) = ($child->getId, $newChild->getId);
         $contentPositions =~ s/\Q${oldChildId}\E/${newChildId}/g if ($contentPositions);

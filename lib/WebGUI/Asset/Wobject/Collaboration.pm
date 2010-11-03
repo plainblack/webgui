@@ -83,6 +83,7 @@ property mailAccount => (
     tab       => 'mail',
     label     => [ "mail account", 'Asset_Collaboration' ],
     hoverHelp => [ "mail account help", 'Asset_Collaboration' ],
+    extras    => 'autocomplete="off"',
 );
 property mailPassword => (
     fieldType => "password",

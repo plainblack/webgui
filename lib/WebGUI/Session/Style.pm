@@ -110,6 +110,25 @@ sub makePrintable {
 
 #-------------------------------------------------------------------
 
+=head2 mobileBrowser ( ) 
+
+Returns true if the user's browser matches any of the mobile browsers set in the config file.
+
+=cut
+
+sub mobileBrowser {
+	my $self    = shift;
+    my $session = $self->session;
+    my $ua      = $session->env->get('HTTP_USER_AGENT');
+    for my $mobileUA (@{ $session->config->get('mobileUserAgents') }) {
+        if ($ua =~ m/$mobileUA/) {
+            return 1;
+        }
+    }
+}
+
+#-------------------------------------------------------------------
+
 =head2 useMobileStyle
 
 Returns a true value if we are on a mobile display.
@@ -130,7 +149,6 @@ sub useMobileStyle {
     if (! $session->setting->get('useMobileStyle')) {
         return $self->{_useMobileStyle} = 0;
     }
-
     if ($session->request->browser->mobile) {
         return $self->{_useMobileStyle} = 1;
     }

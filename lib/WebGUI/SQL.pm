@@ -648,7 +648,7 @@ sub quickCSV {
     my $sql = shift;
     my $params = shift;
 
-    my $csv = Text::CSV_XS->new({ eol => "\n" });
+	my $csv = Text::CSV_XS->new({ eol => "\n", binary => 1 });
 
     my $sth = $self->prepare($sql);
     $sth->execute(@$params);
@@ -656,9 +656,12 @@ sub quickCSV {
     return undef unless $csv->combine($sth->getColumnNames);
     my $output = $csv->string;
 
-    while (my @data = $sth->fetchrow_array) {
-        return undef unless $csv->combine(@data);
-        $output .= $csv->string;
+    while (my @data = $sth->array) {
+        if ( ! $csv->combine(@data) ) {
+            $self->session->log->error( "Problem creating CSV row: " . $csv->error_diag );
+            return undef;
+        }
+        $output .= $csv->string();
     }
 
     $sth->finish;

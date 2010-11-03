@@ -302,25 +302,25 @@ sub toHtml {
                 value   => 'upload',
                 id      => $self->get('id')
             })->toHtml
-            . "<br />";
+            . "\n";
 	} 
     else {
 		$uploadControl .= WebGUI::Form::Hidden->new($self->session, {
             name    => $self->get("name"), 
             value   => $self->getOriginalValue,
             id      => $self->get("id")
-            })->toHtml()."<br />";
+            })->toHtml()."\n";
 		$uploadControl .= WebGUI::Form::Hidden->new($self->session, {
             name    => $self->privateName('action'), 
             value   => 'keep',
             id      => $self->get("id")
-            })->toHtml()."<br />";
+            })->toHtml()."\n";
 	}
 	if (scalar(@files)) {
         if ($self->get('maxAttachments') == 1) {
             $self->set("");
         }
-        $uploadControl .= $self->getFilePreview($storage);
+        $uploadControl .= "<br />".$self->getFilePreview($storage);
 	}
     return $uploadControl;
 }

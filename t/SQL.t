@@ -299,3 +299,13 @@ cmp_deeply(
     'Check table structure',
 );
 
+#----------------------------------------------------------------------------
+# REGRESSIONS
+
+# 11940 : quickCSV chokes on newlines
+$session->db->write( 
+    'INSERT INTO testTable (myIndex,message,myKey) VALUES (?,?,?)',
+    [ 10, "a\ntest", 'B' ],
+);
+ok( $session->db->quickCSV( 'SELECT * FROM testTable' ), 'get some output even with newlines in data' );
+

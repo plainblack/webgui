@@ -277,7 +277,7 @@ sub getContentLastModified {
     my $shortcut = $self->getShortcut;    # XXX "newById must get an assetId"
     my $shortcuttedRev;
     if (defined $shortcut) {
-        $shortcuttedRev = $shortcut->get('revisionDate');
+        $shortcuttedRev = $shortcut->getContentLastModified;
         return $assetRev > $shortcuttedRev ? $assetRev : $shortcuttedRev;
     } else {
         return 0;

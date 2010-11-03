@@ -119,12 +119,36 @@ my $dt = DateTime->from_epoch(epoch => $now, time_zone => $session->datetime->ge
 my $folderName = $dt->strftime('%B_%d_%Y');
 $folderName =~ s/^(\w+_)0/$1/;
 is($todayFolder->getTitle, $folderName, '... folder has the right name');
-my $folderUrl = join '/', $archive->getUrl, lc $folderName;
-is($todayFolder->getUrl, $folderUrl, '... folder has the right URL');
+my $folderUrl = $archive->getFolderUrl($folderName);
+is($todayFolder->get('url'), $folderUrl, '... folder has the right URL');
 is($todayFolder->getParent->getId, $archive->getId, '... created folder has the right parent');
 is($todayFolder->get('state'),  'published', '... created folder is published');
 is($todayFolder->get('status'), 'approved',  '... created folder is approved');
 is($todayFolder->get('styleTemplateId'), $archive->get('styleTemplateId'),  '... created folder has correct styleTemplateId');
+
+{
+    my $undo = WebGUI::Test->overrideSetting(urlExtension => 'ext');
+    my $arch2 = $home->addChild({
+        className => $class,
+        title     => 'Extension Tester',
+    });
+    addToCleanup($arch2);
+
+    is $arch2->get('url'),
+        'home/extension-tester.ext',
+        'ext added';
+
+    is $arch2->getFolderUrl('blah'),
+        'home/extension-tester/blah.ext',
+        'folder url: strip extension from parent and add to child';
+
+    my $folder = $arch2->getFolder($now);
+    ok defined $folder, 'getFolder with url extension';
+
+    is $folder->get('url'),
+        $arch2->getFolderUrl($folder->getMenuTitle),
+        'getFolderUrl and folder getUrl match';
+}
 
 my $sameFolder = $archive->getFolder($now);
 is($sameFolder->getId, $todayFolder->getId, 'call with same time returns the same folder');

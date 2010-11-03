@@ -645,6 +645,7 @@ sub www_editUser {
         -name=>"username",
         -label=>$i18n->get(50),
         -value=>$username
+        -extras=>'autocomplete="off"',
     );
 	my %status;
 	tie %status, 'Tie::IxHash';

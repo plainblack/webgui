@@ -298,9 +298,10 @@ sub getFolder {
 	my ($self, $date) = @_;
     my $session    = $self->session;
     my $folderName = $session->datetime->epochToHuman($date, DATE_FORMAT);
-    my $folderUrl  = join '/', $self->getUrl, $folderName;
+    my $folderUrl  = $self->getFolderUrl($folderName);
     my $folder     = eval { WebGUI::Asset->newByUrl($session, $folderUrl); };
     return $folder if !Exception::Class->caught();
+
     ##The requested folder doesn't exist.  Make it and autocommit it.
 
     ##For a fully automatic commit, save the current tag, create a new one
@@ -331,6 +332,26 @@ sub getFolder {
     ##Get a new version of the asset from the db with the correct state
     $folder = $folder->cloneFromDb();
     return $folder;
+}
+
+#-------------------------------------------------------------------
+
+=head2 getFolderUrl ( name )
+
+Constructs a url for a subfolder with the given name.
+
+=cut
+
+sub getFolderUrl {
+    my ($self, $name) = @_;
+    my $session = $self->session;
+    my $base    = $self->getUrl;
+    $base       =~ s/(.*)\..*/$1/;
+    my $url     = "$base/$name";
+    if (my $ext = $session->setting->get('urlExtension')) {
+        $url .= ".$ext";
+    }
+    return $session->url->urlize($url);
 }
 
 #-------------------------------------------------------------------

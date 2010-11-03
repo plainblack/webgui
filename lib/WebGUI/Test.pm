@@ -40,8 +40,8 @@ use List::MoreUtils qw(any);
 use File::Copy ();
 use File::Temp ();
 use Try::Tiny;
+use Monkey::Patch       qw( patch_object );
 use Scope::Guard;
-use Try::Tiny;
 use WebGUI::Paths -inc;
 use namespace::clean;
 
@@ -533,6 +533,26 @@ sub originalConfig {
         });
     }
     $originalConfig{$param} = $safeValue;
+}
+
+#----------------------------------------------------------------------------
+
+#----------------------------------------------------------------------------
+
+=head2 overrideSetting (name, val)
+
+Overrides WebGUI::Test->session->setting->get($name) to return $val until the
+handle this method returns goes out of scope.
+
+=cut
+
+sub overrideSetting {
+    my ($class, $name, $val) = @_;
+    patch_object $class->session->setting => get => sub {
+        my $get = shift;
+        return $val if $_[1] eq $name;
+        goto &$get;
+    };
 }
 
 #----------------------------------------------------------------------------

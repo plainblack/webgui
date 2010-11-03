@@ -762,7 +762,7 @@ ENDHTML
                 . $i18n->get( "warning default template" )
                 . q{</p><p>}
                 . sprintf( q{<a href="} . $duplicateUrl . q{">%s</a>}, $i18n->get( "make duplicate label" ) )
-                . q{</p></div}
+                . q{</p></div>}
                 ;
     }
     

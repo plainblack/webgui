@@ -2,13 +2,13 @@
 <rss version="2.0">
 <channel>
     <title>PM captur&#xF3; a tres delincuentes que robaron agencia bancaria en San Mart&#xED;n</title>
-    <link>http://www.vtv.gob.ve/rss-noticias-nacionales</link>
+    <link>http://ejemplo.local/rss-noticias-locales</link>
     <description>RSS Noticias Nacionales</description>
     <language>es</language>
     <item>
         <title>PM captur&#xF3; a tres delincuentes que robaron agencia bancaria en San Mart&#xED;n</title>
-        <link>http://www.vtv.gob.ve/noticias-nacionales/25087</link>
-        <description>&lt;p&gt;Efectivos de la Polic&#xED;a Metropolitana (PM) de Caracas capturaron, este lunes en horas de la ma&#xF1;ana, a tres delincuentes implicados en el robo perpetrado en el Banco Industrial de Venezuela (BIV) ubicado dentro de la oficina del Instituto Postal Telegr&#xE1;fico de Venezuela, Ipostel, en la avenida Jos&#xE9; &#xC1;ngel Lamas, San Mart&#xED;n.&lt;/p&gt;</description>
+        <link>http://ejemplo.local/noticias-locales/99999</link>
+        <description>&lt;p&gt;Efectivos de la Polic&#xED;a Metropolitana (PM) capturaron, este lunes en horas de la ma&#xF1;ana, a tres delincuentes implicados en un robo.</description>
         <pubDate>Mon, 19 Oct 2009 15:42:17 -0400</pubDate>
     </item>
 </channel>

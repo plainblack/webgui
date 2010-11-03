@@ -142,4 +142,13 @@ is ($event7->get('startDate'), '2000-09-01', 'startDate bumped by 1 day');
 is ($event7->get('endTime'), '00:00:00',   'endTime set to 00:00:00 if the hour is more than 23');
 is ($event7->get('endDate'), '2000-09-02', 'endDate bumped by 1 day');
 
+#######################################
+#
+# duplicate
+#
+#######################################
+
+
+my $event6b = $event6->duplicate();
+isnt($event6b->get('storageId'), $event6->get('storageId'), 'duplicating an asset creates a new storage location');
 done_testing;

@@ -38,6 +38,23 @@ These methods are available from this class:
 
 =cut
 
+#-------------------------------------------------------------------
+
+=head2 autoCommitUrl ( $base )
+
+Returns the url autoCommitWorkingIfEnabled would redirect to if it were going
+to.
+
+=cut
+
+sub autoCommitUrl {
+    my $self    = shift;
+    my $session = $self->session;
+    my $url     = $session->url;
+    my $base    = shift || $url->page;
+    my $id      = $self->getId;
+    return $url->append($base, "op=commitVersionTag;tagId=$id");
+}
 
 #-------------------------------------------------------------------
 
@@ -76,30 +93,36 @@ sub autoCommitWorkingIfEnabled {
     return undef
         unless $versionTag;
 
-    #Auto commit is no longer determined from autoRequestCommit
-
-    # auto commit assets
-    # save and commit button and site wide auto commit work the same
-    # Do not auto commit if tag is system wide tag or tag belongs to someone else
-    if (
-        $options->{override}
-      || ( $class->getVersionTagMode($session) eq q{autoCommit}
-        && ! $versionTag->get(q{isSiteWide})
-        && $versionTag->get(q{createdBy}) eq $session->user()->userId()
-         )
-    ) {
+    if ($options->{override} || $versionTag->canAutoCommit) {
         if ($session->setting->get("skipCommitComments") || !$options->{allowComments}) {
             $versionTag->requestCommit;
             return 'commit';
         }
         else {
-            my $url = $options->{returnUrl} || $session->url->page;
-            $url = $session->url->append($url, "op=commitVersionTag;tagId=" . $versionTag->getId);
+            my $url = $versionTag->autoCommitUrl($options->{returnUrl});
             $session->http->setRedirect($url);
             return 'redirect';
         }
     }
     return undef;
+}
+
+#-------------------------------------------------------------------
+
+=head2 canAutoCommit
+
+Returns true if we would autocommit this tag without an override.
+
+=cut
+
+sub canAutoCommit {
+    my $self    = shift;
+    my $session = $self->session;
+    my $class   = ref $self;
+    my $mode    = $class->getVersionTagMode($session);
+    return $mode eq 'autoCommit'
+        && !$self->get('isSiteWide')
+        && $self->get('createdBy') eq $session->user->userId;
 }
 
 #-------------------------------------------------------------------

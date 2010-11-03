@@ -22,6 +22,9 @@ use WebGUI::VersionTag;
 use WebGUI::HTMLForm;
 use WebGUI::Paginator;
 use Tie::IxHash;
+use WebGUI::Fork;
+use Monkey::Patch;
+use JSON;
 
 =head1 NAME
 
@@ -137,6 +140,50 @@ sub getVersionTagOptions {
 
     return %tag;
 }
+
+#----------------------------------------------------------------------------
+
+=head2 rollbackInFork ($process, $tagId)
+
+WebGUI::Fork method called by www_rollbackVersionTag
+
+=cut
+
+sub rollbackInFork {
+    my ( $process, $tagId ) = @_;
+    my $session = $process->session;
+    my $tag = WebGUI::VersionTag->new( $session, $tagId );
+    my %status = (
+        finished => 0,
+        total    => $process->session->db->quickScalar( 'SELECT count(*) FROM assetData WHERE tagId = ?', [$tagId] ),
+        message  => '',
+    );
+    my $update = sub {
+        $process->update( sub { JSON::encode_json( \%status ) } );
+    };
+    my $patch = Monkey::Patch::patch_class(
+        'WebGUI::Asset',
+        'purgeRevision',
+        sub {
+            my $purgeRevision = shift;
+            my $self          = shift;
+            $self->$purgeRevision(@_);
+            $status{finished}++;
+            $update->();
+        }
+    );
+    $tag->rollback( {
+            outputSub => sub {
+                $status{message} = shift;
+                $update->();
+            }
+        }
+    );
+
+    # need to get at least one of these in for the degenerate case of no
+    # revisions in tag
+    $update->();
+} ## end sub rollbackInFork
 
 #-------------------------------------------------------------------
 
@@ -656,8 +703,9 @@ sub www_manageRevisionsInTag {
 
     # Process any actions
     my $action     = lc $session->form->get('action');
+    my $form       = $session->form;
     my $validToken = $session->form->validToken;
-    if ( $action eq "purge" && $validToken) {
+    if ( $form->get('purge') && $validToken) {
         # Purge these revisions
         my @assetInfo       = $session->form->get('assetInfo'); 
         for my $assetInfo ( @assetInfo ) {
@@ -672,7 +720,7 @@ sub www_manageRevisionsInTag {
             return www_manageVersions( $session );
         }
     }
-    elsif ( $action eq "move to:" && $validToken) {
+    elsif ( $form->get('moveto') && $validToken) {
         # Get the new version tag
         my $moveToTagId = $session->form->get('moveToTagId');
         my $moveToTag;
@@ -700,7 +748,7 @@ sub www_manageRevisionsInTag {
             return www_manageVersions( $session );
         }
     }
-    elsif ( $action eq "update version tag" && $validToken) {
+    elsif ( $form->get('update') && $validToken) {
         my $startTime = WebGUI::DateTime->new($session,$session->form->process("startTime","dateTime"))->toDatabase;
         my $endTime   = WebGUI::DateTime->new($session,$session->form->process("endTime","dateTime"))->toDatabase;
         
@@ -786,19 +834,19 @@ sub www_manageRevisionsInTag {
             value => WebGUI::DateTime->new($session,$filterEndTime)->epoch,
         })
         . '<br />'
-        . '<input type="submit" name="action" value="'. $i18n->get('manageRevisionsInTag update') . '" />'
+        . '<input type="submit" name="update" value="'. $i18n->get('manageRevisionsInTag update') . '" />'
         . '</td>'
         . '</tr>'
         . '<tr><td colspan="5">&nbsp;</td></tr>'
         . '<tr>'
         . '<td colspan="5">'
         . $i18n->get("manageRevisionsInTag with selected")
-        . '<input type="submit" name="action" value="'. $i18n->get("manageRevisionsInTag move")  . '" />'
+        . '<input type="submit" name="moveto" value="'. $i18n->get("manageRevisionsInTag move")  . '" />'
         . WebGUI::Form::SelectBox( $session, {
             name        => 'moveToTagId',
             options     => \%moveToTagOptions,
         } )
-        . '&nbsp;<input type="submit" name="action" value="'. $i18n->get('manageRevisionsInTag purge') . '" class="red" />'
+        . '&nbsp;<input type="submit" name="purge" value="'. $i18n->get('manageRevisionsInTag purge') . '" class="red" />'
         . '</td>'
         . '</tr>'
         . '<tr>'
@@ -854,16 +902,27 @@ sub www_rollbackVersionTag {
 	return $session->privilege->adminOnly() unless canView($session);
 	my $tagId = $session->form->process("tagId");
 	return $session->privilege->vitalComponent() if ($tagId eq "pbversion0000000000001");
-    my $pb      = WebGUI::ProgressBar->new($session);
-    my $i18n    = WebGUI::International->new($session, 'VersionTag');
-    $pb->start($i18n->get('rollback version tag'), $session->url->extras('adminConsole/versionTags.gif'));
-	if ($tagId) {
-		my $tag = WebGUI::VersionTag->new($session, $tagId);
-		$tag->rollback({ outputSub => sub { $pb->update(@_) }, }) if defined $tag;
-	}
+
+    my $process = WebGUI::Fork->start(
+        $session, 'WebGUI::Operation::VersionTag', 'rollbackInFork', $tagId
+    );
+
+    my $i18n = WebGUI::International->new($session, 'VersionTag');
 	my $method = $session->form->process("proceed");
     $method    = $method eq "manageCommittedVersions" ? $method : 'manageVersions';
-    $pb->finish(WebGUI::Asset->getDefault($session)->getUrl('op='.$method));
+    my $redir = WebGUI::Asset->getDefault($session)->getUrl("op=$method");
+    $session->http->setRedirect(
+        $session->url->page(
+            $process->contentPairs(
+                'ProgressBar', {
+                    icon    => 'versions',
+                    title   => $i18n->get('rollback version tag'),
+                    proceed => $redir,
+                }
+            )
+        )
+    );
+    return 'redirect';
 }
 
 

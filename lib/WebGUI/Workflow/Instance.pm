@@ -101,11 +101,22 @@ A boolean, that if true will not notify Spectre of the delete.
 =cut
 
 sub delete {
-	my $self = shift;
+	my $self       = shift;
+    my $session    = $self->session;
 	my $skipNotify = shift;
-	$self->session->db->write("delete from WorkflowInstanceScratch where instanceId=?",[$self->getId]);
-	$self->session->db->deleteRow("WorkflowInstance","instanceId",$self->getId);
-	WebGUI::Workflow::Spectre->new($self->session)->notify("workflow/deleteInstance",$self->getId) unless ($skipNotify);
+
+    if ( $self->hasNextActivity ) {
+        #We are deleting in the middle of a workflow - Get the current activity and call the cleanup routine
+        my $activity = $self->getNextActivity;
+        eval { $activity->cleanup($self) };
+        if ($@) {
+            $session->errorHandler->error("Caught exception executing cleanup routine which was not run on workflow activity ".$activity->getId." for instance ".$self->getId.".  The following error was reported: ".$@);
+        }
+    }
+
+	$session->db->write("delete from WorkflowInstanceScratch where instanceId=?",[$self->getId]);
+	$session->db->deleteRow("WorkflowInstance","instanceId",$self->getId);
+	WebGUI::Workflow::Spectre->new($session)->notify("workflow/deleteInstance",$self->getId) unless ($skipNotify);
 
 	# We will need to remember that we were deleted if we get realtime-run
 	# during start().
