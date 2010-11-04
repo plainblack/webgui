@@ -31,7 +31,7 @@ define tableName => 'some_crud_table';
 define tableKey  => 'id';
 
 has id => (
-    is => 'ro',
+    is      => 'ro',
 );
 
 package main;
@@ -81,7 +81,8 @@ is($record2->get('id'),'theshawshankredemption',"custom id works");
 $record2->delete;
 
 # instanciation
-my $record2 = WebGUI::Cruddy->new($session);
+$record2 = WebGUI::Cruddy->new($session);
+$record2->write;
 isnt($record1->getId, $record2->getId, "can retrieve unique rows");
 my $copyOfRecord2 = WebGUI::Cruddy->new($session, $record2->getId);
 is($record2->getId, $copyOfRecord2->getId, "can reinstanciate record");
