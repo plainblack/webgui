@@ -85,13 +85,15 @@ $session->user({ userId => 3 });
 isa_ok(
     WebGUI::Operation::Auth::getInstance( $session ),
     'WebGUI::Auth::WebGUI',
-    'AuthType is defined by the logged-in user',
+    'AuthType is defined by the logged-in user, despite being in request',
 );
 
 #----------------------------------------------------------------------------
 # Test the web method for auth operation
 # First a clean session, without an authenticated user
 $session->user({ userId => 1 });
+$session->request->setup_body({});
+
 my $output = WebGUI::Operation::Auth::www_auth($session);
 like(
     $output,

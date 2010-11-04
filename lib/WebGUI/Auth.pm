@@ -1102,7 +1102,7 @@ sub www_displayLogin {
     my $self = shift;
     my $method = $_[0] || "login";
     my $vars = $_[1];
-        print "Auth->www_displayLogin\n";
+
     # Automatically set redirectAfterLogin unless we've linked here directly
     # or it's already been set to perform another operation
     unless (
@@ -1288,7 +1288,7 @@ Override this method in your subclass to change the initialization for custom au
 
 sub www_view {
 	my $self = shift;
-	return $self->displayLogin;
+	return $self->www_displayLogin;
 }
 
 deprecate init => 'www_view';

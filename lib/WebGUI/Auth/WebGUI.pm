@@ -773,7 +773,6 @@ The initial login screen an unauthenticated user sees
 sub www_displayLogin {
    	my $self = shift;
    	my $vars;
-        print "WebGUI->www_displayLogin\n";
    	return $self->www_displayAccount($_[0]) if ($self->isRegistered);
     my $i18n = WebGUI::International->new($self->session);
    	$vars->{'login.message'}             = '<ul>'.$_[0].'</ul>' if ($_[0]);

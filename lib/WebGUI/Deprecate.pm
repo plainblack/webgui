@@ -33,19 +33,33 @@ sub deprecate ($$) {
     my $package = caller;
     no strict 'refs';
     no warnings 'redefine';
-    *{"$package\::$old_method"} = \&{"$package\::$new_method"};
-    my $proxy_method = sub {
-        my $self = $_[0];
-        my $sub = $self->can($old_method);
-        my $class = ref $self || $self;
-        if ($sub ne \&{"$package\::$old_method"}) {
-            my $message = "$class contains the method $old_method.  This has been deprecated and replaced with $new_method.";
-            warn $message unless $warned{$message}++;
-            $self->$new_method( @_ );
-        }
-        goto $sub;
+
+    my %deep;
+    # keep a copy since it will be replaced
+    my $new_sub = \&{"$package\::$new_method"};
+    # call new method instead.  if 
+    *{"$package\::$old_method"} = sub {
+        my $self = shift;
+        my $message = "$package\::$old_method is deprecated and should be replaced with $new_method at " . join( "-", (caller(0))[0,2] );
+        warn $message
+            unless $warned{$message}++;
+
+        local $deep{1} = 1;
+        $self->$new_method(@_);
     };
-    *{"$package\::$new_method"} = $proxy_method;
+    *{"$package\::$new_method"} = sub {
+        my $self = $_[0];
+        if (!$deep{1}) {
+            my $old_sub = $self->can($old_method);
+            if ($old_sub ne \&{"$package\::$old_method"}) {
+                my $message = "Subclass of $package uses deprecated method $old_method, which should be replaced with $new_method";
+                carp $message
+                    unless $warned{$message}++;
+                goto $old_sub;
+            }
+        }
+        goto $new_sub;
+    };
 }
 
 1;

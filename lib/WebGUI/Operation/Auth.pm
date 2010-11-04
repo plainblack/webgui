@@ -73,7 +73,7 @@ sub www_auth {
 	my $auth;
 	($auth) = $session->db->quickArray("select authMethod from users where username=".$session->db->quote($session->form->process("username"))) if($session->form->process("username"));
 	my $authMethod = getInstance($session,$auth);
-	my $methodCall = shift || $session->form->process("method") || "init";
+	my $methodCall = shift || $session->form->process("method") || "view";
 	if(!$authMethod->isCallable($methodCall)){
 		$session->log->security("access uncallable auth method: $methodCall");
 		my $i18n = WebGUI::International->new($session);
