@@ -107,7 +107,7 @@ EOJS
 
             if ( ref $helper eq 'HASH' ) {
                 # Process the output as JSON
-                $text .= sprintf 'parent.admin.processHelper( %s );', JSON->new->encode( $helper );
+                $text .= sprintf 'parent.admin.processPlugin( %s );', JSON->new->encode( $helper );
             }
 
             # Close dialog last so that script above runs!
