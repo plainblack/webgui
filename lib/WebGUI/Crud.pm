@@ -25,15 +25,16 @@ use Clone qw/clone/;
 use WebGUI::DateTime;
 use WebGUI::Exception;
 
-define tableName => 'unamed_crud_table';
-define tableKey  => 'id';
-
 has session => (
     is       => 'ro',
     required => 1,
 );
 
 has lastUpdated => (
+    is       => 'rw',
+);
+
+has dateCreated => (
     is       => 'rw',
 );
 
@@ -56,10 +57,9 @@ around BUILDARGS => sub {
     }
 
     my $identifier = shift;
-    if(ref $_[0] eq 'HASH') {
+    if(!defined($identifier) || ref $identifier eq 'HASH') {
         ##Creating a new object
-        my $data    = shift;
-        my $options = shift;
+        my $data      = $identifier;
         my $tableKey  = $class->meta->tableKey();
         my $tableName = $class->meta->tableName();
         my $db        = $session->db;
@@ -76,10 +76,11 @@ around BUILDARGS => sub {
         $sequenceNumber++;
 
         my $now = WebGUI::DateTime->new($session, time())->toDatabase;
+        $data->{dateCreated}    = $now;
         $data->{lastUpdated}    = $now;
         $data->{session}        = $session;
         $data->{sequenceNumber} = $sequenceNumber;
-        $data->{$tableKey}      = $options->{id} || $session->id->generate;
+        $data->{$tableKey}      = $data->{id} || $session->id->generate;
 
         return $class->$orig($data);
     }
@@ -200,14 +201,6 @@ A reference to a WebGUI::Session or an object that has a session method. If it's
 =head3 properties
 
 The properties that you wish to create this object with. Note that if this object has a sequenceKey then that sequence key must be specified in these properties or it will throw an execption. See crud_definition() for a list of all the properties.
-
-=head3 options
-
-A hash reference of creation options.
-
-=head4 id
-
-A guid. Use this to force the row's table key to a specific ID.
 
 =cut
 
@@ -460,26 +453,20 @@ sub crud_updateTable {
 	}
 
 	# update existing and create new fields
-	my @property_names = $class->meta->get_all_properties_list($session);
+	my @property_names = $class->meta->get_all_property_list($session);
 	foreach my $property_name (@property_names) {
-        my $property = $class->meta->find_attribute_by_name($property_name);
-		my $control = WebGUI::Form::DynamicField->new( $session, %{ $properties->{ $property } });
-		my $fieldType = $control->getDatabaseFieldType;
-		my $isKey = $properties->{$property}{isQueryKey};
-		my $default =  $properties->{$property}{default};
-        if ($properties->{$property}{serialize}) {
-            $default = JSON->new->canonical->encode($default);
-        }
-		my $notNullClause = ($isKey || $default ne "") ? "not null" : "";
-		my $defaultClause = '';
-        if ($fieldType !~ /(?:text|blob)$/i) {
-            $defaultClause = "default ".$dbh->quote($default) if ($default ne "");
-        }
-		if (exists $tableFields{$property}) {
+        my $property        = $class->meta->find_attribute_by_name($property_name);
+        my $form_properties = $property->form;
+		my $control         = WebGUI::Form::DynamicField->new( $session, fieldType => $form_properties->fieldType,);
+		my $fieldType       = $control->getDatabaseFieldType;
+		my $isKey           = $property->isQueryKey;
+        my $default         = $property->default;
+		my $notNullClause   = ($isKey || $default ne "") ? "not null" : "";
+		if (exists $tableFields{$property_name}) {
 			my $changed = 0;
 			
 			# parse database table field type
-			$tableFields{$property}{type} =~ m/^(\w+)(\([\d\s,]+\))?$/;
+			$tableFields{$property_name}{type} =~ m/^(\w+)(\([\d\s,]+\))?$/;
 			my ($tableFieldType, $tableFieldLength) = ($1, $2);
 			
 			# parse form field type
@@ -489,21 +476,21 @@ sub crud_updateTable {
 			# compare table parts to definition
 			$changed = 1 if ($tableFieldType ne $formFieldType);
 			$changed = 1 if ($tableFieldLength ne $formFieldLength);
-			$changed = 1 if ($tableFields{$property}{null} eq "YES" && $isKey);
-			$changed = 1 if ($tableFields{$property}{default} ne $default);
+			$changed = 1 if ($tableFields{$property_name}{null} eq "YES" && $isKey);
+			$changed = 1 if ($tableFields{$property_name}{default} ne $default);
 
 			# modify if necessary
 			if ($changed) {
-				$db->write("alter table $tableName change column ".$dbh->quote_identifier($property)." ".$dbh->quote_identifier($property)." $fieldType $notNullClause $defaultClause");
+				$db->write("alter table $tableName change column ".$dbh->quote_identifier($property_name)." ".$dbh->quote_identifier($property_name)." $fieldType $notNullClause");
 			}
 		}
 		else {
-			$db->write("alter table $tableName add column ".$dbh->quote_identifier($property)." $fieldType $notNullClause $defaultClause");
+			$db->write("alter table $tableName add column ".$dbh->quote_identifier($property_name)." $fieldType $notNullClause");
 		}
 		if ($isKey && !$tableFields{$property}{key}) {
-			$db->write("alter table $tableName add index ".$dbh->quote_identifier($property)." (".$dbh->quote_identifier($property).")");
+			$db->write("alter table $tableName add index ".$dbh->quote_identifier($property_name)." (".$dbh->quote_identifier($property_name).")");
 		}
-		delete $tableFields{$property};
+		delete $tableFields{$property_name};
 	}
 
 	# delete fields that are no longer in the definition
@@ -846,7 +833,7 @@ sub reorder {
 	my $tableKey         = $self->meta->tableKey;
 	my $tableName        = $self->meta->tableName;
 	my $sequenceKey      = $self->meta->sequenceKey;
-	my $sequenceKeyValue = $self->$sequenceKey;
+	my $sequenceKeyValue = $sequenceKey ? $self->$sequenceKey : '';
 	my $i   = 1;
 	my $db  = $self->session->db;
 	my $dbh = $db->dbh;

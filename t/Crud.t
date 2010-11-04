@@ -16,7 +16,25 @@ use strict;
 use Test::More;
 use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
-use WebGUI::Crud;
+
+BEGIN {
+    $INC{'WebGUI/Cruddy.pm'} = __FILE__;
+}
+
+package WebGUI::Cruddy;
+
+use Moose;
+use WebGUI::Definition::Crud;
+extends 'WebGUI::Crud';
+
+define tableName => 'some_crud_table';
+define tableKey  => 'id';
+
+has id => (
+    is => 'ro',
+);
+
+package main;
 
 #----------------------------------------------------------------------------
 # Init
@@ -31,9 +49,9 @@ plan tests => 55;        # Increment this number for each test you create
 #----------------------------------------------------------------------------
 
 # check table structure
-WebGUI::Crud->crud_createTable($session);
-WebGUI::Test->addToCleanup(sub { WebGUI::Crud->crud_dropTable($session); });
-my $sth = $session->db->read("describe unnamed_crud_table");
+WebGUI::Cruddy->crud_createTable($session);
+WebGUI::Test->addToCleanup(sub { WebGUI::Cruddy->crud_dropTable($session); });
+my $sth = $session->db->read("describe some_crud_table");
 my ($col, $type) = $sth->array();
 is($col, 'id', "structure: id name");
 is($type, 'char(22)', "structure: id type");
@@ -49,7 +67,7 @@ is($type, 'datetime', "structure: lastUpdated type");
 $sth->finish;
 
 # check data
-my $record1 = WebGUI::Crud->create($session);
+my $record1 = WebGUI::Cruddy->new($session);
 isa_ok($record1, "WebGUI::Crud", "isa WebGUI::Crud");
 like($record1->get('dateCreated'), qr/\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}/, "dateCreated looks like a date");
 like($record1->get('lastUpdated'), qr/\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}/, "lastUpdated looks like a date");
@@ -58,21 +76,21 @@ is($record1->get('sequenceNumber'), 1, "record 1 sequenceNumber is 1");
 like($record1->get('id'), qr/[A-Za-z0-9_-]{22}/, "id looks like a guid");
 
 # custom id
-my $record2 = WebGUI::Crud->create($session,{},{id=>'theshawshankredemption'});
+my $record2 = WebGUI::Cruddy->new($session, {id=>'theshawshankredemption'});
 is($record2->get('id'),'theshawshankredemption',"custom id works");
 $record2->delete;
 
 # instanciation
-my $record2 = WebGUI::Crud->create($session);
+my $record2 = WebGUI::Cruddy->new($session);
 isnt($record1->getId, $record2->getId, "can retrieve unique rows");
-my $copyOfRecord2 = WebGUI::Crud->new($session, $record2->getId);
+my $copyOfRecord2 = WebGUI::Cruddy->new($session, $record2->getId);
 is($record2->getId, $copyOfRecord2->getId, "can reinstanciate record");
 
 # sequencing
 is($record2->get('sequenceNumber'), 2, "record 1 sequenceNumber is 2");
-my $record3 = WebGUI::Crud->create($session);
+my $record3 = WebGUI::Cruddy->create($session);
 is($record3->get('sequenceNumber'), 3, "record 1 sequenceNumber is 3");
-my $record4 = WebGUI::Crud->create($session);
+my $record4 = WebGUI::Cruddy->create($session);
 is($record4->get('sequenceNumber'), 4, "record 1 sequenceNumber is 4");
 ok($record4->demote, "demotion reports success");
 is($record4->get('sequenceNumber'), 4, "can't demote further than end");
@@ -93,8 +111,8 @@ is($record2->get('sequenceNumber'), 2, "promotion from middle works");
 
 # deleting
 ok($record2->delete, "deletion reports success");
-my $copyOfRecord3 = WebGUI::Crud->new($session, $record3->getId);
-my $copyOfRecord4 = WebGUI::Crud->new($session, $record4->getId);
+my $copyOfRecord3 = WebGUI::Cruddy->new($session, $record3->getId);
+my $copyOfRecord4 = WebGUI::Cruddy->new($session, $record4->getId);
 is($copyOfRecord3->get('sequenceNumber'), '2', "deletion of record 2 moved record 3 to sequence 2");
 is($copyOfRecord4->get('sequenceNumber'), '3', "deletion of record 2 moved record 4 to sequence 3");
 
@@ -104,38 +122,38 @@ ok($copyOfRecord4->update, "update returns success");
 isnt($copyOfRecord4->get('lastUpdated'), $copyOfRecord4->get('dateCreated'), "updates work");
 
 # retrieve data
-my ($sql, $params) = WebGUI::Crud->getAllSql($session);
-is($sql, "select `unnamed_crud_table`.`id` from `unnamed_crud_table` order by `unnamed_crud_table`.`sequenceNumber`", "getAllSql() SQL no options");
-($sql, $params) = WebGUI::Crud->getAllSql($session, {sequenceKeyValue=>1});
-is($sql, "select `unnamed_crud_table`.`id` from `unnamed_crud_table` order by `unnamed_crud_table`.`sequenceNumber`", "getAllSql() SQL sequence key value with no key specified");
+my ($sql, $params) = WebGUI::Cruddy->getAllSql($session);
+is($sql, "select `some_crud_table`.`id` from `some_crud_table` order by `some_crud_table`.`sequenceNumber`", "getAllSql() SQL no options");
+($sql, $params) = WebGUI::Cruddy->getAllSql($session, {sequenceKeyValue=>1});
+is($sql, "select `some_crud_table`.`id` from `some_crud_table` order by `some_crud_table`.`sequenceNumber`", "getAllSql() SQL sequence key value with no key specified");
 is($params->[0], undef, "getAllSql() PARAMS sequence key value with no key specified");
-($sql, $params) = WebGUI::Crud->getAllSql($session, {limit=>5});
-is($sql, "select `unnamed_crud_table`.`id` from `unnamed_crud_table` order by `unnamed_crud_table`.`sequenceNumber` limit 5", "getAllSql() SQL with a row limit");
-($sql, $params) = WebGUI::Crud->getAllSql($session,{limit=>[10,20]});
-is($sql, "select `unnamed_crud_table`.`id` from `unnamed_crud_table` order by `unnamed_crud_table`.`sequenceNumber` limit 10,20", "getAllSql() SQL with a start and row limit");
-($sql, $params) = WebGUI::Crud->getAllSql($session,{orderBy=>'lastUpdated'});
-is($sql, "select `unnamed_crud_table`.`id` from `unnamed_crud_table` order by lastUpdated", "getAllSql() with a custom order by clause");
-($sql, $params) = WebGUI::Crud->getAllSql($session,{join=>['someTable using (someId)']});
-is($sql, "select `unnamed_crud_table`.`id` from `unnamed_crud_table` left join someTable using (someId) order by `unnamed_crud_table`.`sequenceNumber`", "getAllSql() with a custom join");
-($sql, $params) = WebGUI::Crud->getAllSql($session,{joinUsing=>[{myTable => 'myId'}]});
-is($sql, "select `unnamed_crud_table`.`id` from `unnamed_crud_table` left join `myTable` using (`myId`) order by `unnamed_crud_table`.`sequenceNumber`", "getAllSql() with a custom joinUsing");
-($sql, $params) = WebGUI::Crud->getAllSql($session,{constraints=>[{'sequenceNumber=?'=>1}]});
-is($sql, "select `unnamed_crud_table`.`id` from `unnamed_crud_table` where (sequenceNumber=?) order by `unnamed_crud_table`.`sequenceNumber`", "getAllSql() SQL with a constraint");
+($sql, $params) = WebGUI::Cruddy->getAllSql($session, {limit=>5});
+is($sql, "select `some_crud_table`.`id` from `some_crud_table` order by `some_crud_table`.`sequenceNumber` limit 5", "getAllSql() SQL with a row limit");
+($sql, $params) = WebGUI::Cruddy->getAllSql($session,{limit=>[10,20]});
+is($sql, "select `some_crud_table`.`id` from `some_crud_table` order by `some_crud_table`.`sequenceNumber` limit 10,20", "getAllSql() SQL with a start and row limit");
+($sql, $params) = WebGUI::Cruddy->getAllSql($session,{orderBy=>'lastUpdated'});
+is($sql, "select `some_crud_table`.`id` from `some_crud_table` order by lastUpdated", "getAllSql() with a custom order by clause");
+($sql, $params) = WebGUI::Cruddy->getAllSql($session,{join=>['someTable using (someId)']});
+is($sql, "select `some_crud_table`.`id` from `some_crud_table` left join someTable using (someId) order by `some_crud_table`.`sequenceNumber`", "getAllSql() with a custom join");
+($sql, $params) = WebGUI::Cruddy->getAllSql($session,{joinUsing=>[{myTable => 'myId'}]});
+is($sql, "select `some_crud_table`.`id` from `some_crud_table` left join `myTable` using (`myId`) order by `some_crud_table`.`sequenceNumber`", "getAllSql() with a custom joinUsing");
+($sql, $params) = WebGUI::Cruddy->getAllSql($session,{constraints=>[{'sequenceNumber=?'=>1}]});
+is($sql, "select `some_crud_table`.`id` from `some_crud_table` where (sequenceNumber=?) order by `some_crud_table`.`sequenceNumber`", "getAllSql() SQL with a constraint");
 is($params->[0], 1, "getAllSql PARAMS with a constraint");
-($sql, $params) = WebGUI::Crud->getAllSql($session,{constraints=>[{'sequenceNumber=? or sequenceNumber=?'=>[1,2]}]});
-is($sql, "select `unnamed_crud_table`.`id` from `unnamed_crud_table` where (sequenceNumber=? or sequenceNumber=?) order by `unnamed_crud_table`.`sequenceNumber`", "getAllSql() SQL with two constraints");
+($sql, $params) = WebGUI::Cruddy->getAllSql($session,{constraints=>[{'sequenceNumber=? or sequenceNumber=?'=>[1,2]}]});
+is($sql, "select `some_crud_table`.`id` from `some_crud_table` where (sequenceNumber=? or sequenceNumber=?) order by `some_crud_table`.`sequenceNumber`", "getAllSql() SQL with two constraints");
 is($params->[1], 2, "getAllSql PARAMS with two constraints");
-is(scalar(@{WebGUI::Crud->getAllIds($session)}), 3, "getAllIds()");
-my $iterator = WebGUI::Crud->getAllIterator($session);
+is(scalar(@{WebGUI::Cruddy->getAllIds($session)}), 3, "getAllIds()");
+my $iterator = WebGUI::Cruddy->getAllIterator($session);
 while (my $object = $iterator->()) {
-	isa_ok($object, 'WebGUI::Crud', 'Put your trust in the Lord. Your ass belongs to me.');
+	isa_ok($object, 'WebGUI::Cruddy', 'Put your trust in the Lord. Your ass belongs to me.');
 }
 
 
 #crud management stuff
-is(ref WebGUI::Crud->crud_getProperties($session), 'HASH', 'properties work');
-is(WebGUI::Crud->crud_getTableKey($session), 'id', 'default key is id');
-is(WebGUI::Crud->crud_getTableName($session), 'unnamed_crud_table', 'default table is unnamed_crud_table');
-is(WebGUI::Crud->crud_getSequenceKey($session), '', 'default sequence key is blank');
+is(ref WebGUI::Cruddy->crud_getProperties($session), 'HASH', 'properties work');
+is(WebGUI::Cruddy->crud_getTableKey($session), 'id', 'default key is id');
+is(WebGUI::Cruddy->crud_getTableName($session), 'some_crud_table', 'default table is some_crud_table');
+is(WebGUI::Cruddy->crud_getSequenceKey($session), '', 'default sequence key is blank');
 
 #vim:ft=perl
