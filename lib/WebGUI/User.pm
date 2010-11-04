@@ -24,6 +24,7 @@ use WebGUI::Inbox;
 use Scalar::Util qw( weaken );
 use Net::CIDR::Lite;
 use WebGUI::Friends;
+use WebGUI::Deprecate;
 use Carp qw( carp );
 
 =head1 NAME
