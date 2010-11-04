@@ -25,6 +25,9 @@ use Clone qw/clone/;
 use WebGUI::DateTime;
 use WebGUI::Exception;
 
+define tableName => 'unamed_crud_table';
+define tableKey  => 'id';
+
 has session => (
     is       => 'ro',
     required => 1,
@@ -247,7 +250,7 @@ sub crud_createTable {
 	my $tableName = $class->meta->tableName();
 	$class->crud_dropTable($session);
 	$db->write('create table '.$dbh->quote_identifier($tableName).' (
-		'.$dbh->quote_identifier($class->meta->tableKey($session)).' CHAR(22) binary not null primary key,
+		'.$dbh->quote_identifier($class->meta->tableKey()).' CHAR(22) binary not null primary key,
 		sequenceNumber int not null default 1,
 		dateCreated datetime,
 		lastUpdated datetime
@@ -446,8 +449,6 @@ sub crud_updateTable {
 	my %tableFields = ();
 	my $sth = $db->read("DESCRIBE ".$tableName);
 	my $tableKey = $class->meta->tableKey();
-    use Data::Dumper;
-    warn Dumper ($tableKey);
 	while (my ($col, $type, $null, $key, $default) = $sth->array) {
 		next if ($col ~~ [$tableKey, 'lastUpdated', 'dateCreated','sequenceNumber']);
 		$tableFields{$col} = {
@@ -459,8 +460,9 @@ sub crud_updateTable {
 	}
 
 	# update existing and create new fields
-	my $properties = $class->meta->get_all_property_list($session);
-	foreach my $property (keys %{$properties}) {
+	my @property_names = $class->meta->get_all_properties_list($session);
+	foreach my $property_name (@property_names) {
+        my $property = $class->meta->find_attribute_by_name($property_name);
 		my $control = WebGUI::Form::DynamicField->new( $session, %{ $properties->{ $property } });
 		my $fieldType = $control->getDatabaseFieldType;
 		my $isKey = $properties->{$property}{isQueryKey};
