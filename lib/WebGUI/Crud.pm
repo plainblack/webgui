@@ -33,18 +33,18 @@ has session => (
 has lastUpdated => (
     is       => 'rw',
     lazy     => 1,
-    builder  => '_now';
+    builder  => '_now',
 );
 
 has dateCreated => (
     is       => 'rw',
     lazy     => 1,
-    builder  => '_now';
+    builder  => '_now',
 );
 
 sub _now {
     my $self = shift;
-    return WebGUI::DateTime->new($session)->toDatabase;
+    return WebGUI::DateTime->new($self->session)->toDatabase;
 }
 
 has sequenceNumber => (

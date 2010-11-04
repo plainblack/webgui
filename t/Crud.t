@@ -30,8 +30,11 @@ extends 'WebGUI::Crud';
 define tableName => 'some_crud_table';
 define tableKey  => 'id';
 
-has id => (
-    is      => 'ro',
+property id => (
+    required  => 1,
+    is        => 'ro',
+    label     => 'id',
+    fieldType => 'hidden',
 );
 
 package main;
@@ -68,6 +71,7 @@ $sth->finish;
 
 # check data
 my $record1 = WebGUI::Cruddy->new($session);
+can_ok($record1, 'id');
 isa_ok($record1, "WebGUI::Crud", "isa WebGUI::Crud");
 like($record1->get('dateCreated'), qr/\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}/, "dateCreated looks like a date");
 like($record1->get('lastUpdated'), qr/\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}/, "lastUpdated looks like a date");
