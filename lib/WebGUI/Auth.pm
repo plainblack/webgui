@@ -38,8 +38,8 @@ An abstract class for all authentication modules to extend.
 
 =head1 SYNOPSIS
 
- use WebGUI::Auth;
- our @ISA = qw(WebGUI::Auth);
+ package WebGUI::Auth::MyAuth;
+ use base 'WebGUI::Auth';
 
 =head1 METHODS
 
