@@ -1,4 +1,4 @@
-package WebGUI::Definition::Meta::Property::Asset;
+package WebGUI::Definition::Meta::Property::Crud;
 
 =head1 LEGAL
 
