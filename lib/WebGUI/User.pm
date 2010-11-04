@@ -24,6 +24,7 @@ use WebGUI::Inbox;
 use Scalar::Util qw( weaken );
 use Net::CIDR::Lite;
 use WebGUI::Friends;
+use Carp qw( carp );
 
 =head1 NAME
 
@@ -31,7 +32,8 @@ Package WebGUI::User
 
 =head1 DESCRIPTION
 
-This package provides an object-oriented way of managing WebGUI users as well as getting/setting a users's profile data.
+This package provides an object-oriented way of managing WebGUI users as well 
+as getting/setting a users's profile data.
 
 =head1 SYNOPSIS
 
@@ -206,6 +208,7 @@ Returns an instance of the authentication object for this user.
 
 # DEPRECATED. Remove in 9.0
 sub authInstance {
+    carp "WebGUI::User::authInstance is deprecated. Instantiate the auth method directly instead.";
     my $self    = shift;
     my $session = $self->session;
 
@@ -228,8 +231,6 @@ sub authInstance {
 #-------------------------------------------------------------------
 
 =head2 authMethod ( [ value ] )
-
-DEPRECATED! Use get("authMethod") and update({ authMethod => "value })
 
 Returns the authentication method for this user.
 
@@ -350,8 +351,6 @@ sub canViewField {
 #-------------------------------------------------------------------
 
 =head2 dateCreated ( )
-
-DEPRECATED! Use get("dateCreated") instead
 
 Returns the epoch for when this user was created.
 
@@ -1041,8 +1040,6 @@ sub karma {
 
 =head2 lastUpdated ( )
 
-DEPRECATED! Use get("lastUpdated")
-
 Returns the epoch for when this user was last modified.
 
 =cut
@@ -1192,7 +1189,9 @@ The value to set the profile field name to.
 
 =cut
 
+# DEPRECATED! Remove in 9.0
 sub profileField {
+    carp "WebGUI::User::profileField is deprecated. Use get() and update() instead\n";
     my $self        = shift;
     my $fieldName   = shift;
     my $value       = shift;
@@ -1238,8 +1237,6 @@ sub profileIsViewable {
 #-------------------------------------------------------------------
 
 =head2 referringAffiliate ( [ value ] )
-
-DEPRECATED! Use get("referringAffiliate") and update({ referringAffiliate => "value" })
 
 Returns the unique identifier of the affiliate that referred this user to the site. 
 
@@ -1313,8 +1310,6 @@ sub setProfileFieldPrivacySetting {
 
 =head2 status ( [ value ] )
 
-DEPRECATED! Use get("status") and enable() and disable() instead
-
 Returns the status of the user. 
 
 =head3 value
@@ -1360,8 +1355,8 @@ sub uncache {
 
 =head2 update ( properties )
 
-Update properties for the user. C<properties> is a hash reference of user properties
-and/or profile fields.
+Update properties for the user. C<properties> is a hash reference or a list of 
+name => value pairs of user properties and/or profile fields.
 
 Valid user properties:
 
@@ -1379,10 +1374,19 @@ Anything else is a profile field.
 =cut
 
 sub update {
-    my ( $self, $properties ) = @_;
+    my $self        = shift;
     my $session     = $self->session;
     my $db          = $session->db;
     
+    # Allow name => value and hashref
+    my $properties  = {};
+    if ( @_ == 1 ) {
+        $properties = shift;
+    }
+    else {
+        $properties = { @_ };
+    }
+
     # Make a safe copy of properties, we'll be deleting from it
     $properties = { %$properties };
     $self->uncache;
@@ -1450,18 +1454,12 @@ Hash ref of key/value pairs of data in the users's profile to update.
 
 =cut
 
-sub updateProfileFields {
-    my $self    = shift;
-    my $profile = shift;
-
-    $self->update($profile);
-}
+deprecate updateProfileFields => 'update';
 
 #-------------------------------------------------------------------
 
 =head2 username ( [ value ] )
 
-DEPRECATED! Use get("username") and update({ username => "value" }) instead.
 Returns the username. 
 
 =head3 value
@@ -1482,8 +1480,6 @@ sub username {
 #-------------------------------------------------------------------
 
 =head2 userId ( )
-
-DEPRECATED: Use getId() instead!
 
 Returns the userId for this user.
 

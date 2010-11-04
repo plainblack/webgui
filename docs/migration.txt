@@ -18,6 +18,14 @@ init() is deprecated. Use www_view()
 isAdmin, isVisitor, isRegistered are all deprecated. use user->is* instead
 setCallable and isCallable are deprecated. use www_ prefix instead.
 
+WebGUI::User
+==========================
+
+updateProfileFields is deprecated. Use update
+profileField is deprecated. Use get() and update()
+authInstance is deprecated. Instead instantiate the auth method and give it a
+    user or userId
+
 WebGUI::Macro::AdminBar
 ==========================
 There is no Admin Bar for normal pages. Only the admin mode can see the admin bar.
