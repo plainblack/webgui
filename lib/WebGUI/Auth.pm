@@ -32,14 +32,29 @@ my $LOGIN_MESSAGE_SEEN  = 'showMessageOnLoginSeen';
 
 Package WebGUI::Auth
 
-=head1 DESCRIPTION
-
-An abstract class for all authentication modules to extend.
-
 =head1 SYNOPSIS
 
  package WebGUI::Auth::MyAuth;
  use base 'WebGUI::Auth';
+
+ sub www_view { 
+     # default entry point
+ }
+
+=head1 DESCRIPTION
+
+WebGUI::Auth allows you to authenticate and login users.
+
+To write your own auth module, you should override C<www_view> to start the 
+user off with a login form or a create account form.
+
+To access your new auth module, add it to the config file (authMethods) and go to 
+C<?op=auth;authType=MyAuth>. See L<WebGUI::Operation::Auth>.
+
+=head1 SEE ALSO
+
+ WebGUI::Operation::Auth
+ WebGUI::User
 
 =head1 METHODS
 
