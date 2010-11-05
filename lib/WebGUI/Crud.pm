@@ -365,19 +365,24 @@ sub crud_dropTable {
 
 #-------------------------------------------------------------------
 
-=head2 crud_getProperties ( session )
+=head2 crud_getProperties ( )
 
-A management class method that returns just the 'properties' from crud_definition().
-
-=head3 session
-
-A reference to a WebGUI::Session.
+A management class method that returns just the 'properties' from the Crud'd definition.
+These properties have limited use, as you really need a full object to get access to a
+session.
 
 =cut
 
 sub crud_getProperties {
 	my ($class, $session) = @_;
-    return $class->meta->get_all_property_list;
+	my @property_names = $class->meta->get_all_property_list();
+    my $properties = {};
+	foreach my $property_name (@property_names) {
+        my $property        = $class->meta->find_attribute_by_name($property_name);
+        my $form_properties = $property->form;
+        $properties->{$property_name} = $form_properties;
+    }
+    return $properties;
 }
 
 #-------------------------------------------------------------------
@@ -884,56 +889,16 @@ sub reorder {
 
 =head2 update ( properties )
 
-Updates an object's properties. While doing so also validates default data and sets the lastUpdated date.
-
-=head3 properties
-
-A hash reference of properties to be set. See crud_definition() for a list of the properties available.
-
-B<WARNING:> As part of it's validation mechanisms, update() will delete any elements from the properties list that are not specified in the crud_definition().
+Extend the base method to update the lastUpdated property.
 
 =cut
 
-#sub update {
-#	my ($self, $data) = @_;
-#    my $session = $self->session;
-#
-#	# validate incoming data
-#	my $properties = $self->meta->get_all_property_list($session);
-#    my $dbData = { $self->meta->tableKey($session) => $self->getId };
-#	foreach my $property (keys %{$data}) {
-#
-#		# don't save fields that aren't part of our definition
-#		unless (exists $properties->{$property} || $property eq 'lastUpdated') {
-#			delete $data->{$property};
-#			next;
-#		}
-#
-#		# set a default value if it's empty or undef
-#        if ($data->{$property} eq "") {
-#            $data->{$property} = $properties->{$property}{default};
-#        }
-#
-#		# serialize if needed
-#		if ($properties->{$property}{serialize} && $data->{$property} ne "") {
-#			$dbData->{$property} = JSON->new->canonical->encode($data->{$property});
-#		}
-#        else {
-#            $dbData->{$property} = $data->{$property};
-#        }
-#	}
-#
-#	# set last updated
-#	$data->{lastUpdated} ||= WebGUI::DateTime->new($session, time())->toDatabase;
-#
-#	# update memory
-#	my $refId = id $self;
-#	%{$objectData{$refId}} = (%{$objectData{$refId}}, %{$data});
-#
-#	# update the database
-#	$session->db->setRow($self->meta->tableName($session), $self->meta->tableKey($session), $dbData);
-#	return 1;
-#}
+around update => sub {
+	my ($orig, $self, $data) = @_;
+    delete $data->{lastUpdated};
+    $self->lastUpdated($self->_now);
+    $self->$orig($data);
+};
 
 #-------------------------------------------------------------------
 

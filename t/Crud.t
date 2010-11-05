@@ -45,10 +45,6 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 55;        # Increment this number for each test you create
-
-#----------------------------------------------------------------------------
-
 # check table structure
 WebGUI::Cruddy->crud_createTable($session);
 WebGUI::Test->addToCleanup(sub { WebGUI::Cruddy->crud_dropTable($session); });
@@ -123,7 +119,7 @@ is($copyOfRecord3->sequenceNumber, '2', "deletion of record 2 moved record 3 to 
 is($copyOfRecord4->sequenceNumber, '3', "deletion of record 2 moved record 4 to sequence 3");
 
 # updating
-sleep 1;
+$copyOfRecord4->dateCreated(WebGUI::DateTime->new($session, WebGUI::Test->webguiBirthday)->toMysql);
 ok($copyOfRecord4->update, "update returns success");
 isnt($copyOfRecord4->lastUpdated, $copyOfRecord4->get('dateCreated'), "updates work");
 
@@ -158,8 +154,10 @@ while (my $object = $iterator->()) {
 
 #crud management stuff
 is(ref WebGUI::Cruddy->crud_getProperties($session), 'HASH', 'properties work');
-is(WebGUI::Cruddy->crud_getTableKey($session), 'id', 'default key is id');
-is(WebGUI::Cruddy->crud_getTableName($session), 'some_crud_table', 'default table is some_crud_table');
-is(WebGUI::Cruddy->crud_getSequenceKey($session), undef, 'default sequence key is blank');
+is(WebGUI::Cruddy->crud_getTableKey(), 'id', 'default key is id');
+is(WebGUI::Cruddy->crud_getTableName(), 'some_crud_table', 'default table is some_crud_table');
+is(WebGUI::Cruddy->crud_getSequenceKey(), undef, 'default sequence key is blank');
+
+done_testing();
 
 #vim:ft=perl
