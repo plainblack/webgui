@@ -92,8 +92,10 @@ is($record2->getId, $copyOfRecord2->getId, "can reinstanciate record");
 # sequencing
 is($record2->sequenceNumber, 2, "record 1 sequenceNumber is 2");
 my $record3 = WebGUI::Cruddy->new($session);
+$record3->write;
 is($record3->sequenceNumber, 3, "record 1 sequenceNumber is 3");
 my $record4 = WebGUI::Cruddy->new($session);
+$record4->write;
 is($record4->sequenceNumber, 4, "record 1 sequenceNumber is 4");
 ok($record4->demote, "demotion reports success");
 is($record4->sequenceNumber, 4, "can't demote further than end");

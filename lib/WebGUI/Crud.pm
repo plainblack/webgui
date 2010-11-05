@@ -557,7 +557,7 @@ sub demote {
     if ($id ne "") {
         $db->write("update ".$dbh->quote_identifier($tableName)." set sequenceNumber=sequenceNumber+1 where ".$dbh->quote_identifier($tableKey)."=?",[$self->getId]);
         $db->write("update ".$dbh->quote_identifier($tableName)." set sequenceNumber=sequenceNumber-1 where ".$dbh->quote_identifier($tableKey)."=?",[$id]);
-		$self->sequenceNumber($self->sequenceNumber++);
+    $self->sequenceNumber($self->sequenceNumber+1);
     }
 	$db->commit;
 	return 1;
@@ -822,7 +822,7 @@ sub promote {
     if ($id ne "") {
         $db->write("update ".$dbh->quote_identifier($tableName)." set sequenceNumber=sequenceNumber-1 where ".$dbh->quote_identifier($tableKey)."=?", [$self->getId]);
         $db->write("update ".$dbh->quote_identifier($tableName)." set sequenceNumber=sequenceNumber+1 where ".$dbh->quote_identifier($tableKey)."=?", [$id]);
-		$self->sequenceNumber($self->sequenceNumber--);
+        $self->sequenceNumber($self->sequenceNumber-1);
     }
 	$db->commit;
 	return 1;
