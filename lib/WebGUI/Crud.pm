@@ -129,39 +129,45 @@ WebGUI::Crud can be used in one of two ways. You can create a subclass with a de
 
 =head2 Static Subclass
 
-The normal way to use WebGUI::Crud is to create a subclass that defines a specific definition. In your subclass you'd override the crud_definition() method with your own like this:
+The normal way to use WebGUI::Crud is to create a subclass that defines a specific definition. In your subclass you'd make your own like this:
 
- sub crud_definition {
-	my ($class, $session) = @_;
-	my $definition = $class->SUPER::crud_definition($session);
-	$definition->{tableName} = 'ambassador';
-	$definition->{tableKey} = 'ambassadorId';
-	$definition->{properties}{name} = {
-			fieldType		=> 'text',
-			default	=> undef,
-		};
-	$definition->{properties}{emailAddress} = {
-			fieldType		=> 'email',
-			default	=> undef,
-		};
-	return $definition;
- }
+ use Moose;
+ use WebGUI::Definition::Crud;
+ extends 'WebGUI::Crud';
+ define tableName => 'ambassador';
+ define tableKey  => 'ambassadorId';
+ has ambassadorId => (
+    fieldType => 'text',
+    default =>undef,
+ );
+ property name => (
+    fieldType => 'text',
+    default   => undef,
+ );
+ property emailAddress => (
+    fieldType => 'email',
+    default   =>undef,
+ );
 
 =head2 Dynamic Subclass
 
 A more advanced approach is to create a subclass that dynamically generates a definition from a database table or a config file.
 
- sub crud_definition {
-	my ($class, $session) = @_;
-	my $definition = $class->SUPER::crud_definition($session);
-	my $config = Config::JSON->new('/path/to/file.cfg');
-	$definition->{tableName} = $config->get('tableName');
-	$definition->{tableKey} = $config->get('tableKey');
-	my $fields = $config->get('fields');
-	foreach my $fieldName (keys %{$fields}) {
-		$definition->{properties}{$fieldName} = $fields->{$fieldName};
-	}
-	return $definition;
+ use Moose;
+ use WebGUI::Definition::Crud;
+ extends 'WebGUI::Crud';
+ my $config = Config::JSON->new('/path/to/file.cfg');
+ define tableName => $config->get('tableName');
+ define tableKey  => $config->get('tableKey');
+ has $config->get('tableKey') => (
+    fieldType => 'text',
+    default =>undef,
+ );
+ my $fields = $config->get('fields');
+ foreach my $fieldName (keys %{$fields}) {
+    property $fieldName => (
+        @{ $fields->{$fieldName} },
+    );
  }
 
 =head2 Usage
@@ -170,13 +176,11 @@ Once you have a crud class, you can use it's methods like this:
 
  use WebGUI::Crud::Subclass;
 
- $sequenceKey = WebGUI::Crud::Subclass->meta->sequenceKey($session);
- $tableKey = WebGUI::Crud::Subclass->meta->tableKey($session);
- $tableName = WebGUI::Crud::Subclass->meta->tableName($session);
- $propertiesHashRef = WebGUI::Crud::Subclass->meta->get_all_property_list($session);
- $definitionHashRef = WebGUI::Crud::Subclass->crud_definition($session);
+ $sequenceKey = WebGUI::Crud::Subclass->meta->sequenceKey();
+ $tableKey = WebGUI::Crud::Subclass->meta->tableKey();
+ $tableName = WebGUI::Crud::Subclass->meta->tableName();
+ $propertiesHashRef = WebGUI::Crud::Subclass->meta->get_all_property_list();
 
- $crud = WebGUI::Crud::Subclass->create($session, $properties);
  $crud = WebGUI::Crud::Subclass->new($session, $id);
 
  $sql = WebGUI::Crud::Subclass->getAllSql($session, $options);
@@ -204,9 +208,24 @@ These methods are available from this package:
 
 #-------------------------------------------------------------------
 
-=head2 create ( session, [ properties ], [ options ])
+=head2 new ( session, id )
 
-Constructor. Creates a new instance of this object. Returns a reference to the object.
+Constructor.  Looks up an object in the database.
+
+=head3 session
+
+A reference to a WebGUI::Session.
+
+=head3 id
+
+A guid, the unique identifier for this object.  Looks in the database for this object's properties.  If the object
+cannot be found, throws an WebGUI::Error::ObjectNotFound exception.  If the id isn't a valid GUID, then it will
+throw an WebGUI::Error::InvalidParam exception.
+
+=head2 new ( session, [ properties ])
+
+Constructor. Creates a new instance of this object. Returns a reference to the object, but does not serialize inital properties
+to the database.  You must call $object->write to do this.
 
 =head3 session
 
@@ -214,7 +233,7 @@ A reference to a WebGUI::Session or an object that has a session method. If it's
 
 =head3 properties
 
-The properties that you wish to create this object with. Note that if this object has a sequenceKey then that sequence key must be specified in these properties or it will throw an execption. See crud_definition() for a list of all the properties.
+The properties that you wish to create this object with. Note that if this object has a sequenceKey then that sequence key must be specified in these properties or it will throw an execption.
 
 =cut
 
@@ -325,21 +344,6 @@ isQueryKey tells WebGUI::Crud that the field should be marked as 'non null' in t
 
 =cut
 
-sub crud_definition {
-	my ($class, $session) = @_;
-	unless (defined $session && $session->isa('WebGUI::Session')) {
-        WebGUI::Error::InvalidObject->throw(expected=>'WebGUI::Session', got=>(ref $session), error=>'Need a session.');
-    }
-	tie my %properties, 'Tie::IxHash';
-	my %definition = (
-		tableName 	=> 'unnamed_crud_table',
-		tableKey	=> 'id',
-		sequenceKey => '',
-		properties	=> \%properties,
-	);
-	return \%definition;
-}
-
 #-------------------------------------------------------------------
 
 =head2 crud_dropTable ( session )
@@ -387,13 +391,14 @@ sub crud_getProperties {
 
 #-------------------------------------------------------------------
 
-=head2 crud_getSequenceKey ( session )
+=head2 crud_getSequenceKey
 
-A management class method that returns just the 'sequenceKey' from the meta class.
+A management class method that returns just the 'sequenceKey' from the meta class.  This is left for
+backwards compatility.  You should call
 
-=head3 session
+WebGUI::Crud::Subclass->meta->sequenceKey
 
-A reference to a WebGUI::Session.
+instead.
 
 =cut
 
@@ -404,13 +409,14 @@ sub crud_getSequenceKey {
 
 #-------------------------------------------------------------------
 
-=head2 crud_getTableName ( session )
+=head2 crud_getTableName
 
-A management class method that returns just the 'tableName'.
+A management class method that returns just the 'tableName'.  This is left for
+backwards compatility.  You should call
 
-=head3 session
+WebGUI::Crud::Subclass->meta->tableName
 
-A reference to a WebGUI::Session.
+instead.
 
 =cut
 
@@ -421,13 +427,15 @@ sub crud_getTableName {
 
 #-------------------------------------------------------------------
 
-=head2 crud_getTableKey ( session )
+=head2 crud_getTableKey
 
-A management class method that returns just the 'tableKey'.
+A management class method that returns just the 'tableKey'.  This is left for
+backwards compatility.  You should call
 
-=head3 session
+WebGUI::Crud::Subclass->meta->tableKey
 
-A reference to a WebGUI::Session.
+instead.
+
 
 =cut
 
@@ -550,7 +558,7 @@ sub demote {
 	my $tableKey = $self->meta->tableKey();
 	my $tableName = $self->meta->tableName();
 	my $sequenceKey = $self->meta->sequenceKey();
-	my @params = ($self->get('sequenceNumber') + 1);
+	my @params = ($self->sequenceNumber + 1);
 	my $db = $self->session->db;
 	my $dbh = $db->dbh;
 	my $clause = '';
@@ -623,7 +631,7 @@ sub getAllIterator {
         return if !$id;
         my $object = $class->new($someObject, $id);
         if (!$object) {
-            WebGUI::Error::ObjectNotFound->throw(error=>'no such '.$class->getTableKey, id => $id);
+            WebGUI::Error::ObjectNotFound->throw(error=>'no such '.$class->meta->tableKey, id => $id);
         }
         return $object;
     };
@@ -787,22 +795,6 @@ sub getId {
 
 #-------------------------------------------------------------------
 
-=head2 new ( session, id )
-
-Constructor.
-
-=head3 session
-
-A reference to a WebGUI::Session.
-
-=head3 id
-
-A guid, the unique identifier for this object.
-
-=cut
-
-#-------------------------------------------------------------------
-
 =head2 promote ()
 
 Moves this object one position closer to the beginning of its sequence. If the object is already at the top of the sequence then no change will be made. Returns 1 on success.
@@ -814,8 +806,8 @@ sub promote {
 	my $tableKey = $self->meta->tableKey();
 	my $tableName = $self->meta->tableName();
 	my $sequenceKey = $self->meta->sequenceKey();
-	my $sequenceKeyValue = $self->get($sequenceKey);
-	my @params = ($self->get('sequenceNumber')-1);
+	my $sequenceKeyValue = $self->$sequenceKey;
+	my @params = ($self->sequenceNumber-1);
 	my $clause = '';
 	my $db = $self->session->db;
 	my $dbh = $db->dbh;
@@ -823,7 +815,7 @@ sub promote {
 	# determine sequence type
 	if ($sequenceKey) {
 		$clause = $dbh->quote_identifier($sequenceKey)."=? and";
-		unshift @params, $self->get($sequenceKey)
+		unshift @params, $self->$sequenceKey;
 	}
 
 	# make database changes
