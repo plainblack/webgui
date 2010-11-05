@@ -42,6 +42,11 @@ has dateCreated => (
     builder  => '_now',
 );
 
+has sequenceNumber => (
+    is       => 'rw',
+    default  => 1,
+);
+
 sub _now {
     my $self = shift;
     return WebGUI::DateTime->new($self->session)->toDatabase;
@@ -973,9 +978,10 @@ sub write {
         $data->{$property_name} = $value;
     }
     my $tableKey = $self->meta->tableKey;
-    $data->{$tableKey}  = $self->$tableKey;
-    $data->{lastUpdated} = $self->lastUpdated;
-    $data->{dateCreated} = $self->dateCreated;
+    $data->{$tableKey}      = $self->$tableKey;
+    $data->{lastUpdated}    = $self->lastUpdated;
+    $data->{dateCreated}    = $self->dateCreated;
+    $data->{sequenceNumber} = $self->sequenceNumber;
     if (my $sequenceKey = $self->meta->sequenceKey) {
         $data->{$sequenceKey} = $self->$sequenceKey;
     }

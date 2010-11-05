@@ -69,6 +69,7 @@ $sth->finish;
 
 # check data
 my $record1 = WebGUI::Cruddy->new($session);
+$record1->write;
 can_ok($record1, 'id');
 isa_ok($record1, "WebGUI::Crud", "isa WebGUI::Crud");
 like($record1->dateCreated, qr/\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}/, "dateCreated looks like a date");
@@ -159,6 +160,6 @@ while (my $object = $iterator->()) {
 is(ref WebGUI::Cruddy->crud_getProperties($session), 'HASH', 'properties work');
 is(WebGUI::Cruddy->crud_getTableKey($session), 'id', 'default key is id');
 is(WebGUI::Cruddy->crud_getTableName($session), 'some_crud_table', 'default table is some_crud_table');
-is(WebGUI::Cruddy->crud_getSequenceKey($session), '', 'default sequence key is blank');
+is(WebGUI::Cruddy->crud_getSequenceKey($session), undef, 'default sequence key is blank');
 
 #vim:ft=perl
