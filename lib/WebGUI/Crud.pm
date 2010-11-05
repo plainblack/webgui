@@ -105,7 +105,7 @@ around BUILDARGS => sub {
         WebGUI::Error::ObjectNotFound->throw(error=>'no such '.$tableKey, id=>$identifier);
     }
     $data->{session} = $session;
-    return $class->$orig(@_);
+    return $class->$orig($data);
 };
 
 =head1 NAME
@@ -466,7 +466,7 @@ sub crud_updateTable {
 	foreach my $property_name (@property_names) {
         my $property        = $class->meta->find_attribute_by_name($property_name);
         my $form_properties = $property->form;
-		my $control         = WebGUI::Form::DynamicField->new( $session, fieldType => $form_properties->fieldType,);
+		my $control         = WebGUI::Form::DynamicField->new( $session, fieldType => $form_properties->{fieldType},);
 		my $fieldType       = $control->getDatabaseFieldType;
 		my $isKey           = $property->isQueryKey;
         my $default         = $property->default;
@@ -971,6 +971,13 @@ sub write {
             $value    = eval { JSON::to_json($value); } || '';
         }
         $data->{$property_name} = $value;
+    }
+    my $tableKey = $self->meta->tableKey;
+    $data->{$tableKey}  = $self->$tableKey;
+    $data->{lastUpdated} = $self->lastUpdated;
+    $data->{dateCreated} = $self->dateCreated;
+    if (my $sequenceKey = $self->meta->sequenceKey) {
+        $data->{$sequenceKey} = $self->$sequenceKey;
     }
     $session->db->setRow($self->tableName, $self->tableKey, $data);
 }
