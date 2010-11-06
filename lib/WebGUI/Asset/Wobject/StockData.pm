@@ -203,7 +203,7 @@ sub _convertToEpoch {
    my ($month,$day,$year) = split("/",$date);
    $month = $self->_appendZero($month);
    $day = $self->_appendZero($day);   
-   my $tfixed = substr($time,0,-2);
+   my $tfixed = substr($time,0,5);
    my ($hour,$minute) = split(":",$tfixed);
    if($time =~ m/pm/i) {
       $hour += 12;
