@@ -15,8 +15,10 @@ use Test::Class;
 use Module::Find;
 use lib rel2abs( catdir ( dirname( __FILE__ ), 'tests' ) );
 
-plan skip_all => "Extremely slow asset tests only run if WEBGUI_ASSET_TESTS set"
-    unless $ENV{WEBGUI_ASSET_TESTS};
-useall('Test::WebGUI::Asset');
+BEGIN { 
+    plan skip_all => "Extremely slow asset tests only run if WEBGUI_ASSET_TESTS set"
+        unless $ENV{WEBGUI_ASSET_TESTS};
+    useall('Test::WebGUI::Asset');
+}
 Test::Class->runtests;
 
