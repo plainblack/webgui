@@ -221,7 +221,10 @@ sub toHtml {
         my $originalValue = $self->getOriginalValue;
         my $dt = eval { WebGUI::DateTime->new($session, $originalValue); };
         $dt = WebGUI::DateTime->new($session,0) if ! (blessed $dt && $dt->isa('DateTime'));  ##Parsing error
-        $dt->set_time_zone($session->datetime->getTimeZone);
+        if ($originalValue =~ $isaEpoch) {
+            ##Epoch date, correct for time zone;
+            $dt->set_time_zone($session->datetime->getTimeZone);
+        }
         $value = $dt->toMysqlDate;
     }
 

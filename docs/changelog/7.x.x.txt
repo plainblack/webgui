@@ -8,6 +8,7 @@
  - fixed #11926: Version Tag: Delete
  - fixed #11939: WebGUI replacements are not anchored.
  - fixed #11950: Username set to 0 when edit user 
+ - fixed #11946: Double time zone correction when addding an event
 
 7.9.17
  - fixed #11929: In/Out board breaks in Chrome sometimes
