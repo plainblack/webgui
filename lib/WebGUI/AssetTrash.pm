@@ -225,6 +225,7 @@ sub purgeInFork {
     } @roots;
 
     my $tree = WebGUI::ProgressTree->new( $session, \@ids );
+    $process->update( sub { $tree->json } );
     my $patch = Monkey::Patch::patch_class(
         'WebGUI::Asset',
         'purge',
@@ -390,6 +391,7 @@ sub trashInFork {
     } @roots;
 
     my $tree = WebGUI::ProgressTree->new( $session, \@ids );
+    $process->update(sub { $tree->json });
     my $patch = Monkey::Patch::patch_class(
         'WebGUI::Asset',
         'setState',
