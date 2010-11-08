@@ -114,7 +114,7 @@ my $template = <<'TEMPLATE';
                 document.getElementById('ui').style.display = 'block';
             },
             finish : function () {
-                YAHOO.WebGUI.Fork.redirect(params.redirect);
+                YAHOO.WebGUI.Fork.redirect(params);
             },
             error  : function (msg) {
                 alert(msg)
@@ -124,15 +124,6 @@ my $template = <<'TEMPLATE';
 }([% params %]));
 </script>
 TEMPLATE
-
-my $stylesheet = <<'STYLESHEET';
-<style>
-#tree li         { color: black }
-#tree li.focus   { color: cyan }
-#tree li.failure { color: red }
-#tree li.success { color: green }
-</style>
-STYLESHEET
 
 #-------------------------------------------------------------------
 
@@ -145,11 +136,12 @@ See WebGUI::Operation::Fork.
 sub handler {
     my $process = shift;
     my $session = $process->session;
-    my $style   = $session->style;
     my $url     = $session->url;
-    $style->setRawHeadTags($stylesheet);
-    $style->setScript($url->extras('underscore/underscore-min.js'));
-    WebGUI::Fork::ProgressBar::renderBar($process, $template);
+    WebGUI::Fork::ProgressBar::renderBar($process, $template, {
+            css => [ $url->extras('Fork/ProgressTree.css') ],
+            js  => [ $url->extras('underscore/underscore-min.js') ],
+        }
+    );
 }
 
 1;

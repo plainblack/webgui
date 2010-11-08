@@ -883,6 +883,8 @@ sub forkWithStatusPage {
         $args->{plugin}, {
             title   => $i18n->get( $args->{title} ),
             icon    => 'assets',
+            dialog  => $args->{dialog},
+            message => $args->{message},
             proceed => $args->{redirect} || '',
         }
     );
@@ -2612,7 +2614,8 @@ sub urlExists {
 
 =head2 valid_parent_classes ( )
 
-The default view method for any asset that doesn't define one. Under all normal circumstances this should be overridden or your asset won't have any output.
+Returns an arrayref of classes that this asset is allowed to be a child of. If
+a candidate parent passes ->isa for any of these it is a valid parent.
 
 =cut
 

@@ -660,7 +660,7 @@ specified asset and keeps a json structure as the status.
 sub exportInFork {
     my ( $process, $args ) = @_;
     my $session = $process->session;
-    my $self = WebGUI::Asset->new( $session, delete $args->{assetId} );
+    my $self = WebGUI::Asset->newById( $session, delete $args->{assetId} );
     $args->{indexFileName} = delete $args->{index};
     my $assetIds = $self->exportGetDescendants( undef, $args->{depth} );
     my $tree = WebGUI::ProgressTree->new( $session, $assetIds );

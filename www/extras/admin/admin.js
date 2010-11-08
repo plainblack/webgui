@@ -354,7 +354,8 @@ WebGUI.Admin.prototype.addPasteHandler
  */
 WebGUI.Admin.prototype.pasteAsset
 = function ( id ) {
-    var url = appendToUrl( this.currentAssetDef.url, 'func=paste;assetId=' + id );
+    var url = appendToUrl( this.currentAssetDef.url, 'func=pasteList&assetId=' + id );
+    console.log(url);
     this.gotoAsset( url );
 };
 

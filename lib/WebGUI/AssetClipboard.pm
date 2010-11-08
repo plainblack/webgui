@@ -46,8 +46,9 @@ paste a wiki page anywhere else but a wiki master.
 =cut
 
 sub canPaste {
-    my $self = shift;
-    return $self->validParent($self->session);  ##Lazy call to a class method
+    my $self  = shift;
+    my $class = ref $self;
+    return $class->validParent($self->session);
 }
 
 #-------------------------------------------------------------------
@@ -61,7 +62,7 @@ WebGUI::Fork method called by www_copy
 sub copyInFork {
     my ($process, $args) = @_;
     my $session = $process->session;
-    my $asset = WebGUI::Asset->new($session, $args->{assetId});
+    my $asset = WebGUI::Asset->newById($session, $args->{assetId});
     my @pedigree = ('self');
     my $childrenOnly = 0;
     if ($args->{childrenOnly}) {
@@ -285,11 +286,7 @@ sub paste {
         
         # Update lineage in search index.
         $self->purgeCache;
-        my $assetIter = $pastedAsset->getLineageIterator(
-            ['self', 'descendants'], {
-                statesToInclude => ['clipboard','clipboard-limbo']
-            }
-        );
+        my $assetIter = $pastedAsset->getLineageIterator( ['self', 'descendants'] );
         while ( 1 ) {
             my $asset;
             eval { $asset = $assetIter->() };
@@ -298,9 +295,7 @@ sub paste {
                 next;
             }
             last unless $asset;
- 
             $outputSub->(sprintf $i18n->get('indexing %s'), $pastedAsset->getTitle) if defined $outputSub;
-            $asset->setState('published');
             $asset->indexContent();
         }
 		$pastedAsset->updateHistory("pasted to parent ".$self->getId);
@@ -321,8 +316,10 @@ WebGUI::Fork method called by www_pasteList
 sub pasteInFork {
     my ( $process, $args ) = @_;
     my $session = $process->session;
-    my $self    = WebGUI::Asset->new( $session, $args->{assetId} );
-    my @roots   = grep { $_ && $_->canEdit }
+    my $self    = WebGUI::Asset->newById( $session, $args->{assetId} );
+    $session->asset($self);
+
+    my @roots = grep { $_ && $_->canEdit }
         map { WebGUI::Asset->newPending( $session, $_ ) } @{ $args->{list} };
 
     my @ids = map {
@@ -733,7 +730,7 @@ sub www_pasteList {
     my $self    = shift;
     my $session = $self->session;
     my $form    = $session->form;
-    return $session->privilege->insufficient() unless $self->canEdit && $session->form->validToken;
+    return $session->privilege->insufficient() unless $self->canEdit;
 
     $self->forkWithStatusPage( {
             plugin   => 'ProgressTree',

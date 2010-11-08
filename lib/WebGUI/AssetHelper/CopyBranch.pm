@@ -80,59 +80,21 @@ Perform the copy operation, showing the progress.
 =cut
 
 sub www_copy {
-    my ( $class, $asset ) = @_;
+    my ($class, $asset) = @_;
     my $session = $asset->session;
-    my $i18n    = WebGUI::International->new($session, 'Asset');
 
-    my $childrenOnly = lc $session->form->get('with') eq 'children';
-
-    return $session->response->stream( sub {
-        my ( $session ) = @_;
-        my @stack;
-
-        my $pb = WebGUI::ProgressBar->new($session);
-        return $pb->run(
-            admin   => 1,
-            title => $i18n->get('Copy Assets'),
-            icon  => $session->url->extras('adminConsole/assets.gif'),
-            code  => sub {
-                my $bar = shift;
-                # First calculate the total
-                $bar->update("Preparing copy (i18n)");
-                $bar->total( $asset->getDescendantCount + 1 );
-                my $newAsset = $asset->duplicateBranch( $childrenOnly );
-                $bar->update($i18n->get('cut'));
-                my $title   = sprintf("%s (%s)", $asset->getTitle, $i18n->get('copy'));
-                $newAsset->update({ title => $title });
-                $newAsset->cut;
-                my $result = WebGUI::VersionTag->autoCommitWorkingIfEnabled(
-                    $session, {
-                        allowComments => 1,
-                        returnUrl     => $asset->getUrl,
-                    }
-                );
-                if ( $result eq 'redirect' ) {
-                    return $asset->getUrl;
-                }
-                return;
-            },
-            wrap  => {
-                'WebGUI::Asset::duplicateBranch' => sub {
-                    my ($bar, $original, $asset, @args) = @_;
-                    push(@stack, $asset->getTitle);
-                    my $ret = $asset->$original(@args);
-                    pop(@stack);
-                    return $ret;
-                },
-                'WebGUI::Asset::duplicate' => sub {
-                    my ($bar, $original, $asset, @args) = @_;
-                    my $name = join '/', @stack, $asset->getTitle;
-                    $bar->update($name);
-                    return $asset->$original(@args);
-                },
+    $asset->forkWithStatusPage({
+            plugin   => 'ProgressTree',
+            title    => 'Copy Assets',
+            method   => 'copyInFork',
+            dialog   => 1,
+            message  => 'Your assets are now copied!',
+            args     => {
+                childrenOnly => $session->form->get('with') eq 'Children',
+                assetId      => $asset->getId,
             }
-        );
-    } );
+        }
+    );
 }
 
 1;

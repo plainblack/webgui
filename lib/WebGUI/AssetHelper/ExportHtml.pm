@@ -157,50 +157,25 @@ Displays the export status page
 sub www_exportStatus {
     my ($class, $asset) = @_;
     my $session = $asset->session;
-    return $session->privilege->insufficient() unless ($session->user->isInGroup(13));
-    my $i18n        = WebGUI::International->new($session, "Asset");
-    my $pb  = WebGUI::ProgressBar->new( $session );
-
-    my $args = {
-        quiet               => 1, # We'll wrap subs to update the ProgressBar
-        userId              => $session->form->process('userId'),
-        indexFileName       => $session->form->process('index'),
-        extrasUploadAction  => $session->form->process('extrasUploadsAction'),
-        rootUrlAction       => $session->form->process('rootUrlAction'),
-        depth               => $session->form->process('depth'),
-        exportUrl           => $session->form->process('exportUrl'),
-    };
-
-    return $session->response->stream( sub {
-        my ( $session ) = @_;
-        return $pb->run(
-            admin => 1,
-            title => $i18n->get('edit branch'),
-            icon  => $session->url->extras('adminConsole/assets.gif'),
-            code  => sub {
-                my ( $bar ) = @_;
-                $bar->update( 'Preparing...' );
-                $bar->total( $asset->getDescendantCount );
-                $bar->update( 'Asset ID ' . $asset->getId );
-
-                my $message;
-                eval {
-                    $message = $asset->exportAsHtml( $args );
-                };
-                if ( $@ ) {
-                    return { error => "$@" };
-                }
-                return { message => $message || "Export successful!" };
-            },
-            wrap => {
-                'WebGUI::Asset::exportWriteFile' => sub {
-                    my ($bar, $original, $asset, @args) = @_;
-                    $bar->update( "Exporting " . $asset->getTitle );
-                    return $asset->$original(@args);
-                },
-            },
-        );
-    } );
+    return $session->privilege->insufficient
+        unless $session->user->isInGroup(13);
+    my $form    = $session->form;
+    my @vars    = qw(
+        index depth userId extrasUploadsAction rootUrlAction exportUrl
+    );
+    $asset->forkWithStatusPage({
+            plugin   => 'ProgressTree',
+            title    => 'Page Export Status',
+            method   => 'exportInFork',
+            dialog   => 1,
+            message  => 'Your assets have been exported!',
+            groupId  => 13,
+            args     => {
+                assetId => $asset->getId,
+                map { $_ => scalar $form->get($_) } @vars
+            }
+        }
+    );
 }
 
 1;

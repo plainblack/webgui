@@ -17,6 +17,7 @@ package WebGUI::Asset;
 use strict;
 use Carp qw( croak );
 use Scalar::Util qw( weaken );
+use List::Util qw(first);
 
 =head1 NAME
 
@@ -1063,9 +1064,9 @@ sub swapRank {
 
 #-------------------------------------------------------------------
 
-=head2 validParent ([$asset])
+=head2 validParent ([$session, $asset])
 
-Find out whether a potential parent can have this asset as a child.
+Find out whether assets of this class can be children of the given asset.
 
 This is a class method.
 
@@ -1076,15 +1077,10 @@ The potential parent.  If not passed, uses $session->asset;
 =cut
 
 sub validParent {
-    my $class          = shift;
-    my $session        = shift;
-    my $asset          = shift || $session->asset;
-    return 0 unless $asset;
-    my $parent_classes = $class->valid_parent_classes;
-    foreach my $parentClass (@{ $class->valid_parent_classes}) {
-        return 1 if $asset->isa($parentClass);
-    }
-    return 0;
+    my $class   = shift;
+    my $session = shift;
+    my $asset   = shift || $session->asset || return 0;
+    return first { $asset->isa($_) } @{ $class->valid_parent_classes };
 }
 
 #-------------------------------------------------------------------

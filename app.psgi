@@ -2,10 +2,13 @@ use strict;
 use Plack::Builder;
 use WebGUI::Paths -inc;
 use WebGUI::Config;
+use WebGUI::Fork;
 
 if ($ENV{PLACK_ENV} ne 'development') {
     WebGUI::Paths->preloadAll;
 }
+
+WebGUI::Fork->init();
 
 builder {
     my $first_app;
