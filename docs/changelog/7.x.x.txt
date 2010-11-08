@@ -7,6 +7,7 @@
  - fixed #11941: cannot edit default templates in some browsers
  - fixed #11926: Version Tag: Delete
  - fixed #11939: WebGUI replacements are not anchored.
+ - fixed #11950: Username set to 0 when edit user 
 
 7.9.17
  - fixed #11929: In/Out board breaks in Chrome sometimes

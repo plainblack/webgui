@@ -645,7 +645,7 @@ sub www_editUser {
     $tabform->getTab("account")->text(
         -name=>"username",
         -label=>$i18n->get(50),
-        -value=>$username
+        -value=>$username,
         -extras=>'autocomplete="off"',
     );
 	my %status;
