@@ -171,6 +171,7 @@ sub rollbackInFork {
             $update->();
         }
     );
+    $update->();
     $tag->rollback( {
             outputSub => sub {
                 $status{message} = shift;

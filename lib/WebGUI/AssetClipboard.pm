@@ -72,6 +72,7 @@ sub copyInFork {
     }
     my $ids   = $asset->getLineage(\@pedigree);
     my $tree  = WebGUI::ProgressTree->new($session, $ids);
+    $process->update(sub { $tree->json });
     my $patch = Monkey::Patch::patch_class(
         'WebGUI::Asset', 'duplicate', sub {
             my $duplicate = shift;
@@ -326,6 +327,7 @@ sub pasteInFork {
     } @roots;
 
     my $tree = WebGUI::ProgressTree->new( $session, \@ids );
+    $process->update(sub { $tree->json });
     my $patch = Monkey::Patch::patch_class(
         'WebGUI::Asset',
         'indexContent',

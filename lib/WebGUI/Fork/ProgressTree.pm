@@ -73,7 +73,7 @@ my $template = <<'TEMPLATE';
                 finished += 1;
             }
             if (asset.focus) {
-                li.className += 'focus';
+                YAHOO.util.Dom.addClass(li, 'focus');
                 focus = asset.url;
             }
             li.appendChild(document.createTextNode(txt));

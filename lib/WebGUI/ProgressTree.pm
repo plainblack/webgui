@@ -46,30 +46,32 @@ Constructs new tree object for tracking the progress of $assetIds.
 
 sub new {
     my ( $class, $session, $assetIds ) = @_;
-    my $db  = $session->db;
-    my $dbh = $db->dbh;
-    my $set = join( ',', map { $dbh->quote($_) } @$assetIds );
-    my $sql = qq{
-        SELECT   a.assetId, a.parentId, d.url
-        FROM     asset a INNER JOIN assetData d ON a.assetId = d.assetId
-        WHERE    a.assetId IN ($set)
-        ORDER BY a.lineage ASC, d.revisionDate DESC
-    };
-    my $sth = $db->read($sql);
     my ( %flat, @roots );
+    if (@$assetIds) {
+        my $db  = $session->db;
+        my $dbh = $db->dbh;
+        my $set = join( ',', map { $dbh->quote($_) } @$assetIds );
+        my $sql = qq{
+            SELECT   a.assetId, a.parentId, d.url
+            FROM     asset a INNER JOIN assetData d ON a.assetId = d.assetId
+            WHERE    a.assetId IN ($set)
+            ORDER BY a.lineage ASC, d.revisionDate DESC
+        };
+        my $sth = $db->read($sql);
 
-    while ( my $asset = $sth->hashRef ) {
-        my ( $id, $parentId ) = delete @{$asset}{ 'assetId', 'parentId' };
+        while ( my $asset = $sth->hashRef ) {
+            my ( $id, $parentId ) = delete @{$asset}{ 'assetId', 'parentId' };
 
-        # We'll get back multiple rows for each asset, but the first one is
-        # the latest.  Skip the others.
-        next if $flat{$id};
-        $flat{$id} = $asset;
-        if ( my $parent = $flat{$parentId} ) {
-            push( @{ $parent->{children} }, $asset );
-        }
-        else {
-            push( @roots, $asset );
+            # We'll get back multiple rows for each asset, but the first one
+            # is the latest.  Skip the others.
+            next if $flat{$id};
+            $flat{$id} = $asset;
+            if ( my $parent = $flat{$parentId} ) {
+                push( @{ $parent->{children} }, $asset );
+            }
+            else {
+                push( @roots, $asset );
+            }
         }
     }
     my $self = {

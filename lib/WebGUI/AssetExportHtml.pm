@@ -673,6 +673,7 @@ sub exportInFork {
     $args->{indexFileName} = delete $args->{index};
     my $assetIds = $self->exportGetDescendants( undef, $args->{depth} );
     my $tree = WebGUI::ProgressTree->new( $session, $assetIds );
+    $process->update( sub { $tree->json } );
     my %reports = (
         'done'                => sub { $tree->success(shift) },
         'exporting page'      => sub { $tree->focus(shift) },
