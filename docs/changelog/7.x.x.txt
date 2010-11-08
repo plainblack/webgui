@@ -1,4 +1,5 @@
 7.10.5
+ - fixed #11950: Username set to 0 when edit user 
 
 7.10.4
  - Added WebGUI::Fork api
