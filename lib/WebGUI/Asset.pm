@@ -2259,25 +2259,24 @@ sub proceed {
         return $session->asset->www_manageAssets;
     }
     elsif ($proceed eq "viewParent") {
-        $session->asset($self->getParent);
-        return $session->asset->www_view;
+        $session->http->setRedirect( $self->getParent->getUrl );
+        return "redirect";
     }
     elsif ($proceed eq "editParent") {
-        $session->asset($self->getParent);
-        return $session->asset->www_edit;
+        $session->http->setRedirect( $self->getParent->getUrl('func=edit') );
+        return "redirect";
     }
     elsif ($proceed eq "goBackToPage" && $session->form->process('returnUrl')) {
         $session->http->setRedirect($session->form->process("returnUrl"));
-        return undef;
+        return "redirect";
     }
     elsif ($proceed ne "") {
-        my $method = "www_".$session->form->process("proceed");
-        $session->asset($self);
-        return $session->asset->$method();
+        $session->http->setRedirect( $self->getUrl( 'func=' . $proceed ) );
+        return "redirect";
     }
 
-    $session->asset($self->getContainer);
-    return $session->asset->www_view;
+    $session->http->setRedirect( $self->getUrl );
+    return "redirect";
 }
 
 #-------------------------------------------------------------------
