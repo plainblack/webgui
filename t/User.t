@@ -22,7 +22,7 @@ use WebGUI::User;
 use WebGUI::ProfileField;
 use WebGUI::Shop::AddressBook;
 
-use Test::More tests => 225; # increment this value for each test you create
+use Test::More tests => 226; # increment this value for each test you create
 use Test::Deep;
 use Data::Dumper;
 
@@ -941,6 +941,15 @@ is($neighbor->getProfileFieldPrivacySetting('email'), 'none', '...set will not s
 
 is($admin->getProfileFieldPrivacySetting('publicEmail'), 'all', '...get on a user with existing settings');
 is($neighbor->getProfileFieldPrivacySetting('wg_privacySettings'), 'none', '...the privacy field always returns "none"');
+
+my $recentProfileField = WebGUI::ProfileField->create($session, 'recentField', {
+    fieldName             => 'recentField',
+    defaultPrivacySetting => 'all',
+    visible               => 1,
+    label                 => 'recentField',
+});
+WebGUI::Test->addToCleanup($recentProfileField);
+is($neighbor->getProfileFieldPrivacySetting('recentField'), 'all', '...if a field is added and the user does not have privacy data for it, check the original field');
 
 ################################################################
 #
