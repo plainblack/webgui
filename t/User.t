@@ -30,6 +30,7 @@ my $session = WebGUI::Test->session;
 
 my $testCache = WebGUI::Cache->new($session, 'myTestKey');
 $testCache->flush;
+WebGUI::Test->addToCleanup(sub { $testCache->flush; });
 
 my $user;
 my $lastUpdate;
@@ -247,6 +248,7 @@ is($user->profileField('notAProfileField'), undef, 'getting non-existant profile
 
 ##Check for valid profileField access, even if it is not cached in the user object.
 my $newProfileField = WebGUI::ProfileField->create($session, 'testField', {dataDefault => 'this is a test', fieldType => 'Text'});
+WebGUI::Test->addToCleanup($newProfileField);
 is($user->profileField('testField'), 'this is a test', 'getting profile fields not cached in the user object returns the profile field default');
 
 ok(!$user->profileField('wg_privacySettings'), '... wg_privacySettings may not be retrieved');
@@ -514,6 +516,7 @@ $session->config->delete('adminModeSubnets');
 ################################################################
 
 my $originalVisitorEmail = $visitor->profileField('email');
+WebGUI::Test->addToCleanup(sub {$visitor->profileField('email', $originalVisitorEmail); });
 $visitor->profileField('email', 'visitor@localdomain');
 $dude->profileField('email', 'dude@aftery2k.com');
 
@@ -570,6 +573,7 @@ is( $buster->profileField('timeZone'), 'America/Chicago', 'buster received origi
 
 my $profileField = WebGUI::ProfileField->new($session, 'timeZone');
 my %originalFieldData = %{ $profileField->get() };
+WebGUI::Test->addToCleanup(sub { $profileField->set(\%originalFieldData); });
 my %copiedFieldData = %originalFieldData;
 $copiedFieldData{'dataDefault'} = "'America/Hillsboro'";
 $profileField->set(\%copiedFieldData);
@@ -589,6 +593,7 @@ $profileField->set(\%originalFieldData);
 
 my $aliasProfile = WebGUI::ProfileField->new($session, 'alias');
 my %originalAliasProfile = %{ $aliasProfile->get() };
+WebGUI::Test->addToCleanup(sub { $profileField->set(\%originalAliasProfile); });
 my %copiedAliasProfile = %originalAliasProfile;
 $copiedAliasProfile{'dataDefault'} = "'aliasAlias'"; ##Non word characters;
 $aliasProfile->set(\%copiedAliasProfile);
@@ -612,6 +617,7 @@ my %listProfile = %copiedAliasProfile;
 $listProfile{'fieldName'} = 'listProfile';
 $listProfile{'dataDefault'} = "['alpha', 'delta', 'tango']";
 my $listProfileField = WebGUI::ProfileField->create($session, 'listProfile', \%listProfile);
+WebGUI::Test->addToCleanup($listProfileField);
 
 $buster->uncache;
 $buster3 = WebGUI::User->new($session, $buster->userId);
@@ -627,6 +633,7 @@ my %evalProfile = %copiedAliasProfile;
 $evalProfile{'fieldName'} = 'evalProfile';
 $evalProfile{'dataDefault'} = q!$session->scratch->set('hack','true'); 1;!;
 my $evalProfileField = WebGUI::ProfileField->create($session, 'evalProfile', \%evalProfile);
+WebGUI::Test->addToCleanup($evalProfileField);
 
 $buster->uncache;
 my $buster4 = WebGUI::User->new($session, $buster->userId);
@@ -905,6 +912,7 @@ ok(  $neighbor->acceptsFriendsRequests($friend), '... follows ableToBeFriend=1')
 
 ok(  $visitor->can('profileIsViewable'), 'profileIsViewable: is a WebGUI::User method');
 my $originalVisitorPublicProfile = $visitor->profileField('publicProfile');
+WebGUI::Test->addToCleanup(sub { $visitor->profileField('publicProfile', $originalVisitorPublicProfile); });
 $visitor->profileField('publicProfile', 'all');
 ok(! $visitor->profileIsViewable, '... visitors profile is not viewable, even if publicProfile=all');
 ok(! $visitor->profileIsViewable($visitor), '... visitor cannot see his own profile');
@@ -1059,18 +1067,3 @@ undef $book;
 eval { $book = WebGUI::Shop::AddressBook->new($session, $bookId); };
 my $e = Exception::Class->caught();
 isa_ok($e, 'WebGUI::Error::ObjectNotFound', '... cleans up the address book');
-
-END {
-
-    $profileField->set(\%originalFieldData);
-    $aliasProfile->set(\%originalAliasProfile);
-    $listProfileField->delete;
-    $evalProfileField->delete;
-    $visitor->profileField('email',         $originalVisitorEmail);
-    $visitor->profileField('publicProfile', $originalVisitorPublicProfile);
-
-    $newProfileField->delete() if $newProfileField;
-
-	$testCache->flush;
-}
-
