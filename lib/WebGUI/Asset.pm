@@ -2644,13 +2644,14 @@ sub view {
 
 =head2 www_add ( )
 
-Adds a new Asset based upon the class of the current form. Returns the Asset calling method www_edit();  The
-new Asset will inherit security and style properties from the current asset, the parent.
+Show the form to add a new child asset.
 
 =cut
 
 sub www_add {
-	my $self = shift;
+    my $self = shift;
+    my $session = $self->session;
+    my ( $style, $url ) = $session->quick(qw( style url ));
 	my %prototypeProperties;
     my $class = $self->loadModule($self->session->form->process("className","className"));
     return undef unless (defined $class);
@@ -2681,7 +2682,128 @@ sub www_add {
 	$properties{isHidden} = 1 unless $self->session->config->get("assets/".$class."/isContainer");
 	my $newAsset = WebGUI::Asset->newByPropertyHashRef($self->session,\%properties);
 	$newAsset->{_parent} = $self;
-	return $newAsset->www_edit();
+
+    my $f   = eval { $newAsset->getEditForm };
+    return $@ if $@;
+    $f->addField( "Hidden", name => "func", value => "addSave" );
+    $f->action( $self->getUrl );
+    $f->getTab('meta')->getField( 'className' )->set('value', $class);
+    # TODO: Make this whole thing a template instead!
+    $style->setCss($url->extras('yui/build/button/assets/skins/sam/button.css'));
+    $style->setScript($url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'));
+    $style->setScript($url->extras('yui/build/element/element-min.js'));
+    $style->setScript($url->extras('yui/build/button/button-min.js'));
+    $style->setRawHeadTags(<<'ENDHTML'); 
+        <style type="text/css">
+            * { font: 12pt Helvetica, sans-serif; }
+            label.formDescription { display: block; margin-top: 1em; font-weight: bold }
+            .saveButtons { position: absolute; top: 3px; right: 5px; z-index: 9001; }
+        </style>
+        <script type="text/javascript">
+            YAHOO.util.Event.onDOMReady( function() {
+                new YAHOO.widget.Button( "saveButton" );
+                new YAHOO.widget.Button( "cancelButton" );
+                new YAHOO.widget.Button( "saveAndReturnButton" );
+                if ( document.getElementById( 'saveAndCommitButton' ) ) {
+                    new YAHOO.widget.Button('saveAndCommitButton');
+                }
+            } );
+        </script>
+ENDHTML
+    return $self->session->style->process(
+        '<div class="yui-skin-sam">' . $f->toHtml . '</div>',
+        "PBtmpl0000000000000137"
+    );
+}
+
+sub www_addSave {
+    my $self    = shift;
+    my $session = $self->session;
+    my ( $form ) = $session->quick(qw{ form });
+
+    return $session->privilege->insufficient() unless $self->canEdit;
+    if ($self->session->config("maximumAssets")) {
+        my ($count) = $self->session->db->quickArray("select count(*) from asset");
+        my $i18n = WebGUI::International->new($self->session, "Asset");
+        return $self->session->style->userStyle($i18n->get("over max assets")) if ($self->session->config("maximumAssets") <= $count);
+    }
+    my $object;
+    my $className   = $form->process('className','className') || $form->process('class','className');
+    $object = $self->addChild({className=>$className});	
+    return $self->www_view unless defined $object;
+    $object->{_parent} = $self;
+    $object->url(undef);
+
+    # Process properties from form post
+    my $errors = $object->processEditForm;
+    if (ref $errors eq 'ARRAY') {
+        $session->stow->set('editFormErrors', $errors);
+        if ($session->form->process('assetId') eq 'new') {
+            $object->purge;
+            return $self->www_add();
+        } else {
+            $object->purgeRevision;
+            return $self->www_edit();
+        }
+    }
+
+    $object->updateHistory("added");
+
+    # we handle auto commit assets here in case they didn't handle it themselves
+    if ($object->getAutoCommitWorkflowId) {
+        $object->requestAutoCommit;
+        #Since the version tag makes new objects, fetch a fresh one here.
+        $object = $object->cloneFromDb;
+    }
+    # else, try to to auto commit
+    else {
+        my $commitStatus = WebGUI::VersionTag->autoCommitWorkingIfEnabled($session, {
+            override        => scalar $session->form->process('saveAndCommit'),
+            allowComments   => 1,
+            returnUrl       => $self->getUrl,
+        });
+        if ($commitStatus eq 'redirect') {
+            ##Redirect set by tag.  Return nothing to send the user over to the redirect.
+            return undef;
+        }
+        elsif ($commitStatus eq 'commit') {
+            ##Commit was successful.  Update the local object cache so that it will no longer
+            ##register as locked.
+            $object = $object->cloneFromDb;
+        }
+    }
+
+    # Handle "saveAndReturn" button
+    if ( $session->form->process( "saveAndReturn" ) ne "" ) {
+        return $object->www_edit;
+    }
+
+    # Handle "proceed" form parameter
+    my $proceed = $session->form->process('proceed');
+    if ($proceed eq "manageAssets") {
+        $session->asset($object->getParent);
+        return $session->asset->www_manageAssets;
+    }
+    elsif ($proceed eq "viewParent") {
+        $session->asset($object->getParent);
+        return $session->asset->www_view;
+    }
+    elsif ($proceed eq "editParent") {
+        $session->asset($object->getParent);
+        return $session->asset->www_edit;
+    }    
+    elsif ($proceed eq "goBackToPage" && $session->form->process('returnUrl')) {
+        $session->http->setRedirect($session->form->process("returnUrl"));
+        return undef;
+    }
+    elsif ($proceed ne "") {
+        my $method = "www_".$session->form->process("proceed");
+        $session->asset($object);
+        return $session->asset->$method();
+    }
+
+    $session->asset($object->getContainer);
+    return $session->asset->www_view;
 }
 
 #-------------------------------------------------------------------
@@ -2771,14 +2893,7 @@ sub www_edit {
     my $f   = eval { $self->getEditForm };
     return $@ if $@;
     $f->addField( "Hidden", name => "func", value => "editSave" );
-    if ( $func eq 'add' ) {
-        my $className   = $self->session->form->get('className');
-        $f->action( $self->getParent->getUrl );
-        $f->getTab('meta')->getField( 'className' )->set('value', $className);
-    }
-    else {
-        $f->action( $self->getUrl );
-    }
+    $f->action( $self->getUrl );
 
     # TODO: Make this whole thing a template instead!
     $style->setCss($url->extras('yui/build/button/assets/skins/sam/button.css'));
@@ -2800,18 +2915,11 @@ sub www_edit {
                     new YAHOO.widget.Button('saveAndCommitButton');
                 }
             } );
-        </script>
-ENDHTML
-
-    if ( $func ne 'add' ) {
-        $self->session->style->setRawHeadTags(<<'ENDHTML');
-        <script type="text/javascript">
             if ( window.parent && window.parent.admin ) {
                 window.parent.admin.adminBar.show("assetHelpers");
             }
         </script>
 ENDHTML
-    }
 
     return $self->session->style->process(
         '<div class="yui-skin-sam">' . $f->toHtml . '</div>',
@@ -2823,9 +2931,7 @@ ENDHTML
 
 =head2 www_editSave ( )
 
-Saves and updates history. If canEdit, returns www_manageAssets() if a new Asset is created, otherwise returns www_view().  Will return an insufficient Privilege if canEdit returns False, or if the submitted form does not pass the C<$session->form->validToken> check.
-
-NOTE: Don't try to override or overload this method. It won't work. What you are looking for is processEditForm().
+Save a new revision of this asset.
 
 =cut
 
@@ -2835,41 +2941,16 @@ sub www_editSave {
     my ( $form ) = $session->quick(qw{ form });
 
     ##If this is a new asset (www_add), the parent may be locked.  We should still be able to add a new asset.
-    my $isNewAsset = $session->form->process("assetId") eq "new" ? 1 : 0;
-    return $session->privilege->locked() if (!$self->canEditIfLocked and !$isNewAsset);
+    return $session->privilege->locked() unless $self->canEditIfLocked;
     return $session->privilege->insufficient() unless $self->canEdit;
-    if ($self->session->config("maximumAssets")) {
-        my ($count) = $self->session->db->quickArray("select count(*) from asset");
-        my $i18n = WebGUI::International->new($self->session, "Asset");
-        return $self->session->style->userStyle($i18n->get("over max assets")) if ($self->session->config("maximumAssets") <= $count);
-    }
-    my $object;
-    if ($isNewAsset) {
-        my $className   = $form->process('className','className') || $form->process('class','className');
-        $object = $self->addChild({className=>$className});	
-        return $self->www_view unless defined $object;
-        $object->{_parent} = $self;
-        $object->url(undef);
-    } 
-    else {
-        if ($self->canEditIfLocked) {
-            $object = $self->addRevision;
-        } 
-        else {
-            return $session->asset($self->getContainer)->www_view;
-        }
-    }
+    my $object = $self->addRevision;
+
     # Process properties from form post
     my $errors = $object->processEditForm;
     if (ref $errors eq 'ARRAY') {
         $session->stow->set('editFormErrors', $errors);
-        if ($session->form->process('assetId') eq 'new') {
-            $object->purge;
-            return $self->www_add();
-        } else {
-            $object->purgeRevision;
-            return $self->www_edit();
-        }
+        $object->purgeRevision;
+        return $self->www_edit();
     }
 
     $object->updateHistory("edited");
