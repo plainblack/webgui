@@ -779,7 +779,7 @@ Field to get privacy setting for.
 sub getProfileFieldPrivacySetting {
     my $self      = shift;
     my $session   = $self->session;
-    my $field     = shift;
+    my $fieldId   = shift;
 
     unless ($self->{_privacySettings}) {
         #Look it up manually because we want to cache this separately.
@@ -791,12 +791,16 @@ sub getProfileFieldPrivacySetting {
         $self->{_privacySettings} = JSON->new->decode($privacySettings);
     }
     
-    return $self->{_privacySettings} unless ($field);
+    return $self->{_privacySettings} unless ($fieldId);
 
     #No privacy settings returned the privacy setting field
-    return "none" if($field eq "wg_privacySettings");
+    return "none" if($fieldId eq "wg_privacySettings");
 
-    return $self->{_privacySettings}->{$field};
+    if (exists $self->{_privacySettings}->{$fieldId}) {
+        return $self->{_privacySettings}->{$fieldId};
+    }
+    my $field = WebGUI::ProfileField->new($session, $fieldId);
+    return $field && $field->get('defaultPrivacySetting');
 }   
 
 
