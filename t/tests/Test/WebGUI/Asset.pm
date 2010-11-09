@@ -461,21 +461,27 @@ sub t_10_addRevision : Tests {
     my $newRevision = $asset->addRevision( 
         { title => "Newly Revised Title" }, 
         $asset->revisionDate+2, 
+        {
+            skipAutoCommitWorkflows => 1,
+        }
     );
     isa_ok( $newRevision, Scalar::Util::blessed( $asset ), "addRevision returns new revision of asset object" );
     is( $newRevision->title, "Newly Revised Title", "properties set correctly" );
     is( $newRevision->revisionDate, $asset->revisionDate+2, 'revisionDate set correctly' );
-
-    # is( $newRevision->tagId, $tag->getId, "Added to existing working tag" ); # XXX failing for WebGUI::Asset::MapPoint
-    # copied this code
-    SKIP: {
-        no strict 'refs';
-        skip 'Added to existing working tag / class does something magical to tagId using a custom getAutoCommitWorkflowId method', 1, if exists ${$test->class . '::'}{getAutoCommitWorkflowId};
-        is( $newRevision->tagId, $tag->getId, 'Added to existing working tag' );
-    };
-
-   
+    is( $newRevision->tagId, $tag->getId, "Added to existing working tag" );
     $newRevision->purgeRevision;
+
+    # Test autocommit
+    if ( $asset->getAutoCommitWorkflowId ) {
+        $tag->commit;
+        $newRevision    = $asset->addRevision( { title => 'Auto Committed 2!' }, $asset->revisionDate + 8 );
+        is( $newRevision->title, 'Auto Committed 2!', 'properties set correctly' );
+        isnt( $newRevision->tagId, $tag->getId, 'Not Added to existing working tag because parent committed' );
+        ok( my $newTag = WebGUI::VersionTag->new( $session, $newRevision->tagId ), 'tag exists' );
+        $newRevision->purgeRevision;
+        $newTag->rollback;
+    }
+
     debug($@);
     undef $@;
 }
@@ -540,13 +546,13 @@ sub t_11_getEditForm : Tests {
         note "label ``$label'' not in form" if ! grep { $_ eq $label } @form;
     }
 
-    warn "properties: " . join ', ', sort { $a cmp $b } map { $_ } @properties;
-    warn "form: " . join ', ', sort { $a cmp $b } map { $_ } @form;
+    note "properties: " . join ', ', sort { $a cmp $b } map { $_ } @properties;
+    note "form: " . join ', ', sort { $a cmp $b } map { $_ } @form;
 
     cmp_deeply(
-        [ sort { $a cmp $b } map { $_ } @form ],
-        [ sort { $a cmp $b } map { $_ } @properties ],
-        'getProperties agrees with getEditForm->getFieldsRecursive',
+        \@properties,
+        subbagof( @form ),
+        'getProperties are all in getEditForm->getFieldsRecursive',
     );
 
     debug($@);
@@ -564,9 +570,9 @@ sub t_20_www_editSave : Tests {
     my $oldGroupId = $asset->groupIdEdit;
     $asset->groupIdEdit( 7 ); # Everybody! Everybody!
 
+    $asset->commmit;
     $tag->setWorking;
-
-sleep 2; # XXXX Todo -- investigate whether this is actually fixing duplicate commit problems
+    sleep 2; # XXXX Todo -- investigate whether this is actually fixing duplicate commit problems
 
     my %mergedProperties = (   
         formProperties($asset),  
@@ -580,6 +586,7 @@ sleep 2; # XXXX Todo -- investigate whether this is actually fixing duplicate co
 
     $session->request->setup_body( \%mergedProperties );
 
+    my $content;
     ok(eval { $asset->www_editSave; }, 'www_editSave returns true');
     debug($@);
     undef $@;
@@ -590,17 +597,14 @@ sleep 2; # XXXX Todo -- investigate whether this is actually fixing duplicate co
     undef $@;
 
     ok( $newRevision->tagId, 'new revision has a tag' );
-
-    SKIP: {
-        no strict 'refs';
-        skip 'class does something magical to tagId using a custom getAutoCommitWorkflowId method', 1, if exists ${$test->class . '::'}{getAutoCommitWorkflowId};
-        is( $newRevision->tagId, $tag->getId, 'new revision tagId is current working tag' );
-    };
-
-    SKIP: {
-        skip 'no templateId in object to inspect', 1, unless $mergedProperties{templateId};
-        is( $newRevision->templateId, $mergedProperties{templateId}, 'new revision has the corret templateId' );
-    };
+    if ( $asset->getAutoCommitWorkflowId ) {
+        isnt( $newRevision->tagId, $tag->getId, 'Not added to existing working tag' );
+        ok( my $newTag = WebGUI::VersionTag->new( $session, $newRevision->tagId ), 'tag exists' );
+    }
+    else {
+        is( $newRevision->tagId, $tag->getId, "Added to existing working tag" );
+    }
+    is( $newRevision->title, $mergedProperties{title}, 'new revision has the corret title' );
 
     # Alter permissions so it does not work
     # XXX todo?
@@ -611,6 +615,23 @@ sleep 2; # XXXX Todo -- investigate whether this is actually fixing duplicate co
     eval { $asset->groupIdEdit( $oldGroupId ); };
 
     debug($@);
+    undef $@;
+}
+
+sub t_20_addSave : Tests {
+    note "www_addSave";
+    my ( $test ) = @_;
+    my $session = $test->session;
+    my ( $tag, $asset, @parents ) = $test->getAnchoredAsset();
+
+    # Alter permissions so www_addSave works
+    my $oldGroupId = $asset->groupIdEdit;
+    $asset->groupIdEdit( 7 ); # Everybody! Everybody!
+
+    $tag->setWorking;
+
+
+    debug( $@ );
     undef $@;
 }
 
