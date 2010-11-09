@@ -2231,6 +2231,55 @@ sub prepareWidgetView {
     $self->{_viewTemplate} = $template;
 }
 
+#----------------------------------------------------------------------------
+
+=head2 proceed ( [method] )
+
+Proceed from a form submit based on the given method. By default, checks the "proceed"
+form parameter.
+
+Proceed types:
+
+ manageAssets       - Go to the asset manager
+ viewParent         - Go to the parent asset
+ editParent         - Go to the parent asset edit form
+ goBackToPage       - Go to the page specified in the "returnUrl" form param
+ *                  - Go to www_* method
+ <default>          - Go to the www_view method
+
+=cut
+
+sub proceed {
+    my ( $self, $proceed ) = @_;
+    my $session = $self->session;
+
+    my $proceed ||= $session->form->process('proceed');
+    if ($proceed eq "manageAssets") {
+        $session->asset($object->getParent);
+        return $session->asset->www_manageAssets;
+    }
+    elsif ($proceed eq "viewParent") {
+        $session->asset($object->getParent);
+        return $session->asset->www_view;
+    }
+    elsif ($proceed eq "editParent") {
+        $session->asset($object->getParent);
+        return $session->asset->www_edit;
+    }
+    elsif ($proceed eq "goBackToPage" && $session->form->process('returnUrl')) {
+        $session->http->setRedirect($session->form->process("returnUrl"));
+        return undef;
+    }
+    elsif ($proceed ne "") {
+        my $method = "www_".$session->form->process("proceed");
+        $session->asset($object);
+        return $session->asset->$method();
+    }
+
+    $session->asset($object->getContainer);
+    return $session->asset->www_view;
+}
+
 #-------------------------------------------------------------------
 
 =head2 processEditForm ( )
@@ -2716,6 +2765,14 @@ ENDHTML
     );
 }
 
+#----------------------------------------------------------------------------
+
+=head2 www_addSave
+
+Process the add form, creating the new asset.
+
+=cut
+
 sub www_addSave {
     my $self    = shift;
     my $session = $self->session;
@@ -2779,31 +2836,7 @@ sub www_addSave {
     }
 
     # Handle "proceed" form parameter
-    my $proceed = $session->form->process('proceed');
-    if ($proceed eq "manageAssets") {
-        $session->asset($object->getParent);
-        return $session->asset->www_manageAssets;
-    }
-    elsif ($proceed eq "viewParent") {
-        $session->asset($object->getParent);
-        return $session->asset->www_view;
-    }
-    elsif ($proceed eq "editParent") {
-        $session->asset($object->getParent);
-        return $session->asset->www_edit;
-    }    
-    elsif ($proceed eq "goBackToPage" && $session->form->process('returnUrl')) {
-        $session->http->setRedirect($session->form->process("returnUrl"));
-        return undef;
-    }
-    elsif ($proceed ne "") {
-        my $method = "www_".$session->form->process("proceed");
-        $session->asset($object);
-        return $session->asset->$method();
-    }
-
-    $session->asset($object->getContainer);
-    return $session->asset->www_view;
+    return $self->proceed;
 }
 
 #-------------------------------------------------------------------
@@ -2985,31 +3018,7 @@ sub www_editSave {
     }
 
     # Handle "proceed" form parameter
-    my $proceed = $session->form->process('proceed');
-    if ($proceed eq "manageAssets") {
-        $session->asset($object->getParent);
-        return $session->asset->www_manageAssets;
-    }
-    elsif ($proceed eq "viewParent") {
-        $session->asset($object->getParent);
-        return $session->asset->www_view;
-    }
-    elsif ($proceed eq "editParent") {
-        $session->asset($object->getParent);
-        return $session->asset->www_edit;
-    }    
-    elsif ($proceed eq "goBackToPage" && $session->form->process('returnUrl')) {
-        $session->http->setRedirect($session->form->process("returnUrl"));
-        return undef;
-    }
-    elsif ($proceed ne "") {
-        my $method = "www_".$session->form->process("proceed");
-        $session->asset($object);
-        return $session->asset->$method();
-    }
-
-    $session->asset($object->getContainer);
-    return $session->asset->www_view;
+    return $self->proceed;
 }
 
 
