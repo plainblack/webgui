@@ -2235,7 +2235,7 @@ sub prepareWidgetView {
 
 =head2 proceed ( [method] )
 
-Proceed from a form submit based on the given method. By default, checks the "proceed"
+Redirect from a form submit based on the given method. By default, checks the "proceed"
 form parameter.
 
 Proceed types:
@@ -2255,15 +2255,15 @@ sub proceed {
 
     my $proceed ||= $session->form->process('proceed');
     if ($proceed eq "manageAssets") {
-        $session->asset($object->getParent);
+        $session->asset($self->getParent);
         return $session->asset->www_manageAssets;
     }
     elsif ($proceed eq "viewParent") {
-        $session->asset($object->getParent);
+        $session->asset($self->getParent);
         return $session->asset->www_view;
     }
     elsif ($proceed eq "editParent") {
-        $session->asset($object->getParent);
+        $session->asset($self->getParent);
         return $session->asset->www_edit;
     }
     elsif ($proceed eq "goBackToPage" && $session->form->process('returnUrl')) {
@@ -2272,11 +2272,11 @@ sub proceed {
     }
     elsif ($proceed ne "") {
         my $method = "www_".$session->form->process("proceed");
-        $session->asset($object);
+        $session->asset($self);
         return $session->asset->$method();
     }
 
-    $session->asset($object->getContainer);
+    $session->asset($self->getContainer);
     return $session->asset->www_view;
 }
 
@@ -2836,7 +2836,7 @@ sub www_addSave {
     }
 
     # Handle "proceed" form parameter
-    return $self->proceed;
+    return $object->proceed;
 }
 
 #-------------------------------------------------------------------
