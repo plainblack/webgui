@@ -34,7 +34,7 @@ property test => (
     "test": {
         "variable1": "yes",
         "next": "section2",
-         );
+         }
 },
 ]
 END_SPEC

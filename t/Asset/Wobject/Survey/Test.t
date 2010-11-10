@@ -152,7 +152,7 @@ cmp_deeply(
     'surveyOrderIndex correct'
 );
 
-my $t1 = WebGUI::Asset::Wobject::Survey::Test->create( $session, { assetId => $s->getId } );
+my $t1 = WebGUI::Asset::Wobject::Survey::Test->new( $session, { assetId => $s->getId } );
 WebGUI::Test->addToCleanup(sub {$t1->delete();});
 my $spec;
 
