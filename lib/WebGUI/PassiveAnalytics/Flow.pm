@@ -277,7 +277,7 @@ sub www_editRule {
 	$form->hidden( name=>"op",     value=>"passiveAnalytics");
 	$form->hidden( name=>"func",   value=>"editRuleSave");
 	$form->hidden( name=>"ruleId", value=>$ruleId);
-    $form->dynamicForm([WebGUI::PassiveAnalytics::Rule->crud_definition($session)], 'properties', $rule);
+    $rule->crud_form($form, $rule);
 	$form->submit;
 
 	my $i18n = WebGUI::International->new($session, 'PassiveAnalytics');

@@ -24,6 +24,7 @@ use Tie::IxHash;
 use Clone qw/clone/;
 use WebGUI::DateTime;
 use WebGUI::Exception;
+use WebGUI::HTMLForm;
 
 has session => (
     is       => 'ro',
@@ -365,6 +366,29 @@ sub crud_dropTable {
 	my $dbh = $db->dbh;
 	$db->write("drop table if exists ".$dbh->quote_identifier($class->meta->tableName()));
 	return 1;
+}
+
+#-------------------------------------------------------------------
+
+=head2 crud_form ( $form, [$object] )
+
+A class method to populate a WebGUI::HTMLForm object with all the fields for this Cruddy object.
+
+=head3 $form
+
+A WebGUI::HTMLForm object
+
+=head3 $object
+
+An object of this class, used to provide values to the form.  It's optional.
+
+=cut
+
+sub crud_form {
+	my ($class, $form, $object) = @_;
+    my $properties = $class->crud_getProperties;
+    my $definition = [ { properties => $properties, }];
+    $form->dynamicForm($definition, 'properties', $object);
 }
 
 #-------------------------------------------------------------------
