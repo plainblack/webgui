@@ -86,7 +86,7 @@ sub www_addBundleSave {
     return $session->privilege->insufficient() unless canView($session);
     my $form       = $session->form;
     my $bundleName = $form->get('bundleName');
-    my $bundle = WebGUI::FilePump::Bundle->create($session, {
+    my $bundle = WebGUI::FilePump::Bundle->new($session, {
         bundleName   => $bundleName,
         lastModified => time(),
     });
@@ -273,7 +273,7 @@ EOTABLE
                  ;
 
         my $rows = '';
-        my $files = $bundle->get($fileType);
+        my $files = $bundle->$fileType;
         foreach my $file (@{ $files }) {
             my $urlFrag = 'bundleId='.$bundleId.';fileType='.$type.';fileId='.$file->{fileId};
             $rows .= sprintf '<tr><td>%s</td><td>%s</td><td>%s</td></tr>', 
@@ -342,20 +342,20 @@ sub www_manage {
     my $getABundle = WebGUI::FilePump::Bundle->getAllIterator($session,{ orderBy => 'bundleName' } );
     my $notYet = $i18n->get('not yet');
     while (my $bundle = $getABundle->()) {
-        my $lastModified = $bundle->get('lastModified');
-        my $lastBuild    = $bundle->get('lastBuild');
+        my $lastModified = $bundle->lastModified;
+        my $lastBuild    = $bundle->lastBuild;
         my $build = '';
         if ($lastModified > $lastBuild) {
             $build = sprintf q| <a href="%s">(%s)</a>|, 
-                     $url->gateway($url->getRequestedUrl,'op=filePump;func=buildBundle;bundleId='.$bundle->getId),
+                     $url->gateway($url->getRequestedUrl,'op=filePump;func=buildBundle;bundleId='.$bundle->bundleId),
                      $i18n->get('build');
         }
         $rows .= sprintf '<tr><td>%s</td><td><a href="%s">%s</a></td><td>%s</td><td>%s</td>',
-                 $session->icon->delete('op=filePump;func=deleteBundle;bundleId='.$bundle->getId),
-                 $url->gateway($url->getRequestedUrl,'op=filePump;func=editBundle;bundleId='.$bundle->getId),
-                 $bundle->get('bundleName'),
-                 $bundle->get('lastModified') ? $dt->epochToHuman($lastModified)        : $notYet,
-                 $bundle->get('lastBuild')    ? $dt->epochToHuman($lastBuild).$build    : $notYet,
+                 $session->icon->delete('op=filePump;func=deleteBundle;bundleId='.$bundle->bundleId),
+                 $url->gateway($url->getRequestedUrl,'op=filePump;func=editBundle;bundleId='.$bundle->bundleId),
+                 $bundle->bundleName,
+                 $bundle->lastModified ? $dt->epochToHuman($lastModified)        : $notYet,
+                 $bundle->lastBuild    ? $dt->epochToHuman($lastBuild).$build    : $notYet,
                ;
     }
     my $output = sprintf <<EOHTML, $i18n->get('bundle name'), $i18n->get('last modified'), $i18n->get('last build'), $rows;
