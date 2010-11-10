@@ -106,8 +106,10 @@ sub getAnchoredAsset {
     my @parents = $test->getMyParents;
     my $asset   = $parents[-1]->addChild({
         className => $test->class,
+        status  => "pending",
+        tagId   => $tag->getId,
         $test->constructorExtras($session),
-    }, undef, undef, {skipNotification => 1, skipAutoCommitWorkflows => 1,});
+    }, undef, undef, {skipNotification => 1});
     # warn "XXX getAnchoredAsset:  created new asset of Id: " . $asset->getId . ' of type: ' . ref $asset;
     $tag->commit;
     foreach my $a ($asset, @parents) {
@@ -125,12 +127,18 @@ sub getMyParents {
     my $default        = WebGUI::Asset->getDefault($session);
     push @parents, $default;
     my $parent = $default;
+    my $tag     = WebGUI::VersionTag->getWorking($session);
     foreach my $parent_class (@{ $parent_classes }) {
         my $new_parent = $parent->addChild(
-            {className => $parent_class, $test->constructorExtras($session), }, 
+            {   
+                className => $parent_class, 
+                status => "pending", 
+                tagId => $tag->getId,
+                $test->constructorExtras($session), 
+            }, 
             undef, 
             undef, 
-            {skipNotification => 1, skipAutoCommitWorkflows => 1,},
+            {skipNotification => 1,},
         );
         push @parents, $new_parent;
         $parent = $new_parent;
@@ -461,26 +469,11 @@ sub t_10_addRevision : Tests {
     my $newRevision = $asset->addRevision( 
         { title => "Newly Revised Title" }, 
         $asset->revisionDate+2, 
-        {
-            skipAutoCommitWorkflows => 1,
-        }
     );
     isa_ok( $newRevision, Scalar::Util::blessed( $asset ), "addRevision returns new revision of asset object" );
     is( $newRevision->title, "Newly Revised Title", "properties set correctly" );
     is( $newRevision->revisionDate, $asset->revisionDate+2, 'revisionDate set correctly' );
-    is( $newRevision->tagId, $tag->getId, "Added to existing working tag" );
     $newRevision->purgeRevision;
-
-    # Test autocommit
-    if ( $asset->getAutoCommitWorkflowId ) {
-        $tag->commit;
-        $newRevision    = $asset->addRevision( { title => 'Auto Committed 2!' }, $asset->revisionDate + 8 );
-        is( $newRevision->title, 'Auto Committed 2!', 'properties set correctly' );
-        isnt( $newRevision->tagId, $tag->getId, 'Not Added to existing working tag because parent committed' );
-        ok( my $newTag = WebGUI::VersionTag->new( $session, $newRevision->tagId ), 'tag exists' );
-        $newRevision->purgeRevision;
-        $newTag->rollback;
-    }
 
     debug($@);
     undef $@;
@@ -570,7 +563,7 @@ sub t_20_www_editSave : Tests {
     my $oldGroupId = $asset->groupIdEdit;
     $asset->groupIdEdit( 7 ); # Everybody! Everybody!
 
-    $asset->commmit;
+    $asset->commit;
     $tag->setWorking;
     sleep 2; # XXXX Todo -- investigate whether this is actually fixing duplicate commit problems
 
