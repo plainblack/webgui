@@ -3,6 +3,7 @@
  - fixed #11946: Double time zone correction when addding an event
  - fixed #11952: Navigation template help error
  - fixed #11951: Privacy setting of new profile field
+ - fixed #11947: PayPal does not register in-state sales taxes
 
 7.10.4
  - Added WebGUI::Fork api
