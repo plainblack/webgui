@@ -95,7 +95,8 @@ sub addRevision {
 	my %mergedProperties = (%{$self->get}, %{$properties}, );
 
     # Set some defaults
-    $mergedProperties{ revisedBy } ||= $session->user->userId;
+    $mergedProperties{ revisedBy    } ||= $session->user->userId;
+    $mergedProperties{ status       } ||= "approved";
 
     #Instantiate new revision and fill with real data
     my $newVersion = WebGUI::Asset->newById($session, $self->getId, $now);
