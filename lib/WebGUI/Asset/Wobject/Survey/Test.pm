@@ -18,14 +18,14 @@ property assetId => (
          );
 property name => (
         fieldType    => 'text',
-        label        => [ 'test name', 'Asset_Survey' , ''],
-        hoverHelp    => [ 'test name help', 'Asset_Survey' , ''],
+        label        => [ 'test name', 'Asset_Survey' ],
+        hoverHelp    => [ 'test name help', 'Asset_Survey' ],
         default      => '',
          );
 property test => (
         fieldType    => 'codearea',
-        label        => [ 'test spec', 'Asset_Survey' , ''],
-        hoverHelp    => [ 'test spec help', 'Asset_Survey' , ''],
+        label        => [ 'test spec', 'Asset_Survey' ],
+        hoverHelp    => [ 'test spec help', 'Asset_Survey' ],
         syntax       => 'js',
         default      => <<END_SPEC,
 [
