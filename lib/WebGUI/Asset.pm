@@ -2786,12 +2786,49 @@ sub www_addSave {
         my $i18n = WebGUI::International->new($self->session, "Asset");
         return $self->session->style->userStyle($i18n->get("over max assets")) if ($self->session->config("maximumAssets") <= $count);
     }
+
+    # Determine what version tag we should use
+    my $autoCommitId  = $self->getAutoCommitWorkflowId();
+
+    my ($workingTag, $oldWorking);
+    if ( $autoCommitId ) {
+        $workingTag
+            = WebGUI::VersionTag->create( $session, { 
+                groupToUse  => '12',            # Turn Admin On (for lack of something better)
+                workflowId  => $autoCommitId,
+            } ); 
+    }
+    else {
+        my $parentAsset;
+        if ( not defined( $parentAsset = $self->getParent ) ) {
+            $parentAsset = WebGUI::Asset->newPending( $session, $self->parentId );
+        }
+        if ( $parentAsset->hasBeenCommitted ) {
+            $workingTag = WebGUI::VersionTag->getWorking( $session );
+        }
+        else {
+            $oldWorking = WebGUI::VersionTag->getWorking($session, 'noCreate');
+            $workingTag = WebGUI::VersionTag->new( $session, $parentAsset->tagId );
+            $workingTag->setWorking();
+        }
+    }
+
+    # Add the new asset
     my $object;
     my $className   = $form->process('className','className') || $form->process('class','className');
-    $object = $self->addChild({className=>$className});	
+    $object = $self->addChild({
+        className   => $className,
+        revisedBy   => $session->user->userId,
+        tagId       => $workingTag->getId,
+        status      => "pending",
+    });
     return $self->www_view unless defined $object;
     $object->{_parent} = $self;
     $object->url(undef);
+
+    # More version tag stuff
+    $object->setAutoCommitTag($workingTag) if (defined $autoCommitId);
+    $oldWorking->setWorking if $oldWorking;
 
     # Process properties from form post
     my $errors = $object->processEditForm;
@@ -2978,7 +3015,43 @@ sub www_editSave {
     ##If this is a new asset (www_add), the parent may be locked.  We should still be able to add a new asset.
     return $session->privilege->locked() unless $self->canEditIfLocked;
     return $session->privilege->insufficient() unless $self->canEdit;
-    my $object = $self->addRevision;
+
+    # Determine what version tag we should use
+    my $autoCommitId  = $self->getAutoCommitWorkflowId();
+
+    my ($workingTag, $oldWorking);
+    if ( $autoCommitId ) {
+        $workingTag
+            = WebGUI::VersionTag->create( $session, { 
+                groupToUse  => '12',            # Turn Admin On (for lack of something better)
+                workflowId  => $autoCommitId,
+            } ); 
+    }
+    else {
+        my $parentAsset;
+        if ( not defined( $parentAsset = $self->getParent ) ) {
+            $parentAsset = WebGUI::Asset->newPending( $session, $self->parentId );
+        }
+        if ( $parentAsset->hasBeenCommitted ) {
+            $workingTag = WebGUI::VersionTag->getWorking( $session );
+        }
+        else {
+            $oldWorking = WebGUI::VersionTag->getWorking($session, 'noCreate');
+            $workingTag = WebGUI::VersionTag->new( $session, $parentAsset->tagId );
+            $workingTag->setWorking();
+        }
+    }
+
+    # Add the new revision
+    my $object = $self->addRevision({
+        revisedBy   => $session->user->userId,
+        tagId       => $workingTag->getId,
+        status      => "pending",
+    });
+
+    # More version tag stuff
+    $object->setAutoCommitTag($workingTag) if (defined $autoCommitId);
+    $oldWorking->setWorking if $oldWorking;
 
     # Process properties from form post
     my $errors = $object->processEditForm;

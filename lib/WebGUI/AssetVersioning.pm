@@ -51,9 +51,6 @@ These methods are available from this class:
 Creates a new revision of an existing asset. Returns the new revision of
 the asset.
 
-Programmers should almost never call this method directly, but 
-rather use the update() method instead.
-
 When using this method, take care that an asset doesn't try to add two
 revisions of the same asset within the same second. It will cause things to 
 fail. This is not a bug
@@ -71,12 +68,6 @@ created. Defaults to time().
 
 A hash reference of options that change the behavior of this method.
 
-=head4 skipAutoCommitWorkflows
-
-If this is set to 1 then assets that would normally autocommit their 
-workflow (like CS Posts) will instead add themselves to the normal working 
-version tag.
-
 =head4 skipNotification
 
 If this is set to 1 then assets that normally send notifications will (like CS
@@ -91,31 +82,6 @@ sub addRevision {
     my $now         = shift || time();
     my $options     = shift;
 
-    my $autoCommitId  = $self->getAutoCommitWorkflowId() unless ($options->{skipAutoCommitWorkflows});
-
-    my ($workingTag, $oldWorking);
-    if ( $autoCommitId ) {
-        $workingTag  
-            = WebGUI::VersionTag->create( $session, { 
-                groupToUse  => '12',            # Turn Admin On (for lack of something better)
-                workflowId  => $autoCommitId,
-            } ); 
-    }
-    else {
-        my $parentAsset;
-        if ( not defined( $parentAsset = $self->getParent ) ) {
-            $parentAsset = WebGUI::Asset->newPending( $session, $self->parentId );
-        }
-        if ( $parentAsset->hasBeenCommitted ) {
-            $workingTag = WebGUI::VersionTag->getWorking( $session );
-        }
-        else {
-            $oldWorking = WebGUI::VersionTag->getWorking($session, 'noCreate');
-            $workingTag = WebGUI::VersionTag->new( $session, $parentAsset->tagId );
-            $workingTag->setWorking();
-        }
-    }
-
     #Create a dummy revision to be updated with real data later
     $session->db->beginTransaction;
 
@@ -126,7 +92,10 @@ sub addRevision {
     $session->db->commit;
 
 	# current values, and the user set properties
-	my %mergedProperties = (%{$self->get}, %{$properties}, (status => 'pending', revisedBy => $session->user->userId, tagId => $workingTag->getId), );
+	my %mergedProperties = (%{$self->get}, %{$properties}, );
+
+    # Set some defaults
+    $mergedProperties{ revisedBy } ||= $session->user->userId;
 
     #Instantiate new revision and fill with real data
     my $newVersion = WebGUI::Asset->newById($session, $self->getId, $now);
@@ -134,12 +103,9 @@ sub addRevision {
     $newVersion->updateHistory("created revision");
     $newVersion->setVersionLock;
     $newVersion->update(\%mergedProperties);
-    $newVersion->setAutoCommitTag($workingTag) if (defined $autoCommitId);
-    $oldWorking->setWorking if $oldWorking;
 
     return $newVersion;
 }
-
 
 #-------------------------------------------------------------------
 
