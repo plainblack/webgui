@@ -830,7 +830,7 @@ sub promote {
 	my $tableKey = $self->meta->tableKey();
 	my $tableName = $self->meta->tableName();
 	my $sequenceKey = $self->meta->sequenceKey();
-	my $sequenceKeyValue = $self->$sequenceKey;
+	my $sequenceKeyValue = $sequenceKey ? $self->$sequenceKey : '';
 	my @params = ($self->sequenceNumber-1);
 	my $clause = '';
 	my $db = $self->session->db;
