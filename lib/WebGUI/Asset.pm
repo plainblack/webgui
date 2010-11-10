@@ -2834,13 +2834,8 @@ sub www_addSave {
     my $errors = $object->processEditForm;
     if (ref $errors eq 'ARRAY') {
         $session->stow->set('editFormErrors', $errors);
-        if ($session->form->process('assetId') eq 'new') {
-            $object->purge;
-            return $self->www_add();
-        } else {
-            $object->purgeRevision;
-            return $self->www_edit();
-        }
+        $object->purge;
+        return $self->www_add();
     }
 
     $object->updateHistory("added");
