@@ -16,7 +16,6 @@ package WebGUI::Role::Asset::JSONCollateral;
 
 use strict;
 use Moose::Role;
-use WebGUI::Definition::Asset;
 
 =head1 NAME
 
