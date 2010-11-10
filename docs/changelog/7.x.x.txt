@@ -1,4 +1,5 @@
 7.9.19
+ - fixed #11956: ExtendCalenderRecurrence bug
 
 7.9.18
  - fixed #11938: upgrade script always removes specialState

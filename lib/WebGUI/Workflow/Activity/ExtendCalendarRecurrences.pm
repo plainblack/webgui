@@ -165,6 +165,10 @@ sub processRecurrence {
     my ( $self, $recurId, $timeLimit ) = @_;
     my $eventId = $self->findLastEventId($recurId);
     my $event   = WebGUI::Asset::Event->new( $self->session, $eventId );
+    if (! $event) {
+        $self->session->log->warn("Unable to instanciate event with assetId $eventId");
+        return 0;
+    }
     my $recur   = $event->getRecurrence;
 
     my $start   = $event->getDateTimeStart->truncate(to => 'day');
