@@ -1,3 +1,5 @@
+7.9.19
+
 7.9.18
  - fixed #11938: upgrade script always removes specialState
  - fixed #11937: Duplicating events does not duplicate storage locations
