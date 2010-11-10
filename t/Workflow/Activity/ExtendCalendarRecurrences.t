@@ -97,7 +97,7 @@ my $sql = q{
 
 my $dates = $session->db->buildArrayRefOfHashRefs($sql, [$calendar->getId]);
 # 3 years at every other month (6 times) plus the one we started with
-is(@$dates, 19) or diag Dumper $dates;
+is(@$dates, 19, 'created right number of dates') or diag Dumper $dates;
 
 done_testing;
 
