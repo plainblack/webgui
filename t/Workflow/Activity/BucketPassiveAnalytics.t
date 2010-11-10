@@ -59,7 +59,7 @@ my @ruleSets = (
 my @url2 = @ruleSets;
 while (my $spec = shift @url2) {
     my ($bucket, undef, $regexp) = @{ $spec };
-    WebGUI::PassiveAnalytics::Rule->create($session, { bucketName => $bucket, regexp => $regexp });
+    WebGUI::PassiveAnalytics::Rule->new($session, { bucketName => $bucket, regexp => $regexp });
 }
 
 my @urls = map {$_->[1]} @ruleSets;

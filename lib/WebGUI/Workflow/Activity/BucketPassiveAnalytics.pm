@@ -72,8 +72,8 @@ sub execute {
     my @rules = ();
     my $getARule = WebGUI::PassiveAnalytics::Rule->getAllIterator($session);
     while (my $rule = $getARule->()) {
-        my $regexp = $rule->get('regexp');
-        push @rules, [ $rule->get('bucketName'), qr/$regexp/];
+        my $regexp = $rule->regexp;
+        push @rules, [ $rule->bucketName, qr/$regexp/];
     }
 
     ##Get the index stored from the last invocation of the Activity.  If this is
