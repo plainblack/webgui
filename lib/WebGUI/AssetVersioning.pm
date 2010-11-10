@@ -102,7 +102,6 @@ sub addRevision {
     my $newVersion = WebGUI::Asset->newById($session, $self->getId, $now);
     $newVersion->setSkipNotification if ($options->{skipNotification});
     $newVersion->updateHistory("created revision");
-    $newVersion->setVersionLock;
     $newVersion->update(\%mergedProperties);
 
     return $newVersion;

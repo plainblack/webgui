@@ -2827,6 +2827,7 @@ sub www_addSave {
     $object->url(undef);
 
     # More version tag stuff
+    $object->setVersionLock;
     $object->setAutoCommitTag($workingTag) if (defined $autoCommitId);
     $oldWorking->setWorking if $oldWorking;
 
@@ -3045,6 +3046,7 @@ sub www_editSave {
     });
 
     # More version tag stuff
+    $object->setVersionLock;
     $object->setAutoCommitTag($workingTag) if (defined $autoCommitId);
     $oldWorking->setWorking if $oldWorking;
 
