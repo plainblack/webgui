@@ -25,14 +25,7 @@ Package to manipulate collateral for WebGUI::Asset::Sku::Ad.
 This packages is a subclass of L<WebGUI::Crud>.  Please refer to that module
 for a list of base methods that are available.
 
-=cut
-
-use strict;
-use base 'WebGUI::Crud';
-
-#------------------------------------------------
-
-=head1 crud_definition ($session)
+=head1 properties
 
 Defines the fields this CRUD will contain.
 
@@ -47,46 +40,48 @@ isDeleted = boolean that indicates whether the ad has been deleted from the syst
 
 =cut
 
-sub crud_definition {
-	my ($class, $session) = @_;
-	my $definition = $class->SUPER::crud_definition($session);
-	$definition->{tableName} = 'adSkuPurchase';
-	$definition->{tableKey} = 'adSkuPurchaseId';
-	$definition->{properties} = {
-            userId => {
-	        fieldType	=> 'user',
-		defaultValue	=> undef,
-	    },
-	    transactionItemId => {
-		fieldType	=> 'guid',
-		defaultValue	=> undef,
-	    },
-	    adId => {
-		fieldType	=> 'guid',
-		defaultValue	=> undef,
-	    },
-	    clicksPurchased => {
-		fieldType	=> 'integer',
-		defaultValue	=> undef,
-	    },
-	    impressionsPurchased => {
-		fieldType	=> 'integer',
-		defaultValue	=> undef,
-	    },
-	    dateOfPurchase => {
-		fieldType	=> 'date',
-		defaultValue	=> undef,
-	    },
-	    storedImage => {
-		fieldType	=> 'guid',
-		defaultValue	=> undef,
-	    },
-	    isDeleted => {
-		fieldType	=> 'yesNo',
-		defaultValue	=> 0,
-	    },
-	};
-	return $definition;
-}
+use strict;
+use Moose;
+use WebGUI::Definition::Crud;
+extends 'WebGUI::Crud';
+define tableName    => 'adSkuPurchase';
+define tableKey     => 'adSkuPurchaseId';
+has adSkuPurchaseId => (
+    required => 1,
+    is       => 'ro',
+);
+property userId => (
+    label     => 'userId',
+    fieldType => 'user',
+);
+property transactionItemId => (
+    label     => 'transactionItemId',
+    fieldType => 'guid',
+);
+property adId => (
+    label     => 'adId',
+    fieldType => 'guid',
+);
+property clicksPurchased => (
+    label     => 'clicksPurchased',
+    fieldType => 'integer',
+);
+property impressionsPurchased => (
+    label     => 'impressionsPurchased',
+    fieldType => 'integer',
+);
+property dateOfPurchase => (
+    label     => 'dateOfPurchase',
+    fieldType => 'date',
+);
+property storedImage => (
+    label     => 'storedImage',
+    fieldType => 'guid',
+);
+property isDeleted => (
+    label     => 'isDeleted',
+    fieldType => 'yesNo',
+    default   => 0,
+);
 
 1;
