@@ -32,7 +32,7 @@ plan tests => 11;
 #----------------------------------------------------------------------------
 # put your tests here
 
-my $bundle = WebGUI::FilePump::Bundle->create($session, { bundleName => 'test bundle'});
+my $bundle = WebGUI::FilePump::Bundle->new($session, { bundleName => 'test bundle'});
 
 my $root = WebGUI::Asset->getRoot($session);
 
