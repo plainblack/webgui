@@ -29,12 +29,12 @@ plan tests => 4;        # Increment this number for each test you create
 # Create
 WebGUI::Crud::Subclass->crud_createTable($session);
 WebGUI::Test->addToCleanup(sub { WebGUI::Crud::Subclass->crud_dropTable($session); });
-my $record1 = WebGUI::Crud::Subclass->create($session, { field1 => 10 });
+my $record1 = WebGUI::Crud::Subclass->new($session, { field1 => 10 });
 isa_ok($record1, "WebGUI::Crud", "isa WebGUI::Crud");
 is($record1->get('field1'), 10, "got back correct field1 value");
 
 # bug #10660 (zero should not trigger defaultValue)
-is(WebGUI::Crud::Subclass->create($session, { field1 => 0 })->get('field1'), 0, 'zero does not trigger default');
-is(WebGUI::Crud::Subclass->create($session, { field1 => '' })->get('field1'), 5, '..but empty string intentionally triggers default');
+is(WebGUI::Crud::Subclass->new($session, { field1 => 0 })->get('field1'), 0, 'zero does not trigger default');
+is(WebGUI::Crud::Subclass->new($session, { field1 => '' })->get('field1'), '', '..but empty string does not trigger default either');
 
 #vim:ft=perl
