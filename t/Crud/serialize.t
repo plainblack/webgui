@@ -107,12 +107,13 @@ cmp_deeply(
     $cereal->get('jsonField'),
     [
         {
+            fiber            => 0,
             sugarContent     => 50,
             averageNutrition => 3,
             foodColoring     => 15,
         },
     ],
-    'get: returns safe references'
+    'get: returns unsafe references'
 ) or diag Dumper($cereal->jsonField);
 
 #vim:ft=perl
