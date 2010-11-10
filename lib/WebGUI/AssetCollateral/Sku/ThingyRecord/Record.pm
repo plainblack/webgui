@@ -39,40 +39,40 @@ use WebGUI::Definition::Crud;
 extends 'WebGUI::Crud';
 define tableName => 'ThingyRecord_record';
 define tableKey  => 'recordId';
-has recordId => (
+has recordId     => (
     required => 1,
     is       => 'ro',
 );
 property transactionId => (
-    label           => 'transactionId', 
-    fieldType       => "hidden",
+    label     => 'transactionId',
+    fieldType => "hidden",
 );
 property assetId => (
-    label           => 'assetId', 
-    fieldType       => "hidden",
+    label     => 'assetId',
+    fieldType => "hidden",
 );
 property expires => (
-    label           => 'expires', 
-    fieldType       => "DateTime",
+    label     => 'expires',
+    fieldType => "DateTime",
 );
 property userId => (
-    label           => 'userId', 
-    fieldType       => "hidden",
+    label     => 'userId',
+    fieldType => "hidden",
 );
 property fields => (
-    label           => 'fields', 
-    fieldType       => 'textarea',
-    default         => '',
+    label     => 'fields',
+    fieldType => 'textarea',
+    default   => '',
 );
 property isHidden => (
-    label           => 'isHidden', 
-    fieldType       => 'yesNo',
-    default         => 0,
+    label     => 'isHidden',
+    fieldType => 'yesNo',
+    default   => 0,
 );
 property sentExpiresNotice => (
-    label           => 'sentExpiresNotice', 
-    fieldType       => 'yesNo',
-    default         => 0,
+    label     => 'sentExpiresNotice',
+    fieldType => 'yesNo',
+    default   => 0,
 );
 
 1;
