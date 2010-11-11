@@ -2253,7 +2253,7 @@ sub proceed {
     my ( $self, $proceed ) = @_;
     my $session = $self->session;
 
-    my $proceed ||= $session->form->process('proceed');
+    $proceed ||= $session->form->process('proceed');
     if ($proceed eq "manageAssets") {
         $session->asset($self->getParent);
         return $session->asset->www_manageAssets;
