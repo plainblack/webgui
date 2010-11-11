@@ -32,16 +32,17 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 64;
+plan tests => 65;
 
 #----------------------------------------------------------------------------
 # put your tests here
 
 use WebGUI::FilePump::Bundle;
 
-my $bundle = WebGUI::FilePump::Bundle->create($session);
+my $bundle = WebGUI::FilePump::Bundle->new($session);
 isa_ok($bundle, 'WebGUI::FilePump::Bundle');
 isa_ok($bundle, 'WebGUI::Crud');
+can_ok($bundle, qw/update write getJSONCollateralDataIndex/);
 
 is($bundle->get('lastModified'), 0, 'by default, lastModified is 0');
 
@@ -449,7 +450,7 @@ ok(!-e $buildDir->stringify, 'delete deletes the current build directory');
 my @jsFiles = qw/hoverhelp.js inputcheck.js/;
 
 foreach my $jsFile (@jsFiles) {
-    my $bundle = WebGUI::FilePump::Bundle->create($session);
+    my $bundle = WebGUI::FilePump::Bundle->new($session);
     $bundle->addFile('JS', 'file:extras/'.$jsFile);
     lives_ok { $bundle->build } "built file $jsFile";
     $bundle->delete;

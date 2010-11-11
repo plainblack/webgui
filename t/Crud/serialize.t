@@ -36,7 +36,8 @@ WebGUI::Test->addToCleanup(sub {
     WebGUI::Serialize->crud_dropTable($session);
 });
 
-my $cereal = WebGUI::Serialize->create($session);
+my $cereal = WebGUI::Serialize->new($session);
+$cereal->write;
 isa_ok($cereal, 'WebGUI::Serialize');
 cmp_deeply(
     $cereal->get,
@@ -99,18 +100,20 @@ cmp_deeply(
     'new: deserialized data correctly'
 );
 
+use Data::Dumper;
 my $objData = $cereal->get('jsonField');
 $objData->[0]->{fiber} = 0;
 cmp_deeply(
     $cereal->get('jsonField'),
     [
         {
+            fiber            => 0,
             sugarContent     => 50,
             averageNutrition => 3,
             foodColoring     => 15,
         },
     ],
-    'get: returns safe references'
-);
+    'get: returns unsafe references'
+) or diag Dumper($cereal->jsonField);
 
 #vim:ft=perl

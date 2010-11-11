@@ -269,7 +269,7 @@ sub www_editRule {
     else {
         ##We need a temporary rule so that we can call dynamicForm, below
         $ruleId = 'new';
-        $rule = WebGUI::PassiveAnalytics::Rule->create($session, {});
+        $rule = WebGUI::PassiveAnalytics::Rule->new($session, {});
     }
 
     ##Build the form
@@ -277,7 +277,7 @@ sub www_editRule {
 	$form->hidden( name=>"op",     value=>"passiveAnalytics");
 	$form->hidden( name=>"func",   value=>"editRuleSave");
 	$form->hidden( name=>"ruleId", value=>$ruleId);
-    $form->dynamicForm([WebGUI::PassiveAnalytics::Rule->crud_definition($session)], 'properties', $rule);
+    $rule->crud_form($form, $rule);
 	$form->submit;
 
 	my $i18n = WebGUI::International->new($session, 'PassiveAnalytics');
@@ -315,7 +315,7 @@ sub www_editRuleSave {
     my $ruleId = $form->get('ruleId');
     my $rule;
     if ($ruleId eq 'new') {
-        $rule = WebGUI::PassiveAnalytics::Rule->create($session, {});
+        $rule = WebGUI::PassiveAnalytics::Rule->new($session, {});
     }
     else {
         $rule = WebGUI::PassiveAnalytics::Rule->new($session, $ruleId);

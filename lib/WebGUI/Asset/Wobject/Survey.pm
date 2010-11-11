@@ -2797,7 +2797,7 @@ sub www_editTest {
     else {
         ##We need a temporary test so that we can call dynamicForm, below
         $testId = 'new';
-        $test = WebGUI::Asset::Wobject::Survey::Test->create($session, { assetId => $self->getId });
+        $test = WebGUI::Asset::Wobject::Survey::Test->new($session, { assetId => $self->getId });
     }
 
     ##Build the form
@@ -2805,7 +2805,7 @@ sub www_editTest {
 	$form->hidden( name=>"func",   value=>"editTestSave");
 	$form->hidden( name=>"testId", value=>$testId);
 	$form->hidden( name=>"assetId", value=>$self->getId);
-    $form->dynamicForm([WebGUI::Asset::Wobject::Survey::Test->crud_definition($session)], 'properties', $test);
+    $test->crud_form($form, $test);
 	$form->submit;
 	
     if ($testId eq 'new') {
@@ -2849,7 +2849,7 @@ sub www_editTestSave {
     my $testId = $form->get('testId');
     my $test;
     if ($testId eq 'new') {
-        $test = WebGUI::Asset::Wobject::Survey::Test->create($session, { assetId => $self->getId });
+        $test = WebGUI::Asset::Wobject::Survey::Test->new($session, { assetId => $self->getId });
     }
     else {
         $test = WebGUI::Asset::Wobject::Survey::Test->new($session, $testId);

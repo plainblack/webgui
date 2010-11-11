@@ -151,7 +151,7 @@ sub dynamicForm {
                     $params{$key} = $formDefinition->[0]{name};
                 }
             }
-            $params{value} = $parent->get($fieldname);
+            $params{value} = $parent->get($fieldname) if $parent;
             $params{name}  = $fieldname;
             $self->dynamicField(%params);
         }

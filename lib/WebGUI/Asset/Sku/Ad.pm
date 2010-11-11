@@ -328,7 +328,7 @@ sub onCompletePurchase {
         });
     }
 
-    WebGUI::AssetCollateral::Sku::Ad::Ad->create($session, {
+    WebGUI::AssetCollateral::Sku::Ad::Ad->new($session, {
         userId                 => $userId,
         transactionItemId      => $item->getId,
         adId                   => $ad->getId,

@@ -1,6 +1,28 @@
 package WebGUI::Serialize;
 
-use base qw/WebGUI::Crud/;
+use Moose;
+use WebGUI::Definition::Crud;
+extends qw/WebGUI::Crud/;
+
+define tableName   => 'crudSerialize';
+define tableKey    => 'serializeId';
+has    serializeId => (
+    required => 1,
+    is       => 'ro',
+);
+property someName => (
+    label        => 'someName',
+    fieldType    => 'text',
+    default      => 'someName',
+);
+property jsonField => (
+    label        => 'jsonField',
+    fieldType    => 'textarea',
+    default      => sub { return []; },
+    isa          => 'WebGUI::Type::JSONArray',
+    coerce       => 1,
+    traits       => ['Array', 'WebGUI::Definition::Meta::Property::Serialize',],
+);
 
 #-------------------------------------------------------------------
 
@@ -33,22 +55,9 @@ JSON blob text field.
 =cut
 
 sub crud_definition {
-    my ($class, $session) = @_;
-    my $definition = $class->SUPER::crud_definition($session);
-    $definition->{tableName}   = 'crudSerialize';
-    $definition->{tableKey}    = 'serializeId';
-    $definition->{sequenceKey} = '';
-    my $properties = $definition->{properties};
-    $properties->{someName} = {
-        fieldType    => 'text',
-        defaultValue => 'someName',
-    };
-    $properties->{jsonField} = {
-        fieldType    => 'textarea',
-        defaultValue => [],
-        serialize    => 1,
-    };
-    return $definition;
+my ($class, $session) = @_;
+my $definition = $class->SUPER::crud_definition($session);
+return $definition;
 }
 
 

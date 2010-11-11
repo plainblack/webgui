@@ -19,7 +19,6 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-plan tests => 94;
 
 my $tp = use_ok('TAP::Parser');
 my $tpa = use_ok('TAP::Parser::Aggregator');
@@ -152,9 +151,28 @@ cmp_deeply(
     'surveyOrderIndex correct'
 );
 
-my $t1 = WebGUI::Asset::Wobject::Survey::Test->create( $session, { assetId => $s->getId } );
+my $t1 = WebGUI::Asset::Wobject::Survey::Test->new( $session, { assetId => $s->getId } );
 WebGUI::Test->addToCleanup(sub {$t1->delete();});
 my $spec;
+
+can_ok($t1, qw/assetId name test lastUpdated testId session dateCreated sequenceNumber update set get/);
+$t1->name('test name');
+is $t1->name, 'test name', 'name: direct mutator works okay';
+$t1->test('some test');
+is $t1->test, 'some test', 'test: mutator check';
+$t1->set({ name => 'tested name' });
+is $t1->name, 'tested name', 'name: set works okay';
+$t1->set({test => 'tested some'});
+is $t1->test, 'tested some', 'test: set';
+$t1->update({ name => 'different name' });
+is $t1->name, 'different name', 'update: updated name';
+$t1->update({ test => 'another test', name => 'another name', });
+is $t1->name, 'another name', 'update: name, test and name together';
+is $t1->test, 'another test', 'update: test';
+
+my $name_prop = $t1->meta->find_attribute_by_name('name');
+ok $name_prop->does('WebGUI::Definition::Meta::Property'), '::Test property does Meta::Property';
+ok $name_prop->does('WebGUI::Definition::Meta::Settable'), '::Test property does Meta::Settable';
 
 # No tests
 $spec = <<END_SPEC;
@@ -686,7 +704,7 @@ sub try_it {
     my ( $test, $spec, $opts ) = @_;
     chomp($spec);
 
-    $test->update( { test => $spec } );
+    $test->test($spec);
     my $result = $t1->run();
     ok( $result, 'Tests ran ok' );
 
@@ -723,5 +741,7 @@ Hashes differ on element: a
    got : '1'
 expect : '2'
 END_CMP
+
+done_testing;
 
 #vim:ft=perl
