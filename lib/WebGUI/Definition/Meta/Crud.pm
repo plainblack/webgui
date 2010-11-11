@@ -27,11 +27,11 @@ our $VERSION = '0.0.1';
 
 =head1 NAME
 
-Package WebGUI::Definition::Meta::Shop
+Package WebGUI::Definition::Meta::Crud
 
 =head1 DESCRIPTION
 
-Extends 'WebGUI::Definition::Meta::Class' to provide attributes specific to Assets.
+Extends 'WebGUI::Definition::Meta::Class' to provide attributes specific to Cruds.
 
 =head1 METHODS
 
@@ -43,7 +43,7 @@ These methods are available from this class:
 
 =head2 property_meta ( )
 
-Asset Definitions use WebGUI::Definition::Meta::Property::Asset as the base class
+Asset Definitions use WebGUI::Definition::Meta::Property::Crud as the base class
 for properties.
 
 =cut

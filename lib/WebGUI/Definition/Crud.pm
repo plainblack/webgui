@@ -89,7 +89,7 @@ to the class, and applies the meta-role to the meta-class.
 But, if it is applied to a Role, then only the meta-role is applied, since we want
 the final application to be in the end user of the Role.
 
-This permits using this to compose Roles with their own database tables.
+This permits using this package to compose Roles with their own database tables.
 
 =cut
 
