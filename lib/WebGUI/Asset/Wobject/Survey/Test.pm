@@ -1,6 +1,7 @@
 package WebGUI::Asset::Wobject::Survey::Test;
 
 use strict;
+use Test::Deep::NoTest qw/eq_deeply/;
 use Moose;
 use WebGUI::Definition::Crud;
 extends qw/WebGUI::Crud/;
@@ -43,7 +44,6 @@ END_SPEC
 
 
 use WebGUI::International;
-use Test::Deep::NoTest;
 use JSON::PP;
 use Data::Dumper;
 use Params::Validate qw(:all);
