@@ -90,7 +90,7 @@ sub www_copy {
             dialog   => 1,
             message  => 'Your assets are now copied!',
             args     => {
-                childrenOnly => $session->form->get('with') eq 'Children',
+                childrenOnly => $session->form->get('with') eq 'children',
                 assetId      => $asset->getId,
             }
         }
