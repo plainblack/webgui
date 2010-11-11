@@ -35,6 +35,12 @@ has id => (
     is        => 'ro',
 );
 
+property prop => (
+    label => 'prop',
+    fieldType => 'text',
+    default   => 'propeller',
+);
+
 package main;
 
 #----------------------------------------------------------------------------
@@ -67,12 +73,26 @@ $sth->finish;
 my $record1 = WebGUI::Cruddy->new($session);
 $record1->write;
 can_ok($record1, 'id');
-isa_ok($record1, "WebGUI::Crud", "isa WebGUI::Crud");
+isa_ok($record1, "WebGUI::Crud");
 like($record1->dateCreated, qr/\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}/, "dateCreated looks like a date");
 like($record1->lastUpdated, qr/\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}/, "lastUpdated looks like a date");
 like($record1->sequenceNumber, qr/\d+/, "sequenceNumber looks like a number");
 is($record1->sequenceNumber, 1, "record 1 sequenceNumber is 1");
 like($record1->id, qr/[A-Za-z0-9_-]{22}/, "id looks like a guid");
+
+can_ok($record1, 'prop');
+my $prop = $record1->meta->find_attribute_by_name('prop');
+ok($prop->does('WebGUI::Definition::Meta::Property'), 'prop does WebGUI::Definition::Meta::Property');
+ok($prop->does('WebGUI::Definition::Meta::Property::Crud'), 'prop does WebGUI::Definition::Meta::Property::Crud');
+ok($prop->does('WebGUI::Definition::Meta::Settable'), 'prop does WebGUI::Definition::Meta::Settable');
+$record1->update({ prop => 'proposition', });
+is $record1->prop, 'proposition', 'update works';
+my $dbBday = WebGUI::DateTime->new($session, WebGUI::Test->webguiBirthday)->toDatabase;
+$record1->update({
+    prop => '',
+    lastUpdated => $dbBday,
+});
+isnt $record1->lastUpdated, $dbBday, 'lastUpdated overwritten';
 
 # custom id
 my $record2 = WebGUI::Cruddy->new($session, {id=>'theshawshankredemption'});
