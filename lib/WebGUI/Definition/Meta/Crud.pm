@@ -18,7 +18,7 @@ use 5.010;
 use Moose::Role;
 use namespace::autoclean;
 use WebGUI::Definition::Meta::Property;
-use WebGUI::Definition::Meta::Property::Asset;
+use WebGUI::Definition::Meta::Property::Crud;
 no warnings qw(uninitialized);
 
 with 'WebGUI::Definition::Meta::Class';
