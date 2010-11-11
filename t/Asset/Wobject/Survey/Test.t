@@ -687,6 +687,7 @@ sub try_it {
     chomp($spec);
 
     $test->update( { test => $spec } );
+    $test->test($spec);
     my $result = $t1->run();
     ok( $result, 'Tests ran ok' );
 
