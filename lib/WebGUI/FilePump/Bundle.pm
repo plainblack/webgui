@@ -108,6 +108,7 @@ JSON blobs with files attached to the bundle. js = javascript, css = Cascading S
 means anything else.
 
 =cut
+
 #-------------------------------------------------------------------
 
 =head2 addFile ( $type, $uri )
