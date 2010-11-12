@@ -188,6 +188,14 @@ sub close {
     $self->{closed} = 1;
 }
 
+#-------------------------------------------------------------------
+
+=head2 closed
+
+Returns true if this session has been closed.
+
+=cut
+
 sub closed {
     my $self = shift;
     return $self->{closed};
