@@ -765,8 +765,11 @@ sub rollback {
     my $sth = $session->db->read("select asset.assetId, assetData.revisionDate from assetData left join asset using(assetId) where assetData.tagId = ? order by asset.lineage desc, assetData.revisionDate desc", [ $tagId ]);
     my $i18n    = WebGUI::International->new($session, 'VersionTag');
     REVISION: while (my ($id, $revisionDate) = $sth->array) {
-        my $revision = WebGUI::Asset->newById($session, $id, $revisionDate);
-        next REVISION unless $revision;
+        my $revision = eval { WebGUI::Asset->newById($session, $id, $revisionDate); };
+        unless (defined $revision) {
+            $self->session->log->error("Asset $id $revisionDate could not be instanciated by version tag ".$self->getId.". Perhaps it is corrupt.");
+            next REVISION;
+        }
         $outputSub->(sprintf $i18n->get('Rolling back %s'), $revision->getTitle);
 		$revision->purgeRevision;
 	}
