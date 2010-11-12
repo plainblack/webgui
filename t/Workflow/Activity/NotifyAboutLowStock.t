@@ -40,7 +40,7 @@ my $posters = $import->addChild({
 
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->commit();
-addToCleanup($versionTag);
+WebGUI::Test->addToCleanup($versionTag);
 $posters = $posters->cloneFromDb;
 
 my $ritaVarId = $posters->setCollateral('variantsJSON', 'variantId', 'new',
