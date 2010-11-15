@@ -716,7 +716,7 @@ Example call:
         },
         'WebGUI::Session'          => sub {
             my $session = shift;
-            $session->var->end;
+            $session->end;
             $session->close;
         },
         'WebGUI::LDAPLink'         => sub {
@@ -832,7 +832,7 @@ sub cleanup {
         while @guarded;
 
     if ( our $SESSION ) {
-        $SESSION->var->end;
+        $SESSION->end;
         $SESSION->close;
         undef $SESSION;
     }
