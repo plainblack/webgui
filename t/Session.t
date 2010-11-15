@@ -17,8 +17,6 @@ use WebGUI::User;
 
 use Test::More;
 
-plan tests => 5; # increment this value for each test you create
-
 my $session = WebGUI::Test->session;
 
 my $user = WebGUI::User->new($session, "new");
@@ -36,6 +34,8 @@ is($session->user->profileField('uiLevel'), 9, 'Set session user to Admin, check
 
 my $dupe = $session->duplicate;
 WebGUI::Test->addToCleanup($dupe);
+
+is($session->get('sessionId'), $session->getId, 'getId returns sessionId');
 
 is $dupe->getId, $session->getId, 'duplicated session has the same sessionId';
 
@@ -58,5 +58,40 @@ WebGUI::Test->addToCleanup(sub {$session->config->delete('dbslave2');});
 
 my $slave2 = $session->dbSlave;
 isa_ok($slave2, 'WebGUI::SQL::db');
+
+cmp_ok($session->get("lastPageView"), '>', 0, "lastPageView set to something");
+
+can_ok($session, qw/isAdminOn switchAdminOn switchAdminOff/);
+is($session->isAdminOn, 0, "isAdminOn()");
+$session->switchAdminOn;
+is($session->isAdminOn, 1, "switchAdminOn()");
+$session->switchAdminOff;
+is($session->isAdminOn, 0, "switchAdminOff()");
+
+my $token = $session->scratch->get('webguiCsrfToken');
+ok( $token, 'CSRF token set');
+ok( $session->id->valid($token), '...is a valid GUID');
+
+my $id = $session->getId;
+my ($count) = $session->db->quickArray("select count(*) from userSession where sessionId=?", [$id]);
+is($count, 1, "created an user session entry in the database");
+
+my $varSession = WebGUI::Session->open($session->config);
+WebGUI::Test->addToCleanup($varSession);
+my $varTime = time();
+isnt($varSession->scratch->get('webguiCsrfToken'), $token, '... calling new without sessionId creates a new token');
+isnt($varSession->getId, $session->getId, "new session has a different id from current session");
+
+my $varExpires = $varTime + $session->setting->get('sessionTimeout');
+cmp_ok(abs($varSession->get('lastPageView') - $varTime), '<=', 1, 'lastPageView set correctly');
+cmp_ok(abs($varSession->get('expires') - $varExpires), '<=', 1, 'expires set correctly');
+
+is($varSession->get('userId'), 1, 'default userId is 1');
+
+is($varSession->get('adminOn'), $varSession->isAdminOn, "get('adminOn') and isAdminOn return the same thing");
+is($varSession->get('adminOn'), 0, "adminOn is off by default"); ##retest
+is($varSession->get('lastIP'), '192.168.0.34', "lastIP fetched");
+
+done_testing;
 
 #vim:ft=perl
