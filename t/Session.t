@@ -37,7 +37,7 @@ is($session->user->profileField('uiLevel'), 9, 'Set session user to Admin, check
 my $dupe = $session->duplicate;
 WebGUI::Test->addToCleanup($dupe);
 
-is $session->getId, $dupe->getId, 'duplicated session has the same sessionId';
+is $dupe->getId, $session->getId, 'duplicated session has the same sessionId';
 
 ################################################################
 #
