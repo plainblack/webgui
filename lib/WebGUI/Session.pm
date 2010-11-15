@@ -181,7 +181,7 @@ sub close {
 
 	# Kill circular references.  The literal list is so that the order
 	# can be explicitly shuffled as necessary.
-	foreach my $key (qw/_asset _datetime _icon _slave _db _form _http _id _output _privilege _scratch _setting _stow _style _url _user _var _cache _log _response _request/) {
+	foreach my $key (qw/_asset _datetime _icon _slave _db _form _http _id _output _privilege _scratch _setting _stow _style _url _user _cache _log _response _request/) {
 		delete $self->{$key};
 	}
     $self->{closed} = 1;
@@ -610,7 +610,6 @@ sub open {
         $self->start(1,$sessionId);
     }
 
-#	$self->{_var} = WebGUI::Session::Var->new($self,$sessionId, $noFuss);
 	return $self;
 }
 
