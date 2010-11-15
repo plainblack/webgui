@@ -343,10 +343,10 @@ Removes the specified session from memory and database.
 sub end {
     my $self = shift;
     my $id = $self->getId;
-    $session->cache->remove($id);
-    $session->scratch->deleteAll;
-    $session->db->write("delete from userSession where sessionId=?",[$id]);
-    delete $session->{_user};
+    $self->cache->remove($id);
+    $self->scratch->deleteAll;
+    $self->db->write("delete from userSession where sessionId=?",[$id]);
+    delete $self->{_user};
 }
 
 #-------------------------------------------------------------------
@@ -577,9 +577,9 @@ sub open {
     if (!$sessionId || !$self->id->valid($sessionId)) {
         $sessionId = $self->id->generate;
     }
-    $self->{_var} = $session->cache->get($sessionId);
+    $self->{_var} = $self->cache->get($sessionId);
     unless ($self->{_var}{sessionId} eq $sessionId) {
-        $self->{_var} = $session->db->quickHashRef("select * from userSession where sessionId=?", [$sessionId]);
+        $self->{_var} = $self->db->quickHashRef("select * from userSession where sessionId=?", [$sessionId]);
     }
     ##We have to make sure that the session variable has a sessionId, otherwise downstream users of
     ##the object will break
@@ -823,9 +823,9 @@ Disables admin mode.
 sub switchAdminOff {
     my $self = shift;
     $self->{_var}{adminOn} = 0;
-    $session->cache->set($self->getId, $self->{_var}, $session->setting->get('sessionTimeout'));
+    $self->cache->set($self->getId, $self->{_var}, $self->setting->get('sessionTimeout'));
     delete $self->{_var}{nextCacheFlush};
-    $session->db->setRow("userSession","sessionId", $self->{_var});
+    $self->db->setRow("userSession","sessionId", $self->{_var});
 }
 
 #-------------------------------------------------------------------
@@ -839,9 +839,9 @@ Enables admin mode.
 sub switchAdminOn {
     my $self = shift;
     $self->{_var}{adminOn} = 1;
-    $session->cache->set($self->getId, $self->{_var}, $session->setting->get('sessionTimeout'));
+    $self->cache->set($self->getId, $self->{_var}, $self->setting->get('sessionTimeout'));
     delete $self->{_var}{nextCacheFlush};
-    $self->session->db->setRow("userSession","sessionId", $self->{_var});
+    $self->db->setRow("userSession","sessionId", $self->{_var});
 }
 
 #-------------------------------------------------------------------
