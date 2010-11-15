@@ -594,6 +594,7 @@ sub open {
     elsif ($self->{_var}{sessionId} ne "") { ##Fetched an existing session.  Update variables with recent data.
         my $time = time();
         my $timeout = $self->setting->get("sessionTimeout");
+        $self->{_sessionId}         = $self->{_var}{sessionId};
         $self->{_var}{lastPageView} = $time;
         $self->{_var}{lastIP}       = $self->request->address;
         $self->{_var}{expires}      = $time + $timeout;
