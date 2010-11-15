@@ -761,7 +761,7 @@ Session id will be generated if not specified. In almost every case you should l
 sub start {
 	my $self = shift;
 	my $userId = shift;
-	$userId = 1 if ($userId eq "");
+	$userId    = 1 if ($userId eq "");
 	my $sessionId = shift;
 	$sessionId    = $self->id->generate if ($sessionId eq "");
     my $timeout   = $self->setting->get('sessionTimeout');
