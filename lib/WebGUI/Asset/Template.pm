@@ -837,7 +837,9 @@ sub www_editDuplicate {
                     next PROP unless lc $properties->{ $prop }->{ fieldType } eq "template";
                     next PROP unless $asset->get( $prop ) eq $self->getId;
                     if ( $properties->{ $prop }->{ namespace } eq $self->get( "namespace" ) ) {
-                        $asset->addRevision( { $prop => $newTemplate->getId } );
+                        my $tag = WebGUI::VersionTag->getWorking( $session );
+                        $asset->addRevision( { $prop => $newTemplate->getId, tagId => $tag->getId, status => "pending" } );
+                        $asset->setVersionLock;
 
                         # Auto-commit our revision if necessary
                         # TODO: This needs to be handled automatically somehow...
@@ -1087,9 +1089,12 @@ sub www_styleWizard {
 </div>
 </body>
 </html>';
-		return $self->addRevision({
+                my $tag = WebGUI::VersionTag->getWorking( $self->session );
+		my $newSelf = $self->addRevision({
 			template=>$style
-			})->www_edit;
+			});
+                $newSelf->setVersionLock;
+                return $newSelf->www_edit;
 	} else {
 		$output = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl}).WebGUI::Form::hidden($self->session,{name=>"func", value=>"styleWizard"});
 		$output .= WebGUI::Form::hidden($self->session,{name=>"proceed", value=>"manageAssets"}) if ($form->get("proceed"));

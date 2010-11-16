@@ -60,16 +60,18 @@ $session->config->addToHash('adminConsole', 'test2', {
 } );
 
 # Add some assets
+my $tag  = WebGUI::VersionTag->getWorking( $session );
 my $snip = $import->addChild( {
     className       => 'WebGUI::Asset::Snippet',
     title           => 'test',
     groupIdEdit     => '3',
     synopsis        => "aReallyLongWordToGetIndexed",
     keywords        => "AKeywordToGetIndexed",
+    tagId           => $tag->getId,
+    status          => "pending",
 } );
 
 # Commit the tag
-my $tag  = WebGUI::VersionTag->getWorking( $session );
 $tag->commit;
 addToCleanup( $tag );
 

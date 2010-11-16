@@ -1423,7 +1423,9 @@ sub www_deleteFieldConfirm {
         unless $self->canEdit;
     return $self->session->privilege->locked
         unless $self->canEditIfLocked;
-    my $newSelf = $self->addRevision;
+    my $tag     = WebGUI::VersionTag->getWorking( $self->session );
+    my $newSelf = $self->addRevision({ tagId => $tag->getId, status => "pending" });
+    $newSelf->setVersionLock;
     $newSelf->deleteField($self->session->form->process("fieldName"));
     $newSelf->{_mode} = 'form';
     WebGUI::VersionTag->autoCommitWorkingIfEnabled($self->session);
@@ -1450,7 +1452,9 @@ sub www_deleteTabConfirm {
         unless $self->canEdit;
     return $self->session->privilege->locked
         unless $self->canEditIfLocked;
-    my $newSelf = $self->addRevision;
+    my $tag     = WebGUI::VersionTag->getWorking( $self->session );
+    my $newSelf = $self->addRevision({ tagId => $tag->getId, status => "pending" });
+    $newSelf->setVersionLock;
     $newSelf->deleteTab($self->session->form->process("tabId"));
     $newSelf->{_mode} = 'form';
     WebGUI::VersionTag->autoCommitWorkingIfEnabled($self->session);
@@ -1667,7 +1671,9 @@ sub www_editFieldSave {
         $field{isMailField} = 1;
     }
 
-    my $newSelf = $self->addRevision;
+    my $tag     = WebGUI::VersionTag->getWorking( $session );
+    my $newSelf = $self->addRevision({ tagId => $tag->getId, status => "pending" });
+    $newSelf->setVersionLock;
     if ($fieldName) {
         if ($fieldName ne $newName) {
             $newSelf->renameField($fieldName, $newName);
@@ -1923,7 +1929,9 @@ sub www_moveFieldDown {
         unless $self->canEdit;
     return $self->session->privilege->locked
         unless $self->canEditIfLocked;
-    my $newSelf = $self->addRevision;
+    my $tag     = WebGUI::VersionTag->getWorking( $self->session );
+    my $newSelf = $self->addRevision({ tagId => $tag->getId, status => "pending" });
+    $newSelf->setVersionLock;
     my $fieldName = $self->session->form->process('fieldName');
     $newSelf->moveFieldDown($fieldName);
     WebGUI::VersionTag->autoCommitWorkingIfEnabled($self->session);
@@ -1983,7 +1991,9 @@ sub www_moveFieldUp {
         unless $self->canEdit;
     return $self->session->privilege->locked
         unless $self->canEditIfLocked;
-    my $newSelf = $self->addRevision;
+    my $tag     = WebGUI::VersionTag->getWorking( $self->session );
+    my $newSelf = $self->addRevision({ tagId => $tag->getId, status => "pending" });
+    $newSelf->setVersionLock;
     my $fieldName = $self->session->form->process('fieldName');
     $newSelf->moveFieldUp($fieldName);
     WebGUI::VersionTag->autoCommitWorkingIfEnabled($self->session);
@@ -2044,7 +2054,9 @@ sub www_moveTabRight {
         unless $self->canEdit;
     return $self->session->privilege->locked
         unless $self->canEditIfLocked;
-    my $newSelf = $self->addRevision;
+    my $tag     = WebGUI::VersionTag->getWorking( $self->session );
+    my $newSelf = $self->addRevision({ tagId => $tag->getId, status => "pending" });
+    $newSelf->setVersionLock;
     my $tabId = $self->session->form->process('tabId');
     $newSelf->moveTabRight($tabId);
     WebGUI::VersionTag->autoCommitWorkingIfEnabled($self->session);
@@ -2100,7 +2112,9 @@ sub www_moveTabLeft {
         unless $self->canEdit;
     return $self->session->privilege->locked
         unless $self->canEditIfLocked;
-    my $newSelf = $self->addRevision;
+    my $tag     = WebGUI::VersionTag->getWorking( $self->session );
+    my $newSelf = $self->addRevision({ tagId => $tag->getId, status => "pending" });
+    $newSelf->setVersionLock;
     my $tabId = $self->session->form->process('tabId');
     $newSelf->moveTabLeft($tabId);
     WebGUI::VersionTag->autoCommitWorkingIfEnabled($self->session);

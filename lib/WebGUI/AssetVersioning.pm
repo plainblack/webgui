@@ -96,7 +96,6 @@ sub addRevision {
 
     # Set some defaults
     $mergedProperties{ revisedBy    } ||= $session->user->userId;
-    $mergedProperties{ status       } ||= "approved";
 
     #Instantiate new revision and fill with real data
     my $newVersion = WebGUI::Asset->newById($session, $self->getId, $now);
@@ -550,7 +549,9 @@ This is the same as doing an www_editSave without changing anything. It's here s
 sub www_lock {
 	my $self = shift;
 	if (!$self->isLocked && $self->canEdit) {
-		$self = $self->addRevision;
+                my $tag = WebGUI::VersionTag->getWorking( $self->session );
+		$self = $self->addRevision({ tagId => $tag->getId, status => "pending" });
+                $self->setVersionLock;
 	}
 	if ($self->session->form->process("proceed") eq "manageAssets") {
                 $self->session->asset($self->getParent);

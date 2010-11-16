@@ -134,7 +134,11 @@ $tag->setWorking;
 WebGUI::Test->addToCleanup($tag);
 
 my $tempspace  = WebGUI::Asset->getTempspace($session);
-my $folder     = {className => 'WebGUI::Asset::Wobject::Folder'};
+my $folder     = {
+    className   => 'WebGUI::Asset::Wobject::Folder',
+    tagId       => $tag->getId,
+    status      => "pending",
+};
 my $root       = $tempspace->addChild($folder);
 my $child      = $root->addChild($folder);
 my $grandchild = $child->addChild($folder);
@@ -175,13 +179,17 @@ my $versionTag2 = WebGUI::VersionTag->getWorking($session);
 WebGUI::Test->addToCleanup($versionTag2);
 
 my $page = $tempspace->addChild({
-    className => 'WebGUI::Asset::Wobject::Layout',
-    title     => 'Parent asset',
+    className   => 'WebGUI::Asset::Wobject::Layout',
+    title       => 'Parent asset',
+    tagId       => $versionTag2->getId,
+    status      => "pending",
 });
 
 my $shortcut = $tempspace->addChild({
-    className         => 'WebGUI::Asset::Shortcut',
-    shortcutToAssetId => $page->getId,
+    className           => 'WebGUI::Asset::Shortcut',
+    shortcutToAssetId   => $page->getId,
+    tagId               => $versionTag2->getId,
+    status              => "pending",
 });
 
 $versionTag2->commit;

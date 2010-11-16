@@ -265,6 +265,7 @@ sub importPackage {
         if $storage->getErrorCount;
     my $package         = undef;            # The asset package
     my $log           = $self->session->log;
+    my $tag             = WebGUI::VersionTag->getWorking( $self->session );
 
     # The debug output for long requests would be too long, and we'd have to
     # keep it all in memory.

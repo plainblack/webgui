@@ -554,12 +554,20 @@ sub www_ajaxEditPointSave {
             unless $asset && $asset->canEdit;
         $asset  = $asset->addRevision;
     }
-    
+
     my $errors  = $asset->processAjaxEditForm;
 
     # Commit!
     if ( $asset->getAutoCommitWorkflowId ) {
         if ( $self->hasBeenCommitted) {
+            my $tag     = WebGUI::VersionTag->create( $session, {
+                workflowId      => $asset->getAutoCommitWorkflowId,
+            } );
+            $asset->update({
+                tagId       => $tag->getId,
+                status      => "pending",
+            });
+            $asset->setVersionLock;
             $asset->requestAutoCommit;
         }
         else {

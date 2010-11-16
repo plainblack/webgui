@@ -15,7 +15,7 @@ use WebGUI::Session;
 use WebGUI::User;
 
 use WebGUI::Asset;
-use Test::More tests => 109; # increment this value for each test you create
+use Test::More tests => 108; # increment this value for each test you create
 use Test::Deep;
 use Test::Exception;
 use Data::Dumper;
@@ -40,6 +40,8 @@ my $topFolder = $root->addChild({
     menuTitle   => 'topFolderMenuTitle',
     groupIdEdit => 3,
     className   => 'WebGUI::Asset::Wobject::Folder',
+    tagId   => $versionTag->getId,
+    status  => "pending",
 });
 
 my $folder = $topFolder->addChild({
@@ -48,6 +50,8 @@ my $folder = $topFolder->addChild({
     menuTitle   => 'folderMenuTitle',
     groupIdEdit => 3,
     className   => 'WebGUI::Asset::Wobject::Folder',
+    tagId   => $versionTag->getId,
+    status  => "pending",
 });
 
 my $folder2 = $topFolder->addChild({
@@ -55,6 +59,8 @@ my $folder2 = $topFolder->addChild({
     title => 'folder2',
     menuTitle => 'folder2MenuTitle',
     className => 'WebGUI::Asset::Wobject::Folder',
+    tagId   => $versionTag->getId,
+    status  => "pending",
 });
 
 my $editor = WebGUI::User->new($session, 'new');
@@ -71,6 +77,8 @@ foreach my $snipNum (0..6) {
             title       => "Snippet $snipNum",
             menuTitle   => $snipNum,
             url         => 'snippet'.$snipNum,
+            tagId   => $versionTag->getId,
+            status  => "pending",
         });
 }
 
@@ -80,6 +88,8 @@ my $snippet2 = $folder2->addChild( {
             ownerUserId => $editor->userId, #For coverage on addChild properties
             title       => "Snippet2 0",
             menuTitle   => 0,
+            tagId   => $versionTag->getId,
+            status  => "pending",
 });
 
 $versionTag->commit;
@@ -665,6 +675,8 @@ WebGUI::Test->interceptLogging( sub {
                 ownerUserId => 3, #For coverage on addChild properties
                 title       => "Deep Snippet $_",
                 menuTitle   => "Deep Snip $_",
+                tagId       => $vTag2->getId,
+                status      => "pending",
         });
     }
 
@@ -673,26 +685,6 @@ WebGUI::Test->interceptLogging( sub {
     is($deepAsset[41]->getParent->getId, $deepAsset[40]->getId, 'addChild will not create an asset with a lineage deeper than 42 levels');
     like($log_data->{warn}, qr/Adding it as a sibling instead/, 'addChild logged a warning about deep assets');
 });
-
-{
-    my $tag = WebGUI::VersionTag->getWorking($session);
-    addToCleanup($tag);
-    my $uncommittedParent = $root->addChild({
-        className   => "WebGUI::Asset::Wobject::Layout",
-        groupIdView => 7,
-        ownerUserId => 3,
-        title       => "Uncommitted Parent",
-    });
-    $tag->leaveTag;
-    my $parent = WebGUI::Asset->newPending($session, $uncommittedParent->getId);
-    my $floater = $parent->addChild({
-        className   => "WebGUI::Asset::Snippet",
-        groupIdView => 7,
-        ownerUserId => 3, #For coverage on addChild properties
-        title       => "Child of uncommitted parent",
-    });
-    is $parent->get('tagId'), $floater->get('tagId'), 'addChild: with uncommitted parent, adds child and puts it into the same tag as the parent';
-}
 
 TODO: {
     local $TODO = "Tests to make later";

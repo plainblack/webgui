@@ -321,7 +321,9 @@ sub www_annotate {
     return $session->privilege->insufficient() unless $self->canEdit;
     return $session->privilege->locked()       unless $self->canEditIfLocked;
 	if (1) {
-		my $newSelf = $self->addRevision();
+                my $tag = WebGUI::VersionTag->getWorking( $session );
+		my $newSelf = $self->addRevision({ tagId => $tag->getId, status => "pending" });
+                $newSelf->setVersionLock;
 		delete $newSelf->{_storageLocation};
 		$newSelf->getStorageLocation->annotate($newSelf->filename,$newSelf,$session->form);
 		$newSelf->setSize($newSelf->getStorageLocation->getFileSize($newSelf->filename));
@@ -540,7 +542,9 @@ sub www_rotate {
     return $session->privilege->insufficient() unless $self->canEdit;
     return $session->privilege->locked()       unless $self->canEditIfLocked;
 	if (defined $session->form->process("Rotate")) {
-		my $newSelf = $self->addRevision();
+                my $tag = WebGUI::VersionTag->getWorking( $session );
+		my $newSelf = $self->addRevision({ tagId => $tag->getId, status => "pending" });
+                $newSelf->setVersionLock;
 		delete $newSelf->{_storageLocation};
 		$newSelf->getStorageLocation->rotate($newSelf->filename,$session->form->process("Rotate"));
 		$newSelf->setSize($newSelf->getStorageLocation->getFileSize($newSelf->filename));
@@ -599,7 +603,9 @@ sub www_resize {
     return $session->privilege->insufficient() unless $self->canEdit;
     return $session->privilege->locked()       unless $self->canEditIfLocked;
     if ($session->form->process("newWidth") || $session->form->process("newHeight")) {
-        my $newSelf = $self->addRevision();
+        my $tag = WebGUI::VersionTag->getWorking( $session );
+        my $newSelf = $self->addRevision({ tagId => $tag->getId, status => "pending" });
+        $newSelf->setVersionLock;
         delete $newSelf->{_storageLocation};
         $newSelf->getStorageLocation->resize($newSelf->filename,$session->form->process("newWidth"),$session->form->process("newHeight"));
         $newSelf->setSize($newSelf->getStorageLocation->getFileSize($newSelf->filename));
@@ -707,7 +713,9 @@ sub www_crop {
 
     if ($session->form->process("Width") || $session->form->process("Height") 
         || $session->form->process("Top") || $session->form->process("Left")) {
-        my $newSelf = $self->addRevision();
+        my $tag = WebGUI::VersionTag->getWorking( $session );
+        my $newSelf = $self->addRevision({ tagId => $tag->getId, status => "pending" });
+        $newSelf->setVersionLock;
         delete $newSelf->{_storageLocation};
         $newSelf->getStorageLocation->crop(
             $newSelf->filename,

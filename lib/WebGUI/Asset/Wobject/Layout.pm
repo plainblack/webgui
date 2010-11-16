@@ -322,9 +322,11 @@ a new asset revision.
 sub www_setContentPositions {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);
-    $self->addRevision({
+    my $tag = WebGUI::VersionTag->getWorking( $self->session );
+    my $newSelf = $self->addRevision({
         contentPositions=>$self->session->form->process("map")
         });
+    $newSelf->setVersionLock;
     WebGUI::VersionTag->autoCommitWorkingIfEnabled($self->session);
     return "Map set: ".$self->session->form->process("map");
 }

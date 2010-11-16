@@ -771,8 +771,11 @@ sub processFileSynopsis {
         if ( $asset->synopsis ne $synopsis ) {
             my $properties  = $asset->get;
             $properties->{ synopsis } = $synopsis;
+            $properties->{ tagId    } = $newVersionTag->getId;
+            $properties->{ status   } = "pending";
 
-            $asset->addRevision( $properties, undef, { skipAutoCommitWorkflows => 1 } );
+            my $newRev  = $asset->addRevision( $properties );
+            $newRev->setVersionLock;
         }
     }
     
@@ -1440,7 +1443,9 @@ sub www_edit {
         
         if ( ! Exception::Class->caught() ) {
             # Add revision and create a new version tag by doing so
-            my $newRevision = $asset->addRevision;
+            my $tag = WebGUI::VersionTag->create( $session, { workflowId => $asset->getAutoCommitWorkflowId } );
+            my $newRevision = $asset->addRevision({ tagId => $tag->getId, status => "pending" });
+            $newRevision->setVersionLock;
             # Rotate photo (i.e. all attached image files) by 90° CCW
             $newRevision->rotate(-90);           
             # Auto-commit version tag 
@@ -1458,7 +1463,9 @@ sub www_edit {
 
         if ( Exception::Class->caught() ) {
             # Add revision and create a new version tag by doing so
-            my $newRevision = $asset->addRevision;
+            my $tag = WebGUI::VersionTag->create( $session, { workflowId => $asset->getAutoCommitWorkflowId } );
+            my $newRevision = $asset->addRevision({ tagId => $tag->getId, status => "pending" });
+            $newRevision->setVersionLock;
             # Rotate photo (i.e. all attached image files) by 90° CW
             $newRevision->rotate(90);           
             # Auto-commit version tag 

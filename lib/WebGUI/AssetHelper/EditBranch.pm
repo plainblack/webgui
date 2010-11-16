@@ -319,6 +319,7 @@ sub www_editBranchSave {
     my %data;
     my $pb      = WebGUI::ProgressBar->new($session);
     my $i18n    = WebGUI::International->new($session, 'Asset');
+    my $tag = WebGUI::VersionTag->getWorking( $session );
     $data{isHidden}      = $form->yesNo("isHidden")         if ($form->yesNo("change_isHidden"));
     $data{newWindow}     = $form->yesNo("newWindow")        if ($form->yesNo("change_newWindow"));
     $data{encryptPage}   = $form->yesNo("encryptPage")      if ($form->yesNo("change_encryptPage"));
@@ -401,10 +402,11 @@ sub www_editBranchSave {
                     my $revision;
                     if (scalar %$newData > 0) {
                         $revision = $descendant->addRevision(
-                            $newData,
+                            { %$newData, tagId => $tag->getId, status => "pending" },
                             undef,
                             {skipAutoCommitWorkflows => 1, skipNotification => 1},
                         );
+                        $revision->setVersionLock;
                     }
                     else {
                         $revision = $descendant;

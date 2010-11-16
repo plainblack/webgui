@@ -52,7 +52,12 @@ sub process {
         return { error => sprintf $i18n->get('already locked'), $asset->getTitle};
     }
 
-    $asset = $asset->addRevision;
+    my $tag = WebGUI::VersionTag->getWorking( $session );
+    $asset = $asset->addRevision({
+        tagId       => $tag->getId,
+        status      => "pending",
+    });
+    $asset->setVersionLock;
     return {
         message         => sprintf($i18n->get('locked asset'), $asset->getTitle),
     };

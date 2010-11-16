@@ -353,6 +353,7 @@ sub www_editBranchSave {
     my %data;
     my $pb      = WebGUI::ProgressBar->new($session);
     my $i18n    = WebGUI::International->new($session, 'Asset');
+    my $tag     = WebGUI::VersionTag->getWorking( $session );
     $pb->start($i18n->get('edit branch'), $session->url->extras('adminConsole/assets.gif'));
     $pb->update($i18n->get('Processing form data'));
     $data{isHidden}      = $form->yesNo("isHidden")        if ($form->yesNo("change_isHidden"));
@@ -428,10 +429,11 @@ sub www_editBranchSave {
         my $revision;
         if (scalar %$newData > 0) {
             $revision = $descendant->addRevision(
-                $newData,
+                { %$newData, tagId => $tag->getId, status => "pending" },
                 undef,
                 {skipAutoCommitWorkflows => 1, skipNotification => 1},
             );
+            $revision->setVersionLock;
         }
         else {
             $revision = $descendant;

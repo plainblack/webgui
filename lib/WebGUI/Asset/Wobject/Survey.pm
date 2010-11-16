@@ -837,18 +837,16 @@ sub submitObjectEdit {
                 . $self->revisionDate );
         
         # New revision should be created and then committed automatically
-        my $oldVersionTag = WebGUI::VersionTag->getWorking($session, 'noCreate');
         my $newVersionTag = WebGUI::VersionTag->create($session, { workflowId => 'pbworkflow00000000003', });
-        $newVersionTag->setWorking;
         
         # Create the new revision
-        $survey = $self->addRevision;
+        $survey = $self->addRevision({
+            tagId       => $newVersionTag->getId,
+            status      => "pending",
+        });
         
         $newVersionTag->commit();
         $survey = $survey->cloneFromDb;
-        
-        #Restore the old one, if it exists
-        $oldVersionTag->setWorking() if $oldVersionTag;
     }
 
     # See if any special actions were requested..

@@ -245,7 +245,7 @@ sub _set_inheritUrlFromParent {
 property  status => (
             noFormPost      => 1,
             fieldType       => 'text',
-            default         => 'pending',
+            default         => 'approved',
           );
 property  lastModified => (
             noFormPost      => 1,

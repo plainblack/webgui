@@ -79,9 +79,11 @@ my $instance = WebGUI::Workflow::Instance->create(
 );
 
 
+my $count = 0;
 while (my $status = $instance->run ne 'complete') {
     note $status;
     $instance->run;
+    last if $count++ > 30;
 }
 
 my $sql = q{

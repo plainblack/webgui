@@ -1391,16 +1391,7 @@ override processEditForm => sub {
         return \@errors;
     }
 
-    # Since we may be adding more events, set out version tag to be active if needed
-    # Leave the original version tag available, we will need to reactivate it before returning
-    my $activeVersionTag = WebGUI::VersionTag->getWorking($session, 'nocreate');
-    # if our version tag is active, we don't need a new one, and don't need to reactivate anything later
-    if ($activeVersionTag && $activeVersionTag->getId eq $self->get('tagId')) {
-        undef $activeVersionTag;
-    }
-    else {
-        WebGUI::VersionTag->new($session, $self->tagId)->setWorking;
-    }
+    my $tag = WebGUI::VersionTag->getWorking( $session );
 
     ### Form is verified, fix properties
     if (!$session->form->hasParam('groupIdView')) {
@@ -1535,8 +1526,6 @@ override processEditForm => sub {
             if ($recurrence_new) {
                 my $new_id  = $self->setRecurrence($recurrence_new);
                 if (! $new_id) {
-                    $activeVersionTag->setWorking
-                        if $activeVersionTag;
                     return ["There is something wrong with your recurrence pattern."];
                 }
 
@@ -1592,14 +1581,15 @@ override processEditForm => sub {
                 # Add a revision
                 $properties{ startDate  } = $event->startDate;
                 $properties{ endDate    } = $event->endDate;
+                $properties{ tagId      } = $tag->getId;
+                $properties{ status     } = "pending";
 
                 # addRevision returns the new revision
-                $event  = $event->addRevision(\%properties, undef, { skipAutoCommitWorkflows => 1 });
+                $event  = $event->addRevision(\%properties);
+                $event->setVersionLock;
             }
         }
     }
-    $activeVersionTag->setWorking
-        if $activeVersionTag;
 
     delete $self->{_storageLocation};
     return undef;

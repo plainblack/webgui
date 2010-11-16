@@ -334,7 +334,9 @@ sub www_editSubmissionFormSave {
         my $formParams = $self->processForm();
         if( $formParams->{_isValid} ) {
             delete $formParams->{_isValid};
-            $self->addRevision($formParams);
+            my $tag = WebGUI::VersionTag->getWorking( $self->session );
+            my $newRevision = $self->addRevision({%$formParams,tagId => $tag->getId, status => "pending",});
+            $newRevision->setVersionLock;
             WebGUI::VersionTag->autoCommitWorkingIfEnabled($self->session);
             $self = $self->cloneFromDb;
             return $self->getParent->www_viewSubmissionQueue;

@@ -24,8 +24,15 @@ my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Adding Calendar for Event Asset Test"});
 WebGUI::Test->addToCleanup($versionTag);
 my $defaultAsset = WebGUI::Asset->getDefault($session);
-my $cal = $defaultAsset->addChild({className=>'WebGUI::Asset::Wobject::Calendar'});
+my $cal = $defaultAsset->addChild({
+    className=>'WebGUI::Asset::Wobject::Calendar',
+    tagId   => $versionTag->getId,
+    status  => "pending",
+});
 $versionTag->commit;
+
+my $versionTag2 = WebGUI::VersionTag->getWorking($session);
+WebGUI::Test->addToCleanup($versionTag2);
 
 my $properties = {
 	#     '1234567890123456789012'
@@ -39,6 +46,8 @@ my $properties = {
     endTime   => '03:00:00',
     timeZone  => 'America/Chicago',
     location  => 'Madison, Wisconsin',
+    tagId       => $versionTag->getId,
+    status      => "pending",
 };
 
 my $event = $cal->addChild($properties, $properties->{id});
@@ -124,9 +133,6 @@ my $event6 = $cal->addChild($properties3, $properties3->{id}, time()-5);
 my $event6a = $event6->addRevision({ title => 'Event with storage', }, undef, { skipAutoCommitWorkflows => 1, });
 ok($session->id->valid($event6a->get('storageId')), 'addRevision gives the new revision a valid storageId');
 isnt($event6a->get('storageId'), $event6->get('storageId'), '... and it is different from the previous revision');
-
-my $versionTag2 = WebGUI::VersionTag->getWorking($session);
-WebGUI::Test->addToCleanup($versionTag2);
 
 my $event7 = $cal->addChild({
     className => 'WebGUI::Asset::Event',
