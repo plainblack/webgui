@@ -202,7 +202,7 @@ sub www_editFriends {
     my @manageableUsers = ();
     if ($groupName) {
         my $group = WebGUI::Group->find($session, $groupName);
-        push @manageableUsers, @{ $group->getUsersNotIn($user->{_user}->{'friendsGroup'}, 'withoutExpired') };
+        push @manageableUsers, @{ $group->getUsersNotIn($user->friends->getId, 'withoutExpired') };
     }
     else {
         my $groupIds = $session->setting->get('groupsToManageFriends');
@@ -210,7 +210,7 @@ sub www_editFriends {
         foreach my $groupId (@groupIds) {
             my $group = WebGUI::Group->new($session, $groupId);
             next GROUP unless $group->getId || $group->getId eq 'new';
-            push @manageableUsers, @{ $group->getUsersNotIn($user->{_user}->{'friendsGroup'}, 'withoutExpired') };
+            push @manageableUsers, @{ $group->getUsersNotIn($user->friends->getId, 'withoutExpired') };
         }
         @manageableUsers = uniq @manageableUsers;
     }
