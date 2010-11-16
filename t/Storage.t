@@ -31,7 +31,7 @@ my $cwd = Cwd::cwd();
 
 my ($extensionTests, $fileIconTests, $block_extension_tests) = setupDataDrivenTests($session);
 
-plan tests => 141
+plan tests => 155
             + scalar @{ $extensionTests }
             + scalar @{ $fileIconTests  }
             + scalar @{ $block_extension_tests }
@@ -517,6 +517,64 @@ cmp_bag($formStore->getFiles, [ qw/littleTextFile thumb.gif/ ], '... adds the fi
 foreach my $iconTest (@{ $fileIconTests }) {
 	is( $storage1->getFileIconUrl($iconTest->{filename}), $iconTest->{iconUrl}, $iconTest->{comment} );
 }
+
+#----------------------------------------------------------------------------
+# writeAccess
+my $shallowStorage = WebGUI::Storage->create($session);
+addToCleanup($shallowStorage);
+$shallowStorage->writeAccess( users => ["3"], groups => ["2"], assets => ["1"] );
+my $shallowDir = $shallowStorage->getPathClassDir();
+ok(-e $shallowDir->file('.wgaccess')->stringify, 'writeAccess: .wgaccess file created in shallow storage');
+my $privs;
+$privs = $shallowStorage->getFileContentsAsScalar('.wgaccess');
+is ($privs, '{"assets":["1"],"groups":["2"],"users":["3"]}', '... correct group contents');
+$shallowStorage->deleteFile('.wgaccess');
+
+my $deepStorage = WebGUI::Storage->create($session);
+addToCleanup($deepStorage);
+my $deepDir     = $deepStorage->getPathClassDir();
+my $deepDeepDir = $deepDir->subdir('deep');
+my $errorStr;
+$deepDeepDir->mkpath({ error => \$errorStr } );
+ok(-e $deepDeepDir->stringify, 'created storage directory with a subdirectory for testing');
+
+$deepStorage->writeAccess( users => ["3"], groups => ["2"], assets => ["1"] );
+ok(-e $deepDir->file('.wgaccess')->stringify,     '.wgaccess file created in deep storage');
+ok(-e $deepDeepDir->file('.wgaccess')->stringify, '.wgaccess file created in deep storage subdir');
+
+$privs = $deepStorage->getFileContentsAsScalar('.wgaccess');
+is ($privs, '{"assets":["1"],"groups":["2"],"users":["3"]}', '... correct group contents, deep storage');
+$privs = $deepStorage->getFileContentsAsScalar('deep/.wgaccess');
+is ($privs, '{"assets":["1"],"groups":["2"],"users":["3"]}', '... correct group contents, deep storage subdir');
+
+#----------------------------------------------------------------------------
+# trash
+my $shallowStorage = WebGUI::Storage->create($session);
+addToCleanup($shallowStorage);
+$shallowStorage->trash;
+my $shallowDir = $shallowStorage->getPathClassDir();
+ok(-e $shallowDir->file('.wgaccess')->stringify, 'trash: .wgaccess file created in shallow storage');
+my $privs;
+$privs = $shallowStorage->getFileContentsAsScalar('.wgaccess');
+is ($privs, '{"state":"trash"}', '... correct state');
+$shallowStorage->deleteFile('.wgaccess');
+
+my $deepStorage = WebGUI::Storage->create($session);
+addToCleanup($deepStorage);
+my $deepDir     = $deepStorage->getPathClassDir();
+my $deepDeepDir = $deepDir->subdir('deep');
+my $errorStr;
+$deepDeepDir->mkpath({ error => \$errorStr } );
+ok(-e $deepDeepDir->stringify, 'created storage directory with a subdirectory for testing');
+
+$deepStorage->trash;
+ok(-e $deepDir->file('.wgaccess')->stringify,     '.wgaccess file created in deep storage');
+ok(-e $deepDeepDir->file('.wgaccess')->stringify, '.wgaccess file created in deep storage subdir');
+
+$privs = $deepStorage->getFileContentsAsScalar('.wgaccess');
+is ($privs, '{"state":"trash"}', '... correct state contents, deep storage');
+$privs = $deepStorage->getFileContentsAsScalar('deep/.wgaccess');
+is ($privs, '{"state":"trash"}', '... correct state contents, deep storage subdir');
 
 ####################################################
 #

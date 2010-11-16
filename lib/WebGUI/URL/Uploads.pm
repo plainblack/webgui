@@ -15,7 +15,7 @@ package WebGUI::URL::Uploads;
 =cut
 
 use strict;
-use Apache2::Const -compile => qw(OK DECLINED NOT_FOUND AUTH_REQUIRED);
+use Apache2::Const -compile => qw(OK DECLINED NOT_FOUND AUTH_REQUIRED FORBIDDEN);
 use WebGUI::Session;
 
 =head1 NAME
@@ -61,6 +61,7 @@ sub handler {
         my @users;
         my @groups;
         my @assets;
+        my $state;
         if ($fileContents =~ /\A(?:\d+|[A-Za-z0-9_-]{22})\n(?:\d+|[A-Za-z0-9_-]{22})\n(?:\d+|[A-Za-z0-9_-]{22})/) {
             my @privs = split("\n", $fileContents);
             push @users, $privs[0];
@@ -71,7 +72,11 @@ sub handler {
             @users = @{ $privs->{users} };
             @groups = @{ $privs->{groups} };
             @assets = @{ $privs->{assets} };
+            $state  = $privs->{state};
         }
+
+        return Apache2::Const::FORBIDDEN
+            if $state eq "trash";
 
         return Apache2::Const::OK
             if grep { $_ eq '1' } @users;

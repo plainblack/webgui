@@ -1706,36 +1706,7 @@ sub setPrivileges {
         }
     }
 
-    my $public;
-    for my $user (@{ $privs{users} }) {
-        if ($user eq '1') {
-            $public = 1;
-        }
-    }
-    for my $group (@{ $privs{groups} }) {
-        if ($group eq '1' || $group eq '7') {
-            $public = 1;
-        }
-    }
-    my $accessFile = JSON->new->encode( \%privs );
-
-    my $dirObj = $self->getPathClassDir();
-    return undef if ! defined $dirObj;
-    $dirObj->recurse(
-        callback => sub {
-            my $obj = shift;
-            return unless $obj->is_dir;
-            my $rel = $obj->relative($dirObj);
-
-            if ($public) {
-                $self->deleteFile($rel->file('.wgaccess')->stringify);
-            }
-            else {
-                $self->addFileFromScalar($rel->file('.wgaccess')->stringify, $accessFile);
-            }
-        }
-    );
-
+    return $self->writeAccess( %privs );
 }
 
 
@@ -1810,6 +1781,19 @@ sub tar {
     return $temp;
 }
 
+#----------------------------------------------------------------------------
+
+=head2 trash ( )
+
+Set this storage location as trashed
+
+=cut
+
+sub trash {
+    my ( $self ) = @_;
+    return $self->writeAccess( state => "trash" );
+}
+
 #-------------------------------------------------------------------
 
 =head2 untar ( filename [, storage ] )
@@ -1867,6 +1851,65 @@ the uploads path.
 sub getDirectoryId {
     my $self = shift;
     return $self->{_pathParts}[2];
+}
+
+#----------------------------------------------------------------------------
+
+=head2 writeAccess( pairs )
+
+Write the given pairs to the wgaccess files in this storage location.
+
+If the storage location should be public, will remove all wgaccess files.
+
+Possible keys:
+
+ users      - an arrayref of userIds to allow access to
+ groups     - an arrayref of groupIds to allow access to
+ assets     - an arrayref of assetIds to validate permissions against
+ state      - a string describing a special state.
+                valid values: "trash" - storage location is trashed
+
+
+=cut
+
+sub writeAccess {
+    my ( $self, %privs ) = @_;
+
+    my $public;
+    if ( $privs{users} ) {
+        for my $user (@{ $privs{users} }) {
+            if ($user eq '1') {
+                $public = 1;
+            }
+        }
+    }
+    if ( $privs{groups} ) {
+        for my $group (@{ $privs{groups} }) {
+            if ($group eq '1' || $group eq '7') {
+                $public = 1;
+            }
+        }
+    }
+    my $accessFile = JSON->new->encode( \%privs );
+
+    my $dirObj = $self->getPathClassDir();
+    return undef if ! defined $dirObj;
+    $dirObj->recurse(
+        callback => sub {
+            my $obj = shift;
+            return unless $obj->is_dir;
+            my $rel = $obj->relative($dirObj);
+
+            if ($public) {
+                $self->deleteFile($rel->file('.wgaccess')->stringify);
+            }
+            else {
+                $self->addFileFromScalar($rel->file('.wgaccess')->stringify, $accessFile);
+            }
+        }
+    );
+
+    return;
 }
 
 1;
