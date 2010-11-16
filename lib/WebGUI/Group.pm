@@ -979,24 +979,33 @@ sub getUsersNotIn {
     if($groupId eq "") {
         return $self->getUsers($withoutExpired);
     }
+    my $selfWhere;
+    if ( $self->getId ne '2' ) {
+        $selfWhere  = "and groupId=" . $self->session->db->dbh->quote( $self->getId );
+    }
+    else {
+        $selfWhere  = 'and userId != ' . $self->session->db->dbh->quote( "1" );
+    }
 	
     my $expireTime = 0;
 	if ($withoutExpired) {
 		$expireTime = time();
 	}
 
-    my $sql = q{
+    my $sql = qq{
         select
             userId
         from
-            groupings
+            users
+        left join
+            groupings using (userId)
         where
             expireDate > ?
-            and groupId=?
+            $selfWhere
             and userId not in (select userId from groupings where expireDate > ? and groupId=?)
     };
 
-	my @users = $self->session->db->buildArray($sql, [$expireTime,$self->getId,$expireTime,$groupId]);
+	my @users = $self->session->db->buildArray($sql, [$expireTime,$expireTime,$groupId]);
 	return \@users;
 
 }

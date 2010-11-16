@@ -93,7 +93,7 @@ my @ldapTests = (
 );
 
 
-plan tests => (168 + (scalar(@scratchTests) * 2) + scalar(@ipTests)); # increment this value for each test you create
+plan tests => (172 + (scalar(@scratchTests) * 2) + scalar(@ipTests)); # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 my $testCache = WebGUI::Cache->new($session, 'myTestKey');
@@ -831,5 +831,38 @@ ok(  WebGUI::Group->vitalGroup(7), 'vitalGroup: 7');
 ok(  WebGUI::Group->vitalGroup(3), '... 3');
 ok(  WebGUI::Group->vitalGroup('pbgroup000000000000015'), '... pbgroup000000000000015');
 ok(! WebGUI::Group->vitalGroup('27'), '... 27 is not vital');
+
+#----------------------------------------------------------------------------
+# getUsersNotIn
+
+# Normal group
+my $happyDude   = WebGUI::User->create( $session );
+$happyDude->username(" Happy Dude ");
+addToCleanup( $happyDude );
+
+$gA->addUsers([ $happyDude->getId ]);
+$gB->addUsers([ $happyDude->getId ]);
+cmp_deeply(
+    $gA->getUsersNotIn( $gZ->getId ),
+    superbagof( $happyDude->getId ),
+    "get the users not in the group",
+);
+ok(
+    !grep( { $_ eq $happyDude->getId } @{$gA->getUsersNotIn( $gB->getId )}),
+    "don't get the users in both groups",
+);
+
+# Special-case Registered Users
+my $regUser = WebGUI::Group->new( $session, "2" );
+cmp_deeply(
+    $regUser->getUsersNotIn( $gZ->getId ),
+    superbagof( $happyDude->getId ),
+    "registered users: get the users not in the group",
+);
+ok(
+    !grep( { $_ eq $happyDude->getId } @{$regUser->getUsersNotIn( $gA->getId )}),
+    "registered users: don't get the users in both groups",
+);
+
 
 #vim:ft=perl
