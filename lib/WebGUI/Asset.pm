@@ -1910,7 +1910,9 @@ no revision date is available it will return undef.
 =head2 newById ( session, assetId [ , revisionDate ] )
 
 Instances an existing Asset, by looking up the className of the asset specified by the assetId, and then calling new.
-Returns undef if it can't find the classname.
+
+If a class cannot be found for the requested assetId, then it throws a
+WebGUI::Error::InvalidParam exception.
 
 =head3 session
 
