@@ -30,7 +30,7 @@ is($userId, $user->userId, 'changing session user changes sessionId inside userS
 
 $session->user({userId => 3});
 is($session->user->userId,  3, 'Set session user to Admin, check userId==3');
-is($session->user->profileField('uiLevel'), 9, 'Set session user to Admin, check uiLevel==9');
+is($session->user->get('uiLevel'), 9, 'Set session user to Admin, check uiLevel==9');
 
 my $dupe = $session->duplicate;
 WebGUI::Test->addToCleanup($dupe);
@@ -91,6 +91,19 @@ is($varSession->get('userId'), 1, 'default userId is 1');
 is($varSession->get('adminOn'), $varSession->isAdminOn, "get('adminOn') and isAdminOn return the same thing");
 is($varSession->get('adminOn'), 0, "adminOn is off by default"); ##retest
 is($varSession->get('lastIP'), '192.168.0.34', "lastIP fetched");
+
+
+my $var2 = WebGUI::Session->open($session->config, undef, 'illegalSessionIdThatIsTooLong');
+#                                      '1234567890123456789012'
+isa_ok($var2, 'WebGUI::Session', 'invalid sessionId will still produce a Session object');
+($count) = $session->db->quickArray("select count(*) from userSession where sessionId=?",[$var2->getId]);
+is($count, 0, "object store of sessionId does not match database record");
+my $var2Id = $var2->getId;
+$var2->end;
+my $idToDelete = substr $var2Id,0,22;
+($count) = $session->db->quickArray("select count(*) from userSession where sessionId=?",[$idToDelete]);
+is($count, 1, "Unable to delete database record for Var object with invalid sessionId");
+
 
 done_testing;
 
