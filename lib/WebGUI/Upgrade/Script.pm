@@ -113,7 +113,7 @@ sub _build_exports {
             if (WebGUI::VersionTag->getWorking($session, 'nocreate')) {
                 $version_tag_sub->()->commit;
             }
-            $session->var->end;
+            $session->end;
             $session->close;
         }
         undef $session;

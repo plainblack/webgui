@@ -46,7 +46,7 @@ sub run {
     }
 
     $versionTag->commit;
-    $session->var->end;
+    $session->end;
     $session->close;
 
     return $package;
