@@ -6,6 +6,7 @@
  - fixed #11947: PayPal does not register in-state sales taxes
  - fixed #11956: ExtendCalenderRecurrence bug
  - fixed #11965: FriendManager pagination and getUsersNotIn
+ - fixed #11964: files show in trash and in old revisions
 
 7.10.4
  - Added WebGUI::Fork api
