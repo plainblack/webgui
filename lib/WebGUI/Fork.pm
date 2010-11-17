@@ -437,7 +437,7 @@ sub init {
             $class->daemonize( $request, sub { $class->runCmd } );
         };
     }
-    exit 0;
+    CORE::exit(0);
 } ## end sub init
 
 #-----------------------------------------------------------------
