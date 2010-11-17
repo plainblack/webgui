@@ -1,3 +1,5 @@
+7.10.6
+
 7.10.5
  - fixed #11950: Username set to 0 when edit user 
  - fixed #11946: Double time zone correction when addding an event
