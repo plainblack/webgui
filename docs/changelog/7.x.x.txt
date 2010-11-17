@@ -7,6 +7,7 @@
  - fixed #11956: ExtendCalenderRecurrence bug
  - fixed #11965: FriendManager pagination and getUsersNotIn
  - fixed #11964: files show in trash and in old revisions
+ - fixed #11954: Can't clear packed head tags
 
 7.10.4
  - Added WebGUI::Fork api
