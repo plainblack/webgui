@@ -3,6 +3,7 @@
  - fixed #11956: ExtendCalenderRecurrence bug
  - fixed #11964: files show in trash and in old revisions
  - fixed #11954: Can't clear packed head tags
+ - fixed #11957: finBrokenAsset --fix does not fix per se
 
 7.9.18
  - fixed #11938: upgrade script always removes specialState
