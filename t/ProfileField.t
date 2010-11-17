@@ -33,7 +33,7 @@ WebGUI::Test->addToCleanup($newUser);
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 50;        # Increment this number for each test you create
+plan tests => 56;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # Test the creation of ProfileField
@@ -50,6 +50,11 @@ isa_ok( $aliasField, 'WebGUI::ProfileField' );
 my $uilevelField;
 ok( $uilevelField = WebGUI::ProfileField->new( $session, 'uiLevel' ), 'field "uiLevel instantiated' );
 isa_ok( $uilevelField, 'WebGUI::ProfileField' );
+
+
+my $langField;
+ok( $langField = WebGUI::ProfileField->new( $session, 'language' ), 'field "language instantiated' );
+isa_ok( $langField, 'WebGUI::ProfileField' );
 
 #----------------------------------------------------------------------------
 # Test the formField method
@@ -78,6 +83,20 @@ $ffvalue    = undef;
 ok( $ff = $uilevelField->formField(undef, undef, $newUser), 'formField method returns something, uiLevel field, defaulted user' );
 $ffvalue = $newUser->profileField('uiLevel');
 like( $ff, qr/$ffvalue/, 'html returned contains value, uiLevel field, defaulted user' );
+
+
+
+$ff         = undef;
+$ffvalue    = undef;
+ok( $ff     = $langField->formField, 'formField method returns something, language field, session user' );
+$ffvalue    = $session->user->profileField('language');
+like( $ff, qr/value="$ffvalue"[^>]+selected/, 'html returned contains value, language field, session user' );
+
+$ff         = undef;
+$ffvalue    = "German";
+$session->scratch->setLanguageOverride($ffvalue);
+ok( $ff     = $langField->formField, 'formField method returns something, language field, session user, languageOverride' );
+like( $ff, qr/value="$ffvalue"[^>]+selected/, 'html returned contains value, language field, session user, languageOverride' );
 
 ###########################################################
 #

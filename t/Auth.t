@@ -33,7 +33,7 @@ my ($request, $oldRequest, $output);
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 3;        # Increment this number for each test you create
+plan tests => 4;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # Test createAccountSave and returnUrl together
@@ -47,7 +47,9 @@ $session->{_request} = $request;
 
 $auth           = WebGUI::Auth->new( $session, $AUTH_METHOD );
 my $username    = $session->id->generate;
+my $language	= "German";
 push @cleanupUsernames, $username;
+$session->scratch->setLanguageOverride($language);
 $output         = $auth->createAccountSave( $username, { }, "PASSWORD" ); 
 WebGUI::Test->addToCleanup(sub {
     for my $username ( @cleanupUsernames ) {
@@ -74,6 +76,8 @@ is(
     "returnUrl field is used to set redirect after createAccountSave",
 );
 
+is $session->user->profileField('language'), $language, 'languageOverride is taken in to account in createAccountSave';
+
 # Session Cleanup
 $session->{_request} = $oldRequest;
 
@@ -98,6 +102,7 @@ is(
     "returnUrl field is used to set redirect after login",
 );
 is $output, undef, 'login returns undef when showMessageOnLogin is false';
+
 
 # Session Cleanup
 $session->{_request} = $oldRequest;
