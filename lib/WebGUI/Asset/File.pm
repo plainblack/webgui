@@ -628,7 +628,7 @@ sub update {
 	$self->SUPER::update(@_);
 	##update may have entered a new storageId.  Reset the cached one just in case.
 	if ($self->get("storageId") ne $before{storageId}) {
-		$self->setStorageLocation;
+		delete $self->{_storageLocation};
 	}
 	if ($self->get("ownerUserId") ne $before{owner} || $self->get("groupIdEdit") ne $before{edit} || $self->get("groupIdView") ne $before{view}) {
         $self->setPrivileges;
