@@ -1017,6 +1017,7 @@ use HTML::Packer;
 my $asset   = WebGUI::Asset->getImportNode( $session )->addChild({
     className       => 'WebGUI::Asset::Snippet',
 });
+addToCleanup( $asset );
 my $unpacked = qq{<title>
                                                                              
                                                                              
