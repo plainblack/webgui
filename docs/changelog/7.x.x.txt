@@ -2,6 +2,7 @@
  - fixed #11965: FriendManager pagination and getUsersNotIn
  - fixed #11956: ExtendCalenderRecurrence bug
  - fixed #11964: files show in trash and in old revisions
+ - fixed #11954: Can't clear packed head tags
 
 7.9.18
  - fixed #11938: upgrade script always removes specialState

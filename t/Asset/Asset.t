@@ -172,7 +172,7 @@ sub definition {
 
 package main;
 
-plan tests => 132
+plan tests => 134
             + scalar(@fixIdTests)
             + scalar(@fixTitleTests)
             + 2*scalar(@getTitleTests) #same tests used for getTitle and getMenuTitle
@@ -1010,6 +1010,30 @@ is $session->http->getRedirectLocation, $trashedAsset->getUrl('func=manageTrash'
 $session->http->setRedirectLocation('');
 is $clippedAsset->checkView(), 'chunked', 'checkView: returns "chunked" when admin is on for cut asset';
 is $session->http->getRedirectLocation, $clippedAsset->getUrl('func=manageClipboard'), '... cut asset sets redirect to manageClipboard';
+
+#----------------------------------------------------------------------------
+# packed head tags
+use HTML::Packer;
+my $asset   = WebGUI::Asset->getImportNode( $session )->addChild({
+    className       => 'WebGUI::Asset::Snippet',
+});
+my $unpacked = qq{<title>
+                                                                             
+                                                                             
+this is my title
+</title>
+};
+my $packed = $unpacked;
+HTML::Packer::minify( \$packed, {
+    remove_newlines     => 1,
+    do_javascript       => "shrink",
+    do_stylesheet       => "minify",
+} );
+$asset->update({ extraHeadTags => $unpacked });
+is $asset->get('extraHeadTagsPacked'), $packed, 'extraHeadTagsPacked';
+$asset->update({ extraHeadTags => '' });
+ok !$asset->get('extraHeadTagsPacked'), 'extraHeadTagsPacked cleared';
+
 
 ##Return an array of hashrefs.  Each hashref describes a test
 ##for the fixId method.

@@ -2253,7 +2253,11 @@ filter guidelines).
 
 sub packExtraHeadTags {
     my ( $self, $unpacked ) = @_;
-    return $unpacked if !$unpacked;
+    # If no more unpacked tags, remove the packed tags
+    if ( !$unpacked ) {
+        $self->update({ extraHeadTagsPacked => $unpacked });
+        return;
+    }
     my $packed  = $unpacked;
     HTML::Packer::minify( \$packed, {
         remove_newlines     => 1,
