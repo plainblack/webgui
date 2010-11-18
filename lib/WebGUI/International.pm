@@ -231,7 +231,7 @@ Specify a default language. Defaults to user preference or "English".
 
 sub makeUrlCompliant {
 	my ($self, $url, $language) = @_;
-	$language = $language || $self->{_language} || $self->session->user->profileField("language") || "English";
+	$language = $language || $self->{_language} || $self->session->user->get("language") || "English";
 	my $cmd = "WebGUI::i18n::".$language;
     WebGUI::Pluggable::load($cmd);
 	my $output = WebGUI::Pluggable::run($cmd, 'makeUrlCompliant', [$url]);
@@ -283,7 +283,7 @@ Specify a default language. Defaults to user preference or "English".
 sub new {
 	my ($class, $session, $namespace, $language) = @_;
     $namespace ||= 'WebGUI';
-    $language ||= $session->scratch->getLanguageOverride() || $session->user->profileField('language');
+    $language ||= $session->scratch->getLanguageOverride() || $session->user->get('language');
 	my $self =
         bless {
             _session   => $session,
