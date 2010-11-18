@@ -55,7 +55,7 @@ sub process {
         my $i18n    = WebGUI::International->new( $session, 'Macro_EditableToggle' );
         my $turnOn  = $param[0] || $i18n->get(516);
         my $turnOff = $param[1] || $i18n->get(517);
-        if ( $session->var->isAdminOn ) {
+        if ( $session->isAdminOn ) {
             $var{'toggle.url'}  = $session->url->page('op=switchOffAdmin');
             $var{'toggle.text'} = $turnOff;
         }

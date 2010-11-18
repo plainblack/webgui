@@ -34,7 +34,7 @@ process takes one optional parameters for customizing the layout of the Admin ba
 
 sub process {
 	my $session = shift;
-	return undef unless $session->var->isAdminOn;
+	return undef unless $session->isAdminOn;
 	my $i18n = WebGUI::International->new($session,'Macro_AdminBar');
 	my ($url, $style, $asset, $user, $config) = $session->quick(qw(url style asset user config));
 	$style->setScript($url->extras('yui/build/utilities/utilities.js'));

@@ -239,7 +239,7 @@ Shortcut that the Visitor would see, or their own.
 
 sub discernUserId {
 	my $self = shift;
-	return ($self->canManage && $self->session->var->isAdminOn) ? '1' : $self->session->user->userId;
+	return ($self->canManage && $self->session->isAdminOn) ? '1' : $self->session->user->userId;
 }
 
 #-------------------------------------------------------------------
@@ -464,7 +464,7 @@ admin mode is on.
 sub _overridesCacheTag {
 	my $self = shift;
 	#cache by userId, assetId of this shortcut, and whether adminMode is on or not.
-	return ["shortcutOverrides", $self->getId, $self->session->user->userId, $self->session->var->isAdminOn];
+	return ["shortcutOverrides", $self->getId, $self->session->user->userId, $self->session->isAdminOn];
 }
 
 #-------------------------------------------------------------------
@@ -488,7 +488,7 @@ sub getOverrides {
 	my $overridesRef = $cache->get($self->_overridesCacheTag);
     ##If admin mode is not on, and the cache is valid, and not expired, and the user object was not updated,
     ##return the cached value.
-    if ( ! $session->var->isAdminOn
+    if ( ! $session->isAdminOn
         && $overridesRef
         && $overridesRef->{cacheNotExpired}
         && $overridesRef->{userLastUpdated} >= $u->get('lastUpdated')) {
@@ -591,7 +591,7 @@ sub getShortcutByCriteria {
 	if ($assetId) {
 		$scratchId = "Shortcut_" . $assetId;
 		if($self->session->scratch->get($scratchId) && !$self->disableContentLock) {
-			unless ($self->session->var->isAdminOn) {
+			unless ($self->session->isAdminOn) {
 				return WebGUI::Asset->newById($self->session, $self->session->scratch->get($scratchId));
 			}
 		}
@@ -990,8 +990,8 @@ sub www_getUserPrefsForm {
 	my @fielden = $self->getPrefFieldsToShow;
 	my $f = WebGUI::HTMLForm->new($self->session,extras=>' onsubmit="submitForm(this,\''.$self->getId.'\',\''.$self->getUrl.'\');return false;"');
 	$f->raw('<table cellspacing="0" cellpadding="3" border="0">');
-    my $allowedToSave = ( ! $session->var->isAdminOn && $self->getParent->canPersonalize )
-                     || (   $session->var->isAdminOn && $session->user->isInGroup($session->setting->get('groupIdAdminUser')) );
+    my $allowedToSave = ( ! $session->isAdminOn && $self->getParent->canPersonalize )
+                     || (   $session->isAdminOn && $session->user->isInGroup($session->setting->get('groupIdAdminUser')) );
     if ($allowedToSave) {
         $f->hidden(  
             -name => 'func', 
@@ -1090,7 +1090,7 @@ sub www_saveUserPrefs {
 	my $self    = shift;
     my $session = $self->session;
 	return '' unless $self->getParent->canPersonalize
-                  || ( $session->var->isAdminOn && $session->user->isInGroup($session->setting->get('groupIdAdminUser')) );
+                  || ( $session->isAdminOn && $session->user->isInGroup($session->setting->get('groupIdAdminUser')) );
 	my @fellowFields = $self->getPrefFieldsToShow;
 	my %data = ();
 	$self->uncacheOverrides;

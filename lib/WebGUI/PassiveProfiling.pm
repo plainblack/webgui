@@ -58,8 +58,8 @@ sub add {
     my $assetId = shift;
 	$session->db->write("insert into passiveProfileLog (passiveProfileLogId, userId, sessionId, assetId, dateOfEntry) values (?,?,?,?,?)",
                        [
-                        $session->id->generate(),        $session->user->userId,
-                        $session->var->get("sessionId"), $assetId,
+                        $session->id->generate(),  $session->user->userId,
+                        $session->getId,           $assetId,
                         time(),
                        ]);
     return undef;

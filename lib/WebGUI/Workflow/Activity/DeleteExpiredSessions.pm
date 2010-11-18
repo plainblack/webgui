@@ -89,7 +89,7 @@ sub execute {
         }
 		my $session = WebGUI::Session->open($self->session->config, undef, $sessionId, 1);
 		if (defined $session) {
-			$session->var->end;
+			$session->end;
 			$session->close;
 		}
 		if ((time() - $time) > $ttl) {

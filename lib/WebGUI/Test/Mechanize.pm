@@ -88,7 +88,7 @@ sub DESTROY {
     my $self = shift;
     try {
         my $session = $self->session;
-        $session->var->end;
+        $session->end;
         $session->close;
     };
 }

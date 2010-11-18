@@ -169,7 +169,7 @@ sub prepareView {
     }
 
     my %vars;
-    $vars{showAdmin} = ($session->var->isAdminOn && $self->canEdit && $self->canEditIfLocked);
+    $vars{showAdmin} = ($session->isAdminOn && $self->canEdit && $self->canEditIfLocked);
 
     my $splitter = $self->{_viewSplitter} = $self->getSeparator;
 
@@ -369,7 +369,7 @@ override www_view => sub {
     my $self = shift;
     my $session = $self->session;
     # slashdot / burst protection hack
-    if ($session->var->get("userId") eq "1"
+    if ($session->user->isVisitor
         && $session->form->param() == 0
         && !$session->scratch->get('isExporting')
     ) {

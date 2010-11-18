@@ -38,7 +38,6 @@ use WebGUI::Session::Setting;
 use WebGUI::Session::Stow;
 use WebGUI::Session::Style;
 use WebGUI::Session::Url;
-use WebGUI::Session::Var;
 
 =head1 NAME
 

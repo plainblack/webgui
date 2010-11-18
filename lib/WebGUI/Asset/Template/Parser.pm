@@ -39,7 +39,7 @@ sub addSessionVars {
 	$vars->{"session.user.username"} = $self->session->user->username;
 	$vars->{"session.user.firstDayOfWeek"} = $self->session->user->profileField("firstDayOfWeek");
 	$vars->{"session.config.extrasurl"} = $self->session->url->extras();
-	$vars->{"session.var.adminOn"} = $self->session->var->isAdminOn;
+	$vars->{"session.var.adminOn"} = $self->session->isAdminOn;
 	$vars->{"session.setting.companyName"} = $self->session->setting->get("companyName");
 	$vars->{"session.setting.anonymousRegistration"} = $self->session->setting->get("anonymousRegistration");
 	my $forms = $self->session->form->paramsHashRef();

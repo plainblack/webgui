@@ -52,7 +52,7 @@ sub process {
     my $i18n = WebGUI::International->new($session,'Macro_AdminToggle');
     my %var;
     $var{'toggle_text'} = $turnOn || $i18n->get(516);
-    if ($session->var->isAdminOn) {
+    if ($session->isAdminOn) {
         $var{'toggle_url'} = '#'
     }
     else {

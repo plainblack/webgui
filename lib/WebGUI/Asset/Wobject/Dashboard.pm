@@ -121,7 +121,7 @@ Dashboard that Visitor would see, or their own.
 
 sub discernUserId {
 	my $self = shift;
-	return ($self->canManage && $self->session->var->isAdminOn) ? '1' : $self->session->user->userId;
+	return ($self->canManage && $self->session->isAdminOn) ? '1' : $self->session->user->userId;
 }
 
 #-------------------------------------------------------------------
@@ -243,7 +243,7 @@ turned on.
 
 sub isManaging {
 	my $self = shift;
-	return 1 if ($self->canManage && $self->session->var->isAdminOn());
+	return 1 if ($self->canManage && $self->session->isAdminOn());
 	return 0;
 }
 
@@ -415,7 +415,7 @@ sub view {
 			}
 		}
 	}
-	$vars{showAdmin} = ($self->session->var->isAdminOn && $self->canEdit);
+	$vars{showAdmin} = ($self->session->isAdminOn && $self->canEdit);
 	$vars{"dragger.init"} = '
 		<script type="text/javascript">
 			dragable_init("'.$self->getUrl.'");
@@ -459,10 +459,10 @@ sub www_view {
         unless ($self->canView) {
                 if ($self->state eq "published") { # no privileges, make em log in
                         return $self->session->privilege->noAccess();
-                } elsif ($self->session->var->isAdminOn && $self->state =~ /^trash/) { # show em trash
+                } elsif ($self->session->isAdminOn && $self->state =~ /^trash/) { # show em trash
                         $self->session->http->setRedirect($self->getUrl("func=manageTrash"));
                         return undef;
-                } elsif ($self->session->var->isAdminOn && $self->state =~ /^clipboard/) { # show em clipboard
+                } elsif ($self->session->isAdminOn && $self->state =~ /^clipboard/) { # show em clipboard
                         $self->session->http->setRedirect($self->getUrl("func=manageClipboard"));
                         return undef;
                 } else { # tell em it doesn't exist anymore

@@ -61,7 +61,7 @@ sub call {
         }
 
         require WebGUI::Asset;
-        my $userId = $session->var->get('userId');
+        my $userId = $session->get('userId');
 
         return
             if grep { $_ eq '1' || $_ eq $userId }                      @{ $privs->{users} }

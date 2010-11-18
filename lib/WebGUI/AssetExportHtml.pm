@@ -266,7 +266,7 @@ sub exportAsHtml {
     # the exported assets are taken from that user's perspective.
     my $exportSession = WebGUI::Session->open($session->config);
     my $esGuard = Scope::Guard->new(sub {
-        $exportSession->var->end;
+        $exportSession->end;
         $exportSession->close;
     });
 
@@ -394,7 +394,7 @@ sub exportBranch {
             $cs->output->setHandle($handle);
             my $guard = guard {
                 close $handle;
-                $cs->var->end;
+                $cs->end;
                 $cs->close();
                 $asset->$report('collateral notes', $output) if $output;
             };
@@ -553,7 +553,7 @@ sub exportGetDescendants {
             $session = WebGUI::Session->open($session->config);
             $session->user( { userId => $user->userId } );
             $sGuard = Scope::Guard->new(sub {
-                $session->var->end;
+                $session->end;
                 $session->close;
             });
             # clone self in the new session

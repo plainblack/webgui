@@ -301,7 +301,7 @@ sub _getFormFields {
             $value = $formValue;
         }
         my $hidden
-            = ($field->{status} eq 'hidden' && !$session->var->isAdminOn)
+            = ($field->{status} eq 'hidden' && !$session->isAdminOn)
             || ($field->{isMailField} && !$self->get('mailData'));
 	
         # populate Rich Editor field if the field is an HTMLArea
@@ -955,7 +955,7 @@ sub getRecordTemplateVars {
     for my $field_form (@fields) {
         my ($field, $form) = @{ $field_form };
         # need a copy
-        my $hidden =  ($field->{status} eq 'hidden' && !$session->var->isAdminOn)
+        my $hidden =  ($field->{status} eq 'hidden' && !$session->isAdminOn)
                    || ($field->{isMailField} && !$self->mailData);
 	
         # populate Rich Editor field if the field is an HTMLArea

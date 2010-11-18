@@ -253,7 +253,7 @@ sub view {
     my $session    = $self->session;
     my $versionTag = WebGUI::VersionTag->getWorking($session, 1);
     my $noCache =
-        $session->var->isAdminOn
+        $session->isAdminOn
         || $self->cacheTimeout <= 10
         || ($versionTag && $versionTag->getId eq $self->tagId);
     my $cacheKey = $self->getWwwCacheKey('view', $calledAsWebMethod);
@@ -265,7 +265,7 @@ sub view {
                ? $self->snippetPacked
                : $self->snippet
                ;
-	$output = $self->getToolbar.$output if ($session->var->isAdminOn && !$calledAsWebMethod);
+	$output = $self->getToolbar.$output if ($session->isAdminOn && !$calledAsWebMethod);
 	if ($self->processAsTemplate) {
 		$output = WebGUI::Asset::Template->processRaw($session, $output, $self->get);
 	}

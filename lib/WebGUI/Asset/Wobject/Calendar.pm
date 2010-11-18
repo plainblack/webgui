@@ -957,7 +957,7 @@ sub view {
     ##### Process the template
     # Add any global variables
     # Admin
-    if ($self->session->var->isAdminOn) {
+    if ($self->session->isAdminOn) {
         $var->{'admin'}         = 1;
         $var->{'adminControls'} = $self->getToolbar;
     }

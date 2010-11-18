@@ -209,7 +209,7 @@ sub view {
 	my $self = shift;
     my $cache = $self->session->cache;
     my $cacheKey = $self->getWwwCacheKey('view');
-    if (!$self->session->var->isAdminOn && $self->cacheTimeout > 10) {
+    if (!$self->session->isAdminOn && $self->cacheTimeout > 10) {
         my $out = $cache->get( $cacheKey );
 		return $out if $out;
 	}
@@ -232,7 +232,7 @@ sub view {
 	$var{noInitialPage} = $i18n->get('noInitialPage');
 	$var{noFileSpecified} = $i18n->get('noFileSpecified');
        	my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
-    if (!$self->session->var->isAdminOn && $self->cacheTimeout > 10) {
+    if (!$self->session->isAdminOn && $self->cacheTimeout > 10) {
         $cache->set( $cacheKey, $out, $self->cacheTimeout);
     }
     return $out;
@@ -268,7 +268,7 @@ Web facing method which is the default view page.  This method does a
 sub www_view {
 	my $self = shift;
 	return $self->session->privilege->noAccess() unless $self->canView;
-	if ($self->session->var->isAdminOn) {
+	if ($self->session->isAdminOn) {
 		return $self->session->asset($self->getContainer)->www_view;
 	}
 	$self->session->http->setRedirect($self->getFileUrl($self->showPage));

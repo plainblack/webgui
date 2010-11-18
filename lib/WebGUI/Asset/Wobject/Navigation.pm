@@ -307,7 +307,7 @@ Returns a toolbar with a set of icons that hyperlink to functions that delete, e
 override getToolbar => sub {
 	my $self = shift;
     return undef
-        unless $self->canEdit && $self->session->var->isAdminOn;
+        unless $self->canEdit && $self->session->isAdminOn;
 	if ($self->getToolbarState) {
         my $toolbar = '';
         if ($self->canEditIfLocked) {

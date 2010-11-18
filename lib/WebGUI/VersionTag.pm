@@ -263,7 +263,7 @@ sub commitAsUser {
         }
     }
     #End the new session
-    $new_session->var->end;
+    $new_session->end;
     $new_session->close;
     return 1;
 }

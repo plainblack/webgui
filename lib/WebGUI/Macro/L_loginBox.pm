@@ -68,7 +68,7 @@ sub process {
 	my $templateId = $param[2] || "PBtmpl0000000000000044";
 	my %var;	
 	my $i18n = WebGUI::International->new($session,'Macro_L_loginBox');
-        $var{'user.isVisitor'} = ($session->var->get("userId") eq "1");
+        $var{'user.isVisitor'} = ($session->user->isVisitor);
 	$var{'customText'} = $param[1];
 	$var{'customText'} =~ s/%(.*?)%/_createURL($session,$1)/ge;
 	$var{'hello.label'} = $i18n->get(48);

@@ -96,7 +96,7 @@ sub process {
     my $extrasUrl  = Path::Class::Dir->new($session->url->make_urlmap_work($session->config->get('extrasURL')));
 
     ##Normal mode
-    if (! $session->var->isAdminOn) {
+    if (! $session->isAdminOn) {
         # Built files live at /path/to/uploads/filepump/bundle.timestamp/ which is
         # a sub-dir of uploadsDir, so resolve the dir relative to uploads
         my $dir = $bundle->getPathClassDir->relative($uploadsDir);

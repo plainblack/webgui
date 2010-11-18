@@ -83,7 +83,7 @@ sub dispatch {
         }
     }
     $session->clearAsset;
-    if ($session->var->isAdminOn) {
+    if ($session->isAdminOn) {
         my $asset = WebGUI::Asset->newByUrl($session, $session->url->getRefererUrl) || WebGUI::Asset->getDefault($session);
         return $asset->addMissing($assetUrl);
     }
@@ -163,7 +163,7 @@ The content handler for this package.
 
 sub handler {
     my ($session) = @_;
-    my ($log, $http, $var, $asset, $request, $config) = $session->quick(qw(errorHandler http var asset request config));
+    my ($log, $http, $asset, $request, $config) = $session->quick(qw(errorHandler http asset request config));
     my $output = "";
     if (my $perfLog = $log->performanceLogger) { #show performance indicators if required
         my $t = [Time::HiRes::gettimeofday()];

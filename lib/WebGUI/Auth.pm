@@ -1229,7 +1229,7 @@ Superclass method that performs standard logout routines.
 
 sub www_logout {
 	my $self = shift;
-	$self->session->var->end($self->session->var->get("sessionId"));
+	$self->session->end();
 	$self->session->user({userId=>'1'});
 	my $u = WebGUI::User->new($self->session,1);
 	$self->{user} = $u;
