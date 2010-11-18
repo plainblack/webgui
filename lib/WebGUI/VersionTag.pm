@@ -511,7 +511,7 @@ sub getVersionTagMode {
 
     my $mode = q{};
 
-    $mode = $session->user()->profileField(q{versionTagMode});
+    $mode = $session->user()->get(q{versionTagMode});
 
     #verify mode.
     if (!(defined $mode && $mode ~~ [qw{autoCommit siteWide singlePerUser multiPerUser}])) {
