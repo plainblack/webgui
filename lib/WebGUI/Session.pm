@@ -19,7 +19,6 @@ use 5.010;
 
 use CHI;
 use File::Temp qw( tempdir );
-use Scalar::Util qw( weaken );
 use HTTP::Message::PSGI;
 use HTTP::Request::Common;
 use WebGUI::Config;
@@ -417,7 +416,10 @@ The epoch date when this user session will expire if it's not accessed again by 
 sub get {
 	my $self    = shift;
 	my $varName = shift;
-	return $self->{_var}{$varName};
+    if ($varName) {
+        return $self->{_var}{$varName};
+    }
+    return $self->{_var};
 }
 
 #-------------------------------------------------------------------
@@ -547,7 +549,7 @@ If you have a L<PSGI> env hash, you might find the sessionId at: $env->{'psgix.s
 
 =head3 noFuss
 
-Uses simple session vars. See WebGUI::Session::Var::new() for more details.
+Uses simple session vars. See WebGUI::Session->open() for more details.
 
 =cut
 
