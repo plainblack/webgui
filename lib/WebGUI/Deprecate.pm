@@ -19,6 +19,7 @@ Deprecate a subroutine, spitting out a warning whenever it is used.
 
 use strict;
 use warnings;
+use Package::Stash;
 
 use Sub::Exporter -setup => {
     exports => [ 'deprecate' ],
@@ -31,14 +32,13 @@ my %warned;
 sub deprecate ($$) {
     my ($old_method, $new_method) = @_;
     my $package = caller;
-    no strict 'refs';
-    no warnings 'redefine';
+    my $stash = Package::Stash->new($package);
 
     my %deep;
     # keep a copy since it will be replaced
-    my $new_sub = \&{"$package\::$new_method"};
+    my $new_sub = $stash->get_package_symbol('&'.$new_method);
     # call new method instead.  if 
-    *{"$package\::$old_method"} = sub {
+    $stash->add_package_symbol('&'.$old_method, sub {
         my $self = shift;
         my $message = "$package\::$old_method is deprecated and should be replaced with $new_method at " . join( "-", (caller(0))[0,2] );
         warn $message
@@ -46,8 +46,8 @@ sub deprecate ($$) {
 
         local $deep{1} = 1;
         $self->$new_method(@_);
-    };
-    *{"$package\::$new_method"} = sub {
+    });
+    $stash->add_package_symbol('&'.$new_method, sub {
         my $self = $_[0];
         if (!$deep{1}) {
             my $old_sub = $self->can($old_method);
@@ -59,7 +59,7 @@ sub deprecate ($$) {
             }
         }
         goto $new_sub;
-    };
+    });
 }
 
 1;
