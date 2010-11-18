@@ -24,7 +24,7 @@ plan tests => 2;
 my $output;
 $output = WebGUI::Macro::AdminBar::process($session);
 is($output, undef, 'AdminBar returns undef unless admin is on');
-$session->var->switchAdminOn;
+$session->switchAdminOn;
 $output = WebGUI::Macro::AdminBar::process($session);
 ok($output, 'AdminBar returns something when admin is on');
 

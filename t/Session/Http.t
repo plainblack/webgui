@@ -32,7 +32,7 @@ use Test::MockObject::Extends;
 ##try and implement the mod_perl cookie handling code.
 $http = Test::MockObject::Extends->new($http);
 my $cookieName = $session->config->getCookieName;
-my $varId = $session->var->getId();
+my $varId = $session->getId();
 
 $http->mock( getCookies => sub { return {$cookieName => $varId} } );
 
