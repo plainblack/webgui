@@ -506,10 +506,10 @@ TODO: {
 ################################################################
 
 $session->user({ userId => 3 });
-$session->var->switchAdminOff;
+$session->switchAdminOff;
 is($rootAsset->addMissing('/nowhereMan'), undef, q{addMissing doesn't return anything unless user is in Admin Mode});
 
-$session->var->switchAdminOn;
+$session->switchAdminOn;
 my $addMissing = $rootAsset->addMissing('/nowhereMan');
 ok($addMissing, 'addMissing returns some output when in Admin Mode');
 
@@ -858,7 +858,7 @@ $clippedAsset->cut;
 is $trashedAsset->get('state'), 'trash',     'checkView setup: trashed an asset';
 is $clippedAsset->get('state'), 'clipboard', '... clipped an asset';
 
-$session->var->switchAdminOff;
+$session->switchAdminOff;
 $session->http->setRedirectLocation('');
 $session->http->setStatus(200, 'OK');
 
@@ -871,7 +871,7 @@ $clippedAsset->checkView();
 is $session->http->getStatus, 410, '... status set to 410 for cut asset';
 is $session->http->getRedirectLocation, '', '... no redirect set';
 
-$session->var->switchAdminOn;
+$session->switchAdminOn;
 $session->http->setStatus(200, 'OK');
 is $trashedAsset->checkView(), 'chunked', '... returns "chunked" when admin is on for trashed asset';
 is $session->http->getRedirectLocation, $trashedAsset->getUrl('func=manageTrash'), '... trashed asset sets redirect to manageTrash';

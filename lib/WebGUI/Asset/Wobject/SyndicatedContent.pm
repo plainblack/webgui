@@ -368,13 +368,13 @@ sub view {
 	# try the cached version
 	my $cache = $session->cache; 
 	my $out = $cache->get("view_".$self->getId);
-	return $out if ($out ne "" && !$session->var->isAdminOn);
+	return $out if ($out ne "" && !$session->isAdminOn);
     #return $out if $out;
 
 	# generate from scratch
 	my $feed = $self->generateFeed;
 	$out = $self->processTemplate($self->getTemplateVariables($feed),undef,$self->{_viewTemplate});
-	if (!$session->var->isAdminOn && $self->cacheTimeout > 10) {
+	if (!$session->isAdminOn && $self->cacheTimeout > 10) {
 		$cache->set("view_".$self->getId, $out, $self->cacheTimeout);
 	}
 	return $out;

@@ -93,7 +93,7 @@ is ($newSessionCount, $sessionCount+2, 'two of the sessions were deleted');
 is ($newScratchCount, $scratchCount+2, 'scratch from both sessions cleaned up');
 
 foreach my $testSession (@sessions) {
-    $testSession->var->end;
+    $testSession->end;
     $testSession->close;
 }
 

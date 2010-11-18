@@ -99,7 +99,7 @@ sub view {
 	my $self = shift;	
     my $cache = $self->session->cache;
     my $cacheKey = $self->getWwwCacheKey( 'view' );
-    if (!$self->session->var->isAdminOn && $self->cacheTimeout > 10) {
+    if (!$self->session->isAdminOn && $self->cacheTimeout > 10) {
         my $out = eval { $cache->get( $cacheKey ) };
 		return $out if $out;
 	}
@@ -112,7 +112,7 @@ sub view {
 	$var{'submit'} = WebGUI::Form::Submit->new($self->session, {name=>'SearchSubmit',value=>$i18n->get('submit','WebGUI')})->toHtml();
 
        	my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
-    if (!$self->session->var->isAdminOn && $self->cacheTimeout > 10) {
+    if (!$self->session->isAdminOn && $self->cacheTimeout > 10) {
         eval { $cache->set( $cacheKey, $out, $self->cacheTimeout) };
     }
     return $out;

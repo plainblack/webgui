@@ -251,13 +251,14 @@ sub sendHeader {
 	return undef if ($self->{_http}{noHeader});
 	return $self->_sendMinimalHeader unless defined $self->session->db(1);
 
-	my ($request, $response, $config, $var) = $self->session->quick(qw(request response config var));
+    my $session = $self->session;
+	my ($request, $response, $config) = $session->quick(qw(request response config ));
 	return undef unless $request;
-	my $userId = $var->get("userId");
+	my $userId = $session->get("userId");
 	
 	# send webgui session cookie
 	my $cookieName = $config->getCookieName;
-	$self->setCookie($cookieName,$var->getId, $config->getCookieTTL, $config->get("cookieDomain")) unless $var->getId eq $request->cookies->{$cookieName};
+	$self->setCookie($cookieName, $session->getId, $config->getCookieTTL, $config->get("cookieDomain")) unless $session->getId eq $request->cookies->{$cookieName};
 
 	$self->setNoHeader(1);
 	my %params;

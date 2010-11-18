@@ -53,7 +53,7 @@ $session->form->process("sid").  Afterwards, it calls www_viewActiveSessions.
 
 sub www_killSession {
 	my $session = shift;
-	return www_viewActiveSessions($session) if $session->form->process("sid") eq $session->var->get("sessionId");
+	return www_viewActiveSessions($session) if $session->form->process("sid") eq $session->getId;
 	return $session->privilege->adminOnly unless canView($session);
 	$session->db->write("delete from userSession where sessionId=?",[$session->form->process("sid")]);
 	$session->db->write("delete from userSessionScratch where sessionId=?", [$session->form->process("sid")]);

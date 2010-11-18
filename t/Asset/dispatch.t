@@ -124,12 +124,12 @@ isnt( $output, "www_view", "?func= dispatch cancelled because of unhandled fragm
 $td->cut();
 $output = $td->dispatch();
 is $output, undef, 'dispatch returns undef when trying to access an asset that is not published, and admin is not on';
-$session->var->switchAdminOn;
+$session->switchAdminOn;
 $output = $td->dispatch();
 is $output, 'www_view', 'when admin is on, the asset can be accessed';
 
 $td->publish();
-$session->var->switchAdminOff;
+$session->switchAdminOff;
 $output = $td->dispatch();
 is $output, 'www_view', 'asset state restored for next tests';
 

@@ -92,7 +92,7 @@ is(
     '... check illegal file type access returns empty string'
 );
 
-$session->var->switchAdminOn();
+$session->switchAdminOn();
 is(
     WebGUI::Macro::FilePump::process($session, 'test bundle', 'JS'),
     sprintf(qq|<script type="text/javascript" src="%s" ></script>\n<script type="text/javascript" src="%s" ></script>\n|,

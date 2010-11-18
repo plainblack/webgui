@@ -210,7 +210,7 @@ sub view {
     my $session = $self->session;
     my $cache = $session->cache;
     my $cacheKey = $self->getWwwCacheKey('view');
-    if (!$session->var->isAdminOn && $self->cacheTimeout > 10) {
+    if (!$session->isAdminOn && $self->cacheTimeout > 10) {
         my $out = $cache->get( $cacheKey );
 		return $out if $out;
 	}
@@ -233,7 +233,7 @@ sub view {
     $var{annotateJs}  = $crop_js . $domMe;
     $var{parameters} .= sprintf(q{ id="%s"}, $self->getId);
     my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
-    if (!$session->var->isAdminOn && $self->cacheTimeout > 10) {
+    if (!$session->isAdminOn && $self->cacheTimeout > 10) {
         $cache->set( $cacheKey, $out, $self->get("cacheTimeout") );
     }
     return $out;

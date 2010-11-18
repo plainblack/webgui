@@ -40,8 +40,8 @@ sub www_ssoViaSessionId {
 		else {
 			my ($userId) = $session->db->quickArray("select userId from userSession where sessionId=?",[$sessionId]);
 			if (defined $userId && $userId ne "") {
-				$session->var->end;
-				$session->var->start($userId, $sessionId);
+				$session->end;
+				$session->start($userId, $sessionId);
 			}
 		}
 	}

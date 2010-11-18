@@ -15,7 +15,6 @@ use JSON;
 use WebGUI::Test;
 use WebGUI::International;
 use WebGUI::Session;
-use WebGUI::Session::Var;
 use WebGUI::User;
 use WebGUI::Macro::UsersOnline;
 

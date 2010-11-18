@@ -1134,7 +1134,7 @@ sub getViewThingVars {
             [$self->getId,$thingId]);
         while (my %field = $fields->hash) {
             next unless ($field{display} eq '1');
-            my $hidden = ($field{status} eq "hidden" && !$self->session->var->isAdminOn);
+            my $hidden = ($field{status} eq "hidden" && !$self->session->isAdminOn);
 
             my $originalValue = $thingData{"field_".$field{fieldId}};
             my $value = $self->getFieldValue($originalValue,\%field);
@@ -2468,7 +2468,7 @@ sub editThingData {
         $field{value} = $fieldValue || $field{defaultValue};
         my $formElement .= $self->getFormPlugin(\%field,($resetForm eq ""))->toHtml;
         
-        my $hidden = ($field{status} eq "hidden" && !$self->session->var->isAdminOn);
+        my $hidden = ($field{status} eq "hidden" && !$self->session->isAdminOn);
         my $value = $field{value};
         $value = $self->getFieldValue($value,\%field);
 

@@ -296,7 +296,7 @@ sub view {
 	my $i18n = WebGUI::International->new($self->session, 'Asset_HttpProxy');
 	
 	### Set up a cookie jar
-	my $cookiebox = $self->session->url->escape($self->session->var->get("sessionId"));
+	my $cookiebox = $self->session->url->escape($self->session->getId);
 	$cookiebox =~ s/[^A-Za-z0-9\-\.\_]//g;  #removes all funky characters
 	$cookiebox .= '.cookie';
 	my $jar = HTTP::Cookies->new(File => $self->getCookieJar->getPath($cookiebox), AutoSave => 1, Ignore_Discard => 1);

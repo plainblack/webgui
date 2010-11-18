@@ -99,7 +99,7 @@ Display the redirect url when in admin mode.
 
 sub view {
 	my $self = shift;
-	if ($self->session->var->isAdminOn) {
+	if ($self->session->isAdminOn) {
 		return $self->getToolbar.' '.$self->getTitle.' '.$self->redirectUrl;
 	}
     else {
@@ -121,7 +121,7 @@ sub www_view {
 	my $i18n = WebGUI::International->new($self->session, "Asset_Redirect");
     my $url = $self->redirectUrl;
     WebGUI::Macro::process($self->session, \$url);
-    if ($self->session->var->isAdminOn() && $self->canEdit) {
+    if ($self->session->isAdminOn() && $self->canEdit) {
         return $self->getAdminConsole->render($i18n->get("what do you want to do with this redirect").'
             <ul>
                 <li><a href="'.$url.'">'.$i18n->get("go to the redirect url").'</a></li>

@@ -581,7 +581,7 @@ sub www_becomeUser {
 	my $session = shift;
 	return $session->privilege->adminOnly() unless canEdit($session) && $session->form->validToken;
 	return undef unless WebGUI::User->validUserId($session, $session->form->process("uid"));
-	$session->var->end($session->var->get("sessionId"));
+	$session->end();
 	$session->user({userId=>$session->form->process("uid")});
 	return "";
 }

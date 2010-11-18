@@ -701,9 +701,9 @@ WebGUI::Asset::Template->newById($self->session,$self->getSetting('accountActiva
         $mail->addFooter;
         $mail->queue;
         $self->user->status("Deactivated");
-        $session->var->end($session->var->get("sessionId"));
-        $session->var->start(1,$session->getId);
-        my $u = WebGUI::User->new($session,1);
+        $session->end();
+        $session->start(1, $session->getId);
+        my $u = WebGUI::User->new($session, 1);
         $self->{user} = $u;
         $self->logout;
         return $self->www_displayLogin($i18n->get('check email for validation','AuthWebGUI'));

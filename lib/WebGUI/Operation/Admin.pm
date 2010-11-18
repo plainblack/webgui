@@ -43,7 +43,7 @@ sub www_adminConsole {
 =head2 www_switchOffAdmin ( )
 
 If the current user is in the Turn On Admin Group, then allow them to turn off Admin mode
-via WebGUI::Session::Var::switchAdminOff()
+via WebGUI::Session::switchAdminOff()
 
 
 =cut
@@ -52,7 +52,7 @@ sub www_switchOffAdmin {
 	my $session = shift;
 	return "" unless ($session->user->canUseAdminMode);
 	$session->http->setCacheControl("none");
-	$session->var->switchAdminOff();
+	$session->switchAdminOff();
 	return "";
 }
 
@@ -68,7 +68,7 @@ sub www_switchOnAdmin {
 	my $session = shift;
 	return "" unless ($session->user->canUseAdminMode);
 	$session->http->setCacheControl("none");
-	$session->var->switchAdminOn();
+	$session->switchAdminOn();
 	return "";
 }
 

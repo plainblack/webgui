@@ -89,7 +89,7 @@ sub addComment {
 		comment		=> $comment,
 		rating		=> $rating,
 		date		=> time(),
-		ip			=> $session->var->get('lastIP'),
+		ip			=> $session->get('lastIP'),
 		};
 	
 	# calculate average

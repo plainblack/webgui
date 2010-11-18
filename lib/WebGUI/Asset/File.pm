@@ -564,7 +564,7 @@ Generate the view method for the Asset, and handle caching.
 
 sub view {
 	my $self = shift;
-	if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
+	if (!$self->session->isAdminOn && $self->get("cacheTimeout") > 10) {
 		my $out = $self->session->cache->get($self->getViewCacheKey);
 		return $out if $out;
 	}
@@ -574,7 +574,7 @@ sub view {
 	$var{fileIcon} = $self->getFileIconUrl;
 	$var{fileSize} = Number::Format::format_bytes($self->get("assetSize"));
     my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
-	if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
+	if (!$self->session->isAdminOn && $self->get("cacheTimeout") > 10) {
 		$self->session->cache->set($self->getViewCacheKey, $out, $self->get("cacheTimeout"));
 	}
     return $out;

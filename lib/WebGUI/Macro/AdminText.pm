@@ -33,7 +33,7 @@ string is returned.
 sub process {	
 	my $session = shift;
         my @param = @_;
-        return "" unless ($session->var->isAdminOn);
+        return "" unless ($session->isAdminOn);
         return $param[0];
 }
 

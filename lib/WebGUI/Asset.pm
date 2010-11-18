@@ -454,7 +454,7 @@ The missing URL.
 sub addMissing {
 	my $self = shift;
 	my $assetUrl = shift;
-	return undef unless ($self->session->var->isAdminOn);
+	return undef unless ($self->session->isAdminOn);
 	my $i18n = WebGUI::International->new($self->session, "Asset");
 	my $output = $i18n->get("missing page query");
 	$output .= '<ul>
@@ -592,14 +592,15 @@ to SSL.
 sub checkView {
 	my $self = shift;
 	return $self->session->privilege->noAccess() unless $self->canView;
-	my ($conf, $var, $http) = $self->session->quick(qw(config var http));
+    my $session = $self->session;
+	my ($conf, $http) = $self->session->quick(qw(config http));
     if ($conf->get("sslEnabled") && $self->get("encryptPage") && ! $self->session->request->secure) {
         # getUrl already changes url to https if 'encryptPage'
         $http->setRedirect($self->getUrl);
         $http->sendHeader;
         return "chunked";
 	}
-    elsif ($var->isAdminOn && $self->get("state") =~ /^trash/) { # show em trash
+    elsif ($session->isAdminOn && $self->get("state") =~ /^trash/) { # show em trash
         my $queryFrag = "func=manageTrash";
         if ($self->session->form->process('revision')) {
             $queryFrag .= ";revision=".$self->session->form->process('revision');
@@ -608,7 +609,7 @@ sub checkView {
         $http->sendHeader;
 		return "chunked";
 	} 
-    elsif ($var->isAdminOn && $self->get("state") =~ /^clipboard/) { # show em clipboard
+    elsif ($session->isAdminOn && $self->get("state") =~ /^clipboard/) { # show em clipboard
         my $queryFrag = "func=manageClipboard";
         if ($self->session->form->process('revision')) {
             $queryFrag .= ";revision=".$self->session->form->process('revision');
@@ -679,7 +680,7 @@ sub dispatch {
     my $session = $self->session;
     my $state = $self->get('state');
     ##Only allow interaction with assets in certain states
-    return if $state ne 'published' && $state ne 'archived' && !$session->var->isAdminOn;
+    return if $state ne 'published' && $state ne 'archived' && !$session->isAdminOn;
     my $func    = $session->form->param('func') || 'view';
     my $viewing = $func eq 'view' ? 1 : 0;
     my $sub     = $self->can('www_'.$func);
@@ -1594,7 +1595,7 @@ Returns a toolbar with a set of icons that hyperlink to functions that delete, e
 
 sub getToolbar {
     my $self = shift;
-    return undef unless $self->canEdit && $self->session->var->isAdminOn;
+    return undef unless $self->canEdit && $self->session->isAdminOn;
     return $self->{_toolbar}
         if (exists $self->{_toolbar});
     my $userUiLevel = $self->session->user->profileField("uiLevel");
@@ -2372,7 +2373,7 @@ sub processTemplate {
     }
     if (! Exception::Class->caught() ) {
         $var = { %{ $var }, %{ $self->getMetaDataAsTemplateVariables } };
-        $var->{'controls'}   = $self->getToolbar if $session->var->isAdminOn;
+        $var->{'controls'}   = $self->getToolbar if $session->isAdminOn;
         $var->{'assetIdHex'} = $session->id->toHex($self->getId);
         my %vars = (
             %{$self->get},
@@ -2683,7 +2684,7 @@ The default view method for any asset that doesn't define one. Under all normal 
 
 sub view {
 	my $self = shift;
-	if ($self->session->var->isAdminOn) {
+	if ($self->session->isAdminOn) {
 		return $self->getToolbar.' '.$self->getTitle;
 	} else {
 		return "";

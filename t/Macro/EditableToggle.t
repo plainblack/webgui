@@ -197,12 +197,12 @@ foreach my $testSet (@testSets) {
 	$session->user({userId=>$testSet->{userId}});
 	$session->asset($testSet->{asset});
 	if ($testSet->{adminStatus} eq 'off') {
-		$session->var->switchAdminOff();
+		$session->switchAdminOff();
 		$testSet->{label} = $testSet->{onText} || $i18n->get(516);
 		$testSet->{url} = $session->url->page('op=switchOnAdmin'),
 	}
 	elsif ($testSet->{adminStatus} eq 'on') {
-		$session->var->switchAdminOn();
+		$session->switchAdminOn();
 		$testSet->{label} = $testSet->{offText} || $i18n->get(517);
 		$testSet->{url} = $session->url->page('op=switchOffAdmin'),
 	}

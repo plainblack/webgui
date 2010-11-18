@@ -479,7 +479,7 @@ sub getListings {
     my ($listings, $listingsEncoded);
 
     my $noCache =
-        $session->var->isAdminOn
+        $session->isAdminOn
         || $self->listingsCacheTimeout <= 10
         || ($versionTag && $versionTag->getId eq $self->tagId);
     my $cache = $session->cache;
@@ -645,7 +645,7 @@ sub view {
    
     my $versionTag = WebGUI::VersionTag->getWorking($session, 1); 
     my $noCache =
-        $session->var->isAdminOn
+        $session->isAdminOn
         || $self->statisticsCacheTimeout <= 10
         || ($versionTag && $versionTag->getId eq $self->tagId);
     my $cache = $session->cache;

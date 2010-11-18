@@ -1654,7 +1654,7 @@ sub view {
     my $session = $self->session;
     my $cache = $session->cache;
     my $cacheKey = $self->getWwwCacheKey( 'view' );
-    if (!$session->var->isAdminOn && $self->get("cacheTimeout") > 10){
+    if (!$session->isAdminOn && $self->get("cacheTimeout") > 10){
         my $out = $cache->get( $cacheKey );
         return $out if $out;
     }
@@ -1856,7 +1856,7 @@ sub view {
     $var{continueShoppingUrl} = $self->getUrl;
 
     my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
-    if (!$self->session->var->isAdminOn && $self->cacheTimeout > 10 && $self->{_hasAddedToCart} != 1){
+    if (!$self->session->isAdminOn && $self->cacheTimeout > 10 && $self->{_hasAddedToCart} != 1){
         $cache->set( $cacheKey, $out, $self->cacheTimeout );
     }
     return $out;
