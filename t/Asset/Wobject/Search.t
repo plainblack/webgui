@@ -27,8 +27,9 @@ my $node = WebGUI::Asset->getDefault($session);
 
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Search Test"});
+my %tag = ( tagId => $versionTag->getId, status => "pending" );
 addToCleanup($versionTag);
-my $search = $node->addChild({className=>'WebGUI::Asset::Wobject::Search'});
+my $search = $node->addChild({className=>'WebGUI::Asset::Wobject::Search', %tag});
 
 # Test for a sane object type
 isa_ok($search, 'WebGUI::Asset::Wobject::Search');
@@ -88,12 +89,14 @@ $search->update({
 
 {
     my $versionTag2 = WebGUI::VersionTag->getWorking($session);
+    $tag{tagId} = $versionTag2->getId;
     $versionTag2->set({name=>"Collab setup"});
-    my @addArgs = ( undef, undef, { skipAutoCommitWorkflows => 1, skipNotification => 1 } );
+    my @addArgs = ( undef, undef, { skipNotification => 1 } );
     my $collab = $node->addChild({
             className      => 'WebGUI::Asset::Wobject::Collaboration',
             editTimeout    => '1',
             threadsPerPage => 3,
+            %tag,
         },
         @addArgs);
     # finally, add the post to the collaboration system
@@ -101,6 +104,7 @@ $search->update({
         className   => 'WebGUI::Asset::Post::Thread',
         content     => 'verbosity shale anything',
         ownerUserId => 1,
+        %tag,
     };
 
     my $thread = $collab->addChild($props, @addArgs);

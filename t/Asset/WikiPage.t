@@ -36,11 +36,7 @@ my $wikipage = $wiki->addChild(
     @autoCommitCoda,
 );
 
-# Wikis create and autocommit a version tag when a child is added.  Lets get the name so we can roll it back.
-my $secondVersionTag = WebGUI::VersionTag->new($session,$wikipage->get("tagId"));
-$secondVersionTag->commit;
-WebGUI::Test->addToCleanup($secondVersionTag );
-my $wikipage = $wikipage->cloneFromDb;
+WebGUI::Test->addToCleanup($wikipage);
 
 # Test for sane object types
 isa_ok($wiki, 'WebGUI::Asset::Wobject::WikiMaster');

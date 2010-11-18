@@ -163,7 +163,6 @@ sub importAssetData {
     WebGUI::Asset->loadModule( $class );
 
     my %properties = %{ $data->{properties} };
-    delete $properties{tagId};
     if ($options->{inheritPermissions}) {
         delete $properties{ownerUserId};
         delete $properties{groupIdView};
@@ -265,7 +264,6 @@ sub importPackage {
         if $storage->getErrorCount;
     my $package         = undef;            # The asset package
     my $log           = $self->session->log;
-    my $tag             = WebGUI::VersionTag->getWorking( $self->session );
 
     # The debug output for long requests would be too long, and we'd have to
     # keep it all in memory.
@@ -292,6 +290,11 @@ sub importPackage {
         foreach my $storageId (@{$data->{storage}}) {
             my $assetStorage = WebGUI::Storage->get($self->session, $storageId);
             $decompressed->untar($storageId.".storage", $assetStorage);
+        }
+
+        if ( $options->{tagId} ) {
+            $data->{properties}{tagId}  = $options->{tagId};
+            $data->{properties}{status} = "pending";
         }
 
         my $parentId = $data->{properties}->{parentId};

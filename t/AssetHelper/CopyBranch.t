@@ -38,19 +38,23 @@ plan tests => 5;        # Increment this number for each test you create
 my $output;
 my $node = WebGUI::Asset->getImportNode($session);
 my $root = WebGUI::Asset->getRoot( $session );
+my $tag = WebGUI::VersionTag->getWorking( $session );
+my %tag = ( tagId => $tag->getId, status => "pending" );
 my $top = $node->addChild({
     className       => 'WebGUI::Asset::Wobject::Layout',
     title           => 'Top',
+    %tag,
 } );
 my $child   = $top->addChild({
     className       => 'WebGUI::Asset::Wobject::Layout',
     title           => 'Child',
+    %tag,
 });
 my $grand   = $child->addChild({
     className       => 'WebGUI::Asset::Snippet',
     title           => 'Grand',
+    %tag,
 });
-my $tag = WebGUI::VersionTag->getWorking( $session );
 $tag->commit;
 addToCleanup( $tag );
 

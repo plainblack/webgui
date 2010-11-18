@@ -34,9 +34,10 @@ my $node = WebGUI::Asset->getImportNode($session);
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 addToCleanup($versionTag);
 $versionTag->set({name => 'Collaboration => groupToEditPost test'});
+my %tag = ( tagId => $versionTag->getId, status => "pending" );
 
 # place the collab system under a layout to ensure we're using the inherited groupIdEdit value
-my $layout  = $node->addChild({className => 'WebGUI::Asset::Wobject::Layout'});
+my $layout  = $node->addChild({className => 'WebGUI::Asset::Wobject::Layout', %tag});
 
 # set the layout as the current asset for the same reason
 $session->asset($layout);
@@ -45,6 +46,7 @@ $session->asset($layout);
 my $collab  = $layout->addChild({
     className => 'WebGUI::Asset::Wobject::Collaboration',
     url       => 'collab',
+    %tag,
 });
 
 $versionTag->commit;
@@ -62,25 +64,28 @@ cmp_ok($collab->get('groupToEditPost'), 'eq', $collab->get('groupIdEdit'), 'grou
 is($collab->get('itemsPerFeed'), 25, 'itemsPerFeed is set to the default');
 
 # finally, add the post to the collaboration system
+my $tag1 = WebGUI::VersionTag->getWorking($session);
 my $props = {
     className   => 'WebGUI::Asset::Post::Thread',
     content     => 'hello, world!',
+    status      => "pending",
+    tagId       => $tag1->getId,
 };
 my $thread = $collab->addChild($props, @addChildCoda);
-my $tag1 = WebGUI::VersionTag->getWorking($session);
 $tag1->commit;
 addToCleanup($tag1);
 
 # Test for a sane object type
 isa_ok($thread, 'WebGUI::Asset::Post::Thread');
 
+my $tag2 = WebGUI::VersionTag->getWorking($session);
 $props = {
     className   => 'WebGUI::Asset::Post::Thread',
     content     => 'jello, world!',
+    status      => "pending",
+    tagId       => $tag2->getId,
 };
-
 my $thread2 = $collab->addChild($props, @addChildCoda);
-my $tag2 = WebGUI::VersionTag->getWorking($session);
 $tag2->commit;
 addToCleanup($tag2);
 
@@ -94,7 +99,6 @@ is($collab->getAtomFeedUrl, '/collab?func=viewAtom', 'getAtomFeedUrl');
 
 note "Mail Cron job tests";
 my $dupedCollab = $collab->duplicate();
-addToCleanup(WebGUI::VersionTag->new($session, $dupedCollab->get('tagId')));
 ok($dupedCollab->get('getMailCronId'), 'Duplicated CS has a cron job');
 isnt($dupedCollab->get('getMailCronId'), $collab->get('getMailCronId'), '... and it is different from its source asset');
 
@@ -107,10 +111,11 @@ $thread2->archive();
 $collab = $collab->cloneFromDb;
 is $collab->get('threads'), 1, 'CS lost 1 thread due to archiving';
 
-my $thread3 = $collab->addChild($props, @addChildCoda);
-my $tag3 = WebGUI::VersionTag->getWorking($session);
-$tag3->commit;
-addToCleanup($tag3);
+my $thread3 = $collab->addChild({ 
+    className => 'WebGUI::Asset::Post::Thread',
+    content => "Again!",
+}, @addChildCoda);
+$thread3->commit;
 $collab = $collab->cloneFromDb;
 is $collab->get('threads'), 2, '... added 1 thread';
 

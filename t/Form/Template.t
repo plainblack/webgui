@@ -44,6 +44,8 @@ $versionTag->setWorking;
         template    => '',
         namespace   => 'style',
         className   => 'WebGUI::Asset::Template',
+        tagId       => $versionTag->getId,
+        status      => "pending",
     } );
 
     $elem->setOptions;

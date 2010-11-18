@@ -21,10 +21,12 @@ use WebGUI::Session;
 #----------------------------------------------------------------------------
 # Init
 my $session         = WebGUI::Test->session;
+$session->user({ userId => '3' });
 
 my $collab          = WebGUI::Asset->getImportNode( $session )->addChild({
     className       => 'WebGUI::Asset::Wobject::Collaboration',
     archiveAfter    => 60*60*365.25,
+    groupIdEdit     => '3',
 });
 
 # Add a thread
@@ -33,12 +35,12 @@ my @threads = (
         className       => 'WebGUI::Asset::Post::Thread',
         status          => 'archived',
         title           => 'Archived',
-    }, undef, undef, { skipAutoCommitWorkflows => 1 }),
+        groupIdEdit     => '3',
+    }),
 );
+$_->commit for @threads;
 
-my $tag = WebGUI::VersionTag->getWorking( $session );
-$tag->commit;
-WebGUI::Test->addToCleanup($tag);
+WebGUI::Test->addToCleanup($collab,@threads);
 
 #----------------------------------------------------------------------------
 # Tests
@@ -47,8 +49,9 @@ plan tests => 1;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # www_unarchiveAll sets all threads to approved
+note( $threads[0]->status );
 $collab->www_unarchiveAll;
-$threads[0] = WebGUI::Asset->newById( $session, $threads[0]->getId );
+$threads[0] = $threads[0]->cloneFromDb;
 is( $threads[0]->get('status'), 'approved', "unarchiveAll sets thread to approved" );
 
 #vim:ft=perl

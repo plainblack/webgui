@@ -27,23 +27,24 @@ my $node = WebGUI::Asset->getImportNode($session);
 # Grab a named version tag
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Collab setup"});
+my %tag = ( tagId => $versionTag->getId, status => "pending" );
 
 # Need to create a Collaboration system in which the post lives.
 my @addArgs = ( undef, undef, { skipAutoCommitWorkflows => 1, skipNotification => 1 } );
 
-my $collab = $node->addChild({className => 'WebGUI::Asset::Wobject::Collaboration'}, @addArgs);
+my $collab = $node->addChild({className => 'WebGUI::Asset::Wobject::Collaboration', %tag }, @addArgs);
 
 # finally, add posts and threads to the collaboration system
 
 my $first_thread = $collab->addChild(
-    { className   => 'WebGUI::Asset::Post::Thread', },
+    { className   => 'WebGUI::Asset::Post::Thread', %tag },
     undef, 
     WebGUI::Test->webguiBirthday, 
     { skipAutoCommitWorkflows => 1, skipNotification => 1 }
 );
 
 my $second_thread = $collab->addChild(
-    { className   => 'WebGUI::Asset::Post::Thread', },
+    { className   => 'WebGUI::Asset::Post::Thread', %tag },
     undef, 
     WebGUI::Test->webguiBirthday, 
     { skipAutoCommitWorkflows => 1, skipNotification => 1 }
@@ -51,14 +52,14 @@ my $second_thread = $collab->addChild(
 
 ##Thread 1, Post 1 => t1p1
 my $t1p1 = $first_thread->addChild(
-    { className   => 'WebGUI::Asset::Post', },
+    { className   => 'WebGUI::Asset::Post', %tag },
     undef, 
     WebGUI::Test->webguiBirthday, 
     { skipAutoCommitWorkflows => 1, skipNotification => 1 }
 );
 
 my $t1p2 = $first_thread->addChild(
-    { className   => 'WebGUI::Asset::Post', },
+    { className   => 'WebGUI::Asset::Post', %tag },
     undef, 
     WebGUI::Test->webguiBirthday + 1, 
     { skipAutoCommitWorkflows => 1, skipNotification => 1 }
@@ -67,14 +68,14 @@ my $t1p2 = $first_thread->addChild(
 my $past = time()-15;
 
 my $t2p1 = $second_thread->addChild(
-    { className   => 'WebGUI::Asset::Post', },
+    { className   => 'WebGUI::Asset::Post', %tag },
     undef, 
     $past, 
     { skipAutoCommitWorkflows => 1, skipNotification => 1 }
 );
 
 my $t2p2 = $second_thread->addChild(
-    { className   => 'WebGUI::Asset::Post', },
+    { className   => 'WebGUI::Asset::Post', %tag },
     undef, 
     undef, 
     { skipAutoCommitWorkflows => 1, skipNotification => 1 }

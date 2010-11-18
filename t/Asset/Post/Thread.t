@@ -42,6 +42,8 @@ my $props = {
     className   => 'WebGUI::Asset::Post::Thread',
     content     => 'hello, world!',
     ownerUserId => 1,
+    status      => "pending",
+    tagId       => $versionTag->getId,
 };
 
 my $thread = $collab->addChild($props, @addArgs);
@@ -71,10 +73,11 @@ $collab->update({threadsPerPage => 3, postsPerPage => 10,});
 note 'getCSLinkUrl';
 my @newThreads;
 my $threadCount = 15;
+my $versionTag2 = WebGUI::VersionTag->getWorking($session);
+$props->{tagId} = $versionTag2->getId;
 while ($threadCount--) {
     push @newThreads, $collab->addChild($props, @addArgs);
 }
-my $versionTag2 = WebGUI::VersionTag->getWorking($session);
 $versionTag2->commit;
 
 my $csUrl = $collab->get('url');

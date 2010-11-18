@@ -39,6 +39,7 @@ sub run {
     (undef, undef, my $shortname) = File::Spec->splitpath($self->file);
     $shortname =~ s/\.[^.]*$//;
     $versionTag->set({name => "Upgrade to @{[$self->version]} - $shortname"});
+    $versionTag->setWorking;
 
     my $package = $self->import_package($session, $self->file);
     if (! $self->quiet) {
@@ -56,6 +57,8 @@ sub import_package {
     my $class = shift;
     my ($session, $file) = @_;
 
+    my $versionTag  = WebGUI::VersionTag->getWorking( $session, "nocreate" );
+
     # Make a storage location for the package
     my $storage = WebGUI::Storage->createTemp( $session );
     $storage->addFileFromFilesystem( $file );
@@ -67,6 +70,7 @@ sub import_package {
             overwriteLatest    => 1,
             clearPackageFlag   => 1,
             setDefaultTemplate => 1,
+            tagId              => ( $versionTag ? $versionTag->getId : undef ),
         } );
     }
     catch {

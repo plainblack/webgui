@@ -128,12 +128,6 @@ $upgrade->testUpgrade('config.pl');
     ok !$hasSession, 'session properly closed';
 }
 
-{
-    my $vt = $upgrade->testUpgrade('versiontag-implicit.pl');
-    ok $vt->get('isCommitted'), 'implicit version tag committed';
-    is $vt->get('name'), 'Upgrade to 8.3.0 - versiontag-implicit', 'implicit version tag named correctly';
-}
-
 $upgrade->testUpgrade('versiontag.pl');
 $upgrade->testUpgrade('collateral.pl');
 $upgrade->testUpgrade('package.pl');

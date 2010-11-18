@@ -22,6 +22,9 @@ use Test::Exception;
 use JSON qw{ from_json };
 
 my $session = WebGUI::Test->session;
+my $tag = WebGUI::VersionTag->getWorking($session);
+addToCleanup( $tag );
+my %tag = ( tagId => $tag->getId, status => "pending" );
 
 my $list = WebGUI::Asset::Template->getList($session);
 cmp_deeply($list, {}, 'getList with no classname returns an empty hashref');
@@ -38,7 +41,7 @@ ok($output =~ m/true/, "processRaw() - conditionals");
 ok($output =~ m/\s(?:XY){5}\s/, "processRaw() - loops");
 
 my $importNode = WebGUI::Asset::Template->getImportNode($session);
-my $template = $importNode->addChild({className=>"WebGUI::Asset::Template", title=>"test", url=>"testingtemplates", template=>$tmplText, namespace=>'WebGUI Test Template'});
+my $template = $importNode->addChild({className=>"WebGUI::Asset::Template", title=>"test", url=>"testingtemplates", template=>$tmplText, namespace=>'WebGUI Test Template', %tag});
 isa_ok($template, 'WebGUI::Asset::Template', "creating a template");
 
 is($template->get('parser'), 'WebGUI::Asset::Template::HTMLTemplate', 'default parser is HTMLTemplate');
@@ -76,6 +79,7 @@ my $template3 = $importNode->addChild({
     className => "WebGUI::Asset::Template",
     title     => 'headBlock test',
     template  => "this is a template",
+    %tag,
 }, undef, time()-5);
 
 my @atts = (
@@ -108,7 +112,7 @@ cmp_bag(
     'attachments are duplicated'
 ) or diag( Dumper \@atts3dup );
 
-my $template3rev = $template3->addRevision();
+my $template3rev = $template3->addRevision({%tag});
 my $att4 = $template3rev->getAttachments('headScript');
 is($att4->[0]->{url}, 'foo', 'rev has foo');
 is($att4->[1]->{url}, 'bar', 'rev has bar');
@@ -167,6 +171,7 @@ my $trashTemplate = $importNode->addChild({
     className => "WebGUI::Asset::Template",
     title     => 'Trash template',
     template  => q|Trash Trash Trash Trash|,
+    %tag
 });
 
 $trashTemplate->trash;
@@ -191,6 +196,7 @@ my $brokenTemplate = $importNode->addChild({
     className => "WebGUI::Asset::Template",
     title     => 'Broken template',
     template  => q|<tmpl_if unclosedIf>If clause with no ending tag|,
+    %tag
 });
 
 WebGUI::Test->interceptLogging( sub {
@@ -205,14 +211,13 @@ WebGUI::Test->interceptLogging( sub {
     like($log_data->{error}, qr/$brokenId/, '... and the template id');
 });
 
-WebGUI::Test->addToCleanup(WebGUI::VersionTag->getWorking($session));
-
 my $userStyleTemplate = $importNode->addChild({
     className => "WebGUI::Asset::Template",
     title     => "user function style",
     url       => "ufs",
     template  => "user function style",
     namespace => 'WebGUI Test Template',
+    %tag
 });
 
 my $someOtherTemplate = $importNode->addChild({
@@ -221,12 +226,10 @@ my $someOtherTemplate = $importNode->addChild({
     url       => "sot",
     template  => "some other template",
     namespace => 'WebGUI Test Template',
+    %tag
 });
 
 $session->setting->set('userFunctionStyleId', $userStyleTemplate->getId);
-
-my $purgeCutTag = WebGUI::VersionTag->getWorking($session);
-WebGUI::Test->addToCleanup($purgeCutTag);
 
 is($session->setting->get('userFunctionStyleId'), $userStyleTemplate->getId, 'Setup for cut tests.');
 

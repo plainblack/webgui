@@ -26,9 +26,10 @@ my $session = WebGUI::Test->session;
 my $node = WebGUI::Asset->getImportNode($session);
 
 my $versionTag = WebGUI::VersionTag->getWorking($session);
+my %tag = ( tagId => $versionTag->getId, status => "pending" );
 $versionTag->set({name=>"Matrix Test"});
 WebGUI::Test->addToCleanup($versionTag);
-my $matrix = $node->addChild({className=>'WebGUI::Asset::Wobject::Matrix'});
+my $matrix = $node->addChild({className=>'WebGUI::Asset::Wobject::Matrix',%tag});
 
 # Test for a sane object type
 isa_ok($matrix, 'WebGUI::Asset::Wobject::Matrix');
@@ -102,12 +103,9 @@ is($newAttribute->{attributeId},undef,"The new attribute was successfully delete
 
 # add a listing
 
-my $matrixListing = $matrix->addChild({className=>'WebGUI::Asset::MatrixListing'}, undef, undef, { skipAutoCommitWorkflows => 1, skipNotification => 1});
+my $matrixListing = $matrix->addChild({className=>'WebGUI::Asset::MatrixListing'}, undef, undef, { skipNotification => 1});
 
-my $secondVersionTag = WebGUI::VersionTag->new($session,$matrixListing->get("tagId"));
-$secondVersionTag->commit;
-WebGUI::Test->addToCleanup($secondVersionTag);
-$matrixListing = $matrixListing->cloneFromDb;
+WebGUI::Test->addToCleanup($matrixListing);
 
 # Test for sane object type
 isa_ok($matrixListing, 'WebGUI::Asset::MatrixListing');

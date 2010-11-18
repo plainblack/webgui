@@ -44,6 +44,7 @@ my $node = WebGUI::Asset->getImportNode($session);
 # Create a version tag to work in
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"EventManagementSystem Test"});
+my %tag = ( tagId   => $versionTag->getId, status => "pending" );
 
 #----------------------------------------------------------------------------
 # Tests
@@ -67,7 +68,8 @@ my $ems = $node->addChild({
     url                      => '/test-ems',
     workflowIdCommit         => 'pbworkflow000000000003', # Commit Content Immediately
     registrationStaffGroupId => $registrars->getId,
-    groupIdView              => $attendees->getId
+    groupIdView              => $attendees->getId,
+    %tag
 });
 $versionTag->commit;
 WebGUI::Test->addToCleanup($versionTag);

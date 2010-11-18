@@ -60,23 +60,15 @@ $session->config->addToHash('adminConsole', 'test2', {
 } );
 
 # Add some assets
-my $tag  = WebGUI::VersionTag->getWorking( $session );
 my $snip = $import->addChild( {
     className       => 'WebGUI::Asset::Snippet',
     title           => 'test',
     groupIdEdit     => '3',
     synopsis        => "aReallyLongWordToGetIndexed",
     keywords        => "AKeywordToGetIndexed",
-    tagId           => $tag->getId,
-    status          => "pending",
 } );
-
-# Commit the tag
-$tag->commit;
-addToCleanup( $tag );
-
-# Reload snippet to get correct size
-$snip   = $snip->cloneFromDb;
+$snip->commit;
+addToCleanup( $snip );
 
 #----------------------------------------------------------------------------
 # Tests

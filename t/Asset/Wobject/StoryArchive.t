@@ -73,13 +73,15 @@ my @skipAutoCommit  = WebGUI::Test->getAssetSkipCoda;
 
 my $home = WebGUI::Asset->getDefault($session);
 
+$versionTag = WebGUI::VersionTag->getWorking($session);
+my %tag = ( tagId => $versionTag->getId, status => "pending" );
 $archive    = $home->addChild({
                 className => 'WebGUI::Asset::Wobject::StoryArchive',
                 title => 'My Stories',
                 url => '/home/mystories',
                 styleTemplateId => $home->get('styleTemplateId'),
+                %tag,
               });
-$versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->commit;
 WebGUI::Test->addToCleanup($versionTag);
 $archive = $archive->cloneFromDb;
@@ -192,8 +194,9 @@ isa_ok($child, 'WebGUI::Asset::Wobject::Folder', '... will add folders, so impor
 
 $child->purge;
 
-$child = $archive->addChild({className => 'WebGUI::Asset::Story', title => 'First Story'}, @skipAutoCommit);
 my $tag1 = WebGUI::VersionTag->getWorking($session);
+$tag{tagId} = $tag1->getId;
+$child = $archive->addChild({className => 'WebGUI::Asset::Story', title => 'First Story', %tag}, @skipAutoCommit);
 $tag1->commit;
 WebGUI::Test->addToCleanup($tag1);
 isa_ok($child, 'WebGUI::Asset::Story', 'addChild added and returned a Story');
@@ -229,9 +232,10 @@ my $newFolder = $archive->getFolder($yesterday);
 my ($wgBdayMorn,undef)    = $session->datetime->dayStartEnd($wgBday);
 my ($yesterdayMorn,undef) = $session->datetime->dayStartEnd($yesterday);
 
-my $story = $oldFolder->addChild({ className => 'WebGUI::Asset::Story', title => 'WebGUI is released', keywords => 'roger,foxtrot,echo,all'}, @skipAutoCommit);
-$creationDateSth->execute([$wgBday, $story->getId]);
 my $tag2 = WebGUI::VersionTag->getWorking($session);
+$tag{tagId} = $tag2->getId;
+my $story = $oldFolder->addChild({ className => 'WebGUI::Asset::Story', title => 'WebGUI is released', keywords => 'roger,foxtrot,echo,all', %tag}, @skipAutoCommit);
+$creationDateSth->execute([$wgBday, $story->getId]);
 $tag2->commit;
 WebGUI::Test->addToCleanup($tag2);
 
@@ -240,9 +244,10 @@ WebGUI::Test->addToCleanup($tag2);
     is ($storyDB->get('status'), 'approved', 'addRevision always calls for an autocommit');
 }
 
-my $pastStory = $newFolder->addChild({ className => 'WebGUI::Asset::Story', title => "Yesterday is history" }, @skipAutoCommit);
-$creationDateSth->execute([$yesterday, $pastStory->getId]);
 my $tag3 = WebGUI::VersionTag->getWorking($session);
+$tag{tagId} = $tag3->getId;
+my $pastStory = $newFolder->addChild({ className => 'WebGUI::Asset::Story', title => "Yesterday is history", %tag }, @skipAutoCommit);
+$creationDateSth->execute([$yesterday, $pastStory->getId]);
 $tag3->commit;
 WebGUI::Test->addToCleanup($tag3);
 
@@ -311,14 +316,15 @@ cmp_deeply(
     'viewTemplateVariables: returns expected template variables with 3 stories in different folders, user is cannot edit stories'
 );
 
-my $story2 = $folder->addChild({ className => 'WebGUI::Asset::Story', title => 'Story 2', keywords => "roger,foxtrot,all"}, @skipAutoCommit);
-my $story3 = $folder->addChild({ className => 'WebGUI::Asset::Story', title => 'Story 3', keywords => "foxtrot,echo,all"},  @skipAutoCommit);
-my $story4 = $folder->addChild({ className => 'WebGUI::Asset::Story', title => 'Story 4', keywords => "roger,echo,all"},    @skipAutoCommit);
+my $tag4 = WebGUI::VersionTag->getWorking($session);
+$tag{tagId} = $tag4->getId;
+my $story2 = $folder->addChild({ className => 'WebGUI::Asset::Story', title => 'Story 2', keywords => "roger,foxtrot,all", %tag}, @skipAutoCommit);
+my $story3 = $folder->addChild({ className => 'WebGUI::Asset::Story', title => 'Story 3', keywords => "foxtrot,echo,all", %tag},  @skipAutoCommit);
+my $story4 = $folder->addChild({ className => 'WebGUI::Asset::Story', title => 'Story 4', keywords => "roger,echo,all", %tag},    @skipAutoCommit);
 foreach my $storilet ($story2, $story3, $story4) {
     $session->db->write("update asset set creationDate=$now where assetId=?",[$storilet->getId]);
 }
 $archive->update({storiesPerPage => 3});
-my $tag4 = WebGUI::VersionTag->getWorking($session);
 $tag4->commit;
 WebGUI::Test->addToCleanup($tag4);
 
