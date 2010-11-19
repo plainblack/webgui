@@ -326,7 +326,7 @@ sub formField {
     }
     else {
         # start with specified (or current) user's data.  previous data needed by some form types as well (file).
-        $properties->{value} = $u->profileField($self->getId);
+        $properties->{value} = $u->get($self->getId);
         #If the fieldId is actually found in the request, try to process the form
         if ($session->form->param($self->getId)) {
             $properties->{value} = $self->formProcess($u);
@@ -365,7 +365,7 @@ sub formProcess {
     my $u          = shift || $self->session->user;
     my $userId     = $u->userId;
     
-    my $properties  = $self->formProperties({value => $u->profileField($self->getId)});
+    my $properties  = $self->formProperties({value => $u->get($self->getId)});
     my $result      = $self->session->form->process(
         $self->getId,
         $self->get("fieldType"),

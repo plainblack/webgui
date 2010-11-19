@@ -346,7 +346,7 @@ sub notifySubscribers {
     
     if ( !$opt->{ from } ) {
         my $owner   = WebGUI::User->new( $self->session, $self->ownerUserId );
-        $opt->{ from } = $owner->profileField( "email" ) || $opt->{ listAddress } || $companyEmail;
+        $opt->{ from } = $owner->get( "email" ) || $opt->{ listAddress } || $companyEmail;
     }
     
     if ( !$opt->{ replyTo } ) {
