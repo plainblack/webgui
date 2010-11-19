@@ -6,6 +6,7 @@ use Plack::Test;
 use Plack::Builder;
 use HTTP::Request::Common;
 use Test::More;
+use WebGUI::Test::Mechanize;
 use HTTP::Exception;
 
 my $wg = WebGUI->new(config => WebGUI::Test->config);
@@ -59,6 +60,12 @@ test_psgi $regular_app, sub {
     my $res = $cb->( GET "/" );
     is $res->code, 200, 'regular app, status code';
     like $res->content, qr/My Company/, 'testing regular app';
+    use Data::Dumper;
+    my ($sessionId) = $res->header('Set-Cookie') =~ /wgSession=(\w{22})/;
+    if ($sessionId) {
+        my $session = WebGUI::Session->open(WebGUI::Test->config, undef, $sessionId);
+        $session->end;
+    }
 };
 
 # N.B. The die() is caught thanks to WebGUI::Middleware::HTTPExceptions, 
