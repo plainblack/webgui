@@ -199,20 +199,24 @@ sub www_adminAccountSave {
 
     my $timezone = $form->timeZone("timeZone");
     my $language = $form->selectBox("language");
+    my $email    = $form->email('email');
 
     ##update Admin and Visitor users
     my $u = WebGUI::User->new( $session, "3" );
     $u->username( $form->process( "username", "text", "Admin" ) );
-    $u->get( "email",    $form->email("email") );
-    $u->get( "timeZone", $timezone );
-    $u->get( "language", $language );
+    $u->update( email     =>    $email,
+        timeZone  =>  $timezone, 
+        language  =>  $language, 
+    );
     $u->identifier( Digest::MD5::md5_base64( $form->process( "identifier", "password", "123qwe" ) ) );
     # The user is now Admin
     $session->user({ userId => "3" });
 
     $u = WebGUI::User->new( $session, "1" );
-    $u->get( "timeZone", $timezone );
-    $u->get( "language", $language );
+    $u->update(
+        timeZone => $timezone,
+        language => $language,
+    );
 
     ##update ProfileField defaults so new users the get the defaults, too
     my $properties;
