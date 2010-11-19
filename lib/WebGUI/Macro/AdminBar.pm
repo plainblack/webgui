@@ -111,7 +111,7 @@ sub process {
 		my %rawCategories = %{$config->get('assetCategories')};
 		my %categories;
 		my %categoryTitles;
-		my $userUiLevel = $user->profileField('uiLevel');
+		my $userUiLevel = $user->get('uiLevel');
 		foreach my $category (keys %rawCategories) {
 			next if $rawCategories{$category}{uiLevel} > $userUiLevel;
 			next if (exists $rawCategories{$category}{group} && !$user->isInGroup($rawCategories{$category}{group}));

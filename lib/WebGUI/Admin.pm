@@ -99,7 +99,7 @@ sub getAdminPluginTemplateVars {
             elsif ( defined $funcDef->{groupSetting} ) {
                 $canUse = $user->isInGroup( $setting->get( $funcDef->{groupSetting} ) );
             }
-            if ( $funcDef->{uiLevel} > $user->profileField("uiLevel") ) {
+            if ( $funcDef->{uiLevel} > $user->get("uiLevel") ) {
                 $canUse = 0;
             }
             next unless $canUse;
@@ -227,7 +227,7 @@ sub getNewContentTemplateVars {
     # Build the categories
     my %rawCategories = %{ $config->get('assetCategories') };
     my %categories;     # All the categories we have
-    my $userUiLevel = $user->profileField('uiLevel');
+    my $userUiLevel = $user->get('uiLevel');
     foreach my $category ( keys %rawCategories ) {
         # Check the ui level
         next if $rawCategories{$category}{uiLevel} > $userUiLevel;

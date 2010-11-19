@@ -263,7 +263,7 @@ sub _htmlOfResourceList {
 			$subvar->{resourceIcon} = 'groups.gif';
 		} elsif ($resourceKind eq 'user') {
 			my $user = WebGUI::User->new($self->session, $resourceId);
-			my ($firstName, $lastName, $username) = ($user->profileField('firstName'), $user->profileField('lastName'), $user->username);
+			my ($firstName, $lastName, $username) = ($user->get('firstName'), $user->get('lastName'), $user->username);
 			my $displayName = do {
 				if (length($firstName) && length($lastName)) { "$lastName, $firstName" }
 				elsif (length($firstName)) { $firstName }

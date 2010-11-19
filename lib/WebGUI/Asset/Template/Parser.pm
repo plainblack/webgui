@@ -37,7 +37,7 @@ sub addSessionVars {
 	# These are the only session template variables used in the core as 
 	# of 6.8.5.  Further use of session template vars is deprecated.
 	$vars->{"session.user.username"} = $self->session->user->username;
-	$vars->{"session.user.firstDayOfWeek"} = $self->session->user->profileField("firstDayOfWeek");
+	$vars->{"session.user.firstDayOfWeek"} = $self->session->user->get("firstDayOfWeek");
 	$vars->{"session.config.extrasurl"} = $self->session->url->extras();
 	$vars->{"session.var.adminOn"} = $self->session->isAdminOn;
 	$vars->{"session.setting.companyName"} = $self->session->setting->get("companyName");

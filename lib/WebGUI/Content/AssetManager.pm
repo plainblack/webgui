@@ -164,7 +164,7 @@ Gets the "More" menu with the specified label.
 sub getMoreMenu {
     my $session         = shift;
     my $label           = shift || "More";
-    my $userUiLevel     = $session->user->profileField("uiLevel");
+    my $userUiLevel     = $session->user->get("uiLevel");
     my $toolbarUiLevel  = $session->config->get("assetToolbarUiLevel");
     my $i18n            = WebGUI::International->new( $session, "Asset" );
 

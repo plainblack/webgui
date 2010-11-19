@@ -42,7 +42,7 @@ property username => (
 sub _username_builder {
     my $session = shift->session;
     return $session->form->process("visitorUsername")
-        || $session->user->profileField("alias")
+        || $session->user->get("alias")
         || $session->user->username;
 }
 property rating => (
@@ -476,7 +476,7 @@ sub getAvatarUrl {
 	return '' unless $parent and $parent->avatarsEnabled;
 	my $user = WebGUI::User->new($self->session, $self->ownerUserId);
 	#Get avatar field, storage Id.
-	my $storageId = $user->profileField("avatar");
+	my $storageId = $user->get("avatar");
 	return '' unless $storageId;
 	my $avatar = WebGUI::Storage->get($self->session,$storageId);
 	my $avatarUrl = '';
@@ -963,7 +963,7 @@ sub notifySubscribers {
     my $companyAddress = $setting->get("companyEmail");
     my $listAddress = $cs->mailAddress;
     my $posterAddress = $user->getProfileFieldPrivacySetting('email') eq "all"
-                      ? $user->profileField('email')
+                      ? $user->get('email')
                       : '';
     my $from = $posterAddress || $listAddress || $companyAddress;
     my $replyTo = $listAddress || $returnAddress || $companyAddress;
@@ -1079,7 +1079,7 @@ override processEditForm => sub {
 	if ($form->process("assetId") eq "new") {
 		my %data = (
 			ownerUserId => $session->user->userId,
-			username => $form->process("visitorName") || $session->user->profileField("alias") || $session->user->username,
+			username => $form->process("visitorName") || $session->user->get("alias") || $session->user->username,
 			);
 		$self->update(\%data);
 	}
@@ -1132,7 +1132,7 @@ sub postProcess {
     }
 	my $i18n = WebGUI::International->new($self->session, "Asset_Post");
 	if ($self->getThread->getParent->get("addEditStampToPosts")) {
-		$data{content} .= "<p>\n\n --- (".$i18n->get('Edited_on')." ".$self->session->datetime->epochToHuman(undef,"%z %Z [GMT%O]")." ".$i18n->get('By')." ".$self->session->user->profileField("alias").") --- \n</p>";
+		$data{content} .= "<p>\n\n --- (".$i18n->get('Edited_on')." ".$self->session->datetime->epochToHuman(undef,"%z %Z [GMT%O]")." ".$i18n->get('By')." ".$self->session->user->get("alias").") --- \n</p>";
 	}
 	$data{url} = $self->fixUrl($self->getThread->url."/1") if ($self->isReply && $self->isNew);
 	$data{groupIdView} = $self->getThread->getParent->groupIdView;
@@ -1556,7 +1556,7 @@ sub www_edit {
 				value => defined $subscribe ? $subscribe : 1,
             });
 		}
-        $content .= "\n\n".$user->profileField("signature") if ($user->profileField("signature") && !$form->process("content"));
+        $content .= "\n\n".$user->get("signature") if ($user->get("signature") && !$form->process("content"));
 	}
     else { # edit
 		return $privilege->insufficient() unless ($self->canEdit);

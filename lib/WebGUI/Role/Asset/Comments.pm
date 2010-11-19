@@ -84,7 +84,7 @@ sub addComment {
 	my $comments = $self->get('comments');
 	push @$comments, {
 		id			=> $session->id->generate,
-		alias		=> $user->profileField('alias'),
+		alias		=> $user->get('alias'),
 		userId		=> $user->userId,
 		comment		=> $comment,
 		rating		=> $rating,

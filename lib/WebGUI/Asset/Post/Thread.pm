@@ -1086,7 +1086,7 @@ sub view {
         return $out if $out;
     }
     $self->session->scratch->set("discussionLayout",$self->session->form->process("layout")) if ($self->session->form->process("layout"));
-    my $layout = $self->session->scratch->get("discussionLayout") || $self->session->user->profileField("discussionLayout");
+    my $layout = $self->session->scratch->get("discussionLayout") || $self->session->user->get("discussionLayout");
     my $var = $self->getTemplateVars;
 	$self->getParent->appendTemplateLabels($var);
 	

@@ -519,7 +519,7 @@ sub www_getHistory {
                         	.$icon->edit('func=edit;revision='.$revision->revisionDate, $revision->url)
                         	.$icon->view('func=view;revision='.$revision->revisionDate, $revision->url),
 			date => $date->epochToHuman($revision->revisionDate),
-			username => $user->profileField('alias') || $user->username,
+			username => $user->get('alias') || $user->username,
 			actionTaken => $revision->actionTaken,
 			interval => join(" ", $date->secondsToInterval(time() - $revision->revisionDate))
 			});		

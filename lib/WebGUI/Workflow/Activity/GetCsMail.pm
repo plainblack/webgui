@@ -104,7 +104,7 @@ sub addPost {
 		url=>$parent->get("url")."/".$title,
 		content=>$content,
 		ownerUserId=>$user->userId,
-		username=>$user->profileField("alias") || $user->username,
+		username=>$user->get("alias") || $user->username,
         originalEmail=>join("",@{$message->{rawMessage}}),
         });
 	if (scalar(@attachments)) {

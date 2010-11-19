@@ -311,7 +311,7 @@ override getToolbar => sub {
 	if ($self->getToolbarState) {
         my $toolbar = '';
         if ($self->canEditIfLocked) {
-            my $userUiLevel = $self->session->user->profileField("uiLevel");
+            my $userUiLevel = $self->session->user->get("uiLevel");
             my $uiLevels = $self->session->config->get("assetToolbarUiLevel");
             my $returnUrl = '';
             if ($self->session->asset) {

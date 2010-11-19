@@ -52,7 +52,7 @@ sub process {
 	my $languages 	= $i18n->getLanguages();
     my $currentLanguage = $session->scratch->get('language')
                         ? $session->scratch->get('language')
-                        : $session->user->profileField('language');
+                        : $session->user->get('language');
 	my @lang_loop 	= ();
 	foreach my $language ( keys %$languages ) {
         my $isCurrentLanguage = $currentLanguage eq $language ? 1 : 0;

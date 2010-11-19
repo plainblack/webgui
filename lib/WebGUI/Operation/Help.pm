@@ -291,7 +291,7 @@ sub www_viewHelp {
 	else {
 		$vars{body} = $i18n->get($help->{body}) if $help->{body};  ##Body entry is optional
 	}
-	my $userUiLevel = $session->user->profileField("uiLevel");
+	my $userUiLevel = $session->user->get("uiLevel");
 	my $uiOverride = $session->form->process("uiOverride");
         foreach my $row (@{ $help->{fields} }) {
             push @{ $vars{fields} }, 

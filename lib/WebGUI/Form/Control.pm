@@ -572,7 +572,7 @@ Renders the form field to HTML as a table row complete with labels, subtext, hov
 sub passUiLevelCheck {
 	my $self = shift;
 	my $user = $self->session->user;
-	return $self->get("uiLevel") <= $user->profileField("uiLevel") || $user->isAdmin;
+	return $self->get("uiLevel") <= $user->get("uiLevel") || $user->isAdmin;
 }
 
 

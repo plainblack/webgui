@@ -741,7 +741,7 @@ sub view {
     $mailForm->email(
         -extras     =>'class="content"',
         -name       =>"from",
-        -value      =>$session->user->profileField("email"),
+        -value      =>$session->user->get("email"),
         -label      =>$i18n->get('your email label'),
         );
     $mailForm->selectBox(
@@ -1020,7 +1020,7 @@ sub www_sendEmail {
         if ($form->process("body") ne "") {
             my $user = WebGUI::User->new($self->session, $self->get('maintainerId'));
             my $mail = WebGUI::Mail::Send->create($self->session,{
-                        to      =>$user->profileField("email"),
+                        to      =>$user->get("email"),
                         subject =>$self->get('productName')." - ".$form->process("subject"),
                         from=>$form->process("from")
                 });

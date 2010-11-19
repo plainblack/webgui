@@ -1016,7 +1016,7 @@ sub www_lookupPosUser {
         unless (defined $user) {
             $user = WebGUI::User->new($session, "new");
             $user->username($email);
-            $user->profileField('email', $email);
+            $user->get('email', $email);
         }
     }
     $self->update({posUserId=>$user->userId});

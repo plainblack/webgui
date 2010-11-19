@@ -1113,7 +1113,7 @@ sub www_emailRecoverPasswordFinish {
     # generate information necessry to proceed
     my $recoveryGuid = $session->id->generate();
     my $userId = $user->userId; #get the user guid
-    $email = $user->profileField('email');
+    $email = $user->get('email');
 
     if ( ! $email ) {
         return $self->www_recoverPassword( $i18n->get( 'no email address', 'AuthWebGUI' ) );

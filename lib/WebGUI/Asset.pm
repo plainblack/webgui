@@ -1484,7 +1484,7 @@ sub getPrototypeList {
     }
     my $db      = $session->db;
     my @prototypeIds = $db->buildArray("select distinct assetId from assetData where isPrototype=1");
-    my $userUiLevel = $session->user->profileField('uiLevel');
+    my $userUiLevel = $session->user->get('uiLevel');
     my @assets;
     ID: foreach my $id (@prototypeIds) {
         my $asset = WebGUI::Asset->newById($session, $id);
@@ -1598,7 +1598,7 @@ sub getToolbar {
     return undef unless $self->canEdit && $self->session->isAdminOn;
     return $self->{_toolbar}
         if (exists $self->{_toolbar});
-    my $userUiLevel = $self->session->user->profileField("uiLevel");
+    my $userUiLevel = $self->session->user->get("uiLevel");
     my $uiLevels = $self->session->config->get("assetToolbarUiLevel");
     my $i18n = WebGUI::International->new($self->session, "Asset");
     my $toolbar = "";

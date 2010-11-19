@@ -227,7 +227,7 @@ sub www_editFriends {
         ##We don't use acceptsFriendsRequests here because it's overkill.
         ##No need to check invitations, since friends are managed.
         ##Existing friends are already filtered out.
-        next USERID unless $user->profileField('ableToBeFriend') || $overrideProfile;
+        next USERID unless $user->get('ableToBeFriend') || $overrideProfile;
         push @usersToAdd, [ $newFriendId, $user->username ];
     }
 

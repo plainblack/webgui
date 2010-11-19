@@ -173,7 +173,7 @@ sub execute {
 				my $value = $entry->get_value($self->_alias($fieldName));
 				next unless length $value;
 #				$self->session->log->warn("DEBUG: SyncProfilesToLdap: Got data for profile field '$fieldName'");
-				$user->profileField($fieldName, $value);
+				$user->get($fieldName, $value);
 			}
 		}
 	} continue {

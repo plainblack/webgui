@@ -60,8 +60,8 @@ time - time component formatted as HH:MM:SS
 sub process {
     my ( $session, $toTZ, $format, $date, $time ) = @_;
 
-    my $uTZ     = $session->user->profileField("timeZone");
-    my $uFormat = $session->user->profileField("dateFormat");
+    my $uTZ     = $session->user->get("timeZone");
+    my $uFormat = $session->user->get("dateFormat");
 
     $toTZ   ||= $uTZ;
     $format ||= $uFormat;

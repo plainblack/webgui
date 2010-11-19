@@ -292,7 +292,7 @@ sub epochToHuman {
         $epoch = time();
     }
 	my $i18n = WebGUI::International->new($self->session);
-	my $language = $i18n->getLanguage($self->session->user->profileField('language'));
+	my $language = $i18n->getLanguage($self->session->user->get('language'));
 	my $locale = $language->{languageAbbreviation} || 'en';
 	$locale .= "_".$language->{locale} if ($language->{locale});
 	my $time_zone = $self->getTimeZone();
@@ -300,10 +300,10 @@ sub epochToHuman {
 	my $output = shift || "%z %Z";
 	my $temp;
   #---date format preference
-	$temp = $self->session->user->profileField('dateFormat') || '%M/%D/%y';
+	$temp = $self->session->user->get('dateFormat') || '%M/%D/%y';
 	$output =~ s/\%z/$temp/g;
   #---time format preference
-	$temp = $self->session->user->profileField('timeFormat') || '%H:%n %p';
+	$temp = $self->session->user->get('timeFormat') || '%H:%n %p';
 	$output =~ s/\%Z/$temp/g;
   #--- convert WebGUI date formats to DateTime formats
 	my %conversion = (
@@ -609,7 +609,7 @@ sub getTimeZone {
 	return 'America/Chicago' unless defined $self->session->db(1);
 	return $self->session->user->{_timeZone} if $self->session->user->{_timeZone};
 	my @zones = @{DateTime::TimeZone::all_names()};
-	my $zone = $self->session->user->profileField('timeZone');
+	my $zone = $self->session->user->get('timeZone');
 	$zone =~ s/ /\_/g;
 	if ($zone) {
         if ( $zone ~~ @zones ) {

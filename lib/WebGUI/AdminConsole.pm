@@ -169,7 +169,7 @@ sub getAdminFunction {
 		elsif (defined $functions->{$function}{groupSetting}) {
 			$canUse = $user->isInGroup($setting->get($functions->{$function}{groupSetting}));
 		}
-		if ($functions->{$function}{uiLevel} > $user->profileField("uiLevel")) {
+		if ($functions->{$function}{uiLevel} > $user->get("uiLevel")) {
 			$canUse = 0;
 		}
 		

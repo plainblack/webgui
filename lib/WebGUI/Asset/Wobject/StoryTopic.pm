@@ -174,7 +174,7 @@ sub viewTemplateVariables {
     $var->{story_loop} = [];
 
     my $icon          = $session->icon;
-    my $userUiLevel   = $session->user->profileField("uiLevel");
+    my $userUiLevel   = $session->user->get("uiLevel");
     my $uiLevels      = $session->config->get('assetToolbarUiLevel');
     my $i18n          = WebGUI::International->new($session);
 

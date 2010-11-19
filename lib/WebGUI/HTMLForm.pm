@@ -61,7 +61,7 @@ These methods are available from this class:
 #-------------------------------------------------------------------
 sub _uiLevelChecksOut {
 	my $self = shift;
-	if ($_[0] <= $self->session->user->profileField("uiLevel")) {
+	if ($_[0] <= $self->session->user->get("uiLevel")) {
 		return 1;
 	} 
     else {

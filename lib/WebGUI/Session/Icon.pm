@@ -64,11 +64,11 @@ Returns the base URL for this user's toolbar icon set.
 sub getBaseURL {
 	my $self = shift;
 	my $url = $self->session->url->extras('toolbar/');
-	my $toolbar = $self->session->user->profileField("toolbar");
+	my $toolbar = $self->session->user->get("toolbar");
 	if ($toolbar ne "useLanguageDefault") {
 		$url .= $toolbar;
 	} else {
-		$url .= WebGUI::International->new($self->session,'Icon')->getLanguage($self->session->user->profileField("language"),"toolbar");
+		$url .= WebGUI::International->new($self->session,'Icon')->getLanguage($self->session->user->get("language"),"toolbar");
 	}
 	$url .= '/';	
 	return $url;

@@ -332,7 +332,7 @@ sub create {
                 $email = $user->getInboxNotificationAddresses;
             }
             else {
-                $email = $user->profileField("email");
+                $email = $user->get("email");
             }
 			if ($email) {
 				if ($headers->{to}) {
@@ -568,7 +568,7 @@ sub send {
                 $emailAddress = $user->getInboxNotificationAddresses;
             }
             else {
-                $emailAddress = $user->profileField('email');
+                $emailAddress = $user->get('email');
             }
             next USER unless $emailAddress;
             $mail->head->replace('To', $emailAddress);

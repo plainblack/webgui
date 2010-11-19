@@ -154,7 +154,7 @@ sub getValue {
 		# NOTE: Cannot fix time zone since we don't have a complete date/time
 
         if($value =~ $isaEpoch){
-            return $self->session->datetime->epochToSet($value,$self->session->user->profileField( 'timeZone' ));
+            return $self->session->datetime->epochToSet($value,$self->session->user->get( 'timeZone' ));
         }
 
         # Verify format

@@ -93,7 +93,7 @@ sub definition {
 			defaultValue=> 19
 			},
         timeZone=>{
-            defaultValue=> $session->user->profileField("timeZone")
+            defaultValue=> $session->user->get("timeZone")
             },
 		});
         return $class->SUPER::definition($session, $definition);
@@ -153,7 +153,7 @@ sub getValue {
 		# YY(YY)?-MM-DD HH:MM:SS
 
         if($value =~ $isaEpoch){
-            return $self->session->datetime->epochToSet($value,$self->session->user->profileField( 'timeZone' ));
+            return $self->session->datetime->epochToSet($value,$self->session->user->get( 'timeZone' ));
         }
 		
 		# Verify format
@@ -162,7 +162,7 @@ sub getValue {
 		
 		# Fix time zone
 
-		$value 	= WebGUI::DateTime->new($self->session,mysql => $value, time_zone=>$self->session->user->profileField( 'timeZone' ))
+		$value 	= WebGUI::DateTime->new($self->session,mysql => $value, time_zone=>$self->session->user->get( 'timeZone' ))
 			    ->set_time_zone("UTC")->toMysql;
 		
 		return $value;

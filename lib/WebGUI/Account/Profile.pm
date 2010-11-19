@@ -113,7 +113,7 @@ sub appendCommonVars {
     $self->SUPER::appendCommonVars($var);
 
     $var->{'edit_profile_url'     } = $self->getUrl("module=profile;do=edit");
-    $var->{'invitations_enabled'  } = $user->profileField('ableToBeFriend');
+    $var->{'invitations_enabled'  } = $user->get('ableToBeFriend');
     $var->{'profile_category_loop'} = [];
 
     #Append the categories
@@ -244,7 +244,7 @@ sub getExtrasStyle {
 
     return $errorStyle if $field->getId ~~ $fieldErrors;
     return "" unless ($field->isRequired);
-    return $requiredStyle unless($self->session->user->profileField($field->getId) || $fieldValue);
+    return $requiredStyle unless($self->session->user->get($field->getId) || $fieldValue);
     return $requiredStyleOff;
 }
 
@@ -359,7 +359,7 @@ sub www_edit {
         foreach my $field (@{ $category->getFields( { editable => 1 } ) }) {
             my $fieldId             = $field->getId;
             my $fieldLabel          = $field->getLabel;
-            my $fieldForm           = $field->formField({ extras=>$self->getExtrasStyle($field,\@errorFields,$user->profileField($fieldId)) });
+            my $fieldForm           = $field->formField({ extras=>$self->getExtrasStyle($field,\@errorFields,$user->get($fieldId)) });
             my $fieldRequired       = $field->isRequired;
             my $fieldExtras         = $field->getExtras;
             my $fieldViewable       = $field->isViewable;
@@ -472,7 +472,7 @@ sub www_view {
 
     $self->appendCommonVars($var);
 
-    my $privacySetting = $user->profileField('publicProfile') || 'none';
+    my $privacySetting = $user->get('publicProfile') || 'none';
     $var->{"profile_privacy_$privacySetting"} = "true";
 
     $var->{'acceptsPrivateMessages'} 
@@ -501,7 +501,7 @@ sub www_view {
             my $fieldId            = $field->getId;
             my $fieldLabel         = $field->getLabel;
             my $fieldValue         = $field->formField(undef,2,$user);
-            my $fieldRaw           = $user->profileField($fieldId);;
+            my $fieldRaw           = $user->get($fieldId);;
             #Create a seperate template var for each field
             my $fieldBase = 'profile_field_'.$fieldId;
             $var->{$fieldBase.'_label'                          } = $fieldLabel;

@@ -50,7 +50,7 @@ sub process {
                    : $session->user
                    ;
 
-	return  $user->profileField($field);
+	return  $user->get($field);
 }
 
 1;

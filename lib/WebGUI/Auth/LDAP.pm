@@ -687,7 +687,7 @@ sub www_displayAccount {
     $vars->{displayTitle} = '<h1>'.$i18n->get(61).'</h1>';
     $vars->{'account.message'} = $i18n->get(856);
     if($self->session->setting->get("useKarma")){
-        $vars->{'account.form.karma'} = $self->session->user->profileField("karma");
+        $vars->{'account.form.karma'} = $self->session->user->get("karma");
         $vars->{'account.form.karma.label'} = $i18n->get(537);
     }
 

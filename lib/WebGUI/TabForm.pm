@@ -242,7 +242,7 @@ sub print {
 	my $i = 1;
 	my $tabs = '<ul class="yui-nav">';
 	my $form = '<div class="yui-content">';
-	my $userUiLevel = $self->session->user->profileField("uiLevel");
+	my $userUiLevel = $self->session->user->get("uiLevel");
 	my $first = 1;
 	foreach my $key (keys %{$self->{_tab}}) {
 		my $hide = '';

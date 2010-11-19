@@ -66,11 +66,11 @@ sub canView {
     my $session = $self->session;
     my $uid     = $self->uid;
 
-    return 1 if (($session->user->userId eq $uid || $uid eq "") && $session->user->profileField('ableToBeFriend'));
+    return 1 if (($session->user->userId eq $uid || $uid eq "") && $session->user->get('ableToBeFriend'));
 
     my $user    = WebGUI::User->new($session,$uid);
     return 0 if($user->isVisitor); #This should never happen but let's make sure
-    return 0 unless ($user->profileField('ableToBeFriend'));  #User doesn't have friends enabled
+    return 0 unless ($user->get('ableToBeFriend'));  #User doesn't have friends enabled
     return WebGUI::User->new($session,$uid)->profileIsViewable($session->user);  #User's profile isn't viewable by this user
 }
 
@@ -491,7 +491,7 @@ sub www_view {
     my $displayView           = $uid ne "";
     $var->{'display_message'} = $msg;
 
-    unless ($user->profileField('ableToBeFriend') && $user->profileIsViewable($session->user)) {
+    unless ($user->get('ableToBeFriend') && $user->profileIsViewable($session->user)) {
         my $i18n = WebGUI::International->new($session,"Account_Friends");
         my $errorMsg = "";
         if($var->{'can_edit'}) {

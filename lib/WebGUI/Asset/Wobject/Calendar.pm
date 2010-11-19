@@ -1200,7 +1200,7 @@ sub viewMonth {
 
     #### Create the template parameters
     ## The grid
-    my $first_dow     = $session->user->profileField("firstDayOfWeek") || 0;
+    my $first_dow     = $session->user->get("firstDayOfWeek") || 0;
                 # 0 - sunday
                 # 1 - mon
                 # 2 - tue
@@ -1333,7 +1333,7 @@ sub viewWeek {
     $dt->truncate( to => "day");
 
     # Apply First Day of Week settings
-    my $first_dow = $session->user->profileField("firstDayOfWeek") || 0;
+    my $first_dow = $session->user->get("firstDayOfWeek") || 0;
                 # 0 - sunday
                 # 1 - monday 
                 # 2 - tuesday, etc...

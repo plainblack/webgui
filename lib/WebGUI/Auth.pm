@@ -1192,7 +1192,7 @@ sub www_login {
 
     # Set the proper redirect
     if ( $self->session->setting->get( 'showMessageOnLogin' ) 
-        && $self->user->profileField( $LOGIN_MESSAGE_SEEN ) 
+        && $self->user->get( $LOGIN_MESSAGE_SEEN ) 
             < $self->session->setting->get( 'showMessageOnLoginTimes' ) 
     ) {
         return $self->showMessageOnLogin;
@@ -1264,8 +1264,8 @@ sub www_showMessageOnLogin {
     my $i18n        = WebGUI::International->new( $self->session, 'Auth' );
 
     # Increment the number of time seen.
-    $self->user->profileField( $LOGIN_MESSAGE_SEEN, 
-        $self->user->profileField( $LOGIN_MESSAGE_SEEN ) + 1
+    $self->user->get( $LOGIN_MESSAGE_SEEN, 
+        $self->user->get( $LOGIN_MESSAGE_SEEN ) + 1
     );
 
     # Show the message, processing for macros

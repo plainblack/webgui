@@ -614,17 +614,17 @@ sub www_editAddress {
     if ( $copyFrom eq 'work' || $copyFrom eq 'home' ) {
         my $user = $session->user;
 
-        $properties->{ address1     } = $user->profileField( $copyFrom . 'Address' );
-        $properties->{ firstName    } = $user->profileField( 'firstName' );
+        $properties->{ address1     } = $user->get( $copyFrom . 'Address' );
+        $properties->{ firstName    } = $user->get( 'firstName' );
         $properties->{ lastName     } = 
-            join ' ', $user->profileField( 'middleName' ), $user->profileField( 'lastName' );
-        $properties->{ city         } = $user->profileField( $copyFrom . 'City'     );
-        $properties->{ state        } = $user->profileField( $copyFrom . 'State'    );
-        $properties->{ country      } = $user->profileField( $copyFrom . 'Country'  );
-        $properties->{ code         } = $user->profileField( $copyFrom . 'Zip'      );
-        $properties->{ phoneNumber  } = $user->profileField( $copyFrom . 'Phone'    );
-        $properties->{ email        } = $user->profileField( 'email' );
-        $properties->{ organization } = $user->profileField( 'workName' ) if $copyFrom eq 'work';
+            join ' ', $user->get( 'middleName' ), $user->get( 'lastName' );
+        $properties->{ city         } = $user->get( $copyFrom . 'City'     );
+        $properties->{ state        } = $user->get( $copyFrom . 'State'    );
+        $properties->{ country      } = $user->get( $copyFrom . 'Country'  );
+        $properties->{ code         } = $user->get( $copyFrom . 'Zip'      );
+        $properties->{ phoneNumber  } = $user->get( $copyFrom . 'Phone'    );
+        $properties->{ email        } = $user->get( 'email' );
+        $properties->{ organization } = $user->get( 'workName' ) if $copyFrom eq 'work';
     }
 
     # Setup tmpl_vars

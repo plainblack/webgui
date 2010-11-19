@@ -59,7 +59,7 @@ sub appendCommonVars {
     $var->{'view_invitations_url'    } = $self->getUrl("module=inbox;do=manageInvitations");
     $var->{'unread_message_count'    } = $inbox->getUnreadMessageCount($user->userId);
     $var->{'invitation_count'        } = $self->getInvitationCount;
-    $var->{'invitations_enabled'     } = $user->profileField('ableToBeFriend');
+    $var->{'invitations_enabled'     } = $user->get('ableToBeFriend');
     $var->{'user_invitations_enabled'} = $session->setting->get("inboxInviteUserEnabled");
     $var->{'invite_friend_url'       } = $self->getUrl("module=inbox;do=inviteUser");
 
@@ -894,7 +894,7 @@ sub www_inviteUserSave {
     return $self->www_inviteUser($i18n->get('missing message')) unless $message;
 
     #Profile Email address check
-    my $email = $session->user->profileField('email');
+    my $email = $session->user->get('email');
     unless ($email) {
         return $self->www_inviteUser($i18n->get('no email'));
     }

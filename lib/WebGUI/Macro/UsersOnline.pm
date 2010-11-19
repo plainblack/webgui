@@ -85,7 +85,7 @@ sub process {
 	# Obtain internationalization instance
 	my $i18n = WebGUI::International->new($session, "Macro_UsersOnline");
 	# Get preferred time format of current user
-	my $time_format = $session->user->profileField("timeFormat");
+	my $time_format = $session->user->get("timeFormat");
 
 	# Calculate epoch time for comparison to last activity
 	my $dt = $session->datetime;
@@ -165,7 +165,7 @@ sub _visitors {
 	my $db = $session->db();
 	my $dt = $session->datetime;
 	# Get preferred time format of current user
-	my $time_format = $session->user->profileField("timeFormat");
+	my $time_format = $session->user->get("timeFormat");
 
 	# SQL conditional clause for filtering server IP
 	my $ip_clause;
@@ -249,7 +249,7 @@ sub _members {
 	my $db = $session->db();
 	my $dt = $session->datetime;
 	# Get preferred time format of current user
-	my $time_format = $session->user->profileField("timeFormat");
+	my $time_format = $session->user->get("timeFormat");
 
 	# Determine the number of registered users that are online. The Admin 
 	# account is excluded from the list.
@@ -269,10 +269,10 @@ sub _members {
 		my $user = WebGUI::User->new($session, $row{'userId'});
 	    
 		# Only show users with the "showOnline" flag set to true
-		if ($user->profileField("showOnline")) {
+		if ($user->get("showOnline")) {
 	    	# Find URL of avatar if available
 			my $avatar_url;
-			my $avatar = $user->profileField("avatar");
+			my $avatar = $user->get("avatar");
 			if ($avatar) {
 		    		my $storage = WebGUI::Storage->get($session, $avatar);
 		    		my @files = @{ $storage->getFiles() };
@@ -284,10 +284,10 @@ sub _members {
 			# Add item to member template loop
 			push(@{$var->{'member_loop'}}, {
 		    		username => $user->username(),
-		    		firstName => $user->profileField("firstName"),
-		    		middleName => $user->profileField("middleName"),
-		    		lastName => $user->profileField("lastName"),
-		    		alias => $user->profileField("alias"),
+		    		firstName => $user->get("firstName"),
+		    		middleName => $user->get("middleName"),
+		    		lastName => $user->get("lastName"),
+		    		alias => $user->get("alias"),
 		    		avatar => $avatar_url,
 		    		uid => $row{'userId'},
 		    		sessionId => $row{'sessionId'},

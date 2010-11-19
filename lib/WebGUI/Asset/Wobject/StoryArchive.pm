@@ -572,7 +572,7 @@ sub viewTemplateVariables {
     my $datePointer   = undef;
 
     my $icon          = $session->icon;
-    my $userUiLevel   = $session->user->profileField("uiLevel");
+    my $userUiLevel   = $session->user->get("uiLevel");
     my $uiLevels      = $session->config->get('assetToolbarUiLevel');
 
     ##Only build objects for the assets that we need
