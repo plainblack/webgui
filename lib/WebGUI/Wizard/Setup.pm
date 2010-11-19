@@ -163,19 +163,19 @@ sub www_adminAccount {
     );
     $f->email(
         -name      => "email",
-        -value     => $u->profileField("email"),
+        -value     => $u->get("email"),
         -label     => $i18n->get(56),
         -hoverHelp => $i18n->get('56 description'),
     );
     $f->timeZone(
         -name      => "timeZone",
-        -value     => $u->profileField("timeZone"),
+        -value     => $u->get("timeZone"),
         -label     => $i18n->get( 'timezone', 'DateTime' ),
         -hoverHelp => $i18n->get('timezone help'),
     );
     $f->selectBox(
         -name      => "language",
-        -value     => $u->profileField("language"),
+        -value     => $u->get("language"),
         -label     => $i18n->get('304'),
         -hoverHelp => $i18n->get('language help'),
         -options   => $i18n->getLanguages(),
@@ -203,16 +203,16 @@ sub www_adminAccountSave {
     ##update Admin and Visitor users
     my $u = WebGUI::User->new( $session, "3" );
     $u->username( $form->process( "username", "text", "Admin" ) );
-    $u->profileField( "email",    $form->email("email") );
-    $u->profileField( "timeZone", $timezone );
-    $u->profileField( "language", $language );
+    $u->get( "email",    $form->email("email") );
+    $u->get( "timeZone", $timezone );
+    $u->get( "language", $language );
     $u->identifier( Digest::MD5::md5_base64( $form->process( "identifier", "password", "123qwe" ) ) );
     # The user is now Admin
     $session->user({ userId => "3" });
 
     $u = WebGUI::User->new( $session, "1" );
-    $u->profileField( "timeZone", $timezone );
-    $u->profileField( "language", $language );
+    $u->get( "timeZone", $timezone );
+    $u->get( "language", $language );
 
     ##update ProfileField defaults so new users the get the defaults, too
     my $properties;
