@@ -492,7 +492,7 @@ Returns a reference to the WebGUI::Session::Id object.
 sub id {
 	my $self = shift;
 	unless ($self->{_id}) {
-		$self->{_id} = WebGUI::Session::Id->new($self);
+		$self->{_id} = WebGUI::Session::Id->new($self->config->getFilename);
 	}
 	return $self->{_id};
 }

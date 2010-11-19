@@ -89,7 +89,7 @@ This function generates a global unique id.
 sub generate {
 	my $self = shift;
   	my($s,$us)=gettimeofday();
-  	my($v)=sprintf("%09d%06d%10d%06d%255s",rand(999999999),$us,$s,$$,$self->session->config->getFilename);
+  	my($v)=sprintf("%09d%06d%10d%06d%255s",rand(999999999),$us,$s,$$,$self->seed);
 	my $id = Digest::MD5::md5_base64($v);
 	$id =~ tr{+/}{_-};
 	return $id;
@@ -109,23 +109,22 @@ A reference to the current session.
 
 sub new {
 	my $class = shift;
-	my $session = shift;
-    my $self = bless { _session => $session }, $class;
-    weaken $self->{_session};
+	my $seed  = shift;
+    my $self = bless { _seed => $seed }, $class;
     return $self;
 }
 
 #-------------------------------------------------------------------
 
-=head2 session ( ) 
+=head2 seed ( ) 
 
-Returns a reference to the current session.
+Returns the seed that be used for salting the data sent to MD5.
 
 =cut
 
-sub session {
+sub seed {
 	my $self = shift;
-	return $self->{_session};
+	return $self->{_seed};
 }
 
 
