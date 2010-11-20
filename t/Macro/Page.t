@@ -49,7 +49,7 @@ $numTests += 1; #For macro call with undefined session asset
 
 plan tests => $numTests;
 
-my $homeAsset = WebGUI::Asset->getDefault($session);
+my $homeAsset = WebGUI::Test->asset;
 
 @testSets = setupTest($session, $homeAsset, @testSets);
 
@@ -72,14 +72,10 @@ foreach my $testSet (@testSets) {
 
 sub setupTest {
 	my ($session, $homeAsset, @testSets) = @_;
-	my $versionTag = WebGUI::VersionTag->getWorking($session);
-	$versionTag->set({name=>"Page macro test"});
 	foreach my $testSet (@testSets) {
 		my %properties = %{ $testSet };
 		my $asset = $homeAsset->addChild(\%properties, $properties{assetId});
 		$testSet->{asset} = $asset;
 	}
-	$versionTag->commit;
-    addToCleanup($versionTag);
 	return @testSets;
 }

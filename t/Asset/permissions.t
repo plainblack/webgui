@@ -31,7 +31,7 @@ use Storable qw/dclone/;
 
 my $session = WebGUI::Test->session;
 
-my $rootAsset = WebGUI::Asset->getRoot($session);
+my $rootAsset = WebGUI::Test->asset;
 
 ##Test users.
 ##All users in here will be deleted at the end of the test.  DO NOT PUT
@@ -97,12 +97,8 @@ $properties = {
     groupIdView => 7,
 };
 
-my $versionTag2 = WebGUI::VersionTag->getWorking($session);
-WebGUI::Test->addToCleanup($versionTag2);
-
 my $canEditAsset = $rootAsset->addChild($properties, $properties->{id});
 
-$versionTag2->commit;
 $properties = {};  ##Clear out the hash so that it doesn't leak later by accident.
 
 my $canEditMaker = WebGUI::Test::Maker::Permission->new();
@@ -113,8 +109,6 @@ $canEditMaker->prepare({
     'fail'   => [1, $testUsers{'regular user'},                                   ],
 });
 
-my $versionTag3 = WebGUI::VersionTag->getWorking($session);
-WebGUI::Test->addToCleanup($versionTag3);
 $properties = {
 	#            '1234567890123456789012'
 	id          => 'canViewAsset0000000010',
@@ -129,7 +123,6 @@ $properties = {
 
 my $canViewAsset = $rootAsset->addChild($properties, $properties->{id});
 
-$versionTag3->commit;
 $properties = {};  ##Clear out the hash so that it doesn't leak later by accident.
 
 my $canViewMaker = WebGUI::Test::Maker::Permission->new();
@@ -161,7 +154,7 @@ plan tests => $canAddMaker->plan
 
 $session->config->set('assets/WebGUI::Asset/addGroup', $testGroups{'canAdd asset'}->getId );
 
-$session->asset(WebGUI::Asset->getDefault($session));
+$session->asset(WebGUI::Test->asset);
 $canAddMaker->run;
 
 #Without proper group setup, Turn On Admin is excluded from adding assets via assetAddPrivilege

@@ -33,22 +33,19 @@ plan tests => 4;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # put your tests here
-my $root  = WebGUI::Asset->getRoot($session);
 my $group = WebGUI::Group->new($session, 'new');
 WebGUI::Test->addToCleanup($group);
 my $user  = WebGUI::User->create($session);
 WebGUI::Test->addToCleanup($user);
 
-my $sku = $root->addChild({
+my $sku = WebGUI::Test->asset(
         className => "WebGUI::Asset::Sku::Subscription",
         title     => "Test Subscription",
         price     => 50.00,
         recurringSubscription => 0,
         subscriptionGroup     => $group->getId,
         duration              => 'Monthly',
-        });
-my $versionTag = WebGUI::VersionTag->getWorking($session);
-WebGUI::Test->addToCleanup($versionTag);
+        );
 isa_ok($sku, "WebGUI::Asset::Sku::Subscription");
 
 is($sku->getPrice, 50.00, "Price should be 50.00");

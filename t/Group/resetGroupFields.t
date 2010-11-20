@@ -31,7 +31,7 @@ WebGUI::Test->addToCleanup($settingGroup);
 my $activityGroup = WebGUI::Group->new($session, 'new');
 WebGUI::Test->addToCleanup($activityGroup);
 
-my $home = WebGUI::Asset->getDefault($session);
+my $home = WebGUI::Test->asset;
 
 my $snippet1 = $home->addChild({
     className   => 'WebGUI::Asset::Snippet',
@@ -174,4 +174,3 @@ $activityGroup->delete;
 my $userActivity2 = WebGUI::Workflow::Activity->new($session, $userActivity->getId);
 is ($userActivity2->get('groupId'), 3, 'group in Workflow Activity set to Admin');
 
-WebGUI::Test->addToCleanup(WebGUI::VersionTag->getWorking($session));

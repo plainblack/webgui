@@ -19,50 +19,27 @@ use Test::More;
 #----------------------------------------------------------------------------
 # Init
 my $session         = WebGUI::Test->session;
-my $node            = WebGUI::Asset->getImportNode($session);
-my $versionTag      = WebGUI::VersionTag->getWorking($session);
-WebGUI::Test->addToCleanup($versionTag);
-
-$versionTag->set({name=>"Album Test"});
+my $node            = WebGUI::Test->asset;
 
 # Create gallery and a single album
 my $gallery
     = $node->addChild({
         className           => "WebGUI::Asset::Wobject::Gallery",
-    },
-    undef,
-    undef,
-    {
-        skipAutoCommitWorkflows => 1,
     });
 my $album
     = $gallery->addChild({
         className           => "WebGUI::Asset::Wobject::GalleryAlbum",
-    },
-    undef,
-    undef,
-    {
-        skipAutoCommitWorkflows => 1,
     });
     
 # Create 5 photos inside the gallery
 my @photo;
-
 for (my $i = 0; $i < 5; $i++)
 {
     $photo[$i]
         = $album->addChild({
             className           => "WebGUI::Asset::File::GalleryFile::Photo",
-        },
-        undef,
-        undef,
-        {
-            skipAutoCommitWorkflows => 1,
         });
 }
-
-# Commit all changes
-$versionTag->commit;
 
 #----------------------------------------------------------------------------
 # Tests

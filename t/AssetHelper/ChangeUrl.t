@@ -27,15 +27,11 @@ use WebGUI::Test::Mechanize;
 # Init
 my $session         = WebGUI::Test->session;
 
-my $asset           = WebGUI::Asset->getImportNode( $session )->addChild( {
+my $asset           = WebGUI::Test->asset->addChild( {
     className       => 'WebGUI::Asset::Snippet',
     url             => 'example',
     groupIdEdit     => 3,       # Admins
 } );
-
-my $tag = WebGUI::VersionTag->getWorking( $session );
-$tag->commit;
-addToCleanup( $tag );
 
 #----------------------------------------------------------------------------
 # Check permissions

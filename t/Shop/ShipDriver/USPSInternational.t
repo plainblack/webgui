@@ -41,9 +41,7 @@ $session->user({user => $user});
 
 my ($driver2, $cart);
 
-my $versionTag = WebGUI::VersionTag->getWorking($session);
-
-my $home = WebGUI::Asset->getDefault($session);
+my $home = WebGUI::Test->asset;
 
 my $rockHammer = $home->addChild({
     className          => 'WebGUI::Asset::Sku::Product',
@@ -104,12 +102,6 @@ my $singlePage = $bible->setCollateral('variantsJSON', 'variantId', 'new',
         weight    => 0.0001,     quantity  => 999999,
     }
 );
-
-$versionTag->commit;
-addToCleanup($versionTag);
-foreach my $asset ($rockHammer, $bible) {
-    $asset = $asset->cloneFromDb;
-}
 
 #######################################################################
 #

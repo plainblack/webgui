@@ -20,7 +20,7 @@ use Test::More; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
-my $homeAsset = WebGUI::Asset->getDefault($session);
+my $homeAsset = WebGUI::Test->asset;
 $session->asset($homeAsset);
 my $template = setupTest($session, $homeAsset);
 
@@ -179,8 +179,6 @@ sub setupTest {
 	$session->user({userId=>3});
 	my $tao = WebGUI::Group->find($session, "Turn Admin On");
 	##Create an asset with specific editing privileges
-	my $versionTag = WebGUI::VersionTag->getWorking($session);
-	$versionTag->set({name=>"LoginToggle test"});
 	my $properties = {
 		title => 'LoginToggle test template',
 		className => 'WebGUI::Asset::Template',
@@ -193,7 +191,5 @@ sub setupTest {
 		id => 'LoginToggleTemplateA01',
 	};
 	my $template = $defaultNode->addChild($properties, $properties->{id});
-	$versionTag->commit;
-    addToCleanup($versionTag);
 	return ($template);
 }

@@ -29,7 +29,7 @@ my $session         = WebGUI::Test->session;
 # put your tests here
 
 my $output;
-my $home = WebGUI::Asset->getDefault($session);
+my $home = WebGUI::Test->asset;
 
 my $editor = WebGUI::User->create($session);
 $editor->addToGroups([4]);
@@ -42,9 +42,6 @@ my $newPage = $home->addChild({
     groupIdEdit => '4',
     ownerUserId => '3',
 }, undef, WebGUI::Test->webguiBirthday, { skipAutoCommitWorkflows => 1, });
-my $versionTag = WebGUI::VersionTag->getWorking($session);
-$versionTag->commit;
-addToCleanup($versionTag);
 
 $newPage = WebGUI::Asset->newById($session, $newPage->assetId);
 
@@ -67,9 +64,6 @@ cmp_deeply(
     },
     '... locks the asset'
 );
-
-my $versionTag2 = WebGUI::VersionTag->getWorking($session);
-addToCleanup($versionTag2);
 
 $newPage = WebGUI::Asset->newById($session, $newPage->assetId);
 ok $newPage->isLocked, 'Asset is locked, and ready for next test';

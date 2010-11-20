@@ -25,10 +25,10 @@ my $session         = WebGUI::Test->session;
 
 my @versionTags     = ( WebGUI::VersionTag->getWorking( $session ) );
 my @addChildArgs    = ( {skipAutoCommitWorkflows=>1} );
-my $collab          = WebGUI::Asset->getImportNode( $session )->addChild({
+my $collab          = WebGUI::Test->asset(
     className       => 'WebGUI::Asset::Wobject::Collaboration',
     threadsPerPage  => 20,
-});
+);
 
 my @threads = (
     $collab->addChild( {
@@ -58,11 +58,6 @@ my @threads = (
 );
 
 $_->setSkipNotification for @threads; 
-$versionTags[-1]->commit;
-WebGUI::Test->addToCleanup($versionTags[-1]);
-foreach my $asset(@threads, $collab) {
-    $asset = $asset->cloneFromDb;
-}
 
 #----------------------------------------------------------------------------
 # Tests
@@ -141,6 +136,8 @@ push @threads, $collab->addChild( {
         title           => "Abababa",
         isSticky        => 0,
         threadRating    => 1_000_000,
+        tagId           => $versionTags[-1]->getId,
+        status          => "pending",
     }, undef, 6, @addChildArgs
 );
 $sort = sub { $b->get('revisionDate') <=> $a->get('revisionDate') };

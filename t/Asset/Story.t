@@ -50,7 +50,7 @@ $canEditMaker->prepare({
 });
 
 
-my $defaultNode = WebGUI::Asset->getDefault($session);
+my $defaultNode = WebGUI::Test->asset;
 my $archive     = $defaultNode->addChild({
     className   => 'WebGUI::Asset::Wobject::StoryArchive',
     title       => 'Test Archive',
@@ -66,12 +66,6 @@ my $topic       = $defaultNode->addChild({
     assetId   => 'TestStoryTopicAsset123',
     keywords  => 'tango,yankee',
 });
-my $archiveTag  = WebGUI::VersionTag->getWorking($session);
-$archiveTag->commit;
-WebGUI::Test->addToCleanup($archiveTag);
-foreach my $asset ($archive, $topic) {
-    $asset = $asset->cloneFromDb;
-}
 
 my $storage1 = WebGUI::Storage->create($session);
 my $storage2 = WebGUI::Storage->create($session);
@@ -125,15 +119,7 @@ is($story->isHidden, 1, 'by default, stories are hidden');
 $story->update({isHidden => 0});
 is($story->isHidden, 1, 'stories cannot be set to not be hidden');
 is($story->state,    'published', 'Story is published');
-$story->requestAutoCommit;
-
-{
-    ##Version control does not alter the current object's status, fetch an updated copy from the
-    ##db.
-    my $storyDB = $story->cloneFromDb;
-    is($storyDB->status,   'approved',  'Story is approved');
-}
-
+$story->commit;
 
 ############################################################
 #

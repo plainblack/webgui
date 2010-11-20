@@ -20,11 +20,7 @@ use WebGUI::Asset::Wobject::Carousel;
 my $session = WebGUI::Test->session;
 
 # Do our work in the import node
-my $node = WebGUI::Asset->getImportNode($session);
-
-my $versionTag = WebGUI::VersionTag->getWorking($session);
-$versionTag->set({name=>"Search Test"});
-WebGUI::Test->addToCleanup($versionTag);
+my $node = WebGUI::Test->asset;
 my $carousel = $node->addChild({className=>'WebGUI::Asset::Wobject::Carousel'});
 
 # Test for a sane object type

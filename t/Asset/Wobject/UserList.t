@@ -21,11 +21,7 @@ use WebGUI::Asset::Wobject::UserList;
 my $session = WebGUI::Test->session;
 
 # Do our work in the import node
-my $node = WebGUI::Asset->getImportNode($session);
-
-my $versionTag = WebGUI::VersionTag->getWorking($session);
-$versionTag->set({name=>"UserList Test"});
-WebGUI::Test->addToCleanup($versionTag);
+my $node = WebGUI::Test->asset;
 my $userList = $node->addChild({className=>'WebGUI::Asset::Wobject::UserList'});
 
 # Test for a sane object type

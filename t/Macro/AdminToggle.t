@@ -22,7 +22,7 @@ my $session = WebGUI::Test->session;
 
 my $template = addTemplate();
 
-my $homeAsset = WebGUI::Asset->getDefault($session);
+my $homeAsset = WebGUI::Test->asset;
 $session->asset($homeAsset);
 
 my $i18n = WebGUI::International->new($session,'Macro_AdminToggle');
@@ -94,9 +94,7 @@ TODO: {
 
 sub addTemplate {
 	$session->user({userId=>3});
-	my $importNode = WebGUI::Asset->getImportNode($session);
-	my $versionTag = WebGUI::VersionTag->getWorking($session);
-	$versionTag->set({name=>"AdminToggle test"});
+	my $importNode = WebGUI::Test->asset;
 	my $properties = {
 		title => 'AdminToggle test template',
 		className => 'WebGUI::Asset::Template',
@@ -107,8 +105,6 @@ sub addTemplate {
         usePacked => 0,
 	};
 	my $template = $importNode->addChild($properties, $properties->{id});
-	$versionTag->commit;
-    addToCleanup($versionTag);
 	return $template;
 }
 

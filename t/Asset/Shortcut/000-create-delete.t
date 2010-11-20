@@ -20,16 +20,12 @@ use WebGUI::Asset::Snippet;
 #----------------------------------------------------------------------------
 # Init
 my $session         = WebGUI::Test->session;
-my $node            = WebGUI::Asset->getImportNode($session);
-my $versionTag      = WebGUI::VersionTag->getWorking($session);
-$versionTag->set({name=>"Shortcut Test"});
-WebGUI::Test->addToCleanup($versionTag);
 
 # Make a snippet to shortcut
 my $snippet 
-    = $node->addChild({
+    = WebGUI::Test->asset(
         className       => "WebGUI::Asset::Snippet",
-    });
+    );
 
 #----------------------------------------------------------------------------
 # Tests
@@ -44,10 +40,10 @@ use_ok("WebGUI::Asset::Shortcut");
 # Test creating a shortcut to snippet
 # plan tests => 2
 my $shortcut
-    = $node->addChild({
+    = WebGUI::Test->asset(
         className           => "WebGUI::Asset::Shortcut",
         shortcutToAssetId   => $snippet->getId,
-    });
+    );
 
 isa_ok(
     $shortcut, "WebGUI::Asset::Shortcut",

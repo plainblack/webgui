@@ -38,7 +38,7 @@ my $class  = 'WebGUI::Asset::Wobject::StoryTopic';
 
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 
-my $archive    = WebGUI::Asset->getDefault($session)->addChild({className => 'WebGUI::Asset::Wobject::StoryArchive', title => 'My Stories', url => '/home/mystories'});
+my $archive    = WebGUI::Test->asset->addChild({className => 'WebGUI::Asset::Wobject::StoryArchive', title => 'My Stories', url => '/home/mystories'});
 
 my $now = time();
 my $nowFolder = $archive->getFolder($now);
@@ -72,7 +72,7 @@ STORY: foreach my $name (@characters) {
 $storyHandler->{bogs}->update({subtitle => 'drinking his food through a straw'});
 
 my $topicTag = WebGUI::VersionTag->getWorking($session);
-my $topic = WebGUI::Asset->getDefault($session)->addChild({
+my $topic = WebGUI::Test->asset->addChild({
     className   => 'WebGUI::Asset::Wobject::StoryTopic',
     title       => 'Popular inmates in Shawshank Prison',
     keywords    => join(',', @inmates),
@@ -364,7 +364,7 @@ cmp_deeply(
 # Regression -- Empty StoryTopics shouldn't blow up
 ################################################################
 
-my $emptyarchive    = WebGUI::Asset->getDefault($session)->addChild({
+my $emptyarchive    = WebGUI::Test->asset->addChild({
     className => 'WebGUI::Asset::Wobject::StoryTopic', 
     title => 'Why Do Good Things Happen To Bad People', 
     url => '/home/badstories', 

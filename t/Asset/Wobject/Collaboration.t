@@ -28,7 +28,7 @@ my @addChildCoda = (undef, undef,
 );
 
 # Do our work in the import node
-my $node = WebGUI::Asset->getImportNode($session);
+my $node = WebGUI::Test->asset;
 
 # grab a named version tag
 my $versionTag = WebGUI::VersionTag->getWorking($session);
@@ -72,6 +72,7 @@ my $props = {
     tagId       => $tag1->getId,
 };
 my $thread = $collab->addChild($props, @addChildCoda);
+$thread->setSkipNotification;
 $tag1->commit;
 addToCleanup($tag1);
 
@@ -86,6 +87,7 @@ $props = {
     tagId       => $tag2->getId,
 };
 my $thread2 = $collab->addChild($props, @addChildCoda);
+$thread2->setSkipNotification;
 $tag2->commit;
 addToCleanup($tag2);
 
@@ -115,6 +117,7 @@ my $thread3 = $collab->addChild({
     className => 'WebGUI::Asset::Post::Thread',
     content => "Again!",
 }, @addChildCoda);
+$thread->setSkipNotification;
 $thread3->commit;
 $collab = $collab->cloneFromDb;
 is $collab->get('threads'), 2, '... added 1 thread';

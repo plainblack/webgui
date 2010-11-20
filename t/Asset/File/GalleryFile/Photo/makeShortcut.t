@@ -24,40 +24,25 @@ use WebGUI::Asset::File::GalleryFile::Photo;
 # Init
 my $session         = WebGUI::Test->session;
 my $node            = WebGUI::Asset->getImportNode($session);
-my $versionTag      = WebGUI::VersionTag->getWorking($session);
-$versionTag->set({name=>"Photo Test"});
-WebGUI::Test->addToCleanup($versionTag);
 my $otherParent
-    = $node->addChild({
+    = WebGUI::Test->asset(
         className           => "WebGUI::Asset::Wobject::Layout",
-    });
+    );
 my $gallery
-    = $node->addChild({
+    = WebGUI::Test->asset(
         className           => "WebGUI::Asset::Wobject::Gallery",
         imageResolutions    => "1600x1200\n1024x768\n800x600\n640x480",
-    });
+    );
 my $album
     = $gallery->addChild({
         className           => "WebGUI::Asset::Wobject::GalleryAlbum",
-    },
-    undef,
-    undef,
-    {
-        skipAutoCommitWorkflows => 1,
     });
 
 my $photo
     = $album->addChild({
         className           => "WebGUI::Asset::File::GalleryFile::Photo",
         userDefined1        => "ORIGINAL",
-    },
-    undef,
-    undef,
-    {
-        skipAutoCommitWorkflows => 1,
     });
-
-$versionTag->commit;
 
 #----------------------------------------------------------------------------
 # Tests

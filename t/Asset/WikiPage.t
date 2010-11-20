@@ -21,18 +21,16 @@ use WebGUI::Asset::WikiPage;
 
 
 my $session = WebGUI::Test->session;
-my $node = WebGUI::Asset->getImportNode($session);
+my $node = WebGUI::Test->asset;
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Wiki Test"});
 WebGUI::Test->addToCleanup($versionTag);
-
-my $wiki = $node->addChild({className=>'WebGUI::Asset::Wobject::WikiMaster', title => 'Wiki Test', url => 'wikitest'});
+my %tag = ( tagId => $versionTag->getId, status => "pending" );
+my $wiki = $node->addChild({className=>'WebGUI::Asset::Wobject::WikiMaster', title => 'Wiki Test', url => 'wikitest',});
 my @autoCommitCoda = (undef, undef, {skipAutoCommitWorkflows => 1, skipNotification => 1});
-$versionTag->commit;
-my $wiki = $wiki->cloneFromDb;
 my $wikipage = $wiki->addChild(
     {className=>'WebGUI::Asset::WikiPage',
-     title    =>'wikipage'},
+     title    =>'wikipage', %tag},
     @autoCommitCoda,
 );
 
@@ -51,8 +49,6 @@ my $wikiPageCopy = $wikipage->duplicate();
 $wikiPageCopy    = $wikiPageCopy->cloneFromDb;
 $wikiPageCopy->update({ title => 'wikipage copy', });
 isa_ok($wikiPageCopy, 'WebGUI::Asset::WikiPage');
-my $thirdVersionTag = WebGUI::VersionTag->new($session,$wikiPageCopy->get("tagId"));
-WebGUI::Test->addToCleanup($thirdVersionTag);
 
 ## isProtected
 

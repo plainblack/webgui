@@ -71,9 +71,6 @@ sub www_dies {
 
 package main;
 
-my $tag = WebGUI::VersionTag->getWorking( $session );
-WebGUI::Test->addToCleanup( $tag );
-
 #----------------------------------------------------------------------------
 # Tests
 
@@ -83,7 +80,7 @@ plan tests => 18;        # Increment this number for each test you create
 # Test dispatch
 
 # Add a TestDispatch asset and test
-my $td  = WebGUI::Asset->getImportNode( $session )->addChild( { 
+my $td  = WebGUI::Test->asset->addChild( { 
     url         => 'testDispatch',
     className   => 'WebGUI::Asset::TestDispatch',
 } );

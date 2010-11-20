@@ -23,7 +23,7 @@ my $session = WebGUI::Test->session;
 # <a class="myAccountLink" href="<tmpl_var account.url>"><tmpl_var account.text></a>
 my $template = addTemplate();
 
-my $homeAsset = WebGUI::Asset->getDefault($session);
+my $homeAsset = WebGUI::Test->asset;
 
 $session->asset($homeAsset);
 
@@ -82,9 +82,7 @@ foreach my $testSet (@testSets) {
 
 sub addTemplate {
 	$session->user({userId=>3});
-	my $importNode = WebGUI::Asset->getImportNode($session);
-	my $versionTag = WebGUI::VersionTag->getWorking($session);
-	$versionTag->set({name=>"a_account test"});
+	my $importNode = WebGUI::Test->asset;
 	my $properties = {
 		title => 'a_account test template',
 		className => 'WebGUI::Asset::Template',
@@ -95,8 +93,6 @@ sub addTemplate {
         usePacked => 1,
 	};
 	my $template = $importNode->addChild($properties, $properties->{id});
-	$versionTag->commit;
-    addToCleanup($versionTag);
 	return $template;
 }
 

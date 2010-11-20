@@ -20,10 +20,7 @@ use Test::More;
 #----------------------------------------------------------------------------
 # Init
 my $session         = WebGUI::Test->session;
-my $node            = WebGUI::Asset->getImportNode($session);
-my $versionTag      = WebGUI::VersionTag->getWorking($session);
-$versionTag->set({name=>"Album Test"});
-WebGUI::Test->addToCleanup($versionTag);
+my $node            = WebGUI::Test->asset;
 my $gallery
     = $node->addChild({
         className           => "WebGUI::Asset::Wobject::Gallery",
@@ -42,15 +39,7 @@ use_ok("WebGUI::Asset::Wobject::GalleryAlbum");
 my $album
     = $gallery->addChild({
         className           => "WebGUI::Asset::Wobject::GalleryAlbum",
-    },
-    undef,
-    undef,
-    {
-        skipAutoCommitWorkflows => 1,
     });
-
-$versionTag->commit;
-WebGUI::Test->addToCleanup($versionTag);
 
 is(
     Scalar::Util::blessed($album), "WebGUI::Asset::Wobject::GalleryAlbum",

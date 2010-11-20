@@ -18,10 +18,7 @@ use DateTime;
 use Data::Dumper;
 
 my $session = WebGUI::Test->session;
-my $temp    = WebGUI::Asset->getTempspace($session);
-
-my $tag = WebGUI::VersionTag->getWorking($session);
-WebGUI::Test::addToCleanup($tag);
+my $temp    = WebGUI::Test->asset;
 
 my $calendar = $temp->addChild(
     {   className => 'WebGUI::Asset::Wobject::Calendar' }

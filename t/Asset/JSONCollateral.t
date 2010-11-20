@@ -48,14 +48,10 @@ WebGUI::Test->addToCleanup(SQL => 'drop table jsonCollateralDummy');
 
 plan tests => 40;
 
-my $asset = WebGUI::Asset->getDefault($session)->addChild({
+my $asset = WebGUI::Test->asset->addChild({
     className => 'WebGUI::Asset::JSONCollateralDummy',
     title     => 'JSON Collateral Test Asset',
 });
-
-my $tag = WebGUI::VersionTag->getWorking($session);
-WebGUI::Test->addToCleanup($tag);
-$tag->commit;
 
 ################################################################
 #

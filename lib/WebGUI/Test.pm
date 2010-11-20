@@ -273,6 +273,26 @@ sub interceptLogging (&) {
 
 #----------------------------------------------------------------------------
 
+=head2 asset ( props )
+
+Create a safe asset to use for testing. Add all your assets to this asset and
+your assets will be automatically cleaned up after the test.
+
+props is a set of name/value pairs for properties for the new asset. defaults
+to adding a layout
+
+=cut
+
+sub asset {
+    my ( $class, %props ) = @_;
+    $props{className} ||= "WebGUI::Asset::Wobject::Layout";
+    my $asset = WebGUI::Asset->getImportNode( $class->session )->addChild( \%props );
+    addToCleanup( $asset );
+    return $asset;
+}
+
+#----------------------------------------------------------------------------
+
 =head2 config
 
 Returns the config object from the session.

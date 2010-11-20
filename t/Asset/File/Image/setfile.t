@@ -21,16 +21,10 @@ use WebGUI::Asset::File::Image;
 #----------------------------------------------------------------------------
 # Init
 my $session         = WebGUI::Test->session;
-my $node            = WebGUI::Asset->getImportNode($session);
-my $versionTag      = WebGUI::VersionTag->getWorking($session);
-WebGUI::Test->addToCleanup($versionTag);
-$versionTag->set({name=>"Image Test"});
-WebGUI::Test->addToCleanup($versionTag);
 my $image
-    = $node->addChild({
+    = WebGUI::Test->asset(
         className           => "WebGUI::Asset::File::Image",
-    });
-$versionTag->commit;
+    );
 
 #----------------------------------------------------------------------------
 # Tests

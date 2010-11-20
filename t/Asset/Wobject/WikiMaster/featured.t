@@ -22,7 +22,7 @@ use WebGUI::Session;
 #----------------------------------------------------------------------------
 # Init
 my $session         = WebGUI::Test->session;
-my $import          = WebGUI::Asset->getImportNode( $session );
+my $import          = WebGUI::Test->asset;
 
 my $wiki
     = $import->addChild( {
@@ -41,8 +41,6 @@ my $featuredPage
         title           => "Escape From Shawshank!",
         content         => 'A how-to book',
     }, undef, undef, { skipAutoCommitWorkflows => 1 } );
-
-WebGUI::Test->addToCleanup( WebGUI::VersionTag->getWorking( $session ) );
 
 #----------------------------------------------------------------------------
 # Tests

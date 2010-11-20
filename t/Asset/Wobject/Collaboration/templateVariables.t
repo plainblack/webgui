@@ -27,8 +27,7 @@ plan tests => 23;        # Increment this number for each test you create
 #----------------------------------------------------------------------------
 # Init
 my $session         = WebGUI::Test->session;
-my @addChildArgs    = ( {skipAutoCommitWorkflows=>1, skipNotification => 1, } );
-my $collab          = WebGUI::Asset->getImportNode( $session )->addChild({
+my $collab          = WebGUI::Test->asset->addChild({
     className        => 'WebGUI::Asset::Wobject::Collaboration',
     threadsPerPage   => 20,
     displayLastReply => 1,
@@ -40,19 +39,19 @@ my @threads = (
         title           => "X - Foo",
         isSticky        => 0,
         ownerUserId     => 1,
-    }, undef, 1, @addChildArgs),
+    }, undef, 1,),
     $collab->addChild( {
         className       => 'WebGUI::Asset::Post::Thread',
         title           => "X - Bar",
         isSticky        => 0,
         ownerUserId     => 3,
-    }, undef, 2, @addChildArgs),
+    }, undef, 2,),
 );
 
-$_->setSkipNotification for @threads; # 100+ messages later...
-my $versionTag = WebGUI::VersionTag->getWorking( $session );
-$versionTag->commit;
-addToCleanup($versionTag);
+for my $t ( @threads ) {
+    $t->setSkipNotification;
+    $t->commit;
+}
 
 my $templateVars;
 my $posts;
@@ -98,18 +97,20 @@ is(  $posts->[0]->{'url'}, $threads[1]->getUrl.'#id'.$threads[1]->getId, 'url ha
 ###################################################################
 
 my @newThreads = ();
+my $vt2 = WebGUI::VersionTag->getWorking($session);
 foreach my $index (1 .. 5) {
     $newThreads[$index] =  $collab->addChild( {
         className       => 'WebGUI::Asset::Post::Thread',
         title           => "X - Bar",
         isSticky        => 0,
         ownerUserId     => 3,
-    }, undef, 2+$index, @addChildArgs);
+        tagId           => $vt2->getId,
+        status          => "pending",
+    }, undef, 2+$index);
     $newThreads[$index]->setSkipNotification;
 }
-my $vt2 = WebGUI::VersionTag->getWorking($session);
 $vt2->commit;
-addToCleanup($versionTag);
+addToCleanup($vt2);
 
 $session->user({userId => 3});
 $templateVars = $collab->getViewTemplateVars();

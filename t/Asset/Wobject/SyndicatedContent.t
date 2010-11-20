@@ -30,12 +30,9 @@ my %var;
 ##          SETUP           ##
 ##############################
 # Do our work in the import node
-my $node = WebGUI::Asset->getImportNode($session);
+my $node = WebGUI::Test->asset;
 
 # Create a version tag to work in
-my $versionTag = WebGUI::VersionTag->getWorking($session);
-$versionTag->set({name=>"SyndicatedContent Test"});
-addToCleanup($versionTag);
 my $syndicated_content = $node->addChild({className=>'WebGUI::Asset::Wobject::SyndicatedContent'});
 
 ##############################

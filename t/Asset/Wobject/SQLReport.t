@@ -35,7 +35,7 @@ plan tests => 4;
 #----------------------------------------------------------------------------
 # put your tests here
 
-my $defaultNode = WebGUI::Asset->getDefault($session);
+my $defaultNode = WebGUI::Test->asset;
 
 my $report = $defaultNode->addChild({
     className     => 'WebGUI::Asset::Wobject::SQLReport',
@@ -43,10 +43,6 @@ my $report = $defaultNode->addChild({
     cacheTimeout  => 50,
     dqQuery1      => 'select * from users',
 });
-
-my $versionTag = WebGUI::VersionTag->getWorking($session);
-$versionTag->commit;
-addToCleanup($versionTag);
 
 isa_ok($report, 'WebGUI::Asset::Wobject::SQLReport');
 

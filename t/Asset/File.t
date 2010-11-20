@@ -53,6 +53,8 @@ my $properties = {
 	title => 'File Asset Test',
 	className => 'WebGUI::Asset::File',
 	url => 'file-asset-test',
+        tagId => $versionTag->getId,
+        status => "pending",
 };
 my $defaultAsset = WebGUI::Asset->getDefault($session);
 my $asset = $defaultAsset->addChild($properties, $properties->{id});
@@ -107,7 +109,7 @@ cmp_deeply(
 #----------------------------------------------------------------------------
 # Add another new revision, changing the privs
 my $newRev  = $asset->addRevision( { ownerUserId => '3', groupIdView => '3' }, time + 5 );
-WebGUI::Test::addToCleanup( WebGUI::VersionTag->getWorking( $session ) );
+addToCleanup( $newRev );
 $privs   = JSON->new->decode( $newRev->getStorageLocation->getFileContentsAsScalar('.wgaccess') );
 cmp_deeply(
     $privs,
@@ -121,7 +123,7 @@ cmp_deeply(
 
 # Add a new revision, changing the privs
 my $newRev  = $asset->addRevision( { groupIdView => '7' }, time + 8 );
-WebGUI::Test::addToCleanup( WebGUI::VersionTag->getWorking( $session ) );
+addToCleanup( $newRev );
 is( $newRev->getStorageLocation->getFileContentsAsScalar('.wgaccess'), undef, "wgaccess doesn't exist" );
 
 ############################################

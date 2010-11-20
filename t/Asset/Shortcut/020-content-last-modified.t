@@ -27,9 +27,6 @@ use WebGUI::Asset::Snippet;
 my $session         = WebGUI::Test->session;
 my $node            = WebGUI::Asset->getImportNode($session);
 
-my $versionTag      = WebGUI::VersionTag->getWorking($session);
-$versionTag->set({name=>"Shortcut Test"});
-WebGUI::Test->addToCleanup($versionTag);
 # Make a snippet to shortcut
 my $now = time();
 my $snippet = $node->addChild({
@@ -42,7 +39,6 @@ my $shortcut = $node->addChild({
                 shortcutToAssetId   => $snippet->getId,
            },
            undef, $now-10);
-$versionTag->commit;
 $session->db->write(q|update assetData set lastModified=? where assetId=?|,[WebGUI::Test->webguiBirthday, $snippet->getId]);
 foreach my $asset ($snippet, $shortcut) {
     $asset = $asset->cloneFromDb;

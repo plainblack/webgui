@@ -29,9 +29,7 @@ use WebGUI::Test::Mechanize;
 #----------------------------------------------------------------------------
 # Init
 my $session         = WebGUI::Test->session;
-my $node            = WebGUI::Asset->getImportNode( $session );
-my $versionTag      = WebGUI::VersionTag->getWorking( $session );
-WebGUI::Test->addToCleanup($versionTag);
+my $node            = WebGUI::Test->asset;
 
 # Override some settings to make things easier to test
 # userFunctionStyleId 
@@ -66,9 +64,7 @@ my $asset
         groupIdEdit     => 3,   # Admins
         styleTemplateId => 'PBtmpl0000000000000132', 
     });
-$versionTag->commit;
 my $assetUrl    = $baseUrl . $asset->get('url');
-WebGUI::Test->addToCleanup($versionTag);
 
 #----------------------------------------------------------------------------
 # Tests

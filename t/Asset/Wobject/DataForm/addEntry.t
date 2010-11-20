@@ -23,11 +23,9 @@ use WebGUI::Session;
 # Init
 my $session = WebGUI::Test->session;
 
-my $df = WebGUI::Asset->getImportNode($session)->addChild( { 
+my $df = WebGUI::Test->asset->addChild( { 
     className => 'WebGUI::Asset::Wobject::DataForm', 
 } );
-
-WebGUI::Test->addToCleanup( WebGUI::VersionTag->getWorking( $session ) );
 
 # Add fields to the dataform
 $df->createField( "name",    { type => "text", } );

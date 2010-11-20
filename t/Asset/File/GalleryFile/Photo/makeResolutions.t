@@ -24,25 +24,16 @@ use WebGUI::Asset::File::GalleryFile::Photo;
 # Init
 my $session         = WebGUI::Test->session;
 my $node            = WebGUI::Asset->getImportNode($session);
-my @versionTags = ();
-push @versionTags, WebGUI::VersionTag->getWorking($session);
-$versionTags[-1]->set({name=>"Photo Test"});
-WebGUI::Test->addToCleanup($versionTags[-1]);
 
 my ($gallery, $album, $photo);
 $gallery
-    = $node->addChild({
+    = WebGUI::Test->asset(
         className           => "WebGUI::Asset::Wobject::Gallery",
         imageResolutions    => "1600\n1024\n800\n640",
-    });
+    );
 $album
     = $gallery->addChild({
         className           => "WebGUI::Asset::Wobject::GalleryAlbum",
-    },
-    undef,
-    undef,
-    {
-        skipAutoCommitWorkflows => 1,
     });
 
 #----------------------------------------------------------------------------
@@ -54,14 +45,7 @@ plan tests => 14;
 $photo
     = $album->addChild({
         className           => "WebGUI::Asset::File::GalleryFile::Photo",
-    },
-    undef,
-    undef,
-    {
-        skipAutoCommitWorkflows => 1,
     });
-$versionTags[-1]->commit;
-WebGUI::Test->addToCleanup($versionTags[-1]);
 $photo->getStorageLocation->addFileFromFilesystem( WebGUI::Test->getTestCollateralPath('page_title.jpg') );
 $photo->update({ filename => 'page_title.jpg' });
 
@@ -91,32 +75,19 @@ TODO: {
 #----------------------------------------------------------------------------
 # Array of resolutions passed to makeResolutions overrides defaults from 
 # parent asset
-push @versionTags, WebGUI::VersionTag->getWorking($session);
-WebGUI::Test->addToCleanup($versionTags[-1]);
 $gallery
-    = $node->addChild({
+    = WebGUI::Test->asset(
         className           => "WebGUI::Asset::Wobject::Gallery",
         imageResolutions    => "1600\n1024\n800\n640",
-    });
+    );
 $album
     = $gallery->addChild({
         className           => "WebGUI::Asset::Wobject::GalleryAlbum",
-    },
-    undef,
-    undef,
-    {
-        skipAutoCommitWorkflows => 1,
     });
 $photo
     = $album->addChild({
         className           => "WebGUI::Asset::File::GalleryFile::Photo",
-    },
-    undef,
-    undef,
-    {
-        skipAutoCommitWorkflows => 1,
     });
-$versionTags[-1]->commit;
 $photo->getStorageLocation->addFileFromFilesystem( WebGUI::Test->getTestCollateralPath('page_title.jpg') );
 $photo->update({ filename => 'page_title.jpg' });
 
@@ -145,18 +116,10 @@ TODO: {
 #----------------------------------------------------------------------------
 # makeResolutions allows API to specify resolutions to make as array reference
 # argument
-push @versionTags, WebGUI::VersionTag->getWorking($session);
-WebGUI::Test->addToCleanup($versionTags[-1]);
 $photo
     = $album->addChild({
         className           => "WebGUI::Asset::File::GalleryFile::Photo",
-    },
-    undef,
-    undef,
-    {
-        skipAutoCommitWorkflows => 1,
     });
-$versionTags[-1]->commit;
 
 $photo->getStorageLocation->addFileFromFilesystem( WebGUI::Test->getTestCollateralPath('page_title.jpg') );
 $photo->update({ filename => 'page_title.jpg' });
@@ -183,18 +146,10 @@ TODO: {
 
 #----------------------------------------------------------------------------
 # makeResolutions throws a warning on an invalid resolution but keeps going
-push @versionTags, WebGUI::VersionTag->getWorking($session);
-WebGUI::Test->addToCleanup($versionTags[-1]);
 $photo
     = $album->addChild({
         className           => "WebGUI::Asset::File::GalleryFile::Photo",
-    },
-    undef,
-    undef,
-    {
-        skipAutoCommitWorkflows => 1,
     });
-$versionTags[-1]->commit;
 $photo->getStorageLocation->addFileFromFilesystem( WebGUI::Test->getTestCollateralPath('page_title.jpg') );
 $photo->update({ filename => 'page_title.jpg' });
 { # localize our signal handler

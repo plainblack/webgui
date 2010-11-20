@@ -20,8 +20,8 @@ use Test::More; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
-my $homeAsset = WebGUI::Asset->getDefault($session);
-my ($versionTag, $asset, @users) = setupTest($session, $homeAsset);
+my $homeAsset = WebGUI::Test->asset;
+my ($asset, @users) = setupTest($session, $homeAsset);
 
 my $i18n = WebGUI::International->new($session,'Macro_EditableToggle');
 
@@ -247,8 +247,6 @@ sub setupTest {
 	my $editGroup = WebGUI::Group->new($session, "new");
 	my $tao = WebGUI::Group->find($session, "Turn Admin On");
 	##Create an asset with specific editing privileges
-	my $versionTag = WebGUI::VersionTag->getWorking($session);
-	$versionTag->set({name=>"EditableToggle test"});
 	my $properties = {
 		title => 'EditableToggle test template',
 		className => 'WebGUI::Asset::Template',
@@ -260,13 +258,12 @@ sub setupTest {
 		id => 'EditableToggleTemplate',
         usePacked => 1,
 	};
-	my $asset = $defaultNode->addChild($properties, $properties->{id});
-	$versionTag->commit;
+	my $asset = WebGUI::Test->asset->addChild($properties, $properties->{id});
 	my @users = map { WebGUI::User->new($session, "new") } 0..2;
 	##User 1 is an editor
 	$users[1]->addToGroups([$editGroup->getId]);
 	##User 2 is an editor AND can turn on Admin
 	$users[2]->addToGroups([$editGroup->getId, $tao->getId]);
-    addToCleanup($versionTag, $editGroup, @users);
-	return ($versionTag, $asset, @users);
+    addToCleanup($editGroup, @users);
+	return ($asset, @users);
 }

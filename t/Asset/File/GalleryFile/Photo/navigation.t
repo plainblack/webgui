@@ -20,30 +20,15 @@ use Test::More;
 # Init
 my $session    = WebGUI::Test->session;
 my $node       = WebGUI::Asset->getImportNode($session);
-my $versionTag = WebGUI::VersionTag->getWorking($session);
-
-$versionTag->set({name=>"Photo Test"});
-
-addToCleanup($versionTag);
 
 # Create gallery and a single album
 my $gallery
-    = $node->addChild({
+    = WebGUI::Test->asset(
         className           => "WebGUI::Asset::Wobject::Gallery",
-    },
-    undef,
-    undef,
-    {
-        skipAutoCommitWorkflows => 1,
-    });
+    );
 my $album
     = $gallery->addChild({
         className           => "WebGUI::Asset::Wobject::GalleryAlbum",
-    },
-    undef,
-    undef,
-    {
-        skipAutoCommitWorkflows => 1,
     });
     
 # Create 5 photos inside the gallery
@@ -54,16 +39,8 @@ for (my $i = 0; $i < 5; $i++)
     $photo[$i]
         = $album->addChild({
             className           => "WebGUI::Asset::File::GalleryFile::Photo",
-        },
-        undef,
-        undef,
-        {
-            skipAutoCommitWorkflows => 1,
         });
 }
-
-# Commit all changes
-$versionTag->commit;
 
 #----------------------------------------------------------------------------
 # Tests

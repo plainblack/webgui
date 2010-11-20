@@ -23,10 +23,7 @@ use Test::More;
 my $maker           = WebGUI::Test::Maker::HTML->new;
 my $session         = WebGUI::Test->session;
 $session->user({ userId => 3 });
-my $node            = WebGUI::Asset->getImportNode($session);
-my $versionTag      = WebGUI::VersionTag->getWorking($session);
-$versionTag->set({name=>"Album Test"});
-WebGUI::Test->addToCleanup($versionTag);
+my $node            = WebGUI::Test->asset;
 my $gallery
     = $node->addChild({
         className           => "WebGUI::Asset::Wobject::Gallery",
@@ -40,18 +37,7 @@ my $album
     = $gallery->addChild({
         className           => "WebGUI::Asset::Wobject::GalleryAlbum",
         ownerUserId         => "3", # Admin
-    },
-    undef,
-    undef,
-    {
-        skipAutoCommitWorkflows => 1,
     });
-
-$versionTag->commit;
-WebGUI::Test->addToCleanup($versionTag);
-foreach my $asset ($gallery, $album) {
-    $asset = $asset->cloneFromDb;
-}
 
 #----------------------------------------------------------------------------
 # Tests

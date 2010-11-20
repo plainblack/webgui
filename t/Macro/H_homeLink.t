@@ -19,10 +19,10 @@ use Test::More; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
-my ($versionTag, $template) = addTemplate();
-WebGUI::Test->addToCleanup($versionTag);
+my ($template) = addTemplate();
 
-my $homeAsset = WebGUI::Asset->getDefault($session);
+my $homeAsset = WebGUI::Test->asset;
+$session->setting->set( 'defaultPage', $homeAsset->getId );
 
 my $i18n = WebGUI::International->new($session,'Macro_H_homeLink');
 
@@ -89,9 +89,7 @@ foreach my $testSet (@testSets) {
 
 sub addTemplate {
 	$session->user({userId=>3});
-	my $importNode = WebGUI::Asset->getImportNode($session);
-	my $versionTag = WebGUI::VersionTag->getWorking($session);
-	$versionTag->set({name=>"H_homeLink test"});
+	my $importNode = WebGUI::Test->asset;
 	my $properties = {
 		title => 'H_homeLink test template',
 		className => 'WebGUI::Asset::Template',
@@ -102,8 +100,7 @@ sub addTemplate {
         usePacked => 1,
 	};
 	my $template = $importNode->addChild($properties, $properties->{id});
-	$versionTag->commit;
-	return ($versionTag, $template);
+	return ($template);
 }
 
 sub simpleHTMLParser {

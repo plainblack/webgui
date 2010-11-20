@@ -24,29 +24,31 @@ use Encode;
 
 my $session = WebGUI::Test->session;
 
-# Do our work in the import node
-my $node = WebGUI::Asset->getImportNode($session);
-
 # Grab a named version tag
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Collab setup"});
+WebGUI::Test->addToCleanup($versionTag);
+my %tag = ( tagId => $versionTag->getId, status => "pending" );
 
 # Need to create a Collaboration system in which the post lives.
 my @addArgs = ( undef, undef, { skipAutoCommitWorkflows => 1, skipNotification => 1 } );
 
-my $notification_template = $node->addChild({
+my $notification_template = WebGUI::Test->asset(
     className => 'WebGUI::Asset::Template',
     template  => "<body>!!!url:<tmpl_var url>!!!content:<tmpl_var content>!!!</body>",
-}, @addArgs);
+    %tag,
+);
 
-my $collab = $node->addChild({
+my $collab = WebGUI::Test->asset(
     className => 'WebGUI::Asset::Wobject::Collaboration',
     notificationTemplateId => $notification_template->getId,
-}, @addArgs);
+    %tag,
+);
 
 # finally, add posts and threads to the collaboration system
 
-my $first_thread = $collab->addChild( { className   => 'WebGUI::Asset::Post::Thread', }, @addArgs);
+my $first_thread = $collab->addChild( { className   => 'WebGUI::Asset::Post::Thread', %tag },);
+$first_thread->setSkipNotification;
 
 ##Thread 1, Post 1 => t1p1
 my $title = "H\x{00E4}ufige Fragen";
@@ -59,13 +61,12 @@ my $t1p1 = $first_thread->addChild(
         title       => $title,
         url         => lc $title,
         content     => $content,
+        %tag,
     },
-    @addArgs
 );
 $t1p1->setSkipNotification;
 
 $versionTag->commit();
-WebGUI::Test->addToCleanup($versionTag);
 
 is $t1p1->get('title'), "H\x{00E4}ufige Fragen", "utf8 in title set correctly";
 is $t1p1->get('url'),   "h\x{00E4}ufige-fragen", "... in url";

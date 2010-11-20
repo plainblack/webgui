@@ -71,7 +71,7 @@ my $versionTag;
 my $creationDateSth = $session->db->prepare('update asset set creationDate=? where assetId=?');
 my @skipAutoCommit  = WebGUI::Test->getAssetSkipCoda;
 
-my $home = WebGUI::Asset->getDefault($session);
+my $home = WebGUI::Test->asset;
 
 $versionTag = WebGUI::VersionTag->getWorking($session);
 my %tag = ( tagId => $versionTag->getId, status => "pending" );
@@ -137,11 +137,11 @@ is($todayFolder->get('styleTemplateId'), $archive->get('styleTemplateId'),  '...
     addToCleanup($arch2);
 
     is $arch2->get('url'),
-        'home/extension-tester.ext',
+        $home->get('url').'/extension-tester.ext',
         'ext added';
 
     is $arch2->getFolderUrl('blah'),
-        'home/extension-tester/blah.ext',
+        $home->get('url').'/extension-tester/blah.ext',
         'folder url: strip extension from parent and add to child';
 
     my $folder = $arch2->getFolder($now);
@@ -709,10 +709,6 @@ WebGUI::Test->addToCleanup($aaa_child);
 WebGUI::Test->addToCleanup($zzz_child);
 
 $archive->update({storiesPerPage => 25, storySortOrder => 'Alphabetically' });
-
-$tag1 = WebGUI::VersionTag->getWorking($session);
-$tag1->commit;
-WebGUI::Test->addToCleanup($tag1);
 
 $templateVars = $archive->viewTemplateVariables();
 

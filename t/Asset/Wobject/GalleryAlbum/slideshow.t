@@ -22,9 +22,7 @@ use WebGUI::Test::Maker::HTML;
 # Init
 my $maker           = WebGUI::Test::Maker::HTML->new;
 my $session         = WebGUI::Test->session;
-my $node            = WebGUI::Asset->getImportNode($session);
-my $versionTag      = WebGUI::VersionTag->getWorking($session);
-$versionTag->set({name=>"Album Test"});
+my $node            = WebGUI::Test->asset;
 my $gallery
     = $node->addChild({
         className           => "WebGUI::Asset::Wobject::Gallery",
@@ -38,11 +36,6 @@ my $album
     = $gallery->addChild({
         className           => "WebGUI::Asset::Wobject::GalleryAlbum",
         ownerUserId         => "3", # Admin
-    },
-    undef,
-    undef,
-    {
-        skipAutoCommitWorkflows => 1,
     });
 my @photos;
 for my $i ( 0 .. 5 ) {
@@ -50,16 +43,8 @@ for my $i ( 0 .. 5 ) {
         = $album->addChild({
             className           => "WebGUI::Asset::File::GalleryFile::Photo",
             filename            => "$i.jpg",
-        },
-        undef,
-        undef,
-        {
-            skipAutoCommitWorkflows => 1,
         });
 }
-
-$versionTag->commit;
-WebGUI::Test->addToCleanup($versionTag);
 
 #----------------------------------------------------------------------------
 # Tests

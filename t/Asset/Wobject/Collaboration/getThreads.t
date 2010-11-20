@@ -22,10 +22,7 @@ use WebGUI::Session;
 #----------------------------------------------------------------------------
 # Init
 my $session         = WebGUI::Test->session;
-my @versionTags     = ( WebGUI::VersionTag->getWorking( $session ) );
-WebGUI::Test->addToCleanup($versionTags[-1]);
-my @addChildArgs    = ( {skipAutoCommitWorkflows=>1} );
-my $collab          = WebGUI::Asset->getImportNode( $session )->addChild({
+my $collab          = WebGUI::Test->asset->addChild({
     className       => 'WebGUI::Asset::Wobject::Collaboration',
     threadsPerPage  => 20,
 });
@@ -36,29 +33,28 @@ my @threads = (
         title           => "X - Foo",
         isSticky        => 0,
         threadRating    => 4,
-    }, undef, 1, @addChildArgs),
+    }, undef, 1, ),
     $collab->addChild( {
         className       => 'WebGUI::Asset::Post::Thread',
         title           => "W - Bar",
         isSticky        => 0,
         threadRating    => 2,
-    }, undef, 2,  @addChildArgs),
+    }, undef, 2, ),
     $collab->addChild( {
         className       => 'WebGUI::Asset::Post::Thread',
         title           => "Z - Baz",
         isSticky        => 1,
         threadRating    => 6,
-    }, undef, 3, @addChildArgs),
+    }, undef, 3, ),
     $collab->addChild( {
         className       => 'WebGUI::Asset::Post::Thread',
         title           => "Y - Shank",
         isSticky        => 1,
         threadRating    => 5,
-    }, undef, 4, @addChildArgs),
+    }, undef, 4, ),
 );
 
 $_->setSkipNotification for @threads; # 100+ messages later...
-$versionTags[-1]->commit;
 
 #----------------------------------------------------------------------------
 # Tests

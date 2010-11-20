@@ -48,7 +48,7 @@ SKIP: {
 
     skip "Unable to load module $class", $tests unless $loaded;
 
-    my $root  = WebGUI::Asset->getRoot($session);
+    my $root  = WebGUI::Test->asset;
     my $shelf = $root->addChild({className => $class});
 
     #######################################################################
@@ -426,7 +426,7 @@ SKIP: {
     #
     #######################################################################
 
-    $shelf2 = WebGUI::Asset->getRoot($session)->addChild({className => $class});
+    $shelf2 = WebGUI::Test->asset->addChild({className => $class});
 
     $pass = 0;
     eval {
@@ -441,11 +441,6 @@ SKIP: {
 
     $shelf2->purge;
     undef $shelf2;
-
-    ##Clear out this tag so we can do downstream work.
-    my $tag = WebGUI::VersionTag->getWorking($session);
-    $tag->commit;
-    WebGUI::Test->addToCleanup($tag);
 
     #######################################################################
     #
@@ -468,9 +463,6 @@ SKIP: {
         className  => $class,
         templateId => $testTemplate->getId,
     });
-    my $tag2 = WebGUI::VersionTag->getWorking($session);
-    WebGUI::Test->addToCleanup($tag2);
-    $tag2->commit;
     $session->user({userId => 1});
     $testShelf->prepareView;
     my $json = $testShelf->view;
@@ -483,10 +475,6 @@ SKIP: {
         groupIdView => $inGroup->getId,
         title       => 'Private Product',
     });
-    my $tag3 = WebGUI::VersionTag->getWorking($session);
-    WebGUI::Test->addToCleanup($tag3);
-    $tag3->commit;
-
     $session->user({user => $tommy});
     $testShelf->prepareView;
     $json = $testShelf->view;

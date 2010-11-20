@@ -64,8 +64,7 @@ my $session = WebGUI::Test->session;
 
 my $privilege = $session->privilege;
 
-my ($versionTag, $userTemplate) = setup_assets($session);
-WebGUI::Test->addToCleanup($versionTag);
+my ($userTemplate) = setup_assets($session);
 
 isa_ok($privilege, 'WebGUI::Session::Privilege', 'session has correct object type');
 
@@ -117,9 +116,7 @@ is($output, WebGUI::Operation::Auth::www_auth($session, "init"), 'noAccess: visi
 
 sub setup_assets {
 	my $session = shift;
-	my $importNode = WebGUI::Asset->getImportNode($session);
-	my $versionTag = WebGUI::VersionTag->getWorking($session);
-	$versionTag->set({name=>"Session Style test"});
+	my $importNode = WebGUI::Test->asset;
 	my $properties = {
 		title => 'user template for printing',
 		className => 'WebGUI::Asset::Template',
@@ -131,7 +128,7 @@ sub setup_assets {
 		#     '1234567890123456789012'
 	};
 	my $userTemplate = $importNode->addChild($properties, $properties->{id});
-	return ($versionTag, $userTemplate);
+	return ($userTemplate);
 }
 
 #vim:ft=perl

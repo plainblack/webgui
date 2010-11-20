@@ -26,16 +26,14 @@ my $node = WebGUI::Asset->getImportNode($session);
 # Grab a named version tag
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Collab setup"});
-
-# Need to create a Collaboration system in which the post lives.
-my @addArgs = ( undef, undef, { skipAutoCommitWorkflows => 1, skipNotification => 1 } );
+my %tag = ( tagId => $versionTag->getId, status => "pending" );
 
 my $collab = $node->addChild(
     {
         className => 'WebGUI::Asset::Wobject::Collaboration',
         title     => 'Test Collaboration',
+        %tag,
     },
-    @addArgs
 );
 
 # finally, add posts and threads to the collaboration system
@@ -44,18 +42,20 @@ my $first_thread = $collab->addChild(
     {
         className   => 'WebGUI::Asset::Post::Thread',
         title       => 'Test Thread',
+        %tag,
     },
-    @addArgs
 );
+$first_thread->setSkipNotification;
 
 ##Thread 1, Post 1 => t1p1
 my $t1p1 = $first_thread->addChild(
     {
         className   => 'WebGUI::Asset::Post',
         title       => 'Test Post',
+        %tag,
     },
-    @addArgs
 );
+$t1p1->setSkipNotification;
 
 $versionTag->commit();
 WebGUI::Test->addToCleanup($versionTag);

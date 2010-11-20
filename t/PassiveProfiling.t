@@ -28,10 +28,8 @@ plan tests => 1 + $numTests;
 
 my $loaded = use_ok('WebGUI::PassiveProfiling');
 
-my $versionTag = WebGUI::VersionTag->getWorking($session);
 WebGUI::Test->addToCleanup(SQL => ['delete from passiveProfileLog where dateOfEntry >= ?', $startingTime-1]);
-WebGUI::Test->addToCleanup($versionTag);
-my $home = WebGUI::Asset->getDefault($session);
+my $home = WebGUI::Test->asset;
 
 my $pageProperties = {
 	#            '1234567890123456789012'
@@ -59,8 +57,6 @@ $snippetProperties->{title}++;
 $snippetProperties->{url}++;
 
 my $snippet2 = $page->addChild($snippetProperties, $snippetProperties->{id});
-
-$versionTag->commit;
 
 SKIP: {
 

@@ -381,8 +381,7 @@ TODO: {
 #
 #######################################################################
 
-my $versionTag = WebGUI::VersionTag->getWorking($session);
-my $node    = WebGUI::Asset->getImportNode($session);
+my $node    = WebGUI::Test->asset;
 my $widget  = $node->addChild({
     className          => 'WebGUI::Asset::Sku::Product',
     title              => 'Test product for cart template variables in the Product',
@@ -396,15 +395,11 @@ my $blue_widget  = $widget->setCollateral('variantsJSON', 'variantId', 'new',
     }
 );
 
-$versionTag->commit;
-
-$widget = $widget->cloneFromDb;
-
 my $credited_user = WebGUI::User->create($session);
 $session->user({user => $credited_user});
 
 my $cart = WebGUI::Shop::Cart->newBySession($session);
-WebGUI::Test->addToCleanup($versionTag, $cart, $credited_user);
+WebGUI::Test->addToCleanup($cart, $credited_user);
 my $addressBook = $cart->getAddressBook;
 my $workAddress = $addressBook->addAddress({
     label => 'work',

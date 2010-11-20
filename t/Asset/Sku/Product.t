@@ -41,10 +41,10 @@ plan tests => 19;        # Increment this number for each test you create
 # put your tests here
 my $node = WebGUI::Asset->getRoot($session);
 
-my $product = $node->addChild({
+my $product = WebGUI::Test->asset(
     className => "WebGUI::Asset::Sku::Product",
     title     => "Rock Hammer",
-});
+);
 
 is($product->getThumbnailUrl(), '', 'Product with no image1 property returns the empty string');
 
@@ -59,12 +59,12 @@ WebGUI::Test->addToCleanup($image);
 $image->addFileFromFilesystem(WebGUI::Test->getTestCollateralPath('lamp.jpg'));
 $image->generateThumbnail('lamp.jpg');
 
-my $imagedProduct = $node->addChild({
+my $imagedProduct = WebGUI::Test->asset(
     className          => "WebGUI::Asset::Sku::Product",
     title              => "Bible",
     image1             => $image->getId,
     isShippingRequired => 1,
-});
+);
 
 ok($imagedProduct->getThumbnailUrl(), 'getThumbnailUrl is not empty');
 is($imagedProduct->getThumbnailUrl(), $image->getThumbnailUrl('lamp.jpg'), 'getThumbnailUrl returns the right path to the URL');
@@ -114,24 +114,16 @@ cmp_deeply(
     '... form only has 1 variant, since the other one has 0 quantity'
 );
 
-my $tag = WebGUI::VersionTag->getWorking($session);
-$tag->commit;
-WebGUI::Test->addToCleanup($tag);
-
 ####################################################
 #
 # addRevision
 #
 ####################################################
 
-sleep 2;
-my $newImagedProduct = $imagedProduct->addRevision({title => 'Bible and hammer'});
+my $newImagedProduct = $imagedProduct->addRevision({title => 'Bible and hammer'},time+2);
 
 like($newImagedProduct->get('image1'), $session->id->getValidator, 'addRevision: new product rev got an image1 storage location');
 isnt($newImagedProduct->get('image1'), $imagedProduct->get('image1'), '... and it is not the same as the old one');
-
-WebGUI::Test->addToCleanup(WebGUI::VersionTag->getWorking($session));
-WebGUI::VersionTag->getWorking($session)->commit;
 
 ####################################################
 #
@@ -139,7 +131,7 @@ WebGUI::VersionTag->getWorking($session)->commit;
 #
 ####################################################
 
-my $jsonTemplate = $node->addChild({
+my $jsonTemplate = WebGUI::Test->asset(
     className => 'WebGUI::Asset::Template',
     title     => 'JSON template for Product testing',
     template  => q|
@@ -152,25 +144,18 @@ my $jsonTemplate = $node->addChild({
     "manual_url"   :"<tmpl_var manual_url>"
 }
 |,
-});
+);
 
 my @storages = map { WebGUI::Storage->create($session) } 0..2;
 
-my $viewProduct = $node->addChild({
+my $viewProduct = WebGUI::Test->asset(
     className  => 'WebGUI::Asset::Sku::Product',
     title      => 'View Product for template variable tests',
     templateId => $jsonTemplate->getId,
     brochure   => $storages[0]->getId,
     warranty   => $storages[1]->getId,
     manual     => $storages[2]->getId,
-});
-
-my $tag2 = WebGUI::VersionTag->getWorking($session);
-$tag2->commit;
-WebGUI::Test->addToCleanup($tag2);
-
-##Fetch a copy from the db, just like a page fetch
-$viewProduct = WebGUI::Asset->newById($session, $viewProduct->getId);
+);
 
 $viewProduct->prepareView();
 my $json = $viewProduct->view();

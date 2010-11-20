@@ -22,7 +22,7 @@ use Data::Dumper;
 my $session = WebGUI::Test->session;
 
 # put your tests here
-my $home = WebGUI::Asset->getDefault($session);
+my $home = WebGUI::Test->asset;
 
 isa_ok($home, "WebGUI::Asset");
 my $keyword = WebGUI::Keyword->new($session);
@@ -66,10 +66,6 @@ my $snippet = $home->addChild({
     keywords  => 'webgui',
 });
 
-my $tag = WebGUI::VersionTag->getWorking($session);
-WebGUI::Test->addToCleanup($tag);
-$tag->commit;
-
 my $assetIds = $keyword->getMatchingAssets({ keyword => 'webgui', });
 
 cmp_deeply(
@@ -81,7 +77,6 @@ cmp_deeply(
 # sorted by title, alphabetically
 
 my $aa_story = $home->addChild({ className => 'WebGUI::Asset::Snippet', title => "aaaa", keywords => 'webgui' });
-WebGUI::Test->addToCleanup($aa_story);
 
 $assetIds = $keyword->getMatchingAssets({ keyword => 'webgui', sortOrder => 'Alphabetically', });
 

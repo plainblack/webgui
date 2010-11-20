@@ -25,15 +25,12 @@ my $session         = WebGUI::Test->session;
 my ( $db ) = $session->quick(qw{ db });
 
 # Create an article to index
-my $article         = WebGUI::Asset->getImportNode( $session )->addChild( {
+my $article         = WebGUI::Test->asset->addChild( {
     className       => 'WebGUI::Asset::Wobject::Article',
     keywords        => 'keyword1,keyword2',
     title           => 'title',
     menuTitle       => 'menuTitle',
 } );
-WebGUI::Test->addToCleanup(
-    WebGUI::VersionTag->getWorking( $session ),
-);
 
 #----------------------------------------------------------------------------
 # Tests

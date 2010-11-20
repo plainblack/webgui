@@ -52,15 +52,13 @@ $mock->fake_module('WebGUI::Asset::DummyComments', '__DUMMY__DUMMY__' => sub {},
 #----------------------------------------------------------------------------
 # put your tests here
 
-my $dummy = WebGUI::Asset->getDefault($session)->addChild({
+my $dummy = WebGUI::Test->asset->addChild({
     className   => 'WebGUI::Asset::DummyComments',
     url         => '/home/shawshank',
     title       => 'Dummy Title',
     synopsis    => 'Dummy Synopsis',
     description => 'Dummy Description',
 });
-my $tag = WebGUI::VersionTag->getWorking($session);
-addToCleanup($tag);
 
 ok $dummy->does('WebGUI::Role::Asset::Comments'), 'dummy object does the right role';
 $dummy->comments([{ television => 'drop', misdemeanor => 'felony', }]);

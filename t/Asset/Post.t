@@ -31,15 +31,11 @@ my $session = WebGUI::Test->session;
 my $node = WebGUI::Asset->getImportNode($session);
 
 # Grab a named version tag
-my $versionTag = WebGUI::VersionTag->getWorking($session);
-$versionTag->set({name=>"Collab setup"});
 
 # Need to create a Collaboration system in which the post lives.
 my @addArgs = ( undef, undef, { skipAutoCommitWorkflows => 1, skipNotification => 1 } );
 
-my $collab = $node->addChild({className => 'WebGUI::Asset::Wobject::Collaboration', editTimeout => '1'}, @addArgs);
-
-# The Collaboration system must be committed before a post can be made.
+my $collab = WebGUI::Test->asset->addChild({className => 'WebGUI::Asset::Wobject::Collaboration', editTimeout => '1'}, @addArgs);
 
 # Need to do $post->canEdit tests, which test group membership. Therefore,
 # create three users and a group for the process. One user will be doing the
@@ -81,10 +77,6 @@ my $props = {
 
 my $post = $collab->addChild($props, @addArgs);
 
-$versionTag->commit();
-WebGUI::Test->addToCleanup($versionTag);
-$post = $post->cloneFromDb;
-
 # Test for a sane object type
 isa_ok($post, 'WebGUI::Asset::Post::Thread');
 
@@ -97,7 +89,6 @@ isa_ok($post, 'WebGUI::Asset::Post::Thread');
 # so for the test that's supposed to pass (for $otherUser, who's in
 # $groupToEditPost), we need to change the session user a second time. The same
 # applies for $groupIdEditUser, for a total of three user changes.
-sleep 1;
 
 ok(!$post->canEdit(), "Posting user can't edit after editTime has passed");
 
@@ -136,7 +127,6 @@ is($synopsis, q|less than < greater than >|, '... HTML entities decoded by HTML:
 #
 ######################################################################
 
-my $versionTag2 = WebGUI::VersionTag->getWorking($session);
 my $post1 = $collab->addChild({
     className   => 'WebGUI::Asset::Post::Thread',
     content     => 'hello, world!',
@@ -147,8 +137,6 @@ my $post2 = $collab->addChild({
     content     => 'hello, world!',
     ownerUserId => 1,
 }, @addArgs);
-$versionTag2->commit();
-WebGUI::Test->addToCleanup($versionTag);
 my $variables;
 $session->user({userId => 1});
 $variables = $post1->getTemplateVars();

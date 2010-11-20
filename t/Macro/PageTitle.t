@@ -24,10 +24,7 @@ my $numTests = 7;
 
 plan tests => $numTests;
 
-my $homeAsset = WebGUI::Asset->getDefault($session);
-
-my $versionTag = WebGUI::VersionTag->getWorking($session);
-$versionTag->set({name=>"PageTitle macro test"});
+my $homeAsset = WebGUI::Test->asset;
 
 # Create a new snippet and set it's title then check it against the macros output
 my $snippetTitle = "Roy's Incredible Snippet of Mystery and Intrique";
@@ -38,9 +35,6 @@ my $snippet = $homeAsset->addChild({
                         groupIdView=>7,
                         groupIdEdit=>3,
                         });
-
-$versionTag->commit;
-addToCleanup($versionTag);
 
 is(
 	WebGUI::Macro::PageTitle::process($session),

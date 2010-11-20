@@ -40,30 +40,30 @@ my $first_thread = $collab->addChild(
     { className   => 'WebGUI::Asset::Post::Thread', %tag },
     undef, 
     WebGUI::Test->webguiBirthday, 
-    { skipAutoCommitWorkflows => 1, skipNotification => 1 }
 );
+$first_thread->setSkipNotification;
 
 my $second_thread = $collab->addChild(
     { className   => 'WebGUI::Asset::Post::Thread', %tag },
     undef, 
     WebGUI::Test->webguiBirthday, 
-    { skipAutoCommitWorkflows => 1, skipNotification => 1 }
 );
+$second_thread->setSkipNotification;
 
 ##Thread 1, Post 1 => t1p1
 my $t1p1 = $first_thread->addChild(
     { className   => 'WebGUI::Asset::Post', %tag },
     undef, 
     WebGUI::Test->webguiBirthday, 
-    { skipAutoCommitWorkflows => 1, skipNotification => 1 }
 );
+$t1p1->setSkipNotification;
 
 my $t1p2 = $first_thread->addChild(
     { className   => 'WebGUI::Asset::Post', %tag },
     undef, 
     WebGUI::Test->webguiBirthday + 1, 
-    { skipAutoCommitWorkflows => 1, skipNotification => 1 }
 );
+$t1p2->setSkipNotification;
 
 my $past = time()-15;
 
@@ -71,15 +71,13 @@ my $t2p1 = $second_thread->addChild(
     { className   => 'WebGUI::Asset::Post', %tag },
     undef, 
     $past, 
-    { skipAutoCommitWorkflows => 1, skipNotification => 1 }
 );
+$t2p1->setSkipNotification;
 
 my $t2p2 = $second_thread->addChild(
     { className   => 'WebGUI::Asset::Post', %tag },
-    undef, 
-    undef, 
-    { skipAutoCommitWorkflows => 1, skipNotification => 1 }
 );
+$t2p2->setSkipNotification;
 
 $versionTag->commit();
 WebGUI::Test->addToCleanup($versionTag);

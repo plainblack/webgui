@@ -24,8 +24,6 @@ plan skip_all => 'set WEBGUI_LIVE to enable this test' unless $ENV{WEBGUI_LIVE};
 #----------------------------------------------------------------------------
 # Init
 my $session         = WebGUI::Test->session;
-my $node            = WebGUI::Asset->getImportNode( $session );
-my @versionTags     = ( WebGUI::VersionTag->getWorking( $session ) );
 
 # Override some settings to make things easier to test
 # userFunctionStyleId 
@@ -55,13 +53,13 @@ my $testContent     = "Perhaps if you've gone this far, you'd be willing to go f
 my $snippetUrl      = time . "zejuatenejo";
 my $redirectToUrl   = $snippetUrl . "?name=value";
 my $redirectToAsset 
-    = $node->addChild({ 
+    = WebGUI::Test->asset(
         className       => 'WebGUI::Asset::Snippet', 
         url             => $snippetUrl,
         snippet         => $testContent,
-    });
-$versionTags[-1]->commit;
-WebGUI::Test->addToCleanup($versionTags[-1]);
+    );
+
+my $count = time;   # A known count for url uniqueness
 
 #----------------------------------------------------------------------------
 # Tests
@@ -79,18 +77,15 @@ plan tests => 12;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # Test operation with a public Redirect
-push @versionTags, WebGUI::VersionTag->getWorking( $session );
-WebGUI::Test->addToCleanup($versionTags[-1]);
 $redirect       
-    = $node->addChild({
+    = WebGUI::Test->asset(
         className       => 'WebGUI::Asset::Redirect',
         redirectUrl     => $redirectToUrl,
-        url             => $redirectUrl . scalar(@versionTags),
-    });
-$versionTags[-1]->commit;
+        url             => $redirectUrl . $count++,
+    );
 
 $mech   = Test::WWW::Mechanize->new;
-$mech->get_ok( $baseUrl . $redirectUrl . scalar(@versionTags), "We get the redirect" );
+$mech->get_ok( $baseUrl . $redirectUrl . $count, "We get the redirect" );
 $mech->content_contains( $testContent, "We made it to the snippet" );
 
 $response = $mech->res->previous;
@@ -103,20 +98,17 @@ is(
 
 #----------------------------------------------------------------------------
 # Test operation with a private Redirect through a login
-push @versionTags, WebGUI::VersionTag->getWorking( $session );
-WebGUI::Test->addToCleanup($versionTags[-1]);
 $redirect
-    = $node->addChild({
+    = WebGUI::Test->asset(
         className       => 'WebGUI::Asset::Redirect',
         redirectUrl     => $redirectToUrl,
-        url             => $redirectUrl . scalar(@versionTags),
+        url             => $redirectUrl . $count++,
         groupIdView     => 2,
         groupIdEdit     => 3,
-    });
-$versionTags[-1]->commit;
+    );
 
 $mech       = Test::WWW::Mechanize->new;
-$mech->get( $baseUrl . $redirectUrl . scalar(@versionTags) ); 
+$mech->get( $baseUrl . $redirectUrl . $count ); 
 $mech->submit_form_ok( {
     with_fields     => {
         username        => $user->username,
@@ -137,22 +129,19 @@ is(
 #----------------------------------------------------------------------------
 # Test operation with a private Redirect through a login with translate 
 # query params
-push @versionTags, WebGUI::VersionTag->getWorking( $session );
-WebGUI::Test->addToCleanup($versionTags[-1]);
 $redirect
-    = $node->addChild({
+    = WebGUI::Test->asset(
         className           => 'WebGUI::Asset::Redirect',
         redirectUrl         => $redirectToUrl,
-        url                 => $redirectUrl . scalar(@versionTags),
+        url                 => $redirectUrl . $count++,
         groupIdView         => 2,
         groupIdEdit         => 3,
         forwardQueryParams  => 1,
-    });
-$versionTags[-1]->commit;
+    );
 
 my $extraParams = 'extra=hi';
 $mech       = Test::WWW::Mechanize->new;
-$mech->get( $baseUrl . $redirectUrl . scalar(@versionTags) . '?' . $extraParams ); 
+$mech->get( $baseUrl . $redirectUrl . $count . '?' . $extraParams ); 
 $mech->submit_form_ok( {
     with_fields     => {
         username        => $user->username,

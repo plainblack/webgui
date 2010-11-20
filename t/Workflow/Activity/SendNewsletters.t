@@ -39,8 +39,7 @@ $sendmock->fake_module('WebGUI::Mail::Send',
 );
 
 ##Create Assets;
-my $home = WebGUI::Asset->getDefault($session);
-my $versionTag = WebGUI::VersionTag->getWorking($session);
+my $home = WebGUI::Test->asset;
 
                  #1234567890123456789012#
 my $templateId = 'NEWSLETTER_TEMPLATE___';
@@ -65,10 +64,9 @@ my $thread = $cs->addChild({
     title     => 'Test Thread',
     content   => 'This is the content',
     synopsis  => 'This is the synopsis',
-}, undef, undef, {skipAutoCommitWorkflows => 1,});
-
-$versionTag->commit;
-WebGUI::Test->addToCleanup($versionTag);
+},);
+$thread->setSkipNotification;
+$thread->commit;
 
 ##Setup metadata
 $session->setting->set('metaDataEnabled', 1);

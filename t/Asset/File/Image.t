@@ -51,9 +51,6 @@ cmp_bag($storage->getFiles, ['blue.png'], 'Only 1 file in storage with correct n
 ##Initialize an Image Asset with that filename and storage location
 
 $session->user({userId=>3});
-my $versionTag = WebGUI::VersionTag->getWorking($session);
-WebGUI::Test->addToCleanup($versionTag);
-$versionTag->set({name=>"Image Asset test"});
 my $properties = {
 	#            '1234567890123456789012'
 	id        => 'ImageAssetTest00000001',
@@ -61,7 +58,7 @@ my $properties = {
 	className => 'WebGUI::Asset::File::Image',
 	url       => 'image-asset-test',
 };
-my $defaultAsset = WebGUI::Asset->getDefault($session);
+my $defaultAsset = WebGUI::Test->asset();
 my $asset = $defaultAsset->addChild($properties, $properties->{id});
 
 ok($asset->getStorageLocation, 'Image Asset getStorageLocation initialized');
@@ -118,8 +115,6 @@ $asset->update({
     like($templateVars->{parameters}, qr{ id="[^"]{22}"}, 'id in parameters is quoted');
     like($templateVars->{parameters}, qr{alt="alternate"}, 'original parameters included');
 }
-
-$versionTag->commit;
 
 done_testing();
 

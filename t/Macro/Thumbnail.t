@@ -46,8 +46,6 @@ cmp_bag($storage->getFiles, ['square.png'], 'Only 1 file in storage with correct
 ##Initialize an Image Asset with that filename and storage location
 
 $session->user({userId=>3});
-my $versionTag = WebGUI::VersionTag->getWorking($session);
-$versionTag->set({name=>"Thumbnail macro test"});
 my $properties = {
 	#     '1234567890123456789012'
 	id => 'ThumbnailAsset00000001',
@@ -55,7 +53,7 @@ my $properties = {
 	className => 'WebGUI::Asset::File::Image',
 	url => 'thumbnail-test',
 };
-my $defaultAsset = WebGUI::Asset->getDefault($session);
+my $defaultAsset = WebGUI::Test->asset;
 $session->asset($defaultAsset);
 my $asset = $defaultAsset->addChild($properties, $properties->{id});
 $asset->update({
@@ -64,9 +62,6 @@ $asset->update({
 });
 
 $asset->generateThumbnail();
-
-$versionTag->commit;
-addToCleanup($versionTag);
 
 
 ##Call the Thumbnail Macro with that Asset's URL and see if it returns

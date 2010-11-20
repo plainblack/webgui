@@ -24,7 +24,7 @@ use Data::Dumper;
 my $session = WebGUI::Test->session;
 
 # Do our work in the import node
-my $node = WebGUI::Asset->getImportNode($session);
+my $node = WebGUI::Test->asset;
 
 my $templateId = 'THING_EDIT_TEMPLATE___';
 my $templateMock = WebGUI::Test::MockAsset->new('WebGUI::Asset::Template');
@@ -32,9 +32,6 @@ $templateMock->mock_id($templateId);
 my $templateVars;
 $templateMock->mock('process', sub { $templateVars = $_[1]; } );
 
-my $versionTag = WebGUI::VersionTag->getWorking($session);
-$versionTag->set({name=>"Thingy Test"});
-WebGUI::Test->addToCleanup($versionTag);
 my $thingy = $node->addChild({className=>'WebGUI::Asset::Wobject::Thingy'});
 
 # Test for a sane object type

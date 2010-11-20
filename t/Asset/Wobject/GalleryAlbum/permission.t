@@ -21,16 +21,13 @@ use WebGUI::Test::Maker::Permission;
 # Init
 my $maker           = WebGUI::Test::Maker::Permission->new;
 my $session         = WebGUI::Test->session;
-my $node            = WebGUI::Asset->getImportNode($session);
+my $node            = WebGUI::Test->asset;
 
 my %user;
 $user{"2"}          = WebGUI::User->new( $session, "new" );
 $user{"2"}->addToGroups( ['2'] ); # Registered user
 WebGUI::Test->addToCleanup($user{'2'});
 
-my $versionTag      = WebGUI::VersionTag->getWorking($session);
-$versionTag->set({name=>"Album Test"});
-addToCleanup($versionTag);
 my $gallery
     = $node->addChild({
         className           => "WebGUI::Asset::Wobject::Gallery",
@@ -44,14 +41,7 @@ my $album
     = $gallery->addChild({
         className           => "WebGUI::Asset::Wobject::GalleryAlbum",
         ownerUserId         => "3", # Admin
-    },
-    undef,
-    undef,
-    {
-        skipAutoCommitWorkflows => 1,
     });
-
-$versionTag->commit;
 
 #----------------------------------------------------------------------------
 # Tests

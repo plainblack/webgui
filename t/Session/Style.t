@@ -175,8 +175,7 @@ is($macroOutput, 1, 'generateAdditionalHeadTags: process a macro');
 #
 ####################################################
 
-my ($versionTag, $templates, $article, $snippet) = setup_assets($session);
-WebGUI::Test->addToCleanup($versionTag);
+my ($templates, $article, $snippet) = setup_assets($session);
 
 $style->sent(0);
 is($style->sent, 0, 'process: setup sent to 0');
@@ -463,9 +462,7 @@ sub sendImmediate {
 #like($buffer, qr/$output/, );
 sub setup_assets {
 	my $session = shift;
-	my $importNode = WebGUI::Asset->getImportNode($session);
-	my $versionTag = WebGUI::VersionTag->getWorking($session);
-	$versionTag->set({name=>"Session Style test"});
+	my $importNode = WebGUI::Test->asset;
 	my $templates = {};
 	my $properties = {
 		title => 'personal style test template',
@@ -541,7 +538,7 @@ sub setup_assets {
 		#     '1234567890123456789012'
 		snippet => 'I am a snippet',
 	};
-	my $daddySnippet = WebGUI::Asset->getRoot($session)->addChild($properties, $properties->{id});
+	my $daddySnippet = WebGUI::Test->asset->addChild($properties, $properties->{id});
 	$properties = {
 		title => 'My Snippet',
 		className => 'WebGUI::Asset::Snippet',
@@ -551,7 +548,5 @@ sub setup_assets {
 		snippet => 'I am a snippet',
 	};
 	my $snippet = $daddySnippet->addChild($properties, $properties->{id});
-	$versionTag->commit;
-    WebGUI::Test->addToCleanup($versionTag);
-	return ($versionTag, $templates, $asset, $snippet);
+	return ($templates, $asset, $snippet);
 }

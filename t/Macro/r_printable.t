@@ -21,7 +21,7 @@ use HTML::TokeParser;
 
 my $session = WebGUI::Test->session;
 
-my $homeAsset = WebGUI::Asset->getDefault($session);
+my $homeAsset = WebGUI::Test->asset;
 $session->asset($homeAsset);
 my $template = setupTest($session, $homeAsset);
 
@@ -109,8 +109,6 @@ foreach my $testSet (@testSets) {
 sub setupTest {
 	my ($session, $defaultNode) = @_;
 
-	my $versionTag = WebGUI::VersionTag->getWorking($session);
-	$versionTag->set({name=>"r_printable test"});
 	my $properties = {
 		title => 'printable test template',
 		className => 'WebGUI::Asset::Template',
@@ -122,8 +120,6 @@ sub setupTest {
         usePacked => 1,
 	};
 	my $asset = $defaultNode->addChild($properties, $properties->{id});
-	$versionTag->commit;
-    addToCleanup($versionTag);
 
 	return $asset;
 }

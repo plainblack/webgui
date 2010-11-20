@@ -25,7 +25,7 @@ use WebGUI::Session;
 # Init
 my $session = WebGUI::Test->session;
 
-my $df = WebGUI::Asset->getImportNode($session)->addChild( { 
+my $df = WebGUI::Test->asset->addChild( { 
     className   => 'WebGUI::Asset::Wobject::DataForm', 
     defaultview => 0,
     templateId  => 'PBtmpl0000000000000141',
@@ -34,12 +34,6 @@ my $df = WebGUI::Asset->getImportNode($session)->addChild( {
 # Add fields to the dataform
 $df->createField( "bigName",      { type => "textarea", isHidden => 0, } );
 $df->createField( "messageCount", { type => "integer",  isHidden => 0, } );
-
-my $tag = WebGUI::VersionTag->getWorking( $session );
-WebGUI::Test->addToCleanup( $tag );
-$tag->commit;
-
-$df = $df->cloneFromDb;
 
 #----------------------------------------------------------------------------
 # Tests

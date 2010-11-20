@@ -27,7 +27,7 @@ my $bday     = WebGUI::DateTime->new($session, WebGUI::Test->webguiBirthday)->cl
 my $now      = WebGUI::DateTime->new($session, time())->cloneToUserTimeZone;
 my $tz       = $session->datetime->getTimeZone();
 
-my $root = WebGUI::Asset->getRoot($session);
+my $root = WebGUI::Test->asset;
 my $calendar = $root->addChild({
     className => 'WebGUI::Asset::Wobject::Calendar',
     title     => 'Test Calendar',
@@ -38,7 +38,7 @@ my $wgBday = $calendar->addChild({
     startDate   => $bday->toDatabaseDate,
     endDate     => $bday->toDatabaseDate,
     timeZone    => $tz,
-}, undef, undef, {skipAutoCommitWorkflows => 1});
+});
 
 my $wrongBday = $calendar->addChild({
     className => 'WebGUI::Asset::Event',
@@ -46,12 +46,12 @@ my $wrongBday = $calendar->addChild({
     startDate   => $bday->toDatabaseDate,
     endDate     => $bday->toDatabaseDate,
     timeZone    => $tz,
-}, undef, time()-5, {skipAutoCommitWorkflows => 1});
+}, undef, time()-5);
 
 $wrongBday->addRevision({
     startDate   => $now->toDatabaseDate,
     endDate     => $now->toDatabaseDate,
-}, undef, undef, {skipAutoCommitWorkflows => 1});
+},);
 
 my $nowEvent = $calendar->addChild({
     className => 'WebGUI::Asset::Event',
@@ -59,11 +59,7 @@ my $nowEvent = $calendar->addChild({
     startDate   => $now->toDatabaseDate,
     endDate     => $now->toDatabaseDate,
     timeZone    => $tz,
-}, undef, undef, {skipAutoCommitWorkflows => 1});
-
-my $tag = WebGUI::VersionTag->getWorking($session);
-$tag->commit;
-WebGUI::Test->addToCleanup($tag);
+}, );
 
 my $workflow  = WebGUI::Workflow->create($session,
     {

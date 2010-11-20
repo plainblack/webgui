@@ -19,7 +19,7 @@ use Test::More; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
-my $homeAsset = WebGUI::Asset->getDefault($session);
+my $homeAsset = WebGUI::Test->asset;
 $session->asset($homeAsset);
 my $template = setupTest($session, $homeAsset);
 $session->user({userId=>1});
@@ -197,8 +197,6 @@ sub setupTest {
 	my ($session, $defaultNode) = @_;
 	$session->user({userId=>3});
 	##Create an asset with specific editing privileges
-	my $versionTag = WebGUI::VersionTag->getWorking($session);
-	$versionTag->set({name=>"L_loginBox test"});
 	my $properties = {
 		title => 'L_loginBox test template',
 		className => 'WebGUI::Asset::Template',
@@ -219,7 +217,5 @@ sub setupTest {
 		account.create.label form.footer form.returnUrl/;
 	#$properties->{template} .= "\n";
 	my $template = $defaultNode->addChild($properties, $properties->{id});
-	$versionTag->commit;
-    addToCleanup($versionTag);
 	return $template;
 }

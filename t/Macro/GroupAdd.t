@@ -21,7 +21,7 @@ use JSON qw/from_json/;
 
 my $session = WebGUI::Test->session;
 
-my $homeAsset = WebGUI::Asset->getDefault($session);
+my $homeAsset = WebGUI::Test->asset;
 my ($template, $groups, $users) = setupTest($session, $homeAsset);
 
 my @testSets = (
@@ -153,8 +153,6 @@ sub setupTest {
 	$users[1]->addToGroups([$groups[1]->getId]);
     addToCleanup(@users);
 
-	my $versionTag = WebGUI::VersionTag->getWorking($session);
-	$versionTag->set({name=>"GroupAdd test"});
 	my $properties = {
 		title     => 'GroupAdd test template',
 		className => 'WebGUI::Asset::Template',
@@ -166,8 +164,6 @@ sub setupTest {
         usePacked => 1,
 	};
 	my $asset = $defaultNode->addChild($properties, $properties->{id});
-	$versionTag->commit;
-    addToCleanup($versionTag);
 
 	return $asset, \@groups, \@users;
 }

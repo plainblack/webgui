@@ -28,11 +28,13 @@ $versionTag->set({name=>"Collab setup"});
 addToCleanup($versionTag);
 
 # Need to create a Collaboration system in which the post lives.
-my @addArgs = ( undef, undef, { skipAutoCommitWorkflows => 1, skipNotification => 1 } );
+my @addArgs = ( undef, undef, { skipNotification => 1 } );
 my $collab = $node->addChild({
         className      => 'WebGUI::Asset::Wobject::Collaboration',
         editTimeout    => '1',
         threadsPerPage => 3,
+        status          => "pending",
+        tagId           => $versionTag->getId,
     },
     @addArgs);
 
@@ -47,12 +49,14 @@ my $props = {
 };
 
 my $thread = $collab->addChild($props, @addArgs);
+$thread->setSkipNotification;
 
 $versionTag->commit();
 $collab = $collab->cloneFromDb;
 $thread = $thread->cloneFromDb;
 
 my $uncommittedThread = $collab->addChild($props, @addArgs);
+$uncommittedThread->setSkipNotification;
 
 # Test for a sane object type
 isa_ok($thread, 'WebGUI::Asset::Post::Thread');
@@ -74,10 +78,12 @@ note 'getCSLinkUrl';
 my @newThreads;
 my $threadCount = 15;
 my $versionTag2 = WebGUI::VersionTag->getWorking($session);
+addToCleanup( $versionTag2 );
 $props->{tagId} = $versionTag2->getId;
 while ($threadCount--) {
     push @newThreads, $collab->addChild($props, @addArgs);
 }
+$_->setSkipNotification for @newThreads;
 $versionTag2->commit;
 
 my $csUrl = $collab->get('url');

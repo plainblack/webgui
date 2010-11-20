@@ -20,10 +20,7 @@ use Test::More;
 #----------------------------------------------------------------------------
 # Init
 my $session         = WebGUI::Test->session;
-my $node            = WebGUI::Asset->getImportNode($session);
-my $versionTag      = WebGUI::VersionTag->getWorking($session);
-$versionTag->set({name=>"Gallery Test"});
-WebGUI::Test->addToCleanup($versionTag);
+my $node            = WebGUI::Test->asset;
 my $maker           = WebGUI::Test::Maker::Permission->new;
 my $gallery;
 

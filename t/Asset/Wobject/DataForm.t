@@ -27,22 +27,18 @@ use WebGUI::Session;
 my $session         = WebGUI::Test->session;
 
 # Create a DataForm
-my $df  = WebGUI::Asset->getImportNode( $session )
+my $df  = WebGUI::Test->asset
         ->addChild( {
             className           => "WebGUI::Asset::Wobject::DataForm",
             mailData            => 0,
             fieldConfiguration  => '[]',
-        } );
+        }, undef, time-10 );
 
-my $dform = WebGUI::Asset->getDefault($session)->addChild({
+my $dform = WebGUI::Test->asset->addChild({
     className           => "WebGUI::Asset::Wobject::DataForm",
     mailData            => 0,
-});
+}, undef, time-5);
 $dform->createField('gotCaptcha', { type => 'Captcha', name => 'humanCheck', });
-
-my $versionTag = WebGUI::VersionTag->getWorking($session);
-WebGUI::Test->addToCleanup($versionTag);
-$versionTag->commit;
 
 #----------------------------------------------------------------------------
 # Tests
@@ -69,7 +65,7 @@ WebGUI::Test->interceptLogging( sub {
 #----------------------------------------------------------------------------
 # getContentLastModified
 
-sleep 3;
+sleep 3; # whyyyyyyyy
 
 $df->{_mode} = 'form';
 is($df->getContentLastModified,  $df->get('lastModified'), 'getContentLastModified: form normally returns lastModified');

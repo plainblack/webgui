@@ -108,6 +108,7 @@ $search->update({
     };
 
     my $thread = $collab->addChild($props, @addArgs);
+    $thread->setSkipNotification;
     $versionTag2->commit();
     addToCleanup($versionTag2);
 

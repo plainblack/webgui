@@ -48,7 +48,7 @@ SKIP: {
 skip "Unable to load module $class", $tests unless $loaded;
 
 
-my $defaultNode = WebGUI::Asset->getDefault($session);
+my $defaultNode = WebGUI::Test->asset;
 my $template = $defaultNode->addChild({
     className => 'WebGUI::Asset::Template',
     title     => 'test poll template',
@@ -73,10 +73,6 @@ my $poll = $defaultNode->addChild({
     templateId    => $template->getId,
     graphConfiguration => '{"graph_labelFontSize":"20","xyGraph_chartWidth":"200","xyGraph_drawRulers":"1","graph_labelColor":"#333333","xyGraph_drawAxis":"1","graph_formNamespace":"Graph_XYGraph_Bar","graph_backgroundColor":"#ffffff","xyGraph_bar_barSpacing":0,"graph_labelFontId":"defaultFont","graph_labelOffset":"10","xyGraph_drawMode":"sideBySide","xyGraph_yGranularity":"10","xyGraph_chartHeight":"200","graph_imageHeight":"300","graph_imageWidth":"300","xyGraph_drawLabels":"1","xyGraph_bar_groupSpacing":0,"graph_paletteId":"defaultPalette"}',
 });
-
-my $versionTag = WebGUI::VersionTag->getWorking($session);
-WebGUI::Test->addToCleanup($versionTag);
-$versionTag->commit;
 
 isa_ok($poll, 'WebGUI::Asset::Wobject::Poll');
 

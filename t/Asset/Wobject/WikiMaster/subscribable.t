@@ -22,15 +22,13 @@ use WebGUI::Group;
 #----------------------------------------------------------------------------
 # Init
 my $session         = WebGUI::Test->session;
-my $import          = WebGUI::Asset->getImportNode( $session );
+my $import          = WebGUI::Test->asset;
 my $wiki
     = $import->addChild( {
         className               => 'WebGUI::Asset::Wobject::WikiMaster',
         subscriptionTemplateId  => 'limMkk80fMB3fqNZVf162w',
         groupIdView             => '7', # Everyone
     } );
-
-WebGUI::Test->addToCleanup( WebGUI::VersionTag->getWorking( $session ) );
 
 #----------------------------------------------------------------------------
 # Tests

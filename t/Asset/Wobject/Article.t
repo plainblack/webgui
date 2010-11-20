@@ -21,7 +21,7 @@ use WebGUI::Asset::Wobject::Article;
 my $session = WebGUI::Test->session;
 
 # Do our work in the import node
-my $node = WebGUI::Asset->getImportNode($session);
+my $node = WebGUI::Test->asset;
 
 # Lets create an article wobject using all defaults then test to see if those defaults were set
 #
@@ -36,9 +36,6 @@ my $node = WebGUI::Asset->getImportNode($session);
 #	storageId    => undef,
 #};
 
-my $versionTag = WebGUI::VersionTag->getWorking($session);
-$versionTag->set({name=>"Article Test"});
-WebGUI::Test->addToCleanup($versionTag);
 my $article = $node->addChild({className=>'WebGUI::Asset::Wobject::Article'});
 
 # Test for a sane object type

@@ -49,9 +49,7 @@ my $insuranceTable =  <<EOTABLE;
 30:6.00
 EOTABLE
 
-my $versionTag = WebGUI::VersionTag->getWorking($session);
-
-my $home = WebGUI::Asset->getDefault($session);
+my $home = WebGUI::Test->asset;
 
 my $rockHammer = $home->addChild({
     className          => 'WebGUI::Asset::Sku::Product',
@@ -104,12 +102,6 @@ my $gospels = $bible->setCollateral('variantsJSON', 'variantId', 'new',
         weight    => 2.0,        quantity  => 999999,
     }
 );
-
-$versionTag->commit;
-addToCleanup($versionTag);
-foreach my $asset ($bible, $rockHammer) {
-    $asset = $asset->cloneFromDb;
-}
 
 #######################################################################
 #

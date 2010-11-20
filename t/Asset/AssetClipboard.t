@@ -26,6 +26,7 @@ my $session = WebGUI::Test->session;
 $session->user({userId => 3});
 my $root = WebGUI::Asset->getRoot($session);
 my $versionTag = WebGUI::VersionTag->getWorking($session);
+my %tag = ( tagId => $versionTag->getId, status => "pending" );
 $versionTag->set({name=>"Asset Clipboard test"});
 WebGUI::Test->addToCleanup($versionTag);
 
@@ -35,6 +36,7 @@ my $snippet = $root->addChild({
     menuTitle => 'snippetMenuTitle',
     className => 'WebGUI::Asset::Snippet',
     snippet   => 'A snippet of text',
+    %tag,
 }, undef, time()-3);
 
 my $snippetAssetId      = $snippet->getId;
@@ -45,24 +47,28 @@ my $topFolder = $root->addChild({
     menuTitle   => 'topFolderMenuTitle',
     groupIdEdit => 3,
     className   => 'WebGUI::Asset::Wobject::Folder',
+    %tag,
 });
 my $folder1a = $topFolder->addChild({
     url   => 'folder_1a',
     title => 'folder1a',
     groupIdEdit => 3,
     className   => 'WebGUI::Asset::Wobject::Folder',
+    %tag,
 });
 my $folder1b = $topFolder->addChild({
     url   => 'folder_1b',
     title => 'folder1b',
     groupIdEdit => 3,
     className   => 'WebGUI::Asset::Wobject::Folder',
+    %tag,
 });
 my $folder1a2 = $folder1a->addChild({
     url   => 'folder_1a2',
     title => 'folder1a2',
     groupIdEdit => 3,
     className   => 'WebGUI::Asset::Wobject::Folder',
+    %tag,
 });
 
 
@@ -82,9 +88,7 @@ is($snippet->getId,                  $snippetAssetId,  'original snippet has cor
 is($snippet->getParent->getId,           $root->getId, 'original snippet is a child of root');
 is($duplicatedSnippet->getParent->getId, $root->getId, 'duplicated snippet is also a child of root');
 
-my $newVersionTag = WebGUI::VersionTag->getWorking($session);
-$newVersionTag->commit;
-WebGUI::Test->addToCleanup($newVersionTag);
+addToCleanup( $duplicatedSnippet );
 
 ####################################################
 #

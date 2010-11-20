@@ -20,20 +20,9 @@ use WebGUI::Asset::MatrixListing;
 
 
 my $session = WebGUI::Test->session;
-my $node = WebGUI::Asset->getImportNode($session);
 my ($matrix, $matrixListing);
-
-my $versionTag = WebGUI::VersionTag->getWorking($session);
-WebGUI::Test->addToCleanup($versionTag);
-$versionTag->set({name=>"Matrix Listing Test"});
-
-$matrix = $node->addChild({className=>'WebGUI::Asset::Wobject::Matrix'});
-$versionTag->commit;
+$matrix = WebGUI::Test->asset(className=>'WebGUI::Asset::Wobject::Matrix');
 $matrixListing = $matrix->addChild({className=>'WebGUI::Asset::MatrixListing'});
-
-# Wikis create and autocommit a version tag when a child is added.  Lets get the name so we can roll it back.
-my $secondVersionTag = WebGUI::VersionTag->new($session,$matrixListing->get("tagId"));
-WebGUI::Test->addToCleanup($secondVersionTag);
 
 # Test for sane object types
 isa_ok($matrix, 'WebGUI::Asset::Wobject::Matrix');

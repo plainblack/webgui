@@ -25,7 +25,7 @@ plan tests => 6; # increment this value for each test you create
 my $session = WebGUI::Test->session;
 $session->user({userId => 3});
 
-my $home = WebGUI::Asset->getDefault($session);
+my $home = WebGUI::Test->asset;
 my $wgBday = WebGUI::Test->webguiBirthday;
 
 my $creationDateSth = $session->db->prepare('update asset set creationDate=? where assetId=?');
@@ -57,13 +57,6 @@ my $weekFolder = $archive2->getFolder($weekAgo);
 my $weekStory  = $weekFolder->addChild({className => 'WebGUI::Asset::Story',});
 $creationDateSth->execute([$weekAgo, $weekFolder->getId]);
 $creationDateSth->execute([$weekAgo, $weekStory->getId]);
-
-my $versionTag = WebGUI::VersionTag->getWorking($session);
-$versionTag->commit;
-WebGUI::Test->addToCleanup($versionTag);
-foreach my $asset ($archive1, $archive2) {
-    $asset = $asset->cloneFromDb;
-}
 
 my $workflow  = WebGUI::Workflow->create($session,
     {

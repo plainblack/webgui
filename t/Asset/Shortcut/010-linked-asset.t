@@ -23,7 +23,6 @@ use WebGUI::Asset::Snippet;
 #----------------------------------------------------------------------------
 # Init
 my $session         = WebGUI::Test->session;
-my $node            = WebGUI::Asset->getImportNode($session);
 
 my $snippet;
 my $shortcut;
@@ -144,18 +143,15 @@ ok(
 # init a new snippet and shortcut; handy to have in a sub because we destroy
 # them in some tests and need to reset them for the next round
 sub init {
-    my $versionTag      = WebGUI::VersionTag->getWorking($session);
-    $versionTag->set({name=>"Shortcut Test"});
-    WebGUI::Test->addToCleanup($versionTag);
     # Make a snippet to shortcut
     $snippet 
-        = $node->addChild({
+        = WebGUI::Test->asset(
             className       => "WebGUI::Asset::Snippet",
-        });
+        );
 
     $shortcut
-        = $node->addChild({
+        = WebGUI::Test->asset(
             className           => "WebGUI::Asset::Shortcut",
             shortcutToAssetId   => $snippet->getId,
-        });
+        );
 }

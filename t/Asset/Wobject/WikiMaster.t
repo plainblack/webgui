@@ -24,7 +24,7 @@ use WebGUI::Session;
 #----------------------------------------------------------------------------
 # Init
 my $session         = WebGUI::Test->session;
-my $import          = WebGUI::Asset->getImportNode( $session );
+my $import          = WebGUI::Test->asset;
 
 my @childCoda = (undef, undef, { skipAutoCommitWorkflows => 1, skipNotification => 1, } );
 my @revCoda   = (undef,        { skipAutoCommitWorkflows => 1, skipNotification => 1, } );
@@ -37,24 +37,13 @@ my $wiki
         title            => 'testwiki',
     }, @childCoda );
 
-my $wikitag = WebGUI::VersionTag->getWorking( $session );
-$wikitag->commit;
-WebGUI::Test->addToCleanup($wikitag);
-$wiki = $wiki->cloneFromDb;
-
 my %page_set = ();
-
 foreach my $keywords (qw/staff inmates criminals/) {
     $page_set{$keywords} = $wiki->addChild({
         className => 'WebGUI::Asset::WikiPage',
         title     => $keywords,
     }, @childCoda);
 }
-
-my $tag_set1 = WebGUI::VersionTag->getWorking($session);
-$tag_set1->commit;
-WebGUI::Test->addToCleanup($tag_set1);
-
 
 #----------------------------------------------------------------------------
 # Tests
@@ -149,10 +138,6 @@ foreach my $title (qw/red andy brooks heywood norton hadley/) {
     }, @childCoda);
 }
 
-my $tag_set2 = WebGUI::VersionTag->getWorking($session);
-$tag_set2->commit;
-WebGUI::Test->addToCleanup($tag_set2);
-
 cmp_deeply(
     $wiki->getKeywordHierarchy(),
     [
@@ -187,10 +172,6 @@ cmp_deeply(
 ##Check depth-first display, and try to make a keyword loop
 $wiki->setSubKeywords('andy', 'criminals', 'inmates');
 $wiki->setSubKeywords('brooks', 'criminals');
-
-my $tag_set3 = WebGUI::VersionTag->getWorking($session);
-$tag_set3->commit;
-WebGUI::Test->addToCleanup($tag_set3);
 
 cmp_deeply(
     $wiki->getKeywordHierarchy(),

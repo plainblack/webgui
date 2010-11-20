@@ -21,18 +21,21 @@ plan tests => 26;
 
 my $session = WebGUI::Test->session;
 
-my $propertyHash = {
+my %propertyHash = ( 
 	template  => "Hi, I'm a snippet",
 	url       => '/template/versionTest',
 	title     => 'Version Test Snippet',
 	menuTitle => 'Version Test Snippet',
 	namespace => 'Snippet',
 	className => 'WebGUI::Asset::Snippet',
-};
+);
 
 my $root = WebGUI::Asset->getRoot($session);
 
 my $originalVersionTags = $session->db->quickScalar(q{select count(*) from assetVersionTag});
+my $tag = WebGUI::VersionTag->getWorking( $session );
+WebGUI::Test->addToCleanup($tag);
+my %tag = ( tagId => $tag->getId, status => "pending" );
 
 ################################################################
 #
@@ -41,15 +44,13 @@ my $originalVersionTags = $session->db->quickScalar(q{select count(*) from asset
 ################################################################
 
 note "purgeRevision tests";
-my $snippet = $root->addChild($propertyHash);
+my $snippet = $root->addChild({%propertyHash,%tag});
 $snippet->commit;
 
 isa_ok $snippet, "WebGUI::Asset::Snippet";
 checkTableEntries($snippet->getId, 1,1,1,1);
 
-sleep 1;
-
-my $snippetv2 = $snippet->addRevision({snippet => 'Hello, I am a snippet with formal grammar'});
+my $snippetv2 = $snippet->addRevision({snippet => 'Hello, I am a snippet with formal grammar',%tag},time+1);
 $snippetv2->commit;
 
 is ($snippetv2->getId, $snippet->getId, 'Both versions of the asset have the same assetId');
@@ -61,7 +62,7 @@ checkTableEntries($snippetv2->getId, 1,1,1,1);
 
 undef $snippetv2;
 
-my $snippetv2a = $snippet->addRevision({snippet => 'Hey, yall!  Ima snippet.'});
+my $snippetv2a = $snippet->addRevision({snippet => 'Hey, yall!  Ima snippet.',%tag},time+2);
 $snippetv2a->commit;
 
 $snippet->purgeRevision;
@@ -81,15 +82,13 @@ is($versionTagCheck, $originalVersionTags, 'version tag cleaned up by deleting l
 #
 ################################################################
 
-$snippet = $root->addChild($propertyHash);
-my $tag1 = WebGUI::VersionTag->getWorking($session);
-$tag1->commit;
-WebGUI::Test->addToCleanup($tag1);
-sleep 1;
-$snippetv2 = $snippet->addRevision({snippet => 'Vie gates.  Ich bin ein snippetr.'});
+$snippet = $root->addChild({%propertyHash,%tag});
+$tag->commit;
 my $tag2 = WebGUI::VersionTag->getWorking($session);
-$tag2->commit;
+$tag{tagId} = $tag2->getId;
 WebGUI::Test->addToCleanup($tag2);
+$snippetv2 = $snippet->addRevision({snippet => 'Vie gates.  Ich bin ein snippetr.',%tag}, time+3);
+$tag2->commit;
 note "purge";
 checkTableEntries($snippetv2->getId, 1,2,2);
 $versionTagCheck = $session->db->quickScalar(q{select count(*) from assetVersionTag});

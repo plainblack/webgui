@@ -21,9 +21,7 @@ use WebGUI::Asset::Wobject::GalleryAlbum;
 #----------------------------------------------------------------------------
 # Init
 my $session         = WebGUI::Test->session;
-my $node            = WebGUI::Asset->getImportNode($session);
-my $versionTag      = WebGUI::VersionTag->getWorking($session);
-WebGUI::Test->addToCleanup($versionTag);
+my $node            = WebGUI::Test->asset;
 
 my %user;
 $user{'1'} = WebGUI::User->new( $session, "new" );
@@ -35,27 +33,15 @@ WebGUI::Test->addToCleanup($user{'2'});
 # Create everything as user no. 1
 $session->user({ user => $user{'1'} });
 
-$versionTag->set({name=>"Album Test"});
-
 # Create gallery and a single album
 my $gallery
     = $node->addChild({
         className           => "WebGUI::Asset::Wobject::Gallery",
         groupIdEdit         => 3,   # Admins
-    },
-    undef,
-    undef,
-    {
-        skipAutoCommitWorkflows => 1,
     });
 my $album
     = $gallery->addChild({
         className           => "WebGUI::Asset::Wobject::GalleryAlbum",
-    },
-    undef,
-    undef,
-    {
-        skipAutoCommitWorkflows => 1,
     });
     
 # Create 5 photos inside the gallery
@@ -66,18 +52,9 @@ for (my $i = 0; $i < 5; $i++)
     my $photo
         = $album->addChild({
             className           => "WebGUI::Asset::File::GalleryFile::Photo",
-        },
-        undef,
-        undef,
-        {
-            skipAutoCommitWorkflows => 1,
         });
     $photoId[$i] = $photo->getId;
 }
-
-# Commit all changes
-$versionTag->commit;
-WebGUI::Test->addToCleanup($versionTag);
 
 # Make album default asset
 $session->asset( $album );

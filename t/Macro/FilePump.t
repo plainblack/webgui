@@ -34,7 +34,7 @@ plan tests => 11;
 
 my $bundle = WebGUI::FilePump::Bundle->new($session, { bundleName => 'test bundle'});
 
-my $root = WebGUI::Asset->getRoot($session);
+my $root = WebGUI::Test->asset;
 
 my $snippet =  $root->addChild({
     className => 'WebGUI::Asset::Snippet',
@@ -50,10 +50,6 @@ my $fileAsset = $root->addChild({
 
 $fileAsset->getStorageLocation->addFileFromScalar('pumpfile.css', qq|   body {\npadding:   0px;}\n\n|);
 is($fileAsset->getStorageLocation->getFileContentsAsScalar($fileAsset->get('filename')), qq|   body {\npadding:   0px;}\n\n|, 'Sanity check - got back expected file contents');
-
-my $snippetTag = WebGUI::VersionTag->getWorking($session);
-WebGUI::Test->addToCleanup($snippetTag);
-$snippetTag->commit;
 
 ok($bundle->addFile('JS',  'asset://filePumpSnippet'), 'Added filePumpSnippet');
 ok($bundle->addFile('CSS', 'asset://filePumpFileAsset'), 'Added filePumpAsset');

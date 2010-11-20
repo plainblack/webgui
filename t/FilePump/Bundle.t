@@ -255,7 +255,7 @@ cmp_ok($bundle->get('lastModified'), '>=', $startTime, '... updates lastModified
 #
 ###################################################################
 
-my $root = WebGUI::Asset->getRoot($session);
+my $root = WebGUI::Test->asset;
 
 my $snippet =  $root->addChild({
     className => 'WebGUI::Asset::Snippet',
@@ -275,15 +275,6 @@ my $storage = WebGUI::Storage->create($session);
 WebGUI::Test->addToCleanup($storage);
 $storage->addFileFromScalar('addendum', 'Red was too');
 $storage->addFileFromFilesystem(WebGUI::Test->getTestCollateralPath('ShawshankRedemptionMoviePoster.jpg'));
-
-my $snippetTag = WebGUI::VersionTag->getWorking($session);
-WebGUI::Test->addToCleanup($snippetTag);
-$snippetTag->commit;
-
-
-foreach my $asset ($snippet, $fileAsset) {
-    $asset = $asset->cloneFromDb;
-}
 
 my $guts;
 $guts = $bundle->fetchAsset(URI->new('asset://filePumpSnippet'));

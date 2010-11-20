@@ -30,18 +30,13 @@ WebGUI::Test->addToCleanup(sub { WebGUI::Test->cleanupAdminInbox; });
 WebGUI::Test->addToCleanup(SQL =>  "delete from mailQueue  where message like '%Threshold=15%'");
 my $inbox = WebGUI::Inbox->new($session);
 
-my $import = WebGUI::Asset->getImportNode($session);
+my $import = WebGUI::Test->asset;
 
 my $posters = $import->addChild({
     className => 'WebGUI::Asset::Sku::Product',
     url       => 'cell_posters',
     title     => "Red's Posters",
 }, undef, time()-15, { skipAutoCommitWorkflows => 1, });
-
-my $versionTag = WebGUI::VersionTag->getWorking($session);
-$versionTag->commit();
-WebGUI::Test->addToCleanup($versionTag);
-$posters = $posters->cloneFromDb;
 
 my $ritaVarId = $posters->setCollateral('variantsJSON', 'variantId', 'new',
     {

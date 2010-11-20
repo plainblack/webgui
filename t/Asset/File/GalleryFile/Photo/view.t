@@ -23,67 +23,37 @@ use WebGUI::Asset::File::GalleryFile::Photo;
 # Init
 my $session         = WebGUI::Test->session;
 my $user            = WebGUI::User->new( $session, 3 );
-my $node            = WebGUI::Asset->getImportNode($session);
-my $versionTag      = WebGUI::VersionTag->getWorking($session);
-
-$versionTag->set({name=>"Photo Test"});
-addToCleanup($versionTag);
 
 my $gallery
-    = $node->addChild({
+    = WebGUI::Test->asset(
         className           => "WebGUI::Asset::Wobject::Gallery",
         groupIdAddComment   => 7,   # Everyone
         groupIdAddFile      => 2,   # Registered Users
-    });
+    );
 
 my $album
     = $gallery->addChild({
         className           => "WebGUI::Asset::Wobject::GalleryAlbum",
-    },
-    undef,
-    undef,
-    {
-        skipAutoCommitWorkflows => 1,
     });
 
 my $previousPhoto
     = $album->addChild({
         className           => "WebGUI::Asset::File::GalleryFile::Photo",
         ownerUserId         => $user->getId,
-    },
-    undef,
-    undef,
-    {
-        skipAutoCommitWorkflows => 1,
     });
 
 my $photo
     = $album->addChild({
         className           => "WebGUI::Asset::File::GalleryFile::Photo",
         ownerUserId         => $user->getId,
-    },
-    undef,
-    undef,
-    {
-        skipAutoCommitWorkflows => 1,
     });
 
 my $nextPhoto
     = $album->addChild({
         className           => "WebGUI::Asset::File::GalleryFile::Photo",
         ownerUserId         => $user->getId,
-    },
-    undef,
-    undef,
-    {
-        skipAutoCommitWorkflows => 1,
     });
 
-$versionTag->commit;
-foreach my $asset ($gallery, $album, $photo) {
-    $asset = $asset->cloneFromDb;
-}
-WebGUI::Test->addToCleanup($versionTag);
 $photo->setFile( WebGUI::Test->getTestCollateralPath('page_title.jpg') );
 
 #----------------------------------------------------------------------------

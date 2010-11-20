@@ -21,7 +21,7 @@ use WebGUI::Session;
 #----------------------------------------------------------------------------
 # Init
 my $session         = WebGUI::Test->session;
-my $import          = WebGUI::Asset->getImportNode( $session );
+my $import          = WebGUI::Test->asset;
 my $wiki
     = $import->addChild( {
         className               => 'WebGUI::Asset::Wobject::WikiMaster',
@@ -32,9 +32,7 @@ my $wiki
 my $page
     = $wiki->addChild( {
         className               => 'WebGUI::Asset::WikiPage',
-    }, undef, undef, { skipAutoCommitWorkflows => 1 } );
-
-WebGUI::Test->addToCleanup( WebGUI::VersionTag->getWorking( $session ) );
+    } );
 
 #----------------------------------------------------------------------------
 # Tests
@@ -48,8 +46,5 @@ ok( $page->DOES('subscribable'), 'WikiMaster is subscribable' );
 ok( my $template = $page->getSubscriptionTemplate, 'getSubscriptionTemplate returns something' );
 isa_ok( $template, 'WebGUI::Asset::Template', 'getSubscriptionTemplate' );
 is( $template->getId, 'limMkk80fMB3fqNZVf162w', 'getSubscriptionTemplate gets wikimaster template' );
-
-#----------------------------------------------------------------------------
-# Cleanup
 
 #vim:ft=perl

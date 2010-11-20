@@ -38,7 +38,10 @@ my @threads = (
         groupIdEdit     => '3',
     }),
 );
-$_->commit for @threads;
+for my $t ( @threads ) {
+    $t->setSkipNotification;
+    $t->commit;
+}
 
 WebGUI::Test->addToCleanup($collab,@threads);
 

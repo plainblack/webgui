@@ -59,9 +59,7 @@ $cart->update({
 });
 my $transaction;
 
-my $versionTag = WebGUI::VersionTag->getWorking($session);
-
-my $home = WebGUI::Asset->getDefault($session);
+my $home = WebGUI::Test->asset;
 
 my $rockHammer = $home->addChild({
     className          => 'WebGUI::Asset::Sku::Product',
@@ -85,10 +83,6 @@ my $foreignHammer = $rockHammer->setCollateral('variantsJSON', 'variantId', 'new
     }
 );
 
-
-$versionTag->commit;
-WebGUI::Test->addToCleanup($versionTag);
-$rockHammer = $rockHammer->cloneFromDb;
 my $hammerItem = $rockHammer->addToCart($rockHammer->getCollateral('variantsJSON', 'variantId', $smallHammer));
 
 my $ship = WebGUI::Shop::Ship->new($session);

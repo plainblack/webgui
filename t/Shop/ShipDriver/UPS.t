@@ -44,9 +44,7 @@ plan tests => 38;
 
 my $storage;
 my ($driver);
-my $versionTag = WebGUI::VersionTag->getWorking($session);
-
-my $home = WebGUI::Asset->getDefault($session);
+my $home = WebGUI::Test->asset;
 
 my $rockHammer = $home->addChild({
     className          => 'WebGUI::Asset::Sku::Product',
@@ -105,12 +103,6 @@ my $blueFeather = $feather->setCollateral('variantsJSON', 'variantId', 'new',
         quantity  => 999999,
     }
 );
-
-$versionTag->commit;
-addToCleanup($versionTag);
-foreach my $asset($rockHammer, $bible, $feather) {
-    $asset = $asset->cloneFromDb;
-}
 
 #######################################################################
 #

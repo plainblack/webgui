@@ -23,15 +23,11 @@ plan tests => 6; # increment this value for each test you create
 my $session = WebGUI::Test->session;
 $session->user({userId => 3});
 
-my $root = WebGUI::Asset->getRoot($session);
+my $root = WebGUI::Test->asset;
 my $donation = $root->addChild({
     className => 'WebGUI::Asset::Sku::Donation',
     title     => 'test donation',
 });
-my $tag = WebGUI::VersionTag->getWorking($session);
-$tag->commit;
-WebGUI::Test->addToCleanup($tag);
-
 
 my $cart1 = WebGUI::Shop::Cart->create($session);
 WebGUI::Test->addToCleanup($cart1);

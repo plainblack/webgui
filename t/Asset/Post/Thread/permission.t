@@ -48,6 +48,8 @@ my $collab
         canStartThreadGroupId   => 3,   # Admin
         allowReplies            => 1,
         editTimeout             => 60 * 60 * 24, # 24 hours
+        tagId                   => $versionTag->getId,
+        status                  => "pending",
     }, @addArgs );
 
 my $thread
@@ -55,7 +57,10 @@ my $thread
         className           => 'WebGUI::Asset::Post::Thread',
         ownerUserId         => $user{"2"}->userId,  
         groupIdView         => 7,
+        tagId               => $versionTag->getId,
+        status              => "pending",
     }, @addArgs );
+$thread->setSkipNotification;
 
 $versionTag->commit( { timeout => 1_000_000 } );
 

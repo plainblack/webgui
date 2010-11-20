@@ -177,7 +177,7 @@ undef $driver2;
 #
 #######################################################################
 
-my $car = WebGUI::Asset->getImportNode($session)->addChild({
+my $car = WebGUI::Test->asset->addChild({
     className          => 'WebGUI::Asset::Sku::Product',
     title              => 'Automobiles',
     isShippingRequired => 1,
@@ -212,11 +212,6 @@ my $reallyNiceCar = $car->setCollateral('variantsJSON', 'variantId', 'new',
         quantity  => 4,
     }
 );
-
-my $versionTag = WebGUI::VersionTag->getWorking($session);
-$versionTag->commit;
-WebGUI::Test->addToCleanup($versionTag);
-$car = $car->cloneFromDb;
 
 $options = {
     label   => 'flat rate, ship weight',
@@ -260,7 +255,7 @@ $driver->update({
     pricePerItem      => 0,
 });
 
-my $key = WebGUI::Asset->getImportNode($session)->addChild({
+my $key = WebGUI::Test->asset->addChild({
     className          => 'WebGUI::Asset::Sku::Product',
     title              => 'Key',
     isShippingRequired => 1,
@@ -286,8 +281,6 @@ my $bioKey = $key->setCollateral('variantsJSON', 'variantId', 'new',
         quantity  => 1e9,
     }
 );
-
-WebGUI::Test->addToCleanup($key);
 
 my $boughtCar = $car->addToCart($car->getCollateral('variantsJSON', 'variantId', $reallyNiceCar));
 my $firstKey  = $key->addToCart($key->getCollateral('variantsJSON', 'variantId', $metalKey));
