@@ -942,7 +942,7 @@ sub www_ajaxPrices {
             $ship->getOptions($self);
         } || [],
     };
-    $session->http->setMimeType('text/plain');
+    $session->response->content_type('text/plain');
     return JSON->new->encode($response);
 }
 
@@ -961,7 +961,7 @@ sub www_ajaxSetCartItemShippingId {
     my $item    = $self->getItem($form->get('itemId'));
     my $address = $form->get('addressId') || undef;
     $item && $item->update({ shippingAddressId => $address });
-    $session->http->setMimeType('text/plain');
+    $session->response->content_type('text/plain');
     return 'ok';
 }
 

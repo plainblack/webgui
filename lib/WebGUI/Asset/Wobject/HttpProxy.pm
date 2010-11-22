@@ -466,7 +466,7 @@ sub view {
 	}
 	
 	
-	$self->session->http->setMimeType($var{header});
+	$self->session->response->content_type($var{header});
 	
 	if($var{header} ne "text/html") {
 		return $var{content};
@@ -494,7 +494,7 @@ sub www_view {
     return $self->session->privilege->noAccess() unless $self->canView;
     $self->prepareView;
     my $output = $self->view;
-    if ($self->session->http->getMimeType ne "text/html") {
+    if ($self->session->response->content_type ne "text/html") {
         return $output;
     } else {
         $self->session->http->sendHeader;

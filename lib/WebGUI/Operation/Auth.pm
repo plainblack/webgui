@@ -84,7 +84,7 @@ sub www_auth {
         my $method  = $authMethod->can( 'www_' . $methodCall )
                     || $authMethod->can( $methodCall );
     my $out = $method->( $authMethod );
-    if (substr($session->http->getMimeType(),0,9) eq "text/html") {
+    if (substr($session->response->content_type(),0,9) eq "text/html") {
 	    return $session->style->userStyle($out);
     }
     else {

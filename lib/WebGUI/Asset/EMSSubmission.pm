@@ -434,10 +434,10 @@ sub www_editSubmission {
     if( $params->{asHashRef} ) {
 	return { text => $content, title => $title, };
     } elsif( $session->form->get('asJson') ) {
-        $session->http->setMimeType( 'application/json' );
+        $session->response->content_type( 'application/json' );
 	return JSON->new->encode( { text => $content, title => $title, id => $assetId ne 'new' ? $assetId : 'new' . rand } );
     } else {
-        $session->http->setMimeType( 'text/html' );
+        $session->response->content_type( 'text/html' );
         return $asset->processStyle( $content );
     }
 }

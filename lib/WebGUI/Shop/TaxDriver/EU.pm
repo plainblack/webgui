@@ -1079,7 +1079,7 @@ sub www_getTaxGroupsAsJSON {
         $group->{ isDefault     } = 1 if $id eq $self->get( 'defaultGroup' );
     }
 
-    $self->session->http->setMimeType( 'application/json' );
+    $self->session->response->content_type( 'application/json' );
     return to_json( { records => $taxGroups  } );
 }
 
@@ -1158,7 +1158,7 @@ sub www_getVATNumbersAsJSON {
         push @numbers, $number;
     }
 
-    $self->session->http->setMimeType( 'application/json' );
+    $self->session->response->content_type( 'application/json' );
     return to_json( { records => \@numbers } );
 }
 

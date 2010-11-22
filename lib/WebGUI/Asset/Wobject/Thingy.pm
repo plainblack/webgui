@@ -1621,7 +1621,7 @@ sub www_deleteThingDataViaAjax {
     my $thingId     = $self->session->form->process("thingId");
     my $thingDataId = $self->session->form->process('thingDataId');
 
-    $session->http->setMimeType("application/json");
+    $session->response->content_type("application/json");
 
     unless ($thingId && $thingDataId) {
         $session->response->status(400);
@@ -1635,7 +1635,7 @@ sub www_deleteThingDataViaAjax {
 
         $self->deleteThingData($thingId,$thingDataId);
 
-        $session->http->setMimeType("application/json");
+        $session->response->content_type("application/json");
         return JSON->new->encode({message => "Data with thingDataId $thingDataId was deleted."});
     }
     else {
@@ -2704,7 +2704,7 @@ sub www_getThingViaAjax {
     my $self    = shift;
     my $session = $self->session;
     my $thingId = shift || $session->form->process('thingId');
-    $session->http->setMimeType("application/json");
+    $session->response->content_type("application/json");
 
     unless ($thingId) {
         $session->response->status(400);
@@ -2725,7 +2725,7 @@ sub www_getThingViaAjax {
         }
         $thingProperties->{field_loop} = \@field_loop;
         
-        $session->http->setMimeType("application/json");
+        $session->response->content_type("application/json");
         return JSON->new->encode($thingProperties);
     }
     else {
@@ -2747,7 +2747,7 @@ sub www_getThingsViaAjax {
     my $self    = shift;
     my $session = $self->session;
 
-    $session->http->setMimeType("application/json");
+    $session->response->content_type("application/json");
 
     my @visibleThings;
     my $things = $self->getThings;
@@ -3134,7 +3134,7 @@ sub www_searchViaAjax {
 
         my $var = $self->getSearchTemplateVars($thingId,$thingProperties);
 
-        $session->http->setMimeType("application/json");
+        $session->response->content_type("application/json");
         return JSON->new->encode($var);
     }
     else {
@@ -3554,7 +3554,7 @@ sub www_viewThingDataViaAjax {
     my $thingId     = shift || $session->form->process('thingId');
     my $thingDataId = shift || $session->form->process('thingDataId');
 
-    $session->http->setMimeType("application/json");
+    $session->response->content_type("application/json");
 
     unless ($thingId && $thingDataId) {
         $session->response->status(400);

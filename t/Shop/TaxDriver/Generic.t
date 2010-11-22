@@ -596,7 +596,7 @@ is($taxer->getTaxRate( $taxableDonation, $taxFreeAddress ), 0, 'calculate: simpl
 $session->user({userId=>3});
 my $json = $taxer->www_getTaxesAsJson();
 ok($json, 'www_getTaxesAsJson returned something');
-is($session->http->getMimeType, 'application/json', 'MIME type set to application/json');
+is($session->response->content_type, 'application/json', 'MIME type set to application/json');
 my $jsonTax = JSON::from_json($json);
 cmp_deeply(
     $jsonTax,

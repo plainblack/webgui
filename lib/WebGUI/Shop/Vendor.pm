@@ -619,7 +619,7 @@ sub www_payoutDataAsJSON {
         results         => $paginator->getPageData,
     };
 
-    $session->http->setMimeType( 'application/json' );
+    $session->response->content_type( 'application/json' );
 
     return JSON::to_json( $data );
 }
@@ -665,7 +665,7 @@ sub www_setPayoutStatus {
        $item->update({ vendorPayoutStatus => $status });
     }
 
-    $session->http->setMimeType( 'text/plain' );
+    $session->response->content_type( 'text/plain' );
     return $status;
 }
 
@@ -745,7 +745,7 @@ sub www_vendorTotalsAsJSON {
         push @dataset, $dataset;
     }
 
-    $session->http->setMimeType( 'application/json' );
+    $session->response->content_type( 'application/json' );
     return JSON::to_json( { vendors => \@dataset } );
 }
 

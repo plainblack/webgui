@@ -349,7 +349,7 @@ sub www_ajaxCreateUser {
         $mimeType       = "application/xml";
     }
 
-    $session->http->setMimeType( $mimeType ); 
+    $session->response->content_type( $mimeType ); 
 
     # Verify access
     if ( !canAdd($session) || !canUseService($session) ) {
@@ -436,7 +436,7 @@ sub www_ajaxDeleteUser {
         $mimeType       = "application/xml";
     }
 
-    $session->http->setMimeType( $mimeType ); 
+    $session->response->content_type( $mimeType ); 
 
     # Verify access
     if ( !canEdit($session) || !canUseService($session) ) {
@@ -503,7 +503,7 @@ sub www_ajaxUpdateUser {
         $mimeType       = "application/xml";
     }
 
-    $session->http->setMimeType( $mimeType ); 
+    $session->response->content_type( $mimeType ); 
 
     # Verify access
     if ( !canEdit($session) || !canUseService($session) ) {

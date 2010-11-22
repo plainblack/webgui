@@ -82,7 +82,7 @@ sub www_getThingFields {
             [$thingId]
         );
 
-    $session->http->setMimeType( 'application/json' );
+    $session->response->content_type( 'application/json' );
     return JSON->new->encode( \%fields );
 }
 

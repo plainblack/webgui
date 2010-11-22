@@ -41,12 +41,10 @@ This package allows the manipulation of HTTP protocol information.
 
  $http->sendHeader();
 
- $mimetype = $http->getMimeType();
  $boolean = $http->isRedirect();
  
  $http->setCookie($name,$value);
  $http->setFilename($filename,$mimetype);
- $http->setMimeType($mimetype);
  $http->setNoHeader($bool);
  $http->setRedirect($url);
 
@@ -95,19 +93,6 @@ Returns the stored epoch date when the page as last modified.
 sub getLastModified {
 	my $self = shift;
 	return $self->{_http}{lastModified};
-}
-
-#-------------------------------------------------------------------
-
-=head2 getMimeType ( ) 
-
-Returns the current mime type of the document to be returned.
-
-=cut
-
-sub getMimeType {
-	my $self = shift;
-	return $self->{_http}{mimetype} || "text/html; charset=UTF-8";
 }
 
 #-------------------------------------------------------------------
@@ -248,7 +233,6 @@ sub sendHeader {
 	if ($self->isRedirect()) {
 		$response->header(Location => $self->getRedirectLocation);
 	} else {
-		$response->content_type($self->getMimeType);
 		my $cacheControl = $self->getCacheControl;
 		my $date = ($userId eq "1") ? HTTP::Date::time2str($self->getLastModified) : HTTP::Date::time2str();
 		# under these circumstances, don't allow caching
@@ -373,7 +357,7 @@ sub setCookie {
 
 =head2 setFilename ( filename [, mimetype] )
 
-Override the default filename for the document, which is usually the page url. Usually used with setMimeType().
+Override the default filename for the document, which is usually the page url.
 
 =head3 filename
 
@@ -389,7 +373,7 @@ sub setFilename {
 	my $self = shift;
 	$self->{_http}{filename} = shift;
 	my $mimetype = shift || "application/octet-stream";
-	$self->setMimeType($mimetype);
+	$self->session->response->content_type($mimetype);
 }
 
 
@@ -423,25 +407,6 @@ sub setLastModified {
 	my $self = shift;
 	my $epoch = shift;
 	$self->{_http}{lastModified} = $epoch;
-}
-
-#-------------------------------------------------------------------
-
-=head2 setMimeType ( mimetype )
-
-Override mime type for the document, which is defaultly "text/html; charset=UTF-8". Also see setFilename().
-
-B<NOTE:> By setting the mime type to something other than "text/html" WebGUI will automatically not process the normal page contents. Instead it will return only the content of your Wobject function or Operation.
-
-=head3 mimetype
-
-The mime type for the document.
-
-=cut
-
-sub setMimeType {
-	my $self = shift;
-	$self->{_http}{mimetype} = shift;
 }
 
 #-------------------------------------------------------------------

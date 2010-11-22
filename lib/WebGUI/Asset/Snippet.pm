@@ -288,7 +288,7 @@ sub www_view {
     my $self = shift;
     return $self->session->privilege->insufficient() unless $self->canView;
     my $mimeType=$self->mimeType;
-    $self->session->http->setMimeType($mimeType || 'text/html');
+    $self->session->response->content_type($mimeType || 'text/html');
     $self->session->http->setCacheControl($self->cacheTimeout);
     my $output = $self->view(1);
     if (!defined $output) {

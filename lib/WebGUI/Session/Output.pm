@@ -77,7 +77,7 @@ has been set to a non-text type, macros will automatically be skipped.
 sub print {
     my $self       = shift;
     my $content    = shift;
-    my $skipMacros = shift || !($self->session->http->getMimeType =~ /^text/);
+    my $skipMacros = shift || !($self->session->response->content_type =~ /^text/);
     WebGUI::Macro::process($self->session, \$content) unless $skipMacros;
     my $handle = $self->{_handle};
     if (defined $handle) {

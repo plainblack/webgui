@@ -1295,7 +1295,7 @@ sub www_loadSurvey {
         warnings => $warnings                    #List of warnings to display to the user
     };
 
-    $self->session->http->setMimeType('application/json');
+    $self->session->response->content_type('application/json');
 
     return to_json($return);
 }
@@ -1762,7 +1762,7 @@ sub www_loadQuestions {
             if(! $self->session->form->param('shownsummary')){
                 my ($summary,$html) = $self->getSummary();
                 my $json = to_json( { type => 'summary', summary => $summary, html => $html });
-                $self->session->http->setMimeType('application/json');
+                $self->session->response->content_type('application/json');
                 return $json;
             }
         }
@@ -1869,7 +1869,7 @@ sub surveyEnd {
     $exitUrl = $exitUrl || $self->exitURL || $self->getUrl || q{/};
     $exitUrl = $self->session->url->gateway($exitUrl) if($exitUrl !~ /^https?:/i);
     my $json = to_json( { type => 'forward', url => $exitUrl } );
-    $self->session->http->setMimeType('application/json');
+    $self->session->response->content_type('application/json');
     return $json;
 }
 
@@ -1963,7 +1963,7 @@ sub prepareShowSurveyTemplate {
     my $out = $self->processTemplate( $section, $self->surveyQuestionsId );
     WebGUI::Macro::process($self->session, \$out);
 
-    $self->session->http->setMimeType('application/json');
+    $self->session->response->content_type('application/json');
     return to_json( { type => 'displayquestions', section => $section, questions => $questions, html => $out } );
 }
 

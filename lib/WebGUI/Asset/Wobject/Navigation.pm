@@ -577,7 +577,7 @@ override www_view => sub {
 	}
 	else {
 		$self->prepareView();
-		$self->session->http->setMimeType($mimeType);
+		$self->session->response->content_type($mimeType);
 		return $self->view();
 	}
 };

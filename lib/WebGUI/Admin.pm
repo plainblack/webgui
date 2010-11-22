@@ -599,7 +599,7 @@ sub www_getTreeData {
         };
     }
 
-    $session->http->setMimeType( 'application/json' );
+    $session->response->content_type( 'application/json' );
 
     return to_json( $assetInfo );
 }
@@ -732,7 +732,7 @@ sub www_searchAssets {
     $assetInfo->{ sort          } = $session->form->get( 'orderByColumn' );
     $assetInfo->{ dir           } = lc $session->form->get( 'orderByDirection' );
 
-    $session->http->setMimeType( 'application/json' );
+    $session->response->content_type( 'application/json' );
 
     return to_json( $assetInfo );
 }

@@ -134,10 +134,10 @@ sub handler {
             assets      => \@assets
         };
         if ($as eq "xml") {
-            $session->http->setMimeType('text/xml');
+            $session->response->content_type('text/xml');
             return XML::Simple::XMLout($document, NoAttr => 1);
         }
-        $session->http->setMimeType('application/json');
+        $session->response->content_type('application/json');
         return JSON->new->encode($document);
     }
     return undef;

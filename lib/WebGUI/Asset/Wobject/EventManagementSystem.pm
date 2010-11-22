@@ -823,9 +823,9 @@ sub www_addSubmission {
                 my $title =  $i18n->get('select form to submit') ;
 		my $asJson = $session->form->get('asJson');
                 if( $asJson ) {
-                    $session->http->setMimeType( 'application/json' );
+                    $session->response->content_type( 'application/json' );
                 } else {
-                    $session->http->setMimeType( 'text/html' );
+                    $session->response->content_type( 'text/html' );
                 }
                 my $content =  '<h1>' . $title .  '</h1><ul>' . $listOfLinks . '</ul>' ;
                 if( $asJson ) {
@@ -1377,7 +1377,7 @@ sub www_getAllSubmissions {
         push @{ $tableInfo->{ records } }, \%fields;
     }
     
-    $session->http->setMimeType( 'application/json' );
+    $session->response->content_type( 'application/json' );
     return JSON->new->encode( $tableInfo );
 }
 
@@ -1414,7 +1414,7 @@ sub www_getBadgesAsJson {
     $results{'startIndex'} = 0;
     $results{'sort'}       = undef;
     $results{'dir'}        = "asc";
-    $session->http->setMimeType('application/json');
+    $session->response->content_type('application/json');
     return JSON->new->encode(\%results);
 }
 
@@ -1444,7 +1444,7 @@ sub www_getSubmissionById {
        $result->{title} = $submissionId;
        $result->{id} = $submissionId;
    }
-    $self->session->http->setMimeType('application/json');
+    $self->session->response->content_type('application/json');
     return JSON->new->encode($result);
 }
 
@@ -1461,7 +1461,7 @@ sub www_getRegistrantAsJson {
 	my $session = $self->session;
 	my $db = $session->db;
     return $session->privilege->insufficient() unless $self->canView;
-    $session->http->setMimeType('application/json');
+    $session->response->content_type('application/json');
 	my @tickets = ();
 	my @tokens = ();
 	my @ribbons = ();
@@ -1640,7 +1640,7 @@ sub www_getRegistrantsAsJson {
     $results{'dir'}          = "asc";
 	
 	# build json datasource
-    $session->http->setMimeType('application/json');
+    $session->response->content_type('application/json');
     return JSON->new->encode(\%results);
 }
 
@@ -1675,7 +1675,7 @@ sub www_getRibbonsAsJson {
     $results{'startIndex'} = 0;
     $results{'sort'}       = undef;
     $results{'dir'}        = "asc";
-    $session->http->setMimeType('application/json');
+    $session->response->content_type('application/json');
     return JSON->new->encode(\%results);
 }
 
@@ -1788,7 +1788,7 @@ sub www_getScheduleDataJSON {
     $results{totalDatePages} = scalar(@dateRecords);
     $results{currentDatePage} = $datePageNumber;
     $results{dateRecords} = \@dateRecords;
-    $session->http->setMimeType('application/json');
+    $session->response->content_type('application/json');
     return JSON->new->encode(\%results);
 }
 
@@ -1944,7 +1944,7 @@ className='WebGUI::Asset::Sku::EMSTicket' and state='published' and revisionDate
     $results{'startIndex'}   	= $startIndex;
     $results{'sort'}       		= undef;
     $results{'dir'}        		= "asc";
-    $session->http->setMimeType('application/json');
+    $session->response->content_type('application/json');
     return JSON->new->encode(\%results);
 }
 
@@ -1981,7 +1981,7 @@ sub www_getTokensAsJson {
     $results{'startIndex'} = 0;
     $results{'sort'}       = undef;
     $results{'dir'}        = "asc";
-    $session->http->setMimeType('application/json');
+    $session->response->content_type('application/json');
     return JSON->new->encode(\%results);
 }
 
@@ -2065,7 +2065,7 @@ sub www_importEventsSave {
 $|=1;
 
 	# set up
-	$session->http->setMimeType("text/plain");
+	$session->response->content_type("text/plain");
 	my $start = [Time::HiRes::gettimeofday];
 	my $i18n = WebGUI::International->new($session,'Asset_EventManagementSystem');
 	my $csv = Text::CSV_XS->new({ binary => 1 });

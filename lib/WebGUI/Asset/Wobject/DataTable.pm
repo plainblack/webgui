@@ -231,7 +231,7 @@ Get the data asynchronously.
 sub www_ajaxGetData {
     my $self = shift;
 
-    $self->session->http->setMimeType("application/json");
+    $self->session->response->content_type("application/json");
     return $self->getDataJson;
 }
 
@@ -253,7 +253,7 @@ sub www_ajaxUpdateData {
 
     $data ||= $self->data;
 
-    $self->session->http->setMimeType("application/json");
+    $self->session->response->content_type("application/json");
     return $data;
 }
 

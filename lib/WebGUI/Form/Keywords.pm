@@ -149,7 +149,7 @@ sub www_searchAsJSON {
     my $keyword = WebGUI::Keyword->new($session);
 
     my $keywords = $keyword->findKeywords({search => $search, limit => 20});
-    $session->http->setMimeType('application/json');
+    $session->response->content_type('application/json');
 
     return JSON::to_json({keywords => $keywords});
 }

@@ -699,7 +699,7 @@ do whatever other activity a Sku purchase would allow.
 sub www_processRecurringTransactionPostback {
 	my $self    = shift;
     my $session = $self->session;
-	$session->http->setMimeType('text/plain');
+	$session->response->content_type('text/plain');
     my $form    = $session->form;
 
     # Get posted data of interest

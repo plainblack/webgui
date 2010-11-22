@@ -1145,11 +1145,11 @@ sub www_addAlbumService {
         lastUpdated     => $date->epochToHuman($album->revisionDate, '%y-%m-%d %j:%n:%s'),
     };
     if ($as eq "xml") {
-        $session->http->setMimeType('text/xml');
+        $session->response->content_type('text/xml');
         return XML::Simple::XMLout($document, NoAttr => 1);
     }
 
-    $session->http->setMimeType('application/json');
+    $session->response->content_type('application/json');
     return JSON->new->pretty->encode($document);
 }
 
@@ -1206,7 +1206,7 @@ sub www_listAlbumsRss {
         push @{ $var->{albums} }, $assetVar;
     }
 
-    $self->session->http->setMimeType('text/xml');
+    $self->session->response->content_type('text/xml');
     return $self->processTemplate( $var, $self->templateIdListAlbumsRss );
 }
 
@@ -1344,10 +1344,10 @@ sub www_listAlbumsService {
         albums      => \@assets
     };
     if ($as eq "xml") {
-        $session->http->setMimeType('text/xml');
+        $session->response->content_type('text/xml');
         return XML::Simple::XMLout($document, NoAttr => 1);
     }
-    $session->http->setMimeType('application/json');
+    $session->response->content_type('application/json');
     return JSON->new->pretty->encode($document);
 }
 
@@ -1612,7 +1612,7 @@ sub www_listFilesForUserRss {
         push @{ $var->{user_files} }, $assetVar;
     }
 
-    $self->session->http->setMimeType('text/xml');
+    $self->session->response->content_type('text/xml');
     return $self->processTemplate( $var, $self->templateIdListFilesForUserRss );
 }
 

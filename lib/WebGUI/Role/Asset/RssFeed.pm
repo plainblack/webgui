@@ -559,7 +559,7 @@ Return Atom view of the syndicated items.
 sub www_viewAtom {
     my $self = shift;
     return $self->_httpBasicLogin unless $self->canView;
-    $self->session->http->setMimeType('application/atom+xml');
+    $self->session->response->content_type('application/atom+xml');
     return $self->getFeed( XML::FeedPP::Atom->new )->to_string;
 }
 
@@ -574,7 +574,7 @@ Return Rdf view of the syndicated items.
 sub www_viewRdf {
     my $self = shift;
     return $self->_httpBasicLogin unless $self->canView;
-    $self->session->http->setMimeType('application/rdf+xml');
+    $self->session->response->content_type('application/rdf+xml');
     return $self->getFeed( XML::FeedPP::RDF->new )->to_string;
 }
 
@@ -589,7 +589,7 @@ Return RSS view of the syndicated items.
 sub www_viewRss {
     my $self = shift;
     return $self->_httpBasicLogin unless $self->canView;
-    $self->session->http->setMimeType('application/rss+xml');
+    $self->session->response->content_type('application/rss+xml');
     return $self->getFeed( XML::FeedPP::RSS->new )->to_string;
 }
 

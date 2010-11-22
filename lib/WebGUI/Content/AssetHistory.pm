@@ -107,7 +107,7 @@ EOSQL
     $results{'startIndex'}   = $startIndex;
     $results{'sort'}         = undef;
     $results{'dir'}          = $sortDir;
-    $session->http->setMimeType('application/json');
+    $session->response->content_type('application/json');
     my $json = JSON::to_json(\%results);
     return $json;
 }

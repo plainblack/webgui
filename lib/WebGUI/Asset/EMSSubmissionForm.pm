@@ -217,11 +217,11 @@ sub www_editSubmissionForm {
                 return { text => $content, title => $title, };
             }
             elsif ( $session->form->get('asJson') ) {
-                $session->http->setMimeType('application/json');
+                $session->response->content_type('application/json');
                 return JSON->new->encode( { text => $content, title => $title, id => 'list' . rand } );
             }
             else {
-                $session->http->setMimeType('text/html');
+                $session->response->content_type('text/html');
                 return $parent->ems->processStyle($content);
             }
         } ## end else [ if ( scalar(@$res) == ...)]
@@ -292,10 +292,10 @@ sub www_editSubmissionForm {
         ;    # not setting mimie type
     }
     elsif ( $session->form->get('asJson') ) {
-        $session->http->setMimeType('application/json');
+        $session->response->content_type('application/json');
     }
     else {
-        $session->http->setMimeType('text/html');
+        $session->response->content_type('text/html');
     }
     my $content = $asset->processTemplate( {
             errors    => $params->{errors}             || [],

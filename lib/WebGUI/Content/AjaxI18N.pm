@@ -64,7 +64,7 @@ sub handler {
     else {
         $session->log->warn("User ".$session->user->username." tried to execute ajaxGetI18n but could not decode JSON string: $json");
     }
-    $session->http->setMimeType( "application/json" );
+    $session->response->content_type( "application/json" );
     return JSON->new->encode( $response );
 }
 

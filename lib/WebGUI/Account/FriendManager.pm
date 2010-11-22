@@ -380,7 +380,7 @@ sub www_getFriendsAsJson  {
     $results{records}      = \@records;
     $results{'sort'}       = 'username';
     $self->bare(1);
-    $session->http->setMimeType('application/json');
+    $session->response->content_type('application/json');
     my $json = JSON::to_json(\%results);
     return $json;
 }

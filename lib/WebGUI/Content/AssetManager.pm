@@ -315,7 +315,7 @@ sub www_ajaxGetManagerPage {
     $assetInfo->{ sort          } = $session->form->get( 'orderByColumn' );
     $assetInfo->{ dir           } = lc $session->form->get( 'orderByDirection' );
     
-    $session->http->setMimeType( 'application/json' );
+    $session->response->content_type( 'application/json' );
 
     return to_json( $assetInfo );
 }

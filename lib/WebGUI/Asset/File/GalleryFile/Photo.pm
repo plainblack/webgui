@@ -547,7 +547,7 @@ sub www_download {
     
     my $storage     = $self->getStorageLocation;
 
-    $self->session->http->setMimeType( "image/jpeg" );
+    $self->session->response->content_type( "image/jpeg" );
     $self->session->http->setLastModified( $self->getContentLastModified );
 
     my $resolution  = $self->session->form->get("resolution");

@@ -77,7 +77,7 @@ sub handler {
         finished => ( $finished ? \1 : \0 ),
     );
     $status{error} = $error if $finished;
-    $process->session->http->setMimeType('text/plain');
+    $process->session->response->content_type('text/plain');
     JSON::encode_json( \%status );
 } ## end sub handler
 

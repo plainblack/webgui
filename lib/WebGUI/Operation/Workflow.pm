@@ -480,7 +480,7 @@ Checks to ensure the requestor is who we think it is, and then executes a workfl
 
 sub www_runWorkflow {
         my $session = shift;
-	$session->http->setMimeType("text/plain");
+	$session->response->content_type("text/plain");
 	$session->http->setCacheControl("none");
 	unless (Net::CIDR::Lite->new(@{ $session->config->get('spectreSubnets')} )->find($session->request->address) || canRunWorkflow($session)) {
 		$session->log->security("make a Spectre workflow runner request, but we're only allowed to accept requests from ".join(",",@{$session->config->get("spectreSubnets")}).".");

@@ -857,7 +857,7 @@ sub www_getAttributes {
 
     return $session->privilege->noAccess() unless $self->canView;
 
-    $session->http->setMimeType("application/json");
+    $session->response->content_type("application/json");
 
     my @results;
     my @categories  = keys %{$self->getParent->getCategories};
@@ -904,7 +904,7 @@ sub www_getScreenshots {
 
     return $self->session->privilege->noAccess() unless $self->canView;
 
-    $self->session->http->setMimeType('text/xml');
+    $self->session->response->content_type('text/xml');
 
     my $xml = qq |<?xml version="1.0" encoding="UTF-8"?>
 <content>
@@ -958,7 +958,7 @@ sub www_getScreenshotsConfig {
 
     return $self->session->privilege->noAccess() unless $self->canView;
 
-    $self->session->http->setMimeType('text/xml');
+    $self->session->response->content_type('text/xml');
 
     return $self->processTemplate($var,$self->getParent->get("screenshotsConfigTemplateId"));
 }

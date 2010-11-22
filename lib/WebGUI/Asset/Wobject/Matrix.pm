@@ -1109,7 +1109,7 @@ sub www_getCompareFormData {
     
     my @listingIds = $session->form->checkList("listingId");
     
-    $session->http->setMimeType("application/json");
+    $session->response->content_type("application/json");
     my $db = $session->db;
 
     my (@searchParams,@searchParams_sorted,@searchParamList,$searchParamList);
@@ -1301,7 +1301,7 @@ sub www_getCompareListData {
     }
 
     $jsonOutput->{ResultSet} = {Result=>\@results};
-    $session->http->setMimeType("application/json");
+    $session->response->content_type("application/json");
 
     return JSON->new->encode($jsonOutput);
 }

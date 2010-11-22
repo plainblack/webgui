@@ -93,7 +93,7 @@ sub handler {
         .'</urlset>';
 
     
-    $session->http->setMimeType('text/xml');    
+    $session->response->content_type('text/xml');    
     
     return $xml;
 }

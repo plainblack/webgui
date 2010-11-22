@@ -1069,7 +1069,7 @@ sub www_getTransactionsAsJson {
     $results{'startIndex'}   = $startIndex;
     $results{'sort'}         = undef;
     $results{'dir'}          = "desc";
-    $session->http->setMimeType('application/json');
+    $session->response->content_type('application/json');
     return JSON->new->encode(\%results);
 }
 

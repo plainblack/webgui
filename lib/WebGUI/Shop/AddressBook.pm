@@ -527,7 +527,7 @@ parameter
 sub www_ajaxGetAddress {
     my $self    = shift;
     my $session = $self->session;
-    $session->http->setMimeType('text/plain');
+    $session->response->content_type('text/plain');
 
     my $addressId = $session->form->get('addressId');
     my $address   = $self->getAddress($addressId) or return;
@@ -553,7 +553,7 @@ sub www_ajaxSave {
     else {
         $obj = $self->addAddress($address);
     }
-    $session->http->setMimeType('text/plain');
+    $session->response->content_type('text/plain');
     return $obj->getId;
 }
 

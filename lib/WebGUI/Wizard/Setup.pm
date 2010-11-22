@@ -126,7 +126,7 @@ label.formDescription { display: block; margin-top: 1em; font-weight: bold }
 </head>
 <body><div id="wrapper"> ' . $output . ' </div></body>
 </html>';
-    $session->http->setMimeType("text/html");
+    $session->response->content_type("text/html");
     return $page;
 }
 

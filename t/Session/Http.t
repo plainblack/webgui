@@ -20,7 +20,7 @@ use Data::Dumper;
 use Test::More; # increment this value for each test you create
 use Test::Deep;
 
-plan tests => 46;
+plan tests => 44;
 
 my $session = WebGUI::Test->session;
 
@@ -57,19 +57,6 @@ $response->status('200');
 
 ####################################################
 #
-# setMimeType, getMimeType
-#
-####################################################
-
-$http->setMimeType('');
-is($http->getMimeType, 'text/html; charset=UTF-8', 'set/get MimeType: default is text/html');
-
-$http->setMimeType('image/jpeg');
-is($http->getMimeType, 'image/jpeg', 'set/get MimeType: set specific type and get it');
-$http->setMimeType('');
-
-####################################################
-#
 # setStreamedFile, getStreamedFile
 #
 ####################################################
@@ -91,13 +78,13 @@ $http->setStreamedFile('');
 
 $http->setFilename('foo.bin');
 is($http->getFilename, 'foo.bin', 'set/get Filename: filename passed');
-is($http->getMimeType(), 'application/octet-stream', 'set/get Filename: default mime type is octet/stream');
+is($response->content_type(), 'application/octet-stream', 'set/get Filename: default mime type is octet/stream');
 
 $http->setFilename('foo.txt','text/plain');
 is($http->getFilename, 'foo.txt', 'set/get Filename: filename set');
-is($http->getMimeType(), 'text/plain', 'set/get Filename: mime type set');
+is($response->content_type(), 'text/plain', 'set/get Filename: mime type set');
 $http->setFilename('');
-$http->setMimeType('');
+$response->content_type('');
 
 ####################################################
 #
@@ -201,6 +188,7 @@ is($http->sendHeader, undef, 'sendHeader returns undef when no request object is
         headers_out($session1->response->headers),
         {
             'Location' => '/here/there',
+            'Content-Type' => 'text/html; charset=UTF-8',
         },
         '... location set'
     );
@@ -220,7 +208,6 @@ is($http->sendHeader, undef, 'sendHeader returns undef when no request object is
     my $http     = $session->http;
     my $response = $session->response;
     $response->status(200);
-    $http->setMimeType('');
     $session->request->protocol('');
     $http->setLastModified(1200);
 
@@ -255,7 +242,7 @@ is($http->sendHeader, undef, 'sendHeader returns undef when no request object is
     my $http     = $session->http;
     my $response = $session->response;
     $http->setFilename('image.png');
-    $http->setMimeType('image/png');
+    $response->content_type('image/png');
     $http->sendHeader();
     is($response->headers->content_type, 'image/png', 'sendHeader: mimetype');
     cmp_deeply(

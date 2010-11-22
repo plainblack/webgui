@@ -575,7 +575,7 @@ sub process {
 
     # Return a JSONinfied version of vars if JSON is the only requested content type.
     if ( defined $session->request && $session->request->header('Accept') eq 'application/json' ) {
-       $session->http->setMimeType( 'application/json' );
+       $session->response->content_type( 'application/json' );
        return to_json( $vars );
     }
 

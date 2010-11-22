@@ -52,11 +52,11 @@ like($response->body->[-1], qr/3\Z/, '... macro processing');
 $output->print('^#;', 1);
 like($response->body->[-1], qr/\^#;\Z/, '... macro processing skipped due to flag');
 
-$session->http->setMimeType('application/json');
+$session->response->content_type('application/json');
 $output->print('^#;');
 like($response->body->[-1], qr/\^#;\Z/, '... macro processing skipped due to mime type');
 
-$session->http->setMimeType('');
+$session->response->content_type('');
 $output->setHandle($otherHandle);
 $output->print('New content');
 is($otherHandleBuffer, 'New content', '... set to explicit handle');

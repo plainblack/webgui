@@ -482,7 +482,7 @@ sub www_ajaxDeletePoint {
     my $i18n    = WebGUI::International->new( $session, 'Asset_Map' );
     my $assetId = $session->form->get('assetId');
     my $asset   = WebGUI::Asset->newById( $session, $assetId );
-    $session->http->setMimeType('application/json');
+    $session->response->content_type('application/json');
     return JSON->new->encode({error => $i18n->get('error delete unauthorized')})
         unless $asset && $asset->canEdit;
 
@@ -535,7 +535,7 @@ sub www_ajaxEditPointSave {
 
     # We're returning as HTML because application/json causes download pop-up
     # and text/plain causes <pre>...</pre> in firefox
-    $session->http->setMimeType("text/html"); 
+    $session->response->content_type("text/html"); 
     $session->log->preventDebugOutput;
 
     my $assetId     = $form->get('assetId');
@@ -591,7 +591,7 @@ sub www_ajaxSetCenter {
     my $form    = $self->session->form;
     my $i18n    = WebGUI::International->new( $session, 'Asset_Map' );
 
-    $session->http->setMimeType("application/json");
+    $session->response->content_type("application/json");
 
     return JSON->new->encode({message => $i18n->get("error set center unauthorized")})
         unless $self->canEdit;
@@ -619,7 +619,7 @@ sub www_ajaxSetPointLocation {
     my $form    = $self->session->form;
     my $i18n    = WebGUI::International->new( $session, 'Asset_Map' );
 
-    $session->http->setMimeType("application/json");
+    $session->response->content_type("application/json");
     
     my $assetId = $form->get('assetId');
     my $asset   = WebGUI::Asset->newById( $session, $assetId );

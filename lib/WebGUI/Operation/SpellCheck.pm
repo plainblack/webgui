@@ -222,7 +222,7 @@ sub www_spellCheck {
     }
     # add request id and send to client as JSON blob
     $result->{id} = $params->{id};
-    $session->http->setMimeType("text/plain; charset=utf-8");
+    $session->response->content_type("text/plain; charset=utf-8");
     return JSON->new->encode($result);
 }
 

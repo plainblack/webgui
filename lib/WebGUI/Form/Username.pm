@@ -138,7 +138,7 @@ sub www_check {
   my $session = shift;
   my $input = $session->form->param('input');
 
-  $session->http->setMimeType( 'application/json' );
+  $session->response->content_type( 'application/json' );
   my $i18n = WebGUI::International->new($session, 'Form_Username');
 
   my $error = '';
