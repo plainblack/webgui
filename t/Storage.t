@@ -482,10 +482,10 @@ cmp_bag(
 #
 ####################################################
 
-$session->http->setStatus(413);
+$session->response->status(413);
 is($fileStore->addFileFromFormPost(), '', 'addFileFromFormPost returns empty string when HTTP status is 413');
 
-$session->http->setStatus(200);
+$session->response->status(200);
 $session->request->upload('files', []);
 my $formStore = WebGUI::Storage->create($session);
 addToCleanup($formStore);

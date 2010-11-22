@@ -445,8 +445,8 @@ ok( ! $session->url->forceSecureConnection(), 'HTTPS must not be "on" to force S
 ok( ! $session->url->forceSecureConnection('/test/url'), 'all conditions must be met, even if a URL is directly passed in');
 
 ##Validate the HTTP object state before we start
-$session->http->setStatus('200', 'OK');
-is($session->http->getStatus, 200, 'http status is okay, 200');
+$session->response->status('200');
+is($session->response->status, 200, 'http status is okay, 200');
 is($session->http->getRedirectLocation, undef, 'redirect location is empty');
 
 $env->{'psgi.url_scheme'} = "http";
@@ -455,10 +455,10 @@ my $secureUrl = $session->url->getSiteURL . '/foo/bar/baz/buz';
 $secureUrl =~ s/http:/https:/;
 
 ok($session->url->forceSecureConnection('/foo/bar/baz/buz'), 'forced secure connection');
-is($session->http->getStatus, 302, 'http status set to redirect, 302');
+is($session->response->status, 302, 'http status set to redirect, 302');
 is($session->http->getRedirectLocation, $secureUrl, 'redirect location set to proper passed in URL with SSL and sitename added');
 
-$session->http->setStatus('200', 'OK');
+$session->response->status('200', 'OK');
 $session->http->setRedirectLocation(undef);
 
 $secureUrl = $session->url->getSiteURL . $session->url->page();

@@ -860,19 +860,19 @@ is $clippedAsset->get('state'), 'clipboard', '... clipped an asset';
 
 $session->switchAdminOff;
 $session->http->setRedirectLocation('');
-$session->http->setStatus(200, 'OK');
+$session->response->status(200, 'OK');
 
 $trashedAsset->checkView();
-is $session->http->getStatus, 410, '... status set to 410 for trashed asset';
+is $session->response->status, 410, '... status set to 410 for trashed asset';
 is $session->http->getRedirectLocation, '', '... no redirect set';
 
-$session->http->setStatus(200, 'OK');
+$session->response->status(200, 'OK');
 $clippedAsset->checkView();
-is $session->http->getStatus, 410, '... status set to 410 for cut asset';
+is $session->response->status, 410, '... status set to 410 for cut asset';
 is $session->http->getRedirectLocation, '', '... no redirect set';
 
 $session->switchAdminOn;
-$session->http->setStatus(200, 'OK');
+$session->response->status(200, 'OK');
 is $trashedAsset->checkView(), 'chunked', '... returns "chunked" when admin is on for trashed asset';
 is $session->http->getRedirectLocation, $trashedAsset->getUrl('func=manageTrash'), '... trashed asset sets redirect to manageTrash';
 

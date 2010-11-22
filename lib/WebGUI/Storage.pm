@@ -360,7 +360,7 @@ sub addFileFromFormPost {
 	my $attachmentLimit = shift || 99999;
     my $session = $self->session;
     return ""
-        if ($self->session->http->getStatus eq '413');
+        if ($self->session->response->status eq '413');
     my $filename;
     my $attachmentCount = 1;
     foreach my $upload ($session->request->upload($formVariableName)) {

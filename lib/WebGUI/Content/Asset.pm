@@ -70,7 +70,7 @@ sub dispatch {
             # display from cache if page hasn't been modified.
             if ($session->user->isVisitor
              && !$session->http->ifModifiedSince($asset->getContentLastModified, $session->setting->get('maxCacheTimeout'))) {
-                $session->http->setStatus("304","Content Not Modified");
+                $session->response->status("304");
                 $session->http->sendHeader;
                 return "chunked";
             } 

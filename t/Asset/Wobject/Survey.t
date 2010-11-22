@@ -172,7 +172,7 @@ cmp_deeply(from_json($surveyEnd), { type => 'forward', url => '/getting_started'
     # Check a simple www_jumpTo request
     $session->user( { userId => 3 } );
     WebGUI::Test->getPage( $survey, 'www_jumpTo', { formParams => {id => '0'} } );
-    is( $session->http->getStatus, '201', 'Page request ok' ); # why is "201 - created" status used??
+    is( $session->response->status, '201', 'Page request ok' ); # why is "201 - created" status used??
     is($survey->responseJSON->nextResponse, 0, 'S0 is the first response');
 
     tie my %expectedSurveyOrder, 'Tie::IxHash';

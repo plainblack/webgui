@@ -42,7 +42,6 @@ This package allows the manipulation of HTTP protocol information.
  $http->sendHeader();
 
  $mimetype = $http->getMimeType();
- $code = $http->getStatus();
  $boolean = $http->isRedirect();
  
  $http->setCookie($name,$value);
@@ -140,22 +139,6 @@ sub getRedirectLocation {
 
 #-------------------------------------------------------------------
 
-=head2 getStatus ( ) {
-
-Returns the current HTTP status code.  If no code has been set,
-the code returned will be 200.
-
-=cut
-
-sub getStatus {
-	my $self = shift;
-	my $status = $self->{_http}{status} || "200";
-	return $status;
-}
-
-
-#-------------------------------------------------------------------
-
 =head2 getStreamedFile ( ) {
 
 Returns the location of a file to be streamed thru mod_perl, if one has been set.
@@ -212,7 +195,7 @@ Returns a boolean value indicating whether the current page will redirect to som
 
 sub isRedirect {
 	my $self = shift;
-	my $status = $self->getStatus;
+	my $status = $self->session->response->status;
 	return $status == 302 || $status == 301;
 }
 
@@ -264,7 +247,6 @@ sub sendHeader {
 	my %params;
 	if ($self->isRedirect()) {
 		$response->header(Location => $self->getRedirectLocation);
-		$response->status($self->getStatus);
 	} else {
 		$response->content_type($self->getMimeType);
 		my $cacheControl = $self->getCacheControl;
@@ -297,7 +279,6 @@ sub sendHeader {
 		if ($self->getFilename) {
             $response->header( 'Content-Disposition' => qq{attachment; filename="}.$self->getFilename().'"');
 		}
-		$response->status($self->getStatus());
 	}
 	return undef;
 }
@@ -311,7 +292,6 @@ sub _sendMinimalHeader {
         "Pragma"        => "no-cache",
         "Cache-Control" => "no-cache",
     );
-	$response->status($self->getStatus());
 	return undef;
 }
 
@@ -507,7 +487,7 @@ sub setRedirect {
 	return undef if ($url eq $self->session->url->page() && scalar(@params) < 1); # prevent redirecting to self
 	$self->session->log->info("Redirecting to $url");
 	$self->setRedirectLocation($url);
-	$self->setStatus($type);
+	$self->session->response->status($type);
 	$self->session->style->setMeta({"http-equiv"=>"refresh",content=>"0; URL=".$url});
 }
 
@@ -523,23 +503,6 @@ Sets the HTTP redirect URL.
 sub setRedirectLocation {
 	my $self = shift;
 	$self->{_http}{location} = shift;
-}
-
-#-------------------------------------------------------------------
-
-=head2 setStatus ( code )
-
-Sets the HTTP status code.
-
-=head3 code
-
-An HTTP status code. It is a 3 digit status number.
-
-=cut
-
-sub setStatus {
-    my $self = shift;
-    $self->{_http}{status} = shift;
 }
 
 #-------------------------------------------------------------------

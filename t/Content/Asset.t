@@ -224,14 +224,14 @@ WebGUI::Test->addToCleanup( $notModifiedSession );
 
 my $output = WebGUI::Content::Asset::handler( $notModifiedSession );
 is( $output, "chunked", "304 returns chunked" );
-is( $notModifiedSession->http->getStatus, "304", "http status code set" );
+is( $notModifiedSession->response->status, "304", "http status code set" );
 ok( !$notModifiedSession->closed, "session is not closed" );
 
 $notModifiedSession  = WebGUI::Test->newSession( undef, $http_request);
 WebGUI::Test->addToCleanup( $notModifiedSession );
 $notModifiedSession->user({ userId => 3});
 my $output = WebGUI::Content::Asset::handler( $notModifiedSession );
-isnt( $notModifiedSession->http->getStatus, "304", "logged in user doesn't get 304" );
+isnt( $notModifiedSession->response->status, "304", "logged in user doesn't get 304" );
 ok( !$notModifiedSession->closed, "session is not closed" );
 
 # Test that requesting a URL that doesn't exist, but one of the permutations does exist, returns undef

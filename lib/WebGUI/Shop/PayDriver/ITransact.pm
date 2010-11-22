@@ -715,7 +715,7 @@ sub www_processRecurringTransactionPostback {
     # First check whether the original transaction actualy exists
     if (WebGUI::Error->caught || !(defined $baseTransaction) ) {   
         $session->log->warn("Check recurring postback: No base transction for XID: [$originatingXid]");
-        $session->http->setStatus(500);
+        $session->response->status(500);
         return "Check recurring postback. No base transction for XID: [$originatingXid]";
     }
 

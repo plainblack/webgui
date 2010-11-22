@@ -180,7 +180,7 @@ sub handle {
                 return;
             }
             # Keep processing for success codes
-            elsif ($session->http->getStatus < 200 || $session->http->getStatus > 299) {
+            elsif ($session->response->status < 200 || $session->response->status > 299) {
                 $session->http->sendHeader;
                 return;
             }

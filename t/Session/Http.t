@@ -20,11 +20,12 @@ use Data::Dumper;
 use Test::More; # increment this value for each test you create
 use Test::Deep;
 
-plan tests => 48;
+plan tests => 46;
 
 my $session = WebGUI::Test->session;
 
-my $http = $session->http;
+my $http     = $session->http;
+my $response = $session->response;
 
 use Test::MockObject::Extends;
 
@@ -40,35 +41,19 @@ isa_ok($http, 'WebGUI::Session::Http', 'session has correct object type');
 
 ####################################################
 #
-# setStatus, getStatus
-#
-####################################################
-
-$http->setStatus('123');
-
-is($http->getStatus, '123', 'getStatus: returns correct code');
-
-$http->setStatus('');
-
-is($http->getStatus, '200', 'getStatus: returns default code');
-
-$http->setStatus('', 'packets are great');
-
-####################################################
-#
 # isRedirect
 #
 ####################################################
 
-$http->setStatus('200');
+$response->status('200');
 ok(!$http->isRedirect, 'isRedirect: 200 is not');
 
-$http->setStatus('301');
+$response->status('301');
 ok($http->isRedirect, '... 301 is');
 
-$http->setStatus('302');
+$response->status('302');
 ok($http->isRedirect, '... 302 is too');
-$http->setStatus('200');
+$response->status('200');
 
 ####################################################
 #
@@ -151,7 +136,7 @@ $http->setCacheControl(undef);
 $session->request->uri('/here/later');
 
 $http->setRedirect('/here/now');
-is($http->getStatus, 302, 'setRedirect: sets HTTP status');
+is($response->status, 302, 'setRedirect: sets HTTP status');
 is($http->getRedirectLocation, '/here/now', 'setRedirect: redirect location');
 
 $session->style->useEmptyStyle(1);
@@ -234,7 +219,7 @@ is($http->sendHeader, undef, 'sendHeader returns undef when no request object is
     my $guard    = WebGUI::Test->cleanupGuard($session);
     my $http     = $session->http;
     my $response = $session->response;
-    $http->setStatus(200, 'Just spiffy');
+    $response->status(200);
     $http->setMimeType('');
     $session->request->protocol('');
     $http->setLastModified(1200);

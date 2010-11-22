@@ -83,7 +83,7 @@ my $i18n = WebGUI::International->new($session);
 foreach my $test (@simpleTests) {
 	my $method = $test->{method};
 	my $output = $privilege->$method;
-	is($session->http->getStatus(), $test->{status}, "$method: status code");
+	is($session->response->status(), $test->{status}, "$method: status code");
 	my $title = $i18n->get($test->{titleCode});
 	like($output, qr{<h1>$title</h1>}, "$method: correct title");
 	like($output, qr{^USERSTYLE}, "$method: renders in WebGUI User Style");
@@ -97,7 +97,7 @@ foreach my $test (@simpleTests) {
 ####################################################
 
 my $output = $privilege->insufficient(1);
-is($session->http->getStatus(), '401', 'insufficient: status code with Visitor');
+is($session->response->status(), '401', 'insufficient: status code with Visitor');
 my $title = $i18n->get(37);
 unlike($output, qr{^USERSTYLE}, "insufficient: when noStyle is true the user style is not used");
 like($output, qr{<h1>$title</h1>}, "insufficient: when noStyle is true the title is still okay");
@@ -111,7 +111,7 @@ like($output, qr{<h1>$title</h1>}, "insufficient: when noStyle is true the title
 $session->user({userId=>1});
 
 my $output = $privilege->noAccess;
-is($session->http->getStatus(), '401', 'noAccess: status code with Visitor');
+is($session->response->status(), '401', 'noAccess: status code with Visitor');
 ##Is the auth screen returned, not validating the auth screen
 is($output, WebGUI::Operation::Auth::www_auth($session, "init"), 'noAccess: visitor sees auth screen');
 

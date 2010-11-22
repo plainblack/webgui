@@ -46,7 +46,7 @@ The content handler for this package.
 
 sub handler {
     my ($session) = @_;
-	$session->http->setStatus(404);
+	$session->response->status(404);
     my $output = "";
 	my $notFound = WebGUI::Asset->getNotFound($session);
 	if (defined $notFound) {

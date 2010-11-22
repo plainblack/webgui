@@ -353,26 +353,26 @@ is($printRemainingTicketsTemplateId, "hreA_bgxiTX-EzWCSZCZJw", 'Default print re
 #Make sure permissions work on pages
 my $data;
 $session->user({userId => $crasher->getId});
-$session->http->setStatus(201);
+$session->response->status(201);
 $data = $ems->www_viewSchedule();
-is($session->http->getStatus, 401, 'www_viewSchedule: visitor may not see the schedule');
+is($session->response->status, 401, 'www_viewSchedule: visitor may not see the schedule');
 $data = $ems->www_printRemainingTickets();
-is($session->http->getStatus, 401, 'www_printRemainingTickets: visitor may not print the remaining tickets');
+is($session->response->status, 401, 'www_printRemainingTickets: visitor may not print the remaining tickets');
 
-$session->http->setStatus(201);
+$session->response->status(201);
 $session->user({userId => $attender->getId});
 $data = $ems->www_viewSchedule();
-is($session->http->getStatus, 201, '... attender user can see the schedule');
+is($session->response->status, 201, '... attender user can see the schedule');
 $data = $ems->www_printRemainingTickets();
-is($session->http->getStatus, 401, 'www_printRemainingTickets: attender may not print the remaining tickets');
+is($session->response->status, 401, 'www_printRemainingTickets: attender may not print the remaining tickets');
 
-$session->http->setStatus(201);
+$session->response->status(201);
 $session->user({userId => $registrar->getId});
 $data = $ems->www_printRemainingTickets();
-is($session->http->getStatus, 201, 'www_printRemainingTickets: registration staff may print the remaining tickets');
+is($session->response->status, 201, 'www_printRemainingTickets: registration staff may print the remaining tickets');
 
 
-$session->http->setStatus(201);
+$session->response->status(201);
 $session->user({userId => $crasher->getId});
 my ($json, $records);
 $json    = $ems->www_getScheduleDataJSON();

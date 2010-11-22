@@ -60,7 +60,7 @@ Returns a message stating that this functionality can only be used by administra
 sub adminOnly {
 	my $self = shift;
 	my $i18n = WebGUI::International->new($self->session);
-    $self->session->http->setStatus(401);
+    $self->session->response->status(401);
         my $output = '<h1>'.$i18n->get(35).'</h1>';
 	$output .= $i18n->get(36);
 	return $self->session->style->userStyle($output);
@@ -78,7 +78,7 @@ sub insufficient {
 	my $self = shift;
     my $noStyle = shift;
 	my $i18n = WebGUI::International->new($self->session);
-	$self->session->http->setStatus(401);
+	$self->session->response->status(401);
 	my $output = '<h1>'.$i18n->get(37).'</h1>';
     if ($noStyle) {
         $self->session->style->useEmptyStyle(1);
@@ -103,7 +103,7 @@ sub locked {
 	my $self = shift;
     my $noStyle = shift;
 	my $i18n = WebGUI::International->new($self->session);
-	$self->session->http->setStatus(401);
+	$self->session->response->status(401);
 	my $output = '<h1>'.$i18n->get(37).'</h1>';
     if ($noStyle) {
         $self->session->style->useEmptyStyle(1);
@@ -148,7 +148,7 @@ Returns a message stating that the user does not have the privileges necessary t
 
 sub noAccess {
 	my $self = shift;
-	$self->session->http->setStatus(401);
+	$self->session->response->status(401);
    	if ($self->session->user->isVisitor) {
       		return WebGUI::Operation::Auth::www_auth($self->session, "init");
    	} else {
@@ -171,7 +171,7 @@ Returns a message stating that the user they requested information about is no l
 sub notMember {
 	my $self = shift;
 	my $i18n = WebGUI::International->new($self->session);
-	$self->session->http->setStatus(400);
+	$self->session->response->status(400);
 	my ($output);
 	$output = '<h1>'.$i18n->get(345).'</h1>';
 	$output .= $i18n->get(346);
@@ -203,7 +203,7 @@ Returns a message stating that the user made a request to delete something that 
 sub vitalComponent {
 	my $self = shift;
 	my $i18n = WebGUI::International->new($self->session);
-	$self->session->http->setStatus(403);
+	$self->session->response->status(403);
 	my ($output);
         $output = '<h1>'.$i18n->get(40).'</h1>';
 	$output .= $i18n->get(41);
