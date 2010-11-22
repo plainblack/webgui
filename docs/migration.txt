@@ -275,3 +275,7 @@ to be called.
 Inventory adjust is also no longer done when an object is created from scratch.  You will need to call onAdjustQuantityInCart
 manually.
 
+WebGUI::URL
+==========================
+In WebGUI 8, URL handlers are now done as Plack middleware.  See WebGUI::Middleware::Snoop and WebGUI::Middleware::WGAccess
+for examples.

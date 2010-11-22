@@ -974,22 +974,6 @@
 
 "runOnLogout" : "",
 
-# URL handlers are used to associate functionality with a URL via a regular expression.
-
-"urlHandlers" : [
-    { "^/extras" : "WebGUI::URL::PassThru" },
-#    { "^/icons" : "WebGUI::URL::PassThru" },
-#    { "^/documentation/pdf" : "WebGUI::URL::PassThru" },
-#    { "^/my-custom-application$" : "WebGUI::URL::PassThru" },
-#    { "^/server-status$" : "WebGUI::URL::PassThru" },
-#    { "^/perl-status$" : "WebGUI::URL::PassThru" },
-    { "^/uploads/dictionaries" : "WebGUI::URL::Unauthorized" },
-    { "^/uploads" : "WebGUI::URL::Uploads" },
-    { "^/\\*give-credit-where-credit-is-due\\*$" : "WebGUI::URL::Credits" },
-    { "^/abcdefghijklmnopqrstuvwxyz$" : "WebGUI::URL::Snoop" },
-    { ".*" : "WebGUI::URL::Content" }
-    ],
-
 # Content handlers are used to produce content from the content URL handler.
 # Note, these handlers are processed in the order listed.  Do not change
 # unless you know what you're doing.
