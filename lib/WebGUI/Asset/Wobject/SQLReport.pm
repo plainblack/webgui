@@ -699,12 +699,10 @@ sub www_download {
 		unless $self->session->user->isInGroup($self->downloadUserGroup);
 	
 	# Set filename and mimetype
-	if ($self->downloadType eq "csv") {
-		$self->session->http->setFilename($self->downloadFilename,"application/octet-stream");
-	}
-	else {
-		$self->session->http->setFilename($self->downloadFilename, $self->downloadMimeType);
-	}
+    $self->session->response->header( 'Content-Disposition' => qq{attachment; filename="}.$self->downloadFilename().'"');
+    $self->session->response->content_type(
+        $self->downloadType eq 'csv' ? "application/octet-stream" : $self->downloadMimeType
+    );
 	
 	$self->session->http->sendHeader;
 	

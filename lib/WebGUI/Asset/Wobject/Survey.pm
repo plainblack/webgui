@@ -2411,7 +2411,8 @@ sub export {
     $self->clearTempReportTable;
     
     my $filename = $self->session->url->escape( $self->title . "_$opts{name}.$format" );
-    $self->session->http->setFilename($filename,"text/$format");
+    $self->session->response->header( 'Content-Disposition' => qq{attachment; filename="}.$filename.'"');
+    $self->session->response->content_type("text/$format");
     return $content;
 }
 
@@ -2542,7 +2543,8 @@ END_HTML
         my $output = join "\n", @lines;
         
         my $filename = $self->session->url->escape( $self->title . "_structure.csv" );
-        $self->session->http->setFilename($filename,"text/csv");
+        $self->session->response->header( 'Content-Disposition' => qq{attachment; filename="}.$filename.'"');
+        $self->session->response->content_type("text/csv");
         
         return $output;
     }
@@ -2667,7 +2669,8 @@ sub www_downloadDefaultQuestionTypes{
         if !$self->session->user->isInGroup( $self->groupToViewReports );
     
     my $content = to_json($self->getSurveyJSON->{multipleChoiceTypes});
-    $self->session->http->setFilename('WebGUI-Survey-DefaultQuestionTypes.json', "application/json");
+    $self->session->response->header( 'Content-Disposition' => qq{attachment; filename="WebGUI-Survey-DefaultQuestionTypes.json"});
+    $self->session->response->content_type("application/json");
     return $content;
 }
 

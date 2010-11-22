@@ -20,7 +20,7 @@ use Data::Dumper;
 use Test::More; # increment this value for each test you create
 use Test::Deep;
 
-plan tests => 44;
+plan tests => 40;
 
 my $session = WebGUI::Test->session;
 
@@ -69,22 +69,6 @@ is($http->getStreamedFile, undef, 'set/get StreamedFile: false values return und
 $http->setStreamedFile('/home/streaming');
 is($http->getStreamedFile, '/home/streaming', 'set/get StreamedFile: set specific location and get it');
 $http->setStreamedFile('');
-
-####################################################
-#
-# setFilename, getFilename
-#
-####################################################
-
-$http->setFilename('foo.bin');
-is($http->getFilename, 'foo.bin', 'set/get Filename: filename passed');
-is($response->content_type(), 'application/octet-stream', 'set/get Filename: default mime type is octet/stream');
-
-$http->setFilename('foo.txt','text/plain');
-is($http->getFilename, 'foo.txt', 'set/get Filename: filename set');
-is($response->content_type(), 'text/plain', 'set/get Filename: mime type set');
-$http->setFilename('');
-$response->content_type('');
 
 ####################################################
 #
@@ -241,7 +225,7 @@ is($http->sendHeader, undef, 'sendHeader returns undef when no request object is
     my $guard    = WebGUI::Test->cleanupGuard($session);
     my $http     = $session->http;
     my $response = $session->response;
-    $http->setFilename('image.png');
+    $response->header( 'Content-Disposition' => qq{attachment; filename="image.png"});
     $response->content_type('image/png');
     $http->sendHeader();
     is($response->headers->content_type, 'image/png', 'sendHeader: mimetype');

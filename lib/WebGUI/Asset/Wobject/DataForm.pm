@@ -1883,7 +1883,8 @@ sub www_exportTab {
         @exportFields,
     );
 
-    $session->http->setFilename($self->url.".tab","text/plain");
+    $session->response->header( 'Content-Disposition' => qq{attachment; filename="}.$self->url.'.tab"');
+    $session->response->content_type('text/plain');
     $session->http->sendHeader;
     $session->output->print($tsv->string, 1);
 

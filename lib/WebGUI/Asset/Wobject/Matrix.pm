@@ -1078,8 +1078,8 @@ sub www_exportAttributes {
         $output .= "\n".WebGUI::Text::joinCSV($attribute->{name},$attribute->{description},$attribute->{category});
     }
 
-    my $fileName = "export_matrix_attributes.csv";
-    $self->session->http->setFilename($fileName,"application/octet-stream");
+    $session->response->header( 'Content-Disposition' => qq{attachment; filename="export_matrix_attributes.csv"});
+    $session->response->content_type('application/octet-stream');
     $self->session->http->sendHeader;
     return $output;
 }

@@ -304,3 +304,11 @@ NEW: $session->response->content_type();
 
 OLD: $session->http->setMimeType('application/json');
 NEW: $session->response->content_type('application/json');
+
+getFilename and setFilename have been removed.  To set the filename that should be
+uploaded to the user, access the WebGUI::Response object in the session.  First, set
+the header for the Content-Dispostion, then set the content type.
+
+OLD: $session->http->setFilename($filename);
+NEW: $session->response->header( 'Content-Disposition' => qq{attachment; filename="}.$filename.'"');
+     $session->response->content_type('application/octet-stream');

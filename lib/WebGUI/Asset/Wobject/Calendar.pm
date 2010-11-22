@@ -1816,8 +1816,8 @@ sub www_ical {
 
 
     # Set mime of text/icalendar
-    #$self->session->response->content_type("text/plain");
-    $self->session->http->setFilename("feed.ics","text/calendar");
+    $self->session->response->header( 'Content-Disposition' => qq{attachment; filename="feed.ics"});
+    $self->session->response->content_type("text/calendar");
     return $ical;
 }
 

@@ -44,7 +44,6 @@ This package allows the manipulation of HTTP protocol information.
  $boolean = $http->isRedirect();
  
  $http->setCookie($name,$value);
- $http->setFilename($filename,$mimetype);
  $http->setNoHeader($bool);
  $http->setRedirect($url);
 
@@ -260,9 +259,6 @@ sub sendHeader {
   				$response->header( 'Expires' => $date );
 			}
   		}
-		if ($self->getFilename) {
-            $response->header( 'Content-Disposition' => qq{attachment; filename="}.$self->getFilename().'"');
-		}
 	}
 	return undef;
 }
@@ -351,46 +347,6 @@ sub setCookie {
         domain  => $domain,
     };
 }
-
-
-#-------------------------------------------------------------------
-
-=head2 setFilename ( filename [, mimetype] )
-
-Override the default filename for the document, which is usually the page url.
-
-=head3 filename
-
-The filename to set.
-
-=head3 mimetype
-
-The mimetype for this file. Defaults to "application/octet-stream".
-
-=cut
-
-sub setFilename {
-	my $self = shift;
-	$self->{_http}{filename} = shift;
-	my $mimetype = shift || "application/octet-stream";
-	$self->session->response->content_type($mimetype);
-}
-
-
-
-#-------------------------------------------------------------------
-
-=head2 getFilename ( )
-
-Returns the default filename for the document.
-
-=cut
-
-sub getFilename {
-	my $self = shift;
-	return $self->{_http}{filename};
-}
-
 
 
 #-------------------------------------------------------------------

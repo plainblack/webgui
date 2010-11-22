@@ -1258,7 +1258,8 @@ sub www_exportEvents {
 	my $out = $session->output;
 
 	# set http header
-	$self->session->http->setFilename($self->getTitle.".csv", 'application/excel');
+    $session->response->header( 'Content-Disposition' => qq{attachment; filename="}.$self->getTitle().'.csv"' );
+    $session->response->content_type('application/excel');
 	
 	# add file header
 	my @header = ();
