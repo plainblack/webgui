@@ -64,7 +64,7 @@ WebGUI::Test->addToCleanup(sub {
 });
 
 is(
-    $createAccountSession->http->getRedirectLocation, 'REDIRECT_URL',
+    $createAccountSession->response->location, 'REDIRECT_URL',
     "returnUrl field is used to set redirect after createAccountSave",
 );
 
@@ -83,7 +83,7 @@ $session->setting->set('showMessageOnLogin', 0);
 $output         = $auth->login;
 
 is(
-    $loginSession->http->getRedirectLocation, 'REDIRECT_LOGIN_URL',
+    $loginSession->response->location, 'REDIRECT_LOGIN_URL',
     "returnUrl field is used to set redirect after login",
 );
 is $output, undef, 'login returns undef when showMessageOnLogin is false';

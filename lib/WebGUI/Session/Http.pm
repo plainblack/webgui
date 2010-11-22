@@ -109,20 +109,6 @@ sub getNoHeader {
 
 #-------------------------------------------------------------------
 
-=head2 getRedirectLocation ( )
-
-Return the location that was set via setRedirect
-
-=cut
-
-sub getRedirectLocation {
-	my $self = shift;
-	return $self->{_http}{location};
-}
-
-
-#-------------------------------------------------------------------
-
 =head2 getStreamedFile ( ) {
 
 Returns the location of a file to be streamed thru mod_perl, if one has been set.
@@ -229,9 +215,7 @@ sub sendHeader {
 
 	$self->setNoHeader(1);
 	my %params;
-	if ($self->isRedirect()) {
-		$response->header(Location => $self->getRedirectLocation);
-	} else {
+	if (!$self->isRedirect()) {
 		my $cacheControl = $self->getCacheControl;
 		my $date = ($userId eq "1") ? HTTP::Date::time2str($self->getLastModified) : HTTP::Date::time2str();
 		# under these circumstances, don't allow caching
@@ -407,24 +391,11 @@ sub setRedirect {
 	my @params = $self->session->form->param;
 	return undef if ($url eq $self->session->url->page() && scalar(@params) < 1); # prevent redirecting to self
 	$self->session->log->info("Redirecting to $url");
-	$self->setRedirectLocation($url);
+	$self->session->response->location($url);
 	$self->session->response->status($type);
 	$self->session->style->setMeta({"http-equiv"=>"refresh",content=>"0; URL=".$url});
 }
 
-
-#-------------------------------------------------------------------
-
-=head2 setRedirectLocation ( url )
-
-Sets the HTTP redirect URL.
-
-=cut
-
-sub setRedirectLocation {
-	my $self = shift;
-	$self->{_http}{location} = shift;
-}
 
 #-------------------------------------------------------------------
 

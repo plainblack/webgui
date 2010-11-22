@@ -132,9 +132,9 @@ is( $newRev->getStorageLocation->getFileContentsAsScalar('.wgaccess'), undef, "w
 
 $session->config->set('enableStreamingUploads', '0');
 $asset->www_view;
-is($session->http->getRedirectLocation, $storage->getUrl('someScalarFile.txt'), 'www_view: sets a redirect');
+is($session->response->location, $storage->getUrl('someScalarFile.txt'), 'www_view: sets a redirect');
 
 $session->config->set('enableStreamingUploads', '1');
-$session->http->setRedirectLocation('');
+$session->response->location('');
 $asset->www_view;
-is($session->http->getRedirectLocation, '', '... redirect not set when enableStreamingUploads is set');
+is($session->response->location, '', '... redirect not set when enableStreamingUploads is set');

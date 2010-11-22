@@ -312,3 +312,14 @@ the header for the Content-Dispostion, then set the content type.
 OLD: $session->http->setFilename($filename);
 NEW: $session->response->header( 'Content-Disposition' => qq{attachment; filename="}.$filename.'"');
      $session->response->content_type('application/octet-stream');
+
+getRedirectLocation and setRedirectLocation have been removed.  These methods were not
+used outside of WebGUI::Session::Http, but were designed for object encapsulation
+inside the object.  If you need to directly set or access the redirect location,
+use the location mutator in the WebGUI::Response object in the session.
+
+OLD: $session->http->setRedirectLocation($url);
+NEW: $session->response->location($url);
+
+OLD: $session->http->getRedirectLocation();
+NEW: $session->response->location();

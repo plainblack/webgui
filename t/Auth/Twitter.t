@@ -68,7 +68,7 @@ isa_ok( $nt, 'Net::Twitter' );
 is( $auth->www_login, "redirect", "www_login always returns redirect" );
 ok( $session->scratch->get('AuthTwitterToken'), 'auth token gets set to scratch' );
 ok( $session->scratch->get('AuthTwitterTokenSecret'), 'auth token secret gets set to scratch' );
-like( $session->http->getRedirectLocation, qr/twitter[.]com/, "redirect to twitter.com" );
+like( $session->response->location, qr/twitter[.]com/, "redirect to twitter.com" );
 
 # www_callback
 # I have no idea how to test this...

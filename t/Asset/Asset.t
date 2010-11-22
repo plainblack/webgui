@@ -859,26 +859,26 @@ is $trashedAsset->get('state'), 'trash',     'checkView setup: trashed an asset'
 is $clippedAsset->get('state'), 'clipboard', '... clipped an asset';
 
 $session->switchAdminOff;
-$session->http->setRedirectLocation('');
+$session->response->location('');
 $session->response->status(200, 'OK');
 
 $trashedAsset->checkView();
 is $session->response->status, 410, '... status set to 410 for trashed asset';
-is $session->http->getRedirectLocation, '', '... no redirect set';
+is $session->response->location, '', '... no redirect set';
 
 $session->response->status(200, 'OK');
 $clippedAsset->checkView();
 is $session->response->status, 410, '... status set to 410 for cut asset';
-is $session->http->getRedirectLocation, '', '... no redirect set';
+is $session->response->location, '', '... no redirect set';
 
 $session->switchAdminOn;
 $session->response->status(200, 'OK');
 is $trashedAsset->checkView(), 'chunked', '... returns "chunked" when admin is on for trashed asset';
-is $session->http->getRedirectLocation, $trashedAsset->getUrl('func=manageTrash'), '... trashed asset sets redirect to manageTrash';
+is $session->response->location, $trashedAsset->getUrl('func=manageTrash'), '... trashed asset sets redirect to manageTrash';
 
-$session->http->setRedirectLocation('');
+$session->response->location('');
 is $clippedAsset->checkView(), 'chunked', 'checkView: returns "chunked" when admin is on for cut asset';
-is $session->http->getRedirectLocation, $clippedAsset->getUrl('func=manageClipboard'), '... cut asset sets redirect to manageClipboard';
+is $session->response->location, $clippedAsset->getUrl('func=manageClipboard'), '... cut asset sets redirect to manageClipboard';
 
 ##Return an array of hashrefs.  Each hashref describes a test
 

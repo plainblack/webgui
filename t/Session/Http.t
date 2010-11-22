@@ -20,8 +20,6 @@ use Data::Dumper;
 use Test::More; # increment this value for each test you create
 use Test::Deep;
 
-plan tests => 40;
-
 my $session = WebGUI::Test->session;
 
 my $http     = $session->http;
@@ -100,7 +98,7 @@ $http->setCacheControl(undef);
 
 ####################################################
 #
-# setRedirect, getRedirectLocation
+# setRedirect
 #
 ####################################################
 
@@ -108,7 +106,7 @@ $session->request->uri('/here/later');
 
 $http->setRedirect('/here/now');
 is($response->status, 302, 'setRedirect: sets HTTP status');
-is($http->getRedirectLocation, '/here/now', 'setRedirect: redirect location');
+is($response->location, '/here/now', 'setRedirect: redirect location');
 
 $session->style->useEmptyStyle(1);
 my $styled = $session->style->generateAdditionalHeadTags();
@@ -413,6 +411,8 @@ is($http->sendHeader, undef, 'sendHeader returns undef when no request object is
     ok !$session->http->ifModifiedSince(WebGUI::Test->webguiBirthday - 5), '... epoch check, false';
     ok  $session->http->ifModifiedSince(WebGUI::Test->webguiBirthday - 5, 3600), '... epoch check, made true by maxCacheTimeout';
 }
+
+done_testing;
 
 ####################################################
 #
