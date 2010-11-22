@@ -279,3 +279,8 @@ WebGUI::URL
 ==========================
 In WebGUI 8, URL handlers are now done as Plack middleware.  See WebGUI::Middleware::Snoop and WebGUI::Middleware::WGAccess
 for examples.
+
+WebGUI::Session::Var
+==========================
+WebGUI::Session::Var was removed, and all of its code merged into WebGUI::Session.  Any call that used to be
+made to $session->var should now go directly to $session.
