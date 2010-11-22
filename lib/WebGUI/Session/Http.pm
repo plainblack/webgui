@@ -123,40 +123,6 @@ sub getStreamedFile {
 
 #-------------------------------------------------------------------
 
-=head2 ifModifiedSince ( epoch [, maxCacheTimeout] )
-
-Returns 1 if the epoch is greater than the modified date check.
-
-=head3 epoch
-
-The date that the requested content was last modified in epoch format.
-
-=head3 maxCacheTimeout
-
-A modifier to the epoch, that allows us to set a maximum timeout where content will appear to
-have changed and a new page request will be allowed to be processed.
-
-=cut
-
-sub ifModifiedSince {
-    my $self            = shift;
-    my $epoch           = shift;
-    my $maxCacheTimeout = shift;
-    my $modified = $self->session->request->header('If-Modified-Since');
-    return 1 if ($modified eq "");
-    $modified = HTTP::Date::str2time($modified);
-    ##Implement a step function that increments the epoch time in integer multiples of
-    ##the maximum cache time.  Used to handle the case where layouts containing macros
-    ##(like assetproxied Navigations) can be periodically updated.
-    if ($maxCacheTimeout) {
-        my $delta = time() - $epoch;
-        $epoch   += $delta - ($delta % $maxCacheTimeout);
-    }
-    return ($epoch > $modified);
-}
-
-#-------------------------------------------------------------------
-
 =head2 isRedirect ( )
 
 Returns a boolean value indicating whether the current page will redirect to some other location.

@@ -385,33 +385,6 @@ is($http->sendHeader, undef, 'sendHeader returns undef when no request object is
 
 }
 
-####################################################
-#
-# ifModifiedSince
-#
-####################################################
-##Clear request object to run a new set of requests
-
-{
-    ##A new, clean session
-    my $http_request = HTTP::Request::Common::GET('http://'.$session->config->get('sitename')->[0]);
-    $http_request->header('If-Modified-Since' => '');
-    my $session  = WebGUI::Test->newSession('nocleanup', $http_request);
-    my $guard    = WebGUI::Test->addToCleanup($session);
-    ok $session->http->ifModifiedSince(0), 'ifModifiedSince: empty header always returns true';
-
-}
-
-{
-    my $http_request = HTTP::Request::Common::GET('http://'.$session->config->get('sitename')->[0]);
-    $http_request->header('If-Modified-Since' => $session->datetime->epochToHttp(WebGUI::Test->webguiBirthday));
-    my $session  = WebGUI::Test->newSession('nocleanup', $http_request);
-    my $guard    = WebGUI::Test->cleanupGuard($session);
-    ok  $session->http->ifModifiedSince(WebGUI::Test->webguiBirthday + 5), '... epoch check, true';
-    ok !$session->http->ifModifiedSince(WebGUI::Test->webguiBirthday - 5), '... epoch check, false';
-    ok  $session->http->ifModifiedSince(WebGUI::Test->webguiBirthday - 5, 3600), '... epoch check, made true by maxCacheTimeout';
-}
-
 done_testing;
 
 ####################################################

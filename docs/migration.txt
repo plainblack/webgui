@@ -323,3 +323,8 @@ NEW: $session->response->location($url);
 
 OLD: $session->http->getRedirectLocation();
 NEW: $session->response->location();
+
+ifModifiedSince was moved from WebGUI::Session::Http to WebGUI::Session::Request.
+
+OLD: $session->http->ifModifiedSince;
+NEW: $session->request->ifModifiedSince;

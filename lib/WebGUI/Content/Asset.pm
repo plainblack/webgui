@@ -69,7 +69,7 @@ sub dispatch {
             WebGUI::PassiveAnalytics::Logging::log($session, $asset);
             # display from cache if page hasn't been modified.
             if ($session->user->isVisitor
-             && !$session->http->ifModifiedSince($asset->getContentLastModified, $session->setting->get('maxCacheTimeout'))) {
+             && !$session->request->ifModifiedSince($asset->getContentLastModified, $session->setting->get('maxCacheTimeout'))) {
                 $session->response->status("304");
                 $session->http->sendHeader;
                 return "chunked";
