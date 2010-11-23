@@ -1,4 +1,5 @@
 7.10.6
+ - fixed #11974: Toolbar icons unclickable in Webkit using HTML5
 
 7.10.5
  - fixed #11950: Username set to 0 when edit user 
