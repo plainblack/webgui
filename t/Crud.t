@@ -71,7 +71,6 @@ $sth->finish;
 
 # check data
 my $record1 = WebGUI::Cruddy->new($session);
-$record1->write;
 can_ok($record1, 'id');
 isa_ok($record1, "WebGUI::Crud");
 like($record1->dateCreated, qr/\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}/, "dateCreated looks like a date");
@@ -79,6 +78,8 @@ like($record1->lastUpdated, qr/\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}/, "lastUpdat
 like($record1->sequenceNumber, qr/\d+/, "sequenceNumber looks like a number");
 is($record1->sequenceNumber, 1, "record 1 sequenceNumber is 1");
 like($record1->id, qr/[A-Za-z0-9_-]{22}/, "id looks like a guid");
+my $written = $session->db->quickScalar('select COUNT(*) from some_crud_table where id=?',[ $record1->id ]);
+is $written, 1, 'autowrite for a new object works';
 
 can_ok($record1, 'prop');
 my $prop = $record1->meta->find_attribute_by_name('prop');
@@ -101,7 +102,6 @@ $record2->delete;
 
 # instanciation
 $record2 = WebGUI::Cruddy->new($session);
-$record2->write;
 isnt($record1->getId, $record2->getId, "can retrieve unique rows");
 my $copyOfRecord2 = WebGUI::Cruddy->new($session, $record2->getId);
 is($record2->getId, $copyOfRecord2->getId, "can reinstanciate record");
@@ -109,10 +109,8 @@ is($record2->getId, $copyOfRecord2->getId, "can reinstanciate record");
 # sequencing
 is($record2->sequenceNumber, 2, "record 1 sequenceNumber is 2");
 my $record3 = WebGUI::Cruddy->new($session);
-$record3->write;
 is($record3->sequenceNumber, 3, "record 1 sequenceNumber is 3");
 my $record4 = WebGUI::Cruddy->new($session);
-$record4->write;
 is($record4->sequenceNumber, 4, "record 1 sequenceNumber is 4");
 ok($record4->demote, "demotion reports success");
 is($record4->sequenceNumber, 4, "can't demote further than end");

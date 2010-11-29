@@ -48,6 +48,11 @@ has sequenceNumber => (
     default  => 1,
 );
 
+has _dirty => (
+    is       => 'rw',
+    default  => 0,
+);
+
 sub _now {
     my $self = shift;
     return WebGUI::DateTime->new($self->session)->toDatabase;
@@ -96,6 +101,7 @@ around BUILDARGS => sub {
         $data->{session}        = $session;
         $data->{sequenceNumber} = $sequenceNumber;
         $data->{$tableKey}      = $data->{id} || $session->id->generate;
+        $data->{_dirty}         = 1;
 
         return $class->$orig($data);
     }
@@ -113,6 +119,13 @@ around BUILDARGS => sub {
     $data->{session} = $session;
     return $class->$orig($data);
 };
+
+sub BUILD {
+    my $self = shift;
+    if ($self->_dirty) {
+        $self->write;
+    }
+}
 
 =head1 NAME
 
@@ -967,6 +980,7 @@ sub write {
         $data->{$sequenceKey} = $self->$sequenceKey;
     }
     $session->db->setRow($self->tableName, $self->tableKey, $data);
+    $self->_dirty(0);
 }
 
 1;

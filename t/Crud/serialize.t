@@ -37,11 +37,11 @@ WebGUI::Test->addToCleanup(sub {
 });
 
 my $cereal = WebGUI::Serialize->new($session);
-$cereal->write;
 isa_ok($cereal, 'WebGUI::Serialize');
 cmp_deeply(
     $cereal->get,
     {
+        _dirty         => 0,
         someName       => 'someName',
         jsonField      => [],
         dateCreated    => ignore(),
