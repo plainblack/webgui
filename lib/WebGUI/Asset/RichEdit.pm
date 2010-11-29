@@ -467,6 +467,7 @@ sub getRichEditor {
     my @plugins;
     my %loadPlugins;
     push @plugins, "safari";
+    push @plugins, "paste";
     push @plugins, "contextmenu"
         if $self->getValue("enableContextMenu");
     push @plugins, "inlinepopups"
@@ -503,6 +504,7 @@ sub getRichEditor {
 		theme_advanced_statusbar_location => "bottom",
 		valid_elements => $self->getValue("validElements"),
 		wg_userIsVisitor => $self->session->user->isVisitor ? JSON::true() : JSON::false(),
+		paste_postprocess => 'tinyMCE_WebGUI_paste_postprocess',
 		);
 #    if ($ask) {
 #        $config{oninit} = 'turnOffTinyMCE_'.$nameId;
