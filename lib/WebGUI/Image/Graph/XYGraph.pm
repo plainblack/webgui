@@ -41,58 +41,56 @@ documentation.
 =cut
 
 sub configurationForm {
-	my ($configForms, $f);
 	my $self = shift;
+    my $tab  = shift;
 
 	my $i18n = WebGUI::International->new($self->session, 'Image_Graph_XYGraph');
 
-	$configForms = $self->SUPER::configurationForm;
+	$self->SUPER::configurationForm($tab);
 
-	$f = WebGUI::HTMLForm->new($self->session);
-	$f->trClass('Graph_XYGraph');
-	$f->integer(
+	$tab->addField('integer',
 		name	=> 'xyGraph_chartWidth',
 		value	=> $self->getChartWidth,
 		label	=> $i18n->get('chart width'),
 		hoverHelp => $i18n->get('chart width description'),
 	);
-	$f->integer(
+	$tab->addField('integer',
 		name	=> 'xyGraph_chartHeight',
 		value	=> $self->getChartHeight,
 		label	=> $i18n->get('chart height'),
 		hoverHelp => $i18n->get('chart height description'),
 	);
-	$f->yesNo(
+	$tab->addField('yesNo',
 		name	=> 'xyGraph_drawLabels',
 		value	=> $self->showLabels,
 		label	=> $i18n->get('draw labels'),
 		hoverHelp => $i18n->get('draw labels description'),
 	);
-	$f->yesNo(
+	$tab->addField('yesNo',
 		name	=> 'xyGraph_drawAxis',
 		value	=> $self->showAxis,
 		label	=> $i18n->get('draw axis'),
 		hoverHelp => $i18n->get('draw axis description'),
 	);
-	$f->color(
+	$tab->addField('color',
 		name	=> 'xyGraph_axisColor',
 		value	=> $self->getAxisColor,
 		label	=> $i18n->get('axis color'),
 		hoverHelp => $i18n->get('axis color description'),
 	);
-	$f->yesNo(
+	$tab->addField('yesNo',
 		name	=> 'xyGraph_drawRulers',
 		value	=> $self->showRulers,
 		label	=> $i18n->get('draw rulers'),
 		hoverHelp => $i18n->get('draw rulers description'),
 	);
-	$f->color(
+	$tab->addField('color',
 		name	=> 'xyGraph_rulerColor',
 		value	=> $self->getRulerColor,
 		label	=> $i18n->get('ruler color'),
 		hoverHelp => $i18n->get('ruler color description'),
 	);
-	$f->selectBox(
+	$tab->addField('selectBox',
 		name	=> 'xyGraph_drawMode',
 		value	=> [ $self->getDrawMode ],
 		label	=> $i18n->get('draw mode'),
@@ -103,15 +101,12 @@ sub configurationForm {
 			stacked		=> 'Stacked (cumulative',
 		},
 	);
-	$f->float(
+	$tab->addField('float',
 		name	=> 'xyGraph_yGranularity',
 		value	=> $self->getYGranularity,
 		label	=> $i18n->get('y granularity'),	
 		hoverHelp => $i18n->get('y granularity description'),
 	);
-
-	$configForms->{'graph_xygraph'} = $f->printRowsOnly;
-	return $configForms;
 }
 
 #-------------------------------------------------------------------

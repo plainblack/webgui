@@ -198,6 +198,7 @@ sub _generateGraph_noFormPost {
     my $self = shift;
     return WebGUI::Image::Graph->getPluginList($self->session) ? 1 : 0;
 }
+
 #-------------------------------------------------------------------
 sub _hasVoted {
 	my $self = shift;
@@ -281,19 +282,14 @@ override getEditForm => sub {
 	if (WebGUI::Image::Graph->getPluginList($self->session)) {
 		my $config = $self->getGraphConfig;
 
-		$fb->addTab(name => 'graph', label => $i18n->get('Graphing','Image_Graph'));
-		$fb->getTab('graph')->addField( "yesNo", 
+		my $graphTab = $fb->addTab(name => 'graph', label => $i18n->get('Graphing','Image_Graph'));
+		$graphTab->addField( "yesNo", 
 			name		=> 'generateGraph',
 			label		=> $i18n->get('generate graph'),
 			hoverHelp	=> $i18n->get('generate graph description'),
 			value		=> $self->generateGraph,
 		);
-                # TODO: Fix graphing plugins to use FormBuilder API
-		$fb->getTab('graph')->addField(
-            'ReadOnly', 
-            value => WebGUI::Image::Graph->getGraphingTab($self->session, $config)
-        );
-
+        WebGUI::Image::Graph->getGraphingTab($graphTab, $config)
 	}
 
 	return $fb;

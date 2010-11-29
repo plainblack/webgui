@@ -55,79 +55,75 @@ sub addDataset {
 
 #-------------------------------------------------------------------
 
-=head2 configurationForm ( )
+=head2 configurationForm ( $tab )
 
-Returns a hashref containing the form where the properties of your graph type
-can be set. Your pluging should extend this method by append the form to the
-hashref returned by the super method and returning the reference.
-
-The key for this entry must be unique, so use the namespace of your plugin
-without the WebGUI::Image part; the :: converted to and underscore and
-everything in lowercase.
+Adds form fields for this type of graph plugin to a WebGUI::FormBuilder::Tab object.
+Your plugin should extend this method by first calling SUPER.
 
 Check some of the plugins that come with WebGUI for examples.
+
+=head3 $tab
+
+A WebGUI::FormBuilder::Tab object to append the form fields to.
 
 =cut
 
 sub configurationForm {
 	my $self = shift;
+    my $tab  = shift;
 
 	my $i18n = WebGUI::International->new($self->session, 'Image_Graph');
 	
-	my $f = WebGUI::HTMLForm->new($self->session);
-	$f->trClass('Graph');
-	$f->integer(
-		-name	=> 'graph_imageWidth',
-		-value	=> $self->getImageWidth,
-		-label	=> $i18n->get('image width'),
-		-hoverHelp => $i18n->get('image width description'),
+	$tab->addField('integer', 
+		name	=> 'graph_imageWidth',
+		value	=> $self->getImageWidth,
+		label	=> $i18n->get('image width'),
+		hoverHelp => $i18n->get('image width description'),
 	);
-	$f->integer(
-		-name	=> 'graph_imageHeight',
-		-value	=> $self->getImageHeight,
-		-label	=> $i18n->get('image height'),
-		-hoverHelp => $i18n->get('image height description'),
+	$tab->addField('integer',
+		name	=> 'graph_imageHeight',
+		value	=> $self->getImageHeight,
+		label	=> $i18n->get('image height'),
+		hoverHelp => $i18n->get('image height description'),
 	);
-	$f->color(
-		-name	=> 'graph_backgroundColor',
-		-value	=> $self->getBackgroundColor,
-		-label	=> $i18n->get('background color'),
-		-hoverHelp => $i18n->get('background color description'),
+	$tab->addField('color',
+		name	=> 'graph_backgroundColor',
+		value	=> $self->getBackgroundColor,
+		label	=> $i18n->get('background color'),
+		hoverHelp => $i18n->get('background color description'),
 	);
-	$f->selectBox(
-		-name	=> 'graph_paletteId',
-		-label	=> $i18n->get('palette'),
-		-hoverHelp => $i18n->get('palette description'),
-		-value	=> [ $self->getPalette->getId ],
-		-options=> $self->getPalette->getPaletteList,
+	$tab->addField('selectBox',
+		name	=> 'graph_paletteId',
+		label	=> $i18n->get('palette'),
+		hoverHelp => $i18n->get('palette description'),
+		value	=> [ $self->getPalette->getId ],
+		options=> $self->getPalette->getPaletteList,
 	);
-	$f->float(
-		-name	=> 'graph_labelOffset',
-		-value	=> $self->getLabelOffset,
-		-label	=> $i18n->get('label offset'),
-		-hoverHelp => $i18n->get('label offset description'),
+	$tab->addField('float',
+		name	=> 'graph_labelOffset',
+		value	=> $self->getLabelOffset,
+		label	=> $i18n->get('label offset'),
+		hoverHelp => $i18n->get('label offset description'),
 	);
-	$f->selectBox(
-		-name	=> 'graph_labelFontId',
-		-value	=> [ $self->getLabelFont->getId ],
-		-label	=> $i18n->get('label font'),
-		-hoverHelp => $i18n->get('label font description'),
-		-options=> WebGUI::Image::Font->getFontList($self->session),
+	$tab->addField('selectBox',
+		name	=> 'graph_labelFontId',
+		value	=> [ $self->getLabelFont->getId ],
+		label	=> $i18n->get('label font'),
+		hoverHelp => $i18n->get('label font description'),
+		options=> WebGUI::Image::Font->getFontList($self->session),
 	);
-	$f->color(
-		-name	=> 'graph_labelColor',
-		-value	=> $self->getLabelColor,
-		-label	=> $i18n->get('label color'),
-		-hoverHelp => $i18n->get('label color description'),
+	$tab->addField('color',
+		name	=> 'graph_labelColor',
+		value	=> $self->getLabelColor,
+		label	=> $i18n->get('label color'),
+		hoverHelp => $i18n->get('label color description'),
 	);
-	$f->integer(
-		-name	=> 'graph_labelFontSize',
-		-value	=> $self->getLabelFontSize,
-		-label	=> $i18n->get('label fontsize'),
-		-hoverHelp => $i18n->get('label fontsize description'),
+	$tab->addField('integer',
+		name	=> 'graph_labelFontSize',
+		value	=> $self->getLabelFontSize,
+		label	=> $i18n->get('label fontsize'),
+		hoverHelp => $i18n->get('label fontsize description'),
 	);
-	
-	return {'graph' => $f->printRowsOnly};
 }
 
 #-------------------------------------------------------------------
@@ -211,15 +207,16 @@ sub getConfiguration {
 
 #-------------------------------------------------------------------
 
-=head2 getGraphingTab ( session, [ config ] )
+=head2 getGraphingTab ( tab, [ config ] )
 
 Returns the contents of the graphing tab you can add to your asset. 
 
-This is a class method, and therefore you must pass the WebGUI session object.
+This is a class method.
 
-=head3 session 
+=head3 tab 
 
-An instanciated WebGUI session object.
+An instanciated WebGUI::FormBuilder::Tab object.  The session is taken
+from this.
 
 =head3 config
 
@@ -228,10 +225,10 @@ Optionally you can pass a configuration hash to populate the form
 =cut
 
 sub getGraphingTab {
-	my (%configForms, $output);
-	my $class = shift;
-	my $session = shift;
-	my $config = shift;
+	my $class   = shift;
+	my $tab     = shift;
+	my $config  = shift;
+    my $session = $tab->session;
 
 	my (@graphingPlugins, %graphingPlugins, @failedGraphingPlugins);
 	
@@ -240,15 +237,11 @@ sub getGraphingTab {
 	my $f = WebGUI::HTMLForm->new($session);
 
 	unless ($session->config->get("graphingPlugins")) {
-		$f->readOnly(
-			-value	=> $i18n->get('no graphing plugins in config'),
-		);
-
-		return $f->printRowsOnly;
+        $tab->addField('readOnly', { value => $i18n->get('no graphing plugins in config'), });
 	}
 	
 	foreach (@{$session->config->get("graphingPlugins")}) {
-my		$plugin = WebGUI::Image::Graph->load($session, $_);
+        my $plugin = WebGUI::Image::Graph->load($session, $_);
 		if ($plugin) {
 			push(@graphingPlugins, $plugin);
 			$plugin->setConfiguration($config);
@@ -259,20 +252,20 @@ my		$plugin = WebGUI::Image::Graph->load($session, $_);
 	}
 	
 	my $ns = $config->{graph_formNamespace};
-	# payment plugin
+	my %configForms;
 	if (%graphingPlugins) {
 		$session->style->setRawHeadTags(<<EOS
 		<script type="text/javascript">
 			function inNamespace (clas, namespace) {
 				var namespaceParts = namespace.split('_');
 				var s = '';
-				
+
 				for (var i = 0; i < namespaceParts.length; i++) {
 					if (i > 0) { 
 						s = s + '_';
 					}
 					s = s + namespaceParts[i];
-					
+
 					if (s == clas) {
 						return true;
 					}
@@ -280,10 +273,10 @@ my		$plugin = WebGUI::Image::Graph->load($session, $_);
 
 				return false;
 			}
-		
+
 			function getContainerTag (elem, tagname) {
 				var parent = elem.parentNode;
-				
+
 				while (parent.tagName != tagname) {
 					parent = parent.parentNode;
 				}
@@ -307,34 +300,33 @@ my		$plugin = WebGUI::Image::Graph->load($session, $_);
 		</script>
 EOS
 );
-		
-		$f->selectBox(
-			-name		=> 'graphingPlugin',
-			-options	=> \%graphingPlugins,
-			-label		=> $i18n->get('graph type'),
-			-hoverHelp	=> $i18n->get('graph type description'),
-			-id		=> 'graphTypeSelector',
-			-value		=> [ $config->{graph_formNamespace} ],
-			-extras		=> 'onchange="switchGraphingFormElements(this, this.value)"'
+
+        $tab->addField('selectBox',
+			name		=> 'graphingPlugin',
+			options	    => \%graphingPlugins,
+			label		=> $i18n->get('graph type'),
+			hoverHelp	=> $i18n->get('graph type description'),
+			id		    => 'graphTypeSelector',
+			value		=> [ $config->{graph_formNamespace} ],
+			extras		=> 'onchange="switchGraphingFormElements(this, this.value)"', 
 		);
 
 		foreach my $currentPlugin (@graphingPlugins) {
-			%configForms = (%configForms, %{$currentPlugin->configurationForm});
+			$currentPlugin->configurationForm($tab);
 		}
 	} else {
-		$f->raw('<tr><td colspan="2" align="left">'.$i18n->get('no graphing plugins').'</td></tr>');
+		$tab->addField('readOnly', value => $i18n->get('no graphing plugins'), );
 	}
-	
+
 	foreach (sort keys %configForms) {
 		$f->raw($configForms{$_});
 	}
 
-	$f->raw('<script type="text/javascript">'.
-		"switchGraphingFormElements(document.getElementById('graphTypeSelector'), '$ns');".
-		'</script>'
-	);
-	
-	return $f->printRowsOnly;
+    $tab->addField('readOnly', value => <<EOJS );
+<script type="text/javascript">
+    switchGraphingFormElements(document.getElementById('graphTypeSelector'), '$ns')
+</script>
+EOJS
 }
 
 #-------------------------------------------------------------------

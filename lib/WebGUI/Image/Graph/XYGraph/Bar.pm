@@ -47,28 +47,23 @@ more information.
 
 sub configurationForm {
 	my $self = shift;
+    my $tab  = shift;
 
 	my $i18n = WebGUI::International->new($self->session, 'Image_Graph_XYGraph_Bar');
 
-	my $configForms = $self->SUPER::configurationForm;
-my	$f = WebGUI::HTMLForm->new($self->session);
-	$f->trClass('Graph_XYGraph_Bar');
-	$f->float(
+	$self->SUPER::configurationForm($tab);
+	$tab->addField('float',
 		name	=> 'xyGraph_bar_barSpacing',
 		value	=> $self->getBarSpacing,
 		label	=> $i18n->get('bar spacing'),
 		hoverHelp => $i18n->get('bar spacing description'),
 	);
-	$f->float(
+	$tab->addField('float',
 		name	=> 'xyGraph_bar_groupSpacing',
 		value	=> $self->getGroupSpacing,
 		label	=> $i18n->get('group spacing'),
 		hoverHelp => $i18n->get('group spacing description'),
 	);
-
-	$configForms->{'graph_xygraph_bar'} = $f->printRowsOnly;
-
-	return $configForms;
 }
 
 #-------------------------------------------------------------------
