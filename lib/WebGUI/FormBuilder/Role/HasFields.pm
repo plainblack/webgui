@@ -82,10 +82,11 @@ Delete a field by name. Returns the field deleted.
 sub deleteField {
     my ( $self, $name ) = @_;
     my $field    = delete $self->{_fieldsByName}{$name};
-    for ( my $i = 0; $i < scalar @{$self->fields}; $i++ ) {
+    FIELD: for ( my $i = 0; $i < scalar @{$self->fields}; $i++ ) {
         my $testField    = $self->fields->[$i];
         if ( $testField->get('name') eq $name ) {
             splice @{$self->fields}, $i, 1;
+            last FIELD;
         }
     }
     return $field;
