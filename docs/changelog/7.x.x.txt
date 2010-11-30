@@ -6,6 +6,7 @@
  - fixed #11957: finBrokenAsset --fix does not fix per se
  - fixed #11974: Toolbar icons unclickable in Webkit using HTML5
  - fixed #11978: Pasting links into TinyMCE
+ - fixed #11971: Still subscribed to forums you no longer have privilege to view
 
 7.9.18
  - fixed #11938: upgrade script always removes specialState

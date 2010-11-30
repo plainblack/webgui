@@ -835,6 +835,7 @@ Example call:
                     pbworkflow000000000006
                     pbworkflow000000000007
                     send_webgui_statistics
+                    xR-_GRRbjBojgLsFx3dEMA
                 };
         },
     );
