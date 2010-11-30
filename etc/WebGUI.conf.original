@@ -900,6 +900,9 @@
     "WebGUI::Asset::Wobject::Thingy" : [
         "WebGUI::Workflow::Activity::NotifyAboutThing"
     ],
+    "WebGUI::Asset" : [
+        "WebGUI::Workflow::Activity::UpdateAssetSubscribers"
+    ],
     "WebGUI::User" : [
         "WebGUI::Workflow::Activity::CreateCronJob",
         "WebGUI::Workflow::Activity::NotifyAboutUser",

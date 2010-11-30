@@ -2,6 +2,7 @@
  - fixed #11974: Toolbar icons unclickable in Webkit using HTML5
  - fixed #11978: Pasting links into TinyMCE
  - fixed #11980: DataForm broken
+ - fixed #11971: Still subscribed to forums you no longer have privilege to view
 
 7.10.5
  - fixed #11950: Username set to 0 when edit user 

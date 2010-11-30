@@ -22,7 +22,7 @@ use Getopt::Long;
 use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::Asset;
-
+use WebGUI::Workflow;
 
 my $toVersion = '7.10.6';
 my $quiet; # this line required
@@ -31,9 +31,30 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+addCollaborationSubscriptionWorkflow($session);
 
 finish($session); # this line required
 
+
+#----------------------------------------------------------------------------
+sub addCollaborationSubscriptionWorkflow {
+    my $session = shift;
+    print "\tWe're doing some stuff here that you should know about... " unless $quiet;
+    # and here's our code
+    $session->config->addToArray('workflowActivities/WebGUI::Asset', qw/WebGUI::Workflow::Activity::UpdateAssetSubscribers/);
+    my $workflow = WebGUI::Workflow->create($session,
+        {
+            mode => 'parallel',
+            enabled => 1,
+            title   => 'Update CS Subscription members',
+            description => "This workflow will be run whenever the viewing permissions are changed on an Asset.  It will update the members of the subscription group, and remove members who can no longer view the Asset.",
+            type        => 'WebGUI::Asset',
+        },
+        'xR-_GRRbjBojgLsFx3dEMA'
+    );
+    $workflow->addActivity('WebGUI::Workflow::Activity::UpdateAssetSubscribers');
+    print "DONE!\n" unless $quiet;
+}
 
 #----------------------------------------------------------------------------
 # Describe what our function does

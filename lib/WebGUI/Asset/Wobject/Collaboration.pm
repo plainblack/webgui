@@ -1568,6 +1568,31 @@ sub unsubscribe {
 
 #-------------------------------------------------------------------
 
+=head2 update ( )
+
+Update the base method to handle checking valid users in the subscription group if
+view permissions have changed.
+
+=cut
+
+sub update {
+    my $self  = shift;
+    my $origGroupIdView = $self->get('groupIdView');
+    $self->next::method(@_);
+    return if $self->get('groupIdView') eq $origGroupIdView;
+    my $instance_data = {
+        workflowId => 'xR-_GRRbjBojgLsFx3dEMA',
+        className  => 'WebGUI::Asset',
+        methodName => 'newByDynamicClass',
+        parameters => $self->getId,
+    };
+    my $instance = WebGUI::Workflow::Instance->create($self->session, $instance_data);
+    $instance->start('skipRealtime');
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 view 
 
 Render the CS, and handle local caching.
