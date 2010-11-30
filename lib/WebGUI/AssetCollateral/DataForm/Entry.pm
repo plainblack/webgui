@@ -42,7 +42,7 @@ use WebGUI::Asset::Wobject::DataForm;
 
 readonly    session         => my %session;
 private     entryData       => my %entryData;
-private     entryId         => my %entryId;
+readonly    entryId         => my %entryId;
 readonly    assetId         => my %assetId;
 readonly    asset           => my %asset;
 private     userId          => my %userId;
