@@ -39,7 +39,7 @@ finish($session); # this line required
 #----------------------------------------------------------------------------
 sub addCollaborationSubscriptionWorkflow {
     my $session = shift;
-    print "\tWe're doing some stuff here that you should know about... " unless $quiet;
+    print "\tAdd Collaboration System subscriber validation workflow... " unless $quiet;
     # and here's our code
     $session->config->addToArray('workflowActivities/WebGUI::Asset', qw/WebGUI::Workflow::Activity::UpdateAssetSubscribers/);
     my $workflow = WebGUI::Workflow->create($session,
