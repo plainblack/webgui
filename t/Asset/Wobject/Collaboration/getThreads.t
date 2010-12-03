@@ -89,6 +89,10 @@ $expect = sortThreads( sub { $b->get('revisionDate') <=> $a->get('revisionDate')
 cmp_deeply( $page, $expect, 'getThreadsPaginator sort by no default' )
 or diag( "GOT: " . Dumper $page ), diag( "EXPECTED: " . Dumper $expect );
 undef $collab2;
+# clear scratch to reset sort
+$session->scratch->delete($collab->getId.'_sortBy');
+$session->scratch->delete($collab->getId.'_sortDir');
+
 # sortBy default from asset
 $collab->update({ 
     sortBy      => 'assetData.revisionDate',

@@ -329,7 +329,7 @@ cmp_bag(
         { keyword => "whiskey", url => '/home/test-archive?func=view;keyword=whiskey', },
     ],
     'viewTemplateVariables: keywords_loop is okay'
-);
+) or debug( Dumper $viewVariables->{keyword_loop} );
 
 is ($viewVariables->{updatedTimeEpoch}, $story->revisionDate, 'viewTemplateVariables: updatedTimeEpoch');
 

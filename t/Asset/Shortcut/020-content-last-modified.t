@@ -25,7 +25,7 @@ use WebGUI::Asset::Snippet;
 #----------------------------------------------------------------------------
 # Init
 my $session         = WebGUI::Test->session;
-my $node            = WebGUI::Asset->getImportNode($session);
+my $node            = WebGUI::Test->asset;
 
 # Make a snippet to shortcut
 my $now = time();

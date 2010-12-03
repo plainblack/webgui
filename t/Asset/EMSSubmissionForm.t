@@ -85,9 +85,6 @@ loginRgstr ;
 # Add an EMS asset
 my $ems = $node->addChild({
     className                =>'WebGUI::Asset::Wobject::EventManagementSystem',
-    title                    => 'Test EMS',
-    description              => 'This is a test ems',
-    url                      => '/test-ems',
     workflowIdCommit         => 'pbworkflow000000000003', # Commit Content Immediately
     registrationStaffGroupId => $registrars->getId,
     groupIdView              => $attendees->getId,

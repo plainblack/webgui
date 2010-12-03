@@ -33,7 +33,7 @@ $versionTag->set({name=>"Adding assets for RootTitle tests"});
 my %tag = ( tagId => $versionTag->getId, status => "pending" );
 addToCleanup($versionTag);
 
-my $root = WebGUI::Asset->getRoot($session);
+my $root = WebGUI::Test->asset;
 my %properties_A = (
 		className   => 'WebGUI::Asset::Snippet',
 		title       => 'Asset A',
