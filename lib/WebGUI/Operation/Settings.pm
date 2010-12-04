@@ -735,7 +735,7 @@ sub www_saveSettings {
     # Reset login message seen numbers
     if ( $session->form->get( 'showMessageOnLoginReset' ) ) {
         $session->db->write( 
-            "UPDATE userProfileData SET showMessageOnLoginSeen=0"
+            "UPDATE users SET showMessageOnLoginSeen=0"
         );
         $session->cache->clear;
     }

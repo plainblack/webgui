@@ -89,7 +89,6 @@ sub _fetchNames {
 	my %nameHash;
 	my $sql = "SELECT users.username, users.userId, firstName, lastName
 FROM users
-LEFT JOIN userProfileData ON users.userId=userProfileData.userId
 WHERE users.userId=?";
 	my $sth = $self->session->db->prepare($sql);
 	foreach my $userId (@userIds) {
@@ -337,7 +336,6 @@ sub www_selectDelegates {
 		from users
 		left join groupings on users.userId=groupings.userId
 		left join InOutBoard on groupings.groupId=InOutBoard.inOutGroup
-		left join userProfileData on users.userId=userProfileData.userId
 		left join InOutBoard_status on users.userId=InOutBoard_status.userId and InOutBoard_status.assetId=?
 		where
 			users.userId<>'1'

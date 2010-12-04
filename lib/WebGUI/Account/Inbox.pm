@@ -1533,7 +1533,7 @@ sub www_view {
 
     my $userSql = $inbox->getMessageSql(undef, { 'select' => <<EOSQL, });
 ibox.sentBy,
-(IF(userProfileData.firstName != '' and userProfileData.firstName is not null and userProfileData.lastName !='' and userProfileData.lastName is not null, concat(userProfileData.firstName,' ',userProfileData.lastName),users.username)) as fullName
+(IF(users.firstName != '' and users.firstName is not null and users.lastName !='' and users.lastName is not null, concat(users.firstName,' ',users.lastName),users.username)) as fullName
 EOSQL
     tie my %userHash, 'Tie::IxHash';
     my $i18n = WebGUI::International->new($session, 'Account_Inbox');

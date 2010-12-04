@@ -163,11 +163,11 @@ sub getSql {
     return <<END_SQL;
 select  
     r.Survey_responseId, r.username, r.userId, r.startDate, 
-    upd.email, upd.firstName, upd.lastName, 
+    u.email, u.firstName, u.lastName, 
     s.timeLimit, s.doAfterTimeLimit, 
     ad.title, ad.url  
 from 
-    Survey_response r left outer join userProfileData upd on r.userId = upd.userId, Survey s, assetData ad
+    Survey_response r left outer join users u on r.userId = u.userId, Survey s, assetData ad
 where 
     r.isComplete = 0 
     and s.timeLimit > 0 

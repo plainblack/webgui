@@ -179,7 +179,7 @@ sub getAlphabetSearchLoop {
         my $htmlEncodedLetter = encode_entities($letter);
         my $searchURL = "?searchExact_".$fieldName."=".$letter."%25"; 
         my $hasResults;
-        my $users = $self->session->db->read("select userId from userProfileData where `$fieldName` like '".$letter."%'"); 
+        my $users = $self->session->db->read("select userId from users join userProfileData using (userId) where `$fieldName` like '".$letter."%'"); 
         while (my $user = $users->hashRef){
             my $showGroupId = $self->showGroupId;
             if ($showGroupId eq '0' || ($showGroupId && $self->isInGroup($showGroupId,$user->{userId}))){
@@ -430,10 +430,10 @@ sub view {
 	}
     
     # Query user profile data. Exclude the visitor account and users that have been deactivated.
-	$sql = "select distinct users.userId, users.userName, userProfileData.publicProfile ";
+	$sql = "select distinct users.userId, users.userName, users.publicProfile ";
 	# Include remaining profile fields in the query
 	foreach my $profileField (@profileFields){
-    	$sql .= ", userProfileData." . $dbh->quote_identifier($profileField->{fieldName});
+    	$sql .= ", " . $dbh->quote_identifier($profileField->{fieldName});
 	}
 	$sql .= " from users";
 	$sql .= " left join userProfileData using(userId) where users.userId != '1' and users.status = 'active'";
@@ -447,14 +447,14 @@ sub view {
             # Normal search with one keyword in a limited number of fields
             foreach my $profileField (@profileFields){
                 if ($form->process('includeInSearch_'.$profileField->{fieldName})){    
-                    push(@profileSearchFields, 'userProfileData.'.$dbh->quote_identifier($profileField->{fieldName})
+                    push(@profileSearchFields, $dbh->quote_identifier($profileField->{fieldName})
                     .' like '. $dbh->quote('%'.$form->process('search').'%'));
                 }
             }
         }
         else{
             # Normal search with one keyword in all fields
-    		$constraint = "(".join(' or ', map {'userProfileData.'.$dbh->quote_identifier($_->{fieldName})
+    		$constraint = "(".join(' or ', map {$dbh->quote_identifier($_->{fieldName})
             .' like '.$dbh->quote('%'.$form->process('search').'%')} @profileFields).")";	
         }
 	}
@@ -464,14 +464,14 @@ sub view {
             # Exact search with one keyword in a limited number of fields
             foreach my $profileField (@profileFields){
                 if ($form->process('includeInSearch_'.$profileField->{fieldName})){
-                    push(@profileSearchFields,'userProfileData.'.$dbh->quote_identifier($profileField->{fieldName})
+                    push(@profileSearchFields,$dbh->quote_identifier($profileField->{fieldName})
                     .' like '.$dbh->quote($form->process('search')));
                 }
             }
         }
         else{
             # Exact search with one keyword in all fields
-            $constraint = "(".join(' or ', map {'userProfileData.'.$dbh->quote_identifier($_->{fieldName})
+            $constraint = "(".join(' or ', map {$dbh->quote_identifier($_->{fieldName})
             .' like ' . $dbh->quote($form->process('searchExact'))} @profileFields).")";
         }
     }
@@ -480,11 +480,11 @@ sub view {
     	foreach my $profileField (@profileFields){
             # Exact search has precedence over normal search
             if ($form->process('searchExact_'.$profileField->{fieldName})){
-                push(@profileSearchFields,'userProfileData.'.$dbh->quote_identifier($profileField->{fieldName})
+                push(@profileSearchFields,$dbh->quote_identifier($profileField->{fieldName})
                     .' like '. $dbh->quote($form->process('searchExact_'.$profileField->{fieldName})));
             }
             elsif ($form->process('search_'.$profileField->{fieldName})){
-                push(@profileSearchFields,'userProfileData.'.$dbh->quote_identifier($profileField->{fieldName})
+                push(@profileSearchFields,$dbh->quote_identifier($profileField->{fieldName})
                     .' like '. $dbh->quote('%'.$form->process('search_'.$profileField->{fieldName})));
             }
 	    }

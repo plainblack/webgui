@@ -98,7 +98,7 @@ sub _create {
         $privacy->{$field->get('fieldName')} = $privacySetting;
     }
     my $json = JSON->new->encode($privacy);
-    $session->db->write("update userProfileData set wg_privacySettings=? where userId=?",[$json,$userId]);
+    $session->db->write("update users set privacyFields=? where userId=?",[$json,$userId]);
 
     WebGUI::Group->new($session,2)->addUsers([$userId]);
     WebGUI::Group->new($session,7)->addUsers([$userId]);
@@ -578,7 +578,13 @@ sub get {
     my $session     = $self->session;
 
     if ( $field ) {
+        return if $field eq 'privacyFields';
         if ( exists $self->{_user}->{$field} ) {
+            if ( !defined $self->{_user}->{$field} ) {
+                my $default = $session->db->quickScalar("SELECT dataDefault FROM userProfileField WHERE fieldName=?", [$field]);
+                $self->{_user}{$field}
+                    = WebGUI::Operation::Shared::secureEval($session, $default);
+            }
             return $self->{_user}->{$field};
         }
         else {
@@ -606,7 +612,11 @@ sub get {
         "SELECT fieldName, dataDefault FROM userProfileField",
     );
     for my $key ( keys %default ) {
-        if ( !exists $self->{_profile}{$key} ) {
+        if ( exists $self->{_user}->{$key} && !defined $self->{_user}->{$key} ) {
+            $self->{_user}{$key}
+                = WebGUI::Operation::Shared::secureEval($session, $default{$key});
+        }
+        elsif ( !exists $self->{_user}->{$key} && !exists $self->{_profile}{$key} ) {
             $self->{_profile}{$key}
                 = WebGUI::Operation::Shared::secureEval($session, $default{$key});
         }
@@ -788,7 +798,7 @@ sub getProfileFieldPrivacySetting {
     unless ($self->{_privacySettings}) {
         #Look it up manually because we want to cache this separately.
         my $privacySettings        = $session->db->quickScalar(
-            q{select wg_privacySettings from userProfileData where userId=?},
+            q{select privacyFields from users where userId=?},
             [$self->userId]
         );
         $privacySettings          = "{}" unless $privacySettings;
@@ -798,7 +808,7 @@ sub getProfileFieldPrivacySetting {
     return $self->{_privacySettings} unless ($field);
 
     #No privacy settings returned the privacy setting field
-    return "none" if($field eq "wg_privacySettings");
+    return "none" if($field eq "privacyFields");
 
     return $self->{_privacySettings}->{$field};
 }   
@@ -1092,7 +1102,6 @@ sub new {
                 [$user{userId}]
             );
         delete $profile{userId};
-        delete $profile{wg_privacySettings};
 
         # Fill in dataDefault
         my $default = $session->db->buildHashRef(
@@ -1105,8 +1114,8 @@ sub new {
             }
         }
 
-        if (($profile{alias} =~ /^\W+$/ || $profile{alias} eq "") and $user{username}) {
-            $profile{alias} = $user{username};
+        if (($user{alias} =~ /^\W+$/ || $user{alias} eq "") and $user{username}) {
+            $user{alias} = $user{username};
         }
         $self->{_userId}    = $userId;
         $self->{_user}      = \%user,
@@ -1138,7 +1147,7 @@ sub newByEmail {
 	my $class = shift;
 	my $session = shift;
 	my $email = shift;
-	my ($id) = $session->dbSlave->quickArray("select userId from userProfileData where email=?",[$email]);
+	my ($id) = $session->dbSlave->quickArray("select userId from users where email=?",[$email]);
 	my $user = $class->new($session, $id);
 	return undef if ($user->isVisitor); # visitor is never valid for this method
 	return undef unless $user->username;
@@ -1304,7 +1313,7 @@ sub setProfileFieldPrivacySetting {
     
     #Store the data in the database
     my $json = JSON->new->encode($currentSettings);
-    $session->db->write("update userProfileData set wg_privacySettings=? where userId=?",[$json,$self->userId]);
+    $session->db->write("update users set privacyFields=? where userId=?",[$json,$self->userId]);
 
     #Recache the current settings
     $self->{_privacySettings} = $currentSettings;
@@ -1365,14 +1374,38 @@ name => value pairs of user properties and/or profile fields.
 
 Valid user properties:
 
- authMethod
- dateCreated
- friendsGroup
+ authMethod         - The default auth method for the user. DEPRECATED, all users
+                    can be authed by all auth methods
+ dateCreated        - The unix timestamp when the user was created
+ friendsGroup       - The WebGUI::Group containing the user's friends
  karma              - NOTE: To add karma, use the karma() method
- lastUpdated
- referringAffiliate
+ lastUpdated        - The unix timestamp when the user was last updated
+ referringAffiliate - A WebGUI::User who referred the user
  status             - One of "Activated", "Deactivated", or "Selfdestructed"
- username
+ username           - The username
+
+ ableToBeFriend                     - Whether the user can be added as a friend
+ alias                              - Show this instead of the username
+ allowPrivateMessages               - Whether this user can receive private messages
+ avatar                             - A WebGUI::Storage containing an avatar image
+ cellPhone                          - The user's cell number. Used for the SMS gateway
+ dateFormat                         - The desired date format. See WebGUI::DateTime for fields
+ email                              - The user's email
+ firstDayOfWeek                     - The preferred first day of the week
+ firstName                          - The first name
+ language                           - The user's i18n language
+ lastName                           - The last name
+ publicProfile                      - Whether the profile is visible to the public
+ receiveInboxEmailNotifications     - Should inbox messages be sent to the user's email
+ receiveInboxSmsNotifications       - Should inbox messages be sent to user's SMS
+ showMessageOnLoginSeen             - How many times they've seen the login message
+ showOnline                         - Should we reveal if the user is online?
+ signature                          - The signature for private messages and forum posts
+ timeFormat                         - The desired time format. See WebGUI::DateTime for fields
+ timeZone                           - The user's time zone. All datetimes will appear local to this
+ toolbar                            - Customize the toolbar for an i18n language
+ uiLevel                            - The UI Level. Allow users to see more based on their comprehension
+ versionTagMode                     - Their version tag mode
 
 Anything else is a profile field.
 
@@ -1401,7 +1434,8 @@ sub update {
     delete $properties->{userId};
 
     # This is an internal field with its own api to set it
-    delete $properties->{wg_privacySettings};
+    ### CHANGE THIS to be settable by update
+    delete $properties->{privacyFields};
 
     # $self->{_user} contains all fields in `users` table
     my @userFields  = ();

@@ -482,7 +482,7 @@ sub getMessageSql {
         $select =<<SELECT;
 ibox.messageId, ibox.subject, ibox.sentBy, ibox.dateStamp,
 (IF(ibox.status = 'completed' or ibox.status = 'pending',ibox.status,IF(inbox_messageState.repliedTo,'replied',IF(inbox_messageState.isRead,'read','unread')))) as messageStatus,
-(IF(userProfileData.firstName != '' and userProfileData.firstName is not null and userProfileData.lastName !='' and userProfileData.lastName is not null, concat(userProfileData.firstName,' ',userProfileData.lastName),users.username)) as fullName
+(IF(users.firstName != '' and users.firstName is not null and users.lastName !='' and users.lastName is not null, concat(users.firstName,' ',users.lastName),users.username)) as fullName
 SELECT
     }
 

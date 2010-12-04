@@ -467,7 +467,7 @@ sub www_findUser {
     }
 
     my $sql     = 'SELECT userId, CONCAT(firstName,lastName) AS name, username, alias, avatar
-                FROM users JOIN userProfileData USING (userId) WHERE ' . join( ' || ', @places );
+                FROM users WHERE ' . join( ' || ', @places );
     my $params  = [ ( $query ) x scalar @places ];
 
     my $sth = $db->read( $sql, $params );

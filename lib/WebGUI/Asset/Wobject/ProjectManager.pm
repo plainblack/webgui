@@ -385,7 +385,6 @@ sub _userSearchQuery {
 	my $query = <<"SQL";
 SELECT 'user' AS resourceKind, users.userId AS resourceId
   FROM users
-       LEFT JOIN userProfileData ON users.userId = userProfileData.userId
  WHERE (LOWER(lastName) LIKE ? OR LOWER(firstName) LIKE ?
         OR LOWER(users.username) LIKE ?) AND (users.userId NOT IN $excludePlaceholders)
  ORDER BY lastName, firstName

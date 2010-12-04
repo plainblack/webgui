@@ -227,10 +227,9 @@ sub doUserSearch {
 		$keyword = "%".$keyword;
 	}
 	my $sql = "select users.userId, users.username, users.status, users.dateCreated, users.lastUpdated,
-                userProfileData.email from users 
-                left join userProfileData on users.userId=userProfileData.userId 
+                users.email from users 
                 where $selectedStatus  and (users.username like ? or alias like ? or email like ? 
-                    or firstName like ? or lastName like ?) 
+                    or firstName like ? or lastName like ? or CONCAT(firstName, ' ', lastName) LIKE ? ) 
                 and users.userId not in (".$session->db->quoteAndJoin($userFilter).")  order by users.username";
 	if ($returnPaginator) {
         	my $p = WebGUI::Paginator->new($session,$session->url->page("op=".$op));

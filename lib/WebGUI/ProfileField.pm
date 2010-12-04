@@ -607,7 +607,7 @@ sub isDuplicate {
     my $value     = shift;
     my $userId    = shift || $session->user->userId;
 
-    my $sql       = qq{select count(*) from userProfileData where $fieldId = ? and userId <> ?};
+    my $sql       = qq{select count(*) from users join userProfileData using( userId ) where $fieldId = ? and userId <> ?};
     my $duplicate = $session->db->quickScalar($sql,[$value, $userId]);
     return ($duplicate > 0);
 }
@@ -918,7 +918,7 @@ sub set {
     }
 
     # If the fieldType has changed, modify the userProfileData column
-    if ($properties->{fieldType} ne $originalFieldType) {
+    if ($properties->{fieldType} ne $originalFieldType && !$self->isProtected) {
         # Create a copy of the new properties so we don't mess them up
         my $fieldClass  = $self->getFormControlClass;
         eval { WebGUI::Pluggable::load($fieldClass) };

@@ -13,6 +13,7 @@ use strict;
 use WebGUI::Test;
 use WebGUI::Session;
 #use Exception::Class;
+use List::MoreUtils qw( uniq );
 
 use WebGUI::User;
 use WebGUI::ProfileField;
@@ -150,7 +151,7 @@ is(
 );
 
 is(
-    $session->db->quickScalar("SELECT firstName FROM userProfileData WHERE userId=?",[$user->getId]),
+    $session->db->quickScalar("SELECT firstName FROM users WHERE userId=?",[$user->getId]),
     "John",
     "update() updates profile firstName",
 );
@@ -161,7 +162,7 @@ is(
 );
 
 is(
-    $session->db->quickScalar("SELECT lastName FROM userProfileData WHERE userId=?",[$user->getId]),
+    $session->db->quickScalar("SELECT lastName FROM users WHERE userId=?",[$user->getId]),
     "Lumbergh",
     "update() updates profile lastName",
 );
@@ -188,7 +189,7 @@ ok(
 
 $user->update({ lastName => "Lumberg" }),
 is( 
-    $session->db->quickScalar("SELECT lastName FROM userProfileData WHERE userId=?",[$user->getId]),
+    $session->db->quickScalar("SELECT lastName FROM users WHERE userId=?",[$user->getId]),
     "Lumberg",
     "update() updates lastName again",
 );
@@ -210,7 +211,7 @@ my $expectValues  = {
 };
 
 # expects all user properties and all profile fields
-my @expectFields    = ( 
+my @expectFields    = uniq( 
     $session->db->buildArray('DESCRIBE users'),
     $session->db->buildArray('SELECT fieldName FROM userProfileField'),
 );
@@ -244,9 +245,9 @@ is($user->profileField('notAProfileField'), undef, 'getting non-existant profile
 my $newProfileField = WebGUI::ProfileField->create($session, 'testField', {dataDefault => 'this is a test', fieldType => 'Text'});
 is($user->profileField('testField'), 'this is a test', 'getting profile fields not cached in the user object returns the profile field default');
 
-ok(!$user->profileField('wg_privacySettings'), '... wg_privacySettings may not be retrieved');
-$user->profileField('wg_privacySettings', '{"email"=>"all"}');
-ok(!$user->profileField('wg_privacySettings'), '... wg_privacySettings may not be set');
+ok(!$user->profileField('privacyFields'), '... privacyFields may not be retrieved');
+$user->profileField('privacyFields', '{"email"=>"all"}');
+ok(!$user->profileField('privacyFields'), '... privacyFields may not be set');
 
 ################################################################
 #
@@ -562,6 +563,8 @@ is( $buster->profileField('timeZone'), 'America/Chicago', 'buster received origi
 
 my $profileField = WebGUI::ProfileField->new($session, 'timeZone');
 my %originalFieldData = %{ $profileField->get() };
+use Data::Dumper;
+note( Dumper \%originalFieldData );
 my %copiedFieldData = %originalFieldData;
 $copiedFieldData{'dataDefault'} = "'America/Hillsboro'";
 $profileField->set(\%copiedFieldData);
@@ -569,9 +572,12 @@ $profileField->set(\%copiedFieldData);
 is($profileField->get('dataDefault'), "'America/Hillsboro'", 'default timeZone set to America/Hillsboro');
 
 # now let's make sure it has an extras field, and that we can get/set it.
-$profileField->set( { extras => '<!-- hello world -->' } );
+# DID YOU KNOW? you have to set everything otherwise things get messed up!
+$copiedFieldData{ 'extras' } = '<!-- hello world -->';
+$profileField->set( \%copiedFieldData );
 is($profileField->getExtras, '<!-- hello world -->', 'extras field for profileField');
-$profileField->set( { extras => '' } );
+$copiedFieldData{ 'extras' } = '';
+$profileField->set( \%copiedFieldData );
 
 
 my $busterCopy = WebGUI::User->new($session, $buster->userId);
@@ -930,8 +936,8 @@ is($neighbor->getProfileFieldPrivacySetting('email'), 'none', '...get and set 1 
 $neighbor->setProfileFieldPrivacySetting({email => 'only Tony'});
 is($neighbor->getProfileFieldPrivacySetting('email'), 'none', '...set will not set invalid profile settings');
 
-is($admin->getProfileFieldPrivacySetting('publicEmail'), 'all', '...get on a user with existing settings');
-is($neighbor->getProfileFieldPrivacySetting('wg_privacySettings'), 'none', '...the privacy field always returns "none"');
+is($admin->getProfileFieldPrivacySetting('email'), 'all', '...get on a user with existing settings');
+is($neighbor->getProfileFieldPrivacySetting('privacyFields'), 'none', '...the privacy field always returns "none"');
 
 ################################################################
 #
