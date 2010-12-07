@@ -108,9 +108,19 @@ sub getEditForm {
 	my $tabform = $self->SUPER::getEditForm();
     my $i18n    = WebGUI::International->new($self->session, "Asset_Carousel");
 
+    $self->session->style->setScript($self->session->url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'), {type =>
+    'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/element/element-min.js'), {type =>
+    'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/tabview/tabview-min.js'), {type =>
+    'text/javascript'});
     $self->session->style->setScript($self->session->url->extras('yui/build/editor/editor-min.js'), {type =>
     'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/json/json-min.js'), {type =>
+    'text/javascript'});
     $self->session->style->setLink($self->session->url->extras('yui/build/editor/assets/skins/sam/editor.css'), {type
+    =>'text/css', rel=>'stylesheet'});
+    $self->session->style->setLink($self->session->url->extras('yui/build/tabview/assets/skins/sam/tabview.css'), {type
     =>'text/css', rel=>'stylesheet'});
     $self->session->style->setScript($self->session->url->extras('wobject/Carousel/carousel.js'), {type =>
     'text/javascript'});
@@ -120,56 +130,30 @@ sub getEditForm {
         .'    <td class="formDescription"  valign="top" style="width: 180px;"><label for="item1">'
               .$i18n->get("items label").'</label><div class="wg-hoverhelp">'.$i18n->get("items description").'</div></td>'
         .'    <td id="items_td" valign="top" class="tableData">'
-        .'    <input type="button" value="Add item" onClick="javascript:addItem()"></input><br />'
+        .'    <input type="hidden" id="items_formId" name="items" />'
+        .'    <input type="button" value="Add item" onclick="window.carouselEditor.addTab()"></input><br />'
         ."    <br />\n";
 
     $tabform->getTab("properties")->raw($tableRowStart);
+    
 
-    if($self->getValue('items')){
-        my @items = @{JSON->new->decode($self->getValue('items'))->{items}};
+    my $richedit        = WebGUI::Asset->newByDynamicClass( $self->session, $self->session->setting->get('richEditor') );
+    my $config          = JSON->new->encode( $richedit->getConfig );
+    my $loadMcePlugins  = $richedit->getLoadPlugins;
+    my $items           = $self->get('items') ? JSON->new->decode($self->get('items'))->{items} : [];
+    $items              = JSON->new->encode( $items );
+    my $i18n            = JSON->new->encode( { "delete" => $i18n->get("delete") } );
 
-        foreach my $item (@items){
-            my $itemNr = $item->{sequenceNumber};
-            my $itemHTML = "<div id='item_div".$itemNr."' name='item_div_".$itemNr."'>\n"
-                ."<span>\n"
-                .$i18n->get("id label").'<div class="wg-hoverhelp">'.$i18n->get("id description").'</div>: '
-                .'<input type="text" id="itemId'.$itemNr.'" '
-                .'name="itemId_'.$itemNr.'" value="'.$item->{itemId}.'">'
-                ."</span>\n"
-                ."<input type='button' id='deleteItem".$itemNr."' value='Delete this item'
-onClick='javascript:deleteItem(this.id)'></input>\n"
-                .'<textarea id="item'.$itemNr.'" name="item_'.$itemNr.'" '
-                .'class="carouselItemText" rows="#" cols="#" '
-                .'style="width: 500px; height: 80px;">'.$item->{text}."</textarea><br />\n";
-            
-            $itemHTML .= 
-                " <script type='text/javascript'>\n"
-                .'var myEditor'.$itemNr.' '
-                .'= new YAHOO.widget.SimpleEditor("item'.$itemNr.'", '
-                ."{height: '80px', width: '500px', handleSubmit: true});\n"
-                .'myEditor'.$itemNr.".render()\n"
-                ."</script>\n"
-                ."</div>\n";
-            $tabform->getTab("properties")->raw($itemHTML);
-        }
-    }
-    else{
-        my $itemHTML = "<div id='item_div1' name='item_div_1'>\n"
-                ."<span>\n"
-                .$i18n->get("id label").'<div class="wg-hoverhelp">'.$i18n->get("id description").'</div>: '
-                .' <input type="text" id="itemId1" name="itemId_1" value="carousel_item_1">'
-                ."</span>\n"
-                ."<input type='button' id='deleteItem1' value='Delete this item' onClick='javascript:deleteItem(this.id)'></input>\n"
-                .'<textarea id="item1" name="item_1" class="carouselItemText" rows="#" cols="#" '
-                ."style='width: 500px; height: 80px;'></textarea><br />\n";
-            
-        $itemHTML .= 
-                 "<script type='text/javascript'>\n"
-                ."var myEditor1 = new YAHOO.widget.SimpleEditor('item1', {height: '80px', width: '500px', handleSubmit: true});\n"
-                ."myEditor1.render()\n"
-                ."</script>\n";
-        $tabform->getTab("properties")->raw($itemHTML);
-    }
+    $tabform->getTab('properties')->raw(<<"ENDHTML");
+    <div id="carouselEditor"></div>
+    <script type="text/javascript">
+    $loadMcePlugins
+    YAHOO.util.Event.onDOMReady( function() {
+        window.carouselEditor = new WebGUI.Carousel.Editor( "carouselEditor", $config, $items, $i18n );
+    } );
+    </script>
+ENDHTML
+
     my $tableRowEnd = qq|
             </td>
         </tr>
@@ -213,32 +197,10 @@ Used to process properties from the form posted.
 sub processPropertiesFromFormPost {
     my $self    = shift;
     my $form    = $self->session->form;
-    my (@items,$items);
     $self->SUPER::processPropertiesFromFormPost(@_);
 
-    foreach my $param ($form->param) {
-        if ($param =~ m/^item_/){
-            my $sequenceNumber = $param;
-            $sequenceNumber =~ s/^item_//;
-            if($form->process('itemId_'.$sequenceNumber)){
-            push(@items,{
-                sequenceNumber  => $sequenceNumber,
-                text            => $form->process($param),
-                itemId              => $form->process('itemId_'.$sequenceNumber),
-            });
-            }
-        }
-    }
-    
-    my  @sortedItems = sort { $a->{sequenceNumber} cmp $b->{sequenceNumber} } @items;
-    @items = ();
-    for (my $i=0; $i<scalar @sortedItems; $i++) {
-        $sortedItems[$i]->{sequenceNumber} = $i + 1;
-        push(@items,$sortedItems[$i]);
-    }        
-   
-    $items = JSON->new->encode({items => \@items});
-    $self->update({items => $items});
+    my $items   = JSON->new->decode( $form->get("items") ); 
+    $self->update({ items => JSON->new->encode({ items => $items }) });
     return undef;
 }
 
