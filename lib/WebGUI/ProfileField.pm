@@ -335,6 +335,11 @@ sub formField {
         if(!defined $properties->{value}) {
             $properties->{value} = WebGUI::Operation::Shared::secureEval($session,$properties->{dataDefault});
         }
+        if ($self->getId eq "language") {
+            if ($self->session->scratch->getLanguageOverride) {
+            	$properties->{value} = $self->session->scratch->getLanguageOverride;
+            }
+        }
     }
     my $form = WebGUI::Form::DynamicField->new($session,%{$properties});
     return $form if $returnObject;

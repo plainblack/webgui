@@ -310,6 +310,9 @@ sub createAccountSave {
 	my $userId = $u->userId;
 	$u->username($username);
 	$u->authMethod($self->authMethod);
+	if (!$profile->{'language'} && $self->session->scratch->getLanguageOverride) {
+	    $profile->{'language'} = $self->session->scratch->getLanguageOverride;
+	}
 	$u->karma($self->session->setting->get("karmaPerLogin"),"Login","Just for logging in.") if ($self->session->setting->get("useKarma"));
 	$u->updateProfileFields($profile) if ($profile);
     $self->saveParams($userId,$self->authMethod,$properties);

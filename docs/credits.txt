@@ -56,7 +56,7 @@ Contributing Developers..............C.J. Adams-Collier / <cjac@colliertech.org>
                                      Stephen Opal / Plain Black
                                      Tavis Parker / Plain Black
                                      Daniel Quinlan
-                                     Jukka Raimovaara / Axxion Oy
+                                     Jukka Raimovaara / Mentalhouse Oy
                                      Alan Ritari / DonorWare
                                      Hal Roberts / Harvard
                                      Luke Robinson / Orchard Solutions

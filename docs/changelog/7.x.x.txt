@@ -1,4 +1,5 @@
 7.10.7
+ - added #11968: use the language override in the registration form (Jukka Raimovaara / Mentalhouse Oy)
 
 7.10.6
  - fixed #11974: Toolbar icons unclickable in Webkit using HTML5
