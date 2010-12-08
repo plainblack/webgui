@@ -74,8 +74,8 @@ sub execute {
         return $self->COMPLETE unless $piped;
         my ( $recurId, $rest ) = split /\|/, $piped, 2;
 
-        $self->processRecurrence( $recurId, $timeLimit )
-            and $piped = $rest;
+        $self->processRecurrence( $recurId, $timeLimit );
+        $piped = $rest;
     }
 
     $instance->setScratch( recurrences => $piped );
