@@ -7,6 +7,7 @@
  - fixed #11974: Toolbar icons unclickable in Webkit using HTML5
  - fixed #11978: Pasting links into TinyMCE
  - fixed #11971: Still subscribed to forums you no longer have privilege to view
+ - fixed #11984: No JS allows invalid dates in Event asset
 
 7.9.18
  - fixed #11938: upgrade script always removes specialState

@@ -821,6 +821,18 @@ be useful, others may not.|,
         context => 'follows a select list with ordinals, first, second, etc.  To form the phrase, First week on, Second week on',
     },
 
+    'invalid start date' => {
+        message     => 'Invalid start date. Please enter a valid date in the form "YYYY-MM-DD"',
+        lastUpdated => 0,
+        context     => 'An error when we cant parse the date they give us',
+    },
+
+    'invalid end date' => {
+        message     => 'Invalid end date. Please enter a valid date in the form "YYYY-MM-DD"',
+        lastUpdated => 0,
+        context     => 'An error when we cant parse the date they give us',
+    },
+
 };
 
 1;
