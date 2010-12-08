@@ -142,14 +142,14 @@ sub getEditForm {
     my $loadMcePlugins  = $richedit->getLoadPlugins;
     my $items           = $self->get('items') ? JSON->new->decode($self->get('items'))->{items} : [];
     $items              = JSON->new->encode( $items );
-    my $i18n            = JSON->new->encode( { "delete" => $i18n->get("delete") } );
+    my $i18nJson        = JSON->new->encode( { "delete" => $i18n->get("delete") } );
 
     $tabform->getTab('properties')->raw(<<"ENDHTML");
     <div id="carouselEditor"></div>
     <script type="text/javascript">
     $loadMcePlugins
     YAHOO.util.Event.onDOMReady( function() {
-        window.carouselEditor = new WebGUI.Carousel.Editor( "carouselEditor", $config, $items, $i18n );
+        window.carouselEditor = new WebGUI.Carousel.Editor( "carouselEditor", $config, $items, $i18nJson );
     } );
     </script>
 ENDHTML
