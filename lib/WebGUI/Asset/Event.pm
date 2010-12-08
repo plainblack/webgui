@@ -1333,8 +1333,17 @@ sub processPropertiesFromFormPost {
 
     ### Verify the form was filled out correctly...
     my @errors;
-    # If the start date is after the end date
     my $i18n = WebGUI::International->new($session, 'Asset_Event');
+
+    # Verify we got valid dates
+    if ( !eval{ $self->getDateTimeStart; 1 } ) {
+        push @errors, $i18n->get('invalid start date');
+    }
+    if ( !eval{ $self->getDateTimeEnd; 1 } ) {
+        push @errors, $i18n->get('invalid end date');
+    }
+
+    # If the start date is after the end date
     if ($self->get("startDate") gt $self->get("endDate")) {
         push @errors, $i18n->get("The event end date must be after the event start date.");
     }

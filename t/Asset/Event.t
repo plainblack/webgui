@@ -19,7 +19,7 @@ use WebGUI::Asset::Event;
 
 use Test::More; # increment this value for each test you create
 use Test::Deep;
-plan tests => 23;
+plan tests => 25;
 
 my $session = WebGUI::Test->session;
 
@@ -143,6 +143,14 @@ is ($event7->get('startDate'), '2000-09-01', 'startDate bumped by 1 day');
 
 is ($event7->get('endTime'), '00:00:00',   'endTime set to 00:00:00 if the hour is more than 23');
 is ($event7->get('endDate'), '2000-09-02', 'endDate bumped by 1 day');
+
+#############################################################################
+# Valid dates
+$session->request->setup_body({ startDate => '0000-00-01', endDate => '1000-00-01' });
+my $event = $cal->addChild({ className => 'WebGUI::Asset::Event' }, undef, time()+10);
+my $output = $event->processPropertiesFromFormPost;
+is( ref $output, 'ARRAY', 'ppffp returns error array' );
+is( scalar @$output, 2, 'has two errors' );
 
 #######################################
 #
