@@ -34,11 +34,11 @@ sub derp ($) { # DEprecation caRP
 
     # Add stack info to message
     unless ( $message =~ /\n$/ ) {
-        $message .= " at " . join( "-", (caller(1))[0,2] );
+        $message .= " at " . join( " line ", (caller(1))[0,2] );
     }
 
     return if ( $derped{ $message }++ ); # HERP
-    warn $message;
+    warn $message . "\n"; # DERP
 }
 
 sub deprecate ($$) {

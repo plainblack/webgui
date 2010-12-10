@@ -19,6 +19,7 @@ use Carp qw( croak );
 use Scalar::Util qw( blessed );
 use WebGUI::International;
 use WebGUI::Pluggable;
+use WebGUI::Deprecate;
 
 =head1 NAME
 
