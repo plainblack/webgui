@@ -302,9 +302,10 @@ sub generateIdParameter {
 
 #-------------------------------------------------------------------
 
-=head2 get ( var )
+=head2 get ( [var] )
 
-Returns a property of this form object.
+Returns a property of this form object. If no property is specified, returns a hashref of all
+properties.
 
 =head3 var
 
@@ -315,7 +316,11 @@ The variable name of the value to return.
 sub get {
 	my $self = shift;
 	my $var = shift;
-	return $self->{_params}{$var};
+        if ( $var ) {
+            return $self->{_params}{$var};
+        }
+
+        return $self->{_params};
 }
 
 #-------------------------------------------------------------------
@@ -696,7 +701,20 @@ sub toHtmlWithWrapper {
     }
 }
 
+#----------------------------------------------------------------------------
 
+=head2 toTemplateVars ( )
+
+Returns a hashref of template variables of the properties of this control, used
+to re-create it in a template.
+
+=cut
+
+sub toTemplateVars {
+    my ( $self ) = @_;
+    my %var = %{$self->get};
+    return \%var;
+}
 
 1;
 

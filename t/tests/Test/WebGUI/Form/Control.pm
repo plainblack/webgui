@@ -41,7 +41,7 @@ sub t_00_method_check : Test(1) {
 }
 
 
-sub t_01_get_set : Test(2) {
+sub t_01_get_set : Test(3) {
     my $test    = shift;
     my $session = $test->session;
 
@@ -49,7 +49,7 @@ sub t_01_get_set : Test(2) {
 
     lives_ok { $form->set('name', 'form1'); } 'set name';
     is $form->get('name'), 'form1', 'get name';
-
+    cmp_deeply $form->get, superhashof({ name => 'form1' }), 'get hashref';
 }
 
 sub t_02_instanced : Test(1) {
@@ -61,6 +61,18 @@ sub t_02_instanced : Test(1) {
     });
 
     is $form->get('name'), 'form1', 'name set on instanciation';
+}
+
+sub t_03_toTemplateVars : Test(2) {
+    my $test    = shift;
+    my $session = $test->session;
+
+    my $form = $test->class->new($session, {
+        name => 'form1',
+    });
+
+    cmp_deeply $form->get, superhashof({ name => 'form1' }), 'toTemplateVars hashref';
+    isnt $form->toTemplateVars, $form->get, 'toTemplateVars creates safe hashref';
 }
 
 1;
