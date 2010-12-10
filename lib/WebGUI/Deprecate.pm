@@ -22,13 +22,25 @@ use warnings;
 use Package::Stash;
 
 use Sub::Exporter -setup => {
-    exports => [ 'deprecate' ],
+    exports => [ 'deprecate', 'derp' ],
     groups => {
-        default => [ 'deprecate' ],
+        default => [ 'deprecate', 'derp' ],
     }
 };
 
-my %warned;
+my %derped;
+sub derp ($) { # DEprecation caRP
+    my ( $message ) = @_;
+
+    # Add stack info to message
+    unless ( $message =~ /\n$/ ) {
+        $message .= " at " . join( "-", (caller(1))[0,2] );
+    }
+
+    return if ( $derped{ $message }++ ); # HERP
+    warn $message;
+}
+
 sub deprecate ($$) {
     my ($old_method, $new_method) = @_;
     my $package = caller;
@@ -40,10 +52,7 @@ sub deprecate ($$) {
     # call new method instead.  if 
     $stash->add_package_symbol('&'.$old_method, sub {
         my $self = shift;
-        my $message = "$package\::$old_method is deprecated and should be replaced with $new_method at " . join( "-", (caller(0))[0,2] );
-        warn $message
-            unless $warned{$message}++;
-
+        derp "$package\::$old_method is deprecated and should be replaced with $new_method";
         local $deep{1} = 1;
         $self->$new_method(@_);
     });
@@ -52,9 +61,7 @@ sub deprecate ($$) {
         if (!$deep{1}) {
             my $old_sub = $self->can($old_method);
             if ($old_sub ne \&{"$package\::$old_method"}) {
-                my $message = "Subclass of $package uses deprecated method $old_method, which should be replaced with $new_method";
-                carp $message
-                    unless $warned{$message}++;
+                derp "Subclass of $package uses deprecated method $old_method, which should be replaced with $new_method";
                 goto $old_sub;
             }
         }
