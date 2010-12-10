@@ -27,8 +27,6 @@ use WebGUI::Friends;
 use WebGUI::Deprecate;
 use Carp qw( carp );
 
-my %deprecateMessage = ();
-
 =head1 NAME
 
 Package WebGUI::User
@@ -211,8 +209,7 @@ Returns an instance of the authentication object for this user.
 
 # DEPRECATED. Remove in 9.0
 sub authInstance {
-    my $message = "WebGUI::User::authInstance is deprecated. Instantiate the auth method directly instead.";
-    carp $message unless $deprecateMessage{$message}++;
+    derp "WebGUI::User::authInstance is deprecated. Instantiate the auth method directly instead.";
     my $self    = shift;
     my $session = $self->session;
 
@@ -1204,8 +1201,7 @@ The value to set the profile field name to.
 
 # DEPRECATED! Remove in 9.0
 sub profileField {
-    my $message = "WebGUI::User::profileField is deprecated. Use get() and update() instead\n";
-    carp $message unless $deprecateMessage{$message}++;
+    derp "WebGUI::User::profileField is deprecated. Use get() and update() instead";
     my $self        = shift;
     my $fieldName   = shift;
     my $value       = shift;
