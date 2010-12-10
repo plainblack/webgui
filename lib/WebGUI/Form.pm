@@ -66,6 +66,7 @@ sub AUTOLOAD {
         $session->log->error($@);
         return undef;
     }
+    derp "Using WebGUI::Form::<field type> is deprecated. Use WebGUI::Form::Control->new() and toHtml() instead.";
 	return $control->toHtml;
 }
 
