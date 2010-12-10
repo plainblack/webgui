@@ -221,15 +221,9 @@ sub toTemplateVars {
         $var->{ "${prefix}_fieldloop" } = $fieldLoop;
         for my $field ( @{$self->fields} ) {
             my $name  = $field->get('name');
-            my $props = {
-                name            => $name,
-                field           => $field->toHtml,
-                label           => $field->getLabel,
-                label_nohover   => $field->get('label'),
-                pretext         => $field->get('pretext'),
-                subtext         => $field->get('subtext'),
-                hoverhelp       => $field->get('hoverhelp'),
-            };
+            my $props = $field->toTemplateVars;
+            # Add the whole field to the vars
+            $props->{ field } = $field->toHtml;
             for my $key ( keys %{$props} ) {
                 $var->{ "${prefix}_field_${name}_${key}" } = $props->{$key};
             }

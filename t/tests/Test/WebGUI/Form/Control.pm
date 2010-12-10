@@ -71,7 +71,13 @@ sub t_03_toTemplateVars : Test(2) {
         name => 'form1',
     });
 
-    cmp_deeply $form->get, superhashof({ name => 'form1' }), 'toTemplateVars hashref';
+    cmp_deeply $form->toTemplateVars, 
+        superhashof({ 
+            name  => 'form1',
+            label => $form->getLabel,
+            label_nohover => $form->get('label'),
+        }),
+        'toTemplateVars hashref';
     isnt $form->toTemplateVars, $form->get, 'toTemplateVars creates safe hashref';
 }
 

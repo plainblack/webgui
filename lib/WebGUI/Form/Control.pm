@@ -712,7 +712,11 @@ to re-create it in a template.
 
 sub toTemplateVars {
     my ( $self ) = @_;
-    my %var = %{$self->get};
+    my %var = ( 
+        %{$self->get},
+        label           => $self->getLabel,
+        label_nohover   => $self->get('label'),
+    );
     return \%var;
 }
 
