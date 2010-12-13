@@ -341,7 +341,7 @@ function dragable_dragStop(e) {
                         contentDiv.innerHTML = myArr528[0];
                     },
                     failure : function(req) {
-                        alert("Toggle Edit Form failed.  Problem with connection.  Please refresh the page and try again.");
+                        alert("Move failed.  Problem with connection.  Please refresh the page and try again.");
                     }
                 }
     
