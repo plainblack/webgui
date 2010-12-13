@@ -714,6 +714,25 @@ sub removeAttachments {
     $self->update({ attachmentsJson => $json, });
 }
 
+#----------------------------------------------------------------------------
+
+=head2 replaceParamName ( oldName, newName )
+
+Replace all instances of oldName with newName. Updates the template instance with
+the new names and returns the new template data. This is only to be used to alter
+the names of template parameters.
+
+=cut
+
+sub replaceParamName {
+    my ( $self, $oldName, $newName ) = @_;
+
+    # We're lazy here. If this fails, we'll add more checks, or call out to the parser
+    my $template    = $self->template;
+    $template =~ s/$oldName/$newName/g;
+    $self->template( $template );
+    return $template;
+}
 
 #-------------------------------------------------------------------
 
