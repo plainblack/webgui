@@ -875,8 +875,10 @@ sub www_ajaxPrices {
         } || 0,
 
         shipping => eval {
-            die unless $shipping;
-            $self->update({ shippingAddressId => $shipping });
+            #die unless $shipping;
+            if ( $shipping ) {
+                $self->update({ shippingAddressId => $shipping });
+            }
             my $ship = WebGUI::Shop::Ship->new($self->session);
             $ship->getOptions($self);
         } || [],
