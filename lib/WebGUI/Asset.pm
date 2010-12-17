@@ -2917,10 +2917,10 @@ sub www_editSave {
     my $isNewAsset = $session->form->process("assetId") eq "new" ? 1 : 0;
     return $session->privilege->locked() if (!$self->canEditIfLocked and !$isNewAsset);
     return $session->privilege->insufficient() unless $self->canEdit && $session->form->validToken;
-    if ($self->session->config("maximumAssets")) {
+    if ($self->session->config->get("maximumAssets")) {
         my ($count) = $self->session->db->quickArray("select count(*) from asset");
         my $i18n = WebGUI::International->new($self->session, "Asset");
-        return $self->session->style->userStyle($i18n->get("over max assets")) if ($self->session->config("maximumAssets") <= $count);
+        return $self->session->style->userStyle($i18n->get("over max assets")) if ( $self->session->config->get("maximumAssets") <= $count && $isNewAsset );
     }
     my $object;
     if ($isNewAsset) {

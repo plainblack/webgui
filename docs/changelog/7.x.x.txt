@@ -8,6 +8,8 @@
  - fixed #11978: Pasting links into TinyMCE
  - fixed #11971: Still subscribed to forums you no longer have privilege to view
  - fixed #11984: No JS allows invalid dates in Event asset
+ - fixed #11997: maximumAssets in config is ignored (Arjan Widlak / United Knowledge)
+ - fixed #11998: maximumAssets affects not only new assets, but als prevents editing existing assets if maximum is reached (Arjan Widlak / United Knowledge)
 
 7.9.18
  - fixed #11938: upgrade script always removes specialState
