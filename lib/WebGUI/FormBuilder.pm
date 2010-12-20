@@ -224,10 +224,14 @@ sub toTemplateVars {
             my $props = $field->toTemplateVars;
             # Add the whole field to the vars
             $props->{ field } = $field->toHtml;
+            $var->{ "${prefix}_field_${name}" } = $props->{ field };
+            push @{$fieldLoop}, $props;
+            # Individual accessor
             for my $key ( keys %{$props} ) {
                 $var->{ "${prefix}_field_${name}_${key}" } = $props->{$key};
             }
-            push @{$fieldLoop}, $props;
+            # Loop accessor
+            push @{$var->{ "${prefix}_field_${name}_loop" }}, $props;
         }
     }
     # $prefix_fieldsetloop
