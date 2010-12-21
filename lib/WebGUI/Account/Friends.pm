@@ -402,33 +402,37 @@ sub www_sendFriendsRequest {
     $var->{'user_full_name'    } = $user->getWholeName;
     $var->{'user_member_since' } = $user->dateCreated;
 
+    $var->{'cancel_url'       }  = $user->getProfileUrl;
+
     my $defaultComment = sprintf(
         $i18n->get('default friend comments'),
         $user->getFirstName,
         $session->user->getFirstName
     );
-    $var->{'form_message_text'}  = WebGUI::Form::textarea($session, {
+
+    my $form = WebGUI::FormBuilder->new( $session,
+        name    => "messageForm",
+        action  => $self->getUrl( "module=friends;do=sendFriendsRequestSave;uid=$uid" ),
+    );
+    $form->addField( "HTMLArea",
+        name        => "message",
+        value       => $defaultComment,
+        width       => 600,
+    );
+
+    # Add an alternative to the rich editor
+    $var->{'form_message_text'}  = WebGUI::Form::Textarea->new($session, {
         name   =>"message",
         value  =>$defaultComment,
         width  =>600,
         height =>200
-    });
+    })->toHtml;
 
-    $var->{'form_message_rich'}  = WebGUI::Form::HTMLArea($session, {
-        name  => "message",
-        value => $defaultComment,
-        width => "600",
-    });
+    $form->addField( "Submit",
+        name        => "submit",
+    );
 
-    $var->{'form_header'      }  = WebGUI::Form::formHeader($session,{
-        action => $self->getUrl("module=friends;do=sendFriendsRequestSave;uid=$uid"),
-        extras => q{name="messageForm"}
-    });
-
-    $var->{'submit_button'    }  = WebGUI::Form::submit($session,{});
-    $var->{'form_footer'      }  = WebGUI::Form::formFooter($session, {});
-
-    $var->{'cancel_url'       }  = $user->getProfileUrl;
+    $form->toTemplateVars( "form", $var );
 
     return $self->processTemplate($var,$self->getSendRequestTemplateId);
 }

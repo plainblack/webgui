@@ -19,6 +19,10 @@ my %namespaces = (
         submit          => "form_field_submit",
         formFooter      => "form_footer",
     },
+    "Account/Friends/SendRequest" => {
+        form_message_rich   => "form_field_message_field",
+        submit_button       => "form_field_submit",
+    },
 );
 
 # Map of namespace => { match => replacement }
