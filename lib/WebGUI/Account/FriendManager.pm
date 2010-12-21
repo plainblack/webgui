@@ -184,27 +184,13 @@ sub www_editFriends {
 
     my $groupName = shift || $form->get('groupName');
 
-    ##List users in my friends group.   Each friend gets a delete link.
-    my $friendsList = $user->friends->getUserList();
-    my @friends_loop = ();
-    while (my ($userId, $username) = each %{ $friendsList }) {
-        push @friends_loop, {
-            userId => $userId,
-            username => $username,
-            checkForm => WebGUI::Form::checkbox($session, {
-                name  => 'friendToAxe',
-                value => $userId,
-            }),
-        };
-    }
-
-    ##List users in all administrated groups.  Friends are added one at a time.
+    # Get the users we can add
     my @manageableUsers = ();
-    if ($groupName) {
+    if ($groupName) { # Only adding users from a single group
         my $group = WebGUI::Group->find($session, $groupName);
         push @manageableUsers, @{ $group->getUsersNotIn($user->{_user}->{'friendsGroup'}, 'withoutExpired') };
     }
-    else {
+    else { # Defaults to groups selected in settings
         my $groupIds = $session->setting->get('groupsToManageFriends');
         my @groupIds = split "\n", $groupIds;
         foreach my $groupId (@groupIds) {
@@ -214,11 +200,8 @@ sub www_editFriends {
         }
         @manageableUsers = uniq @manageableUsers;
     }
-    my %usersToAdd = ();
-    tie %usersToAdd, 'Tie::IxHash';
     my $manager = $session->user;
     my $i18n = WebGUI::International->new($session);
-    $usersToAdd{0} = $i18n->get('Select One');
     my @usersToAdd = ();
     my $overrideProfile = $session->setting->get('overrideAbleToBeFriend');
     USERID: foreach my $newFriendId (@manageableUsers) {
@@ -231,38 +214,48 @@ sub www_editFriends {
         push @usersToAdd, [ $newFriendId, $user->username ];
     }
 
+    tie my %usersToAdd, 'Tie::IxHash';
+    $usersToAdd{0} = $i18n->get('Select One');
     @usersToAdd = sort { $a->[1] cmp $b->[1] } @usersToAdd;
     foreach my $newFriend (@usersToAdd) {
         $usersToAdd{$newFriend->[0]} = $newFriend->[1];
     }
 
     my $var;
-    $var->{formHeader}  = WebGUI::Form::formHeader($session, {
-                            action => $self->getUrl('module=friendManager;do=editFriendsSave'),
-                          })
-                        . WebGUI::Form::hidden($session, { name => 'userId', value => $user->userId } );
-    if ($groupName) {
-        $var->{formHeader} .= WebGUI::Form::hidden($session, { name => 'groupName', value => $groupName });
-    }
-    $var->{addUserForm} = WebGUI::Form::selectBox($session, {
-        name        => 'userToAdd',
-        options     => \%usersToAdd,
-    });
-    $var->{friends_loop} = \@friends_loop;
-    $var->{has_friends}  = scalar @friends_loop;
-    $var->{submit}       = WebGUI::Form::submit($session);
-    $var->{formFooter}   = WebGUI::Form::formFooter($session);
+    $var->{has_friends}  = @{$user->friends->getUsers("noexpired")};
     $var->{username}     = $user->username;
     $var->{userId}       = $user->userId;
     $var->{manageUrl}    = $self->getUrl('module=friendManager;do=view');
-    $var->{removeAll}    = WebGUI::Form::checkbox($session, { name => 'removeAllFriends', value => 'all', });
-    if (! $groupName) {
-        $var->{addManagers}  = WebGUI::Form::checkbox($session, { name => 'addManagers', value => 'addManagers', });
-    }
     if ($groupName) {
         $var->{groupName}  = $groupName;
         $var->{viewAllUrl} = $self->getUrl('module=friendManager;do=editFriends;userId='.$userId);
     }
+
+    my $form    = WebGUI::FormBuilder->new( $session,
+                    name    => "friendManager",
+                    action => $self->getUrl('module=friendManager;do=editFriendsSave')
+                );
+    $form->addField( "Hidden", name => "userId", value => $user->userId );
+    if ( $groupName ) {
+        $form->addField( "Hidden", name => 'groupName', value => $groupName );
+    }
+
+    # Add checkboxes to remove friends
+    my $friendsList = $user->friends->getUserList();
+    while (my ($userId, $username) = each %{ $friendsList }) {
+        $form->addField( "Checkbox", name => 'friendToAxe', value => $userId, label => $username );
+    }
+
+    # Add a selectbox to add friends
+    $form->addField( "SelectBox", name => 'userToAdd', options => \%usersToAdd );
+
+    $form->addField( "Checkbox", name => 'removeAllFriends', value => 'all' );
+    if (!$groupName) {
+        $form->addField( "Checkbox", name => 'addManagers', value => 'addManagers' );
+    }
+    $form->addField( 'Submit', name => "submit" );
+    $form->toTemplateVars( "form", $var );
+
     return $self->processTemplate($var,$session->setting->get("fmEditTemplateId"));
 }
 
