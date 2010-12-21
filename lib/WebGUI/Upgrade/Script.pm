@@ -9,6 +9,7 @@ use Sub::Name;
 use WebGUI::Upgrade ();
 use Scope::Guard;
 use Scalar::Util qw(weaken);
+use Try::Tiny;
 
 my $exporter = Sub::Exporter::build_exporter({
     groups => {
