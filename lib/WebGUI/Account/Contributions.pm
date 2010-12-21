@@ -215,12 +215,12 @@ sub www_view {
 
     tie my %rpps, "Tie::IxHash";
     %rpps = (25 => "25", 50 => "50", 100=>"100");
-    $var->{'contributions_rpp'  } = WebGUI::Form::selectBox($session,{
+    $var->{'contributions_rpp'  } = WebGUI::Form::SelectBox->new($session,{
         name    =>"rpp",
         options => \%rpps,
         value   => $session->form->get("rpp") || 25,
         extras  => q{onchange="location.href='}.$var->{'rpp_url'}.q{;rpp='+this.options[this.selectedIndex].value"}
-    });
+    })->toHtml;
 
     $self->appendCommonVars($var);
     $p->appendTemplateVars($var);
