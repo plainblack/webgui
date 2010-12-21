@@ -44,6 +44,7 @@ use Monkey::Patch       qw( patch_object );
 use Scope::Guard;
 use WebGUI::Paths -inc;
 use namespace::clean;
+use WebGUI::User;
 
 our @EXPORT = qw(cleanupGuard addToCleanup);
 our @EXPORT_OK = qw(session config collateral);
@@ -289,6 +290,23 @@ sub asset {
     my $asset = WebGUI::Asset->getImportNode( $class->session )->addChild( \%props );
     addToCleanup( $asset );
     return $asset;
+}
+
+#----------------------------------------------------------------------------
+
+=head2 user ( props )
+
+Create a safe user to use for testing. The user will be removed after the test
+is run.
+
+=cut
+
+sub user {
+    my ( $class, %props ) = @_;
+    my $user = WebGUI::User->create( $class->session );
+    $user->update( %props );
+    addToCleanup( $user );
+    return $user;
 }
 
 #----------------------------------------------------------------------------
