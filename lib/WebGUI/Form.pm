@@ -27,6 +27,10 @@ Package WebGUI::Form
 
 =head1 DESCRIPTION
 
+NOTE: This module is deprecated. You should use WebGUI::FormBuilder to create
+and process forms built with WebGUI::Form::Control objects (all of the 
+WebGUI::Form::* modules).
+
 This is a convenience package which provides a simple interface to use all of the form controls without having to load each one seperately, create objects, and call methods.
 
 =head1 SYNOPSIS
@@ -59,7 +63,8 @@ Dynamically creates functions on the fly for all the different form control type
 sub AUTOLOAD {
 	our $AUTOLOAD;
     return if $AUTOLOAD =~ m/::DESTROY$/;
-	my $name = ucfirst((split /::/, $AUTOLOAD)[-1]);	
+        my $method = (split /::/, $AUTOLOAD)[-1];
+	my $name = ucfirst($method);	
 	my $session = shift;
 	my @params = @_;
     my $control = eval { WebGUI::Pluggable::instanciate("WebGUI::Form::".$name, "new", [ $session, @params ]) };
@@ -67,7 +72,7 @@ sub AUTOLOAD {
         $session->log->error($@);
         return undef;
     }
-    derp "Using WebGUI::Form::<field type> is deprecated. Use WebGUI::Form::Control->new() and toHtml() instead.";
+    derp "Using WebGUI::Form::$method is deprecated. Use WebGUI::Form::$name->new() and toHtml() instead.";
 	return $control->toHtml;
 }
 
