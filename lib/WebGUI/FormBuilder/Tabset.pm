@@ -139,4 +139,30 @@ sub toHtml {
     return $html;
 }
 
+#----------------------------------------------------------------------------
+
+=head2 toTemplateVars ( )
+
+Return a hashref of template vars to re-create this tabset
+
+=cut
+
+sub toTemplateVars {
+    my ( $self ) = @_;
+    my $var = {};
+
+    $var->{ tabs } = [];
+    for my $tab ( $self->tabs ) {
+        my $name  = $tab->name;
+        my $props = $tab->toTemplateVars;
+        $var->{ "tabs_${name}" } = $tab->toHtml;
+        push @{$var->{tabs}}, $props;
+        for my $key ( %$props ) {
+            $var->{ "tabs_${name}_${key}" } = $props->{$key};
+        }
+    }
+
+    return $var;
+}
+
 1;

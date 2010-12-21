@@ -257,26 +257,26 @@ sub toTemplateVars {
             push @{$fieldsetLoop}, $props;
         }
     }
-    # $prefix_tabloop
+    # $prefix_tabsetloop
     #   name
-    #   label
-    #   fieldloop
-    #       ...
-    #   fieldsetloop
-    #       ...
     #   tabloop
-    #       ...
-    # $prefix_tab_$tabName
-    if ( @{$self->tabs} ) {
-        my $tabLoop = [];
-        $var->{ "${prefix}_tabLoop" } = $tabLoop;
-        for my $tab ( @{$self->tabs} ) {
-            my $name    = $tab->name;
-            my $props   = $tab->toTemplateVars;
+    #       fieldloop
+    #           ...
+    #       fieldsetloop
+    #           ...
+    #       tabsetloop
+    #           ...
+    # $prefix_tabset_$tabsetName
+    if ( @{$self->tabsets} ) {
+        my $tabsetLoop = [];
+        $var->{ "${prefix}_tabsetLoop" } = $tabsetLoop;
+        for my $tabset ( @{$self->tabsets} ) {
+            my $name    = $tabset->name;
+            my $props   = $tabset->toTemplateVars;
             for my $key ( keys %{$props} ) {
-                $var->{ "${prefix}_tab_${name}_${key}" } = $props->{key};
+                $var->{ "${prefix}_tabset_${name}_${key}" } = $props->{key};
             }
-            push @{$tabLoop}, $props;
+            push @{$tabsetLoop}, $props;
         }
     }
 
