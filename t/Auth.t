@@ -47,8 +47,15 @@ $session->{_request} = $request;
 
 $auth           = WebGUI::Auth->new( $session, $AUTH_METHOD );
 my $username    = $session->id->generate;
-my $language	= "German";
+my $language	= "PigLatin";
 push @cleanupUsernames, $username;
+installPigLatin();
+WebGUI::Test->addToCleanup(sub {
+	unlink File::Spec->catfile(WebGUI::Test->lib, qw/WebGUI i18n PigLatin WebGUI.pm/);
+	unlink File::Spec->catfile(WebGUI::Test->lib, qw/WebGUI i18n PigLatin.pm/);
+	rmdir File::Spec->catdir(WebGUI::Test->lib, qw/WebGUI i18n PigLatin/);
+});
+
 $session->scratch->setLanguageOverride($language);
 $output         = $auth->createAccountSave( $username, { }, "PASSWORD" ); 
 WebGUI::Test->addToCleanup(sub {
@@ -77,6 +84,7 @@ is(
 );
 
 is $session->user->profileField('language'), $language, 'languageOverride is taken in to account in createAccountSave';
+$session->scratch->delete('language');  ##Remove language override
 
 # Session Cleanup
 $session->{_request} = $oldRequest;
@@ -106,4 +114,17 @@ is $output, undef, 'login returns undef when showMessageOnLogin is false';
 
 # Session Cleanup
 $session->{_request} = $oldRequest;
+sub installPigLatin {
+    use File::Copy;
+	mkdir File::Spec->catdir(WebGUI::Test->lib, 'WebGUI', 'i18n', 'PigLatin');
+	copy( 
+		WebGUI::Test->getTestCollateralPath('WebGUI.pm'),
+		File::Spec->catfile(WebGUI::Test->lib, qw/WebGUI i18n PigLatin WebGUI.pm/)
+	);
+	copy(
+		WebGUI::Test->getTestCollateralPath('PigLatin.pm'),
+		File::Spec->catfile(WebGUI::Test->lib, qw/WebGUI i18n PigLatin.pm/)
+	);
+}
+
 
