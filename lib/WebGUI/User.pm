@@ -380,7 +380,6 @@ sub delete {
     my $userId  = $self->userId;
     my $session = $self->session;
     my $db      = $session->db;
-    $self->uncache;
 
     foreach my $groupId ( @{ $self->getGroups } ) {
         my $group = WebGUI::Group->new($session, $groupId);
@@ -429,6 +428,7 @@ sub delete {
     $credit->purge;
 
     # remove user itself
+    $self->uncache;
     $db->write("DELETE FROM userProfileData WHERE userId=?",[$userId]);
     $db->write("DELETE FROM users WHERE userId=?",[$userId]);
 }
