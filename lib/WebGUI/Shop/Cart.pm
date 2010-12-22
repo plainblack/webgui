@@ -1174,7 +1174,10 @@ sub www_view {
 
         my $billingAddressId = $self->get('billingAddressId');
         if ($billingAddressId) {
-            $billingAddressOptions{'update_address'} = sprintf $i18n->get('Update %s'), $self->getBillingAddress->get('label');
+            my $billingAddress = eval { $self->getBillingAddress };
+            if ( defined $billingAddress ) {
+                $billingAddressOptions{'update_address'} = sprintf $i18n->get('Update %s'), $billingAddress->get('label');
+            }
         }
 
         %billingAddressOptions = (%billingAddressOptions, %addressOptions);
@@ -1190,7 +1193,10 @@ sub www_view {
 
         my $shippingAddressId = $self->get('shippingAddressId');
         if ($shippingAddressId) {
-            $shippingAddressOptions{'update_address'} = sprintf $i18n->get('Update %s'), $self->getShippingAddress->get('label');
+            my $shippingAddress = eval { $self->getShippingAddress };
+            if ( defined $shippingAddress ) {
+               $shippingAddressOptions{'update_address'} = sprintf $i18n->get('Update %s'), $shippingAddress->get('label');
+            }
         }
         %shippingAddressOptions = (%shippingAddressOptions, %addressOptions);
 
