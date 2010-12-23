@@ -1257,14 +1257,6 @@ sub www_view {
 
     # render the cart
     my $template = WebGUI::Asset::Template->new($session, $session->setting->get("shopCartTemplateId"));
-
-    my $style = $session->style;
-    my $yui = $url->extras('/yui/build');
-    $style->setScript("$yui/yahoo-dom-event/yahoo-dom-event.js");
-    $style->setScript("$yui/json/json-min.js");
-    $style->setScript("$yui/connection/connection-min.js");
-    $style->setScript($url->extras('underscore/underscore-min.js'));
-    $style->setScript($url->extras('shop/cart.js'), undef, 1);
     return $session->style->userStyle($template->process(\%var));
 }
 
