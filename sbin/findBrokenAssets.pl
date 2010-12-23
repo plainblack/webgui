@@ -65,10 +65,13 @@ my $totalAsset      = $session->db->quickScalar('SELECT COUNT(*) FROM asset');
 my $totalAssetData  = $session->db->quickScalar('SELECT COUNT( DISTINCT( assetId ) ) FROM assetData' );
 my $total   = $totalAsset >= $totalAssetData ? $totalAsset : $totalAssetData;
 
-# Order by to put corrupt parents before corrupt children
+# Order by lineage to put corrupt parents before corrupt children
 # Join assetData to get all asset and assetData
 my $sql   = "SELECT * FROM asset LEFT JOIN assetData USING ( assetId ) GROUP BY assetId ORDER BY lineage ASC";
 my $sth   = $session->db->read($sql);
+
+##Guarantee that we get the most recent revisionDate
+my $max_revision  = $session->db->prepare('select max(revisionDate) from assetData where assetId=?');
 
 my $count = 1;
 my %classTables;            # Cache definition lookups
@@ -85,6 +88,8 @@ while ( my %row = $sth->hash ) {
                 eval "require $row{className}";
                 [ map { $_->{tableName} } reverse @{ $row{className}->definition($session) } ];
             };
+            $max_revision->execute([$row{assetId}]);
+            ($row{revisionDate}) = $max_revision->array();
             $row{revisionDate} ||= time;
 
             for my $table ( @{$classTables} ) {
@@ -196,6 +201,8 @@ while ( my %row = $sth->hash ) {
     } ## end if ( !$asset )
     progress( $total, $count++ );
 } ## end while ( my %row = $sth->hash)
+$sth->finish;
+$max_revision->finish;
 
 finish($session);
 print "\n";

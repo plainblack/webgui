@@ -18,6 +18,7 @@ use strict;
 use lib "$FindBin::Bin/lib";
 use Test::More;
 use Data::Dumper;
+use File::Spec;
 use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
 use WebGUI::Form::Text;
@@ -92,11 +93,19 @@ ok( $ff     = $langField->formField, 'formField method returns something, langua
 $ffvalue    = $session->user->profileField('language');
 like( $ff, qr/value="$ffvalue"[^>]+selected/, 'html returned contains value, language field, session user' );
 
+installPigLatin();
+WebGUI::Test->addToCleanup(sub {
+	unlink File::Spec->catfile(WebGUI::Test->lib, qw/WebGUI i18n PigLatin WebGUI.pm/);
+	unlink File::Spec->catfile(WebGUI::Test->lib, qw/WebGUI i18n PigLatin.pm/);
+	rmdir File::Spec->catdir(WebGUI::Test->lib, qw/WebGUI i18n PigLatin/);
+});
+
 $ff         = undef;
-$ffvalue    = "German";
+$ffvalue    = "PigLatin";
 $session->scratch->setLanguageOverride($ffvalue);
 ok( $ff     = $langField->formField, 'formField method returns something, language field, session user, languageOverride' );
 like( $ff, qr/value="$ffvalue"[^>]+selected/, 'html returned contains value, language field, session user, languageOverride' );
+$session->scratch->delete('language');
 
 ###########################################################
 #
@@ -204,3 +213,19 @@ $newProfileField3->set({ required => 1});
 is ($newProfileField3->get('required'), 1, 'set required = 1');
 is ($newProfileField3->get('editable'), 1, '... editable = 1');
 $newProfileField3->delete;
+
+
+sub installPigLatin {
+    use File::Copy;
+	mkdir File::Spec->catdir(WebGUI::Test->lib, 'WebGUI', 'i18n', 'PigLatin');
+	copy( 
+		WebGUI::Test->getTestCollateralPath('WebGUI.pm'),
+		File::Spec->catfile(WebGUI::Test->lib, qw/WebGUI i18n PigLatin WebGUI.pm/)
+	);
+	copy(
+		WebGUI::Test->getTestCollateralPath('PigLatin.pm'),
+		File::Spec->catfile(WebGUI::Test->lib, qw/WebGUI i18n PigLatin.pm/)
+	);
+}
+
+

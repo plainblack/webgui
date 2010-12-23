@@ -6,6 +6,9 @@
    be empty ( Martin Kamerbeek / Oqapi )
  - fixed bug where an invalid address ids would prevent a customer from ever
    checking out again ( Martin Kamerbeek / Oqapi )
+ - fixed #11997: maximumAssets in config is ignored (Arjan Widlak / United Knowledge)
+ - fixed #11998: maximumAssets affects not only new assets, but als prevents editing existing assets if maximum is reached
+ - fixed #12003: WebGUI::User->delete leaves around cache data
 
 7.10.6
  - fixed #11974: Toolbar icons unclickable in Webkit using HTML5
