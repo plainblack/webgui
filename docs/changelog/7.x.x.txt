@@ -13,6 +13,8 @@
  - fixed #12003: WebGUI::User->delete leaves around cache data
  - fixed bug in shopping cart where in some cases the shipper selectbox would
    be empty ( Martin Kamerbeek / Oqapi )
+ - fixed bug where an invalid address ids would prevent a customer from ever
+   checking out again ( Martin Kamerbeek / Oqapi )
 
 7.9.18
  - fixed #11938: upgrade script always removes specialState

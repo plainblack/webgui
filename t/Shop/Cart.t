@@ -35,7 +35,7 @@ my $i18n = WebGUI::International->new($session, "Shop");
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 34;        # Increment this number for each test you create
+plan tests => 36;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -205,6 +205,22 @@ is($cart->delete, undef, "Can destroy cart.");
     is( $cart->get('shippingAddressId'), 'OtherShippert', 'calling www_ajaxPrices w/ shipperId updates the cart shipperId' );
 
     $cart->update( { shippingAddressId => $shipper->getId } );
+}
+
+# Test (part of) www_view
+{
+    my $shippingAddressId   = $cart->get( 'shippingAddressId'   );
+    my $billingAddressId    = $cart->get( 'billingAddressId'    );
+
+    $cart->update( { shippingAddressId => 'NoWayDude' } );
+    eval { $cart->www_view };
+    is( $@, '', 'Invalid shippingAddressId doesn\'t make www_view crash' );
+
+    $cart->update( { billingAddressId => 'WRONG!!!!', shippingAddressId => $shippingAddressId } );
+    eval { $cart->www_view };
+    is( $@, '', 'Invalid billingAddressId doesn\'t make www_view crash' );
+
+    $cart->update( { billingAddressId => $billingAddressId } );
 }
 
 $product->purge;
