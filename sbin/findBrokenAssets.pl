@@ -201,6 +201,8 @@ while ( my %row = $sth->hash ) {
     } ## end if ( !$asset )
     progress( $total, $count++ );
 } ## end while ( my %row = $sth->hash)
+$sth->finish;
+$max_revision->finish;
 
 finish($session);
 print "\n";
