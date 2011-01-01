@@ -371,6 +371,14 @@ sub duplicate {
 	my $newAsset = $self->SUPER::duplicate(@_);
 	my $newStorage = $self->getStorageLocation->copy;
 	$newAsset->update({storageId=>$newStorage->getId});
+    my $links = $self->getRelatedLinks();
+    my $id    = $self->session->id;
+    foreach my $link (@{ $links }) {
+        $link->{new_event}   = 1;
+        $link->{eventlinkId} = $id->generate;
+        $link->{linkurl}     = $link->{linkURL};
+    }
+    $newAsset->setRelatedLinks($links);
 	return $newAsset;
 }
 
@@ -395,12 +403,11 @@ sub generateRecurrence {
     };
     my $db = $self->session->db;
     unless ($db->quickScalar($sql, [$self->get('recurId'), $sdb])) {
-        my $child = $self->get;
-        $child->{startDate} = $sdb;
-        $child->{endDate}   = $edb;
-        $self->getParent->addChild(
-            $child, undef, undef, { skipAutoCommitWorkflows => 1 }
-        );
+        my $child = $self->duplicate({skipAutoCommitWorkflows => 1});
+        $child->update({
+            startDate => $sdb,
+            endDate   => $edb,
+        });
     }
 }
 
@@ -1582,14 +1589,18 @@ Extent the method from the super class to delete all storage locations.
 =cut
 
 sub purge {
-    my $self = shift;
-    my $sth = $self->session->db->read("select storageId from Event where assetId=?",[$self->getId]);
-    while (my ($storageId) = $sth->array) {
-        my $storage = WebGUI::Storage->get($self->session,$storageId);
+    my $self    = shift;
+    my $id      = $self->getId;
+    my $session = $self->session;
+    my @storageIds = $session->db->buildArray("select storageId from Event where assetId=?",[$id]);
+    my $success    = $self->SUPER::purge;
+    return 0 unless $success;
+    foreach my $storageId (@storageIds) {
+        my $storage = WebGUI::Storage->get($session, $storageId);
         $storage->delete if defined $storage;
     }
-    $sth->finish;
-    return $self->SUPER::purge;
+    $session->db->write('delete from Event_relatedlink where assetId=?',[$id]);
+    return 1;
 }
 
 #-------------------------------------------------------------------

@@ -16,6 +16,7 @@
  - fixed bug where an invalid address ids would prevent a customer from ever
    checking out again ( Martin Kamerbeek / Oqapi )
  - fixed #12007: Hardcoded js in cart view ( Martin Kamerbeek / Oqapi )
+ - fixed #12010: Related URLs are not copied for events created through recurrence
 
 7.9.18
  - fixed #11938: upgrade script always removes specialState
