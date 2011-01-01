@@ -11,6 +11,7 @@
  - fixed #11998: maximumAssets affects not only new assets, but als prevents editing existing assets if maximum is reached
  - fixed #12003: WebGUI::User->delete leaves around cache data
  - fixed #12007: Hardcoded js in cart view ( Martin Kamerbeek / Oqapi )
+ - fixed #12010: Related URLs are not copied for events created through recurrence
 
 7.10.6
  - fixed #11974: Toolbar icons unclickable in Webkit using HTML5
