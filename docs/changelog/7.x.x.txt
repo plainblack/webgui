@@ -18,6 +18,7 @@
  - fixed #12007: Hardcoded js in cart view ( Martin Kamerbeek / Oqapi )
  - fixed #12010: Related URLs are not copied for events created through recurrence
  - fixed #12012: WebGUI Account system does not present login to visitors for proper redirect
+ - fixed #12015: Thingy: Custom 'File' form fields get deleted upon save
 
 7.9.18
  - fixed #11938: upgrade script always removes specialState
