@@ -454,7 +454,7 @@ sub copyThingData {
     my @storage_field_ids = ();
     ##Check to see if any of them are File or Image
     foreach my $field (@{ $fields }) {
-        if ($field->{fieldType} eq 'File' or $field->{fieldType} eq 'Image') {
+        if ($self->field_isa($field->{fieldType}, 'WebGUI::Form::File')) {
             push @storage_field_ids, $field->{fieldId};
         }
     }
@@ -512,7 +512,7 @@ sub deleteThingData {
     my @storage_field_ids = ();
     ##Check to see if any of them are File or Image
     foreach my $field (@{ $fields }) {
-        if ($field->{fieldType} eq 'File' or $field->{fieldType} eq 'Image') {
+        if ($self->field_isa($field->{fieldType}, 'WebGUI::Form::File')) {
             push @storage_field_ids, $field->{fieldId};
         }
     }
@@ -610,7 +610,7 @@ sub editThingDataSave {
             $fieldType = "" if ($fieldType =~ m/^otherThing/x);
             # Modify the defaultValue for certain field types. For most types we want to use
             # the default in the database, for these we want the last known value for this thingData
-            if ( $fieldType eq "File" || $fieldType eq "Image" ) {
+            if ($self->field_isa($fieldType, 'WebGUI::Form::File')) {
                 $field->{ defaultValue } = $thingData{ "field_" . $field->{ fieldId } };
             }
             $fieldValue = $thingData->{$fieldName} || $session->form->process($fieldName,$fieldType,$field->{defaultValue},$field);
@@ -670,6 +670,32 @@ sub exportAssetData {
     $data->{fields} = $db->buildArrayRefOfHashRefs('select * from Thingy_fields where assetId = ?',[$assetId]);
 
     return $data;
+}
+
+#-------------------------------------------------------------------
+
+=head2 field_isa ( $fieldType, $isa )
+
+Builds a form field and does an isa check on it.
+
+=head2 $fieldType
+
+This is the type of a field to build.  It will have 'WebGUI::Form' prepended to it to form
+a complete classname.
+
+=head2 $isa
+
+This is the class name to check against.
+
+=cut
+
+sub field_isa {
+    my $self      = shift;
+    my $session   = $self->session;
+    my $fieldType = shift;
+    my $isa       = shift;
+    my $control   = eval { WebGUI::Pluggable::instanciate("WebGUI::Form::".$fieldType, "new", [ $session, () ]) };
+    return ($control && $control->isa($isa));
 }
 
 #-------------------------------------------------------------------
@@ -1853,11 +1879,11 @@ sub www_editThing {
     $fields = $self->session->db->read('select * from Thingy_fields where assetId = '.$self->session->db->quote($self->get("assetId")).' and thingId = '.$self->session->db->quote($thingId).' order by sequenceNumber');
     while (my $field = $fields->hashRef) {
         my $formElement;
-        if ($field->{fieldType} eq "File"){
-            $formElement = "<input type='file' name='file'>";
-        }
-        if ($field->{fieldType} eq "Image"){
+        if ($self->field_isa($field->{fieldType}, 'WebGUI::Form::Image')) {
             $formElement = "<input type='file' name='image'>";
+        }
+        elsif ($self->field_isa($field->{fieldType}, 'WebGUI::Form::File')) {
+            $formElement = "<input type='file' name='file'>";
         }
         else{
             $formElement = $self->getFormElement($field);     
@@ -2301,11 +2327,11 @@ sub www_editFieldSave {
         $newFieldId = $self->setCollateral("Thingy_fields","fieldId",\%properties,1,1,"thingId",$thingId);
     }
 
-    if ($properties{fieldType} eq "File"){ 
-        $formElement = "<input type='file' name='file'>";
-    }
-    elsif ($properties{fieldType} eq "Image"){ 
+    if ($self->field_isa($properties{fieldType}, 'WebGUI::Form::Image')) {
         $formElement = "<input type='file' name='image'>";
+    }
+    elsif ($self->field_isa($properties{fieldType}, 'WebGUI::Form::File')) {
+        $formElement = "<input type='file' name='file'>";
     }
     else{
         $formElement = $self->getFormElement(\%properties);
