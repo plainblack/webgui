@@ -12,6 +12,7 @@
  - fixed #12003: WebGUI::User->delete leaves around cache data
  - fixed #12007: Hardcoded js in cart view ( Martin Kamerbeek / Oqapi )
  - fixed #12010: Related URLs are not copied for events created through recurrence
+ - fixed #12012: WebGUI Account system does not present login to visitors for proper redirect
 
 7.10.6
  - fixed #11974: Toolbar icons unclickable in Webkit using HTML5
