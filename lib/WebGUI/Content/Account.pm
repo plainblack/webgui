@@ -159,7 +159,7 @@ sub handler {
     return undef unless ($form->get("op") eq "account");
 
     #Visitor cannot access the acccount system
-    return $session->privilege->insufficient if($session->user->isVisitor);
+    return $session->privilege->noAccess if($session->user->isVisitor);
 
     my $module   = $form->get("module");
     my $method   = $form->get("do");
