@@ -21,6 +21,7 @@
  - fixed #11945: Slow SQL access for duplicate e-mail address lookups
  - fixed #11960: Billing address mandatory fields not specified
  - fixed #11975: Cannot paste threads: "Cannot call method isa()"
+ - fixed #11976: Use Container URL in search gives user Permission Denied
 
 7.10.6
  - fixed #11974: Toolbar icons unclickable in Webkit using HTML5
