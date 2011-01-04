@@ -22,6 +22,7 @@
  - fixed #11994: recurring calendar entries
  - fixed #11995: recurring calendar entries in trash
  - fixed #11986: Finance::Quote can give invalid dates to StockData asset
+ - fixed #12001: Shelf product import mangles price
 
 7.9.18
  - fixed #11938: upgrade script always removes specialState
