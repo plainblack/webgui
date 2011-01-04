@@ -75,6 +75,7 @@ addToCleanup( $tag );
 
 my $mech    = WebGUI::Test::Mechanize->new( config => WebGUI::Test->file );
 $mech->get_ok( '/?op=assetHelper;className=WebGUI::AssetHelper::CopyBranch;method=copy;with=children;assetId=' . $top->getId );
+WebGUI::Test->waitForAllForks;
 
 my $clippies = $root->getLineage(["descendants"], {statesToInclude => [qw{clipboard clipboard-limbo}], returnObjects => 1,});
 is @{ $clippies }, 2, '... copied 2 asset to the clipboard';
@@ -83,6 +84,7 @@ for my $asset ( @$clippies ) {
 }
 
 $mech->get_ok( '/?op=assetHelper;className=WebGUI::AssetHelper::CopyBranch;method=copy;with=descendants;assetId=' . $top->getId );
+WebGUI::Test->waitForAllForks;
 my $clippies = $root->getLineage(["descendants"], {statesToInclude => [qw{clipboard clipboard-limbo}], returnObjects => 1,});
 is @{ $clippies }, 3, '... copied 3 asset to the clipboard';
 addToCleanup( @$clippies );
