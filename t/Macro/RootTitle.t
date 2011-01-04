@@ -33,7 +33,7 @@ $versionTag->set({name=>"Adding assets for RootTitle tests"});
 my %tag = ( tagId => $versionTag->getId, status => "pending" );
 addToCleanup($versionTag);
 
-my $root = WebGUI::Test->asset;
+my $root = WebGUI::Asset->getRoot($session);
 my %properties_A = (
 		className   => 'WebGUI::Asset::Snippet',
 		title       => 'Asset A',
@@ -117,6 +117,8 @@ my %properties__ = (
 my $asset_ = $root->addChild(\%properties__, $properties__{id});
 
 $versionTag->commit;
+
+WebGUI::Test->addToCleanup($assetZ, $asset_);
 
 my $origLineage = $asset_->lineage;
 my $newLineage = substr $origLineage, 0, length($origLineage)-1; 
