@@ -41,14 +41,47 @@ my $event = $calendar->addChild(
     }, undef, undef, {skipAutoCommitWorkflows => 1, }
 );
 
+my $trashed_event = $calendar->addChild(
+    {   className => 'WebGUI::Asset::Event',
+        startDate => $one_year_ago,
+        endDate   => $one_year_ago,
+    }, undef, undef, {skipAutoCommitWorkflows => 1, }
+);
+$trashed_event->trash;
+
+my $clipped_event = $calendar->addChild(
+    {   className => 'WebGUI::Asset::Event',
+        startDate => $one_year_ago,
+        endDate   => $one_year_ago,
+    }, undef, undef, {skipAutoCommitWorkflows => 1, }
+);
+$clipped_event->cut;
+
 $tag->commit;
-$calendar = $calendar->cloneFromDb;
-$event    = $event->cloneFromDb;
+foreach my $asset($calendar, $event, $clipped_event, $trashed_event) {
+    $asset = $asset->cloneFromDb;
+}
 
 my $recurId = $event->setRecurrence(
     {   recurType => 'monthDay',
         every     => 2,
         startDate => $event->get('startDate'),
+        dayNumber => $eventStartDate->day,
+    }
+);
+
+$trashed_event->setRecurrence(
+    {   recurType => 'monthDay',
+        every     => 2,
+        startDate => $trashed_event->get('startDate'),
+        dayNumber => $eventStartDate->day,
+    }
+);
+
+$clipped_event->setRecurrence(
+    {   recurType => 'monthDay',
+        every     => 2,
+        startDate => $clipped_event->get('startDate'),
         dayNumber => $eventStartDate->day,
     }
 );

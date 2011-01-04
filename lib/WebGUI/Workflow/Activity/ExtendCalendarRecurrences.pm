@@ -170,6 +170,11 @@ sub processRecurrence {
         $self->session->log->warn("Unable to instanciate event with assetId $eventId");
         return 0;
     }
+    ##Ignore assets in the trash.  Same with assets in the clipboard since they would not be
+    ##put into the clipboard.
+    if ($event->get('state') ne 'published') {
+        return 0;
+    }
     my $recur   = $event->getRecurrence;
 
     my $versionTag = WebGUI::VersionTag->create($self->session, {name => 'Extend Calendar Recurrence for assetId '.$event->getId, });
