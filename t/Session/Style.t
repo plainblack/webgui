@@ -136,10 +136,8 @@ is($url, '-', 'setScript: called with no params or script url');
 $style->setScript('http://www.plainblack.com/stuff.js');
 is($style->setScript('http://www.plainblack.com/stuff.js'), undef, 'setScript: called with duplicate url returns undef');
 my $scriptOutput = $style->generateAdditionalHeadTags;
-diag $scriptOutput;
 ($url, $params) = simpleLinkParser('script', $scriptOutput);
 is($url, 'http://www.plainblack.com/stuff.js', '... called with script url');
-diag Dumper $params;
 is_deeply($params, { type => 'text/javascript', }, '... defaults to text/javascript');
 
 my $setParams = { type => 'textual/mongoscript' };
@@ -538,7 +536,7 @@ sub setup_assets {
 		#     '1234567890123456789012'
 		snippet => 'I am a snippet',
 	};
-	my $daddySnippet = WebGUI::Test->asset->addChild($properties, $properties->{id});
+	my $daddySnippet = WebGUI::Asset->getRoot($session)->addChild($properties, $properties->{id});
 	$properties = {
 		title => 'My Snippet',
 		className => 'WebGUI::Asset::Snippet',
@@ -548,5 +546,6 @@ sub setup_assets {
 		snippet => 'I am a snippet',
 	};
 	my $snippet = $daddySnippet->addChild($properties, $properties->{id});
+    WebGUI::Test->addToCleanup($daddySnippet, $snippet);
 	return ($templates, $asset, $snippet);
 }
