@@ -77,7 +77,7 @@ WebGUI::Test->addToCleanup($storage1, $storage2);
 #
 ############################################################
 
-my $tests = 45;
+my $tests = 44;
 plan tests => $tests
             + $canEditMaker->plan
             ;
@@ -324,9 +324,9 @@ is($viewVariables->{headline}, 'WebGUI, Web Done Right', '... headline is okay')
 cmp_bag(
     $viewVariables->{keyword_loop},
     [
-        { keyword => "foxtrot", url => '/home/test-archive?func=view;keyword=foxtrot', },
-        { keyword => "tango",   url => '/home/test-archive?func=view;keyword=tango', },
-        { keyword => "whiskey", url => '/home/test-archive?func=view;keyword=whiskey', },
+        { keyword => "foxtrot", url => re('test-archive\?func=view;keyword=foxtrot$'), },
+        { keyword => "tango",   url => re('test-archive\?func=view;keyword=tango$'), },
+        { keyword => "whiskey", url => re('test-archive\?func=view;keyword=whiskey$'), },
     ],
     'viewTemplateVariables: keywords_loop is okay'
 ) or diag( Dumper $viewVariables->{keyword_loop} );
