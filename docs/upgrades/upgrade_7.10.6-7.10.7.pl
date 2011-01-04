@@ -31,6 +31,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+addEmailIndexToProfile( $session );
 
 finish($session); # this line required
 
@@ -44,6 +45,15 @@ finish($session); # this line required
 #    print "DONE!\n" unless $quiet;
 #}
 
+#----------------------------------------------------------------------------
+# Add an index to the userProfileData table for email lookups
+sub addEmailIndexToProfile {
+    my $session = shift;
+    print "\tAdding index to email column on userProfileData table... " unless $quiet;
+    # and here's our code
+    $session->db->write( "ALTER TABLE userProfileData ADD INDEX email ( email )" );
+    print "DONE!\n" unless $quiet;
+}
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
 

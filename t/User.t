@@ -22,7 +22,7 @@ use WebGUI::User;
 use WebGUI::ProfileField;
 use WebGUI::Shop::AddressBook;
 
-use Test::More tests => 226; # increment this value for each test you create
+use Test::More tests => 233; # increment this value for each test you create
 use Test::Deep;
 use Data::Dumper;
 
@@ -1047,6 +1047,39 @@ is($inmate->getInboxSmsNotificationAddress, '37927@textme.com', '... returns cel
 
 $inmate->profileField('cellPhone', '(555)-555.5555');
 is($inmate->getInboxSmsNotificationAddress, '5555555555@textme.com', '... strips non digits from cellphone');
+
+################################################################
+#
+# isDuplicateEmail
+#
+################################################################
+
+$newFish->profileField( 'email' => 'tommy@shawshank.com' );
+ok( $inmate->isDuplicateEmail( 'tommy@shawshank.com' ), 'isDuplicateEmail triggers for duplicate email' );
+$inmate->profileField( 'email' => 'andy@shawshank.com' );
+ok( !$inmate->isDuplicateEmail( 'andy@shawshank.com' ), "isDuplicateEmail doesn't trigger for our email" );
+
+################################################################
+#
+# validateProfileDataFromForm
+#
+################################################################
+
+my $profileData = {
+    email       => 'tommy@shawshank.com',
+    language    => 'SmoothBankerTalk',
+};
+$session->request->setup_body( $profileData );
+
+# Also check for firstName, which is not in request
+my @fields = map { WebGUI::ProfileField->new( $session, $_ ); } ( keys %$profileData, "firstName" );
+my $reply = $inmate->validateProfileDataFromForm( \@fields );
+
+cmp_deeply( $reply->{errorFields}, [ "language" ], "language isn't found, errors" );
+is( scalar( @{$reply->{errors}} ), 1, "error messages contains one message" );
+cmp_deeply( $reply->{warningFields}, [ "email" ], "email is duplicate, warns" );
+is( scalar( @{$reply->{warnings}} ), 1, "warnings messages contains one message" );
+cmp_deeply( $reply->{profile}, $profileData, "profile data makes it through" );
 
 ################################################################
 #

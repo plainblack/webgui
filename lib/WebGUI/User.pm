@@ -27,6 +27,7 @@ use WebGUI::Shop::Credit;
 use JSON;
 use WebGUI::Exception;
 use WebGUI::ProfileField;
+use List::MoreUtils qw( any );
 use Scalar::Util qw( weaken );
 
 =head1 NAME
@@ -896,6 +897,25 @@ sub isAdmin {
 
 #-------------------------------------------------------------------
 
+=head2 isDuplicateEmail( email )
+
+Returns true if the email passed is also being used by any other user
+
+=cut
+
+sub isDuplicateEmail {
+    my ( $self, $email ) = @_;
+
+    my @userIds = $self->session->db->quickArray(
+        "SELECT userId FROM userProfileData WHERE email = ?",
+        [ $email ],
+    );
+
+    return any { $_ ne $self->userId } @userIds;
+}
+
+#-------------------------------------------------------------------
+
 =head2 isEnabled ()
 
 Returns 1 if the user is enabled.
@@ -1552,7 +1572,7 @@ sub validateProfileDataFromForm {
             push(@{$errorFields},$fieldId);
         }
         #Duplicate emails throw warnings
-        elsif($fieldId eq "email" && $field->isDuplicate($fieldValue,$self->userId)) {
+        elsif($fieldId eq "email" && $self->isDuplicateEmail($fieldValue)) {
             $errorCat = $field->get("profileCategoryId") unless (defined $errorCat);
             push (@{$warnings},$i18n->get(1072));
             push(@{$warnFields},$fieldId);
