@@ -317,6 +317,7 @@ sub pasteInFork {
     my ( $process, $args ) = @_;
     my $session = $process->session;
     my $self    = WebGUI::Asset->new( $session, $args->{assetId} );
+    $session->asset( $self );
     my @roots   = grep { $_ && $_->canEdit }
         map { WebGUI::Asset->newPending( $session, $_ ) } @{ $args->{list} };
 
