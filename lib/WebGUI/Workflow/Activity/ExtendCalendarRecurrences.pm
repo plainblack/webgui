@@ -19,6 +19,7 @@ use strict;
 use base 'WebGUI::Workflow::Activity';
 use WebGUI::International;
 use WebGUI::Asset;
+use WebGUI::VersionTag;
 use DateTime;
 
 =head1 NAME
@@ -171,18 +172,25 @@ sub processRecurrence {
     }
     my $recur   = $event->getRecurrence;
 
+    my $versionTag = WebGUI::VersionTag->create($self->session, {name => 'Extend Calendar Recurrence for assetId '.$event->getId, });
+    $versionTag->setWorking();
     my $start   = $event->getDateTimeStart->truncate(to => 'day');
     my $limit   = DateTime->today->add( years => 2 );
     my $end     = $event->limitedEndDate($limit);
     my $set     = $event->dateSet( $recur, $start, $end );
     my $i       = $set->iterator;
 
-    while ( my $d = $i->next ) {
-        return if ( time > $timeLimit );
+    my $time_limit = 0;
+    DATE: while ( my $d = $i->next ) {
+        if ( time > $timeLimit ) {
+            $time_limit = 1;
+            last DATE;
+        }
         $event->generateRecurrence($d);
     }
 
-    return 1;
+    $versionTag->commit;
+    return $time_limit ? 1 : 0;
 } ## end sub processRecurrence
 
 1;
