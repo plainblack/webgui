@@ -398,11 +398,14 @@ TODO: {
     ok(0, 'test a child of the media folder');
 }
 
-my $parentAsset = WebGUI::Test->asset;
+my $versionTag = WebGUI::VersionTag->getWorking($session);
+WebGUI::Test->addToCleanup($versionTag);
+my $parentAsset = WebGUI::Asset->getRoot($session);
 my $statefulAsset = $parentAsset->addChild({ className => 'WebGUI::Asset::Snippet' });
-$session->asset( $statefulAsset );
+$versionTag->commit;
+$statefulAsset = $statefulAsset->cloneFromDb;
+$session->asset($statefulAsset);
 
-$statefulAsset->state('published');
 is(
     $session->url->getBackToSiteURL, 
     $parentAsset->getUrl,
