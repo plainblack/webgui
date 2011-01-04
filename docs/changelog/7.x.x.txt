@@ -17,6 +17,7 @@
  - fixed #11994: recurring calendar entries
  - fixed #11995: recurring calendar entries in trash
  - fixed #11986: Finance::Quote can give invalid dates to StockData asset
+ - fixed #12001: Shelf product import mangles price
 
 7.10.6
  - fixed #11974: Toolbar icons unclickable in Webkit using HTML5
