@@ -15,6 +15,7 @@
  - fixed #12012: WebGUI Account system does not present login to visitors for proper redirect
  - fixed #12015: Thingy: Custom 'File' form fields get deleted upon save
  - fixed #11994: recurring calendar entries
+ - fixed #11995: recurring calendar entries in trash
 
 7.10.6
  - fixed #11974: Toolbar icons unclickable in Webkit using HTML5
