@@ -876,4 +876,25 @@ sub cleanup {
     }
 }
 
+#----------------------------------------------------------------------------
+
+=head2 waitForAllForks( )
+
+Will block until all WebGUI::Fork processes are completed.
+
+=cut
+
+sub waitForAllForks {
+    my ( $class ) = @_;
+    my $session = session;
+    my @forkIds = $session->db->quickArray( "SELECT id FROM fork WHERE finished != 1" );
+    my $wait = 1;
+    while ( $wait ) {
+        $wait = 0;
+        $wait = 1 if grep { !$_->isFinished } map { WebGUI::Fork->new( $session, $_ ) } @forkIds;
+        return unless $wait;
+        sleep 1;
+    }
+}
+
 1;
