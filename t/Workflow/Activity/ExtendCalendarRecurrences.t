@@ -38,8 +38,12 @@ my $event = $calendar->addChild(
     {   className => 'WebGUI::Asset::Event',
         startDate => $one_year_ago,
         endDate   => $one_year_ago,
-    }
+    }, undef, undef, {skipAutoCommitWorkflows => 1, }
 );
+
+$tag->commit;
+$calendar = $calendar->cloneFromDb;
+$event    = $event->cloneFromDb;
 
 my $recurId = $event->setRecurrence(
     {   recurType => 'monthDay',
@@ -87,17 +91,21 @@ while (my $status = $instance->run ne 'complete') {
     $instance->run;
 }
 
-my $sql = q{
-    select e.startDate, e.endDate
-    from   asset a
-    inner join Event e on e.assetId = a.assetId
-    and    a.parentId = ?
-    order by e.startDate
-};
+#my $sql = q{
+#    select e.startDate, e.endDate
+#    from   asset a
+#    inner join Event e on e.assetId = a.assetId
+#    and    a.parentId = ?
+#    order by e.startDate
+#};
 
-my $dates = $session->db->buildArrayRefOfHashRefs($sql, [$calendar->getId]);
+#my $dates = $session->db->buildArrayRefOfHashRefs($sql, [$calendar->getId]);
+my $dates = $calendar->getLineage(['children'], { returnObjects => 1, });
 # 3 years at every other month (6 times) plus the one we started with
-is(@$dates, 19, 'created right number of dates') or diag Dumper $dates;
+is(@{$dates}, 19, 'created right number of dates') or diag Dumper $dates;
+
+my @uncommitted_events = grep { $_->get('status') ne 'approved' } @{ $dates };
+is @uncommitted_events, 0, 'all events are committed (approved)';
 
 done_testing;
 
