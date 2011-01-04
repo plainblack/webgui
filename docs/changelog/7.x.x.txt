@@ -19,6 +19,7 @@
  - fixed #11986: Finance::Quote can give invalid dates to StockData asset
  - fixed #12001: Shelf product import mangles price
  - fixed #11945: Slow SQL access for duplicate e-mail address lookups
+ - fixed #11960: Billing address mandatory fields not specified
 
 7.10.6
  - fixed #11974: Toolbar icons unclickable in Webkit using HTML5
