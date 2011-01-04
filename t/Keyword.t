@@ -68,7 +68,7 @@ my $snippet = $home->addChild({
 
 my $assetIds = $keyword->getMatchingAssets({ keyword => 'webgui', });
 
-cmp_deeply(
+cmp_bag(
     $assetIds,
     [ $snippet->getId, $home->getId, ],
     'getMatchingAssets, by keyword, assetIds in order by creationDate, descending'
@@ -99,7 +99,7 @@ cmp_deeply(
     '... only published assets'
 );
 
-cmp_deeply(
+cmp_bag(
     $keyword->getMatchingAssets({ keyword => 'webgui', states => [ qw/published trash/, ]}),
     [$snippet->getId, $home->getId, ],
     '... retrieving assets in more than one state'
