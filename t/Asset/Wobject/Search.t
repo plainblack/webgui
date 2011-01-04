@@ -16,7 +16,7 @@ use lib "$FindBin::Bin/../../lib";
 
 use WebGUI::Test;
 use WebGUI::Session;
-use Test::More tests => 11; # increment this value for each test you create
+use Test::More tests => 13; # increment this value for each test you create
 use Test::Deep;
 use WebGUI::Asset::Wobject::Search;
 use Data::Dumper;
@@ -129,6 +129,44 @@ $search->update({
     $search->update({useContainers => 0});
 }
 
+{
+    # Test useContainers when the user cannot view the container
+    my $versionTag3 = WebGUI::VersionTag->getWorking($session);
+    $versionTag3->set({name=>"Folder setup"});
+    my @addArgs = ( undef, undef, { skipAutoCommitWorkflows => 1, skipNotification => 1 } );
+    my $folder = $node->addChild({
+            className      => 'WebGUI::Asset::Wobject::Folder',
+            groupIdView     => '3', # Admins
+        },
+        @addArgs);
+    # add an article anyone can see
+    my $props = {
+        className   => 'WebGUI::Asset::Wobject::Article',
+        synopsis => 'juxtaposition coolwhip cheezewhiz',
+        groupIdView => '7', # Everyone
+    };
+
+    my $snippet = $folder->addChild($props, @addArgs);
+    $versionTag3->commit();
+    addToCleanup($versionTag3);
+
+    $session->request->setup_body({
+        doit     => 1,
+        keywords => 'juxtaposition',
+    });
+    WebGUI::Test->mockAssetId($templateId, $templateMock);
+    $search->prepareView;
+    $search->view;
+    $search->update({useContainers => 0});
+    is $templateVars->{result_set}->[0]->{url}, $snippet->get('url'), 'search returns regular URL for article';
+    $search->update({useContainers => 1});
+    $search->view;
+    is $templateVars->{result_set}->[0]->{url}, $snippet->get('url'), 'search returns regular URL for article because user cannot see container';
+
+    WebGUI::Test->unmockAssetId($templateId);
+    $session->request->setup_body({});
+    $search->update({useContainers => 0});
+}
 
 TODO: {
         local $TODO = "Tests to make later";

@@ -223,7 +223,7 @@ sub view {
             my $asset = WebGUI::Asset->new($session, $data->{assetId}, $data->{className});
             if (defined $asset) {
                 my $properties = $asset->get;
-                if ($self->get("useContainers")) {
+                if ( $self->get("useContainers") && $asset->getContainer->canView ) {
                     $properties->{url} = $asset->isa('WebGUI::Asset::Post::Thread') ? $asset->getCSLinkUrl()
                                        :                                              $asset->getContainer->get("url");
                 }
