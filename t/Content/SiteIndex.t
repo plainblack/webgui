@@ -46,9 +46,7 @@ my $hiddenPage = WebGUI::Asset->getDefault($session)->addChild({
     title     => 'seekrit hidden page',
     url       => 'hidden_page',
 });
-my $versionTag = WebGUI::VersionTag->getWorking($session);
-$versionTag->commit;
-addToCleanup($versionTag);
+WebGUI::Test->addToCleanup($hiddenPage);
 
 $output = WebGUI::Content::SiteIndex::handler($session);
 $xmlData = XMLin($output,
