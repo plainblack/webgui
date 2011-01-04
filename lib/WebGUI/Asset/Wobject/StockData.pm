@@ -167,7 +167,8 @@ sub _convertToEpoch {
    }
    $hour = $self->_appendZero($hour);
    $minute = $self->_appendZero($minute);
-   return $self->session->datetime->humanToEpoch("$year-$month-$day $hour:$minute:00");
+   my $epoch = eval {$self->session->datetime->humanToEpoch("$year-$month-$day $hour:$minute:00")};
+   return $epoch;
 }
 
 #-------------------------------------------------------------------
