@@ -292,7 +292,6 @@ ok($adminSiteWideTag->getId() eq $siteWideTagId, 'versionTagMode siteWide + admi
 
 
 $adminUserTag->rollback();
-$admin_session->var()->end();
 $admin_session->close();
 
 # Check if get returns a safe copy
