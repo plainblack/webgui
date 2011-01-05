@@ -231,7 +231,7 @@ sub www_editFriends {
         $var->{viewAllUrl} = $self->getUrl('module=friendManager;do=editFriends;userId='.$userId);
     }
 
-    my $form    = WebGUI::FormBuilder->new( $session,
+    $form    = WebGUI::FormBuilder->new( $session,
                     name    => "friendManager",
                     action => $self->getUrl('module=friendManager;do=editFriendsSave')
                 );
