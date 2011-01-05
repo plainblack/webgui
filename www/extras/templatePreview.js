@@ -5,7 +5,6 @@
         $connect   = YAHOO.util.Connect,
         $json      = YAHOO.lang.JSON,
         $dom       = YAHOO.util.Dom,
-        shown      = false,
         assetId, panel, panelRendered, onHide;
 
     function absolute(url) {
@@ -47,7 +46,7 @@
             return;
         }
 
-        abs = absolute(url),
+        abs = absolute(url);
         b   = base();
 
         if (abs.indexOf(b) === 0) {
@@ -83,8 +82,7 @@
     }
 
     function withVariables(k) {
-        var inBox  = document.getElementById('previewVars').value,
-            url;
+        var inBox  = document.getElementById('previewVars').value;
 
 
         function finish(raw) {
@@ -154,7 +152,7 @@
             draggable   : false,
             underlay    : 'shadow',
             modal       : true,
-            fixedcenter : true,
+            fixedcenter : true
         });
         $event.on('previewFetch', 'click', fetch);
         $event.on('preview', 'click', render);
