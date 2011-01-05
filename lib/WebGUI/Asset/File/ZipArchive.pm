@@ -39,7 +39,6 @@ property templateId => (
          );
 
 
-use WebGUI::HTMLForm;
 use WebGUI::SQL;
 
 use Archive::Tar;
