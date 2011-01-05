@@ -53,28 +53,28 @@ sub editSettingsForm {
     my $session = $self->session;
     my $setting = $session->setting;
     my $i18n    = WebGUI::International->new($session,'Account_User');
-    my $f       = WebGUI::HTMLForm->new($session);
+    my $f       = WebGUI::FormBuilder->new($session);
 
-    $f->template(
+    $f->addField( "template",
 		name      => "userAccountStyleTemplateId",
 		value     => $self->getStyleTemplateId,
 		namespace => "style",
 		label     => $i18n->get("user style template label"),
         hoverHelp => $i18n->get("user style template hoverHelp")
     );
-    $f->template(
+    $f->addField( "template",
 		name      => "userAccountLayoutTemplateId",
 		value     => $self->getLayoutTemplateId,
 		namespace => "Account/Layout",
 		label     => $i18n->get("user layout template label"),
         hoverHelp => $i18n->get("user layout template hoverHelp")
     );
-    $f->raw(q{<tr><td class="formDescription" colspan="2">&nbsp</td></tr>});
-    $f->readOnly (
+    $f->addField( "readOnly",
+        name => 'templateMessage',
         value     => $i18n->get("templates in auth method message"),
     );
 
-    return $f->printRowsOnly;
+    return $f;
 }
 
 #-------------------------------------------------------------------
