@@ -86,37 +86,37 @@ sub editSettingsForm {
     my $self    = shift;
     my $session = $self->session;
     my $i18n    = WebGUI::International->new($session,'Account_Friends');
-    my $f       = WebGUI::HTMLForm->new($session);
+    my $f       = WebGUI::FormBuilder->new($session);
 
-    $f->template(
+    $f->addField( "template",
 		name      => "friendsStyleTemplateId",
 		value     => $self->getStyleTemplateId,
 		namespace => "style",
 		label     => $i18n->get("friends style template label"),
         hoverHelp => $i18n->get("friends style template hoverHelp")
 	);
-	$f->template(
+	$f->addField( "template",
 		name      => "friendsLayoutTemplateId",
 		value     => $self->getLayoutTemplateId,
 		namespace => "Account/Layout",
 		label     => $i18n->get("friends layout template label"),
         hoverHelp => $i18n->get("friends layout template hoverHelp")
 	);
-	$f->template(
+	$f->addField( "template",
         name      => "friendsViewTemplateId",
         value     => $self->getViewTemplateId,
         namespace => "Account/Friends/View",
         label     => $i18n->get("friends view template label"),
         hoverHelp => $i18n->get("friends view template hoverHelp")
 	);
-    $f->template(
+    $f->addField( "template",
         name      => "friendsEditTemplateId",
         value     => $self->getEditTemplateId,
         namespace => "Account/Friends/Edit",
         label     => $i18n->get("friends edit template label"),
         hoverHelp => $i18n->get("friends edit template hoverHelp")
 	);
-    $f->template(
+    $f->addField( "template",
         name      => "friendsSendRequestTemplateId",
         value     => $self->getSendRequestTemplateId,
         namespace => "Account/Friends/SendRequest",
@@ -124,7 +124,7 @@ sub editSettingsForm {
         hoverHelp => $i18n->get("friends send request template hoverHelp")
 	);
 
-    $f->template(
+    $f->addField( "template",
         name      => "friendsErrorTemplateId",
         value     => $self->getErrorTemplateId,
         namespace => "Account/Friends/Error",
@@ -132,7 +132,7 @@ sub editSettingsForm {
         hoverHelp => $i18n->get("friends error template hoverHelp")
 	);
 
-    $f->template(
+    $f->addField( "template",
         name      => "friendsConfirmTemplateId",
         value     => $self->getConfirmTemplateId,
         namespace => "Account/Friends/Confirm",
@@ -140,7 +140,7 @@ sub editSettingsForm {
         hoverHelp => $i18n->get("friends confirm template hoverHelp")
 	);
 
-    $f->template(
+    $f->addField( "template",
         name      => "friendsRemoveConfirmTemplateId",
         value     => $self->getRemoveConfirmTemplateId,
         namespace => "Account/Friends/Confirm",
@@ -148,7 +148,7 @@ sub editSettingsForm {
         hoverHelp => $i18n->get("friends remove confirm template hoverHelp")
 	);
 
-    return $f->printRowsOnly;
+    return $f;
 }
 
 #-------------------------------------------------------------------
