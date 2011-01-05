@@ -19,7 +19,6 @@ use WebGUI::International;
 use WebGUI::Asset::Template;
 use WebGUI::Macro;
 use WebGUI::VersionTag;
-use WebGUI::HTMLForm;
 
 =head1 NAME
 
