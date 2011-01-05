@@ -25,7 +25,8 @@ use List::MoreUtils qw{ any };
 use Tie::IxHash;
 use Clone qw/clone/;
 use HTML::Packer;
-use JSON qw{ to_json };
+use JSON qw{ to_json from_json };
+use Try::Tiny;
 
 =head1 NAME
 
@@ -284,60 +285,134 @@ Returns the TabForm object that will be used in generating the edit page for thi
 
 sub getEditForm {
 	my $self = shift;
+	my $session = $self->session;
+
+	my ( $db, $url, $style, $form, $config )
+	    = $session->quick(qw( db url style form config ));
+
 	my $tabform = $self->SUPER::getEditForm();
-	my $i18n = WebGUI::International->new($self->session, 'Asset_Template');
+	my $i18n = WebGUI::International->new($session, 'Asset_Template');
+
+	my ( $properties, $meta, $display ) =
+	    map { $tabform->getTab($_) } qw( properties meta display );
+
+	my $returnUrl = $form->get('returnUrl');
 	$tabform->hidden({
 		name=>"returnUrl",
-		value=>$self->session->form->get("returnUrl")
+		value=>$returnUrl,
 		});
 	if ($self->getValue("namespace") eq "") {
-		my $namespaces = $self->session->dbSlave->buildHashRef("select distinct(namespace) from template order by namespace");
-		$tabform->getTab("properties")->combo(
+		my $namespaces = $db->buildHashRef("select distinct(namespace) from template order by namespace");
+		$properties->combo(
 			-name=>"namespace",
 			-options=>$namespaces,
 			-label=>$i18n->get('namespace'),
 			-hoverHelp=>$i18n->get('namespace description'),
-			-value=>[$self->session->form->get("namespace")] 
+			-value=>[$form->get("namespace")]
 			);
 	} else {
-		$tabform->getTab("meta")->readOnly(
+		$meta->readOnly(
 			-label=>$i18n->get('namespace'),
 			-hoverHelp=>$i18n->get('namespace description'),
 			-value=>$self->getValue("namespace")
-			);	
-		$tabform->getTab("meta")->hidden(
+			);
+		$meta->hidden(
 			-name=>"namespace",
 			-value=>$self->getValue("namespace")
 			);
 	}
-	$tabform->getTab("display")->yesNo(
+	$display->yesNo(
 		-name=>"showInForms",
 		-value=>$self->getValue("showInForms"),
 		-label=>$i18n->get('show in forms'),
 		-hoverHelp=>$i18n->get('show in forms description'),
 		);
-	$tabform->getTab("properties")->codearea(
+	$properties->codearea(
 		-name=>"template",
 		-label=>$i18n->get('assetName'),
 		-hoverHelp=>$i18n->get('template description'),
 		-syntax => "html",
 		-value=>$self->getValue("template")
 		);
-    $tabform->getTab('properties')->yesNo(
-        name        => "usePacked",
-        label       => $i18n->get('usePacked label'),
-        hoverHelp   => $i18n->get('usePacked description'),
-        value       => $self->getValue("usePacked"),
-    );
-	if($self->session->config->get("templateParsers")){
-		my @temparray = @{$self->session->config->get("templateParsers")};
+	$properties->raw(qq(
+	    <tr>
+	        <td class='formDescription' valign='top'>
+	            ${\ $i18n->get('Preview') }
+	        </td>
+	        <td class='tableData'>
+	            <input type='button'
+	                   value='${\ $i18n->get('Preview') }'
+	                   id='preview'/>
+	            <input type='button'
+	                   value='${\ $i18n->get('Configure') }'
+	                   id='previewConfig'/>
+	        </td>
+	    </tr>
+	));
+	my $cform = WebGUI::HTMLForm->new($session);
+	$cform->yesNo(
+	    id        => 'previewRaw',
+	    name      => 'previewRaw',
+	    label     => $i18n->get('Plain Text?'),
+	    hoverHelp => $i18n->get('Plain Text hoverHelp'),
+	);
+	$cform->text(
+	    id           => 'previewFetchUrl',
+	    label        => $i18n->get('URL'),
+	    hoverHelp    => $i18n->get('URL hoverHelp'),
+	    defaultValue => $returnUrl,
+	);
+	$cform->button(
+	    id        => 'previewFetch',
+	    label     => $i18n->get('Fetch Variables'),
+	    hoverHelp => $i18n->get('Fetch Variables hoverHelp'),
+	    value     => $i18n->get('Fetch'),
+	);
+	$cform->codearea(
+	    id        => 'previewVars',
+	    label     => $i18n->get('Variables'),
+	    hoverHelp => $i18n->get('Variables hoverHelp'),
+	);
+
+	$cform->hidden(id => 'previewId', value => $self->getId);
+	$cform->hidden(id => 'previewGateway', value => $url->gateway);
+	$properties->raw(qq(
+	    <tr>
+	    <td></td>
+	    <td>
+	        <div id='previewConfigForm'>
+	            <div class='hd'>${\ $i18n->get('Configure Preview') }</div>
+	            <table class='bd'>${\ $cform->printRowsOnly }</table>
+	            <div class='ft' style='margin:0 auto; text-align: center'>
+	                <button id='previewConfigClose'>Close</button>
+	            </div>
+	        </div>
+	    </td>
+	    </tr>
+	));
+
+	$properties->yesNo(
+	    name        => "usePacked",
+	    label       => $i18n->get('usePacked label'),
+	    hoverHelp   => $i18n->get('usePacked description'),
+	    value       => $self->getValue("usePacked"),
+	);
+
+	$style->setScript($url->extras($_)) for qw(
+	    yui/build/json/json-min.js
+	    yui/build/container/container-min.js
+	    templatePreview.js
+	);
+
+	if($config->get("templateParsers")){
+		my @temparray = @{$config->get("templateParsers")};
 		tie my %parsers, 'Tie::IxHash';
 		while(my $a = shift @temparray){
-			$parsers{$a} = $self->getParser($self->session, $a)->getName();
+			$parsers{$a} = $self->getParser($session, $a)->getName();
 		}
 		my $value = [$self->getValue("parser")];
-		$value = \[$self->session->config->get("defaultTemplateParser")] if(!$self->getValue("parser"));
-		$tabform->getTab("properties")->selectBox(
+		$value = \[$config->get("defaultTemplateParser")] if(!$self->getValue("parser"));
+		$properties->selectBox(
 			-name=>"parser",
 			-options=>\%parsers,
 			-value=>$value,
@@ -346,36 +421,36 @@ sub getEditForm {
 			);
 	}
 
-    $tabform->getTab('properties')->jsonTable(
-        name        => 'attachmentsJson', 
-        value       => $self->get('attachmentsJson'),
-        label       => $i18n->get("attachment display label"),
-        fields      => [
-            {
-                type            => "text",
-                name            => "url",
-                label           => $i18n->get('attachment header url'),
-                size            => '48',
-            },
-            {
-                type            => "select",
-                name            => "type",
-                label           => $i18n->get('attachment header type'),
-                options         => [
-                    stylesheet => $i18n->get('css label'),
-                    headScript => $i18n->get('js head label'),
-                    bodyScript => $i18n->get('js body label'),
-                ],
-            },
-        ],
-    );
+	$properties->jsonTable(
+	    name        => 'attachmentsJson',
+	    value       => $self->get('attachmentsJson'),
+	    label       => $i18n->get("attachment display label"),
+	    fields      => [
+	        {
+	            type            => "text",
+	            name            => "url",
+	            label           => $i18n->get('attachment header url'),
+	            size            => '48',
+	        },
+	        {
+	            type            => "select",
+	            name            => "type",
+	            label           => $i18n->get('attachment header type'),
+	            options         => [
+	                stylesheet => $i18n->get('css label'),
+	                headScript => $i18n->get('js head label'),
+	                bodyScript => $i18n->get('js body label'),
+	            ],
+	        },
+	    ],
+	);
 
-        $tabform->getTab('properties')->image( 
-            name        => 'storageIdExample',
-            value       => $self->getValue('storageIdExample'),
-            label       => $i18n->get('field storageIdExample'),
-            hoverHelp   => $i18n->get('field storageIdExample description'),
-        );
+	$properties->image(
+	    name        => 'storageIdExample',
+	    value       => $self->getValue('storageIdExample'),
+	    label       => $i18n->get('field storageIdExample'),
+	    hoverHelp   => $i18n->get('field storageIdExample description'),
+	);
 
 	return $tabform;
 }
@@ -623,6 +698,44 @@ sub process {
        return to_json( $vars );
     }
 
+    my $extra = '';
+    if ($self->canEdit) {
+        # Used for debugging and the template test renderer.
+
+        # WARNING: Please do not rely on this behavior. It's a bit of a hack,
+        # and should not be considered part of the core API. Eventually, we
+        # will have introspectable template objects so that you can more
+        # easily (and efficiently) get this kind of information.
+
+        # If the first value for the 'X-Webgui-Template-Variables' header is
+        # our assetId, then in addition to processing the template, we'll add
+        # a json representation of our template variables. The headers
+        # "X-Webgui-Template-Variables-Start" and
+        # "X-Webgui-Template-Variables-End" will contain the delimiters for
+        # the start and end of this content so that the user agent (who had to
+        # have stuck the header in in the first place) can parse it out.  The
+        # delimiters will make the whole thing look like an xml comment (<!--
+        # ... -->) just in case.
+
+        # We would just send the vars in the header, but different webservers
+        # have different limits on header field size and it's impossible to
+        # say whether our data will fit inside them or not.
+        my $r    = $session->request;
+        my $head = 'X-Webgui-Template-Variables';
+        if ($self->getId eq $r->headers_in->{$head}) {
+            if (my $json = eval { to_json($vars) }) {
+                my @chr = ('0'..'9', 'a'..'z', 'A'..'Z');
+                my $rnd = join('', map { $chr[int(rand($#chr))] } (1..32));
+                my $out = $r->headers_out;
+                my $st  = "<!-- $rnd ";
+                my $end = " $rnd -->";
+                $out->{"$head-Start"} = $st;
+                $out->{"$head-End"}   = $end;
+                $extra = $st . $json . $end;
+            }
+        }
+    }
+
 	$self->prepare unless ($self->{_prepared});
     my $parser      = $self->getParser($session, $self->get("parser"));
     my $template    = $self->get('usePacked')
@@ -636,7 +749,7 @@ sub process {
         my $i18n = WebGUI::International->new($session, 'Asset_Template');
         $output = sprintf $i18n->get('template error').$e->error, $self->getUrl, $self->getId;
     }
-	return $output;
+	return $output . $extra;
 }
 
 
@@ -1170,6 +1283,42 @@ sub www_styleWizard {
 	}
 	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=edit'),$i18n->get("edit template")) if ($self->get("url"));
         return $self->getAdminConsole->render($output,$i18n->get('style wizard'));
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_preview
+
+Rendes this template with the given variables (posted as JSON)
+
+=cut
+
+sub www_preview {
+    my $self    = shift;
+    my $session = $self->session;
+    return $session->privilege->insufficient unless $self->canEdit;
+
+    my $form = $session->form;
+    my $http = $session->http;
+
+    try {
+        my $output = $self->processRaw(
+            $session,
+            $form->get('template'),
+            from_json($form->get('variables')),
+            $form->get('parser'),
+        );
+        if ($form->get('plainText')) {
+            $http->setMimeType('text/plain');
+        }
+        elsif ($output !~ /<html>/) {
+            $output = $session->style->userStyle($output);
+        }
+        return $output;
+    } catch {
+        $http->setMimeType('text/plain');
+        $_[0];
+    }
 }
 
 #-------------------------------------------------------------------

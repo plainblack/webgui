@@ -1,4 +1,5 @@
 7.10.7
+ - Added a Preview button the the Template asset's edit page
  - fixed #12009: Export JS errors in IE7
  - added #11968: use the language override in the registration form (Jukka Raimovaara / Mentalhouse Oy)
  - Changed Carousel to use TinyMCE with WebGUI plugins
