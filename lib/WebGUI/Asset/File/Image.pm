@@ -16,7 +16,6 @@ package WebGUI::Asset::File::Image;
 
 use strict;
 use WebGUI::Storage;
-use WebGUI::HTMLForm;
 use WebGUI::Form::Image;
 
 use Moose;
@@ -360,46 +359,46 @@ sub www_annotate {
 
 	my @checkboxes = ();
 	my $i18n = WebGUI::International->new($session,"Asset_Image");
-	my $f    = WebGUI::HTMLForm->new($session);
+	my $f    = WebGUI::FormBuilder->new($session);
 
 	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=edit'),$i18n->get("edit image"));
-	$f->hidden(
+	$f->addField( "hidden", 
 		-name=>"func",
 		-value=>"annotate"
 		);
-    $f->text(
+    $f->addField( "text", 
 		-label=>$i18n->get('annotate image'),
 		-value=>'',
 		-hoverHelp=>$i18n->get('annotate image description'),
 		-name=>'annotate_text'
 		);
-	$f->integer(
+	$f->addField( "integer", 
 		-label=>$i18n->get('top'),
 		-name=>"annotate_top",
 		-value=>,
 		);
-	$f->integer(
+	$f->addField( "integer", 
 		-label=>$i18n->get('left'),
 		-name=>"annotate_left",
 		-value=>,
 		);
-	$f->integer(
+	$f->addField( "integer", 
 		-label=>$i18n->get('width'),
 		-name=>"annotate_width",
 		-value=>,
 		);
-	$f->integer(
+	$f->addField( "integer", 
 		-label=>$i18n->get('height'),
 		-name=>"annotate_height",
 		-value=>,
 		);
-    $f->button(
+    $f->addField( "button", 
         -value=>$i18n->get('annotate'),
         -extras=>'onclick="switchState();"',
         );
-	$f->submit;
+	$f->addField( "submit", name => "submit" );
     my ($crop_js, $domMe) = $self->annotate_js();
-    return $self->getAdminConsole->render($f->print."$image$crop_js$domMe",$i18n->get("annotate image"));
+    return $self->getAdminConsole->render($f->toHtml."$image$crop_js$domMe",$i18n->get("annotate image"));
 }
 
 #-------------------------------------------------------------------
@@ -564,26 +563,26 @@ sub www_rotate {
 
 	my $i18n = WebGUI::International->new($session,"Asset_Image");
 	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=edit'),$i18n->get("edit image"));
-	my $f = WebGUI::HTMLForm->new($session);
-	$f->hidden(
+	my $f = WebGUI::FormBuilder->new($session);
+	$f->addField( "hidden", 
 		-name=>"func",
 		-value=>"rotate"
     );
-    $f->button(
+    $f->addField( "button", 
         -value=>"Left",
         -extras=>qq(onclick="var deg = document.getElementById('Rotate_formId').value; deg = parseInt(deg) + 90; document.getElementById('Rotate_formId').value = deg;"),
     );
-    $f->button(
+    $f->addField( "button", 
         -value=>"Right",
         -extras=>qq(onclick="var deg = document.getElementById('Rotate_formId').value; deg = parseInt(deg) - 90; document.getElementById('Rotate_formId').value = deg;"),
     );
-	$f->integer(
+	$f->addField( "integer", 
 		-label=>$i18n->get('degree'),
 		-name=>"Rotate",
 		-value=>0,
     );
-	$f->submit;
-    return $self->getAdminConsole->render($f->print.$image,$i18n->get("rotate image"));
+	$f->addField( "submit", name => "submit" );
+    return $self->getAdminConsole->render($f->toHtml.$image,$i18n->get("rotate image"));
 }
 
 #-------------------------------------------------------------------
@@ -666,31 +665,31 @@ sub www_resize {
 
     my $i18n = WebGUI::International->new($session,"Asset_Image");
     $self->getAdminConsole->addSubmenuItem($self->getUrl('func=edit'),$i18n->get("edit image"));
-    my $f = WebGUI::HTMLForm->new($session);
-    $f->hidden(
+    my $f = WebGUI::FormBuilder->new($session);
+    $f->addField( "hidden", 
         -name=>"func",
         -value=>"resize"
         );
-        $f->readOnly(
+        $f->addField( "readOnly", 
         -label=>$i18n->get('image size'),
         -hoverHelp=>$i18n->get('image size description'),
         -value=>$x.' x '.$y,
         );
-    $f->integer(
+    $f->addField( "integer", 
         -label=>$i18n->get('new width'),
         -hoverHelp=>$i18n->get('new width description'),
         -name=>"newWidth",
         -value=>$x,
         );
-    $f->integer(
+    $f->addField( "integer", 
         -label=>$i18n->get('new height'),
         -hoverHelp=>$i18n->get('new height description'),
         -name=>"newHeight",
         -value=>$y,
         );
-    $f->submit;
+    $f->addField( "submit", name => "submit" );
     my $image = '<div align="center" class="yui-skin-sam"><img src="'.$self->getStorageLocation->getUrl($self->filename).'" style="border-style:none;" alt="'.$self->filename.'" id="yui_img" /></div>'.$resize_js;
-    return $self->getAdminConsole->render($f->print.$image,$i18n->get("resize image"));
+    return $self->getAdminConsole->render($f->toHtml.$image,$i18n->get("resize image"));
 }
 
 #-------------------------------------------------------------------
@@ -773,45 +772,45 @@ sub www_crop {
 	my $i18n = WebGUI::International->new($session,"Asset_Image");
 
 	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=edit'),$i18n->get("edit image"));
-	my $f = WebGUI::HTMLForm->new($session);
-	$f->hidden(
+	my $f = WebGUI::FormBuilder->new($session);
+	$f->addField( "hidden", 
 		-name=>"degree",
 		-value=>"0"
 		);
-	$f->hidden(
+	$f->addField( "hidden", 
 		-name=>"func",
 		-value=>"crop"
 		);
 	my ($x, $y) = $self->getStorageLocation->getSizeInPixels($filename);
-	$f->integer(
+	$f->addField( "integer", 
 		-label=>$i18n->get('width'),
 		-hoverHelp=>$i18n->get('new width description'),
 		-name=>"Width",
 		-value=>$x,
 		);
-	$f->integer(
+	$f->addField( "integer", 
 		-label=>$i18n->get('height'),
 		-hoverHelp=>$i18n->get('new height description'),
 		-name=>"Height",
 		-value=>$y,
 		);
-	$f->integer(
+	$f->addField( "integer", 
 		-label=>$i18n->get('top'),
 		-hoverHelp=>$i18n->get('new width description'),
 		-name=>"Top",
 		-value=>$x,
 		);
-	$f->integer(
+	$f->addField( "integer", 
 		-label=>$i18n->get('left'),
 		-hoverHelp=>$i18n->get('new height description'),
 		-name=>"Left",
 		-value=>$y,
 		);
-	$f->submit;
+	$f->addField( "submit", name => "submit" );
 
     my $image = '<div align="center" class="yui-skin-sam"><img src="'.$self->getStorageLocation->getUrl($filename).'" style="border-style:none;" alt="'.$filename.'" id="yui_img" /></div>'.$crop_js;
 
-    return $self->getAdminConsole->render($f->print.$image,$i18n->get("crop image"));
+    return $self->getAdminConsole->render($f->toHtml.$image,$i18n->get("crop image"));
 }
 
 __PACKAGE__->meta->make_immutable;
