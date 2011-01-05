@@ -607,7 +607,7 @@ sub set {
     if ($self->{_started} && !$skipNotify) {
 		my $spectre = WebGUI::Workflow::Spectre->new($self->session);
 		$spectre->notify("workflow/deleteInstance",$self->getId);
-		$spectre->notify("workflow/addInstance", {cookieName=>$self->session->config->getCookieName, gateway=>$self->session->config->get("gateway"), sitename=>$self->session->config->get("sitename")->[0], instanceId=>$self->getId, priority=>$self->{_data}{priority}});
+		$spectre->notify("workflow/addInstance", {cookieName=>$self->session->config->getCookieName, gateway=>$self->session->request->base->path, sitename=>$self->session->config->get("sitename")->[0], instanceId=>$self->getId, priority=>$self->{_data}{priority}});
 	}
 }
 
@@ -675,7 +675,7 @@ sub start {
 	# hand off the workflow to spectre
 	$log->info('Could not complete workflow instance '.$self->getId.' in realtime, handing off to Spectre.');
 	my $spectre = WebGUI::Workflow::Spectre->new($self->session);
-	$spectre->notify("workflow/addInstance", {cookieName=>$self->session->config->getCookieName, gateway=>$self->session->config->get("gateway"), sitename=>$self->session->config->get("sitename")->[0], instanceId=>$self->getId, priority=>$self->{_data}{priority}});
+	$spectre->notify("workflow/addInstance", {cookieName=>$self->session->config->getCookieName, gateway=>$self->session->request->base->path, sitename=>$self->session->config->get("sitename")->[0], instanceId=>$self->getId, priority=>$self->{_data}{priority}});
 
     my $spectreTest = WebGUI::Operation::Spectre::spectreTest($self->session);
     if($spectreTest ne "success"){

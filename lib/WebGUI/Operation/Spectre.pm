@@ -65,7 +65,7 @@ sub www_spectreGetSiteData {
 	} 
   	else {
 		my $sitename = $session->config->get("sitename")->[0];
-		my $gateway = $session->config->get("gateway");
+		my $gateway  = $session->request->base->path;
 		my $cookieName = $session->config->getCookieName;
 		my @instances = ();
 		foreach my $instance (@{WebGUI::Workflow::Instance->getAllInstances($session)}) {
