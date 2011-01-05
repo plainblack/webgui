@@ -41,23 +41,23 @@ sub editSettingsForm {
     my $session = $self->session;
     my $setting = $session->setting;
     my $i18n    = WebGUI::International->new($session,'Account_Contributions');
-    my $f       = WebGUI::HTMLForm->new($session);
+    my $f       = WebGUI::FormBuilder->new($session);
 
-    $f->template(
+    $f->addField( "template",
 		name      => "contribStyleTemplateId",
 		value     => $self->getStyleTemplateId,
 		namespace => "style",
 		label     => $i18n->get("contrib style template label"),
         hoverHelp => $i18n->get("contrib style template hoverHelp")
     );
-    $f->template(
+    $f->addField( "template",
 		name      => "contribLayoutTemplateId",
 		value     => $self->getLayoutTemplateId,
 		namespace => "Account/Layout",
 		label     => $i18n->get("contrib layout template label"),
         hoverHelp => $i18n->get("contrib layout template hoverHelp")
     );
-    $f->template(
+    $f->addField( "template",
 		name      => "contribViewTemplateId",
 		value     => $self->getViewTemplateId,
 		namespace => "Account/Contrib/View",
@@ -65,7 +65,7 @@ sub editSettingsForm {
         hoverHelp => $i18n->get("contrib view template hoverHelp")
     );
 
-    return $f->printRowsOnly;
+    return $f;
 }
 
 #-------------------------------------------------------------------
