@@ -234,8 +234,8 @@ sub www_editSubmissionForm {
     }
     my $asset   = $self || $parent;
     my $url     = $asset->getUrl('func=editSubmissionFormSave');
-    my $newform = WebGUI::HTMLForm->new( $session, action => $url );
-    $newform->hidden( name => 'assetId', value => $assetId );
+    my $newform = WebGUI::FormBuilder->new( $session, action => $url );
+    $newform->addField( "hidden",name => 'assetId', value => $assetId );
     my @fieldNames = qw/title description startDate duration seatsAvailable location/;
     my $fields;
     my @defs = reverse @{ WebGUI::Asset::EMSSubmission->definition($session) };
@@ -257,7 +257,7 @@ sub www_editSubmissionForm {
         $fields->{ $metaField->{fieldId} }{fieldType} = $metaField->{dataType};
         $fields->{ $metaField->{fieldId} }{hoverHelp} = $metaField->{helpText};
     }
-    $newform->hidden( name => 'fieldNames', value => join( ' ', @fieldNames ) );
+    $newform->addField( "hidden", name => 'fieldNames', value => join( ' ', @fieldNames ) );
     @defs = reverse @{ WebGUI::Asset::EMSSubmissionForm->definition($session) };
     for my $def (@defs) {
         my $properties = $def->{properties};
@@ -270,7 +270,7 @@ sub www_editSubmissionForm {
                 my %fieldParams = %{ $properties->{$fieldName} };
                 $fieldParams{name} = $fieldName;
                 $fieldParams{value} = $params->{$fieldName} || $self ? $self->get($fieldName) : undef;
-                $newform->dynamicField(%fieldParams);
+                $newform->addField( "dynamicField", %fieldParams);
             }
         }
     }
@@ -279,14 +279,14 @@ sub www_editSubmissionForm {
     for my $fieldId (@fieldNames) {
         next if $fieldId eq 'submissionStatus';
         my $field = $fields->{$fieldId};
-        $newform->yesNo(
+        $newform->addField( "yesNo", 
             label        => $field->{label},
             name         => $field->{fieldId} . '_yesNo',
             defaultValue => 0,
             value        => $formDescription->{ $field->{fieldId} },
         );
     }
-    $newform->submit;
+    $newform->addField( "submit", name => "submit" );
     my $title = $assetId eq 'new' ? $i18n->get('new form') || 'new' : $asset->get('title');
     if ( $params->{asHashRef} ) {
         ;    # not setting mimie type
@@ -302,7 +302,8 @@ sub www_editSubmissionForm {
             isDynamic => $session->form->get('asJson') || 0,
             backUrl   => $parent->getUrl,
             pageTitle => $title,
-            pageForm  => $newform->print,
+            pageForm  => $newform->toHtml,
+            %{ $newform->toTemplateVars },
         },
         $parent->get('eventSubmissionTemplateId')
     );
