@@ -231,30 +231,30 @@ sub www_editFriends {
         $var->{viewAllUrl} = $self->getUrl('module=friendManager;do=editFriends;userId='.$userId);
     }
 
-    $form    = WebGUI::FormBuilder->new( $session,
+    my $fb    = WebGUI::FormBuilder->new( $session,
                     name    => "friendManager",
                     action => $self->getUrl('module=friendManager;do=editFriendsSave')
                 );
-    $form->addField( "Hidden", name => "userId", value => $user->userId );
+    $fb->addField( "Hidden", name => "userId", value => $user->userId );
     if ( $groupName ) {
-        $form->addField( "Hidden", name => 'groupName', value => $groupName );
+        $fb->addField( "Hidden", name => 'groupName', value => $groupName );
     }
 
     # Add checkboxes to remove friends
     my $friendsList = $user->friends->getUserList();
     while (my ($userId, $username) = each %{ $friendsList }) {
-        $form->addField( "Checkbox", name => 'friendToAxe', value => $userId, label => $username );
+        $fb->addField( "Checkbox", name => 'friendToAxe', value => $userId, label => $username );
     }
 
     # Add a selectbox to add friends
-    $form->addField( "SelectBox", name => 'userToAdd', options => \%usersToAdd );
+    $fb->addField( "SelectBox", name => 'userToAdd', options => \%usersToAdd );
 
-    $form->addField( "Checkbox", name => 'removeAllFriends', value => 'all' );
+    $fb->addField( "Checkbox", name => 'removeAllFriends', value => 'all' );
     if (!$groupName) {
-        $form->addField( "Checkbox", name => 'addManagers', value => 'addManagers' );
+        $fb->addField( "Checkbox", name => 'addManagers', value => 'addManagers' );
     }
-    $form->addField( 'Submit', name => "submit" );
-    $form->toTemplateVars( "form", $var );
+    $fb->addField( 'Submit', name => "submit" );
+    $fb->toTemplateVars( "form", $var );
 
     return $self->processTemplate($var,$session->setting->get("fmEditTemplateId"));
 }
