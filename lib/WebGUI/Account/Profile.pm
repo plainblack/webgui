@@ -146,37 +146,37 @@ sub editSettingsForm {
     my $session = $self->session;
     my $setting = $session->setting;
     my $i18n    = WebGUI::International->new($session,'Account_Profile');
-    my $f       = WebGUI::HTMLForm->new($session);
+    my $f       = WebGUI::FormBuilder->new($session);
 
-	$f->template(
+	$f->addField( "template",
 		name      => "profileStyleTemplateId",
 		value     => $self->getStyleTemplateId,
 		namespace => "style",
 		label     => $i18n->get("profile style template label"),
         hoverHelp => $i18n->get("profile style template hoverHelp")
 	);
-	$f->template(
+	$f->addField( "template",
 		name      => "profileLayoutTemplateId",
 		value     => $self->getLayoutTemplateId,
 		namespace => "Account/Layout",
 		label     => $i18n->get("profile layout template label"),
         hoverHelp => $i18n->get("profile layout template hoverHelp")
 	);
-	$f->template(
+	$f->addField( "template",
         name      => "profileEditTemplateId",
         value     => $self->getEditTemplateId,
         namespace => "Account/Profile/Edit",
         label     => $i18n->get("profile edit template label"),
         hoverHelp => $i18n->get("profile edit template hoverHelp")
 	);
-    $f->template(
+    $f->addField( "template",
         name      => "profileViewTemplateId",
         value     => $self->getViewTemplateId,
         namespace => "Account/Profile/View",
         label     => $i18n->get("profile view template label"),
         hoverHelp => $i18n->get("profile view template hoverHelp")
 	);
-    $f->template(
+    $f->addField( "template",
         name      => "profileErrorTemplateId",
         value     => $self->getErrorTemplateId,
         namespace => "Account/Profile/Error",
@@ -185,7 +185,7 @@ sub editSettingsForm {
 	);
 
 
-    return $f->printRowsOnly;
+    return $f;
 }
 
 
