@@ -887,7 +887,7 @@ Will block until all WebGUI::Fork processes are completed.
 sub waitForAllForks {
     my ( $class ) = @_;
     my $session = session;
-    my @forkIds = $session->db->quickArray( "SELECT id FROM fork WHERE finished != 1" );
+    my @forkIds = $session->db->quickArray( "SELECT id FROM Fork WHERE finished != 1" );
     my $wait = 1;
     while ( $wait ) {
         $wait = 0;
