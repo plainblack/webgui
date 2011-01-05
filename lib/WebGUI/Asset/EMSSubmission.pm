@@ -353,8 +353,8 @@ sub www_editSubmission {
         }
         my $asset = $self || $parent;
 	my $url = $asset->getUrl('func=editSubmissionSave');
-        my $newform = WebGUI::HTMLForm->new($session,action => $url);
-        $newform->hidden(name => 'assetId', value => $assetId);
+        my $newform = WebGUI::FormBuilder->new($session,action => $url);
+        $newform->addField( "hidden", name => 'assetId', value => $assetId);
 	my $formDescription = $parent->getFormDescription;
 	my @defs = reverse @{__PACKAGE__->definition($session)};
         my @fieldNames = qw/title submissionStatus startDate duration seatsAvailable location description/;
@@ -401,7 +401,7 @@ sub www_editSubmission {
 			$field->{fieldType} = "readOnly";
 		    }
  
-	        $newform->dynamicField(%$field);
+	        $newform->addField( "dynamicField", %$field);
 	    } else {
 	        my $value;
 	        # TODO see that the data gets formatted
@@ -411,14 +411,14 @@ sub www_editSubmission {
                 } else {
                     $value = $field->{value} || '[ ]';
                 }
-		$newform->readOnly(
+		$newform->addField( "readOnly", 
 		         label => $field->{label},
 			 value => $value,
 			 fieldId => $field->{fieldId},
 	            );
 	    }
 	}
-        $newform->submit;
+        $newform->addField( "submit", name => "submit" );
 	my $title = $asset->get('title');
         my $content = 
                $asset->processTemplate({
@@ -426,9 +426,10 @@ sub www_editSubmission {
                       isDynamic => $session->form->get('asJson') || 0,
                       backUrl => $parent->getUrl,
                       pageTitle => $title,
-                      pageForm => $newform->print,
+                      pageForm => $newform->toHtml,
 		      commentForm => $self ? $self->getFormattedComments : '',
 		      commentFlag => $self ? 1 : 0 ,
+                      %{ $newform->toTemplateVars },
                   },$parent->getParent->get('eventSubmissionTemplateId'));
 	   WebGUI::Macro::process( $session, \$content );
     if( $params->{asHashRef} ) {
