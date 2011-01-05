@@ -89,37 +89,37 @@ sub editSettingsForm {
     my $session  = $self->session;
     my $i18n     = WebGUI::International->new($session,'Account_Shop');
     my $shopi18n = WebGUI::International->new($session,'Shop');
-    my $f        = WebGUI::HTMLForm->new($session);
+    my $f        = WebGUI::FormBuilder->new($session);
 
-    $f->template(
+    $f->addField( "template",
 		name      => "shopStyleTemplateId",
 		value     => $self->getStyleTemplateId,
 		namespace => "style",
 		label     => $i18n->get("shop style template label"),
         hoverHelp => $i18n->get("shop style template hoverHelp")
     );
-    $f->template(
+    $f->addField( "template",
 		name      => "shopLayoutTemplateId",
 		value     => $self->getLayoutTemplateId,
 		namespace => "Account/Layout",
 		label     => $i18n->get("shop layout template label"),
         hoverHelp => $i18n->get("shop layout template hoverHelp")
     );
-    $f->template(
+    $f->addField( "template",
 		name      => "shopMyPurchasesTemplateId",
 		value     => $self->session->setting->get("shopMyPurchasesTemplateId"),
 		namespace => "Shop/MyPurchases",
 		label     => $shopi18n->get("my purchases template"),
         hoverHelp => $shopi18n->get("my purchases template help")
     );
-    $f->template(
+    $f->addField( "template",
 		name      => "shopMyPurchasesDetailTemplateId",
 		value     => $self->session->setting->get("shopMyPurchasesDetailTemplateId"),
 		namespace => "Shop/MyPurchasesDetail",
 		label     => $shopi18n->get("my purchases detail template"),
         hoverHelp => $shopi18n->get("my purchases detail template help")
     );
-    $f->template(
+    $f->addField( "template",
         name        => 'shopMySalesTemplateId',
         value       => $self->session->setting->get('shopMySalesTemplateId'),
         namespace   => 'Shop/MySales',
@@ -127,7 +127,7 @@ sub editSettingsForm {
         hoverHelp   => $i18n->get('my sales template help'),
     );
 
-    return $f->printRowsOnly;
+    return $f;
 }
 
 #-------------------------------------------------------------------
