@@ -302,19 +302,7 @@ sub getFolder {
     my $folder     = eval { WebGUI::Asset->newByUrl($session, $folderUrl); };
     return $folder if !Exception::Class->caught();
 
-    ##The requested folder doesn't exist.  Make it and autocommit it.
-
-    ##For a fully automatic commit, save the current tag, create a new one
-    ##with the commit without approval workflow, commit it, then restore
-    ##the original if it exists
-    my ($oldVersionTag, $newVersionTag);
-    $oldVersionTag = WebGUI::VersionTag->getWorking($session, 'noCreate');
-
-    if ($self->hasBeenCommitted) {
-        $newVersionTag = WebGUI::VersionTag->create($session, { workflowId => 'pbworkflow00000000003', });
-        $newVersionTag->setWorking;
-        $newVersionTag->set({ name => 'Adding folder '. $folderName. ' to archive '. $self->getUrl});
-    }
+    ##The requested folder doesn't exist.  Make it.
 
     ##Call SUPER because my addChild calls getFolder
     $folder = $self->addChild({
@@ -325,9 +313,6 @@ sub getFolder {
         isHidden        => 1,
         styleTemplateId => $self->styleTemplateId,
     });
-    $newVersionTag->commit() if $newVersionTag;
-    ##Restore the old one, if it exists
-    $oldVersionTag->setWorking() if $oldVersionTag;
 
     ##Get a new version of the asset from the db with the correct state
     $folder = $folder->cloneFromDb();
