@@ -315,7 +315,7 @@ Override this method to create settings for your Account Pluggin
 
 sub editSettingsForm {
     my $self = shift;
-    return "";
+    return WebGUI::FormBuilder->new( $self->session );
 }
 
 #-------------------------------------------------------------------

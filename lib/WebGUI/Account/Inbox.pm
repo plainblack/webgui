@@ -2,7 +2,7 @@ package WebGUI::Account::Inbox;
 
 use strict;
 
-use WebGUI::Form;
+use WebGUI::FormBuilder;
 use WebGUI::Exception;
 use WebGUI::International;
 use WebGUI::Pluggable;
@@ -96,168 +96,168 @@ sub editSettingsForm {
     my $session = $self->session;
     my $setting = $session->setting;
     my $i18n    = WebGUI::International->new($session,'Account_Inbox');
-    my $f       = WebGUI::HTMLForm->new($session);
+    my $f       = WebGUI::FormBuilder->new($session);
 
-    $f->template(
+    $f->addField( "Template",
 		name      => "inboxStyleTemplateId",
 		value     => $self->getStyleTemplateId,
 		namespace => "style",
 		label     => $i18n->get("inbox style template label"),
         hoverHelp => $i18n->get("inbox style template hoverHelp")
 	);
-	$f->template(
+	$f->addField( "Template",
 		name      => "inboxLayoutTemplateId",
 		value     => $self->getLayoutTemplateId,
 		namespace => "Account/Layout",
 		label     => $i18n->get("inbox layout template label"),
         hoverHelp => $i18n->get("inbox layout template hoverHelp")
 	);
-	$f->template(
+	$f->addField( "Template",
         name      => "inboxViewTemplateId",
         value     => $self->getViewTemplateId,
         namespace => "Account/Inbox/View",
         label     => $i18n->get("inbox view template label"),
         hoverHelp => $i18n->get("inbox view template hoverHelp")
 	);
-    $f->template(
+    $f->addField( "Template", 
         name      => "inboxViewMessageTemplateId",
         value     => $self->getViewMessageTemplateId,
         namespace => "Account/Inbox/ViewMessage",
         label     => $i18n->get("inbox view message template label"),
         hoverHelp => $i18n->get("inbox view message template hoverHelp")
 	);
-    $f->template(
+    $f->addField( "Template", 
         name      => "inboxSendMessageTemplateId",
         value     => $self->getSendMessageTemplateId,
         namespace => "Account/Inbox/SendMessage",
         label     => $i18n->get("inbox send message template label"),
         hoverHelp => $i18n->get("inbox send message template hoverHelp")
 	);
-    $f->template(
+    $f->addField( "Template", 
         name      => "inboxMessageConfirmationTemplateId",
         value     => $self->getMessageConfirmTemplateId,
         namespace => "Account/Inbox/Confirm",
         label     => $i18n->get("inbox message confirm template label"),
         hoverHelp => $i18n->get("inbox message confirm template hoverHelp")
 	);
-    $f->template(
+    $f->addField( "Template", 
         name      => "inboxErrorTemplateId",
         value     => $self->getInboxErrorTemplateId,
         namespace => "Account/Inbox/Error",
         label     => $i18n->get("inbox error message template label"),
         hoverHelp => $i18n->get("inbox error message template hoverHelp")
 	);
-    $f->template(
+    $f->addField( "Template",
         name      => "inboxManageInvitationsTemplateId",
         value     => $self->getManageInvitationsTemplateId,
         namespace => "Account/Inbox/ManageInvitations",
         label     => $i18n->get("inbox manage invitations template label"),
         hoverHelp => $i18n->get("inbox manage invitations template hoverHelp")
 	);
-    $f->template(
+    $f->addField( "Template",
         name      => "inboxViewInvitationTemplateId",
         value     => $self->getViewInvitationTemplateId,
         namespace => "Account/Inbox/ViewInvitation",
         label     => $i18n->get("inbox view invitation template label"),
         hoverHelp => $i18n->get("inbox view invitation template hoverHelp")
 	);
-    $f->template(
+    $f->addField( "Template", 
         name      => "inboxInvitationConfirmTemplateId",
         value     => $self->getInvitationConfirmTemplateId,
         namespace => "Account/Inbox/Confirm",
         label     => $i18n->get("invitation confirm message template label"),
         hoverHelp => $i18n->get("invitation confirm message template hoverHelp")
 	);
-    $f->yesNo(
+    $f->addField( "YesNo",
 		name      => "inboxInviteUserEnabled",
 		value     => $setting->get("inboxInviteUserEnabled"),
 		label     => $i18n->get("invite user enabled template label"),
         hoverHelp => $i18n->get("invite user enabled template hoverHelp")
 	);
-    $f->yesNo(
+    $f->addField( "YesNo", 
 		name      => "inboxInviteUserRestrictSubject",
 		value     => $setting->get("inboxInviteUserRestrictSubject"),
 		label     => $i18n->get("invite user restrict subject template label"),
         hoverHelp => $i18n->get("invite user restrict subject template hoverHelp")
 	);
-    $f->text(
+    $f->addField( "Text", 
 		name      => "inboxInviteUserSubject",
 		value     => $setting->get("inboxInviteUserSubject"),
 		label     => $i18n->get("invite user subject template label"),
         hoverHelp => $i18n->get("invite user subject template hoverHelp")
 	);
-    $f->yesNo(
+    $f->addField( "YesNo", 
 		name      => "inboxInviteUserRestrictMessage",
 		value     => $setting->get("inboxInviteUserRestrictMessage"),
 		label     => $i18n->get("invite user restrict message template label"),
         hoverHelp => $i18n->get("invite user restrict message template hoverHelp")
 	);
-    $f->textarea(
+    $f->addField( "Textarea",
 		name      => "inboxInviteUserMessage",
 		value     => $setting->get("inboxInviteUserMessage"),
         height    => 300,
 		label     => $i18n->get("invite user message label"),
         hoverHelp => $i18n->get("invite user message hoverHelp")
 	);
-    $f->template(
+    $f->addField( "Template",
 		name      => "inboxInviteUserMessageTemplateId",
 		value     => $self->getInviteUserMessageTemplateId,
         namespace => "Account/Inbox/InviteUserMessage",
 		label     => $i18n->get("invite user message template label"),
         hoverHelp => $i18n->get("invite user message template hoverHelp")
 	);
-    $f->template(
+    $f->addField( "Template", 
 		name      => "inboxInviteUserTemplateId",
 		value     => $self->getInviteUserTemplateId,
 		namespace => "Account/Inbox/InviteUser",
 		label     => $i18n->get("invite user template label"),
         hoverHelp => $i18n->get("invite user template hoverHelp")
 	);
-    $f->template(
+    $f->addField( "Template",
 		name      => "inboxInviteUserConfirmTemplateId",
 		value     => $self->getInviteUserConfirmTemplateId,
 		namespace => "Account/Inbox/InviteUserConfirm",
 		label     => $i18n->get("invite user confirm template label"),
         hoverHelp => $i18n->get("invite user confirm template hoverHelp")
 	);
-    $f->selectRichEditor(
+    $f->addField( "SelectRichEditor",
         name        => "inboxRichEditId",
         value       => $self->getRichEditorId,
         label       => $i18n->get("inbox rich editor label"),
         hoverHelp   => $i18n->get("inbox rich editor description"),
     );
-    $f->yesNo(
+    $f->addField( "YesNo",
         name      => "inboxCopySender",
         value     => $setting->get("inboxCopySender"),
         label     => $i18n->get("inbox copy sender label"),
         hoverHelp => $i18n->get("inbox copy sender hoverHelp")
     );
-    $f->yesNo(
+    $f->addField( "YesNo",
         name         => 'sendInboxNotificationsOnly',
         label        => $i18n->get('send inbox notifications only'),
         hoverHelp    => $i18n->get('send inbox notifications only help'),
         defaultValue => $setting->get('sendInboxNotificationsOnly'),
     );
-    $f->yesNo(
+    $f->addField( "YesNo",
         name         => 'sendRejectNotice',
         label        => $i18n->get('send reject notice'),
         hoverHelp    => $i18n->get('send reject notice help'),
         defaultValue => $setting->get('sendRejectNotice'),
     );
-    $f->text(
+    $f->addField( "Text",
         name         => 'inboxNotificationsSubject',
         label        => $i18n->get('inbox notifications subject'),
         hoverHelp    => $i18n->get('inbox notifications subject help'),
         defaultValue => $setting->get('inboxNotificationsSubject'),
     );
-    $f->template(
+    $f->addField( "Template",
         name         => 'inboxNotificationTemplateId',
         label        => $i18n->get('inbox notification template'),
         hoverHelp    => $i18n->get('inbox notification template help'),
         defaultValue => $self->getInboxNotificationTemplateId,
         namespace    => 'Account/Inbox/Notification',
     );
-    $f->template(
+    $f->addField( "Template",
         name         => 'inboxSmsNotificationTemplateId',
         label        => $i18n->get('inbox sms notification template'),
         hoverHelp    => $i18n->get('inbox sms notification template help'),
@@ -265,7 +265,7 @@ sub editSettingsForm {
         namespace    => 'Account/Inbox/Notification',
     );
 
-    return $f->printRowsOnly;
+    return $f;
 }
 
 #-------------------------------------------------------------------
