@@ -21,8 +21,10 @@ builder {
             Plack::Util::load_psgi($psgi);
         };
         $first_app ||= $app;
+        my $gateway = $config->get('gateway');
+        $gateway =~ s{^/?}{/};
         for my $sitename ( @{ $config->get('sitename') } ) {
-            mount "http://$sitename/" => $app;
+            mount "http://$sitename$gateway" => $app;
         }
     }
 
