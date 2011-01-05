@@ -87,29 +87,29 @@ sub editSettingsForm {
     my $self    = shift;
     my $session = $self->session;
     my $i18n    = WebGUI::International->new($session,'Account_FriendManager');
-    my $f       = WebGUI::HTMLForm->new($session);
+    my $f       = WebGUI::FormBuilder->new($session);
 
-    $f->template(
+    $f->addField( "template",
         name      => "fmStyleTemplateId",
         value     => $self->getStyleTemplateId,
         namespace => "style",
         label     => $i18n->get("style template label"),
         hoverHelp => $i18n->get("style template hoverHelp"),
     );
-    $f->template(
+    $f->addField( "template",
         name      => "fmLayoutTemplateId",
         value     => $self->getLayoutTemplateId,
         namespace => "Account/Layout",
         label     => $i18n->get("layout template label"),
         hoverHelp => $i18n->get("layout template hoverHelp"),
     );
-    $f->group(
+    $f->addField( "group",
         name      => "groupIdAdminFriends",
         value     => $session->setting->get('groupIdAdminFriends'),
         label     => $i18n->get("setting groupIdAdminFriends label"),
         hoverHelp => $i18n->get("setting groupIdAdminFriends hoverHelp"),
     );
-    $f->group(
+    $f->addField( "group",
         name      => "groupsToManageFriends",
         value     => $session->setting->get('groupsToManageFriends'),
         multiple  => 1,
@@ -118,28 +118,28 @@ sub editSettingsForm {
         hoverHelp => $i18n->get("groupsToManageFriends hoverHelp"),
         defaultValue => [2,3],
     );
-    $f->template(
+    $f->addField( "template",
         name      => "fmViewTemplateId",
         value     => $self->session->setting->get("fmViewTemplateId"),
         namespace => "Account/FriendManager/View",
         label     => $i18n->get("view template label"),
         hoverHelp => $i18n->get("view template hoverHelp"),
     );
-    $f->template(
+    $f->addField( "template",
         name      => "fmEditTemplateId",
         value     => $self->session->setting->get("fmEditTemplateId"),
         namespace => "Account/FriendManager/Edit",
         label     => $i18n->get("edit template label"),
         hoverHelp => $i18n->get("edit template hoverHelp"),
     );
-    $f->yesNo(
+    $f->addField( "yesNo",
         name      => "overrideAbleToBeFriend",
         value     => $self->session->setting->get("overrideAbleToBeFriend"),
         label     => $i18n->get("override abletobefriend label"),
         hoverHelp => $i18n->get("override abletobefriend hoverHelp"),
     );
 
-    return $f->printRowsOnly;
+    return $f;
 }
 
 #-------------------------------------------------------------------
