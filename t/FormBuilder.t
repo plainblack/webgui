@@ -27,7 +27,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 69;        # Increment this number for each test you create
+plan tests => 77;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # Constructor and properties
@@ -45,12 +45,14 @@ $fb = WebGUI::FormBuilder->new( $session,
     enctype     => 'application/x-www-form-urlencoded',
     name        => 'search',
     method      => 'get',
+    extras      => q{onclick="alert('hi');"},
 );
 isa_ok( $fb, 'WebGUI::FormBuilder' );
 is( $fb->method, 'get' );
 is( $fb->action, '/myurl' );
 is( $fb->enctype, 'application/x-www-form-urlencoded' );
 is( $fb->name, 'search' );
+is( $fb->extras, q{onclick="alert('hi');"} );
 
 # Test mutators
 is( $fb->method("POST"), "POST" );
@@ -61,6 +63,17 @@ is( $fb->enctype('multipart/form-data'), 'multipart/form-data' );
 is( $fb->enctype, 'multipart/form-data' );
 is( $fb->name('myname'), 'myname' );
 is( $fb->name, 'myname' );
+is( $fb->extras(""), "" );
+is( $fb->extras, "" );
+
+# getHeader
+like( $fb->getHeader, qr{ method="POST"} );
+like( $fb->getHeader, qr{ action="/otherurl"} );
+like( $fb->getHeader, qr{ enctype="multipart/form-data"} );
+like( $fb->getHeader, qr{ name="myname"} );
+
+$fb->extras(q{onclick="alert()"});
+like( $fb->getHeader, qr{ onclick="alert\(\)"} );
 
 #----------------------------------------------------------------------------
 # Adding objects
@@ -245,6 +258,5 @@ $fb->addField( 'submit', name => 'submit', label => 'Submit' );
 #----------------------------------------------------------------------------
 # toHtml
 
-print $fb->toHtml;
 
 #vim:ft=perl

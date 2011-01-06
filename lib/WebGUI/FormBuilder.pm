@@ -70,6 +70,14 @@ The name of the form. Not required, but recommended.
 
 has 'name' => ( is => 'rw' );
 
+=head2 extras
+
+Any extra things to add to the <form> tag. Optional.
+
+=cut
+
+has 'extras' => ( is => 'rw', isa => 'Str', default => '' );
+
 =head2 session
 
 A WebGUI::Session object. Required.
@@ -152,7 +160,7 @@ sub getHeader {
     my @attrs   = qw{ action method name enctype };
     my $attrs   = join " ", map { qq{$_="} . $self->$_ . qq{"} } grep { $self->$_ } @attrs;
 
-    my $html    = sprintf '<form %s>', $attrs;
+    my $html    = sprintf '<form %s %s>', $attrs, $self->extras;
     
     return $html;
 }
