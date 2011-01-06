@@ -75,7 +75,14 @@ $in->{$hname} = $template->getId;
 # processRaw sets some session variables (including username), so we need to
 # re-do it.
 WebGUI::Asset::Template->processRaw($session,$tmplText,\%var);
-my $output = $template->process(\%var);
+
+# This has to get called to set up the stow good and proper
+WebGUI::Asset::Template->processVariableHeaders($session);
+
+$template->process(\%var);
+
+my $output = WebGUI::Asset::Template->getVariableJson($session);
+
 delete $in->{$hname};
 my $start = delete $out->{"$hname-Start"};
 my $end   = delete $out->{"$hname-End"};

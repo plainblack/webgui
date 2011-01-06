@@ -20,6 +20,7 @@ use WebGUI::Affiliate;
 use WebGUI::Exception;
 use WebGUI::Pluggable;
 use WebGUI::Session;
+use WebGUI::Asset::Template;
 
 =head1 NAME
 
@@ -69,6 +70,7 @@ sub handler {
                 $session = WebGUI::Session->open($server->dir_config('WebguiRoot'), $config->getFilename, $request, $server);
                 return Apache2::Const::OK if ! defined $session;
             }
+            WebGUI::Asset::Template->processVariableHeaders($session);
             foreach my $handler (@{$config->get("contentHandlers")}) {
                 my $output = eval { WebGUI::Pluggable::run($handler, "handler", [ $session ] )};
                 if ( my $e = WebGUI::Error->caught ) {
@@ -107,6 +109,9 @@ sub handler {
                 }
             }
         }
+        $session->output->print(
+            WebGUI::Asset::Template->getVariableJson($session), 1
+        );
         $session->close if defined $session;
         return Apache2::Const::OK;
     });

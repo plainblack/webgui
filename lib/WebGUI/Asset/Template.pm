@@ -558,6 +558,22 @@ sub getParser {
 }
 
 #-------------------------------------------------------------------
+#
+# See the warning about using this on processVariableHeaders(). If no
+# variables were captured, we'll return the empty string.
+
+sub getVariableJson {
+    my ($class, $session) = @_;
+    my ($show, $vars, $json);
+
+    return ($show = $session->stow->get('showTemplateVars'))
+        && ($vars = $show->{vars})
+        && ($json = eval { JSON::encode_json($vars) })
+        && ($show->{startDelimiter} . $json . $show->{endDelimiter})
+        or '';
+}
+
+#-------------------------------------------------------------------
 
 =head2 importAssetCollateralData ( data )
 
@@ -572,6 +588,7 @@ sub importAssetCollateralData {
     }
     return $self->SUPER::importAssetCollateralData( $data, @args );
 }
+
     
 #-------------------------------------------------------------------
 
@@ -698,42 +715,13 @@ sub process {
        return to_json( $vars );
     }
 
-    my $extra = '';
-    if ($self->canEdit) {
-        # Used for debugging and the template test renderer.
-
-        # WARNING: Please do not rely on this behavior. It's a bit of a hack,
-        # and should not be considered part of the core API. Eventually, we
-        # will have introspectable template objects so that you can more
-        # easily (and efficiently) get this kind of information.
-
-        # If the first value for the 'X-Webgui-Template-Variables' header is
-        # our assetId, then in addition to processing the template, we'll add
-        # a json representation of our template variables. The headers
-        # "X-Webgui-Template-Variables-Start" and
-        # "X-Webgui-Template-Variables-End" will contain the delimiters for
-        # the start and end of this content so that the user agent (who had to
-        # have stuck the header in in the first place) can parse it out.  The
-        # delimiters will make the whole thing look like an xml comment (<!--
-        # ... -->) just in case.
-
-        # We would just send the vars in the header, but different webservers
-        # have different limits on header field size and it's impossible to
-        # say whether our data will fit inside them or not.
-        my $r    = $session->request;
-        my $head = 'X-Webgui-Template-Variables';
-        if ($self->getId eq $r->headers_in->{$head}) {
-            if (my $json = eval { to_json($vars) }) {
-                my @chr = ('0'..'9', 'a'..'z', 'A'..'Z');
-                my $rnd = join('', map { $chr[int(rand($#chr))] } (1..32));
-                my $out = $r->headers_out;
-                my $st  = "<!-- $rnd ";
-                my $end = " $rnd -->";
-                $out->{"$head-Start"} = $st;
-                $out->{"$head-End"}   = $end;
-                $extra = $st . $json . $end;
-            }
-        }
+    my $stow = $session->stow;
+    my $show = $stow->get('showTemplateVars');
+    if ( $show && $show->{assetId} eq $self->getId && $self->canEdit ) {
+        # This will never be true again, cause we're getting rid of assetId
+        delete $show->{assetId};
+        $show->{vars} = $vars;
+        $stow->set( showTemplateVars => $show );
     }
 
 	$self->prepare unless ($self->{_prepared});
@@ -749,9 +737,61 @@ sub process {
         my $i18n = WebGUI::International->new($session, 'Asset_Template');
         $output = sprintf $i18n->get('template error').$e->error, $self->getUrl, $self->getId;
     }
-	return $output . $extra;
+	return $output;
 }
 
+#-------------------------------------------------------------------
+
+# Used for debugging and the template test renderer.
+
+# WARNING: Please do not rely on this behavior. It's a bit of a hack, and
+# should not be considered part of the core API. Eventually, we will have
+# introspectable template objects so that you can more easily (and
+# efficiently) get this kind of information.
+
+# If the first value for the 'X-Webgui-Template-Variables' header is our
+# assetId, then in addition to processing the template, append add a json
+# representation of our template variables to the response. The headers
+# "X-Webgui-Template-Variables-Start" and "X-Webgui-Template-Variables-End"
+# will contain the delimiters for the start and end of this content so that
+# the user agent (who had to have stuck the header in in the first place) can
+# parse it out.  The delimiters will make the whole thing look like an xml
+# comment (<!-- ... -->) just in case.
+
+# We would just send the vars in the header, but different webservers have
+# different limits on header field size and it's impossible to say whether our
+# data will fit inside them or not.
+
+# This is intended to be called earlier in the request cycle (in the Content
+# URL handler) so that the headers get sent before any chunked content starts
+# being set up.  We set the stow here and check it during process() to see
+# whether we need to include the delimited json. Later on, Content will call
+# call getVariableJson to get the results.
+
+{
+    my $head = 'X-Webgui-Template-Variables';
+    my @chr  = ('0'..'9', 'a'..'z', 'A'..'Z');
+
+    sub processVariableHeaders {
+        my ($class, $session) = @_;
+        my $r = $session->request;
+        if (my $id = $r->headers_in->{$head}) {
+            my $rnd = join('', map { $chr[int(rand($#chr))] } (1..32));
+            my $out = $r->headers_out;
+            my $st  = "<!-- $rnd ";
+            my $end = " $rnd -->";
+            $out->{"$head-Start"} = $st;
+            $out->{"$head-End"}   = $end;
+            $session->stow->set(
+                showTemplateVars => {
+                    assetId        => $id,
+                    startDelimiter => $st,
+                    endDelimiter   => $end,
+                }
+            );
+        }
+    }
+}
 
 #-------------------------------------------------------------------
 
