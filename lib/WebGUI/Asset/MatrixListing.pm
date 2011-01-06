@@ -209,48 +209,47 @@ sub getEditForm {
     my $i18n        = WebGUI::International->new($session, 'Asset_MatrixListing');
     my $func        = $session->form->process("func");
 
-    # TODO: Change to FormBuilder
-    my $form = WebGUI::HTMLForm->new($session);
+    my $form = WebGUI::FormBuilder->new($session);
     
     if ($func eq "add" || ( $func eq "editSave" && $session->form->process("assetId") eq "new")) {
-        $form->hidden(
-            -name           => 'assetId',
-            -value          => 'new',
+        $form->addField( "hidden", 
+            name           => 'assetId',
+            value          => 'new',
         );
-        $form->hidden(
-            -name           => 'class',
-            -value          => 'WebGUI::Asset::MatrixListing',
+        $form->addField( "hidden", 
+            name           => 'class',
+            value          => 'WebGUI::Asset::MatrixListing',
         );
     }
-    $form->hidden(
-        -name           =>'func',
-        -value          =>'editSave',
+    $form->addField( "hidden", 
+        name           =>'func',
+        value          =>'editSave',
         );
-    $form->text(
-        -name           =>'title',
-        -defaultValue   =>'Untitled',
-        -label          =>$i18n->get("product name label"),
-        -hoverHelp      =>$i18n->get('product name description'),
-        -value          =>$self->title,
+    $form->addField( "text", 
+        name           =>'title',
+        defaultValue   =>'Untitled',
+        label          =>$i18n->get("product name label"),
+        hoverHelp      =>$i18n->get('product name description'),
+        value          =>$self->title,
     );
 
-    $form->image(
-        -name           =>'screenshots',
-        -defaultValue   =>undef,
-        -maxAttachments =>20,
-        -label          =>$i18n->get("screenshots label"),
-        -hoverHelp      =>$i18n->get("screenshots description"),,
-        -value          =>$self->screenshots,
+    $form->addField( "image", 
+        name           =>'screenshots',
+        defaultValue   =>undef,
+        maxAttachments =>20,
+        label          =>$i18n->get("screenshots label"),
+        hoverHelp      =>$i18n->get("screenshots description"),,
+        value          =>$self->screenshots,
         );
-    $form->HTMLArea(
-        -name           =>'description',
-        -defaultValue   =>undef,
-        -label          =>$i18n->get("description label"),
-        -hoverHelp      =>$i18n->get("description description"),
-        -value          =>$self->description,
+    $form->addField( "HTMLArea", 
+        name           =>'description',
+        defaultValue   =>undef,
+        label          =>$i18n->get("description label"),
+        hoverHelp      =>$i18n->get("description description"),
+        value          =>$self->description,
         );
     if ($self->getParent->canEdit) {
-        $form->user(
+        $form->addField( "user", 
             name        =>"ownerUserId",
             value       =>$self->ownerUserId,
             label       =>$i18n->get('maintainer label'),
@@ -265,42 +264,42 @@ sub getEditForm {
         else{
             $userId = $self->get('ownerUserId');
         }
-        $form->hidden(
-            -name           =>'ownerUserId',
-            -value          =>$userId,
+        $form->addField( "hidden", 
+            name           =>'ownerUserId',
+            value          =>$userId,
         );
     }
-    $form->text(
-        -name           =>'version',
-        -defaultValue   =>undef,
-        -label          =>$i18n->get("version label"),
-        -hoverHelp      =>$i18n->get("version description"),
-        -value          =>$self->version,
+    $form->addField( "text", 
+        name           =>'version',
+        defaultValue   =>undef,
+        label          =>$i18n->get("version label"),
+        hoverHelp      =>$i18n->get("version description"),
+        value          =>$self->version,
         );
-    $form->text(
-        -name           =>'manufacturerName',
-        -defaultValue   =>undef,
-        -label          =>$i18n->get("manufacturerName label"),
-        -hoverHelp      =>$i18n->get("manufacturerName description"),
-        -value          =>$self->manufacturerName,
+    $form->addField( "text", 
+        name           =>'manufacturerName',
+        defaultValue   =>undef,
+        label          =>$i18n->get("manufacturerName label"),
+        hoverHelp      =>$i18n->get("manufacturerName description"),
+        value          =>$self->manufacturerName,
         );
-    $form->url(
-        -name           =>'manufacturerURL',
-        -defaultValue   =>undef,
-        -label          =>$i18n->get("manufacturerURL label"),
-        -hoverHelp      =>$i18n->get("manufacturerURL description"),
-        -value          =>$self->manufacturerURL,
+    $form->addField( "url", 
+        name           =>'manufacturerURL',
+        defaultValue   =>undef,
+        label          =>$i18n->get("manufacturerURL label"),
+        hoverHelp      =>$i18n->get("manufacturerURL description"),
+        value          =>$self->manufacturerURL,
         );
-    $form->url(
-        -name           =>'productURL',
-        -defaultValue   =>undef,
-        -label          =>$i18n->get("productURL label"),
-        -hoverHelp      =>$i18n->get("productURL description"),
-        -value          =>$self->productURL,
+    $form->addField( "url", 
+        name           =>'productURL',
+        defaultValue   =>undef,
+        label          =>$i18n->get("productURL label"),
+        hoverHelp      =>$i18n->get("productURL description"),
+        value          =>$self->productURL,
         );
 
     foreach my $category (keys %{$self->getParent->getCategories}) {
-        $form->raw('<tr><td colspan="2"><b>'.$category.'</b></td></tr>');
+        my $fieldset = $form->addFieldset( name => $category, label => $category );
         my $attributes = $db->read("select * from Matrix_attribute where category = ? and assetId = ?",
             [$category,$matrixId]);
         while (my $attribute = $attributes->hashRef) {
@@ -320,18 +319,16 @@ sub getEditForm {
                 $attribute->{options}   = \%options;
                 $attribute->{extras}    = "style='width:120px'";
             }
-            $form->dynamicField(%{$attribute});           
+            $fieldset->addField( delete $attribute->{fieldType}, %{$attribute});
         }
     }
 
-    $form->raw(
-    '<tr><td COLSPAN=2>'.
-    WebGUI::Form::Submit($session, {}).
-    WebGUI::Form::Button($session, {
-        -value  => $i18n->get('cancel', 'WebGUI'),
-        -extras => q|onclick="history.go(-1);" class="backwardButton"|
-    }).
-    '</td></tr>'
+    my $buttons = $form->addField( "ButtonGroup", name => "saveButtons", rowClass => "saveButtons" );
+    $buttons->addButton( "Submit", name => "submit" );
+    $buttons->addButton( "Button", 
+        name => "cancel", 
+        value => $i18n->get('cancel', 'WebGUI'),
+        extras => q{onclick="history.go(-1);" class="backwardButton"},
     );
 
     return $form;
