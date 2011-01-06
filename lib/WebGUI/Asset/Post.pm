@@ -81,7 +81,6 @@ with 'WebGUI::Role::Asset::AutoSynopsis';
 
 use WebGUI::Group;
 use WebGUI::HTML;
-use WebGUI::HTMLForm;
 use WebGUI::Form::DynamicField;
 use WebGUI::International;
 use WebGUI::Inbox;
