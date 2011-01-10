@@ -29,6 +29,7 @@
  - fixed #12008: Activity CleanLoginHistory is too slow
  - fixed #12004: SSO operation vulnerable to session fixation attacks
  - fixed #11996: Mandatory field in Thingy saves empty
+ - fixed #11987: Map displays white text on white background
 
 7.10.6
  - fixed #11974: Toolbar icons unclickable in Webkit using HTML5
