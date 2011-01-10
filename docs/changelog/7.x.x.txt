@@ -3,6 +3,7 @@
  - rfe #10521: Use monospaced font in template edit textarea
  - fixed #12004: SSO operation vulnerable to session fixation attacks
  - fixed #11996: Mandatory field in Thingy saves empty
+ - fixed #11987: Map displays white text on white background
 
 7.9.19
  - fixed #11945: Slow SQL access for duplicate e-mail address lookups
