@@ -33,6 +33,7 @@ my $session = start(); # this line required
 # upgrade functions go here
 addEmailIndexToProfile( $session );
 addIndecesToUserLoginLog($session);
+addSSOOptionToConfigs($session);
 
 finish($session); # this line required
 
@@ -45,6 +46,15 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+#----------------------------------------------------------------------------
+# Add an index to the userProfileData table for email lookups
+sub addSSOOptionToConfigs {
+    my $session = shift;
+    print "\tAdding SSO flag to config file to enable the feature... " unless $quiet;
+    $session->config->set('enableSimpleSSO', 0);
+    print "DONE!\n" unless $quiet;
+}
 
 #----------------------------------------------------------------------------
 # Add an index to the userProfileData table for email lookups
