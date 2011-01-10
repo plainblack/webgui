@@ -32,6 +32,7 @@ my $session = start(); # this line required
 
 # upgrade functions go here
 addIndecesToUserLoginLog($session);
+addSSOOptionToConfigs($session);
 
 finish($session); # this line required
 
@@ -50,6 +51,13 @@ sub addIndecesToUserLoginLog {
         $session->db->write("ALTER TABLE userLoginLog ADD INDEX timeStamp (timeStamp)");
     }
 
+    print "DONE!\n" unless $quiet;
+}
+
+sub addSSOOptionToConfigs {
+    my $session = shift;
+    print "\tAdding SSO flag to config file to enable the feature... " unless $quiet;
+    $session->config->set('enableSimpleSSO', 0);
     print "DONE!\n" unless $quiet;
 }
 
