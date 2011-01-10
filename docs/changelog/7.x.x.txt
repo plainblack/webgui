@@ -1,5 +1,6 @@
 7.9.20
  - fixed #12008: Activity CleanLoginHistory is too slow
+ - rfe #10521: Use monospaced font in template edit textarea
 
 7.9.19
  - fixed #11945: Slow SQL access for duplicate e-mail address lookups
