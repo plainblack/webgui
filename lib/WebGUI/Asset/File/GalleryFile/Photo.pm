@@ -549,13 +549,17 @@ sub updateExifDataFromFile {
     }
 
     # Remove other, pointless, possibly harmful keys
-    for my $key ( qw( Directory NativeDigest CameraID CameraType ) ) {
-        delete $info->{ $key };
-    }
+    delete @{ $info }{qw( Directory NativeDigest CameraID CameraType )};
 
-    $self->update({
-        exifData    => to_json( $info ),
-    });
+    my $json = eval { to_json ($info) };
+    if ($@) {
+        $self->session->log->warn('Bad EXIF data in image file for Photo asset '. $self->getId .', unable to convert to JSON');
+    }
+    else {
+        $self->update({
+            exifData    => $json,
+        });
+    }
 }
 
 #----------------------------------------------------------------------------
