@@ -92,6 +92,39 @@ addToCleanup($versionTag);
 #
 ################################################################
 
+# When it's okay that the variables we get will have extra keys and
+# values beyond what we're checking for, we'll use this function.
+sub cmp_variable_loop {
+    my ($got, $expected, $name) = @_;
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+    my $sg = @$got;
+    my $se = @$expected;
+    unless (@$got == @$expected) {
+        fail($name);
+        diag(<<EOM);
+Arrayrefs are not the same length.
+   got : $sg
+expect : $se
+EOM
+        return 0;
+    }
+
+    my $failed;
+    for my $i (0..$#$got) {
+        my $g = $got->[$i];
+        my $e = $expected->[$i];
+        my ($ok, $stack) = Test::Deep::cmp_details($g, superhashof($e));
+        unless ($ok) {
+            unless ($failed) {
+                fail($name);
+                $failed = 1;
+            }
+            diag(Test::Deep::deep_diag($stack));
+        }
+    }
+    return $failed ? 0 : pass($name);
+}
+
 my $templateVars;
 $templateVars = $topic->viewTemplateVariables();
 
@@ -104,7 +137,7 @@ cmp_deeply(
     }),
     'viewTemplateVars: RSS and Atom feed template variables'
 );
-cmp_deeply(
+cmp_variable_loop(
     $templateVars->{story_loop},
     [
         {
@@ -132,7 +165,7 @@ ok(! $templateVars->{standAlone}, 'viewTemplateVars: not in standalone mode');
 
 $topic->{_standAlone} = 1;
 $templateVars = $topic->viewTemplateVariables();
-cmp_deeply(
+cmp_variable_loop(
     $templateVars->{story_loop},
     [
         {
@@ -239,7 +272,7 @@ $topic->update({
     storiesShort => 3,
 });
 $templateVars = $topic->viewTemplateVariables;
-cmp_deeply(
+cmp_variable_loop(
     $templateVars->{story_loop},
     [
         {
@@ -321,7 +354,7 @@ $topic->update( { storySortOrder => 'Alphabetically' } );
 
 $templateVars = $topic->viewTemplateVariables();
 
-cmp_deeply(
+cmp_variable_loop(
     [
         {
             title        => $templateVars->{topStoryTitle},

@@ -193,32 +193,43 @@ sub viewTemplateVariables {
         rowsPerPage    => $numberOfStories,
     });
     my $storyIds = $p->getPageData();
-    $var->{story_loop} = [];
 
     my $icon          = $session->icon;
     my $userUiLevel   = $session->user->profileField("uiLevel");
     my $uiLevels      = $session->config->get('assetToolbarUiLevel');
     my $i18n          = WebGUI::International->new($session);
+    my $url           = $session->url;
 
     ##Only build objects for the assets that we need
-    STORY: foreach my $storyId (@{ $storyIds }) {
-        my $story = WebGUI::Asset->new($session, $storyId->{assetId}, $storyId->{className}, $storyId->{revisionDate});
-        next STORY unless $story;
-        my $storyVars = {
-            url           => ( $exporting
-                               ? $story->getUrl
-                               : $session->url->append($self->getUrl, 'func=viewStory;assetId='.$storyId->{assetId}) ),
-            title         => $story->getTitle,
-            creationDate  => $story->get('creationDate'),
-        };
-        if ($story->canEdit && $userUiLevel >= $uiLevels->{delete} && !$exporting) {
-            $storyVars->{deleteIcon} = $icon->delete('func=delete', $story->get('url'), $i18n->get(43));
+    $var->{story_loop} = [
+        map {
+            my $v = $_->viewTemplateVariables;
+            if ($exporting) {
+                $v->{url} = $_->getUrl;
+            }
+            else {
+                my $params = "func=viewStory;assetId=$v->{assetId}";
+                my $rawUrl = $v->{url};
+                $v->{url}  = $url->append($self->getUrl, $params);
+                if ($v->{canEdit}) {
+                    if ($userUiLevel >= $uiLevels->{delete}) {
+                        $v->{deleteIcon} = $icon->delete('func=delete', $rawUrl, $i18n->get(43));
+                    }
+                    if ($userUiLevel >= $uiLevels->{edit}) {
+                        $v->{editIcon} = $icon->edit('func=edit', $rawUrl);
+                    }
+                }
+            }
+            $v;
         }
-        if ($story->canEdit && $userUiLevel >= $uiLevels->{edit}   && !$exporting) {
-            $storyVars->{editIcon}   = $icon->edit('func=edit', $story->get('url'));
+        grep { $_ }
+        map  {
+            WebGUI::Asset->new(
+                $session, @{ $_ }{ qw( assetId className revisionDate ) }
+            )
         }
-        push @{$var->{story_loop}}, $storyVars;
-    }
+        @{ $storyIds }
+    ];
 
     if (@{ $storyIds }) {
         my $topStoryData = $storyIds->[0];
