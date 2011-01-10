@@ -31,8 +31,27 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+addIndecesToUserLoginLog($session);
 
 finish($session); # this line required
+
+#----------------------------------------------------------------------------
+sub addIndecesToUserLoginLog {
+    my $session = shift;
+    print "\tAdd indeces to userLoginLog to speed cleanup... " unless $quiet;
+    # and here's our code
+    my $sth = $session->db->read('SHOW CREATE TABLE userLoginLog');
+    my ($field,$stmt) = $sth->array;
+    $sth->finish;
+    unless ($stmt =~ m/KEY `userId`/i) {
+        $session->db->write("ALTER TABLE userLoginLog ADD INDEX userId (userId)");
+    }
+    unless ($stmt =~ m/KEY `timeStamp`/i) {
+        $session->db->write("ALTER TABLE userLoginLog ADD INDEX timeStamp (timeStamp)");
+    }
+
+    print "DONE!\n" unless $quiet;
+}
 
 
 #----------------------------------------------------------------------------
