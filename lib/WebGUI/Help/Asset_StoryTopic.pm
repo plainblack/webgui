@@ -46,7 +46,12 @@ our $HELP = {
             { name => 'rssUrl'               },
             { name => 'atomUrl'              },
         ],
-        related => []
+        related => [
+              {
+                  namespace => 'Asset_Story',
+                  tag       => 'view template',
+              }
+        ],
     },
 
     'storytopic asset template variables' => {

@@ -58,9 +58,9 @@ our $I18N = {
     },
 
     'story_loop' => {
-        message => q|A loop containing the most recent stories for this topic.|,
+        message => q|A loop containing the most recent stories for this topic.  In addition to the listed variables, all the view template variables from Story are available.|,
         context => q|Template variable.|,
-        lastUpdated => 0,
+        lastUpdated => 1294679882,
     },
 
     'url' => {
