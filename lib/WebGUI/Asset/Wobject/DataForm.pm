@@ -88,12 +88,13 @@ sub _fieldAdminIcons {
     my $self = shift;
     my $fieldName = shift;
     my $i18n = WebGUI::International->new($self->session,"Asset_DataForm");
+    my $mode = ";mode=" . $self->currentView;
     my $output;
-    $output = $self->session->icon->delete('func=deleteFieldConfirm;fieldName='.$fieldName,$self->get("url"),$i18n->get(19))
+    $output = $self->session->icon->delete('func=deleteFieldConfirm;fieldName='.$fieldName.$mode,$self->get("url"),$i18n->get(19))
         unless $self->getFieldConfig($fieldName)->{isMailField};
-    $output .= $self->session->icon->edit('func=editField;fieldName='.$fieldName,$self->get("url"))
-        . $self->session->icon->moveUp('func=moveFieldUp;fieldName='.$fieldName,$self->get("url"))
-        . $self->session->icon->moveDown('func=moveFieldDown;fieldName='.$fieldName,$self->get("url"));
+    $output .= $self->session->icon->edit('func=editField;fieldName='.$fieldName.$mode,$self->get("url"))
+        . $self->session->icon->moveUp('func=moveFieldUp;fieldName='.$fieldName.$mode,$self->get("url"))
+        . $self->session->icon->moveDown('func=moveFieldDown;fieldName='.$fieldName.$mode,$self->get("url"));
     return $output;
 }
 #-------------------------------------------------------------------
