@@ -1050,6 +1050,12 @@ be useful, others may not.|,
         context     => q{Help for template variable},
     },
 
+    'add entry' => {
+        message     => q{Add Entry},
+        lastUpdated => 0,
+        context     => q{Label for link to add a new entry to the dataform},
+    },
+
 };
 
 1;
