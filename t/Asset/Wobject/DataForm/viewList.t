@@ -119,7 +119,7 @@ my @fields  = (
 # Test the field_loop
 my $fieldVars   = [];
 for my $field ( @fields ) {
-    my $var = {};
+    my $var = { 'field.controls' => ignore() };
     for my $key ( keys %$field ) {
         $var->{ 'field.' . $key } = $field->{ $key };
     }
