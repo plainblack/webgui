@@ -93,6 +93,12 @@ our $I18N = {
         lastUpdated => 1248191575,
     },
 
+    'topStory' => {
+        message => 'Variable containing the same kind of values as story_loop, but for the topStory.  Accessible via topStory.hasPhotos, etc.',
+        context => 'Template variable.',
+        lastUpdated => 1294761543,
+    },
+
     'topStoryUrl' => {
         message => q|The URL to view the top story.|,
         context => q|Template variable.|,

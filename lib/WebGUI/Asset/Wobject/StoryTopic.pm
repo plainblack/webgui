@@ -236,6 +236,7 @@ sub viewTemplateVariables {
         my $topStoryVars = shift @{ $var->{story_loop} };
         ##Note, this could have saved from the loop above, but this looks more clean and encapsulated to me.
         my $topStory   = WebGUI::Asset->new($session, $topStoryData->{assetId}, $topStoryData->{className}, $topStoryData->{revisionDate});
+        $var->{topStory}               = $topStoryVars;
         $var->{topStoryTitle}          = $topStory->getTitle;
         $var->{topStorySubtitle}       = $topStory->get('subtitle');
         $var->{topStoryUrl}            = $session->url->append($self->getUrl, 'func=viewStory;assetId='.$topStoryData->{assetId}),
