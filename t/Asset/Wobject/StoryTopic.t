@@ -31,7 +31,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 20;
+plan tests => 21;
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -155,7 +155,8 @@ cmp_variable_loop(
 );
 
 ok(
-    exists $templateVars->{topStoryTitle}
+    exists $templateVars->{topStory}
+ && exists $templateVars->{topStoryTitle}
  && exists $templateVars->{topStoryUrl}
  && exists $templateVars->{topStoryCreationDate}
  && exists $templateVars->{topStorySubtitle},
@@ -196,6 +197,13 @@ cmp_variable_loop(
     ],
     'viewTemplateVars has right number and contents in the story_loop in standalone mode.  Top story not present in story_loop'
 );
+
+cmp_deeply($templateVars->{topStory}, superhashof({
+    title        => 'bogs',
+    subtitle     => 'drinking his food through a straw',
+    creationDate => $now,
+}));
+
 
 is($templateVars->{topStoryTitle}, 'bogs', '... topStoryTitle');
 is(
