@@ -31,6 +31,8 @@
  - fixed #11996: Mandatory field in Thingy saves empty
  - fixed #11987: Map displays white text on white background
  - fixed #11988: Dataform list view doesn't allow moving fields
+ - fixed #11989: Calendar list view isn't uniform and missing fields
+ - fixed: Calendar list view sections don't use timezones
 
 7.10.6
  - fixed #11974: Toolbar icons unclickable in Webkit using HTML5
