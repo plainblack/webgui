@@ -723,6 +723,7 @@ sub getListTemplateVars {
             'field.label'       => $fieldConfig->{$_}{label},
             'field.isMailField' => $fieldConfig->{$_}{isMailField},
             'field.type'        => $fieldConfig->{$_}{type},
+            "field.controls"          => $self->_fieldAdminIcons($fieldConfig->{$_}{name}),
         }
     } @{ $self->getFieldOrder };
     $var->{field_loop} = \@fieldLoop;
