@@ -28,6 +28,7 @@
  - fixed #11985: Search.pl should warn on bad assets
  - fixed #12008: Activity CleanLoginHistory is too slow
  - fixed #12004: SSO operation vulnerable to session fixation attacks
+ - fixed #11996: Mandatory field in Thingy saves empty
 
 7.10.6
  - fixed #11974: Toolbar icons unclickable in Webkit using HTML5

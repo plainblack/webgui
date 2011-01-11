@@ -556,7 +556,9 @@ sub deleteThing {
 
 =head2 editThingDataSave ( )
 
-Saves a row of thing data and triggers the appropriate workflow triggers.
+Saves a row of thing data and triggers the appropriate workflow triggers.  Returns the id of the row created in
+the database, and an array reference of errors from required fields and other sources.  In there are errors, no data
+is saved in the database, and the id returned in the empty string.
 
 =head3 thingId
 
@@ -619,7 +621,6 @@ sub editThingDataSave {
             push (@errors,{
                 "error_message"=>$field->{label}." ".$i18n->get('is required error').".",
                 });
-            #$hadErrors = 1;
         }
         if ($field->{status} eq "hidden") {
             $fieldValue = $field->{defaultValue};
@@ -632,6 +633,9 @@ sub editThingDataSave {
         $thingData{$fieldName} = $fieldValue;
     }
 
+    if (@errors) {
+        return ('', \@errors);
+    }
     $newThingDataId = $self->setCollateral("Thingy_".$thingId,"thingDataId",\%thingData,0,0);
 
     # trigger workflow
