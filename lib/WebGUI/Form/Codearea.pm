@@ -102,23 +102,6 @@ sub getName {
 
 #-------------------------------------------------------------------
 
-=head2 headTags
-
-Includes script files for the code area
-
-=cut
-
-sub headTags {
-    my $self    = shift;
-    my $session = $self->session;
-    $self->SUPER::headTags(@_);
-    $session->style->setScript(
-        $session->url->extras('yui-webgui/build/codeArea/codeArea-min.js')
-    );
-}
-
-#-------------------------------------------------------------------
-
 =head2 toHtml
 
 Add some javascript to fix hitting the tab key.
@@ -127,7 +110,10 @@ Add some javascript to fix hitting the tab key.
 
 sub toHtml {
     my $self = shift;
-    $self->headTags;
+    my $session = $self->session;
+    $session->style->setScript(
+        $session->url->extras('yui-webgui/build/codeArea/codeArea-min.js')
+    );
     my $id = $self->get('id');
     return $self->SUPER::toHtml(@_)
         . qq{<script>new YAHOO.WebGUI.CodeArea('$id').render()</script>};
