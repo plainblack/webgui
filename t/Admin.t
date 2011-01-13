@@ -147,7 +147,7 @@ cmp_deeply(
         name        => $newtag->get('name'),
         editUrl     => $newtag->getEditUrl,
         commitUrl   => $newtag->getCommitUrl,
-        leaveUrl    => '?op=leaveVersionTag',
+        leaveUrl    => '/?op=leaveVersionTag',
     },
     'www_getCurrentVersionTag',
 );
