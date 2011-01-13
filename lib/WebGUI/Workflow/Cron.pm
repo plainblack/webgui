@@ -299,7 +299,7 @@ sub set {
 	$params{parameters} = $self->get("parameters");
 	$params{config} = $self->session->config->getFilename;
 	$params{sitename} = $self->session->config->get("sitename")->[0];
-	$params{gateway} = $self->request->base->path;
+	$params{gateway} = $self->session->request->base->path;
 	$params{cookieName} = $self->session->config->getCookieName;
 	$spectre->notify("cron/addJob", \%params);
 }
