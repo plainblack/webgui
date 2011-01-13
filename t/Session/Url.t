@@ -48,7 +48,6 @@ my @getRefererUrlTests = (
 );
 
 use Test::More;
-plan tests => 84 + scalar(@getRefererUrlTests);
 
 my $session = WebGUI::Test->session;
 my $request = $session->request;
@@ -193,11 +192,6 @@ is( $session->url->makeCompliant($character), $character, 'utf8 allowed in URLs'
 my $setUri = sub {
     $request->env->{PATH_INFO} = $_[0];
 };
-$session->{_request} = undef;
-
-is($session->url->getRequestedUrl, undef, 'getRequestedUrl returns undef unless it has a request object');
-
-$session->{_request} = $request;
 
 $setUri->('empty');
 is($session->request->uri, 'http://devsite.com/empty', 'Validate Mock Object operation');
@@ -206,14 +200,10 @@ $setUri->('full');
 is($session->request->uri, 'http://devsite.com/full', 'Validate Mock Object operation #2');
 
 $setUri->('/path1/file1');
-is($session->url->getRequestedUrl, 'path1/file1', 'getRequestedUrl, fetch');
+is($session->url->getRequestedUrl, '/path1/file1', 'getRequestedUrl, fetch');
 
 $setUri->('/path2/file2');
-is($session->url->getRequestedUrl, 'path1/file1', 'getRequestedUrl, check cache of previous result');
-
-$session->url->{_requestedUrl} = undef;  ##Manually clear cached value
-$setUri->('/path2/file2?param1=one;param2=two');
-is($session->url->getRequestedUrl, 'path2/file2', 'getRequestedUrl, does not return params');
+is($session->url->getRequestedUrl, '/path1/file1', 'getRequestedUrl, check cache of previous result');
 
 $session->url->{_requestedUrl} = undef;
 my $utf8_url = "Viel Spa\x{00DF}";
@@ -398,11 +388,9 @@ TODO: {
     ok(0, 'test a child of the media folder');
 }
 
-my $versionTag = WebGUI::VersionTag->getWorking($session);
-WebGUI::Test->addToCleanup($versionTag);
 my $parentAsset = WebGUI::Asset->getRoot($session);
 my $statefulAsset = $parentAsset->addChild({ className => 'WebGUI::Asset::Snippet' });
-$versionTag->commit;
+WebGUI::Test->addToCleanup($statefulAsset);
 $statefulAsset = $statefulAsset->cloneFromDb;
 $session->asset($statefulAsset);
 
@@ -468,3 +456,4 @@ ok($session->url->forceSecureConnection(), 'forced secure connection with no url
 ok($session->http->isRedirect, '... and redirect status code was set');
 is($session->response->location, $secureUrl, '... and redirect status code was set');
 
+done_testing;

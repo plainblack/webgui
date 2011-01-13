@@ -178,7 +178,7 @@ sub gateway {
 	my $pairs = shift;
 	my $skipPreventProxyCache = shift;
         my $url = $self->make_urlmap_work($self->session->config->get("gateway")).'/'.$pageUrl;
-	$url =~ s/\/+/\//g;
+        $url =~ tr{/}{/}s;
         if ($self->session->setting->get("preventProxyCache") == 1 and !$skipPreventProxyCache) {
                 $url = $self->append($url,"noCache=".int(rand(1001)).':'.time());
         }
@@ -260,7 +260,7 @@ sub getRefererUrl {
 	my $referer = $self->session->request->referer;
 	return undef unless ($referer);
 	my $url = $referer;
-	my $gateway = $self->session->config->get("gateway");
+	my $gateway = $self->session->request->base->path;
 	$url =~ s{https?://[A-Za-z0-9\.-]+$gateway/*([^?]*)\??.*$}{$1};
 	if ($url eq $referer) { ##s/// failed
 		return undef;
