@@ -211,7 +211,11 @@ input.disabled {
 }
 
 #wrapper .yui-content {
-    margin: 0; padding: 0;
+    margin: 0; padding: 0; height: 100%;
+}
+
+#viewTab {
+    height: 100%;
 }
 
 #viewTab * { 
