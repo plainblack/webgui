@@ -17,7 +17,7 @@ package WebGUI::GUID;
 
 use strict;
 use WebGUI::BestPractices;
-use MIME::Base64::URLSafe;
+use MIME::Base64;
 use UUID::Tiny;
 
 my $idValidator = qr/^[A-Za-z0-9_-]{22}$/;
@@ -58,7 +58,8 @@ sub fromHex {
     shift;
     my $hexId = shift;
     my $binId = pack( 'H2' x 16, unpack( 'A2' x 16, $hexId ) );
-    my $id    = substr( urlsafe_b64encode($binId), 0, 22 );
+    my $id    = substr( encode_base64($binId), 0, 22 );
+    $id =~ tr{+/}{_-};
     return $id;
 }
 
@@ -85,7 +86,9 @@ This function generates a global unique id.
 
 sub generate {
     shift;
-    return urlsafe_b64encode( create_UUID( UUID_V4 ) );
+    my $id = substr( encode_base64( create_UUID( UUID_V4 ) ), 0, 22 );
+    $id =~ tr{+/}{_-};
+    return $id;
 }
 
 #-------------------------------------------------------------------
@@ -103,8 +106,9 @@ guid to convert to hex value.
 sub toHex {
     shift;
     my $id   = shift;
+    $id =~ tr{_-}{+/};
     $id .= 'AA';
-    my $bin_id = urlsafe_b64decode($id);
+    my $bin_id = decode_base64($id);
     my $hex_id = unpack("H*", $bin_id);
     $hex_id =~ s/0{3,4}$//;
     return $hex_id;
