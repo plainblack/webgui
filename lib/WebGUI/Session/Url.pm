@@ -177,7 +177,7 @@ sub gateway {
 	my $pageUrl = shift;
 	my $pairs = shift;
 	my $skipPreventProxyCache = shift;
-        my $url = $self->make_urlmap_work($self->session->config->get("gateway")).'/'.$pageUrl;
+        my $url = $self->make_urlmap_work($self->session->request->base->path).'/'.$pageUrl;
         $url =~ tr{/}{/}s;
         if ($self->session->setting->get("preventProxyCache") == 1 and !$skipPreventProxyCache) {
                 $url = $self->append($url,"noCache=".int(rand(1001)).':'.time());
