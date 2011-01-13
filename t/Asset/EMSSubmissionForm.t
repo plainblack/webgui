@@ -72,11 +72,6 @@ sub logout     { $session->user({userId => 1}); }
 
 loginAdmin;
 
-# Create a version tag to work in
-my $versionTag = WebGUI::VersionTag->getWorking($session);
-$versionTag->set({name=>"EventManagementSystem Test"});
-WebGUI::Test->addToCleanup($versionTag);
-
 # Do our work in the import node
 my $node = WebGUI::Asset->getImportNode($session);
 
@@ -90,6 +85,7 @@ my $ems = $node->addChild({
     groupIdView              => $attendees->getId,
     submittedLocationsList   => join( "\n", my @submissionLocations = qw'loc1 loc2' ),
 });
+WebGUI::Test->addToCleanup($ems);
 # I scooped this out ot WG::Asset::Wobject::EventManagementSystem
 # its not pretty, but there is no other way to add a meta field
 my $mf1Id = $ems->setCollateral("EMSEventMetaField", "fieldId",{
@@ -114,9 +110,6 @@ my $mf2Id = $ems->setCollateral("EMSEventMetaField", "fieldId",{
 
 my $i18n = $ems->i18n;
 
-$versionTag->commit;
-$versionTag = WebGUI::VersionTag->getWorking($session);
-WebGUI::Test->addToCleanup($versionTag);
 $ems = $ems->cloneFromDb;
 
 my $id1 = $ems->getNextSubmissionId;
@@ -374,8 +367,6 @@ is( $sub2, undef, 'submission deleted');
 } # end of workflow skip
 
 } # end of create submission skip
-
-$versionTag->commit;
 
 # this is not the greatest test but it does run through the basic create submissionForm code.
 loginRgstr;
