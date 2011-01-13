@@ -100,6 +100,7 @@ sub addTemplate {
         usePacked => 1,
 	};
 	my $template = $importNode->addChild($properties, $properties->{id});
+    WebGUI::Test->addToCleanup($template);
 	return ($template);
 }
 
