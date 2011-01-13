@@ -68,9 +68,7 @@ SKIP: {
         title           => 'Chinese ideograph experiment',
         description     => "甲骨文",
     } );
-    my $tag = WebGUI::VersionTag->getWorking( $session );
-    $tag->commit;
-    WebGUI::Test->addToCleanup($tag);
+    WebGUI::Test->addToCleanup($article);
     WebGUI::Search::Index->create( $article );
     my $searcher = WebGUI::Search->new($session);
     my $assetIds = $searcher->search({ keywords => "Chinese", })->getAssetIds;
