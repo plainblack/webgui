@@ -51,9 +51,7 @@ my $grand   = $child->addChild({
     description     => 'This is some content',
     groupIdView     => '7',
 });
-my $tag = WebGUI::VersionTag->getWorking( $session );
-$tag->commit;
-addToCleanup( $tag );
+WebGUI::Test->addToCleanup( $top );
 
 my $dir     = File::Temp->newdir;
 WebGUI::Test->originalConfig( "exportPath" );
