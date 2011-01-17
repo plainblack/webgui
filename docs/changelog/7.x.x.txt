@@ -7,6 +7,7 @@
  - fixed #11988: Dataform list view doesn't allow moving fields
  - fixed #11989: Calendar list view isn't uniform and missing fields
  - fixed: Calendar list view sections don't use timezones
+ - fixed #11965: Friend Manager only shows 15 people
 
 7.9.19
  - fixed #11945: Slow SQL access for duplicate e-mail address lookups
