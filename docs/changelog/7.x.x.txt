@@ -1,5 +1,6 @@
 7.10.8
  - rfe #12016 for the top story as well
+ - fixed #11965: Friend Manager only shows 15 people
 
 7.10.7
  - rfe #10521: Use monospaced font in template edit textarea

@@ -97,7 +97,7 @@ WebGUI.FriendManager.MakeTable = function (groupId, containerId) {
 
     // Initialize the data table
     var myPaginator = new YAHOO.widget.Paginator({
-        containers            : ['pagination'],
+        containers            : [containerId+'_pagination'],
         pageLinks             : 7,
         rowsPerPage           : 15,
         template              : "<strong>{CurrentPageReport}</strong> {PreviousPageLink} {PageLinks} {NextPageLink}"
