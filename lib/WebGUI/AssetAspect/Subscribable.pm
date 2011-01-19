@@ -84,7 +84,7 @@ Override addRevision to set skipNotification to 0 for each new revision.
 
 sub addRevision {
     my $self        = shift;
-    my $properties  = shift;
+    my $properties  = shift || {};
     
     $properties->{ skipNotification     } = 0;
 
