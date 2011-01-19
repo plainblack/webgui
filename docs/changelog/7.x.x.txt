@@ -1,4 +1,5 @@
 7.9.21
+ - fixed #12023: International URLs of aattachments & files in folder
 
 7.9.20
  - fixed #12008: Activity CleanLoginHistory is too slow

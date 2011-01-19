@@ -304,7 +304,10 @@ sub addFileFromFilesystem {
     if (! defined $pathToFile) {
         return undef;
     }
+    ##Handle UTF-8 filenames.
+    $pathToFile = Encode::encode_utf8($pathToFile);
     $pathToFile = Cwd::realpath($pathToFile); # trace any symbolic links
+    $pathToFile = Encode::decode_utf8($pathToFile);
     if (-d $pathToFile) {
         $self->session->log->error($pathToFile." is a directory, not a file.");
         return undef;
@@ -372,6 +375,7 @@ sub addFileFromFormPost {
             return $filename;
         }
         my $clientFilename = $upload->filename;
+        $clientFilename = Encode::decode_utf8($clientFilename);
         next
             unless $clientFilename;
         next
@@ -1080,7 +1084,7 @@ sub getFiles {
         callback => sub {
             my $obj = shift;
             my $rel = $obj->relative($dir);
-            my $str = $rel->stringify;
+            my $str = Encode::decode_utf8($rel->stringify);
             if (! $showAll ) {
                 return if $str =~ /^thumb-/;
                 return if $str =~ /^\./;
