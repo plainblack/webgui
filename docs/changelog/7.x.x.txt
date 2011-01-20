@@ -4,6 +4,7 @@
  - fixed #12027: Wiki Search and Keyword security, pages visible to visitors when wiki is restricted.
  - fixed #12020: Event Recurrend end date field is always active
  - fixed #11991: calendar view event formatting
+ - fixed #11990: calendar event view
 
 7.9.20
  - fixed #12008: Activity CleanLoginHistory is too slow
