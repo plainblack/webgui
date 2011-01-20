@@ -3,6 +3,7 @@
  - fixed #11965: Friend Manager only shows 15 people
  - fixed #12023: International URLs of aattachments & files in folder
  - fixed #12024: Copied Collaboration System re-sends subscription mail
+ - fixed #12027: Wiki Search and Keyword security, pages visible to visitors when wiki is restricted.
 
 7.10.7
  - rfe #10521: Use monospaced font in template edit textarea
