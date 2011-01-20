@@ -1,5 +1,6 @@
 7.9.21
  - fixed #12023: International URLs of aattachments & files in folder
+ - fixed #12024: Copied Collaboration System re-sends subscription mail
 
 7.9.20
  - fixed #12008: Activity CleanLoginHistory is too slow

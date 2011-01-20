@@ -97,14 +97,25 @@ A hash reference of options that can modify how this method works.
 
 Assets that normally autocommit their workflows (like CS Posts, and Wiki Pages) won't if this is true.
 
+=head4 skipNotification
+
+Disable sending a notification that a new revision was added, for those assets that support it.
+
 =cut
 
 sub duplicate {
     my $self        = shift;
     my $options     = shift;
     my $parent      = $self->getParent;
+    ##Remove state and pass all other options along to addChild
+    my $asset_state = delete $options->{state};
     my $newAsset    
-        = $parent->addChild( $self->get, undef, $self->get("revisionDate"), { skipAutoCommitWorkflows => $options->{skipAutoCommitWorkflows} } );
+        = $parent->addChild(
+            $self->get,
+            undef,
+            $self->get("revisionDate"),
+            $options,
+        );
 
     if (! $newAsset) {
         $self->session->log->error(
