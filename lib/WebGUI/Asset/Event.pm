@@ -2272,19 +2272,23 @@ sub www_edit {
     # End
     $var->{"formRecurEnd"}
         = q|
-        <div><input type="radio" name="recurEndType" id="recurEndType_none" value="none" |.(!$recur->{endDate} && !$recur->{endAfter} ? 'checked="checked"' : '').q|/>
-        <label for="recurEndType_none">|. $i18n->get('No end'). q|</label><br />
+        <div><input type="radio" name="recurEndType" id="recurEndType_none" value="none" |.(!$recur->{endDate} && !$recur->{endAfter} ? 'checked="checked"' : '').q| onclick="toggleRecurEnd()"/>
+        <label for="recurEndType_none">|. $i18n->get('No end'). q|</label>
 
-        <input type="radio" name="recurEndType" id="recurEndType_date" value="date" |.($recur->{endDate} ? 'checked="checked"' : '' ).q| />
-        <label for="recurEndType_date">|. $i18n->get('By date'). q| </label>|
+        <input type="radio" name="recurEndType" id="recurEndType_date" value="date" |.($recur->{endDate} ? 'checked="checked"' : '' ).q| onclick="toggleRecurEnd()"/>
+        <label for="recurEndType_date">|. $i18n->get('By date'). q| </label>
+        <div id="recurEndPattern_date"> |
         . WebGUI::Form::date($session,{ name => "recurEndDate", value => $recur->{endDate}, defaultValue => $recur->{endDate} })
         . q|
         <br />
+        </div>
 
-        <input type="radio" name="recurEndType" id="recurEndType_after" value="after" |.($recur->{endAfter} ? 'checked="checked"' : '' ).q| />
+        <input type="radio" name="recurEndType" id="recurEndType_after" value="after" |.($recur->{endAfter} ? 'checked="checked"' : '' ).q| onclick="toggleRecurEnd()"/>
         <label for="recurEndType_after">|. $i18n->get('After'). q| </label>
+        <div id="recurEndPattern_after">
         <input type="text" size="3" name="recurEndAfter" value="|.$recur->{endAfter}.q|" />
         |. $i18n->get('occurences'). q|.
+        </div>
         </div>
     |;
 
@@ -2347,7 +2351,19 @@ sub www_edit {
                 document.getElementById("recurPattern_yearly").style.display = "block";
             }
         }
-        YAHOO.util.Event.onAvailable("recurPattern",function(e) { toggleRecur(); });
+
+        function toggleRecurEnd() {
+            document.getElementById("recurEndPattern_date").style.display = "none";
+            document.getElementById("recurEndPattern_after").style.display = "none";
+
+            if (document.getElementById("recurEndType_date").checked) {
+                document.getElementById("recurEndPattern_date").style.display = "block";
+            }
+            else if (document.getElementById("recurEndType_after").checked) {
+                document.getElementById("recurEndPattern_after").style.display = "block";
+            }
+        }
+        YAHOO.util.Event.onAvailable("recurPattern",function(e) { toggleRecur(); toggleRecurEnd(); });
         </script>
 ENDJS
 
