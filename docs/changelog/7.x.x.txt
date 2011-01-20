@@ -2,6 +2,7 @@
  - rfe #12016 for the top story as well
  - fixed #11965: Friend Manager only shows 15 people
  - fixed #12023: International URLs of aattachments & files in folder
+ - fixed #12024: Copied Collaboration System re-sends subscription mail
 
 7.10.7
  - rfe #10521: Use monospaced font in template edit textarea
