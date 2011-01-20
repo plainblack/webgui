@@ -1,6 +1,7 @@
 7.9.21
  - fixed #12023: International URLs of aattachments & files in folder
  - fixed #12024: Copied Collaboration System re-sends subscription mail
+ - fixed #12027: Wiki Search and Keyword security, pages visible to visitors when wiki is restricted.
 
 7.9.20
  - fixed #12008: Activity CleanLoginHistory is too slow

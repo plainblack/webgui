@@ -38,6 +38,7 @@ my $wiki
     = $import->addChild( {
         className        => 'WebGUI::Asset::Wobject::WikiMaster',
         searchTemplateId => $templateId,
+        groupIdView      => '2',
     } );
 
 WebGUI::Test->addToCleanup($wiki);
@@ -45,11 +46,13 @@ WebGUI::Test->addToCleanup($wiki);
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 1;        # Increment this number for each test you create
+plan tests => 4;        # Increment this number for each test you create
 
 $session->request->setup_body({
     query => 'Red&Andy',
 });
+
+$session->user({userId => 3});
 
 {
     WebGUI::Test->mockAssetId($templateId, $templateMock);
@@ -60,6 +63,15 @@ $session->request->setup_body({
 is $templateVars->{addPageUrl},
     $wiki->getUrl('func=add;class=WebGUI::Asset::WikiPage;title=Red%26Andy'),
     'search encodes unsafe characters in addPageUrl';
+
+$session->user({userId => 1});
+ok !$wiki->canView(), 'checking permission handling in www_search: visitor cannot view the wiki';
+
+$templateVars = {};
+
+$wiki->www_search;
+is_deeply $templateVars, {}, '... no template variables set';
+is $session->http->getStatus, 401, '... HTTP status set to 401, no access';
 
 #----------------------------------------------------------------------------
 # 
