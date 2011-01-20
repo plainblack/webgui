@@ -6,6 +6,9 @@ templates, you will need to apply these changes manually to your copies.
   * Friend Manager view template - root/import/account/friendmanager/view
     Add a div to hold the pagination.
 
+  * Event Template - root/import/calendar-templates/default-calendar-event
+    Add foreground/font color to the CSS for the details.
+
 7.9.17
 
   * DataForm email template - default_email
