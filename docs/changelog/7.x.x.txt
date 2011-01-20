@@ -5,6 +5,7 @@
  - fixed #12024: Copied Collaboration System re-sends subscription mail
  - fixed #12027: Wiki Search and Keyword security, pages visible to visitors when wiki is restricted.
  - fixed #12020: Event Recurrend end date field is always active
+ - fixed #11991: calendar view event formatting
 
 7.10.7
  - rfe #10521: Use monospaced font in template edit textarea
