@@ -211,11 +211,20 @@ sub generateCloud {
         [ $options->{startAsset}->get("lineage").'%', @extraPlaceholders, $maxKeywords ]);
     my $cloud = HTML::TagCloud->new(levels=>$options->{cloudLevels} || 24);
     while (my ($count, $keyword) = $sth->array) {
-        my $url
-            = $urlCallback ? $display->$urlCallback($keyword)
-            : $options->{displayFunc} ? $display->getUrl("func=".$options->{displayFunc}.";keyword=".$keyword)
-            : $display->getUrl("keyword=".$keyword)
-            ;
+        my $url;
+        if ($urlCallback) {
+            $url = $display->$urlCallback($keyword);
+        }
+        else {
+            my %q = ( keyword => $keyword );
+            my $e = $self->session->url;
+            if (my $func = $options->{displayFunc}) {
+                $q{displayFunc} = $func;
+            }
+            $url = $display->getUrl(
+                join(';', map { join '=', $_, $e->escape($q{$_}) } keys %q)
+            );
+        }
         $cloud->add($keyword, $url, $count);
     }
     return $cloud->html_and_css($maxKeywords);
