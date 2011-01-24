@@ -6,6 +6,7 @@
  - fixed #12020: Event Recurrend end date field is always active
  - fixed #11991: calendar view event formatting
  - fixed #11990: calendar event view
+ - fixed #12028: i18n Account_Shop
 
 7.9.20
  - fixed #12008: Activity CleanLoginHistory is too slow
