@@ -7,6 +7,7 @@
  - fixed #11991: calendar view event formatting
  - fixed #11990: calendar event view
  - fixed #12028: i18n Account_Shop
+ - fixed #11989: calendar list view
 
 7.9.20
  - fixed #12008: Activity CleanLoginHistory is too slow
