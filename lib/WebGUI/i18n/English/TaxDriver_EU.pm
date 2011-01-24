@@ -183,6 +183,24 @@ after some time.|,
         context => q|Error message on adding vat number|,
     },
 
+    'Enter VAT numbers' => {
+        message => q|Enter VAT numbers|,
+        lastUpdated => 0,
+        context => q|Title for the per-user vat number management screen|,
+    },
+
+    'Approved for use' => {
+        message => q|Approved for use|,
+        lastUpdated => 0,
+        context => q|Status flag for the VAT number.|,
+    },
+
+    'Add another VAT number' => {
+        message => q|Add another VAT number|,
+        lastUpdated => 0,
+        context => q||,
+    },
+
 
 };
 
