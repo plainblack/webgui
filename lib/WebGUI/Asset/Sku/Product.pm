@@ -1380,53 +1380,53 @@ sub www_editVariant {
     return $self->session->privilege->insufficient() unless ($self->canEdit);
     my $i18n = WebGUI::International->new($self->session,'Asset_Product');
     my $data = $self->getCollateral("variantsJSON", 'variantId', $vid);
-    my $f    = WebGUI::HTMLForm->new($self->session, -action=>$self->getUrl);
-    $f->hidden(
-        -name => 'func',
-        -value => 'editVariantSave',
+    my $f    = WebGUI::FormBuilder->new($self->session, action=>$self->getUrl);
+    $f->addField( "hidden",
+        name => 'func',
+        value => 'editVariantSave',
     );
-    $f->hidden(
-        -name => 'vid',
-        -value => $vid,
+    $f->addField( "hidden",
+        name => 'vid',
+        value => $vid,
     );
-    $f->text(
-        -name      => 'varSku',
-        -label     => $i18n->get('variant sku'),
-        -hoverHelp => $i18n->get('variant sku description'),
-        -value     => $data->{varSku},
+    $f->addField( "text",
+        name      => 'varSku',
+        label     => $i18n->get('variant sku'),
+        hoverHelp => $i18n->get('variant sku description'),
+        value     => $data->{varSku},
     );
-    $f->text(
-        -name      => 'shortdesc',
-        -maxlength => 30,
-        -label     => $i18n->get('shortdesc'),
-        -hoverHelp => $i18n->get('shortdesc description'),
-        -value     => $data->{shortdesc},
+    $f->addField( "text",
+        name      => 'shortdesc',
+        maxlength => 30,
+        label     => $i18n->get('shortdesc'),
+        hoverHelp => $i18n->get('shortdesc description'),
+        value     => $data->{shortdesc},
     );
-    $f->float(
-        -name      => 'price',
-        -label     => $i18n->get(10),
-        -hoverHelp => $i18n->get('10 description'),
-        -value     => $data->{price},
+    $f->addField( "float",
+        name      => 'price',
+        label     => $i18n->get(10),
+        hoverHelp => $i18n->get('10 description'),
+        value     => $data->{price},
     );
-    $f->float(
-        -name      => 'weight',
-        -label     => $i18n->get('weight'),
-        -hoverHelp => $i18n->get('weight description'),
-        -value     => $data->{weight},
+    $f->addField( "float",
+        name      => 'weight',
+        label     => $i18n->get('weight'),
+        hoverHelp => $i18n->get('weight description'),
+        value     => $data->{weight},
     );
-    $f->integer(
-        -name      => 'quantity',
-        -label     => $i18n->get('quantity'),
-        -hoverHelp => $i18n->get('quantity description'),
-        -value     => $data->{quantity},
+    $f->addField( "integer",
+        name      => 'quantity',
+        label     => $i18n->get('quantity'),
+        hoverHelp => $i18n->get('quantity description'),
+        value     => $data->{quantity},
     );
-    $f->yesNo(
-        -name      => "proceed",
-        -label     => $i18n->get('add another variant'),
-        -hoverHelp => $i18n->get('add another variant description'),
+    $f->addField( "yesNo",
+        name      => "proceed",
+        label     => $i18n->get('add another variant'),
+        hoverHelp => $i18n->get('add another variant description'),
     );
-    $f->submit;
-    return $self->getAdminConsole->render($f->print, 'add variant');
+    $f->addField( "submit", name => "submit" );
+    return $f->toHtml;
 }
 
 #-------------------------------------------------------------------

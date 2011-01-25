@@ -36,7 +36,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 58;        # Increment this number for each test you create
+plan tests => 67;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -408,6 +408,77 @@ cmp_deeply(
     [
         { name => "Oneitude", value => "3", units => "Ones", specificationId => $spec->{specificationId}, },
         { name => "Cold", value => "2", units => "Colditude", specificationId => ignore(), },
+    ],
+);
+
+
+#----------------------------------------------------------------------------
+# editVariant
+my $mech = WebGUI::Test::Mechanize->new( config => WebGUI::Test->file );
+$mech->get_ok( '/' );
+$mech->session->user({ userId => 3 });
+$mech->get_ok( $product->getUrl( 'func=editVariant' ) );
+my %variantFlexo = (
+    varSku => "3370318",
+    shortdesc => "He just looks evil because he has a beard.",
+    price => "199.99",
+    weight => "100",
+    quantity => 1,
+);
+$mech->submit_form_ok({
+    fields => {
+        %variantFlexo,
+        proceed => 1,
+    },
+}, 'add one new variant');
+
+$product = $product->cloneFromDb;
+cmp_deeply(
+    $product->getAllCollateral( 'variantsJSON' ),
+    [
+        { %variantFlexo, variantId => ignore() },
+    ],
+);
+
+my %variantBender = (
+    varSku => "2716057",
+    shortdesc => "He's just evil",
+    price => "109.99",
+    weight => "100",
+    quantity => 1,
+);
+$mech->submit_form_ok({
+    fields  => {
+        %variantBender,
+        proceed => 0,
+    },
+}, 'add one more new variant' );
+
+$product = $product->cloneFromDb;
+cmp_deeply(
+    $product->getAllCollateral( 'variantsJSON' ),
+    [
+        { %variantFlexo, variantId => ignore() },
+        { %variantBender, variantId => ignore() },
+    ],
+);
+
+my $variant = $product->getAllCollateral( 'variantsJSON' )->[1];
+$mech->get_ok( $product->getUrl( 'func=editVariant;vid=' . $variant->{variantId} ) );
+$variantBender{variantId} = $variant->{variantId};
+$variantBender{shortdesc} = "He found religion";
+$variantBender{weight} = 99;
+$variantBender{price} = 119.99;
+
+$mech->submit_form_ok( {
+    fields => { %variantBender },
+}, 'edit an existing variant' );
+$product = $product->cloneFromDb;
+cmp_deeply(
+    $product->getAllCollateral( 'variantsJSON' ),
+    [
+        { %variantFlexo, variantId => ignore() },
+        { %variantBender, variantId => ignore() },
     ],
 );
 
