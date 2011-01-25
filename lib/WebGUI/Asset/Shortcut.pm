@@ -464,7 +464,7 @@ admin mode is on.
 sub _overridesCacheTag {
 	my $self = shift;
 	#cache by userId, assetId of this shortcut, and whether adminMode is on or not.
-	return ["shortcutOverrides", $self->getId, $self->session->user->userId, $self->session->isAdminOn];
+	return join "", "shortcutOverrides", $self->getId, $self->session->user->userId, $self->session->isAdminOn;
 }
 
 #-------------------------------------------------------------------
@@ -478,6 +478,9 @@ Overrides are cached, unless you are in admin mode.  The cache is invalidated if
 expired, or if the user's profile field has changed.
 
 =cut
+
+# The datastructure returned here is insane. There should be a simple "getOverride( 'name' )"
+# that works exactly like get() does.
 
 sub getOverrides {
 	my $self    = shift;
@@ -988,14 +991,16 @@ sub www_getUserPrefsForm {
 	return $i18n->get('cannot personalize') unless $self->getParent->canPersonalize;
 	my $output;
 	my @fielden = $self->getPrefFieldsToShow;
-	my $f = WebGUI::HTMLForm->new($self->session,extras=>' onsubmit="submitForm(this,\''.$self->getId.'\',\''.$self->getUrl.'\');return false;"');
-	$f->raw('<table cellspacing="0" cellpadding="3" border="0">');
+	my $f = WebGUI::FormBuilder->new($self->session,
+            action => $self->getUrl,
+            extras => 'onsubmit="submitForm(this,\''.$self->getId.'\',\''.$self->getUrl.'\');return false;"',
+        );
     my $allowedToSave = ( ! $session->isAdminOn && $self->getParent->canPersonalize )
                      || (   $session->isAdminOn && $session->user->isInGroup($session->setting->get('groupIdAdminUser')) );
     if ($allowedToSave) {
-        $f->hidden(  
-            -name => 'func', 
-            -value => 'saveUserPrefs'
+        $f->addField( "hidden",   
+            name => 'func', 
+            value => 'saveUserPrefs'
         );
     }
 	my $u = WebGUI::User->new($session, $self->discernUserId);
@@ -1013,14 +1018,13 @@ sub www_getUserPrefsForm {
         if (! $allowedToSave) {
             $params->{extras} = ' disabled ';
         }
-		$f->raw($field->formField($params,1, $u));
+		$f->addField($field->formField($params,1, $u, 0, undef, 1));
 	}
     if ($allowedToSave) {
-        $f->submit({extras=>'className="nothing"'});
+        $f->addField( "submit", extras => 'className="nothing"' );
     }
-	$f->raw('</table>');
 	my $tags = $session->style->generateAdditionalHeadTags();
-	$output .= $tags.$f->print;
+	$output .= $tags.$f->toHtml;
 
 	return $output;
 }
@@ -1154,22 +1158,22 @@ sub www_editOverride {
 	my $output = '';
 	$output .= '</table>';
 	
-	my $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
-	$f->hidden(
-		-name		=> "func",
-		-value		=> "saveOverride"
+	my $f = WebGUI::FormBuilder->new( $self->session, action => $self->getUrl );
+	$f->addField( "hidden", 
+		name		=> "func",
+		value		=> "saveOverride"
 	);
-	$f->hidden(
-		-name		=> "overrideFieldName",
-		-value		=> $fieldName
+	$f->addField( "hidden", 
+		name		=> "overrideFieldName",
+		value		=> $fieldName
 	);
-	$f->readOnly(
-		-label		=> $i18n->get("fieldName"),
-		-value		=> $fieldName
+	$f->addField( "readOnly", 
+		label		=> $i18n->get("fieldName"),
+		value		=> $fieldName
 	);
-	$f->readOnly(
-		-label		=> $i18n->get("Original Value"),
-		-value		=> $origValue
+	$f->addField( "readOnly", 
+		label		=> $i18n->get("Original Value"),
+		value		=> $origValue
 	);
 
 	# Fetch the parameters for the dynamic field.
@@ -1181,21 +1185,21 @@ sub www_editOverride {
 
 	if ($params{fieldType} eq 'template') {$params{namespace} = $params{namespace} || WebGUI::Asset->newById($self->session, $origValue)->get("namespace");}
 
-	$f->dynamicField(%params);
-	$f->textarea(
-		-name		=> "newOverrideValueText",
-		-label		=> $i18n->get("New Override Value"),
-		-value		=> $overrides{overrides}{$fieldName}{newValue},
-		-hoverHelp	=> $i18n->get("Place something in this box if you dont want to use the automatically generated field")
+	$f->addField( $params{fieldType} || "text", %params );
+	$f->addField( "textarea", 
+		name		=> "newOverrideValueText",
+		label		=> $i18n->get("New Override Value"),
+		value		=> $overrides{overrides}{$fieldName}{newValue},
+		hoverHelp	=> $i18n->get("Place something in this box if you dont want to use the automatically generated field")
 	);
-	$f->readOnly(
-		-label		=> $i18n->get("Replacement Value"),
-		-value		=> $overrides{overrides}{$fieldName}{parsedValue},
-		-hoverHelp	=> $i18n->get("This is the example output of the field when parsed for user preference macros")
+	$f->addField( "readOnly", 
+		label		=> $i18n->get("Replacement Value"),
+		value		=> $overrides{overrides}{$fieldName}{parsedValue},
+		hoverHelp	=> $i18n->get("This is the example output of the field when parsed for user preference macros")
 	) if $self->isDashlet;
-	$f->submit;
+	$f->addField( "submit", name => "submit" );
 
-	$output .= $f->print;
+	$output .= $f->toHtml;
 	
 	return $self->_submenu($output,$i18n->get('Edit Override'));
 }
@@ -1214,11 +1218,8 @@ sub www_saveOverride {
     my $fieldName = $self->session->form->process("overrideFieldName");
     my %overrides = $self->getOverrides;
     my $output = '';
-    my %props;
-    foreach my $def (@{$self->getShortcutOriginal->definition($self->session)}) {
-        %props = (%props,%{$def->{properties}});
-    }
-    my $fieldType = $props{$fieldName}{fieldType};
+    my %params = %{ $self->getShortcutOriginal->getFormProperties($fieldName) };
+    my $fieldType = $params{fieldType} || "Text";
     my $value = $self->session->form->process($fieldName,$fieldType);
     $value = $self->session->form->process("newOverrideValueText") || $value;
     $self->session->db->write("delete from Shortcut_overrides where assetId=".$self->session->db->quote($self->getId)." and fieldName=".$self->session->db->quote($fieldName));
