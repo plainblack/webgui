@@ -36,7 +36,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 31;        # Increment this number for each test you create
+plan tests => 40;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -241,4 +241,58 @@ cmp_deeply(
     $product->getAllCollateral( 'relatedJSON' ),
     [ { relatedAssetId => $imagedProduct->getId }, { relatedAssetId => $viewProduct->getId } ],
 );
+
+#----------------------------------------------------------------------------
+# editBenefit
+my $mech = WebGUI::Test::Mechanize->new( config => WebGUI::Test->file );
+$mech->get_ok( '/' );
+$mech->session->user({ userId => 3 });
+$mech->get_ok( $product->getUrl( 'func=editBenefit' ) );
+
+$mech->submit_form_ok({
+    fields => {
+        benefit => 'One new benefit',
+        proceed => 1,
+    },
+}, 'add one new benefit');
+
+$product = $product->cloneFromDb;
+cmp_deeply(
+    $product->getAllCollateral( 'benefitJSON' ),
+    [ { benefit => 'One new benefit', benefitId => ignore() } ],
+);
+
+$mech->submit_form_ok({
+    fields  => {
+        benefit => 'Two new benefit',
+        proceed => 0,
+    },
+}, 'add one more new benefit' );
+
+$product = $product->cloneFromDb;
+cmp_deeply(
+    $product->getAllCollateral( 'benefitJSON' ),
+    [
+        { benefit => 'One new benefit', benefitId => ignore() }, 
+        { benefit => 'Two new benefit', benefitId => ignore() },
+    ],
+);
+
+my $benefit = $product->getAllCollateral( 'benefitJSON' )->[0];
+$mech->get_ok( $product->getUrl( 'func=editBenefit;bid=' . $benefit->{benefitId} ) );
+
+$mech->submit_form_ok( {
+    fields => {
+        benefit => 'One edited benefit',
+    },
+}, 'edit an existing benefit' );
+$product = $product->cloneFromDb;
+cmp_deeply(
+    $product->getAllCollateral( 'benefitJSON' ),
+    [
+        { benefit => 'One edited benefit', benefitId => ignore() }, 
+        { benefit => 'Two new benefit', benefitId => ignore() },
+    ],
+);
+
 

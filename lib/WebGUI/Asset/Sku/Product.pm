@@ -1174,28 +1174,28 @@ sub www_editBenefit {
     return $self->session->privilege->insufficient() unless ($self->canEdit);
     my $data = $self->getCollateral('benefitJSON', 'benefitId', $bid);
     my $i18n = WebGUI::International->new($self->session,'Asset_Product');
-    my $f    = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
-    $f->hidden(
-        -name => 'bid',
-        -value => $bid,
+    my $f    = WebGUI::FormBuilder->new($self->session,action=>$self->getUrl);
+    $f->addField( "hidden",
+        name => 'bid',
+        value => $bid,
     );
-    $f->hidden(
-        -name => 'func',
-        -value => 'editBenefitSave',
+    $f->addField( "hidden",
+        name => 'func',
+        value => 'editBenefitSave',
     );
-    $f->text(
-        -name => 'benefit',
-        -label => $i18n->get(51),
-        -hoverHelp => $i18n->get('51 description'),
-        -value => $data->{benefit},
+    $f->addField( "text",
+        name => 'benefit',
+        label => $i18n->get(51),
+        hoverHelp => $i18n->get('51 description'),
+        value => $data->{benefit},
     );
-    $f->yesNo(
-        -name => 'proceed',
-        -label => $i18n->get(52),
-        -hoverHelp => $i18n->get('52 description'),
+    $f->addField( "yesNo",
+        name => 'proceed',
+        label => $i18n->get(52),
+        hoverHelp => $i18n->get('52 description'),
     );
-    $f->submit;
-    return $self->getAdminConsole->render($f->print, 'product benefit add/edit');
+    $f->addField( "submit", name => "submit" );
+    return $f->toHtml;
 }
 
 #-------------------------------------------------------------------
