@@ -17,6 +17,7 @@ use strict;
 use Test::More;
 use Test::Deep;
 use WebGUI::Test; # Must use this before any other WebGUI modules
+use WebGUI::Test::Mechanize;
 use WebGUI::Session;
 use WebGUI::Asset;
 use WebGUI::Asset::Sku::Subscription;
@@ -25,19 +26,19 @@ use WebGUI::Asset::Sku::Subscription;
 # Init
 my $session         = WebGUI::Test->session;
 
-
-#----------------------------------------------------------------------------
-# Tests
-
-plan tests => 4;        # Increment this number for each test you create
-
-#----------------------------------------------------------------------------
-# put your tests here
 my $group = WebGUI::Group->new($session, 'new');
 WebGUI::Test->addToCleanup($group);
 my $user  = WebGUI::User->create($session);
 WebGUI::Test->addToCleanup($user);
 
+
+#----------------------------------------------------------------------------
+# Tests
+
+plan tests => 9;        # Increment this number for each test you create
+
+#----------------------------------------------------------------------------
+# put your tests here
 my $sku = WebGUI::Test->asset(
         className => "WebGUI::Asset::Sku::Subscription",
         title     => "Test Subscription",
@@ -65,3 +66,67 @@ cmp_deeply(
     num(2*$sku->getExpirationOffset, 10),
     "... increments user's expiration offset when the subscription is non-recurring and they are already a group member"
 );
+
+#----------------------------------------------------------------------------
+# www_createSubscriptionBatch
+my $mech = WebGUI::Test::Mechanize->new( config => WebGUI::Test->file );
+$mech->get_ok( '/' );
+$mech->session->user({ userId => 3 });
+$mech->get_ok( $sku->getUrl( 'func=createSubscriptionCodeBatch' ) );
+$mech->submit_form_ok( {
+    fields => {
+        noc => 2,
+        codeLength => 20,
+        expires => 60 * 60 * 24 * 14, # 14 days
+        name => "Paycheck",
+        description => "Sign up to get your paycheck!",
+    },
+}, 'generate subscription codes' );
+
+my $batches = $session->db->buildArrayRefOfHashRefs(
+    "SELECT * FROM Subscription_codeBatch WHERE subscriptionId=?",
+    [ $sku->getId ],
+);
+cmp_deeply( $batches,
+    [
+        {
+            name => "Paycheck",
+            description => "Sign up to get your paycheck!",
+            expirationDate => ignore(),
+            dateCreated => ignore(),
+            subscriptionId => $sku->getId,
+            batchId => ignore(),
+        },
+    ],
+    "code batch got created",
+);
+
+my $codes = $session->db->buildArrayRefOfHashRefs(
+    "SELECT * FROM Subscription_code WHERE batchId=?",
+    [ $batches->[0]->{batchId} ],
+);
+cmp_deeply( $codes,
+    [
+        {
+            code => ignore(),
+            batchId => $batches->[0]->{batchId},
+            status  => 'Unused',
+            dateUsed => 0,
+            usedBy => 0,
+        },
+        {
+            code => ignore(),
+            batchId => $batches->[0]->{batchId},
+            status  => 'Unused',
+            dateUsed => 0,
+            usedBy => 0,
+        },
+    ],
+    "codes got created",
+);
+
+
+
+
+
+

@@ -582,45 +582,45 @@ sub www_createSubscriptionCodeBatch {
 	my $errorMessage = $i18n->get('create batch error').'<ul><li>'.join('</li><li>', @{$error}).'</li></ul>' if ($error);
 	
     # Generate the properties form for this subscription code batch	
-	my $f = WebGUI::HTMLForm->new( $session );
-	$f->submit;
-	$f->hidden(
-		-name       => 'func', 
-		-value      => 'createSubscriptionCodeBatchSave'
+	my $f = WebGUI::FormBuilder->new( $session, action => $self->getUrl );
+	$f->addField( "submit", name => "submit" );
+	$f->addField( "hidden",
+		name       => 'func', 
+		value      => 'createSubscriptionCodeBatchSave'
 		);
-	$f->integer(
-		-name	    => 'noc',
-		-label	    => $i18n->get('noc'),
-		-hoverHelp  => $i18n->get('noc description'),
-		-value	    => $session->form->process("noc") || 1
+	$f->addField( "integer",
+		name	    => 'noc',
+		label	    => $i18n->get('noc'),
+		hoverHelp  => $i18n->get('noc description'),
+		value	    => $session->form->process("noc") || 1
 		);
-	$f->integer(
-		-name	    => 'codeLength',
-		-label	    => $i18n->get('code length'),
-		-hoverHelp  => $i18n->get('code length description'),
-		-value	    => $session->form->process("codeLength") || 64
+	$f->addField( "integer",
+		name	    => 'codeLength',
+		label	    => $i18n->get('code length'),
+		hoverHelp  => $i18n->get('code length description'),
+		value	    => $session->form->process("codeLength") || 64
 		);
-	$f->interval(
-		-name       => 'expires',
-		-label      => $i18n->get('codes expire'),
-		-hoverHelp  => $i18n->get('codes expire description'),
-		-value      => $session->form->process("expires") || $session->datetime->intervalToSeconds(1, 'months')
+	$f->addField( "interval",
+		name       => 'expires',
+		label      => $i18n->get('codes expire'),
+		hoverHelp  => $i18n->get('codes expire description'),
+		value      => $session->form->process("expires") || $session->datetime->intervalToSeconds(1, 'months')
 		);
-    $f->text(
-        -name       => 'name',
-        -label      => $i18n->get('batch name'),
-        -hoverHelp  => $i18n->get('batch name description'),
-        -value      => $session->form->process('name'),
+    $f->addField( "text",
+        name       => 'name',
+        label      => $i18n->get('batch name'),
+        hoverHelp  => $i18n->get('batch name description'),
+        value      => $session->form->process('name'),
         );
-	$f->textarea(
-		-name	    => 'description',
-		-label	    => $i18n->get('batch description'),
-		-hoverHelp	=> $i18n->get('batch description description'),
-		-value	    => $session->form->process("description"),
+	$f->addField( "textarea",
+		name	    => 'description',
+		label	    => $i18n->get('batch description'),
+		hoverHelp	=> $i18n->get('batch description description'),
+		value	    => $session->form->process("description"),
 		);
-	$f->submit;
+	$f->addField( "submit", name => "submit" );
 
-	return $self->getAdminConsoleWithSubmenu->render( $errorMessage.$f->print, $i18n->get('create batch menu') );
+	return $errorMessage.$f->toHtml;
 }
 
 #-------------------------------------------------------------------
