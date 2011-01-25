@@ -16,6 +16,7 @@ package WebGUI::Asset::Sku::EMSTicket;
 
 use strict;
 use Moose;
+use WebGUI::FormBuilder;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Sku';
 define assetName           => ['ems ticket', 'Asset_EMSTicket'];
@@ -497,11 +498,11 @@ sub view {
 
 	# build the add to cart form
 	if ($form->get('badgeId') ne '') {
-		my $addToCart = WebGUI::HTMLForm->new($self->session, action=>$self->getUrl);
-		$addToCart->hidden(name=>"func", value=>"addToCart");
-		$addToCart->hidden(name=>"badgeId", value=>$form->get('badgeId'));
-		$addToCart->submit(value=>$i18n->get('add to cart','Shop'), label=>$self->getPrice);
-		$output .= $addToCart->print;		
+		my $f = WebGUI::FormBuilder->new( $self->session, action => $self->getUrl );
+		$f->addField( "hidden", name=>"func", value=>"addToCart" );
+		$f->addField( "hidden", name=>"badgeId", value=>$form->get('badgeId') );
+		$f->addField( "submit", value=>$i18n->get('add to cart','Shop'), label=>$self->getPrice );
+		$output .= $f->toHtml;
 	}
 		
 	return $output;
