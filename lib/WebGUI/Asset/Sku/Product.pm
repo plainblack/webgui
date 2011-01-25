@@ -1301,41 +1301,41 @@ sub www_editSpecification {
 
     my $i18n = WebGUI::International->new($self->session,'Asset_Product');
     my $data = $self->getCollateral('specificationJSON', 'specificationId', $sid);
-    my $f    = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
+    my $f    = WebGUI::FormBuilder->new($self->session,action=>$self->getUrl);
 
-    $f->hidden(
-        -name => 'sid',
-        -value => $sid,
+    $f->addField( "hidden",
+        name => 'sid',
+        value => $sid,
     );
-    $f->hidden(
-        -name => 'func',
-        -value => 'editSpecificationSave',
+    $f->addField( "hidden",
+        name => 'func',
+        value => 'editSpecificationSave',
     );
-    $f->text(
-        -name => 'name',
-        -label => $i18n->get(26),
-        -hoverHelp => $i18n->get('26 description'),
-        -value => $data->{name},
+    $f->addField( "text",
+        name => 'name',
+        label => $i18n->get(26),
+        hoverHelp => $i18n->get('26 description'),
+        value => $data->{name},
     );
-    $f->text(
-        -name => 'value',
-        -label => $i18n->get(27),
-        -hoverHelp => $i18n->get('27 description'),
-        -value => $data->{value},
+    $f->addField( "text",
+        name => 'value',
+        label => $i18n->get(27),
+        hoverHelp => $i18n->get('27 description'),
+        value => $data->{value},
     );
-    $f->text(
-        -name => 'units',
-        -label => $i18n->get(29),
-        -hoverHelp => $i18n->get('29 description'),
-        -value => $data->{units},
+    $f->addField( "text",
+        name => 'units',
+        label => $i18n->get(29),
+        hoverHelp => $i18n->get('29 description'),
+        value => $data->{units},
     );
-    $f->yesNo(
-        -name => 'proceed',
-        -label => $i18n->get(28),
-        -hoverHelp => $i18n->get('28 description'),
+    $f->addField( "yesNo",
+        name => 'proceed',
+        label => $i18n->get(28),
+        hoverHelp => $i18n->get('28 description'),
     );
-    $f->submit;
-    return $self->getAdminConsole->render($f->print, 'product specification add/edit');
+    $f->addField( "submit", name => "submit" );
+    return $f->toHtml;
 }
 
 #-------------------------------------------------------------------

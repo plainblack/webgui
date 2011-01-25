@@ -36,7 +36,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 49;        # Increment this number for each test you create
+plan tests => 58;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -346,6 +346,68 @@ cmp_deeply(
     [
         { feature => 'One edited feature', featureId => ignore() }, 
         { feature => 'Two new feature', featureId => ignore() },
+    ],
+);
+
+
+#----------------------------------------------------------------------------
+# editSpecification
+my $mech = WebGUI::Test::Mechanize->new( config => WebGUI::Test->file );
+$mech->get_ok( '/' );
+$mech->session->user({ userId => 3 });
+$mech->get_ok( $product->getUrl( 'func=editSpecification' ) );
+
+$mech->submit_form_ok({
+    fields => {
+        name => "One",
+        value => "1",
+        units => "Oneitude",
+        proceed => 1,
+    },
+}, 'add one new specification');
+
+$product = $product->cloneFromDb;
+cmp_deeply(
+    $product->getAllCollateral( 'specificationJSON' ),
+    [
+        { name => "One", value => "1", units => "Oneitude", specificationId => ignore(), },
+    ],
+);
+
+$mech->submit_form_ok({
+    fields  => {
+        name => "Cold",
+        value => "2",
+        units => "Colditude",
+        proceed => 0,
+    },
+}, 'add one more new feature' );
+
+$product = $product->cloneFromDb;
+cmp_deeply(
+    $product->getAllCollateral( 'specificationJSON' ),
+    [
+        { name => "One", value => "1", units => "Oneitude", specificationId => ignore(), },
+        { name => "Cold", value => "2", units => "Colditude", specificationId => ignore(), },
+    ],
+);
+
+my $spec = $product->getAllCollateral( 'specificationJSON' )->[0];
+$mech->get_ok( $product->getUrl( 'func=editSpecification;sid=' . $spec->{specificationId} ) );
+
+$mech->submit_form_ok( {
+    fields => {
+        name        => "Oneitude",
+        value       => "3",
+        units       => "Ones",
+    },
+}, 'edit an existing specification' );
+$product = $product->cloneFromDb;
+cmp_deeply(
+    $product->getAllCollateral( 'specificationJSON' ),
+    [
+        { name => "Oneitude", value => "3", units => "Ones", specificationId => $spec->{specificationId}, },
+        { name => "Cold", value => "2", units => "Colditude", specificationId => ignore(), },
     ],
 );
 
