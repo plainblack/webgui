@@ -10,6 +10,7 @@
  - fixed #11990: calendar event view
  - fixed #12028: i18n Account_Shop
  - fixed #11989: calendar list view
+ - fixed #12024: Copied Collaboration System re-sends subscription mail
 
 7.10.7
  - rfe #10521: Use monospaced font in template edit textarea

@@ -403,6 +403,26 @@ sub disqualifyAsLastPost {
 
 #-------------------------------------------------------------------
 
+=head2 duplicate ( )
+
+Extend the base method to handle duplicate storage locations and groups.
+
+=cut
+
+sub duplicate {
+	my $self    = shift;
+    my $session = $self->session;
+    my $copy    = $self->SUPER::duplicate(@_);
+    if ($self->get('storageId')) {
+        my $storage        = $self->getStorageLocation;
+        my $copied_storage = $storage->copy;
+        $copy->update({storageId => $copied_storage->getId});
+    }
+    return $copy;
+}
+
+#-------------------------------------------------------------------
+
 =head2 DESTROY 
 
 Extend the base method to delete the locally cached thread object.
