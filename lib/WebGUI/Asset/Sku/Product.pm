@@ -959,10 +959,10 @@ Provides a form for the user to pick Products related to this one.
 sub www_addRelated {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);
-    my $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
-    $f->hidden(
-        -name => 'func',
-        -value => 'addRelatedSave',
+    my $f = WebGUI::FormBuilder->new($self->session,action=>$self->getUrl);
+    $f->addField( "hidden",
+        name => 'func',
+        value => 'addRelatedSave',
     );
     ##Relateds are other Products.  Give the user a list of Related products that
     ##are not already used, nor itself.
@@ -988,19 +988,19 @@ sub www_addRelated {
 
 
     my $i18n = WebGUI::International->new($self->session,'Asset_Product');
-    $f->selectBox(
-        -name => 'relatedAssetId',
-        -options => $related,
-        -label => $i18n->get(20),
-        -hoverHelp => $i18n->get('20 description'),
+    $f->addField( "selectBox",
+        name => 'relatedAssetId',
+        options => $related,
+        label => $i18n->get(20),
+        hoverHelp => $i18n->get('20 description'),
     );
-    $f->yesNo(
-        -name => 'proceed',
-        -label => $i18n->get(21),
-        -hoverHelp => $i18n->get('21 description'),
+    $f->addField( "yesNo",
+        name => 'proceed',
+        label => $i18n->get(21),
+        hoverHelp => $i18n->get('21 description'),
     );
-    $f->submit;
-    return $self->getAdminConsole->render($f->print,'product related add/edit');
+    $f->addField( "submit", name => "submit" );
+    return $f->toHtml;
 }
 
 #-------------------------------------------------------------------

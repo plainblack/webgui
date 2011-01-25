@@ -36,7 +36,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 25;        # Increment this number for each test you create
+plan tests => 31;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -207,5 +207,38 @@ $product = $product->cloneFromDb;
 cmp_deeply(
     $product->getAllCollateral( 'accessoryJSON' ),
     [ { accessoryAssetId => $imagedProduct->getId }, { accessoryAssetId => $viewProduct->getId } ],
+);
+
+#----------------------------------------------------------------------------
+# addRelated
+my $mech = WebGUI::Test::Mechanize->new( config => WebGUI::Test->file );
+$mech->get_ok( '/' );
+$mech->session->user({ userId => 3 });
+$mech->get_ok( $product->getUrl( 'func=addRelated' ) );
+
+$mech->submit_form_ok({
+    fields => {
+        relatedAssetId => $imagedProduct->getId,
+        proceed => 1,
+    },
+}, 'add imagedProduct as a related and add another');
+
+$product = $product->cloneFromDb;
+cmp_deeply(
+    $product->getAllCollateral( 'relatedJSON' ),
+    [ { relatedAssetId => $imagedProduct->getId } ],
+);
+
+$mech->submit_form_ok({
+    fields  => {
+        relatedAssetId => $viewProduct->getId,
+        proceed => 0,
+    },
+}, 'add viewProduct and go back' );
+
+$product = $product->cloneFromDb;
+cmp_deeply(
+    $product->getAllCollateral( 'relatedJSON' ),
+    [ { relatedAssetId => $imagedProduct->getId }, { relatedAssetId => $viewProduct->getId } ],
 );
 
