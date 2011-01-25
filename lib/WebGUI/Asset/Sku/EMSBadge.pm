@@ -82,7 +82,6 @@ property templateId => (
 
 
 use JSON;
-use WebGUI::HTMLForm;
 use WebGUI::International;
 use WebGUI::Shop::AddressBook;
 
