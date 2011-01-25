@@ -35,7 +35,7 @@ WebGUI::Test->addToCleanup($user);
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 9;        # Increment this number for each test you create
+plan tests => 16;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -126,7 +126,34 @@ cmp_deeply( $codes,
 );
 
 
+#----------------------------------------------------------------------------
+# www_listSubscriptionCodeBatches
+my $mech = WebGUI::Test::Mechanize->new( config => WebGUI::Test->file );
+$mech->get_ok( '/' );
+$mech->session->user({ userId => 3 });
 
+# Add another code for the selection
+$session->db->setRow( 'Subscription_codeBatch', 'batchId', {
+    batchId         => 'new',
+    name            => "Fired!",
+    description     => "Sign up to get fired!",
+    subscriptionId  => $sku->getId,
+    expirationDate  => 3600 * 24 * 7,
+    dateCreated     => time+1500,
+});
+
+$mech->get_ok( $sku->getUrl( 'func=listSubscriptionCodeBatches' ) );
+$mech->text_contains( "Sign up to get your paycheck!" );
+$mech->text_contains( "Sign up to get fired!" );
+$mech->submit_form_ok( {
+    fields => {
+        selection => "dc",
+        dcStart => time+1000,
+        dcStop => time+2000,
+    },
+}, 'limit subscription code batches' );
+$mech->content_lacks( "Sign up to get your paycheck!" );
+$mech->text_contains( "Sign up to get fired!" );
 
 
 

@@ -764,13 +764,13 @@ sub www_listSubscriptionCodeBatches {
 	my $dcStop      = $session->datetime->addToTime($session->form->date('dcStop'), 23, 59);
     my $selection   = $session->form->process('selection');
 
-    my $f = WebGUI::HTMLForm->new( $session );
-    $f->hidden(
+    my $f = WebGUI::FormBuilder->new( $session, action => $self->getUrl );
+    $f->addField( "hidden",
         name    => 'func',
         value   => 'listSubscriptionCodeBatches',
     );
 
-    $f->readOnly(
+    $f->addField( "readOnly",
         label   =>
             WebGUI::Form::radio( $session, { name => 'selection', value => 'dc', checked => ($selection eq 'dc') } )
             . $i18n->get('selection created'),
@@ -779,13 +779,13 @@ sub www_listSubscriptionCodeBatches {
             . ' ' . $i18n->get( 'and' ) . ' ' 
             . WebGUI::Form::date( $session, { name => 'dcStop',     value=> $dcStop } ),
     );
-    $f->readOnly(
+    $f->addField( "readOnly",
         label   =>
             WebGUI::Form::radio( $session, { name => 'selection', value => 'all', checked => ($selection ne 'dc') } )
             . $i18n->get('display all'),
         value   => '',
     );
-    $f->submit(
+    $f->addField( "submit",
         value   => $i18n->get('select'),
     );
 
@@ -804,7 +804,7 @@ sub www_listSubscriptionCodeBatches {
     # Fetch the list of batches at the current paginition index
     my $batches = $p->getPageData;
 
-	my $output = $f->print;
+	my $output = $f->toHtml;
 	$output .= $p->getBarTraditional($session->form->process("pn"));
 	$output .= '<table border="1" cellpadding="5" cellspacing="0" align="center">';
 	foreach my $batch ( @{$batches} ) {
@@ -826,7 +826,7 @@ sub www_listSubscriptionCodeBatches {
 	
 	$output = $i18n->get('no subscription code batches') unless $session->db->quickScalar('select count(*) from Subscription_codeBatch');
 
-	return $self->getAdminConsoleWithSubmenu->render( $output, $i18n->get('manage batches') );
+	return $output;
 }
 
 #-------------------------------------------------------------------
