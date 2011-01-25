@@ -1237,28 +1237,28 @@ sub www_editFeature {
     return $self->session->privilege->insufficient() unless ($self->canEdit);
     my $data = $self->getCollateral('featureJSON', 'featureId', $fid);
     my $i18n = WebGUI::International->new($self->session,'Asset_Product');
-    my $f    = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
-    $f->hidden(
-        -name  => 'fid',
-        -value => $fid,
+    my $f    = WebGUI::FormBuilder->new($self->session,action=>$self->getUrl);
+    $f->addField( "hidden",
+        name  => 'fid',
+        value => $fid,
     );
-    $f->hidden(
-        -name  => 'func',
-        -value => 'editFeatureSave',
+    $f->addField( "hidden",
+        name  => 'func',
+        value => 'editFeatureSave',
     );
-    $f->text(
-        -name      => 'feature',
-        -label     => $i18n->get(23),
-        -hoverHelp => $i18n->get('23 description'),
-        -value     => $data->{feature},
+    $f->addField( "text",
+        name      => 'feature',
+        label     => $i18n->get(23),
+        hoverHelp => $i18n->get('23 description'),
+        value     => $data->{feature},
     );
-    $f->yesNo(
-        -name      => 'proceed',
-        -label     => $i18n->get(24),
-        -hoverHelp => $i18n->get('24 description'),
+    $f->addField( "yesNo",
+        name      => 'proceed',
+        label     => $i18n->get(24),
+        hoverHelp => $i18n->get('24 description'),
     );
-    $f->submit;
-    return $self->getAdminConsole->render($f->print, 'product feature add/edit');
+    $f->addField( "submit", name => "submit" );
+    return $f->toHtml;
 }
 
 #-------------------------------------------------------------------

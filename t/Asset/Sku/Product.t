@@ -36,7 +36,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 40;        # Increment this number for each test you create
+plan tests => 49;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -295,4 +295,57 @@ cmp_deeply(
     ],
 );
 
+
+#----------------------------------------------------------------------------
+# editFeature
+my $mech = WebGUI::Test::Mechanize->new( config => WebGUI::Test->file );
+$mech->get_ok( '/' );
+$mech->session->user({ userId => 3 });
+$mech->get_ok( $product->getUrl( 'func=editFeature' ) );
+
+$mech->submit_form_ok({
+    fields => {
+        feature => 'One new feature',
+        proceed => 1,
+    },
+}, 'add one new feature');
+
+$product = $product->cloneFromDb;
+cmp_deeply(
+    $product->getAllCollateral( 'featureJSON' ),
+    [ { feature => 'One new feature', featureId => ignore() } ],
+);
+
+$mech->submit_form_ok({
+    fields  => {
+        feature => 'Two new feature',
+        proceed => 0,
+    },
+}, 'add one more new feature' );
+
+$product = $product->cloneFromDb;
+cmp_deeply(
+    $product->getAllCollateral( 'featureJSON' ),
+    [
+        { feature => 'One new feature', featureId => ignore() }, 
+        { feature => 'Two new feature', featureId => ignore() },
+    ],
+);
+
+my $feature = $product->getAllCollateral( 'featureJSON' )->[0];
+$mech->get_ok( $product->getUrl( 'func=editFeature;fid=' . $feature->{featureId} ) );
+
+$mech->submit_form_ok( {
+    fields => {
+        feature => 'One edited feature',
+    },
+}, 'edit an existing feature' );
+$product = $product->cloneFromDb;
+cmp_deeply(
+    $product->getAllCollateral( 'featureJSON' ),
+    [
+        { feature => 'One edited feature', featureId => ignore() }, 
+        { feature => 'Two new feature', featureId => ignore() },
+    ],
+);
 
