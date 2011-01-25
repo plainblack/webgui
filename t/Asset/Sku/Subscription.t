@@ -35,7 +35,7 @@ WebGUI::Test->addToCleanup($user);
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 16;        # Increment this number for each test you create
+plan tests => 32;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -133,7 +133,7 @@ $mech->get_ok( '/' );
 $mech->session->user({ userId => 3 });
 
 # Add another code for the selection
-$session->db->setRow( 'Subscription_codeBatch', 'batchId', {
+my $batchId = $session->db->setRow( 'Subscription_codeBatch', 'batchId', {
     batchId         => 'new',
     name            => "Fired!",
     description     => "Sign up to get fired!",
@@ -154,6 +154,64 @@ $mech->submit_form_ok( {
 }, 'limit subscription code batches' );
 $mech->content_lacks( "Sign up to get your paycheck!" );
 $mech->text_contains( "Sign up to get fired!" );
+
+
+#----------------------------------------------------------------------------
+# www_listSubscriptionCodes
+my $mech = WebGUI::Test::Mechanize->new( config => WebGUI::Test->file );
+$mech->get_ok( '/' );
+$mech->session->user({ userId => 3 });
+
+# Add more codes for the selection
+my $codeId = $session->db->setRow( 'Subscription_code', 'code', {
+    batchId         => $batchId,
+    usedBy          => 3,
+    dateUsed        => time+150,
+}, "1234567890qwertyuiopasdfghjklzxcvbnm" );
+
+# Limit by dateCreated
+$mech->get_ok( $sku->getUrl( 'func=listSubscriptionCodes' ) );
+$mech->submit_form_ok( {
+    fields => {
+        selection => "dc",
+        dcStart => time+1000,
+        dcStop => time+2000,
+    },
+}, 'limit subscription code batches by date created' );
+
+# The codes are there
+$mech->content_lacks( $codes->[0]{code} );
+$mech->content_lacks( $codes->[1]{code} );
+$mech->content_contains( $codeId );
+
+# Limit by dateUsed
+$mech->get_ok( $sku->getUrl( 'func=listSubscriptionCodes' ) );
+$mech->submit_form_ok( {
+    fields => {
+        selection => "du",
+        duStart => time+100,
+        duStop => time+200,
+    },
+}, 'limit subscription code batches by date used' );
+
+# The codes are there
+$mech->content_lacks( $codes->[0]{code} );
+$mech->content_lacks( $codes->[1]{code} );
+$mech->content_contains( $codeId );
+
+# Limit by batchId
+$mech->get_ok( $sku->getUrl( 'func=listSubscriptionCodes' ) );
+$mech->submit_form_ok( {
+    fields => {
+        selection => "b",
+        bid => $batches->[0]{batchId},
+    },
+}, 'limit subscription code batches by batchId' );
+
+# The codes are there
+$mech->content_contains( $codes->[0]{code} );
+$mech->content_contains( $codes->[1]{code} );
+$mech->content_lacks( $codeId );
 
 
 

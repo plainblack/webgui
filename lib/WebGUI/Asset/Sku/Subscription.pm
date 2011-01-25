@@ -858,13 +858,13 @@ sub www_listSubscriptionCodes {
 
 
     # Build a subscription code selection form
-    my $f = WebGUI::HTMLForm->new( $session );
-    $f->hidden(
+    my $f = WebGUI::FormBuilder->new( $session, action => $self->getUrl );
+    $f->addField( "hidden",
         name    => 'func',
         value   => 'listSubscriptionCodes',
     );
-    #--- Selection by date created
-    $f->readOnly(
+    #--- Selection by date used
+    $f->addField( "readOnly",
         label   => 
             WebGUI::Form::radio( $session, { name => 'selection', value => 'du', checked => ($selection eq 'du') } ) 
             . $i18n->get('selection used'),
@@ -873,8 +873,8 @@ sub www_listSubscriptionCodes {
             . ' ' . $i18n->get( 'and' ) . ' ' 
             . WebGUI::Form::date( $session, { name => 'duStop',     value=> $duStop } ),
     );
-    #--- Selection by date used
-    $f->readOnly(
+    #--- Selection by date created
+    $f->addField( "readOnly",
         label   =>
             WebGUI::Form::radio( $session, { name => 'selection', value => 'dc', checked => ($selection eq 'dc') } )
             . $i18n->get('selection created'),
@@ -884,7 +884,7 @@ sub www_listSubscriptionCodes {
             . WebGUI::Form::date( $session, { name => 'dcStop',     value=> $dcStop } ),
     );
     #--- Selection by batch
-    $f->readOnly(
+    $f->addField( "readOnly",
         label   =>
             WebGUI::Form::radio( $session, { name => 'selection', value => 'b', checked => ($selection eq 'b') } )
             . $i18n->get('selection batch name'),
@@ -892,9 +892,12 @@ sub www_listSubscriptionCodes {
             WebGUI::Form::selectBox( $session, { name => 'bid', value => $batchId, options => $batches } ),
     );
     #--- Submit button
-    $f->submit(
+    $f->addField( "submit",
         value   => $i18n->get('select'),
     );
+
+	$output = $i18n->get('selection message');
+    $output .= $f->toHtml;
 
 	if ($session->form->process("selection") eq 'du') {
 		$where = " and dateUsed >= ".$session->db->quote($duStart)." and dateUsed <= ".$session->db->quote($duStop);
@@ -909,7 +912,7 @@ sub www_listSubscriptionCodes {
 		$ops = ';bid='.$session->form->process("bid").';selection=b';
 		$delete = '<a href="'.$self->getUrl('func=deleteSubscriptionCodeBatch'.$ops).'">'.$i18n->get('delete codes').'</a>';
 	} else {
-        return $self->getAdminConsoleWithSubmenu->render( $output, $i18n->get('listSubscriptionCodes title') );
+        return $output;
 	}
 	
 	$p = WebGUI::Paginator->new( $session, $self->getUrl('func=listSubscriptionCodes'.$ops) );
@@ -924,8 +927,6 @@ sub www_listSubscriptionCodes {
 
 	$codes = $p->getPageData;
 
-	$output = $i18n->get('selection message');
-    $output .= $f->print;
 	$output .= '<br />'.$delete.'<br />' if ($delete) and $p->getRowCount;
 	$output .= $p->getBarTraditional($session->form->process("pn"));
 	$output .= '<br />';
@@ -947,7 +948,7 @@ sub www_listSubscriptionCodes {
 	$output .= '</table>';
 	$output .= $p->getBarTraditional($session->form->process("pn"));
 
-	return $self->getAdminConsoleWithSubmenu->render( $output, $i18n->get('listSubscriptionCodes title') );
+	return $output;
 }
 
 
