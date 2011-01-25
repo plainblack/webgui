@@ -12,7 +12,7 @@ package WebGUI::Asset::Sku::Product;
 
 use strict;
 use Tie::IxHash;
-use WebGUI::HTMLForm;
+use WebGUI::FormBuilder;
 use WebGUI::Storage;
 use WebGUI::SQL;
 use JSON;
@@ -879,10 +879,10 @@ the user to select them.
 sub www_addAccessory {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);
-    my $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
-    $f->hidden(
-        -name => "func",
-        -value => "addAccessorySave",
+    my $f = WebGUI::FormBuilder->new($self->session,action=>$self->getUrl);
+    $f->addField( "hidden", 
+        name => "func",
+        value => "addAccessorySave",
     );
     ##Accessories are other Products.  Give the user a list of Accessories that
     ##are not already used, nor itself.
@@ -906,20 +906,20 @@ sub www_addAccessory {
     );
 
     my $i18n = WebGUI::International->new($self->session,"Asset_Product");
-    $f->selectBox(
-        -name => "accessoryAccessId",
-        -options => $accessory,
-        -label => $i18n->get(17),
-        -hoverHelp => $i18n->get('17 description'),
+    $f->addField( "selectBox",
+        name => "accessoryAccessId",
+        options => $accessory,
+        label => $i18n->get(17),
+        hoverHelp => $i18n->get('17 description'),
     );
-    $f->yesNo(
-        -name => "proceed",
-        -label => $i18n->get(18),
-        -hoverHelp => $i18n->get('18 description'),
+    $f->addField( "yesNo",
+        name => "proceed",
+        label => $i18n->get(18),
+        hoverHelp => $i18n->get('18 description'),
     );
-    $f->submit;
+    $f->addField( "submit" );
 
-    return $self->getAdminConsole->render($f->print, "product accessory add/edit");
+    return $f->toHtml;
 }
 
 #-------------------------------------------------------------------

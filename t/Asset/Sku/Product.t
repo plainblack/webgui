@@ -25,6 +25,7 @@ use WebGUI::Session;
 use WebGUI::Asset;
 use WebGUI::Asset::Sku::Product;
 use WebGUI::Storage;
+use WebGUI::Test::Mechanize;
 use JSON;
 
 #----------------------------------------------------------------------------
@@ -35,7 +36,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 19;        # Increment this number for each test you create
+plan tests => 25;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -44,6 +45,7 @@ my $node = WebGUI::Asset->getRoot($session);
 my $product = WebGUI::Test->asset(
     className => "WebGUI::Asset::Sku::Product",
     title     => "Rock Hammer",
+    groupIdEdit => 3,
 );
 
 is($product->getThumbnailUrl(), '', 'Product with no image1 property returns the empty string');
@@ -173,3 +175,37 @@ cmp_deeply(
     },
     'brochure, warranty and manual vars are blank since their storages are empty'
 );
+
+#----------------------------------------------------------------------------
+# addAccessory
+my $mech = WebGUI::Test::Mechanize->new( config => WebGUI::Test->file );
+$mech->get_ok( '/' );
+$mech->session->user({ userId => 3 });
+$mech->get_ok( $product->getUrl( 'func=addAccessory' ) );
+
+$mech->submit_form_ok({
+    fields => {
+        accessoryAccessId => $imagedProduct->getId,
+        proceed => 1,
+    },
+}, 'add imagedProduct as an accessory and add another');
+
+$product = $product->cloneFromDb;
+cmp_deeply(
+    $product->getAllCollateral( 'accessoryJSON' ),
+    [ { accessoryAssetId => $imagedProduct->getId } ],
+);
+
+$mech->submit_form_ok({
+    fields  => {
+        accessoryAccessId => $viewProduct->getId,
+        proceed => 0,
+    },
+}, 'add viewProduct and go back' );
+
+$product = $product->cloneFromDb;
+cmp_deeply(
+    $product->getAllCollateral( 'accessoryJSON' ),
+    [ { accessoryAssetId => $imagedProduct->getId }, { accessoryAssetId => $viewProduct->getId } ],
+);
+
