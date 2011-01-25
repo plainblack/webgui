@@ -1,3 +1,5 @@
+7.10.9
+
 7.10.8
  - rfe #12016 for the top story as well
  - fixed #12029: issue with keywords
