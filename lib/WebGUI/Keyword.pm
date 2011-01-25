@@ -216,13 +216,13 @@ sub generateCloud {
             $url = $display->$urlCallback($keyword);
         }
         else {
-            my %q = ( keyword => $keyword );
+            my @q = ( [ 'keyword', $keyword, ] );
             my $e = $self->session->url;
             if (my $func = $options->{displayFunc}) {
-                $q{displayFunc} = $func;
+                unshift @q, [ 'func', $func ];
             }
             $url = $display->getUrl(
-                join(';', map { join '=', $_, $e->escape($q{$_}) } keys %q)
+                join(';', map { join '=', $_->[0], $e->escape($_->[1]) } @q)
             );
         }
         $cloud->add($keyword, $url, $count);
