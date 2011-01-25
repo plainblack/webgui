@@ -19,7 +19,7 @@ use strict;
 use lib "$FindBin::Bin/../lib";
 use WebGUI::Test;
 use WebGUI::Session;
-use Test::More tests => 18; # increment this value for each test you create
+use Test::More tests => 20; # increment this value for each test you create
 use Test::Deep;
 use WebGUI::Asset::Wobject::Collaboration;
 use WebGUI::Asset::Post;
@@ -202,5 +202,17 @@ cmp_bag(
     ],
     'checking attachment loop with multiple attachments for handling of image and non-image types'
 );
+
+######################################################################
+#
+# duplicate
+#
+######################################################################
+
+{
+    my $post1_copy = $post1->duplicate;
+    ok $post1_copy->get('storageId'), 'copied post has a storage location';
+    isnt $post1->get('storageId'), $post1_copy->get('storageId'), '... and it is different from the source post';
+}
 
 # vim: syntax=perl filetype=perl

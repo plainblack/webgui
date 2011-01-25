@@ -13,7 +13,7 @@ use strict;
 use lib "$FindBin::Bin/../../lib";
 use WebGUI::Test;
 use WebGUI::Session;
-use Test::More tests => 15; # increment this value for each test you create
+use Test::More tests => 17; # increment this value for each test you create
 use Test::MockObject::Extends;
 use Test::Exception;
 use WebGUI::Asset::Wobject::Collaboration;
@@ -103,5 +103,15 @@ like $thread->getCSLinkUrl, qr/\?pn=5/, 'checking thread on another page, with a
 
 $collab->update({threadsPerPage => 0, postsPerPage => 0,});
 lives_ok { $uncommittedThread->getCSLinkUrl } '... works when pagination set to 0';
+
+######################################################################
+#
+# duplicate
+#
+######################################################################
+
+my $thread_copy = $thread->duplicate();
+ok $thread_copy->get('subscriptionGroupId'), 'duplicate: copied thread got a subscription group';
+isnt $thread_copy->get('subscriptionGroupId'), $thread->get('subscriptionGroupId'), '... and it is different from the original thread';
 
 # vim: syntax=perl filetype=perl

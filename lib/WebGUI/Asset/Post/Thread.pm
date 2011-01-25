@@ -258,6 +258,27 @@ sub DESTROY {
 
 #-------------------------------------------------------------------
 
+=head2 duplicate
+
+Extends the base method to handle creating a new subscription group.
+
+=cut
+
+sub duplicate {
+	my $self    = shift;
+    my $session = $self->session;
+	my $copy    = $self->SUPER::duplicate(@_);
+    if ($self->get('subscriptionGroupId')) {
+        my $group        = WebGUI::Group->new($session, $self->get('subscriptionGroupId'));
+        my $copied_group = WebGUI::Group->new($session, 'new');
+        $copied_group->addUsers($group->getUsers('withoutExpired'));
+        $copy->update({subscriptionGroupId => $copied_group->getId});
+    }
+    return $copy;
+}
+
+#-------------------------------------------------------------------
+
 =head2 getAdjacentThread ( )
 
 Given a field and an order, returns the nearest thread when sorting by those.
