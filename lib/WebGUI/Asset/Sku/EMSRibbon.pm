@@ -36,7 +36,7 @@ property percentageDiscount => (
             hoverHelp       => ["percentage discount help", 'Asset_EventManagementSystem'],
          );
 
-use WebGUI::HTMLForm;
+use WebGUI::FormBuilder;
 
 =head1 NAME
 
@@ -192,12 +192,12 @@ sub view {
 		.'<p>'.$self->description.'</p>';
 
 	# build the add to cart form
-	if ($form->badgeId ne '') {
-		my $addToCart = WebGUI::HTMLForm->new($self->session, action=>$self->getUrl);
-		$addToCart->hidden(name=>"func", value=>"addToCart");
-		$addToCart->hidden(name=>"badgeId", value=>$form->get('badgeId'));
-		$addToCart->submit(value=>$i18n->get('add to cart','Shop'), label=>$self->getPrice);
-		$output .= $addToCart->print;		
+	if ($form->get('badgeId') ne '') {
+		my $f = WebGUI::FormBuilder->new($self->session, action=>$self->getUrl);
+		$f->addField( "hidden", name=>"func", value=>"addToCart");
+		$f->addField( "hidden", name=>"badgeId", value=>$form->get('badgeId'));
+		$f->addField( "submit", value=>$i18n->get('add to cart','Shop'), label=>$self->getPrice);
+		$output .= $f->toHtml;
 	}
 		
 	return $output;
