@@ -1782,28 +1782,28 @@ sub www_editTab {
         $tab = $self->getTabConfig($tabId);
     }
 
-    my $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
-    $f->hidden(
+    my $f = WebGUI::FormBuilder->new($self->session,action=>$self->getUrl);
+    $f->addField( "hidden",
         -name => "tabId",
         -value => $tabId,
     );
-    $f->hidden(
+    $f->addField( "hidden",
         -name => "func",
         -value => "editTabSave"
     );
-    $f->text(
+    $f->addField( "text",
         -name=>"label",
         -label=>$i18n->get(101),
         -value=>$tab->{label}
     );
-    $f->textarea(
+    $f->addField( "textarea",
         -name=>"subtext",
         -label=>$i18n->get(79),
         -value=>$tab->{subtext},
         -subtext=>""
     );
     if ($tabId eq "new") {
-        $f->whatNext(
+        $f->addField( "whatNext",
             options=>{
                 editTab=>$i18n->get(103),
                 ""=>$i18n->get(745)
@@ -1811,10 +1811,9 @@ sub www_editTab {
             -value=>"editTab"
         );
     }
-    $f->submit;
-    my $ac = $self->getAdminConsole;
-    return $ac->render($f->print,$i18n->get('103')) if $tabId eq "new";
-    return $ac->render($f->print,$i18n->get('102'));
+    $f->addField( "submit", name => "submit" );
+    return '<h1>' . $i18n->get('103') . '</h1>' . $f->toHtml if $tabId eq "new";
+    return '<h1>' . $i18n->get('102') . '</h1>' . $f->toHtml;
 }
 
 #-------------------------------------------------------------------

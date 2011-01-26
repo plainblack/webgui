@@ -44,7 +44,7 @@ $dform->createField('gotCaptcha', { type => 'Captcha', name => 'humanCheck', });
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 11;        # Increment this number for each test you create
+plan tests => 18;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # _createForm
@@ -141,5 +141,51 @@ cmp_deeply(
 );
 
 
+#----------------------------------------------------------------------------
+# www_editTab
+my $mech = WebGUI::Test::Mechanize->new( config => WebGUI::Test->file );
+$mech->get_ok('/');
+$mech->session->user({ userId => 3 });
+
+# Create a new tab
+$mech->get_ok( $df->getUrl( 'func=editTab' ) );
+$mech->submit_form_ok( {
+    fields => {
+        label => 'Request Info',
+        subtext => "We won't be reading it, but fill it out anyway or get fired.",
+    },
+}, "add a new tab" );
+
+$df = WebGUI::Asset->newById( $mech->session, $df->getId );
+# Figure out the ID
+my $tabId = ( keys %{$df->getTabConfig} )[0];
+cmp_deeply( 
+    $df->getTabConfig( $tabId ),
+    superhashof( {
+        label => 'Request Info',
+        subtext => "We won't be reading it, but fill it out anyway or get fired.",
+    } ),
+    "tab exists with correct config",
+);
+
+# Edit that tab
+sleep 1; # stupid addRevision
+$mech->get_ok( $df->getUrl( 'func=editTab;tabId=' . $tabId ) );
+$mech->submit_form_ok( {
+    fields => {
+        label => 'Begging Info',
+        subtext => "Adding puppydog eyes may help your case, slightly",
+    },
+}, "edit the tab" );
+
+$df = WebGUI::Asset->newPending( $mech->session, $df->getId );
+cmp_deeply( 
+    $df->getTabConfig( $tabId ),
+    superhashof( {
+        label => 'Begging Info',
+        subtext => "Adding puppydog eyes may help your case, slightly",
+    } ),
+    "tab config updated",
+);
 
 #vim:ft=perl
