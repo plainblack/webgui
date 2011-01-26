@@ -44,7 +44,7 @@ $dform->createField('gotCaptcha', { type => 'Captcha', name => 'humanCheck', });
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 8;        # Increment this number for each test you create
+plan tests => 11;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # _createForm
@@ -117,6 +117,29 @@ cmp_deeply(
 );
 
 # Edit that field
+sleep 1; # stupid addRevision
+$mech->get_ok( $df->getUrl( 'func=editField;fieldName=request' ) );
+$mech->submit_form_ok( {
+    fields => {
+        label   => 'Beg Here',
+        tabId => 0,
+        subtext => 'Throw yourself upon the mercy of the manager',
+    },
+}, "edit the field" );
+
+$df = WebGUI::Asset->newPending( $mech->session, $df->getId );
+cmp_deeply( 
+    $df->getFieldConfig( "request" ),
+    superhashof( {
+        label   => 'Beg Here',
+        name    => 'request',
+        tabId   => undef,
+        subtext => 'Throw yourself upon the mercy of the manager',
+        type => 'Textarea',
+    } ),
+    "field config updated",
+);
+
 
 
 #vim:ft=perl
