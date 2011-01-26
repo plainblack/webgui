@@ -49,7 +49,7 @@ sub new {
     my $wg = WebGUI->new( config => $config_file );
     my $app = $wg->to_app;
     $app = WebGUI::Middleware::Session->wrap($app, config => $wg->config);
-    $app = Plack::Middleware::NullLogger->wrap($app);
+    #$app = Plack::Middleware::NullLogger->wrap($app);
     $options{app} = $app;
     my $self = $class->SUPER::new(%options);
     $self->{_webgui_config} = $wg->config;
