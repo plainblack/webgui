@@ -35,7 +35,7 @@ WebGUI::Test->addToCleanup($user);
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 32;        # Increment this number for each test you create
+plan tests => 39;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -138,8 +138,8 @@ my $batchId = $session->db->setRow( 'Subscription_codeBatch', 'batchId', {
     name            => "Fired!",
     description     => "Sign up to get fired!",
     subscriptionId  => $sku->getId,
-    expirationDate  => 3600 * 24 * 7,
-    dateCreated     => time+1500,
+    expirationDate  => time + 3600 * 24 * 7,
+    dateCreated     => time + 1500,
 });
 
 $mech->get_ok( $sku->getUrl( 'func=listSubscriptionCodeBatches' ) );
@@ -213,5 +213,23 @@ $mech->content_contains( $codes->[0]{code} );
 $mech->content_contains( $codes->[1]{code} );
 $mech->content_lacks( $codeId );
 
+#----------------------------------------------------------------------------
+# www_redeemSubscriptionCode
+my $mech = WebGUI::Test::Mechanize->new( config => WebGUI::Test->file );
+$mech->get_ok( '/' );
+$mech->session->user({ userId => 3 });
 
+$mech->get_ok( $sku->getUrl( 'func=redeemSubscriptionCode' ) );
+$mech->submit_form_ok({
+    fields => {
+        code => $codes->[0]{code},
+    },
+}, "redeem a code" );
 
+my $i18n = WebGUI::International->new($session, "Asset_Subscription");
+$mech->content_contains( $i18n->get('redeem code success') );
+
+my %redeemed = $session->db->quickHash( "SELECT * FROM Subscription_code WHERE code=?", [ $codeId ] );
+is( $redeemed{status}, 'Used', "status updated" );
+is( $redeemed{usedBy}, $mech->session->user->userId, "used by updated" );
+cmp_ok( $redeemed{dateUsed}, '>=', time, "dateUsed updated" );

@@ -994,20 +994,20 @@ sub www_redeemSubscriptionCode {
 		$var->{ message             } = $i18n->get('redeem code ask for code');
 	}
 	
-	my $f = WebGUI::HTMLForm->new( $session );
-	$f->hidden(
+	my $f = WebGUI::FormBuilder->new( $session );
+	$f->addField( "hidden",
 		-name       => 'func',
 		-value      => 'redeemSubscriptionCode'
 		);
-	$f->text(
+	$f->addField( "text",
 		-name		=> 'code',
 		-label		=> $i18n->get('code'),
 		-hoverHelp	=> $i18n->get('code description'),
 		-maxLength	=> 64,
 		-size		=> 30
 		);
-	$f->submit;
-	$var->{ codeForm } = $f->print;
+	$f->addField( "submit", name => "submit" );
+	$var->{ codeForm } = $f->toHtml;
 
     return $self->processStyle($self->processTemplate($var, $self->redeemSubscriptionCodeTemplateId));
 }
