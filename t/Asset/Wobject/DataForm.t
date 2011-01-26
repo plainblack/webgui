@@ -17,6 +17,7 @@ use strict;
 use Test::More;
 use Test::Deep;
 use WebGUI::Test; # Must use this before any other WebGUI modules
+use WebGUI::Test::Mechanize;
 use WebGUI::Asset;
 use WebGUI::Asset::Wobject::DataForm;
 use WebGUI::VersionTag;
@@ -43,7 +44,7 @@ $dform->createField('gotCaptcha', { type => 'Captcha', name => 'humanCheck', });
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 4;        # Increment this number for each test you create
+plan tests => 8;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # _createForm
@@ -83,5 +84,39 @@ cmp_ok(
     $dform->get('lastModified'),
     '... form with a captcha does not return lastModified, even in form mode'
 );
+
+#----------------------------------------------------------------------------
+# www_editField
+my $mech = WebGUI::Test::Mechanize->new( config => WebGUI::Test->file );
+$mech->get_ok('/');
+$mech->session->user({ userId => 3 });
+
+# Create a new field
+$mech->get_ok( $df->getUrl( 'func=editField;fieldName=new' ) );
+$mech->submit_form_ok( {
+    fields => {
+        label   => 'Request',
+        newName => 'request',
+        tabId => 0,
+        subtext => 'Submit your request to the circular file',
+        type => "Textarea",
+    },
+}, "add a new field" );
+
+$df = WebGUI::Asset->newById( $mech->session, $df->getId );
+cmp_deeply( 
+    $df->getFieldConfig( "request" ),
+    superhashof( {
+        label   => 'Request',
+        name    => 'request',
+        tabId   => undef,
+        subtext => 'Submit your request to the circular file',
+        type => 'Textarea',
+    } ),
+    "field exists with correct config",
+);
+
+# Edit that field
+
 
 #vim:ft=perl

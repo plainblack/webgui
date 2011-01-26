@@ -17,7 +17,7 @@ http://www.plainblack.com                     info@plainblack.com
 use strict;
 use Tie::IxHash;
 use WebGUI::Form;
-use WebGUI::HTMLForm;
+use WebGUI::FormBuilder;
 use WebGUI::International;
 use WebGUI::Mail::Send;
 use WebGUI::Macro;
@@ -1489,23 +1489,23 @@ sub www_editField {
     else {
         $field = {};
     }
-    my $f = WebGUI::HTMLForm->new($self->session, action => $self->getUrl);
-    $f->hidden(
+    my $f = WebGUI::FormBuilder->new($self->session, action => $self->getUrl);
+    $f->addField( "hidden",
         name => "fieldName",
         value => $field->{name},
     );
-    $f->hidden(
+    $f->addField( "hidden",
         name => "func",
         value => "editFieldSave"
     );
-    $f->text(
+    $f->addField( "text",
         name=>"label",
         label=>$i18n->get(77),
         hoverHelp=>$i18n->get('77 description'),
         value=>$field->{label}
     );
     if ($field->{isMailField}) {
-        $f->readOnly(
+        $f->addField( "readOnly",
             name        => "newName",
             label       => $i18n->get(21),
             hoverHelp   => $i18n->get('21 description'),
@@ -1513,7 +1513,7 @@ sub www_editField {
         );
     }
     else {
-        $f->text(
+        $f->addField( "text",
             name        => "newName",
             label       => $i18n->get(21),
             hoverHelp   => $i18n->get('21 description'),
@@ -1525,14 +1525,14 @@ sub www_editField {
         0   => $i18n->get("no tab"),
         map { $_ => $self->getTabConfig($_)->{label} } @{ $self->getTabOrder },
     );
-    $f->selectBox(
+    $f->addField( "selectBox",
         name        => "tabId",
         options     => \%tabs,
         label       => $i18n->get(104),
         hoverHelp   => $i18n->get('104 description'),
         value       => [ $field->{tabId} ]
     );
-    $f->text(
+    $f->addField( "text",
         name        => "subtext",
         value       => $field->{subtext},
         label       => $i18n->get(79),
@@ -1545,62 +1545,62 @@ sub www_editField {
         "editable"  => $i18n->get(6),
         "required"  => $i18n->get(75),
     );
-    $f->selectBox(
+    $f->addField( "selectBox",
         name        => "status",
         options     => \%fieldStatus,
         label       => $i18n->get(22),
         hoverHelp   => $i18n->get('22 description'),
         value       => [ $field->{status} || "editable" ],
     );
-    $f->fieldType(
+    $f->addField( "fieldType",
         name        => "type",
         label       => $i18n->get(23),
         hoverHelp   => $i18n->get('23 description'),
         value       => "\u$field->{type}" || "Text",
         types       => [qw(DateTime TimeField Float Zipcode Text Textarea HTMLArea Url Date Email Phone Integer YesNo SelectList RadioList CheckList SelectBox File)],
     );
-    $f->integer(
+    $f->addField( "integer",
         name        => "width",
         label       => $i18n->get(8),
         hoverHelp   => $i18n->get('8 description'),
         value       => ($field->{width} || 0),
     );
-    $f->integer(
+    $f->addField( "integer",
         name        => "rows",
         value       => $field->{rows} || 0,
         label       => $i18n->get(27),
         hoverHelp   => $i18n->get('27 description'),
         subtext     => $i18n->get(28),
     );
-    $f->yesNo(
+    $f->addField( "yesNo",
         name=>"vertical",
         value=>$field->{vertical},
         label=>$i18n->get('editField vertical label'),
         hoverHelp=>$i18n->get('editField vertical label description'),
         subtext=>$i18n->get('editField vertical subtext')
     );
-    $f->text(
+    $f->addField( "text",
         name=>"extras",
         value=>$field->{extras},
         label=>$i18n->get('editField extras label'),
         hoverHelp=>$i18n->get('editField extras label description'),
     );
-    $f->textarea(
-        -name=>"options",
-        -label=>$i18n->get(24),
-        -hoverHelp=>$i18n->get('24 description'),
-        -value=>$field->{options},
-        -subtext=>'<br />'.$i18n->get(85)
+    $f->addField( "textarea",
+        name=>"options",
+        label=>$i18n->get(24),
+        hoverHelp=>$i18n->get('24 description'),
+        value=>$field->{options},
+        subtext=>'<br />'.$i18n->get(85)
     );
-    $f->textarea(
-        -name=>"defaultValue",
-        -label=>$i18n->get(25),
-        -hoverHelp=>$i18n->get('25 description'),
-        -value=>$field->{defaultValue},
-        -subtext=>'<br />'.$i18n->get(85)
+    $f->addField( "textarea",
+        name=>"defaultValue",
+        label=>$i18n->get(25),
+        hoverHelp=>$i18n->get('25 description'),
+        value=>$field->{defaultValue},
+        subtext=>'<br />'.$i18n->get(85)
     );
     if (!$fieldName) {
-        $f->whatNext(
+        $f->addField( "whatNext",
             options => {
                 "editField"     => $i18n->get(76),
                 "viewDataForm"  => $i18n->get(745),
@@ -1608,9 +1608,8 @@ sub www_editField {
             value  => "editField"
         );
     }
-    $f->submit;
-    my $ac = $self->getAdminConsole;
-    return $ac->render($f->print,$i18n->get('20'));
+    $f->addField( "submit", name => "submit" );
+    return '<h1>' . $i18n->get('20') . '</h1>' . $f->toHtml;
 }
 
 #-------------------------------------------------------------------
