@@ -200,7 +200,7 @@ use WebGUI::Asset::Sku::EMSRibbon;
 use WebGUI::Asset::Sku::EMSToken;
 use WebGUI::Exception;
 use WebGUI::FormValidator;
-use WebGUI::HTMLForm;
+use WebGUI::FormBuilder;
 use WebGUI::International;
 use WebGUI::Workflow::Instance;
 use Data::Dumper;
@@ -995,20 +995,20 @@ sub www_editBadgeGroup {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless $self->canEdit;
 	my ($form, $db) = $self->session->quick(qw(form db));
-	my $f = WebGUI::HTMLForm->new($self->session, action=>$self->getUrl);
+	my $f = WebGUI::FormBuilder->new($self->session, action=>$self->getUrl);
 	my $badgeGroup = $db->getRow("EMSBadgeGroup","badgeGroupId",$form->get('badgeGroupId'));
 	$badgeGroup->{badgeList} = ($badgeGroup->{badgeList} ne "") ? JSON::from_json($badgeGroup->{badgeList}) : [];
 	my $i18n = WebGUI::International->new($self->session, "Asset_EventManagementSystem");
-	$f->hidden(name=>'func', value=>'editBadgeGroupSave');
-	$f->hidden(name=>'badgeGroupId', value=>$form->get('badgeGroupId'));
-	$f->text(
+	$f->addField( "hidden", name=>'func', value=>'editBadgeGroupSave');
+	$f->addField( "hidden", name=>'badgeGroupId', value=>$form->get('badgeGroupId'));
+	$f->addField( "text",
 		name		=> 'name',	
 		value		=> $badgeGroup->{name},
 		label		=> $i18n->get('badge group name'),
 		hoverHelp	=> $i18n->get('badge group name help'),
 		);
-	$f->submit;
-	return $self->processStyle('<h1>'.$i18n->get('badge groups').'</h1>'.$f->print);
+	$f->addField( "submit", name => "submit" );
+	return $self->processStyle('<h1>'.$i18n->get('badge groups').'</h1>'.$f->toHtml);
 }
 
 

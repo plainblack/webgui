@@ -16,6 +16,7 @@
 use strict;
 use Test::More;
 use WebGUI::Test; # Must use this before any other WebGUI modules
+use WebGUI::Test::Mechanize;
 use WebGUI::Test::MockAsset;
 use WebGUI::Session;
 use WebGUI::User;
@@ -49,7 +50,7 @@ my %tag = ( tagId   => $versionTag->getId, status => "pending" );
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 41;        # Increment this number for each test you create
+plan tests => 51;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 
@@ -630,3 +631,47 @@ cmp_deeply( JSON::from_json($data), {
      'Location page #2 looks good'
 );
 
+#----------------------------------------------------------------------------
+# www_editBadgeGroup
+$ems = WebGUI::Test->asset(
+    className   => 'WebGUI::Asset::Wobject::EventManagementSystem',
+    groupIdEdit => '3',
+);
+
+my $mech = WebGUI::Test::Mechanize->new( config => WebGUI::Test->file );
+$mech->get_ok('/');
+$mech->session->user({ userId => 3 });
+
+# Create a new one
+$mech->get_ok( $ems->getUrl( 'func=editBadgeGroup;badgeGroupId=new' ), "Get form to create a new badge group" );
+$mech->submit_form_ok( {
+    fields => {
+        name => 'Inmate Training',
+    },
+}, "create a new badge group" );
+
+my $bgroup = $session->db->quickHashRef(
+    "SELECT * FROM EMSBadgeGroup WHERE name=?",
+    [ "Inmate Training" ],
+);
+ok( $bgroup, "Badge group exists" );
+is( $bgroup->{emsAssetId}, $ems->getId, 'ems asset id set correctly' );
+
+# Edit existing one
+$mech->get_ok( 
+    $ems->getUrl( 'func=editBadgeGroup;badgeGroupId=' . $bgroup->{badgeGroupId} ), 
+    "Get form to edit our badge group",
+);
+$mech->submit_form_ok( {
+    fields  => {
+        name    => 'Inmate Beating',
+    },
+}, "Edit an existing badge group" );
+
+$bgroup = $session->db->quickHashRef(
+    "SELECT * FROM EMSBadgeGroup WHERE badgeGroupId=?",
+    [ $bgroup->{badgeGroupId} ],
+);
+ok( $bgroup, "Badge group exists" );
+is( $bgroup->{emsAssetId}, $ems->getId, 'ems asset id set correctly' );
+is( $bgroup->{name}, "Inmate Beating", 'badge name set correctly' );
