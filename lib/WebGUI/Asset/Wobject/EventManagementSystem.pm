@@ -1104,7 +1104,7 @@ sub www_editEventMetaField {
 	return $self->session->privilege->insufficient unless ($self->canEdit);
 	my $i18n2 = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
 	my $i18n = WebGUI::International->new($self->session,"WebGUIProfile");
-	my $f = WebGUI::HTMLForm->new($self->session, (
+	my $f = WebGUI::FormBuilder->new($self->session, (
 		action => $self->getUrl("func=editEventMetaFieldSave;fieldId=".$fieldId)
 	));
 	my $data = {};
@@ -1119,10 +1119,10 @@ sub www_editEventMetaField {
 			defaultValues => $self->session->form->process("defaultValues",'textarea'),
 			helpText => $self->session->form->process("helpText",'textarea'),
 		};
-		$f->readOnly(
-			-name => 'error',
-			-label => $i18n2->get('error'),
-			-value => '<span style="color:red;font-weight:bold">'.$error.'</span>',
+		$f->addField( "readOnly",
+			name => 'error',
+			label => $i18n2->get('error'),
+			value => '<span style="color:red;font-weight:bold">'.$error.'</span>',
 		);
 	} elsif ($fieldId ne 'new') {
 		$data = $self->session->db->quickHashRef("select * from EMSEventMetaField where fieldId=?",[$fieldId]);
@@ -1135,53 +1135,53 @@ sub www_editEventMetaField {
 			required => 0,
 		};
 	}
-	$f->text(
-		-name => "label",
-		-label => $i18n2->get('label'),
-		-hoverHelp => $i18n2->get('label help'),
-		-value => $data->{label},
-		-extras=>(($data->{label} eq $i18n2->get('type label here'))?' style="color:#bbbbbb" ':'').' onblur="if(!this.value){this.value=\''.$i18n2->get('type label here').'\';this.style.color=\'#bbbbbb\';}" onfocus="if(this.value == \''.$i18n2->get('type label here').'\'){this.value=\'\';this.style.color=\'\';}"',
+	$f->addField( "text",
+		name => "label",
+		label => $i18n2->get('label'),
+		hoverHelp => $i18n2->get('label help'),
+		value => $data->{label},
+		extras=>(($data->{label} eq $i18n2->get('type label here'))?' style="color:#bbbbbb" ':'').' onblur="if(!this.value){this.value=\''.$i18n2->get('type label here').'\';this.style.color=\'#bbbbbb\';}" onfocus="if(this.value == \''.$i18n2->get('type label here').'\'){this.value=\'\';this.style.color=\'\';}"',
 	);
-	$f->yesNo(
-		-name=>"visible",
-		-label=>$i18n->get('473a'),
-		-hoverHelp=>$i18n->get('473a description'),
-		-value=>$data->{visible},
+	$f->addField( "yesNo",
+		name=>"visible",
+		label=>$i18n->get('473a'),
+		hoverHelp=>$i18n->get('473a description'),
+		value=>$data->{visible},
 		defaultValue=>1,
 	);
-	$f->yesNo(
-		-name=>"required",
-		-label=>$i18n->get(474),
-		-hoverHelp=>$i18n->get('474 description'),
-		-value=>$data->{required}
+	$f->addField( "yesNo",
+		name=>"required",
+		label=>$i18n->get(474),
+		hoverHelp=>$i18n->get('474 description'),
+		value=>$data->{required}
 	);
-    $f->fieldType(
-        -name=>"dataType",        
-        -label=>$i18n->get(486),        
-        -hoverHelp=>$i18n->get('486 description'),
-        -value=>ucfirst $data->{dataType},        
-        -defaultValue=>"Text",
+    $f->addField( "fieldType",
+        name=>"dataType",        
+        label=>$i18n->get(486),        
+        hoverHelp=>$i18n->get('486 description'),
+        value=>ucfirst $data->{dataType},        
+        defaultValue=>"Text",
         );
-	$f->textarea(
-		-name => "possibleValues",
-		-label => $i18n->get(487),
-		-hoverHelp => $i18n->get('487 description'),
-		-value => $data->{possibleValues},
+	$f->addField( "textarea",
+		name => "possibleValues",
+		label => $i18n->get(487),
+		hoverHelp => $i18n->get('487 description'),
+		value => $data->{possibleValues},
 	);
-	$f->textarea(
-		-name => "defaultValues",
-		-label => $i18n->get(488),
-		-hoverHelp => $i18n->get('488 description'),
-		-value => $data->{defaultValues},
+	$f->addField( "textarea",
+		name => "defaultValues",
+		label => $i18n->get(488),
+		hoverHelp => $i18n->get('488 description'),
+		value => $data->{defaultValues},
 	);
-	$f->textarea(
-		-name => "helpText",
-		-label => $i18n2->get('meta field help text'),
-		-hoverHelp => $i18n2->get('meta field help text description'),
-		-value => $data->{helpText},
+	$f->addField( "textarea",
+		name => "helpText",
+		label => $i18n2->get('meta field help text'),
+		hoverHelp => $i18n2->get('meta field help text description'),
+		value => $data->{helpText},
 	);
-	$f->submit;
-	return $self->processStyle($f->print);
+	$f->addField( "submit", name => "submit" );
+	return $self->processStyle($f->toHtml);
 }
 
 #-------------------------------------------------------------------

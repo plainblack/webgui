@@ -50,7 +50,7 @@ my %tag = ( tagId   => $versionTag->getId, status => "pending" );
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 51;        # Increment this number for each test you create
+plan tests => 60;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 
@@ -675,3 +675,59 @@ $bgroup = $session->db->quickHashRef(
 ok( $bgroup, "Badge group exists" );
 is( $bgroup->{emsAssetId}, $ems->getId, 'ems asset id set correctly' );
 is( $bgroup->{name}, "Inmate Beating", 'badge name set correctly' );
+
+#----------------------------------------------------------------------------
+# www_editEventMetaField
+my $mech = WebGUI::Test::Mechanize->new( config => WebGUI::Test->file );
+$mech->get_ok('/');
+$mech->session->user({ userId => 3 });
+
+# Create a new one
+my %metaField = ( 
+    label => 'Security Level',
+    visible => 1,
+    required => 1,
+    dataType => 'Text',
+    helpText => 'What security level is required for this event?',
+);
+
+$mech->get_ok( $ems->getUrl( 'func=editEventMetaField' ), 'Get form to create new meta field' );
+$mech->submit_form_ok( {
+    fields => { %metaField },
+}, 'create a new meta field' );
+
+# Meta field exists
+my $field = $session->db->quickHashRef(
+    "SELECT * FROM EMSEventMetaField WHERE assetId=?",
+    [ $ems->getId ],
+);
+ok( $field, 'meta field exists' );
+cmp_deeply(
+    $field,
+    superhashof( { %metaField, assetId => $ems->getId } ), 
+    'meta field contains correct data',
+);
+
+# Edit existing one
+$metaField{ helpText } = "This is new help text";
+$mech->get_ok( 
+    $ems->getUrl( 'func=editEventMetaField;fieldId=' . $field->{fieldId} ), 
+    'Get form to edit meta field' 
+);
+$mech->submit_form_ok( {
+    fields => { %metaField },
+}, 'create a new meta field' );
+
+# Meta field still exists
+my $field = $session->db->quickHashRef(
+    "SELECT * FROM EMSEventMetaField WHERE assetId=?",
+    [ $ems->getId ],
+);
+ok( $field, 'meta field exists' );
+cmp_deeply(
+    $field,
+    superhashof( { %metaField, assetId => $ems->getId } ), 
+    'meta field contains correct data',
+);
+
+
