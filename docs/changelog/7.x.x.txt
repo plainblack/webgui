@@ -1,4 +1,5 @@
 7.10.9
+ - fixed #12030: Calendar Feed Time Zone Issue
 
 7.10.8
  - rfe #12016 for the top story as well

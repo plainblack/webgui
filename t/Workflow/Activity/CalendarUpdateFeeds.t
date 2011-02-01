@@ -20,12 +20,13 @@ use WebGUI::Asset::Wobject::Calendar;
 
 use Test::More;
 use Test::Deep;
+use Test::LongString;
 use Data::Dumper;
 
 plan skip_all => 'set WEBGUI_LIVE to enable this test'
     unless $ENV{WEBGUI_LIVE};
 
-plan tests => 14; # increment this value for each test you create
+plan tests => 19; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -105,7 +106,12 @@ is($anniversary->get('menuTitle'),     $party->get('menuTitle'),   '... menuTitl
 is($anniversary->get('groupIdView'),   $party->get('groupIdView'), '... groupIdView');
 is($anniversary->get('groupIdEdit'),   $party->get('groupIdEdit'), '... groupIdEdit');
 is($anniversary->get('url'),           $party->get('url').'2',     '... url (accounting for duplicate)');
-is($anniversary->get('description'),   $party->get('description'), '... description, checks for line wrapping');
+is($anniversary->get('timeZone'),      $party->get('timeZone'),    '... timeZone');
+is($anniversary->get('startDate'),     $party->get('startDate'),   '... startDate');
+is($anniversary->get('startTime'),     $party->get('startTime'),   '... startTime');
+is($anniversary->get('endDate'),       $party->get('endDate'),     '... endDate');
+is($anniversary->get('endTime'),       $party->get('endTime'),     '... endTime');
+is_string($anniversary->get('description'),   $party->get('description'), '... description, checks for line wrapping');
 
 $party->update({description => "one line\nsecond line"});
 

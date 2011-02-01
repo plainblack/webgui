@@ -67,6 +67,7 @@ checkModule("HTTP::Headers",                1.61         );
 checkModule("Test::More",                   0.82,      2 );
 checkModule("Test::MockObject",             1.02,      2 );
 checkModule("Test::Deep",                   0.095,       );
+checkModule("Test::LongString",             0.13,      2 );
 checkModule("Test::Exception",              0.27,      2 );
 checkModule("Test::Differences",            0.5,       2 );
 checkModule("Test::Class",                  0.31,      2 );
@@ -149,6 +150,7 @@ checkModule('IO::Socket::SSL',                           );
 checkModule('Net::Twitter',                 "3.13006"    );
 checkModule('PerlIO::eol',                  "0.14"       );
 checkModule('Monkey::Patch',                '0.03'       );
+checkModule('Data::ICal',                   '0.16'       );
 
 failAndExit("Required modules are missing, running no more checks.") if $missingModule;
 

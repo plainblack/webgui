@@ -28,6 +28,7 @@ use WebGUI::Storage;
 use Test::Deep::NoTest qw(eq_deeply);
 use DateTime::Event::ICal;
 use DateTime::Set;
+use Data::ICal::Entry::Event;
 
 use base 'WebGUI::Asset';
 
@@ -72,6 +73,54 @@ sub addRevision {
         $newRev->update({storageId => $newStorage->getId});
     }
     return $newRev;
+}
+
+####################################################################
+
+=head2 add_to_calendar ($iCal)
+
+Build a Data::ICal::Entry::Event object that contains the information for this
+event and add it to the Data::ICal calendar
+
+=head3 $iCal
+
+A Data::ICal object, representing the top-level calendar instance.
+
+=cut
+
+sub add_to_calendar {
+    my $self     = shift;
+    my $session  = $self->session;
+    my $calendar = shift;
+    my $event = Data::ICal::Entry::Event->new();
+    $event->add_properties(
+        'last-modified' => WebGUI::DateTime->new($session, $event->get("revisionDate"))->toIcal,
+        created         => WebGUI::DateTime->new($session, $event->get("creationDate"))->toIcal,
+        sequence        => $self->get('iCalSequenceNumber'),
+        summary         => $self->get('title'),
+        description     => $self->get('description'),
+        location        => $self->get('location'),
+        uid => $self->get('feedUid')
+             ? $self->get('feedUid')
+             : $self->get('assetId') . '@'. $session->config->get("sitename")->[0],
+    );
+    ##WebGUI Specific fields
+    foreach my $prop (qw/groupIdView groupIdEdit url menuTitle timeZone/) {
+        $event->add_property( 'x-webgui-'.lc($prop) => $self->get($prop));
+    }
+    my $eventStart = $self->getIcalStart;
+    my $start_parameters = {};
+    if (! $eventStart =~ /T/) {
+        $start_parameters->{VALUE} = 'DATE';
+    }
+    $event->add_property(dtstart => [ $eventStart, $start_parameters ]);
+    my $eventEnd = $self->getIcalEnd;
+    my $end_parameters = {};
+    if (! $eventEnd =~ /T/) {
+        $end_parameters->{VALUE} = 'DATE';
+    }
+    $event->add_property(dtend => [ $eventEnd, $end_parameters ]);
+    $calendar->add_entry($event);
 }
 
 {
