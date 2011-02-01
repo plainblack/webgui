@@ -744,3 +744,50 @@ cmp_deeply(
     'getEventFieldsForImport contains correct items',
 );
 
+#----------------------------------------------------------------------------
+# www_importEvents
+my $mech = WebGUI::Test::Mechanize->new( config => WebGUI::Test->file );
+$mech->get_ok('/');
+$mech->session->user({ userId => 3 });
+
+$mech->get_ok( $ems->getUrl( 'func=importEvents' ), 'get form to import events' );
+$mech->set_fields( 
+    file_file => WebGUI::Test::collateral( "ems_events.csv" ),
+    ignore_first_line => 1,
+);
+# Remove the fields we don't have
+my @unticks = qw( assetId vendorId seatsAvailable price eventNumber location relatedBadgeGroups
+    relatedRibbons
+);
+for my $val ( @unticks ) {
+    $mech->untick( 'fieldsToImport', $val );
+}
+$mech->click_ok( "submit", "import files" );
+
+# Events exist
+my $events = $ems->getLineage( ['children'], {
+    includeOnlyClasses => ['WebGUI::Asset::Sku::EMSTicket'],
+    returnObjects => 1,
+} );
+is( scalar @$events, 2, '2 events added' );
+cmp_deeply(
+    [ map { $_->get } sort { $a->title cmp $b->title } @$events ],
+    [ superhashof( 
+            { 
+                title => "One",
+                description => "Oneness",
+                startDate => WebGUI::DateTime->new( $session, mysql => '2010-01-01 00:00:00', time_zone => DateTime::TimeZone::Local->TimeZone() )->toMysql,
+                duration => 2,
+            }
+        ),
+        superhashof(
+            {
+                title => 'Two',
+                description => 'Twoness',
+                startDate => WebGUI::DateTime->new( $session, mysql => '2010-02-02 00:00:00', time_zone => DateTime::TimeZone::Local->TimeZone() )->toMysql,
+                duration => 3,
+            }
+        ),
+    ],
+    'correct asset props are set'
+);

@@ -2013,18 +2013,18 @@ sub www_importEvents {
 	}
 
 	# create the form
-	my $f = WebGUI::HTMLForm->new( $self->session, action => $self->getUrl("func=importEventsSave"), enctype => 'multipart/form-data' );
+	my $f = WebGUI::FormBuilder->new( $self->session, action => $self->getUrl("func=importEventsSave"), enctype => 'multipart/form-data' );
 
-	$f->file(
-		-label     => $i18n->get('choose a file to import'),
-		-hoverHelp => $i18n->get('import hoverhelp file'),
-		-name      => 'file',
+	$f->addField( "file",
+		label     => $i18n->get('choose a file to import'),
+		hoverHelp => $i18n->get('import hoverhelp file'),
+		name      => 'file',
 	);
-	$f->yesNo(
-		-label   => $i18n->get('ignore first line'),
-		-name    => 'ignore_first_line',
-		-hoverHelp => $i18n->get('import hoverhelp first line'),
-		-defaultValue   => scalar $form->param('ignore_first_line'),
+	$f->addField( "yesNo",
+		label   => $i18n->get('ignore first line'),
+		name    => 'ignore_first_line',
+		hoverHelp => $i18n->get('import hoverhelp first line'),
+		defaultValue   => scalar $form->param('ignore_first_line'),
 	);
 
 	# create the std & meta fields part of the form
@@ -2034,7 +2034,7 @@ sub www_importEvents {
 		$importableFields{$field->{name}} = $field->{label};
 	}
 	my @defaultImportableFields = keys %importableFields;
-	$f->checkList(
+	$f->addField( "checkList",
 		vertical			=> 1,
 		showSelectAllButton	=> 1,
 		label				=> 'Fields',
@@ -2044,9 +2044,9 @@ sub www_importEvents {
 		value				=> scalar $form->get('fieldsToImport'),
 	);
 
-	$f->submit(-value=>$i18n->get('import events'));
+	$f->addField( "submit", name => "submit", value=>$i18n->get('import events'));
 
-	return $self->processStyle($page_header.'<p/>'.$f->print);
+	return $self->processStyle($page_header.'<p/>'.$f->toHtml);
 }
 
 
@@ -2127,7 +2127,7 @@ $|=1;
 				foreach my $field (@{$fields}) {
 					next unless $field->{name} ~~ @import;
             		$out->print("\tAdding field ".$field->{label}."\n",1);
-					my $type = $field->{type};
+					my $type = $field->{type} || "Text";
                     ##Force the use of Form::DateTime and MySQL Format
                     if ($field->{name} eq 'startDate') {
                         $type = 'dateTime';
