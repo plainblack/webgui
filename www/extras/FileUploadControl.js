@@ -4,6 +4,11 @@
 
 function FileUploadControl(fieldName, imageArray, removeLabel, fileLimit, size) {
 
+
+        // Remove the existing field
+        var replace = document.getElementById( fieldName );
+        replace.parentNode.removeChild( replace );
+
 	this.images = imageArray;
 	this.fileLimit = fileLimit;
 	this.fileCount = 1;

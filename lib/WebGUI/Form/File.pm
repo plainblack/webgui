@@ -293,7 +293,10 @@ sub toHtml {
 	my @files = @{ $storage->getFiles } if (defined $storage);
 	my $maxFiles = $self->get('maxAttachments') - scalar(@files);
 	if ($maxFiles > 0) {
-        $uploadControl = '<script type="text/javascript">'
+        # Add basic field, use JS to replace with better field
+        $uploadControl = 
+            '<input type="file" name="' . $self->get("name") . '_file" id="' . $self->get("name") . '_file" />'
+            . '<script type="text/javascript">'
             . sprintf(q!var uploader = new FileUploadControl("%s", fileIcons, "%s","%d", "%s"); uploader.addRow();!
                 , $self->get("name")."_file", $i18n->get("removeLabel"), $maxFiles, $self->get("size"))
             . '</script>'
