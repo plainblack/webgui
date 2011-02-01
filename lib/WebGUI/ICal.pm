@@ -28,7 +28,7 @@ This package wraps Data::ICal so the PRODUCT_ID parameter in the generated iCal 
 
 
 use WebGUI;
-use parent qw/Data::ICal/;
+use base 'Data::ICal';
 
 =head2 product_id 
 
