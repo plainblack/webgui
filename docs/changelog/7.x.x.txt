@@ -1,3 +1,5 @@
+7.9.22
+
 7.9.21
  - fixed #12029: issue with keywords
  - fixed #12023: International URLs of aattachments & files in folder
