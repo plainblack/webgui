@@ -1,4 +1,5 @@
 7.9.22
+ - fixed: Permission on who can create a shortcut of an Asset.
 
 7.9.21
  - fixed #12029: issue with keywords

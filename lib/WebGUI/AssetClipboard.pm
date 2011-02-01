@@ -395,8 +395,7 @@ sub www_copyList {
 sub www_createShortcut {
 	my $self    = shift;
     my $session = $self->session;
-    return $session->privilege->insufficient()
-        if !$session->user->isInGroup(12) || !$self->canView;
+    return $session->privilege->insufficient() if ! $self->canEdit;
 	my $isOnDashboard = $self->getParent->isa('WebGUI::Asset::Wobject::Dashboard');
 
 	my $shortcutParent = $isOnDashboard? $self->getParent : WebGUI::Asset->getImportNode($session);
