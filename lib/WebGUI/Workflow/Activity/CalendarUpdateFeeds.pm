@@ -23,6 +23,7 @@ use WebGUI::Asset::Event;
 use WebGUI::DateTime;
 use DateTime::TimeZone;
 use Data::Dumper;
+use Data::ICal;
 
 use LWP::UserAgent;
 use JSON ();
@@ -142,88 +143,52 @@ sub execute {
                     next FEED;
                 }
 
-                my $data    = $response->content;
-                # If doesn't start with BEGIN:VCALENDAR then error
-                unless ($data =~ /^BEGIN:VCALENDAR/i) {
+                my $data  = $response->content;
+                my $cal   = Data::ICal->new( data => $data );
+                if (!$cal) {
                     # Update the result and last updated fields
-                    $feed->{lastResult}  = "Not an iCalendar feed";
+                    $feed->{lastResult}  = "Error parsing iCal feed";
                     $feed->{lastUpdated} = $dt;
                     $calendar->setFeed($feed->{feedId}, $feed);
-                    next FEED;
+                    #next FEED;
                 }
-
-                my $active          = 0;    # Parser on/off
-                my %current_event   = ();
-                my %events;
-                my $line_number     = 0;
-                $data =~ s/[ \t]?[\r\n]+[ \t]+/ /msg; #Process line continuations
-                LINE: for my $line (split /[\r\n]+/,$data) {
-                    chomp $line;
-                    $line_number++;
-                    next unless $line =~ /\w/;
-
-                    #warn "LINE $line_number: $line\n";
-
-                    if ($line =~ /^BEGIN:VEVENT$/i) {
-                        $active = 1;
-                        next LINE;
-                    }
-                    elsif ($line =~ /^END:VEVENT$/i) {
-                        $active = 0;
-                        # Flush event
-                        my $uid = lc $current_event{uid}[1];
-                        delete $current_event{uid};
-                        $events{$uid} = {%current_event};
-                        $session->log->info( "Found event $uid from feed " . $feed->{feedId} );
-                        %current_event  = ();
-                        next LINE;
-                    }
-                    else {
-                        # Flush old entry
-                        # KEY;ATTRIBUTE=VALUE;ATTRIBUTE=VALUE:KEYVALUE
-                        my ($key_attrs,$value) = split /:/,$line,2;
-                        my @attrs   = $key_attrs ? (split /;/, $key_attrs) : ();
-                        my $key     = shift @attrs;
-                        my %attrs;
-                        while (my $attribute = shift @attrs) {
-                            my ($attr_key, $attr_value) = split /=/, $attribute, 2;
-                            $attrs{lc $attr_key} = $attr_value;
-                        }
-
-                        $current_event{lc $key} = [\%attrs,$value];
-                    }
-                }
-
                 my $feedData = $feedList->{$feed->{feedId}} = {
                     added   => 0,
                     updated => 0,
                     errored => 0,
                     assetId => $calendar->getId,
                 };
-         EVENT: for my $id (keys %events) {
+         EVENT: foreach my $entry (@{ $cal->entries }) {
+                    next EVENT unless $entry->ical_entry_type eq 'VEVENT';
                     #use Data::Dumper;
                     #warn "EVENT: $id; ".Dumper $events{$id};
+                    my $event_properties = $entry->properties;
 
                     # Prepare event data
                     my $properties  = {
-                        feedUid     => $id,
                         feedId      => $feed->{feedId},
-                        description => _unwrapIcalText($events{$id}->{description}->[1]),
-                        title       => _unwrapIcalText($events{$id}->{summary}->[1]),
-                        location    => _unwrapIcalText($events{$id}->{location}->[1]),
-                        menuTitle   => substr($events{$id}->{summary}->[1],0,15),
                         className   => 'WebGUI::Asset::Event',
                         isHidden    => 1,
                     };
+                    PROPERTY: foreach my $property (qw/uid description summary location/) {
+                        next property unless exists $event_properties->{$property};
+                        $properties->{$property} = $event_properties->{$property}->[0]->value;
+                    }
+                    ##Fixup
+                    $properties->{title}     = delete $properties->{summary};
+                    $properties->{feedUid}   = delete $properties->{uid};
 
                     # Prepare the date
-                    my $dtstart = $events{$id}->{dtstart}->[1];
+                    my $dtstart = $event_properties->{dtstart}->[0]->value;
                     if ($dtstart =~ /T/) {
                         my ($date, $time) = split /T/, $dtstart;
 
                         my ($year, $month, $day) = $date =~ /(\d{4})(\d{2})(\d{2})/;
                         my ($hour, $minute, $second) = $time =~ /(\d{2})(\d{2})(\d{2})/;
-                        my $tz = $events{$id}->{dtstart}->[0]->{tzid};
+                        my $tz = '';
+                        if ($event_properties->{dtstart}->[0]->properties->{tzid}) {
+                            $tz = $event_properties->{dtstart}->[0]->properties->{tzid};
+                        }
                         if (!$tz || !DateTime::TimeZone->is_valid_name($tz)) {
                             $tz = "UTC";
                         }
@@ -253,14 +218,14 @@ sub execute {
                         next EVENT;
                     }
 
-                    my $dtend       = $events{$id}->{dtend}->[1];
-                    my $duration    = $events{$id}->{duration}->[1];
+                    my $dtend     = exists $event_properties->{dtend}    ? $event_properties->{dtend}->[0]->value    : undef;
+                    my $duration  = exists $event_properties->{duration} ? $event_properties->{duration}->[0]->value : undef;
                     if ($dtend =~ /T/) {
                         my ($date, $time) = split /T/, $dtend;
 
                         my ($year, $month, $day) = $date =~ /(\d{4})(\d{2})(\d{2})/;
                         my ($hour, $minute, $second) = $time =~ /(\d{2})(\d{2})(\d{2})/;
-                        my $tz = $events{$id}->{dtend}->[0]->{tzid};
+                        my $tz = '';
                         if (!$tz || !DateTime::TimeZone->is_valid_name($tz)) {
                             $tz = "UTC";
                         }
@@ -330,28 +295,15 @@ sub execute {
                     }
 
                     # If there are X-WebGUI-* fields
-                    for my $key (grep /^x-webgui-/, keys %{$events{$id}}) {
-                        my $property_name   = $key;
-                        $property_name  =~ s/^x-webgui-//;
-                        $property_name  = lc $property_name;
-
-                        if ($property_name eq "groupidedit") {
-                            $properties->{groupIdEdit} = $events{$id}->{$key}->[1];
-                        }
-                        elsif ($property_name eq "groupidview") {
-                            $properties->{groupIdView} = $events{$id}->{$key}->[1];
-                        }
-                        elsif ($property_name eq "url") {
-                            $properties->{url}         = $events{$id}->{$key}->[1];
-                        }
-                        elsif ($property_name eq "menutitle") {
-                            $properties->{menuTitle}   = $events{$id}->{$key}->[1];
-                        }
+                    PROPERTY: foreach my $key (qw/groupIdEdit groupIdView url menuTitle timeZone/) {
+                        my $property_name   = 'x-webgui-'.lc $key;
+                        next PROPERTY unless exists $event_properties->{$property_name};
+                        $properties->{$key} = $event_properties->{$property_name}->[0]->value;
                     }
 
                     my $recur;
-                    if ($events{$id}->{rrule}) {
-                        $recur = _icalToRecur($session, $properties->{startDate}, $events{$id}->{rrule}->[1]);
+                    if (exists $event_properties->{rrule}) {
+                        $recur = _icalToRecur($session, $properties->{startDate}, $event_properties->{rrule}->[0]->value);
                     }
 
                     # save events for later
