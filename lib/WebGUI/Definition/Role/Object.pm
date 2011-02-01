@@ -150,13 +150,21 @@ The name of the property to return.
 
 sub getFormProperties {
     my $self     = shift;
+
+    # If called as a class method, get a session
+    # If called as an object method, session is set when first needed below
+    my $session;
+    if ( !ref $self ) {
+        $session = shift;
+    }
+
     my $property = $self->meta->find_attribute_by_name(@_);
     my $form     = $property->form;
     PROPERTY: while (my ($property_name, $property_value) = each %{ $form }) {
         next PROPERTY unless ref $property_value;
         if (($property_name eq 'label' || $property_name eq 'hoverHelp' || $property_name eq 'subtext') and ref $property_value eq 'ARRAY') {
             my ($label, $namespace, @arguments) = @{ $property_value };
-            my $text = WebGUI::International->new($self->session)->get($label, $namespace);
+            my $text = WebGUI::International->new($session ||= $self->session)->get($label, $namespace);
             if (@arguments) {
                 $text = sprintf $text, @arguments;
             }

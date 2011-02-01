@@ -143,6 +143,17 @@ my $session = WebGUI::Test->session;
         'getFormProperties handles i18n and subroutines'
     );
 
+    ::cmp_deeply(
+        __PACKAGE__->getFormProperties($object->session,'property1'),
+        {
+            label     => 'WebGUI',
+            hoverHelp => 'webgui help extra',
+            options   => { one => 1, two => 2, three => 3 },
+            named_url => 'property1',
+        },
+        'getFormProperties called as class method',
+    );
+
 }
 
 {
