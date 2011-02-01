@@ -50,7 +50,7 @@ my %tag = ( tagId   => $versionTag->getId, status => "pending" );
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 60;        # Increment this number for each test you create
+plan tests => 65;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 
@@ -730,4 +730,17 @@ cmp_deeply(
     'meta field contains correct data',
 );
 
+#----------------------------------------------------------------------------
+# getEventFieldsForImport
+use Data::Dumper;
+my $fields = $ems->getEventFieldsForImport;
+cmp_deeply(
+    $fields,
+    array_each( superhashof( {
+        type    => ignore(),
+        name    => ignore(),
+        label   => ignore(),
+    } ) ),
+    'getEventFieldsForImport contains correct items',
+);
 

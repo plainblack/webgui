@@ -394,20 +394,20 @@ sub getEventFieldsForImport {
 			required	=> 1,
 		});
 	my $count = 0;
-	foreach my $definition (@{WebGUI::Asset::Sku::EMSTicket->definition($self->session)}) {
-		$count++;
-		foreach my $field (keys %{$definition->{properties}}) {
-			next if ($count > 1 && ! $field ~~ [qw(title description)]);
-			next unless ($definition->{properties}{$field}{label} ne "");
-			push(@fields, {
-				name 	 		=> $field,
-				label 	  		=> $definition->{properties}{$field}{label},
-				required		=> ($field eq "eventNumber") ? 1 : 0,
-				type			=>  $definition->{properties}{$field}{fieldType},
-				options 		=> $definition->{properties}{$field}{options},
-				defaultValue	=> $definition->{properties}{$field}{defaultValue},
-				});
-		}
+        my $class = "WebGUI::Asset::Sku::EMSTicket";
+	foreach my $fieldName ( $class->getProperties ) {
+            next if $fieldName ~~ [qw( groupIdEdit groupIdView ownerUserId newWindow menuTitle
+                                    encryptPage isHidden url synopsis extraHeadTags
+                                    usePackedHeadTags isPackage isPrototype isExportable
+                                    inheritUrlFromParent displayTitle shipsSeparately sku )];
+            my $attr = $class->meta->find_attribute_by_name( $fieldName );
+            my $props = {
+                type => $attr->fieldType,
+                name => $fieldName,
+                %{ $class->getFormProperties( $self->session, $fieldName ) },
+            };
+            next unless $props->{label};
+            push @fields, $props;
 	}
 	foreach my $field (@{$self->getEventMetaFields}) {
 		push(@fields, {
