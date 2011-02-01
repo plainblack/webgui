@@ -19,37 +19,37 @@ use Moose;
 use WebGUI::FormBuilder;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Sku';
-define assetName           => ['ems ticket', 'Asset_EMSTicket'];
+define assetName           => ['ems ticket', 'Asset_EventManagementSystem'];
 define icon                => 'EMSTicket.gif';
 define tableName           => 'EMSTicket';
 property price => (
             tab             => "shop",
             fieldType       => "float",
             default         => 0.00,
-            label           => ["price", 'Asset_EMSTicket'],
-            hoverHelp       => ["price help", 'Asset_EMSTicket'],
+            label           => ["price", 'Asset_EventManagementSystem'],
+            hoverHelp       => ["price help", 'Asset_EventManagementSystem'],
          );
 property seatsAvailable => (
             tab             => "shop",
             fieldType       => "integer",
             default         => 25,
-            label           => ["seats available", 'Asset_EMSTicket'],
-            hoverHelp       => ["seats available help", 'Asset_EMSTicket'],
+            label           => ["seats available", 'Asset_EventManagementSystem'],
+            hoverHelp       => ["seats available help", 'Asset_EventManagementSystem'],
          );
 property eventNumber => (
             tab             => "properties",
             fieldType        => "integer",
             customDrawMethod=> 'drawEventNumberField',
-            label           => ["event number", 'Asset_EMSTicket'],
-            hoverHelp       => ["event number help", 'Asset_EMSTicket'],
+            label           => ["event number", 'Asset_EventManagementSystem'],
+            hoverHelp       => ["event number help", 'Asset_EventManagementSystem'],
          );
 property startDate => (
             noFormPost      => 1,
             fieldType       => "hidden",
             builder         => '_startDate_builder',
             lazy            => 1,
-            label           => ["add/edit event start date", 'Asset_EMSTicket'],
-            hoverHelp       => ["add/edit event start date help", 'Asset_EMSTicket'],
+            label           => ["add/edit event start date", 'Asset_EventManagementSystem'],
+            hoverHelp       => ["add/edit event start date help", 'Asset_EventManagementSystem'],
             autoGenerate    => 0,
          );
 sub _startDate_builder {
@@ -61,30 +61,30 @@ property duration => (
             tab             => "properties",
             fieldType       => "float",
             default         => 1.0,
-            subtext         => ['hours', 'Asset_EMSTicket'],
-            label           => ["duration", 'Asset_EMSTicket'],
-            hoverHelp       => ["duration help", 'Asset_EMSTicket'],
+            subtext         => ['hours', 'Asset_EventManagementSystem'],
+            label           => ["duration", 'Asset_EventManagementSystem'],
+            hoverHelp       => ["duration help", 'Asset_EventManagementSystem'],
          );
 property location => (
             fieldType        => "combo",
             tab             => "properties",
             customDrawMethod=> 'drawLocationField',
-            label           => ["location", 'Asset_EMSTicket'],
-            hoverHelp       => ["location help", 'Asset_EMSTicket'],
+            label           => ["location", 'Asset_EventManagementSystem'],
+            hoverHelp       => ["location help", 'Asset_EventManagementSystem'],
          );
 property relatedBadgeGroups => (
             tab             => "properties",
             fieldType        => "checkList",
             customDrawMethod=> 'drawRelatedBadgeGroupsField',
-            label           => ["related badge groups", 'Asset_EMSTicket'],
-            hoverHelp       => ["related badge groups ticket help", 'Asset_EMSTicket'],
+            label           => ["related badge groups", 'Asset_EventManagementSystem'],
+            hoverHelp       => ["related badge groups ticket help", 'Asset_EventManagementSystem'],
          );
 property relatedRibbons => (
             tab             => "properties",
             fieldType        => "checkList",
             customDrawMethod=> 'drawRelatedRibbonsField',
-            label           => ["related ribbons", 'Asset_EMSTicket'],
-            hoverHelp       => ["related ribbons help", 'Asset_EMSTicket'],
+            label           => ["related ribbons", 'Asset_EventManagementSystem'],
+            hoverHelp       => ["related ribbons help", 'Asset_EventManagementSystem'],
          );
 property eventMetaData => (
             noFormPost      => 1,
