@@ -117,7 +117,6 @@ sub renderBar {
     );
     $tt->process( \$template, \%vars, \my $content ) or die $tt->error;
 
-    my $console = WebGUI::AdminConsole->new( $session, $form->get('icon') );
     $style->setLink( $url->extras("Fork/ProgressBar.css"), { rel => 'stylesheet' } );
     $style->setScript( $url->extras("$_.js") )
         for ( (
@@ -134,7 +133,12 @@ sub renderBar {
         'Fork/poll',
         'Fork/redirect'
         );
-    return $console->render( $content, encode_entities( $form->get('title') ) );
+    ##If the user does not have admin mode turned on, then render the content in the user function style.
+    ##Otherwise, use the AdminConsole.
+    if ($session->var->isAdminOn) {
+        return WebGUI::AdminConsole->new($session, $form->get('icon'))->render($content, encode_entities( $form->get('title') ));
+    }
+    return $session->style->userStyle($content);
 } ## end sub renderBar
 
 1;
