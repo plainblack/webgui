@@ -50,7 +50,7 @@ my %tag = ( tagId   => $versionTag->getId, status => "pending" );
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 65;        # Increment this number for each test you create
+plan tests => 70;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 
@@ -791,3 +791,49 @@ cmp_deeply(
     ],
     'correct asset props are set'
 );
+
+
+#----------------------------------------------------------------------------
+# www_manageRegistrant
+my $mech = WebGUI::Test::Mechanize->new( config => WebGUI::Test->file );
+$mech->get_ok('/');
+$mech->session->user({ userId => 3 });
+
+# Need a badge
+my $badger = $ems->addChild({
+        className => 'WebGUI::Asset::Sku::EMSBadge',
+        title => 'Badgers',
+    });
+# Add cart and complete checkout
+my $regBadgeId 
+    = $session->db->setRow( 'EMSRegistrant', 'badgeId', {
+        badgeId => "new",
+        badgeAssetId => $badger->getId,
+        emsAssetId => $ems->getId,
+    } );
+
+$mech->get_ok( $ems->getUrl( 'func=manageRegistrant;badgeId=' . $regBadgeId ) );
+my %reg = (
+    userId      => '3',
+    name        => 'Homer S.',
+    address1    => '742 Evergreen Terr.',
+    city        => 'Springfield',
+    notes       => 'Will need assistance.',
+);
+$mech->submit_form_ok({
+        fields => { %reg },
+    }, 
+    "save our registrant's information" 
+);
+
+my $regInfo = $session->db->getRow( 'EMSRegistrant', 'badgeId', $regBadgeId );
+cmp_deeply( 
+    $regInfo,
+    superhashof( {
+        %reg, 
+        badgeAssetId => $badger->getId,
+        emsAssetId => $ems->getId,
+    } ),
+    "Registrant info saved correctly",
+);
+

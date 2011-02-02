@@ -2294,78 +2294,78 @@ sub www_manageRegistrant {
 	}
 	
 	# build form
-	my $f = WebGUI::HTMLForm->new($session, action=>$self->getUrl, tableExtras=>'class="manageRegistrant"');
-	$f->submit;
-	$f->hidden(name=>"func", value=>"editRegistrantSave");
-	$f->hidden(name=>'badgeId', value=>$badgeId);
-	$f->readOnly(
+	my $f = WebGUI::FormBuilder->new($session, action=>$self->getUrl, extras=>'class="manageRegistrant"');
+	$f->addField( "submit", name => "submit" );
+	$f->addField( "hidden",name=>"func", value=>"editRegistrantSave");
+	$f->addField( "hidden",name=>'badgeId', value=>$badgeId);
+	$f->addField( "readOnly",
 		label			=> $i18n->get('badge number'),
 		value			=> $registrant->{badgeNumber},
 	);
-	$f->user(
+	$f->addField( "user",
 		name			=> 'userId',
 		label			=> $i18n->get('user'),
 		defaultValue	=> $registrant->{userId},
 	);
-	$f->text(
+	$f->addField( "text",
 		name			=> 'name',
 		label			=> $i18n->get('name','Shop'),
 		defaultValue	=> $registrant->{name},
 		);
-	$f->text(
+	$f->addField( "text",
 		name			=> 'organization',
 		label			=> $i18n->get('organization'),
 		defaultValue	=> $registrant->{organization},
 		);
-	$f->text(
+	$f->addField( "text",
 		name			=> 'address1',
 		label			=> $i18n->get('address','Shop'),		
 		defaultValue	=> $registrant->{address1},
 		);
-	$f->text(
+	$f->addField( "text",
 		name			=> 'address2',
 		defaultValue	=> $registrant->{address2},
 		);
-	$f->text(
+	$f->addField( "text",
 		name			=> 'address3',
 		defaultValue	=> $registrant->{address3},
 		);
-	$f->text(
+	$f->addField( "text",
 		name			=> 'city',
 		label			=> $i18n->get('city','Shop'),		
 		defaultValue	=> $registrant->{city},
 		);
-	$f->text(
+	$f->addField( "text",
 		name			=> 'state',
 		label			=> $i18n->get('state','Shop'),		
 		defaultValue	=> $registrant->{state},
 		);
-	$f->zipcode(
+	$f->addField( "zipcode",
 		name			=> 'zipcode',
 		label			=> $i18n->get('code','Shop'),		
 		defaultValue	=> $registrant->{zipcode},
 		);
-	$f->country(
+	$f->addField( "country",
 		name			=> 'country',
 		label			=> $i18n->get('country','Shop'),		
 		defaultValue	=> $registrant->{country},
 		);
-	$f->phone(
+	$f->addField( "phone",
 		name			=> 'phoneNumber',
 		label			=> $i18n->get('phone number','Shop'),		
 		defaultValue	=> $registrant->{phoneNumber},
 		);
-	$f->email(
+	$f->addField( "email",
 		name			=> 'email',
 		label			=> $i18n->get('email address'),
 		defaultValue	=> $registrant->{email}
 		);
-	$f->textarea(
+	$f->addField( "textarea",
 		name			=> 'notes',
 		label			=> $i18n->get('notes'),
 		defaultValue	=> $registrant->{notes}
 		);
-	$f->submit;
+	$f->addField( "submit", name => "submit" );
 	
 	# build html
 	my $output = q|
@@ -2378,7 +2378,7 @@ sub www_manageRegistrant {
 		<div id="bd">
 			<div class="yui-gc">
 				<div class="yui-u first">
-				|.$f->print.q|
+				|.$f->toHtml.q|
 				</div>
 				<div class="yui-u">
 		|;
@@ -2445,11 +2445,6 @@ sub www_manageRegistrant {
 
 	# render
 	$session->style->setCss($session->url->extras('/yui/build/reset-fonts-grids/reset-fonts-grids.css'));
-	$session->style->setRawHeadTags(q|
-		<style type="text/css">
-		.manageRegistrant tbody tr td { padding: 2px;}
-		</style>
-		|);
 	return $self->processStyle($output);
 }
 
