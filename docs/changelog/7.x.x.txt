@@ -1,6 +1,7 @@
 7.9.22
  - fixed: Permission on who can create a shortcut of an Asset.
  - fixed: Underground label style forces radio buttons and check boxes to render vertically.
+ - fixed #11704: JavaScript::Packer, HTML::Packer, and CSS::Packer use $& variable
 
 7.9.21
  - fixed #12029: issue with keywords

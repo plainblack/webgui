@@ -9,8 +9,13 @@ save you many hours of grief.
 
 7.9.21
 --------------------------------------------------------------------
-     * WebGUI now depends on Data::ICal for making and reading iCal feeds
+    * WebGUI now depends on Data::ICal for making and reading iCal feeds
        for the Calendar.
+
+    * WebGUI now depends on updated versions of the HTML::Packer, JavaScript::Packer and
+      CSS::Packer modules.  These new versions have much better performance than their
+      earlier incarnations.  However, it is safe to skip updating these modules.
+
 
 7.9.17
 --------------------------------------------------------------------
