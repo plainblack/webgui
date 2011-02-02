@@ -12,6 +12,10 @@ save you many hours of grief.
     * WebGUI now depends on Data::ICal for making and reading iCal feeds
       for the Calendar.
 
+    * WebGUI now depends on updated versions of the HTML::Packer, JavaScript::Packer and
+      CSS::Packer modules.  These new versions have much better performance than their
+      earlier incarnations.
+
 7.10.4
 --------------------------------------------------------------------
     * WebGUI now depends on Monkey::Patch for doing sanely scoped
