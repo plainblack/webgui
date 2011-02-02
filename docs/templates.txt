@@ -1,6 +1,11 @@
 This is a running list of template changes made during upgrades.  If you have copied the default
 templates, you will need to apply these changes manually to your copies.
 
+7.10.9
+
+  * Underground style template CSS - style-underground/css/underground-webgui-css
+    Make labels render inline.
+
 7.10.8
 
   * Friend Manager view template - root/import/account/friendmanager/view
