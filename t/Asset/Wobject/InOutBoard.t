@@ -16,8 +16,9 @@ use Test::MockObject::Extends;
 
 use WebGUI::Test;
 use WebGUI::Test::MockAsset;
+use WebGUI::Test::Mechanize;
 use WebGUI::Session;
-use Test::More tests => 9; # increment this value for each test you create
+use Test::More tests => 15; # increment this value for each test you create
 use Test::Deep;
 use Data::Dumper;
 
@@ -44,16 +45,9 @@ foreach my $name (@names) {
 }
 WebGUI::Test->addToCleanup(@users);
 
-# Do our work in the import node
-my $node = WebGUI::Asset->getImportNode($session);
-
-my $versionTag = WebGUI::VersionTag->getWorking($session);
-$versionTag->set({name=>"InOutBoard Test"});
-WebGUI::Test->addToCleanup($versionTag);
-my $board = $node->addChild({
+my $board = WebGUI::Test->asset(
     className       => 'WebGUI::Asset::Wobject::InOutBoard',
-    inOutTemplateId => $templateId,
-});
+);
 
 $board->prepareView();
 
@@ -66,13 +60,17 @@ isa_ok($board, 'WebGUI::Asset::Wobject::InOutBoard');
 #
 ################################################################
 
-$session->request->setup_body({
-    delegate => $users[0]->userId,
-    status   => 'In',
-    message  => 'work time',
-});
-$session->scratch->set('userId', $users[0]->userId);
-$board->www_setStatus;
+my $mech = WebGUI::Test::Mechanize->new( config => WebGUI::Test->file );
+$mech->get_ok( '/' );
+$mech->session->user({ user => $users[0] });
+
+$mech->get_ok( $board->getUrl );
+$mech->submit_form_ok({
+    fields   => {
+        status   => 'In',
+        message  => 'work time',
+    },
+}, "update status" );
 my $status;
 $status = $session->db->quickHashRef('select * from InOutBoard_status where assetId=? and userId=?',[$board->getId, $users[0]->userId]);
 cmp_deeply(
@@ -96,18 +94,22 @@ cmp_deeply(
         status  => 'In',
         message => 'work time',
         dateStamp => re('^\d+$'),
-        createdBy => 1,
+        createdBy => $users[0]->getId, 
     },
     '... set statusLog for a user'
 );
 
-$session->scratch->set('userId', $users[1]->userId);
-$session->request->setup_body({
-    delegate => $users[1]->userId,
-    status   => undef,
-    message  => 'work time',
+my $mech = WebGUI::Test::Mechanize->new( config => WebGUI::Test->file );
+$mech->get_ok( '/' );
+$mech->session->user({ user => $users[1] });
+
+$mech->get_ok( $board->getUrl );
+$mech->submit_form_ok({
+    fields   => {
+        status   => undef,
+        message  => 'work time',
+    },
 });
-$board->www_setStatus;
 $status = $session->db->quickHashRef('select * from InOutBoard_status where assetId=? and userId=?',[$board->getId, $users[1]->userId]);
 cmp_deeply(
     $status,
@@ -121,10 +123,6 @@ cmp_deeply(
     { },
     '... no statusLog set when status is blank'
 );
-
-
-$session->request->setup_body({ });
-$session->scratch->delete('userId');
 
 ################################################################
 #
@@ -140,6 +138,8 @@ is_deeply [$board->getStatusList], [qw(In Out Home Lunch)], 'getStatusList';
 #
 ################################################################
 
+$board->update({ inOutTemplateId => $templateId });
+$board->prepareView;
 $board->view;
 cmp_bag(
     $templateVars->{rows_loop},

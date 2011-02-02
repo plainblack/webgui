@@ -2,7 +2,7 @@ package WebGUI::Asset::Wobject::InOutBoard;
 
 
 use strict;
-use WebGUI::HTMLForm;
+use WebGUI::FormBuilder;
 use WebGUI::International;
 use WebGUI::Paginator;
 use WebGUI::SQL;
@@ -207,7 +207,7 @@ sub view {
         [ $self->getId, $session->user->userId ]
     );
 
-	my $f = WebGUI::HTMLForm->new($session,-action=>$self->getUrl);
+	my $f = WebGUI::FormBuilder->new($session,-action=>$self->getUrl);
 	if (@users) {
         my %names = (
             $self->_fetchNames(@users),
@@ -220,7 +220,7 @@ sub view {
             keys %names
             ;
 
-		$f->selectBox(
+		$f->addField( "selectBox",
 			-name=>"delegate",
 			-options=>\@options,
 			-value=>[ $session->scratch->get("userId") ],
@@ -229,23 +229,23 @@ sub view {
 			-extras=>q|onchange="this.form.submit();"|,
 		);
 	}
-	$f->radioList(
+	$f->addField( "radioList",
 		-name=>"status",
 		-value=>$status,
 		-options=>\%statusOptions,
 		-label=>$i18n->get(5),
 		-hoverHelp=>$i18n->get('5 description'),
 		);
-	$f->text(
+	$f->addField( "text",
 		-name=>"message",
 		-label=>$i18n->get(6),
 		-hoverHelp=>$i18n->get('6 description'),
 		);
-	$f->hidden(
+	$f->addField( "hidden",
 		-name=>"func",
 		-value=>"setStatus"
 		);
-	$f->submit;
+	$f->addField( "submit", name => "submit" );
 	
 	my ($isInGroup) = $session->db->quickArray(
         "select count(*) from groupings where userId=? and groupId=?",
@@ -253,7 +253,7 @@ sub view {
     );
 	if ($isInGroup) {
 	    $var{displayForm} = 1;
-	    $var{'form'} = $f->print;
+	    $var{'form'} = $f->toHtml;
 	    $var{'selectDelegatesURL'} = $self->getUrl("func=selectDelegates");
 	    $var{'selectDelegatesLabel'} = $i18n->get('select delegates label');
 	}
