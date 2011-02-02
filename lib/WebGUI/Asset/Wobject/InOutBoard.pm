@@ -448,26 +448,26 @@ sub www_viewReport {
 	return "" unless ($self->session->user->isInGroup($self->reportViewerGroup));
 	my %var;
 	my $i18n = WebGUI::International->new($self->session,'Asset_InOutBoard');
-	my $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl, -method=>"GET");
+	my $f = WebGUI::FormBuilder->new($self->session, action=>$self->getUrl, method=>"GET");
 	my %changedBy = ();
-	$f->hidden(
+	$f->addField( "hidden",
 		-name=>"func",
 		-value=>"viewReport"
 		);
-	$f->hidden(
+	$f->addField( "hidden",
 		-name=>"doit",
 		-value=>"1"
 		);
 	my $startDate = $self->session->datetime->addToDate(time(),0,0,-15);
 	$startDate = $self->session->form->date("startDate") if ($self->session->form->process("doit")); 
-	$f->date(
+	$f->addField( "date",
 		-name=>"startDate",
 		-label=>$i18n->get(16),
 		-hoverHelp=>$i18n->get('16 description'),
 		-value=>$startDate
 		);
 	my $endDate = $self->session->form->date("endDate");
-	$f->date(
+	$f->addField( "date",
 		-name=>"endDate",
 		-label=>$i18n->get(17),
 		-hoverHelp=>$i18n->get('17 description'),
@@ -485,7 +485,7 @@ sub www_viewReport {
                             : $defaultDepartment eq ''
                             ? 'and userProfileData.department IS NULL'
                             : 'and userProfileData.department='.$self->session->db->quote($defaultDepartment);
-	$f->selectBox(
+	$f->addField( "selectBox",
 		-name=>"selectDepartment",
 		-options=>\%depHash,
 		-value=>[ $defaultDepartment ],
@@ -496,16 +496,16 @@ sub www_viewReport {
 	tie %paginHash, "Tie::IxHash"; ##Because default sort order is alpha
 	%paginHash = (50 => 50, 100 => 100, 300 => 300, 500 => 500, 1000 => 1000, 10_000 => 10_000,);
 	my $pageReportAfter = $self->session->form->process("reportPagination") || 50;
-	$f->selectBox(
+	$f->addField( "selectBox",
 		-name=>"reportPagination",
 		-options=>\%paginHash,
 		-value=>[ $pageReportAfter ],
 		-label=>$i18n->get(14),
 		-hoverHelp=>$i18n->get('14 description'),
 	);
-	$f->submit(-value=>$i18n->get('search','Asset'));
+	$f->addField( "submit", value=>$i18n->get('search','Asset'));
 	$var{'reportTitleLabel'} = $i18n->get('report title');
-	$var{'form'}             = $f->print;
+	$var{'form'}             = $f->toHtml;
 	my $url = $self->getUrl("func=viewReport;selectDepartment=".$defaultDepartment.";reportPagination=".$pageReportAfter.";startDate=".$self->session->form->process("startDate").";endDate=".$endDate.";doit=1");
 	if ($self->session->form->process("doit")) {
 	  $var{showReport} = 1;

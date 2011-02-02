@@ -18,7 +18,7 @@ use WebGUI::Test;
 use WebGUI::Test::MockAsset;
 use WebGUI::Test::Mechanize;
 use WebGUI::Session;
-use Test::More tests => 19; # increment this value for each test you create
+use Test::More tests => 27; # increment this value for each test you create
 use Test::Deep;
 use Data::Dumper;
 
@@ -199,3 +199,42 @@ my $hasDelegate = $session->db->quickScalar(
     );
 ok( $hasDelegate, "delegate saved in db" );
 
+#----------------------------------------------------------------------------
+# selectDelegates
+
+my $mech = WebGUI::Test::Mechanize->new( config => WebGUI::Test->file );
+$mech->get_ok( '/' );
+$mech->session->user({ userId => '3' });
+
+# Add some input to report on
+$session->db->write(
+    "insert into InOutBoard_statusLog (assetId,userId,createdBy,status,dateStamp,message) values (?,?,?,?,?,?)",
+    [$board->getId, $users[0]->getId, '3', "in", time, "No sleep till Brooklyn!" ], 
+);
+$session->db->write(
+    "insert into InOutBoard_statusLog (assetId,userId,createdBy,status,dateStamp,message) values (?,?,?,?,?,?)",
+    [$board->getId, $users[1]->getId, '3', "out", time+1000, "Sleeping till Brooklyn!" ], 
+);
+
+$mech->get_ok( $board->getUrl( 'func=viewReport' ) );
+$mech->submit_form_ok( {
+        fields => {
+        },
+    }, "configure the report",
+);
+
+# Report was ok!
+$mech->content_contains( "No sleep till Brooklyn!" );
+$mech->content_contains( "Sleeping till Brooklyn!" );
+
+$mech->submit_form_ok( {
+        fields => {
+            startDate => time + 100,
+            endDate => time + 2000,
+        },
+    }, "configure the report again",
+);
+
+# Report was ok!
+$mech->content_lacks( "No sleep till Brooklyn!" );
+$mech->content_contains( "Sleeping till Brooklyn!" );
