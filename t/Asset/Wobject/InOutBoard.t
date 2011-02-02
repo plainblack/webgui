@@ -18,7 +18,7 @@ use WebGUI::Test;
 use WebGUI::Test::MockAsset;
 use WebGUI::Test::Mechanize;
 use WebGUI::Session;
-use Test::More tests => 15; # increment this value for each test you create
+use Test::More tests => 19; # increment this value for each test you create
 use Test::Deep;
 use Data::Dumper;
 
@@ -172,3 +172,30 @@ $count = $session->db->quickScalar('select count(*) from InOutBoard_status where
 is ($count, 0, 'purge: cleans up status table');
 $count = $session->db->quickScalar('select count(*) from InOutBoard_statusLog where assetId=?',[$boardId]);
 is ($count, 0, '... cleans up statusLog table');
+
+
+#----------------------------------------------------------------------------
+# selectDelegates
+$board = WebGUI::Test->asset(
+    className       => 'WebGUI::Asset::Wobject::InOutBoard',
+    inOutGroup => '7', # everyone
+);
+
+my $mech = WebGUI::Test::Mechanize->new( config => WebGUI::Test->file );
+$mech->get_ok( '/' );
+$mech->session->user({ user => $users[0] });
+
+$mech->get_ok( $board->getUrl( 'func=selectDelegates' ) );
+$mech->submit_form_ok({
+    fields => {
+        delegates => $users[1]->getId,
+    },
+}, "add a delegate" );
+
+my $hasDelegate = $session->db->quickScalar(
+        "SELECT COUNT(*) FROM InOutBoard_delegates WHERE userId=? AND
+        delegateUserId=? AND assetId=?",
+        [ $users[0]->getId, $users[1]->getId, $board->getId ],
+    );
+ok( $hasDelegate, "delegate saved in db" );
+

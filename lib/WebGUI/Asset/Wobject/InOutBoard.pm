@@ -352,26 +352,24 @@ sub www_selectDelegates {
 	                $self->session->db->quote($self->session->user->userId), $self->session->db->quote($self->getId);
 	my $delegates = $self->session->db->buildArrayRef($sql);
 	my $i18n = WebGUI::International->new($self->session,"Asset_InOutBoard");
-        my $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
-        $f->hidden(
-	    -name => "func",
-	    -value => "selectDelegatesEditSave"
+        my $f = WebGUI::FormBuilder->new($self->session,action=>$self->getUrl);
+        $f->addField( "hidden",
+	    name => "func",
+	    value => "selectDelegatesEditSave"
 	);
-        $f->selectList(
-	    -name => "delegates",
-	    -label => $i18n->get('in/out status delegates'),
-	    -hoverHelp => $i18n->get('in/out status delegates description','Asset_InOutBoard'),
-	    -options => \%userNames,
-	    -multiple => 1,        ##Multiple select
-	    -size => 10,        ##Multiple select
-	    -sortByValue => 1,
-	    -value => $delegates,  ##My current delegates, if any
-	    -subtext => $i18n->get('in/out status delegates subtext'),
+        $f->addField( "selectList",
+	    name => "delegates",
+	    label => $i18n->get('in/out status delegates'),
+	    hoverHelp => $i18n->get('in/out status delegates description','Asset_InOutBoard'),
+	    options => \%userNames,
+	    multiple => 1,        ##Multiple select
+	    size => 10,        ##Multiple select
+	    sortByValue => 1,
+	    value => $delegates,  ##My current delegates, if any
+	    subtext => $i18n->get('in/out status delegates subtext'),
 	);
-	$f->submit;
-	my $ac = $self->getAdminConsole;
-	return $ac->render($f->print,
-	                   $i18n->get('select delegate'));
+	$f->addField( "submit", name => "submit" );
+	return '<h1>' .  $i18n->get('select delegate') . '</h1> ' . $f->toHtml;
 }
 
 #-------------------------------------------------------------------
