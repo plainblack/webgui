@@ -1127,83 +1127,78 @@ sub www_editProject {
    my $addEditText = ($projectId eq "new")?$i18n->get("create project"):$i18n->get("edit project");
    
    #Build Form
-   my $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl, -extras=>q|onsubmit="return checkform(this);"|);
-   $f->hidden( 
-			    -name=>"func",
-				-value=>"editProjectSave" 
+   my $f = WebGUI::FormBuilder->new($self->session,
+        action=>$self->getUrl,
+        extras=>q|onsubmit="return checkform(this);"|
+    );
+   $f->addField( "hidden",
+			    name=>"func",
+				value=>"editProjectSave" 
    );
-   $f->hidden( 
-               -name=>"projectId", 
-               -value=>$projectId 
+   $f->addField( "hidden", 
+               name=>"projectId", 
+               value=>$projectId 
    );
-   $f->readOnly(
-		-label=>$i18n->get("project id"),
-		-hoverHelp => $i18n->get('project name hoverhelp'),
-		-value=>$projectId
+   $f->addField( "readOnly",
+		label=>$i18n->get("project id"),
+		hoverHelp => $i18n->get('project name hoverhelp'),
+		value=>$projectId
    );
-   $f->text(
-		   -name  => "name",
-		   -value => $form->get("name") || $project->{name},
-		   -hoverHelp => $i18n->get('project name hoverhelp'),
-		   -label => $i18n->get('project name label')
+   $f->addField( "text",
+		   name  => "name",
+		   value => $form->get("name") || $project->{name},
+		   hoverHelp => $i18n->get('project name hoverhelp'),
+		   label => $i18n->get('project name label')
    );
-   $f->HTMLArea(
-		-name  => "description",
-		-value => $form->get("description") || $project->{description},
-		-hoverHelp => $i18n->get('project description hoverhelp'),
-		-label => $i18n->get('project description label')
+   $f->addField( "HTMLArea",
+		name  => "description",
+		value => $form->get("description") || $project->{description},
+		hoverHelp => $i18n->get('project description hoverhelp'),
+		label => $i18n->get('project description label')
    );
-   $f->group(
-         -name=> "projectManager",
-		 -value=> $form->get("projectManager") || $project->{projectManager} || $self->groupToAdd,
-		 -hoverHelp=> $i18n->get('project manager hoverhelp'),
-		 -label => $i18n->get('project manager label')
+   $f->addField( "group",
+         name=> "projectManager",
+		 value=> $form->get("projectManager") || $project->{projectManager} || $self->groupToAdd,
+		 hoverHelp=> $i18n->get('project manager hoverhelp'),
+		 label => $i18n->get('project manager label')
    );
-   $f->group(
-         -name=> "projectObserver",
-		 -value=> $form->get("projectObserver") || $project->{projectObserver} || '7',
-		 -hoverHelp=> $i18n->get('project observer hoverhelp'),
-		 -label => $i18n->get('project observer label')
+   $f->addField( "group",
+         name=> "projectObserver",
+		 value=> $form->get("projectObserver") || $project->{projectObserver} || '7',
+		 hoverHelp=> $i18n->get('project observer hoverhelp'),
+		 label => $i18n->get('project observer label')
    );
    
    my $dunitValue = $form->get("durationUnits") || $project->{durationUnits} || "hours";
-   $f->selectBox(
-          -name=>"durationUnits",
-		  -value=> $dunitValue,
-		  -options=>$self->_getDurationUnitHash,
-		  -hoverHelp => $i18n->get('duration units hoverhelp'),
-		  -label => $i18n->get('duration units label'),
-		  -extras=> q|onchange="if(this.value == 'hours'){ document.getElementById('hoursper').style.display='' } else { document.getElementById('hoursper').style.display='none' }"|
+   $f->addField( "selectBox",
+          name=>"durationUnits",
+		  value=> $dunitValue,
+		  options=>$self->_getDurationUnitHash,
+		  hoverHelp => $i18n->get('duration units hoverhelp'),
+		  label => $i18n->get('duration units label'),
+		  extras=> q|onchange="if(this.value == 'hours'){ document.getElementById('hoursper').style.display='' } else { document.getElementById('hoursper').style.display='none' }"|
    );
    
   
    
-   my $hpdLabel = $i18n->get('hours per day label');
-   my $hpdHoverHelp = $i18n->get('hours per day hoverhelp');
-   my $hpdValue = $form->get("hoursPerDay") || $project->{hoursPerDay} || "8.0";
-   my $hpdStyle = ($dunitValue eq "days"?"display:none":"");
    
-   my $html = qq|
-   <tr id="hoursper" style="$hpdStyle">
-      <td class="formDescription" valign="top" style="width: 180px;">
-	     <div class="wg-hoverhelp">$hpdHoverHelp</div>
-         <label for="hoursPerDay_formId">$hpdLabel</label>
-	  </td>
-	  <td valign="top" class="tableData"  style="width: *;">
-	     <input id="hoursPerDay_formId" type="text" name="hoursPerDay" value="$hpdValue" size="11" maxlength="14" />
-	  </td>
-   </tr>|;
-   $f->raw($html);		
-   
-   $f->float (
-           -name=>"targetBudget",
-		   -value=> $form->get("targetBudget") || $project->{targetBudget} || "0.00",
-		   -hoverHelp => $i18n->get('target budget hoverhelp'),
-		   -label=> $i18n->get('target budget label')
+   $f->addField( "text",
+        name => 'hoursPerDay',
+        label => $i18n->get('hours per day label'),
+        hoverHelp => $i18n->get('hours per day hoverhelp'),
+        value => $form->get("hoursPerDay") || $project->{hoursPerDay} || "8.0",
+        extras => ($dunitValue eq "days"? q{ style="display:none"} :""),
+    );
+
+   $f->addField( "float",
+           name=>"targetBudget",
+		   value=> $form->get("targetBudget") || $project->{targetBudget} || "0.00",
+		   hoverHelp => $i18n->get('target budget hoverhelp'),
+		   label=> $i18n->get('target budget label')
    );
-   $f->submit( 
-           -extras=>"name='subbutton'",
-		   -value=>$addEditText
+   $f->addField( "submit", 
+           extras=>"name='subbutton'",
+		   value=>$addEditText
    );
    
    my $jscript = qq|
@@ -1221,8 +1216,8 @@ sub www_editProject {
    
    my $errors = $self->processErrors($_[0]);
    
-   my $output = $jscript."\n".$errors.$f->print;
-   return $self->getAdminConsole->render($output,$addEditText);
+   my $output = $jscript."\n".$errors.$f->toHtml;
+   return '<h1>' . $addEditText . '</h1>' . $output;
 }
 
 #-------------------------------------------------------------------
