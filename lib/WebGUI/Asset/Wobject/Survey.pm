@@ -694,22 +694,20 @@ sub www_graph {
 
     my $i18n = WebGUI::International->new($session, "Asset_Survey");
     
-    my $ac   = $self->getAdminConsole;
-    
     eval { require GraphViz };
     if ($@) {
-        return $ac->render('Survey Visualization requires the GraphViz module', $i18n->get('survey visualization'));
+        return '<h1>' . $i18n->get('survey visualization') . '</h1>Survey Visualization requires the GraphViz module';
     }
     
     my $format = $self->session->form->param('format');
     my $layout = $self->session->form->param('layout');
     
-    my $f = WebGUI::HTMLForm->new($session);
-    $f->hidden(
+    my $f = WebGUI::FormBuilder->new($session, action => $self->getUrl);
+    $f->addField( "hidden",
         name=>'func',
         value=>'graph'
     );
-    $f->selectBox(
+    $f->addField( "selectBox",
         name      => 'format',
         label     => $i18n->get('visualization format'),
         hoverHelp => $i18n->get('visualization format help'),
@@ -717,7 +715,7 @@ sub www_graph {
         defaultValue => [$format],
         sortByValue => 1,
     );
-    $f->selectBox(
+    $f->addField( "selectBox",
         name      => 'layout',
         label     => $i18n->get('visualization layout algorithm'),
         hoverHelp => $i18n->get('visualization layout algorithm help'),
@@ -725,7 +723,7 @@ sub www_graph {
         defaultValue => [$layout],
         sortByValue => 1,
     );
-    $f->submit(
+    $f->addField( "submit",
         defaultValue => $i18n->get('generate'),
     );
     
@@ -735,7 +733,7 @@ sub www_graph {
             $output .= "<p>" . $i18n->get('visualization success') . qq{ <a href="$url">survey.$format</a></p>};
         }
     }
-    return $ac->render($f->print . $output, $i18n->get('survey visualization'));
+    return '<h1>' . $i18n->get('survey visualization') . '</h1>' . $f->toHtml . $output;
 }
 
 =head2 hasResponses

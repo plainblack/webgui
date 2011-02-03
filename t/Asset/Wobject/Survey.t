@@ -8,6 +8,7 @@ use Test::More;
 use Test::Deep;
 use Data::Dumper;
 use WebGUI::Test;    # Must use this before any other WebGUI modules
+use WebGUI::Test::Mechanize;
 use WebGUI::Session;
 
 #----------------------------------------------------------------------------
@@ -16,7 +17,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-plan tests => 47;
+plan tests => 51;
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -260,6 +261,21 @@ like($storage->getFileContentsAsScalar($filename), qr{
     (edge .*){3}    # ..then 3 edges
     stop$            # ..and end with stop
 }xs, 'Generated graph looks roughly okay');
+
+my $mech = WebGUI::Test::Mechanize->new( config => WebGUI::Test->file );
+$mech->get_ok( '/' );
+$mech->session->user({ userId => 3 });
+$mech->get_ok( $survey->getUrl( 'func=graph' ) );
+$mech->submit_form_ok({ 
+        fields => {
+            format => "plain",
+            layout => "dot",
+        },
+    }, 
+    "generate a graph",
+);
+# Can only test for the uploads, mech doesn't have uploads handler
+$mech->content_contains( 'uploads/temp', 'uploads link exists' );
 
 }
 
