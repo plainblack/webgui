@@ -399,7 +399,6 @@ sub exportBranch {
             $cs->output->setHandle($handle);
             my $guard = guard {
                 close $handle;
-                $cs->var->end;
                 $cs->close();
                 $asset->$report('collateral notes', $output) if $output;
             };
