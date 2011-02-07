@@ -5,6 +5,7 @@
  - fixed #12033: scratch variable problems during export
  - fixed: Underground label style forces radio buttons and check boxes to render vertically.
  - fixed #11704: JavaScript::Packer, HTML::Packer, and CSS::Packer use $& variable
+ - fixed #12038: Incorrect caching of groups with 0 second cache setting (Dale Trexel)
 
 7.10.8
  - rfe #12016 for the top story as well

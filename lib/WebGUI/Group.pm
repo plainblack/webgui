@@ -259,7 +259,9 @@ sub cacheGroupings {
         $groupMembers->{$userId} = { isMember => $isInGroup };
     }
 
-    $cache->set($groupMembers, $self->groupCacheTimeout);
+    if ($self->groupCacheTimeout()) {
+        $cache->set($groupMembers, $self->groupCacheTimeout);
+    }
 }
 
 #-------------------------------------------------------------------
@@ -630,7 +632,9 @@ sub getAllUsers {
 	}
 	my %users = map { $_ => 1 } @users;
 	@users = keys %users;
-	$cache->set(\@users, $self->groupCacheTimeout);
+    if ($self->groupCacheTimeout()) {
+        $cache->set(\@users, $self->groupCacheTimeout);
+    }
 	return \@users;
 }
 
