@@ -2,6 +2,7 @@
  - fixed: Permission on who can create a shortcut of an Asset.
  - fixed: Underground label style forces radio buttons and check boxes to render vertically.
  - fixed #11704: JavaScript::Packer, HTML::Packer, and CSS::Packer use $& variable
+ - fixed #12038: Incorrect caching of groups with 0 second cache setting (Dale Trexel)
 
 7.9.21
  - fixed #12029: issue with keywords
