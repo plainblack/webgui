@@ -1,3 +1,5 @@
+7.10.10
+
 7.10.9
  - fixed #12030: Calendar Feed Time Zone Issue
  - fixed: Permission on who can create a shortcut of an Asset.
