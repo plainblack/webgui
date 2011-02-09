@@ -84,7 +84,7 @@ WebGUI::Test->addToCleanup($storage1, $storage2);
 #
 ############################################################
 
-my $tests = 45;
+my $tests = 46;
 plan tests => 1
             + $tests
             + $canEditMaker->plan
@@ -443,6 +443,27 @@ cmp_bag(
     ],
     '...asset package data has the storage locations in it'
 );
+
+############################################################
+#
+# keyword variables in export mode
+#
+############################################################
+
+$session->scratch->set('isExporting', 1);
+
+my $keyword_loop = $story->viewTemplateVariables->{keyword_loop};
+cmp_bag(
+    $keyword_loop,
+    [
+        { keyword => "foxtrot", url => '../keyword_foxtrot.html', },
+        { keyword => "tango",   url => '../keyword_tango.html', },
+        { keyword => "whiskey", url => '../keyword_whiskey.html', },
+    ],
+    'viewTemplateVariables: keywords_loop is okay'
+) or diag Dumper( $keyword_loop );
+$session->scratch->delete('isExporting');
+
 
 }
 #vim:ft=perl
