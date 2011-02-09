@@ -31,6 +31,7 @@ our $HELP = {
             { name      => 'form_phone', },
             { name      => 'form_fax', },
             { name      => 'form_email', },
+            { name      => 'user defined variables', },
         ],
         related => []
     },
@@ -60,6 +61,11 @@ our $HELP = {
             { name      => 'phone', },
             { name      => 'fax', },
             { name      => 'email', },
+            { name      => 'userDefined1', },
+            { name      => 'userDefined2', },
+            { name      => 'userDefined3', },
+            { name      => 'userDefined4', },
+            { name      => 'userDefined5', },
         ],
         related => []
     },

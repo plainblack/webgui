@@ -4,6 +4,7 @@
  - fixed #11704: JavaScript::Packer, HTML::Packer, and CSS::Packer use $& variable
  - fixed #12038: Incorrect caching of groups with 0 second cache setting (Dale Trexel)
  - fixed #12035: Story Manager - make keywords from Story view work
+ - fixed #12042: userDefined variables have no template variable help
 
 7.9.21
  - fixed #12029: issue with keywords

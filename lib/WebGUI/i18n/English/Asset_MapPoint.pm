@@ -344,6 +344,42 @@ our $I18N = {
         context     => "template variable help",
     },
 
+    'userDefined1' => {
+        message     => "The value of userDefined field 1.",
+        lastUpdated => 0,
+        context     => "template variable help",
+    },
+
+    'userDefined2' => {
+        message     => "The value of userDefined field 2.",
+        lastUpdated => 0,
+        context     => "template variable help",
+    },
+
+    'userDefined3' => {
+        message     => "The value of userDefined field 3.",
+        lastUpdated => 0,
+        context     => "template variable help",
+    },
+
+    'userDefined4' => {
+        message     => "The value of userDefined field 4.",
+        lastUpdated => 0,
+        context     => "template variable help",
+    },
+
+    'userDefined5' => {
+        message     => "The value of userDefined field 5.",
+        lastUpdated => 0,
+        context     => "template variable help",
+    },
+
+    'user defined variables' => {
+        message     => "Unlike the Collaboration System, the Map Point does not provide predefined form fields for the userdefined variables.  Instead, create any kind of form field that you need and give the field the name of the userDefined variable that you want to use.  WebGUI will handle saving it.",
+        lastUpdated => 0,
+        context     => "template variable help",
+    },
+
 };
 
 1;
