@@ -884,13 +884,23 @@ sub viewTemplateVariables {
         }
     }
 
-    my $key = WebGUI::Keyword->new($session);
-    my $keywords = $key->getKeywordsForAsset( { asArrayRef => 1, asset => $self  });
+    my $isExporting  = $session->scratch->get('isExporting');
+    my $key        = WebGUI::Keyword->new($session);
+    my $keywords   = $key->getKeywordsForAsset( { asArrayRef => 1, asset => $self  });
     $var->{keyword_loop} = [];
+    my $parent     = $self->getParent;
+    my $upwards    = $parent->isa('WebGUI::Asset::Wobject::StoryArchive')
+                   ? ''       #In parallel with the Keywords files
+                   : '../'    #Keywords files are one level up
+                   ;
     foreach my $keyword (@{ $keywords }) {
+        my $keyword_url = $isExporting
+                        ? $upwards . $archive->getKeywordFilename($keyword)
+                        : $archive->getUrl("func=view;keyword=".$session->url->escape($keyword))
+                        ;
         push @{ $var->{keyword_loop} }, {
             keyword => $keyword,
-            url     => $archive->getUrl("func=view;keyword=".$session->url->escape($keyword)),
+            url     => $keyword_url,
         };
     }
     $var->{updatedTime}      = $self->formatDuration();
