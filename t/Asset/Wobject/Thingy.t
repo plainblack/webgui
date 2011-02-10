@@ -15,7 +15,7 @@ use strict;
 use WebGUI::Test;
 use WebGUI::Test::MockAsset;
 use WebGUI::Session;
-use Test::More tests => 35; # increment this value for each test you create
+use Test::More tests => 39; # increment this value for each test you create
 use Test::Deep;
 use JSON;
 use WebGUI::Asset::Wobject::Thingy;
@@ -466,3 +466,63 @@ my $field = $session->db->quickHashRef(
 );
 ok( $field, "field exists" );
 cmp_deeply( $field, superhashof( \%fieldInfo ), 'field info saved' );
+
+#----------------------------------------------------------------------------
+# www_importForm
+
+my $thingy = WebGUI::Test->asset(
+    className => 'WebGUI::Asset::Wobject::Thingy',
+);
+my $thingId = $thingy->addThing();
+my @fieldIds = (
+    $thingy->addField({
+            assetId => $thingy->getId,
+            thingId => $thingId,
+            sequenceNumber => 1,
+            label => 'Name',
+            fieldType => 'text',
+        }),
+    $thingy->addField({
+            assetId => $thingy->getId,
+            thingId => $thingId,
+            sequenceNumber => 2,
+            label => 'Age',
+            fieldType => 'Integer',
+        }),
+);
+
+my $mech = WebGUI::Test::Mechanize->new( config => WebGUI::Test->file );
+$mech->get_ok( '/' );
+$mech->session->user({ userId => 3 });
+
+$mech->get_ok( $thingy->getUrl( 'func=importForm;thingId=' . $thingId ) );
+$mech->submit_form_ok({
+        fields => {
+            importFile_file => WebGUI::Test::collateral( "thingy.csv" ),
+            "fileContains_$fieldIds[0]" => 1,
+            "fileContains_$fieldIds[1]" => 1,
+        },
+    },
+    "Import data into thing",
+);
+
+my @thingData = $session->db->buildArrayRefOfHashRefs(
+    "select * from ". $session->db->quote_identifier("Thingy_".$thingId),
+);
+cmp_deeply(
+    @thingData,
+    bag(
+        superhashof({
+            "field_$fieldIds[0]" => "Andy Dufresne",
+            "field_$fieldIds[1]" => "42",
+        }),
+        superhashof({
+            "field_$fieldIds[0]" => "Red Ellis",
+            "field_$fieldIds[1]" => "47",
+        }),
+    ),
+    " All rows imported ",
+) or diag( explain \@thingData );
+
+
+

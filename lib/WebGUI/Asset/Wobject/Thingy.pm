@@ -2836,8 +2836,11 @@ sub www_import {
     while (my $field = $fields->hashRef) {
         push(@insertColumns, $field) if ($session->form->process("fileContains_".$field->{fieldId}));
     }
+    
 
     my $log = $self->session->log;
+    use Data::Dumper;
+    $log->info( "Importing columns: " . Dumper( \@insertColumns ) );
     my $storage = WebGUI::Storage->createTemp($self->session);
     $handleDuplicates = $session->form->process("handleDuplicates");
 
@@ -2955,32 +2958,32 @@ sub www_importForm {
     $i18n = WebGUI::International->new($self->session, "Asset_Thingy");
     
     $output = "<h1>".$i18n->get("import label")."</h1>";
-    $form = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
-    $form->hidden(
-        -name => "thingId",
-        -value => $thingId
+    $form = WebGUI::FormBuilder->new($self->session,action=>$self->getUrl);
+    $form->addField( "hidden",
+        name => "thingId",
+        value => $thingId
     );
-    $form->hidden(
-        -name => "func",
-        -value => "import"
-    );
-
-    $form->file(
-        -name => "importFile",
-        -label => $i18n->get("import file label"),
+    $form->addField( "hidden",
+        name => "func",
+        value => "import"
     );
 
-    $form->selectBox(
-        -name => "handleDuplicates",
-        -label=> $i18n->get("duplicates label"),
-        -options=> {
+    $form->addField( "file",
+        name => "importFile",
+        label => $i18n->get("import file label"),
+    );
+
+    $form->addField( "selectBox",
+        name => "handleDuplicates",
+        label=> $i18n->get("duplicates label"),
+        options=> {
                 "skip" => $i18n->get("skip label"),
                 "overwrite" => $i18n->get("overwrite label"),
             },
     );
-    $form->yesNo(
-        -name=>"ignoreFirstLine",
-        -label=>$i18n->get("ignore first line label"),
+    $form->addField( "yesNo",
+        name=>"ignoreFirstLine",
+        label=>$i18n->get("ignore first line label"),
     );
 
     $fieldOptions = "<table>"
@@ -2993,24 +2996,24 @@ sub www_importForm {
         [$self->getId,$thingId]);
     while (my $field = $fields->hashRef) {
         $fieldOptions .= "<tr><td>".$field->{label}."</td><td>";
-        $fieldOptions .= WebGUI::Form::checkbox($self->session, {
+        $fieldOptions .= WebGUI::Form::Checkbox->new($self->session, {
                 checked => "",
                 name  => "fileContains_".$field->{fieldId},
                 value => 1,
-            });
+            })->toHtml;
         $fieldOptions .= "</td><td>";
-        $fieldOptions .= WebGUI::Form::checkbox($self->session, {
+        $fieldOptions .= WebGUI::Form::Checkbox->new($self->session, {
                 checked => "",
                 name  => "checkDuplicates_".$field->{fieldId},
                 value => 1,
-            });
+            })->toHtml;
         $fieldOptions .= "</td></tr>";
     }
     $fieldOptions .= "</table>";
-    $form->raw($fieldOptions);
-    $form->submit;
+    $form->addField( "ReadOnly", name => 'fieldOptions', value => $fieldOptions );
+    $form->addField( "submit", name => "submit" );
 
-    $output .= $form->print;
+    $output .= $form->toHtml;
     return $self->processStyle($output);
 }
 
