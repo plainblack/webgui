@@ -72,26 +72,26 @@ sub www_changeUrl {
             error => $i18n->get('38', 'WebGUI'),
         }
     }
-    my $f = WebGUI::HTMLForm->new($session, method => 'POST' );
-    $f->hidden( name => 'op', value => 'assetHelper' );
-    $f->hidden( name => 'className', value => $class );
-    $f->hidden( name => "method", value=>"changeUrlSave" );
-    $f->hidden( name => 'assetId', value => $asset->getId );
-    $f->text(
+    my $f = WebGUI::FormBuilder->new($session, method => 'POST', action => $asset->getUrl );
+    $f->addField( "hidden", name => 'op', value => 'assetHelper' );
+    $f->addField( "hidden", name => 'className', value => $class );
+    $f->addField( "hidden", name => "method", value=>"changeUrlSave" );
+    $f->addField( "hidden", name => 'assetId', value => $asset->getId );
+    $f->addField( "text",
         name     => "url",
         value    => $asset->get('url'),
         label    => $i18n->get("104"),
         hoverHelp=> $i18n->get('104 description'),
     );
-    $f->yesNo(
+    $f->addField( "yesNo",
         name     => "confirm",
         value    => 0,
         label    => $i18n->get("confirm change"),
         hoverHelp=> $i18n->get("confirm change url message"),
         subtext  => '<br />'.$i18n->get("confirm change url message")
     );
-    $f->submit;
-    return $f->print;
+    $f->addField( "submit", name => "submit" );
+    return $f->toHtml;
 }
 
 #-------------------------------------------------------------------
