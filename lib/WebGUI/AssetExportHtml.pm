@@ -24,6 +24,7 @@ use WebGUI::Session;
 use URI::URL;
 use Scope::Guard qw(guard);
 use WebGUI::ProgressTree;
+use WebGUI::FormBuilder;
 
 =head1 NAME
 
@@ -929,64 +930,64 @@ sub www_export {
     my $self    = shift;
     return $self->session->privilege->insufficient() unless ($self->session->user->isInGroup(13));
     my $i18n    = WebGUI::International->new($self->session, "Asset");
-    my $f       = WebGUI::HTMLForm->new($self->session, -action => $self->getUrl);
-    $f->hidden(
-        -name           => "func",
-        -value          => "exportStatus"
+    my $f       = WebGUI::FormBuilder->new($self->session, action => $self->getUrl);
+    $f->addField( "hidden",
+        name           => "func",
+        value          => "exportStatus"
     );
-    $f->integer(
-        -label          => $i18n->get('Depth'),
-        -hoverHelp      => $i18n->get('Depth description'),
-        -name           => "depth",
-        -value          => 99,
+    $f->addField( "integer",
+        label          => $i18n->get('Depth'),
+        hoverHelp      => $i18n->get('Depth description'),
+        name           => "depth",
+        value          => 99,
     );
-    $f->selectBox(
-        -label          => $i18n->get('Export as user'),
-        -hoverHelp      => $i18n->get('Export as user description'),
-        -name           => "userId",
-        -options        => $self->session->db->buildHashRef("select userId, username from users"),
-        -value          => [1],
+    $f->addField( "selectBox",
+        label          => $i18n->get('Export as user'),
+        hoverHelp      => $i18n->get('Export as user description'),
+        name           => "userId",
+        options        => $self->session->db->buildHashRef("select userId, username from users"),
+        value          => [1],
     );
-    $f->text(
-        -label          => $i18n->get("directory index"),
-        -hoverHelp      => $i18n->get("directory index description"),
-        -name           => "index",
-        -value          => "index.html"
+    $f->addField( "text",
+        label          => $i18n->get("directory index"),
+        hoverHelp      => $i18n->get("directory index description"),
+        name           => "index",
+        value          => "index.html"
     );
 
-    $f->text(
-        -label          => $i18n->get("Export site root URL"),
-        -name           => 'exportUrl',
-        -value          => '',
-        -hoverHelp      => $i18n->get("Export site root URL description"),
+    $f->addField( "text",
+        label          => $i18n->get("Export site root URL"),
+        name           => 'exportUrl',
+        value          => '',
+        hoverHelp      => $i18n->get("Export site root URL description"),
     );
 
     # TODO: maybe add copy options to these boxes alongside symlink
-    $f->selectBox(
-        -label          => $i18n->get('extrasUploads form label'),
-        -hoverHelp      => $i18n->get('extrasUploads form hoverHelp'),
-        -name           => "extrasUploadsAction",
-        -options        => { 
+    $f->addField( "selectBox",
+        label          => $i18n->get('extrasUploads form label'),
+        hoverHelp      => $i18n->get('extrasUploads form hoverHelp'),
+        name           => "extrasUploadsAction",
+        options        => { 
             'symlink'   => $i18n->get('extrasUploads form option symlink'),
             'none'      => $i18n->get('extrasUploads form option none') },
-        -value          => ['none'],
+        value          => ['none'],
     );
-    $f->selectBox(
-        -label          => $i18n->get('rootUrl form label'),
-        -hoverHelp      => $i18n->get('rootUrl form hoverHelp'),
-        -name           => "rootUrlAction",
-        -options        => {
+    $f->addField( "selectBox",
+        label          => $i18n->get('rootUrl form label'),
+        hoverHelp      => $i18n->get('rootUrl form hoverHelp'),
+        name           => "rootUrlAction",
+        options        => {
             'symlink'   => $i18n->get('rootUrl form option symlinkDefault'),
             'none'      => $i18n->get('rootUrl form option none') },
-        -value          => ['none'],
+        value          => ['none'],
     );
-    $f->submit;
+    $f->addField( "submit", name => "submit" );
     my $message;
     eval { $self->exportCheckPath };
     if($@) {
         $message = $@;
     }
-    $self->getAdminConsole->render($message . $f->print, $i18n->get('Export Page'));
+    return '<h1>' . $i18n->get('Export Page') . '</h1>' . $message . $f->toHtml;
 }
 
 
