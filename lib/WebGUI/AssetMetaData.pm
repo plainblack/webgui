@@ -246,52 +246,53 @@ sub www_editMetaDataField {
 		$fieldInfo = $self->getMetaDataFields($self->session->form->process("fid"));
 	}
 	my $fid = $self->session->form->process("fid") || "new";
-	my $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
-	$f->hidden(
-		-name => "func",
-		-value => "editMetaDataFieldSave"
+	my $f = WebGUI::FormBuilder->new($self->session,action=>$self->getUrl);
+	$f->addField( "hidden",
+		name => "func",
+		value => "editMetaDataFieldSave"
 	);
-	$f->hidden(
-		-name => "fid",
-		-value => $fid
+	$f->addField( "hidden",
+		name => "fid",
+		value => $fid
 	);
-	$f->readOnly(
-		-value=>$fid,
-		-label=>$i18n->get('Field Id'),
+	$f->addField( "readOnly",
+            name => 'fid_display',
+		value=>$fid,
+		label=>$i18n->get('Field Id'),
 	);
-	$f->text(
-		-name=>"fieldName",
-		-label=>$i18n->get('Field name'),
-		-hoverHelp=>$i18n->get('Field Name description'),
-		-value=>$fieldInfo->{fieldName}
+	$f->addField( "text",
+		name=>"fieldName",
+		label=>$i18n->get('Field name'),
+		hoverHelp=>$i18n->get('Field Name description'),
+		value=>$fieldInfo->{fieldName}
 	);
-	$f->textarea(
-		-name=>"description",
-		-label=>$i18n->get(85),
-		-hoverHelp=>$i18n->get('Metadata Description description'),
-		-value=>$fieldInfo->{description}
+	$f->addField( "textarea",
+		name=>"description",
+		label=>$i18n->get(85),
+		hoverHelp=>$i18n->get('Metadata Description description'),
+		value=>$fieldInfo->{description}
         );
-	$f->fieldType(
-		-name=>"fieldType",
-		-label=>$i18n->get(486),
-		-hoverHelp=>$i18n->get('Data Type description'),
-		-value=>$fieldInfo->{fieldType} || "text",
-		-types=> [ qw /text integer yesNo selectBox radioList checkList/ ]
+	$f->addField( "fieldType",
+		name=>"fieldType",
+		label=>$i18n->get(486),
+		hoverHelp=>$i18n->get('Data Type description'),
+		value=>$fieldInfo->{fieldType} || "text",
+		types=> [ qw /text integer yesNo selectBox radioList checkList/ ]
 	);
-	$f->textarea(
-		-name=>"possibleValues",
-		-label=>$i18n->get(487),
-		-hoverHelp=>$i18n->get('Possible Values description'),
-		-value=>$fieldInfo->{possibleValues}
+	$f->addField( "textarea",
+		name=>"possibleValues",
+		label=>$i18n->get(487),
+		hoverHelp=>$i18n->get('Possible Values description'),
+		value=>$fieldInfo->{possibleValues}
 	);
-	$f->textarea(
-		-name=>"defaultValue",
-		-label=>$i18n->get('default value'),
-		-hoverHelp=>$i18n->get('default value description'),
-		-value=>$fieldInfo->{defaultValue}
+	$f->addField( "textarea",
+		name=>"defaultValue",
+		label=>$i18n->get('default value'),
+		hoverHelp=>$i18n->get('default value description'),
+		value=>$fieldInfo->{defaultValue}
 	);
-	$f->submit();
-	return $ac->render($f->print, $i18n->get('Edit Metadata'));
+	$f->addField( "submit", name => "submit" );
+	return '<h1>' . $i18n->get('Edit Metadata') . '</h1>' . $f->toHtml;
 }
 
 #-------------------------------------------------------------------

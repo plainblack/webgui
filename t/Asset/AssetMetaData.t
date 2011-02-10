@@ -17,10 +17,11 @@ use WebGUI::Test;
 use WebGUI::Session;
 use WebGUI::Asset;
 use WebGUI::VersionTag;
+use WebGUI::Test::Mechanize;
 
 use Test::More; # increment this value for each test you create
 use Test::Deep;
-plan tests => 13;
+plan tests => 22;
 
 my $session = WebGUI::Test->session;
 $session->user({userId => 3});
@@ -231,5 +232,48 @@ sub buildNameIndex {
     }
     return $nameStruct;
 }
+
+#----------------------------------------------------------------------------
+# www_editMetaDataField
+
+my $mech = WebGUI::Test::Mechanize->new( config => WebGUI::Test->file );
+$mech->get_ok( '/' );
+$mech->session->user({userId => 3});
+
+my %fieldInfo = (
+    fieldName   => 'rsi_type',
+    description => 'What type of RSI this content will inflict upon you',
+    fieldType   => 'text',
+);
+$mech->get_ok( $folder->getUrl( 'func=editMetaDataField' ) );
+$mech->submit_form_ok({
+        fields => \%fieldInfo,
+    },
+    "add a new field",
+);
+
+my $field = ( grep { $_->{fieldName} eq $fieldInfo{fieldName} } values %{$folder->getMetaDataFields} )[0];
+ok( $field );
+cmp_deeply(
+    $field,
+    superhashof( \%fieldInfo ),
+    "Field info saved correctly",
+);
+
+$mech->get_ok( $folder->getUrl( 'func=editMetaDataField;fid=' . $field->{fieldId} ) );
+$fieldInfo{ description } = 'What type of RSI this content will protect you from';
+$mech->submit_form_ok({
+        fields => \%fieldInfo,
+    },
+    "edit an existing field",
+);
+
+$field = $folder->getMetaDataFields( $field->{fieldId} );
+ok( $field );
+cmp_deeply(
+    $field,
+    superhashof( \%fieldInfo ),
+    "Field info saved correctly",
+);
 
 #vim:ft=perl
