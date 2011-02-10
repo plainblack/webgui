@@ -17,7 +17,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-plan tests => 51;
+plan tests => 57;
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -288,3 +288,27 @@ $mech->content_contains( 'uploads/temp', 'uploads link exists' );
 my $survey_json = $survey->www_loadSurvey({});
 my $survey_data = JSON::from_json($survey_json);
 unlike($survey_data->{edithtml}, qr/\^International/, 'www_loadSurvey process macros');
+
+#----------------------------------------------------------------------------
+# www_editTest
+my $mech = WebGUI::Test::Mechanize->new( config => WebGUI::Test->file );
+$mech->get_ok( '/' );
+$mech->session->user({ userId => 3 });
+$mech->get_ok( $survey->getUrl( 'func=editTest' ) );
+$mech->submit_form_ok({
+        fields => {
+            name => 'TEST Test',
+        },
+    }, "Create a new test"
+);
+
+use WebGUI::Asset::Wobject::Survey::Test;
+my $tests = WebGUI::Asset::Wobject::Survey::Test->getAllIds( $session, {
+    constraints => [{
+        'assetId = ?' => $survey->getId,
+    }],
+});
+is( @$tests, 1, "test exists" );
+my $test = WebGUI::Asset::Wobject::Survey::Test->new( $session, $tests->[0] );
+ok( $test, "test exists" );
+is( $test->name, "TEST Test", "name set correctly" );

@@ -25,6 +25,7 @@ use Clone qw/clone/;
 use WebGUI::DateTime;
 use WebGUI::Exception;
 use WebGUI::HTMLForm;
+use Scalar::Util qw( blessed );
 
 has session => (
     is       => 'ro',
@@ -385,11 +386,12 @@ sub crud_dropTable {
 
 =head2 crud_form ( $form, [$object] )
 
-A class method to populate a WebGUI::HTMLForm object with all the fields for this Cruddy object.
+A class method to populate a WebGUI::FormBuilder object with all the fields for this Cruddy object.
 
 =head3 $form
 
-A WebGUI::HTMLForm object
+A WebGUI::FormBuilder object, or any object that does
+FormBuilder::Role::HasFields
 
 =head3 $object
 
@@ -399,9 +401,14 @@ An object of this class, used to provide values to the form.  It's optional.
 
 sub crud_form {
 	my ($class, $form, $object) = @_;
-    my $properties = $class->crud_getProperties;
-    my $definition = [ { properties => $properties, }];
-    $form->dynamicForm($definition, 'properties', $object);
+    my $properties = $class->crud_getProperties( $form->session );
+    for my $propName ( keys %$properties ) {
+        my $prop = $properties->{ $propName };
+        $form->addField( delete $prop->{fieldType},
+            %$prop,
+            value => $object ? $object->get( $propName ) : undef,
+        );
+    }
 }
 
 #-------------------------------------------------------------------
@@ -416,12 +423,21 @@ session.
 
 sub crud_getProperties {
 	my ($class, $session) = @_;
+        # We must really have a class here
+        if ( blessed $class ) {
+            $class = blessed $class;
+        }
+
 	my @property_names = $class->meta->get_all_property_list();
     my $properties = {};
 	foreach my $property_name (@property_names) {
         my $property        = $class->meta->find_attribute_by_name($property_name);
-        my $form_properties = $property->form;
-        $properties->{$property_name} = $form_properties;
+        next unless $property;
+        $properties->{$property_name} = {
+                                %{ $class->getFormProperties( $session, $property_name ) },
+                                name        => $property_name,
+                                fieldType => $property->form->{fieldType},
+                            };
     }
     return $properties;
 }
@@ -942,9 +958,13 @@ sub updateFromFormPost {
 	my $session = $self->session;
 	my $form = $session->form;
 	my %data;
-	my $properties = $self->meta->get_all_property_list($session);
-	foreach my $property ($form->param) {
-		$data{$property} = $form->get($property, $properties->{$property}{fieldType}, $properties->{$property}{default});
+	my @properties = $self->meta->get_all_property_list($session);
+	foreach my $property_name ( @properties ) {
+        my $property        = $self->meta->find_attribute_by_name($property_name);
+        next unless $property;
+		$data{$property_name} = $form->get($property_name,
+                    $property->form->{fieldType}, $property->default);
+            $self->session->log->warn(" SETTING $property_name to $data{$property_name}");
 	}
 	return $self->update(\%data);
 }

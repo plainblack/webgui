@@ -2763,8 +2763,7 @@ sub www_editTestSuite {
     my $out = $error . $addmenu;
     $out .= $tests if $testsFound;
     
-    my $ac = $self->getAdminConsole;
-    return $ac->render($out, 'Survey');
+    return '<h1>Survey</h1>' . $out;
 }
 
 
@@ -2800,21 +2799,20 @@ sub www_editTest {
     }
 
     ##Build the form
-	my $form = WebGUI::HTMLForm->new($session);
-	$form->hidden( name=>"func",   value=>"editTestSave");
-	$form->hidden( name=>"testId", value=>$testId);
-	$form->hidden( name=>"assetId", value=>$self->getId);
+	my $form = WebGUI::FormBuilder->new($session, action => $self->getUrl);
+	$form->addField( "hidden", name=>"func",   value=>"editTestSave");
+	$form->addField( "hidden", name=>"testId", value=>$testId);
+	$form->addField( "hidden", name=>"assetId", value=>$self->getId);
     $test->crud_form($form, $test);
-	$form->submit;
+	$form->addField( "submit", name => "submit" );
 	
     if ($testId eq 'new') {
         $test->delete;
     }
-    my $ac = $self->getAdminConsole;
     my $i18n = WebGUI::International->new($session, 'Asset_Survey');
-    $ac->addSubmenuItem($self->session->url->page("func=editTest;testId=$testId"), $i18n->get('edit test'));
-    $ac->addSubmenuItem($self->session->url->page("func=runTest;testId=$testId"), $i18n->get('run test'));
-	return $ac->render($error.$form->print, $i18n->get('edit test'));
+    #$ac->addSubmenuItem($self->session->url->page("func=editTest;testId=$testId"), $i18n->get('edit test'));
+    #$ac->addSubmenuItem($self->session->url->page("func=runTest;testId=$testId"), $i18n->get('run test'));
+	return '<h1>' . $i18n->get('edit test') . '</h1>' . $error . $form->toHtml;
 }
 
 #-------------------------------------------------------------------
