@@ -388,7 +388,7 @@ require WebGUI::AdminConsole;
 require WebGUI::Asset::Shortcut;
 use WebGUI::Form;
 use WebGUI::HTML;
-use WebGUI::HTMLForm;
+use WebGUI::FormBuilder;
 use WebGUI::Keyword;
 require WebGUI::ProgressBar;
 use WebGUI::ProgressTree;
@@ -2887,59 +2887,6 @@ sub www_ajaxInlineView {
 	return $self->session->privilege->noAccess() unless $self->canView;
 	$self->prepareView;
 	return $self->view;
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 www_changeUrl ( )
-
-Allows a user to change a url permanently to something else.
-
-=cut
-
-sub www_changeUrl {
-	my $self = shift;
-	return $self->session->privilege->insufficient() unless $self->canEdit;
-	my $i18n = WebGUI::International->new($self->session, "Asset");
-	my $f = WebGUI::HTMLForm->new($self->session, action=>$self->getUrl);
-	$f->hidden(name=>"func", value=>"changeUrlConfirm");
-	$f->hidden(name=>"proceed", value=>scalar($self->session->form->param("proceed")));
-	$f->text(name=>"url", value=>$self->get('url'), label=>$i18n->get("104"), hoverHelp=>$i18n->get('104 description'));
-	$f->yesNo(name=>"confirm", value=>0, label=>$i18n->get("confirm change"), hoverHelp=>$i18n->get("confirm change url message"), subtext=>'<br />'.$i18n->get("confirm change url message"));
-	$f->submit;
-	return $self->getAdminConsole->render($f->print,$i18n->get("change url"));
-}
-
-#-------------------------------------------------------------------
-
-=head2 www_changeUrlConfirm ( )
-
-This actually does the change url of the www_changeUrl() function.
-
-=cut
-
-sub www_changeUrlConfirm {
-	my $self = shift;
-	return $self->session->privilege->insufficient() unless $self->canEdit;
-	$self->_invokeWorkflowOnExportedFiles($self->session->setting->get('changeUrlWorkflow'), 1);
-
-	if ($self->session->form->process("confirm","yesNo") && $self->session->form->process("url","text")) {
-		$self->update({url=>$self->session->form->process("url","text")});
-	 	my $rs = $self->session->db->read("select revisionDate from assetData where assetId=? and revisionDate<>?",[$self->getId, $self->get("revisionDate")]);
-                while (my ($version) = $rs->array) {
-                	my $old = eval { WebGUI::Asset->newById($self->session, $self->getId, $version); };
-                    $old->purgeRevision if ! Exception::Class->caught();
-                }
-	}
-
-	if ($self->session->form->param("proceed") eq "manageAssets") {
-		$self->session->http->setRedirect($self->getManagerUrl);
-	} else {
-		$self->session->http->setRedirect($self->getUrl());
-	}
-
-	return undef;
 }
 
 #-------------------------------------------------------------------
