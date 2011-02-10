@@ -15,10 +15,11 @@ use strict;
 use WebGUI::Test;
 use WebGUI::Test::MockAsset;
 use WebGUI::Session;
-use Test::More tests => 30; # increment this value for each test you create
+use Test::More tests => 35; # increment this value for each test you create
 use Test::Deep;
 use JSON;
 use WebGUI::Asset::Wobject::Thingy;
+use WebGUI::Test::Mechanize;
 use Data::Dumper;
 
 my $session = WebGUI::Test->session;
@@ -434,3 +435,34 @@ is $json, '{}', 'www_editThingDataSaveViaAjax: Empty JSON hash';
 is $session->response->status, 200, '... http status=200';
 
 $session->request->setup_body({ });
+
+#----------------------------------------------------------------------------
+# www_editField
+
+my $fieldThingId = $thingy->addThing();
+diag( "Field Thing ID: $fieldThingId" );
+
+my $mech = WebGUI::Test::Mechanize->new( config => WebGUI::Test->file );
+$mech->get_ok( '/' );
+$mech->session->user({ userId => 3 });
+
+my %fieldInfo = (
+    thingId => $fieldThingId,
+    label => 'Escape Plan',
+    defaultValue => 'zihuatanejo',
+    pretext => '',
+    subtext => 'PS: Dont tell anyone!',
+);
+$mech->get_ok( $thingy->getUrl( 'func=editField;thingId=' . $fieldThingId . ';fieldId=new' ) );
+$mech->submit_form_ok({
+        fields => \%fieldInfo,
+    },
+    "add field to thing",
+);
+
+my $field = $session->db->quickHashRef(
+    "SELECT * FROM Thingy_fields WHERE assetId=? AND thingId=?",
+    [ $thingy->getId, $fieldThingId ],
+);
+ok( $field, "field exists" );
+cmp_deeply( $field, superhashof( \%fieldInfo ), 'field info saved' );

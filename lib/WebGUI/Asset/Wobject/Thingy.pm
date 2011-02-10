@@ -707,7 +707,8 @@ sub getEditFieldForm {
         "required" => $i18n->get('fieldstatus required label'),
     );
     
-    my %fieldTypes = %{WebGUI::Form::FieldType->new($session)->getTypes};
+    my $fieldType = WebGUI::Pluggable::instanciate( "WebGUI::Form::FieldType", "new", [ $session ] );
+    my %fieldTypes = %{$fieldType->getTypes};
     
     my $things = $self->session->db->read('select thingId, Thingy_things.label, count(*) from Thingy_things '
         .'left join Thingy_fields using(thingId) where Thingy_things.assetId = ? and fieldId != "" '
@@ -733,121 +734,168 @@ sub getEditFieldForm {
         $dialogPrefix = "edit_".$fieldId."_Dialog";
     }
     
-    my $f = WebGUI::HTMLForm->new($self->session,{
+    my $f = WebGUI::FormBuilder->new($self->session,
             action=>$self->getUrl,
-            tableExtras=>' cellpadding="0" cellspacing="0"'
-            });
-    $f->hidden(
-        -name => "fieldId",
-        -value => $fieldId,
+            );
+    $f->addField( "hidden",
+        name => "fieldId",
+        value => $fieldId,
     );
-    $f->hidden(
-        -name => "thingId",
-        -value => $field->{thingId},
+    $f->addField( "hidden",
+        name => "thingId",
+        value => $field->{thingId},
     );
-    $f->hidden(
-        -name => "func",
-        -value => "editFieldSave"
+    $f->addField( "hidden",
+        name => "func",
+        value => "editFieldSave"
     );
-    $f->text(
-        -name=>"label",
-        -label=>$i18n->get('field label label'),
-        -hoverHelp=>$i18n->get('field label description'),
-        -value=>$field->{label}
+    $f->addField( "text",
+        name=>"label",
+        label=>$i18n->get('field label label'),
+        hoverHelp=>$i18n->get('field label description'),
+        value=>$field->{label}
     );
-    $f->selectBox(
-        -name=>"fieldType",
-        -label=>$i18n->get('field type label'),
-        -hoverHelp=>$i18n->get('field type description'),
-        -value=>$field->{fieldType} || "Text",
-        -options=>\@fieldTypes,
-        -id=>$dialogPrefix."_fieldType_formId",
+    $f->addField( "selectBox",
+        name=>"fieldType",
+        label=>$i18n->get('field type label'),
+        hoverHelp=>$i18n->get('field type description'),
+        value=>$field->{fieldType} || "Text",
+        options=>\@fieldTypes,
+        id=>$dialogPrefix."_fieldType_formId",
         );
-    $f->raw($self->getHtmlWithModuleWrapper($dialogPrefix."_fieldInThing_module"));
+    $f->addField( "ReadOnly", 
+        name => "${dialogPrefix}_fieldInThing_module",
+        value => $self->getHtmlWithModuleWrapper($dialogPrefix."_fieldInThing_module")
+    );
 
-    $f->raw($self->getHtmlWithModuleWrapper($dialogPrefix."_defaultFieldInThing_module"));
+    $f->addField( "ReadOnly", 
+        name => "${dialogPrefix}_defaultFieldInThing_module",
+        value => $self->getHtmlWithModuleWrapper($dialogPrefix."_defaultFieldInThing_module"),
+    );
     unless ($field->{fieldType} =~ m/^otherThing/x){
         $defaultValue = $field->{defaultValue};
     }
-    my $defaultValueForm = WebGUI::Form::Textarea($self->session, {
+    my $defaultValueForm = WebGUI::Form::Textarea->new($self->session, {
                 name=>"defaultValue",
                 value=>$defaultValue,
                 subtext=>'<br />'.$i18n->get('default value subtext'),
                 width=>200,
                 height=>40,
                 resizable=>0,
-            });
-    $f->raw($self->getHtmlWithModuleWrapper($dialogPrefix."_defaultValue_module",$defaultValueForm,
-        $i18n->get('default value label'),$i18n->get('default value description')));
+            })->toHtml;
+    $f->addField( "ReadOnly",
+        name => "${dialogPrefix}_defaultValue_module",
+        value => $self->getHtmlWithModuleWrapper(
+            $dialogPrefix."_defaultValue_module",
+            $defaultValueForm,
+            $i18n->get('default value label'),
+            $i18n->get('default value description')
+        )
+    );
    
-    $f->text(
-        -name=>"pretext",
-        -value=>$field->{pretext},
-        -label=>$i18n->get('pretext label'),
-        -hoverHelp=>$i18n->get('pretext description'),
+    $f->addField( "text",
+        name=>"pretext",
+        value=>$field->{pretext},
+        label=>$i18n->get('pretext label'),
+        hoverHelp=>$i18n->get('pretext description'),
         );
-    $f->text(
+    $f->addField( "text",
         -name=>"subtext",
         -value=>$field->{subtext},
         -label=>$i18n->get('subtext label'),
         -hoverHelp=>$i18n->get('subtext description'),
         );
-    $f->selectBox(
-        -name=>"status",
-        -options=>\@fieldStatus,
-        -label=>$i18n->get('field status label'),
-        -hoverHelp=>$i18n->get('field status description'),
-        -value=> [ $field->{status} || "editable" ] ,
+    $f->addField( "selectBox",
+        name=>"status",
+        options=>\@fieldStatus,
+        label=>$i18n->get('field status label'),
+        hoverHelp=>$i18n->get('field status description'),
+        value=> [ $field->{status} || "editable" ] ,
         ); 
     
-    my $widthForm = WebGUI::Form::Integer($self->session, {
+    my $widthForm = WebGUI::Form::Integer->new($self->session, {
             name=>"width",
             value=>($field->{width} || 250),
             size=>10,
-        });
-    $f->raw($self->getHtmlWithModuleWrapper($dialogPrefix."_width_module",$widthForm,$i18n->get('width label'),
-        $i18n->get('width description')));
+        })->toHtml;
+    $f->addField( "ReadOnly",
+        name => "${dialogPrefix}_width_module",
+        value => $self->getHtmlWithModuleWrapper(
+            $dialogPrefix."_width_module",
+            $widthForm,
+            $i18n->get('width label'),
+            $i18n->get('width description')
+        )
+    );
 
-    my $sizeForm = WebGUI::Form::Integer($self->session, {
+    my $sizeForm = WebGUI::Form::Integer->new($self->session, {
             name=>"size",
             value=>($field->{size} || 25),
             size=>10,
-        });
-    $f->raw($self->getHtmlWithModuleWrapper($dialogPrefix."_size_module",$sizeForm,$i18n->get('size label'),
-        $i18n->get('size description'),));
+        })->toHtml;
+    $f->addField( "ReadOnly",
+        name => "${dialogPrefix}_size_module",
+        value => $self->getHtmlWithModuleWrapper(
+            $dialogPrefix."_size_module",
+            $sizeForm,
+            $i18n->get('size label'),
+            $i18n->get('size description'),
+        )
+    );
 
-    my $heightForm = WebGUI::Form::Integer($self->session, {
+    my $heightForm = WebGUI::Form::Integer->new($self->session, {
             name=>"height",
             value=>$field->{height} || 40,
             label=>$i18n->get('height label'),
             size=>10,
-        });
-    $f->raw($self->getHtmlWithModuleWrapper($dialogPrefix."_height_module",$heightForm,$i18n->get('height label'),
-        $i18n->get('height description')));
+        })->toHtml;
+    $f->addField( "ReadOnly",
+        name => "${dialogPrefix}_height_module",
+        value => $self->getHtmlWithModuleWrapper(
+            $dialogPrefix."_height_module",
+            $heightForm,
+            $i18n->get('height label'),
+            $i18n->get('height description')
+        )
+    );
 
-    my $verticalForm = WebGUI::Form::YesNo($self->session, {
+    my $verticalForm = WebGUI::Form::YesNo->new($self->session, {
             name=>"vertical",
             value=>$field->{vertical},
             label=>$i18n->get('vertical label'),
-        });
-    $f->raw($self->getHtmlWithModuleWrapper($dialogPrefix."_vertical_module",$verticalForm,$i18n->get('vertical label'),
-        $i18n->get('vertical description')));
+        })->toHtml;
+    $f->addField( "ReadOnly",
+        name => "${dialogPrefix}_vertical_module",
+        value => $self->getHtmlWithModuleWrapper(
+            $dialogPrefix."_vertical_module",
+            $verticalForm,
+            $i18n->get('vertical label'),
+            $i18n->get('vertical description')
+        )
+    );
     
-    my $valuesForm = WebGUI::Form::Textarea($self->session, { 
+    my $valuesForm = WebGUI::Form::Textarea->new($self->session, { 
             name=>"possibleValues",
             value=>$field->{possibleValues},
             width=>200,
             height=>60,
             resizable=>0,
-        });
-    $f->raw($self->getHtmlWithModuleWrapper($dialogPrefix."_values_module",$valuesForm,$i18n->get('possible values label'),
-        $i18n->get('possible values description')));
-    $f->text(
-        -name=>"extras",
-        -value=>$field->{extras},
-        -label=>$i18n->get('extras label'),
-        -hoverHelp=>$i18n->get('extras description'),
-        );
+        })->toHtml;
+    $f->addField( "ReadOnly",
+        name => "${dialogPrefix}_values_module",
+        value => $self->getHtmlWithModuleWrapper(
+            $dialogPrefix."_values_module",
+            $valuesForm,
+            $i18n->get('possible values label'),
+            $i18n->get('possible values description')
+        )
+    );
+    $f->addField( "text",
+        name=>"extras",
+        value=>$field->{extras},
+        label=>$i18n->get('extras label'),
+        hoverHelp=>$i18n->get('extras description'),
+    );
 
     #unless ($dialogPrefix eq "addDialog") {
     #    $f->raw('<script type="text/javascript">initHoverHelp("'.$dialogPrefix.'");</script>');
@@ -1076,18 +1124,11 @@ sub getHtmlWithModuleWrapper {
     my $hoverHelp = shift;
 
     $hoverHelp &&= '<div class="wg-hoverhelp">' . $hoverHelp . '</div>';
-    my $html =  "\n<tr><td colspan='2'>\n";
-    $html .=    "\t<div id='".$id."'>\n";
+    my $html =  "\t<div id='".$id."'>\n";
     $html .=    "\t<div class='bd' style='padding:0px;'>\n";
-    $html .=    "\t<table cellpadding='0' cellspacing='0' style='width: 100%;'>\n";
-    $html .=    "\t<tr><td class='formDescription' valign='top' style='width:180px'>";
-    $html .=    $formDescription.$hoverHelp."</td>";
-    $html .=    "<td valign='top' class='tableData' style='padding-left:4px'>";
-    $html .=    $formElement."</td>";
-    $html .=    "\t\n</tr>\n";
-    $html .=    "\t</table>";
+    $html .=    $formDescription.$hoverHelp;
+    $html .=    $formElement;
     $html .=    "\t\n</div>\t\n</div>\n";
-    $html .=    "</td></tr>";
 
     return $html;
 
@@ -2077,7 +2118,7 @@ sub www_editThing {
     my %fieldProperties;
     $fieldProperties{thingId} = $thingId;
     my $dialogBody = $self->getEditFieldForm(\%fieldProperties);
-    $dialog .= $dialogBody->print;
+    $dialog .= $dialogBody->toHtml;
 
     $dialog .= "</div>\n"
             ."</div>";
@@ -2179,7 +2220,7 @@ sub www_editField {
     # Make sure we send debug information along with the field edit screen.
     $session->log->preventDebugOutput;
 
-    $self->session->output->print($dialogBody->print);
+    $self->session->output->print($dialogBody->toHtml);
     return "chunked";
 }
 #-------------------------------------------------------------------
