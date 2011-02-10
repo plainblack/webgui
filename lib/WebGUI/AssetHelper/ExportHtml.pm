@@ -79,35 +79,35 @@ sub www_export {
 ENDHTML
 
     my $i18n    = WebGUI::International->new($session, "Asset");
-    my $f       = WebGUI::HTMLForm->new($session, -action => $asset->getUrl);
-    $f->hidden( name => 'op', value => 'assetHelper' );
-    $f->hidden( name => 'className', value => $class );
-    $f->hidden( name => 'assetId', value => $asset->getId );
-    $f->hidden(
+    my $f       = WebGUI::FormBuilder->new($session, action => $asset->getUrl);
+    $f->addField( "hidden", name => 'op', value => 'assetHelper' );
+    $f->addField( "hidden", name => 'className', value => $class );
+    $f->addField( "hidden", name => 'assetId', value => $asset->getId );
+    $f->addField( "hidden",
         name           => "method",
         value          => "exportStatus"
     );
-    $f->integer(
+    $f->addField( "integer",
         label          => $i18n->get('Depth'),
         hoverHelp      => $i18n->get('Depth description'),
         name           => "depth",
         value          => 99,
     );
-    $f->selectBox(
+    $f->addField( "selectBox",
         label          => $i18n->get('Export as user'),
         hoverHelp      => $i18n->get('Export as user description'),
         name           => "userId",
         options        => $session->db->buildHashRef("select userId, username from users"),
         value          => [1],
     );
-    $f->text(
+    $f->addField( "text",
         label          => $i18n->get("directory index"),
         hoverHelp      => $i18n->get("directory index description"),
         name           => "index",
         value          => "index.html"
     );
 
-    $f->text(
+    $f->addField( "text",
         label          => $i18n->get("Export site root URL"),
         name           => 'exportUrl',
         value          => '',
@@ -115,7 +115,7 @@ ENDHTML
     );
 
     # TODO: maybe add copy options to these boxes alongside symlink
-    $f->selectBox(
+    $f->addField( "selectBox",
         label          => $i18n->get('extrasUploads form label'),
         hoverHelp      => $i18n->get('extrasUploads form hoverHelp'),
         name           => "extrasUploadsAction",
@@ -124,7 +124,7 @@ ENDHTML
             'none'     => $i18n->get('extrasUploads form option none') },
         value          => ['none'],
     );
-    $f->selectBox(
+    $f->addField( "selectBox",
         label          => $i18n->get('rootUrl form label'),
         hoverHelp      => $i18n->get('rootUrl form hoverHelp'),
         name           => "rootUrlAction",
@@ -133,14 +133,14 @@ ENDHTML
             'none'     => $i18n->get('rootUrl form option none') },
         value          => ['none'],
     );
-    $f->submit;
+    $f->addField( "submit", name => "submit" );
     my $message;
     eval { $asset->exportCheckPath };
     if($@) {
         $message = $@;
     }
     return $session->style->process( 
-        $message . $f->print,
+        $message . $f->toHtml,
         "PBtmpl0000000000000137"
     );
 }
