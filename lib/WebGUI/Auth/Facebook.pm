@@ -69,16 +69,16 @@ sub editUserSettingsForm {
     my ( $setting ) = $session->quick(qw( setting ));
     my $i18n = WebGUI::International->new( $session, 'Auth_Facebook' );
 
-    my $f = WebGUI::HTMLForm->new( $session );
+    my $f = WebGUI::FormBuilder->new( $session );
 
-    $f->yesNo(
+    $f->addField( "yesNo",
         name        => 'facebookAuthEnabled',
         value       => $setting->get( 'facebookAuthEnabled' ),
         label       => $i18n->get('enabled'),
         hoverHelp   => $i18n->get('enabled help'),
     );
 
-    $f->text(
+    $f->addField( "text",
         name        => 'facebookAuthAppId',
         value       => $setting->get( 'facebookAuthAppId' ),
         label       => $i18n->get('app id'),
@@ -86,14 +86,14 @@ sub editUserSettingsForm {
         subtext     => $i18n->get('get app id'),
     );
 
-    $f->text(
+    $f->addField( "text",
         name        => 'facebookAuthSecret',
         value       => $setting->get( 'facebookAuthSecret' ),
         label       => $i18n->get('secret'),
         hoverHelp   => $i18n->get('secret help'),
     );
 
-    $f->template(
+    $f->addField( "template",
         name        => 'facebookAuthTemplateIdChooseUsername',
         value       => $setting->get( 'facebookAuthTemplateIdChooseUsername' ),
         label       => $i18n->get('choose username template'),
@@ -101,7 +101,7 @@ sub editUserSettingsForm {
         namespace   => 'Auth/Facebook/ChooseUsername',
     );
 
-    return $f->printRowsOnly;
+    return $f;
 }
 
 #----------------------------------------------------------------------------

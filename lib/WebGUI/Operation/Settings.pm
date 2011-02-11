@@ -606,6 +606,14 @@ sub www_editSettings {
         $output .= '</ul>';
     }
 
+    # Start the form
+ 	my $tabform = WebGUI::FormBuilder->new($session, action => '?op=saveSettings' );
+        $tabform->addField( 'csrfToken', name => 'csrfToken' );
+	$tabform->addField( "hidden",
+		name        => "op",
+		value       => "saveSettings"
+    );
+
     # Available tabs
     # TODO: Build this from the definition instead.
 	tie my %tabs, 'Tie::IxHash', (
@@ -619,25 +627,19 @@ sub www_editSettings {
         auth        => { label => $i18n->get("authentication") },
         perms       => { label => $i18n->get("permissions") },
     );
-
-    # Start the form
- 	my $tabform = WebGUI::TabForm->new($session,\%tabs);
-	$tabform->hidden({
-		name        => "op",
-		value       => "saveSettings"
-    });
+    for my $tabName ( keys %tabs ) {
+        $tabform->addTab( name => $tabName, %{$tabs{$tabName}} );
+    }
 
 	my $definitions = definition($session, $i18n);
 	foreach my $definition (@{$definitions}) {
-		$tabform->getTab($definition->{tab})->dynamicField(%{$definition});
+		$tabform->getTab($definition->{tab})->addField( $definition->{fieldType}, %$definition );
 	}
 
     # Get fieldsets for avaiable auth methods
-	foreach (@{$session->config->get("authMethods")}) {
-		$tabform->getTab("auth")->fieldSetStart($_);
+	foreach my $authName (@{$session->config->get("authMethods")}) {
 		my $authInstance = WebGUI::Operation::Auth::getInstance($session,$_,1);
-		$tabform->getTab("auth")->raw($authInstance->editUserSettingsForm);
-		$tabform->getTab("auth")->fieldSetEnd;
+                $tabform->getTab( "auth" )->addFieldset( $authInstance->editUserSettingsForm, name => $authName, label => $authName );
 	}
 
      # Get fieldsets for avaiable account methods
@@ -660,20 +662,18 @@ sub www_editSettings {
         }
 
         #If editUserSettingsForm is empty, skip it
-        next if $settingsForm eq "";
+        next unless $settingsForm;
 
         #Set the title of the fieldset
         my $title = $account->{title};
         WebGUI::Macro::process($title);
 
         #Print the settings form for this account pluggin
-		$tabform->getTab("account")->fieldSetStart($title);
-		$tabform->getTab("account")->raw($settingsForm);
-		$tabform->getTab("account")->fieldSetEnd;
+		$tabform->getTab("account")->addFieldset( $settingsForm, name => $account->{identifier}, label => $title );
 	}
 
-	$tabform->submit();
-    $output .= $tabform->print;
+	$tabform->addField( "submit", name => "submit" );
+    $output .= $tabform->toHtml;
 
 	my $ac = WebGUI::AdminConsole->new($session,"settings");
 	return $ac->render($output);
@@ -707,6 +707,7 @@ sub www_saveSettings {
 
         my $authErrors          = $authInstance->editUserSettingsFormSave;
         if ($authErrors) {
+            $session->log->warn( "Problem saving settings: " . $authErrors );
             push @errors, @{ $authErrors };
         }
     }

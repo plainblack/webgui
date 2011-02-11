@@ -69,16 +69,16 @@ sub editUserSettingsForm {
 
     my $keyUrl  = 'http://dev.twitter.com/apps/new';
 
-    my $f = WebGUI::HTMLForm->new( $session );
+    my $f = WebGUI::FormBuilder->new( $session );
 
-    $f->yesNo(
+    $f->addField( "yesNo",
         name        => 'twitterEnabled',
         value       => $setting->get( 'twitterEnabled' ),
         label       => $i18n->get('enabled'),
         hoverHelp   => $i18n->get('enabled help'),
     );
 
-    $f->text(
+    $f->addField( "text",
         name        => 'twitterConsumerKey',
         value       => $setting->get( 'twitterConsumerKey' ),
         label       => $i18n->get('consumer key'),
@@ -86,14 +86,14 @@ sub editUserSettingsForm {
         subtext     => sprintf( $i18n->get('get key'), ($keyUrl) x 2 ),
     );
 
-    $f->text(
+    $f->addField( "text",
         name        => 'twitterConsumerSecret',
         value       => $setting->get( 'twitterConsumerSecret' ),
         label       => $i18n->get('consumer secret'),
         hoverHelp   => $i18n->get('consumer secret help'),
     );
 
-    $f->template(
+    $f->addField( "template",
         name        => 'twitterTemplateIdChooseUsername',
         value       => $setting->get( 'twitterTemplateIdChooseUsername' ),
         label       => $i18n->get('choose username template'),
@@ -101,7 +101,7 @@ sub editUserSettingsForm {
         namespace   => 'Auth/Twitter/ChooseUsername',
     );
 
-    return $f->printRowsOnly;
+    return $f;
 }
 
 #----------------------------------------------------------------------------

@@ -12,7 +12,7 @@ package WebGUI::Auth::LDAP;
 
 use strict;
 use WebGUI::Auth;
-use WebGUI::HTMLForm;
+use WebGUI::FormBuilder;
 use WebGUI::Form;
 use WebGUI::LDAPLink;
 use WebGUI::Workflow;
@@ -327,21 +327,9 @@ sub editUserFormSave {
 
 sub editUserSettingsForm {
    my $self = shift;
-   my $f = WebGUI::HTMLForm->new($self->session);
-   my $ldapConnection = WebGUI::Form::selectBox($self->session, {
-	                name=>"ldapConnection",
-					options=>WebGUI::LDAPLink->getList($self->session,),
-					value=>[$self->session->setting->get("ldapConnection")]
-				  });
-	my $i18n = WebGUI::International->new($self->session,'AuthLDAP');
-   my $ldapConnectionLabel = $i18n->get("ldapConnection"); 
-   my $buttons = "";
-   if($self->session->setting->get("ldapConnection")) {
-      $buttons = $self->session->icon->edit("op=editLDAPLink;returnUrl=".$self->session->url->escape($self->session->url->page("op=editSettings")).";llid=".$self->session->setting->get("ldapConnection"));
-   }
-   $buttons .= $self->session->icon->manage("op=listLDAPLinks;returnUrl=".$self->session->url->escape($self->session->url->page("op=editSettings")));
-   $f->raw(qq|<tr><td class="formDescription" valign="top" style="width: 25%;">$ldapConnectionLabel</td><td class="tableData" style="width: 75%;">$ldapConnection&nbsp;$buttons</td></tr>|);
-   return $f->printRowsOnly;
+   my $f = WebGUI::FormBuilder->new($self->session);
+   $f->addField( "LdapLink", name => "ldapConnection" );
+   return $f;
 }
 
 #-------------------------------------------------------------------

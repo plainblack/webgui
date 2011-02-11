@@ -15,7 +15,7 @@ use strict;
 use URI;
 use WebGUI::Asset::Template;
 use WebGUI::Auth;
-use WebGUI::HTMLForm;
+use WebGUI::FormBuilder;
 use WebGUI::Macro;
 use WebGUI::Mail::Send;
 use WebGUI::Storage;
@@ -154,39 +154,39 @@ or an empty string if the check was successful.
 sub editUserForm {
    my $self = shift;
    my $userData = $self->get;
-   my $f = WebGUI::HTMLForm->new($self->session);
+   my $f = WebGUI::FormBuilder->new($self->session);
 	my $i18n = WebGUI::International->new($self->session);
-   $f->password(
+   $f->addField( "password",
 	name=>"authWebGUI.identifier",
 	label=>$i18n->get(51),
 	value=>"password",
     extras=>'autocomplete="off"',
 	);
-   $f->interval(
-	-name=>"authWebGUI.passwordTimeout",
-	-label=>$i18n->get(16,'AuthWebGUI'),
-	-value=>$userData->{passwordTimeout},
-	-defaultValue=>$self->session->setting->get("webguiPasswordTimeout")
+   $f->addField( "interval",
+	name=>"authWebGUI.passwordTimeout",
+	label=>$i18n->get(16,'AuthWebGUI'),
+	value=>$userData->{passwordTimeout},
+	defaultValue=>$self->session->setting->get("webguiPasswordTimeout")
 	);
    my $userChange = $self->session->setting->get("webguiChangeUsername");
    if($userChange || $userChange eq "0"){
       $userChange = $userData->{changeUsername};
    }
-   $f->yesNo(
-                -name=>"authWebGUI.changeUsername",
-                -value=>$userChange,
-                -label=>$i18n->get(21,'AuthWebGUI')
+   $f->addField( "yesNo",
+                name=>"authWebGUI.changeUsername",
+                value=>$userChange,
+                label=>$i18n->get(21,'AuthWebGUI')
              );
    my $passwordChange = $self->session->setting->get("webguiChangePassword");
    if($passwordChange || $passwordChange eq "0"){
       $passwordChange = $userData->{changePassword};
    }
-   $f->yesNo(
-                -name=>"authWebGUI.changePassword",
-                -value=>$passwordChange,
-                -label=>$i18n->get(20,'AuthWebGUI')
+   $f->addField( "yesNo",
+                name=>"authWebGUI.changePassword",
+                value=>$passwordChange,
+                label=>$i18n->get(20,'AuthWebGUI')
              );
-   return $f->printRowsOnly;
+   return $f;
 }
 
 #-------------------------------------------------------------------
@@ -233,165 +233,165 @@ sub editUserFormSave {
 sub editUserSettingsForm {
     my $self = shift;
     my $i18n = WebGUI::International->new($self->session,'AuthWebGUI');
-    my $f = WebGUI::HTMLForm->new($self->session);
+    my $f = WebGUI::FormBuilder->new($self->session);
 
-    $f->integer(
-        -name      => "webguiPasswordLength",
-        -value     => $self->session->setting->get("webguiPasswordLength"),
-        -label     => $i18n->get(15),
-        -hoverHelp => $i18n->get('15 help'),
+    $f->addField( "integer",
+        name      => "webguiPasswordLength",
+        value     => $self->session->setting->get("webguiPasswordLength"),
+        label     => $i18n->get(15),
+        hoverHelp => $i18n->get('15 help'),
     );
-    $f->integer(
-        -name      => "webguiRequiredDigits",
-        -label     => $i18n->get('setting webguiRequiredDigits'),
-        -value     => $self->session->setting->get("webguiRequiredDigits"),
-        -hoverHelp => $i18n->get('setting webguiRequiredDigits help'),
+    $f->addField( "integer",
+        name      => "webguiRequiredDigits",
+        label     => $i18n->get('setting webguiRequiredDigits'),
+        value     => $self->session->setting->get("webguiRequiredDigits"),
+        hoverHelp => $i18n->get('setting webguiRequiredDigits help'),
    	);
-    $f->integer(
-        -name      => "webguiNonWordCharacters",
-        -label     => $i18n->get('setting webguiNonWordCharacters'),
-        -value     => $self->session->setting->get("webguiNonWordCharacters"),
-        -hoverHelp => $i18n->get('setting webguiNonWordCharacters help'),
+    $f->addField( "integer",
+        name      => "webguiNonWordCharacters",
+        label     => $i18n->get('setting webguiNonWordCharacters'),
+        value     => $self->session->setting->get("webguiNonWordCharacters"),
+        hoverHelp => $i18n->get('setting webguiNonWordCharacters help'),
    	);
-    $f->integer(
-        -name      => "webguiRequiredMixedCase",
-        -label     => $i18n->get('setting webguiRequiredMixedCase'),
-        -value     => $self->session->setting->get("webguiRequiredMixedCase"),
-        -hoverHelp => $i18n->get('setting webguiRequiredMixedCase help'),
+    $f->addField( "integer",
+        name      => "webguiRequiredMixedCase",
+        label     => $i18n->get('setting webguiRequiredMixedCase'),
+        value     => $self->session->setting->get("webguiRequiredMixedCase"),
+        hoverHelp => $i18n->get('setting webguiRequiredMixedCase help'),
 	);
-    $f->interval(
-        -name      => "webguiPasswordTimeout",
-        -label     => $i18n->get(16),
-        -value     => $self->session->setting->get("webguiPasswordTimeout"),
-        -hoverHelp => $i18n->get('16 help'),
+    $f->addField( "interval",
+        name      => "webguiPasswordTimeout",
+        label     => $i18n->get(16),
+        value     => $self->session->setting->get("webguiPasswordTimeout"),
+        hoverHelp => $i18n->get('16 help'),
 	);
-    $f->yesNo(
-        -name      => "webguiExpirePasswordOnCreation",
-        -value     => $self->session->setting->get("webguiExpirePasswordOnCreation"),
-        -label     => $i18n->get(9),
-        -hoverHelp => $i18n->get('9 help')
+    $f->addField( "yesNo",
+        name      => "webguiExpirePasswordOnCreation",
+        value     => $self->session->setting->get("webguiExpirePasswordOnCreation"),
+        label     => $i18n->get(9),
+        hoverHelp => $i18n->get('9 help')
     );
-    $f->yesNo(
-        -name      => "webguiSendWelcomeMessage",
-        -value     => $self->session->setting->get("webguiSendWelcomeMessage"),
-        -label     => $i18n->get(868,'WebGUI'),
-        -hoverHelp => $i18n->get('868 help','WebGUI'),
+    $f->addField( "yesNo",
+        name      => "webguiSendWelcomeMessage",
+        value     => $self->session->setting->get("webguiSendWelcomeMessage"),
+        label     => $i18n->get(868,'WebGUI'),
+        hoverHelp => $i18n->get('868 help','WebGUI'),
     );
-    $f->HTMLArea(
-        -name      => "webguiWelcomeMessage",
-        -value     => $self->session->setting->get("webguiWelcomeMessage"),
-        -label     => $i18n->get(869,'WebGUI'),
-        -hoverHelp => $i18n->get('869 help','WebGUI'),
+    $f->addField( "HTMLArea",
+        name      => "webguiWelcomeMessage",
+        value     => $self->session->setting->get("webguiWelcomeMessage"),
+        label     => $i18n->get(869,'WebGUI'),
+        hoverHelp => $i18n->get('869 help','WebGUI'),
     );
-    $f->yesNo(
-        -name      => "webguiUseEmailAsUsername",
-        -value     => $self->session->setting->get("webguiUseEmailAsUsername"),
-        -label     => $i18n->get('use email as username label'),
-        -hoverHelp => $i18n->get('use email as username description'),
+    $f->addField( "yesNo",
+        name      => "webguiUseEmailAsUsername",
+        value     => $self->session->setting->get("webguiUseEmailAsUsername"),
+        label     => $i18n->get('use email as username label'),
+        hoverHelp => $i18n->get('use email as username description'),
     );
-    $f->yesNo(
-        -name      => "webguiChangeUsername",
-        -value     => $self->session->setting->get("webguiChangeUsername"),
-        -label     => $i18n->get(19),
-        -hoverHelp => $i18n->get('19 help'),
+    $f->addField( "yesNo",
+        name      => "webguiChangeUsername",
+        value     => $self->session->setting->get("webguiChangeUsername"),
+        label     => $i18n->get(19),
+        hoverHelp => $i18n->get('19 help'),
     );
-    $f->yesNo(
-        -name      => "webguiChangePassword",
-        -value     => $self->session->setting->get("webguiChangePassword"),
-        -label     => $i18n->get(18),
-        -hoverHelp => $i18n->get('18 help'),
+    $f->addField( "yesNo",
+        name      => "webguiChangePassword",
+        value     => $self->session->setting->get("webguiChangePassword"),
+        label     => $i18n->get(18),
+        hoverHelp => $i18n->get('18 help'),
     );
-    $f->selectList(
-        -name      => "webguiPasswordRecovery",
-        -value     => $self->session->setting->get("webguiPasswordRecovery"),
-        -label     => $i18n->get(6),
-        -hoverHelp => $i18n->get('webguiPasswordRecovery hoverHelp'),
-        -options   => $self->getPasswordRecoveryTypesAvailable,
-        -size      => 1,
-        -multiple  => 0,
+    $f->addField( "selectList",
+        name      => "webguiPasswordRecovery",
+        value     => $self->session->setting->get("webguiPasswordRecovery"),
+        label     => $i18n->get(6),
+        hoverHelp => $i18n->get('webguiPasswordRecovery hoverHelp'),
+        options   => $self->getPasswordRecoveryTypesAvailable,
+        size      => 1,
+        multiple  => 0,
     );
-    $f->yesNo(
-        -name      => "webguiPasswordRecoveryRequireUsername",
-        -value     => $self->session->setting->get("webguiPasswordRecoveryRequireUsername"),
-        -label     => $i18n->get('require username for password recovery'),
-        -hoverHelp => $i18n->get('webguiPasswordRecoveryRequireUsername hoverHelp'),
+    $f->addField( "yesNo",
+        name      => "webguiPasswordRecoveryRequireUsername",
+        value     => $self->session->setting->get("webguiPasswordRecoveryRequireUsername"),
+        label     => $i18n->get('require username for password recovery'),
+        hoverHelp => $i18n->get('webguiPasswordRecoveryRequireUsername hoverHelp'),
     );
-   	$f->yesNo(
-        -name      => "webguiValidateEmail",
-        -value     => $self->session->setting->get("webguiValidateEmail"),
-        -label     => $i18n->get('validate email'),
-        -hoverHelp => $i18n->get('validate email help'),
+   	$f->addField( "yesNo",
+        name      => "webguiValidateEmail",
+        value     => $self->session->setting->get("webguiValidateEmail"),
+        label     => $i18n->get('validate email'),
+        hoverHelp => $i18n->get('validate email help'),
     );
-   	$f->yesNo(
-        -name      => "webguiUseCaptcha",
-        -value     => $self->session->setting->get("webguiUseCaptcha"),
-        -label     => $i18n->get('use captcha'),
-        -hoverHelp => $i18n->get('use captcha help'),
+   	$f->addField( "yesNo",
+        name      => "webguiUseCaptcha",
+        value     => $self->session->setting->get("webguiUseCaptcha"),
+        label     => $i18n->get('use captcha'),
+        hoverHelp => $i18n->get('use captcha help'),
     );
-	$f->template(
-		-name      => "webguiAccountTemplate",
-		-value     => $self->session->setting->get("webguiAccountTemplate"),
-		-namespace => "Auth/WebGUI/Account",
-		-label     => $i18n->get("account template"),
-		-hoverHelp => $i18n->get("account template help"),
+	$f->addField( "template",
+		name      => "webguiAccountTemplate",
+		value     => $self->session->setting->get("webguiAccountTemplate"),
+		namespace => "Auth/WebGUI/Account",
+		label     => $i18n->get("account template"),
+		hoverHelp => $i18n->get("account template help"),
     );
-	$f->template(
-		-name      => "webguiCreateAccountTemplate",
-		-value     => $self->session->setting->get("webguiCreateAccountTemplate"),
-		-namespace => "Auth/WebGUI/Create",
-		-label     => $i18n->get("create account template"),
-		-hoverHelp => $i18n->get("create account template help"),
+	$f->addField( "template",
+		name      => "webguiCreateAccountTemplate",
+		value     => $self->session->setting->get("webguiCreateAccountTemplate"),
+		namespace => "Auth/WebGUI/Create",
+		label     => $i18n->get("create account template"),
+		hoverHelp => $i18n->get("create account template help"),
     );
-    $f->template(
-        -name      => "webguiDeactivateAccountTemplate",
-        -value     => $self->session->setting->get("webguiDeactivateAccountTemplate"),
-        -namespace => "Auth/WebGUI/Deactivate",
-        -label     => $i18n->get("deactivate account template"),
-        -hoverHelp => $i18n->get("deactivate account template help"),
+    $f->addField( "template",
+        name      => "webguiDeactivateAccountTemplate",
+        value     => $self->session->setting->get("webguiDeactivateAccountTemplate"),
+        namespace => "Auth/WebGUI/Deactivate",
+        label     => $i18n->get("deactivate account template"),
+        hoverHelp => $i18n->get("deactivate account template help"),
     );
-	$f->template(
-		-name      => "webguiExpiredPasswordTemplate",
-		-value     => $self->session->setting->get("webguiExpiredPasswordTemplate"),
-		-namespace => "Auth/WebGUI/Expired",
-		-label     => $i18n->get("expired password template"),
-		-hoverHelp => $i18n->get("expired password template"),
+	$f->addField( "template",
+		name      => "webguiExpiredPasswordTemplate",
+		value     => $self->session->setting->get("webguiExpiredPasswordTemplate"),
+		namespace => "Auth/WebGUI/Expired",
+		label     => $i18n->get("expired password template"),
+		hoverHelp => $i18n->get("expired password template"),
     );
-	$f->template(
-		-name      => "webguiLoginTemplate",
-		-value     => $self->session->setting->get("webguiLoginTemplate"),
-		-namespace => "Auth/WebGUI/Login",
-		-label     => $i18n->get("login template"),
-		-hoverHelp => $i18n->get("login template help"),
+	$f->addField( "template",
+		name      => "webguiLoginTemplate",
+		value     => $self->session->setting->get("webguiLoginTemplate"),
+		namespace => "Auth/WebGUI/Login",
+		label     => $i18n->get("login template"),
+		hoverHelp => $i18n->get("login template help"),
 		);
-	$f->template(
-		-name      => "webguiPasswordRecoveryTemplate",
-		-value     => $self->session->setting->get("webguiPasswordRecoveryTemplate"),
-		-namespace => "Auth/WebGUI/Recovery2",
-		-label     => $i18n->get("password recovery template"),
-		-hoverHelp => $i18n->get("password recovery template help")
+	$f->addField( "template",
+		name      => "webguiPasswordRecoveryTemplate",
+		value     => $self->session->setting->get("webguiPasswordRecoveryTemplate"),
+		namespace => "Auth/WebGUI/Recovery2",
+		label     => $i18n->get("password recovery template"),
+		hoverHelp => $i18n->get("password recovery template help")
     );
-    $f->template(
-        -name      => "webguiPasswordRecoveryEmailTemplate",
-        -value     => $self->session->setting->get('webguiPasswordRecoveryEmailTemplate'),
-        -label     => $i18n->get('Password Recovery Email Template'),
-		-hoverHelp => $i18n->get("password recovery email template help"),
-		-namespace => "Auth/WebGUI/RecoveryEmail",
+    $f->addField( "template",
+        name      => "webguiPasswordRecoveryEmailTemplate",
+        value     => $self->session->setting->get('webguiPasswordRecoveryEmailTemplate'),
+        label     => $i18n->get('Password Recovery Email Template'),
+	hoverHelp => $i18n->get("password recovery email template help"),
+		namespace => "Auth/WebGUI/RecoveryEmail",
     );
-    $f->template(
-        -name      => "webguiWelcomeMessageTemplate",
-        -value     => $self->session->setting->get("webguiWelcomeMessageTemplate"),
-        -namespace => "Auth/WebGUI/Welcome",
-        -label     => $i18n->get("welcome message template"),
-        -hoverHelp => $i18n->get("welcome message template help")
+    $f->addField( "template",
+        name      => "webguiWelcomeMessageTemplate",
+        value     => $self->session->setting->get("webguiWelcomeMessageTemplate"),
+        namespace => "Auth/WebGUI/Welcome",
+        label     => $i18n->get("welcome message template"),
+        hoverHelp => $i18n->get("welcome message template help")
     );
-    $f->template(
-        -name      => "webguiAccountActivationTemplate",
-        -value     => $self->session->setting->get("webguiAccountActivationTemplate"),
-        -namespace => "Auth/WebGUI/Activation",
-        -label     => $i18n->get("account activation template"),
-        -hoverHelp => $i18n->get("account activation template help")
+    $f->addField( "template",
+        name      => "webguiAccountActivationTemplate",
+        value     => $self->session->setting->get("webguiAccountActivationTemplate"),
+        namespace => "Auth/WebGUI/Activation",
+        label     => $i18n->get("account activation template"),
+        hoverHelp => $i18n->get("account activation template help")
     );
-    return $f->printRowsOnly;
+    return $f;
 }
 
 #-------------------------------------------------------------------
