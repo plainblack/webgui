@@ -7,6 +7,10 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+7.10.10
+--------------------------------------------------------------------
+    * Asset metadata is now versioned.
+
 7.10.9
 --------------------------------------------------------------------
     * WebGUI now depends on Data::ICal for making and reading iCal feeds

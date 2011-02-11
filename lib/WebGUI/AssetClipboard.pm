@@ -182,11 +182,12 @@ sub duplicate {
     }
     # Duplicate metadata fields
     my $sth = $self->session->db->read(
-        "select * from metaData_values where assetId = ?", 
-        [$self->getId]
+        "select * from metaData_values where assetId = ? and revisionDate = ?",
+        [$self->getId, $self->get('revisionDate')]
     );
     while (my $h = $sth->hashRef) {
-        $self->session->db->write("insert into metaData_values (fieldId, assetId, value) values (?, ?, ?)", [$h->{fieldId}, $newAsset->getId, $h->{value}]);
+        $self->session->db->write("insert into metaData_values (fieldId,
+            assetId, revisionDate, value) values (?, ?, ?, ?)", [$h->{fieldId}, $newAsset->getId, $newAsset->get('revisionDate'), $h->{value}]);
     }
 
     # Duplicate keywords

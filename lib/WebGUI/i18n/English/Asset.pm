@@ -1409,6 +1409,14 @@ Couldn't open %-s because %-s <br />
         context     => q{Class, as in name of class, or type of asset},
     },
 
+    'Allowed Classes' => {
+        message     => 'Allowed Classes',
+        lastUpdated => 1295986062,
+    },
+    'Allowed Classes hoverHelp' => {
+        message     => 'Which assets use this metadata?',
+        lastUpdated => 1295986062,
+    }
 };
 
 1;

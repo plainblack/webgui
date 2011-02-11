@@ -39,7 +39,8 @@ These methods are available from this class:
 
 =head2 addMetaDataField ( )
 
-Adds a new field to the metadata system, or edit an existing one.
+Adds a new field to the metadata system, or edit an existing one. The id of
+the field is returned.
 
 =head3 fieldId
 
@@ -67,6 +68,10 @@ The form field type for metaData: selectBox, text, integer, or checkList, yesNo,
 For fields that provide options, the list of options.  This is a string with
 newline separated values.
 
+=head3 classes
+
+An arrayref of classnames that this metadata field applies to
+
 =cut
 
 sub addMetaDataField {
@@ -78,18 +83,31 @@ sub addMetaDataField {
     my $description      = shift || '';
     my $fieldType        = shift;
     my $possibleValues   = shift;
+    my $classes          = shift;
+    my $db               = $self->session->db;
 
 	if($fieldId eq 'new') {
 		$fieldId = $self->session->id->generate();
-		$self->session->db->write("insert into metaData_properties (fieldId, fieldName, defaultValue, description, fieldType, possibleValues) values (?,?,?,?,?,?)",
+		$db->write("insert into metaData_properties (fieldId, fieldName, defaultValue, description, fieldType, possibleValues) values (?,?,?,?,?,?)",
             [ $fieldId, $fieldName, $defaultValue, $description, $fieldType, $possibleValues, ]
         );
 	}
     else {
-        $self->session->db->write("update metaData_properties set fieldName = ?, defaultValue = ?, description = ?, fieldType = ?, possibleValues = ? where fieldId = ?",
+        $db->write("update metaData_properties set fieldName = ?, defaultValue = ?, description = ?, fieldType = ?, possibleValues = ? where fieldId = ?",
             [ $fieldName, $defaultValue, $description, $fieldType, $possibleValues, $fieldId, ]
         );
+        $db->write('delete from metaData_classes where fieldId=?', [$fieldId]);
 	}
+
+    if ($classes && @$classes) {
+        my $qfid = $db->quote($fieldId);
+        $db->write('insert into metaData_classes (fieldId, className) values '
+            .join(', ',
+            map { my $q = $db->quote($_); "($qfid, $q)" } @$classes
+        ));
+    }
+
+    return $fieldId;
 }
 
 
@@ -108,12 +126,57 @@ The fieldId to be deleted.
 sub deleteMetaDataField {
     my $self = shift;
     my $fieldId = shift;
-    $self->session->db->beginTransaction;
-    $self->session->db->write("delete from metaData_properties where fieldId = ?",[$fieldId]);
-    $self->session->db->write("delete from metaData_values where fieldId = ?",[$fieldId]);
-    $self->session->db->commit;
+    my $db = $self->session->db;
+    $db->beginTransaction;
+    for my $table (map { "metaData_$_" } qw(properties values classes)) {
+        $db->write("delete from $table where fieldId = ?", [ $fieldId ]);
+    }
+    $db->commit;
 }
 
+#-------------------------------------------------------------------
+
+=head2 getMetaDataAsFormFields
+
+Returns a hashref of metadata field names WebGUI::Form objects appropriate
+for use on edit forms.
+
+=cut
+
+sub getMetaDataAsFormFields {
+    my $self    = shift;
+    my $session = $self->session;
+    my $i18n    = WebGUI::International->new($session, 'Asset');
+    my $fields  = $self->getMetaDataFields;
+    my %hash;
+    for my $fid (keys %$fields) {
+        my $info    = $fields->{$fid};
+        my $type    = lcfirst ($info->{fieldType} || 'text');
+        my $name    = $info->{fieldName};
+        my $options = $info->{possibleValues};
+        if($type eq 'selectBox') {
+            my $label = $i18n->get('Select');
+            $options = "|$label\n$options";
+        }
+        my $formClass = ucfirst $type;
+        $hash{$name} = WebGUI::Pluggable::instanciate(
+            "WebGUI::Form::$formClass",
+            'new',
+            [
+                $session, {
+                    name         => "metadata_$fid",
+                    label        => $name,
+                    value        => $info->{value},
+                    extras       => qq'title="$info->{description}"',
+                    defaultValue => $info->{defaultValue},
+                    fieldType    => $type,
+                    options      => $options,
+                }
+            ]
+        )->toHtml;
+    };
+    \%hash;
+}
 
 #-------------------------------------------------------------------
 
@@ -139,21 +202,11 @@ sub getMetaDataAsTemplateVariables {
 
 #-------------------------------------------------------------------
 
-=head2 getMetaDataFields ( [fieldId] )
-
-Returns a hash reference containing all metadata field properties for this Asset.
-You can limit the output to a certain field by specifying a fieldId.
-
-=head3 fieldId
-
-If specified, the hashRef will contain only this field.
-
-=cut
-
-sub getMetaDataFields {
+sub _getMetaDataFieldsHelper {
 	my $self    = shift;
 	my $fieldId = shift;
-    my $session = $self->session;
+	my $listAll = shift || $fieldId;
+	my $db      = $self->session->db;
 	my $sql = "select
 		 	f.fieldId, 
 			f.fieldName, 
@@ -163,19 +216,76 @@ sub getMetaDataFields {
 			f.possibleValues,
 			d.value
 		from metaData_properties f
-		left join metaData_values d on f.fieldId=d.fieldId and d.assetId=".$session->db->quote($self->getId);
-	$sql .= " where f.fieldId = ".$session->db->quote($fieldId) if ($fieldId);
-	$sql .= " order by f.fieldName";
-	if ($fieldId) {
-		return $session->db->quickHashRef($sql);	
-	}
-    else {
-        tie my %hash, 'Tie::IxHash';
-        %hash = %{ $session->db->buildHashRefOfHashRefs($sql, [], 'fieldId') };
-        return \%hash;
-	}
+        left join metaData_values d
+            on f.fieldId=d.fieldId
+            and d.assetId=?
+            and d.revisionDate = ?
+        ";
+
+    my @where;
+    my @place = ($self->getId, $self->get('revisionDate'));
+    unless ($listAll) {
+        # Either there's no class info stored for this field or this class is
+        # one of them.
+        push @where, q{
+            not exists (
+                select * from metaData_classes where fieldId = f.fieldId
+            )
+            or exists (
+                select *
+                from metaData_classes
+                where className = ?
+                    and fieldId = f.fieldId
+            )
+        };
+        push @place, ref $self;
+    }
+
+    if ($fieldId) {
+        push @where, 'f.fieldId = ?';
+        push @place, $fieldId;
+    }
+
+    if (@where) {
+        $sql .= 'where ' . join(' AND ', map { "($_)" } @where);
+    }
+
+    my $hash = $db->buildHashRefOfHashRefs( $sql, \@place, 'fieldId' );
+
+    return $fieldId ? $hash->{$fieldId} : $hash;
 }
 
+#-------------------------------------------------------------------
+
+=head2 getAllMetaDataFields
+
+getMetaDataFields without bothering about whether they apply to this class.
+
+=cut
+
+sub getAllMetaDataFields {
+    my $self = shift;
+    return $self->_getMetaDataFieldsHelper(undef, 1);
+}
+
+#-------------------------------------------------------------------
+
+=head2 getMetaDataFields ( [fieldId] )
+
+Returns a hash reference containing all metadata field properties for this Asset.
+You can limit the output to a certain field by specifying a fieldId.
+
+=head3 fieldId
+
+If specified, the hashRef will contain only this field. In this case, you will
+get that metadata field if it exists whether it applies to this asset or not.
+
+=cut
+
+sub getMetaDataFields {
+    my ($self, $fieldId) = @_;
+    return $self->_getMetaDataFieldsHelper($fieldId);
+}
 
 #-------------------------------------------------------------------
 
@@ -197,17 +307,10 @@ sub updateMetaData {
 	my $self = shift;
 	my $fieldId = shift;
 	my $value = shift;
-	my $db = $self->session->db;
-	my ($exists) = $db->quickArray("select count(*) from metaData_values where assetId = ? and fieldId = ?",[$self->getId, $fieldId]);
-    if (!$exists && $value ne "") {
-        $db->write("insert into metaData_values (fieldId, assetId) values (?,?)",[$fieldId, $self->getId]);
-    }
-    if ($value  eq "") { # Keep it clean
-        $db->write("delete from metaData_values where assetId = ? and fieldId = ?",[$self->getId, $fieldId]);
-    }
-    else {
-        $db->write("update metaData_values set value = ? where assetId = ? and fieldId=?", [$value, $self->getId, $fieldId]);
-    }
+    $self->session->db->write(
+        'replace into metaData_values (fieldId, assetId, revisionDate, value) values (?, ?, ?, ?)',
+        [$fieldId, $self->getId, $self->get('revisionDate'), $value]
+    );
 }
 
 
@@ -277,6 +380,44 @@ sub www_editMetaDataField {
 		-value=>$fieldInfo->{fieldType} || "text",
 		-types=> [ qw /text integer yesNo selectBox radioList checkList/ ]
 	);
+
+    my $default = WebGUI::Asset->definition($self->session)->[0]->{assetName};
+    my %classOptions;
+    # usedNames maps a name to a class. If a name exists there, it has been
+    # used.  If it maps to a classname, that classname needs to be renamed.
+    my %usedNames;
+    for my $class (WebGUI::Pluggable::findAndLoad('WebGUI::Asset')) {
+        next unless $class->isa('WebGUI::Asset');
+        my $name  = $class->definition($self->session)->[0]->{assetName};
+        next unless $name; # abstract classes (e.g. wobject) don't have names
+
+        # We don't want things named "Asset".
+        if ($name eq $default) {
+            $name = $class;
+        }
+        elsif (exists $usedNames{$name}) {
+            if (my $rename = $usedNames{$name}) {
+                $classOptions{$rename} = "$name ($rename)";
+                undef $usedNames{$name};
+            }
+            $name = "$name ($class)";
+        }
+        $usedNames{$name} = $class;
+        $classOptions{$class} = $name;
+    }
+
+    $f->selectList(
+        name         => 'classes',
+        label        => $i18n->get('Allowed Classes'),
+        hoverHelp    => $i18n->get('Allowed Classes hoverHelp'),
+        options      => \%classOptions,
+        defaultValue => $fid ne 'new' && $self->session->db->buildArrayRef(
+            'select className from metaData_classes where fieldId = ?',
+            [ $fid ]
+        ),
+        sortByValue  => 1,
+    );
+
 	$f->textarea(
 		-name=>"possibleValues",
 		-label=>$i18n->get(487),
@@ -330,6 +471,7 @@ sub www_editMetaDataFieldSave {
         $self->session->form->process("description") || '',
         $self->session->form->process("fieldType"),
         $self->session->form->process("possibleValues"),
+        [ $self->session->form->process("classes") ],
     );
 
 	return $self->www_manageMetaData; 
@@ -351,7 +493,7 @@ sub www_manageMetaData {
 	my $i18n = WebGUI::International->new($self->session,"Asset");
 	$ac->addSubmenuItem($self->getUrl('func=editMetaDataField'), $i18n->get("Add new field"));
 	my $output;
-	my $fields = $self->getMetaDataFields();
+	my $fields = $self->getAllMetaDataFields;
 	foreach my $fieldId (keys %{$fields}) {
 		$output .= $self->session->icon->delete("func=deleteMetaDataField;fid=".$fieldId,$self->get("url"),$i18n->get('deleteConfirm'));
 		$output .= $self->session->icon->edit("func=editMetaDataField;fid=".$fieldId,$self->get("url"));

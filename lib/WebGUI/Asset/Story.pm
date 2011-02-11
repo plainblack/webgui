@@ -429,6 +429,9 @@ sub getEditForm {
                             value => $i18n->get('save and add another photo'),
                           }),
     };
+    if ($session->setting->get('metaDataEnabled')) {
+        $var->{metadata} = $self->getMetaDataAsFormFields;
+    }
     $var->{ photo_form_loop } = [];
     ##Provide forms for the existing photos, if any
     ##Existing photos get a delete Yes/No.

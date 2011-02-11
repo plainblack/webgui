@@ -16,6 +16,7 @@ use lib "$FindBin::Bin/../lib";
 ##versions.
 
 use WebGUI::Test;
+use WebGUI::Test::Metadata;
 use WebGUI::Session;
 use WebGUI::Utility;
 use WebGUI::Asset;
@@ -23,7 +24,7 @@ use WebGUI::VersionTag;
 
 use Test::More; # increment this value for each test you create
 use Test::Deep;
-plan tests => 13;
+plan tests => 16;
 
 my $session = WebGUI::Test->session;
 $session->user({userId => 3});
@@ -73,6 +74,21 @@ WebGUI::Test->addToCleanup(sub {
 
 cmp_deeply({}, $snippet->getMetaDataFields, 'snippet has no metadata fields');
 cmp_deeply({}, $folder->getMetaDataFields,  'folder has no metadata fields');
+
+subtest 'Field with class data' => sub {
+    my $meta = WebGUI::Test::Metadata->new(
+        $folder, {
+            classes => ['WebGUI::Asset::Wobject::Folder']
+        }
+    );
+    my $id = $meta->fieldId;
+    my $snips = $snippet->getMetaDataFields;
+    my $folds = $folder->getMetaDataFields;
+    ok !exists $snips->{$id}, 'snippet does not have field';
+    ok exists $folds->{$id}, 'but folder does';
+    $snips = $snippet->getAllMetaDataFields;
+    ok exists $snips->{$id}, 'snips returns data with getAll';
+};
 
 $snippet->addMetaDataField('new', 'searchEngine', '', 'Search Engine preference', 'text');
 
@@ -222,6 +238,71 @@ cmp_deeply(
     },
     'getMetaDataAsTemplateVariables returns proper values for folder'
 );
+
+{
+    my $asset = $root->addChild(
+        {
+            className => 'WebGUI::Asset::Snippet',
+        }
+    );
+    WebGUI::Test->addToCleanup($asset);
+    my $meta = WebGUI::Test::Metadata->new($asset);
+    my $ff = $asset->getMetaDataAsFormFields;
+    like $ff->{$meta->fieldName}, qr/input/, 'getMetaDataAsFormFields';
+}
+
+# check that asset metadata versioning works properly
+subtest 'asset metadata versioning' => sub {
+    my $asset = WebGUI::Asset->getImportNode($session)->addChild(
+        {
+            className => 'WebGUI::Asset::Snippet',
+        }
+    );
+    WebGUI::Test->addToCleanup($asset);
+    my $meta = WebGUI::Test::Metadata->new($asset);
+    $meta->update('version one');
+    sleep 1;
+    my $rev2 = $asset->addRevision();
+    is $meta->get(), 'version one', 'v1 for 1';
+    is $meta->get($rev2), 'version one', 'v1 for 2';
+    $meta->update('version two', $rev2);
+    is $meta->get($rev2), 'version two', 'v2 has been set';
+    is $meta->get(), 'version one', 'v1 has not been changed';
+
+    my $dup = $asset->duplicate;
+
+    my $db    = $session->db;
+    my $count_rev = sub {
+        my $a = shift;
+        my $sql = q{
+            select count(*)
+            from metaData_values
+            where assetId = ? and revisionDate = ?
+        };
+        $db->quickScalar( $sql, [ $a->getId, $a->get('revisionDate') ] );
+    };
+    my $count_all = sub {
+        my $a = shift;
+        my $sql = 'select count(*) from metaData_values where assetId = ?';
+        $db->quickScalar( $sql, [ $a->getId ] );
+    };
+
+    is $count_all->($asset), 2, 'two values for original';
+    is $count_all->($dup), 1, 'one value for dup';
+
+    is $count_rev->($asset), 1, 'one value for v1';
+    is $count_rev->($rev2), 1, 'one value for v2';
+
+    $rev2->purgeRevision;
+
+    note 'after purge';
+
+    is $count_rev->($asset), 1, 'one value for v1';
+    is $count_rev->($rev2), 0, 'no value for v2';
+
+    is $count_all->($asset), 1, 'one value for original';
+    is $count_all->($dup), 1, 'one value for dup';
+};
 
 sub buildNameIndex {
     my ($fidStruct) = @_;

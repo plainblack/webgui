@@ -64,7 +64,7 @@ my $missingModule = 0;
 checkModule("LWP",                          5.833        );
 checkModule("HTTP::Request",                1.40         );
 checkModule("HTTP::Headers",                1.61         );
-checkModule("Test::More",                   0.82,      2 );
+checkModule("Test::More",                   0.96,      2 );
 checkModule("Test::MockObject",             1.02,      2 );
 checkModule("Test::Deep",                   0.095,       );
 checkModule("Test::LongString",             0.13,      2 );

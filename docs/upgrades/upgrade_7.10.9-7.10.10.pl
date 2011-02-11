@@ -32,7 +32,7 @@ my $session = start(); # this line required
 
 # upgrade functions go here
 convertCsMailInterval($session);
-
+addVersioningToMetadata($session);
 finish($session); # this line required
 
 
@@ -69,6 +69,25 @@ sub convertCsMailInterval {
     }
     $get_row->finish;
     $change_row->finish;
+    print "DONE!\n" unless $quiet;
+}
+
+sub addVersioningToMetadata {
+    my $session = shift;
+    print "\tAltering metadata tables for versioning..." unless $quiet;
+    my $db = $session->db;
+    $db->write(q{
+        alter table metaData_values
+            add column revisionDate bigint,
+            drop primary key,
+            add primary key (fieldId, assetId, revisionDate);
+    });
+    $db->write(q{
+        create table metaData_classes (
+            className char(255),
+            fieldId   char(22)
+        );
+    });
     print "DONE!\n" unless $quiet;
 }
 
