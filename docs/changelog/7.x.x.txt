@@ -1,6 +1,7 @@
 7.10.10
  - fixed #12035: Story Manager - make keywords from Story view work
  - fixed #12042: userDefined variables have no template variable help
+ - fixed #12045: Job listing template, missing summary
 
 7.10.9
  - fixed #12030: Calendar Feed Time Zone Issue
