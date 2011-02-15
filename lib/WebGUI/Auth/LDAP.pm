@@ -260,7 +260,7 @@ sub editUserForm {
 	my $connectDN = $self->session->form->process('authLDAP_connectDN') || $userData->{connectDN};
 	my $ldapConnection = $self->session->form->process('authLDAP_ldapConnection') || $userData->{ldapConnection};
 	my $ldapLinks = $self->session->db->buildHashRef("select ldapLinkId,ldapUrl from ldapLink");
-	my $f = WebGUI::HTMLForm->new($self->session);
+	my $f = WebGUI::FormBuilder->new($self->session);
 	my $jscript = "";
 	my $i18n = WebGUI::International->new($self->session,'AuthLDAP');
 	if(scalar(keys %{$ldapLinks}) > 0) {
@@ -277,27 +277,27 @@ sub editUserForm {
 		    $jsArray
 	      //-->
 	   </script>|;
-	   $f->selectBox(
-	                -name=>"authLDAP_ldapConnection",
-					-label=>$i18n->get("ldapConnection"),
-					-hoverHelp=>$i18n->get("ldapConnection description"),
-					-options=>WebGUI::LDAPLink->getList($self->session,),
-					-value=>[$ldapConnection],
-					-extras=>q|onchange="this.form.authLDAP_ldapUrl.value=ldapValue[this.options[this.selectedIndex].value];"|
+	   $f->addField( "selectBox",
+	                name=>"authLDAP_ldapConnection",
+					label=>$i18n->get("ldapConnection"),
+					hoverHelp=>$i18n->get("ldapConnection description"),
+					options=>WebGUI::LDAPLink->getList($self->session,),
+					value=>[$ldapConnection],
+					extras=>q|onchange="this.form.authLDAP_ldapUrl.value=ldapValue[this.options[this.selectedIndex].value];"|
 				  );
 	}
-	$f->url(
-		-name => "authLDAP_ldapUrl",
-		-label => $i18n->get(3),
-		-value => $ldapUrl,
+	$f->addField( "url",
+		name => "authLDAP_ldapUrl",
+		label => $i18n->get(3),
+		value => $ldapUrl,
 	);
-	$f->text(
-		-name => "authLDAP_connectDN",
-		-label => $i18n->get('LDAP User DN'),
-		-value => $connectDN,
+	$f->addField( "text",
+		name => "authLDAP_connectDN",
+		label => $i18n->get('LDAP User DN'),
+		value => $connectDN,
 	);
 	$self->session->style->setRawHeadTags($jscript);
-	return $f->printRowsOnly;
+	return $f;
 }
 
 #-------------------------------------------------------------------

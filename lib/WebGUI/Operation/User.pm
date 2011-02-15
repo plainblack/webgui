@@ -621,100 +621,122 @@ sub www_editUser {
 	return $session->privilege->adminOnly() unless canAdd($session);
 	my $error = shift;
 	my $uid = shift || $session->form->process("uid");
-	my $i18n = WebGUI::International->new($session, "WebGUI");
-	my %tabs;
-	tie %tabs, 'Tie::IxHash';
-    %tabs = (
-        "account"=> { label=>$i18n->get("account")},
-        "profile"=> { label=>$i18n->get("profile")},
-        "groups"=> { label=>$i18n->get('89')},
-    );
-	my $tabform = WebGUI::TabForm->new($session,\%tabs);
-	$tabform->formHeader({extras=>'autocomplete="off"'});	
 	my $u = WebGUI::User->new($session,($uid eq 'new') ? '' : $uid); #Setting uid to '' when uid is 'new' so visitor defaults prefill field for new user
 	my $username = ($u->isVisitor && $uid ne "1") ? '' : $u->username;
-    $tabform->hidden({name=>"op",value=>"editUserSave"});
-    $tabform->hidden({name=>"uid",value=>$uid});
-    $tabform->getTab("account")->raw('<tr><td width="170">&nbsp;</td><td>&nbsp;</td></tr>');
-    $tabform->getTab("account")->readOnly(value=>$uid,label=>$i18n->get(378));
-    $tabform->getTab("account")->readOnly(value=>$u->karma,label=>$i18n->get(537)) if ($session->setting->get("useKarma"));
-    $tabform->getTab("account")->readOnly(value=>$session->datetime->epochToHuman($u->dateCreated,"%z"),label=>$i18n->get(453));
-    $tabform->getTab("account")->readOnly(value=>$session->datetime->epochToHuman($u->lastUpdated,"%z"),label=>$i18n->get(454));
-    $tabform->getTab("account")->text(
-        -name=>"username",
-        -label=>$i18n->get(50),
-        -value=>$username
-        -extras=>'autocomplete="off"',
+	my $i18n = WebGUI::International->new($session, "WebGUI");
+    my $f = WebGUI::FormBuilder->new( $session, 
+        action => $session->url->page,
+        extras => 'autocomplete="off"',
     );
-	my %status;
-	tie %status, 'Tie::IxHash';
-	%status = (
-		Active		=>$i18n->get(817),
-		Deactivated	=>$i18n->get(818),
-		Selfdestructed	=>$i18n->get(819)
-		);
+    $f->addField( 'csrfToken', name => 'csrfToken' );
+    $f->addField( "hidden",
+        name => 'op',
+        value => 'editUserSave',
+    );
+    $f->addField( "hidden", 
+        name => "uid", 
+        value => $uid,
+    );
+    my $account = $f->addTab( name => "account", label => $i18n->get('account') );
+    my $profile = $f->addTab( name => "profile", label => $i18n->get('profile') );
+    my $groups = $f->addTab( name => "groups", label => $i18n->get('89') );
+
+    # Normal user fields
+    $account->addField( "readOnly", 
+        name => "uid", 
+        value => $uid, 
+        label => $i18n->get(378),
+    );
+    $account->addField( "readOnly", 
+        name => "karma", 
+        value => $u->karma,
+        label => $i18n->get(537)
+    ) if ($session->setting->get("useKarma"));
+    $account->addField( "readOnly",
+        name => "dateCreated",
+        value=>$session->datetime->epochToHuman($u->dateCreated,"%z"),
+        label=>$i18n->get(453)
+    );
+    $account->addField( "readOnly",
+        name => "lastUpdated",
+        value=>$session->datetime->epochToHuman($u->lastUpdated,"%z"),
+        label=>$i18n->get(454)
+    );
+    $account->addField( "text",
+        name=>"username",
+        label=>$i18n->get(50),
+        value=>$username,
+        extras=>'autocomplete="off"',
+    );
+
 	if ($u->userId eq $session->user->userId) {
-		$tabform->getTab("account")->hidden(
-			-name => "status",
-			-value => $u->status
+		$account->addField( "hidden",
+			name => "status",
+			value => $u->status
 			);
 	}
     else {
-		$tabform->getTab("account")->selectBox(
-			-name => "status",
-			-options => \%status,
-			-label => $i18n->get(816),
-			-value => $u->status
+        tie my %status, 'Tie::IxHash', (
+            Active		=>$i18n->get(817),
+            Deactivated	=>$i18n->get(818),
+            Selfdestructed	=>$i18n->get(819)
+        );
+		$account->addField( "selectBox",
+			name => "status",
+			options => \%status,
+			label => $i18n->get(816),
+			value => $u->status
 			);
 	}
+
+    # Auth configurations
 	my $options;
 	foreach (@{$session->config->get("authMethods")}) {
 		$options->{$_} = $_;
 	}
-	$tabform->getTab("account")->selectBox(
-	        -name=>"authMethod",
-		-options=>$options,
-		-label=>$i18n->get(164),
-		-value=>$u->authMethod,
+	$account->addField( "selectBox",
+	        name=>"authMethod",
+		options=>$options,
+		label=>$i18n->get(164),
+		value=>$u->authMethod,
     );
-	foreach (@{$session->config->get("authMethods")}) {
-		my $authInstance = WebGUI::Operation::Auth::getInstance($session,$_,$u->userId);
+	foreach my $auth (@{$session->config->get("authMethods")}) {
+		my $authInstance = WebGUI::Operation::Auth::getInstance($session,$auth,$u->userId);
         my $editUserForm = $authInstance->editUserForm;
         next unless $editUserForm;
-		$tabform->getTab("account")->fieldSetStart($_);
-		$tabform->getTab("account")->raw($editUserForm);
-		$tabform->getTab("account")->fieldSetEnd;
+        $account->addFieldset( $editUserForm, name => $auth, label => $auth );
 	}
+
+    # Profile fields
 	foreach my $category (@{WebGUI::ProfileCategory->getCategories($session)}) {
-		$tabform->getTab("profile")->fieldSetStart($category->getLabel);
+		my $fieldset = $profile->addFieldset( name => $category->getLabel, label => $category->getLabel );
 		foreach my $field (@{$category->getFields}) {
 			next if $field->getId =~ /contentPositions/;
 			my $label = $field->getLabel . ($field->isRequired ? "*" : '');
 			if ($u->isVisitor) {
-				$tabform->getTab("profile")->raw($field->formField({label=>$label},1,undef,undef,undef,undef,'useFormDefault'));
+				$fieldset->addField($field->formField({label=>$label},1,undef,undef,undef,1,'useFormDefault'));
 			}
             else {
-				$tabform->getTab("profile")->raw($field->formField({label=>$label},1,$u));
+				$fieldset->addField($field->formField({label=>$label},1,$u,undef,undef,1));
 			}
 		}
-		$tabform->getTab("profile")->fieldSetEnd($category->getLabel);
 	}
+
+    # Groups
 	my @groupsToAdd = $session->form->group("groupsToAdd");
 	my @exclude = $session->db->buildArray("select groupId from groupings where userId=?",[$u->userId]);
-	@exclude = (@exclude,"1","2","7");
+	push @exclude,"1","2","7"; # Special groups cannot be left/joined
     my $secondaryAdmin = $session->user->isInGroup('11');
-    my @extraExclude = ();
     if ($secondaryAdmin && !$session->user->isAdmin) {
-        @extraExclude = $session->db->buildArray('select groupId from groups where groupId not in (select groupId from groupings where userId=?)',[$session->user->userId]);
+        push @exclude, $session->db->buildArray('select groupId from groups where groupId not in (select groupId from groupings where userId=?)',[$session->user->userId]);
     }
-    push @extraExclude, @exclude;
-	$tabform->getTab("groups")->group(
-		-name=>"groupsToAdd",
-		-label=>$i18n->get("groups to add"),
-		-excludeGroups=>\@extraExclude,
-		-size=>15,
-		-multiple=>1,
-		-value=>\@groupsToAdd
+	$groups->addField( "group",
+		name=>"groupsToAdd",
+		label=>$i18n->get("groups to add"),
+		excludeGroups=>\@exclude,
+		size=>15,
+		multiple=>1,
+		value=>\@groupsToAdd
 		);
 	my @include; 
 	foreach my $group (@exclude) {
@@ -728,22 +750,16 @@ sub www_editUser {
 	}
 	push (@include, "0");
 	my @groupsToDelete = $session->form->group("groupsToDelete");
-	$tabform->getTab("groups")->selectList(
-		-name=>"groupsToDelete",
-		-options=>$session->db->buildHashRef("select groupId, groupName from groups 
+	$groups->addField( "selectList",
+		name=>"groupsToDelete",
+		options=>$session->db->buildHashRef("select groupId, groupName from groups 
 			where groupId in (".$session->db->quoteAndJoin(\@include).") and showInForms=1 order by groupName"),
-		-label=>$i18n->get("groups to delete"),
-		-multiple=>1,
-		-size=>15,
-		-value=>\@groupsToDelete
+		label=>$i18n->get("groups to delete"),
+		multiple=>1,
+		size=>15,
+		value=>\@groupsToDelete
 		);
-	my $submenu = _submenu(
-                        $session,
-                        { workarea => $error.$tabform->print,
-                          title    => 168,
-                          userId   => $uid, }
-                  );
-	return $submenu;;
+	return '<h1>' . $i18n->get(168) . '</h1>' . $f->toHtml;
 }
 
 #-------------------------------------------------------------------

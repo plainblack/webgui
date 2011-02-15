@@ -219,7 +219,7 @@ sub editUserFormSave {
 		}
    	}
    
-   $self->SUPER::editUserFormSave($properties);
+    $self->update( $properties );
 }
 
 #-------------------------------------------------------------------
