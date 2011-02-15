@@ -1749,6 +1749,66 @@ the Collaboration Asset, the user will be notified.|,
         lastUpdated => 0,
     },
 
+    'every minute' => {
+        message     => q{Every minute},
+        context     => q{label in the asset edit form},
+        lastUpdated => 0,
+    },
+
+    'every other minute' => {
+        message     => q{Every other minute},
+        context     => q{label in the asset edit form},
+        lastUpdated => 0,
+    },
+
+    'every 5 minutes' => {
+        message     => q{Every 5 minutes},
+        context     => q{label in the asset edit form},
+        lastUpdated => 0,
+    },
+
+    'every 10 minutes' => {
+        message     => q{Every 10 minutes},
+        context     => q{label in the asset edit form},
+        lastUpdated => 0,
+    },
+
+    'every 15 minutes' => {
+        message     => q{Every 15 minutes},
+        context     => q{label in the asset edit form},
+        lastUpdated => 0,
+    },
+
+    'every 20 minutes' => {
+        message     => q{Every 20 minutes},
+        context     => q{label in the asset edit form},
+        lastUpdated => 0,
+    },
+
+    'every 30 minutes' => {
+        message     => q{Every 30 minutes},
+        context     => q{label in the asset edit form},
+        lastUpdated => 0,
+    },
+
+    'every hour' => {
+        message     => q{Every hour},
+        context     => q{label in the asset edit form},
+        lastUpdated => 0,
+    },
+
+    'every other hour' => {
+        message     => q{Every other hour},
+        context     => q{label in the asset edit form},
+        lastUpdated => 0,
+    },
+
+    'once per day' => {
+        message     => q{Once per day},
+        context     => q{label in the asset edit form},
+        lastUpdated => 0,
+    },
+
 };
 
 1;

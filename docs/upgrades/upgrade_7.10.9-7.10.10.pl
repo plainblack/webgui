@@ -31,6 +31,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+convertCsMailInterval($session);
 
 finish($session); # this line required
 
@@ -43,6 +44,33 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+#----------------------------------------------------------------------------
+sub convertCsMailInterval {
+    my $session = shift;
+    print "\tConvert the getMailInterval from seconds to enumeration... " unless $quiet;
+    # and here's our code
+    $session->db->write('alter table Collaboration modify column getMailInterval char(64)');
+    my $get_row    = $session->db->read('select assetId, revisionDate, getMailInterval from Collaboration');
+    my $change_row = $session->db->prepare('update Collaboration set getMailInterval=? where assetId=? and revisionDate=?');
+    while (my ($assetId, $revisionDate, $seconds ) = $get_row->array) {
+        my $interval;
+        if ($seconds <= 60) { $interval = 'every minute'; }
+        elsif ($seconds <= 120)  { $interval = 'every other minute'; }
+        elsif ($seconds <= 300)  { $interval = 'every 5 minutes'; }
+        elsif ($seconds <= 600)  { $interval = 'every 10 minutes'; }
+        elsif ($seconds <= 900)  { $interval = 'every 15 minutes'; }
+        elsif ($seconds <= 1200) { $interval = 'every 20 minutes'; }
+        elsif ($seconds <= 1800) { $interval = 'every 30 minutes'; }
+        elsif ($seconds <= 3600) { $interval = 'every hour'; }
+        elsif ($seconds <= 7200) { $interval = 'every other hour'; }
+        else                     { $interval = 'once per day'; }
+        $change_row->execute([$interval, $assetId, $revisionDate]);
+    }
+    $get_row->finish;
+    $change_row->finish;
+    print "DONE!\n" unless $quiet;
+}
 
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------

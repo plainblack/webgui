@@ -418,19 +418,19 @@ sub commit {
     unless (defined $cron) {
             $cron = WebGUI::Workflow::Cron->create($self->session, {
                     title=>$self->getTitle." ".$i18n->get("mail"),
-                    minuteOfHour=>"*/".($self->get("getMailInterval")/60),
                     className=>(ref $self),
                     methodName=>"new",
                     parameters=>$self->getId,
-                    workflowId=>"csworkflow000000000001"
+                    workflowId=>"csworkflow000000000001",
+                    $self->getCronIntervals,
                     });
             $self->update({getMailCronId=>$cron->getId});
     }
-    if ($self->get("getMail")) {
-            $cron->set({enabled=>1,title=>$self->getTitle." ".$i18n->get("mail"), minuteOfHour=>"*/".($self->get("getMailInterval")/60)});
-    } else {
-            $cron->set({enabled=>0,title=>$self->getTitle." ".$i18n->get("mail"), minuteOfHour=>"*/".($self->get("getMailInterval")/60)});
-    }
+    $cron->set({
+        enabled => $self->get('getMail') ? 1 : 0,
+        title   => $self->getTitle." ".$i18n->get("mail"),
+        $self->getCronIntervals(),
+    });
 }
 
 #-------------------------------------------------------------------
@@ -487,6 +487,20 @@ sub definition {
 			  userDefined5=>$i18n->get('user defined 5'),
 			  ($useKarma? (karmaRank=>$i18n->get('karma rank')) : ()),
 			 );
+
+	tie my %mailIntervalOptions, 'Tie::IxHash';
+    %mailIntervalOptions = (
+         'every minute'       => $i18n->get('every minute'),
+         "every other minute" => $i18n->get('every other minute'),
+         'every 5 minutes'    => $i18n->get('every 5 minutes'),
+         'every 10 minutes'   => $i18n->get('every 10 minutes'),
+         'every 15 minutes'   => $i18n->get('every 15 minutes'),
+         'every 20 minutes'   => $i18n->get('every 20 minutes'),
+         'every 30 minutes'   => $i18n->get('every 30 minutes'),
+         'every hour'         => $i18n->get('every hour'),
+         'every other hour'   => $i18n->get('every other hour'),
+         'once per day'       => $i18n->get('once per day'),
+     );
 
 	my %properties;
 	tie %properties, 'Tie::IxHash';
@@ -593,8 +607,11 @@ sub definition {
 			hoverHelp=>$i18n->get("get mail help"),
 			},
 		getMailInterval=>{
-			fieldType=>"interval",
-			defaultValue=>300,
+			#fieldType=>"interval",
+			#defaultValue=>300,
+			fieldType=>"selectBox",
+            defaultValue => 'every 10 minutes',
+            options => \%mailIntervalOptions,
 			tab=>'mail',
 			label=>$i18n->get("get mail interval"),
 			hoverHelp=>$i18n->get("get mail interval help"),
@@ -921,11 +938,11 @@ sub duplicate {
     my $i18n = WebGUI::International->new($self->session, "Asset_Collaboration");
     my $newCron = WebGUI::Workflow::Cron->create($self->session, {
             title=>$self->getTitle." ".$i18n->get("mail"),
-            minuteOfHour=>"*/".($self->get("getMailInterval")/60),
             className=>(ref $self),
             methodName=>"new",
             parameters=>$self->getId,
-            workflowId=>"csworkflow000000000001"
+            workflowId=>"csworkflow000000000001",
+            $self->getCronIntervals(),
     });
     $newAsset->update({getMailCronId=>$newCron->getId});
     $newAsset->incrementReplies('','');
@@ -945,6 +962,87 @@ sub duplicateBranch {
     my $newAsset = $self->next::method(@_);
     $newAsset->incrementReplies('','');
     return $newAsset;
+}
+
+#-------------------------------------------------------------------
+
+=head2 getCronIntervals
+
+Translate the settings for getCsMailInterval into options for Spectre's Cron,
+minuteOfHour, hourOfDay and so on.
+
+Returns a hash of those options that can be folded into a hash of property settings for the
+Cron job.
+
+=cut
+
+sub getCronIntervals {
+	my $self     = shift;
+    my $interval = $self->get('getMailInterval');
+    ##My kingdom for a switch statement!
+    if ($interval eq 'every minute') {
+        return(
+            hourOfDay    => '*',
+            minuteOfHour => '*/1',
+        );
+    }
+    elsif ($interval eq 'every other minute') {
+        return(
+            hourOfDay    => '*',
+            minuteOfHour => '*/2',
+        );
+    }
+    elsif ($interval eq 'every 5 minutes') {
+        return(
+            hourOfDay    => '*',
+            minuteOfHour => '*/5',
+        );
+    }
+    elsif ($interval eq 'every 10 minutes') {
+        return(
+            hourOfDay    => '*',
+            minuteOfHour => '*/10',
+        );
+    }
+    elsif ($interval eq 'every 15 minutes') {
+        return(
+            hourOfDay    => '*',
+            minuteOfHour => '*/15',
+        );
+    }
+    elsif ($interval eq 'every 20 minutes') {
+        return(
+            hourOfDay    => '*',
+            minuteOfHour => '*/20',
+        );
+    }
+    elsif ($interval eq 'every 30 minutes') {
+        return(
+            hourOfDay    => '*',
+            minuteOfHour => '*/30',
+        );
+    }
+    elsif ($interval eq 'every hour') {
+        return(
+            hourOfDay    => '*',
+            minuteOfHour => '0',
+        );
+    }
+    elsif ($interval eq 'every other hour') {
+        return(
+            hourOfDay    => '*/2',
+            minuteOfHour => '0',
+        );
+    }
+    elsif ($interval eq 'once per day') {
+        return(
+            hourOfDay    => '7',
+            minuteOfHour => '0',
+        );
+    }
+	return(
+        minuteOfHour => '*/10',
+    );
 }
 
 #-------------------------------------------------------------------
