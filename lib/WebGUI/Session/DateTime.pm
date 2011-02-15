@@ -375,7 +375,7 @@ sub epochToMail {
 
 =head2 epochToSet ( [ epoch, withTime ] )
 
-Returns a set date (used by WebGUI::HTMLForm->date) in the format of YYYY-MM-DD. 
+Returns a set date (used by WebGUI::Form::Date) in the format of YYYY-MM-DD. 
 
 =head3 epoch
 
