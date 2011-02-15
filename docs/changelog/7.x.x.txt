@@ -8,6 +8,7 @@
  - fixed #12045: Job listing template, missing summary
  - fixed #12043: Collaboration Systems don't pull mail that fast!
  - fixed #12044: Spectre::Cron and non-integer time units
+ - fixed #12046: Empty AssetProxy creates infinite loop (Dale Trexel)
 
 7.9.21
  - fixed #12029: issue with keywords
