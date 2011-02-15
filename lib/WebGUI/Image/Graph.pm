@@ -295,7 +295,7 @@ sub getGraphingTab {
                     }
                 }
             </script>
-    EOS
+EOS
     );
 
             $tab->addField('selectBox',
