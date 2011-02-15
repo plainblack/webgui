@@ -24,7 +24,7 @@ use Tie::IxHash;
 use Clone qw/clone/;
 use WebGUI::DateTime;
 use WebGUI::Exception;
-use WebGUI::HTMLForm;
+use WebGUI::FormBuilder;
 use Scalar::Util qw( blessed );
 
 has session => (
