@@ -234,8 +234,6 @@ sub getGraphingTab {
 	
 	my $i18n = WebGUI::International->new($session, 'Image_Graph');
 		
-	my $f = WebGUI::HTMLForm->new($session);
-
 	unless ($session->config->get("graphingPlugins")) {
         $tab->addField('readOnly', { value => $i18n->get('no graphing plugins in config'), });
 	}
@@ -252,75 +250,70 @@ sub getGraphingTab {
 	}
 	
 	my $ns = $config->{graph_formNamespace};
-	my %configForms;
-	if (%graphingPlugins) {
-		$session->style->setRawHeadTags(<<EOS
-		<script type="text/javascript">
-			function inNamespace (clas, namespace) {
-				var namespaceParts = namespace.split('_');
-				var s = '';
+        if (%graphingPlugins) {
+            $session->style->setRawHeadTags(<<EOS
+            <script type="text/javascript">
+                function inNamespace (clas, namespace) {
+                    var namespaceParts = namespace.split('_');
+                    var s = '';
 
-				for (var i = 0; i < namespaceParts.length; i++) {
-					if (i > 0) { 
-						s = s + '_';
-					}
-					s = s + namespaceParts[i];
+                    for (var i = 0; i < namespaceParts.length; i++) {
+                        if (i > 0) { 
+                            s = s + '_';
+                        }
+                        s = s + namespaceParts[i];
 
-					if (s == clas) {
-						return true;
-					}
-				}
+                        if (s == clas) {
+                            return true;
+                        }
+                    }
 
-				return false;
-			}
+                    return false;
+                }
 
-			function getContainerTag (elem, tagname) {
-				var parent = elem.parentNode;
+                function getContainerTag (elem, tagname) {
+                    var parent = elem.parentNode;
 
-				while (parent.tagName != tagname) {
-					parent = parent.parentNode;
-				}
+                    while (parent.tagName != tagname) {
+                        parent = parent.parentNode;
+                    }
 
-				return parent;
-			}
+                    return parent;
+                }
 
-			function switchGraphingFormElements (elem, namespace) {
-				var rowElements = getContainerTag(elem, 'TABLE').getElementsByTagName('TR');
+                function switchGraphingFormElements (elem, namespace) {
+                    var rowElements = getContainerTag(elem, 'TABLE').getElementsByTagName('TR');
 
-				for (var ix = 0; ix < rowElements.length; ix++) {
-					if (inNamespace(rowElements[ix].className, namespace)) {
-						rowElements[ix].style.display = '';
-					} else {
-						if (rowElements[ix].className.match(/^Graph_/)) {
-							rowElements[ix].style.display = 'none';
-						}
-					}
-				}
-			}
-		</script>
-EOS
-);
+                    for (var ix = 0; ix < rowElements.length; ix++) {
+                        if (inNamespace(rowElements[ix].className, namespace)) {
+                            rowElements[ix].style.display = '';
+                        } else {
+                            if (rowElements[ix].className.match(/^Graph_/)) {
+                                rowElements[ix].style.display = 'none';
+                            }
+                        }
+                    }
+                }
+            </script>
+    EOS
+    );
 
-        $tab->addField('selectBox',
-			name		=> 'graphingPlugin',
-			options	    => \%graphingPlugins,
-			label		=> $i18n->get('graph type'),
-			hoverHelp	=> $i18n->get('graph type description'),
-			id		    => 'graphTypeSelector',
-			value		=> [ $config->{graph_formNamespace} ],
-			extras		=> 'onchange="switchGraphingFormElements(this, this.value)"', 
-		);
+            $tab->addField('selectBox',
+                name		=> 'graphingPlugin',
+                options	    => \%graphingPlugins,
+                label		=> $i18n->get('graph type'),
+                hoverHelp	=> $i18n->get('graph type description'),
+                id		    => 'graphTypeSelector',
+                value		=> [ $config->{graph_formNamespace} ],
+                extras		=> 'onchange="switchGraphingFormElements(this, this.value)"', 
+            );
 
-		foreach my $currentPlugin (@graphingPlugins) {
-			$currentPlugin->configurationForm($tab);
-		}
-	} else {
-		$tab->addField('readOnly', value => $i18n->get('no graphing plugins'), );
-	}
-
-	foreach (sort keys %configForms) {
-		$f->raw($configForms{$_});
-	}
+            foreach my $currentPlugin (@graphingPlugins) {
+                $currentPlugin->configurationForm($tab);
+            }
+        } else {
+            $tab->addField('readOnly', value => $i18n->get('no graphing plugins'), );
+        }
 
     $tab->addField('readOnly', value => <<EOJS );
 <script type="text/javascript">
