@@ -10,6 +10,7 @@ The API for new() has changed: new( $session, $userId );
 
 editUserSettingsForm deprecated. Use editSettingsForm
 editUserSettingsFormSave is deprecated. Use editSettingsFormSave
+editUserForm and editSettingsForm now return WebGUI::FormBuilder objects instead of raw HTML.
 deleteParams is deprecated. use delete()
 deleteSingleParam is deprecated. use delete("param")
 saveParams is deprecated. use update()
