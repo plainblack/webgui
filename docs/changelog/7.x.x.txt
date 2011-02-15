@@ -6,6 +6,7 @@
  - fixed #12035: Story Manager - make keywords from Story view work
  - fixed #12042: userDefined variables have no template variable help
  - fixed #12045: Job listing template, missing summary
+ - fixed #12043: Collaboration Systems don't pull mail that fast!
 
 7.9.21
  - fixed #12029: issue with keywords
