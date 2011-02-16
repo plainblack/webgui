@@ -326,7 +326,6 @@ $mech->submit_form_ok({
 
 # Payment method edited!
 $mech->content_contains( 'Free Luna Dollars', 'new label shows up in manage screen' );
-diag( $mech->content );
 ok( my $paydriver = WebGUI::Shop::PayDriver->new( $mech->session, $paydriverId ), 'paydriver can be instanced' );
 is( $paydriver->label, 'Free Luna Dollars', 'label set correctly' );
 ok( $paydriver->enabled, 'driver is enabled' );
