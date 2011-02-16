@@ -50,12 +50,12 @@ is( $wizard->getCurrentStep, "one", "SetCurrentStep" );
 # Form Start and End
 
 my $f   = $wizard->getForm;
-isa_ok( $f, 'WebGUI::HTMLForm' );
-my $html = $f->print;
+isa_ok( $f, 'WebGUI::FormBuilder' );
+my $html = $f->toHtml;
 like( $html, qr/wizard_class.+WebGUI::Wizard/, 'getFormStart wizard_class' );
 like( $html, qr/wizard_step.+one/, 'getFormStart wizard_step' );
 
-$html   = $wizard->getForm( "two" )->print;
+$html   = $wizard->getForm( "two" )->toHtml;
 like( $html, qr/wizard_step.+two/, 'getFormStart wizard_step override step' );
 
 #----------------------------------------------------------------------------

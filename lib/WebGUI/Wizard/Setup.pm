@@ -148,40 +148,40 @@ sub www_adminAccount {
     my $legend = $i18n->get('admin account');
     my $u = WebGUI::User->new( $session, '3' );
     my $f = $self->getForm;
-    $f->text(
-        -name      => "username",
-        -value     => $u->username,
-        -label     => $i18n->get(50),
-        -hoverHelp => $i18n->get('50 setup description'),
+    $f->addField( "text",
+        name      => "username",
+        value     => $u->username,
+        label     => $i18n->get(50),
+        hoverHelp => $i18n->get('50 setup description'),
     );
-    $f->text(
-        -name      => "identifier",
-        -value     => "123qwe",
-        -label     => $i18n->get(51),
-        -hoverHelp => $i18n->get('51 description'),
-        -subtext   => '<div style=\"font-size: 10px;\">(' . $i18n->get("password clear text") . ')</div>'
+    $f->addField( "text",
+        name      => "identifier",
+        value     => "123qwe",
+        label     => $i18n->get(51),
+        hoverHelp => $i18n->get('51 description'),
+        subtext   => '<div style=\"font-size: 10px;\">(' . $i18n->get("password clear text") . ')</div>'
     );
-    $f->email(
-        -name      => "email",
-        -value     => $u->get("email"),
-        -label     => $i18n->get(56),
-        -hoverHelp => $i18n->get('56 description'),
+    $f->addField( "email",
+        name      => "email",
+        value     => $u->get("email"),
+        label     => $i18n->get(56),
+        hoverHelp => $i18n->get('56 description'),
     );
-    $f->timeZone(
-        -name      => "timeZone",
-        -value     => $u->get("timeZone"),
-        -label     => $i18n->get( 'timezone', 'DateTime' ),
-        -hoverHelp => $i18n->get('timezone help'),
+    $f->addField( "timeZone",
+        name      => "timeZone",
+        value     => $u->get("timeZone"),
+        label     => $i18n->get( 'timezone', 'DateTime' ),
+        hoverHelp => $i18n->get('timezone help'),
     );
-    $f->selectBox(
-        -name      => "language",
-        -value     => $u->get("language"),
-        -label     => $i18n->get('304'),
-        -hoverHelp => $i18n->get('language help'),
-        -options   => $i18n->getLanguages(),
+    $f->addField( "selectBox",
+        name      => "language",
+        value     => $u->get("language"),
+        label     => $i18n->get('304'),
+        hoverHelp => $i18n->get('language help'),
+        options   => $i18n->getLanguages(),
     );
-    $f->submit;
-    return '<h1>' . $legend . '</h1>' . $f->print;
+    $f->addField( "submit", name => "submit" );
+    return '<h1>' . $legend . '</h1>' . $f->toHtml;
 }
 
 #----------------------------------------------------------------------------
@@ -252,26 +252,26 @@ sub www_companyInformation {
     my $output = '<h1>' . $i18n->get('company information') . '</h1>';
 
     my $f = $self->getForm;
-    $f->text(
+    $f->addField( "text",
         name      => "companyName",
         value     => $session->setting->get("companyName"),
         label     => $i18n->get(125),
         hoverHelp => $i18n->get('125 description'),
     );
-    $f->email(
+    $f->addField( "email",
         name      => "companyEmail",
         value     => $session->setting->get("companyEmail"),
         label     => $i18n->get(126),
         hoverHelp => $i18n->get('126 description'),
     );
-    $f->url(
+    $f->addField( "url",
         name      => "companyURL",
         value     => $session->setting->get("companyURL"),
         label     => $i18n->get(127),
         hoverHelp => $i18n->get('127 description'),
     );
-    $f->submit;
-    $output .= $f->print;
+    $f->addField( "submit", name => "submit" );
+    $output .= $f->toHtml;
 
     return $output;
 }
@@ -310,18 +310,18 @@ sub www_siteStats {
     my $i18n = WebGUI::International->new( $session, "WebGUI" );
 
     my $enableForm  = $self->getForm;
-    $enableForm->hidden( name => "enableStats", value => 1 );
-    $enableForm->submit( value => $i18n->get( 'enable', 'Activity_SendWebguiStats' ) );
+    $enableForm->addField( "hidden", name => "enableStats", value => 1 );
+    $enableForm->addField( "submit", name => 'submit', value => $i18n->get( 'enable', 'Activity_SendWebguiStats' ) );
 
     my $disableForm = $self->getForm;
-    $disableForm->hidden( name => "enableStats", value => 0 );
-    $disableForm->submit( value => $i18n->get( 'disable', 'Activity_SendWebguiStats' ) );
+    $disableForm->addField( "hidden", name => "enableStats", value => 0 );
+    $disableForm->addField( "submit", name => 'submit', value => $i18n->get( 'disable', 'Activity_SendWebguiStats' ) );
 
     my $output = '<h1>' . $i18n->get( 'topicName', 'Activity_SendWebguiStats' ) . '</h1>';
     $output .= ' <p>' . $i18n->get( 'why to send', 'Activity_SendWebguiStats' ) . '</p>
          <p>' . $i18n->get( 'would you participate', 'Activity_SendWebguiStats' ) . '</p>
-        <div style="float: left">' . $enableForm->print . '</div><div style="float: left">'
-        . $disableForm->print
+        <div style="float: left">' . $enableForm->toHtml . '</div><div style="float: left">'
+        . $disableForm->toHtml
         . '</div>'
         . '<div style="clear: both;">&nbsp;</div>'
         ;
@@ -341,6 +341,7 @@ sub www_siteStatsSave {
     my ( $self ) = @_;
     my $session = $self->session;
     my $form    = $session->form;
+    use WebGUI::Operation::Statistics;
     WebGUI::Operation::Statistics::www_enableSendWebguiStats($session) if ( $form->get("enableStats") );
     return;
 }
