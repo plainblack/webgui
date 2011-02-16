@@ -244,10 +244,15 @@ sub www_manage {
 #    }
 
     my $taxDriver   = $self->getDriver;
+    my $editForm    = $taxDriver->getEditForm;
+    my $editFormHtml = '';
+    if ( blessed $editForm and $editForm->isa( 'WebGUI::FormBuilder' ) ) {
+        $editFormHtml = $editForm->toHtml;
+    }
     my $output      = 
         $pluginSwitcher
         . '<fieldset><legend>Plugin configuration</legend>' 
-            . $taxDriver->getConfigurationScreen
+            . $editFormHtml
         . '</fieldset>'
         ;
 

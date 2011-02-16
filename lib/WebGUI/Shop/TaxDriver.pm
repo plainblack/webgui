@@ -177,13 +177,13 @@ sub className {
 
 #-----------------------------------------------------------
 
-=head2 getConfigurationScreen ( )
+=head2 getEditForm ( )
 
-Returns the configuration screen that contains the configuration options for this plugin in the admin console.
+Returns the edit form that contains the configuration options for this plugin in the admin console.
 
 =cut
 
-sub getConfigurationScreen {
+sub getEditForm {
     return 'This plugin has no configuration options';
 }
 

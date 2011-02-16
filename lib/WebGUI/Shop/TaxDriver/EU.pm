@@ -291,13 +291,13 @@ sub deleteVATNumber {
     
 #-----------------------------------------------------------
 
-=head2 getConfigurationScreen ( )
+=head2 getEditForm ( )
 
 Returns the form that contains the configuration options for this plugin in the admin console.
 
 =cut
 
-sub getConfigurationScreen {
+sub getEditForm {
     my $self    = shift;
     my $session = $self->session;
     my $i18n    = WebGUI::International->new( $session, 'TaxDriver_EU' );
@@ -310,48 +310,48 @@ sub getConfigurationScreen {
     );
 
     # General setting form
-    my $f = WebGUI::HTMLForm->new( $session );
-    $f->hidden(
+    my $f = WebGUI::FormBuilder->new( $session );
+    $f->addField( "hidden",
         name        => 'shop',
         value       => 'tax',
     );
-    $f->hidden(
+    $f->addField( "hidden",
         name        => 'method',
         value       => 'do',
     );
-    $f->hidden(
+    $f->addField( "hidden",
         name        => 'do',
         value       => 'saveConfiguration',
     );
-    $f->selectBox(
+    $f->addField( "selectBox",
         name        => 'shopCountry',
         value       => $self->get( 'shopCountry' ),
         label       => $i18n->get('shop country'),
         hoverHelp   => $i18n->get('shop country help'),
         options     => \%countryOptions,
     );
-    $f->template(
+    $f->addField( "template",
         name        => 'userTemplateId',
         value       => $self->get('userTemplateId'),
         label       => $i18n->get('user template'),
         hoverHelp   => $i18n->get('user template help'), 
         namespace   => 'TaxDriver/EU/User',
     );
-    $f->yesNo(
+    $f->addField( "yesNo",
         name        => 'automaticViesApproval',
         value       => $self->get('automaticViesApproval'),
         label       => $i18n->get('auto vies approval'),
         hoverHelp   => $i18n->get('auto vies approval help'),
     );
-    $f->yesNo(
+    $f->addField( "yesNo",
         name        => 'acceptOnViesUnavailable',
         value       => $self->get('acceptOnViesUnavailable'),
         label       => $i18n->get('accept when vies unavailable'),
         hoverHelp   => $i18n->get('accept when vies unavailable help'),
     );
 
-    $f->submit;
-    my $general = $f->print;
+    $f->addField( "submit", name => "submit" );
+    my $general = $f->toHtml;
 
     # VAT groups manager
     my $vatGroups = 
@@ -365,7 +365,7 @@ sub getConfigurationScreen {
         . $i18n->get('rate')
         . WebGUI::Form::float(  $session, { name => 'rate' } )
         . '%'
-        . WebGUI::Form::submit( $session, { value => 'Add' } )
+        . WebGUI::Form::submit( $session, { name => 'submit', value => 'Add' } )
         . WebGUI::Form::formFooter( $session );
 
     # Wrap output in a YUI Tab widget.

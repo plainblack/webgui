@@ -528,13 +528,13 @@ sub www_importTax {
 
 #-----------------------------------------------------------
 
-=head2 getConfigurationScreen ( )
+=head2 getEditForm ( )
 
 Returns the form that contains the configuration options for this plugin in the admin console.
 
 =cut
 
-sub getConfigurationScreen {
+sub getEditForm {
     my $self            = shift;
     my $session         = $self->session;
     my $status_message  = $session->stow->get( 'tax_message' );
