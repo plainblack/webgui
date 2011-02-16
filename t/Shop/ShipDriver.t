@@ -22,6 +22,7 @@ use HTML::Form;
 use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
 use WebGUI::Shop::ShipDriver;
+use WebGUI::Test::Mechanize;
 use Clone;
 
 #----------------------------------------------------------------------------
@@ -31,7 +32,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 32;
+plan tests => 48;
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -127,16 +128,16 @@ is($driver->get('label'), 'Slow and dangerous', 'get returns a safe copy of the 
 
 my $form = $driver->getEditForm;
 
-isa_ok($form, 'WebGUI::HTMLForm', 'getEditForm returns an HTMLForm object');
+isa_ok($form, 'WebGUI::FormBuilder', 'getEditForm returns a FormBuilder object');
 
-my $html = $form->print;
+my $html = $form->toHtml;
 
 ##Any URL is fine, really
 my @forms = HTML::Form->parse($html, 'http://www.webgui.org');
 is (scalar @forms, 1, 'getEditForm generates just 1 form');
 
 my @inputs = $forms[0]->inputs;
-is (scalar @inputs, 10, 'getEditForm: the form has 10 controls');
+is (scalar @inputs, 9, 'getEditForm: the form has 10 controls');
 
 my @interestingFeatures;
 foreach my $input (@inputs) {
@@ -149,11 +150,7 @@ cmp_deeply(
     \@interestingFeatures,
     [
         {
-            name => 'webguiCsrfToken',
-            type => 'hidden',
-        },
-        {
-            name => undef,
+            name => 'submit',
             type => 'submit',
         },
         {
@@ -193,6 +190,76 @@ cmp_deeply(
 
 );
 
+
+my $mech = WebGUI::Test::Mechanize->new( config => WebGUI::Test->file );
+$mech->get_ok( '/' );
+$mech->session->user({ userId => 3 });
+
+# Get to the management screen
+$mech->get_ok( '?shop=ship;method=manage' );
+
+# Click the Add Shipping button
+$mech->form_with_fields( 'className', 'add' );
+$mech->select( 'className' => 'WebGUI::Shop::ShipDriver::FlatRate' );
+$mech->click_ok( 'add' );
+
+# Fill in the form
+$mech->submit_form_ok({
+        fields => {
+            label => 'Blue Box',
+            enabled => 1,
+            flatFee => 5.00,
+        },
+    },
+    "add a new driver",
+);
+
+# Shipping method added!
+$mech->content_contains( 'Blue Box', 'new shipping label shows up in manage screen' );
+
+# Find our new shipping driver
+my $shipdriverId;
+for my $row ( @{ $session->db->buildArrayRefOfHashRefs( 'SELECT * FROM shipper' ) } ) {
+    my $options = JSON->new->decode( $row->{options} );
+    if ( $options->{label} eq 'Blue Box' ) {
+        $shipdriverId = $row->{shipperId};
+    }
+}
+ok( my $shipdriver = WebGUI::Shop::ShipDriver::FlatRate->new( $mech->session, $shipdriverId ), 'shipdriver can be instanced' );
+WebGUI::Test::addToCleanup( $shipdriver );
+is( $shipdriver->label, 'Blue Box', 'label set correctly' );
+ok( $shipdriver->enabled, 'driver is enabled' );
+is( $shipdriver->flatFee, 5.00, 'flat fee added correctly' );
+
+# Edit an existing ShipDriver
+# Find the right form and click the Edit button
+my $formNumber = 1;
+for my $form ( $mech->forms ) {
+    if ( $form->value( 'do' ) eq 'edit' && $form->value( 'driverId' ) eq $shipdriverId ) {
+        last;
+    }
+    $formNumber++;
+}
+$mech->submit_form_ok({
+        form_number => $formNumber,
+    }, 'click edit button',
+);
+
+# Fill in the form
+$mech->submit_form_ok({
+        fields => {
+            label => "Brown Box",
+        }
+    },
+    "edit shipping method",
+);
+
+# Shipping method edited!
+$mech->content_contains( 'Brown Box', 'new label shows up in manage screen' );
+ok( my $shipdriver = WebGUI::Shop::ShipDriver::FlatRate->new( $mech->session, $shipdriverId ), 'shipdriver can be instanced' );
+is( $shipdriver->label, 'Brown Box', 'label set correctly' );
+ok( $shipdriver->enabled, 'driver is enabled' );
+is( $shipdriver->flatFee, 5.00, 'flat fee still only $5' );
 
 #######################################################################
 #

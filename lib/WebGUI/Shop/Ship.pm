@@ -273,7 +273,7 @@ sub www_manage {
         .WebGUI::Form::hidden($session, {name=>"shop", value=>"ship"})
         .WebGUI::Form::hidden($session, {name=>"method", value=>"addDriver"})
         .WebGUI::Form::selectBox($session, {name=>"className", options=>$self->getDrivers})
-        .WebGUI::Form::submit($session, {value=>$i18n->get("add shipper")})
+        .WebGUI::Form::submit($session, {name => 'add', value=>$i18n->get("add shipper")})
         .WebGUI::Form::formFooter($session);
     my $hasShipper = 0;
     foreach my $shipper (@{$self->getShippers}) {
@@ -282,14 +282,14 @@ sub www_manage {
             .WebGUI::Form::hidden($session, {name=>"shop", value=>"ship"})
             .WebGUI::Form::hidden($session, {name=>"method", value=>"deleteDriver"})
             .WebGUI::Form::hidden($session, {name=>"driverId", value=>$shipper->getId})
-            .WebGUI::Form::submit($session, {value=>$i18n->get("delete"), extras=>'class="backwardButton"'})
+            .WebGUI::Form::submit($session, {name => 'delete', value=>$i18n->get("delete"), extras=>'class="backwardButton"'})
             .WebGUI::Form::formFooter($session)
             .WebGUI::Form::formHeader($session, {extras=>'style="float: left;"'})
             .WebGUI::Form::hidden($session, {name=>"shop", value=>"ship"})
             .WebGUI::Form::hidden($session, {name=>"method", value=>"do"})
             .WebGUI::Form::hidden($session, {name=>"do", value=>"edit"})
             .WebGUI::Form::hidden($session, {name=>"driverId", value=>$shipper->getId})
-            .WebGUI::Form::submit($session, {value=>$i18n->get("edit"), extras=>'class="normalButton"'})
+            .WebGUI::Form::submit($session, {name => 'edit', value=>$i18n->get("edit"), extras=>'class="normalButton"'})
             .WebGUI::Form::formFooter($session)
             .' '
             .$shipper->get("label")

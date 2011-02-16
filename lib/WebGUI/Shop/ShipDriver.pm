@@ -5,7 +5,7 @@ use strict;
 use Carp qw(croak);
 use Tie::IxHash;
 use WebGUI::International;
-use WebGUI::HTMLForm;
+use WebGUI::FormBuilder;
 use WebGUI::Exception::Shop;
 use JSON;
 
@@ -199,27 +199,26 @@ Returns the configuration form for the options of this plugin.
 
 sub getEditForm {
     my $self = shift;
-    
-    my $form = WebGUI::HTMLForm->new($self->session);
-    $form->submit;
-    
-    $form->hidden(name  => 'shop',value => "ship");
-    $form->hidden(name  => 'method',value => "do");
-    $form->hidden(name  => 'do',value => "editSave");
-    $form->hidden(
+
+    my $form = WebGUI::FormBuilder->new($self->session, action => $self->session->url->page );
+    $form->addField( "submit", name => "submit" );
+
+    $form->addField( "hidden", name => 'shop', value => "ship");
+    $form->addField( "hidden", name => 'method', value => "do");
+    $form->addField( "hidden", name => 'do', value => "editSave");
+    $form->addField( "hidden",
         name  => 'driverId',
         value => $self->getId,
     );
-    tie my %form_options, 'Tie::IxHash';
     foreach my $property_name ($self->getProperties) {
         my $property = $self->meta->find_attribute_by_name($property_name);
-        $form_options{$property_name} = {
+        my %form_options = (
+            name => $property_name,
             value => $self->$property_name,
             %{ $self->getFormProperties($property_name)},
-        };
+        );
+        $form->addField( delete $form_options{fieldType}, %form_options );
     }
-    my $definition = [ { properties => \%form_options }, ];
-    $form->dynamicForm($definition, 'properties', $self);
 
     return $form;
 }
@@ -329,8 +328,9 @@ sub www_edit {
     my $admin = WebGUI::Shop::Admin->new($session);
     my $i18n = WebGUI::International->new($session, "Shop");
     my $form = $self->getEditForm;
-    $form->submit;
-    return $admin->getAdminConsole->render($form->print, $i18n->get("shipping methods"));
+    $form->addField( "submit", name => "submit" );
+    $form->addField( 'csrfToken', name => 'webguiCsrfToken' );
+    return '<h1>' . $i18n->get("shipping methods") . '</h1>' . $form->toHtml;
 }
 
 #-------------------------------------------------------------------

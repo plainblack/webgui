@@ -71,6 +71,11 @@ WebGUI::Shop::PayDriver
 
 getEditForm now returns a WebGUI::FormBuilder object
 
+WebGUI::Shop::ShipDriver
+========================
+
+getEditForm now returns a WebGUI::FormBuilder object
+
 WebGUI::Utility
 ===============
 This module has been removed.  It had many functions that weren't used, and others have better replacements.
