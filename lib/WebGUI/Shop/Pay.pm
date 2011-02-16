@@ -328,7 +328,7 @@ sub www_manage {
         .WebGUI::Form::hidden($session,     { name  => "shop",      value   => "pay" })
         .WebGUI::Form::hidden($session,     { name  => "method",    value   => "addPaymentGateway" })
         .WebGUI::Form::selectBox($session,  { name  => "className", options => $self->getDrivers })
-        .WebGUI::Form::submit($session,     { value => $i18n->get("add payment method") })
+        .WebGUI::Form::submit($session,     { name => "add", value => $i18n->get("add payment method") })
         .WebGUI::Form::formFooter($session);
 
     # Add a row with edit/delete buttons for each payment gateway.
@@ -339,7 +339,7 @@ sub www_manage {
             .WebGUI::Form::hidden($session, { name   => "shop",                value => "pay" })
             .WebGUI::Form::hidden($session, { name   => "method",              value => "deletePaymentGateway" })
             .WebGUI::Form::hidden($session, { name   => "paymentGatewayId",    value => $paymentGateway->getId })
-            .WebGUI::Form::submit($session, { value  => $i18n->get("delete"),  extras => 'class="backwardButton"' }) 
+            .WebGUI::Form::submit($session, { name => 'delete', value  => $i18n->get("delete"),  extras => 'class="backwardButton"' }) 
             .WebGUI::Form::formFooter($session)
 
             # Edit button for current payment gateway
@@ -348,7 +348,7 @@ sub www_manage {
             .WebGUI::Form::hidden($session, { name   => "method",            value => "do" })
             .WebGUI::Form::hidden($session, { name   => "do",                value => "edit" })
             .WebGUI::Form::hidden($session, { name   => "paymentGatewayId",  value => $paymentGateway->getId })
-            .WebGUI::Form::submit($session, { value  => $i18n->get("edit"),  extras => 'class="normalButton"' })
+            .WebGUI::Form::submit($session, { name => 'edit', value  => $i18n->get("edit"),  extras => 'class="normalButton"' })
             .WebGUI::Form::formFooter($session)
 
             # Append payment gateway label

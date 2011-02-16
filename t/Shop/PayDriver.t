@@ -27,6 +27,7 @@ use WebGUI::Shop::Credit;
 use WebGUI::Shop::PayDriver;
 use Clone;
 use WebGUI::User;
+use WebGUI::Test::Mechanize;
 
 #----------------------------------------------------------------------------
 # Init
@@ -194,16 +195,16 @@ isa_ok      ($cart, 'WebGUI::Shop::Cart', 'getCart returns an instantiated WebGU
 
 my $form = $driver->getEditForm;
 
-isa_ok      ($form, 'WebGUI::HTMLForm', 'getEditForm returns an HTMLForm object');
+isa_ok      ($form, 'WebGUI::FormBuilder', 'getEditForm returns an FormBuilder object');
 
-my $html = $form->print;
+my $html = $form->toHtml;
 
 ##Any URL is fine, really
 my @forms = HTML::Form->parse($html, 'http://www.webgui.org');
 is          (scalar @forms, 1, 'getEditForm generates just 1 form');
 
 my @inputs = $forms[0]->inputs;
-is          (scalar @inputs, 11, 'getEditForm: the form has 11 controls');
+is          (scalar @inputs, 10, 'getEditForm: the form has 10 controls');
 
 my @interestingFeatures;
 foreach my $input (@inputs) {
@@ -216,11 +217,7 @@ cmp_deeply(
     \@interestingFeatures,
     [
         {
-            name    => 'webguiCsrfToken',
-            type    => 'hidden',
-        },
-        {
-            name    => undef,
+            name    => 'submit',
             type    => 'submit',
         },
         {
@@ -264,6 +261,75 @@ cmp_deeply(
 
 );
 
+# Try to add a new PayDriver
+my $mech = WebGUI::Test::Mechanize->new( config => WebGUI::Test->file );
+$mech->get_ok( '/' );
+$mech->session->user({userId => 3});
+
+# Get to the management screen
+$mech->get_ok( '?shop=pay;method=manage' );
+
+# Click the Add Payment button
+$mech->form_with_fields( 'className', 'add' );
+$mech->select( 'className' => 'WebGUI::Shop::PayDriver::Cash' );
+$mech->click_ok( 'add' );
+
+# Fill in the form
+$mech->submit_form_ok({
+        fields => {
+            label => 'Authority Scrip',
+            enabled => '1',
+        },
+    },
+    "add a new gateway",
+);
+
+# Payment method added!
+$mech->content_contains( 'Authority Scrip', 'new label shows up in manage screen' );
+
+# Find our new payment gateway
+my $paydriverId;
+for my $row ( @{ $session->db->buildArrayRefOfHashRefs( 'SELECT * FROM paymentGateway' ) } ) {
+    my $options = JSON->new->decode( $row->{options} );
+    if ( $options->{label} eq 'Authority Scrip' ) {
+        $paydriverId = $row->{paymentGatewayId};
+    }
+}
+ok( my $paydriver = WebGUI::Shop::PayDriver->new( $mech->session, $paydriverId ), 'paydriver can be instanced' );
+WebGUI::Test::addToCleanup( $paydriver );
+is( $paydriver->label, 'Authority Scrip', 'label set correctly' );
+ok( $paydriver->enabled, 'driver is enabled' );
+
+# Edit an existing PayDriver
+# Find the right form and click the Edit button
+my $formNumber = 1;
+for my $form ( $mech->forms ) {
+    if ( $form->value( 'do' ) eq 'edit' && $form->value( 'paymentGatewayId' ) eq $paydriverId ) {
+        last;
+    }
+    $formNumber++;
+}
+$mech->submit_form_ok({
+        form_number => $formNumber,
+    }, 'click edit button',
+);
+
+# Fill in the form
+$mech->submit_form_ok({
+        fields => {
+            label   => 'Free Luna Dollars',
+            enabled => 1,
+        },
+    },
+    "edit an existing method",
+);
+
+# Payment method edited!
+$mech->content_contains( 'Free Luna Dollars', 'new label shows up in manage screen' );
+diag( $mech->content );
+ok( my $paydriver = WebGUI::Shop::PayDriver->new( $mech->session, $paydriverId ), 'paydriver can be instanced' );
+is( $paydriver->label, 'Free Luna Dollars', 'label set correctly' );
+ok( $paydriver->enabled, 'driver is enabled' );
 
 #######################################################################
 #

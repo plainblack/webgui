@@ -66,6 +66,11 @@ WebGUI::Session::ErrorHandler
 ErrorHandler has been changed to "log" in all circumstances. $session->errorHandler no longer exists,
 use $session->log. WebGUI::Session::ErrorHandler no longer exists, use WebGUI::Session::Log
 
+WebGUI::Shop::PayDriver
+=======================
+
+getEditForm now returns a WebGUI::FormBuilder object
+
 WebGUI::Utility
 ===============
 This module has been removed.  It had many functions that weren't used, and others have better replacements.

@@ -318,30 +318,28 @@ sub getCart {
 
 #-------------------------------------------------------------------
 
-=head2 getDoFormTags ( $method, $htmlForm )
+=head2 getDoFormTags ( $method, $fb )
 
-Returns a string containing the required form fields for doing a www_do method call. If an HTMLForm object is
+Returns a string containing the required form fields for doing a www_do method call. If a FormBuilder object is
 passed the fields are automatically added to it. In that case no form tags a returned by this method.
 
-=head3 $htmlForm
+=head3 $fb
 
-The HTMLForm object you want to add the fields to. This is optional.
+The FormBuilder object you want to add the fields to. This is optional.
 
 =cut
 
 sub getDoFormTags {
     my $self        = shift;
     my $doMethod    = shift;
-    my $htmlForm    = shift;
+    my $fb          = shift;
     my $session     = $self->session;
 
-    if ($htmlForm) {
-        $htmlForm->hidden(name => 'shop',               value => 'pay');
-        $htmlForm->hidden(name => 'method',             value => 'do');
-        $htmlForm->hidden(name => 'do',                 value => $doMethod);
-        $htmlForm->hidden(name => 'paymentGatewayId',   value => $self->getId);
-
-        return undef;
+    if ($fb) {
+        $fb->addField( "hidden", name => 'shop',               value => 'pay');
+        $fb->addField( "hidden", name => 'method',             value => 'do');
+        $fb->addField( "hidden", name => 'do',                 value => $doMethod);
+        $fb->addField( "hidden", name => 'paymentGatewayId',   value => $self->getId);
     }
     else {
         return WebGUI::Form::hidden($session, { name => 'shop',               value => 'pay' })
@@ -363,24 +361,23 @@ Returns the configuration form for the options of this plugin.
 sub getEditForm {
     my $self = shift;
     
-    my $form = WebGUI::HTMLForm->new($self->session);
-    $form->submit;
+    my $form = WebGUI::FormBuilder->new($self->session);
+    $form->addField( "submit", name => "submit" );
     
     $self->getDoFormTags('editSave', $form);
-    $form->hidden(
+    $form->addField( "hidden",
         name  => 'className',
         value => $self->className,
     );
-    tie my %form_options, 'Tie::IxHash';
     foreach my $property_name ($self->getProperties) {
         my $property = $self->meta->find_attribute_by_name($property_name);
-        $form_options{$property_name} = {
+        my %form_options = (
+            name => $property_name,
             value => $self->$property_name,
             %{ $self->getFormProperties($property_name)},
-        };
+        );
+        $form->addField( delete $form_options{ fieldType }, %form_options );
     }
-    my $definition = [ { properties => \%form_options }, ];
-    $form->dynamicForm($definition, 'properties', $self);
 
     return $form;
 }
@@ -651,9 +648,10 @@ sub www_edit {
     return $session->privilege->insufficient() unless $session->user->isAdmin;
 
     my $form = $self->getEditForm;
-    $form->submit;
+    $form->addField( 'csrfToken', name => 'csrfToken' );
+    $form->addField( "submit", name => "submit" );
   
-    return $admin->getAdminConsole->render($form->print, $i18n->get('payment methods'));
+    return '<h1>' . $i18n->get('payment methods') . '</h1>' . $form->toHtml;
 }
 
 #-------------------------------------------------------------------
