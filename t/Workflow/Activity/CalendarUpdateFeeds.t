@@ -98,40 +98,44 @@ $instance1->delete;
 
 my $newEvents = $receiver->getLineage(['children'], { returnObjects => 1, });
 
-is(scalar @{ $newEvents }, 1, 'ical import of 1 event');
-my $anniversary = pop @{ $newEvents };
+my $got_anniversary = is(scalar @{ $newEvents }, 1, 'ical import of 1 event');
 
-is($anniversary->get('title'),         $party->get('title'),       'transferred title');
-is($anniversary->get('menuTitle'),     $party->get('menuTitle'),   '... menuTitle');
-is($anniversary->get('groupIdView'),   $party->get('groupIdView'), '... groupIdView');
-is($anniversary->get('groupIdEdit'),   $party->get('groupIdEdit'), '... groupIdEdit');
-is($anniversary->get('url'),           $party->get('url').'2',     '... url (accounting for duplicate)');
-is($anniversary->get('timeZone'),      $party->get('timeZone'),    '... timeZone');
-is($anniversary->get('startDate'),     $party->get('startDate'),   '... startDate');
-is($anniversary->get('startTime'),     $party->get('startTime'),   '... startTime');
-is($anniversary->get('endDate'),       $party->get('endDate'),     '... endDate');
-is($anniversary->get('endTime'),       $party->get('endTime'),     '... endTime');
-is_string($anniversary->get('description'),   $party->get('description'), '... description, checks for line wrapping');
+SKIP: {
+    skip "No event recieved", 15 unless $got_anniversary;
+    diag "point";
+    my $anniversary = pop @{ $newEvents };
 
-$party->update({description => "one line\nsecond line"});
+    is($anniversary->get('title'),         $party->get('title'),       'transferred title');
+    is($anniversary->get('menuTitle'),     $party->get('menuTitle'),   '... menuTitle');
+    is($anniversary->get('groupIdView'),   $party->get('groupIdView'), '... groupIdView');
+    is($anniversary->get('groupIdEdit'),   $party->get('groupIdEdit'), '... groupIdEdit');
+    is($anniversary->get('url'),           $party->get('url').'2',     '... url (accounting for duplicate)');
+    is($anniversary->get('timeZone'),      $party->get('timeZone'),    '... timeZone');
+    is($anniversary->get('startDate'),     $party->get('startDate'),   '... startDate');
+    is($anniversary->get('startTime'),     $party->get('startTime'),   '... startTime');
+    is($anniversary->get('endDate'),       $party->get('endDate'),     '... endDate');
+    is($anniversary->get('endTime'),       $party->get('endTime'),     '... endTime');
+    is_string($anniversary->get('description'),   $party->get('description'), '... description, checks for line wrapping');
 
-my $instance2 = WebGUI::Workflow::Instance->create($session,
-    {
-        workflowId              => $workflow->getId,
-        skipSpectreNotification => 1,
-    }
-);
+    $party->update({description => "one line\nsecond line"});
 
-$retVal = $instance2->run();
-is($retVal, 'complete', 'cleanup: 2nd activity complete');
-$retVal = $instance2->run();
-is($retVal, 'done', 'cleanup: 2nd activity is done');
-$instance1->delete;
+    my $instance2 = WebGUI::Workflow::Instance->create($session,
+        {
+            workflowId              => $workflow->getId,
+            skipSpectreNotification => 1,
+        }
+    );
 
-$newEvents = $receiver->getLineage(['children'], { returnObjects => 1, });
+    $retVal = $instance2->run();
+    is($retVal, 'complete', 'cleanup: 2nd activity complete');
+    $retVal = $instance2->run();
+    is($retVal, 'done', 'cleanup: 2nd activity is done');
+    $instance1->delete;
 
-is(scalar @{ $newEvents }, 1, 'reimport does not create new children');
-$anniversary = pop @{ $newEvents };
-is($anniversary->get('description'),   $party->get('description'), '... description, checks for line unwrapping');
+    $newEvents = $receiver->getLineage(['children'], { returnObjects => 1, });
 
+    is(scalar @{ $newEvents }, 1, 'reimport does not create new children');
+    $anniversary = pop @{ $newEvents };
+    is($anniversary->get('description'),   $party->get('description'), '... description, checks for line unwrapping');
+}
 #vim:ft=perl
