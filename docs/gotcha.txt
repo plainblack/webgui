@@ -11,6 +11,9 @@ save you many hours of grief.
 --------------------------------------------------------------------
     * Asset metadata is now versioned.
 
+    * The updated versions of HTML::Packer, JavaScript::Packer and CSS::Packer
+      added for 7.10.9 require perl 5.8.8 or higher to run.
+
 7.10.9
 --------------------------------------------------------------------
     * WebGUI now depends on Data::ICal for making and reading iCal feeds

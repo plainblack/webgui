@@ -7,6 +7,7 @@
  - fixed #12046: Empty AssetProxy creates infinite loop (Dale Trexel)
  - Metadata is now versioned
  - Metadata fields can be restricted by asset class
+ - fixed #12049: gotcha: 7.10.9 needs perl > 5.8.8   
 
 7.10.9
  - fixed #12030: Calendar Feed Time Zone Issue

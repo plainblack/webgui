@@ -52,10 +52,10 @@ printResult($webguiRoot);
 ###################################
 
 printTest("Perl Interpreter");
-if ($] >= 5.008) {
+if ($] >= 5.008008) {
 	printResult("OK");
 } else {
-	failAndExit("Please upgrade to 5.8 or later! Cannot continue without Perl 5.8 or higher.");
+	failAndExit("Please upgrade to 5.8.8 or later! Cannot continue without Perl 5.8.8 or higher.");
 }
 
 ##Doing this as a global is not nice, but it works
