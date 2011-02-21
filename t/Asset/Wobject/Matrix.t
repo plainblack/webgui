@@ -135,7 +135,7 @@ is($matrixListing->get('views'),'1','Views were incremented');
 
 my $expectedAssetId = $matrixListing->getId;
 my $safeAssetId     = $expectedAssetId;
-$safeAssetId =~ s/-/_____/;
+$safeAssetId =~ s/-/_____/g;
 
 my $listings = $matrix->getListings;
 
