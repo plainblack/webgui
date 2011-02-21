@@ -8,6 +8,7 @@
  - Metadata is now versioned
  - Metadata fields can be restricted by asset class
  - fixed #12049: gotcha: 7.10.9 needs perl > 5.8.8   
+ - fixed #12048: Asset Manager Search
 
 7.10.9
  - fixed #12030: Calendar Feed Time Zone Issue

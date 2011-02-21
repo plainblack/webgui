@@ -615,11 +615,11 @@ sub www_search {
             # The markup for a single asset
             my $row_markup  = q{<tr %s ondblclick="WebGUI.AssetManager.toggleRow( this )">}
                             . q{<td class="center"><input type="checkbox" name="assetId" value="%s" onchange="WebGUI.AssetManager.toggleHighlightForRow( this )" /></td>}
-                            . q{<td class="center">%s</td>}
-                            . q{<td>%s</td>}
-                            . q{<td><img src="%s" /> %s</td>}
-                            . q{<td class="center">%s</td>}
-                            . q{<td class="right">%s</td>}
+                            . q{<td class="center">%s</td>}    #Edit
+                            . q{<td><a href="%s">%s</a></td>}  #URL/Title as link
+                            . q{<td><img src="%s" /> %s</td>}  #Type
+                            . q{<td class="center">%s</td>}    #Revision Date
+                            . q{<td class="right">%s</td>}     #Lock
                             . q{<td class="center"><a href="%s?func=manageRevisions">%s</a></td>}
                             . q{</tr>}
                             ;
@@ -629,6 +629,7 @@ sub www_search {
                             alt
                             assetId
                             editLink 
+                            url
                             title
                             iconUrl type
                             revisionDate
