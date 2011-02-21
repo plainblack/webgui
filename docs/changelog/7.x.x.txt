@@ -1,4 +1,5 @@
 7.9.23
+ - fixed #12048: Asset Manager Search
 
 7.9.22
  - fixed: Permission on who can create a shortcut of an Asset.
@@ -11,7 +12,6 @@
  - fixed #12043: Collaboration Systems don't pull mail that fast!
  - fixed #12044: Spectre::Cron and non-integer time units
  - fixed #12046: Empty AssetProxy creates infinite loop (Dale Trexel)
- - fixed #12048: Asset Manager Search
 
 7.9.21
  - fixed #12029: issue with keywords
