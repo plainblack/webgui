@@ -11,48 +11,48 @@ use Scope::Guard;
 use Scalar::Util qw(weaken);
 use Try::Tiny;
 
-my $exporter = Sub::Exporter::build_exporter({
+use Sub::Exporter -setup => {
     groups => {
         default => \&_build_exports,
     },
-});
+    collectors => {
+        INIT => sub {
+            my ($col, $config) = @_;
+            my $config_file  = $ENV{WEBGUI_CONFIG}
+                or die 'WEBGUI_CONFIG environment variable must be specified';
+            my $version      = $ENV{WEBGUI_UPGRADE_VERSION};
+            my $upgrade_file = File::Spec->rel2abs( (caller 4)[1] );
+            (my $vol, my $dir, my $shortname) = File::Spec->splitpath( $upgrade_file );
+            $shortname =~ s/\.[^.]*$//;
+            my $last_dir = (File::Spec->splitdir($dir))[-1];
+            if ( !$version && $last_dir =~ /\A\d+\.\d+\.\d+-(\d+\.\d+\.\d+)\z/msx ) {
+                $version = $1;
+            }
+            if (! $version) {
+                die 'WEBGUI_UPGRADE_VERSION must be set';
+            }
 
-my $caller_upgrade_file;
-sub import {
-    my ($class, @args) = @_;
-    my $extra = shift @args if ref $args[0] eq 'HASH';
-    $extra ||= {};
-    if ( !$extra->{into} ) {
-        $extra->{into_level} ||= 0;
-        $extra->{into_level}++;
+            $col->{config_file} = $config_file;
+            $col->{version} = $version;
+            $col->{upgrade_file} = $upgrade_file;
+            $col->{upgrade_name} = $shortname;
+
+            feature->import(':5.10');
+            strict->import;
+            warnings->import;
+            warnings->unimport('uninitialized');
+        }
     }
-
-    # save this in a lexical so _build_exports can pull it out
-    $caller_upgrade_file = File::Spec->rel2abs( (caller 0)[1] );
-
-    feature->import(':5.10');
-    strict->import;
-    warnings->import;
-    warnings->unimport('uninitialized');
-    $class->$exporter( $extra, @args );
-}
+};
 
 my @cleanups;
-
 sub _build_exports {
-    my $configFile   = $ENV{WEBGUI_CONFIG}
-        or die 'WEBGUI_CONFIG environment variable must be specified';
-    my $version      = $ENV{WEBGUI_UPGRADE_VERSION};
-    my $upgrade_file = $caller_upgrade_file;
-    (my $vol, my $dir, my $shortname) = File::Spec->splitpath( $upgrade_file );
-    $shortname =~ s/\.[^.]*$//;
-    my $last_dir = (File::Spec->splitdir($dir))[-1];
-    if ( !$version && $last_dir =~ /\A\d+\.\d+\.\d+-(\d+\.\d+\.\d+)\z/msx ) {
-        $version = $1;
-    }
-    if (! $version) {
-        die 'WEBGUI_UPGRADE_VERSION must be set';
-    }
+    my ($class, $name, $arg, $col) = @_;
+    my $config = $col->{INIT};
+
+    my $config_file  = $config->{config_file};
+    my $version      = $config->{version};
+    my $upgrade_name = $config->{upgrade_name};
 
     # need to be able to reference these directly in the cleanup code
     my $session;
@@ -62,7 +62,7 @@ sub _build_exports {
     my $config_sub = sub () {
         state $config = do {
             require WebGUI::Config;
-            WebGUI::Config->new($configFile);
+            WebGUI::Config->new($config_file);
         };
         return $config;
     };
@@ -86,7 +86,7 @@ sub _build_exports {
                 return $versionTag;
             }
         }
-        $name ||= $shortname;
+        $name ||= $upgrade_name;
         $versionTag = WebGUI::VersionTag->getWorking($session_sub->());
         $versionTag->set({name => "Upgrade to $version - $name"});
         return $versionTag;
@@ -99,7 +99,8 @@ sub _build_exports {
     };
     my $collateral_sub = sub () {
         state $collateral = do {
-            my $path = File::Spec->catpath($vol, File::Spec->catdir($dir, $shortname), '');
+            my $path = $config->{upgrade_file};
+            $path =~ s/\.[^.]*$//;
             Path::Class::Dir->new($path);
         };
         return $collateral;
@@ -214,8 +215,9 @@ sub _build_exports {
             $cache->clear;
         },
     };
+
     # give the subs some names to help with diagnostics
-    my $sub_package = $shortname;
+    my $sub_package = $upgrade_name;
     $sub_package =~ s/\W//g;
     for my $sub_name ( keys %$subs ) {
         subname join('::', __PACKAGE__, $sub_package, $sub_name) => $subs->{$sub_name};
