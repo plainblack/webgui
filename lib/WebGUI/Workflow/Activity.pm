@@ -16,7 +16,7 @@ package WebGUI::Workflow::Activity;
 =cut
 
 use strict;
-use WebGUI::HTMLForm;
+use WebGUI::FormBuilder;
 use WebGUI::Pluggable;
 
 =head1 NAME
@@ -235,12 +235,17 @@ Returns the form that will be used to edit the properties of an activity.
 
 sub getEditForm {
     my $self = shift;
-    my $form = WebGUI::HTMLForm->new($self->session);
-    $form->submit;
-    $form->hidden(name=>"activityId", value=>$self->getId);
-    $form->hidden(name=>"className", value=>$self->get("className"));
+    my $form = WebGUI::FormBuilder->new($self->session);
+    $form->addField( "submit", name => "submit" );
+    $form->addField( "hidden", name=>"activityId", value=>$self->getId);
+    $form->addField( "hidden", name=>"className", value=>$self->get("className"));
     my $fullDefinition = $self->definition($self->session);
-    $form->dynamicForm($fullDefinition, "properties", $self);
+    for my $hash ( map { $_->{properties} } @{$fullDefinition} ) {
+        for my $fieldName ( keys %$hash ) {
+            my $field = $hash->{ $fieldName };
+            $form->addField( delete $field->{fieldType}, name => $fieldName, %$field );
+        }
+    }
     return $form;
 }
 

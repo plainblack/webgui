@@ -385,14 +385,15 @@ sub www_editWorkflowActivity {
 		$activity = WebGUI::Workflow::Activity->new($session, $session->form->get("activityId"));
 	}
 	my $form = $activity->getEditForm;
-	$form->hidden( name=>"op", value=>"editWorkflowActivitySave");
-	$form->hidden( name=>"workflowId", value=>$session->form->get("workflowId"));
-	$form->submit;
+        $form->action( $session->url->page );
+	$form->addField( "hidden", name=>"op", value=>"editWorkflowActivitySave");
+	$form->addField( "hidden", name=>"workflowId", value=> scalar $session->form->get("workflowId"));
+	$form->addField( "submit", name => "submit" );
 	my $i18n = WebGUI::International->new($session, "Workflow");
 	my $ac = WebGUI::AdminConsole->new($session,"workflow");
 	$ac->addSubmenuItem($session->url->page("op=addWorkflow"), $i18n->get("add a new workflow"));
 	$ac->addSubmenuItem($session->url->page("op=manageWorkflows"), $i18n->get("manage workflows"));
-	return $ac->render($form->print,$activity->getName);
+	return $ac->render($form->toHtml,$activity->getName);
 }
 
 #-------------------------------------------------------------------
