@@ -1,3 +1,5 @@
+7.10.11
+
 7.10.10
  - fixed #12035: Story Manager - make keywords from Story view work
  - fixed #12042: userDefined variables have no template variable help
