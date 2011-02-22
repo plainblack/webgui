@@ -129,7 +129,7 @@ sub generateThumbnail {
 
 =head2 getEditForm ( )
 
-Returns the TabForm object that will be used in generating the edit page for this asset.
+Returns the WebGUI::FormBuilder object that will be used in generating the edit page for this asset.
 
 =cut
 

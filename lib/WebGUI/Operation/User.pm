@@ -21,7 +21,6 @@ use WebGUI::International;
 use WebGUI::Operation::Auth;
 use WebGUI::Paginator;
 use WebGUI::SQL;
-use WebGUI::TabForm;
 use WebGUI::User;
 use JSON;
 use XML::Simple;

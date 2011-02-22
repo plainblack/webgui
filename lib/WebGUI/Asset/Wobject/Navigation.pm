@@ -15,7 +15,6 @@ use Tie::IxHash;
 use WebGUI::Form;
 use WebGUI::International;
 use WebGUI::SQL;
-use WebGUI::TabForm;
 
 use Moose;
 use WebGUI::Definition::Asset;

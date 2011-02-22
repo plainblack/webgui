@@ -17,7 +17,6 @@ package WebGUI::Shop::TaxDriver::EU;
 use strict;
 
 use WebGUI::Content::Account;
-use WebGUI::TabForm;
 use WebGUI::International;
 
 use Business::Tax::VAT::Validation;
