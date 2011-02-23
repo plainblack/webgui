@@ -1205,6 +1205,10 @@ sub getHelpers {
             label   => 'Copy Branch',
         },
         {
+            class   => 'WebGUI::AssetHelper::CreateShortcut',
+            label   => 'Create Shortcut',
+        },
+        {
             class   => 'WebGUI::AssetHelper::Cut',
             label   => 'Cut',
         },

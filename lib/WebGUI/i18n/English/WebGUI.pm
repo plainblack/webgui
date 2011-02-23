@@ -4720,6 +4720,12 @@ Users may override this setting in their profile.
         lastUpdated => 0,
         context     => q{Label for button to log out.},
     },
+
+    'shortcut created' => {
+        message     => q{Shortcut created},
+        lastUpdated => 0,
+        context     => q{Message after a shortcut is created successfully},
+    },
 };
 
 1;
