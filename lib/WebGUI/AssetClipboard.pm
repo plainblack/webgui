@@ -358,53 +358,6 @@ sub pasteInFork {
 
 #-------------------------------------------------------------------
 
-=head2 www_createShortcut ( )
-
-=cut
-
-sub www_createShortcut {
-	my $self    = shift;
-    my $session = $self->session;
-    return $session->privilege->insufficient()
-        if !$session->user->isInGroup(12) || !$self->canView;
-	my $isOnDashboard = $self->getParent->isa('WebGUI::Asset::Wobject::Dashboard');
-
-	my $shortcutParent = $isOnDashboard? $self->getParent : WebGUI::Asset->getImportNode($session);
-	my $child = $shortcutParent->addChild({
-		className=>'WebGUI::Asset::Shortcut',
-		shortcutToAssetId=>$self->getId,
-		title=>$self->getTitle,
-		menuTitle=>$self->getMenuTitle,
-		isHidden=>$self->get("isHidden"),
-		newWindow=>$self->get("newWindow"),
-		ownerUserId=>$self->get("ownerUserId"),
-		groupIdEdit=>$self->get("groupIdEdit"),
-		groupIdView=>$self->get("groupIdView"),
-		url=>$self->get("title"),
-		templateId=>'PBtmpl0000000000000140'
-	});
-
-    if (! $isOnDashboard) {
-        $child->cut;
-    }
-    if (WebGUI::VersionTag->autoCommitWorkingIfEnabled($session, {
-        allowComments   => 1,
-        returnUrl       => $self->getUrl,
-    }) eq 'redirect') {
-        return 'redirect';
-    };
-
-    if ($isOnDashboard) {
-		return $self->getParent->www_view;
-	} else {
-		$self->session->asset($self->getContainer);
-		return $self->session->asset->www_manageAssets if ($self->session->form->process("proceed") eq "manageAssets");
-		return $self->session->asset->www_view;
-	}
-}
-
-#-------------------------------------------------------------------
-
 =head2 www_cut ( )
 
 If the current user canEdit, it puts $self into the clipboard and calls www_view on it's container.
