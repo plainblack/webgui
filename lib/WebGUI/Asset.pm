@@ -3040,36 +3040,6 @@ sub www_editSave {
     return $self->proceed;
 }
 
-
-#-------------------------------------------------------------------
-
-=head2 www_manageAssets ( )
-
-Redirect to the asset manager content handler (for backwards compatibility)
-
-=cut
-
-sub www_manageAssets {
-    my $self = shift;
-    $self->session->http->setRedirect( $self->getManagerUrl );
-    return "redirect";
-}
-
-#-------------------------------------------------------------------
-
-=head2 www_searchAssets ( )
-
-Redirect to the asset manager content handler (for backwards 
-compatibility)
-
-=cut
-
-sub www_searchAssets {
-    my $self = shift;
-    $self->session->http->setRedirect( $self->getSearchUrl );
-    return "redirect";
-}
-
 #-------------------------------------------------------------------
 
 =head2 www_view ( )
