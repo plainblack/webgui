@@ -32,7 +32,7 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 
-=head2 process ( $class, $asset )
+=head2 process ( $asset )
 
 Cuts the asset to the clipboard.  If the user cannot edit the asset, or the asset is a
 system asset, it returns an error message.
@@ -40,7 +40,7 @@ system asset, it returns an error message.
 =cut
 
 sub process {
-    my ($class, $asset) = @_;
+    my ($self, $asset) = @_;
     my $session = $asset->session;
 
     my $i18n = WebGUI::International->new($session, 'WebGUI');
@@ -52,20 +52,20 @@ sub process {
     }
 
     return {
-        openDialog      => '?op=assetHelper;className=' . $class . ';method=cut;assetId=' . $asset->getId,
+        openDialog      => '?op=assetHelper;helperId=' . $self->id . ';method=cut;assetId=' . $asset->getId,
     };
 }
 
 #----------------------------------------------------------------------------
 
-=head2 www_cut ( $class, $asset )
+=head2 www_cut ( $asset )
 
 Show the progress bar while cutting the asset.
 
 =cut
 
 sub www_cut {
-    my ( $class, $asset ) = @_;
+    my ( $self, $asset ) = @_;
     my $session = $asset->session;
     my $i18n    = WebGUI::International->new($session, 'Asset');
 

@@ -30,6 +30,7 @@ my $session         = WebGUI::Test->session;
 $session->user({ userId => 3 });
 
 my $output;
+my $helper = WebGUI::AssetHelper::ExportHtml->new( id => 'export_html', session => $session );
 my $node = WebGUI::Asset->getImportNode($session);
 my $root = WebGUI::Asset->getRoot( $session );
 my $top = $node->addChild({
@@ -62,7 +63,7 @@ WebGUI::Test->config->set( "exportPath" => $dir->dirname );
 
 { 
 
-    $output = WebGUI::AssetHelper::ExportHtml->process($top);
+    $output = $helper->process($top);
     cmp_deeply(
         $output, 
         {
@@ -78,7 +79,7 @@ WebGUI::Test->config->set( "exportPath" => $dir->dirname );
 my $mech    = WebGUI::Test::Mechanize->new( config => WebGUI::Test->file );
 $mech->get('/');
 $mech->session->user({ userId => 3 });
-$mech->get_ok( '/?op=assetHelper;className=WebGUI::AssetHelper::ExportHtml;method=export;assetId=' . $top->getId );
+$mech->get_ok( '/?op=assetHelper;helperId=export_html;method=export;assetId=' . $top->getId );
 $mech->submit_form_ok({
     fields  => {
     },

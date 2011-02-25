@@ -81,10 +81,10 @@ $mech->get('/'); # Start a session
 $mech->session->user({ userId => '3' });
 
 # www_processAssetHelper
-$mech->get_ok( '/?op=admin;method=processAssetHelper;className=WebGUI::AssetHelper::Cut;assetId=' . $snip->getId );
+$mech->get_ok( '/?op=admin;method=processAssetHelper;helperId=cut;assetId=' . $snip->getId );
 cmp_deeply( 
     JSON->new->decode( $mech->content ), 
-    WebGUI::AssetHelper::Cut->process( $snip ),
+    WebGUI::AssetHelper::Cut->new( id => 'cut', session => $session )->process( $snip ),
     'www_processAssetHelper',
 );
 

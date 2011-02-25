@@ -33,7 +33,7 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 
-=head2 process ( $class, $asset )
+=head2 process ( $asset )
 
 Locks the asset with a version tag.  If the user cannot edit the asset, or the asset is
 already locked, it returns an error message.
@@ -41,7 +41,7 @@ already locked, it returns an error message.
 =cut
 
 sub process {
-    my ($class, $asset) = @_;
+    my ($self, $asset) = @_;
     my $session = $asset->session;
 
     my $i18n = WebGUI::International->new($session, 'Asset');

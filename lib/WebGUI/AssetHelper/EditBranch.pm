@@ -64,7 +64,7 @@ Creates a tabform to edit the Asset Tree. If canEdit returns False, returns insu
 =cut
 
 sub www_editBranch {
-    my ($class, $asset) = @_;
+    my ($self, $asset) = @_;
     my $session = $asset->session;
     my ( $style, $url ) = $session->quick( qw( style url ) );
     $style->setCss( $url->extras('hoverhelp.css'));
@@ -84,7 +84,7 @@ ENDHTML
     my $change = '<br />'.$i18n->get("change") . ' ';
 	my $tabform = WebGUI::TabForm->new($session);
         $tabform->hidden({name=>"op",value=>"assetHelper"});
-        $tabform->hidden({name=>"className",value=>$class});
+        $tabform->hidden({name=>"helperId",value=>$self->id});
 	$tabform->hidden({name=>"method",value=>"editBranchSave"});
         $tabform->hidden({name=>"assetId",value=>$asset->getId});
 	$tabform->addTab("properties",$i18n->get("properties"),9);
@@ -312,7 +312,7 @@ Verifies proper inputs in the Asset Tree and saves them. Returns ManageAssets me
 =cut
 
 sub www_editBranchSave {
-    my ($class, $asset) = @_;
+    my ($self, $asset) = @_;
     my $session = $asset->session;
     return $session->privilege->insufficient() unless ($asset->canEdit && $session->user->isInGroup('4'));
     my $form    = $session->form;

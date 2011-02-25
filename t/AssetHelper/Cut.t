@@ -31,10 +31,11 @@ my $session         = WebGUI::Test->session;
 # Tests
 
 my $output;
+my $helper = WebGUI::AssetHelper::Cut->new( id => 'cut', session => $session );
 my $import = WebGUI::Asset->getImportNode($session);
 
 $session->user({userId => 1});
-$output = WebGUI::AssetHelper::Cut->process($import);
+$output = $helper->process($import);
 cmp_deeply(
     $output, 
     {
@@ -44,7 +45,7 @@ cmp_deeply(
 );
 
 $session->user({userId => 3});
-$output = WebGUI::AssetHelper::Cut->process($import);
+$output = $helper->process($import);
 cmp_deeply(
     $output, 
     {
@@ -54,7 +55,7 @@ cmp_deeply(
 );
 
 my $safe_page = $import->getFirstChild;
-$output = WebGUI::AssetHelper::Cut->process($safe_page);
+$output = $helper->process($safe_page);
 cmp_deeply(
     $output, 
     {

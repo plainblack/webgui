@@ -454,28 +454,28 @@ WebGUI.Admin.prototype.updateAssetHelpers
     }
 
     // Add new ones
-    for ( var i = 0; i < assetDef.helpers.length; i++ ) {
-        var helper  = assetDef.helpers[i];
+    for ( var helperId in assetDef.helpers ) {
+        var helper  = assetDef.helpers[helperId];
         var li      = document.createElement('li');
         li.className = "clickable with_icon";
         li.appendChild( document.createTextNode( helper.label ) );
-        this.addHelperHandler( li, helper );
+        this.addHelperHandler( li, helperId, helper );
         helperEl.appendChild( li );
     }
 };
 
 /**
- * addHelperHandler( elem, helper )
+ * addHelperHandler( elem, helperId, helper )
  * Add the click handler to activate the given helper
  */
 WebGUI.Admin.prototype.addHelperHandler
-= function ( elem, helper ) {
+= function ( elem, helperId, helper ) {
     var self = this;
     if ( helper.url ) {
         YAHOO.util.Event.on( elem, "click", function(){ self.gotoAsset( helper.url ) }, self, true );
     }
-    else if ( helper['class'] ) {
-        YAHOO.util.Event.on( elem, "click", function(){ self.requestHelper( helper['class'], self.currentAssetDef.assetId ) }, self, true );
+    else {
+        YAHOO.util.Event.on( elem, "click", function(){ self.requestHelper( helperId, self.currentAssetDef.assetId ) }, self, true );
     }
 };
 
@@ -535,7 +535,7 @@ WebGUI.Admin.prototype.requestUpdateCurrentVersionTag
  * Request the Asset Helper for the given assetId
  */
 WebGUI.Admin.prototype.requestHelper
-= function ( helperClass, assetId ) {
+= function ( helperId, assetId ) {
     var callback = {
         success : function (o) {
             var resp = YAHOO.lang.JSON.parse( o.responseText );
@@ -547,7 +547,7 @@ WebGUI.Admin.prototype.requestHelper
         scope: this
     };
 
-    var url = '?op=admin;method=processAssetHelper;className=' + helperClass + ';assetId=' + assetId;
+    var url = '?op=admin;method=processAssetHelper;helperId=' + helperId + ';assetId=' + assetId;
     var ajax = YAHOO.util.Connect.asyncRequest( 'GET', url, callback );
 };
 

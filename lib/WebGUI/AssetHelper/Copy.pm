@@ -32,30 +32,30 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 
-=head2 process ( $class, $asset )
+=head2 process ( $asset )
 
 Open a progress dialog for the copy operation
 
 =cut
 
 sub process {
-    my ($class, $asset) = @_;
+    my ($self, $asset) = @_;
 
     return {
-        openDialog => '?op=assetHelper;className=' . $class . ';method=copy;assetId=' . $asset->getId,
+        openDialog => '?op=assetHelper;helperId=' . $self->id . ';method=copy;assetId=' . $asset->getId,
     };
 }
 
 #----------------------------------------------------------------------------
 
-=head2 www_copy ( $class, $asset )
+=head2 www_copy ( $asset )
 
 Perform the copy operation, showing the progress.
 
 =cut
 
 sub www_copy {
-    my ( $class, $asset ) = @_;
+    my ( $self, $asset ) = @_;
     my $session = $asset->session;
     my $i18n    = WebGUI::International->new($session, 'Asset');
 

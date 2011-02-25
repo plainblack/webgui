@@ -83,14 +83,20 @@ sub handler {
 
     if ( $session->form->get("op") eq "assetHelper" ) {
         # Load and run the requested asset helper www_ method
-        my $class   = $session->form->get('className');
-        WebGUI::Pluggable::load( $class );
-        my $method  = $session->form->get('method') || "view";
         my $assetId = $session->form->get('assetId');
         my $asset   = WebGUI::Asset->newById( $session, $assetId );
 
-        if ( $class->can( "www_" . $method ) ) {
-            return $class->can( "www_" . $method )->( $class, $asset );
+        my $helperId = $session->form->get('helperId');
+        my $class = $asset->getHelpers->{ $helperId }->{ className };
+        WebGUI::Pluggable::load( $class );
+        my $helper = $class->new( id => $helperId, session => $session );
+
+        my $method  = $session->form->get('method') || "view";
+        if ( $helper->can( "www_" . $method ) ) {
+            return $helper->can( "www_" . $method )->( $helper, $asset );
+        }
+        else {
+            $session->log->error( sprintf 'Invalid asset helper "%s" calling method "%s"', $helperId, $method );
         }
     }
 

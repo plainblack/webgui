@@ -32,36 +32,36 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 
-=head2 process ( $class, $asset )
+=head2 process ( $asset )
 
 Open a progress dialog for the copy operation
 
 =cut
 
 sub process {
-    my ($class, $asset) = @_;
+    my ($self, $asset) = @_;
 
     return {
-        openDialog => '?op=assetHelper;className=' . $class . ';method=getWith;assetId=' . $asset->getId
+        openDialog => '?op=assetHelper;helperId=' . $self->id . ';method=getWith;assetId=' . $asset->getId
     };
 }
 
 #----------------------------------------------------------------------------
 
-=head2 www_getWith ( $class, $asset )
+=head2 www_getWith ( $asset )
 
 Get the "with" configuration. "Descendants" or "Children".
 
 =cut
 
 sub www_getWith {
-    my ( $class, $asset ) = @_;
+    my ( $self, $asset ) = @_;
     my $session = $asset->session;
     my $i18n    = WebGUI::International->new($session, 'Asset');
 
     return '<form style="text-align: center">'
         . '<input type="hidden" name="op" value="assetHelper" />'
-        . '<input type="hidden" name="className" value="' . $class . '" />'
+        . '<input type="hidden" name="helperId" value="' . $self->id . '" />'
         . '<input type="hidden" name="assetId" value="' . $asset->getId . '" />'
         . '<input type="hidden" name="method" value="copy" />'
         . '<input type="submit" name="with" value="Children" />'
@@ -73,14 +73,14 @@ sub www_getWith {
 
 #----------------------------------------------------------------------------
 
-=head2 www_copy ( $class, $asset )
+=head2 www_copy ( $asset )
 
 Perform the copy operation, showing the progress.
 
 =cut
 
 sub www_copy {
-    my ($class, $asset) = @_;
+    my ($self, $asset) = @_;
     my $session = $asset->session;
 
     $asset->forkWithStatusPage({

@@ -23,7 +23,38 @@ the Admin Console.
 
 =head1 SYNOPSIS
 
-Despite using OO style methods, there are no AssetHelper objects.  This is simply to provide inheritance.
+    package MyHelper;
+    use base 'WebGUI::AssetHelper';
+
+    sub process {
+        my ( $self, $asset ) = @_;
+        # Do stuff
+        return { message => 'Done stuff!' };
+    }
+
+    sub www_doOtherStuff {
+        my ( $self, $asset ) = @_;
+        # Do other stuff
+    }
+
+=head1 ATTRIBUTES
+
+=cut
+
+use WebGUI::BestPractices;
+use Moose;
+
+has 'session' => (
+    is      => 'ro',
+    required => 1,
+    isa => 'WebGUI::Session',
+);
+
+has 'id' => (
+    is      => 'ro',
+    required => 1,
+    isa     => 'Str',
+);
 
 =head1 METHODS
 
@@ -33,15 +64,11 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 
-=head2 process ( $class, $asset )
+=head2 process ( $asset )
 
-This is a class method.  Process is the default method called by the Asset Helper content handler.
+Process is the default method called by the Admin Console.
 It returns a hashref, that is converted by the content handler to JSON to be passed back to the
 Admin Console.
-
-=head3 $class
-
-The name of the class this method was called as.
 
 =head3 $asset
 
@@ -82,14 +109,14 @@ An array reference of arguments that, when used with C<scriptMethod>, will be pa
 =cut
 
 sub process {
-    my ($class, $asset) = @_;
+    my ($self, $asset) = @_;
 
     ##This method can do work, or it can delegate out to other methods.
 
     return {
         error           => q{User, we have a problem.},
         message         => q{A friendly informational method},
-        open_tab        => '?op=assetHelper;className=WebGUI::AssetHelper;method=editBranch',
+        open_tab        => '?op=assetHelper;helperId=' . $self->id . ';method=editBranch',
         redirect        => '/home',
         scriptFile      => q{URL},
         scriptMethod    => q{methodName},

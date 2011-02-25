@@ -32,14 +32,14 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 
-=head2 process ( $class, $asset )
+=head2 process ( $asset )
 
 Create a shortcut to the asset on the clipboard.
 
 =cut
 
 sub process {
-    my ($class, $asset) = @_;
+    my ($self, $asset) = @_;
     my $session = $asset->session;
     my $i18n = WebGUI::International->new( $session, 'WebGUI' );
 

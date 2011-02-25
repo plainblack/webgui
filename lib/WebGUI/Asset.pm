@@ -1191,61 +1191,56 @@ sub getHelpers {
     my $session = $self->session;
     my ( $conf ) = $session->quick(qw{ config });
 
-    my $default = [
-        {
-            class   => 'WebGUI::AssetHelper::ChangeUrl',
+    my $default = { 
+        change_url => {
+            className   => 'WebGUI::AssetHelper::ChangeUrl',
             label   => 'Change URL',
         },
-        {
-            class   => 'WebGUI::AssetHelper::Copy',
+        copy => {
+            className   => 'WebGUI::AssetHelper::Copy',
             label   => 'Copy',
         },
-        {
-            class   => 'WebGUI::AssetHelper::CopyBranch',
+        copy_branch => {
+            className   => 'WebGUI::AssetHelper::CopyBranch',
             label   => 'Copy Branch',
         },
-        {
-            class   => 'WebGUI::AssetHelper::CreateShortcut',
+        shortcut => {
+            className   => 'WebGUI::AssetHelper::CreateShortcut',
             label   => 'Create Shortcut',
         },
-        {
-            class   => 'WebGUI::AssetHelper::Cut',
+        cut => {
+            className   => 'WebGUI::AssetHelper::Cut',
             label   => 'Cut',
         },
-        {
+        edit => {
             url     => $self->getUrl( 'func=edit' ),
             label   => 'Edit',
         },
-        {
-            class   => 'WebGUI::AssetHelper::EditBranch',
+        edit_branch => {
+            className   => 'WebGUI::AssetHelper::EditBranch',
             label   => 'Edit Branch',
         },
-        {
-            class   => 'WebGUI::AssetHelper::ExportHtml',
+        export_html => {
+            className   => 'WebGUI::AssetHelper::ExportHtml',
             label   => 'Export As HTML',
         },
-        {
+        view => {
             url     => $self->getUrl( 'func=view' ),
             label   => 'View',
         },
-        {
-            class   => 'WebGUI::AssetHelper::Lock',
+        lock => {
+            className   => 'WebGUI::AssetHelper::Lock',
             label   => 'Lock',
         },
-    ];
+    };
 
+    # Merge additional helpers for this class from config
+    my $confHelpers = $conf->get('assets/' . $self->className . '/helpers') || {};
+    $default = { %$default, %$confHelpers };
 
-    # Get additional helpers for this class from config
-    my $confHelpers = $conf->get('assets/' . $self->className . '/helpers');
-    # Merge on label
-    for my $helper ( @$confHelpers ) {
+    # Process macros in labels
+    for my $helper ( values %$default ) {
         WebGUI::Macro::process( \$helper->{label} );
-        if ( my $replace = first { $_->{label} eq $helper->{label} } @$default ) {
-            $replace = $helper; # replace in the default arrayref
-        }
-        else {
-            push @$default, $helper;
-        }
     }
 
     return $default;

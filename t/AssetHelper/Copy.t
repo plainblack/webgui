@@ -36,16 +36,18 @@ plan tests => 3;        # Increment this number for each test you create
 # put your tests here
 
 my $output;
+my $helper = WebGUI::AssetHelper::Copy->new( id => 'copy', session => $session );
 my $home = WebGUI::Asset->getDefault($session);
 my $root = WebGUI::Asset->getRoot($session);
 
 { 
 
-    $output = WebGUI::AssetHelper::Copy->process($home);
+    $output = $helper->process($home);
     cmp_deeply(
         $output, 
         {
             openDialog  => all(
+                            re('helperId=copy'),
                             re('method=copy'),
                             re('assetId=' . $home->getId ),
                         ),
@@ -55,7 +57,7 @@ my $root = WebGUI::Asset->getRoot($session);
 }
 
 my $mech    = WebGUI::Test::Mechanize->new( config => WebGUI::Test->file );
-$mech->get_ok( '/?op=assetHelper;className=WebGUI::AssetHelper::Copy;method=copy;assetId=' . $home->getId );
+$mech->get_ok( '/?op=assetHelper;helperId=copy;method=copy;assetId=' . $home->getId );
 
 my $clippies = $root->getLineage(["descendants"], {statesToInclude => [qw{clipboard clipboard-limbo}], returnObjects => 1,});
 is @{ $clippies }, 1, '... only copied 1 asset to the clipboard, no children';

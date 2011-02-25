@@ -35,9 +35,10 @@ my $asset           = WebGUI::Test->asset->addChild( {
 
 #----------------------------------------------------------------------------
 # Check permissions
+my $helper = WebGUI::AssetHelper::ChangeUrl->new( id => 'change_url', session => $session );
 
 $session->user({ userId => 1 });
-my $output  = WebGUI::AssetHelper::ChangeUrl->process( $asset );
+my $output  = $helper->process( $asset );
 ok( $output->{error}, "Errors on bad permissions" );
 
 
@@ -45,7 +46,7 @@ ok( $output->{error}, "Errors on bad permissions" );
 # Change URL!
 
 $session->user({ userId => 3 }); # By the power of grayskull!
-my $output  = WebGUI::AssetHelper::ChangeUrl->process( $asset );
+my $output  = $helper->process( $asset );
 cmp_deeply( $output, {
     openDialog  => all(
         re( 'method=changeUrl' ),

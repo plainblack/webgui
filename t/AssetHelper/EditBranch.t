@@ -31,6 +31,7 @@ my $session         = WebGUI::Test->session;
 # Tests
 
 my $output;
+my $helper = WebGUI::AssetHelper::EditBranch->new( id => 'edit_branch', session => $session );
 my $node = WebGUI::Asset->getImportNode($session);
 my $root = WebGUI::Asset->getRoot( $session );
 my $top = $node->addChild({
@@ -54,7 +55,7 @@ WebGUI::Test->addToCleanup( $top, $child, $grand );
 
 { 
 
-    $output = WebGUI::AssetHelper::EditBranch->process($top);
+    $output = $helper->process($top);
     cmp_deeply(
         $output, 
         {
@@ -70,7 +71,7 @@ WebGUI::Test->addToCleanup( $top, $child, $grand );
 my $mech    = WebGUI::Test::Mechanize->new( config => WebGUI::Test->file );
 $mech->get('/');
 $mech->session->user({ userId => 3 });
-$mech->get_ok( '/?op=assetHelper;className=WebGUI::AssetHelper::EditBranch;method=editBranch;assetId=' . $top->getId );
+$mech->get_ok( '/?op=assetHelper;helperId=edit_branch;method=editBranch;assetId=' . $top->getId );
 $mech->submit_form_ok({
     fields  => {
         ownerUserId         => '3',

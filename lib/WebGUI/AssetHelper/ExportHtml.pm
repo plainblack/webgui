@@ -34,14 +34,14 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 
-=head2 process ( $class, $asset )
+=head2 process ( $asset )
 
 Opens a new tab for displaying the form and the output for exporting a branch.
 
 =cut
 
 sub process {
-    my ($class, $asset) = @_;
+    my ($self, $asset) = @_;
     my $session = $asset->session;
     my $i18n = WebGUI::International->new($session, "Asset");
     if (! $asset->canEdit) {
@@ -51,7 +51,7 @@ sub process {
     }
 
     return {
-        openDialog => '?op=assetHelper;className=' . $class . ';method=export;assetId=' . $asset->getId,
+        openDialog => '?op=assetHelper;helperId=' . $self->id . ';method=export;assetId=' . $asset->getId,
     };
 }
 
@@ -64,7 +64,7 @@ Displays the export page administrative interface
 =cut
 
 sub www_export {
-    my ($class, $asset) = @_;
+    my ($self, $asset) = @_;
     my $session = $asset->session;
     return $session->privilege->insufficient() unless ($session->user->isInGroup(13));
     my ( $style, $url ) = $session->quick(qw{ style url });
@@ -81,7 +81,7 @@ ENDHTML
     my $i18n    = WebGUI::International->new($session, "Asset");
     my $f       = WebGUI::FormBuilder->new($session, action => $asset->getUrl);
     $f->addField( "hidden", name => 'op', value => 'assetHelper' );
-    $f->addField( "hidden", name => 'className', value => $class );
+    $f->addField( "hidden", name => 'helperId', value => $self->id );
     $f->addField( "hidden", name => 'assetId', value => $asset->getId );
     $f->addField( "hidden",
         name           => "method",
@@ -155,7 +155,7 @@ Displays the export status page
 =cut
 
 sub www_exportStatus {
-    my ($class, $asset) = @_;
+    my ($self, $asset) = @_;
     my $session = $asset->session;
     return $session->privilege->insufficient
         unless $session->user->isInGroup(13);

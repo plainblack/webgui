@@ -34,14 +34,14 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 
-=head2 process ( $class, $asset )
+=head2 process ( $asset )
 
 Opens a new tab for displaying the form to change the Asset's URL.
 
 =cut
 
 sub process {
-    my ($class, $asset) = @_;
+    my ($self, $asset) = @_;
     my $session = $asset->session;
     my $i18n = WebGUI::International->new($session, "Asset");
     if (! $asset->canEdit) {
@@ -51,20 +51,20 @@ sub process {
     }
 
     return {
-        openDialog => $asset->getUrl('op=assetHelper;className=WebGUI::AssetHelper::ChangeUrl;method=changeUrl;assetId=' . $asset->getId ),
+        openDialog => $asset->getUrl('op=assetHelper;helperId=' . $self->id . ';method=changeUrl;assetId=' . $asset->getId ),
     };
 }
 
 #-------------------------------------------------------------------
 
-=head2 www_changeUrl ( $class, $asset )
+=head2 www_changeUrl ( $asset )
 
 Displays a form to change the URL for this asset.
 
 =cut
 
 sub www_changeUrl {
-    my ($class, $asset) = @_;
+    my ($self, $asset) = @_;
     my $session = $asset->session;
     my $i18n    = WebGUI::International->new($session, "Asset");
     if (! $asset->canEdit) {
@@ -74,7 +74,7 @@ sub www_changeUrl {
     }
     my $f = WebGUI::FormBuilder->new($session, method => 'POST', action => $asset->getUrl );
     $f->addField( "hidden", name => 'op', value => 'assetHelper' );
-    $f->addField( "hidden", name => 'className', value => $class );
+    $f->addField( "hidden", name => 'helperId', value => $self->id );
     $f->addField( "hidden", name => "method", value=>"changeUrlSave" );
     $f->addField( "hidden", name => 'assetId', value => $asset->getId );
     $f->addField( "text",
@@ -103,7 +103,7 @@ This actually does the change url of the www_changeUrl() function.
 =cut
 
 sub www_changeUrlSave {
-    my ($class, $asset) = @_;
+    my ($self, $asset) = @_;
     my $session = $asset->session;
     my $i18n    = WebGUI::International->new($session, "Asset");
     if (! $asset->canEdit) {

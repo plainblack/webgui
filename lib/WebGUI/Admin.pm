@@ -656,10 +656,13 @@ sub www_processAssetHelper {
     my ( $form ) = $session->quick(qw{ form });
 
     my $assetId = $form->get('assetId');
-    my $class   = $form->get('className');
-    WebGUI::Pluggable::load( $class );
+    my $helperId = $form->get('helperId');
     my $asset   = WebGUI::Asset->newById( $session, $assetId );
-    return JSON->new->encode( $class->process( $asset ) );
+
+    my $class = $asset->getHelpers->{ $helperId }->{ className };
+    WebGUI::Pluggable::load( $class );
+    my $helper = $class->new( id => $helperId, session => $self->session );
+    return JSON->new->encode( $helper->process( $asset ) );
 }
 
 #----------------------------------------------------------------------

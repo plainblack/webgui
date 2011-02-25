@@ -36,6 +36,7 @@ plan tests => 5;        # Increment this number for each test you create
 # put your tests here
 
 my $output;
+my $helper = WebGUI::AssetHelper::CopyBranch->new( id => 'copy_branch', session => $session );
 my $node = WebGUI::Asset->getImportNode($session);
 my $root = WebGUI::Asset->getRoot( $session );
 my $tag = WebGUI::VersionTag->getWorking( $session );
@@ -60,11 +61,12 @@ addToCleanup( $tag );
 
 { 
 
-    $output = WebGUI::AssetHelper::CopyBranch->process($top);
+    $output = $helper->process($top);
     cmp_deeply(
         $output, 
         {
             openDialog  => all(
+                            re('helperId=copy_branch'),
                             re('method=getWith'),
                             re('assetId=' . $top->getId ),
                         ),
@@ -74,7 +76,7 @@ addToCleanup( $tag );
 }
 
 my $mech    = WebGUI::Test::Mechanize->new( config => WebGUI::Test->file );
-$mech->get_ok( '/?op=assetHelper;className=WebGUI::AssetHelper::CopyBranch;method=copy;with=children;assetId=' . $top->getId );
+$mech->get_ok( '/?op=assetHelper;helperId=copy_branch;method=copy;with=children;assetId=' . $top->getId );
 WebGUI::Test->waitForAllForks;
 
 my $clippies = $root->getLineage(["descendants"], {statesToInclude => [qw{clipboard clipboard-limbo}], returnObjects => 1,});
@@ -83,7 +85,7 @@ for my $asset ( @$clippies ) {
     $asset->purge;
 }
 
-$mech->get_ok( '/?op=assetHelper;className=WebGUI::AssetHelper::CopyBranch;method=copy;with=descendants;assetId=' . $top->getId );
+$mech->get_ok( '/?op=assetHelper;helperId=copy_branch;method=copy;with=descendants;assetId=' . $top->getId );
 WebGUI::Test->waitForAllForks;
 my $clippies = $root->getLineage(["descendants"], {statesToInclude => [qw{clipboard clipboard-limbo}], returnObjects => 1,});
 is @{ $clippies }, 3, '... copied 3 asset to the clipboard';
