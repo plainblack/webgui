@@ -70,7 +70,9 @@ WebGUI.Admin = function(cfg){
     this.i18n = new WebGUI.i18n( {
         namespaces : {
             'WebGUI' : [ '< prev', 'next >', 'locked by' ],
-            'Asset'  : [ 'rank', '99', 'type', 'revision date', 'size', 'locked', 'More', 'unlocked', 'edit' ]
+            'Asset'  : [ 'rank', '99', 'type', 'revision date', 'size', 'locked', 'More', 'unlocked', 'edit',
+                         'update', 'delete', '43', 'cut', 'Copy', 'duplicate', 'create shortcut'
+                       ]
         },
         onpreload : {
             fn : _init
@@ -1374,7 +1376,8 @@ WebGUI.Admin.AssetTable.prototype.formatLockedBy
 WebGUI.Admin.AssetTable.prototype.formatRank 
 = function ( elCell, oRecord, oColumn, orderNumber ) {
     var rank    = oRecord.getData("lineage").match(/[1-9][0-9]{0,5}$/); 
-    elCell.innerHTML = '<input type="text" name="' + oRecord.getData("assetId") + '_rank" '
+    elCell.innerHTML = '<input type="text" id="' + oRecord.getData("assetId") + '_rank" '
+        + 'name="' + oRecord.getData("assetId") + '_rank" '
         + 'value="' + rank + '" size="3" '
         + '/>';
     // TODO: Add onchange handler to select row
@@ -1588,6 +1591,24 @@ WebGUI.Admin.AssetTable.prototype.buildQueryString
     return query;
 };
 
+/**
+ * getSelected( )
+ * Return an array of the selected asset IDs
+ */
+WebGUI.Admin.AssetTable.prototype.getSelected
+= function ( ) {
+    var assetIds = [];
+    var row = this.dataTable.getFirstTrEl();
+    while ( row ) {
+        var check = this.findCheckbox( row );
+        if ( check.checked ) {
+            assetIds.push( check.value );
+        }
+        row = this.dataTable.getNextTrEl( row );
+    }
+    return assetIds;
+};
+
 /****************************************************************************
  *
  * WebGUI.Admin.Tree
@@ -1609,9 +1630,66 @@ WebGUI.Admin.Tree
         formatter: bind( this, this.formatRank )
     } );
 
+    // Add button behaviors
+    this.btnUpdate  = new YAHOO.widget.Button( "treeUpdate", {
+        type        : "button",
+        label       : window.admin.i18n.get('Asset','update'),
+        onclick     : { fn: this.update, scope: this }
+    } );
+
+    this.btnDelete  = new YAHOO.widget.Button( "treeDelete", {
+        type        : "button",
+        label       : window.admin.i18n.get('Asset','delete'),
+        onclick     : { fn: this.trash, scope: this }
+    } );
+
+    this.btnCut     = new YAHOO.widget.Button( "treeCut", {
+        type        : "button",
+        label       : window.admin.i18n.get('Asset','cut'),
+        onclick     : { fn: this.cut, scope: this }
+    } );
+
+    this.btnCopy    = new YAHOO.widget.Button( "treeCopy", {
+        type        : "button",
+        label       : window.admin.i18n.get('Asset','Copy'),
+        onclick     : { fn: this.copy, scope: this }
+    } );
+
+    this.btnDuplicate = new YAHOO.widget.Button( "treeDuplicate", {
+        type        : "button",
+        label       : window.admin.i18n.get('Asset','duplicate'),
+        onclick     : { fn: this.duplicate, scope: this }
+    } );
+
+    this.btnCreateShortcut  = new YAHOO.widget.Button( "treeCreateShortcut", {
+        type        : "button",
+        label       : window.admin.i18n.get('Asset','create shortcut'),
+        onclick     : { fn: this.shortcut, scope: this }
+    } );
+
     this.init();
 };
 YAHOO.lang.extend( WebGUI.Admin.Tree, WebGUI.Admin.AssetTable );
+
+/**
+ * update( e )
+ * Update the selected assets' rank
+ */
+WebGUI.Admin.Tree.prototype.update
+= function ( e ) {
+    // Get the new ranks
+    var assetIds    = this.getSelected();
+    var payload     = {}; // Request data payload
+    for ( var i = 0; i < assetIds.length; i++ ) {
+        var assetId = assetIds[i];
+        payload[ assetId ] = {
+            rank : document.getElementById( assetId + "_rank" ).value
+        };
+    }
+
+    // Send the request
+    
+};
 
 /**
  * buildQueryString ( )

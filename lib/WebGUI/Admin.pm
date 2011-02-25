@@ -916,6 +916,14 @@ __DATA__
                 <div id="yui-tabs" class="yui-content">
                     <div id="viewTab"><iframe src="<tmpl_var viewUrl>" name="view"></iframe></div>
                     <div id="treeTab">
+                        <div id="treeButtons">
+                            <input type="button" id="treeUpdate" value="^i18n('update');" />
+                            <input type="button" id="treeDelete" value="^i18n('delete');" />
+                            <input type="button" id="treeCut" value="^i18n('cut');" />
+                            <input type="button" id="treeCopy" value="^i18n('copy');" />
+                            <input type="button" id="treeDuplicate" value="^i18n('duplicate');" />
+                            <input type="button" id="treeCreateShortcut" value="^i18n('create shortcut');" />
+                        </div>
                         <div id="treeCrumbtrail"></div>
                         <div id="treeDataTableContainer"></div>
                         <div id="treePagination"></div>
