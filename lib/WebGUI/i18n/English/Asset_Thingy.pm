@@ -912,8 +912,8 @@ below/after the form element.|,
     },
 
     'viewScreenTitle' => {
-        message => q|The title for the view screen|,
-        lastUpdated => 1104630516,
+        message => q|The title for the view screen.  This is the concatenation of all values for fields which have View Screen Title set for this Thing.  If no fields are set, then the title is empty.|,
+        lastUpdated => 1298915023,
     },
 
     'import_url' => {
