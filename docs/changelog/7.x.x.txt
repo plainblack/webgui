@@ -1,6 +1,7 @@
 7.9.23
  - fixed #12048: Asset Manager Search
  - fixed #12057: WebGUI::Search, assetIds search clause
+ - fixed #12051: Prevent Proxy Caching Breaks Edit/Add Thing
 
 7.9.22
  - fixed: Permission on who can create a shortcut of an Asset.
