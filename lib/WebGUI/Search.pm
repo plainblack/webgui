@@ -285,6 +285,9 @@ A hash reference containing rules for a search. The rules will will be hash refe
 
  { keywords => "something to search for", lineage => [ "000001000005", "000001000074000003" ] };
 
+All rules, except for assetIds, are logically AND'ed together to create a finer search.  assetIds are OR'ed to the final
+query.
+
 =head4 keywords
 
 This rule limits the search results to assets that match keyword criteria.
@@ -302,6 +305,8 @@ This rule limits the search to a specific set of descendants in the asset tree. 
 This rule limits the search to a specific set of assetIds. An array reference of assetIds to match against.
 
  assetIds => [ "PBasset000000000000001", ]
+
+Unlike every other rule, this rule is logically OR'ed with the other rules.
 
 =head4 classes
 

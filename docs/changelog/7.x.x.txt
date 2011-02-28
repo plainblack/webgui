@@ -1,5 +1,6 @@
 7.9.23
  - fixed #12048: Asset Manager Search
+ - fixed #12057: WebGUI::Search, assetIds search clause
 
 7.9.22
  - fixed: Permission on who can create a shortcut of an Asset.
