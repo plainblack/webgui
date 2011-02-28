@@ -1,5 +1,6 @@
 7.10.11
  - fixed #12057: WebGUI::Search, assetIds search clause
+ - fixed #12051: Prevent Proxy Caching Breaks Edit/Add Thing
 
 7.10.10
  - fixed #12035: Story Manager - make keywords from Story view work

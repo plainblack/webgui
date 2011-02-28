@@ -1903,11 +1903,12 @@ sub www_editThing {
             ."\n<table>\n<tr>\n"
             ."  <td style='width:100px;' valign='top' class='formDescription'>".$field->{label}."</td>\n"
             ."  <td style='width:370px;'>".$formElement."</td>\n"
-            ."  <td style='width:120px;' valign='top'> <input onClick=\"editListItem('".$self->session->url->page()
-            ."?func=editField;fieldId=".$field->{fieldId}.";thingId=".$thingId."','".$field->{fieldId}."')\" value='Edit' type='button'>"
-            ." <input onClick=\"editListItem('".$self->session->url->page()
-            ."?func=editField;copy=1;fieldId=".$field->{fieldId}.";thingId=".$thingId."','".$field->{fieldId}
-            ."','copy')\" value='Copy' type='button'>"
+            ."  <td style='width:120px;' valign='top'> <input onClick=\"editListItem('"
+            .$self->getUrl('func=editField;fieldId='.$field->{fieldId}.';thingId='.$thingId)
+            ."','".$field->{fieldId}."')\" value='".$i18n->get('Edit','Icon')."' type='button'>"
+            ." <input onClick=\"editListItem('"
+            .$self->getUrl('func=editField;copy=1;fieldId='.$field->{fieldId}.';thingId='.$thingId)
+            ."','".$field->{fieldId}."','copy')\" value='".$i18n->get('Copy','Icon')."' type='button'>"
             ."<input onClick=\"deleteListItem('".$self->session->url->page()."','".$field->{fieldId}."','".$thingId."')\" " 
             ."value='".$i18n->get('Delete','Icon')."' type='button'></td>\n</tr>\n</table>\n</li>\n";
 
@@ -2349,8 +2350,9 @@ sub www_editFieldSave {
 
     $listItemHTML = "<table>\n<tr>\n<td style='width:100px;' valign='top' class='formDescription'>".$label."</td>\n"
         ."<td style='width:370px;'>".$formElement."</td>\n"
-        ."<td style='width:120px;' valign='top'> <input onClick=\"editListItem('".$session->url->page()
-        ."?func=editField;fieldId=".$newFieldId.";thingId=".$properties{thingId}."','".$newFieldId."')\" value='".$i18n->get('Edit','Icon')."' type='button'>"
+        ."<td style='width:120px;' valign='top'> <input onClick=\"editListItem('"
+        .$self->getUrl('func=editField;fieldId='.$newFieldId.';thingId='.$properties{thingId})
+        ."','".$newFieldId."')\" value='".$i18n->get('Edit','Icon')."' type='button'>"
         ."<input onClick=\"deleteListItem('".$session->url->page()."','".$newFieldId
         ."','".$properties{thingId}."')\" value='".$i18n->get('Delete','Icon')."' type='button'></td>\n</tr>\n</table>";
 
