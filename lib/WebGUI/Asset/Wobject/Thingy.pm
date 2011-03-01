@@ -1194,6 +1194,29 @@ sub getThing {
 
 #-------------------------------------------------------------------
 
+=head2 getThingUrl  ( thingData )
+
+Returns a the URL to view a Thing in this Thingy
+
+=head3 thingData
+
+A hashref of properties for the Thing, as returned by getThing.  This is needed to extract the defaultView,
+to get the right func, and the thingId.
+
+=cut
+
+sub getThingUrl {
+    my ($self, $thing) = @_;
+    if ($thing->{defaultView} eq "addThing") {
+        return 'func=editThingData;thingId='.$thing->{thingId}.';thingDataId=new';
+    }
+    else{
+        return 'func=search;thingId='.$thing->{thingId};
+    }
+}
+
+#-------------------------------------------------------------------
+
 =head2 getViewThingVars  (  )
 
 Returns the field values of a thing instance and the title for its view screen in a tmpl var hashref. 
@@ -2773,7 +2796,7 @@ sub www_export {
     }
     close $CSV;
 
-    $pb->update(sprintf q|<a href="%s">%s</a>|, $self->getUrl, sprintf($i18n->get('Return to %s'), $thingProperties->{label}));
+    $pb->update(sprintf q|<a href="%s">%s</a>|, $self->getUrl($self->getThingUrl($thingProperties)), sprintf($i18n->get('Return to %s'), $thingProperties->{label}));
     return $pb->finish($tempStorage->getUrl($csv_filename));
 }
 
