@@ -1,3 +1,5 @@
+7.9.24
+
 7.9.23
  - fixed #12048: Asset Manager Search
  - fixed #12057: WebGUI::Search, assetIds search clause
