@@ -2745,9 +2745,10 @@ sub www_export {
 
     ### Loop through the returned structure and put it through Text::CSV
     # Column heads
+    $self->session->log->warn("field labels: ". join ' ', @fieldLabels);
     my $csv_filename = 'export_'.$thingProperties->{label}.'.csv';
-    $tempStorage->addFileFromScalar($csv_filename, WebGUI::Text::joinCSV(@fieldLabels));
     open my $CSV, '>', $tempStorage->getPath($csv_filename);
+    print $CSV WebGUI::Text::joinCSV( @fieldLabels );
 
     # Data lines
     $pb->update($i18n->get('Writing data'));
