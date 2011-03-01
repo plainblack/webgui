@@ -50,7 +50,7 @@ my $testBlock = [
 
 my $formType = 'text'; ##timeField is a text subclass
 
-my $numTests = 37 + scalar @{ $testBlock };
+my $numTests = 40 + scalar @{ $testBlock };
 
 plan tests => $numTests;
 
@@ -86,48 +86,52 @@ WebGUI::Form_Checking::auto_check($session, 'TimeField', $testBlock);
 my $cntl;
 $cntl = WebGUI::Form::TimeField->new($session,{ });
 is($cntl->getValue('10'),         '10', 'no default, not mysql mode, all digits');
-is($cntl->getValue('00:00:10'),   '10', 'no default, not mysql mode, mysql formatted data, 3 pairs');
-is($cntl->getValue('00:10'),     '600', 'no default, not mysql mode, mysql formatted data, 2 pairs');
-is($cntl->getValue('00:10:00'),  '600', 'no default, not mysql mode, mysql formatted data, 3 pairs');
-is($cntl->getValue('innocent'),  undef, 'no default, not mysql mode, wrong data');
+is($cntl->getValue('00:00:10'),   '10', '... mysql formatted data, 3 pairs');
+is($cntl->getValue('00:10'),     '600', '... mysql formatted data, 2 pairs');
+is($cntl->getValue('00:10:00'),  '600', '... mysql formatted data, 3 pairs');
+is($cntl->getValue('innocent'),  undef, '... wrong data');
 
 $cntl = WebGUI::Form::TimeField->new($session,{ format => 'mysql' });
 is($cntl->getValue('10'),        '00:00:10', 'no default, mysql mode, all digits');
-is($cntl->getValue('00:00:10'),  '00:00:10', 'no default, mysql mode, mysql formatted data, 3 pairs');
-is($cntl->getValue('00:10'),     '00:10',    'no default, mysql mode, mysql formatted data, 2 pairs');
-is($cntl->getValue('00:10:00'),  '00:10:00', 'no default, mysql mode, mysql formatted data, 3 pairs');
-is($cntl->getValue('innocent'),  undef,      'no default, mysql mode, wrong data');
+is($cntl->getValue('00:00:10'),  '00:00:10', '... mysql formatted data, 3 pairs');
+is($cntl->getValue('00:10'),     '00:10',    '... mysql formatted data, 2 pairs');
+is($cntl->getValue('00:10:00'),  '00:10:00', '... mysql formatted data, 3 pairs');
+is($cntl->getValue('innocent'),  undef,      '... wrong data');
 
 $cntl = WebGUI::Form::TimeField->new($session,{ defaultValue => 0, });
 is($cntl->getValue('10'),         '10', '0 default, not mysql mode, all digits');
-is($cntl->getValue('00:00:10'),   '10', '0 default, not mysql mode, mysql formatted data, 3 pairs');
-is($cntl->getValue('00:10'),     '600', '0 default, not mysql mode, mysql formatted data, 2 pairs');
-is($cntl->getValue('00:10:00'),  '600', '0 default, not mysql mode, mysql formatted data, 3 pairs');
+is($cntl->getValue('00:00:10'),   '10', '... mysql formatted data, 3 pairs');
+is($cntl->getValue('00:10'),     '600', '... mysql formatted data, 2 pairs');
+is($cntl->getValue('00:10:00'),  '600', '... mysql formatted data, 3 pairs');
 
 $cntl = WebGUI::Form::TimeField->new($session,{ defaultValue => 1, });
 is($cntl->getValue('10'),         '10', '1 default, not mysql mode, all digits');
-is($cntl->getValue('00:00:10'),   '10', '1 default, not mysql mode, mysql formatted data, 3 pairs');
-is($cntl->getValue('00:10'),     '600', '1 default, not mysql mode, mysql formatted data, 2 pairs');
-is($cntl->getValue('00:10:00'),  '600', '1 default, not mysql mode, mysql formatted data, 3 pairs');
+is($cntl->getValue('00:00:10'),   '10', '... mysql formatted data, 3 pairs');
+is($cntl->getValue('00:10'),     '600', '... mysql formatted data, 2 pairs');
+is($cntl->getValue('00:10:00'),  '600', '... mysql formatted data, 3 pairs');
 
 $cntl = WebGUI::Form::TimeField->new($session,{ defaultValue => '55:55:55', });
 is($cntl->getValue('10'),       '00:00:10', 'mysql defaultValue, all digits');
-is($cntl->getValue('00:00:10'), '00:00:10', 'mysql defaultValue, mysql formatted data, 3 pairs');
-is($cntl->getValue('00:10'),    '00:10',    'mysql defaultValue, mysql formatted data, 2 pairs');
-is($cntl->getValue('00:10:00'), '00:10:00', 'mysql defaultValue, mysql formatted data, 3 pairs');
+is($cntl->getValue('00:00:10'), '00:00:10', '... mysql formatted data, 3 pairs');
+is($cntl->getValue('00:10'),    '00:10',    '... mysql formatted data, 2 pairs');
+is($cntl->getValue('00:10:00'), '00:10:00', '... mysql formatted data, 3 pairs');
 
 $cntl = WebGUI::Form::TimeField->new($session,{ defaultValue => 0, format => 'mysql', });
 is($cntl->getValue('10'),       '00:00:10', '0 default, mysql mode, all digits');
-is($cntl->getValue('00:00:10'), '00:00:10', '0 default, mysql mode, mysql formatted data, 3 pairs');
-is($cntl->getValue('00:10'),    '00:10',    '0 default, mysql mode, mysql formatted data, 2 pairs');
-is($cntl->getValue('00:10:00'), '00:10:00', '0 default, mysql mode, mysql formatted data, 3 pairs');
-is($cntl->getValue('high noon'),     undef, '0 default, mysql mode, mysql formatted data, bad data');
+is($cntl->getValue('00:00:10'), '00:00:10', '... mysql formatted data, 3 pairs');
+is($cntl->getValue('00:10'),    '00:10',    '... mysql formatted data, 2 pairs');
+is($cntl->getValue('00:10:00'), '00:10:00', '... mysql formatted data, 3 pairs');
+is($cntl->getValue('high noon'),     undef, '... mysql formatted data, bad data');
 
 $cntl = WebGUI::Form::TimeField->new($session,{ defaultValue => 1, format => 'mysql', });
 is($cntl->getValue('10'),       '00:00:10', '1 default, mysql mode, all digits');
-is($cntl->getValue('00:00:10'), '00:00:10', '1 default, mysql mode, mysql formatted data, 3 pairs');
-is($cntl->getValue('00:10'),    '00:10',    '1 default, mysql mode, mysql formatted data, 2 pairs');
-is($cntl->getValue('00:10:00'), '00:10:00', '1 default, mysql mode, mysql formatted data, 3 pairs');
+is($cntl->getValue('00:00:10'), '00:00:10', '... mysql formatted data, 3 pairs');
+is($cntl->getValue('00:10'),    '00:10',    '... mysql formatted data, 2 pairs');
+is($cntl->getValue('00:10:00'), '00:10:00', '... mysql formatted data, 3 pairs');
 
-__END__
-
+$cntl->set('value', 10);
+is($cntl->getValueAsHtml('10'),         '00:00:10', 'getValueAsHtml, all digits');
+$cntl->set('value', '00:10');
+is($cntl->getValueAsHtml('00:10'),      '00:10',    '... minutes');
+$cntl->set('value', '00:10:00');
+is($cntl->getValueAsHtml('00:10:00'),   '00:10:00', 'minutes, with empty seconds');

@@ -157,6 +157,32 @@ sub getValue {
 
 #-------------------------------------------------------------------
 
+=head2 getValueAsHtml ( )
+
+Return the Form's value as a formatted time.
+
+=cut
+
+sub getValueAsHtml {
+	my $self  = shift;
+    my $value = $self->getOriginalValue();
+    my $mysqlTime = ($value =~ $mysqlFormattedDate);
+    my $digits    = ($value =~ /^\d+$/);
+    ##Format is fine
+    if (  $mysqlTime ) {
+        return $value;
+    }
+    ##Convert to mysql format
+    elsif ($digits) {
+        return $self->session->datetime->secondsToTime($value);
+    }
+    else { ##Bad stuff, maynard
+        return undef;
+    }
+}
+
+#-------------------------------------------------------------------
+
 =head2 isDynamicCompatible ( )
 
 A class method that returns a boolean indicating whether this control is compatible with the DynamicField control.
@@ -177,7 +203,8 @@ Renders a time field.
 
 sub toHtml {
     my $self = shift;
-	my $value = $self->getOriginalValue;
+	##JS expects formatted time
+    $self->set('value', $self->getValueAsHtml);
 	my $i18n = WebGUI::International->new($self->session);
 	$self->session->style->setScript($self->session->url->extras('inputCheck.js'),{ type=>'text/javascript' });
 	$self->set("extras", $self->get('extras') . ' onkeyup="doInputCheck(document.getElementById(\''.$self->get("id").'\'),\'0123456789:\')"');
