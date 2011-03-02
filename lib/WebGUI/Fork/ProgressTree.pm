@@ -26,6 +26,65 @@ WebGUI::Fork::ProgressTree
 Renders an admin console page that polls ::Status to draw a friendly graphical
 representation of how progress on a tree of assets is coming along.
 
+=head1 SYNOPSIS
+
+    package MyClass;
+
+    # User has requested we do some work
+    sub www_doWork {
+        my ( $self ) = @_;
+
+        # Get the assets that need work
+        my @assetIds = ();
+
+        # Start the fork with our "doWork" sub
+        my $process = WebGUI::Fork->start(
+            $self->session, 'MyClass', 'doWork',
+            { assetIds => \@assetIds },
+        );
+
+        # Get the URL for a status page
+        my $statusUrl = $process->contentPairs( 'ProgressTree', {
+            title   => 'Doing Work',
+            icon    => 'assets',
+            proceed => '/home?message=Work%20Done',
+        } );
+
+        # Go to the status page
+        $self->session->response->location( $statusUrl );
+        return 'redirect';
+    }
+
+    # Do the work of our WebGUI::Fork
+    sub doWork {
+        my ( $process, $args ) = @_;
+        # All the Assets we need to work on
+        my $assetIds = $args->{ assetIds };
+
+        # Build a tree and update process status
+        my $tree = WebGUI::ProgressTree->new( $process->session, $assetIds );
+        $process->update( sub { $tree->json } );
+
+        # Do the actual work
+        for my $id ( @$assetIds ) {
+            # ... Do something
+
+            # Update our tree and process again
+            $tree->update( $id, "Done!" );
+            $process->update( sub { $tree->json } );
+        }
+    }
+
+=head1 SEE ALSO
+
+=over 4
+
+=item WebGUI::ProgressTree
+
+Stores the data for the asset tree we are working on
+
+=back
+
 =head1 SUBROUTINES
 
 These subroutines are available from this package:

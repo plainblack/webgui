@@ -27,6 +27,7 @@ status of.
 
     sub doWork {
         my ($process, $data) = @_;
+        # Update our status
         $process->update("Starting...");
         ...
         $process->update("About half way done...");
@@ -46,6 +47,7 @@ status of.
         return 'redirect';
     }
 
+    # Display a page with the status of the fork
     package WebGUI::Operation::Fork::DoWork;
 
     sub handler {
@@ -56,6 +58,19 @@ status of.
         # or better yet, an ajaxy page that polls.
     }
 
+    # For ways of displaying status from a fork, see
+    # WebGUI::Fork::ProgressTree
+    # WebGUI::Fork::ProgressBar
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<WebGUI::Fork::ProgressTree>
+
+=item L<WebGUI::Fork::ProgressBar>
+
+=back
 
 =head1 LEGAL
 
