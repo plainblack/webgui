@@ -616,7 +616,7 @@ If specified the reply with automatically quote the parent post.
 sub getReplyUrl {
 	my $self = shift;
 	my $withQuote = shift || 0;
-	return $self->getUrl("func=add;class=WebGUI::Asset::Post;withQuote=".$withQuote);
+	return $self->getUrl("func=add;className=WebGUI::Asset::Post;withQuote=".$withQuote);
 }
 
 #-------------------------------------------------------------------

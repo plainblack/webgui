@@ -965,7 +965,7 @@ sub view {
     # Event editor
     if ($self->canAddEvent) {
         $var->{'editor'}    = 1;
-        $var->{"urlAdd"}    = $self->getUrl("func=add;class=WebGUI::Asset::Event;type=".$params->{type}.";start=$params->{start}");
+        $var->{"urlAdd"}    = $self->getUrl("func=add;className=WebGUI::Asset::Event;type=".$params->{type}.";start=$params->{start}");
     }
 
     # URLs

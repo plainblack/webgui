@@ -967,7 +967,7 @@ Formats the url to start a new thread.
 
 sub getNewThreadUrl {
 	my $self = shift;
-	$self->getUrl("func=add;class=WebGUI::Asset::Post::Thread");
+	$self->getUrl("func=add;className=WebGUI::Asset::Post::Thread");
 }
 
 #-------------------------------------------------------------------

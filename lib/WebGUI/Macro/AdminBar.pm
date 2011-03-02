@@ -131,7 +131,7 @@ sub process {
             next unless ($dummy->canAdd($session));
             my $assetInfo = {
                 icon    => $dummy->getIcon(1),
-                url     => $asset->getUrl("func=add;class=" . $dummy->get('className')),
+                url     => $asset->getUrl("func=add;className=" . $dummy->get('className')),
                 title   => $dummy->getTitle,
             };
             my @assetCategories = ref $assetConfig->{category} ? @{$assetConfig->{category}} : $assetConfig->{category};
@@ -164,7 +164,7 @@ sub process {
             push @{$categories{prototypes}{items}}, {
                 title   => $prototype->getTitle,
                 url     => $asset->getUrl(
-                    "func=add;class=".$prototype->get('className').";prototype=".$prototype->getId.$proceed
+                    "func=add;className=".$prototype->get('className').";prototype=".$prototype->getId.$proceed
                 ),
                 icon    => $prototype->getIcon(1),
             };

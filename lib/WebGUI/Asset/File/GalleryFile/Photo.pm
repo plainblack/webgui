@@ -698,7 +698,7 @@ sub www_showConfirmation {
     return $self->processStyle(
         sprintf( $i18n->get('save message'), 
             $self->getUrl, 
-            $self->getParent->getUrl('func=add;class='.__PACKAGE__),
+            $self->getParent->getUrl('func=add;className='.__PACKAGE__),
         )
     );
 }

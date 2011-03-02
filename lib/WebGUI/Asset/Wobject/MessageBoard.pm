@@ -147,7 +147,7 @@ sub view {
 		$first->prepareView;
 		$var{'default.listing'} = $first->view;
 	}
-	$var{'forum.add.url'} = $self->getUrl("func=add;class=WebGUI::Asset::Wobject::Collaboration");
+	$var{'forum.add.url'} = $self->getUrl("func=add;className=WebGUI::Asset::Wobject::Collaboration");
 	$var{'forum.add.label'} = $i18n->get(75);
 	$var{'title.label'} = $i18n->get('title');
 	$var{'views.label'} = $i18n->get('views');

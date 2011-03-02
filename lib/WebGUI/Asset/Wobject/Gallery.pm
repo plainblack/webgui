@@ -812,7 +812,7 @@ sub getTemplateVars {
     $self->appendTemplateVarsSearchForm( $var );
 
     $var->{ url                         } = $self->getUrl;
-    $var->{ url_addAlbum                } = $self->getUrl('func=add;class=WebGUI::Asset::Wobject::GalleryAlbum');
+    $var->{ url_addAlbum                } = $self->getUrl('func=add;className=WebGUI::Asset::Wobject::GalleryAlbum');
     $var->{ url_listAlbums              } = $self->getUrl('func=listAlbums');
     $var->{ url_listAlbumsRss           } = $self->getUrl('func=listAlbumsRss');
     $var->{ url_listFilesForCurrentUser } = $self->getUrl('func=listFilesForUser');

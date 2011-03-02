@@ -679,7 +679,7 @@ sub getTemplateVars {
         mostPopularUrl      => $self->getUrl("func=mostPopular"),
         mostPopularLabel    => $i18n->get("mostPopularLabel"),
         addPageLabel        => $i18n->get("addPageLabel"),
-        addPageUrl          => $self->getUrl("func=add;class=WebGUI::Asset::WikiPage"),
+        addPageUrl          => $self->getUrl("func=add;className=WebGUI::Asset::WikiPage"),
         recentChangesUrl    => $self->getUrl("func=recentChanges"),
         recentChangesLabel  => $i18n->get("recentChangesLabel"),
         restoreLabel        => $i18n->get("restoreLabel"),
@@ -994,7 +994,7 @@ sub www_search {
 		mostPopularUrl=>$self->getUrl("func=mostPopular"),
 		mostPopularLabel=>$i18n->get("mostPopularLabel"),
 		wikiHomeUrl=>$self->getUrl,
-		addPageUrl=>$self->getUrl("func=add;class=WebGUI::Asset::WikiPage;title=".$self->session->url->escape($queryString)),
+		addPageUrl=>$self->getUrl("func=add;className=WebGUI::Asset::WikiPage;title=".$self->session->url->escape($queryString)),
 		};
 	$self->appendSearchBoxVars($var, $queryString);
 	if (length $queryString) {

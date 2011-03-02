@@ -590,7 +590,7 @@ sub viewTemplateVariables {
 
     $var->{canPostStories} = $self->canPostStories;
     $var->{addStoryUrl}    = $var->{canPostStories}
-                           ? $self->getUrl('func=add;class=WebGUI::Asset::Story')
+                           ? $self->getUrl('func=add;className=WebGUI::Asset::Story')
                            : '';
     $var->{rssUrl}         = $self->getRssFeedUrl;
     $var->{atomUrl}        = $self->getAtomFeedUrl;

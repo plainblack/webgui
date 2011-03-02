@@ -133,7 +133,7 @@ sub getTemplateVars {
 	my $i18n        = WebGUI::International->new($self->session, 'Asset_Folder');
 
 	$vars->{ 'addFile.label'    } = $i18n->get('add file label');
-	$vars->{ 'addFile.url'      } = $self->getUrl('func=add;class=WebGUI::Asset::FilePile');
+	$vars->{ 'addFile.url'      } = $self->getUrl('func=add;className=WebGUI::Asset::FilePile');
     $vars->{ canEdit            } = $self->canEdit;
     $vars->{ canAddFile         } = $self->canEdit;
     

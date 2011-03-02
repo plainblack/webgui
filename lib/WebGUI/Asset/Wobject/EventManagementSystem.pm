@@ -743,7 +743,7 @@ sub view {
 
 	# set up objects we'll need
 	my %var = (
-		addBadgeUrl			=> $self->getUrl('func=add;class=WebGUI::Asset::Sku::EMSBadge'),
+		addBadgeUrl			=> $self->getUrl('func=add;className=WebGUI::Asset::Sku::EMSBadge'),
 		buildBadgeUrl		=> $self->getUrl('func=buildBadge'),
 		viewScheduleUrl		=> $self->getUrl('func=viewSchedule'),
 		addSubmissionUrl	=> $self->getUrl('func=viewSubmissionQueue'),
@@ -916,7 +916,7 @@ sub www_buildBadge {
 	my $i18n = WebGUI::International->new($session, "Asset_EventManagementSystem");
 	my %var = (
 		%{$self->get},
-		addTicketUrl				=> $self->getUrl('func=add;class=WebGUI::Asset::Sku::EMSTicket'),
+		addTicketUrl				=> $self->getUrl('func=add;className=WebGUI::Asset::Sku::EMSTicket'),
 		importTicketsUrl			=> $self->getUrl('func=importEvents'),
 		exportTicketsUrl			=> $self->getUrl('func=exportEvents'),
 		getTicketsUrl				=> $self->getUrl('func=getTicketsAsJson;badgeId='.$badgeId),
@@ -925,10 +925,10 @@ sub www_buildBadge {
 		hasBadge					=> ($badgeId ne ""),
 		badgeId						=> $badgeId,
 		whichTab					=> $whichTab || "tickets",
-		addRibbonUrl				=> $self->getUrl('func=add;class=WebGUI::Asset::Sku::EMSRibbon'),
+		addRibbonUrl				=> $self->getUrl('func=add;className=WebGUI::Asset::Sku::EMSRibbon'),
 		getRibbonsUrl				=> $self->getUrl('func=getRibbonsAsJson'),
 		getTokensUrl				=> $self->getUrl('func=getTokensAsJson'),
-		addTokenUrl					=> $self->getUrl('func=add;class=WebGUI::Asset::Sku::EMSToken'),
+		addTokenUrl					=> $self->getUrl('func=add;className=WebGUI::Asset::Sku::EMSToken'),
 		lookupBadgeUrl				=> $self->getUrl('func=lookupRegistrant'),
 		url							=> $self->getUrl,
 		viewCartUrl					=> $self->getUrl('shop=cart'),
