@@ -1,7 +1,9 @@
 WebGUI 8 Migration Guide
 ------------------------
 
-The information contained herein documents the API changes that have occurred in the WebGUI 8 development effort and how to migrate your code to accomodate the new APIs.
+The information contained herein documents the API changes that have occurred
+in the WebGUI 8 development effort and how to migrate your code to accomodate
+the new APIs.
 
 WebGUI::Auth
 ==========================
@@ -39,7 +41,9 @@ parameter is now the template ID.
 
 WebGUI::Config
 ==============
-WebGUI::Config->new has a new API.  Its WebGUI root parameter has been eliminated.  It now only accepts a config file as either an absolute path, or a path relative to WebGUI's etc directory.
+WebGUI::Config->new has a new API.  Its WebGUI root parameter has been
+eliminated.  It now only accepts a config file as either an absolute path, or
+a path relative to WebGUI's etc directory.
 
 my $config = WebGUI::Config->new($filename);
 
@@ -47,7 +51,9 @@ my $config = WebGUI::Config->new($filename);
 
 WebGUI::Session
 ===============
-WebGUI::Session->open has a new API.  Its WebGUI root parameter has been eliminated.  The config file it is given can be either an absolute path, or a path relative to WebGUI's etc directory.
+WebGUI::Session->open has a new API.  Its WebGUI root parameter has been
+eliminated.  The config file it is given can be either an absolute path, or a
+path relative to WebGUI's etc directory.
 
 my $session = WebGUI::Session->open($configFile);
 
@@ -56,7 +62,8 @@ perldoc WebGUI::Session for more details about the arguments.
 
 WebGUI::Session::Env
 ====================
-WebGUI::Session::Env has been moved into WebGUI::Session::Request.  A listing of replacements and equivalents follows:
+WebGUI::Session::Env has been moved into WebGUI::Session::Request.  A listing
+of replacements and equivalents follows:
 
 $session->env->getIp => $session->request->address
 
@@ -65,21 +72,6 @@ WebGUI::Session::ErrorHandler
 
 ErrorHandler has been changed to "log" in all circumstances. $session->errorHandler no longer exists,
 use $session->log. WebGUI::Session::ErrorHandler no longer exists, use WebGUI::Session::Log
-
-WebGUI::Shop::PayDriver
-=======================
-
-getEditForm now returns a WebGUI::FormBuilder object
-
-WebGUI::Shop::ShipDriver
-========================
-
-getEditForm now returns a WebGUI::FormBuilder object
-
-WebGUI::Shop::TaxDriver
-=======================
-
-getConfigurationScreen is now called getEditForm and should return a WebGUI::FormBuilder object
 
 WebGUI::Utility
 ===============
@@ -102,48 +94,78 @@ All other subs were unused and were just removed.
 
 WebGUI::Cache
 =============
-WebGUI::Cache has been completely rewritten. If you were using the cache API in the past, you'll need to update your code to reflect the changes. NOTE: you can get a cached reference to the cache object from WebGUI::Session, which will be substantially faster than instantiating the object yourself.
+WebGUI::Cache has been completely rewritten. If you were using the cache API
+in the past, you'll need to update your code to reflect the changes. NOTE: you
+can get a cached reference to the cache object from WebGUI::Session, which
+will be substantially faster than instantiating the object yourself.
 
 my $cache = $session->cache;
 
 
 
-WebGUI::Asset
-=============
-The Asset API has been changed in small, but significant ways. You'll need to make a few changes to your asset subclasses to support these changes.
+WebGUI::Asset 
+============= 
+The Asset API has been changed in small, but
+significant ways. You'll need to make a few changes to your asset subclasses
+to support these changes.
 
-Definition
+Definition 
 ----------
-You must migrate your asset to use the new WebGUI::Definition::Asset class instead of the definition() method. This executes several orders of magnitude faster, but is different in a few ways.
+You must migrate your asset to use the new
+WebGUI::Definition::Asset class instead of the definition() method. This
+executes several orders of magnitude faster, but is different in a few ways.
 
-1) You define your definition using property and define calls, as well as standard Moose syntax.
+1) You define your definition using property and define calls, as well as
+standard Moose syntax.
 
-2) You no longer have a reference to $session, so you'll need to make sub routine refs to to method calls. However, you cannot use sub refs on any attributes or the following property elements: tableName.
+2) You no longer have a reference to $session, so you'll need to make sub
+routine refs to to method calls. However, you cannot use sub refs on any
+attributes or the following property elements: tableName.
 
-3) You no longer have the "customDrawMethod" element. You must make custom form controls.
+3) You no longer have the "customDrawMethod" element. You must make custom
+form controls.
 
-4) You no longer have filters. Instead, each property has a method called propertyName (so a property called 'title' would be title()). You can override that to achieve the same result.  You can see examples of this in Asset.pm, look at the url and title properties.
+4) You no longer have filters. Instead, each property has a method called
+propertyName (so a property called 'title' would be title()). You can override
+that to achieve the same result.  You can see examples of this in Asset.pm,
+look at the url and title properties.
 
-5) Because you don't have a reference to $session, you can't internationalize right in the definition. So property elements like "label" and "hoverHelp" are just i18n identifiers and will automatically be run through internationalization on calling the getFormProperties() method.  To specify
-an i18n identifier, place the label and namespace in an arrayref, like this:
+5) Because you don't have a reference to $session, you can't internationalize
+right in the definition. So property elements like "label" and "hoverHelp" are
+just i18n identifiers and will automatically be run through
+internationalization on calling the getFormProperties() method.  To specify an
+i18n identifier, place the label and namespace in an arrayref, like this:
     
     label => ['i18n key', 'namespace'],
 
-6) Definition's are now rigid. This means that every property needs to be defined in the definition, and it must at least have a "fieldType" element. If the field is to be displayed (ie: it doesn't have a noFormPost=>1 element) then it must also at minimum have label elements. In addition, you must specify assetName, tableName, and properties defines at minimum. Anything less is invalid. 
+6) Definition's are now rigid. This means that every property needs to be
+defined in the definition, and it must at least have a "fieldType" element. If
+the field is to be displayed (ie: it doesn't have a noFormPost=>1 element)
+then it must also at minimum have label elements. In addition, you must
+specify assetName, tableName, and properties defines at minimum. Anything less
+is invalid. 
 
-7) The properties attribute must be an array reference of properties. No more Tie::IxHash.
+7) The properties attribute must be an array reference of properties. No more
+Tie::IxHash.
 
-8) The autoGenerateForms has been removed. All edit forms are autogenerated in WebGUI 8.
+8) The autoGenerateForms has been removed. All edit forms are autogenerated in
+WebGUI 8.
 
-9) You no longer have the "visible" element. It was a duplicate of "noFormPost", so use "noFormPost" instead.
+9) You no longer have the "visible" element. It was a duplicate of
+"noFormPost", so use "noFormPost" instead.
 
-10) You no longer have the "displayOnly" element. Make a custom form control instead.
+10) You no longer have the "displayOnly" element. Make a custom form control
+instead.
 
-11) Defaults for properties are set by the default key in the property.  This sets form defaults as well.  This means that newly created
-Assets always have sane defaults.  Unless specifically overridden, any property can be set to undef.  This takes care of the long
-standing problem with sticky titles and other fields.
+11) Defaults for properties are set by the default key in the property.  This
+sets form defaults as well.  This means that newly created Assets always have
+sane defaults.  Unless specifically overridden, any property can be set to
+undef.  This takes care of the long standing problem with sticky titles and
+other fields.
 
-12) You no longer have the "allowEmpty" element. However, you can now specify an initial value in the "value" element, and set "default" to undef if you want to have an initial value but allow the field to become empty or undef.
+12) You no longer have the "allowEmpty" element. However, you can now specify
+an initial value in the "value" element, and set "default" to undef if you
+want to have an initial value but allow the field to become empty or undef.
 
 Here's an example.
 
@@ -196,7 +218,8 @@ sub _baz_options {
 
 Asset Instanciators
 -------------------
-Moose does not allow a dynamic class to be passed into ->new.  Trying to access an asset from the database like this:
+Moose does not allow a dynamic class to be passed into ->new.  Trying to
+access an asset from the database like this:
 
     WebGUI::Asset->new($session, $assetId, 'WebGUI::Asset::Template');
 
@@ -258,48 +281,71 @@ processPropertiesFromFormPost
 -----------------------------
 Absurdly long and non-descriptive name, changed to processEditForm
 
+Versioning
+----------
+New revisions are not created in a "pending" state automatically. VersionTags
+are not created by calling addRevision(). If you want a revision to be part of
+a version tag, you must set 
+    status => "pending", 
+    tagId => $tag->getId,
+explicitly.
+
 WebGUI::Shop::Vendor
 ====================
-Object properties are no longer written to the database when an object is created from scratch.  The write method needs
-to be called.
+Object properties are no longer written to the database when an object is
+created from scratch.  The write method needs to be called.
 
 WebGUI::Shop::AddressBook
 =========================
-Since create is now really new, there is no way to create an address book for an arbitrary userId.  To work around this,
-update the address book with the new userId after it has been created.
+Since create is now really new, there is no way to create an address book for
+an arbitrary userId.  To work around this, update the address book with the
+new userId after it has been created.
+
+WebGUI::Shop::PayDriver
+=======================
+getEditForm now returns a WebGUI::FormBuilder object
+
+WebGUI::Shop::ShipDriver
+========================
+getEditForm now returns a WebGUI::FormBuilder object
+
+WebGUI::Shop::TaxDriver
+=======================
+getConfigurationScreen is now called getEditForm and should return a WebGUI::FormBuilder object
 
 WebGUI::Shop::Address
 =====================
-Object properties are no longer written to the database when an object is created from scratch.  The write method needs
-to be called.
+Object properties are no longer written to the database when an object is
+created from scratch.  The write method needs to be called.
 
 WebGUI::Shop::Transaction
 =========================
-Object properties are no longer written to the database when an object is created from scratch.  The write method needs
-to be called.
+Object properties are no longer written to the database when an object is
+created from scratch.  The write method needs to be called.
 
 WebGUI::Shop::TransactionItem
 =============================
-Object properties are no longer written to the database when an object is created from scratch.  The write method needs
-to be called.
+Object properties are no longer written to the database when an object is
+created from scratch.  The write method needs to be called.
 
 WebGUI::Shop::CartItem
 =============================
-Object properties are no longer written to the database when an object is created from scratch.  The write method needs
-to be called.
+Object properties are no longer written to the database when an object is
+created from scratch.  The write method needs to be called.
 
-Inventory adjust is also no longer done when an object is created from scratch.  You will need to call onAdjustQuantityInCart
-manually.
+Inventory adjust is also no longer done when an object is created from
+scratch.  You will need to call onAdjustQuantityInCart manually.
 
 WebGUI::URL
 ==========================
-In WebGUI 8, URL handlers are now done as Plack middleware.  See WebGUI::Middleware::Snoop and WebGUI::Middleware::WGAccess
-for examples.
+In WebGUI 8, URL handlers are now done as Plack middleware.  See
+WebGUI::Middleware::Snoop and WebGUI::Middleware::WGAccess for examples.
 
 WebGUI::Session::Var
 ==========================
-WebGUI::Session::Var was removed, and all of its code merged into WebGUI::Session.  Any call that used to be
-made to $session->var should now go directly to $session.
+WebGUI::Session::Var was removed, and all of its code merged into
+WebGUI::Session.  Any call that used to be made to $session->var should now go
+directly to $session.
 
 WebGUI::Session::Http
 ==========================
@@ -344,3 +390,7 @@ ifModifiedSince was moved from WebGUI::Session::Http to WebGUI::Session::Request
 
 OLD: $session->http->ifModifiedSince;
 NEW: $session->request->ifModifiedSince;
+
+WebGUI::Workflow::Activity
+==========================
+getEditForm now returns a WebGUI::FormBuilder object
