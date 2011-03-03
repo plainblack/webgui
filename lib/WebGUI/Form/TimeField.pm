@@ -192,6 +192,7 @@ Set the head tags for this form plugin
 sub headTags {
     my $self = shift;
 	$self->session->style->setScript($self->session->url->extras('inputCheck.js'),{ type=>'text/javascript' });
+	$self->session->style->setScript($self->session->url->extras('form/timefield.js'),{ type=>'text/javascript' });
 }
 
 #-------------------------------------------------------------------
@@ -218,14 +219,9 @@ sub toHtml {
     my $self = shift;
 	##JS expects formatted time
     $self->set('value', $self->getValueAsHtml);
-	my $i18n = WebGUI::International->new($self->session);
-	$self->set("extras", $self->get('extras') . ' onkeyup="doInputCheck(document.getElementById(\''.$self->get("id").'\'),\'0123456789:\')"');
-	return $self->SUPER::toHtml
-		.WebGUI::Form::Button->new($self->session,
-			id=>$self->get('id'),
-			extras=>'style="font-size: 8pt;" onclick="window.timeField = this.form.'.$self->get("name").';clockSet = window.open(\''.$self->session->url->extras('timeChooser.html').'\',\'timeChooser\',\'WIDTH=230,HEIGHT=100\');return false"',
-			value=>$i18n->get(970)
-			)->toHtml;
+	#my $i18n = WebGUI::International->new($self->session);
+	$self->set("extras", $self->get('extras') . ' onblur="WebGUI.TimeField.munge(document.getElementById(\''.$self->get("id").'\'))" onkeyup="WebGUI.TimeField.check(document.getElementById(\''.$self->get("id").'\'));"');
+	return $self->SUPER::toHtml;
 }
 
 #-------------------------------------------------------------------
