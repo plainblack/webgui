@@ -8,6 +8,7 @@
  - fixed #12062: Thingy: column headers missing from exported file
  - fixed #12063: Return URL from export doesn't work on non-default Thingy's
  - fixed #12054: Thingy: Time fields and formatting
+ - fixed #12055: Thingy pagination breaks after editing data
 
 7.9.22
  - fixed: Permission on who can create a shortcut of an Asset.

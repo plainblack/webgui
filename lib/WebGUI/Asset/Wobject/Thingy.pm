@@ -3309,13 +3309,12 @@ sub getSearchTemplateVars {
     my $session = $self->session;
     my $dbh = $session->db->dbh;
     my $i18n = WebGUI::International->new($self->session,"Asset_Thingy");
-    my ($var,$url,$orderBy);
     my ($fields,@searchFields_loop,@displayInSearchFields_loop,$query,@constraints);
-    my (@searchResult_loop,$searchResults,@searchResults,@displayInSearchFields,$paginatePage,$currentUrl,$p);
+    my (@searchResult_loop,$searchResults,@searchResults,@displayInSearchFields,$paginatePage,$p);
 
-    $orderBy = $session->form->process("orderBy") || $thingProperties->{sortBy};
-    $var = $self->get;
-    $url = $self->getUrl;
+    my $orderBy = $session->form->process("orderBy") || $thingProperties->{sortBy};
+    my $var = $self->get;
+    my $url = $self->getUrl;
 
     $var->{canEditThings} = $self->canEdit;
     $var->{"addThing_url"} = $session->url->append($url, 'func=editThing;thingId=new');
@@ -3334,18 +3333,17 @@ sub getSearchTemplateVars {
     $var->{searchScreenTitle} = $thingProperties->{searchScreenTitle};    
     $var->{searchDescription} = $thingProperties->{searchDescription};
 
-    $currentUrl = $self->getUrl();
-    foreach ($self->session->form->param) {
-                                 # if we just saved data from an edit, we do not want to keep any of the params
-        last if $_ eq 'func' and $self->session->form->process($_) eq 'editThingDataSave';
-
-        unless ($_ eq "pn" || $_ eq "op" || $_ =~ /identifier/xi || $_ =~ /password/xi || $_ eq "orderBy" ||
-$self->session->form->process($_) eq "") {
-            $currentUrl = $self->session->url->append($currentUrl,$self->session->url->escape($_)
-            .'='.$self->session->url->escape($self->session->form->process($_)));
-        }
+    my $currentUrl;
+    my $func = $session->form->process('func');
+    $func = 'search' if $func eq 'editThingDataSave';
+    $currentUrl = $self->getUrl('func='.$func.';thingId='.$thingId);
+    ##Instead of blacklisting query params, they are whitelisted.  List is currently empty.
+    FORM: foreach my $form (qw//) {
+        my $param = $session->form->process($form);
+        next FORM unless defined $param;
+        $currentUrl = $session->url->append($currentUrl, $form.'='.$param);
     }
-    
+ 
     $fields = $session->db->read('select * from Thingy_fields where assetId =
 '.$session->db->quote($self->get("assetId")).' and thingId = '.$session->db->quote($thingId).' order by
 sequenceNumber');
