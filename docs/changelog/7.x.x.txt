@@ -5,6 +5,7 @@
  - fixed #12062: Thingy: column headers missing from exported file
  - fixed #12063: Return URL from export doesn't work on non-default Thingy's
  - fixed #12054: Thingy: Time fields and formatting
+ - fixed #12055: Thingy pagination breaks after editing data
 
 7.10.10
  - fixed #12035: Story Manager - make keywords from Story view work
