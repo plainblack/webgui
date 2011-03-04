@@ -1,4 +1,4 @@
-package WebGUI::AssetHelper::Copy;
+package WebGUI::AssetHelper::Duplicate;
 
 use strict;
 use Class::C3;
@@ -8,7 +8,7 @@ use Scalar::Util qw( blessed );
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Duplicateright 2001-2009 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -19,11 +19,11 @@ use Scalar::Util qw( blessed );
 
 =head1 NAME
 
-Package WebGUI::AssetHelper::Copy
+Package WebGUI::AssetHelper::Duplicate
 
 =head1 DESCRIPTION
 
-Copy an Asset to the Clipboard, with no children.
+Duplicate an Asset, with no children.
 
 =head1 METHODS
 
@@ -35,7 +35,7 @@ These methods are available from this class:
 
 =head2 process ( $asset )
 
-Fork the copy operation
+Fork the duplicate operation
 
 =cut
 
@@ -46,9 +46,9 @@ sub process {
     # Should we autocommit?
     my $commit = $session->setting->get('versionTagMode') eq 'autoCommit';
 
-    # Fork the copy. Forking makes sure it won't get interrupted
+    # Fork the Duplicate. Forking makes sure it won't get interrupted
     my $fork    = WebGUI::Fork->start(
-        $session, blessed( $self ), 'copy', { assetId => $asset->getId, commit => $commit },
+        $session, blessed( $self ), 'duplicate', { assetId => $asset->getId, commit => $commit },
     );
 
     return {
@@ -58,19 +58,19 @@ sub process {
 
 #-------------------------------------------------------------------
 
-=head2 copy ( $process, $args )
+=head2 duplicate ( $process, $args )
 
-Perform the copy stuff in a forked process
+Perform the duplicate stuff in a forked process
 
 =cut
 
-sub copy {
+sub duplicate {
     my ($process, $args) = @_;
     my $session = $process->session;
     my $asset = WebGUI::Asset->newById($session, $args->{assetId});
     my $tree  = WebGUI::ProgressTree->new($session, [ $asset->getId ] );
     $process->update(sub { $tree->json });
-    my $newAsset = $asset->duplicate({ state => "clipboard" });
+    my $newAsset = $asset->duplicate;
 
     # If we aren't committing, add to a tag
     if ( !$args->{commit} ) {
@@ -79,7 +79,7 @@ sub copy {
             tagId       => WebGUI::VersionTag->getWorking( $session )->getId,
         });
     }
-    $newAsset->update({ title => $newAsset->getTitle . ' (copy)'});
+    $newAsset->update({ title => $newAsset->getTitle . ' (Duplicate)'});
 
     $tree->success($asset->getId);
     $process->update(sub { $tree->json });

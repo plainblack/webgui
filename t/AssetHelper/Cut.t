@@ -59,14 +59,12 @@ $output = $helper->process($safe_page);
 cmp_deeply(
     $output, 
     {
-        openDialog  => all( re('method=cut'), re('assetId=' . $safe_page->getId) ),
+        forkId => re(qr/[a-zA-Z0-9_-]{22}/),
     },
-    'AssetHelper/Cut opens a dialog'
+    'AssetHelper/Cut forks a process'
 );
 
-my $mech    = WebGUI::Test::Mechanize->new( config => WebGUI::Test->file );
-$mech->get_ok( $output->{ openDialog } );
-$mech->content_lacks( 'error', "Cut succeeded" );
+WebGUI::Test->waitForAllForks;
 
 $session->cache->clear;
 $safe_page  = WebGUI::Asset->newById( $session, $safe_page->assetId );

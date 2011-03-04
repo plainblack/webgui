@@ -1,6 +1,6 @@
 # vim:syntax=perl
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Duplicateright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -19,7 +19,7 @@ use Test::Deep;
 use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
 use WebGUI::Asset;
-use WebGUI::AssetHelper::Copy;
+use WebGUI::AssetHelper::Duplicate;
 use WebGUI::Test::Mechanize;
 
 #----------------------------------------------------------------------------
@@ -37,26 +37,25 @@ plan tests => 2;        # Increment this number for each test you create
 
 my $output;
 $session->setting->set( "versionTagMode" => "autoCommit" );
-my $helper = WebGUI::AssetHelper::Copy->new( id => 'copy', session => $session );
-my $home = WebGUI::Asset->getDefault($session);
-my $root = WebGUI::Asset->getRoot($session);
+my $helper = WebGUI::AssetHelper::Duplicate->new( id => 'duplicate', session => $session );
+my $root = WebGUI::Test->asset;
+my $test = $root->addChild( { className => 'WebGUI::Asset::Snippet' } );
 
 { 
 
-    $output = $helper->process($home);
+    $output = $helper->process($test);
     cmp_deeply(
         $output, 
         {
             forkId  => re('[a-zA-Z0-9_-]{22}'),
         },
-        'AssetHelper/Copy forks a process'
+        'AssetHelper/Duplicate forks a process'
     );
 }
 
 WebGUI::Test->waitForAllForks;
 $session->cache->clear;
-my $clippies = $root->getLineage(["descendants"], {statesToInclude => [qw{clipboard clipboard-limbo}], returnObjects => 1,});
-is @{ $clippies }, 1, '... only copied 1 asset to the clipboard, no children';
-addToCleanup(@{ $clippies });
+my $children = $root->getLineage(["children"]);
+is @{ $children }, 2, '... created a new asset';
 
 #vim:ft=perl

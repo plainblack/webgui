@@ -363,51 +363,6 @@ sub trash {
     return 1;
 }
 
-#-------------------------------------------------------------------
-
-=head2 trashInFork
-
-WebGUI::Fork method called by www_deleteList and www_delete to move assets
-into the trash.
-
-=cut
-
-sub trashInFork {
-    my ( $process, $list ) = @_;
-    my $session = $process->session;
-    my @roots = grep { $_->canEdit && $_->canEditIfLocked }
-        map {
-        eval { WebGUI::Asset->newPending( $session, $_ ) }
-        } @$list;
-
-    my @ids = map {
-        my $list = $_->getLineage(
-            [ 'self', 'descendants' ], {
-                statesToInclude => [qw(published clipboard clipboard-limbo trash trash-limbo)],
-                statusToInclude => [qw(approved archived pending)],
-            }
-        );
-        @$list;
-    } @roots;
-
-    my $tree = WebGUI::ProgressTree->new( $session, \@ids );
-    $process->update(sub { $tree->json });
-    my $patch = Monkey::Patch::patch_class(
-        'WebGUI::Asset',
-        'setState',
-        sub {
-            my ( $setState, $self, $state ) = @_;
-            my $id = $self->getId;
-            $tree->focus($id);
-            my $ret = $self->$setState($state);
-            $tree->success($id);
-            $process->update(sub { $tree->json });
-            return $ret;
-        }
-    );
-    $_->trash() for @roots;
-} ## end sub trashInFork
-
 require WebGUI::Workflow::Activity::DeleteExportedFiles;
 sub _invokeWorkflowOnExportedFiles {
 	my $self = shift;
@@ -432,63 +387,6 @@ sub _invokeWorkflowOnExportedFiles {
         }
     }
 }
-
-#-------------------------------------------------------------------
-
-=head2 www_delete
-
-Moves self to trash in fork, redirects to Container or Parent if canEdit.
-Otherwise returns AdminConsole rendered insufficient privilege.
-
-=cut
-
-sub www_delete {
-	my $self = shift;
-	return $self->session->privilege->insufficient() unless ($self->canEdit && $self->canEditIfLocked);
-	return $self->session->privilege->vitalComponent() if $self->get('isSystem');
-	return $self->session->privilege->vitalComponent() if ($self->getId ~~ [$self->session->setting->get("defaultPage"), $self->session->setting->get("notFoundPage")]);
-	$self->trash;
-    my $asset = $self->getContainer;
-    if ($self->getId eq $asset->getId) {
-        $asset = $self->getParent;
-    }
-    $self->forkWithStatusPage({
-            plugin   => 'ProgressTree',
-            title    => 'Delete Assets',
-            redirect => $asset->getUrl,
-            method   => 'trashInFork',
-            args     => [ $self->getId ],
-        }
-    );
-}
-
-#-------------------------------------------------------------------
-
-=head2 www_deleteList
-
-Checks to see if a valid CSRF token was received.  If not, then it returns insufficient privilege.
-
-Moves list of assets to trash, checking each to see if the user canEdit,
-and canEditIfLocked.  Returns the user to manageTrash, or to the screen set
-by the form variable C<proceeed>.
-
-=cut
-
-sub www_deleteList {
-    my $self    = shift;
-    my $session = $self->session;
-    my $form    = $session->form;
-    return $session->privilege->insufficient() unless $session->form->validToken;
-    my $method = $form->get('proceed') || 'manageTrash';
-    $self->forkWithStatusPage({
-            plugin   => 'ProgressTree',
-            title    => 'Delete Assets',
-            redirect => $self->getUrl("func=$method"),
-            method   => 'trashInFork',
-            args     => [ $form->get('assetId') ],
-        }
-    );
-} ## end sub www_deleteList
 
 #-------------------------------------------------------------------
 

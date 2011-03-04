@@ -19,7 +19,7 @@ use Test::Deep;
 use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
 use WebGUI::Asset;
-use WebGUI::AssetHelper::Copy;
+use WebGUI::AssetHelper::Delete;
 use WebGUI::Test::Mechanize;
 
 #----------------------------------------------------------------------------
@@ -30,33 +30,48 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 2;        # Increment this number for each test you create
-
-#----------------------------------------------------------------------------
-# put your tests here
-
 my $output;
-$session->setting->set( "versionTagMode" => "autoCommit" );
-my $helper = WebGUI::AssetHelper::Copy->new( id => 'copy', session => $session );
-my $home = WebGUI::Asset->getDefault($session);
-my $root = WebGUI::Asset->getRoot($session);
+my $helper = WebGUI::AssetHelper::Delete->new( id => 'Delete', session => $session );
+my $import = WebGUI::Asset->getImportNode($session);
 
-{ 
+$session->user({userId => 1});
+$output = $helper->process($import);
+cmp_deeply(
+    $output, 
+    {
+        error => re('You do not have sufficient privileges'),
+    },
+    'AssetHelper/Delete checks for editing privileges'
+);
 
-    $output = $helper->process($home);
-    cmp_deeply(
-        $output, 
-        {
-            forkId  => re('[a-zA-Z0-9_-]{22}'),
-        },
-        'AssetHelper/Copy forks a process'
-    );
-}
+$session->user({userId => 3});
+$output = $helper->process($import);
+cmp_deeply(
+    $output, 
+    {
+        error => re('vital component'),
+    },
+    'AssetHelper/Delete checks for system pages'
+);
+
+my $safe_page = $import->getFirstChild;
+$output = $helper->process($safe_page);
+cmp_deeply(
+    $output, 
+    {
+        forkId => re(qr/[a-zA-Z0-9_-]{22}/),
+    },
+    'AssetHelper/Delete forks a process'
+);
 
 WebGUI::Test->waitForAllForks;
+
 $session->cache->clear;
-my $clippies = $root->getLineage(["descendants"], {statesToInclude => [qw{clipboard clipboard-limbo}], returnObjects => 1,});
-is @{ $clippies }, 1, '... only copied 1 asset to the clipboard, no children';
-addToCleanup(@{ $clippies });
+$safe_page  = WebGUI::Asset->newById( $session, $safe_page->assetId );
+is $safe_page->state, 'trash', '... and the asset was really Deleted';
+
+$safe_page->restore;
+
+done_testing();
 
 #vim:ft=perl

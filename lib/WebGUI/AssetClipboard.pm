@@ -53,59 +53,6 @@ sub canPaste {
 
 #-------------------------------------------------------------------
 
-=head2 copyInFork ( $process, $args )
-
-WebGUI::Fork method called by www_copy
-
-=cut
-
-sub copyInFork {
-    my ($process, $args) = @_;
-    my $session = $process->session;
-    my $asset = WebGUI::Asset->newById($session, $args->{assetId});
-    my @pedigree = ('self');
-    my $childrenOnly = 0;
-    if ($args->{childrenOnly}) {
-        $childrenOnly = 1;
-        push @pedigree, 'children';
-    }
-    else {
-        push @pedigree, 'descendants';
-    }
-    my $ids   = $asset->getLineage(\@pedigree);
-    my $tree  = WebGUI::ProgressTree->new($session, $ids);
-    $process->update(sub { $tree->json });
-    my $patch = Monkey::Patch::patch_class(
-        'WebGUI::Asset', 'duplicate', sub {
-            my $duplicate = shift;
-            my $self      = shift;
-            my $id        = $self->getId;
-            $tree->focus($id);
-            my $asset     = eval { $self->$duplicate(@_) };
-            my $e         = $@;
-            if ($e) {
-                $tree->note($id, $e);
-                $tree->failure($id, 'Died');
-            }
-            else {
-                $tree->success($id);
-            }
-            $process->update(sub { $tree->json });
-            die $e if $e;
-            return $asset;
-        }
-    );
-    my $newAsset = $asset->duplicateBranch($childrenOnly, 'clipboard');
-    $newAsset->update({ title => $newAsset->getTitle . ' (copy)'});
-    if ($args->{commit}) {
-        my $tag = WebGUI::VersionTag->getWorking($session);
-        $tag->requestCommit();
-    }
-}
-
-
-#-------------------------------------------------------------------
-
 =head2 cut ( )
 
 Removes asset from lineage, places it in clipboard state. The "gap" in the lineage is changed in state to clipboard-limbo.

@@ -3,6 +3,8 @@ package WebGUI::AssetHelper::Cut;
 use strict;
 use Class::C3;
 use base qw/WebGUI::AssetHelper/;
+use Scalar::Util qw( blessed );
+use Monkey::Patch;
 
 =head1 LEGAL
 
@@ -51,58 +53,47 @@ sub process {
         return { error => $i18n->get('41'), };
     }
 
+    # Fork the cut. Forking makes sure it won't get interrupted
+    my $fork    = WebGUI::Fork->start(
+        $session, blessed( $self ), 'cut', { assetId => $asset->getId },
+    );
+
     return {
-        openDialog      => '?op=assetHelper;helperId=' . $self->id . ';method=cut;assetId=' . $asset->getId,
+        forkId      => $fork->getId,
     };
 }
 
 #----------------------------------------------------------------------------
 
-=head2 www_cut ( $asset )
+=head2 cut ( process, args )
 
-Show the progress bar while cutting the asset.
+Handle the actual cutting in the forked process.
 
 =cut
 
-sub www_cut {
-    my ( $self, $asset ) = @_;
-    my $session = $asset->session;
-    my $i18n    = WebGUI::International->new($session, 'Asset');
+sub cut {
+    my ( $process, $args ) = @_;
+    my $asset = WebGUI::Asset->newById( $process->session, $args->{assetId} );
 
-    return $session->response->stream( sub {
-        my ( $session ) = @_;
-        my $pb = WebGUI::ProgressBar->new($session);
-        my @stack;
+    # All the Assets we need to work on
+    my $assetIds = $asset->getLineage( ['self','descendants'] );
 
-        return $pb->run(
-            admin => 1,
-            title => $i18n->get('Copy Assets'),
-            icon  => $session->url->extras('adminConsole/assets.gif'),
-            code  => sub {
-                my $bar = shift;
-                $bar->update( "Preparing... (i18n)" );
-                $bar->total( $asset->getDescendantCount + 2 );
-                $bar->update( "Cutting... (i18n)" );
-                my $success = $asset->cut();
-                if (! $success) {
-                    return { error => $i18n->get('41', 'WebGUI'), };
-                }
-                return { message => "Your asset is cut!" };
-            },
-            wrap  => {
-                'WebGUI::Asset::getLineageIterator' => sub {
-                    my ($bar, $orig, $asset, @args) = @_;
-                    $bar->update("Updating descendants... (i18n)");
-                    return $asset->$orig(@args);
-                },
-                'WebGUI::Asset::updateHistory' => sub {
-                    my ( $bar, $orig, $asset, @args ) = @_;
-                    $bar->update( "Updating " . $asset->getTitle );
-                    return $asset->$orig(@args);
-                },
-            },
-        );
-    } );
+    # Build a tree and update process status
+    my $tree = WebGUI::ProgressTree->new( $process->session, $assetIds );
+    $process->update( sub { $tree->json } );
+
+    # Monkeypatch a sub to get a status update
+    my $patch = Monkey::Patch::patch_class(
+        'WebGUI::Asset', 'updateHistory', sub {
+            my ( $orig, $self, @args ) = @_;
+            $tree->success( $self->assetId );
+            $process->update( sub { $tree->json } );
+            $self->$orig( @args );
+        }
+    );
+
+    # Do the actual work
+    $asset->cut;
 }
 
 1;

@@ -24,12 +24,12 @@ Admin Plugins do the administrative tasks.
 
 use Moose;
 use JSON qw( from_json to_json );
-use namespace::autoclean;
 use Scalar::Util;
 use Search::QueryParser;
 use WebGUI::Pluggable;
 use WebGUI::Macro;
 use WebGUI::Search;
+use WebGUI::Fork;
 
 has 'session' => (
     is          => 'ro',
@@ -740,6 +740,55 @@ sub www_searchAssets {
     return to_json( $assetInfo );
 }
 
+#----------------------------------------------------------------------------
+
+=head2 www_updateAsset( )
+
+Update an asset. The assetId is given in a query parameter. The updated 
+properties are given as a JSON string in the POST body.
+
+The actual update will happen in a forked process, due to rank being a long
+update.
+
+=cut
+
+sub www_updateAsset {
+    my ( $self ) = @_;
+    my $session = $self->session;
+    my $assetId = $session->form->get( 'assetId' );
+    my $asset   = eval { WebGUI::Asset->newById( $session, $assetId ); };
+    if ( $@ || !$asset ) {
+        return to_json( { error => "Could not find asset" } );
+    }
+
+    my $props   = eval { JSON->new->decode( $session->request->raw_body ); };
+    if ( $@ ) {
+        return to_json( { error => "Unable to decode JSON body" } );
+    }
+
+    my $fork = WebGUI::Fork->start(
+        $session, __PACKAGE__, 'updateAsset', { assetId => $assetId, properties => $props },
+    );
+
+    return to_json( { forkId => $fork->getId } );
+}
+
+sub updateAsset {
+    my ( $process, $args ) = @_;
+    my $session = $process->session;
+    my $props   = $args->{properties};
+    my $assetId = $args->{assetId};
+    my $asset   = WebGUI::Asset->newById( $session, $assetId );
+
+    # Update rank specially
+    if ( my $rank = delete $props->{rank} ) {
+        $asset->setRank( $rank );
+    }
+
+    # Update other properties
+    # TODO: Do we add a revision? or do they request a revision?
+}
+
 #----------------------------------------------------------------------
 
 =head2 www_view ( session )
@@ -783,6 +832,7 @@ sub www_view {
     $style->setCss( $url->extras('yui/build/container/assets/skins/sam/container.css'));
     $style->setCss( $url->extras('yui/build/autocomplete/assets/skins/sam/autocomplete.css'));
     $style->setCss( $url->extras('yui/build/menu/assets/skins/sam/menu.css'));
+    $style->setCss( $url->extras('yui/build/progressbar/assets/skins/sam/progressbar.css') );
     $style->setCss( $url->extras('admin/admin.css'));
     $style->setScript($url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'));
     $style->setScript($url->extras('yui/build/utilities/utilities.js'));
@@ -799,7 +849,9 @@ sub www_view {
     $style->setScript($url->extras('yui/build/button/button-min.js'));
     $style->setScript($url->extras('yui/build/autocomplete/autocomplete-min.js'));
     $style->setScript( $url->extras( 'yui/build/json/json-min.js' ) );
+    $style->setScript( $url->extras( 'yui/build/progressbar/progressbar-min.js' ) );
     $style->setScript( $url->extras( 'yui-webgui/build/i18n/i18n.js' ) );
+    $style->setScript( $url->extras( 'Fork/poll.js' ) );
     $style->setScript($url->extras('admin/admin.js'));
 
     # Use the template in our __DATA__ block

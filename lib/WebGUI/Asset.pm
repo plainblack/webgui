@@ -1208,6 +1208,10 @@ sub getHelpers {
             className   => 'WebGUI::AssetHelper::CreateShortcut',
             label   => 'Create Shortcut',
         },
+        duplicate => {
+            className   => 'WebGUI::AssetHelper::Duplicate',
+            label       => 'Duplicate',
+        },
         cut => {
             className   => 'WebGUI::AssetHelper::Cut',
             label   => 'Cut',
@@ -1231,6 +1235,10 @@ sub getHelpers {
         lock => {
             className   => 'WebGUI::AssetHelper::Lock',
             label   => 'Lock',
+        },
+        delete => {
+            className   => 'WebGUI::AssetHelper::Delete',
+            label       => 'Delete',
         },
     };
 

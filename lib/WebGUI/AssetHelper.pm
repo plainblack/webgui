@@ -94,6 +94,11 @@ A URL. Will open a tab in the Admin Console.  Anything returned by the URL will 
 
 A URL.  Puts new content into the View tab from the requested URL.
 
+=head4 forkId
+
+The ID for a WebGUI::Fork process. The Admin Console can then open a progress
+dialog to poll for the progress of the forked process.
+
 =head4 scriptFile
 
 Loads the requested JavaScript file, referenced by URL.

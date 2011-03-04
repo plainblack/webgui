@@ -533,7 +533,7 @@ WebGUI.Admin.prototype.requestUpdateCurrentVersionTag
 };
 
 /**
- * requestHelper( helperClass, assetId )
+ * requestHelper( helperId, assetId )
  * Request the Asset Helper for the given assetId
  */
 WebGUI.Admin.prototype.requestHelper
@@ -561,6 +561,7 @@ WebGUI.Admin.prototype.requestHelper
  *      openDialog  : Open a dialog with the given URL
  *      openTab     : Open a tab with the given URL
  *      redirect    : Redirect the View pane to the given URL
+ *      forkId      : The Helper forked a process, use the ID to get the status
  *      scriptFile  : Load a JS file
  *      scriptFunc  : Run a JS function. Used with scriptFile
  *      scriptArgs  : Arguments to scriptFunc. Used with scriptFile
@@ -581,6 +582,9 @@ WebGUI.Admin.prototype.processPlugin
     }
     else if ( resp.error ) {
         this.showInfoMessage( resp.error );
+    }
+    else if ( resp.forkId ) {
+        // Do nothing right now
     }
     else {
         alert( "Unknown plugin response: " + YAHOO.lang.JSON.stringify(resp) );
@@ -1376,11 +1380,15 @@ WebGUI.Admin.AssetTable.prototype.formatLockedBy
 WebGUI.Admin.AssetTable.prototype.formatRank 
 = function ( elCell, oRecord, oColumn, orderNumber ) {
     var rank    = oRecord.getData("lineage").match(/[1-9][0-9]{0,5}$/); 
-    elCell.innerHTML = '<input type="text" id="' + oRecord.getData("assetId") + '_rank" '
-        + 'name="' + oRecord.getData("assetId") + '_rank" '
-        + 'value="' + rank + '" size="3" '
-        + '/>';
-    // TODO: Add onchange handler to select row
+    var input   = document.createElement( 'input' );
+    input.type  = "text";
+    input.id    = oRecord.getData("assetId") + '_rank';
+    input.name  = input.id;
+    input.size  = 3;
+    input.value = rank;
+
+    YAHOO.util.Event.addListener( input, "change", function(){ this.selectRow(elCell); }, this, true );
+    elCell.appendChild( input );
 };
 
 /**
@@ -1640,7 +1648,7 @@ WebGUI.Admin.Tree
     this.btnDelete  = new YAHOO.widget.Button( "treeDelete", {
         type        : "button",
         label       : window.admin.i18n.get('Asset','delete'),
-        onclick     : { fn: this.trash, scope: this }
+        onclick     : { fn: this.delete, scope: this }
     } );
 
     this.btnCut     = new YAHOO.widget.Button( "treeCut", {
@@ -1672,23 +1680,281 @@ WebGUI.Admin.Tree
 YAHOO.lang.extend( WebGUI.Admin.Tree, WebGUI.Admin.AssetTable );
 
 /**
- * update( e )
- * Update the selected assets' rank
+ * runHelperForSelected( helperId )
+ * Run the named asset helper for each selected asset
+ * Show the status of the task in a dialog box
+ */
+WebGUI.Admin.Tree.prototype.runHelperForSelected
+= function ( helperId, title ) {
+    var self = this;
+    var assetIds = this.getSelected();
+
+    // Open the dialog with two progress bars
+    var dialog  = new YAHOO.widget.Panel( 'adminModalDialog', {
+        "width"             : '350px',
+        fixedcenter         : true,
+        constraintoviewport : true,
+        underlay            : "shadow",
+        close               : true,
+        visible             : true,
+        draggable           : false
+    } );
+    dialog.setHeader( title );
+    dialog.setBody( 
+        '<div id="pbQueue"></div><div id="pbQueueStatus">0 / ' + assetIds.length + '</div>'
+        + '<div id="pbTask"></div><div id="pbTaskStatus"></div>'
+    );
+    dialog.render( document.body );
+    this.treeDialog = dialog;
+
+    var pbQueueBar = new YAHOO.widget.ProgressBar({
+        minValue : 0,
+        value : 0,
+        maxValue : assetIds.length,
+        width: '300px',
+        height: '30px',
+        anim: true
+    });
+    pbQueueBar.render( 'pbQueue' );
+    pbQueueBar.get('anim').duration = 0.5;
+    pbQueueBar.get('anim').method = YAHOO.util.Easing.easeOut;
+    var pbQueueStatus = document.getElementById( 'pbQueueStatus' );
+
+    var pbTaskBar = new YAHOO.widget.ProgressBar({
+        minValue : 0,
+        value : 0,
+        maxValue : 1,
+        width: '300px',
+        height: '30px',
+        anim: true
+    });
+    pbTaskBar.render( 'pbTask' );
+    pbTaskBar.get('anim').duration = 0.5;
+    pbTaskBar.get('anim').method = YAHOO.util.Easing.easeOut;
+
+    // Clean up when we're done
+    var finish = function () {
+        dialog.destroy();
+        dialog = null;
+        self.admin.requestUpdateClipboard();
+        self.admin.requestUpdateCurrentVersionTag();
+        self.goto( self.admin.currentAssetDef.url );
+    };
+
+    // Build a function to call the helper for the next asset
+    var callHelper = function( assetIds ) {
+        var assetId = assetIds.shift();
+
+        var callback = {
+            success : function (o) {
+                var resp = YAHOO.lang.JSON.parse( o.responseText );
+
+                if ( resp.error ) {
+                    this.admin.processPlugin( resp );
+                    finish();
+                }
+                else if ( resp.forkId ) {
+                    // Wait until the helper is done, then call the next
+                    YAHOO.WebGUI.Fork.poll({
+                        url     : '?op=fork;pid=' + resp.forkId,
+                        draw    : function(data) {
+                            pbTaskBar.set( 'maxValue', data.total );
+                            pbTaskBar.set( 'value', data.finished );
+                        },
+                        finish  : function(){
+                            pbQueueBar.set( 'value', pbQueueBar.get('value') + 1 );
+                            pbQueueStatus.innerHTML = pbQueueBar.get('value') + ' / ' + pbQueueBar.get('maxValue');
+                            if ( assetIds.length > 0 ) {
+                                callHelper( assetIds );
+                            }
+                            else {
+                                // We're all done now!
+                                finish();
+                            }
+                        },
+                    });
+                }
+                else {
+                    // Just go to the next one
+                    if ( assetIds.length > 0 ) {
+                        callHelper( assetIds );
+                    }
+                    else {
+                        finish();
+                    }
+                }
+            },
+            failure : function (o) {
+
+            },
+            scope: this
+        };
+
+        var url = '?op=admin;method=processAssetHelper;helperId=' + helperId + ';assetId=' + assetId;
+        var ajax = YAHOO.util.Connect.asyncRequest( 'GET', url, callback );
+    };
+
+    // Start the queue
+    callHelper( assetIds );
+};
+
+/**
+ * cut( e )
+ * Run the cut assethelper for the selected assets
+ */
+WebGUI.Admin.Tree.prototype.cut
+= function ( e ) {
+    this.runHelperForSelected( "cut", "Cut" );
+};
+
+/**
+ * copy( e )
+ * Run the Copy assethelper for the selected assets
+ */
+WebGUI.Admin.Tree.prototype.copy
+= function ( e ) {
+    this.runHelperForSelected( "copy", "Copy" );
+};
+
+/**
+ * shortcut( e )
+ * Run the shortcut assethelper for the selected assets
+ */
+WebGUI.Admin.Tree.prototype.shortcut
+= function ( e ) {
+    this.runHelperForSelected( "shortcut", "Create Shortcut" );
+};
+
+/**
+ * Run the duplicate assethelper for the selected assets
+ */
+WebGUI.Admin.Tree.prototype.duplicate
+= function ( e ) {
+    this.runHelperForSelected( "duplicate", "Duplicate" );
+};
+
+/**
+ * Run the delete assetHelper for the selected assets
+ */
+WebGUI.Admin.Tree.prototype.delete
+= function ( e ) {
+    this.runHelperForSelected( "delete", "Delete" );
+};
+
+/**
+ * Update the selected assets' ranks
  */
 WebGUI.Admin.Tree.prototype.update
 = function ( e ) {
-    // Get the new ranks
-    var assetIds    = this.getSelected();
-    var payload     = {}; // Request data payload
-    for ( var i = 0; i < assetIds.length; i++ ) {
-        var assetId = assetIds[i];
-        payload[ assetId ] = {
-            rank : document.getElementById( assetId + "_rank" ).value
-        };
-    }
+    var self = this;
+    var assetIds = this.getSelected();
 
-    // Send the request
-    
+    // Open the dialog with two progress bars
+    var dialog  = new YAHOO.widget.Panel( 'adminModalDialog', {
+        "width"             : '350px',
+        fixedcenter         : true,
+        constraintoviewport : true,
+        underlay            : "shadow",
+        close               : true,
+        visible             : true,
+        draggable           : false
+    } );
+    dialog.setHeader( "Updating" );
+    dialog.setBody( 
+        '<div id="pbQueue"></div><div id="pbQueueStatus">0 / ' + assetIds.length + '</div>'
+        + '<div id="pbTask"></div><div id="pbTaskStatus"></div>'
+    );
+    dialog.render( document.body );
+    this.treeDialog = dialog;
+
+    var pbQueueBar = new YAHOO.widget.ProgressBar({
+        minValue : 0,
+        value : 0,
+        maxValue : assetIds.length,
+        width: '300px',
+        height: '30px',
+        anim: true
+    });
+    pbQueueBar.render( 'pbQueue' );
+    pbQueueBar.get('anim').duration = 0.5;
+    pbQueueBar.get('anim').method = YAHOO.util.Easing.easeOut;
+    var pbQueueStatus = document.getElementById( 'pbQueueStatus' );
+
+    var pbTaskBar = new YAHOO.widget.ProgressBar({
+        minValue : 0,
+        value : 0,
+        maxValue : 1,
+        width: '300px',
+        height: '30px',
+        anim: true
+    });
+    pbTaskBar.render( 'pbTask' );
+    pbTaskBar.get('anim').duration = 0.5;
+    pbTaskBar.get('anim').method = YAHOO.util.Easing.easeOut;
+
+    // Clean up when we're done
+    var finish = function () {
+        dialog.destroy();
+        dialog = null;
+        self.admin.requestUpdateClipboard();
+        self.admin.requestUpdateCurrentVersionTag();
+        self.goto( self.admin.currentAssetDef.url );
+    };
+
+
+    // Build a function to call the helper for the next asset
+    var callUpdate = function( assetIds ) {
+        var assetId = assetIds.shift();
+
+        var callback = {
+            success : function (o) {
+                var resp = YAHOO.lang.JSON.parse( o.responseText );
+
+                if ( resp.error ) {
+                    this.admin.processPlugin( resp );
+                    finish();
+                }
+                else if ( resp.forkId ) {
+                    // Wait until the helper is done, then call the next
+                    YAHOO.WebGUI.Fork.poll({
+                        url     : '?op=fork;pid=' + resp.forkId,
+                        draw    : function(data) {
+                            pbTaskBar.set( 'maxValue', data.total );
+                            pbTaskBar.set( 'value', data.finished );
+                        },
+                        finish  : function(){
+                            pbQueueBar.set( 'value', pbQueueBar.get('value') + 1 );
+                            pbQueueStatus.innerHTML = pbQueueBar.get('value') + ' / ' + pbQueueBar.get('maxValue');
+                            if ( assetIds.length > 0 ) {
+                                callHelper( assetIds );
+                            }
+                            else {
+                                // We're all done now!
+                                finish();
+                            }
+                        },
+                    });
+                }
+                else if ( assetIds.length > 0 ) {
+                    callUpdate( assetIds );
+                }
+                else {
+                    finish();
+                }
+            },
+            failure : function (o) {
+            },
+            scope : this
+        };
+
+        var payload = YAHOO.lang.JSON.stringify({
+            "rank" : document.getElementById( assetId + "_rank" ).value
+        });
+
+        YAHOO.util.Connect.asyncRequest( "POST", "?op=admin;method=updateAsset;assetId=" + assetId, callback, payload );
+    };
+
+    callUpdate( assetIds );
 };
 
 /**
