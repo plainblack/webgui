@@ -923,8 +923,7 @@ below/after the form element.|,
     },
 
     'export_url' => {
-        message => q|Url to export the data in a search result into a csv file. This is only available after a
-search has been done.|,
+        message => q|Url to export the all data in a thing into a csv file.|,
         lastUpdated => 1104630516,
         context => q|Description of a tmpl_var for the template help.|,
     },
