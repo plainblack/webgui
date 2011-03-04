@@ -2727,13 +2727,13 @@ sub www_editThingDataSaveViaAjax {
 
 #-------------------------------------------------------------------
 
-=head2 www_export ( )
+=head2 www_exportThing ( )
 
-Exports search results as csv.
+Exports one entire Thing as CSV.
 
 =cut
 
-sub www_export {
+sub www_exportThing {
     my $self = shift;
     my $session = $self->session;
     my ($query,$sth,$out,$fields,@fields,$fileName,@fieldLabels);
@@ -3322,7 +3322,7 @@ sub getSearchTemplateVars {
     $var->{"thing_label"} = $thingProperties->{label};
 
     if ($self->hasPrivileges($thingProperties->{groupIdExport})){
-        $var->{"export_url"} = $session->url->append($url, 'func=export;thingId='.$thingId);
+        $var->{"export_url"} = $session->url->append($url, 'func=exportThing;thingId='.$thingId);
     }
     if ($self->hasPrivileges($thingProperties->{groupIdImport})){
         $var->{"import_url"} = $session->url->append($url, 'func=importForm;thingId='.$thingId);
