@@ -191,8 +191,14 @@ Set the head tags for this form plugin
 
 sub headTags {
     my $self = shift;
-	$self->session->style->setScript($self->session->url->extras('inputCheck.js'),{ type=>'text/javascript' });
-	$self->session->style->setScript($self->session->url->extras('form/timefield.js'),{ type=>'text/javascript' });
+    my $style   = $session->style;
+    my $url     = $session->url;
+	$style->setScript($url->extras('inputCheck.js'),                          { type => 'text/javascript' });
+    $style->setScript($url->extras('yui/build/connection/connection-min.js'), { type => 'text/javascript'});
+    $style->setScript($url->extras('yui/build/event/event-min.js'),           { type => 'text/javascript' });
+    $style->setScript($url->extras('yui/build/json/json-min.js'),             { type => 'text/javascript' });
+    $style->setScript($url->extras('yui-webgui/build/i18n/i18n.js' ),         { type => 'text/javascript' });
+	$style->setScript($url->extras('form/timefield.js'),                      { type => 'text/javascript' });
 }
 
 #-------------------------------------------------------------------
