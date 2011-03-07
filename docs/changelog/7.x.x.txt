@@ -10,6 +10,7 @@
  - fixed #12054: Thingy: Time fields and formatting
  - fixed #12055: Thingy pagination breaks after editing data
  - fixed #12066: Thingy CSV export overrides ExportHTML
+ - fixed #12060: Thingy: importAssetCollateralData and asset checking
 
 7.9.22
  - fixed: Permission on who can create a shortcut of an Asset.
