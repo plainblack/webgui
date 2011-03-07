@@ -211,7 +211,7 @@ sub toHtml {
 	return $self->SUPER::toHtml
 		.WebGUI::Form::Button->new($self->session,
 			id=>$self->get('id'),
-			extras=>'style="font-size: 8pt;" onclick="window.timeField = this.form.'.$self->get("name").';clockSet = window.open(\''.$self->session->url->extras('timeChooser.html').'\',\'timeChooser\',\'WIDTH=230,HEIGHT=100\');return false"',
+			extras=>'style="font-size: 8pt;" onclick="window.timeField = document.getElementById(\''.$self->get("id").'\');clockSet = window.open(\''.$self->session->url->extras('timeChooser.html').'\',\'timeChooser\',\'WIDTH=230,HEIGHT=100\');return false"',
 			value=>$i18n->get(970)
 			)->toHtml;
 }

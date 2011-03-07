@@ -1,4 +1,5 @@
 7.9.24
+ - fixed #12061: TimeField form plugin doesn't work with all names
 
 7.9.23
  - fixed #12048: Asset Manager Search
