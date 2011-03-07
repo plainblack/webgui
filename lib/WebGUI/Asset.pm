@@ -2915,6 +2915,11 @@ sub www_editSave {
 
     ##If this is a new asset (www_add), the parent may be locked.  We should still be able to add a new asset.
     my $isNewAsset = $session->form->process("assetId") eq "new" ? 1 : 0;
+    $session->log->warn("new asset: $isNewAsset");
+    $session->log->warn("canEdit: ". $self->canEdit);
+    $session->log->warn("validToken: ". $session->form->validToken);
+    $session->log->warn("userId: ". $session->user->userId);
+    $session->log->warn("ownerUserId: ". $self->get('ownerUserId'));
     return $session->privilege->locked() if (!$self->canEditIfLocked and !$isNewAsset);
     return $session->privilege->insufficient() unless $self->canEdit && $session->form->validToken;
     if ($self->session->config->get("maximumAssets")) {
@@ -2924,7 +2929,9 @@ sub www_editSave {
     }
     my $object;
     if ($isNewAsset) {
-        $object = $self->addChild({className=>$session->form->process("class","className")});	
+        my $className = $session->form->process("class","className");
+        return $session->privilege->insufficient() if ($isNewAsset && !$className->canAdd($session));
+        $object = $self->addChild({className=> $className});	
         return $self->www_view unless defined $object;
         $object->{_parent} = $self;
         $object->{_properties}{url} = undef;
