@@ -8,6 +8,7 @@
  - fixed #12061: TimeField form plugin doesn't work with all names.
  - fixed #12055: Thingy pagination breaks after editing data
  - fixed #12066: Thingy CSV export overrides ExportHTML
+ - fixed #12060: Thingy: importAssetCollateralData and asset checking
 
 7.10.10
  - fixed #12035: Story Manager - make keywords from Story view work
