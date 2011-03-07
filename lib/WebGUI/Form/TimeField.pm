@@ -190,9 +190,9 @@ Set the head tags for this form plugin
 =cut
 
 sub headTags {
-    my $self = shift;
-    my $style   = $session->style;
-    my $url     = $session->url;
+    my $self  = shift;
+    my $style = $self->session->style;
+    my $url   = $self->session->url;
 	$style->setScript($url->extras('inputCheck.js'),                          { type => 'text/javascript' });
     $style->setScript($url->extras('yui/build/connection/connection-min.js'), { type => 'text/javascript'});
     $style->setScript($url->extras('yui/build/event/event-min.js'),           { type => 'text/javascript' });
