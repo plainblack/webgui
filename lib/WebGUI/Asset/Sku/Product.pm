@@ -1796,34 +1796,42 @@ sub view {
     $var{'addaccessory_url'}   = $self->getUrl('func=addAccessory');
     $var{'addaccessory_label'} = $i18n->get(36);
     ##Need an id for collateral operations, and an assetId for asset instantiation.
-    foreach my $collateral ( @{ $self->getAllCollateral('accessoryJSON') } ) {
+    ACCESSORY: foreach my $collateral ( @{ $self->getAllCollateral('accessoryJSON') } ) {
         my $id = $collateral->{accessoryAssetId};
         $segment = $self->session->icon->delete('func=deleteAccessoryConfirm&aid='.$id,$self->get('url'),$i18n->get(2))
                  . $self->session->icon->moveUp('func=moveAccessoryUp&aid='.$id,$self->get('url'))
                  . $self->session->icon->moveDown('func=moveAccessoryDown&aid='.$id,$self->get('url'));
+        my $accessory_vars = {
+            accessory_title    => $i18n->get('Lost'),
+            accessory_controls => $segment,
+        };
         my $accessory = WebGUI::Asset->newByDynamicClass($session, $collateral->{accessoryAssetId});
-        push(@accessoryloop,{
-                           'accessory_URL'      => $accessory->getUrl,
-                           'accessory_title'    => $accessory->getTitle,
-                           'accessory_controls' => $segment,
-                           });
+        if ( $accessory ) {
+            $accessory_vars->{ accessory_URL }   = $accessory->getUrl;
+            $accessory_vars->{ accessory_title } = $accessory->getTitle;
+        }
+        push(@accessoryloop, $accessory_vars);
     }
     $var{accessory_loop} = \@accessoryloop;
 
     #---related
     $var{'addrelatedproduct_url'}   = $self->getUrl('func=addRelated');
     $var{'addrelatedproduct_label'} = $i18n->get(37);
-    foreach my $collateral ( @{ $self->getAllCollateral('relatedJSON')} ) {
+    RELATED: foreach my $collateral ( @{ $self->getAllCollateral('relatedJSON')} ) {
         my $id = $collateral->{relatedAssetId};
         $segment = $self->session->icon->delete('func=deleteRelatedConfirm&rid='.$id, $self->get('url'),$i18n->get(4))
                  . $self->session->icon->moveUp('func=moveRelatedUp&rid='.$id, $self->get('url'))
                  . $self->session->icon->moveDown('func=moveRelatedDown&rid='.$id, $self->get('url'));
+        my $related_vars = {
+            relatedproduct_title    => $i18n->get('Lost'),
+            relatedproduct_controls => $segment,
+        };
         my $related = WebGUI::Asset->newByDynamicClass($session, $collateral->{relatedAssetId});
-        push(@relatedloop,{
-                          'relatedproduct_URL'      => $related->getUrl,
-                          'relatedproduct_title'    => $related->getTitle,
-                          'relatedproduct_controls' => $segment,
-                          });
+        if ($related) {
+            $related_vars->{ relatedproduct_URL }   = $related->getUrl;
+            $related_vars->{ relatedproduct_title } = $related->getTitle;
+        }
+        push(@relatedloop, $related_vars);
     }
     $var{relatedproduct_loop} = \@relatedloop;
 

@@ -1,4 +1,5 @@
 7.10.12
+ - fixed #12072: Product, related and accessory assets
 
 7.10.11
  - fixed #12057: WebGUI::Search, assetIds search clause
