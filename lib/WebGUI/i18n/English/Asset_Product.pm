@@ -864,6 +864,12 @@ be useful, others may not.|,
 		context => q|A set of links or icons to edit or alter the object.|
 	},
 
+	'Lost' => {
+		message => q|Asset lost|,
+		lastUpdated => 0,
+		context => q|A message indicating that the asset used by the Product as collateral has been lost.  Lost as in missing/deleted.|
+	},
+
 };
 
 1;
