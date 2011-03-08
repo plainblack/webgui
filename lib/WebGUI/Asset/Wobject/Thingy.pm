@@ -1367,10 +1367,6 @@ sub importAssetCollateralData {
     my $session = $self->session;
     my $error = $session->errorHandler;
     my $data = shift;
-    my $id = $data->{properties}{assetId};
-    my $class = $data->{properties}{className};
-    my $version = $data->{properties}{revisionDate};
-    my $assetExists = WebGUI::Asset->assetExists($self->session, $id, $class, $version);
     
     $error->info("Importing Things for Thingy ".$data->{properties}{title});
     my @importThings;
@@ -1378,7 +1374,7 @@ sub importAssetCollateralData {
         push(@importThings,$thing->{thingId});
         my ($thingIdExists) = $session->db->quickArray("select thingId from Thingy_things where thingId = ?",
             [$thing->{thingId}]);
-        if ($assetExists && $thingIdExists){
+        if ($thingIdExists){
             # update existing thing
             $error->info("Updating Thing, label: ".$thing->{label}.", id: ".$thing->{thingId});
             $self->setCollateral("Thingy_things","thingId",$thing,0,0);
@@ -1402,7 +1398,7 @@ sub importAssetCollateralData {
         push(@importFields,$field->{fieldId});
         my $dbDataType = $self->_getDbDataType($field->{fieldType});
         my ($fieldIdExists) = $session->db->quickArray("select fieldId from Thingy_fields where fieldId = ? and thingId = ? ",[$field->{fieldId},$field->{thingId}]);
-        if ($assetExists && $fieldIdExists){
+        if ($fieldIdExists){
             # update existing field
             $error->info("Updating Field, label: ".$field->{label}.", id: ".$field->{fieldId}.",seq :"
                 .$field->{sequenceNumber});
