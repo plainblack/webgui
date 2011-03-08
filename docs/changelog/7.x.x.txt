@@ -1,3 +1,5 @@
+7.10.12
+
 7.10.11
  - fixed #12057: WebGUI::Search, assetIds search clause
  - fixed #12051: Prevent Proxy Caching Breaks Edit/Add Thing
