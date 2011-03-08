@@ -23,7 +23,7 @@ BEGIN {
 
 $|++;    # disable output buffering
 
-our ( $configFile, $help, $man, $fix, $delete );
+our ( $configFile, $help, $man, $fix, $delete, $no_progress );
 use Pod::Usage;
 use Getopt::Long;
 use WebGUI::Session;
@@ -35,6 +35,7 @@ GetOptions(
     'man'          => \$man,
     'fix'          => \$fix,
     'delete'       => \$delete,
+    'noProgress'   => \$no_progress,
 );
 
 pod2usage( verbose => 1 ) if $help;
@@ -199,7 +200,7 @@ while ( my %row = $sth->hash ) {
         } ## end else [ if ($fix) ]
 
     } ## end if ( !$asset )
-    progress( $total, $count++ );
+    progress( $total, $count++ ) unless $no_progress;
 } ## end while ( my %row = $sth->hash)
 $sth->finish;
 $max_revision->finish;
