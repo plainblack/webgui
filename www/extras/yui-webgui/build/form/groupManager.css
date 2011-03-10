@@ -1,0 +1,170 @@
+
+.yui-panel .bd  {
+	overflow: visible !important;
+	padding-bottom: 15px;
+}
+
+.yui-panel {
+	overflow: visible !important;
+}
+
+.yui-skin-sam .yui-ac-container {
+	min-height: 50px;
+	height: auto !important;
+	width: 154px;
+	display: none;
+	z-index: 9999;
+	clear: both;
+}
+
+.yui-skin-sam .yui-ac {
+	width: 170px !important;
+}
+
+#groupManagerTable, #dialog1{
+	width: 300px !important;
+}
+
+#groupManagerForm, #groupManagerTable {
+	width: 270px !important;
+}
+
+#group_lookup, #user_lookup {
+	width: 150px;
+	margin-top: -9px;
+	height: 13px;
+}
+
+#groupManagerTable div {
+	display: block;
+}
+
+#groupsAdded_row, #usersAdded_row{
+	display: none !important;
+	clear: both;
+}
+
+#groupsAdded_row ul, #usersAdded_row ul{
+	margin: 0px !important
+	padding: 0px !important;
+	padding-left: 0px !important;
+	list-style: none;
+}
+
+#groupsAdded_row ul li, #usersAdded_row ul li {
+	margin-bottom: 5px;
+	clear: both;
+}
+
+.removeLink {
+	margin-right: 10px;
+	display: block;
+	float: left;
+	height: 19px !important;
+	width: 15px !important;
+}
+
+#groupResultsContainer, #userResultsContainer {
+	display: none;
+	left: 30px;
+}
+
+.ft {
+	padding-top: 10px !important;
+	font-size: 11px !important;
+	text-align: left !important;
+	color: #000 !important;
+}
+
+.yui-skin-sam .yui-button {
+	border: 0px !important;
+	border-style: hidden !important;
+}
+
+.yui-skin-sam .yui-button .first-child {
+	border: 0px !important;
+	border-style: none !important;
+}
+.yui-skin-sam .yui-dialog .ft span.default button {
+	color: #000 !important;
+}
+
+.yui-skin-sam .yui-dialog .ft .button-group {
+	text-align: left !important;
+}
+
+.yui-skin-sam .yui-dialog .ft span.default {
+	background-position: 0 0 !important;
+}
+
+.button-group button{
+	border-color: #ccc #666 #333 #fff !important;
+}
+
+.yui-dialog .ft, .yui-simple-dialog .ft {
+	padding-left: 5px !important;
+	padding-bottom: 10px !important;
+	text-align: left !important;
+}
+
+#groupManagerTable label {
+	font-weight: bold;
+}
+
+#groupManagerTable .firstcol {
+	padding-top: 7px;
+	padding-right: 7px;
+}
+
+.groupLabel {
+	height: 35px;
+	margin-top: 15px;
+	clear: both;
+}
+
+#groupEntry, #userEntry {
+}
+
+.addBtn {
+	padding-right: 10px;
+	float: left;
+	width: 20px;
+	position: relative;
+	top: -8px;
+}
+
+.entryInput {
+	float: left;
+}
+
+#createNewGroupRow img {
+	margin-right: 7px;
+	margin-left: 7px;
+	position: relative;
+	top: 6px;
+}
+
+#createNewGroupRow a, #createNewGroupRow a:link, #createNewGroupRow a:hover, #createNewGroupRow a:active {
+	font-size: 11px !important;
+	position: relative;
+	top: -7px;
+	text-decoration: none !important;
+}
+
+#groupNameRow {
+	float: left;
+	padding-right: 10px;
+	margin-bottom: 10px;
+}
+
+#createNewGroupRow {
+	float: left;
+	margin-bottom: 10px;
+}
+
+#groupManagerContainer {
+	padding-left: 10px;
+	padding-top: 10px;
+	padding-right: 10px;
+}
+

@@ -7,6 +7,21 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+7.10.12
+--------------------------------------------------------------------
+    * The Dashboard has been extended to include Asset Dashlets.  This gives
+      Assets fine control over which properties can be extended and which can't.
+      Assets in the Dashboard can be set to be required, which prevents them from
+      being deleted, and fixed, which prevents them from moved.
+    * The StockData and WeatherData assets now include cache settings to reduce
+      server side load.  The browser interface for the StockData asset still does
+      real time lookups.
+    * A new macro has been added, LastModifiedBy.  This returns the username of
+      the user who last modified an Asset.  If the asset in question is a Page
+      Layout or Folder, then querying that asset will also check all children.
+    * The Group form control has been extended to add a simple interface for
+      adding new Groups and changing their membership.
+
 7.10.11
 --------------------------------------------------------------------
     * Modified TimeField, now provides popupless immediate validation with

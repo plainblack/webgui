@@ -1823,6 +1823,19 @@ sub getContentLastModified {
 
 #-------------------------------------------------------------------
 
+=head2 getContentLastModifiedBy ( )
+
+Returns the userId that modified the content last.
+
+=cut
+
+sub getContentLastModifiedBy {
+        my $self = shift;
+        return $self->get("revisedBy");
+}
+
+#-------------------------------------------------------------------
+
 =head2 getValue ( key )
 
 Tries to look up C<key> in the asset object's property cache.  If it can't find it in there, then it

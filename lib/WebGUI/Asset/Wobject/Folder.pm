@@ -121,7 +121,7 @@ Overridden to check the revision dates of children as well
 
 sub getContentLastModified {
     my $self = shift;
-    my $mtime = $self->get("revisionDate");
+    my $mtime = $self->get("lastModified");
     my $childIter = $self->getLineageIterator(["children"]);
     while ( 1 ) {
         my $child;
@@ -135,6 +135,36 @@ sub getContentLastModified {
         $mtime = $child_mtime if ($child_mtime > $mtime);
     }
     return $mtime;
+}
+
+#-------------------------------------------------------------------
+
+=head2 getContentLastModifiedBy
+
+Overridden to check the updated dates of children as well
+
+=cut
+
+sub getContentLastModifiedBy {
+    my $self      = shift;
+    my $mtime     = $self->SUPER::getContentLastModified;
+    my $userId    = $self->get('revisedBy');
+    my $childIter = $self->getLineageIterator(["children"]);
+    while ( 1 ) {
+        my $child;
+        eval { $child = $childIter->() };
+        if ( my $x = WebGUI::Error->caught('WebGUI::Error::ObjectNotFound') ) {
+            $self->session->log->error($x->full_message);
+            next;
+        }
+        last unless $child;
+        my $child_mtime = $child->getContentLastModified;
+        if ($child_mtime > $mtime) {
+            $mtime = $child_mtime;
+            $userId = $child->get("revisedBy");
+        }
+    }
+    return $userId;
 }
 
 #-------------------------------------------------------------------

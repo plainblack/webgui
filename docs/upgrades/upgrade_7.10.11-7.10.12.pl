@@ -31,6 +31,11 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+installNewDashboardTables($session);
+addStockDataCacheColumn($session);
+addWeatherDataCacheColumn($session);
+addLastModifiedByMacro($session);
+
 
 finish($session); # this line required
 
@@ -44,6 +49,67 @@ finish($session); # this line required
 #    print "DONE!\n" unless $quiet;
 #}
 
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub addLastModifiedMacro {
+    my $session = shift;
+    print "\tAdd LastModifiedBy macro to the config file... " unless $quiet;
+    # and here's our code
+    $session->config->addToHash('macros', 'LastModifiedBy', 'LastModifiedBy');
+    print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub installNewDashboardTables {
+    my $session = shift;
+    print "\tInstall new Dashboard tables... " unless $quiet;
+    $session->db->write(<<EOSQL);
+CREATE TABLE IF NOT EXISTS Dashboard_dashlets (
+    dashboardAssetId CHAR(22) BINARY,
+    dashletAssetId   CHAR(22) BINARY,
+    isStatic    BOOLEAN,
+    isRequired  BOOLEAN,
+    PRIMARY KEY (dashboardAssetId, dashletAssetId)
+) TYPE=MyISAM CHARSET=utf8;
+EOSQL
+    $session->db->write(<<EOSQL);
+CREATE TABLE IF NOT EXISTS Dashboard_userPrefs (
+    dashboardAssetId CHAR(22) BINARY,
+    dashletAssetId   CHAR(22) BINARY,
+    userId           CHAR(22) BINARY,
+    isMinimized    BOOLEAN,
+    properties     LONGTEXT,
+    PRIMARY KEY (dashboardAssetId, dashletAssetId, userId)
+) TYPE=MyISAM CHARSET=utf8;
+EOSQL
+    # and here's our code
+    print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub addStockDataCacheColumn {
+    my $session = shift;
+    print "\tAdd cache column for the StockData asset... " unless $quiet;
+    $session->db->write(<<EOSQL);
+ALTER TABLE StockData ADD COLUMN cacheTimeout BIGINT
+EOSQL
+    # and here's our code
+    print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub addWeatherDataCacheColumn {
+    my $session = shift;
+    print "\tAdd cache column for the WeatherData asset... " unless $quiet;
+    $session->db->write(<<EOSQL);
+ALTER TABLE WeatherData ADD COLUMN cacheTimeout BIGINT
+EOSQL
+    # and here's our code
+    print "DONE!\n" unless $quiet;
+}
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
 

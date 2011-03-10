@@ -1,5 +1,10 @@
 7.10.12
  - fixed #12072: Product, related and accessory assets
+ - added: Add Asset Dashlets to Dashboard
+ - added: Required and Static properties to assets in a dashboard.
+ - added: Caching to StockData and WeatherData asset.
+ - added: LastModifiedBy macro
+ - added: Group Manager form control
 
 7.10.11
  - fixed #12057: WebGUI::Search, assetIds search clause

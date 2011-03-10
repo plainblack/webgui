@@ -820,6 +820,7 @@
     "If"               : "If",
     "International"    : "International", 
     "LastModified"     : "LastModified", 
+    "LastModifiedBy"   : "LastModifiedBy", 
     "L"                : "L_loginBox", 
     "LoginToggle"      : "LoginToggle", 
     "MiniCart"         : "MiniCart",

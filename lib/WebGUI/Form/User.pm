@@ -170,5 +170,25 @@ sub toHtml {
                         )->toHtml).$manage;
 }
 
+#-------------------------------------------------------------------
+
+=head2 www_searchUsers
+
+Returns users that match the supplied username.  Username is specified via the form
+variable C<search>.  A list of usernames will be returned of up to 15 names and userIds.
+
+=cut
+
+sub www_searchUsers {
+    my $session = shift;
+    return '{"results":[]}' unless $session->user->isInGroup($session->setting->get('groupIdAdminUser'));
+    my $search = $session->form->param('query');
+
+    my $results = $session->db->buildArrayRefOfHashRefs(q|select userId, username from users where username like CONCAT(?, '%') LIMIT 15|, [ $search ]);
+
+    return JSON::to_json({ results => $results });
+}
+
+
 1;
 

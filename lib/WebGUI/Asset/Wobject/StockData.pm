@@ -16,7 +16,8 @@ use WebGUI::Utility;
 use WebGUI::Asset::Wobject;
 use Finance::Quote;
 
-our @ISA = qw(WebGUI::Asset::Wobject);
+use Class::C3;
+use base qw/WebGUI::Asset::Wobject WebGUI::AssetAspect::Dashlet/;
 
 #-------------------------------------------------------------------
 
@@ -165,7 +166,9 @@ sub _convertToEpoch {
    if($time =~ m/pm/i) {
       $hour += 12;
    }
+   $hour ||= 0;
    $hour = $self->_appendZero($hour);
+   $minute ||= 0;
    $minute = $self->_appendZero($minute);
    my $epoch = eval {$self->session->datetime->humanToEpoch("$year-$month-$day $hour:$minute:00")};
    return $epoch;
@@ -184,21 +187,47 @@ List of stock symbols to find passed in as an array reference.  Stock symbols sh
 =cut
 
 sub _getStocks {
-   my $self = shift;
-   my $stocks = $_[0];
+    my $self = shift;
+    my $stocks = $_[0];
+    my $session = $self->session;
 
-   # Create a new Finance::Quote object
-   my $q = Finance::Quote->new;
-   # Disable failover if specified
-   unless ($self->getValue("failover")) {
-	   $q->failover(0);
-   }
+    # Create a new Finance::Quote object
+    my $q = Finance::Quote->new;
+    # Disable failover if specified
+    unless ($self->getValue("failover")) {
+       $q->failover(0);
+    }
+    # Hardcoded timeout for now.
+    $q->timeout(15);
 
-   # Hardcoded timeout for now.
-   $q->timeout(15);
+    my $source = $self->getValue('source');
+    my %stocks = ();
+    my @stocks_to_fetch = ();
+    STOCK: foreach my $stock (@{$stocks}) {
+        $stock = uc $stock;
+        my $cache = WebGUI::Cache->new($session, [$self->getId, $source, $stock]);
+        if ($cache->get()) {
+            my $value = $cache->get();
+            %stocks = (%stocks, %{ $value });
+        }
+        else {
+            push @stocks_to_fetch, $stock;
+        }
+    }
 
-   # Fetch the stock information and return the results
-   return $q->fetch($self->getValue("source"),@{$stocks});
+    # Fetch the information for uncached stocks, cache them individually, and build the composite data.
+    my %new_stocks = $q->fetch($source, @stocks_to_fetch);
+    foreach my $stock (@stocks_to_fetch) {
+        $stock = uc $stock;
+        my @stock_keys = grep { /$stock\b/ } keys %new_stocks;
+        my $cache = WebGUI::Cache->new($session, [$self->getId, $source, $stock]);
+        my %slice;
+        @slice{ @stock_keys } = @new_stocks{ @stock_keys };
+        $slice{$stock,'last_fetch'} = time();
+        $cache->set(\%slice, $self->get('cacheTimeout'));
+        %stocks = (%stocks, %slice);
+    }
+    return \%stocks;
 }
 
 #-------------------------------------------------------------------
@@ -284,6 +313,7 @@ sub definition {
 			tab=>'properties',
 			label=> $i18n->get("default_stock_label"),
 			hoverHelp=> $i18n->get("default_stock_label_description"),
+            dashletOverridable => 1,
 		},
 		source=>{
 			fieldType=>"selectList",
@@ -297,8 +327,16 @@ sub definition {
 			fieldType=>"yesNo",
 			defaultValue=>undef,
 			label=> $i18n->get("failover_label"),
-			hoverHelp=> $i18n->get("failover_description")
-		}
+			hoverHelp=> $i18n->get("failover_description"),
+		},
+        cacheTimeout => {
+            tab => "display",
+            fieldType => "interval",
+            defaultValue => 3600,
+            uiLevel => 5,
+            label => $i18n->get("cache timeout", 'Asset_Snippet'),
+            hoverHelp => $i18n->get("cache timeout help"),
+        },
 	);
 
 	push(@{$definition}, {
@@ -370,7 +408,8 @@ sub view {
 	$var->{'stock.display.url'} = $self->getUrl("func=displayStock;symbol=");
 	
 	#Build list of stocks as an array
-	my $defaults = $self->getValue("defaultStocks");
+    my $overrides = $self->fetchUserOverrides($self->getParent->getId);
+	my $defaults  = $overrides->{defaultStocks} || $self->getValue("defaultStocks");
 	#replace any windows newlines
 	$defaults =~ s/\r//;
 	my @array = split("\n",$defaults);

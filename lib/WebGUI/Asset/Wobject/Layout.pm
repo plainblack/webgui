@@ -443,6 +443,36 @@ sub getContentLastModified {
 
 #-------------------------------------------------------------------
 
+=head2 getContentLastModifiedBy
+
+Extend the base class to include the userid of the person that made last modification.
+
+=cut
+
+sub getContentLastModifiedBy {
+    my $self      = shift;
+    my $mtime     = $self->SUPER::getContentLastModified;
+    my $userId    = $self->get('revisedBy');
+    my $childIter = $self->getLineageIterator(["children"],{excludeClasses=>['WebGUI::Asset::Wobject::Layout']});
+    while ( 1 ) {
+        my $child;
+        eval { $child = $childIter->() };
+        if ( my $x = WebGUI::Error->caught('WebGUI::Error::ObjectNotFound') ) {
+            $self->session->log->error($x->full_message);
+            next;
+        }
+        last unless $child;
+        my $child_mtime = $child->getContentLastModified;
+        if ($child_mtime > $mtime) {
+            $mtime = $child_mtime;
+            $userId = $child->get("revisedBy");
+        }
+    }
+    return $userId;
+}
+
+#-------------------------------------------------------------------
+
 =head2 www_view 
 
 Extend the base method to handle caching and ad rotation.

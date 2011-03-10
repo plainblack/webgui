@@ -3049,6 +3049,12 @@ or are under your current version tag.</p>
                 context => q|Label of the cancel button|
         },
 
+    'Cancel' => {
+        message => q|Cancel|,
+        lastUpdated =>1092930637,
+        context => q|Label of the cancel button, with capital C|
+    },
+
 	'trash' => {
 		message => q|Trash|,
 		lastUpdated =>1211131614,

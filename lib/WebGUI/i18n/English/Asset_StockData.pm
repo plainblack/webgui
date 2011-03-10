@@ -514,6 +514,12 @@ our $I18N = {
 		lastUpdated => 1229493261,
 	},
 
+	'cache timeout help' => {
+		message => q|How long should lookups for each stock symbol be cached internally?  Note, the default template has javascript that does fetches on the client side.|,
+		context => q|Template variable help|,
+		lastUpdated => 1229493261,
+	},
+
 };
 
 1;

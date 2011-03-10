@@ -172,7 +172,7 @@ sub definition {
 
 package main;
 
-plan tests => 134
+plan tests => 137
             + scalar(@fixIdTests)
             + scalar(@fixTitleTests)
             + 2*scalar(@getTitleTests) #same tests used for getTitle and getMenuTitle
@@ -1011,8 +1011,12 @@ $session->http->setRedirectLocation('');
 is $clippedAsset->checkView(), 'chunked', 'checkView: returns "chunked" when admin is on for cut asset';
 is $session->http->getRedirectLocation, $clippedAsset->getUrl('func=manageClipboard'), '... cut asset sets redirect to manageClipboard';
 
-#----------------------------------------------------------------------------
-# packed head tags
+################################################################
+#
+# Packed head tags
+#
+################################################################
+
 use HTML::Packer;
 my $asset   = WebGUI::Asset->getImportNode( $session )->addChild({
     className       => 'WebGUI::Asset::Snippet',
@@ -1035,6 +1039,30 @@ is $asset->get('extraHeadTagsPacked'), $packed, 'extraHeadTagsPacked';
 $asset->update({ extraHeadTags => '' });
 ok !$asset->get('extraHeadTagsPacked'), 'extraHeadTagsPacked cleared';
 
+################################################################
+#
+# getContentLastModifiedBy
+#
+################################################################
+
+{
+    my $revised_user1 = WebGUI::User->new($session, 'new');
+    my $revised_user2 = WebGUI::User->new($session, 'new');
+    WebGUI::Test->addToCleanup($revised_user1, $revised_user2 );
+    $session->user({user => $revised_user1});
+    my $versionTag = WebGUI::VersionTag->getWorking($session);
+    my $asset   = WebGUI::Asset->getImportNode( $session )->addChild({
+        className       => 'WebGUI::Asset::Snippet',
+    }, undef, 12);
+    $versionTag->commit;
+    $asset = $asset->cloneFromDb;
+    WebGUI::Test->addToCleanup($asset, $versionTag);
+    is $asset->getContentLastModifiedBy, $asset->get('revisedBy'), 'getContentLastModifiedBy returns revisedBy for most assets';
+    is $asset->getContentLastModifiedBy, $revised_user1->userId, '... real userId check';
+    $session->user({user => $revised_user2});
+    $asset = $asset->addRevision({ title => 'titular', }, 14);
+    is $asset->getContentLastModifiedBy, $revised_user2->userId, '... check that a new revision tracks';
+}
 
 ##Return an array of hashrefs.  Each hashref describes a test
 ##for the fixId method.
