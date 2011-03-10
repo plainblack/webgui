@@ -2746,20 +2746,19 @@ sub www_exportThing {
     $fields = $session->db->read('select * from Thingy_fields where assetId =? and thingId = ? order by sequenceNumber',
         [$self->get("assetId"),$thingId]);
     while (my $field = $fields->hashRef) {
-        if ($field->{displayInSearch}){
-            push(@fields, {
-                fieldId => $field->{fieldId},
-                properties => $field,
-            });
-            push(@fieldLabels,$field->{label});
-        }
+        push(@fields, {
+            fieldId => $field->{fieldId},
+            properties => $field,
+	});
+        push(@fieldLabels,$field->{label});
     }
+
     my @metaDataFields = ('thingDataId','dateCreated','createdById','updatedById','updatedByName','lastUpdated','ipAddress');
     if ($thingProperties->{exportMetaData}){
         push(@fieldLabels,@metaDataFields)
     }
  
-    $query = WebGUI::Cache->new($self->session,"query_".$thingId)->get;
+    $query = 'select * from '.$session->db->dbh->quote_identifier("Thingy_".$thingId);
     $sth = $session->db->read($query);
 
     ### Loop through the returned structure and put it through Text::CSV
@@ -2780,11 +2779,11 @@ sub www_exportThing {
             my $value = $self->getFieldValue($data->{"field_".$fieldId},$field->{properties},"%y-%m-%d","%y-%m-%d %j:%n:%s");
             push(@fieldValues, $value);
         }
-        if ($thingProperties->{exportMetaData}) {
-            foreach my $metaDataField (@metaDataFields){
-                push(@fieldValues,$data->{$metaDataField});
-            }
-        }
+
+	if ($thingProperties->{exportMetaData}) {
+	    push(@fieldValues, @{$data}{@metaDataFields});
+	}
+
         print $CSV "\n".WebGUI::Text::joinCSV( @fieldValues );
         #if (! ++$rowCounter % 25) {
             $pb->update($i18n->get('Writing data'));
