@@ -99,7 +99,13 @@ sub new {
         # Default values
         my $resolveConf = sub {
             my ($config) = @_;
-            if ( $config->{driver} =~ /DBI/ ) {
+            if (
+                $config->{driver} =~ /DBI/ or (
+                    $config->{args} and   # "args" : [ "dbh" ] in the "cache": { } block?
+                    ref $config->{args} eq 'ARRAY' and 
+                    grep($_ eq 'dbh', @{ $config->{args} })
+                )
+            ) {  
                 $config->{ dbh } = $session->db->dbh;
             }
             if ( $config->{driver} =~ /File|FastMmap|BerkeleyDB/ ) {
