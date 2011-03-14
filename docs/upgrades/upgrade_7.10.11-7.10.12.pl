@@ -51,7 +51,7 @@ finish($session); # this line required
 
 #----------------------------------------------------------------------------
 # Describe what our function does
-sub addLastModifiedMacro {
+sub addLastModifiedByMacro {
     my $session = shift;
     print "\tAdd LastModifiedBy macro to the config file... " unless $quiet;
     # and here's our code
