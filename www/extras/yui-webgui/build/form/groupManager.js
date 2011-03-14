@@ -67,7 +67,6 @@ WebGUI.Form.GroupManager.initDialog = function () {
     var handleSubmit = function() {
         this.cancel();
 		var url = "?op=formHelper;class=Group;sub=saveGroup;";
-		var getEverything = "?op=formHelper;class=Group;sub=groupMembers;groupId=" + groupId;
 
         var form_target = document.getElementById("gm_form_target");
 		for(var i=0; i < WebGUI.Form.GroupManager.users_added.length; i++) {
@@ -297,7 +296,7 @@ WebGUI.Form.GroupManager.show_dialog = function(formName, isNew) {
 	};
 
     if (isNew != "new") {
-        var requestUrl = this.url + "?op=formHelper;class=Group;sub=groupMembers;groupId=" + groupId;
+        var requestUrl = "?op=formHelper;class=Group;sub=groupMembers;groupId=" + groupId;
         var callback    = {
             failure : function ( o ) {
                 // TODO: YUI logger for this
