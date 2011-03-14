@@ -1,11 +1,6 @@
 7.9.24
  - fixed #12061: TimeField form plugin doesn't work with all names
  - fixed #12072: Product, related and accessory assets
- - added: Add Asset Dashlets to Dashboard
- - added: Required and Static properties to assets in a dashboard.
- - added: Caching to StockData and WeatherData asset.
- - added: LastModifiedBy macro
- - added: Group Manager form control
  - fixed #12050: Thing query caching #1
 
 7.9.23
