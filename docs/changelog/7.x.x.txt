@@ -1,3 +1,5 @@
+7.9.25
+
 7.9.24
  - fixed #12061: TimeField form plugin doesn't work with all names
  - fixed #12072: Product, related and accessory assets
