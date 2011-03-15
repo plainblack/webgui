@@ -71,7 +71,7 @@ my @forms = HTML::Form->parse($html, 'http://www.webgui.org');
 is(scalar @forms, 1, '1 form was parsed');
 
 my @inputs = $forms[0]->inputs;
-is(scalar @inputs, 2, 'The form has 2 inputs.  Field and CSRF');
+is(scalar @inputs, 3, 'The form has 3 inputs.  Field and CSRF');
 
 #Basic tests
 
