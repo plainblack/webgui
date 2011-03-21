@@ -17,7 +17,7 @@ use WebGUI::Session;
 use WebGUI::User;
 
 use WebGUI::Asset;
-use Test::More tests => 96; # increment this value for each test you create
+use Test::More tests => 98; # increment this value for each test you create
 use Test::Deep;
 
 # Test the methods in WebGUI::AssetLineage
@@ -233,6 +233,12 @@ is($root->getRank('100001'), '100001', "getRank: arbitrary lineage");
 
 is($folder->getNextChildRank,  '000008',  "getNextChildRank: folder with 8 snippets");
 is($folder2->getNextChildRank, '000002',  "getNextChildRank: empty folder");
+
+# Change the step and offset
+$session->config->set( 'db', { increment_step => 5, increment_offset => 3 } );
+is( $folder->getNextChildRank, '000013', "getNextChildRank: step 5, offset 3, folder with 8 snippets" );
+is( $folder2->getNextChildRank, '000008', "getNextChildRank: step 5, offset 3, empty folder" );
+$session->config->delete( 'db' );
 
 ####################################################
 #

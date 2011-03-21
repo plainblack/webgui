@@ -154,6 +154,24 @@
 #     "password" : "password"
 #     },
 
+# If you have a multi-master set up, you must define increment_step and increment_offset
+# to prevent merge conflicts between the different masters. increment_step should be set
+# to the number of masters, and offset should be unique to each master, starting at 0.
+#
+# So, a 2-master cluster would define:
+#   Master 1:
+#       increment_step: 2
+#       increment_offset: 0
+#   Master 2:
+#       increment_step: 2
+#       increment_offset: 1
+#
+# "db" : {
+#       "increment_step" : 1,
+#       "increment_offset" : 0
+#   },
+
+
 # Set this value if you wish to override all outbound emails to a specific
 # user for testing purposes.
 

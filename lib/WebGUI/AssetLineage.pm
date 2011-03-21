@@ -763,19 +763,25 @@ Returns a 6 digit number with leading zeros of the next rank a child will get.
 =cut
 
 sub getNextChildRank {
-	my $self = shift;	
-	my ($lineage) = $self->session->db->quickArray("select max(lineage) from asset where parentId=?",[$self->getId]);
-	my $rank;
-	if (defined $lineage) {
-		$rank = $self->getRank($lineage);
-		$self->session->errorHandler->fatal("Asset ".$self->getId." has too many children.") if ($rank >= 999998);
-		$rank++;
-	} else {
-		$rank = 1;
-	}
-	return $self->formatRank($rank);
-}
+    my $self = shift;
 
+    # Increment by steps for servers in multi-master DB setups
+    my $inc_step = $self->session->config->get('db/increment_step') || 1;
+    my $inc_offset = $self->session->config->get('db/increment_offset') || 0;
+
+    my ($lineage) = $self->session->db->quickArray("select max(lineage) from asset where parentId=?",[$self->getId]);
+    my $rank;
+    if (defined $lineage) {
+        $rank = $self->getRank($lineage);
+        # Increase rank to next step then add offset
+        $rank += ( $inc_step - $rank % $inc_step ) + $inc_offset;
+        $self->session->errorHandler->fatal("Asset ".$self->getId." has too many children.") if ($rank >= 999999); # Each lineage area is only 6 digits
+    }
+    else {
+        $rank = 1;
+    }
+    return $self->formatRank($rank);
+}
 
 #-------------------------------------------------------------------
 
