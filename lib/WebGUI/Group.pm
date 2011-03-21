@@ -137,7 +137,7 @@ sub addGroups {
 		my $group = WebGUI::Group->new($self->session, $gid);
 		my $recursive = isIn($self->getId, @{$group->getGroupsIn(1)});
         next GROUP if $recursive;
-        $self->session->db->write("insert into groupGroupings (groupId,inGroup) values (?,?)",[$gid, $self->getId]);
+        $self->session->db->write("REPLACE into groupGroupings (groupId,inGroup) values (?,?)",[$gid, $self->getId]);
 	}
 	$self->clearCaches();
 	return 1;
@@ -169,7 +169,7 @@ sub addUsers {
 	foreach my $uid (@{$users}) {
 		my ($isIn) = $self->session->db->quickArray("select count(*) from groupings where groupId=? and userId=?", [$self->getId, $uid]);
 		unless ($isIn) {
-			$self->session->db->write("insert into groupings (groupId,userId,expireDate) values (?,?,?)", [$self->getId, $uid, (time()+$expireOffset)]);
+			$self->session->db->write("REPLACE into groupings (groupId,userId,expireDate) values (?,?,?)", [$self->getId, $uid, (time()+$expireOffset)]);
 			$self->session->stow->delete("gotGroupsForUser");
 		} else {
 			$self->userGroupExpireDate($uid,(time()+$expireOffset));

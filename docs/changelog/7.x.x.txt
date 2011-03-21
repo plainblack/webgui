@@ -8,6 +8,7 @@
  - fixed #12050: Thing query caching #1
  - added: Let CHI cache request $dbh via an "args" : [ "dbh" ] cache conf
  - added: lineage increment_step and increment_offset for multi-master DB clusters
+ - Change Group INSERT to REPLACE to prevent merge problems in multi-master DB clusters
 
 7.10.11
  - fixed #12057: WebGUI::Search, assetIds search clause
