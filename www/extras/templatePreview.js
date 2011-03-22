@@ -203,7 +203,7 @@
             fixedcenter         : true,
             constraintoviewport : true
         });
-        $event.on('previewFetch', 'click', fetch);
+        $event.on('previewFetch', 'click', function() { fetch() });
         $event.on('preview', 'click', render);
         $event.on('previewConfig', 'click', runConfigDialog);
         $event.on('previewConfigClose', 'click', function () {
