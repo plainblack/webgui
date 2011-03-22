@@ -1,3 +1,5 @@
+7.10.13
+
 7.10.12
  - fixed #12072: Product, related and accessory assets
  - added: Add Asset Dashlets to Dashboard
