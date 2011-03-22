@@ -10,6 +10,7 @@
 
 #The goal of this test is to checkout uft8 handling in filenames.
 
+use utf8;
 use FindBin;
 use strict;
 use lib "$FindBin::Bin/..//lib";
@@ -47,7 +48,7 @@ cmp_deeply(
     'getFiles: returns names in UTF-8'
 );
 
-my $copy_name = "Ca\x{00F1}on.txt";
+my $copy_name = "Ca\x{0303}on.txt";
 utf8::upgrade($copy_name);
 $filesystem_storage->copyFile($filename, $copy_name);
 
@@ -55,4 +56,19 @@ cmp_bag(
     $filesystem_storage->getFiles(),
     [ $filename, $copy_name ],
     'copyFile: copies files handling UTF-8 correctly'
+) 
+or diag(
+    "GOT: " . join( ', ', map { nice_string($_) } @{ $filesystem_storage->getFiles } ) 
+    . " EXPECT: " . join( ', ', map { nice_string($_) } ( $filename, $copy_name ) ) 
 );
+
+sub nice_string {
+   join("",
+     map { $_ > 255 ?                  # if wide character...
+           sprintf('\\x{%04X}', $_) :  # \x{...}
+           chr($_) =~ /[[:cntrl:]]/ ?  # else if control character ...
+           sprintf('\\x%02X', $_) :    # \x..
+           quotemeta(chr($_))          # else quoted or as themselves
+     } unpack("W*", $_[0]));           # unpack Unicode characters
+}
+
