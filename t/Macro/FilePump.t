@@ -35,6 +35,7 @@ plan tests => 11;
 # put your tests here
 
 my $bundle = WebGUI::FilePump::Bundle->create($session, { bundleName => 'test bundle'});
+WebGUI::Test->addToCleanup( sub { $bundle->delete } );
 
 my $root = WebGUI::Asset->getRoot($session);
 
