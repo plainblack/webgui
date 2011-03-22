@@ -11,6 +11,7 @@
  - Change Group INSERT to REPLACE to prevent merge problems in multi-master DB clusters
  - added #12078: Add alt tag to default Image template
  - fixed #12077: Carousel update not possible
+ - Try to reconnect to MySQL if sbin/rebuildLineage.pl takes too long
 
 7.10.11
  - fixed #12057: WebGUI::Search, assetIds search clause
