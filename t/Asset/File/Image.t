@@ -27,11 +27,12 @@ use WebGUI::Image;
 use WebGUI::Storage;
 use WebGUI::Asset::File::Image;
 use WebGUI::Form::File;
+use Image::Magick;
 
 use Test::More; # increment this value for each test you create
 use Test::Deep;
 use Data::Dumper;
-plan tests => 13;
+plan tests => 14;
 
 my $session = WebGUI::Test->session;
 
@@ -79,19 +80,20 @@ is($storage->getId, $asset->getStorageLocation->getId, 'Cached Asset storage loc
 
 my $filename = $asset->getStorageLocation->getPath . "/" . $asset->get("filename");
 
-my @stat_before = stat($filename);
 $asset->getStorageLocation->rotate($asset->get("filename"), 90);
-my @stat_after = stat($filename);
-is(isnt_array(\@stat_before, \@stat_after), 1, 'Image is different after rotation');
+my $im = Image::Magick->new;
+$im->Read( $filename );
+is( $im->Get('width'), "200", "image width rotated 90" );
+is( $im->Get('height'), "100", "image height rotated 90" );
 
-@stat_before = stat($filename);
+my @stat_before = stat($filename);
 $asset->getStorageLocation->resize($asset->get("filename"), 200, 300);
 my @stat_after = stat($filename);
 is(isnt_array(\@stat_before, \@stat_after), 1, 'Image is different after resize');
 
 @stat_before = stat($filename);
 $asset->getStorageLocation->crop($asset->get("filename"), 100, 125, 10, 25);
-my @stat_after = stat($filename);
+@stat_after = stat($filename);
 is(isnt_array(\@stat_before, \@stat_after), 1, 'Image is different after crop');
 
 my $sth = $session->db->read('describe ImageAsset annotations');
