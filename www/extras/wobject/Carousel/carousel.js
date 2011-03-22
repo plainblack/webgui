@@ -95,6 +95,9 @@ WebGUI.Carousel.Editor.prototype.handleSubmit
         item.itemId = id.value;
 
         var text    = elem.getElementsByTagName( 'textarea' )[0];
+        // Force the TinyMCE to update the textarea
+        tinyMCE.getInstanceById( text.id ).save();
+
         item.text   = text.value;
 
         item.sequenceNumber = i;

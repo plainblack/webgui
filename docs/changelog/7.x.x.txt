@@ -10,6 +10,7 @@
  - added: lineage increment_step and increment_offset for multi-master DB clusters
  - Change Group INSERT to REPLACE to prevent merge problems in multi-master DB clusters
  - added #12078: Add alt tag to default Image template
+ - fixed #12077: Carousel update not possible
 
 7.10.11
  - fixed #12057: WebGUI::Search, assetIds search clause
