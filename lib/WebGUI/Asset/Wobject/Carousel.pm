@@ -65,6 +65,21 @@ sub definition {
             fieldType       =>'text',
             autoGenerate    =>0,
         },
+        autoPlay    => {
+            fieldType       => 'yesNo',
+            defaultValue    => 0,
+            tab             => "properties",
+            hoverHelp       => $i18n->get('carousel autoPlay description'),
+            label           => $i18n->get('carousel autoPlay label'),
+        },
+        autoPlayInterval => {
+            fieldType       => 'Integer',
+            defaultValue    => 4,
+            tab             => 'properties',
+            hoverHelp       => $i18n->get('carousel autoPlayInterval description'),
+            label           => $i18n->get('carousel autoPlayInterval label'),
+        },
+
 	);
 	push(@{$definition}, {
 		assetName=>$i18n->get('assetName'),

@@ -115,7 +115,31 @@ our $I18N = {
         message => q|This carousel item's sequenceNumber.|,
         lastUpdated => 0,
         context => q|Description of the sequenceNumber tmpl_var for the template help.|
-    }
+    },
+
+    'carousel autoPlay description' => {
+        message     => q{Should this carousel automatically scroll through its items?},
+        lastUpdated => 0,
+        context     => 'Description of asset property',
+    },
+
+    'carousel autoPlay label' => {
+        message     => q{Auto Play},
+        lastUpdated => 0,
+        context     => 'Label for asset property',
+    },
+
+    'carousel autoPlayInterval label' => {
+        message     => q{Auto Play Interval},
+        lastUpdated => 0,
+        context     => 'Label for asset property',
+    },
+
+    'carousel autoPlayInterval description' => {
+        message     => q{Length of time in seconds between carousel slides},
+        lastUpdated => 0,
+        context     => 'Description of asset property',
+    },
 };
 
 1;
