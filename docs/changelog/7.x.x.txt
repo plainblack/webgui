@@ -1,4 +1,5 @@
 7.10.13
+ - added #12079: Carousel Auto Play
 
 7.10.12
  - fixed #12072: Product, related and accessory assets

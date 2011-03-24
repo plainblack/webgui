@@ -31,6 +31,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+addAutoPlayToCarousel( $session );
 
 finish($session); # this line required
 
@@ -44,6 +45,16 @@ finish($session); # this line required
 #    print "DONE!\n" unless $quiet;
 #}
 
+#----------------------------------------------------------------------------
+# Add AutoPlay fields to the Carousel
+sub addAutoPlayToCarousel {
+    my $session = shift;
+    print "\tAdding Auto Play to Carousel... " unless $quiet;
+    $session->db->write(
+        "ALTER TABLE Carousel ADD COLUMN autoPlay INT, ADD COLUMN autoPlayInterval INT"
+    );
+    print "DONE!\n" unless $quiet;
+}
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
 
