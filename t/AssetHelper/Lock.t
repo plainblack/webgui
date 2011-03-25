@@ -45,9 +45,9 @@ my $newPage = $home->addChild({
 
 $newPage = WebGUI::Asset->newById($session, $newPage->assetId);
 
-my $helper = WebGUI::AssetHelper::Lock->new( id => 'lock', session => $session );
+my $helper = WebGUI::AssetHelper::Lock->new( id => 'lock', session => $session, asset => $newPage );
 $session->user({userId => 1});
-$output = $helper->process($newPage);
+$output = $helper->process;
 cmp_deeply(
     $output, 
     {
@@ -57,7 +57,7 @@ cmp_deeply(
 );
 
 $session->user({userId => 3});
-$output = $helper->process($newPage);
+$output = $helper->process;
 cmp_deeply(
     $output, 
     {
@@ -70,8 +70,9 @@ $newPage = WebGUI::Asset->newById($session, $newPage->assetId);
 ok $newPage->isLocked, 'Asset is locked, and ready for next test';
 is $newPage->getRevisionCount, 2, 'new revision added';
 
+$helper = WebGUI::AssetHelper::Lock->new( id => 'lock', session => $session, asset => $newPage );
 $session->user({userId => $editor->getId});
-$output = $helper->process($newPage);
+$output = $helper->process;
 cmp_deeply(
     $output, 
     {

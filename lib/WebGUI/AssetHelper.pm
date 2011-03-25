@@ -56,11 +56,58 @@ has 'id' => (
     isa     => 'Str',
 );
 
+has 'asset' => (
+    is      => 'ro',
+    required => 1,
+    isa     => 'WebGUI::Asset',
+);
+
 =head1 METHODS
 
 These methods are available from this class:
 
 =cut
+
+#-------------------------------------------------------------------
+
+=head2 getForm ( $method )
+
+Get a WebGUI::FormBuilder that submits to the given www_ $method.
+
+=cut
+
+sub getForm {
+    my ( $self, $method ) = @_;
+
+    my $f   = WebGUI::FormBuilder->new( $self->session, action => $self->session->url->page );
+    $f->addField( 'hidden', name => 'op',       value => 'assetHelper' );
+    $f->addField( 'hidden', name => 'helperId', value => $self->id );
+    $f->addField( 'hidden', name => 'method',   value => $method );
+    $f->addField( 'hidden', name => 'assetId',  value => $self->asset->assetId );
+
+    return $f;
+}
+
+#-------------------------------------------------------------------
+
+=head2 getUrl ( $method, $pairs )
+
+Get a URL to call the www_ method of this Asset Helper. $method is the name
+of the method, without the www_. $pairs is a string of name=value; pairs to 
+add to the URL.
+
+=cut
+
+sub getUrl {
+    my ( $self, $method, $pairs ) = @_;
+    $method ||= 'view';
+    $pairs ||= '';
+
+    return $self->asset->getUrl( 
+        'op=assetHelper;assetId=' . $self->asset->assetId . ';helperId=' . $self->id 
+        . ';method=' . $method . ';' . $pairs
+    );
+}
 
 #-------------------------------------------------------------------
 

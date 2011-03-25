@@ -31,7 +31,6 @@ my $session         = WebGUI::Test->session;
 # Tests
 
 my $output;
-my $helper = WebGUI::AssetHelper::EditBranch->new( id => 'edit_branch', session => $session );
 my $node = WebGUI::Asset->getImportNode($session);
 my $root = WebGUI::Asset->getRoot( $session );
 my $top = $node->addChild({
@@ -54,8 +53,9 @@ $tag->commit;
 WebGUI::Test->addToCleanup( $top, $child, $grand );
 
 { 
+    my $helper = WebGUI::AssetHelper::EditBranch->new( id => 'edit_branch', session => $session, asset => $top );
 
-    $output = $helper->process($top);
+    $output = $helper->process;
     cmp_deeply(
         $output, 
         {

@@ -34,15 +34,16 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 
-=head2 process ( $class, $asset )
+=head2 process ()
 
 Opens a new tab for displaying the form and the output for editing a branch.
 
 =cut
 
 sub process {
-    my ($class, $asset) = @_;
-    my $session = $asset->session;
+    my ($self) = @_;
+    my $asset = $self->asset;
+    my $session = $self->session;
     my $i18n = WebGUI::International->new($session, "Asset");
     if (! $asset->canEdit) {
         return {
@@ -51,7 +52,7 @@ sub process {
     }
 
     return {
-        openDialog => '?op=assetHelper;className=' . $class . ';method=editBranch;assetId=' . $asset->getId,
+        openDialog => $self->getUrl( 'editBranch' ),
     };
 }
 
@@ -64,8 +65,9 @@ Creates a tabform to edit the Asset Tree. If canEdit returns False, returns insu
 =cut
 
 sub www_editBranch {
-    my ($self, $asset) = @_;
-    my $session = $asset->session;
+    my ($self) = @_;
+    my $asset = $self->asset;
+    my $session = $self->session;
     my ( $style, $url ) = $session->quick( qw( style url ) );
     $style->setCss( $url->extras('hoverhelp.css'));
     $style->setScript( $url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js') );
@@ -312,8 +314,9 @@ Verifies proper inputs in the Asset Tree and saves them. Returns ManageAssets me
 =cut
 
 sub www_editBranchSave {
-    my ($self, $asset) = @_;
-    my $session = $asset->session;
+    my ($self) = @_;
+    my $asset = $self->asset;
+    my $session = $self->session;
     return $session->privilege->insufficient() unless ($asset->canEdit && $session->user->isInGroup('4'));
     my $form    = $session->form;
     my %data;

@@ -3,6 +3,7 @@ package WebGUI::AssetHelper::CopyBranch;
 use strict;
 use Class::C3;
 use base qw/WebGUI::AssetHelper::Copy/;
+use Scalar::Util qw{ blessed };
 
 =head1 LEGAL
 
@@ -32,69 +33,106 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 
-=head2 process ( $asset )
+=head2 process ()
 
 Open a progress dialog for the copy operation
 
 =cut
 
 sub process {
-    my ($self, $asset) = @_;
+    my ($self) = @_;
 
     return {
-        openDialog => '?op=assetHelper;helperId=' . $self->id . ';method=getWith;assetId=' . $asset->getId
+        openDialog => $self->getUrl( 'getWith' ),
     };
 }
 
 #----------------------------------------------------------------------------
 
-=head2 www_getWith ( $asset )
+=head2 www_getWith ()
 
 Get the "with" configuration. "Descendants" or "Children".
 
 =cut
 
 sub www_getWith {
-    my ( $self, $asset ) = @_;
-    my $session = $asset->session;
+    my ( $self ) = @_;
+    my $asset   = $self->asset;
+    my $session = $self->session;
     my $i18n    = WebGUI::International->new($session, 'Asset');
 
-    return '<form style="text-align: center">'
-        . '<input type="hidden" name="op" value="assetHelper" />'
-        . '<input type="hidden" name="helperId" value="' . $self->id . '" />'
-        . '<input type="hidden" name="assetId" value="' . $asset->getId . '" />'
-        . '<input type="hidden" name="method" value="copy" />'
-        . '<input type="submit" name="with" value="Children" />'
-        . '<input type="submit" name="with" value="Descendants" />'
-        . '</form>'
-        ;
+    my $f   = $self->getForm( 'copy' );
+    $f->addField( 'submit', name => 'with', value => 'Children' );
+    $f->addField( 'submit', name => 'with', value => 'Descendants' );
+    return $f->toHtml;
 }
 
 
 #----------------------------------------------------------------------------
 
-=head2 www_copy ( $asset )
+=head2 www_copy ()
 
-Perform the copy operation, showing the progress.
+Perform the copy operation in a fork
 
 =cut
 
 sub www_copy {
-    my ($self, $asset) = @_;
-    my $session = $asset->session;
+    my ($self) = @_;
+    my $asset   = $self->asset;
+    my $session = $self->session;
 
-    $asset->forkWithStatusPage({
-            plugin   => 'ProgressTree',
-            title    => 'Copy Assets',
-            method   => 'copyInFork',
-            dialog   => 1,
-            message  => 'Your assets are now copied!',
-            args     => {
-                childrenOnly => $session->form->get('with') eq 'children',
-                assetId      => $asset->getId,
-            }
-        }
+    my $childrenOnly = 1 if lc $session->form->get('with') eq 'children';
+
+    # Should we autocommit?
+    my $commit = $session->setting->get('versionTagMode') eq 'autoCommit';
+
+    # Fork the copy. Forking makes sure it won't get interrupted
+    my $fork    = WebGUI::Fork->start(
+        $session, blessed( $self ), 'copyBranch', { childrenOnly => $childrenOnly, assetId => $asset->getId, commit => $commit },
     );
+
+    return {
+        forkId      => $fork->getId,
+    };
+}
+
+#-------------------------------------------------------------------
+
+=head2 copyBranch ( $process, $args )
+
+Perform the copy stuff in a forked process
+
+=cut
+
+sub copyBranch {
+    my ($process, $args) = @_;
+    my $session = $process->session;
+    my $asset = WebGUI::Asset->newById($session, $args->{assetId});
+
+    # Get the assets we need to duplicate
+    my $assetIds = [];
+    if ( $args->{childrenOnly} ) {
+        $assetIds = $asset->getLineage(['children']);
+    }
+    else {
+        $assetIds = $asset->getLineage(['descendants']);
+    }
+
+    my $tree  = WebGUI::ProgressTree->new($session, $assetIds );
+    $process->update(sub { $tree->json });
+    my $newAsset = $asset->duplicateBranch( $args->{childrenOnly} ? 1 : 0, 'clipboard' );
+
+    # If we aren't committing, add to a tag
+    if ( !$args->{commit} ) {
+        $newAsset->update({
+            status      => "pending",
+            tagId       => WebGUI::VersionTag->getWorking( $session )->getId,
+        });
+    }
+    $newAsset->update({ title => $newAsset->getTitle . ' (copy)'});
+
+    $tree->success($asset->getId);
+    $process->update(sub { $tree->json });
 }
 
 1;

@@ -89,11 +89,11 @@ sub handler {
         my $helperId = $session->form->get('helperId');
         my $class = $asset->getHelpers->{ $helperId }->{ className };
         WebGUI::Pluggable::load( $class );
-        my $helper = $class->new( id => $helperId, session => $session );
+        my $helper = $class->new( id => $helperId, session => $session, asset => $asset );
 
         my $method  = $session->form->get('method') || "view";
         if ( $helper->can( "www_" . $method ) ) {
-            return $helper->can( "www_" . $method )->( $helper, $asset );
+            return $helper->can( "www_" . $method )->( $helper );
         }
         else {
             $session->log->error( sprintf 'Invalid asset helper "%s" calling method "%s"', $helperId, $method );

@@ -30,7 +30,6 @@ my $session         = WebGUI::Test->session;
 $session->user({ userId => 3 });
 
 my $output;
-my $helper = WebGUI::AssetHelper::ExportHtml->new( id => 'export_html', session => $session );
 my $node = WebGUI::Asset->getImportNode($session);
 my $root = WebGUI::Asset->getRoot( $session );
 my $top = $node->addChild({
@@ -62,7 +61,7 @@ WebGUI::Test->config->set( "exportPath" => $dir->dirname );
 # Tests
 
 { 
-
+    my $helper = WebGUI::AssetHelper::ExportHtml->new( id => 'export_html', session => $session, asset => $top );
     $output = $helper->process($top);
     cmp_deeply(
         $output, 

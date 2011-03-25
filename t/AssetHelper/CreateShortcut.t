@@ -31,12 +31,12 @@ my $session         = WebGUI::Test->session;
 # Tests
 
 my $output;
-my $helper = WebGUI::AssetHelper::CreateShortcut->new( id => 'shortcut', session => $session );
 my $import = WebGUI::Asset->getImportNode($session);
 
 my $priv_page = WebGUI::Test->asset( groupIdView => '3' );
+my $helper = WebGUI::AssetHelper::CreateShortcut->new( id => 'shortcut', session => $session, asset => $priv_page );
 $session->user({userId => 1});
-$output = $helper->process($priv_page);
+$output = $helper->process;
 cmp_deeply(
     $output, 
     {
@@ -49,7 +49,8 @@ $session->setting->set( versionTagMode => 'autoCommit' );
 $session->setting->set( skipCommitComments => '1' );
 $session->user({userId => 3});
 my $safe_page = WebGUI::Test->asset;
-$output = $helper->process($safe_page);
+my $helper = WebGUI::AssetHelper::CreateShortcut->new( id => 'shortcut', session => $session, asset => $safe_page );
+$output = $helper->process;
 cmp_deeply(
     $output, 
     {

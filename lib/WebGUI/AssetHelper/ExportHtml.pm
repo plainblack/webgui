@@ -34,15 +34,16 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 
-=head2 process ( $asset )
+=head2 process ()
 
 Opens a new tab for displaying the form and the output for exporting a branch.
 
 =cut
 
 sub process {
-    my ($self, $asset) = @_;
-    my $session = $asset->session;
+    my ($self) = @_;
+    my $asset = $self->asset;
+    my $session = $self->session;
     my $i18n = WebGUI::International->new($session, "Asset");
     if (! $asset->canEdit) {
         return {
@@ -51,7 +52,7 @@ sub process {
     }
 
     return {
-        openDialog => '?op=assetHelper;helperId=' . $self->id . ';method=export;assetId=' . $asset->getId,
+        openDialog => $self->getUrl( 'export' ),
     };
 }
 
@@ -64,8 +65,9 @@ Displays the export page administrative interface
 =cut
 
 sub www_export {
-    my ($self, $asset) = @_;
-    my $session = $asset->session;
+    my ($self) = @_;
+    my $asset = $self->asset;
+    my $session = $self->session;
     return $session->privilege->insufficient() unless ($session->user->isInGroup(13));
     my ( $style, $url ) = $session->quick(qw{ style url });
     $style->setCss( $url->extras('hoverhelp.css'));
@@ -79,14 +81,7 @@ sub www_export {
 ENDHTML
 
     my $i18n    = WebGUI::International->new($session, "Asset");
-    my $f       = WebGUI::FormBuilder->new($session, action => $asset->getUrl);
-    $f->addField( "hidden", name => 'op', value => 'assetHelper' );
-    $f->addField( "hidden", name => 'helperId', value => $self->id );
-    $f->addField( "hidden", name => 'assetId', value => $asset->getId );
-    $f->addField( "hidden",
-        name           => "method",
-        value          => "exportStatus"
-    );
+    my $f       = $self->getForm( 'exportStatus' );
     $f->addField( "integer",
         label          => $i18n->get('Depth'),
         hoverHelp      => $i18n->get('Depth description'),
@@ -155,8 +150,9 @@ Displays the export status page
 =cut
 
 sub www_exportStatus {
-    my ($self, $asset) = @_;
-    my $session = $asset->session;
+    my ($self) = @_;
+    my $asset = $self->asset;
+    my $session = $self->session;
     return $session->privilege->insufficient
         unless $session->user->isInGroup(13);
     my $form    = $session->form;

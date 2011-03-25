@@ -36,7 +36,6 @@ plan tests => 5;        # Increment this number for each test you create
 # put your tests here
 
 my $output;
-my $helper = WebGUI::AssetHelper::CopyBranch->new( id => 'copy_branch', session => $session );
 my $node = WebGUI::Asset->getImportNode($session);
 my $root = WebGUI::Asset->getRoot( $session );
 my $tag = WebGUI::VersionTag->getWorking( $session );
@@ -60,8 +59,8 @@ $tag->commit;
 addToCleanup( $tag );
 
 { 
-
-    $output = $helper->process($top);
+    my $helper = WebGUI::AssetHelper::CopyBranch->new( id => 'copy_branch', session => $session, asset => $top );
+    $output = $helper->process;
     cmp_deeply(
         $output, 
         {

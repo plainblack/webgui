@@ -34,15 +34,16 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 
-=head2 process ( $asset )
+=head2 process ( )
 
 Opens a new tab for displaying the form to change the Asset's URL.
 
 =cut
 
 sub process {
-    my ($self, $asset) = @_;
-    my $session = $asset->session;
+    my ($self) = @_;
+    my $asset = $self->asset;
+    my $session = $self->session;
     my $i18n = WebGUI::International->new($session, "Asset");
     if (! $asset->canEdit) {
         return {
@@ -51,7 +52,7 @@ sub process {
     }
 
     return {
-        openDialog => $asset->getUrl('op=assetHelper;helperId=' . $self->id . ';method=changeUrl;assetId=' . $asset->getId ),
+        openDialog => $self->getUrl( 'changeUrl' ),
     };
 }
 
@@ -64,19 +65,16 @@ Displays a form to change the URL for this asset.
 =cut
 
 sub www_changeUrl {
-    my ($self, $asset) = @_;
-    my $session = $asset->session;
+    my ($self) = @_;
+    my $asset   = $self->asset;
+    my $session = $self->session;
     my $i18n    = WebGUI::International->new($session, "Asset");
     if (! $asset->canEdit) {
         return {
             error => $i18n->get('38', 'WebGUI'),
         }
     }
-    my $f = WebGUI::FormBuilder->new($session, method => 'POST', action => $asset->getUrl );
-    $f->addField( "hidden", name => 'op', value => 'assetHelper' );
-    $f->addField( "hidden", name => 'helperId', value => $self->id );
-    $f->addField( "hidden", name => "method", value=>"changeUrlSave" );
-    $f->addField( "hidden", name => 'assetId', value => $asset->getId );
+    my $f = $self->getForm( 'changeUrlSave' );
     $f->addField( "text",
         name     => "url",
         value    => $asset->get('url'),
@@ -103,8 +101,9 @@ This actually does the change url of the www_changeUrl() function.
 =cut
 
 sub www_changeUrlSave {
-    my ($self, $asset) = @_;
-    my $session = $asset->session;
+    my ($self) = @_;
+    my $asset   = $self->asset;
+    my $session = $self->session;
     my $i18n    = WebGUI::International->new($session, "Asset");
     if (! $asset->canEdit) {
         return {

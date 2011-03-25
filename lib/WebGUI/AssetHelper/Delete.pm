@@ -33,14 +33,15 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 
-=head2 process ( $asset )
+=head2 process ()
 
 Fork the Delete operation
 
 =cut
 
 sub process {
-    my ($self, $asset) = @_;
+    my ($self) = @_;
+    my $asset = $self->asset;
     my $session = $self->session;
 
     my $i18n = WebGUI::International->new($session, 'WebGUI');

@@ -37,13 +37,13 @@ plan tests => 2;        # Increment this number for each test you create
 
 my $output;
 $session->setting->set( "versionTagMode" => "autoCommit" );
-my $helper = WebGUI::AssetHelper::Duplicate->new( id => 'duplicate', session => $session );
 my $root = WebGUI::Test->asset;
 my $test = $root->addChild( { className => 'WebGUI::Asset::Snippet' } );
+my $helper = WebGUI::AssetHelper::Duplicate->new( id => 'duplicate', session => $session, asset => $test );
 
 { 
 
-    $output = $helper->process($test);
+    $output = $helper->process;
     cmp_deeply(
         $output, 
         {

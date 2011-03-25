@@ -32,15 +32,16 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 
-=head2 process ( $asset )
+=head2 process ( )
 
 Create a shortcut to the asset on the clipboard.
 
 =cut
 
 sub process {
-    my ($self, $asset) = @_;
-    my $session = $asset->session;
+    my ($self) = @_;
+    my $session = $self->session;
+    my $asset = $self->asset;
     my $i18n = WebGUI::International->new( $session, 'WebGUI' );
 
     return { error => $i18n->get('39') } if !$asset->canView;
