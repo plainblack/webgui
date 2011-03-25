@@ -1125,7 +1125,7 @@ WebGUI.Admin.AssetTable
         rowsPerPage           : 100,
         previousPageLinkLabel : window.admin.i18n.get('WebGUI', '< prev'),
         nextPageLinkLabel     : window.admin.i18n.get('WebGUI', 'next >'),
-        template              : "<strong>{CurrentPageReport}</strong> {PreviousPageLink} {PageLinks} {NextPageLink}"
+        template              : "{PreviousPageLink} <strong>{CurrentPageReport}</strong> {NextPageLink}"
     });
 
    // initialize the data source
@@ -1210,7 +1210,7 @@ WebGUI.Admin.AssetTable.prototype.init
 = function ( ) {
     // Initialize the data table
     this.dataTable
-        = new YAHOO.widget.DataTable( this.cfg.dataTableId, 
+        = new YAHOO.widget.ScrollingDataTable( this.cfg.dataTableId, 
             this.columnDefs,
             this.dataSource, 
             {
@@ -1627,7 +1627,7 @@ WebGUI.Admin.Tree
     WebGUI.Admin.Tree.superclass.constructor.call( this, admin, {
         dataSourceUrl   : '?op=admin;method=getTreeData;',
         dataTableId     : 'treeDataTableContainer',
-        paginatorIds    : [ 'treePaginator' ]
+        paginatorIds    : [ 'treePagination' ]
     } );
 
     // Add Rank column for ordering

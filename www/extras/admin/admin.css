@@ -362,4 +362,34 @@ dl.accordion-menu dd.a-m-d {
     overflow-x: hidden;
 }
 
+#treeTab {
+    height: 100%;
+    overflow: auto;
+    margin-bottom: 30px;
+}
 
+#treeCrumbtrail {
+    margin: 5px;
+}
+
+#treeDataTableContainer {
+    margin-bottom: 50px; /* Same as treeBottom height */
+}
+
+#treeBottom {
+    position: fixed;
+    bottom: 0px;
+    width: 100%;
+    background: white;
+    border-top: 2px outset gray;
+}
+
+#treeButtons {
+    margin : 5px;
+    float: left;
+}
+
+#treePagination {
+    margin: 5px;
+    float: left;
+}
