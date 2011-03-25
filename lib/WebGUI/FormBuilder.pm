@@ -255,7 +255,7 @@ sub toTemplateVars {
     # $prefix_fieldset_$fieldsetName
     if ( @{$self->fieldsets} ) {
         my $fieldsetLoop = [];
-        $var->{ "${prefix}_fieldsetLoop" } = $fieldsetLoop;
+        $var->{ "${prefix}_fieldsetloop" } = $fieldsetLoop;
         for my $fieldset ( @{$self->fieldsets} ) {
             my $name    = $fieldset->name;
             my $props   = $fieldset->toTemplateVars;
@@ -277,7 +277,7 @@ sub toTemplateVars {
     # $prefix_tabset_$tabsetName
     if ( @{$self->tabsets} ) {
         my $tabsetLoop = [];
-        $var->{ "${prefix}_tabsetLoop" } = $tabsetLoop;
+        $var->{ "${prefix}_tabsetloop" } = $tabsetLoop;
         for my $tabset ( @{$self->tabsets} ) {
             my $name    = $tabset->name;
             my $props   = $tabset->toTemplateVars;
