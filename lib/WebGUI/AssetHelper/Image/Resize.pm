@@ -157,7 +157,11 @@ sub www_resizeSave {
     $asset->setSize( $asset->getStorageLocation->getFileSize( $asset->filename ) );
     $asset->generateThumbnail;
     WebGUI::VersionTag->autoCommitWorkingIfEnabled( $session, { allowComments => 0 } );
+
     # We're in admin mode, close the dialog
+    my $helper = {
+        message     => 'Image Resized',
+    };
     my $text = '<script type="text/javascript">';
 
     if ( ref $helper eq 'HASH' ) {
