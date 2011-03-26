@@ -171,6 +171,26 @@ override getEditForm => sub {
 
 #-------------------------------------------------------------------
 
+=head2 getHelpers ( )
+
+Add the image helpers
+
+=cut
+
+override getHelpers => sub {
+    my ( $self ) = @_;
+
+    my $helpers = super();
+    $helpers->{resize} = {
+        className   => 'WebGUI::AssetHelper::Image::Resize',
+        label       => 'Resize Image',
+    };
+
+    return $helpers;
+};
+
+#-------------------------------------------------------------------
+
 =head2 getThumbnailUrl 
 
 Returns the URL to the thumbnail of the image stored in the Asset.
@@ -255,31 +275,30 @@ override setFile => sub {
 
 #-------------------------------------------------------------------
 
-=head2 www_edit 
+#=head2 www_edit 
 
-Override the master class to add image editing controls to the edit screen.
-Also adds the Image template form variable.
+#Override the master class to add image editing controls to the edit screen.
+#Also adds the Image template form variable.
 
-=cut
+#=cut
 
-sub www_edit {
-    my $self    = shift;
-    my $session = $self->session;
-    return $session->privilege->insufficient() unless $self->canEdit;
-    return $session->privilege->locked()       unless $self->canEditIfLocked;
-    my $i18n = WebGUI::International->new($session, 'Asset_Image');
-    if ($self->filename) {
-        my $ac   = $self->getAdminConsole;
-        # These are asset helpers now, not functions
-        $ac->addSubmenuItem($self->getUrl('func=resize'),   $i18n->get("resize image"));
-        $ac->addSubmenuItem($self->getUrl('func=rotate'),   $i18n->get("rotate image"));
-        $ac->addSubmenuItem($self->getUrl('func=crop'),     $i18n->get("crop image"));
-        $ac->addSubmenuItem($self->getUrl('func=annotate'), $i18n->get("annotate image"));
-        $ac->addSubmenuItem($self->getUrl('func=undo'),     $i18n->get("undo image"));
-    }
-    my $tabform = $self->getEditForm;
-    return $self->getAdminConsole->render($tabform->toHtml,$i18n->get("edit image"));
-}
+#sub www_edit {
+#    my $self    = shift;
+#    my $session = $self->session;
+#    return $session->privilege->insufficient() unless $self->canEdit;
+#    return $session->privilege->locked()       unless $self->canEditIfLocked;
+#    my $i18n = WebGUI::International->new($session, 'Asset_Image');
+#    if ($self->filename) {
+#        my $ac   = $self->getAdminConsole;
+#         These are asset helpers now, not functions
+#        $ac->addSubmenuItem($self->getUrl('func=rotate'),   $i18n->get("rotate image"));
+#        $ac->addSubmenuItem($self->getUrl('func=crop'),     $i18n->get("crop image"));
+#        $ac->addSubmenuItem($self->getUrl('func=annotate'), $i18n->get("annotate image"));
+#        $ac->addSubmenuItem($self->getUrl('func=undo'),     $i18n->get("undo image"));
+#    }
+#    my $tabform = $self->getEditForm;
+#    return $self->getAdminConsole->render($tabform->toHtml,$i18n->get("edit image"));
+#}
 
 #-------------------------------------------------------------------
 
@@ -583,113 +602,6 @@ sub www_rotate {
     );
 	$f->addField( "submit", name => "submit" );
     return $self->getAdminConsole->render($f->toHtml.$image,$i18n->get("rotate image"));
-}
-
-#-------------------------------------------------------------------
-
-=head2 www_resize 
-
-Displays a form for the user to resize this image.  If either of the C<newWidth> or
-C<newHeight> form variables are true, also does the resizing.
-
-Returns the user to the resize form.
-
-=cut
-
-sub www_resize {
-    my $self    = shift;
-    my $session = $self->session;
-    return $session->privilege->insufficient() unless $self->canEdit;
-    return $session->privilege->locked()       unless $self->canEditIfLocked;
-    if ($session->form->process("newWidth") || $session->form->process("newHeight")) {
-        my $tag = WebGUI::VersionTag->getWorking( $session );
-        my $newSelf = $self->addRevision({ tagId => $tag->getId, status => "pending" });
-        $newSelf->setVersionLock;
-        delete $newSelf->{_storageLocation};
-        $newSelf->getStorageLocation->resize($newSelf->filename,$session->form->process("newWidth"),$session->form->process("newHeight"));
-        $newSelf->setSize($newSelf->getStorageLocation->getFileSize($newSelf->filename));
-        $self = $newSelf;
-        $self->generateThumbnail;
-        WebGUI::VersionTag->autoCommitWorkingIfEnabled($session, { allowComments => 0 });
-    }
-
-	my ($x, $y) = $self->getStorageLocation->getSizeInPixels($self->filename);
-
-	##YUI specific datatable CSS
-	my ($style, $url) = $session->quick(qw(style url));
-
-	$style->setCss($url->extras('yui/build/fonts/fonts-min.css'));
-	$style->setCss($url->extras('yui/build/resize/assets/skins/sam/resize.css'));
-	$style->setScript($url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'));
-	$style->setScript($url->extras('yui/build/element/element-min.js'));
-	$style->setScript($url->extras('yui/build/dragdrop/dragdrop-min.js'));
-	$style->setScript($url->extras('yui/build/resize/resize-min.js'));
-	$style->setScript($url->extras('yui/build/animation/animation-min.js'));
-
-	my $resize_js = qq(
-		<script>
-		(function() { 
-			  var Dom = YAHOO.util.Dom, 
-			      Event = YAHOO.util.Event; 
-		       
-			      var resize = new YAHOO.util.Resize('yui_img', { 
-				  handles: 'all', 
-				  knobHandles: true, 
-				  height: '${y}px', 
-				  width: '${x}px', 
-				    proxy: true, 
-				    ghost: true, 
-				    status: true, 
-				    draggable: false, 
-				    ratio: true,
-				    animate: true, 
-				    animateDuration: .75, 
-				    animateEasing: YAHOO.util.Easing.backBoth 
-				}); 
-			 
-				resize.on('startResize', function() { 
-				    this.getProxyEl().innerHTML = '<img src="' + this.get('element').src + '" style="height: 100%; width: 100%;">'; 
-				    Dom.setStyle(this.getProxyEl().firstChild, 'opacity', '.25'); 
-				}, resize, true); 
-
-				resize.on('resize', function(e) { 
-				    element = document.getElementById('newWidth_formId');
-				    element.value = e.width;
-
-				    element = document.getElementById('newHeight_formId');
-				    element.value = e.height;
-			        }, resize, true); 
-			})(); 
-		</script>
-	);
-
-    my $i18n = WebGUI::International->new($session,"Asset_Image");
-    $self->getAdminConsole->addSubmenuItem($self->getUrl('func=edit'),$i18n->get("edit image"));
-    my $f = WebGUI::FormBuilder->new($session);
-    $f->addField( "hidden", 
-        -name=>"func",
-        -value=>"resize"
-        );
-        $f->addField( "readOnly", 
-        -label=>$i18n->get('image size'),
-        -hoverHelp=>$i18n->get('image size description'),
-        -value=>$x.' x '.$y,
-        );
-    $f->addField( "integer", 
-        -label=>$i18n->get('new width'),
-        -hoverHelp=>$i18n->get('new width description'),
-        -name=>"newWidth",
-        -value=>$x,
-        );
-    $f->addField( "integer", 
-        -label=>$i18n->get('new height'),
-        -hoverHelp=>$i18n->get('new height description'),
-        -name=>"newHeight",
-        -value=>$y,
-        );
-    $f->addField( "submit", name => "submit" );
-    my $image = '<div align="center" class="yui-skin-sam"><img src="'.$self->getStorageLocation->getUrl($self->filename).'" style="border-style:none;" alt="'.$self->filename.'" id="yui_img" /></div>'.$resize_js;
-    return $self->getAdminConsole->render($f->toHtml.$image,$i18n->get("resize image"));
 }
 
 #-------------------------------------------------------------------
