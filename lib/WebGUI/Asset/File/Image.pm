@@ -185,6 +185,10 @@ override getHelpers => sub {
         className   => 'WebGUI::AssetHelper::Image::Resize',
         label       => 'Resize Image',
     };
+    $helpers->{rotate} = {
+        className   => 'WebGUI::AssetHelper::Image::Rotate',
+        label       => 'Rotate Image',
+    };
 
     return $helpers;
 };
@@ -291,7 +295,6 @@ override setFile => sub {
 #    if ($self->filename) {
 #        my $ac   = $self->getAdminConsole;
 #         These are asset helpers now, not functions
-#        $ac->addSubmenuItem($self->getUrl('func=rotate'),   $i18n->get("rotate image"));
 #        $ac->addSubmenuItem($self->getUrl('func=crop'),     $i18n->get("crop image"));
 #        $ac->addSubmenuItem($self->getUrl('func=annotate'), $i18n->get("annotate image"));
 #        $ac->addSubmenuItem($self->getUrl('func=undo'),     $i18n->get("undo image"));
@@ -541,67 +544,6 @@ sub annotate_js {
     }
 
     return($crop_js, $domMe);
-}
-
-#-------------------------------------------------------------------
-
-=head2 www_rotate 
-
-Displays a form to the user to rotate their image.  If the C<Rotate> form variable
-is true, does the rotation as well.
-
-Returns the user to the roate form.
-
-=cut
-
-sub www_rotate {
-    my $self    = shift;
-    my $session = $self->session;
-    return $session->privilege->insufficient() unless $self->canEdit;
-    return $session->privilege->locked()       unless $self->canEditIfLocked;
-	if (defined $session->form->process("Rotate")) {
-                my $tag = WebGUI::VersionTag->getWorking( $session );
-		my $newSelf = $self->addRevision({ tagId => $tag->getId, status => "pending" });
-                $newSelf->setVersionLock;
-		delete $newSelf->{_storageLocation};
-		$newSelf->getStorageLocation->rotate($newSelf->filename,$session->form->process("Rotate"));
-		$newSelf->setSize($newSelf->getStorageLocation->getFileSize($newSelf->filename));
-		$self = $newSelf;
-		$self->generateThumbnail;
-        WebGUI::VersionTag->autoCommitWorkingIfEnabled($session, { allowComments => 0 });
-	}
-
-	my ($x, $y) = $self->getStorageLocation->getSizeInPixels($self->filename);
-
-	##YUI specific datatable CSS
-	my ($style, $url) = $session->quick(qw(style url));
-
-	my $img_name = $self->getStorageLocation->getUrl($self->filename);
-	my $img_file = $self->filename;
-	my $image = '<div align="center" class="yui-skin-sam"><img src="'.$self->getStorageLocation->getUrl($self->filename).'" style="border-style:none;" alt="'.$self->filename.'" id="yui_img" /></div>';
-
-	my $i18n = WebGUI::International->new($session,"Asset_Image");
-	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=edit'),$i18n->get("edit image"));
-	my $f = WebGUI::FormBuilder->new($session);
-	$f->addField( "hidden", 
-		-name=>"func",
-		-value=>"rotate"
-    );
-    $f->addField( "button", 
-        -value=>"Left",
-        -extras=>qq(onclick="var deg = document.getElementById('Rotate_formId').value; deg = parseInt(deg) + 90; document.getElementById('Rotate_formId').value = deg;"),
-    );
-    $f->addField( "button", 
-        -value=>"Right",
-        -extras=>qq(onclick="var deg = document.getElementById('Rotate_formId').value; deg = parseInt(deg) - 90; document.getElementById('Rotate_formId').value = deg;"),
-    );
-	$f->addField( "integer", 
-		-label=>$i18n->get('degree'),
-		-name=>"Rotate",
-		-value=>0,
-    );
-	$f->addField( "submit", name => "submit" );
-    return $self->getAdminConsole->render($f->toHtml.$image,$i18n->get("rotate image"));
 }
 
 #-------------------------------------------------------------------
