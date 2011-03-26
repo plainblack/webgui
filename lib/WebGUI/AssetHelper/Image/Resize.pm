@@ -1,6 +1,10 @@
 package WebGUI::AssetHelper::Image::Resize;
 
-use base 'WebGUI::AssetHelper';
+use strict;
+use warnings;
+
+use Moose;
+extends 'WebGUI::AssetHelper';
 
 #-------------------------------------------------------------------
 
