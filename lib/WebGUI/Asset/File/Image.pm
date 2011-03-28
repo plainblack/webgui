@@ -193,6 +193,10 @@ override getHelpers => sub {
         className   => 'WebGUI::AssetHelper::Image::Crop',
         label       => 'Crop Image',
     };
+    $helpers->{annotate} = {
+        url         => $self->getUrl( 'func=annotate' ),
+        label       => "Annotate Image",
+    };
 
     return $helpers;
 };
@@ -283,30 +287,6 @@ override setFile => sub {
 
 #-------------------------------------------------------------------
 
-#=head2 www_edit 
-
-#Override the master class to add image editing controls to the edit screen.
-#Also adds the Image template form variable.
-
-#=cut
-
-#sub www_edit {
-#    my $self    = shift;
-#    my $session = $self->session;
-#    return $session->privilege->insufficient() unless $self->canEdit;
-#    return $session->privilege->locked()       unless $self->canEditIfLocked;
-#    my $i18n = WebGUI::International->new($session, 'Asset_Image');
-#    if ($self->filename) {
-#        my $ac   = $self->getAdminConsole;
-#         These are asset helpers now, not functions
-#        $ac->addSubmenuItem($self->getUrl('func=annotate'), $i18n->get("annotate image"));
-#    }
-#    my $tabform = $self->getEditForm;
-#    return $self->getAdminConsole->render($tabform->toHtml,$i18n->get("edit image"));
-#}
-
-#-------------------------------------------------------------------
-
 # 
 # All of the images will have to change to support annotate.
 # The revision system doesn't support the blobs, it seems.
@@ -366,7 +346,6 @@ sub www_annotate {
 	my $i18n = WebGUI::International->new($session,"Asset_Image");
 	my $f    = WebGUI::FormBuilder->new($session);
 
-	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=edit'),$i18n->get("edit image"));
 	$f->addField( "hidden", 
 		-name=>"func",
 		-value=>"annotate"
@@ -403,7 +382,8 @@ sub www_annotate {
         );
 	$f->addField( "submit", name => "submit" );
     my ($crop_js, $domMe) = $self->annotate_js();
-    return $self->getAdminConsole->render($f->toHtml."$image$crop_js$domMe",$i18n->get("annotate image"));
+    my $output = '<h1>' . $i18n->get('annotate image') . '</h1>' . $f->toHtml . $image . $crop_js . $domMe;
+    return $style->process( $output, "PBtmplBlankStyle000001" );
 }
 
 #-------------------------------------------------------------------
