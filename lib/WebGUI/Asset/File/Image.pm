@@ -189,6 +189,10 @@ override getHelpers => sub {
         className   => 'WebGUI::AssetHelper::Image::Rotate',
         label       => 'Rotate Image',
     };
+    $helpers->{crop} = {
+        className   => 'WebGUI::AssetHelper::Image::Crop',
+        label       => 'Crop Image',
+    };
 
     return $helpers;
 };
@@ -295,7 +299,6 @@ override setFile => sub {
 #    if ($self->filename) {
 #        my $ac   = $self->getAdminConsole;
 #         These are asset helpers now, not functions
-#        $ac->addSubmenuItem($self->getUrl('func=crop'),     $i18n->get("crop image"));
 #        $ac->addSubmenuItem($self->getUrl('func=annotate'), $i18n->get("annotate image"));
 #    }
 #    my $tabform = $self->getEditForm;
@@ -524,127 +527,6 @@ sub annotate_js {
     }
 
     return($crop_js, $domMe);
-}
-
-#-------------------------------------------------------------------
-
-=head2 www_crop 
-
-Display a form that allows the user to Crop their images.  Also does the
-cropping if any of the C<Width>, C<Height>, C<Top> or C<Left> form
-variables are true.
-
-Returns the user to the cropping form.
-
-=cut
-
-sub www_crop {
-    my $self    = shift;
-    my $session = $self->session;
-    return $session->privilege->insufficient() unless $self->canEdit;
-    return $session->privilege->locked()       unless $self->canEditIfLocked;
-
-    if ($session->form->process("Width") || $session->form->process("Height") 
-        || $session->form->process("Top") || $session->form->process("Left")) {
-        my $tag = WebGUI::VersionTag->getWorking( $session );
-        my $newSelf = $self->addRevision({ tagId => $tag->getId, status => "pending" });
-        $newSelf->setVersionLock;
-        delete $newSelf->{_storageLocation};
-        $newSelf->getStorageLocation->crop(
-            $newSelf->filename,
-            $session->form->process("Width"),
-            $session->form->process("Height"),
-            $session->form->process("Top"),
-            $session->form->process("Left")
-        );
-		$self = $newSelf;
-		$self->generateThumbnail;
-        WebGUI::VersionTag->autoCommitWorkingIfEnabled($session, { allowComments => 0 });
-    }
-
-	my $filename = $self->filename;
-
-	##YUI specific datatable CSS
-    my ($style, $url) = $session->quick(qw(style url));
-
-	my $crop_js = qq(
-		<script>
-		(function() {
-            var Dom = YAHOO.util.Dom, Event = YAHOO.util.Event, results = null; 
-
-        Event.onDOMReady(function() { 
-                var crop = new YAHOO.widget.ImageCropper('yui_img', { 
-                    initialXY: [20, 20], 
-                    keyTick: 5, 
-                    shiftKeyTick: 50 
-                }); 
-                crop.on('moveEvent', function() { 
-                    var region = crop.getCropCoords(); 
-                    element = document.getElementById('Width_formId');
-                    element.value = region.width;
-                    element = document.getElementById('Height_formId');
-                    element.value = region.height;
-                    element = document.getElementById('Top_formId');
-                    element.value = region.top;
-                    element = document.getElementById('Left_formId');
-                    element.value = region.left;
-                }); 
-            }); 
-        })(); 
-		</script>
-    );
-
-	$style->setCss($url->extras('yui/build/resize/assets/skins/sam/resize.css'));
-	$style->setCss($url->extras('yui/build/fonts/fonts-min.css'));
-	$style->setCss($url->extras('yui/build/imagecropper/assets/skins/sam/imagecropper.css'));
-	$style->setScript($url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'));
-	$style->setScript($url->extras('yui/build/element/element-min.js'));
-	$style->setScript($url->extras('yui/build/dragdrop/dragdrop-min.js'));
-	$style->setScript($url->extras('yui/build/resize/resize-min.js'));
-	$style->setScript($url->extras('yui/build/imagecropper/imagecropper-min.js'));
-
-	my $i18n = WebGUI::International->new($session,"Asset_Image");
-
-	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=edit'),$i18n->get("edit image"));
-	my $f = WebGUI::FormBuilder->new($session);
-	$f->addField( "hidden", 
-		-name=>"degree",
-		-value=>"0"
-		);
-	$f->addField( "hidden", 
-		-name=>"func",
-		-value=>"crop"
-		);
-	my ($x, $y) = $self->getStorageLocation->getSizeInPixels($filename);
-	$f->addField( "integer", 
-		-label=>$i18n->get('width'),
-		-hoverHelp=>$i18n->get('new width description'),
-		-name=>"Width",
-		-value=>$x,
-		);
-	$f->addField( "integer", 
-		-label=>$i18n->get('height'),
-		-hoverHelp=>$i18n->get('new height description'),
-		-name=>"Height",
-		-value=>$y,
-		);
-	$f->addField( "integer", 
-		-label=>$i18n->get('top'),
-		-hoverHelp=>$i18n->get('new width description'),
-		-name=>"Top",
-		-value=>$x,
-		);
-	$f->addField( "integer", 
-		-label=>$i18n->get('left'),
-		-hoverHelp=>$i18n->get('new height description'),
-		-name=>"Left",
-		-value=>$y,
-		);
-	$f->addField( "submit", name => "submit" );
-
-    my $image = '<div align="center" class="yui-skin-sam"><img src="'.$self->getStorageLocation->getUrl($filename).'" style="border-style:none;" alt="'.$filename.'" id="yui_img" /></div>'.$crop_js;
-
-    return $self->getAdminConsole->render($f->toHtml.$image,$i18n->get("crop image"));
 }
 
 __PACKAGE__->meta->make_immutable;
