@@ -297,30 +297,10 @@ override setFile => sub {
 #         These are asset helpers now, not functions
 #        $ac->addSubmenuItem($self->getUrl('func=crop'),     $i18n->get("crop image"));
 #        $ac->addSubmenuItem($self->getUrl('func=annotate'), $i18n->get("annotate image"));
-#        $ac->addSubmenuItem($self->getUrl('func=undo'),     $i18n->get("undo image"));
 #    }
 #    my $tabform = $self->getEditForm;
 #    return $self->getAdminConsole->render($tabform->toHtml,$i18n->get("edit image"));
 #}
-
-#-------------------------------------------------------------------
-
-=head2 www_undo 
-
-Rolls back the last revision of this asset, undoing any work that may
-have been done to it.
-
-=cut
-
-sub www_undo {
-    my $self = shift;
-    my $previous = (@{$self->getRevisions()})[1];
-    if ($previous) {
-	    $self = $self->purgeRevision();
-	    $self->generateThumbnail;
-    }
-    return $self->www_edit();
-}
 
 #-------------------------------------------------------------------
 
