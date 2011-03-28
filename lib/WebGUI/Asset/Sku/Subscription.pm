@@ -277,7 +277,9 @@ a shelf.  Override master class to add different form.
 
 sub getAddToCartForm {
     my $self    = shift;
-    my $session = $self->session;
+    :cn
+    :cn
+
     my $i18n = WebGUI::International->new($session, 'Asset_Subscription');
     return
         WebGUI::Form::formHeader($session, {action => $self->getUrl})
@@ -285,27 +287,6 @@ sub getAddToCartForm {
       . WebGUI::Form::submit(    $session, {value => $i18n->get('purchase button')})
       . WebGUI::Form::formFooter($session)
       ;
-}
-
-#-------------------------------------------------------------------
-
-=head2 getAdminConsoleWithSubmenu ( )
-
-Returns an admin console with management links added to the submenu.
-
-=cut
-
-sub getAdminConsoleWithSubmenu {
-	my $self    = shift;
-    my $session = $self->session;
-	my $ac      = $self->getAdminConsole;
-	my $i18n    = WebGUI::International->new( $session, 'Asset_Subscription' );
-
-	$ac->addSubmenuItem( $self->getUrl('func=createSubscriptionCodeBatch'),        $i18n->get('generate batch'));
-	$ac->addSubmenuItem( $self->getUrl('func=listSubscriptionCodes;selection=dc'), $i18n->get('manage codes')  );
-	$ac->addSubmenuItem( $self->getUrl('func=listSubscriptionCodeBatches'),        $i18n->get('manage batches'));
-
-	return $ac;
 }
 
 #-------------------------------------------------------------------
@@ -411,6 +392,35 @@ sub getExpirationOffset {
 	return $self->session->datetime->addToDate( 1, 1, 0,  0 ) - 1 if $duration eq 'Yearly';
 
     # TODO: Throw exception
+}
+
+#-------------------------------------------------------------------
+
+=head2 getHelpers ( )
+
+Get the some links to manage subscription codes
+
+=cut
+
+override getHelpers => sub {
+    my ( $self ) = @_;
+    my $helpers = super();
+    my $i18n    = WebGUI::International->new( $session, 'Asset_Subscription' );
+
+    $helpers->{createSubscriptionCodeBatch} = {
+        url     => $self->getUrl('func=createSubscriptionCodeBatch'),
+        label   => $i18n->get('generate batch'),
+    };
+    $helpers->{listSubscriptionCodes} = {
+        url     => $self->getUrl('func=listSubscriptionCodes;selection=dc'), 
+        label   => $i18n->get('manage codes'),
+    };
+    $helpers->{listSubscriptionCodeBatches} = {
+        url     => $self->getUrl('func=listSubscriptionCodeBatches'),
+        label   => $i18n->get('manage batches'),
+    };
+
+    return $helpers;
 }
 
 #-------------------------------------------------------------------
