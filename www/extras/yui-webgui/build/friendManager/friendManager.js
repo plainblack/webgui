@@ -104,7 +104,7 @@ WebGUI.FriendManager.MakeTable = function (groupId, containerId) {
     });
 
     that.DataSource
-        = new YAHOO.util.DataSource('?op=account;module=friendManager;do=getFriendsAsJson;groupId='+groupId+';',{connTimeout:30000} );
+        = new YAHOO.util.DataSource(encodeURI(location.pathname) + '?op=account;module=friendManager;do=getFriendsAsJson;groupId='+groupId+';',{connTimeout:30000} );
     that.DataSource.responseType   = YAHOO.util.DataSource.TYPE_JSON;
     that.DataSource.responseSchema = WebGUI.FriendManager.responseSchema;
     that.DataTable = new YAHOO.widget.DataTable(

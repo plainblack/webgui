@@ -69,7 +69,7 @@ function showPopWin( e ) {
    }
     
       
-   var status = YAHOO.util.Connect.asyncRequest('POST',url,callback,dataPart);
+   var status = YAHOO.util.Connect.asyncRequest('POST',encodeURI(url),callback,dataPart);
    
 }
 

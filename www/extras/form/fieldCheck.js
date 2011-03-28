@@ -72,7 +72,8 @@ WebGUI.FieldCheck.AjaxEvent.prototype = {
       return false;
     } else {
       this.sUri = (!sUri) ? this.sUri : sUri;
-      YAHOO.util.Connect.asyncRequest('GET', this.sUri, {
+      var url = encodeURI(this.sUri);
+      YAHOO.util.Connect.asyncRequest('GET', url, {
         success: function (o) {
           var oJSON = eval("(" + o.responseText + ")");
           var imgEltId=fieldId+"_Img";

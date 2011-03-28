@@ -20,7 +20,7 @@ if (typeof WebGUI == "undefined") {
  */
 WebGUI.i18n 
 = function ( opt ) {
-    this.url        = opt.url   || "";
+    this.url        = opt.url   || location.pathname;
     this.namespaces = {};
 
     this.evPreload  = this.createEvent( "preload" );
@@ -59,7 +59,7 @@ WebGUI.i18n.prototype.get
  */
 WebGUI.i18n.prototype.load
 = function ( obj, preload ) {
-    var requestUrl  = this.url + "?op=ajaxGetI18N"
+    var requestUrl  = encodeURI(this.url) + "?op=ajaxGetI18N"
     var callback    = {
         failure : function ( o, preload ) {
             // TODO: YUI logger for this

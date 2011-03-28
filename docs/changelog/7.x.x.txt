@@ -1,4 +1,6 @@
 7.9.25
+ - added #12079: Carousel Auto Play
+ - fixed #12065: "Data error" in AssetManager if URL is Cyrillic
 
 7.9.24
  - fixed #12061: TimeField form plugin doesn't work with all names
