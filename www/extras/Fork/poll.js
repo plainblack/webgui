@@ -7,6 +7,7 @@
     ns.poll = function(args) {
         function fetch() {
             var first = true;
+            var url = encodeURI(args.url),
             YAHOO.util.Connect.asyncRequest('GET', args.url, {
                 success: function (o) {
                     var data, e;

@@ -29,7 +29,7 @@ WebGUI.ThingyRecord.getThingFields
         }
     };
     
-    var url = '?op=formHelper;class=ThingFieldsList;sub=getThingFields;thingId='
+    var url = encodeURI(location.pathname) + '?op=formHelper;class=ThingFieldsList;sub=getThingFields;thingId='
             + thingId
             ;
     YAHOO.util.Connect.asyncRequest( 'GET', url, callback );

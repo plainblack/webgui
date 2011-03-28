@@ -78,7 +78,7 @@ WebGUI.AssetHistory.initDataTable = function (o) {
 
    // initialize the data source
    WebGUI.AssetHistory.DataSource
-        = new YAHOO.util.DataSource( '?op=assetHistory;method=getHistoryAsJson;',{connTimeout:30000} );
+        = new YAHOO.util.DataSource( encodeURI(location.pathname) + '?op=assetHistory;method=getHistoryAsJson;', {connTimeout:30000} );
     WebGUI.AssetHistory.DataSource.responseType
         = YAHOO.util.DataSource.TYPE_JSON;
     WebGUI.AssetHistory.DataSource.responseSchema

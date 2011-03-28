@@ -6,13 +6,14 @@ if (typeof Survey == "undefined") {
 Survey.Comm = new function(){
     var callMade = 0;
 
-    var request = function(sUrl,callback,postData){
+    var request = function(sQuery,callback,postData){
         YAHOO.util.Dom.setStyle('mask-all','display','block');
         if(callMade == 1){
             alert("Waiting on previous request");
         }else{
             callMade = 1;
-            YAHOO.util.Connect.asyncRequest('POST', sUrl, callback, postData);
+            var url = encodeURI(location.pathname) + sQuery;
+            YAHOO.util.Connect.asyncRequest('POST', url, callback, postData);
         }
     };
     this.callback = {
@@ -31,49 +32,49 @@ Survey.Comm = new function(){
     };
     this.loadSurvey = function(p){
         var postData = "data="+p;
-        var sUrl = "?func=loadSurvey";
-        request(sUrl,this.callback,postData);
+        var sQuery = "?func=loadSurvey";
+        request(sQuery,this.callback,postData);
     };
     this.dragDrop = function(target,before){
         var p = {}; 
         p.target = target;
         p.before = before;
         var postData = "data="+YAHOO.lang.JSON.stringify(p);
-        var sUrl = "?func=dragDrop";
-        request(sUrl,this.callback,postData);
+        var sQuery = "?func=dragDrop";
+        request(sQuery,this.callback,postData);
     };
     this.submitEdit = function(p){
         var postData = "data="+YAHOO.lang.JSON.stringify(p);
-        var sUrl = "?func=submitEdit";
-        request(sUrl,this.callback,postData);
+        var sQuery = "?func=submitEdit";
+        request(sQuery,this.callback,postData);
     };
     this.newSection = function(){
-        var sUrl = "?func=newObject";
-        request(sUrl,this.callback);
+        var sQuery = "?func=newObject";
+        request(sQuery,this.callback);
     };
     this.newQuestion = function(id){
         var postData = "data="+id;
-        var sUrl = "?func=newObject";
-        request(sUrl,this.callback,postData);
+        var sQuery = "?func=newObject";
+        request(sQuery,this.callback,postData);
     };
     this.newAnswer = function(id){
         var postData = "data="+id;
-        var sUrl = "?func=newObject";
-        request(sUrl,this.callback,postData);
+        var sQuery = "?func=newObject";
+        request(sQuery,this.callback,postData);
     };
     this.deleteAnswer = function(id){
         var postData = "data="+id;
-        var sUrl = "?func=deleteAnswer";
-        request(sUrl,this.callback,postData);
+        var sQuery = "?func=deleteAnswer";
+        request(sQuery,this.callback,postData);
     };
     this.deleteQuestion = function(id){
         var postData = "data="+id;
-        var sUrl = "?func=deleteQuestion";
-        request(sUrl,this.callback,postData);
+        var sQuery = "?func=deleteQuestion";
+        request(sQuery,this.callback,postData);
     };
     this.deleteSection = function(id){
         var postData = "data="+id;
-        var sUrl = "?func=deleteSection";
-        request(sUrl,this.callback,postData);
+        var sQuery = "?func=deleteSection";
+        request(sQuery,this.callback,postData);
     };
 }();

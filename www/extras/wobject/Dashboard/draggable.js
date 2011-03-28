@@ -317,7 +317,7 @@ function dragable_dragStop(e) {
                     }
                 }
 
-                var url    = replUrl + "?func=ajaxInlineView";
+                var url    = encodeURI(replUrl) + "?func=ajaxInlineView";
                 var status = YAHOO.util.Connect.asyncRequest('GET',url,callback);
             }
             startTD=null;        
@@ -365,7 +365,7 @@ function dragable_postNewContentMap() {
         }
     }
 
-    var url       = pageURL;
+    var url       = encodeURI(pageURL);
     var dataParts = "func=setContentPositions&map=" + dragable_getContentMap();
     var status = YAHOO.util.Connect.asyncRequest('POST',url,callback,dataParts);
 
@@ -528,6 +528,7 @@ function dashboard_toggleEditForm(event,shortcutId,editFormUrl) {
         }
     }
 
+    editFormUrl = encodeURI(editFormUrl);
     var status = YAHOO.util.Connect.asyncRequest('GET',editFormUrl,callback);
 
 }
@@ -571,7 +572,7 @@ function dashboard_toggleEditDashletForm(event,assetId,dashboardUrl) {
         }
     }
 
-    var url    = dashboardUrl + "?func=editDashlet;dashletAssetId="+assetId;
+    var url    = encodeURI(dashboardUrl) + "?func=editDashlet;dashletAssetId="+assetId;
     var status = YAHOO.util.Connect.asyncRequest('GET',url,callback);
 
 }
@@ -595,7 +596,7 @@ function dashboard_reloadDashlet(event,shortcutId,shortcutUrl) {
         }
     }
 
-    var url    = shortcutUrl + "?func=ajaxInlineView";
+    var url    = encodeURI(shortcutUrl) + "?func=ajaxInlineView";
     var status = YAHOO.util.Connect.asyncRequest('GET',url,callback);
 }
 
@@ -922,7 +923,7 @@ function dragable_dragStop(e) {
                     }
                 }
 
-                var url    = replUrl + "?func=ajaxInlineView";
+                var url    = encodeURI(replUrl) + "?func=ajaxInlineView";
                 var status = YAHOO.util.Connect.asyncRequest('GET',url,callback);
             }
             startTD=null;        
@@ -970,7 +971,7 @@ function dragable_postNewContentMap() {
         }
     }
 
-    var url       = pageURL;
+    var url       = encodeURI(pageURL);
     var dataParts = "func=setContentPositions&map=" + dragable_getContentMap();
     var status = YAHOO.util.Connect.asyncRequest('POST',url,callback,dataParts);
 
@@ -1133,6 +1134,7 @@ function dashboard_toggleEditForm(event,shortcutId,editFormUrl) {
         }
     }
 
+    editFormUrl = encodeURI(editFormUrl);
     var status = YAHOO.util.Connect.asyncRequest('GET',editFormUrl,callback);
 
 }
@@ -1176,7 +1178,7 @@ function dashboard_toggleEditDashletForm(event,assetId,dashboardUrl) {
         }
     }
 
-    var url    = dashboardUrl + "?func=editDashlet;dashletAssetId="+assetId;
+    var url    = encodeURI(dashboardUrl) + "?func=editDashlet;dashletAssetId="+assetId;
     var status = YAHOO.util.Connect.asyncRequest('GET',url,callback);
 
 }
@@ -1200,7 +1202,7 @@ function dashboard_reloadDashlet(event,shortcutId,shortcutUrl) {
         }
     }
 
-    var url    = shortcutUrl + "?func=ajaxInlineView";
+    var url    = encodeURI(shortcutUrl) + "?func=ajaxInlineView";
     var status = YAHOO.util.Connect.asyncRequest('GET',url,callback);
 }
 
