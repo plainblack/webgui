@@ -15,6 +15,7 @@ use Carp qw/croak/;
 use Tie::IxHash;
 use Moose;
 use WebGUI::Definition::Asset;
+use WebGUI::Form::CheckList;
 extends 'WebGUI::Asset';
 
 define assetName => ['assetName', 'Asset_Shortcut'];
@@ -186,20 +187,6 @@ sub _drawQueryBuilder {
 }
 
 #-------------------------------------------------------------------
-sub _submenu {
-	my $self = shift;
-	my $workarea = shift;
-	my $title = shift;
-	my $help = shift;
-	my $ac = WebGUI::AdminConsole->new($self->session,"shortcutmanager");
-	$ac->setIcon($self->getIcon);
-	my $i18n = WebGUI::International->new($self->session,"Asset_Shortcut");
-	$ac->addSubmenuItem($self->getUrl('func=edit'), $i18n->get("Back to Edit Shortcut"));
-	$ac->addSubmenuItem($self->getUrl("func=manageOverrides"),$i18n->get("Manage Shortcut Overrides"));
-	return $ac->render($workarea, $title);
-}
-
-#-------------------------------------------------------------------
 
 =head2 canEdit 
 
@@ -313,23 +300,23 @@ override getEditForm => sub {
 	if($self->session->setting->get("metaDataEnabled")) {
 		$f->getTab("properties")->addField( "YesNo",
 			name     => "shortcutByCriteria",
-			value    => $self->getValue("shortcutByCriteria"),
+			value    => $self->shortcutByCriteria,
 			label    => $i18n->get("Shortcut by alternate criteria"),
 			hoverHelp=> $i18n->get("Shortcut by alternate criteria description"),
 			extras   => q|onchange="wgCriteriaDisable(this.form, this.form.shortcutByCriteria[0].checked)"|,
         );
 		$f->getTab("properties")->addField( "YesNo",
 			name=>"disableContentLock",
-			value=>$self->getValue("disableContentLock"),
+			value=>$self->disableContentLock,
 			label=>$i18n->get("disable content lock"),
 			hoverHelp=>$i18n->get("disable content lock description"),
 			);
-		if ($self->getValue("shortcutByCriteria") == 0) {
+		if ($self->shortcutByCriteria == 0) {
 			$self->{_disabled} = 'disabled=true';
 		}
 		$f->getTab("properties")->addField( "SelectBox",
 			name=>"resolveMultiples",
-			value=>[ $self->getValue("resolveMultiples") ],
+			value=>[ $self->resolveMultiples ],
 			label=>$i18n->get("Resolve Multiples"),
 			hoverHelp=>$i18n->get("Resolve Multiples description"),
 			options=>{
@@ -347,10 +334,10 @@ override getEditForm => sub {
 	$f->addTab( name => 'overrides', label => $i18n->get('Overrides') );
 	$f->getTab('overrides')->addField( "ReadOnly", value => $self->getOverridesList );
 	if ($self->isDashlet) {
-		$f->addTab('preferences',$i18n->get('Preferences'), 9);
+		$f->addTab( name => 'preferences', label => $i18n->get('Preferences'), uiLevel => 9);
 		$f->getTab('preferences')->addField( "ReadOnly", value => $self->getFieldsList );
 		$f->getTab("properties")->addField( "YesNo",
-			value=>$self->getValue("showReloadIcon"),
+			value=>$self->showReloadIcon,
 			name=>"showReloadIcon",
 			label=>$i18n->get("show reload icon"),
 			hoverHelp=>$i18n->get("show reload icon description"),
@@ -408,6 +395,26 @@ sub getFieldsList {
 	return $output;
 }
 
+#----------------------------------------------------------------------------
+
+=head2 getHelpers
+
+Get the helpers to manage the shortcut overrides.
+
+NOTE: These are added to the edit form, so why do we also need a special page for them? Remove it in the future...
+
+=cut
+
+override getHelpers => sub {
+    my ( $self ) = @_;
+    my $helpers = super();
+    $helpers->{manageOverrides} = {
+        url     => $self->getUrl( 'func=manageOverrides' ),
+        label   => 'Manage Overrides',
+    };
+    return $helpers;
+};
+
 #-------------------------------------------------------------------
 
 =head2 getOverridesList
@@ -420,6 +427,7 @@ generated for that field
 
 sub getOverridesList {
 	my $self = shift;
+        my $session = $self->session;
 	my $output = '';
 	my $i18n = WebGUI::International->new($self->session, "Asset_Shortcut");
 	my %overrides = $self->getOverrides;
@@ -428,14 +436,23 @@ sub getOverridesList {
 	my $shortcut = $self->getShortcutOriginal;
 	return undef unless defined $shortcut;
 
+    # Config file overrides for properties
+    my $overrides = $session->config->get( "assets/" . $shortcut->get("className") . '/fields' ) || {};
+
+    # Get the properties of the shortcutted asset
     for my $property_name ( $shortcut->getProperties ) {
         my $property = $shortcut->meta->find_attribute_by_name( $property_name );
         next if $property->noFormPost;
         next if $property->fieldType eq 'hidden';
-        next unless $property->can('label');
-        next if $property->label eq '';
+
+        my $fieldType       = $property->fieldType;
+        my $fieldOverrides  = $overrides->{ $property_name } || {};
+        my $fieldHash       = {
+                                %{ $shortcut->getFormProperties( $property_name ) },
+                                %{ $overrides },
+                            };
         $output .= '<tr>';
-        $output .= '<td class="tableData">'.$property->label.'</td>';
+        $output .= '<td class="tableData">'.$fieldHash->{label}.'</td>';
         $output .= '<td class="tableData">';
         $output .= $self->session->icon->edit('func=editOverride;fieldName='.$property_name,$self->get("url"));
         $output .= $self->session->icon->delete('func=deleteOverride;fieldName='.$property_name,$self->get("url")) if exists $overrides{overrides}{$property_name};
@@ -958,23 +975,6 @@ sub view {
 
 #-------------------------------------------------------------------
 
-=head2 www_edit 
-
-Override the base class to handle adding a menu entry for Manage Overrides.
-
-=cut
-
-sub www_edit {
-	my $self = shift;
-	return $self->session->privilege->insufficient() unless $self->canEdit;
-	return $self->session->privilege->locked() unless $self->canEditIfLocked;
-	my $i18n = WebGUI::International->new($self->session,"Asset_Shortcut");
-	$self->getAdminConsole->addSubmenuItem($self->getUrl("func=manageOverrides"),$i18n->get("Manage Shortcut Overrides"));
-	return $self->getAdminConsole->render($self->getEditForm->toHtml,$i18n->get(2));
-}
-
-#-------------------------------------------------------------------
-
 =head2 www_getUserPrefsForm 
 
 Returns a form displaying all user profile fields to show to the user, that they
@@ -1042,7 +1042,7 @@ sub www_manageOverrides {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless $self->canEdit;
 	my $i18n = WebGUI::International->new($self->session,"Asset_Shortcut");
-	return $self->_submenu($self->getOverridesList,$i18n->get("Manage Shortcut Overrides"));
+	return '<h1>' . $i18n->get("Manage Shortcut Overrides") . '</h1>' . $self->getOverridesList;
 }
 
 #-------------------------------------------------------------------
@@ -1201,7 +1201,7 @@ sub www_editOverride {
 
 	$output .= $f->toHtml;
 	
-	return $self->_submenu($output,$i18n->get('Edit Override'));
+	return '<h1>' . $i18n->get('Edit Override') . '</h1>' . $output;
 }
 
 #-------------------------------------------------------------------

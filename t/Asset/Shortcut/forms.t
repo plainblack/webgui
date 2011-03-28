@@ -60,7 +60,13 @@ my $mech = WebGUI::Test::Mechanize->new( config => WebGUI::Test->file );
 $mech->get_ok('/');
 $mech->session->user({ userId => 3 });
 
-$mech->get_ok( $shortcut->getUrl( 'func=editOverride;fieldName=title' ) );
+# Make sure edit form has a link to edit the override
+$mech->get_ok( $shortcut->getUrl( 'func=edit' ) );
+diag( $mech->content );
+$mech->follow_link_ok( 
+    { url_regex => qr/func=editOverride;fieldName=title/ },
+    "Follow the link to edit the override",
+);
 $mech->submit_form_ok( {
     fields => { title => "New Title" },
 } );
