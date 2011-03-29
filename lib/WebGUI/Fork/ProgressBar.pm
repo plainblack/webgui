@@ -26,6 +26,32 @@ WebGUI::Fork::ProgressBar
 Renders an admin console page that polls ::Status to draw a simple progress
 bar along with some kind of message.
 
+=head1 SYNOPSIS
+
+    # Make our fork routine update our status
+    sub doInFork {
+        my ( $process, $args ) = @_;
+        my $status = {
+            message     => 'Starting up...',                # A message to the user
+            total       => scalar @{$args->{stuffToDo}},    # How many tasks we have to do
+            finished    => 0,                               # How many tasks we've done
+        };
+        $process->update( sub { JSON->new->encode( $status ) } );
+            # Using a subref causes Fork to compute JSON only when needed
+
+        for my $thing ( @{$args->{stuffToDo}} ) {
+            # Do The work
+            # ...
+
+            # Update status
+            $status->{finished}++;
+            $process->update( sub { JSON->new->encode( $status ) } );
+        }
+
+        # All done!
+        $process->finish;
+    }
+
 =head1 SUBROUTINES
 
 These subroutines are available from this package:
