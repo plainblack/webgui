@@ -277,9 +277,7 @@ a shelf.  Override master class to add different form.
 
 sub getAddToCartForm {
     my $self    = shift;
-    :cn
-    :cn
-
+    my $session = $self->session;
     my $i18n = WebGUI::International->new($session, 'Asset_Subscription');
     return
         WebGUI::Form::formHeader($session, {action => $self->getUrl})
@@ -404,6 +402,7 @@ Get the some links to manage subscription codes
 
 override getHelpers => sub {
     my ( $self ) = @_;
+    my $session = $self->session;
     my $helpers = super();
     my $i18n    = WebGUI::International->new( $session, 'Asset_Subscription' );
 
@@ -421,7 +420,7 @@ override getHelpers => sub {
     };
 
     return $helpers;
-}
+};
 
 #-------------------------------------------------------------------
 
