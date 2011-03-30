@@ -63,6 +63,7 @@ my $missingModule = 0;
 
 checkModule("LWP",                          5.833        );
 checkModule("Net::DNS",                     0.66,        );
+checkModule("Try::Tiny",                    0.07,        );
 checkModule("HTTP::Request",                1.40         );
 checkModule("HTTP::Headers",                1.61         );
 checkModule("Test::More",                   0.96,      2 );
