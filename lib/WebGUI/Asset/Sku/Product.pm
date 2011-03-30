@@ -457,6 +457,30 @@ sub getFileUrl {
     return $store->getUrl($self->getFilename($store));
 }
 
+#----------------------------------------------------------------------------
+
+=head2 getHelpers ( )
+
+Add the importCSV and exportCSV helpers
+
+=cut
+
+override getHelpers => sub {
+    my ( $self ) = @_;
+    my $helpers = super();
+
+    $helpers->{import_products} = {
+        className   => 'WebGUI::AssetHelper::Product::ImportCSV',
+        label       => 'Import Products',
+    };
+    $helpers->{export_products} = {
+        className   => 'WebGUI::AssetHelper::Product::ExportCSV',
+        label       => 'Export Products',
+    };
+
+    return $helpers;
+};
+
 #-------------------------------------------------------------------
 
 =head2 getMaxAllowedInCart ( )
