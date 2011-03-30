@@ -1,6 +1,7 @@
 7.10.13
  - added #12079: Carousel Auto Play
  - fixed #12065: "Data error" in AssetManager if URL is Cyrillic
+ - fixed #12075: Underground Style - Search does not search
 
 7.10.12
  - fixed #12072: Product, related and accessory assets
