@@ -6,7 +6,7 @@ if (typeof Survey === "undefined") {
 (function(){
 
     var callMade = 0;
-    var request = function(sQuery, callback, postData, form, hasFile){
+    var request = function(sUrl, callback, postData, form, hasFile){
         if (form) {
             if (hasFile) {
                 YAHOO.util.Connect.setForm(form, true);
@@ -23,9 +23,8 @@ if (typeof Survey === "undefined") {
         }
         else {
             callMade = 1;
-            YAHOO.log(sQuery);
-            var url = encodeURI(location.pathname) + sQuery;
-            YAHOO.util.Connect.asyncRequest('POST', url, callback, postData);
+            YAHOO.log(sUrl);
+            YAHOO.util.Connect.asyncRequest('POST', sUrl, callback, postData);
         }
     };
     
@@ -80,13 +79,13 @@ if (typeof Survey === "undefined") {
             }
         },
         submitSummary: function(data,functionName){
-            var sQuery = "?func=loadQuestions;shownSummary=1";
+            var sUrl = "?func=loadQuestions;shownSummary=1";
             var revision = Survey.Comm.getRevision();
             if (revision) {
-                sQuery += ";revision=" + revision;
+                sUrl += ";revision=" + revision;
             }
             
-            request(sQuery, this.callback, null, null, null);
+            request(sUrl, this.callback, null, null, null);
         },
         
         getRevision: function() {
@@ -105,15 +104,15 @@ if (typeof Survey === "undefined") {
                 postData = "data=" + YAHOO.lang.JSON.stringify(data, data);
             }
             
-            //var sQuery = this.url + "?func="+functionName;
-            var sQuery = "?func=" + functionName;
+            //var sUrl = this.url + "?func="+functionName;
+            var sUrl = "?func=" + functionName;
             
             var revision = Survey.Comm.getRevision();
             if (revision) {
-                sQuery += ";revision=" + revision;
+                sUrl += ";revision=" + revision;
             }
             
-            request(sQuery, this.callback, postData, form, hasFile);
+            request(sUrl, this.callback, postData, form, hasFile);
         }
     };
 })();

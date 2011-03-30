@@ -77,8 +77,7 @@ WebGUI.VendorPayout.prototype.initialize = function (aaa, bbb,ccc,ddd) {
     // Submit button
     this.submitPayoutsButton    = new YAHOO.widget.Button({ label: this.i18n( 'submit scheduled payouts button' ), container: this.buttonDiv });
     this.submitPayoutsButton.on( 'click', function () { 
-        var buttonUrl = encodeURI(location.pathname) + '?shop=vendor;method=submitScheduledPayouts';
-        YAHOO.util.Connect.asyncRequest( 'GET', buttonUrl, { 
+        YAHOO.util.Connect.asyncRequest( 'GET', '?shop=vendor;method=submitScheduledPayouts', { 
             success: obj.initialize, 
             scope: obj
         } );
@@ -88,7 +87,7 @@ WebGUI.VendorPayout.prototype.initialize = function (aaa, bbb,ccc,ddd) {
     this.payoutDetails  = document.createElement('div');
     this.container.appendChild( this.payoutDetails );
 
-    this.itemBaseUrl = encodeURI(location.pathname) + '?shop=vendor;method=payoutDataAsJSON;';
+    this.itemBaseUrl = '?shop=vendor;method=payoutDataAsJSON;';
 
     this.initVendorList();
     this.initPayoutDetails();
@@ -106,7 +105,7 @@ WebGUI.VendorPayout.prototype.initVendorList = function () {
     ];
 
     // setup data source
-    var url = encodeURI(location.pathname) + '?shop=vendor;method=vendorTotalsAsJSON;';
+    var url = '?shop=vendor;method=vendorTotalsAsJSON;';
     this.vendorDataSource = new YAHOO.util.DataSource( url );
     this.vendorDataSource.responseType      = YAHOO.util.DataSource.TYPE_JSON;
     this.vendorDataSource.responseSchema    = {
@@ -247,7 +246,7 @@ WebGUI.VendorPayout.prototype.initPayoutDetails = function () {
         };
     
         var status = record.getData( 'vendorPayoutStatus' ) === 'NotPaid' ? 'Scheduled' : 'NotPaid';
-        var url = encodeURI(location.pathname) + '?shop=vendor;method=setPayoutStatus' + ';itemId=' + record.getData( 'itemId' ) + ';status=' + status;
+        var url = '?shop=vendor;method=setPayoutStatus' + ';itemId=' + record.getData( 'itemId' ) + ';status=' + status;
         YAHOO.util.Connect.asyncRequest( 'post', url, callback );
     } );  
 }

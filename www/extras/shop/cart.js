@@ -408,7 +408,7 @@
 
         // This is a very thin layer on top of YAHOO.util.Connect.asyncRequest.
         request: function (method, params, success) {
-            var url   = encodeURI(this.baseUrl),
+            var url   = this.baseUrl,
                 cb    = { success: success },
                 query = _(params).map(function (v, k) {
                     return [k, escape(v)].join('=');

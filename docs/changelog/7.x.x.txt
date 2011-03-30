@@ -1,7 +1,6 @@
 7.9.26
 
 7.9.25
- - fixed #12065: "Data error" in AssetManager if URL is Cyrillic
  - fixed #12075: Underground Style - Search does not search
  - fixed #12084: Greenportal links are sometimes white on white
 

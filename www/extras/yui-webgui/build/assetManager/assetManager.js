@@ -263,7 +263,7 @@ WebGUI.AssetManager.initDataTable = function (o) {
 
    // initialize the data source
    WebGUI.AssetManager.DataSource
-        = new YAHOO.util.DataSource( encodeURI(location.pathname) + '?op=assetManager;method=ajaxGetManagerPage;', {connTimeout:30000} );
+        = new YAHOO.util.DataSource( '?op=assetManager;method=ajaxGetManagerPage;',{connTimeout:30000} );
     WebGUI.AssetManager.DataSource.responseType
         = YAHOO.util.DataSource.TYPE_JSON;
     WebGUI.AssetManager.DataSource.responseSchema

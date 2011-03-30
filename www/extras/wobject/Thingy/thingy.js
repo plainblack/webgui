@@ -75,7 +75,7 @@ function initOptionalFields(prefix,fieldId) {
 
 		var getFieldValues = function() {
 			var fieldInOtherThingId = this.value;
-			var url = encodeURI(location.pathname) + "?func=selectDefaultFieldValue;thingId=" + thingId + ";fieldInOtherThingId=" + fieldInOtherThingId + ";fieldId=" + fieldId;
+			var url = location.pathname + "?func=selectDefaultFieldValue;thingId=" + thingId + ";fieldInOtherThingId=" + fieldInOtherThingId + ";fieldId=" + fieldId;
 
 			var handleSuccess = function(o){
 				defaultFieldInThing_module.setBody(o.responseText);
@@ -100,7 +100,7 @@ function initOptionalFields(prefix,fieldId) {
 			fieldInThing_module.show();
 			defaultFieldInThing_module.show();
 		}else{	
-			var url = encodeURI(location.pathname) + "?func=selectFieldInThing;thingId=" + thingId + ";prefix=" +prefix + ";fieldId=" + fieldId;
+			var url = location.pathname + "?func=selectFieldInThing;thingId=" + thingId + ";prefix=" +prefix + ";fieldId=" + fieldId;
 			var handleSuccess = function(o){
 				fieldInThing_module.setBody(o.responseText);
 				fieldInThing_module.show();
@@ -202,7 +202,7 @@ function editListItem(url,fieldId,copy) {
 		cache:false 
 	};
 	
-	var request = YAHOO.util.Connect.asyncRequest('GET', encodeURI(url), callbackGetForm);
+	var request = YAHOO.util.Connect.asyncRequest('GET', url, callbackGetForm);
 }
 
 function addListItemHTML(listItemId, newInnerHTML,label){
@@ -355,7 +355,7 @@ if (confirm("Are you sure you want to delete this field?")){
 	};
 	
 	var postData = "func=deleteFieldConfirm;fieldId=" + listItemId + ";thingId=" + thingId;
-	var request = YAHOO.util.Connect.asyncRequest('POST', encodeURI(url), callback, postData);
+	var request = YAHOO.util.Connect.asyncRequest('POST', url, callback, postData);
 		
 	}
 }
@@ -482,7 +482,7 @@ YAHOO.extend(YAHOO.draglist.DDList, YAHOO.util.DDProxy, {
 		success:handleSuccess,
 		failure:handleFailure
 		};
-		var url = encodeURI(location.pathname);
+		var url = location.pathname;
 		//curRank = curRank +1;
 		//origRank = origRank +1;
 		var postData = "func=moveFieldConfirm;fieldId=" + srcEl.id + ";targetFieldId=" + destination+";direction="+direction;//currentRank="+curRank+";originalRank="+origRank+";
