@@ -102,6 +102,7 @@ checkModule("HTML::Template",               2.9          );
 checkModule("HTML::Template::Expr",         0.07,      2 );
 checkModule("Template",                     2.20,      2 );
 checkModule("XML::FeedPP",                  0.40         );
+checkModule("XML::FeedPP::MediaRSS",        0.02         );
 checkModule("JSON",                         2.12         );
 checkModule("Config::JSON",                 "1.3.1"      );
 checkModule("Text::CSV_XS",                 "0.64"       );

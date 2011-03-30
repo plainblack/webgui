@@ -21,7 +21,7 @@ use Class::C3;
 use base qw(WebGUI::AssetAspect::RssFeed WebGUI::Asset::Wobject);
 use WebGUI::Macro;
 use XML::FeedPP;
-
+use XML::FeedPP::MediaRSS;
 
 =head1 NAME
 
@@ -279,6 +279,7 @@ A reference to an XML::FeedPP object.
 
 sub getTemplateVariables {
 	my ($self, $feed) = @_;
+	my $media = XML::FeedPP::MediaRSS->new($feed);
 	my @items = $feed->get_item;
 	my %var;
 	$var{channel_title} = WebGUI::HTML::filter(scalar $feed->title, 'javascript');
@@ -295,6 +296,7 @@ sub getTemplateVariables {
 	$var{channel_image_height} = WebGUI::HTML::filter($image[5], 'javascript');
 	foreach my $object (@items) {
 		my %item;
+		$item{media} = [ $media->for_item($object) ];
         $item{title} = WebGUI::HTML::filter(scalar $object->title, 'javascript');
         $item{date} = WebGUI::HTML::filter(scalar $object->get_pubDate_epoch, 'javascript');
         $item{category} = WebGUI::HTML::filter(scalar $object->category, 'javascript');

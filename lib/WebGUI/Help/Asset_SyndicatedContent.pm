@@ -39,6 +39,7 @@ our $HELP = {
                     { 'name' => 'category' },
                     { 'name' => 'author' },
                     { 'name' => 'guid' },
+                    { 'name' => 'media' },
                     { 'name' => 'description' },
                     { 'name' => 'descriptionFirst100words' },
                     { 'name' => 'descriptionFirst75words' },

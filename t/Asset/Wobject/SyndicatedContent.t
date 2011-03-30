@@ -20,7 +20,7 @@ use Data::Dumper;
 
 use WebGUI::Test;
 use WebGUI::Session;
-use Test::More tests => 29; # increment this value for each test you create
+use Test::More tests => 30; # increment this value for each test you create
 use Test::Deep;
 use WebGUI::Asset::Wobject::SyndicatedContent;
 use XML::FeedPP;
@@ -144,7 +144,7 @@ ok( defined $vars->{item_loop}->[0]->{description}, 'getTemplateVariables: descr
 ##Construct a feed with a wrapped description, to check for paragraph handling.
 $feed = XML::FeedPP->new(<<EOFEED);
 <?xml version="1.0" encoding="UTF-8" ?>
-<rss version="2.0">
+<rss version="2.0" xmlns:media="http://search.yahoo.com/mrss">
 <channel>
 <title>The WebGUI buglist</title>
 <link>/tbb</link>
@@ -165,6 +165,11 @@ character, creating invalid markup.&lt;/p&gt;
 &lt;p&gt;No more text is shown of the first paragraph beyond the bold characters of the first line.&lt;/p&gt;
 &lt;p&gt;Third paragraph, for completeness.&lt;/p&gt;
 </description>
+<media:content
+    url="http://www.plainblack.com/wg_btn.jpg"
+    filesize="1415"
+    type="image/jpeg"
+    medium="image" />
 </item>
 </channel>
 </rss>
@@ -184,6 +189,15 @@ is $vars->{item_loop}->[0]->{descriptionFirstSentence},
 "In the attached feed, there is a hidden return line character from the
 Rich Text editor in the first sentence of the description.",
 '... first sentence, with HTML stripped';
+
+is_deeply $vars->{item_loop}->[0]->{media}, [
+    {
+        url      => 'http://www.plainblack.com/wg_btn.jpg',
+        type     => 'image/jpeg',
+        medium   => 'image',
+        filesize => 1415,
+    }
+], 'MediaRSS';
 
 ####################################################################
 #

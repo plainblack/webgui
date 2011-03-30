@@ -7,6 +7,10 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+7.10.13
+--------------------------------------------------------------------
+    * WebGUI now depends on XML::FeedPP::MediaRSS.
+
 7.10.12
 --------------------------------------------------------------------
     * The Dashboard has been extended to include Asset Dashlets.  This gives
