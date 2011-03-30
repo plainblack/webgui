@@ -55,7 +55,7 @@
     }
 
     function fetch(k) {
-        var url = encodeURI(document.getElementById('previewFetchUrl').value),
+        var url = document.getElementById('previewFetchUrl').value,
             abs, b;
 
         if (!url) {
