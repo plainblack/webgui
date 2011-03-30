@@ -2,6 +2,7 @@
  - added #12079: Carousel Auto Play
  - fixed #12065: "Data error" in AssetManager if URL is Cyrillic
  - fixed #12075: Underground Style - Search does not search
+ - fixed #12084: Greenportal links are sometimes white on white
 
 7.10.12
  - fixed #12072: Product, related and accessory assets
