@@ -584,7 +584,10 @@ WebGUI.Admin.prototype.processPlugin
         this.showInfoMessage( resp.error );
     }
     else if ( resp.forkId ) {
-        // Do nothing right now
+        this.openForkDialog( resp.forkId );
+    }
+    else if ( resp.redirect ) {
+        this.gotoAsset( resp.redirect );
     }
     else {
         alert( "Unknown plugin response: " + YAHOO.lang.JSON.stringify(resp) );
@@ -678,6 +681,66 @@ WebGUI.Admin.prototype.hideInfoMessage
 = function ( ) {
     var infoContainer   = document.getElementById( 'infoMessageContainer' );
     infoContainer.style.display  = "none";
+};
+
+/**
+ * openForkDialog( forkId )
+ * Open a dialog to show a progress bar for the forked process
+ */
+WebGUI.Admin.prototype.openForkDialog
+= function ( forkId ) {
+    // Open the dialog with a progress bar
+    var dialog  = new YAHOO.widget.Panel( 'forkModalDialog', {
+        "width"             : '350px',
+        fixedcenter         : true,
+        constraintoviewport : true,
+        underlay            : "shadow",
+        close               : true,
+        visible             : true,
+        draggable           : false
+    } );
+    dialog.setBody( 
+        '<div id="pbTask"></div><div id="pbTaskStatus">Starting...</div>'
+    );
+    dialog.render( document.body );
+    this.treeDialog = dialog;
+
+    var pbTaskBar = new YAHOO.widget.ProgressBar({
+        minValue : 0,
+        value : 0,
+        maxValue : 1,
+        width: '300px',
+        height: '30px',
+        anim: true
+    });
+    pbTaskBar.render( 'pbTask' );
+    pbTaskBar.get('anim').duration = 0.5;
+    pbTaskBar.get('anim').method = YAHOO.util.Easing.easeOut;
+
+    YAHOO.WebGUI.Fork.poll({
+        url     : '?op=fork;pid=' + forkId,
+        draw    : function(data) {
+            var status = YAHOO.lang.JSON.parse( data.status );
+            if ( status ) {
+                pbTaskBar.set( 'maxValue', status.total );
+                pbTaskBar.set( 'value', status.finished );
+                document.getElementById( 'pbTaskStatus' ).innerHTML = status.message;
+            }
+        },
+        finish  : function(data){
+            var status = YAHOO.lang.JSON.parse( data.status );
+            if ( status.redirect ) {
+                alert("Dispensing product...");
+                window.admin.gotoAsset( status.redirect );
+            }
+            dialog.destroy();
+            dialog = null;
+            // TODO: Handle the last request of the forked process
+        },
+        error : function(e){
+            alert("Error: " + e);
+        }
+    });
 };
 
 /**
@@ -1621,8 +1684,7 @@ WebGUI.Admin.AssetTable.prototype.getSelected
  *
  * WebGUI.Admin.Tree
  */
-
-WebGUI.Admin.Tree 
+WebGUI.Admin.Tree
 = function(admin) {
     WebGUI.Admin.Tree.superclass.constructor.call( this, admin, {
         dataSourceUrl   : '?op=admin;method=getTreeData;',
@@ -1690,7 +1752,7 @@ WebGUI.Admin.Tree.prototype.runHelperForSelected
     var assetIds = this.getSelected();
 
     // Open the dialog with two progress bars
-    var dialog  = new YAHOO.widget.Panel( 'adminModalDialog', {
+    var dialog  = new YAHOO.widget.Panel( 'helperForkModalDialog', {
         "width"             : '350px',
         fixedcenter         : true,
         constraintoviewport : true,
