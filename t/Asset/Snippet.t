@@ -33,7 +33,7 @@ isa_ok($snippet, 'WebGUI::Asset::Snippet');
 # Test to see if we can set values
 my $properties = {
 	cacheTimeout => 124,
-	processAsTemplate => 1,
+	templateParser => 'WebGUI::Asset::Template::HTMLTemplate',
 	mimeType => 'text/plain',
 	snippet => "Gooey's milkshake brings all the girls to the yard...",
 };
@@ -74,9 +74,9 @@ isnt ($editOutput, undef, 'www_edit returns something');
 
 $snippet->update({
     title   => "authMethod",
-    processAsTemplate => 1,
+    templateParser => 'WebGUI::Asset::Template::TemplateToolkit',
     cacheTimeout      => 1,
-    snippet => q|^SQL(select value from settings where name="<tmpl_var title>");|
+    snippet => q|^SQL(select value from settings where name="[% title %]");|
 });
 
 WebGUI::Test->originalConfig('macros');

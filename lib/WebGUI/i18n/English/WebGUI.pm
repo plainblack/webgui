@@ -520,6 +520,11 @@ our $I18N = {
 		lastUpdated => 1133087205
 	},
 
+	'Template Parser' => {
+		message => q|Template Parser|,
+		lastUpdated => 1301593691
+	},
+
 	'391' => {
 		message => q|Delete attached file.|,
 		lastUpdated => 1031514049

@@ -32,6 +32,7 @@ my $session = start(); # this line required
 
 # upgrade functions go here
 addAutoPlayToCarousel( $session );
+addProcessorDropdownToSnippet( $session );
 
 finish($session); # this line required
 
@@ -54,6 +55,36 @@ sub addAutoPlayToCarousel {
         "ALTER TABLE Carousel ADD COLUMN autoPlay INT, ADD COLUMN autoPlayInterval INT"
     );
     print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+sub addProcessorDropdownToSnippet {
+    my $session = shift;
+    my $db      = $session->db;
+    print "\tUpdating the Snippet table to add templateProcessor option..."
+        unless $quiet;
+
+    my $rows = $db->buildArrayRefOfHashRefs(q{
+        select assetId, revisionDate from snippet where processAsTemplate = 1
+    });
+
+    $db->write(q{
+        alter table snippet
+        drop column processAsTemplate,
+        add column templateParser char(255)
+    });
+
+    my $default = $session->config->get('defaultTemplateParser');
+
+    for my $row (@$rows) {
+        $db->write(q{
+            update snippet
+            set templateParser = ?
+            where assetId = ? and revisionDate = ?
+        }, [ $default, $row->{assetId}, $row->{revisionDate} ]);
+    }
+
+    print "Done!\n";
 }
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------

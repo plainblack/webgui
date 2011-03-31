@@ -140,9 +140,8 @@ sub definition {
                 defaultValue    => 1,
             },
             parser => {
-                noFormPost      => 1,
-                fieldType       => 'selectBox',
-                defaultValue    => [$session->config->get("defaultTemplateParser")],
+                fieldType    => 'templateParser',
+                defaultValue => $session->config->get('defaultTemplateParser'),
             },	
             namespace => {
                 fieldType       => 'combo',
@@ -404,22 +403,12 @@ sub getEditForm {
 	    templatePreview.js
 	);
 
-	if($config->get("templateParsers")){
-		my @temparray = @{$config->get("templateParsers")};
-		tie my %parsers, 'Tie::IxHash';
-		while(my $a = shift @temparray){
-			$parsers{$a} = $self->getParser($session, $a)->getName();
-		}
-		my $value = [$self->getValue("parser")];
-		$value = \[$config->get("defaultTemplateParser")] if(!$self->getValue("parser"));
-		$properties->selectBox(
-			-name=>"parser",
-			-options=>\%parsers,
-			-value=>$value,
-			-label=>$i18n->get('parser'),
-			-hoverHelp=>$i18n->get('parser description'),
-			);
-	}
+	$properties->templateParser(
+		name      => 'parser',
+		label     => $i18n->get('parser'),
+		hoverHelp => $i18n->get('parser description'),
+		value     => $self->getValue('parser'),
+	);
 
 	$properties->jsonTable(
 	    name        => 'attachmentsJson',

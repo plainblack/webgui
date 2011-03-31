@@ -63,6 +63,7 @@ sub definition {
         my $session = shift;
         my $definition = shift;
 	my $i18n = WebGUI::International->new($session,"Asset_Snippet");
+	my $t18n = WebGUI::International->new($session,'Asset_Template');
 	my %properties;
 	tie %properties, 'Tie::IxHash';
 	%properties = (
@@ -94,13 +95,14 @@ sub definition {
 				label => $i18n->get("cache timeout"),
 				hoverHelp => $i18n->get("cache timeout help")
 				},
- 			processAsTemplate=>{
-                        	fieldType=>'yesNo',
-				label=>$i18n->get('process as template'),
-				hoverHelp=>$i18n->get('process as template description'),
-				tab=>"properties",
-                                defaultValue=>0
-                                },
+			templateParser => {
+				fieldType    => 'templateParser',
+				allowNone    => 1,
+				label        => $t18n->get('parser'),
+				hoverHelp    => $t18n->get('parser description'),
+				tab          => 'properties',
+				defaultValue => '',
+			},
 			mimeType=>{
 				tab=>"properties",
 				hoverHelp=>$i18n->get('mimeType description'),
@@ -312,8 +314,10 @@ sub view {
                 : $self->get('snippet')
                 ;
 	$output = $self->getToolbar.$output if ($session->var->isAdminOn && !$calledAsWebMethod);
-	if ($self->getValue("processAsTemplate")) {
-		$output = WebGUI::Asset::Template->processRaw($session, $output, $self->get);
+	if (my $parser = $self->getValue('templateParser')) {
+		$output = WebGUI::Asset::Template->processRaw(
+			$session, $output, $self->get, $parser
+		);
 	}
 	WebGUI::Macro::process($session,\$output);
     unless ($noCache) {

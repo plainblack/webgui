@@ -23,6 +23,8 @@ use Test::Exception;
 use JSON qw{ from_json };
 
 my $session = WebGUI::Test->session;
+my $default = $session->config->get('defaultTemplateParser');
+my $ht      = 'WebGUI::Asset::Template::HTMLTemplate';
 
 my $list = WebGUI::Asset::Template->getList($session);
 cmp_deeply($list, {}, 'getList with no classname returns an empty hashref');
@@ -33,16 +35,19 @@ my %var = (
 	conditional=>1,
 	loop=>[{},{},{},{},{}]
 	);
-my $output = WebGUI::Asset::Template->processRaw($session,$tmplText,\%var);
+my $output = WebGUI::Asset::Template->processRaw($session,$tmplText,\%var, $ht);
 ok($output =~ m/\bAAAAA\b/, "processRaw() - variables");
 ok($output =~ m/true/, "processRaw() - conditionals");
 ok($output =~ m/\s(?:XY){5}\s/, "processRaw() - loops");
 
 my $importNode = WebGUI::Asset::Template->getImportNode($session);
-my $template = $importNode->addChild({className=>"WebGUI::Asset::Template", title=>"test", url=>"testingtemplates", template=>$tmplText, namespace=>'WebGUI Test Template'});
+
+my $template = $importNode->addChild({className=>"WebGUI::Asset::Template"});
+is($template->get('parser'), $default, "default parser is $default");
+
+$template = $importNode->addChild({className=>"WebGUI::Asset::Template", title=>"test", url=>"testingtemplates", template=>$tmplText, namespace=>'WebGUI Test Template',parser=>$ht});
 isa_ok($template, 'WebGUI::Asset::Template', "creating a template");
 
-is($template->get('parser'), 'WebGUI::Asset::Template::HTMLTemplate', 'default parser is HTMLTemplate');
 
 $var{variable} = "BBBBB";
 $output = $template->process(\%var);
@@ -111,6 +116,7 @@ my $template3 = $importNode->addChild({
     title     => 'headBlock test',
     headBlock => "tag1 tag2 tag3",
     template  => "this is a template",
+    parser    => $ht,
 }, undef, time()-5);
 
 ok(!$template3->get('headBlock'),    'headBlock is empty');
@@ -205,6 +211,7 @@ my $trashTemplate = $importNode->addChild({
     className => "WebGUI::Asset::Template",
     title     => 'Trash template',
     template  => q|Trash Trash Trash Trash|,
+    parser    => $ht,
 });
 
 $trashTemplate->trash;
@@ -229,6 +236,7 @@ my $brokenTemplate = $importNode->addChild({
     className => "WebGUI::Asset::Template",
     title     => 'Broken template',
     template  => q|<tmpl_if unclosedIf>If clause with no ending tag|,
+    parser    => $ht,
 });
 
 WebGUI::Test->interceptLogging;
@@ -251,6 +259,7 @@ my $userStyleTemplate = $importNode->addChild({
     url       => "ufs",
     template  => "user function style",
     namespace => 'WebGUI Test Template',
+    parser    => $ht,
 });
 
 my $someOtherTemplate = $importNode->addChild({
@@ -259,6 +268,7 @@ my $someOtherTemplate = $importNode->addChild({
     url       => "sot",
     template  => "some other template",
     namespace => 'WebGUI Test Template',
+    parser    => $ht,
 });
 
 $session->setting->set('userFunctionStyleId', $userStyleTemplate->getId);
