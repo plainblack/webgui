@@ -39,6 +39,7 @@ my @addArgs = ( undef, undef, { skipAutoCommitWorkflows => 1, skipNotification =
 my $notification_template = $node->addChild({
     className => 'WebGUI::Asset::Template',
     template  => "<body>!!!url:<tmpl_var url>!!!content:<tmpl_var content>!!!</body>",
+    parser    => 'WebGUI::Asset::Template::HTMLTemplate',
 }, @addArgs);
 
 my $collab = $node->addChild({
