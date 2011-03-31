@@ -1180,6 +1180,9 @@ sub www_view {
             if ( defined $billingAddress ) {
                 $billingAddressOptions{'update_address'} = sprintf $i18n->get('Update %s'), $billingAddress->get('label');
             }
+            elsif (my $e = WebGUI::Error->caught("WebGUI::Error::ObjectNotFound") && $self->get('billingAddressId')) {
+                $self->update({billingAddressId=>''});
+            }
         }
 
         %billingAddressOptions = (%billingAddressOptions, %addressOptions);
