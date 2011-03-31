@@ -137,6 +137,7 @@ WebGUI::VersionTag->getWorking($session)->commit;
 
 my $jsonTemplate = $node->addChild({
     className => 'WebGUI::Asset::Template',
+    parser    => 'WebGUI::Asset::Template::HTMLTemplate',
     title     => 'JSON template for Product testing',
     template  => q|
 {
