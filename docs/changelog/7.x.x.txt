@@ -4,8 +4,8 @@
  - fixed #12084: Greenportal links are sometimes white on white
  - rfe   #618:   Syndicated Content Asset: Make images in the downloaded RSS-feeds available in the template.
  - fixed #12086: Shop Billing Address Unpopulated
- - Snippets can now select a template parser (instead of being restricted to
-   the configured default)
+ - Snippets can now select a template parser (instead of being restricted to the configured default)
+ - fixed #12081: addrees not in addressbook after user change in session
 
 7.10.12
  - fixed #12072: Product, related and accessory assets
