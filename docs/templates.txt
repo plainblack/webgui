@@ -1,8 +1,16 @@
 This is a running list of template changes made during upgrades.  If you have copied the default
 templates, you will need to apply these changes manually to your copies.
 
-7.10.11
+7.10.13
+  * Cart (Default) - default-shopping-cart-template
+    In 7.10.7, hardcoded JavaScript was removed from the Cart code and migrated to the Cart template.  The list of Javascript and files which are needed is below.  Please add it to the Attachments or Extra Head Tags for any customized Cart templates.
+    ^Extras(/yui/build/yahoo-dom-event/yahoo-dom-event.js);
+    ^Extras(/yui/build/json/json-min.js);
+    ^Extras(/yui/build/connection/connection-min.js);
+    ^Extras(/underscore/underscore-min.js);
+    ^Extras(/shop/cart.js);
 
+7.10.11
   * Default View Thing Data Template - templates/thingy-default-view-thing
     Change how the title is rendered.  If no fields are set to be displayed in the title, show the internationalized word View.
     If fields are set, then display the viewScreenTitle variable instead.

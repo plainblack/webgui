@@ -3,6 +3,7 @@
  - fixed #12075: Underground Style - Search does not search
  - fixed #12084: Greenportal links are sometimes white on white
  - rfe   #618:   Syndicated Content Asset: Make images in the downloaded RSS-feeds available in the template.
+ - fixed #12086: Shop Billing Address Unpopulated
 
 7.10.12
  - fixed #12072: Product, related and accessory assets
