@@ -93,7 +93,7 @@ my @ldapTests = (
 );
 
 
-plan tests => (172 + (scalar(@scratchTests) * 2) + scalar(@ipTests)); # increment this value for each test you create
+plan tests => (173 + (scalar(@scratchTests) * 2) + scalar(@ipTests)); # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 my $testCache = WebGUI::Cache->new($session, 'myTestKey');
@@ -123,6 +123,8 @@ foreach my $gid ('new', '') {
 
 	$g->delete;
 }
+
+is(WebGUI::Group->new($session, 'neverAGroupId'), undef, 'calling new with a non-existant groupId returns undef');
 
 my $g = WebGUI::Group->new($session, "new");
 
