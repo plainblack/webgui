@@ -8,6 +8,7 @@
  - fixed #12081: addrees not in addressbook after user change in session
  - fixed #12089: Cannot refund item in transaction if the sku no longer exists.
  - rfe   #12085: Export Related Story Topics
+ - fixed #12076: Paginator shows no results with cached page index
 
 7.10.12
  - fixed #12072: Product, related and accessory assets
