@@ -510,6 +510,7 @@ SKIP: {
 
     my $testTemplate = $root->addChild({
         className => 'WebGUI::Asset::Template',
+        parser    => 'WebGUI::Asset::Template::HTMLTemplate',
         template  => q|{ "noViewableSkus":"<tmpl_var noViewableSkus>","emptyShelf":"<tmpl_var emptyShelf>"}|,
     });
     my $testShelf = $root->addChild({

@@ -53,6 +53,7 @@ skip "Unable to load module $class", $tests unless $loaded;
 my $defaultNode = WebGUI::Asset->getDefault($session);
 my $template = $defaultNode->addChild({
     className => 'WebGUI::Asset::Template',
+    parser    => 'WebGUI::Asset::Template::HTMLTemplate',
     title     => 'test poll template',
     template  => q|
 {
