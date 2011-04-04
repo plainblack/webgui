@@ -27,7 +27,10 @@ sub getClassSelectBox {
     );
     delete $classes{"WebGUI::Asset"}; # don't want to search for the root asset
 
-    my $className = $session->form->process("class","className") || $session->scratch->get('assetManagerSearchClassName');
+    #my $className = $session->form->process("class","className") || $session->scratch->get('assetManagerSearchClassName');
+    my $className = $session->form->get('action') ? $session->form->process('class', "className")
+                  : $session->scratch->get('assetManagerSearchPageNumber')
+                  ;
     $session->scratch->set('assetManagerSearchClassName', $className);
     return WebGUI::Form::selectBox( $session, {
         name            => "class",
@@ -145,7 +148,12 @@ sub getSearchPaginator {
         $queryString    .= ';class=' . $class;
     }
 
-    my $pageNumber  = $session->form->get('pn') || $session->scratch->get('assetManagerSearchPageNumber');
+    ##If the form was submitted, we always use page #1.  Otherwise, take the page # from the
+    ##form or from the scratch variable.
+    my $pageNumber  = $session->form->get('action') ? 1
+                    : $session->form->get('pn')     ? $session->form->get('pn') 
+                    : $session->scratch->get('assetManagerSearchPageNumber')
+                    ;
     my $p           = $s->getPaginatorResultSet( $session->url->page( $queryString ), undef, $pageNumber );
 
     $session->scratch->set('assetManagerSearchPageNumber', $pageNumber);

@@ -2,6 +2,7 @@
  - fixed #12086: Shop Billing Address Unpopulated
  - fixed #12081: addrees not in addressbook after user change in session
  - fixed #12089: Cannot refund item in transaction if the sku no longer exists.
+ - fixed #12076: Paginator shows no results with cached page index
 
 7.9.25
  - fixed #12075: Underground Style - Search does not search
