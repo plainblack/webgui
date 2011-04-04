@@ -35,7 +35,7 @@ my @threads = (
         className       => 'WebGUI::Asset::Post::Thread',
         status          => 'archived',
         title           => 'Archived',
-    }, undef, undef, { skipAutoCommitWorkflows => 1 }),
+    }, undef, undef, { skipAutoCommitWorkflows => 1, skipNotification => 1 }),
 );
 
 my $tag = WebGUI::VersionTag->getWorking( $session );

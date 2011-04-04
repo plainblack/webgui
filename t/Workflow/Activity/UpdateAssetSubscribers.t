@@ -41,7 +41,7 @@ my $cs = $root->addChild({
 });
 my $tag = WebGUI::VersionTag->getWorking($session);
 $tag->commit;
-WebGUI::Test->addToCleanup($tag, $subscriberGroup, $betterGroup, $oldUser, $betterUser, $otherUser);
+WebGUI::Test->addToCleanup($tag, $oldGroup, $subscriberGroup, $betterGroup, $oldUser, $betterUser, $otherUser);
 
 $subscriberGroup->addUsers([$oldUser->getId, $betterUser->getId, ]);
 $betterGroup->addUsers([$betterUser->getId, ]);

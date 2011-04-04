@@ -214,20 +214,22 @@ my $process = Test::MockObject::Extends->new( 'WebGUI::Fork' );
 $process->mock( "update" => sub { } ); # do nothing on update. we don't care
 $process->mock( "session" => sub { return $session } );
 
+
 # Try with a Collaboration and some Threads
 my $tag = WebGUI::VersionTag->getWorking( $session );
+WebGUI::Test->addToCleanup($tag);
 my $collab = $tempspace->addChild({
     className => 'WebGUI::Asset::Wobject::Collaboration',
     groupIdEdit => "3",
     status => "pending",
     tagId => $tag->getId,
-});
+}, undef, undef, { skipAutoCommitWorkflows => 1, skipNotification => 1 });
 my $thread = $collab->addChild({
     className => 'WebGUI::Asset::Post::Thread',
     groupIdEdit => "3",
     status => "pending",
     tagId => $tag->getId,
-}, undef, undef, { skipAutoCommitWorkflows => 1 });
+}, undef, undef, { skipAutoCommitWorkflows => 1, skipNotification => 1 });
 $tag->commit;
 $thread->cut;
 WebGUI::Asset::pasteInFork( $process, { assetId => $collab->getId, list => [ $thread->getId ] } );

@@ -124,7 +124,6 @@ cmp_deeply(
 my $newRev  = $asset->addRevision( { groupIdView => '7' }, time + 8 );
 WebGUI::Test::addToCleanup( WebGUI::VersionTag->getWorking( $session ) );
 is( $newRev->getStorageLocation->getFileContentsAsScalar('.wgaccess'), undef, "wgaccess doesn't exist" );
-note( @{ $newRev->getStorageLocation->getFiles() } );
 
 #----------------------------------------------------------------------------
 # commit on new revision trashes old revision
