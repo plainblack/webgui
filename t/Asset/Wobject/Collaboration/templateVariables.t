@@ -54,7 +54,7 @@ my @threads = (
 $_->setSkipNotification for @threads; # 100+ messages later...
 my $versionTag = WebGUI::VersionTag->getWorking( $session );
 $versionTag->commit;
-addToCleanup($versionTag);
+WebGUI::Test->addToCleanup($versionTag);
 
 my $templateVars;
 my $posts;

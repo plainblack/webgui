@@ -191,3 +191,4 @@ $shortcut->publish;
 $page->cut;
 
 is $shortcut->paste($page->getId), 0, 'cannot paste below shortcuts';
+

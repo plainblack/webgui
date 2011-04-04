@@ -418,8 +418,6 @@ isnt($untarStorage->getPath, $tarStorage->getPath, 'untar did not reuse the same
 $tarStorage->addFileFromFilesystem(WebGUI::Test->getTestCollateralPath('extensions.tar'));
 my $extensionStorage = $tarStorage->untar('extensions.tar');
 WebGUI::Test->addToCleanup($extensionStorage);
-use Data::Dumper;
-diag Dumper $extensionStorage->getFiles;
 cmp_bag(
     $extensionStorage->getFiles, 
     [ qw{ extension_pm.txt extension_perl.txt extension_html.txt extensions extensions/extension_html.txt }], 
