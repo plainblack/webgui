@@ -10,6 +10,7 @@
  - rfe   #12085: Export Related Story Topics
  - fixed #12076: Paginator shows no results with cached page index
  - fixed #12087: Extend WebGUI tests to check template attachments
+ - fixed #12091: Survey Statistical Overview display
 
 7.10.12
  - fixed #12072: Product, related and accessory assets
