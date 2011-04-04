@@ -1020,8 +1020,8 @@ Refunds a specific item from a transaction and then issues shop credit.
 sub www_refundItem {
     my ($class, $session) = @_;
     return $session->privilege->insufficient unless (WebGUI::Shop::Admin->new($session)->canManage);
-    my $self = $class->new($session, $session->form->get("transactionId"));
     my $form = $session->form;
+    my $self = $class->new($session, $form->get("transactionId"));
     my $item = eval { $self->getItem($form->get("itemId")) };
     if (WebGUI::Error->caught()) {
         $session->errorHandler->error("Can't get item ".$form->get("itemId"));

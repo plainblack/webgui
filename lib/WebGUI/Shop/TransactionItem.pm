@@ -145,15 +145,20 @@ sub getSku {
 
 =head2 issueCredit ( )
 
-Returns the money from this item to the user in the form of in-store credit.
+Returns the money from this item to the user in the form of in-store credit.  Items marked
+cancelled cannot be refunded.
 
 =cut
 
 sub issueCredit {
     my $self = shift;
+    return if $self->get('orderStatus') eq 'Cancelled';
+    return unless $self->transaction->isSuccessful;
     my $credit = WebGUI::Shop::Credit->new($self->transaction->session, $self->transaction->get('userId'));
     $credit->adjust(($self->get('price') * $self->get('quantity')), "Issued credit on sku ".$self->get('assetId')." for transaction item ".$self->getId." on transaction ".$self->transaction->getId);
-    $self->getSku->onRefund($self);
+    if (my $sku = eval {$self->getSku}) {
+        $sku->onRefund($self);
+    }
     $self->update({orderStatus=>'Cancelled'});
 }
 
