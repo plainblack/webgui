@@ -2590,6 +2590,21 @@ sub purgeCache {
 
 #-------------------------------------------------------------------
 
+=head2 refused ( )
+
+Returns an error message to the user, wrapped in the user's style.  This is most useful for
+handling UI errors.  Privilege errors should be still be sent to $session->privilege.
+
+=cut
+
+sub refused {
+	my ($self) = @_;
+	return $self->{_session};
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 session ( )
 
 Returns a reference to the current session.

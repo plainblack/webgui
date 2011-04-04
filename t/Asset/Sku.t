@@ -30,7 +30,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 21;        # Increment this number for each test you create
+plan tests => 22;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -83,5 +83,14 @@ $item->cart->delete;
 
 my $loadSku = WebGUI::Asset::Sku->newBySku($session, $sku->get("sku"));
 is($loadSku->getId, $sku->getId, "newBySku() works.");
+
+{
+    ##Check to see that calling onRefund does not call onCancelRecurring for a default, non-recurring sku.
+    use Monkey::Patch qw/:all/;
+    my $messageAdded = 0;
+    my $monkey = patch_object $sku => 'onCancelRecurring' => sub { $messageAdded = 1; };
+    $sku->onRefund;
+    ok !$messageAdded, 'onRefund did not call onCancelRecurring';
+}
 
 1;

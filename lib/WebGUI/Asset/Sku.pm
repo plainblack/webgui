@@ -564,7 +564,9 @@ The WebGUI::Shop::TransactionItem being refunded.
 
 sub onRefund {
 	my ($self, $item) = @_;
-	$self->onCancelRecurring($item);
+    if ($self->isRecurring) {
+        $self->onCancelRecurring($item);
+    }
 	return undef;
 }
 
