@@ -142,6 +142,6 @@ sub setupJSONtemplate {
     ]
     }
 EOTMPL
-    my $template = WebGUI::Asset->getImportNode($session)->addChild({className=>'WebGUI::Asset::Template', namespace => 'Shop/MiniCart', template=>$templateBody});
+    my $template = WebGUI::Asset->getImportNode($session)->addChild({className=>'WebGUI::Asset::Template', parser => 'WebGUI::Asset::Template::HTMLTemplate', namespace => 'Shop/MiniCart', template=>$templateBody});
     return $template;
 }

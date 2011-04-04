@@ -160,6 +160,7 @@ sub setupTest {
 	my $properties = {
 		title     => 'GroupAdd test template',
 		className => 'WebGUI::Asset::Template',
+		parser    => 'WebGUI::Asset::Template::HTMLTemplate',
 		url       => 'groupadd-test',
 		namespace => 'Macro/GroupAdd',
 		template  => qq|{"HREF":"<tmpl_var group.url>",\n"LABEL":"<tmpl_var group.text>"}|,

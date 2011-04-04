@@ -254,6 +254,7 @@ sub setupTest {
 	my $properties = {
 		title => 'EditableToggle test template',
 		className => 'WebGUI::Asset::Template',
+		parser    => 'WebGUI::Asset::Template::HTMLTemplate',
 		url => 'editabletoggle-test',
 		namespace => 'Macro/EditableToggle',
 		template => "HREF=<tmpl_var toggle.url>\nLABEL=<tmpl_var toggle.text>",
