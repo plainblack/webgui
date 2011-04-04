@@ -84,7 +84,7 @@ WebGUI::Test->addToCleanup($storage1, $storage2);
 #
 ############################################################
 
-my $tests = 46;
+my $tests = 47;
 plan tests => 1
             + $tests
             + $canEditMaker->plan
@@ -264,6 +264,12 @@ cmp_deeply(
         },
     ],
     'getCrumbTrail: with topic set'
+);
+
+is_deeply(
+    $story->exportGetRelatedAssetIds,
+    [ $topic->getId ],
+    'exportGetRelatedAssetIds',
 );
 
 $story->topic('');

@@ -240,6 +240,26 @@ sub exportAssetData {
 
 #-------------------------------------------------------------------
 
+=head2 exportGetRelatedAssetIds
+
+Overriden to include any topics in which this story would appear.
+
+=cut
+
+sub exportGetRelatedAssetIds {
+    my $self = shift;
+    my $rel  = $self->SUPER::exportGetRelatedAssetIds(@_);
+    push @$rel, @{
+        WebGUI::Keyword->new($self->session)->getMatchingAssets({
+            keywords => WebGUI::Keyword::string2list($self->get('keywords')),
+            isa      => 'WebGUI::Asset::Wobject::StoryTopic',
+        })
+    };
+    return $rel;
+}
+
+#-------------------------------------------------------------------
+
 =head2 formatDuration ( $lastUpdated )
 
 Format the time since this story was last updated.  If it is longer than 1 week, then

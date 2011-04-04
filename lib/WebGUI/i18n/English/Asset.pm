@@ -808,6 +808,15 @@ case of the check box list, then enter one per line.  The total amount of data i
                      context => q|Field label for the Export Page operation|,
                      message => q|Depth|,
                    },
+        'Export Related Assets' => {
+                     lastUpdated => 1301501028,
+                     context => q|Field label for the Export Page operation|,
+                     message => q|Export Related Assets|,
+                   },
+        'Export Related Assets description' => {
+                     lastUpdated => 1301501028,
+                     message => q|Include related assets in export?|,
+                   },
         '964' => {
                    lastUpdated => 1052850265,
                    message => q|Manage system trash.|,

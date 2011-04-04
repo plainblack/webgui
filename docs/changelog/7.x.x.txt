@@ -7,6 +7,7 @@
  - Snippets can now select a template parser (instead of being restricted to the configured default)
  - fixed #12081: addrees not in addressbook after user change in session
  - fixed #12089: Cannot refund item in transaction if the sku no longer exists.
+ - rfe   #12085: Export Related Story Topics
 
 7.10.12
  - fixed #12072: Product, related and accessory assets
