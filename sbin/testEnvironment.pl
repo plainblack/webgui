@@ -62,6 +62,7 @@ if ($] >= 5.008) {
 my $missingModule = 0;
 
 checkModule("LWP",                          5.833        );
+checkModule("HTML::Form",                   5.800,     2 );
 checkModule("Net::DNS",                     0.66,        );
 checkModule("HTTP::Request",                1.40         );
 checkModule("HTTP::Headers",                1.61         );
