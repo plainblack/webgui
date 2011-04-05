@@ -332,6 +332,14 @@ $story->setPhotoData([
         title     => '',
         url       => 'http://www.lamp.com',
     },
+    {
+        remoteUrl => 'http://www.plainblack.com/rockstar.jpg',
+        caption   => 'Elvis',
+        byLine    => 'The King',
+        alt       => '(impersonator)',
+        title     => 'Rockstar Support',
+        url       => 'http://plainblack.com/services/support/rockstar-support',
+    },
 ]);
 
 
@@ -362,6 +370,15 @@ cmp_bag(
 
 is ($viewVariables->{updatedTimeEpoch}, $story->get('revisionDate'), 'viewTemplateVariables: updatedTimeEpoch');
 
+my $rockstarVar = {
+    imageUrl     => 'http://www.plainblack.com/rockstar.jpg',
+    imageCaption => 'Elvis',
+    imageByline  => 'The King',
+    imageAlt     => '(impersonator)',
+    imageTitle   => 'Rockstar Support',
+    imageLink    => 'http://plainblack.com/services/support/rockstar-support',
+};
+
 cmp_deeply(
     $viewVariables->{photo_loop},
     [
@@ -381,6 +398,7 @@ cmp_deeply(
             imageTitle   => '',
             imageLink    => 'http://www.lamp.com',
         },
+        $rockstarVar,
     ],
     'viewTemplateVariables: photo_loop is okay'
 );
@@ -389,20 +407,14 @@ ok(! $viewVariables->{singlePhoto}, 'viewVariables: singlePhoto: there is more t
 ok(  $viewVariables->{hasPhotos},   'viewVariables: hasPhotos: it has photos');
 
 ##Simulate someone deleting the file stored in the storage object.
+$storage1->deleteFile('gooey.jpg');
 $storage2->deleteFile('lamp.jpg');
 $viewVariables = $story->viewTemplateVariables;
 
 cmp_deeply(
     $viewVariables->{photo_loop},
     [
-        {
-            imageUrl     => re('gooey.jpg'),
-            imageCaption => 'Mascot for a popular CMS',
-            imageByline  => 'Darcy Gibson',
-            imageAlt     => 'Gooey',
-            imageTitle   => 'Mascot',
-            imageLink    => 'http://www.webgui.org',
-        },
+        $rockstarVar,
     ],
     'viewTemplateVariables: photo_loop: if the storage has no files, it is not shown'
 );

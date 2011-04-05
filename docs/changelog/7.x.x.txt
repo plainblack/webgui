@@ -1,5 +1,6 @@
 7.10.14
  - fixed #12094: Cannot enter in Macros in URLs inside TinyMCE.
+ - rfe   #12093: Remotely stored photos for Story assets
 
 7.10.13
  - added #12079: Carousel Auto Play

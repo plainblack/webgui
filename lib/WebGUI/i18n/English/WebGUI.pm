@@ -290,6 +290,11 @@ our $I18N = {
 		lastUpdated => 1065356764
 	},
 
+    'or' => {
+        message => q|or|,
+		lastUpdated => 1053804577,
+    },
+
 	'978' => {
 		message => q|User added successfully.|,
 		lastUpdated => 1053804577
