@@ -44,7 +44,7 @@ PerlRequire /data/WebGUI/sbin/preload.perl
    mysql -e "create database WebGUI"
    mysql -e "grant all privileges on WebGUI.* to webgui@localhost identified by 'password'"
    mysql -e "flush privileges"
-   mysql -uwebgui -ppassword WebGUI < docs/create.sql
+   mysql -uwebgui -ppassword WebGUI < share/create.sql
 
 8. Edit "etc/WebGUI.conf" to match your DB settings and log directory.
 
