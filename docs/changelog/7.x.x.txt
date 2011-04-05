@@ -1,3 +1,5 @@
+7.10.14
+
 7.10.13
  - added #12079: Carousel Auto Play
  - fixed #12075: Underground Style - Search does not search
