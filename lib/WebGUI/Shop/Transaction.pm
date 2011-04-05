@@ -261,7 +261,9 @@ A hash reference with the address properties.
 
 sub formatAddress {
     my ($self, $address) = @_;
-    my $formatted = $address->{name} . "<br />" . $address->{address1} . "<br />";
+    my $formatted = $address->{name} . "<br />";
+    $formatted .= $address->{organization} . "<br />" if ($address->{organization} ne "");
+    $formatted .= $address->{address1} . "<br />";
     $formatted .= $address->{address2} . "<br />" if ($address->{address2} ne "");
     $formatted .= $address->{address3} . "<br />" if ($address->{address3} ne "");
     $formatted .= $address->{city} . ", ";
@@ -415,26 +417,28 @@ sub getTransactionVars {
         taxes                   => sprintf( "%.2f", $self->get('taxes') ),
         shippingPrice           => sprintf( "%.2f", $self->get('shippingPrice') ),
         shippingAddress         => $self->formatAddress( {
-            name        => $self->get('shippingAddressName'),
-            address1    => $self->get('shippingAddress1'),
-            address2    => $self->get('shippingAddress2'),
-            address3    => $self->get('shippingAddress3'),
-            city        => $self->get('shippingCity'),
-            state       => $self->get('shippingState'),
-            code        => $self->get('shippingCode'),
-            country     => $self->get('shippingCountry'),
-            phoneNumber => $self->get('shippingPhoneNumber'),
+            name         => $self->get('shippingAddressName'),
+            organization => $self->get('shippingOrganization'),
+            address1     => $self->get('shippingAddress1'),
+            address2     => $self->get('shippingAddress2'),
+            address3     => $self->get('shippingAddress3'),
+            city         => $self->get('shippingCity'),
+            state        => $self->get('shippingState'),
+            code         => $self->get('shippingCode'),
+            country      => $self->get('shippingCountry'),
+            phoneNumber  => $self->get('shippingPhoneNumber'),
         } ),
         paymentAddress          =>  $self->formatAddress({
-            name        => $self->get('paymentAddressName'),
-            address1    => $self->get('paymentAddress1'),
-            address2    => $self->get('paymentAddress2'),
-            address3    => $self->get('paymentAddress3'),
-            city        => $self->get('paymentCity'),
-            state       => $self->get('paymentState'),
-            code        => $self->get('paymentCode'),
-            country     => $self->get('paymentCountry'),
-            phoneNumber => $self->get('paymentPhoneNumber'),
+            name         => $self->get('paymentAddressName'),
+            organization => $self->get('paymentOrganization'),
+            address1     => $self->get('paymentAddress1'),
+            address2     => $self->get('paymentAddress2'),
+            address3     => $self->get('paymentAddress3'),
+            city         => $self->get('paymentCity'),
+            state        => $self->get('paymentState'),
+            code         => $self->get('paymentCode'),
+            country      => $self->get('paymentCountry'),
+            phoneNumber  => $self->get('paymentPhoneNumber'),
         } ),
     };
     
@@ -444,15 +448,16 @@ sub getTransactionVars {
         my $address = '';
         if ($self->get('shippingAddressId') ne $item->get('shippingAddressId')) {
             $address = $self->formatAddress({
-                            name        => $item->get('shippingAddressName'),
-                            address1    => $item->get('shippingAddress1'),
-                            address2    => $item->get('shippingAddress2'),
-                            address3    => $item->get('shippingAddress3'),
-                            city        => $item->get('shippingCity'),
-                            state       => $item->get('shippingState'),
-                            code        => $item->get('shippingCode'),
-                            country     => $item->get('shippingCountry'),
-                            phoneNumber => $item->get('shippingPhoneNumber'),
+                            name         => $item->get('shippingAddressName'),
+                            organization => $self->get('shippingOrganization'),
+                            address1     => $item->get('shippingAddress1'),
+                            address2     => $item->get('shippingAddress2'),
+                            address3     => $item->get('shippingAddress3'),
+                            city         => $item->get('shippingCity'),
+                            state        => $item->get('shippingState'),
+                            code         => $item->get('shippingCode'),
+                            country      => $item->get('shippingCountry'),
+                            phoneNumber  => $item->get('shippingPhoneNumber'),
                             });
         }
  
@@ -747,28 +752,30 @@ sub update {
         $newProperties->{taxes} = $cart->calculateTaxes;
 
         my $billingAddress = $cart->getBillingAddress;
-        $newProperties->{paymentAddressId}   = $billingAddress->getId;
-        $newProperties->{paymentAddressName} = $billingAddress->get('firstName') . " " . $billingAddress->get('lastName');
-        $newProperties->{paymentAddress1}    = $billingAddress->get('address1');
-        $newProperties->{paymentAddress2}    = $billingAddress->get('address2');
-        $newProperties->{paymentAddress3}    = $billingAddress->get('address3');
-        $newProperties->{paymentCity}        = $billingAddress->get('city');
-        $newProperties->{paymentState}       = $billingAddress->get('state');
-        $newProperties->{paymentCountry}     = $billingAddress->get('country');
-        $newProperties->{paymentCode}        = $billingAddress->get('code');
-        $newProperties->{paymentPhoneNumber} = $billingAddress->get('phoneNumber');
+        $newProperties->{paymentAddressId}    = $billingAddress->getId;
+        $newProperties->{paymentAddressName}  = $billingAddress->get('firstName') . " " . $billingAddress->get('lastName');
+        $newProperties->{paymentOrganization} = $billingAddress->get('organization');
+        $newProperties->{paymentAddress1}     = $billingAddress->get('address1');
+        $newProperties->{paymentAddress2}     = $billingAddress->get('address2');
+        $newProperties->{paymentAddress3}     = $billingAddress->get('address3');
+        $newProperties->{paymentCity}         = $billingAddress->get('city');
+        $newProperties->{paymentState}        = $billingAddress->get('state');
+        $newProperties->{paymentCountry}      = $billingAddress->get('country');
+        $newProperties->{paymentCode}         = $billingAddress->get('code');
+        $newProperties->{paymentPhoneNumber}  = $billingAddress->get('phoneNumber');
 
         my $shippingAddress = $cart->getShippingAddress;
-        $newProperties->{shippingAddressId}   = $shippingAddress->getId;
-        $newProperties->{shippingAddressName} = $shippingAddress->get('firstName') . " " . $shippingAddress->get('lastName');
-        $newProperties->{shippingAddress1}    = $shippingAddress->get('address1');
-        $newProperties->{shippingAddress2}    = $shippingAddress->get('address2');
-        $newProperties->{shippingAddress3}    = $shippingAddress->get('address3');
-        $newProperties->{shippingCity}        = $shippingAddress->get('city');
-        $newProperties->{shippingState}       = $shippingAddress->get('state');
-        $newProperties->{shippingCountry}     = $shippingAddress->get('country');
-        $newProperties->{shippingCode}        = $shippingAddress->get('code');
-        $newProperties->{shippingPhoneNumber} = $shippingAddress->get('phoneNumber');
+        $newProperties->{shippingAddressId}    = $shippingAddress->getId;
+        $newProperties->{shippingAddressName}  = $shippingAddress->get('firstName') . " " . $shippingAddress->get('lastName');
+        $newProperties->{shippingOrganization} = $shippingAddress->get('organization');
+        $newProperties->{shippingAddress1}     = $shippingAddress->get('address1');
+        $newProperties->{shippingAddress2}     = $shippingAddress->get('address2');
+        $newProperties->{shippingAddress3}     = $shippingAddress->get('address3');
+        $newProperties->{shippingCity}         = $shippingAddress->get('city');
+        $newProperties->{shippingState}        = $shippingAddress->get('state');
+        $newProperties->{shippingCountry}      = $shippingAddress->get('country');
+        $newProperties->{shippingCode}         = $shippingAddress->get('code');
+        $newProperties->{shippingPhoneNumber}  = $shippingAddress->get('phoneNumber');
 
         if ($cart->requiresShipping) {
             my $shipper = $cart->getShipper;
@@ -803,7 +810,8 @@ sub update {
         shippingCountry shippingCode shippingPhoneNumber shippingDriverId shippingDriverLabel notes
         shippingPrice paymentAddressId paymentAddressName originatingTransactionId isRecurring
         paymentAddress1 paymentAddress2 paymentAddress3 paymentCity paymentState paymentCountry paymentCode
-        paymentPhoneNumber paymentDriverId paymentDriverLabel taxes shopCreditDeduction));
+        paymentPhoneNumber paymentDriverId paymentDriverLabel taxes shopCreditDeduction
+        shippingOrganization paymentOrganization));
     foreach my $field (@fields) {
         $properties{$id}{$field} = (exists $newProperties->{$field}) ? $newProperties->{$field} : $properties{$id}{$field};
     }
@@ -1125,15 +1133,16 @@ sub www_view {
             </tr>
             <tr>
                 <th>}. $i18n->get("shipping address") .q{</th><td>}. $transaction->formatAddress({
-                        name        => $transaction->get('shippingAddressName'),
-                        address1    => $transaction->get('shippingAddress1'),
-                        address2    => $transaction->get('shippingAddress2'),
-                        address3    => $transaction->get('shippingAddress3'),
-                        city        => $transaction->get('shippingCity'),
-                        state       => $transaction->get('shippingState'),
-                        code        => $transaction->get('shippingCode'),
-                        country     => $transaction->get('shippingCountry'),
-                        phoneNumber => $transaction->get('shippingPhoneNumber'),
+                        name         => $transaction->get('shippingAddressName'),
+                        organization => $transaction->get('shippingOrganization'),
+                        address1     => $transaction->get('shippingAddress1'),
+                        address2     => $transaction->get('shippingAddress2'),
+                        address3     => $transaction->get('shippingAddress3'),
+                        city         => $transaction->get('shippingCity'),
+                        state        => $transaction->get('shippingState'),
+                        code         => $transaction->get('shippingCode'),
+                        country      => $transaction->get('shippingCountry'),
+                        phoneNumber  => $transaction->get('shippingPhoneNumber'),
                         }) .q{</td>
             </tr>
             <tr>
@@ -1144,15 +1153,16 @@ sub www_view {
             </tr>
             <tr>
                 <th>}. $i18n->get("payment address") .q{</th><td>}. $transaction->formatAddress({
-                        name        => $transaction->get('paymentAddressName'),
-                        address1    => $transaction->get('paymentAddress1'),
-                        address2    => $transaction->get('paymentAddress2'),
-                        address3    => $transaction->get('paymentAddress3'),
-                        city        => $transaction->get('paymentCity'),
-                        state       => $transaction->get('paymentState'),
-                        code        => $transaction->get('paymentCode'),
-                        country     => $transaction->get('paymentCountry'),
-                        phoneNumber => $transaction->get('paymentPhoneNumber'),
+                        name         => $transaction->get('paymentAddressName'),
+                        organization => $transaction->get('paymentOrganization'),
+                        address1     => $transaction->get('paymentAddress1'),
+                        address2     => $transaction->get('paymentAddress2'),
+                        address3     => $transaction->get('paymentAddress3'),
+                        city         => $transaction->get('paymentCity'),
+                        state        => $transaction->get('paymentState'),
+                        code         => $transaction->get('paymentCode'),
+                        country      => $transaction->get('paymentCountry'),
+                        phoneNumber  => $transaction->get('paymentPhoneNumber'),
                         }) .q{</td>
             </tr>
         </table>
@@ -1195,15 +1205,16 @@ sub www_view {
         else {
             $output .= q{
                 <td class="smallAddress">}. $transaction->formatAddress({
-                            name        => $item->get('shippingAddressName'),
-                            address1    => $item->get('shippingAddress1'),
-                            address2    => $item->get('shippingAddress2'),
-                            address3    => $item->get('shippingAddress3'),
-                            city        => $item->get('shippingCity'),
-                            state       => $item->get('shippingState'),
-                            code        => $item->get('shippingCode'),
-                            country     => $item->get('shippingCountry'),
-                            phoneNumber => $item->get('shippingPhoneNumber'),
+                            name         => $item->get('shippingAddressName'),
+                            organization => $item->get('shippingOrganization'),
+                            address1     => $item->get('shippingAddress1'),
+                            address2     => $item->get('shippingAddress2'),
+                            address3     => $item->get('shippingAddress3'),
+                            city         => $item->get('shippingCity'),
+                            state        => $item->get('shippingState'),
+                            code         => $item->get('shippingCode'),
+                            country      => $item->get('shippingCountry'),
+                            phoneNumber  => $item->get('shippingPhoneNumber'),
                             }) .q{</td>
             };
         }
