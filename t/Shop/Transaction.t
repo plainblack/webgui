@@ -18,6 +18,7 @@ use strict;
 use lib "$FindBin::Bin/../lib";
 use Test::More;
 use Test::Deep;
+use Test::LongString;
 use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
 use WebGUI::Shop::Transaction;
@@ -32,39 +33,41 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 77;        # Increment this number for each test you create
+plan tests => 83;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # put your tests here
 
 my $transaction = WebGUI::Shop::Transaction->create($session,{
-    amount              => 40,
-    shippingAddressId   => 'xxx1',
-    shippingAddressName => 'abc',
-    shippingAddress1    => 'def',
-    shippingAddress2    => 'hij',
-    shippingAddress3    => 'lmn',
-    shippingCity        => 'opq',
-    shippingState       => 'wxy',
-    shippingCountry     => 'z',
-    shippingCode        => '53333',
-    shippingPhoneNumber => '123456',
-    shippingDriverId    => 'xxx2',
-    shippingDriverLabel => 'foo',
-    shippingPrice       => 5,
-    paymentAddressId    => 'xxx3',
-    paymentAddressName  => 'abc1',
-    paymentAddress1     => 'def1',
-    paymentAddress2     => 'hij1',
-    paymentAddress3     => 'lmn1',
-    paymentCity         => 'opq1',
-    paymentState        => 'wxy1',
-    paymentCountry      => 'z1',
-    paymentCode         => '66666',
-    paymentPhoneNumber  => '908765',
-    paymentDriverId     => 'xxx4',
-    paymentDriverLabel  => 'kkk',
-    taxes               => 7,
+    amount               => 40,
+    shippingAddressId    => 'xxx1',
+    shippingAddressName  => 'abc',
+    shippingOrganization => 'Ship To Us',
+    shippingAddress1     => 'def',
+    shippingAddress2     => 'hij',
+    shippingAddress3     => 'lmn',
+    shippingCity         => 'opq',
+    shippingState        => 'wxy',
+    shippingCountry      => 'z',
+    shippingCode         => '53333',
+    shippingPhoneNumber  => '123456',
+    shippingDriverId     => 'xxx2',
+    shippingDriverLabel  => 'foo',
+    shippingPrice        => 5,
+    paymentAddressId     => 'xxx3',
+    paymentAddressName   => 'abc1',
+    paymentOrganization  => 'Pay To Us',
+    paymentAddress1      => 'def1',
+    paymentAddress2      => 'hij1',
+    paymentAddress3      => 'lmn1',
+    paymentCity          => 'opq1',
+    paymentState         => 'wxy1',
+    paymentCountry       => 'z1',
+    paymentCode          => '66666',
+    paymentPhoneNumber   => '908765',
+    paymentDriverId      => 'xxx4',
+    paymentDriverLabel   => 'kkk',
+    taxes                => 7,
     });
 addToCleanup($transaction);
 
@@ -76,6 +79,7 @@ isa_ok($transaction->session, "WebGUI::Session");
 # basic transaction properties
 is($transaction->get("amount"), 40, "set and get amount");
 is($transaction->get("shippingAddressId"), 'xxx1', "set and get shipping address id");
+is($transaction->get("shippingOrganization"), 'Ship To Us', "set and get shipping organization");
 is($transaction->get("shippingAddressName"), 'abc', "set and get shipping address name");
 is($transaction->get("shippingAddress1"), 'def', "set and get shipping address 1");
 is($transaction->get("shippingAddress2"), 'hij', "set and get shipping address 2");
@@ -90,6 +94,7 @@ is($transaction->get("shippingDriverLabel"), 'foo', "set and get shipping driver
 is($transaction->get("shippingPrice"), 5, "set and get shipping price");
 is($transaction->get("paymentAddressId"), 'xxx3', "set and get payment address id");
 is($transaction->get("paymentAddressName"), 'abc1', "set and get payment address name");
+is($transaction->get("paymentOrganization"), 'Pay To Us', "set and get payment organization");
 is($transaction->get("paymentAddress1"), 'def1', "set and get payment address 1");
 is($transaction->get("paymentAddress2"), 'hij1', "set and get payment address 2");
 is($transaction->get("paymentAddress3"), 'lmn1', "set and get payment address 3");
@@ -128,6 +133,7 @@ my $item = $transaction->addItem({
     assetId                 => 'a',
     configuredTitle         => 'b',
     options                 => {color=>'blue'},
+    shippingOrganization    => 'organized',
     shippingAddressId       => 'c',
     shippingName            => 'd',
     shippingAddress1        => 'e',
@@ -162,6 +168,7 @@ is($item->get("shippingPhoneNumber"), 'l', "set and get shipping phone number");
 is($item->get("quantity"), 5, "set and get quantity");
 is($item->get("price"), 33,  "set and get price");
 is($item->get('taxRate'), 19, 'set and get taxRate' );
+is($item->get('shippingOrganization'), 'organized', 'set and get shipping organization' );
 
 $item->update({
     shippingTrackingNumber  => 'adfs',
@@ -282,6 +289,50 @@ $session->setting->set('shopReceiptEmailTemplateId', $templateId);
     like($templateVars[1]->{viewDetailUrl}, qr/shop=transaction;method=view;/  , '... viewDetailUrl okay for admin');
     WebGUI::Test->unmockAssetId($templateId);
 }
+
+#######################################################################
+#
+# formatAddress
+#
+#######################################################################
+
+my $formattedAddress = $transaction->formatAddress({
+    name        => 'Red',
+    address1    => 'Cell Block #5',
+    city        => 'Shawshank',
+    state       => 'MN',
+    code        => 55555,
+    country     => 'USA',
+    phoneNumber => '555.555.5555',
+});
+
+is_string $formattedAddress, 'Red<br />Cell Block #5<br />Shawshank, MN 55555<br />USA<br />555.555.5555', 'formatAddress: a regular address';
+
+my $formattedAddress = $transaction->formatAddress({
+    name        => 'Red',
+    address1    => 'Cell Block #5',
+    address2    => 'Next to Andy',
+    city        => 'Shawshank',
+    state       => 'MN',
+    code        => 55555,
+    country     => 'USA',
+    phoneNumber => '555.555.5555',
+});
+
+is_string $formattedAddress, 'Red<br />Cell Block #5<br />Next to Andy<br />Shawshank, MN 55555<br />USA<br />555.555.5555', '... a regular address with address2';
+
+my $formattedAddress = $transaction->formatAddress({
+    name         => 'Red',
+    organization => 'Shawshank Prison',
+    address1     => 'Cell Block #5',
+    city         => 'Shawshank',
+    state        => 'MN',
+    code         => 55555,
+    country      => 'USA',
+    phoneNumber  => '555.555.5555',
+});
+
+is_string $formattedAddress, 'Red<br />Shawshank Prison<br />Cell Block #5<br />Shawshank, MN 55555<br />USA<br />555.555.5555', '... a regular address with address2';
 
 #######################################################################
 #

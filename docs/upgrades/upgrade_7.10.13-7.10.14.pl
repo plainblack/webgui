@@ -31,6 +31,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+addOrganizationsToTransaction($session);
 
 finish($session); # this line required
 
@@ -44,6 +45,18 @@ finish($session); # this line required
 #    print "DONE!\n" unless $quiet;
 #}
 
+
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub addOrganizationsToTransaction {
+    my $session = shift;
+    print "\tAdd organization fields to the addresses stored in the Transaction and TransactionItem... " unless $quiet;
+    # and here's our code
+    $session->db->write('ALTER TABLE transaction     ADD COLUMN shippingOrganization CHAR(35)');
+    $session->db->write('ALTER TABLE transaction     ADD COLUMN paymentOrganization CHAR(35)');
+    $session->db->write('ALTER TABLE transactionItem ADD COLUMN shippingOrganization CHAR(35)');
+    print "DONE!\n" unless $quiet;
+}
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
 
