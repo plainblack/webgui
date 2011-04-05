@@ -69,7 +69,7 @@ sub import {
     $class->$import({ into_level => 1 });
     warnings->unimport('uninitialized');
     feature->import(':5.10');
-    #namespace::autoclean->import( -cleanee => $caller );
+    namespace::autoclean->import( -cleanee => $caller );
     return 1;
 }
 
