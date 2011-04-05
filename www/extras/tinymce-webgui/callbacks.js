@@ -5,15 +5,13 @@
         colon      = /%3B/g,
         leftParen  = /%28/g,
         rightParen = /%29/g,
-        front      = /^.*(\^.*)$/,
         quot       = /&quot;/g;
 
     function convert(url) {
         return url.replace(carat, '^')
             .replace(colon, ':')
             .replace(leftParen, '(')
-            .replace(rightParen, ')')
-            .replace(front, '$1');
+            .replace(rightParen, ')');
     }
 
     function recurse(el) {

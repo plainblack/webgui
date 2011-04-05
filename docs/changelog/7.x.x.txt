@@ -5,6 +5,7 @@
  - fixed #12076: Paginator shows no results with cached page index
  - fixed #12087: Extend WebGUI tests to check template attachments
  - fixed #12091: Survey Statistical Overview display
+ - fixed #12094: Cannot enter in Macros in URLs inside TinyMCE.
 
 7.9.25
  - fixed #12075: Underground Style - Search does not search
