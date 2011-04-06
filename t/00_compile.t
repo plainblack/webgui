@@ -26,7 +26,7 @@ my $wgLib = catdir($wgRoot, 'lib');
 unshift @INC, $wgLib;
 
 my @modules = findModules($wgLib);
-my @scripts = findScripts(catdir($wgRoot, 'docs', 'upgrades'), catdir($wgRoot, 'sbin'));
+my @scripts = findScripts(catdir($wgRoot, 'sbin'), catdir($wgRoot, 'share', 'upgrades', '*'));
 
 plan tests => 2 * (scalar @modules + scalar @scripts);
 my $failed_compile = 0;
@@ -75,6 +75,8 @@ for my $script (@scripts) {
     local $SIG{__WARN__} = sub {
         $warnings .= shift;
     };
+    # upgrade scripts need a version defined to be able to compile
+    local $ENV{WEBGUI_UPGRADE_VERSION} = '8.0.0';
     eval $to_compile;
     chomp $warnings;
     is($@, '', "$short_name compiles successfully");
