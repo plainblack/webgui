@@ -16,6 +16,7 @@ use FindBin;
 use strict;
 use lib "$FindBin::Bin/../lib";
 use Test::More;
+use Monkey::Patch qw(patch_class);
 use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::PseudoRequest;
 
@@ -29,6 +30,7 @@ use File::Path;
 use File::Temp qw/tempfile tempdir/;
 use Path::Class;
 use Test::Deep;
+use Scope::Guard qw(guard);
 
 #----------------------------------------------------------------------------
 # Init
@@ -41,7 +43,7 @@ WebGUI::Test->originalConfig('exportPath');
 
 my $testRan = 1;
 
-plan tests => 126;        # Increment this number for each test you create
+plan tests => 128;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # exportCheckPath()
@@ -628,6 +630,34 @@ ok(-e $symlinkedRoot->stringify, 'exportSymlinkRoot sets up link correctly and s
 is(readlink $symlinkedRoot->stringify, $parentPath, 'exportSymlinkRoot sets up link correctly and supplies default index');
 unlink $symlinkedRoot->stringify;
 
+subtest exportRelated => sub {
+    my $old = WebGUI::VersionTag->getWorking($session);
+    my $tag = WebGUI::VersionTag->create($session);
+    $tag->setWorking();
+    my $topic = $parent->addChild({
+        className => 'WebGUI::Asset::Wobject::StoryTopic',
+        keywords  => 'relatedAssetTesting'
+    });
+    my $archive = $parent->addChild({
+        className => 'WebGUI::Asset::Wobject::StoryArchive',
+    });
+    my $story  = $archive->addChild({
+        className => 'WebGUI::Asset::Story',
+        keywords  => 'relatedAssetTesting',
+    });
+    $tag->commit();
+    my $cleanup = guard { $old->setWorking(); $tag->rollback };
+    cmp_deeply(
+        $archive->exportGetAssetIds({ depth => 99, exportRelated => 1}),
+        superbagof(map { $_->getId } ($topic, $archive, $story)),
+        'exporting archive includes topic with exportRelated'
+    );
+    is(0, scalar grep { $_ eq $topic->getId }
+        @{ $archive->exportGetAssetIds({ depth => 99 }) },
+        'but not without exportRelated'
+    );
+};
+
 
 #----------------------------------------------------------------------------
 # exportGetDescendants()
@@ -737,7 +767,22 @@ is($@, "orly? yarly! is not a valid depth", "exportAsHtml throws correct error w
 # the exportPath first to make sure there are no residuals from the tests
 # above.
 $exportPath->rmtree;
-eval { $message = $parent->exportAsHtml( { userId => 3, depth => 99, quiet => 1 } ) };
+eval {
+    my $ret;
+    # We can't just mock the object to test, because exportAsHtml
+    # re-instantiates with a new session.
+    my $patch = patch_class(ref $parent, exportGetAssetIds => sub {
+        my $orig = shift;
+        my $self = shift;
+        $ret = $self->$orig(@_);
+    });
+    $message = $parent->exportAsHtml(
+        { userId => 3, depth => 99, quiet => 1 }
+    );
+    cmp_bag($ret, [map { $_->getId} $parent, $firstChild, $grandChild],
+        'exportAsHtml lets exportGetAssetIds figure out which assets to export.'
+    );
+};
 is($@, '', "exportAsHtml on parent does not throw an error"); ##Note, string comparison
 
 # list of files that should exist. obtained by running previous known working
