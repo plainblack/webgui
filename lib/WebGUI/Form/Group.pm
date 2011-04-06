@@ -155,6 +155,8 @@ sub headTags {
     my $url   = $self->session->url;
 	$style->setLink($url->extras('yui/build/container/assets/skins/sam/container.css'), { rel => 'stylesheet', type => 'text/css' });
 	$style->setLink($url->extras('yui/build/button/assets/skins/sam/button.css'),       { rel => 'stylesheet', type => 'text/css' });
+	$style->setScript($url->extras('yui/build/yahoo/yahoo-min.js'),           { type=>'text/javascript' });
+	$style->setScript($url->extras('yui/build/event/event-min.js'),           { type=>'text/javascript' });
 	$style->setScript($url->extras('yui/build/connection/connection-min.js'), { type=>'text/javascript' });
 	$style->setScript($url->extras('yui/build/element/element-min.js'),       { type=>'text/javascript' });
 	$style->setScript($url->extras('yui/build/button/button-min.js'),         { type=>'text/javascript' });
