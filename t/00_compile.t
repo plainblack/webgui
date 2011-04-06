@@ -37,9 +37,10 @@ foreach my $library (@modules) {
     local $SIG{__WARN__} = sub {
         my $warn = shift;
         # file the warning occurred in
+        my $caller = caller;
         my $warning_file = realpath( (caller(0))[1] );
-        # only care about it if it is within the WebGUI lib directory
-        if ($warning_file =~ /^\Q$wgLib/) {
+        # only care about it if it is within the WebGUI lib directory or is an explicit warning
+        if ($warning_file =~ /^\Q$wgLib/ || $caller eq 'Carp') {
             $warnings .= $warn;
         }
     };
