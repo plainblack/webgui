@@ -21,7 +21,7 @@ use Scalar::Util qw(looks_like_number);
 use WebGUI::International;
 use WebGUI::Exception;
 use WebGUI::Session;
-use URI::URL;
+use URI::URL ();
 use Scope::Guard qw(guard);
 use WebGUI::ProgressTree;
 use WebGUI::FormBuilder;
