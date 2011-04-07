@@ -32,6 +32,7 @@ my $session = start(); # this line required
 
 # upgrade functions go here
 addOrganizationsToTransaction($session);
+removeDuplicateUndergroundStyleTemplates($session);
 
 finish($session); # this line required
 
@@ -57,6 +58,19 @@ sub addOrganizationsToTransaction {
     print "DONE!\n" unless $quiet;
 }
 
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub removeDuplicateUndergroundStyleTemplates {
+    my $session = shift;
+    print "\tRemove duplicate Underground Style templatess that were mistakenly added during the 7.10.13 upgrade... " unless $quiet;
+    # and here's our code
+    ASSETID: foreach my $assetId(qw/IeFioyemW2Ov-hFGFwD75A niYg8Da1sULTQnevZ8wYpw/) {
+        my $asset = WebGUI::Asset->newByDynamicClass($session, $assetId);
+        next ASSETID unless $asset;
+        $asset->purge;  ##Kill it, crush it, grind its bits into dust.
+    }
+    print "DONE!\n" unless $quiet;
+}
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
 
