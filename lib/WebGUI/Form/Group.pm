@@ -153,18 +153,22 @@ sub headTags {
     my $self = shift;
     my $style = $self->session->style;
     my $url   = $self->session->url;
-	$style->setLink($url->extras('yui/build/container/assets/skins/sam/container.css'), { rel => 'stylesheet', type => 'text/css' });
-	$style->setLink($url->extras('yui/build/button/assets/skins/sam/button.css'),       { rel => 'stylesheet', type => 'text/css' });
 	$style->setScript($url->extras('yui/build/yahoo/yahoo-min.js'),           { type=>'text/javascript' });
+	$style->setScript($url->extras('yui/build/dom/dom-min.js'),               { type=>'text/javascript' });
 	$style->setScript($url->extras('yui/build/event/event-min.js'),           { type=>'text/javascript' });
+    $style->setScript($url->extras("yui/build/datasource/datasource-min.js"), {type=>"text/javascript"});
 	$style->setScript($url->extras('yui/build/connection/connection-min.js'), { type=>'text/javascript' });
 	$style->setScript($url->extras('yui/build/element/element-min.js'),       { type=>'text/javascript' });
 	$style->setScript($url->extras('yui/build/button/button-min.js'),         { type=>'text/javascript' });
 	$style->setScript($url->extras('yui/build/container/container-min.js'),   { type=>'text/javascript' });
+    $style->setScript($url->extras("yui/build/autocomplete/autocomplete-min.js"), {type=>"text/javascript"});
 	$style->setScript($url->extras('yui-webgui/build/form/form.js'),          { type=>'text/javascript' });
     $style->setScript($url->extras('yui/build/json/json-min.js'),             {type => 'text/javascript'});
     $style->setScript($url->extras('yui-webgui/build/i18n/i18n.js'),          {type => 'text/javascript'} );
 	$style->setScript($url->extras('yui-webgui/build/form/groupManager.js'),  { type=>'text/javascript' });
+	$style->setLink($url->extras('yui/build/autocomplete/assets/skins/sam/autocomplete.css'), { rel => 'stylesheet', type => 'text/css' });
+	$style->setLink($url->extras('yui/build/container/assets/skins/sam/container.css'), { rel => 'stylesheet', type => 'text/css' });
+	$style->setLink($url->extras('yui/build/button/assets/skins/sam/button.css'),       { rel => 'stylesheet', type => 'text/css' });
 	$style->setLink($url->extras('yui-webgui/build/form/groupManager.css'),   { rel => 'stylesheet', type => 'text/css' });
 }
 

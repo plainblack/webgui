@@ -3,6 +3,7 @@
  - rfe   #12093: Remotely stored photos for Story assets
  - fixed #12088: Organization left out of transaction
  - fixed #12095: Shop admin screen has JS errors?
+ - fixed #12097: GroupManager pop-up not working
 
 7.10.13
  - added #12079: Carousel Auto Play
