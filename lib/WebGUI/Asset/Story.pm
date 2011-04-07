@@ -461,7 +461,7 @@ sub getEditForm {
     foreach my $photoIndex (1..$numberOfPhotos) {
         my $photo   = $photoData->[$photoIndex-1];
         my $storage = WebGUI::Storage->get($session, $photo->{storageId});
-        my $filename = $storage->getFiles->[0];
+        my $filename = $storage && $storage->getFiles->[0];
         push @{ $var->{ photo_form_loop } }, {
             hasPhoto       => $filename ? 1                                    : 0, 
             imgThumb       => $filename ? $storage->getThumbnailUrl($filename) : '', 
