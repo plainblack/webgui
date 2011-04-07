@@ -5,6 +5,7 @@
  - fixed #12095: Shop admin screen has JS errors?
  - fixed #12097: GroupManager pop-up not working
  - fixed #12098: Missing template breaks WebGUI password recovery by email
+ - remove extra Underground style templates that were part of the 7.10.13 upgrade.
 
 7.10.13
  - added #12079: Carousel Auto Play
