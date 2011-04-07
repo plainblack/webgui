@@ -7,6 +7,7 @@
  - fixed #12091: Survey Statistical Overview display
  - fixed #12094: Cannot enter in Macros in URLs inside TinyMCE.
  - fixed #12088: Organization left out of transaction
+ - fixed #12098: Missing template breaks WebGUI password recovery by email
 
 7.9.25
  - fixed #12075: Underground Style - Search does not search
