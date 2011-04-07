@@ -1794,7 +1794,7 @@ sub www_editThing {
             exportMetaData=>undef, 
             maxEntriesPerUser=>undef,
         );
-        $thingId = $self->addThing(\%properties,0);
+        $thingId = "new";
     }
     else{
         %properties = %{$self->getThing($thingId)};
@@ -2211,9 +2211,13 @@ sub www_editThingSave {
     my ($thingId, $fields);
     $thingId = $self->session->form->process("thingId");
 
-    $fields = $self->session->db->read('select * from Thingy_fields where assetId = '.$self->session->db->quote($self->get("assetId")).' and thingId = '.$self->session->db->quote($thingId).' order by sequenceNumber');
+	$fields = $self->session->db->read('select * from Thingy_fields where assetId = '.$self->session->db->quote($self->get("assetId")).' and thingId = '.$self->session->db->quote($thingId).' order by sequenceNumber');
 
-        
+    if($fields->rows < 1){
+        $self->session->log->warn("Thing failed to create because it had no fields");
+        my $i18n = WebGUI::International->new($self->session, "Asset_Thingy");
+        return $self->www_editThing($i18n->get("thing must have fields"));
+    }
     $self->setCollateral("Thingy_things","thingId",{
         thingId=>$thingId,
         label=>$form->process("label"),
@@ -2241,13 +2245,7 @@ sub www_editThingSave {
         exportMetaData=>$form->process("exportMetaData") || '',
         maxEntriesPerUser=>$form->process("maxEntriesPerUser") || '',
         },0,1);
-    
-    if($fields->rows < 1){
-        $self->session->log->warn("Thing failed to create because it had no fields");
-        my $i18n = WebGUI::International->new($self->session, "Asset_Thingy");
-        return $self->www_editThing($i18n->get("thing must have fields"));
-    }
-    
+
     while (my $field = $fields->hashRef) {
         my $display = $self->session->form->process("display_".$field->{fieldId}) || 0;
         my $viewScreenTitle = $self->session->form->process("viewScreenTitle_".$field->{fieldId}) || 0;
@@ -2274,6 +2272,7 @@ sub www_editField {
     return $session->privilege->insufficient() unless $self->canEdit;
     $fieldId = $session->form->process("fieldId");
     $thingId = $session->form->process("thingId");
+
     %properties = $session->db->quickHash("select * from Thingy_fields where thingId=? and fieldId=? and assetId=?",
         [$thingId,$fieldId,$self->get("assetId")]);
     if($session->form->process("copy")){
@@ -2314,6 +2313,8 @@ sub www_editFieldSave {
     if ($fieldType =~ m/^otherThing/){
         $defaultValue = $session->form->process("defaultFieldInThing");
     }
+	
+	$thingId = $self->addThing({ thingId => 'new' },0) if $thingId eq 'new';
     
     $fieldId = $session->form->process("fieldId");
     %properties = (
@@ -2378,7 +2379,7 @@ sub www_editFieldSave {
     # Make sure we send debug information along with the field.
     $log->preventDebugOutput;
 
-    $session->output->print($newFieldId.$listItemHTML);
+    $session->output->print($thingId.$newFieldId.$listItemHTML);
     return "chunked";
 }
 
