@@ -9,6 +9,7 @@
  - fixed #12088: Organization left out of transaction
  - fixed #12098: Missing template breaks WebGUI password recovery by email
  - remove extra Underground style templates that were part of the 7.9.25 upgrade.
+ - fixed #12056: Adding a Thing always creates a table
 
 7.9.25
  - fixed #12075: Underground Style - Search does not search
