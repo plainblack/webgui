@@ -165,12 +165,18 @@ sub handle {
             
             # We decide what to do next depending on what the contentHandler returned
             
+            # A WebGUI::Asset::Template object means we should process it
+            if ( defined $output && blessed $output && $output->isa( 'WebGUI::Asset::Template' ) ) {
+                $session->http->sendHeader;
+                $session->output->print( $output->process );
+                return;
+            }
             # "chunked" or "empty" means it took care of its own output needs
-            if (defined $output && ( $output eq "chunked" || $output eq "empty" )) {
+            elsif (defined $output && ( $output eq "chunked" || $output eq "empty" )) {
                 #warn "chunked and empty no longer stream, use session->response->stream() instead";
                 return;
             }
-            # non-empty output should be used as the response body
+            # other non-empty output should be used as the response body
             elsif (defined $output && $output ne "") {
                 # Auto-set the headers
                 $session->http->sendHeader;
