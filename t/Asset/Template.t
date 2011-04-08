@@ -29,7 +29,7 @@ my %tag = ( tagId => $tag->getId, status => "pending" );
 my $list = WebGUI::Asset::Template->getList($session);
 cmp_deeply($list, {}, 'getList with no classname returns an empty hashref');
 
-my $tmplText = " <tmpl_var variable> <tmpl_if conditional>true</tmpl_if> <tmpl_loop loop>XY</tmpl_loop> ";
+my $tmplText = " <tmpl_var variable> <tmpl_if conditional>true</tmpl_if> <tmpl_loop loop>XY</tmpl_loop> <tmpl_var setParam_var> ";
 my %var = (
 	variable=>"AAAAA",
 	conditional=>1,
@@ -47,10 +47,13 @@ isa_ok($template, 'WebGUI::Asset::Template', "creating a template");
 is($template->get('parser'), 'WebGUI::Asset::Template::HTMLTemplate', 'default parser is HTMLTemplate');
 
 $var{variable} = "BBBBB";
+$template->setParam( setParam_var => 'HUEG SUCCESS' );
 $output = $template->process(\%var);
 ok($output =~ m/\bBBBBB\b/, "process() - variables");
 ok($output =~ m/true/, "process() - conditionals");
 ok($output =~ m/\b(?:XY){5}\b/, "process() - loops");
+ok($output =~ m/\bHUEG SUCCESS\b/, "process() merges with setParam" );
+$template->deleteParam( 'setParam_var' );
 
 # See if template listens the Accept header
 $session->request->header('Accept' => 'application/json');
@@ -59,6 +62,14 @@ my $json = $template->process(\%var);
 my $andNowItsAPerlHashRef = eval { from_json( $json ) };
 ok( !$@, 'Accept = json, JSON is returned' );
 cmp_deeply( \%var, $andNowItsAPerlHashRef, 'Accept = json, The correct JSON is returned' );
+
+# Try Accept application/json again, but with a setParam
+$template->setParam( herp_status => 'derp' );
+$json = $template->process(\%var);
+$andNowItsAPerlHashRef = eval { from_json( $json ) };
+ok( !$@, 'Accept = json, JSON is returned with setParam' );
+# Also test getParam
+cmp_deeply( { %var, herp_status => $template->getParam('herp_status') }, $andNowItsAPerlHashRef, 'Accept = json, The correct JSON is returned with setParam' );
 
 # Done, so remove the json Accept header.
 $session->request->headers->remove_header('Accept');

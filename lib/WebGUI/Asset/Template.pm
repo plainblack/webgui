@@ -127,7 +127,37 @@ Provides a mechanism to provide a templating system in WebGUI.
 
 =head1 SYNOPSIS
 
-use WebGUI::Asset::Template;
+    my $template    = WebGUI::Asset::Template->newById( $session, "template id" );
+    $template->setParam( param => "value", param2 => "value" );
+    print $template->process;
+
+
+=head1 ATTRIBUTES
+
+
+#----------------------------------------------------------------------------
+
+=head2 param
+
+Save params in the template for later processing. This allows a template to be
+passed around, adding variables until finally it is processed and output for
+the user.
+
+Use L<setParam> method to set parameters.
+
+=cut
+
+has param => (
+    traits  => [ 'Hash' ],
+    is      => 'ro',
+    isa     => 'HashRef',
+    default => sub { {} },
+    handles => {
+        setParam    => 'set',
+        getParam    => 'get',
+        deleteParam => 'delete',
+    },
+);
 
 
 =head1 METHODS
@@ -573,10 +603,15 @@ sub process {
         return $session->isAdminOn ? $i18n->get('template in clipboard') : '';
     }
 
+    # Merge the passed-in vars with the prepared vars
+    if ( keys %$vars > 0 ) { # can't call setParam with an empty hash
+        $self->setParam( %$vars );
+    }
+
     # Return a JSONinfied version of vars if JSON is the only requested content type.
     if ( defined $session->request && $session->request->header('Accept') eq 'application/json' ) {
        $session->response->content_type( 'application/json' );
-       return to_json( $vars );
+       return to_json( $self->param );
     }
 
 	$self->prepare unless ($self->{_prepared});
@@ -586,7 +621,7 @@ sub process {
                     : $self->template
                     ;
     my $output;
-    eval { $output = $parser->process($template, $vars); };
+    eval { $output = $parser->process($template, $self->param); };
     if (my $e = Exception::Class->caught) {
         $session->log->error(sprintf "Error processing template: %s, %s, %s", $self->getUrl, $self->getId, $e->error);
         my $i18n = WebGUI::International->new($session, 'Asset_Template');
@@ -650,7 +685,7 @@ A scalar containing the template text.
 
 =head3 vars
 
-A hash reference containing template variables.
+A hash reference containing template variables to add to the existing params.
 
 =head3 parser
 
