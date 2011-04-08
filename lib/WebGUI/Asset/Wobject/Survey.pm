@@ -2826,8 +2826,6 @@ sub www_editTest {
         $test->delete;
     }
     my $i18n = WebGUI::International->new($session, 'Asset_Survey');
-    #$ac->addSubmenuItem($self->session->url->page("func=editTest;testId=$testId"), $i18n->get('edit test'));
-    #$ac->addSubmenuItem($self->session->url->page("func=runTest;testId=$testId"), $i18n->get('run test'));
 	return '<h1>' . $i18n->get('edit test') . '</h1>' . $error . $form->toHtml;
 }
 
@@ -2933,9 +2931,7 @@ sub www_runTest {
     
     my $parsed = $self->parseTap($tap) or return $self->www_editTestSuite('Unable to parse test output');
     
-    $ac->addSubmenuItem($self->session->url->page("func=editTest;testId=$testId"), $i18n->get('edit test'));
-    $ac->addSubmenuItem($self->session->url->page("func=runTest;testId=$testId"), $i18n->get('run test'));
-    return $ac->render($parsed->{templateText}, 'Test Results');
+    return '<h1>Test Results</h1>' . $parsed->{templateText};
 }
 
 =head2 parseTap
