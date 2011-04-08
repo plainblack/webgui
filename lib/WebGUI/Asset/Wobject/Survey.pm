@@ -235,6 +235,47 @@ use Text::CSV_XS;
 use Params::Validate qw(:all);
 Params::Validate::validation_options( on_fail => sub { WebGUI::Error::InvalidParam->throw( error => shift ) } );
 
+#----------------------------------------------------------------------------
+
+=head2 getHelpers ( )
+
+Add survey-specific URLs to the asset helpers list
+
+=cut
+
+override getHelpers => sub {
+    my ( $self ) = @_;
+    my $helpers = super();
+    my $i18n = WebGUI::International->new($self->session, "Asset_Survey");
+
+    $helpers->{edit_survey} = {
+        url     => $self->getUrl("func=editSurvey"),
+        label   => $i18n->get('edit survey'),
+    });
+    $helpers->{take_survey} = {
+        url     => $self->getUrl("func=takeSurvey"),
+        label   => $i18n->get('take survey'),
+    };
+    $helpers->{graph} = {
+        url     => $self->getUrl("func=graph"),
+        label   => $i18n->get('visualize'),
+    };
+    $helpers->{edit_tests} = {
+        url     => $self->getUrl("func=editTestSuite"),
+        label   => $i18n->get("test suite"),
+    };
+    $helpers->{run_tests} = {
+        url     => $self->getUrl("func=runTests"),
+        label   => $i18n->get("run all tests"),
+    };
+    $helpers->{run_tests_tap} = {
+        url     => $self->getUrl("func=runTests;format=tap"),
+        label   => $i18n->get("run all tests") . " (TAP)",
+    };
+
+    return $helpers;
+};
+
 #-------------------------------------------------------------------
 
 =head2 surveyJSON_update ( )
@@ -649,31 +690,6 @@ sub www_editSurvey {
     
     return $self->session->privilege->locked() unless $self->canEditIfLocked;
     return $self->processTemplate( {}, $self->surveyEditTemplateId );
-}
-
-#-------------------------------------------------------------------
-
-=head2 getAdminConsole 
-
-Extends the base class to add in survey controls like edit, view graph, run tests, and
-test suite.
-
-# TODO: Convert to Asset Helper
-sub getAdminConsole {
-    my $self = shift;
-    my $ac = $self->SUPER::getAdminConsole;
-    unless ($self->{_modifiedAdminConsole}) {
-        my $i18n = WebGUI::International->new($self->session, "Asset_Survey");
-        $ac->addSubmenuItem($self->session->url->page("func=edit"), WebGUI::International->new($self->session, "WebGUI")->get(575));
-        $ac->addSubmenuItem($self->session->url->page("func=editSurvey"), $i18n->get('edit survey'));
-        $ac->addSubmenuItem($self->session->url->page("func=takeSurvey"), $i18n->get('take survey'));
-        $ac->addSubmenuItem($self->session->url->page("func=graph"), $i18n->get('visualize'));
-        $ac->addSubmenuItem($self->session->url->page("func=editTestSuite"), $i18n->get("test suite"));
-        $ac->addSubmenuItem($self->session->url->page("func=runTests"), $i18n->get("run all tests"));
-        $ac->addSubmenuItem($self->session->url->page("func=runTests;format=tap"), $i18n->get("run all tests") . " (TAP)");
-        $self->{_modifiedAdminConsole} = 1;
-    }
-    return $ac;
 }
 
 #-------------------------------------------------------------------
