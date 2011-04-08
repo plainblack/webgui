@@ -55,6 +55,19 @@ ok($output =~ m/\b(?:XY){5}\b/, "process() - loops");
 ok($output =~ m/\bHUEG SUCCESS\b/, "process() merges with setParam" );
 $template->deleteParam( 'setParam_var' );
 
+# Test with a style template
+my $style   = $importNode->addChild({
+    className   => 'WebGUI::Asset::Template',
+    title       => 'test style',
+    namespace   => 'style',
+    template    => '<IGOTSTYLE><tmpl_var body.content></IGOTSTYLE>',
+    parser      => 'WebGUI::Asset::Template::HTMLTemplate',
+});
+$template->style( $style->getId );
+$output = $template->process({});
+ok( $output =~ m{^<IGOTSTYLE>.+</IGOTSTYLE>$}, 'style template is added' );
+$template->style( undef );
+
 # See if template listens the Accept header
 $session->request->header('Accept' => 'application/json');
 

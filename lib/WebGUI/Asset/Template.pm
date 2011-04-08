@@ -159,6 +159,21 @@ has param => (
     },
 );
 
+#----------------------------------------------------------------------------
+
+=head2 style
+
+Attach a style template to this template. This will allow you to return the
+template from a www_ method and have the WebGUI PSGI handler do the processing.
+
+Accepts an asset ID
+
+=cut
+
+has style => (
+    is      => 'rw',
+    isa     => 'Maybe[Str]',
+);
 
 =head1 METHODS
 
@@ -579,6 +594,8 @@ Evaluate a template replacing template commands for HTML.  If the internal prope
 is set to true, the packed, minimized template will be used.  Otherwise, the original template
 will be used.
 
+Will also process the style template attached to this template
+
 =head3 vars
 
 A hash reference containing template variables and loops. Automatically includes the entire WebGUI session.
@@ -627,6 +644,12 @@ sub process {
         my $i18n = WebGUI::International->new($session, 'Asset_Template');
         $output = sprintf $i18n->get('template error').$e->error, $self->getUrl, $self->getId;
     }
+
+    # Process the style template
+    if ( $self->style ) {
+        $output = $self->session->style->process( $output, $self->style );
+    }
+
 	return $output;
 }
 
