@@ -251,7 +251,7 @@ override getHelpers => sub {
     $helpers->{edit_survey} = {
         url     => $self->getUrl("func=editSurvey"),
         label   => $i18n->get('edit survey'),
-    });
+    };
     $helpers->{take_survey} = {
         url     => $self->getUrl("func=takeSurvey"),
         label   => $i18n->get('take survey'),
