@@ -40,6 +40,15 @@ sub t_00_method_check : Test(1) {
     can_ok $form, qw/get set headTags toHtml prepareWrapper toHtmlAsHidden toHtmlWithWrapper isInRequest isDynamicCompatible getName/;
 }
 
+sub t_01_getPackageClassName : Test(1) {
+    my $test    = shift;
+    my $session = $test->session;
+
+    my $form = $test->class->new($session);
+    my $package = $test->class;
+    $package =~ s/WebGUI::Form:://;
+    is $form->getPackageClassName, 'wg-form-' . lcfirst $package;
+}
 
 sub t_01_get_set : Test(3) {
     my $test    = shift;

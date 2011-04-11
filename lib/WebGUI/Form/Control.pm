@@ -16,6 +16,7 @@ package WebGUI::Form::Control;
 
 use strict;
 use WebGUI::International;
+use Scalar::Util qw( blessed );
 
 =head1 NAME
 
@@ -425,6 +426,23 @@ sub getDefaultValue {
 	return $self->get("defaultValue");
 }
 
+#----------------------------------------------------------------------------
+
+=head2 getPackageClassName ( )
+
+Get the class name for this package. Defaults to 'wg-form-typeCamelCase' (so, a
+WebGUI::Form::Button would have a class of 'wg-form-button' and a
+WebGUI::Form::SelectBox would have a class of 'wg-form-selectBox')
+
+=cut
+
+sub getPackageClassName {
+    my ( $self ) = @_;
+    my $package = blessed $self;
+    $package =~ s/WebGUI::Form:://;
+    return 'wg-form-' . lcfirst $package;
+}
+
 #-------------------------------------------------------------------
 
 =head2 getValueAsHtml ( )
@@ -591,8 +609,8 @@ Common code for preparing wrappers for *WithWrapper
 
 sub prepareWrapper {
 	my $self = shift;
-	my $rowClass = $self->get("rowClass");
-	$rowClass = qq| class="$rowClass" | if($self->get("rowClass"));
+	my $rowClass = join " ", $self->get("rowClass"), $self->getPackageClassName;
+	$rowClass = qq| class="$rowClass" |;
 	my $fieldClass = $self->get("fieldClass");
 	$fieldClass = qq| class="$fieldClass" | if($self->get("fieldClass"));
     my $subtext = $self->get("subtext");
