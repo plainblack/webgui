@@ -7,6 +7,8 @@
  - fixed #12098: Missing template breaks WebGUI password recovery by email
  - remove extra Underground style templates that were part of the 7.10.13 upgrade.
  - fixed #12056: Adding a Thing always creates a table
+ - fixed #11955: Rich Text Editor for Forums doesn't work on the iPad
+ - fixed #11992: html source editor
 
 7.10.13
  - added #12079: Carousel Auto Play
