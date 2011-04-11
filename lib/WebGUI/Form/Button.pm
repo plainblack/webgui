@@ -61,6 +61,9 @@ sub definition {
 		defaultValue=>{
 			defaultValue=>$i18n->get(62)
 			},
+                type => {
+                    defaultValue     => 'button',
+                },
 		});
         return $class->SUPER::definition($session, $definition);
 }
@@ -89,7 +92,7 @@ Renders a button.
 sub toHtml {
 	my $self = shift;
  	my $value = $self->fixQuotes($self->getOriginalValue);
-	my $html = '<input type="button" ';
+	my $html = '<input type="' . $self->get('type') . '" ';
 	$html .= 'name="'.$self->get("name").'" ' if ($self->get("name"));
 	$html .= 'id="'.$self->get('id').'" ' unless ($self->get('id') eq "_formId");
 	$html .= 'value="'.$value.'" '.$self->get("extras").' />';

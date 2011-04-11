@@ -59,15 +59,8 @@ Renders a button.
 
 sub toHtml {
 	my $self = shift;
-	my $value = $self->fixQuotes($self->getOriginalValue);
-    my $extras = $self->get("extras") || q|class="forwardButton"|;
-	my $i18n = WebGUI::International->new($self->session);
-	$self->{_params}{extras} ||= 'onclick="this.value=\''.$i18n->get(452).'\'"';
-	my $html = '<input type="submit" ';
-	$html .= 'name="'.$self->get("name").'" ' if ($self->get("name"));
-	$html .= 'id="'.$self->get('id').'" ' unless ($self->get('id') eq "_formId");
-	$html .= 'value="'.$value.'" '.$extras.' />';
-	return $html;
+	$self->{_params}{extras} ||= 'class="forwardButton" onclick="this.value=\''.$i18n->get(452).'\'"';
+	return $self->SUPER::toHtml;
 }
 
 1;
