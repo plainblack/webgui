@@ -73,6 +73,33 @@ sub addField {
 
 #----------------------------------------------------------------------------
 
+=head2 addFieldAt ( field, position )
+
+Add a field at a given position. 
+
+Note: Unlike L<addField>, this method requires a full field object. It will not
+create one for you.
+
+=cut
+
+sub addFieldAt {
+    my ( $self, $field, $position ) = @_;
+    $self->addObjectAt( $field, $position );
+    # Rebuild the fields array to fix the ordering
+    #   We can't be sure the position in $self->objects is the same as in $self->fields
+    $self->fields([]);
+    for my $obj ( @{$self->objects} ) {
+        next unless blessed $obj;
+        # A field isn't allowed to have child objects
+        if ( !$obj->can('does') || !$obj->does('WebGUI::FormBuilder::Role::HasObjects') ) {
+            push @{$self->fields}, $obj;
+        }
+    }
+    return $field;
+}
+
+#----------------------------------------------------------------------------
+
 =head2 deleteField ( name )
 
 Delete a field by name. Returns the field deleted.

@@ -27,8 +27,6 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 77;        # Increment this number for each test you create
-
 #----------------------------------------------------------------------------
 # Constructor and properties
 use_ok( 'WebGUI::FormBuilder' );
@@ -243,6 +241,16 @@ cmp_deeply(
     'field is deleted from fields',
 );
 
+# addFieldAt
+$fb     = WebGUI::FormBuilder->new( $session );
+$field  = $fb->addField( 'Text', name => "zero" );
+
+$tab    = $fb->addTab( tabset => 'one', name => 'one' );
+$fset   = $fb->addFieldset( name => 'three', label => 'Three' );
+$field2 = $fb->addFieldAt( WebGUI::Form::Text->new( $session, name => "two" ), 2 );
+
+is( $fb->objects->[2], $field2, 'objects array is correct' );
+is( $fb->fields->[1], $field2, 'fields array is correct' );
 
 #----------------------------------------------------------------------------
 # Serialize and deserialize
@@ -259,4 +267,5 @@ $fb->addField( 'submit', name => 'submit', label => 'Submit' );
 # toHtml
 
 
+done_testing;
 #vim:ft=perl

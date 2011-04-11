@@ -59,8 +59,26 @@ sub addObject {
     return $object;
 }
 
-# Handle re-ordering of objects
+=head2 addObjectAt ( $object, $position )
 
+Adds $object to the list of objects at a certain position, pushing all other
+objects down.
+
+=head3 $object
+
+Some object
+
+=head3 $position
+
+The numeric index. 0 is the first object.
+
+=cut
+
+sub addObjectAt {
+    my ( $self, $object, $position ) = @_;
+    splice @{$self->objects}, $position, 1, $object;
+    return $object;
+}
 
 1;
 
