@@ -168,6 +168,7 @@ checkModule('Search::QueryParser',                       );
 checkModule('Monkey::Patch',                '0.03'       );
 checkModule('UUID::Tiny',                	'1.03'       );
 checkModule('Starman',						'0.2010',	2);
+checkModule('App::Cmd',                     '0.311'     );
 
 
 failAndExit("Required modules are missing, running no more checks.") if $missingModule;
