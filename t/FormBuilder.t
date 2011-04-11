@@ -249,8 +249,16 @@ $tab    = $fb->addTab( tabset => 'one', name => 'one' );
 $fset   = $fb->addFieldset( name => 'three', label => 'Three' );
 $field2 = $fb->addFieldAt( WebGUI::Form::Text->new( $session, name => "two" ), 2 );
 
-is( $fb->objects->[2], $field2, 'objects array is correct' );
-is( $fb->fields->[1], $field2, 'fields array is correct' );
+cmp_deeply( 
+    $fb->objects,
+    [ $field, $fb->getTabset('one'), $field2, $fset ], 
+    'objects array is correct',
+);
+cmp_deeply( 
+    $fb->fields,
+    [ $field, $field2 ], 
+    'fields array is correct',
+);
 
 #----------------------------------------------------------------------------
 # Serialize and deserialize

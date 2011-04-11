@@ -76,7 +76,7 @@ The numeric index. 0 is the first object.
 
 sub addObjectAt {
     my ( $self, $object, $position ) = @_;
-    splice @{$self->objects}, $position, 1, $object;
+    splice @{$self->objects}, $position, 0, $object;
     return $object;
 }
 
