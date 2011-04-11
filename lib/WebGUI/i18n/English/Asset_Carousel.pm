@@ -140,6 +140,13 @@ our $I18N = {
         lastUpdated => 0,
         context     => 'Description of asset property',
     },
+
+    'rich editor description' => {
+        message     => q{Choose a rich editor to use for entering content in each pane of the Carousel.  The new setting will take effect the next time the Carousel is edited.},
+        lastUpdated => 0,
+        context     => 'Description of asset property',
+    },
+
 };
 
 1;

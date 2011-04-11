@@ -9,6 +9,7 @@
  - fixed #12056: Adding a Thing always creates a table
  - fixed #11955: Rich Text Editor for Forums doesn't work on the iPad
  - fixed #11992: html source editor
+ - fixed #12100: Carousel and/or RichEdit
 
 7.10.13
  - added #12079: Carousel Auto Play

@@ -33,6 +33,7 @@ my $session = start(); # this line required
 # upgrade functions go here
 addOrganizationsToTransaction($session);
 removeDuplicateUndergroundStyleTemplates($session);
+addRichEditToCarousel($session);
 
 finish($session); # this line required
 
@@ -70,6 +71,17 @@ sub removeDuplicateUndergroundStyleTemplates {
         next ASSETID unless $asset;
         $asset->purge;  ##Kill it, crush it, grind its bits into dust.
     }
+    print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub addRichEditToCarousel {
+    my $session = shift;
+    print "\tAdd RichEdit option to the Carousel" unless $quiet;
+    # and here's our code
+    $session->db->write('ALTER TABLE Carousel ADD COLUMN richEditor CHAR(22) BINARY');
+    $session->db->write(q!update Carousel set richEditor='PBrichedit000000000001'!);
     print "DONE!\n" unless $quiet;
 }
 

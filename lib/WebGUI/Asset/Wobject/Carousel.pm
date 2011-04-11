@@ -60,6 +60,13 @@ sub definition {
 			hoverHelp       => $i18n->get('carousel slideHeight description'),
 			label           => $i18n->get('carousel slideHeight label'),
 		},
+		richEditor =>{
+			fieldType    => "selectRichEditor",
+			defaultValue => "PBrichedit000000000001",
+			tab          => 'display',
+			label        => $i18n->get('rich editor', 'Asset_Collaboration'),
+			hoverHelp    => $i18n->get('rich editor description'),
+        },
         items =>{
             noFormPost      =>1,
             fieldType       =>'text',
@@ -152,7 +159,9 @@ sub getEditForm {
     $tabform->getTab("properties")->raw($tableRowStart);
     
 
-    my $richedit        = WebGUI::Asset->newByDynamicClass( $self->session, $self->session->setting->get('richEditor') );
+    $self->session->log->warn('richedit:' .$self->get('richEditor'));
+    my $richEditId      = $self->get('richEditor') || "PBrichedit000000000001";
+    my $richedit        = WebGUI::Asset->newByDynamicClass( $self->session, $richEditId );
     my $config          = JSON->new->encode( $richedit->getConfig );
     my $loadMcePlugins  = $richedit->getLoadPlugins;
     my $items           = $self->get('items') ? JSON->new->decode($self->get('items'))->{items} : [];
