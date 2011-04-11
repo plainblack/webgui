@@ -631,7 +631,7 @@ is(readlink $symlinkedRoot->stringify, $parentPath, 'exportSymlinkRoot sets up l
 unlink $symlinkedRoot->stringify;
 
 subtest exportRelated => sub {
-    my $old = WebGUI::VersionTag->getWorking($session);
+    my $old = WebGUI::VersionTag->getWorking($session, 'noCreate');
     my $tag = WebGUI::VersionTag->create($session);
     $tag->setWorking();
     my $topic = $parent->addChild({
@@ -646,7 +646,7 @@ subtest exportRelated => sub {
         keywords  => 'relatedAssetTesting',
     });
     $tag->commit();
-    my $cleanup = guard { $old->setWorking(); $tag->rollback };
+    my $cleanup = guard { $tag->rollback; if ($old) { $old->setWorking(); } };
     cmp_deeply(
         $archive->exportGetAssetIds({ depth => 99, exportRelated => 1}),
         superbagof(map { $_->getId } ($topic, $archive, $story)),
@@ -657,7 +657,6 @@ subtest exportRelated => sub {
         'but not without exportRelated'
     );
 };
-
 
 #----------------------------------------------------------------------------
 # exportGetDescendants()

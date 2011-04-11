@@ -44,6 +44,8 @@ This package provides a mechanism for storing and retrieving files that are not 
  $store = WebGUI::Storage->createTemp($self->session);
  $store = WebGUI::Storage->get($self->session,$id);
 
+ $exists = WebGUI::Storage->storageExists($session, $id);
+
  $filename = $store->addFileFromFilesystem($pathToFile);
  $filename = $store->addFileFromFormPost($formVarName,$attachmentLimit);
  $filename = $store->addFileFromHashref($filename,$hashref);
@@ -1711,6 +1713,33 @@ sub setPrivileges {
     }
 
     return $self->writeAccess( %privs );
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 storageExists ( $session, $storageId )
+
+Class method to determine if a storage location exists.  This can't be done
+with C<get> since it will create it if it doesn't exist.  Returns true if the
+storage directory exists.
+
+=head3 $session
+
+A session object, used to find the uploadsPath location
+
+=head3 $storageId
+
+A WebGUI::Storage GUID.
+
+=cut
+
+sub storageExists {
+    my ($class, $session, $storageId) = @_;
+    my $hexId = $session->id->toHex($storageId);
+    my @parts = ($hexId =~ m/^((.{2})(.{2}).+)/)[1,2,0];
+    my $dir = Path::Class::Dir->new($session->config->get('uploadsPath'), @parts);
+    return (-e $dir->stringify && -d _ ? 1 : 0);
 }
 
 

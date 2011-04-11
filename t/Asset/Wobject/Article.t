@@ -98,12 +98,7 @@ is ($duplicateFilename, $filename, "duplicate method copies collateral");
 $duplicateArticle->purge();
 
 # The get method will create the directory if it doesnt exist... very strange.
-$duplicateStorage = WebGUI::Storage->get($session,$duplicateStorageId);
-
-# so lets check for the file instead
-$duplicateFilename = $duplicateStorage->getFiles->[0];
-
-is ($duplicateFilename, undef, 'purge method deletes collateral');
+ok (!WebGUI::Storage->storageExists($session, $duplicateStorageId), 'purge method deletes collateral');
 
 }
 
