@@ -61,10 +61,6 @@ sub new {
     my ( $class, @args ) = @_;
     my $self = $class->SUPER::new( @args );
     $self->set( 'type' => 'submit' );
-    if ( !$self->get('extras') ) {
-        my $i18n = WebGUI::International->new($self->session, 'WebGUI');
-        $self->set( 'extras' => 'class="forwardButton" onclick="this.value\'' . $i18n->get(452) . '\'"' );
-    }
     return $self;
 }
 
