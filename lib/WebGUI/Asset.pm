@@ -397,6 +397,7 @@ use WebGUI::Fork;
 use WebGUI::Search::Index;
 use WebGUI::TabForm;
 use WebGUI::PassiveAnalytics::Logging;
+use WebGUI::Form::ButtonGroup;
 
 =head1 NAME
 
@@ -437,6 +438,65 @@ sub addEditLabel {
 	my $i18n = WebGUI::International->new($self->session,'Asset_Wobject');
 	my $addEdit = ($self->session->form->process("func") eq 'add') ? $i18n->get('add') : $i18n->get('edit');
     return $addEdit.' '.$self->getName;
+}
+
+#----------------------------------------------------------------------------
+
+=head2 addEditSaveButtons ( form )
+
+Add the save buttons to the given form. Used by www_add and www_edit to modify
+the asset edit form.
+
+=cut
+
+sub addEditSaveButtons {
+    my ( $self, $form ) = @_;
+    my $session = $self->session;
+    my $i18n = WebGUI::International->new($session, "Asset");
+
+    ###
+    # Buttons
+    my $buttonGroup = WebGUI::Form::ButtonGroup->new( $session, 
+        name => "saveButtons",
+        rowClass => 'saveButtons',
+    );
+
+    # Approved status
+    $buttonGroup->addButton( 'checkbox', {
+        name        => 'approved',
+        id          => 'approveCheckbox',
+        value       => 'approved',
+        label       => $i18n->get('560', 'WebGUI'),
+        checked     => ( $session->setting->get( 'versionTagMode' ) eq 'autoCommit' ? 1 : 0 ),
+    } );
+
+    $buttonGroup->addButton( "submit", {
+        name        => "save",
+        id          => 'saveButton',
+        value       => $i18n->get('save'),
+    } );
+
+    if ( $session->config->get("enableSaveAndCommit") ) {
+        $buttonGroup->addButton( 'Submit', {
+            name  => "saveAndCommit",
+            id    => 'saveAndCommitButton',
+            value => $i18n->get("save and commit"),
+        } );
+    }
+
+    $buttonGroup->addButton( 'Submit', {
+        name  => "saveAndReturn",
+        id    => 'saveAndReturnButton',
+        value => $i18n->get("apply"),
+    } );
+
+    $buttonGroup->addButton( 'Submit', {
+        name    => 'cancel',
+        id      => 'cancelButton',
+        value   => $i18n->get('cancel','WebGUI'),
+    } );
+
+    return $form->addFieldAt( $buttonGroup, 0 );
 }
 
 #-------------------------------------------------------------------
@@ -1004,45 +1064,6 @@ sub getEditForm {
     my $i18n      = WebGUI::International->new( $session, "Asset" );
     my $f         = WebGUI::FormBuilder->new( $session );
     my $overrides = $session->config->get( "assets/" . $self->get("className") . '/fields' ) || {};
-
-    ###
-    # Buttons
-    my $buttonGroup = $f->addField( 'ButtonGroup', name => "saveButtons", rowClass => 'saveButtons' );
-
-    # Approved status
-    $buttonGroup->addButton( 'checkbox', {
-        name        => 'approved',
-        id          => 'approveCheckbox',
-        value       => 'approved',
-        label       => $i18n->get('560', 'WebGUI'),
-        checked     => ( $session->setting->get( 'versionTagMode' ) eq 'autoCommit' ? 1 : 0 ),
-    } );
-
-    $buttonGroup->addButton( "submit", {
-        name        => "save",
-        id          => 'saveButton',
-        value       => $i18n->get('save'),
-    } );
-
-    if ( $session->config->get("enableSaveAndCommit") ) {
-        $buttonGroup->addButton( 'Submit', {
-            name  => "saveAndCommit",
-            id    => 'saveAndCommitButton',
-            value => $i18n->get("save and commit"),
-        } );
-    }
-
-    $buttonGroup->addButton( 'Submit', {
-        name  => "saveAndReturn",
-        id    => 'saveAndReturnButton',
-        value => $i18n->get("apply"),
-    } );
-
-    $buttonGroup->addButton( 'Submit', {
-        name    => 'cancel',
-        id      => 'cancelButton',
-        value   => $i18n->get('cancel','WebGUI'),
-    } );
 
     ### 
     # Create the main tabset
@@ -2743,6 +2764,7 @@ sub www_add {
 
     my $f   = eval { $newAsset->getEditForm };
     return $@ if $@;
+    $self->addEditSaveButtons( $f );
     $f->addField( "Hidden", name => "func", value => "addSave" );
     $f->action( $self->getUrl );
     $f->getTab('meta')->getField( 'className' )->set('value', $class);
@@ -2913,6 +2935,7 @@ sub www_edit {
     my $func    = $self->session->form->get('func');
 
     my $f   = eval { $self->getEditForm };
+    $self->addEditSaveButtons( $f );
     return $@ if $@;
     $f->addField( "Hidden", name => "func", value => "editSave" );
     $f->action( $self->getUrl );
