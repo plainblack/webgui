@@ -1,3 +1,5 @@
+7.9.27
+
 7.9.26
  - fixed #12086: Shop Billing Address Unpopulated
  - fixed #12081: addrees not in addressbook after user change in session
