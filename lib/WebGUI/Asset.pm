@@ -2768,30 +2768,12 @@ sub www_add {
     $f->addField( "Hidden", name => "func", value => "addSave" );
     $f->action( $self->getUrl );
     $f->getTab('meta')->getField( 'className' )->set('value', $class);
-    # TODO: Make this whole thing a template instead!
-    $style->setCss($url->extras('yui/build/button/assets/skins/sam/button.css'));
-    $style->setScript($url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'));
-    $style->setScript($url->extras('yui/build/element/element-min.js'));
-    $style->setScript($url->extras('yui/build/button/button-min.js'));
-    $style->setRawHeadTags(<<'ENDHTML'); 
-        <style type="text/css">
-            * { font: 12pt Helvetica, sans-serif; }
-            label.formDescription { display: block; margin-top: 1em; font-weight: bold }
-            .saveButtons { position: absolute; top: 3px; right: 5px; z-index: 9001; }
-        </style>
-        <script type="text/javascript">
-            YAHOO.util.Event.onDOMReady( function() {
-                new YAHOO.widget.Button( "saveButton" );
-                new YAHOO.widget.Button( "cancelButton" );
-                new YAHOO.widget.Button( "saveAndReturnButton" );
-                if ( document.getElementById( 'saveAndCommitButton' ) ) {
-                    new YAHOO.widget.Button('saveAndCommitButton');
-                }
-            } );
-        </script>
-ENDHTML
+
+    my $template    = WebGUI::Asset->newById( $session, $session->setting->get('templateIdAssetEdit') );
+    $template->setParam( %{ $f->toTemplateVars } );
+
     return $self->session->style->process(
-        '<div class="yui-skin-sam">' . $f->toHtml . '</div>',
+        $template->process,
         "PBtmpl0000000000000137"
     );
 }
@@ -2940,34 +2922,11 @@ sub www_edit {
     $f->addField( "Hidden", name => "func", value => "editSave" );
     $f->action( $self->getUrl );
 
-    # TODO: Make this whole thing a template instead!
-    $style->setCss($url->extras('yui/build/button/assets/skins/sam/button.css'));
-    $style->setScript($url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'));
-    $style->setScript($url->extras('yui/build/element/element-min.js'));
-    $style->setScript($url->extras('yui/build/button/button-min.js'));
-    $style->setRawHeadTags(<<'ENDHTML'); 
-        <style type="text/css">
-            * { font: 12pt Helvetica, sans-serif; }
-            label.formDescription { display: block; margin-top: 1em; font-weight: bold }
-            .saveButtons { position: absolute; top: 3px; right: 5px; z-index: 9001; }
-        </style>
-        <script type="text/javascript">
-            YAHOO.util.Event.onDOMReady( function() {
-                new YAHOO.widget.Button( "saveButton" );
-                new YAHOO.widget.Button( "cancelButton" );
-                new YAHOO.widget.Button( "saveAndReturnButton" );
-                if ( document.getElementById( 'saveAndCommitButton' ) ) {
-                    new YAHOO.widget.Button('saveAndCommitButton');
-                }
-            } );
-            if ( window.parent && window.parent.admin ) {
-                window.parent.admin.adminBar.show("assetHelpers");
-            }
-        </script>
-ENDHTML
+    my $template    = WebGUI::Asset->newById( $session, $session->setting->get('templateIdAssetEdit') );
+    $template->setParam( %{ $f->toTemplateVars } );
 
     return $self->session->style->process(
-        '<div class="yui-skin-sam">' . $f->toHtml . '</div>',
+        $template->process,
         "PBtmpl0000000000000137"
     );
 }

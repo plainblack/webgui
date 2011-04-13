@@ -248,6 +248,15 @@ sub definition {
 		namespace=>"AdminConsole",
 		defaultValue=>$setting->get("AdminConsoleTemplate")
 		});
+    push @fields, {
+        tab             => 'ui',
+        fieldType       => 'template',
+        name            => 'templateIdAssetEdit',
+        label           => $i18n->get('templateIdAssetEdit label'),
+        hoverHelp       => $i18n->get('templateIdAssetEdit description'),
+        namespace       => 'Asset/Edit',
+        defaultValue    => $setting->get('templateIdAssetEdit') || "yKl2HX76TSuv42vmprFbXQ",
+    };
     push(@fields, {
         tab             => "ui",
         fieldType       => "yesNo",

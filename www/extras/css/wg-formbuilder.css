@@ -1,0 +1,11 @@
+/**
+ * wg-formbuilder.css
+ * CSS rules for all forms built with WebGUI::FormBuilder
+ */
+
+.wg-formbuilder label.formDescription
+{
+    display: block;
+    margin-top: 1em;
+    font-weight: bold;
+}
