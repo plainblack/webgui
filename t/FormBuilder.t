@@ -324,6 +324,7 @@ sub fieldset_vars {
         name    => $fieldset->name,
         label   => $fieldset->label,
         legend  => $fieldset->legend,
+        isFieldset => 1,
         %{object_vars( $fieldset )},
     };
 }
@@ -332,6 +333,7 @@ sub tabset_vars {
     my $tabset = shift;
     my $var = {
         name    => $tabset->name,
+        isTabset => 1,
         tabs    => [ map { { %{object_vars( $_ )}, name => $_->name, label => $_->label } } @{$tabset->tabs} ],
     };
     for my $tab ( @{ $var->{tabs} } ) {
