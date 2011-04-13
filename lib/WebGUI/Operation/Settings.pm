@@ -257,6 +257,15 @@ sub definition {
         namespace       => 'Asset/Edit',
         defaultValue    => $setting->get('templateIdAssetEdit') || "yKl2HX76TSuv42vmprFbXQ",
     };
+    push @fields, {
+        tab             => 'ui',
+        fieldType       => 'template',
+        name            => 'templateIdAdmin',
+        label           => $i18n->get('templateIdAdmin label'),
+        hoverHelp       => $i18n->get('templateIdAdmin description'),
+        namespace       => 'Admin',
+        defaultValue    => $setting->get('templateIdAdmin') || "p8g7xlQaTeKSRRDo-_ejSQ",
+    };
     push(@fields, {
         tab             => "ui",
         fieldType       => "yesNo",

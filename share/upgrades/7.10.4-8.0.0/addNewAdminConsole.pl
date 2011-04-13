@@ -12,4 +12,7 @@ session->config->addToArrayAfter(
 session->config->deleteFromHash( 'adminConsole', 'adminConsoleOff' );
 session->config->deleteFromHash( 'adminConsole', 'assets' );
 
+# Add template setting
+session->setting->set( 'templateIdAdmin' => 'p8g7xlQaTeKSRRDo-_ejSQ' );
+
 done;

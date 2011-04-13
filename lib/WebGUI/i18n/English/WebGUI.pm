@@ -3145,8 +3145,8 @@ or are under your current version tag.</p>
         },
 
 	'admin console template' => {
-		message => q|Admin Console Template|,
-		lastUpdated =>1118453709,
+		message => q|Legacy Admin Console Template|,
+		lastUpdated => 0,
         },
 
 	'admin console template variables' => {
