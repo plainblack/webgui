@@ -96,6 +96,12 @@ sub toHtml {
 	$html .= 'name="'.$self->get("name").'" ' if ($self->get("name"));
 	$html .= 'id="'.$self->get('id').'" ' unless ($self->get('id') eq "_formId");
 	$html .= 'value="'.$value.'" '.$self->get("extras").' />';
+        my ( $style, $url ) = $self->session->quick(qw( style url ));
+        $style->setCss($url->extras('yui/build/button/assets/skins/sam/button.css'));
+        $style->setScript($url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'));
+        $style->setScript($url->extras('yui/build/element/element-min.js'));
+        $style->setScript($url->extras('yui/build/button/button-min.js'));
+        $html .= '<script type="text/javascript">new YAHOO.widget.Button("' . $self->get('id') . '");</script>';
 	return $html;
 }
 
