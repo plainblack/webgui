@@ -105,6 +105,7 @@ sub toTemplateVars {
             when ( $_->isa( 'WebGUI::FormBuilder::Tabset' ) ) {
                 my $name = $obj->name;
                 $props   = $obj->toTemplateVars;
+                $props->{ isTabset } = 1;
                 for my $key ( keys %{$props} ) {
                     $var->{ "${prefix}tabset_${name}_${key}" } = $props->{$key};
                 }
@@ -113,6 +114,7 @@ sub toTemplateVars {
             when ( $_->isa( 'WebGUI::FormBuilder::Fieldset' ) ) {
                 my $name = $obj->name;
                 $props   = $obj->toTemplateVars;
+                $props->{ isFieldset } = 1;
                 for my $key ( keys %{$props} ) {
                     $var->{ "${prefix}fieldset_${name}_${key}" } = $props->{$key};
                 }
