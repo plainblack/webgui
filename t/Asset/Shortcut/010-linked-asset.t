@@ -33,7 +33,7 @@ init();
 
 #----------------------------------------------------------------------------
 # Tests
-plan tests => 11;
+plan tests => 12;
 
 #----------------------------------------------------------------------------
 # Test shortcut's link to original asset
@@ -52,6 +52,12 @@ is(
 is(
     $original->getId, $snippet->getId,
     "Original assetId is correct"
+);
+
+is_deeply(
+    [ $shortcut->getId ],
+    $original->exportGetRelatedAssetIds,
+    'shortcut is related for the purpose of exports',
 );
 
 #----------------------------------------------------------------------------

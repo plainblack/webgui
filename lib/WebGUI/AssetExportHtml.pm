@@ -623,7 +623,7 @@ sub exportGetDescendants {
 
 =head2 exportGetRelatedAssetIds
 
-Normally the empty arrayref, but override if exporting your asset would
+Normally all an asset's shorcuts,  but override if exporting your asset would
 invalidate other exported assets. If exportRelated is checked, this will be
 called and any assetIds it returns will be exported when your asset is
 exported.
@@ -635,7 +635,10 @@ related, exporting anything would export everything.
 
 =cut
 
-sub exportGetRelatedAssetIds { [] }
+sub exportGetRelatedAssetIds {
+    my $self = shift;
+    WebGUI::Asset::Shortcut->getShortcutsForAssetId($self->session, $self->getId);
+}
 
 #-------------------------------------------------------------------
 
