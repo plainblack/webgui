@@ -105,4 +105,20 @@ sub toHtml {
     return $html;
 }
 
+#----------------------------------------------------------------------------
+
+=head2 toTemplateVars ( )
+
+Get the template vars for this tab
+
+=cut
+
+around toTemplateVars => sub {
+    my ( $orig, $self ) = @_;
+    my $var = $self->$orig();
+    $var->{ name } = $self->name;
+    $var->{ label } = $self->label;
+    return $var;
+};
+
 1;

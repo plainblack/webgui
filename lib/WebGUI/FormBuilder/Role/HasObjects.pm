@@ -14,7 +14,7 @@ package WebGUI::FormBuilder::Role::HasObjects;
 
 =cut
 
-
+use WebGUI::BestPractices;
 use Moose::Role;
 
 has 'objects' => (
@@ -78,6 +78,70 @@ sub addObjectAt {
     my ( $self, $object, $position ) = @_;
     splice @{$self->objects}, $position, 0, $object;
     return $object;
+}
+
+=head2 toTemplateVars ( prefix, var )
+
+Get all the objects as a set of template vars with the given prefix. $var is 
+an optional hashref to add the variables to.
+
+=cut
+
+sub toTemplateVars {
+    my ( $self, $prefix, $var ) = @_;
+    $prefix ||= "";
+    $var ||= {};
+
+    # Loop over all objects, adding to appropriate template loops
+    for my $obj ( @{ $self->objects } ) {
+        # Prepare our object's variables and add to object type loop
+        my $props = {};
+
+        given ( blessed $obj ) {
+            when ( undef ) {
+                # Treat as raw template properties
+                $props = $obj;
+            }
+            when ( $_->isa( 'WebGUI::FormBuilder::Tabset' ) ) {
+                my $name = $obj->name;
+                $props   = $obj->toTemplateVars;
+                for my $key ( keys %{$props} ) {
+                    $var->{ "${prefix}tabset_${name}_${key}" } = $props->{$key};
+                }
+                push @{$var->{ "${prefix}tabsetloop" }}, $props;
+            }
+            when ( $_->isa( 'WebGUI::FormBuilder::Fieldset' ) ) {
+                my $name = $obj->name;
+                $props   = $obj->toTemplateVars;
+                for my $key ( keys %{$props} ) {
+                    $var->{ "${prefix}fieldset_${name}_${key}" } = $props->{$key};
+                }
+                push @{$var->{ "${prefix}fieldsetloop" }}, $props;
+            }
+            # Form field objects
+            when ( $_->isa( 'WebGUI::Form::Control' ) ) {
+                my $name    = $obj->get('name');
+                $props      = $obj->toTemplateVars;
+                # Add the whole field to the vars
+                $props->{ field } = $obj->toHtmlWithWrapper;
+                $props->{ field_input } = $obj->toHtml;
+                $var->{ "${prefix}field_${name}" } = $props->{ field };
+                # Add to fieldloop
+                push @{$var->{"${prefix}fieldloop"}}, $props;
+                # Individual accessors
+                for my $key ( keys %{$props} ) {
+                    $var->{ "${prefix}field_${name}_${key}" } = $props->{$key};
+                }
+                # Loop accessor
+                push @{$var->{ "${prefix}field_${name}_loop" }}, $props;
+            }
+        }
+
+        # Add to the global object loop
+        push @{ $var->{ "${prefix}objects" } }, $props;
+    }
+
+    return $var;
 }
 
 1;

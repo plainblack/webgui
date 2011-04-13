@@ -71,7 +71,6 @@ has 'session' => (
 );
 
 with Storage( format => 'JSON' );
-with 'WebGUI::FormBuilder::Role::HasObjects';
 
 #----------------------------------------------------------------------------
 
@@ -90,9 +89,15 @@ sub BUILDARGS {
 #----------------------------------------------------------------------------
 
 sub addTab {
-    my ( $self, $tab ) = @_;
+    my $self = shift;
+    my $tab;
+    if ( scalar @_ == 1 ) {
+        $tab = $_[0];
+    }
+    else {
+        $tab = WebGUI::FormBuilder::Tab->new( $self->session, @_ );
+    }
     push @{$self->tabs}, $tab;
-    $self->addObject( $tab );
     return $tab;
 }
 
@@ -151,13 +156,14 @@ sub toTemplateVars {
     my ( $self ) = @_;
     my $var = {};
 
+    $var->{ name } = $self->name;
     $var->{ tabs } = [];
-    for my $tab ( $self->tabs ) {
+    for my $tab ( @{ $self->tabs } ) {
         my $name  = $tab->name;
         my $props = $tab->toTemplateVars;
         $var->{ "tabs_${name}" } = $tab->toHtml;
         push @{$var->{tabs}}, $props;
-        for my $key ( %$props ) {
+        for my $key ( keys %{$props} ) {
             $var->{ "tabs_${name}_${key}" } = $props->{$key};
         }
     }

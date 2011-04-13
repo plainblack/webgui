@@ -13,11 +13,16 @@
 # 
 #
 
+use warnings;
 use strict;
 use Test::More;
 use Test::Deep;
 use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
+use WebGUI::BestPractices;
+
+use Carp;
+$SIG{ __DIE__ } = sub { Carp::confess( @_ ) };
 
 #----------------------------------------------------------------------------
 # Init
@@ -155,7 +160,7 @@ cmp_deeply(
 );
 
 # addFieldset with objects
-my $field = $fset->addField( 
+$field = $fset->addField( 
     'WebGUI::Form::Text' => (
         name        => 'search',
         value       => "Search Now",
@@ -165,7 +170,7 @@ my $subfset = $fset->addFieldset(
     name        => 'advanced',
     label       => 'Advanced Search',
 );
-my $tab = $fset->addTab(
+$tab = $fset->addTab(
     name        => 'more',
     label       => 'More',
 );
@@ -200,7 +205,7 @@ ok( !$fb->getFieldset('newname'), 'deleted fieldset cannot be gotten' );
 
 # addField with properties
 $fb         = WebGUI::FormBuilder->new( $session );
-my $field   = $fb->addField( 
+$field   = $fb->addField( 
     'Text' => (
         name        => 'search',
         value       => 'Search Now',
@@ -263,17 +268,128 @@ cmp_deeply(
 #----------------------------------------------------------------------------
 # Serialize and deserialize
 
-my $fb      = WebGUI::FormBuilder->new( $session );
-my $fset    = $fb->addFieldset( name => 'search', label => 'Search' );
+$fb      = WebGUI::FormBuilder->new( $session );
+$fset    = $fb->addFieldset( name => 'search', label => 'Search' );
 $fset->addField( 'text', name => 'keywords', label => 'Keywords' );
-my $tab     = $fb->addTab( name => 'advanced', label => 'Advanced Search' );
+$tab     = $fb->addTab( name => 'advanced', label => 'Advanced Search' );
 $tab->addField( 'text', name => 'type', label => 'Type' );
 $fb->addField( 'submit', name => 'submit', label => 'Submit' );
 
 
 #----------------------------------------------------------------------------
-# toHtml
+# toTemplateVars
 
+$fb  = WebGUI::FormBuilder->new( $session );
+$field = $fb->addField( 'Text', name => 'field1' );
+my $fieldset = $fb->addFieldset( name => 'two', label => 'Two' );
+my $fieldsetField = $fieldset->addField( 'Text', name => 'two one' );
+$tab = $fb->addTab( name => 'three 1', label => 'Three 1' );
+$tab->addField( 'Text', name => 'three 1 1' );
+my $tab2 = $fb->addTab( name => 'three 2', label => 'Three 2' );
+$tab2->addField( 'Checkbox', name => 'three 2 1' );
+$tab2->addField( 'Checkbox', name => 'three 2 1' );
+$field2 = $fb->addField( 'Submit', name => 'submit' );
+$field3 = $fb->addField( 'Button', name => 'cancel' );
+
+my $expected_var = {
+    header       => $fb->getHeader,
+    footer       => $fb->getFooter,
+    %{ object_vars( $fb ) },
+};
+
+# Add the prefix
+$expected_var = { map { ("fb_$_" => delete $expected_var->{$_}) } keys %$expected_var };
+
+cmp_deeply(
+    $fb->toTemplateVars('fb_'),
+    $expected_var,
+    'toTemplateVars complete and correct'
+);
 
 done_testing;
+
+sub field_vars {
+    my $field = shift;
+    my $var = {
+        field   => $field->toHtmlWithWrapper,
+        field_input => $field->toHtml,
+        %{$field->toTemplateVars}, # not testing field's toTemplateVars method
+    };
+    return $var;
+}
+
+sub fieldset_vars {
+    my $fieldset = shift;
+    return {
+        name    => $fieldset->name,
+        label   => $fieldset->label,
+        legend  => $fieldset->legend,
+        %{object_vars( $fieldset )},
+    };
+}
+
+sub tabset_vars {
+    my $tabset = shift;
+    my $var = {
+        name    => $tabset->name,
+        tabs    => [ map { { %{object_vars( $_ )}, name => $_->name, label => $_->label } } @{$tabset->tabs} ],
+    };
+    for my $tab ( @{ $var->{tabs} } ) {
+        my $name = $tab->{name};
+        $var->{ "tabs_${name}" } = ignore(); # Ignore html for tabs, just as long as it's there
+        for my $key ( keys %$tab ) {
+            $var->{ "tabs_${name}_${key}" } = $tab->{ $key };
+        }
+    }
+    return $var;
+}
+
+sub object_vars {
+    my $f = shift;
+    my $var = {};
+
+    # Stream of objects
+    for my $obj ( @{$f->objects} ) {
+        use Scalar::Util qw(blessed);
+        given ( blessed $obj ) {
+            when ( undef ) {
+                push @{$var->{objects}}, $obj;
+            }
+            when ( $_->isa( 'WebGUI::FormBuilder::Tabset' ) ) {
+                my $props  = tabset_vars( $obj );
+                my $name   = $props->{name};
+                for my $key ( keys %$props ) {
+                    $var->{ "tabset_${name}_${key}" } = $props->{$key};
+                }
+                push @{ $var->{tabsetloop} }, $props;
+                push @{$var->{objects}}, $props;
+            }
+            when ( $_->isa( 'WebGUI::FormBuilder::Fieldset' ) ) {
+                my $props  = fieldset_vars( $obj );
+                my $name   = $props->{name};
+                for my $key ( keys %$props ) {
+                    $var->{ "fieldset_${name}_${key}" } = $props->{$key};
+                }
+                push @{ $var->{fieldsetloop} }, $props;
+                push @{$var->{objects}}, $props;
+            }
+            when ( $_->isa( 'WebGUI::Form::Control' ) ) {
+                my $props   = field_vars( $obj );
+                my $name    = $props->{name};
+                for my $key ( keys %$props ) {
+                    $var->{ "field_${name}_${key}" } = $props->{$key};
+                }
+                push @{$var->{ "field_${name}_loop" }}, $props;
+                push @{ $var->{fieldloop} }, $props;
+                $var->{ "field_${name}" } = $props->{field};
+                push @{$var->{objects}}, $props;
+            }
+        }
+    }
+
+    return $var;
+}
+
 #vim:ft=perl
+
+

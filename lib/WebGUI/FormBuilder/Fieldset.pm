@@ -144,8 +144,13 @@ sub toHtml {
 
 =cut
 
-sub toTemplateVars {
-
-}
+around toTemplateVars => sub {
+    my ( $orig, $self ) = @_;
+    my $var = $self->$orig();
+    $var->{ name } = $self->name;
+    $var->{ label } = $self->label;
+    $var->{ legend } = $self->label;
+    return $var;
+};
 
 1;

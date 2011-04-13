@@ -1,6 +1,7 @@
 package WebGUI::FormBuilder;
 
 use strict;
+use WebGUI::BestPractices;
 use Moose;
 use MooseX::Storage;
 
@@ -69,6 +70,19 @@ The name of the form. Not required, but recommended.
 =cut
 
 has 'name' => ( is => 'rw' );
+
+=head2 class
+
+The class name for the element. Defaults to "wg-formbuilder" and pulls in the
+style rules from extras/css/wg-formbuilder.css. Multiple class names may be
+seperated by a space.
+
+You should probably keep the default class and either add additional classes 
+or override .wg-formbuilder in your custom CSS files.
+
+=cut
+
+has class => ( is => 'rw', default => 'wg-formbuilder' );
 
 =head2 extras
 
@@ -157,7 +171,7 @@ Get the header for this form.
 sub getHeader {
     my ( $self ) = @_;
 
-    my @attrs   = qw{ action method name enctype };
+    my @attrs   = qw{ action method name enctype class };
     my $attrs   = join " ", map { qq{$_="} . $self->$_ . qq{"} } grep { $self->$_ } @attrs;
 
     my $html    = sprintf '<form %s %s>', $attrs, $self->extras;
@@ -177,10 +191,11 @@ sub toHtml {
     my ( $self ) = @_;
     my ( $style, $url ) = $self->session->quick(qw{ style url });
 
-    $style->setCss( $url->extras('hoverhelp.css'));
+    $style->setCss( $url->extras('css/wg-formbuilder.css') );
     $style->setScript( $url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js') );
     $style->setScript( $url->extras('yui/build/container/container-min.js') );
     $style->setScript( $url->extras('hoverhelp.js') );
+    $style->setCss( $url->extras('hoverhelp.css'));
 
     my $html = $self->getHeader;
     # Add individual objects
@@ -199,97 +214,23 @@ sub toHtml {
 
 #----------------------------------------------------------------------------
 
-=head2 toTemplateVars ( prefix, [var] )
+=head2 toTemplateVars ( prefix, var )
 
-Get the template variables for the form's controls with the given prefix. 
-C<var> is an optional hashref to add the variables to.
+Get the template variables for the form's controls with the given prefix. C<prefix>
+defaults to "form_". C<var> is an optional hashref to add the variables to.
 
 =cut
 
-sub toTemplateVars {
-    my ( $self, $prefix, $var ) = @_;
-    $prefix ||= "form";
-    $var ||= {};
+around toTemplateVars => sub {
+    my ( $orig, $self, $prefix, $var ) = @_;
+    $prefix ||= "form_";
+    $var = $self->$orig($prefix, $var);
 
-    # $prefix_header
-    $var->{ "${prefix}_header" } = $self->getHeader;
-    # $prefix_footer
-    $var->{ "${prefix}_footer" } = $self->getFooter;
-    # $prefix_fieldloop
-    #   name    -- for comparisons
-    #   field
-    #   label   -- includes hoverhelp
-    #   label_nohover
-    #   pretext
-    #   subtext
-    #   hoverhelp   -- The text. For use with label_nohover
-    # $prefix_field_$fieldName
-    if ( @{$self->fields} ) {
-        my $fieldLoop = [];
-        $var->{ "${prefix}_fieldloop" } = $fieldLoop;
-        for my $field ( @{$self->fields} ) {
-            my $name  = $field->get('name');
-            my $props = $field->toTemplateVars;
-            # Add the whole field to the vars
-            $props->{ field } = $field->toHtml;
-            $var->{ "${prefix}_field_${name}" } = $props->{ field };
-            push @{$fieldLoop}, $props;
-            # Individual accessor
-            for my $key ( keys %{$props} ) {
-                $var->{ "${prefix}_field_${name}_${key}" } = $props->{$key};
-            }
-            # Loop accessor
-            push @{$var->{ "${prefix}_field_${name}_loop" }}, $props;
-        }
-    }
-    # $prefix_fieldsetloop
-    #   name
-    #   legend
-    #   label       -- same as legend
-    #   fieldloop
-    #       ...
-    #   fieldsetloop
-    #       ...
-    #   tabloop
-    #       ...
-    # $prefix_fieldset_$fieldsetName
-    if ( @{$self->fieldsets} ) {
-        my $fieldsetLoop = [];
-        $var->{ "${prefix}_fieldsetloop" } = $fieldsetLoop;
-        for my $fieldset ( @{$self->fieldsets} ) {
-            my $name    = $fieldset->name;
-            my $props   = $fieldset->toTemplateVars;
-            for my $key ( keys %{$props} ) {
-                $var->{ "${prefix}_fieldset_${name}_${key}" } = $props->{key};
-            }
-            push @{$fieldsetLoop}, $props;
-        }
-    }
-    # $prefix_tabsetloop
-    #   name
-    #   tabloop
-    #       fieldloop
-    #           ...
-    #       fieldsetloop
-    #           ...
-    #       tabsetloop
-    #           ...
-    # $prefix_tabset_$tabsetName
-    if ( @{$self->tabsets} ) {
-        my $tabsetLoop = [];
-        $var->{ "${prefix}_tabsetloop" } = $tabsetLoop;
-        for my $tabset ( @{$self->tabsets} ) {
-            my $name    = $tabset->name;
-            my $props   = $tabset->toTemplateVars;
-            for my $key ( keys %{$props} ) {
-                $var->{ "${prefix}_tabset_${name}_${key}" } = $props->{key};
-            }
-            push @{$tabsetLoop}, $props;
-        }
-    }
+    $var->{ "${prefix}header" } = $self->getHeader;
+    $var->{ "${prefix}footer" } = $self->getFooter;
 
     return $var;
-}
+};
 
 =head1 TEMPLATES
 

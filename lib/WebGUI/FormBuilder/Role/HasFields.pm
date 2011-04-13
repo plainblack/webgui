@@ -91,9 +91,10 @@ sub addFieldAt {
     for my $obj ( @{$self->objects} ) {
         next unless blessed $obj;
         # A field isn't allowed to have child objects
-        if ( !$obj->can('does') || !$obj->does('WebGUI::FormBuilder::Role::HasObjects') ) {
-            push @{$self->fields}, $obj;
-        }
+        next if ( $obj->can('does') && $obj->does('WebGUI::FormBuilder::Role::HasObjects') );
+        next if $obj->isa('WebGUI::FormBuilder::Tabset');
+
+        push @{$self->fields}, $obj;
     }
     return $field;
 }
