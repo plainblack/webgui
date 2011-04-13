@@ -216,7 +216,8 @@
 # Specify the list of template parsers available in the system.
 
 "templateParsers" : [
-    "WebGUI::Asset::Template::HTMLTemplate"
+    "WebGUI::Asset::Template::HTMLTemplate",
+    "WebGUI::Asset::Template::TemplateToolkit"
     ],
 
 # Enable the Survey Expression Engine, which allows goto expressions in
