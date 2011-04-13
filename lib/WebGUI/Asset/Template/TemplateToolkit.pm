@@ -27,7 +27,12 @@ sub _rewriteVars { # replace dots with underscrores in keys (except in keys that
                 $newKey =~ s/\./_/g if $newKey !~ /\//;
 		if ( ref $vars->{$key} eq 'ARRAY') {
 			foreach my $entry (@{$vars->{$key}}) {
+                            if ( ref $entry eq 'HASH' ) {
 				push(@{$newVars->{$newKey}}, _rewriteVars($entry));
+                            }
+                            else {
+                                push(@{$newVars->{$newKey}}, $entry );
+                            }
 			}
                 } elsif(ref $vars->{$key} eq 'HASH') {
                         $newVars->{$newKey} = _rewriteVars($vars->{$key});
