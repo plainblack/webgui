@@ -630,6 +630,17 @@ sub editThingDataSave {
             $fieldValue = $field->{defaultValue};
             #WebGUI::Macro::process($self->session,\$fieldValue);
         }
+
+	if ($field->{isUnique}) {
+
+             unless ( $self->isUniqueEntry($thingId,$fieldName,$fieldValue,$thingDataId)) {
+               push (@errors,{
+                "error_message"=>$field->{label}. $i18n->get('needs to be unique error'),
+                });
+             }
+	}
+
+
         $thingData{$fieldName} = $fieldValue;
     }
 
@@ -813,6 +824,16 @@ sub getEditFieldForm {
         -options=>\%fieldTypes,
         -id=>$dialogPrefix."_fieldType_formId",
         );
+
+    $f->yesNo(
+        -name=>'isUnique',
+        -label=>$i18n->get('unique label'),
+	-hoverHelp=>$i18n->get('unique description'),
+        -value=>$field->{isUnique},
+        -id=>$dialogPrefix."_isUnique_formId",
+      );
+
+
     $f->raw($self->getHtmlWithModuleWrapper($dialogPrefix."_fieldInThing_module"));
 
     $f->raw($self->getHtmlWithModuleWrapper($dialogPrefix."_defaultFieldInThing_module"));
@@ -1328,6 +1349,68 @@ sub hasEnteredMaxPerUser {
     }
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 hasEnteredMaxEntries
+
+Check whether the the maximum number of entries allowed for this thing has been reached.
+
+=head3 thingId
+
+The unique id of a thing.
+
+=cut
+
+sub hasEnteredMaxEntries {
+    my ($self,$thingId) = @_;
+    my $session         = $self->session;
+    my $db       	= $session->db;
+
+    my $maxEntriesTotal = $db->quickScalar("select maxEntriesTotal from Thingy_things where thingId=?",[$thingId]);
+
+    return 0 unless $maxEntriesTotal;
+
+    my $numberOfEntries = $session->db->quickScalar("select count(*) "
+        ."from ".$session->db->dbh->quote_identifier("Thingy_".$thingId));
+
+    if($numberOfEntries < $maxEntriesTotal){
+        return 0;
+    }
+    else{
+        return 1;
+    }
+}
+
+
+
+
+#-------------------------------------------------------------------
+
+=head2 isUniqueEntry ( thingId,fieldName,fieldValue, thingDataId )
+
+Checks if the data entered in thingy record is unique
+
+=cut
+
+
+sub isUniqueEntry {
+
+   my ($self,$thingId,$fieldName,$fieldValue,$thingDataId) = @_;
+   my $session = $self->session;
+   my $db = $session->db;
+
+   my $nrOfEntries = $session->db->quickScalar("select count(*) "
+        ."from ".$session->db->dbh->quote_identifier("Thingy_".$thingId)." where " .
+        $session->db->dbh->quote_identifier($fieldName) ."=? and thingDataId !=?",[$fieldValue,$thingDataId]);
+   if ($nrOfEntries > 0) { return 0; }
+   return 1;
+}
+
+
+
+
+
 #-------------------------------------------------------------------
 
 =head2 hasPrivileges  ( groupId )
@@ -1793,8 +1876,9 @@ sub www_editThing {
             thingsPerPage=>25,
             exportMetaData=>undef, 
             maxEntriesPerUser=>undef,
+            maxEntriesTotal=>undef,
         );
-        $thingId = "new";
+        $thingId = $self->addThing(\%properties,0);
     }
     else{
         %properties = %{$self->getThing($thingId)};
@@ -2004,6 +2088,14 @@ sub www_editThing {
         -hoverHelp=> $i18n->get('max entries per user description'),
         -label => $i18n->get('max entries per user label')
     );
+
+    $tab->integer(
+        -name=> "maxEntriesTotal",
+        -value=> $properties{maxEntriesTotal},
+        -hoverHelp => $i18n->get('max entries total description'),
+        -label => $i18n->get('max entries total label')
+    );
+
     $tab->group(
         -name=> "groupIdAdd",
         -value=> $properties{groupIdAdd},
@@ -2211,13 +2303,9 @@ sub www_editThingSave {
     my ($thingId, $fields);
     $thingId = $self->session->form->process("thingId");
 
-	$fields = $self->session->db->read('select * from Thingy_fields where assetId = '.$self->session->db->quote($self->get("assetId")).' and thingId = '.$self->session->db->quote($thingId).' order by sequenceNumber');
+    $fields = $self->session->db->read('select * from Thingy_fields where assetId = '.$self->session->db->quote($self->get("assetId")).' and thingId = '.$self->session->db->quote($thingId).' order by sequenceNumber');
 
-    if($fields->rows < 1){
-        $self->session->log->warn("Thing failed to create because it had no fields");
-        my $i18n = WebGUI::International->new($self->session, "Asset_Thingy");
-        return $self->www_editThing($i18n->get("thing must have fields"));
-    }
+        
     $self->setCollateral("Thingy_things","thingId",{
         thingId=>$thingId,
         label=>$form->process("label"),
@@ -2244,8 +2332,15 @@ sub www_editThingSave {
         sortBy=>$form->process("sortBy") || '',
         exportMetaData=>$form->process("exportMetaData") || '',
         maxEntriesPerUser=>$form->process("maxEntriesPerUser") || '',
+        maxEntriesTotal=>$form->process("maxEntriesTotal") || '',
         },0,1);
-
+    
+    if($fields->rows < 1){
+        $self->session->log->warn("Thing failed to create because it had no fields");
+        my $i18n = WebGUI::International->new($self->session, "Asset_Thingy");
+        return $self->www_editThing($i18n->get("thing must have fields"));
+    }
+    
     while (my $field = $fields->hashRef) {
         my $display = $self->session->form->process("display_".$field->{fieldId}) || 0;
         my $viewScreenTitle = $self->session->form->process("viewScreenTitle_".$field->{fieldId}) || 0;
@@ -2272,7 +2367,6 @@ sub www_editField {
     return $session->privilege->insufficient() unless $self->canEdit;
     $fieldId = $session->form->process("fieldId");
     $thingId = $session->form->process("thingId");
-
     %properties = $session->db->quickHash("select * from Thingy_fields where thingId=? and fieldId=? and assetId=?",
         [$thingId,$fieldId,$self->get("assetId")]);
     if($session->form->process("copy")){
@@ -2309,12 +2403,12 @@ sub www_editFieldSave {
     my $log     = $session->log;
     my $defaultValue = $session->form->process("defaultValue");
     my $fieldType    = $session->form->process("fieldType") || "ReadOnly";
+    my $uniqueField  = $session->form->process("isUnique");
+
 
     if ($fieldType =~ m/^otherThing/){
         $defaultValue = $session->form->process("defaultFieldInThing");
     }
-	
-	$thingId = $self->addThing({ thingId => 'new' },0) if $thingId eq 'new';
     
     $fieldId = $session->form->process("fieldId");
     %properties = (
@@ -2322,6 +2416,7 @@ sub www_editFieldSave {
         thingId             => $thingId,
         label               => $label,
         fieldType           => $fieldType,
+	isUnique            => $uniqueField,
         defaultValue        => $defaultValue,
         possibleValues      => $session->form->process("possibleValues"),
         pretext             => $session->form->process("pretext"),
@@ -2379,7 +2474,7 @@ sub www_editFieldSave {
     # Make sure we send debug information along with the field.
     $log->preventDebugOutput;
 
-    $session->output->print($thingId.$newFieldId.$listItemHTML);
+    $session->output->print($newFieldId.$listItemHTML);
     return "chunked";
 }
 
@@ -2539,7 +2634,7 @@ sub editThingData {
         $var->{"delete_confirm"} = "onclick=\"return confirm('".$i18n->get("delete thing data warning")."')\"";
     }
 
-    if($self->hasPrivileges($thingProperties->{groupIdAdd}) && !$self->hasEnteredMaxPerUser($thingId)){    
+    if($self->hasPrivileges($thingProperties->{groupIdAdd}) && !$self->hasEnteredMaxPerUser($thingId) && !$self->hasEnteredMaxEntries($thingId)){    
         $var->{"add_url"} = $session->url->append($url,'func=editThingData;thingId='.$thingId.';thingDataId=new');
     }
     if($self->hasPrivileges($thingProperties->{groupIdSearch})){
@@ -2606,6 +2701,15 @@ sub editThingData {
         delete $var->{field_loop};
         $var->{editInstructions} = $i18n->get("has entered max per user message");
     }
+    if($thingDataId eq 'new' && $self->hasEnteredMaxEntries($thingId)){
+        delete $var->{form_start};
+        delete $var->{form_end};
+        delete $var->{form_submit};
+        delete $var->{field_loop};
+        $var->{editInstructions} = $i18n->get("has entered max total message");
+    }
+
+
     return $self->processTemplate($var,$thingProperties->{editTemplateId});
 }
 
@@ -2635,6 +2739,10 @@ sub www_editThingDataSave {
     if($thingDataId eq 'new' && $self->hasEnteredMaxPerUser($thingId)){
         return $i18n->get("has entered max per user message");
     }
+    if($thingDataId eq 'new' && $self->hasEnteredMaxEntries($thingId)){
+        return $i18n->get("has entered max total message");
+    }
+
 
     ($newThingDataId,$errors) = $self->editThingDataSave($thingId,$thingDataId);
 
@@ -2704,6 +2812,10 @@ sub www_editThingDataSaveViaAjax {
         if($thingDataId eq 'new' && $self->hasEnteredMaxPerUser($thingId)){
             $session->http->setStatus("400", "Bad Request");
             return JSON->new->encode({message => $i18n->get("has entered max per user message")});
+        }
+        if($thingDataId eq 'new' && $self->hasEnteredMaxEntries($thingId)){
+            $session->http->setStatus("400", "Bad Request");
+            return JSON->new->encode({message => $i18n->get("has entered max total message")});
         }
 
     	my ($newThingDataId,$errors) = $self->editThingDataSave($thingId,$thingDataId);
@@ -2893,6 +3005,9 @@ sub www_import {
     my ($sql,$fields,@fields,$fileName,@insertColumns);
     my ($handleDuplicates,$newThingDataId);
 
+    my $i18n        = WebGUI::International->new($self->session, "Asset_Thingy");
+
+
     my $thingId = $session->form->process('thingId');
     my $thingProperties = $self->getThing($thingId);
     return $session->privilege->insufficient() unless $self->hasPrivileges($thingProperties->{groupIdImport});
@@ -2990,9 +3105,27 @@ sub www_import {
                 $error->info("Skipping line");
                 next;
             }
-            $thingData{lastUpdated} = time();
-            $thingData{updatedByName} = $session->user->username;
-            $thingData{updatedById} = $session->user->userId;
+
+	   # Is this a new record or are we updating an existing record?
+           if ($thingData{thingDataId} eq 'new') {
+            	$thingData{dateCreated} = time();
+            	$thingData{createdById} = $session->user->userId;
+           }
+           else {
+            	$thingData{lastUpdated} = time();
+            	$thingData{updatedByName} = $session->user->username;
+            	$thingData{updatedById} = $session->user->userId;
+           }
+
+           $thingData{ipAddress} = $session->env->getIp;
+
+           if($thingData{thingDataId} eq 'new' && $self->hasEnteredMaxPerUser($thingId)){
+             last;
+            }
+           if($thingData{thingDataId} eq 'new' && $self->hasEnteredMaxEntries($thingId)){
+	      last;
+            }
+
             $self->setCollateral("Thingy_".$thingId,"thingDataId",\%thingData,0,0) if ($thingData{thingDataId});
         }
         close $importFile;
@@ -3323,7 +3456,7 @@ sub getSearchTemplateVars {
     if ($self->hasPrivileges($thingProperties->{groupIdImport})){
         $var->{"import_url"} = $session->url->append($url, 'func=importForm;thingId='.$thingId);
     }
-    if ($self->hasPrivileges($thingProperties->{groupIdAdd}) && !$self->hasEnteredMaxPerUser($thingId)){
+    if ($self->hasPrivileges($thingProperties->{groupIdAdd}) && !$self->hasEnteredMaxPerUser($thingId) && !$self->hasEnteredMaxEntries($thingId) ){
         $var->{"add_url"} = $session->url->append($url,'func=editThingData;thingId='.$thingId.';thingDataId=new');
     }
     $var->{searchScreenTitle} = $thingProperties->{searchScreenTitle};    
@@ -3624,7 +3757,7 @@ sub www_viewThingData {
         .$thingId.';thingDataId='.$thingDataId);
         $var->{"delete_confirm"} = "onclick=\"return confirm('".$i18n->get("delete thing data warning")."')\"";
     }
-    if($self->hasPrivileges($thingProperties->{groupIdAdd}) && !$self->hasEnteredMaxPerUser($thingId)){
+    if($self->hasPrivileges($thingProperties->{groupIdAdd}) && !$self->hasEnteredMaxPerUser($thingId) && !$self->hasEnteredMaxEntries($thingId) ){
         $var->{"add_url"} = $session->url->append($url, 'func=editThingData;thingId='.$thingId.';thingDataId=new');
     }
     if($self->hasPrivileges($thingProperties->{groupIdSearch})){    
