@@ -11,9 +11,11 @@ if ( typeof WebGUI == "undefined" ) {
     WebGUI = {};
 }
 WebGUI.Admin = function(cfg){
+    var self = this;
     // Public properties
     this.cfg = cfg;
     this.currentAssetDef    = null;
+    this.currentAssetId     = "";
     this.currentTab         = "view"; // "view" or "tree" or other ID
     this.treeDirty          = true;
 
@@ -37,8 +39,20 @@ WebGUI.Admin = function(cfg){
     // Custom events
     this.afterNavigate = new YAHOO.util.CustomEvent( "afterNavigate", this );
 
+    // Keep track of the view iframe
+    var viewframe   = document.getElementById('adminViewFrame');
+    // If it already loaded, run the right function
+    if ( viewframe.hasLoaded && window.frames[viewframe.name].WG ) {
+        this.navigate( window.frames[viewframe.name].WG.currentAssetId );
+    }
+    // Next and every subsequent time it loads, run the right function again
+    YAHOO.util.Event.on( viewframe, 'load', function(){ 
+        if ( window.frames[viewframe.name].WG ) {
+            self.navigate( window.frames[viewframe.name].WG.currentAssetId );
+        }
+    } );
+
     // Private methods
-    var self = this;
     // Initialize these things AFTER the i18n is fetched
     var _init = function () {
         self.afterNavigate.subscribe( self.requestUpdateCurrentVersionTag, self );
@@ -60,10 +74,6 @@ WebGUI.Admin = function(cfg){
             homeUrl : self.cfg.homeUrl
         } );
         self.afterNavigate.subscribe( self.locationBar.afterNavigate, self.locationBar );
-        if ( self.currentAssetDef ) {
-            self.locationBar.navigate( self.currentAssetDef );
-        }
-
     };
 
     // Get I18N
@@ -245,23 +255,51 @@ WebGUI.Admin.prototype.makeGotoAsset
  * page is reached
  */
 WebGUI.Admin.prototype.navigate
-= function ( assetDef ) {
+= function ( assetId ) {
     // Don't do the same asset twice
-    if ( this.currentAssetDef && this.currentAssetDef.assetId == assetDef.assetId ) {
+    if ( this.currentAssetId && this.currentAssetId == assetId ) {
         // But still fire the event
-        this.afterNavigate.fire( assetDef );
+        this.afterNavigate.fire( this.currentAssetDef );
         return;
     }
 
-    if ( !this.currentAssetDef || this.currentAssetDef.assetId != assetDef.assetId ) {
-        this.currentAssetDef = assetDef;
-        this.treeDirty = 1;
-        this.updateAssetHelpers( assetDef );
-        this.updateAssetHistory( assetDef );
-    }
+    if ( !this.currentAssetId || this.currentAssetId != assetId ) {
+        // request asset update
+        this.currentAssetId = assetId;
+        var self = this;
+        this.requestAssetDef( assetId, function( assetDef ) {
+            self.currentAssetDef = assetDef;
+            self.treeDirty = 1;
+            self.updateAssetHelpers( assetDef );
+            self.updateAssetHistory( assetDef );
 
-    // Fire event
-    this.afterNavigate.fire( assetDef );
+            // Fire event
+            this.afterNavigate.fire( assetDef );
+        } );
+    }
+};
+
+/**
+ * requestAssetDef( assetId, callback )
+ * Request more information about an asset. The callback takes a single
+ * argument which is an object containing the asset information and is 
+ * called in the scope of the admin function
+ */
+WebGUI.Admin.prototype.requestAssetDef
+= function ( assetId, callback ) {
+    var connectCallback = {
+        success : function (o) {
+            var assetDef = YAHOO.lang.JSON.parse( o.responseText );
+            callback.call( this, assetDef );
+        },
+        failure : function (o) {
+
+        },
+        scope: this
+    };
+
+    var url = '?op=admin;method=getAssetData;assetId=' + assetId;
+    var ajax = YAHOO.util.Connect.asyncRequest( 'GET', url, connectCallback );
 };
 
 /**
@@ -447,7 +485,7 @@ WebGUI.Admin.prototype.updateAssetHelpers
 = function ( assetDef ) {
     var typeEl  = document.getElementById( 'helper_asset_name' );
     typeEl.style.backgroundImage = 'url(' + assetDef.icon + ')';
-    typeEl.innerHTML = assetDef.type;
+    typeEl.innerHTML = assetDef.className;
 
     // Clear old helpers
     var helperEl    = document.getElementById( 'helper_list' );
@@ -477,7 +515,7 @@ WebGUI.Admin.prototype.addHelperHandler
         YAHOO.util.Event.on( elem, "click", function(){ self.gotoAsset( helper.url ) }, self, true );
     }
     else {
-        YAHOO.util.Event.on( elem, "click", function(){ self.requestHelper( helperId, self.currentAssetDef.assetId ) }, self, true );
+        YAHOO.util.Event.on( elem, "click", function(){ self.requestHelper( helperId, self.currentAssetId ) }, self, true );
     }
 };
 

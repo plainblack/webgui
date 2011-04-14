@@ -248,34 +248,15 @@ if ($self->session->user->isRegistered || $self->session->setting->get("preventP
 }
 
 
-    # TODO: Figure out if user is still in the admin console
-    $var{'head.tags'} .= '<script type="text/javascript">';
-    my $asset   = $session->asset;
-
-    # If user is in an operation, find the right asset
-    if ( !$asset && $session->form->get('op') ) {
-        $asset  = WebGUI::Asset->newByUrl( $session );
-    }
-
-    if ( $asset ) {
-        my $i18n        = WebGUI::International->new( $session );
-        my $assetName   = $i18n->get( @{ $asset->assetName } );
-        my $assetDef    = { 
-            assetId     => $asset->getId,
-            title       => $asset->getTitle,
-            url         => $asset->getUrl,
-            icon        => $asset->getIcon(1),
-            type        => $assetName,
-            helpers     => $asset->getHelpers,
-            revisions   => $asset->getRevisionDates,
-        };
-        $var{'head.tags'} .= sprintf <<'ADMINJS', JSON->new->encode( $assetDef );
-if ( window.parent && window.parent.admin ) {
-    window.parent.admin.navigate( %s );
-}
+    # Give the API jocks something to use
+    if ( $session->asset ) {
+        $var{'head.tags'} .= sprintf <<'ADMINJS', $session->asset->getId
+            <script type="text/javascript">
+            if ( typeof window.WG == "undefined" ) { window.WG = {} }
+            WG.currentAssetId   = '%s';
+            </script>
 ADMINJS
     }
-    $var{'head.tags'} .= '</script>';
 
     # Removing the newlines will probably annoy people. 
     # Perhaps turn it off under debug mode?

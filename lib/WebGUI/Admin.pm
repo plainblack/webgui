@@ -122,6 +122,38 @@ sub getAdminPluginTemplateVars {
 
 #----------------------------------------------------------------------
 
+=head2 getAssetData ( asset )
+
+Get the required data for an asset, including the properties and helpers.
+Returns a hashref.
+
+=cut
+
+sub getAssetData {
+    my ( $self, $asset ) = @_;
+
+    # Populate the required fields to fill in
+    my %fields      = (
+        assetId         => $asset->getId,
+        url             => $asset->getUrl,
+        lineage         => $asset->lineage,
+        title           => $asset->menuTitle,
+        revisionDate    => $asset->revisionDate,
+        childCount      => $asset->getChildCount,
+        assetSize       => $asset->assetSize,
+        lockedBy        => ($asset->isLockedBy ? $asset->lockedBy->username : ''),
+        canEdit         => $asset->canEdit && $asset->canEditIfLocked,
+        helpers         => $asset->getHelpers,
+        icon            => $asset->getIcon("small"),
+        className       => $asset->getName,
+        revisions       => [ $asset->getRevisionDates ],
+    );
+
+    return \%fields;
+}
+
+#----------------------------------------------------------------------
+
 =head2 getAssetTypes ( )
 
 Get a hash of className => info pairs containing information about the
@@ -480,6 +512,22 @@ sub www_findUser {
 
 #----------------------------------------------------------------------
 
+=head2 www_getAssetData ( )
+
+Get data for an asset, including properties and asset helpers.
+
+=cut
+
+sub www_getAssetData {
+    my ( $self ) = @_;
+    my $session = $self->session;
+    my $assetId = $session->form->get('assetId');
+    my $asset   = WebGUI::Asset->newById( $session, $assetId );
+    return JSON->new->encode( $self->getAssetData( $asset ) );
+}
+
+#----------------------------------------------------------------------
+
 =head2 www_getClipboard ( ) 
 
 Get the assets currently on the user's clipboard
@@ -496,13 +544,7 @@ sub www_getClipboard {
     my $assets      = WebGUI::Asset->getRoot( $session )->getAssetsInClipboard( $userOnly );
     my @assetInfo   = ();
     for my $asset ( @{$assets} ) {
-        push @assetInfo, {
-            assetId         => $asset->getId,
-            url             => $asset->getUrl,
-            title           => $asset->menuTitle,
-            revisionDate    => $asset->revisionDate,
-            icon            => $asset->getIcon("small"),
-        };
+        push @assetInfo, $self->getAssetData( $asset );
     }
 
     return JSON->new->encode( \@assetInfo );
@@ -557,43 +599,16 @@ sub www_getTreeData {
 
     for my $assetId ( @{ $p->getPageData } ) {
         my $asset       = WebGUI::Asset->newById( $session, $assetId );
-
-        # Populate the required fields to fill in
-        my %fields      = (
-            assetId         => $asset->getId,
-            url             => $asset->getUrl,
-            lineage         => $asset->lineage,
-            title           => $asset->menuTitle,
-            revisionDate    => $asset->revisionDate,
-            childCount      => $asset->getChildCount,
-            assetSize       => $asset->assetSize,
-            lockedBy        => ($asset->isLockedBy ? $asset->lockedBy->username : ''),
-            canEdit         => $asset->canEdit && $asset->canEditIfLocked,
-            helpers         => $asset->getHelpers,
-            icon            => $asset->getIcon("small"),
-            className       => $asset->getName,
-        );
-
-        push @{ $assetInfo->{ assets } }, \%fields;
+        push @{ $assetInfo->{ assets } }, $self->getAssetData( $asset );
     }
 
     $assetInfo->{ totalAssets   } = $p->getRowCount;
     $assetInfo->{ sort          } = $session->form->get( 'orderByColumn' );
     $assetInfo->{ dir           } = lc $session->form->get( 'orderByDirection' );
-    $assetInfo->{ currentAsset  } = { 
-        assetId => $asset->getId,
-        url     => $asset->getUrl,
-        title => $asset->getTitle,
-        icon    => $asset->getIcon("small"),
-        helpers => $asset->getHelpers,
-    };
-
+    $assetInfo->{ currentAsset  } = $self->getAssetData( $asset );
     $assetInfo->{ crumbtrail    } = [];
     for my $asset ( @{ $asset->getLineage( ['ancestors'], { returnObjects => 1 } ) } ) {
-        push @{ $assetInfo->{crumbtrail} }, {
-            title       => $asset->getTitle,
-            url         => $asset->getUrl
-        };
+        push @{ $assetInfo->{crumbtrail} }, $self->getAssetData( $asset );
     }
 
     $session->response->content_type( 'application/json' );
@@ -708,24 +723,7 @@ sub www_searchAssets {
     for my $result ( @{ $p->getPageData } ) {
         my $assetId = $result->{assetId};
         my $asset       = WebGUI::Asset->newById( $session, $assetId );
-
-        # Populate the required fields to fill in
-        my %fields      = (
-            assetId         => $asset->getId,
-            url             => $asset->getUrl,
-            lineage         => $asset->lineage,
-            title           => $asset->menuTitle,
-            revisionDate    => $asset->revisionDate,
-            childCount      => $asset->getChildCount,
-            assetSize       => $asset->assetSize,
-            lockedBy        => ($asset->isLockedBy ? $asset->lockedBy->username : ''),
-            canEdit         => $asset->canEdit && $asset->canEditIfLocked,
-            helpers         => $asset->getHelpers,
-            icon            => $asset->getIcon('small'),
-            className       => $asset->getName,
-        );
-
-        push @{ $assetInfo->{ assets } }, \%fields;
+        push @{ $assetInfo->{ assets } }, $self->getAssetData( $asset );
     }
 
     $assetInfo->{ totalAssets   } = $p->getRowCount;
