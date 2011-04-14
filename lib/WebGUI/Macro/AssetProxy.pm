@@ -77,7 +77,6 @@ sub process {
         }
     }
     elsif ($asset->canView) {
-        $asset->toggleToolbar;
         $asset->prepareView;
         my $output = $asset->view;
         $perfLog->({ asset => $asset, time => Time::HiRes::tv_interval($t), type => 'Proxy'})

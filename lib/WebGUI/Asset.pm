@@ -1728,20 +1728,6 @@ sub getToolbar {
 
 #-------------------------------------------------------------------
 
-=head2 getToolbarState ( )
-
-Returns 0 if the state is normal, and 1 if the toolbar state has been toggled. See toggleToolbar() for details.
-
-=cut
-
-sub getToolbarState {
-	my $self = shift;
-	return $self->{_toolbarState};
-}
-
-
-#-------------------------------------------------------------------
-
 =head2 getUiLevel ( )
 
 Returns the UI Level specified in the asset definition or from the config file if it's overridden. And if neither of those is specified, then it returns 1.
@@ -2578,24 +2564,6 @@ sub setState {
     $self->stateChanged($props[2]);
     $self->purgeCache;
 }
-
-#-------------------------------------------------------------------
-
-=head2 toggleToolbar ( )
-
-Toggles a toolbar to a special state so that custom toolbars can be rendered under special circumstances. This is mostly useful for macros that wish to proxy an asset but not display the toolbar.
-
-=cut
-
-sub toggleToolbar {
-	my $self = shift;
-	if ($self->{_toolbarState}) {
-		$self->{_toolbarState} = 0;
-	} else {
-		$self->{_toolbarState} = 1;
-	}
-}
-
 
 #-------------------------------------------------------------------
 

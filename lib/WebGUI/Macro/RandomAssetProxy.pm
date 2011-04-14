@@ -51,7 +51,6 @@ sub process {
         return $i18n->get('childless');
     }
     elsif ($randomAsset->canView) {
-        $randomAsset->toggleToolbar;
         $randomAsset->prepareView;
         return $randomAsset->view;
     }
