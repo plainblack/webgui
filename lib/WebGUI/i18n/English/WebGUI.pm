@@ -1445,6 +1445,11 @@ You must be using mod_perl and configure <b>PerlSetEnv SYBASE /opt/sybase/11.0.2
                 lastUpdated => 1122093200,
         },
 
+        'override user email preference description' => {
+                message => q|Send mail regardless of the users' preferences about receiving inbox notifications|,
+                lastUpdated => 1302878213,
+        },
+
         '230 description' => {
                 message => q|The message that will be sent to all members of the group.  The message will be
 sent in HTML format. No attachments can be included.|,
@@ -2241,6 +2246,11 @@ This group could then be named "Employees in HMO 1", and would allow you to rest
 	'229' => {
 		message => q|Subject|,
 		lastUpdated => 1031514049
+	},
+
+	'override user email preference' => {
+		message => 'Override user email preference?',
+		lastUpdated => 1302878112,
 	},
 
 	'866' => {
