@@ -463,11 +463,16 @@ sub getTransactionVars {
  
         # Post purchase actions
         my $actionsLoop = [];
-        my $actions     = $item->getSku->getPostPurchaseActions( $item );
-        for my $label ( keys %{$actions} ) {
-            push @{$actionsLoop}, {
-                label       => $label,
-                url         => $actions->{$label},
+        my $sku = eval { $item->getSku };
+        my $has_sku = 0;
+        if (! WebGUI::Error->caught) {
+            my $actions = $sku->getPostPurchaseActions( $item );
+            $has_sku    = 1;
+            for my $label ( keys %{$actions} ) {
+                push @{$actionsLoop}, {
+                    label       => $label,
+                    url         => $actions->{$label},
+                }
             }
         }
 
@@ -485,7 +490,8 @@ sub getTransactionVars {
             %{$item->get},
             %taxVars,
             viewItemUrl             => $url->page('shop=transaction;method=viewItem;transactionId='.$self->getId.';itemId='.$item->getId, 1),
-            price                   => sprintf("%.2f", $item->get('price')),
+            hasSku                  => $hasSku,
+            price                   => sprintf( "%.2f", $item->get('price') ),
             pricePlusTax            => sprintf( "%.2f", $price + $taxAmount ),
             extendedPrice           => sprintf( "%.2f", $quantity * $price ),
             extendedPricePlusTax    => sprintf( "%.2f", $quantity * ( $price + $taxAmount ) ),
@@ -1187,6 +1193,8 @@ sub www_view {
         <tbody>
     };
     foreach my $item (@{$transaction->getItems}) {
+        eval { $item->getSku; };
+        my $sku_exists = !WebGUI::Error->caught;
         $output .= WebGUI::Form::formHeader($session)
             .WebGUI::Form::hidden($session, {name=>"shop",value=>"transaction"})
             .WebGUI::Form::hidden($session, {name=>"method",value=>"updateItem"})
@@ -1194,9 +1202,15 @@ sub www_view {
             .WebGUI::Form::hidden($session, {name=>"itemId",value=>$item->getId})
             .q{
             <tr>
-            <td>}.$item->get('lastUpdated').q{</td>
-            <td><a href="}.$url->page('shop=transaction;method=viewItem;transactionId='.$transaction->getId.';itemId='.$item->getId).q{">}.$item->get('configuredTitle').q{</a></td>
-            <td>}.$transaction->formatCurrency($item->get('price')).q{</td>
+            <td>}.$item->get('lastUpdated').qq{</td>\n}.
+            (
+                $sku_exists
+                ?  q{<td><a href="}.$url->page('shop=transaction;method=viewItem;transactionId='.$transaction->getId
+                   . ';itemId='.$item->getId).q{">}.$item->get('configuredTitle').qq{</a></td>\n}
+                :  q{<td>}.$item->get('configuredTitle').q{<br />}.$i18n->get('item sku deleted').qq{</td>\n}
+ 
+            )
+            . q{<td>}.$transaction->formatCurrency($item->get('price')).q{</td>
             <td>}.$item->get('quantity').q{</td>
         };
         if ($item->get('shippingAddressId') eq $transaction->get('shippingAddressId')) {
@@ -1273,7 +1287,12 @@ sub www_viewItem {
         $session->errorHandler->error("Can't get item ".$session->form->get("itemId"));
         return $class->www_view($session);
     }
-    return $item->getSku->www_view;
+    my $sku = eval { $item->getSku };
+    if (WebGUI::Error->caught()) {
+        $session->errorHandler->error("Can't get sku for ".$session->form->get("itemId"));
+        return $class->www_view($session);
+    }
+    return $sku->www_view;
 }
 
 #-------------------------------------------------------------------

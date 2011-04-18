@@ -1,5 +1,6 @@
 7.9.27
  - fixed #12103: PayPalStd driver fails occasionally
+ - fixed #12107: Viewing an individual transaction item fails
 
 7.9.26
  - fixed #12086: Shop Billing Address Unpopulated

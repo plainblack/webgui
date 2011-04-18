@@ -1,6 +1,11 @@
 This is a running list of template changes made during upgrades.  If you have copied the default
 templates, you will need to apply these changes manually to your copies.
 
+7.9.27
+  * My Purchases Detail (Default) - shopping-cart-collateral-items/my-purchases-detail-default
+  * Email Receipt (Default) - shopping-cart-collateral-items/email-receipt-default 
+    Added code to prevent links to items with bad skus to both templates.
+
 7.9.26
   * Cart (Default) - default-shopping-cart-template
     In 7.9.17, hardcoded JavaScript was removed from the Cart code and should be migrated to the Cart template.  The list of Javascript and files which are needed is below.  Please add it to the Attachments or Extra Head Tags for any customized Cart templates.
