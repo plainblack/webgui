@@ -274,7 +274,7 @@ sub definition {
                     label       => $i18n->get('Feed URL'),
                 },
                 {
-                    name        => 'status',
+                    name        => 'lastResult',
                     type        => 'readonly',
                     label       => $i18n->get('434','WebGUI'),
                 },
@@ -867,6 +867,17 @@ sub processPropertiesFromFormPost {
 
     unless ($self->get("groupIdSubscribed")) {
         $self->createSubscriptionGroup();
+    }
+
+    my @feeds = @{ $self->getFeeds };
+    foreach my $feed (@feeds) {
+        if ($feed->{lastUpdated} eq 'new') {
+            $feed->{lastUpdated} = 'never';
+        }
+        if ($feed->{lastResult} eq 'new') {
+            $feed->{lastResult} = '';
+        }
+        $self->setFeed($feed->{feedId}, $feed);
     }
 
     return;

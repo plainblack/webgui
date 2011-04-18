@@ -22,6 +22,7 @@ use Getopt::Long;
 use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::Asset;
+use WebGUI::Asset::Wobject::Calendar;
 
 
 my $toVersion = '7.9.27';
@@ -31,6 +32,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+fixBadCalendarFeedStatus($session);
 
 finish($session); # this line required
 
@@ -43,6 +45,32 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub fixBadCalendarFeedStatus {
+    my $session = shift;
+    print "\tFix the name of the iCal status field in all Calendar assets... " unless $quiet;
+    # and here's our code
+    my $fetch_calendar = WebGUI::Asset::Wobject::Calendar->getIsa($session);
+    my $sth = $session->db->read('select assetId, revisionDate from Calendar');
+    CALENDAR: while (my ($assetId, $revisionDate) = $sth->array) {
+        my $calendar = eval {WebGUI::Asset->new($session, $assetId, 'WebGUI::Asset::Wobject::Calendar', $revisionDate)};
+        next CALENDAR if !$calendar;
+        FEED: foreach my $feed ( @{ $calendar->getFeeds } ) {
+            my $status = delete $feed->{status};
+            if (!exists $feed->{lastResult}) {
+                $feed->{lastResult} = $status;
+            }
+            if (!exists $feed->{lastUpdated}) {
+                $feed->{lastUpdated} = 'never';
+            }
+            $calendar->setFeed($feed->{feedId}, $feed);
+        }
+    }
+    $sth->finish;
+    print "DONE!\n" unless $quiet;
+}
 
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
