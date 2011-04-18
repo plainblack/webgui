@@ -1617,113 +1617,14 @@ sub getTitle {
 
 =head2 getToolbar ( )
 
-Returns a toolbar with a set of icons that hyperlink to functions that delete, edit, promote, demote, cut, and copy.
+Returns a toolbar placeholder, which can be filled in using the toolbar.js, located
+in www/extras/admin/toolbar.js
 
 =cut
 
 sub getToolbar {
     my $self = shift;
-    return undef unless $self->canEdit && $self->session->isAdminOn;
-    return $self->{_toolbar}
-        if (exists $self->{_toolbar});
-    my $userUiLevel = $self->session->user->get("uiLevel");
-    my $uiLevels = $self->session->config->get("assetToolbarUiLevel");
-    my $i18n = WebGUI::International->new($self->session, "Asset");
-    my $toolbar = "";
-    my $commit;
-    if ($self->canEditIfLocked) {
-        $toolbar .= $self->session->icon->delete('func=delete',$self->get("url"),$i18n->get(43))
-            if ($userUiLevel >= $uiLevels->{"delete"});
-        $toolbar .= $self->session->icon->edit('func=edit',$self->get("url"))
-            if ($userUiLevel >= $uiLevels->{"edit"});
-    }
-    else {
-        $toolbar .= $self->session->icon->locked('func=manageRevisions',$self->get("url"))
-            if ($userUiLevel >= $uiLevels->{"revisions"});
-    }
-    $toolbar .= $self->session->icon->cut('func=cut',$self->get("url"))
-        if ($userUiLevel >= $uiLevels->{"cut"});
-
-    if ($userUiLevel >= $uiLevels->{"copy"}) {
-        $toolbar .= $self->session->icon->copy('func=copy',$self->get("url"));
-        # if this asset has children, create a more full-featured menu for copying
-        if ($self->getChildCount) {
-            $toolbar
-                .= '<div class="yuimenu wg-contextmenu">'
-                . '<div class="bd">'
-                . '<ul class="first-of-type">'
-                . '<li class="yuimenuitem"><a class="yuimenuitemlabel" href="'
-                . $self->getUrl("func=copy") . '">' . $i18n->get("this asset only") . '</a></li>'
-                . '<li class="yuimenuitem"><a class="yuimenuitemlabel" href="'
-                . $self->getUrl("func=copy;with=children") . '">' . $i18n->get("with children") . '</a></li>'
-                . '<li class="yuimenuitem"><a class="yuimenuitemlabel" href="'
-                . $self->getUrl("func=copy;with=descendants") . '">' . $i18n->get("with descendants") . '</a></li>'
-                . '</ul></div></div>';
-        }
-    }
-    $toolbar .= $self->session->icon->shortcut('func=createShortcut',$self->get("url"))
-        if ($userUiLevel >= $uiLevels->{"shortcut"} && !$self->isa('WebGUI::Asset::Shortcut'));
-
-    $self->session->style->setCss($self->session->url->extras('assetToolbar/assetToolbar.css'));
-    $self->session->style->setCss($self->session->url->extras('yui/build/menu/assets/skins/sam/menu.css'));
-    $self->session->style->setScript($self->session->url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'));
-    $self->session->style->setScript($self->session->url->extras('yui/build/container/container_core-min.js'));
-    $self->session->style->setScript($self->session->url->extras('yui/build/menu/menu-min.js'));
-    $self->session->style->setScript($self->session->url->extras('assetToolbar/assetToolbar.js'));
-    my $output
-        = '<div class="yui-skin-sam wg-toolbar">'
-        . '<img src="' . $self->getIcon(1) . '" title="' . $self->getName . '" alt="' . $self->getName . '" class="wg-toolbar-icon" />'
-        . '<div class="yuimenu wg-contextmenu">'
-        . '<div class="bd">'
-        . '<ul class="first-of-type">';
-    if ($userUiLevel >= $uiLevels->{"changeUrl"}) {
-        $output
-            .= '<li class="yuimenuitem"><a class="yuimenuitemlabel" href="'
-            . $self->getUrl("func=changeUrl") . '">' . $i18n->get("change url") . '</a></li>';
-    }
-    if ($userUiLevel >= $uiLevels->{"editBranch"}) {
-        $output
-            .= '<li class="yuimenuitem"><a class="yuimenuitemlabel" href="'
-            . $self->getUrl("func=editBranch") . '">' . $i18n->get("edit branch") . '</a></li>';
-    }
-    if ($userUiLevel >= $uiLevels->{"revisions"}) {
-        $output
-            .= '<li class="yuimenuitem"><a class="yuimenuitemlabel" href="'
-            . $self->getUrl("func=manageRevisions") . '">' . $i18n->get("revisions") . '</a></li>';
-    }
-    if ($userUiLevel >= $uiLevels->{"view"}) {
-        $output
-            .= '<li class="yuimenuitem"><a class="yuimenuitemlabel" href="'
-            . $self->getUrl . '">' . $i18n->get("view") . '</a></li>';
-    }
-    if ($userUiLevel >= $uiLevels->{"lock"} && !$self->isLocked) {
-        $output
-            .= '<li class="yuimenuitem"><a class="yuimenuitemlabel" href="'
-            . $self->getUrl('func=lock') . '">' . $i18n->get("lock") . '</a></li>';
-    }
-    if ($userUiLevel >= $uiLevels->{"export"} && $self->session->config->get("exportPath")) {
-        $output
-            .= '<li class="yuimenuitem"><a class="yuimenuitemlabel" href="'
-            . $self->getUrl('func=export') . '">' . $i18n->get('Export','Icon') . '</a></li>';
-    }
-    if ($userUiLevel >= $uiLevels->{"promote"}) {
-        $output
-            .= '<li class="yuimenuitem"><a class="yuimenuitemlabel" href="'
-            . $self->getUrl("func=promote") . '">' . $i18n->get("promote") . '</a></li>';
-    }
-    if ($userUiLevel >= $uiLevels->{"demote"}) {
-        $output
-            .= '<li class="yuimenuitem"><a class="yuimenuitemlabel" href="'
-            . $self->getUrl("func=demote") . '">' . $i18n->get("demote") . '</a></li>';
-    }
-    if ($userUiLevel >= $uiLevels->{"manage"}) {
-        $output
-            .= '<li class="yuimenuitem"><a class="yuimenuitemlabel" href="'
-            . $self->getManagerUrl . '">' . $i18n->get("manage") . '</a></li>';
-    }
-    $output .= '</ul></div></div>' . $toolbar . '</div>';
-    $self->{_toolbar} = $output;
-    return $output;
+    return sprintf '<div class="wg-admin-toolbar yui-skin-sam" id="wg-admin-toolbar-%s"></div>', $self->getId;
 }
 
 #-------------------------------------------------------------------

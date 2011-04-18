@@ -216,20 +216,6 @@ sub getThumbnailUrl {
 
 #-------------------------------------------------------------------
 
-=head2 getToolbar ( )
-
-Returns a toolbar with a set of icons that hyperlink to functions that delete, edit, promote, demote, cut, and copy.
-
-=cut
-
-override getToolbar => sub {
-	my $self = shift;
-	return undef if ($self->getToolbarState);
-	return super();
-};
-
-#-------------------------------------------------------------------
-
 =head2 view 
 
 Renders this asset.

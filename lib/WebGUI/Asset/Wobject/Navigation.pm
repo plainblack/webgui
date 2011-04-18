@@ -293,57 +293,6 @@ override getEditForm => sub {
     return $fb;
 };
 
-
-
-#-------------------------------------------------------------------
-
-=head2 getToolbar ( )
-
-Returns a toolbar with a set of icons that hyperlink to functions that delete, edit, promote, demote, cut, and copy.
-
-=cut
-
-override getToolbar => sub {
-	my $self = shift;
-    return undef
-        unless $self->canEdit && $self->session->isAdminOn;
-	if ($self->getToolbarState) {
-        my $toolbar = '';
-        if ($self->canEditIfLocked) {
-            my $userUiLevel = $self->session->user->get("uiLevel");
-            my $uiLevels = $self->session->config->get("assetToolbarUiLevel");
-            my $returnUrl = '';
-            if ($self->session->asset) {
-                $returnUrl = ";proceed=goBackToPage;returnUrl=".$self->session->url->escape($self->session->asset->getUrl);
-            }
-            $toolbar = $self->session->icon->edit('func=edit'.$returnUrl,$self->url)
-                if ($userUiLevel >= $uiLevels->{"edit"});
-        }
-        $self->session->style->setCss($self->session->url->extras('assetToolbar/assetToolbar.css'));
-        $self->session->style->setCss($self->session->url->extras('yui/build/menu/assets/skins/sam/menu.css'));
-        $self->session->style->setScript($self->session->url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'));
-        $self->session->style->setScript($self->session->url->extras('yui/build/container/container_core-min.js'));
-        $self->session->style->setScript($self->session->url->extras('yui/build/menu/menu-min.js'));
-        $self->session->style->setScript($self->session->url->extras('assetToolbar/assetToolbar.js'));
-        my $i18n = WebGUI::International->new($self->session, "Asset");
-        return '<div class="yui-skin-sam wg-toolbar">'
-            . '<img src="' . $self->getIcon(1) . '" title="' . $self->getName . '" alt="' . $self->getName . '" class="wg-toolbar-icon" />'
-            . '<div class="yuimenu wg-contextmenu">'
-            . '<div class="bd">'
-            . '<ul class="first-of-type">'
-            . '<li class="yuimenuitem"><a class="yuimenuitemlabel" href="'
-            . $self->getUrl("func=copy") . '">' . $i18n->get("Copy") . '</a></li>'
-            . '<li class="yuimenuitem"><a class="yuimenuitemlabel" href="'
-            . $self->getUrl("op=assetManager") . '">' . $i18n->get("manage") . '</a></li>'
-            . '<li class="yuimenuitem"><a class="yuimenuitemlabel" href="'
-            . $self->getUrl . '">' . $i18n->get("view") . '</a></li>'
-            . "</ul></div></div>$toolbar</div>";
-    }
-    return super();
-};
-
-
-
 #-------------------------------------------------------------------
 
 =head2 prepareView ( )

@@ -354,22 +354,6 @@ my $sql = "select asset.assetId, assetData.revisionDate from RichEdit left join 
 
 #-------------------------------------------------------------------
 
-=head2 getToolbar ( )
-
-Returns a toolbar with a set of icons that hyperlink to functions that delete, edit, promote, demote, cut, and copy.
-
-=cut
-
-override getToolbar => sub {
-	my $self = shift;
-	return undef if ($self->getToolbarState);
-	return super();
-};
-
-
-
-#-------------------------------------------------------------------
-
 =head2 getRichEditor ( $nameId )
 
 Return the javascript needed to make the Rich Editor.

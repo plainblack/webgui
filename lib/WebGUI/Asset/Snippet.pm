@@ -174,20 +174,6 @@ sub exportGetUrlAsPath {
 
 #-------------------------------------------------------------------
 
-=head2 getToolbar ( )
-
-Returns a toolbar with a set of icons that hyperlink to functions that delete, edit, promote, demote, cut, and copy.
-
-=cut
-
-override getToolbar => sub {
-	my $self = shift;
-	return undef if ($self->getToolbarState);
-	return '<p>'.super().'</p>';
-};
-
-#-------------------------------------------------------------------
-
 =head2 indexContent ( )
 
 Indexing the content of the snippet. See WebGUI::Asset::indexContent() for additonal details. 

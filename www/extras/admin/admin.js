@@ -51,6 +51,41 @@ WebGUI.Admin = function(cfg){
             self.navigate( window.frames[viewframe.name].WG.currentAssetId );
         }
     } );
+    this.afterNavigate.subscribe( function(){
+        // Create the toolbars
+        var viewframe   = document.getElementById('adminViewFrame');
+        var viewWin     = window.frames[viewframe.name];
+        // Inject some dependencies
+        YAHOO.util.Get.css( [
+                    getWebguiProperty( 'extrasURL' ) + 'yui/build/menu/assets/skins/sam/menu.css',
+                    getWebguiProperty( 'extrasURL' ) + 'yui/build/button/assets/skins/sam/button.css'
+                ],
+                {
+                    win : viewWin
+                }
+            );
+        YAHOO.util.Get.script( [
+                    getWebguiProperty( 'extrasURL' ) + 'yui/build/yahoo-dom-event/yahoo-dom-event.js',
+                    getWebguiProperty( 'extrasURL' ) + 'yui/build/utilities/utilities.js',
+                    getWebguiProperty( 'extrasURL' ) + 'yui/build/element/element-min.js',
+                    getWebguiProperty( 'extrasURL' ) + 'yui/build/container/container-min.js',
+                    getWebguiProperty( 'extrasURL' ) + 'yui/build/animation/animation-min.js',
+                    getWebguiProperty( 'extrasURL' ) + 'yui/build/menu/menu-min.js',
+                    getWebguiProperty( 'extrasURL' ) + 'yui/build/json/json-min.js',
+                    getWebguiProperty( 'extrasURL' ) + 'yui/build/button/button-min.js',
+                    getWebguiProperty( 'extrasURL' ) + 'yui/build/selector/selector-min.js',
+                    getWebguiProperty( 'extrasURL' ) + 'admin/admin.js',
+                    getWebguiProperty( 'extrasURL' ) + 'admin/toolbar.js'
+                ],
+                {
+                    win : viewWin,
+                    onSuccess : function(data) {
+                        // We have to create these menus within the correct window context
+                        data.win.WebGUI.Toolbar.createAll();
+                    }
+                }
+            );
+    }, this );
 
     // Private methods
     // Initialize these things AFTER the i18n is fetched
@@ -499,24 +534,26 @@ WebGUI.Admin.prototype.updateAssetHelpers
         var li      = document.createElement('li');
         li.className = "clickable with_icon";
         li.appendChild( document.createTextNode( helper.label ) );
-        this.addHelperHandler( li, helperId, helper );
+        YAHOO.util.Event.on( li, "click", this.getHelperHandler( this.currentAssetId, helperId, helper ) );
         helperEl.appendChild( li );
     }
 };
 
 /**
- * addHelperHandler( elem, helperId, helper )
- * Add the click handler to activate the given helper
+ * getHelperHandler( helperId, helper )
+ * Get a function to handle the helper
  */
-WebGUI.Admin.prototype.addHelperHandler
-= function ( elem, helperId, helper ) {
-    var self = this;
+WebGUI.Admin.prototype.getHelperHandler
+= function ( assetId, helperId, helper ) {
     if ( helper.url ) {
-        YAHOO.util.Event.on( elem, "click", function(){ self.gotoAsset( helper.url ) }, self, true );
+        return bind( this, function(){ 
+            this.gotoAsset( helper.url ) 
+        } );
     }
-    else {
-        YAHOO.util.Event.on( elem, "click", function(){ self.requestHelper( helperId, self.currentAssetId ) }, self, true );
-    }
+
+    return bind( this, function(){ 
+        this.requestHelper( helperId, assetId ) 
+    } );
 };
 
 /**
@@ -884,6 +921,54 @@ WebGUI.Admin.prototype.updateTabLabel
     var iframe = tab.get('contentEl').getElementsByTagName( 'iframe' )[0];
     var title = iframe.contentDocument.title;
     tab.set( 'label', title );
+};
+
+/**
+ * getHelperMenuItems( assetId, helpers )
+ * Get the items to create a menu for the given helpers
+ */
+WebGUI.Admin.prototype.getHelperMenuItems
+= function ( assetId, helpers ) {
+    var items = [];
+
+    // Add all the items with appropriate onclick handlers
+    for ( var i in helpers ) {
+        var helper = helpers[i];
+        var item   = {
+            onclick : {
+                fn : this.getHelperHandler( assetId, i, helper ),
+                scope : this
+            },
+            text : helper["label"],
+            icon : helper["icon"]
+        };
+        items.push( item );
+    }
+
+    return items;
+};
+
+/**
+ * showHelperMenu( elem, assetId, helpers )
+ * Show a pop-up Helper menu for the given assetId with the given helpers
+ */
+WebGUI.Admin.prototype.showHelperMenu 
+= function ( elem, assetId, helpers ) {
+    if ( this.helperMenu ) {
+        // destroy the old helper menu!
+        this.helperMenu.destroy();
+    }
+    var helperMenu = new YAHOO.widget.Menu( document.createElement('div'), {
+        position : "dynamic",
+        clicktohide : true,
+        constraintoviewport : true,
+        items : this.getHelperMenuItems( assetId, helpers ),
+        context : [ elem, 'tl', 'bl' ],
+        effect: { effect: YAHOO.widget.ContainerEffect.FADE, duration:0.25 }
+    } );
+    this.helperMenu.render( document.body );
+    this.helperMenu.show();
+    this.helperMenu.focus();
 };
 
 /****************************************************************************
@@ -1368,60 +1453,6 @@ WebGUI.Admin.AssetTable.prototype.addMenuOpenHandler
     YAHOO.util.Event.addListener( elem, "click", function(){
         self.showHelperMenu( elem, assetId, helpers );
     } );
-};
-
-/**
- * showHelperMenu( elem, assetId, helpers )
- * Show the Helper menu for the given assetId with the given helpers
- */
-WebGUI.Admin.AssetTable.prototype.showHelperMenu 
-= function ( elem, assetId, helpers ) {
-    if ( this.helperMenu ) {
-        // destroy the old helper menu!
-        this.helperMenu.destroy();
-    }
-    this.helperMenu = new YAHOO.widget.Menu( document.createElement('div'), {
-        position : "dynamic",
-        clicktohide : true,
-        constraintoviewport : true,
-        context : [ elem, 'tl', 'bl' ],
-        effect: { effect: YAHOO.widget.ContainerEffect.FADE, duration:0.25 }
-    } );
-
-    // Add all the items with appropriate onclick handlers
-    for ( var i = 0; i < helpers.length; i++ ) {
-        var helper = helpers[i];
-        var item   = { 
-            text : helper["label"], 
-            icon : helper["icon"],
-            onclick : {
-                fn : this.clickHelper,
-                obj : [ assetId, helper ],
-                scope : this
-            }
-        };
-        this.helperMenu.addItem( item );
-    }
-
-    this.helperMenu.render( document.body );
-    this.helperMenu.show();
-    this.helperMenu.focus();
-};
-
-/**
- * clickHelper( type, event, args, menuItem )
- * Request the helper. args is an array of [ assetId, helperData ]
- */
-WebGUI.Admin.AssetTable.prototype.clickHelper
-= function ( type, e, args, menuItem ) {
-    var assetId = args[0];
-    var helper  = args[1];
-    if ( helper.url ) {
-        this.admin.showView( helper.url );
-    }
-    else if ( helper['class'] ) {
-        this.admin.requestHelper( helper['class'], assetId );
-    }
 };
 
 /**
