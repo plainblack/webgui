@@ -52,12 +52,7 @@ sub process {
     my $i18n = WebGUI::International->new($session,'Macro_AdminToggle');
     my %var;
     $var{'toggle_text'} = $turnOn || $i18n->get(516);
-    if ($session->isAdminOn) {
-        $var{'toggle_url'} = '#'
-    }
-    else {
-        $var{'toggle_url'} = $session->url->page('op=admin');
-    }
+    $var{'toggle_url'} = $session->url->page('op=admin');
     my $template = $templateName    ? WebGUI::Asset::Template->newByUrl($session, $templateName)
                                     : WebGUI::Asset::Template->newById($session, "PBtmpl0000000000000036");
     return $template->process(\%var);
