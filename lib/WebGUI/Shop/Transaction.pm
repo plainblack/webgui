@@ -490,7 +490,7 @@ sub getTransactionVars {
             %{$item->get},
             %taxVars,
             viewItemUrl             => $url->page('shop=transaction;method=viewItem;transactionId='.$self->getId.';itemId='.$item->getId, 1),
-            hasSku                  => $hasSku,
+            hasSku                  => $has_sku,
             price                   => sprintf( "%.2f", $item->get('price') ),
             pricePlusTax            => sprintf( "%.2f", $price + $taxAmount ),
             extendedPrice           => sprintf( "%.2f", $quantity * $price ),
