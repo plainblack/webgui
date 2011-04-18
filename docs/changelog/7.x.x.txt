@@ -13,6 +13,7 @@
  - fixed #12103: PayPalStd driver fails occasionally
  - rfe   #12105: Make shortcuts related for export purposes
  - rfe   #12108: Mail to Group preference field
+ - fixed #12107: Viewing an individual transaction item fails
 
 7.10.13
  - added #12079: Carousel Auto Play

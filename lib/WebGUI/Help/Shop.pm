@@ -741,6 +741,9 @@ our $HELP = {
                         name        => 'viewItemUrl',
                     },
                     {
+                        name        => 'hasSku',
+                    },
+                    {
                         name        => 'price',
                         description => 'price help',
                     },
