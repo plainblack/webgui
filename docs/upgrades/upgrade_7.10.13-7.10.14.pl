@@ -22,6 +22,7 @@ use Getopt::Long;
 use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::Asset;
+use WebGUI::Asset::Wobject::Calendar;
 
 
 my $toVersion = '7.10.14';
@@ -34,6 +35,7 @@ my $session = start(); # this line required
 addOrganizationsToTransaction($session);
 removeDuplicateUndergroundStyleTemplates($session);
 addRichEditToCarousel($session);
+fixBadCalendarFeedStatus($session);
 
 finish($session); # this line required
 
@@ -47,6 +49,32 @@ finish($session); # this line required
 #    print "DONE!\n" unless $quiet;
 #}
 
+
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub fixBadCalendarFeedStatus {
+    my $session = shift;
+    print "\tFix the name of the iCal status field in all Calendar assets... " unless $quiet;
+    # and here's our code
+    my $fetch_calendar = WebGUI::Asset::Wobject::Calendar->getIsa($session);
+    my $sth = $session->db->read('select assetId, revisionDate from Calendar');
+    CALENDAR: while (my ($assetId, $revisionDate) = $sth->array) {
+        my $calendar = eval {WebGUI::Asset->new($session, $assetId, 'WebGUI::Asset::Wobject::Calendar', $revisionDate)};
+        next CALENDAR if !$calendar;
+        FEED: foreach my $feed ( @{ $calendar->getFeeds } ) {
+            my $status = delete $feed->{status};
+            if (!exists $feed->{lastResult}) {
+                $feed->{lastResult} = $status;
+            }
+            if (!exists $feed->{lastUpdated}) {
+                $feed->{lastUpdated} = 'never';
+            }
+            $calendar->setFeed($feed->{feedId}, $feed);
+        }
+    }
+    $sth->finish;
+    print "DONE!\n" unless $quiet;
+}
 
 #----------------------------------------------------------------------------
 # Describe what our function does
@@ -78,7 +106,7 @@ sub removeDuplicateUndergroundStyleTemplates {
 # Describe what our function does
 sub addRichEditToCarousel {
     my $session = shift;
-    print "\tAdd RichEdit option to the Carousel" unless $quiet;
+    print "\tAdd RichEdit option to the Carousel... " unless $quiet;
     # and here's our code
     $session->db->write('ALTER TABLE Carousel ADD COLUMN richEditor CHAR(22) BINARY');
     $session->db->write(q!update Carousel set richEditor='PBrichedit000000000001'!);

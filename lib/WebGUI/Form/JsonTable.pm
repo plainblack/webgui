@@ -203,7 +203,10 @@ sub toHtml {
         elsif ( $field->{type} eq "id" ) {
             $fieldHtml  .= '<input type="hidden" class="jsontable_id" name="' . $fieldName . '" value="new" />';
         }
-        else {  # Readonly or unknown
+        elsif ( $field->{type} eq "hidden" || $field->{type} eq "readonly" ) {
+            $fieldHtml  .= '<input type="hidden" name="' . $fieldName . '" value="new" />';
+        }
+        else {  # Unknown
             $fieldHtml  = '&nbsp;';
         }
 

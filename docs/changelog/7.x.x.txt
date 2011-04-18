@@ -14,6 +14,7 @@
  - rfe   #12105: Make shortcuts related for export purposes
  - rfe   #12108: Mail to Group preference field
  - fixed #12107: Viewing an individual transaction item fails
+ - fixed #12104: Calendar iCal feed status and lastUPdated fields missing
 
 7.10.13
  - added #12079: Carousel Auto Play
