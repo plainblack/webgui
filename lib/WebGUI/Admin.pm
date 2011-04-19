@@ -145,7 +145,8 @@ sub getAssetData {
         canEdit         => $asset->canEdit && $asset->canEditIfLocked,
         helpers         => $asset->getHelpers,
         icon            => $asset->getIcon("small"),
-        className       => $asset->getName,
+        type            => $asset->getName,
+        className       => $asset->className,
         revisions       => [ $asset->getRevisionDates ],
     );
 

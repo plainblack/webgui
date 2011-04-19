@@ -520,7 +520,7 @@ WebGUI.Admin.prototype.updateAssetHelpers
 = function ( assetDef ) {
     var typeEl  = document.getElementById( 'helper_asset_name' );
     typeEl.style.backgroundImage = 'url(' + assetDef.icon + ')';
-    typeEl.innerHTML = assetDef.className;
+    typeEl.innerHTML = assetDef.type;
 
     // Clear old helpers
     var helperEl    = document.getElementById( 'helper_list' );
@@ -1328,7 +1328,7 @@ WebGUI.Admin.AssetTable
                 { key: 'canEdit' },
                 { key: 'helpers' },
                 { key: 'title' },
-                { key: 'className' },
+                { key: 'type' },
                 { key: 'revisionDate' },
                 { key: 'assetSize' },
                 { key: 'lockedBy' },
@@ -1362,10 +1362,10 @@ WebGUI.Admin.AssetTable
                 sortable: true 
             },
             { 
-                key: 'className', 
+                key: 'type', 
                 label: window.admin.i18n.get('Asset','type'), 
                 sortable: true, 
-                formatter: bind( this, this.formatClassName )
+                formatter: bind( this, this.formatType )
             },
             { 
                 key: 'revisionDate', 
@@ -1476,13 +1476,13 @@ WebGUI.Admin.AssetTable.prototype.formatAssetSize
 };
 
 /**
- * formatClassName ( )
+ * formatType ( )
  * Format the asset class name
  */
-WebGUI.Admin.AssetTable.prototype.formatClassName 
+WebGUI.Admin.AssetTable.prototype.formatType 
 = function ( elCell, oRecord, oColumn, orderNumber ) {
     elCell.innerHTML = '<img src="' + oRecord.getData( 'icon' ) + '" /> '
-        + oRecord.getData( "className" );
+        + oRecord.getData( "type" );
 };
 
 /**
@@ -2538,7 +2538,7 @@ WebGUI.Admin.Search.prototype.addFilter
         filter.dataSource.responseType = YAHOO.util.XHRDataSource.TYPE_JSON;
         filter.dataSource.responseSchema = {
             resultsList : "results",
-            fields : [ 'className', 'title', 'icon' ]
+            fields : [ 'type', 'title', 'icon' ]
         };
 
         createAutocomplete( li, filter );
@@ -2546,7 +2546,7 @@ WebGUI.Admin.Search.prototype.addFilter
         filter.autocomplete.formatResult = function ( result, query, match ) {
             return '<div style="float: left; width: 50px; height: 50px; background: url(' + result.icon + ') no-repeat 50% 50%;"></div>'
                     + '<div class="autocomplete_value">' + result.name + "</div>"
-                    + '<div class="autocomplete_subtext">' + result.className + '</div>';
+                    + '<div class="autocomplete_subtext">' + result.type + '</div>';
 
         };
 
