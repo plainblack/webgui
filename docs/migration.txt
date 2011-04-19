@@ -290,6 +290,17 @@ a version tag, you must set
     tagId => $tag->getId,
 explicitly.
 
+Admin Controls
+--------------------
+The admin controls are now added to the asset with javascript. This javascript
+is located in www/extras/admin/toolbar.js
+
+Turn Admin On
+--------------------
+There is no Turn Admin On. In order to maintain some backwards compatibility, 
+if you are a member of the Turn Admin On group, "Admin On" will be set when you
+log in.
+
 WebGUI::Shop::Vendor
 ====================
 Object properties are no longer written to the database when an object is
