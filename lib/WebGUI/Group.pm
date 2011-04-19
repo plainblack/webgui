@@ -71,6 +71,35 @@ This package provides an object-oriented way of managing WebGUI groups and group
  $boolean = $group->userIsAdmin($userId,$groupId);
  $epoch = $group->userGroupExpireDate($userId,$date);
 
+=head1 MAGIC NUMBERS
+
+These magic group IDs are used throughout WebGUI:
+
+=over 4
+
+=item 1
+
+The visitors group. Only visitors are in this group, not registered users.
+
+=item 2
+
+The registered users group. Any user that is not a visitor is in this group.
+
+=item 3
+
+The admins group. This is the highest level of authority that can be given in
+the site.
+
+=item 7
+
+Everyone. All Visitors and Registered Users are in this group.
+
+=item 12
+
+Turn Admin On group. This group is allowed to use the Admin interface.
+
+=back
+
 =head1 METHODS
 
 These methods are available from this class:

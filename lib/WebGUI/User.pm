@@ -70,6 +70,22 @@ as getting/setting a users's profile data.
 
  WebGUI::User->validUserId($session, $userId);
 
+=head1 MAGIC NUMBERS
+
+These magic user IDs are used throughout WebGUI
+
+=over 4
+
+=item 1
+
+Visitor. Any user that is not logged-in is a Visitor.
+
+=item 3
+
+Admin. This is the main site admin account.
+
+=back
+
 =head1 METHODS
 
 These methods are available from this class:
