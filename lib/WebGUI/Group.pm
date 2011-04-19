@@ -88,15 +88,29 @@ The registered users group. Any user that is not a visitor is in this group.
 =item 3
 
 The admins group. This is the highest level of authority that can be given in
-the site.
+the site. Admins can do everything regardless of permissions.
+
+=item 4
+
+Content Managers. This group is allowed to manage the content on the site. They
+must still have permissions to edit the individual asset however.
 
 =item 7
 
 Everyone. All Visitors and Registered Users are in this group.
 
+=item 11
+
+Secondary Admins. By default, this group has limited privileges to edit some
+users and groups.
+
 =item 12
 
 Turn Admin On group. This group is allowed to use the Admin interface.
+
+=item 13
+
+Export Managers. This group is allowed to use the HTML export functions.
 
 =back
 
