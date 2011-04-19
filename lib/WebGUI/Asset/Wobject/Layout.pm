@@ -235,6 +235,8 @@ sub prepareView {
         unshift @{ $vars{"position1_loop"} }, reverse @children;
     }
 
+    # NOTE: This is the old way of doing the Layout drag/drop. The new way is injected by the WebGUI Admin
+    # Interface if certain elements are present in the template
     if ($vars{showAdmin}) {
         # under normal circumstances we don't put HTML stuff in our code, but this will make it much easier
         # for end users to work with our templates

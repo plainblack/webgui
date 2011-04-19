@@ -17,7 +17,6 @@ div.dragable:hover {
   color: #888888;
   background-color: #cccccc;
   border: 1px solid #888888;
-  opacity: 0.5;
   text-align: right;
 }
 .dragging{
@@ -57,4 +56,13 @@ div.dragable:hover {
   width: 50px;
   height: 100px;
 }
-
+/* TODO: Make the buttons appear inside the drag toolbar! Maybe JS?
+.wg-content-position > * {
+    position: relative;
+}
+.wg-content-position .wg-admin-toolbar {
+    position: absolute;
+    left: auto;
+    top: 0px;
+}
+*/

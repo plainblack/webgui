@@ -85,6 +85,33 @@ WebGUI.Admin = function(cfg){
                     }
                 }
             );
+
+        // For layout types, create draggable handlers
+        if ( this.currentAssetDef.className == "WebGUI::Asset::Wobject::Layout" ) {
+            YAHOO.util.Get.css( [
+                    getWebguiProperty( 'extrasURL' ) + 'draggable.css'
+                ], 
+                {
+                    win : viewWin
+                }
+            );
+            YAHOO.util.Get.script( [
+                    getWebguiProperty( 'extrasURL' ) + 'yui/build/yahoo-dom-event/yahoo-dom-event.js',
+                    getWebguiProperty( 'extrasURL' ) + 'yui/build/utilities/utilities.js',
+                    getWebguiProperty( 'extrasURL' ) + 'yui/build/element/element-min.js',
+                    getWebguiProperty( 'extrasURL' ) + 'yui/build/animation/animation-min.js',
+                    getWebguiProperty( 'extrasURL' ) + 'yui/build/dragdrop/dragdrop-min.js',
+                    getWebguiProperty( 'extrasURL' ) + 'admin/layout.js'
+                ],
+                {
+                    win : viewWin,
+                    onSuccess : function(data) {
+                        new data.win.WebGUI.Layout(data.win.document.body);
+                    }
+                }
+            );
+        }
+
     }, this );
 
     // Private methods
