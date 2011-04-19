@@ -779,6 +779,9 @@ sub start {
     $self->{_sessionId} = $sessionId;
     $self->cache->set($sessionId, $self->{_var}, $timeout);
     delete $self->{_var}{nextCacheFlush};
+        if ( $self->user->isInGroup( 12 ) ) { # Turn Admin On!!
+            $self->{_var}{adminOn} = 1;
+        }
 	$self->db->setRow("userSession","sessionId",$self->{_var}, $sessionId);
     $self->scratch->set('webguiCsrfToken', $self->id->generate); # create cross site request forgery token
 }
@@ -813,39 +816,6 @@ sub style {
 		$self->{_style} = WebGUI::Session::Style->new($self);
 	}
 	return $self->{_style}
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 switchAdminOff ( )
-
-Disables admin mode.
-
-=cut
-
-sub switchAdminOff {
-    my $self = shift;
-    $self->{_var}{adminOn} = 0;
-    $self->cache->set($self->getId, $self->{_var}, $self->setting->get('sessionTimeout'));
-    delete $self->{_var}{nextCacheFlush};
-    $self->db->setRow("userSession","sessionId", $self->{_var});
-}
-
-#-------------------------------------------------------------------
-
-=head2 switchAdminOn ( )
-
-Enables admin mode.
-
-=cut
-
-sub switchAdminOn {
-    my $self = shift;
-    $self->{_var}{adminOn} = 1;
-    $self->cache->set($self->getId, $self->{_var}, $self->setting->get('sessionTimeout'));
-    delete $self->{_var}{nextCacheFlush};
-    $self->db->setRow("userSession","sessionId", $self->{_var});
 }
 
 #-------------------------------------------------------------------
@@ -889,13 +859,13 @@ sub user {
 	my $option = shift;
 	if (defined $option) {
 		my $userId = $option->{userId} || $option->{user}->userId; 
-   		$self->start($userId,$self->getId);
 		if ($self->setting->get("passiveProfilingEnabled")) {
 			$self->db->write("update passiveProfileLog set userId = ? where sessionId = ?",[$userId,$self->getId]);
 		}	
 		delete $self->{_stow};
 		$self->{_user} = $option->{user} || WebGUI::User->new($self, $userId);
 		$self->request->env->{REMOTE_USER} = $self->{_user}->username if $self->request;
+   		$self->start($userId,$self->getId);
 	}
     elsif (!exists $self->{_user}) {
 		$self->{_user} = WebGUI::User->new($self, $self->get('userId'));
