@@ -100,8 +100,12 @@ WebGUI.Toolbar.prototype.render
 
     // Edit button
     var editButton = new YAHOO.widget.Button({
+        type        : "push",
         "container" : this.container,
-        label       : assetData.helpers["edit"].label
+        label       : assetData.helpers["edit"].label,
+        onclick     : {
+            fn: window.parent.admin.getHelperHandler( this.assetId, "edit", assetData.helpers["edit"] )
+        }
     });
 
     // Add the container to our parent
