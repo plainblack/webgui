@@ -602,8 +602,7 @@ sub editThingDataSave {
         lastUpDated=>time(),
     );
     
-    $fields = $session->db->read('select * from Thingy_fields where assetId = ? and thingId = ? order by sequenceNumber',
-        [$self->get("assetId"),$thingId]);
+    $fields = $self->getFields($thingId);
     while (my $field = $fields->hashRef) {
         my $fieldName = 'field_'.$field->{fieldId};
         my $fieldValue;
@@ -939,6 +938,23 @@ sub getEditForm {
 
 #-------------------------------------------------------------------
 
+=head2 getFields  ( $thingId )
+
+Returns a result set with all the fields in a thing in this Thingy.
+
+=head3 $thingId
+
+The GUID for a thing
+
+=cut
+
+sub getFields {
+    my ($self, $thingId) = @_;
+    return $self->session->db->read("select * from Thingy_fields where assetId=? and thingId=? order by sequenceNumber",[$self->getId, $thingId]);
+}
+
+#-------------------------------------------------------------------
+
 =head2 getFieldValue ( value, field )
 
 Processes the field value for date(Time) fields and Other Thing fields.
@@ -1235,8 +1251,7 @@ sub getViewThingVars {
         ." where thingDataId = ?",[$thingDataId]);
 
     if (%thingData) {
-        my $fields = $db->read('select * from Thingy_fields where assetId = ? and thingId = ? order by sequenceNumber',
-            [$self->get('assetId'),$thingId]);
+        my $fields = $self->getFields($thingId);
         while (my %field = $fields->hash) {
             next unless ($field{display} eq '1');
             my $hidden = ($field{status} eq "hidden" && !$self->session->var->isAdminOn);
@@ -1899,7 +1914,7 @@ sub www_editThing {
                         ."  <td class='formDescription'>".$i18n->get('sort by label')."</td>\n"
                         ."</tr>\n";
     
-    $fields = $self->session->db->read('select * from Thingy_fields where assetId = '.$self->session->db->quote($self->get("assetId")).' and thingId = '.$self->session->db->quote($thingId).' order by sequenceNumber');
+    $fields = $self->getFields($thingId);
     while (my $field = $fields->hashRef) {
         my $formElement;
         if ($self->field_isa($field->{fieldType}, 'WebGUI::Form::Image')) {
@@ -2211,7 +2226,7 @@ sub www_editThingSave {
     my ($thingId, $fields);
     $thingId = $self->session->form->process("thingId");
 
-	$fields = $self->session->db->read('select * from Thingy_fields where assetId = '.$self->session->db->quote($self->get("assetId")).' and thingId = '.$self->session->db->quote($thingId).' order by sequenceNumber');
+    $fields = $self->getFields($thingId);
 
     if($fields->rows < 1){
         $self->session->log->warn("Thing failed to create because it had no fields");
@@ -2561,8 +2576,7 @@ sub editThingData {
         ." where thingDataId = ?",[$thingDataId]);
     }
 
-    $fields = $session->db->read('select * from Thingy_fields where assetId = ? and thingId = ? order by sequenceNumber'
-        ,[$self->getId,$thingId]);
+    $fields = $self->getFields($thingId);
     while (my %field = $fields->hash) {
         my $fieldName = 'field_'.$field{fieldId};
         $fieldValue = undef;
@@ -2744,8 +2758,7 @@ sub www_exportThing {
     $pb->start($i18n->get('export label').' '.$thingProperties->{label}, $session->url->extras('assets/thingy.gif'));
     $pb->update($i18n->get('Creating column headers'));
     my $tempStorage = WebGUI::Storage->createTemp($session);
-    $fields = $session->db->read('select * from Thingy_fields where assetId =? and thingId = ? order by sequenceNumber',
-        [$self->get("assetId"),$thingId]);
+    $fields = $self->getFields($thingId);
     while (my $field = $fields->hashRef) {
         push(@fields, {
             fieldId => $field->{fieldId},
@@ -2826,8 +2839,7 @@ sub www_getThingViaAjax {
             $thingProperties->{groupIdView});
 
         my @field_loop;
-        my $fields = $session->db->read('select * from Thingy_fields where assetId=? and thingId=? order by sequenceNumber'
-        ,[$self->getId,$thingId]);
+        my $fields = $self->getFields($thingId);
         while (my $field = $fields->hashRef) {
             $field->{formElement} = $self->getFormElement($field);
             push(@field_loop,$field);
@@ -3057,8 +3069,7 @@ sub www_importForm {
         ."  <td>".$i18n->get("check duplicates label")."</td>"
         ."</tr>";
 
-    $fields = $db->read('select label, fieldId from Thingy_fields where assetId =? and thingId = ? order by sequenceNumber',
-        [$self->get("assetId"),$thingId]);
+    $fields = $self->getFields($thingId);
     while (my $field = $fields->hashRef) {
         $fieldOptions .= "<tr><td>".$field->{label}."</td><td>";
         $fieldOptions .= WebGUI::Form::checkbox($self->session, {
@@ -3340,9 +3351,7 @@ sub getSearchTemplateVars {
         $currentUrl = $session->url->append($currentUrl, $form.'='.$param);
     }
  
-    $fields = $session->db->read('select * from Thingy_fields where assetId =
-'.$session->db->quote($self->get("assetId")).' and thingId = '.$session->db->quote($thingId).' order by
-sequenceNumber');
+    $fields = $self->getFields($thingId);
     while (my $field = $fields->hashRef) {
         if ($field->{searchIn}){
             my $searchForm = $self->getFormPlugin($field, 1);
@@ -3395,7 +3404,8 @@ sequenceNumber');
         }
         $query .= join(", ",map {$dbh->quote_identifier('field_'.$_->{fieldId})} @displayInSearchFields);
         $query .= " from ".$dbh->quote_identifier("Thingy_".$thingId);
-        if($session->form->process('func') eq 'search'){
+        my $func = $session->form->process('func');
+        if( $func eq 'search' || $func eq 'searchViaAjax' ){
             # Don't add constraints when the search screen is displayed as an 'after save' option.
             $query .= " where ".join(" and ",@constraints) if (scalar(@constraints) > 0);
         }
@@ -3408,9 +3418,6 @@ sequenceNumber');
         $noFields = 1;
     }
 
-    # store query in cache for thirty minutes
-    WebGUI::Cache->new($self->session,"query_".$thingId)->set($query,30*60);
-
     $paginatePage = $self->session->form->param('pn') || 1;
     $currentUrl   = $self->session->url->append($currentUrl, "orderBy=".$orderBy) if $orderBy;
 
@@ -3418,7 +3425,7 @@ sequenceNumber');
 
     my @visibleResults;
     if (! $noFields) {
-        my $sth = $self->session->db->read($query) if ! $noFields;
+        my $sth = $self->session->db->read($query);
         while (my $result = $sth->hashRef){
             if ($self->canViewThingData($thingId,$result->{thingDataId})){
                 push(@visibleResults,$result);
