@@ -581,11 +581,19 @@ WebGUI.Admin.prototype.getHelperHandler
 = function ( assetId, helperId, helper ) {
     if ( helper.url ) {
         return bind( this, function(){ 
+            // a confirmation dialog
+            if ( helper.confirm && !confirm( helper.confirm ) ) {
+                return;
+            }
             this.gotoAsset( helper.url ) 
         } );
     }
 
     return bind( this, function(){ 
+        // a confirmation dialog
+        if ( helper.confirm && !confirm( helper.confirm ) ) {
+            return;
+        }
         this.requestHelper( helperId, assetId ) 
     } );
 };
