@@ -801,7 +801,7 @@ default template.
 
 =cut
 
-sub www_edit {
+override www_edit => sub {
     my $self = shift;
     return $self->session->privilege->insufficient() unless $self->canEdit;
     return $self->session->privilege->locked() unless $self->canEditIfLocked;
@@ -809,7 +809,7 @@ sub www_edit {
     my $form    = $session->form;
     my $url     = $session->url;
     my $i18n    = WebGUI::International->new($session, "Asset_Template");
-    my $output  = '';
+    my $template = super();
 
     # Add an unfriendly warning message if this is a default template
     if ( $self->get( 'isDefault' ) ) {
@@ -821,48 +821,20 @@ sub www_edit {
                 $duplicateUrl = $url->append( $duplicateUrl, "returnUrl=" . $form->get( "returnUrl" ) );
             }
         }
-        
-        $session->style->setRawHeadTags( <<'ENDHTML' );
-<style type="text/css">
-.wGwarning { 
-    border              : 1px solid red;
-    background-color    : #FF6666;
-    padding             : 10px;
-    margin              : 5px;
-    /* TODO: Add a nice little image here */
-    /* TODO: Make this a generic warning class from the default webgui stylesheet */
-}
-</style>
-ENDHTML
 
-        $output .= q{<div class="wGwarning"><p>}
+        my $errors  = $template->getParam('errors') || [];
+        my $message .= q{<p>}
                 . $i18n->get( "warning default template" )
                 . q{</p><p>}
                 . sprintf( q{<a href="} . $duplicateUrl . q{">%s</a>}, $i18n->get( "make duplicate label" ) )
-                . q{</p></div>}
+                . q{</p>}
                 ;
+        push @$errors, $message;
+        $template->setParam( 'errors' => $errors );
     }
-    
-    my $func    = $self->session->form->get('func');
-    my $f   = eval { $self->getEditForm };
-    return $@ if $@;
-    $f->addField( "Hidden", name => "func", value => "editSave" );
-    if ( $func eq 'add' ) {
-        my $className   = $self->session->form->get('className');
-        $f->action( $self->getParent->getUrl );
-        $f->getTab('meta')->getField( 'className' )->set('value', $className);
-    }
-    else {
-        $f->action( $self->getUrl );
-    }
-    $output .= $f->toHtml;
 
-    # TODO: Make a www_edit template
-    return $self->session->style->process(
-        '<div class="yui-skin-sam">' . $output . '</div>',
-        "PBtmpl0000000000000137"
-    );
-}
+    return $template;
+};
 
 #-------------------------------------------------------------------
 

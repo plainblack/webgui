@@ -1645,28 +1645,6 @@ sub wrapIcal {
 
 #----------------------------------------------------------------------------
 
-=head2 www_edit ( )
-
-Adds a submenu to the default edit page that includes links to Add an Event.
-
-=cut
-
-sub www_edit {
-    my $self    = shift;
-    my $session = $self->session;
-    my $i18n    = WebGUI::International->new($session, 'Asset_Calendar');
-
-    return $session->privilege->insufficient() unless $self->canEdit;
-
-
-    return $self->getAdminConsole->render(
-            $self->getEditForm->toHtml,
-            $i18n->get("assetName")
-        );
-}
-
-#----------------------------------------------------------------------------
-
 =head2 www_ical
 
 Export an iCalendar feed of this Events Calendar's events.

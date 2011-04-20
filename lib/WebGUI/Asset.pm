@@ -2794,10 +2794,8 @@ sub www_edit {
     my $template    = WebGUI::Asset->newById( $session, $session->setting->get('templateIdAssetEdit') );
     $template->setParam( %{ $f->toTemplateVars } );
 
-    return $self->session->style->process(
-        $template->process,
-        "PBtmpl0000000000000137"
-    );
+    $template->style( "PBtmpl0000000000000137" );
+    return $template;
 }
 
 #-------------------------------------------------------------------
