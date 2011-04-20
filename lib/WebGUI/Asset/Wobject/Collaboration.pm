@@ -957,6 +957,28 @@ sub duplicateBranch {
     return $newAsset;
 }
 
+#----------------------------------------------------------------------------
+
+=head2 getHelpers ( )
+
+Add the collaboration-specific asset helpers
+
+=cut
+
+override getHelpers => sub {
+    my ( $self ) = @_;
+    my $helpers = super();
+
+    my $i18n = WebGUI::International->new($self->session, 'Asset_Collaboration');
+    $helpers->{ unarchiveAll } = {
+        label   => $i18n->get("unarchive all"),
+        url     => $self->getUrl( 'func=unarchiveAll' ),
+        confirm => $i18n->get("unarchive confirm"),
+    };
+
+    return $helpers;
+};
+
 #-------------------------------------------------------------------
 
 =head2 getNewThreadUrl(  )
@@ -1591,25 +1613,6 @@ sub view {
 		$cache->set($self->_visitorCacheKey, $out, $self->visitorCacheTimeout);
 	}
     return $out;
-}
-
-#-------------------------------------------------------------------
-
-=head2 www_edit 
-
-Override the master class to add an "Unarchive All" link.
-
-=cut
-
-sub www_edit {
-    my $self = shift;
-    return $self->session->privilege->insufficient() unless $self->canEdit;
-    return $self->session->privilege->locked() unless $self->canEditIfLocked;
-    my $i18n = WebGUI::International->new($self->session, 'Asset_Collaboration');
-    # Unarchive All needs to be an asset helper
-    #$self->getAdminConsole->addConfirmedSubmenuItem($self->getUrl('func=unarchiveAll'),$i18n->get("unarchive all"),$i18n->get("unarchive confirm"));
-    #return $self->getAdminConsole->render($self->getEditForm->toHtml,$i18n->get("assetName"));
-    super();
 }
 
 #-------------------------------------------------------------------
