@@ -978,8 +978,7 @@ WebGUI.Admin.prototype.getHelperMenuItems
         var helper = helpers[i];
         var item   = {
             onclick : {
-                fn : this.getHelperHandler( assetId, i, helper ),
-                scope : this
+                fn : this.getHelperHandler( assetId, i, helper )
             },
             text : helper["label"],
             icon : helper["icon"]
