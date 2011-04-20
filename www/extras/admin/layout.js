@@ -23,6 +23,7 @@ WebGUI.Layout = function (elem, cfg) {
 
     // Some special vars
     this.scrollJump = 50;
+    this.blankCount = 0;
 
     // Init layout positions
     var positions   = this.getPositions();
@@ -58,7 +59,14 @@ WebGUI.Layout.prototype.getPositions
  */
 WebGUI.Layout.prototype.getPositionElements
 = function ( pos ) {
-    return pos.getElementsByTagName( '*' );
+    var elems = [];
+    for ( var i = 0; i < pos.childNodes.length; i++ ) {
+        var child = pos.childNodes[i];
+        if ( child.nodeType == 1 ) { // Only elements
+            elems.push(child);
+        }
+    }
+    return elems;
 };
 
 /**
@@ -112,7 +120,7 @@ WebGUI.Layout.prototype.addBlankTarget
 = function ( el ) {
     var blank = document.createElement("div");
     blank.className="blank";
-    blank.id = "blank" + new Date().getTime() + blankCount++;
+    blank.id = "blank" + new Date().getTime() + this.blankCount++;
     el.appendChild(blank);
     blank.style.top     = 0+"px";
     blank.style.left    = 0+"px";
@@ -171,7 +179,7 @@ WebGUI.Layout.prototype.move
  */
 WebGUI.Layout.prototype.isBlank
 = function ( obj ) {
-    return obj.className.indexOf( "blank" ) == -1;
+    return obj.className.indexOf( "blank" ) != -1;
 };
 
 /**
@@ -181,32 +189,32 @@ WebGUI.Layout.prototype.save
 = function () {
     // Create the content map
     contentMap = "";
-    contentCount=1;
-    var contentArea = document.getElementById("position1");
-    while (contentArea) {
-        if ((contentMap != "") || ( contentCount == 2 )) {
+    var positions   = this.getPositions();
+    for ( var i = 0; i < positions.length; i ++ ) {
+        var pos = positions[i];
+
+        // Seperator character
+        if ((contentMap != "") || ( i == 1 )) { // if first position is blank, still add a .
             contentMap+=".";
         }
 
-        //get down to the tr area
-        children = dragable_getElementChildren(contentArea);
-        children=dragable_getElementChildren(children[0]);
-        for (i=0;i<children.length;i++) {
+        var children = this.getPositionElements( pos );
+        for ( var j = 0; j < children.length; j++) {
             if (contentMap != "" && (contentMap.lastIndexOf(".") != contentMap.length-1)) {
                 contentMap+=",";
             }
 
-            if ( !this.isBlank( children[i] ) ) {
-                contentMap+=children[i].id.replace(/^wg-content-asset-/,"");
+            if ( !this.isBlank( children[j] ) ) {
+                contentMap+=children[j].id.replace(/^wg-content-asset-/,"");
             }
         }
-
-        contentCount++;
-        contentArea = document.getElementById("position" + contentCount);
     }
 
     // Send it off!
-    YAHOO.util.Connect.asyncRequest( this.cfg.url + '?' + contentMap, {} );
+    YAHOO.util.Connect.asyncRequest( 'POST', this.cfg.url, {
+        success : function () {},
+        failure : function () {}
+    }, "map=" + contentMap );
 };
 
 /****************************************************************************
@@ -239,13 +247,14 @@ WebGUI.LayoutItem.prototype.startDrag
     // make the proxy look like the source element
     var dragEl = this.getDragEl();
     var clickEl = this.getEl();
-    Dom.setStyle(clickEl, "visibility", "hidden");
+    YAHOO.util.Dom.setStyle(clickEl, "visibility", "hidden");
 
     dragEl.innerHTML = clickEl.innerHTML;
+    dragEl.className = "dragging";
 
-    Dom.setStyle(dragEl, "color", Dom.getStyle(clickEl, "color"));
-    Dom.setStyle(dragEl, "backgroundColor", Dom.getStyle(clickEl, "backgroundColor"));
-    Dom.setStyle(dragEl, "border", "2px solid gray");
+    YAHOO.util.Dom.setStyle(dragEl, "color", YAHOO.util.Dom.getStyle(clickEl, "color"));
+    YAHOO.util.Dom.setStyle(dragEl, "backgroundColor", YAHOO.util.Dom.getStyle(clickEl, "backgroundColor"));
+    YAHOO.util.Dom.setStyle(dragEl, "border", "2px solid gray");
 };
 
 
@@ -254,7 +263,7 @@ WebGUI.LayoutItem.prototype.startDrag
  */
 WebGUI.LayoutItem.prototype.onDragOut
 = function (e, id) {
-    var obj = Dom.get(id);
+    var obj = YAHOO.util.Dom.get(id);
     if ( this.layout.isBlank(obj) ) {
         document.getElementById(id).className="blank";
     }else if (obj.className == 'draggedOverTop' || obj.className == 'draggedOverBottom') {
@@ -271,11 +280,11 @@ WebGUI.LayoutItem.prototype.endDrag
     var proxy = this.getDragEl();
 
     // Show the proxy element and animate it to the src element's location
-    Dom.setStyle(proxy, "visibility", "");
+    YAHOO.util.Dom.setStyle(proxy, "visibility", "");
     var a = new YAHOO.util.Motion( 
         proxy, { 
             points: { 
-                to: Dom.getXY(srcEl)
+                to: YAHOO.util.Dom.getXY(srcEl)
             }
         }, 
         0.2, 
@@ -286,8 +295,8 @@ WebGUI.LayoutItem.prototype.endDrag
 
     // Hide the proxy and show the source element when finished with the animation
     a.onComplete.subscribe(function() {
-            Dom.setStyle(proxyid, "visibility", "hidden");
-            Dom.setStyle(thisid, "visibility", "");
+            YAHOO.util.Dom.setStyle(proxyid, "visibility", "hidden");
+            YAHOO.util.Dom.setStyle(thisid, "visibility", "");
         });
     a.animate();
 };
@@ -305,14 +314,14 @@ WebGUI.LayoutItem.prototype.onDragDrop
     else{
         position = "bottom";
     }
-    var target = this.getEl().parentNode.parentNode;
-    var destination = Dom.get(id);
+    var target = this.getEl();
+    var destination = YAHOO.util.Dom.get(id);
     if ( !this.layout.isBlank( destination ) ){
         destination.className = "dragable";
-        destination = Dom.get(id).parentNode.parentNode;
+        destination = YAHOO.util.Dom.get(id);
     }
     this.layout.move(target, destination, position);
-    //this.layout.save();
+    this.layout.save();
 };
 
 /**
@@ -321,7 +330,7 @@ WebGUI.LayoutItem.prototype.onDragDrop
 WebGUI.LayoutItem.prototype.onDrag
 = function (e) {
     // Keep track of the direction of the drag for use during onDragOver
-    var y = Event.getPageY(e);
+    var y = YAHOO.util.Event.getPageY(e);
     if (y < this.lastY) {
         this.goingUp = true;
     } else if (y > this.lastY) {
@@ -339,7 +348,7 @@ WebGUI.LayoutItem.prototype.onDragOver
     var srcEl = this.getEl();
     if(srcEl.id == id){return;}
 
-    var obj = Dom.get(id);
+    var obj = YAHOO.util.Dom.get(id);
     // We are only concerned with list items, we ignore the dragover
     // notifications for the list.
     if ( this.layout.isBlank( obj ) ) {

@@ -12,20 +12,26 @@ div.dragable:hover {
 }
 .dragTriggerWrap{
   width: 100%;
-  height: 18px;
+  height: 25px;
   font-size: 10px;
   color: #888888;
   background-color: #cccccc;
   border: 1px solid #888888;
   text-align: right;
 }
+.dragTriggerWrap img {
+    border: none;
+    margin-top: 4px;
+    margin-right: 4px;
+}
+
 .dragging{
   position: relative;
    opacity:0.6;
    -moz-opacity:0.6;
    filter:progid:DXImageTransform.Microsoft.Alpha(opacity=60);
   cursor: pointer;
-  z-index: 2000; 
+  z-index: 2000;
 }
 .draggedOverTop{
   position: relative;
@@ -56,13 +62,20 @@ div.dragable:hover {
   width: 50px;
   height: 100px;
 }
-/* TODO: Make the buttons appear inside the drag toolbar! Maybe JS?
-.wg-content-position > * {
+.dragging, .empty {
+      background-image: url(opaque.gif);
+}
+
+/* Make the buttons appear inside the drag toolbar */
+.wg-content-position > *, .dragging {
     position: relative;
 }
-.wg-content-position .wg-admin-toolbar {
+.wg-content-position .wg-admin-toolbar,
+.dragging .wg-admin-toolbar {
     position: absolute;
     left: auto;
     top: 0px;
+    margin-top: 2px;
+    margin-left: 2px;
 }
-*/
+

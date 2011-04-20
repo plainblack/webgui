@@ -99,6 +99,8 @@ WebGUI.Admin = function(cfg){
                     getWebguiProperty( 'extrasURL' ) + 'yui/build/yahoo-dom-event/yahoo-dom-event.js',
                     getWebguiProperty( 'extrasURL' ) + 'yui/build/utilities/utilities.js',
                     getWebguiProperty( 'extrasURL' ) + 'yui/build/element/element-min.js',
+                    getWebguiProperty( 'extrasURL' ) + 'yui/build/connection/connection-debug.js',
+                    getWebguiProperty( 'extrasURL' ) + 'yui/build/selector/selector-min.js',
                     getWebguiProperty( 'extrasURL' ) + 'yui/build/animation/animation-min.js',
                     getWebguiProperty( 'extrasURL' ) + 'yui/build/dragdrop/dragdrop-min.js',
                     getWebguiProperty( 'extrasURL' ) + 'admin/layout.js'
@@ -106,7 +108,12 @@ WebGUI.Admin = function(cfg){
                 {
                     win : viewWin,
                     onSuccess : function(data) {
-                        new data.win.WebGUI.Layout(data.win.document.body);
+                        new data.win.WebGUI.Layout(
+                            data.win.document.body, 
+                            {
+                                url: self.currentAssetDef.url + '?func=setContentPositions;'
+                            }
+                        );
                     }
                 }
             );
