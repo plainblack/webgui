@@ -1475,6 +1475,17 @@ Couldn't open %-s because %-s <br />
         context     => q{Label for list of asset's revisions},
     },
 
+    'copy branch' => {
+        message     => q{Copy Branch},
+        lastUpdated => 0,
+        context     => q{Label for asset helper},
+    },
+
+    'export as html' => {
+        message     => q{Export As HTML},
+        lastUpdated => 0,
+        context     => q{Label for asset helper},
+    },
 };
 
 1;

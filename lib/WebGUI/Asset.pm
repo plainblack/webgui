@@ -1211,55 +1211,57 @@ sub getHelpers {
     my ( $self ) = @_;
     my $session = $self->session;
     my ( $conf ) = $session->quick(qw{ config });
+    my $i18n        = WebGUI::International->new( $session, "Asset" );
 
     my $default = { 
         change_url => {
             className   => 'WebGUI::AssetHelper::ChangeUrl',
-            label   => 'Change URL',
+            label   => $i18n->get('change url'),
         },
         copy => {
             className   => 'WebGUI::AssetHelper::Copy',
-            label   => 'Copy',
+            label   => $i18n->get('Copy'),
         },
         copy_branch => {
             className   => 'WebGUI::AssetHelper::CopyBranch',
-            label   => 'Copy Branch',
+            label   => $i18n->get('copy branch'),
         },
         shortcut => {
             className   => 'WebGUI::AssetHelper::CreateShortcut',
-            label   => 'Create Shortcut',
+            label   => $i18n->get( 'create shortcut' ),
         },
         duplicate => {
             className   => 'WebGUI::AssetHelper::Duplicate',
-            label       => 'Duplicate',
+            label       => $i18n->get('duplicate'),
         },
         cut => {
             className   => 'WebGUI::AssetHelper::Cut',
-            label   => 'Cut',
+            label   => $i18n->get('cut'),
         },
         edit => {
             url     => $self->getUrl( 'func=edit' ),
-            label   => 'Edit',
+            label   => $i18n->get('edit'),
         },
         edit_branch => {
             className   => 'WebGUI::AssetHelper::EditBranch',
-            label   => 'Edit Branch',
+            label   => $i18n->get( 'edit branch' ),
         },
         export_html => {
             className   => 'WebGUI::AssetHelper::ExportHtml',
-            label   => 'Export As HTML',
+            label   => $i18n->get('export as html'),
         },
         view => {
             url     => $self->getUrl( 'func=view' ),
-            label   => 'View',
+            label   => $i18n->get('view'),
         },
         lock => {
             className   => 'WebGUI::AssetHelper::Lock',
-            label   => 'Lock',
+            label   => $i18n->get('lock'),
         },
         delete => {
             className   => 'WebGUI::AssetHelper::Delete',
-            label       => 'Delete',
+            label       => $i18n->get('delete'),
+            confirm     => $i18n->get('43'),
         },
     };
 
