@@ -1198,10 +1198,12 @@ sub getFieldData {
     my ( $self, $property ) = @_;
     my $session         = $self->session;
     my $overrides       = $session->config->get( "assets/" . $self->get("className") . '/fields' ) || {};
-    my $fieldType       = $self->meta->find_attribute_by_name( $property )->fieldType;
+    my $attr            = $self->meta->find_attribute_by_name( $property );
+    my $fieldType       = $attr->fieldType;
     my $fieldOverrides  = $overrides->{ $property } || {};
     my $fieldHash       = {
                             fieldType   => $fieldType,
+                            noFormPost  => $attr->noFormPost,
                             tab         => "properties",
                             %{ $self->getFormProperties( $property ) },
                             %{ $overrides },
