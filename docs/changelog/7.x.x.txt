@@ -4,6 +4,7 @@
  - fixed #12104: Calendar iCal feed status and lastUPdated fields missing
  - fixed #12117: Thingy - www_searchViaAjax broken
  - fixed #12116: JsonTable form control needs i18n
+ - fixed #12102: User profiling field extras information
 
 7.9.26
  - fixed #12086: Shop Billing Address Unpopulated

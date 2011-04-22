@@ -33,7 +33,7 @@ WebGUI::Test->addToCleanup($newUser);
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 50;        # Increment this number for each test you create
+plan tests => 52;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # Test the creation of ProfileField
@@ -185,3 +185,24 @@ $newProfileField3->set({ required => 1});
 is ($newProfileField3->get('required'), 1, 'set required = 1');
 is ($newProfileField3->get('editable'), 1, '... editable = 1');
 $newProfileField3->delete;
+
+###########################################################
+#
+# form fields, extras, form properties
+#
+###########################################################
+
+my $extra_field = WebGUI::ProfileField->create($session, 'textual',
+    {
+        label     => 'Textual',
+        fieldName => 'Textual',
+        extras    => q|class="texted"|,
+    }
+);
+
+is $extra_field->get('extras'), q|class="texted"|, 'extras set on field creation';
+is $extra_field->formProperties->{extras}, q|class="texted"|, 'extras available from formProperties';
+
+$extra_field->delete;
+
+
