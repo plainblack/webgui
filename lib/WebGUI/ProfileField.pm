@@ -254,6 +254,7 @@ sub formProperties {
     $properties{ options            } = $orderedValues;
     $properties{ forceImageOnly     } = $self->get("forceImageOnly");
     $properties{ dataDefault        } = $self->get("dataDefault");
+    $properties{ extras             } = $self->get("extras");
     return \%properties;
 }
 
