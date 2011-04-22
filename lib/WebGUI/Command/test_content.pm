@@ -9,6 +9,7 @@ use File::Spec::Functions qw(catfile);
 use WebGUI::Paths;
 use WebGUI::Session;
 use WebGUI::Macro;
+use WebGUI::DateTime;
 
 our $LAYOUT_CLASS = 'WebGUI::Asset::Wobject::Layout';
 our $FOLDER_CLASS = 'WebGUI::Asset::Wobject::Folder';
@@ -120,7 +121,7 @@ sub getAsset {
 
 =head2 buildAsset( class, page, props )
 
-Build one asset on the page
+Build one asset on the page, recursing into any _children.
 
 =cut
 
@@ -148,6 +149,14 @@ sub buildAsset {
     }
 
     # Add children
+    my $first_child  = $children->[0];
+    for my $child ( @$children ) {
+        my $merged_set = {
+            %$first_child,
+            %$child,
+        };
+        $self->buildAsset( $merged_set->{className}, $asset, $merged_set );
+    }
 
     return $asset;
 }
@@ -160,10 +169,12 @@ This is hardcoded for now, but should eventually become a config file of some ki
 
 =cut
 
+my $DT_NOW = DateTime->now;
 
 # The first set is the default properties, every other set will combine the
 # default properties with the set properties
 # A special property _children allows for child assets
+#   again, the first item will set defaults for the next items
 # A special property _files allows for files
 %ASSETS = (
     'WebGUI::Asset::Wobject::Article' => [
@@ -201,6 +212,39 @@ This is hardcoded for now, but should eventually become a config file of some ki
                 {
                     property    => 'storageId',
                     file        => catfile( WebGUI::Paths->extras, 'wg.png' ),
+                },
+            ],
+        },
+    ],
+    'WebGUI::Asset::Wobject::Calendar' => [
+        {
+            title           => 'Calendar',
+            isHidden        => 1,
+            displayTitle    => 1,
+            _children       => [
+                {
+                    className   => 'WebGUI::Asset::Event',
+                    title       => 'Today',
+                    startDate   => $DT_NOW->ymd,
+                    endDate     => $DT_NOW->ymd,
+                },
+                {
+                    title       => 'Tomorrow',
+                    startDate   => $DT_NOW->clone->add( days => 1 )->ymd,
+                    endDate     => $DT_NOW->clone->add( days => 1 )->ymd,
+                },
+                {
+                    title       => 'Tomorrow Noon',
+                    startDate   => $DT_NOW->clone->add( days => 1 )->ymd,
+                    endDate     => $DT_NOW->clone->add( days => 1 )->ymd,
+                    startTime   => '12:00:00',
+                    endTime     => '12:00:00',
+                    timeZone    => 'CST',
+                },
+                {
+                    title       => 'This weekend',
+                    startDate   => $DT_NOW->clone->add( days => 6 - $DT_NOW->dow )->ymd,
+                    endDate     => $DT_NOW->clone->add( days => 7 - $DT_NOW->dow )->ymd,
                 },
             ],
         },
