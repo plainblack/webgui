@@ -2376,7 +2376,7 @@ sub www_view {
     return $self->session->privilege->noAccess() unless $self->canView;
     my $check = $self->checkView;
     return $check if (defined $check);
-    $self->session->http->setCacheControl($self->visitorCacheTimeout) if ($self->session->user->isVisitor);
+    $self->session->http->setCacheControl($self->getParent->visitorCacheTimeout) if ($self->session->user->isVisitor);
     $self->session->http->sendHeader;
     $self->prepareView;
     my $style = $self->getParent->processStyle($self->getSeparator);
