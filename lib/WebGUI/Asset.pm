@@ -1063,7 +1063,6 @@ sub getEditForm {
     my $session   = $self->session;
     my $i18n      = WebGUI::International->new( $session, "Asset" );
     my $f         = WebGUI::FormBuilder->new( $session );
-    my $overrides = $session->config->get( "assets/" . $self->get("className") . '/fields' ) || {};
 
     ### 
     # Create the main tabset
@@ -1112,28 +1111,15 @@ sub getEditForm {
     ###
     # Properties
     foreach my $property ( $self->getProperties ) {
-        next if $self->meta->find_attribute_by_name( $property )->noFormPost;
-        my $fieldType       = $self->meta->find_attribute_by_name( $property )->fieldType;
-        my $fieldOverrides  = $overrides->{ $property } || {};
-        my $fieldHash       = {
-                                tab         => "properties",
-                                %{ $self->getFormProperties( $property ) },
-                                %{ $overrides },
-                                name        => $property,
-                                value       => $self->$property,
-                            };
-
-        # Kludge...
-        if ( $fieldHash->{fieldType} ~~ ['selectBox', 'workflow'] and ref $fieldHash->{value} ne 'ARRAY' ) {
-            $fieldHash->{value} = [ $fieldHash->{value} ];
-        }
+        my $fieldHash = $self->getFieldData( $property );
+        next if $fieldHash->{noFormPost};
 
         # Create tabs to have labels added later
         if ( !$f->getTab( $fieldHash->{tab} ) ) {
             $f->addTab( name => $fieldHash->{tab}, label => $fieldHash->{tab} );
         }
 
-        $f->getTab( $fieldHash->{tab} )->addField( $fieldType, %{$fieldHash} );
+        $f->getTab( $fieldHash->{tab} )->addField( delete $fieldHash->{fieldType}, %{$fieldHash} );
     }
 
     ###
@@ -1198,6 +1184,38 @@ sub getExtraHeadTags {
             : $self->extraHeadTags
             ;
 }
+
+#----------------------------------------------------------------------------
+
+=head2 getFieldData( property )
+
+Returns the form field data for the given property name. Adds the 
+overrides from the config file.
+
+=cut
+
+sub getFieldData {
+    my ( $self, $property ) = @_;
+    my $session         = $self->session;
+    my $overrides       = $session->config->get( "assets/" . $self->get("className") . '/fields' ) || {};
+    my $fieldType       = $self->meta->find_attribute_by_name( $property )->fieldType;
+    my $fieldOverrides  = $overrides->{ $property } || {};
+    my $fieldHash       = {
+                            fieldType   => $fieldType,
+                            tab         => "properties",
+                            %{ $self->getFormProperties( $property ) },
+                            %{ $overrides },
+                            name        => $property,
+                            value       => $self->$property,
+                        };
+
+    # Kludge...
+    if ( $fieldHash->{fieldType} ~~ ['selectBox', 'workflow'] and ref $fieldHash->{value} ne 'ARRAY' ) {
+        $fieldHash->{value} = [ $fieldHash->{value} ];
+    }
+
+    return $fieldHash;
+};
 
 #----------------------------------------------------------------------------
 
