@@ -4725,6 +4725,24 @@ Users may override this setting in their profile.
         context     => 'Description for pick style template page',
     },
 
+    'Up' => {
+        message     => 'Up',
+        lastUpdate  => 0,
+        context     => 'Up, as in move up.',
+    },
+
+    'Down' => {
+        message     => 'Down',
+        lastUpdate  => 0,
+        context     => 'Down, as in move down.',
+    },
+
+    'Add' => {
+        message     => 'Add',
+        lastUpdate  => 0,
+        context     => 'Add, as in to append or add more',
+    },
+
 };
 
 1;

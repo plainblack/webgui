@@ -1,5 +1,6 @@
 7.10.15
  - fixed #12117: Thingy - www_searchViaAjax broken
+ - fixed #12116: JsonTable form control needs i18n
 
 7.10.14
  - fixed #12094: Cannot enter in Macros in URLs inside TinyMCE.

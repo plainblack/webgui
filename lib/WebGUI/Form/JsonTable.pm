@@ -138,11 +138,19 @@ sub headTags {
     my $self = shift;
     my ( $url, $style ) = $self->session->quick(qw( url style ));
     $style->setScript(
+        $url->extras('yui/build/connect/connect-min.js'),
+        { type => 'text/javascript' },
+    );
+    $style->setScript(
         $url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'),
         { type => 'text/javascript' },
     );
     $style->setScript(
         $url->extras('yui/build/json/json-min.js'),
+        { type => 'text/javascript' },
+    );
+    $style->setScript(
+        $url->extras('yui-webgui/build/i18n/i18n.js'),
         { type => 'text/javascript' },
     );
     $style->setScript(
@@ -162,6 +170,7 @@ Renders an input tag of type text.
 sub toHtml {
     my $self    = shift;
     my $session = $self->session;
+    my $i18n    = WebGUI::International->new($session, 'WebGUI');
     my ( $url, $style ) = $session->quick(qw( url style ));
     my $value   = $self->fixMacros($self->fixQuotes($self->fixSpecialCharacters($self->getOriginalValue)));
     my $output  = '';
@@ -176,7 +185,7 @@ sub toHtml {
     # Buttons to add rows in the table footer
     my $cols    = scalar @{ $self->get('fields') } + 1; # Extra column for buttons
     $output .= '</thead><tfoot><tr><td colspan="' . $cols . '">'
-            . '<button id="' . $self->get('id') . '_add">' . "Add" . '</button>'
+            . '<button id="' . $self->get('id') . '_add">' . $i18n->get('Add') . '</button>'
             . '</td></tr></tfoot>'
             ;
 
