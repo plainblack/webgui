@@ -42,6 +42,7 @@ sub run {
             title           => 'Test Content',
             styleTemplateId => $style->getId,
         });
+    $top->indexContent;
 
     # Create category pages for all asset categories
     my %categories = ();
@@ -53,21 +54,24 @@ sub run {
             title           => $title,
             styleTemplateId => $style->getId,
         });
+        $categories{ $cat }->indexContent;
     }
 
     # Add individual asset pages to their category pages
     for my $class ( keys %ASSETS ) {
         my @sets    = @{ $self->getPropertySets( $class ) };
+        next unless @sets > 0;
 
         # Set the default style template
         $sets[0]->{styleTemplateId} ||= $style->getId;
 
         # Put the first one on the given page
-        my $cat     = $session->config->get( "assets/$class/category" );
+        my $cat     = $session->config->get( "assets/$class/category" ) || "utilities";
         my $page    = $categories{ $cat }->addChild({
                 className       => $LAYOUT_CLASS,
                 styleTemplateId => $style->getId,
             });
+
         my $asset   = $self->buildAsset( $class, $page, $sets[0] );
         $page->title( $asset->getName );
         $page->menuTitle( $asset->getName );
@@ -75,8 +79,10 @@ sub run {
         # Fix the URLs to take the new titles
         $page->url( '' );
         $page->write;
+        $page->indexContent;
         $asset->url( '' );
         $asset->write;
+        $asset->indexContent;
 
         # Make subpages for the other ones
         for my $set ( @sets[1..$#sets] ) {
@@ -158,6 +164,9 @@ sub buildAsset {
         };
         $self->buildAsset( $merged_set->{className}, $asset, $merged_set );
     }
+
+    # Index the content
+    $asset->indexContent;
 
     return $asset;
 }
@@ -407,6 +416,101 @@ my $DT_NOW = DateTime->now;
                 },
             ],
         },
+    ],
+    'WebGUI::Asset::Wobject::Poll' => [
+
+    ],
+    'WebGUI::Asset::Wobject::Search' => [
+        {
+            title       => 'Search',
+            isHidden    => 1,
+            searchRoot  => 'PBasset000000000000001',
+        },
+    ],
+    'WebGUI::Asset::Snippet' => [
+        {
+            title       => 'Snippet',
+            isHidden    => 1,
+            snippet     => '<div style="color: red">Red room!</div>',
+        },
+    ],
+    'WebGUI::Asset::Wobject::Collaboration' => [
+
+    ],
+    'WebGUI::Asset::Wobject::Gallery' => [
+
+    ],
+    'WebGUI::Asset::Wobject::MessageBoard' => [
+
+    ],
+    'WebGUI::Asset::Wobject::Collaboration::Newsletter' => [
+
+    ],
+    'WebGUI::Asset::Wobject::StoryArchive' => [
+
+    ],
+    'WebGUI::Asset::Wobject::Survey' => [
+
+    ],
+    'WebGUI::Asset::Wobject::WikiMaster' => [
+
+    ],
+    'WebGUI::Asset::Wobject::Dashboard' => [
+
+    ],
+    'WebGUI::Asset::Wobject::StockData' => [
+
+    ],
+    'WebGUI::Asset::Wobject::Thingy' => [
+
+    ],
+    'WebGUI::Asset::Wobject::UserList' => [
+
+    ],
+    'WebGUI::Asset::Wobject::WeatherData' => [
+
+    ],
+    'WebGUI::Asset::Sku::Donation' => [
+
+    ],
+    'WebGUI::Asset::Sku::FlatDiscount' => [
+
+    ],
+    'WebGUI::Asset::Sku::Product' => [
+
+    ],
+    'WebGUI::Asset::Wobject::Shelf' => [
+
+    ],
+    'WebGUI::Asset::Sku::Subscription' => [
+
+    ],
+    'WebGUI::Asset::Wobject::AssetReport' => [
+
+    ],
+    'WebGUI::Asset::Wobject::Carousel' => [
+
+    ],
+    'WebGUI::Asset::File' => [
+
+    ],
+    'WebGUI::Asset::File::Image' => [
+
+    ],
+    'WebGUI::Asset::Wobject::Navigation' => [
+
+    ],
+    'WebGUI::Asset::Redirect' => [
+
+    ],
+    'WebGUI::Asset::Wobject::SQLReport' => [
+
+    ],
+    'WebGUI::Asset::Wobject::SyndicatedContent' => [
+
+    ],
+    'WebGUI::Asset::Template' => [
+
     ],
 );
 
