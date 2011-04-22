@@ -388,7 +388,7 @@ sub purgeRevision {
 	if ($self->getRevisionCount > 1) {
 		$self->session->db->beginTransaction;
         	foreach my $definition (@{$self->definition($self->session)}) {
-			$self->session->db->write("delete from ".$definition->{tableName}." where assetId=? and revisionDate=?",[$self->getId, $self->get("revisionDate")]);
+			$self->session->db->write("delete from ".$self->session->db->dbh->quote_identifier($definition->{tableName})." where assetId=? and revisionDate=?",[$self->getId, $self->get("revisionDate")]);
         	}
 		my ($count) = $self->session->db->quickArray("select count(*) from assetData where assetId=? and status='pending'",[$self->getId]);
 		if ($count < 1) {
