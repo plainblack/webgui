@@ -231,11 +231,14 @@ WebGUI.LayoutItem
     dragger.className = "draggable";
     var dragTrigger = document.createElement( 'div' );
     dragTrigger.className = "dragTrigger dragTriggerWrap";
+    dragTrigger.id = elem.id + "_handle";
     var icon    = document.createElement( 'img' );
     icon.src = getWebguiProperty( 'extrasURL' ) + 'icon/arrow_out.png';
     dragTrigger.appendChild( icon );
     dragger.appendChild( dragTrigger );
     elem.insertBefore( dragger, elem.firstChild );
+
+    this.setHandleElId( dragTrigger.id );
 };
 YAHOO.extend(WebGUI.LayoutItem, YAHOO.util.DDProxy);
 
