@@ -5,6 +5,7 @@ use strict;
 use warnings;
 use Try::Tiny;
 use File::Spec::Functions qw(catfile);
+use JSON;
 
 use WebGUI::Paths;
 use WebGUI::Session;
@@ -245,6 +246,164 @@ my $DT_NOW = DateTime->now;
                     title       => 'This weekend',
                     startDate   => $DT_NOW->clone->add( days => 6 - $DT_NOW->dow )->ymd,
                     endDate     => $DT_NOW->clone->add( days => 7 - $DT_NOW->dow )->ymd,
+                },
+            ],
+        },
+    ],
+    'WebGUI::Asset::Wobject::DataForm' => [
+        {
+            title       => 'Data Form',
+            isHidden    => 1,
+            defaultView => 0,
+            useCaptcha  => 1,
+            templateId  => 'PBtmpl0000000000000141', # Default dataform
+            fieldConfiguration  => JSON->new->encode( [
+                {
+                    name        => "from",
+                    label       => 'From',
+                    status      => "required",
+                    type        => "email",
+                },
+                {
+                    name        => 'subject',
+                    label       => 'Subject',
+                    status      => 'required',
+                    type        => 'text',
+                },
+                {
+                    name        => 'date',
+                    label       => 'Date',
+                    status      => 'editable',
+                    type        => 'date',
+                },
+                {
+                    name        => 'body',
+                    label       => 'Body',
+                    status      => 'editable',
+                    type        => 'textarea',
+                },
+            ] ),
+        },
+        {
+            title       => 'Data Form (list)',
+            defaultView => 1,
+        },
+        {
+            title       => 'Data Form (tabbed)',
+            defaultView => 0,
+            templateId  => 'PBtmpl0000000000000116', # Tab form
+            fieldConfiguration  => JSON->new->encode( [
+                {
+                    name        => "from",
+                    label       => 'From',
+                    status      => "required",
+                    type        => "email",
+                    tabId       => 0,
+                },
+                {
+                    name        => 'subject',
+                    label       => 'Subject',
+                    status      => 'required',
+                    type        => 'text',
+                    tabId       => 'one',
+                },
+                {
+                    name        => 'date',
+                    label       => 'Date',
+                    status      => 'editable',
+                    type        => 'date',
+                    tabId       => 'one',
+                },
+                {
+                    name        => 'body',
+                    label       => 'Body',
+                    status      => 'editable',
+                    type        => 'textarea',
+                    tabId       => 'two',
+                },
+            ] ),
+            tabConfiguration    => JSON->new->encode( [
+                {
+                    tabId   => 'one',
+                    label   => "One",
+                    subtext => "The oneth page",
+                },
+                {
+                    tabId   => 'two',
+                    label   => 'Two',
+                    subtext => 'The twoth page',
+                },
+            ] ),
+        },
+    ],
+    'WebGUI::Asset::Wobject::DataTable' => [
+        {
+            title       => 'DataTable (YUI)',
+            isHidden    => 1,
+            templateId  => '3rjnBVJRO6ZSkxlFkYh_ug',
+            data        => JSON->new->encode( {
+                columns => [
+                    {
+                        key         => 'ID',
+                        formatter   => 'text',
+                    },
+                    {
+                        key         => 'Name',
+                        formatter   => 'text',
+                    },
+                    {
+                        key         => 'URL',
+                        formatter   => 'link',
+                    },
+                ],
+                rows    => [
+                    {
+                        ID      => '1',
+                        Name    => 'WebGUI',
+                        URL     => 'http://webgui.org',
+                    },
+                    {
+                        ID      => '2',
+                        Name    => 'Plain Black Corp.',
+                        URL     => 'http://plainblack.com',
+                    },
+                ],
+            } ),
+        },
+        {
+            title       => 'DataTable (HTML)',
+            templateId  => 'TuYPpHx7TUyk08639Pc8Bg',
+        },
+    ],
+    'WebGUI::Asset::Wobject::Map' => [
+        {
+            title       => 'Map',
+            mapApiKey   => 'ABQIAAAAxadBCYjK6rRsw7rJkBgiEBT7g5bZECU_gqoByQmzcFSTeCxKshSKEU-GQYssxXNgQ1qkA3XtjOGYog',
+            # Key only works for "localhost:5000"
+            startLatitude => '43.068888',
+            startLongitude => '-89.384251',
+            startZoom   => '6',
+            _children   => [
+                {
+                    className   => 'WebGUI::Asset::MapPoint',
+                    title       => 'Lake Poygan',
+                    latitude    => '44.166445',
+                    longitude   => '-88.791504',
+                    description => 'I have never heard of this place before',
+                },
+                {
+                    className   => 'WebGUI::Asset::MapPoint',
+                    title       => 'Chicago',
+                    latitude    => '41.885921',
+                    longitude   => '-87.670898',
+                    description => 'Best pizza in the world',
+                },
+                {
+                    className   => 'WebGUI::Asset::MapPoint',
+                    title       => 'Dubuque',
+                    latitude    => '42.569264',
+                    longitude   => '-90.725098',
+                    description => 'At the corner of three states',
                 },
             ],
         },

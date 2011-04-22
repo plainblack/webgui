@@ -273,15 +273,13 @@ sub getTemplateVarsEditForm {
     } );
 
     # Stuff from this class's definition
-    my $definition  = __PACKAGE__->definition($session)->[0]->{properties};
-    for my $key ( keys %{$definition} ) {
-        next if $definition->{$key}->{noFormPost};
+    foreach my $key ( $self->getProperties ) {
+        my $fieldHash = $self->getFieldData( $key );
+        next if $fieldHash->{noFormPost};
         next if $key eq 'latitude' 
              || $key eq 'longitude';
-        $definition->{$key}->{name}     = $key;
-        $definition->{$key}->{value}    = $self->$key;
         $var->{ "form_$key" } 
-            = WebGUI::Form::dynamicField( $session, %{$definition->{$key}} );
+            = WebGUI::Form::dynamicField( $session, $fieldHash );
     }
     
     # Stuff from Asset
@@ -325,9 +323,8 @@ sub processAjaxEditForm {
     my $prop    = {};
 
     # Stuff from this class's definition
-    my $definition = __PACKAGE__->definition($session)->[0]->{properties};
-    for my $key ( keys %{$definition} ) {
-        my $field   = $definition->{$key};
+    for my $key ( $self->getProperties ) {
+        my $field   = $self->getFieldData( $key );
         next if $field->{noFormPost};
         $prop->{$key}
             = $form->get($key,$field->{fieldType},$field->{defaultValue},$field);    

@@ -549,9 +549,10 @@ sub www_ajaxEditPointSave {
         } );
     }
     else {
-        $asset  = WebGUI::Asset->newById( $session, $assetId );
-        return JSON->new->encode({message => $i18n->get("error edit unauthorized")})
-            unless $asset && $asset->canEdit;
+        eval { $asset  = WebGUI::Asset->newById( $session, $assetId ) };
+        if ( $@ || !$asset || !$asset->canEdit ) {
+            return JSON->new->encode({message => $i18n->get("error edit unauthorized")});
+        }
         $asset  = $asset->addRevision;
     }
 
