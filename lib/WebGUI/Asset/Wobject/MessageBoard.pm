@@ -50,8 +50,8 @@ See WebGUI::Asset::prepareView() for details.
 sub prepareView {
     my $self = shift;
     $self->SUPER::prepareView();
-    my $template = WebGUI::Asset::Template->newById($self->session, $self->templateId);
-    if (!$template) {
+    my $template = eval{ WebGUI::Asset::Template->newById($self->session, $self->templateId) };
+    if ($@ or !$template) {
         WebGUI::Error::ObjectNotFound::Template->throw(
             error      => qq{Template not found},
             templateId => $self->templateId,
@@ -111,8 +111,11 @@ sub view {
 			$first = $child;
 		}
 		my %lastPostVars;
-		my $lastPost = WebGUI::Asset::Wobject::MessageBoard->newById($self->session, $child->lastPostId);
-		if (defined $lastPost) {
+		if ( $child->lastPostId ) {
+                    my $lastPost = eval { WebGUI::Asset->newById($self->session, $child->lastPostId) };
+                    if ( $@ ) {
+                        $self->session->log->error( "Could not instance " . $child->lastPostId . ": " . $@ );
+                    }
 			%lastPostVars = (
 				'forum.lastPost.url' => $lastPost->getUrl,
 				'forum.lastPost.date' => $self->session->datetime->epochToHuman($lastPost->creationDate,"%z"),

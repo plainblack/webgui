@@ -132,6 +132,7 @@ sub buildAsset {
     my $files       = $rawprops->{_files}       || [];
     my $children    = $rawprops->{_children}    || [];
     my $props       = { map { $_ => $rawprops->{$_} } grep { !/^_/ } keys %$rawprops };
+    $props->{ styleTemplateId } ||= $page->can( 'styleTemplateId' ) ? $page->styleTemplateId : '';
 
     my $asset = $page->addChild({
             className   => $class,
@@ -461,12 +462,12 @@ my $DT_NOW = DateTime->now;
                             ],
                         },
                     ],
-                },
-            ],
-            _files  => [
-                {
-                    property    => 'storageId',
-                    file        => catfile( WebGUI::Paths->extras, 'wg.png' ),
+                    _files  => [
+                        {
+                            property    => 'storageId',
+                            file        => catfile( WebGUI::Paths->extras, 'wg.png' ),
+                        },
+                    ],
                 },
             ],
         },
@@ -626,7 +627,113 @@ my $DT_NOW = DateTime->now;
         }
     ],
     'WebGUI::Asset::Wobject::MessageBoard' => [
-
+        {
+            title       => 'Message Board',
+            isHidden    => 1,
+            _children   => [
+                {
+                    className   => 'WebGUI::Asset::Wobject::Collaboration',
+                    title => 'Logos',
+                    isHidden    => 1,
+                    postFormTemplateId => 'PBtmpl0000000000000029',
+                    threadTemplateId => 'PBtmpl0000000000000032',
+                    collaborationTemplateId => 'PBtmpl0000000000000026',
+                    _children   => [
+                        {
+                            className   => 'WebGUI::Asset::Post::Thread',
+                            title       => 'Thread',
+                            content     => lorem(0,1,2),
+                            synopsis    => lorem(0),
+                            _children   => [
+                                {
+                                    className   => 'WebGUI::Asset::Post',
+                                    title       => "Post",
+                                    content     => lorem(3,4,5),
+                                    _files      => [
+                                        {
+                                            property    => 'storageId',
+                                            file        => catfile( WebGUI::Paths->extras, 'plainblack.gif' ),
+                                        },
+                                    ],
+                                },
+                            ],
+                            _files  => [
+                                {
+                                    property    => 'storageId',
+                                    file        => catfile( WebGUI::Paths->extras, 'wg.png' ),
+                                },
+                            ],
+                        },
+                    ],
+                },
+                {
+                    title => 'Icons',
+                    _children   => [
+                        {
+                            className   => 'WebGUI::Asset::Post::Thread',
+                            title       => 'Clock',
+                            content     => lorem(0,1,2),
+                            synopsis    => lorem(0),
+                            _children   => [
+                                {
+                                    className   => 'WebGUI::Asset::Post',
+                                    title       => "Camera",
+                                    content     => lorem(3,4,5),
+                                    _files      => [
+                                        {
+                                            property    => 'storageId',
+                                            file        => catfile( WebGUI::Paths->extras, 'icon', 'camera.png' ),
+                                        },
+                                    ],
+                                },
+                            ],
+                            _files  => [
+                                {
+                                    property    => 'storageId',
+                                    file        => catfile( WebGUI::Paths->extras, 'icon', 'clock.png' ),
+                                },
+                            ],
+                        },
+                        {
+                            className   => 'WebGUI::Asset::Post::Thread',
+                            title       => 'Brick',
+                            content     => lorem(0,1,2),
+                            synopsis    => lorem(0),
+                            _files  => [
+                                {
+                                    property    => 'storageId',
+                                    file        => catfile( WebGUI::Paths->extras, 'icon', 'brick.png' ),
+                                },
+                            ],
+                        },
+                        {
+                            className   => 'WebGUI::Asset::Post::Thread',
+                            title       => 'Cog',
+                            content     => lorem(0,1,2),
+                            synopsis    => lorem(0),
+                            _files  => [
+                                {
+                                    property    => 'storageId',
+                                    file        => catfile( WebGUI::Paths->extras, 'icon', 'cog.png' ),
+                                },
+                            ],
+                        },
+                        {
+                            className   => 'WebGUI::Asset::Post::Thread',
+                            title       => 'Bug',
+                            content     => lorem(0,1,2),
+                            synopsis    => lorem(0),
+                            _files  => [
+                                {
+                                    property    => 'storageId',
+                                    file        => catfile( WebGUI::Paths->extras, 'icon', 'bug.png' ),
+                                },
+                            ],
+                        },
+                    ],
+                },
+            ],
+        },
     ],
     'WebGUI::Asset::Wobject::Collaboration::Newsletter' => [
 
