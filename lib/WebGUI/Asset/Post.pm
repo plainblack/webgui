@@ -1608,7 +1608,7 @@ sub www_edit {
 	$var{'user.isVisitor'  } = ($user->isVisitor);
 	$var{'visitorName.form'} = WebGUI::Form::text($session, {
 		name => "visitorName",
-		value => $form->process('visitorName') || $self->visitorName
+		value => $form->process('visitorName') || $self->username
     });
     
 	for my $x (1..5) {
@@ -1693,9 +1693,9 @@ sub www_edit {
 	$var{'karmaScale.form'} = WebGUI::Form::integer($session, {
         name=>"karmaScale",
         defaultValue=>$self->getThread->getParent->defaultKarmaScale,
-        value=>$self->karmaScale,
+        value=>$self->getThread->karmaScale,
     });
-	$var{karmaIsEnabled} = $session->setting->useKarma;
+	$var{karmaIsEnabled} = $session->setting->get('useKarma');
 	$var{'form.preview'} = WebGUI::Form::submit($session, {
 	    value=>$i18n->get("preview","Asset_Collaboration")
     });

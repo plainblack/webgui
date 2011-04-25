@@ -133,11 +133,12 @@ Build one asset on the page, recursing into any _children.
 =cut
 
 sub buildAsset {
-    my ( $self, $class, $page, $props ) = @_;
+    my ( $self, $class, $page, $rawprops ) = @_;
     my $session = $self->{_session};
 
-    my $files       = delete $props->{_files}       || [];
-    my $children    = delete $props->{_children}    || [];
+    my $files       = $rawprops->{_files}       || [];
+    my $children    = $rawprops->{_children}    || [];
+    my $props       = { map { $_ => $rawprops->{$_} } grep { !/^_/ } keys %$rawprops };
 
     my $asset = $page->addChild({
             className   => $class,
@@ -229,6 +230,7 @@ my $DT_NOW = DateTime->now;
     'WebGUI::Asset::Wobject::Calendar' => [
         {
             title           => 'Calendar',
+            description     => lorem(0,1,2),
             isHidden        => 1,
             displayTitle    => 1,
             _children       => [
@@ -262,6 +264,7 @@ my $DT_NOW = DateTime->now;
     'WebGUI::Asset::Wobject::DataForm' => [
         {
             title       => 'Data Form',
+            description => lorem(0,1,2),
             isHidden    => 1,
             defaultView => 0,
             useCaptcha  => 1,
@@ -348,6 +351,7 @@ my $DT_NOW = DateTime->now;
     'WebGUI::Asset::Wobject::DataTable' => [
         {
             title       => 'DataTable (YUI)',
+            description => lorem(0,1,2),
             isHidden    => 1,
             templateId  => '3rjnBVJRO6ZSkxlFkYh_ug',
             data        => JSON->new->encode( {
@@ -387,6 +391,7 @@ my $DT_NOW = DateTime->now;
     'WebGUI::Asset::Wobject::Map' => [
         {
             title       => 'Map',
+            description => lorem(0,1,2),
             mapApiKey   => 'ABQIAAAAxadBCYjK6rRsw7rJkBgiEBT7g5bZECU_gqoByQmzcFSTeCxKshSKEU-GQYssxXNgQ1qkA3XtjOGYog',
             # Key only works for "localhost:5000"
             startLatitude => '43.068888',
@@ -398,21 +403,21 @@ my $DT_NOW = DateTime->now;
                     title       => 'Lake Poygan',
                     latitude    => '44.166445',
                     longitude   => '-88.791504',
-                    description => 'I have never heard of this place before',
+                    description => lorem(0),
                 },
                 {
                     className   => 'WebGUI::Asset::MapPoint',
                     title       => 'Chicago',
                     latitude    => '41.885921',
                     longitude   => '-87.670898',
-                    description => 'Best pizza in the world',
+                    description => lorem(1),
                 },
                 {
                     className   => 'WebGUI::Asset::MapPoint',
                     title       => 'Dubuque',
                     latitude    => '42.569264',
                     longitude   => '-90.725098',
-                    description => 'At the corner of three states',
+                    description => lorem(2),
                 },
             ],
         },
@@ -425,6 +430,7 @@ my $DT_NOW = DateTime->now;
             title       => 'Search',
             isHidden    => 1,
             searchRoot  => 'PBasset000000000000001',
+            description => lorem(0,1,2),
         },
     ],
     'WebGUI::Asset::Snippet' => [
@@ -435,7 +441,111 @@ my $DT_NOW = DateTime->now;
         },
     ],
     'WebGUI::Asset::Wobject::Collaboration' => [
-
+        {
+            title => 'Collaboration (Forum)',
+            isHidden    => 1,
+            postFormTemplateId => 'PBtmpl0000000000000029',
+            threadTemplateId => 'PBtmpl0000000000000032',
+            collaborationTemplateId => 'PBtmpl0000000000000026',
+            _children   => [
+                {
+                    className   => 'WebGUI::Asset::Post::Thread',
+                    title       => 'Thread',
+                    content     => lorem(0,1,2),
+                    synopsis    => lorem(0),
+                    _children   => [
+                        {
+                            className   => 'WebGUI::Asset::Post',
+                            title       => "Post",
+                            content     => lorem(3,4,5),
+                        },
+                    ],
+                },
+            ],
+        },
+        {
+            title   => 'Collaboration (FAQ)',
+            postFormTemplateId => 'PBtmpl0000000000000099',
+            threadTemplateId => 'PBtmpl0000000000000032',
+            collaborationTemplateId => 'PBtmpl0000000000000080',
+            _children   => [
+                {
+                    className   => 'WebGUI::Asset::Post::Thread',
+                    title       => "Question 1?",
+                    content     => '<p>Answer!</p>' . lorem(0),
+                },
+                {
+                    className   => 'WebGUI::Asset::Post::Thread',
+                    title       => "Question 2?",
+                    content     => '<p>Answer!</p>' . lorem(1),
+                },
+                {
+                    className   => 'WebGUI::Asset::Post::Thread',
+                    title       => "Question 3?",
+                    content     => '<p>Answer!</p>' . lorem(2),
+                },
+            ],
+        },
+        {
+            title   => 'Collaboration (Job)',
+            postFormTemplateId => 'PBtmpl0000000000000122',
+            threadTemplateId => 'PBtmpl0000000000000098',
+            collaborationTemplateId => 'PBtmpl0000000000000077',
+        },
+        {
+            title   => 'Collaboration (Link List)',
+            postFormTemplateId => 'PBtmpl0000000000000114',
+            threadTemplateId => 'PBtmpl0000000000000113',
+            collaborationTemplateId => 'PBtmpl0000000000000083',
+        },
+        {
+            title   => 'Collaboration (Request Tracker)',
+            postFormTemplateId => 'PBtmpl0000000000000210',
+            threadTemplateId => 'PBtmpl0000000000000209',
+            collaborationTemplateId => 'PBtmpl0000000000000208',
+        },
+        {
+            title   => 'Collaboration (Blog)',
+            postFormTemplateId => 'PBtmpl0000000000000029',
+            threadTemplateId => 'PBtmpl0000000000000032',
+            collaborationTemplateId => 'PBtmpl0000000000000112',
+        },
+        {
+            title   => 'Collaboration (Classifieds)',
+            postFormTemplateId => 'PBtmpl0000000000000029',
+            threadTemplateId => 'PBtmpl0000000000000032',
+            collaborationTemplateId => 'PBtmpl0000000000000128',
+        },
+        {
+            title   => 'Collaboration (Guest Book)',
+            postFormTemplateId => 'PBtmpl0000000000000029',
+            threadTemplateId => 'PBtmpl0000000000000032',
+            collaborationTemplateId => 'PBtmpl0000000000000133',
+        },
+        {
+            title   => 'Collaboration (Ordered List)',
+            postFormTemplateId => 'PBtmpl0000000000000029',
+            threadTemplateId => 'PBtmpl0000000000000032',
+            collaborationTemplateId => 'PBtmpl0000000000000101',
+        },
+        {
+            title   => 'Collaboration (Photo Gallery)',
+            postFormTemplateId => 'PBtmpl0000000000000029',
+            threadTemplateId => 'PBtmpl0000000000000032',
+            collaborationTemplateId => 'PBtmpl0000000000000121',
+        },
+        {
+            title   => 'Collaboration (Topics)',
+            postFormTemplateId => 'PBtmpl0000000000000029',
+            threadTemplateId => 'PBtmpl0000000000000032',
+            collaborationTemplateId => 'PBtmpl0000000000000079',
+        },
+        {
+            title   => 'Collaboration (Traditional with Thumbnails)',
+            postFormTemplateId => 'PBtmpl0000000000000029',
+            threadTemplateId => 'PBtmpl0000000000000032',
+            collaborationTemplateId => 'PBtmpl0000000000000097',
+        },
     ],
     'WebGUI::Asset::Wobject::Gallery' => [
 
@@ -528,16 +638,16 @@ to pull from __DATA__
 
 our @LOREM;
 sub lorem {
-    my ( $self, @indexes ) = @_;
+    my ( @indexes ) = @_;
     return join "", map { "<p>$_</p>" } split "\n\n", lorem_text( @indexes );
 }
 
 sub lorem_text {
-    my ( $self, @indexes ) = @_;
+    my ( @indexes ) = @_;
     if ( !@LOREM ) {
         @LOREM = <DATA>;
     }
-    if ( !@indexes ) {
+    if ( scalar @indexes == 0 ) {
         @indexes = ( 0..3 );
     }
     return join "\n\n", @LOREM[ @indexes ];
