@@ -125,10 +125,6 @@ sub execute {
                     $session->db->write("REPLACE INTO userSessionScratch (sessionId,name,value) VALUES (?,?,?)",
                         [$session->getId,$calendar->getId,"SPECTRE"]);
                 }
-                #/KLUDGE
-
-                ## Somebody point me to a DECENT iCalendar parser...
-                # Text::vFile perhaps?
 
                 # Get the feed
                 $session->log->info( "Trying Calendar feed ".$feed->{url}." for $calendarTitle" );
@@ -171,7 +167,7 @@ sub execute {
                         isHidden    => 1,
                     };
                     PROPERTY: foreach my $property (qw/uid description summary location/) {
-                        next property unless exists $event_properties->{$property};
+                        next PROPERTY unless exists $event_properties->{$property};
                         $properties->{$property} = $event_properties->{$property}->[0]->value;
                     }
                     ##Fixup
@@ -186,8 +182,8 @@ sub execute {
                         my ($year, $month, $day) = $date =~ /(\d{4})(\d{2})(\d{2})/;
                         my ($hour, $minute, $second) = $time =~ /(\d{2})(\d{2})(\d{2})/;
                         my $tz = '';
-                        if ($event_properties->{dtstart}->[0]->properties->{tzid}) {
-                            $tz = $event_properties->{dtstart}->[0]->properties->{tzid};
+                        if ($event_properties->{dtstart}->[0]->{tzid}) {
+                            $tz = $event_properties->{dtstart}->[0]->{tzid};
                         }
                         if (!$tz || !DateTime::TimeZone->is_valid_name($tz)) {
                             $tz = "UTC";

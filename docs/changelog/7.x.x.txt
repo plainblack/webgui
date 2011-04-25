@@ -5,6 +5,7 @@
  - fixed #12117: Thingy - www_searchViaAjax broken
  - fixed #12116: JsonTable form control needs i18n
  - fixed #12102: User profiling field extras information
+ - fixed #12106: CalendarUpdateFeeds activity does not handle time zones correctly
 
 7.9.26
  - fixed #12086: Shop Billing Address Unpopulated

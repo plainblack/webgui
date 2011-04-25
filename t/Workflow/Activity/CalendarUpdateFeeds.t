@@ -26,7 +26,7 @@ use Data::Dumper;
 plan skip_all => 'set WEBGUI_LIVE to enable this test'
     unless $ENV{WEBGUI_LIVE};
 
-plan tests => 19; # increment this value for each test you create
+plan tests => 23; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -40,9 +40,8 @@ my $receiver = $home->addChild({
     title     => 'Receiving Calendar',
 });
 
-$receiver->addFeed({
+my $feedId = $receiver->addFeed({
     url      => $session->url->getSiteURL.$session->url->gateway($sender->getUrl('func=ical')),
-    feedType => 'ical',
     lastUpdated => 'never',
 });
 
@@ -64,9 +63,45 @@ my $party = $sender->addChild({
     ownerUserId => 3,
 }, undef, undef, {skipAutoCommitWorkflows => 1});
 
+my $ical_feed = <<"EOICAL";
+BEGIN:VCALENDAR
+PRODID:-//Oregon State University//NONSGML Web Calendar//EN
+VERSION:2.0
+BEGIN:VEVENT
+UID:20110426T010000Z-51795\@calendar.oregonstate.edu
+CLASS:PUBLIC
+SUMMARY:CPR/AED for the Professional Rescuer
+DESCRIPTION:This class is designed for any individual who has a duty to res
+ pond to emergencies.&nbsp; It combines lectures and video with hands-on sk
+ ill training and it incorporates real-life rescue scenarios and lessons th
+ at reinforce decision-making skills.&nbsp; This class covers Adult/Child A
+ ED &amp; CPR and Infant CPR; two-person CPR; use of a bag-valve mask; a
+ nd introduction to Emergency Medical Services and bloodbourne pathogens.**
+ This course meets Level C CPR requirements.&nbsp; It is the pre-requisite 
+ for most nursing and EMT programs. **&nbsp; Course continues Tuesday&nbsp\
+ ;April 26, 6:00pm - 10:00pm Dixon Upper Classroom.
+DTSTART:20110426T010000Z
+DTEND:20110426T050000Z
+LAST-MODIFIED:20110301T215024Z
+CREATED:20110301T215024Z
+DTSTAMP:20110301T215024Z
+CONTACT:Recreation Services
+END:VEVENT
+END:VCALENDAR
+EOICAL
+
+my $snippet_feed = $home->addChild({
+    className => 'WebGUI::Asset::Snippet',
+    url       => 'icalFeed.ics',
+    snippet   => $ical_feed,
+    mimeType  => 'text/calendar',
+});
+
 my $tag = WebGUI::VersionTag->getWorking($session);
 $tag->commit;
 WebGUI::Test->addToCleanup($tag);
+
+$snippet_feed = $snippet_feed->cloneFromDb;
 
 my $workflow  = WebGUI::Workflow->create($session,
     {
@@ -102,7 +137,6 @@ my $got_anniversary = is(scalar @{ $newEvents }, 1, 'ical import of 1 event');
 
 SKIP: {
     skip "No event recieved", 15 unless $got_anniversary;
-    diag "point";
     my $anniversary = pop @{ $newEvents };
 
     is($anniversary->get('title'),         $party->get('title'),       'transferred title');
@@ -130,12 +164,44 @@ SKIP: {
     is($retVal, 'complete', 'cleanup: 2nd activity complete');
     $retVal = $instance2->run();
     is($retVal, 'done', 'cleanup: 2nd activity is done');
-    $instance1->delete;
 
     $newEvents = $receiver->getLineage(['children'], { returnObjects => 1, });
 
     is(scalar @{ $newEvents }, 1, 'reimport does not create new children');
     $anniversary = pop @{ $newEvents };
     is($anniversary->get('description'),   $party->get('description'), '... description, checks for line unwrapping');
+    $anniversary->purge;
 }
+
+##Add an ical feed to check time zone processing
+
+$receiver->deleteFeed($feedId);
+$receiver->addFeed({
+    url      => $session->url->getSiteURL.$snippet_feed->getUrl,
+    lastUpdated => 'never',
+});
+
+$oldEvents = $receiver->getLineage(['children'], { returnObjects => 1, });
+is(scalar @{ $oldEvents }, 0, 'receiving calendar has no events');
+
+$instance1->delete('skipNotify');
+$instance1 = WebGUI::Workflow::Instance->create($session,
+    {
+        workflowId              => $workflow->getId,
+        skipSpectreNotification => 1,
+    }
+);
+
+my $retVal;
+
+$retVal = $instance1->run();
+is($retVal, 'complete', 'cleanup: activity complete');
+$retVal = $instance1->run();
+is($retVal, 'done', 'cleanup: activity is done');
+$instance1->delete;
+
+$newEvents = $receiver->getLineage(['children'], { returnObjects => 1, });
+
+my $got_cpr = is(scalar @{ $newEvents }, 1, 'ical import of 1 event');
+
 #vim:ft=perl
