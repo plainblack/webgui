@@ -79,6 +79,9 @@ sub dispatch {
             $fragment =~ s/$url//;
             $session->asset($asset);
             my $output = eval { $asset->dispatch($fragment); };
+            if ( $@ ) {
+                $session->log->error( "Problem with dispatching $url: " . $@ );
+            }
             return $output if defined $output;
         }
     }

@@ -387,7 +387,7 @@ are authorized to see them.
 
 =cut
 
-sub getCurrentRevisionDate {
+override getCurrentRevisionDate => sub {
     my $class       = shift;
     my $session     = shift;
     my $assetId     = shift;
@@ -410,9 +410,9 @@ sub getCurrentRevisionDate {
         return $revisionDate;
     }
     else {
-        return $class->next::method( $session, $assetId );
+        return super();
     }
-}
+};
 
 #----------------------------------------------------------------------------
 
@@ -721,9 +721,9 @@ See WebGUI::Asset::prepareView() for details.
 
 =cut
 
-sub prepareView {
-    my $self = shift;
-    $self->next::method();
+around prepareView => sub {
+    my ($orig, $self, @args) = @_;;
+    $self->$orig(@args);
 
     my $templateId  = $self->getParent->templateIdViewAlbum;
 
@@ -740,7 +740,7 @@ sub prepareView {
 
     $self->{_viewTemplate}  = $template;
     $self->{_viewVariables} = $self->getTemplateVars;
-}
+};
 
 #----------------------------------------------------------------------------
 

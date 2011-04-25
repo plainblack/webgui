@@ -329,6 +329,7 @@ use WebGUI::International;
 use WebGUI::Search;
 use XML::Simple;
 use WebGUI::HTML;
+use WebGUI::Asset::Wobject::GalleryAlbum;
 
 =head1 NAME
 
@@ -950,9 +951,9 @@ See WebGUI::Asset::prepareView() for details.
 
 =cut
 
-sub prepareView {
-    my $self = shift;
-    $self->next::method();
+around prepareView => sub {
+    my ( $orig, $self, @args ) = @_;
+    $self->$orig( @args );
 
     if ( $self->viewDefault eq "album" && $self->viewAlbumAssetId && $self->viewAlbumAssetId ne 'PBasset000000000000001') {
         my $asset
@@ -968,7 +969,7 @@ sub prepareView {
     else {
         $self->prepareViewListAlbums;
     }
-}
+};
 
 #----------------------------------------------------------------------------
 
@@ -1058,7 +1059,7 @@ instead of having to block things from being added.
 
 =cut
 
-sub www_add {
+override www_add => sub {
     my $self        = shift;
 
     unless ( $self->hasBeenCommitted ) {
@@ -1066,8 +1067,8 @@ sub www_add {
         return $self->processStyle($i18n->get("error add uncommitted"));
     }
 
-    return $self->next::method( @_ );
-}
+    return super();
+};
 
 #----------------------------------------------------------------------------
 

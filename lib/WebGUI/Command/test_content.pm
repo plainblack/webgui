@@ -70,19 +70,11 @@ sub run {
         my $page    = $categories{ $cat }->addChild({
                 className       => $LAYOUT_CLASS,
                 styleTemplateId => $style->getId,
+                title           => $sets[0]->{title},
             });
+        $page->indexContent;
 
         my $asset   = $self->buildAsset( $class, $page, $sets[0] );
-        $page->title( $asset->getName );
-        $page->menuTitle( $asset->getName );
-
-        # Fix the URLs to take the new titles
-        $page->url( '' );
-        $page->write;
-        $page->indexContent;
-        $asset->url( '' );
-        $asset->write;
-        $asset->indexContent;
 
         # Make subpages for the other ones
         for my $set ( @sets[1..$#sets] ) {
@@ -91,6 +83,7 @@ sub run {
                 %{ $set },
             };
             my $subpage = $page->addChild({
+                url             => $asset->url . '/' . $set->{title},
                 className       => $LAYOUT_CLASS,
                 title           => $set->{title},
                 styleTemplateId => $style->getId,
@@ -149,11 +142,13 @@ sub buildAsset {
     my %storage = ();
     for my $file ( @$files ) {
         my $storage;
+        next unless -f $file->{file};
         if ( !($storage = $storage{ $file->{property} }) ) {
             $storage = $storage{ $file->{property} } = WebGUI::Storage->create( $session );
             $asset->update({ $file->{property} => $storage->getId });
         }
-        $storage->addFileFromFilesystem( $file->{file} );
+        my $filename = $storage->addFileFromFilesystem( $file->{file} );
+        $storage->generateThumbnail( $filename );
     }
 
     # Add children
@@ -458,8 +453,20 @@ my $DT_NOW = DateTime->now;
                             className   => 'WebGUI::Asset::Post',
                             title       => "Post",
                             content     => lorem(3,4,5),
+                            _files      => [
+                                {
+                                    property    => 'storageId',
+                                    file        => catfile( WebGUI::Paths->extras, 'plainblack.gif' ),
+                                },
+                            ],
                         },
                     ],
+                },
+            ],
+            _files  => [
+                {
+                    property    => 'storageId',
+                    file        => catfile( WebGUI::Paths->extras, 'wg.png' ),
                 },
             ],
         },
@@ -478,6 +485,12 @@ my $DT_NOW = DateTime->now;
                     className   => 'WebGUI::Asset::Post::Thread',
                     title       => "Question 2?",
                     content     => '<p>Answer!</p>' . lorem(1),
+                    _files      => [
+                        {
+                            property    => 'storageId',
+                            file        => catfile( WebGUI::Paths->extras, 'plainblack.gif' ),
+                        },
+                    ],
                 },
                 {
                     className   => 'WebGUI::Asset::Post::Thread',
@@ -548,7 +561,69 @@ my $DT_NOW = DateTime->now;
         },
     ],
     'WebGUI::Asset::Wobject::Gallery' => [
-
+        {
+            title       => 'Gallery',
+            isHidden    => 1,
+            _children   => [
+                {
+                    className   => 'WebGUI::Asset::Wobject::GalleryAlbum',
+                    title       => 'Album 1',
+                    _children   => [
+                        {
+                            className   => 'WebGUI::Asset::File::GalleryFile::Photo',
+                            title       => 'WebGUI Logo',
+                            filename    => 'wg.png',
+                            _files      => [
+                                {
+                                    property        => 'storageId',
+                                    file            => catfile( WebGUI::Paths->extras, 'wg.png' ),
+                                },
+                            ],
+                        },
+                        {
+                            className   => 'WebGUI::Asset::File::GalleryFile::Photo',
+                            title       => 'Plainblack logo',
+                            filename    => 'plainblack.gif',
+                            _files      => [
+                                {
+                                    property        => 'storageId',
+                                    file            => catfile( WebGUI::Paths->extras, 'plainblack.gif' ),
+                                },
+                            ],
+                        },
+                    ],
+                },
+                {
+                    className   => 'WebGUI::Asset::Wobject::GalleryAlbum',
+                    title       => 'Icons',
+                    _children   => [ 
+                        map { {
+                            className   => 'WebGUI::Asset::File::GalleryFile::Photo',
+                            title       => ucfirst $_,
+                            filename    => $_,
+                            _files      => [
+                                {
+                                    property    => 'storageId',
+                                    file        => catfile( WebGUI::Paths->extras, 'icon', $_ ),
+                                },
+                            ],
+                        } } qw( 
+                            application.png keyboard.png layers.png layout.png anchor.png lightbulb.png
+                            lightning.png link.png maginifier.png map.png attach.png money.png basket.png
+                            monitor.png mouse.png bell.png bin.png bomb.png book.png note.png new.png music.png
+                            page.png brick.png briefcase.png bug.png building.png cake.png calculator.png 
+                            calendar.png car.png camera.png cart.png cd.png pencil.png phone.png chart_bar.png
+                            photo.png picture.png clock.png printer.png rainbow.png report.png plugin.png 
+                            cog.png coins.png comment.png resultset_first.png resultset_next.png
+                            contrast.png script.png controller.png server.png cross.png css.png shading.png
+                            shield.png date.png database.png sound.png disk.png door.png star.png stop.png
+                            dvd.png email.png table.png error.png feed.png television.png folder.png font.png 
+                            group.png user.png world.png xhtml.png image.png key.png zoom.png wrench.png
+                        )
+                    ],
+                },
+            ],
+        }
     ],
     'WebGUI::Asset::Wobject::MessageBoard' => [
 

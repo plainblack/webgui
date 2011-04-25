@@ -129,8 +129,8 @@ Extent the base method in Asset.pm to handle RSS feeds.
 
 =cut
 
-sub dispatch {
-    my ( $self, $fragment ) = @_;
+around dispatch => sub {
+    my ( $orig, $self, $fragment ) = @_;
     if ($fragment eq '.rss') {
         return $self->www_viewRss;
     }
@@ -140,8 +140,8 @@ sub dispatch {
     elsif ($fragment eq '.rdf') {
         return $self->www_viewRdf;
     }
-    return $self->next::method($fragment);
-}
+    return $self->$orig($fragment);
+};
 
 #-------------------------------------------------------------------
 
