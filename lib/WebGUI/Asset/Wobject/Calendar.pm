@@ -344,10 +344,6 @@ The date this feed was added, or edited last.
 
 The results of what happened the last time this feed was accessed to pull iCal.
 
-=head4 feedType
-
-What kind of feed this is.
-
 =cut
 
 sub addFeed {
