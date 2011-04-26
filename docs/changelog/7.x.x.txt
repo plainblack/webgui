@@ -1,3 +1,5 @@
+7.9.28
+
 7.9.27
  - fixed #12103: PayPalStd driver fails occasionally
  - fixed #12107: Viewing an individual transaction item fails
