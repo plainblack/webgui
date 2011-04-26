@@ -73,6 +73,13 @@ sub addChild {
     # Check for valid parentage using validParent on child's class
     WebGUI::Asset->loadModule($properties->{className});
     if (! $properties->{className}->validParent($session, $self)) {
+        $session->log->error( 
+            sprintf 'Cannot add %s to %s (URL: %s)(ID: %s)', 
+                $properties->{className},
+                $self->className,
+                $self->url,
+                $self->getId,
+        );
         return undef;
     }
 

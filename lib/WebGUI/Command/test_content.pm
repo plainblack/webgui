@@ -138,6 +138,10 @@ sub buildAsset {
             className   => $class,
             %$props,
         });
+    if ( !$asset ) {
+        print "Could not create " . $class . " inside of " . $page->className . ' (' . $page->getUrl . ")\n";
+        return;
+    }
 
     # Add files to storage locations
     my %storage = ();
@@ -736,13 +740,193 @@ my $DT_NOW = DateTime->now;
         },
     ],
     'WebGUI::Asset::Wobject::Collaboration::Newsletter' => [
-
+        {
+            title => 'Newsletter',
+            isHidden    => 1,
+            _children   => [
+                {
+                    className   => 'WebGUI::Asset::Post::Thread',
+                    title       => 'Thread',
+                    content     => lorem(0,1,2),
+                    synopsis    => lorem(0),
+                    _children   => [
+                        {
+                            className   => 'WebGUI::Asset::Post',
+                            title       => "Post",
+                            content     => lorem(3,4,5),
+                            _files      => [
+                                {
+                                    property    => 'storageId',
+                                    file        => catfile( WebGUI::Paths->extras, 'plainblack.gif' ),
+                                },
+                            ],
+                        },
+                    ],
+                    _files  => [
+                        {
+                            property    => 'storageId',
+                            file        => catfile( WebGUI::Paths->extras, 'wg.png' ),
+                        },
+                    ],
+                },
+            ],
+        },
     ],
     'WebGUI::Asset::Wobject::StoryArchive' => [
-
+        {
+            title       => 'Story Archive',
+            isHidden    => 1,
+            _children   => [
+                {
+                    className       => 'WebGUI::Asset::Story',
+                    title           => 'Story 1',
+                    byline          => 'Gooey',
+                    keywords        => 'webgui',
+                    highlights      => lorem(0),
+                    story           => lorem(1,2,3,4),
+                },
+                {
+                    className       => 'WebGUI::Asset::Story',
+                    title           => 'Story 2',
+                    byline          => 'TEH INTARWEBS',
+                    keywords        => 'webgui,lorem',
+                    highlights      => lorem(2),
+                    story           => lorem(1,0,3,4),
+                },
+                {
+                    className       => 'WebGUI::Asset::Story',
+                    title           => 'Story 3',
+                    byline          => 'Lorem',
+                    keywords        => 'lorem',
+                    highlights      => lorem(1),
+                    story           => lorem(0,2,3,4),
+                },
+            ],
+        },
+    ],
+    'WebGUI::Asset::Wobject::StoryTopic' => [
+        {
+            title       => 'StoryTopic (lorem)',
+            keywords    => 'lorem',
+        },
+        {
+            title       => 'StoryTopic (webgui)',
+            keywords    => 'webgui',
+        },
     ],
     'WebGUI::Asset::Wobject::Survey' => [
-
+        {
+            title       => 'Survey',
+            surveyJSON  => JSON->new->encode(
+                {
+                    "mold" => {
+                        "question" => {
+                            "commentCols" => "10",
+                            "variable" => "",
+                            "gotoExpression" => "",
+                            "verticalDisplay" => "0",
+                            "required" => "0",
+                            "text" => "",
+                            "commentRows" => "5",
+                            "goto" => "",
+                            "answers" => [],
+                            "maxAnswers" => "1",
+                            "value" => "1",
+                            "randomWords" => "",
+                            "randomizeAnswers" => "0",
+                            "questionType" => "Multiple Choice",
+                            "allowComment" => "0",
+                            "textInButton" => "0",
+                            "type" => "question",
+                        },
+                        "answer" => {
+                            "verbatim" => "0",
+                            "value" => "1",
+                            "min" => "1",
+                            "gotoExpression" => "",
+                            "textCols" => "10",
+                            "max" => "10",
+                            "step" => "1",
+                            "terminal" => "0",
+                            "textRows" => "5",
+                            "text" => "",
+                            "recordedAnswer" => "",
+                            "type" => "answer",
+                            "terminalUrl" => "",
+                            "goto" => "",
+                            "isCorrect" => "1"
+                        },
+                        "section" => {
+                            "variable"=>"",
+                            "gotoExpression" => "",
+                            "questionsPerPage" => "5",
+                            "terminal" => "0",
+                            "text" => "",
+                            "goto" => "",
+                            "terminalUrl" => "",
+                            "everyPageText" => "1",
+                            "logical" => "0",
+                            "questions" => [],
+                            "everyPageTitle" => "1",
+                            "timeLimit" => "0",
+                            "randomizeQuestions" => "0",
+                            "questionsOnSectionPage" => "1",
+                            "title" => "NEW SECTION",
+                            "type" => "section"
+                        }
+                    },
+                    "sections" => [
+                        {
+                            "text"=>"Who would cross the Bridge of Death must answer me these questions three, 'ere the other side he see.",
+                            "title"=>"The Questions Three",
+                            "questions" => [
+                                {
+                                    "text"=>"What is your name?",
+                                    "answers" => [
+                                        {
+                                            "recordedAnswer"=>"Sir Launcelot",
+                                            "text"=>"Sir Launcelot"
+                                        },
+                                        {
+                                            "text"=>"Sir Galahad",
+                                            "recordedAnswer"=>"Sir Galahad"
+                                        },
+                                        {
+                                            "recordedAnswer"=>"Sir Robin",
+                                            "text"=>"Sir Robin"
+                                        },
+                                        {
+                                            "text"=>"Arthur, King of the Britons",
+                                            "recordedAnswer"=>"Arthur, King of the Britons"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "text"=>"What is your Quest?",
+                                    "answers"=>[
+                                        {
+                                            "text"=>"The Holy Grail",
+                                            "recordedAnswer" => "The Holy Grail"
+                                        },
+                                    ],
+                                },
+                                {
+                                    "text"=>"What is your favorite color?",
+                                    "answers"=>[
+                                        {
+                                            "recordedAnswer"=>"Blue",
+                                            "text" => "Blue"
+                                        },
+                                        {
+                                            "text"=>"Blue, no yel--!","recordedAnswer"=>"ARGGGGHHH"
+                                        },
+                                    ],
+                                },
+                            ],
+                        },
+                    ],
+                }),
+        },
     ],
     'WebGUI::Asset::Wobject::WikiMaster' => [
 
