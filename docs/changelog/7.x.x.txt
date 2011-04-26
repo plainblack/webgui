@@ -1,4 +1,5 @@
 7.9.28
+ - fixed #11213: Gooey on the Go format problem
 
 7.9.27
  - fixed #12103: PayPalStd driver fails occasionally
