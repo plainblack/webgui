@@ -3,6 +3,7 @@
  - fixed #12116: JsonTable form control needs i18n
  - fixed #12102: User profiling field extras information
  - fixed #12106: CalendarUpdateFeeds activity does not handle time zones correctly
+ - fixed #11213: Gooey on the Go format problem
 
 7.10.14
  - fixed #12094: Cannot enter in Macros in URLs inside TinyMCE.
