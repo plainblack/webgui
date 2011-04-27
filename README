@@ -19,7 +19,7 @@ I'm currently getting 370 requests/second, whereas I'm getting 430/second on the
 = INSTALL =
 
 * Recent Perl (5.12.1 or better)
-* Install libgd (from source or binary package)
+* Install ImageMagick (http://www.imagemagick.org/, compile and install the source or binary package)
 * Run sbin/testEnvironment.pl as root to install Perl modules
 * MySQL with a user account
 * Load share/create.sql
