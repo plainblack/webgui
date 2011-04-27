@@ -16,6 +16,33 @@ You can benchmark your server via:
 
 I'm currently getting 370 requests/second, whereas I'm getting 430/second on the non-PSGI WebGUI8 branch.
 
+= INSTALL =
+
+* Recent Perl (5.12.1 or better)
+* Install libgd (from source or binary package)
+* Run sbin/testEnvironment.pl as root to install Perl modules
+* MySQL with a user account
+* Load share/create.sql
+* Copy WebGUI.conf.original to something named after the site's URL and ending in .conf, 
+  such as www.example.com.conf and edit it, making sure to insert your site's URL and
+  the database connection information (dbuser, dbpass, dsn)
+* wgd reset --uploads
+* Continue with the UPGRADE instructions below 
+
+= UPGRADE =
+
+* Run sbin/testEnvironment.pl.  WebGUI 8 adds new dependencies.
+* Update wgd.  Get it from http://haarg.org/wgd, put in /data/wre/prereqs/bin/ or /usr/local/bin,
+  and do chmod ugo+x /data/wre/prereqs/bin/wgd to make it executable.  WebGUI has a new upgrades system 
+  for wgd to support.  The old system silently ignores the new upgrade scripts.
+* wgd reset --upgrade
+  This is needed even for new WebGUI 8 installs.  The create.sql and WebGUI.conf.original are both
+  from 7.10.x.
+* rsync -r -a (or cp -a) /data/WebGUI/www/extras /data/domains/www.example.com/public/
+* export PERL5LIB='/data/WebGUI/lib:/data/WebGUI/t/lib'
+  Previously, this would break Apache if it were set; now it's required for the stuff plackup loads to
+  find the rest of WebGUI.
+
 = ARCHITECTURE =
 
 * The root level app.psgi file loads all the config files found and
@@ -30,4 +57,5 @@ I'm currently getting 370 requests/second, whereas I'm getting 430/second on the
   it and $app ($session created one per request)
 * $session creates the $request WebGUI::Session::Request and $response WebGUI::Session::Response
   objects (one per request)
+
 
