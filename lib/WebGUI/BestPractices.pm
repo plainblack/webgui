@@ -32,6 +32,11 @@ This module is the equivalent of adding the following to your module:
 
 =cut
 
+use strict;
+use warnings;
+use feature ':5.10';
+use namespace::autoclean ();
+
 sub import {
     my $caller = caller;
     strict->import;
