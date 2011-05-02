@@ -884,21 +884,21 @@ sub cleanup {
 
 #----------------------------------------------------------------------------
 
-=head2 waitForAllForks( )
+=head2 C<< waitForAllForks( [ $wait_time ] ) >>
 
 Will block until all WebGUI::Fork processes are completed.
+Optional argument C<< $wait_time >> gives a maxmimum wait time before turning in failure.
 
 =cut
 
 sub waitForAllForks {
-    my ( $class ) = @_;
+    my ( $class, $wait_time ) = @_;
     my $session = session;
     my @forkIds = $session->db->quickArray( "SELECT id FROM Fork WHERE finished != 1" );
-    my $wait = 1;
-    while ( $wait ) {
-        $wait = 0;
-        $wait = 1 if grep { !$_->isFinished } map { WebGUI::Fork->new( $session, $_ ) } @forkIds;
-        return unless $wait;
+    my $start_time = time;
+    while ( 1 ) {
+        return 1 if ! grep { !$_->isFinished } map { WebGUI::Fork->new( $session, $_ ) } @forkIds;
+        return if $wait_time and $start_time + $wait_time < time;
         sleep 1;
     }
 }

@@ -22,6 +22,8 @@ use WebGUI::Asset;
 use WebGUI::AssetHelper::Copy;
 use WebGUI::Test::Mechanize;
 
+$SIG{HUP} = sub { use Carp; confess "hup"; };
+
 #----------------------------------------------------------------------------
 # Init
 my $session         = WebGUI::Test->session;
@@ -30,7 +32,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 2;        # Increment this number for each test you create
+plan tests => 3;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -51,9 +53,12 @@ my $root = WebGUI::Asset->getRoot($session);
         },
         'AssetHelper/Copy forks a process'
     );
+
+    addToCleanup( 'WebGUI::Fork' => $output->{forkId} );
 }
 
-WebGUI::Test->waitForAllForks;
+ok(WebGUI::Test->waitForAllForks(10), "Forks finished");
+
 $session->cache->clear;
 my $clippies = $root->getLineage(["descendants"], {statesToInclude => [qw{clipboard clipboard-limbo}], returnObjects => 1,});
 is @{ $clippies }, 1, '... only copied 1 asset to the clipboard, no children';
