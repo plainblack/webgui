@@ -12,14 +12,6 @@ our $LANGUAGE = {
 
 sub makeUrlCompliant {			# you have to have this method, but it can do URL transcoding for your language
         my $value = shift; 
-        $value =~ s/\s+$//;                     #removes trailing whitespace
-        $value =~ s/^\s+//;                     #removes leading whitespace
-        $value =~ s/ /-/g;                      #replaces whitespace with hyphens
-        $value =~ s/\.$//;                      #removes trailing period
-        $value =~ s/[^A-Za-z0-9\-\.\_\/]//g;    #removes all funky characters
-        $value =~ s/^\///;                      #removes a leading /
-        $value =~ s/\/$//;                      #removes a trailing /
-        $value =~ s/\/\//\//g;                  #removes double /
         return $value;
 }
 

@@ -1024,7 +1024,6 @@ Couldn't open %-s because %-s <br />
 <dd>The new URL will be based on the Asset's present URL.</dd>
 </dl>
 </div>
-<p>New URLs will be passed through the makeUrlCompliant function that is specific to the default language for your site.</p>
 |,
 		lastUpdated => 0,
 	},
