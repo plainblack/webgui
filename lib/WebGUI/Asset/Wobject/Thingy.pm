@@ -281,6 +281,24 @@ sub definition {
 
 #-------------------------------------------------------------------
 
+=head2 deleteThingIndex ( $thingId )
+
+Remove the entry about this Thing from the database, and for any rows for it that are indexed as well.
+
+=head3 $thingId
+
+The GUID of the Thing, used to pick out this record in the database.
+
+=cut
+
+sub deleteThingIndex {
+	my $self    = shift;
+    my $thingId = shift;
+    $self->session->db->write(q|delete from assetIndex where assetId=? and subId like CONCAT(?,'%')|,[$self->getId, $thingId]);
+}
+
+#-------------------------------------------------------------------
+
 =head2 duplicate ( )
 
 Duplicates a Thingy, including the definitions of the Things in this Thingy and their fields.
@@ -367,6 +385,8 @@ sub duplicateThing {
         $self->addField($field,0);
     }
 
+    $thingProperties->{thingId} = $newThingId;
+    $self->indexThing($thingProperties);
     return $newThingId;
 
 }
@@ -418,6 +438,7 @@ sub deleteField {
         $db->write("ALTER TABLE ".$db->dbh->quote_identifier("Thingy_".$thingId)." DROP "
             .$db->dbh->quote_identifier("field_".$fieldId));
     }
+    $self->reindexThings;
     $error->info("Deleted field: $fieldId in thing: $thingId.");
     return undef;
 }
@@ -468,6 +489,7 @@ sub copyThingData {
     }
     ##Update the copy
     $self->setCollateral("Thingy_".$thingId, "thingDataId", $origCollateral, 0, 0);
+    $self->indexThingData($thingId, $origCollateral);
 
     return undef;
 }
@@ -522,7 +544,26 @@ sub deleteThingData {
         $storage->delete;
     }
 
+    $self->deleteThingDataIndex($thingDataId);
     return undef;
+}
+
+#-------------------------------------------------------------------
+
+=head2 deleteThingDataIndex ( $thingDataId )
+
+Remove the entry about this Thing from the database, and for any rows for it that are indexed as well.
+
+=head3 $thingDataId
+
+The GUID of the thingData to remove, used to pick out this record in the database.
+
+=cut
+
+sub deleteThingDataIndex {
+	my $self        = shift;
+    my $thingDataId = shift;
+    $self->session->db->write(q|delete from assetIndex where assetId=? and subId like CONCAT('%-',?)|,[$self->getId, $thingDataId]);
 }
 
 #-------------------------------------------------------------------
@@ -549,6 +590,7 @@ sub deleteThing {
     $session->db->write("drop table if exists ".$session->db->dbh->quote_identifier("Thingy_".$thingId));
     
     $error->info("Deleted thing: $thingId.");
+    $self->deleteThingIndex($thingId);
     return undef;
 }
 
@@ -636,6 +678,7 @@ sub editThingDataSave {
         return ('', \@errors);
     }
     $newThingDataId = $self->setCollateral("Thingy_".$thingId,"thingDataId",\%thingData,0,0);
+    $self->indexThingData($thingId, \%thingData);
 
     # trigger workflow
     if($thingDataId eq "new"){
@@ -697,6 +740,7 @@ sub field_isa {
     my $session   = $self->session;
     my $fieldType = shift;
     my $isa       = shift;
+    $fieldType    = ucfirst $fieldType;
     my $control   = eval { WebGUI::Pluggable::instanciate("WebGUI::Form::".$fieldType, "new", [ $session, () ]) };
     return ($control && $control->isa($isa));
 }
@@ -1286,6 +1330,7 @@ sub getViewThingVars {
             );
             push(@viewScreenTitleFields,$value) if ($field{viewScreenTitle});
             push(@field_loop, { map {("field_".$_ => $fieldProperties{$_})} keys(%fieldProperties) });
+            $var->{ $field{label} } = $value;
         }
         $var->{viewScreenTitle} = join(" ",@viewScreenTitleFields);
         $var->{field_loop} = \@field_loop;
@@ -1398,6 +1443,7 @@ sub importAssetCollateralData {
             # add new thing
             $self->addThing($thing,1);
         }
+        $self->indexThing($thing);
     }
     # delete deleted things
     my $thingsInDatabase = $self->getThings;
@@ -1436,6 +1482,126 @@ sub importAssetCollateralData {
     }
 
     return undef;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 indexContent ( )
+
+Extend the base class to handle reindexing every Thing, and every row in every Thing.  We have
+to do a complete rework because the URL may have changed, and that affects everything that has
+been inserted into the AssetIndex.
+
+=cut
+
+sub indexContent {
+    my ($self)  = @_;
+    my $session = $self->session;
+    $self->SUPER::indexContent();
+    $self->reindexThings;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 indexThing ( $thing )
+
+Add an entry about this Thing into the AssetIndex so it can be found for searches.
+
+=head3 $thing
+
+A hashref of Thing properties, as returned by getThing
+
+=cut
+
+sub indexThing {
+    my ($self, $thing) = @_;
+    return unless $thing;
+    my $index = WebGUI::Search::Index->new($self);
+    $index->addRecord(
+        url         => $self->getUrl($self->getThingUrl($thing)),
+        groupIdView => $thing->{groupIdView},
+        title       => $thing->{label},
+        subId       => $thing->{thingId},
+        keywords    => join(' ', @{$thing}{qw/label editScreenTitle editInstructions searchScreenTitle searchDescription/}),
+    );
+    ##Easy update of all thingData fields for this thing.  This is in lieu of deleting all records
+    ##And rebuilding them all.
+    $self->session->db->write(q|update assetIndex set title=?, groupIdView=? where assetId=? and subId like CONCAT(?, '%')|, [$thing->{label}, $thing->{groupIdView}, $self->getId, $thing->{thingId}]);
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 indexThingData ( $thingId, $thingData )
+
+Add an entry about a row from this Thing into the AssetIndex so it can be found for searches.
+
+=head3 $thingId
+
+The GUID for a Thing.
+
+=head3 $thingData
+
+A hashref of ThingData properties
+
+=cut
+
+sub indexThingData {
+    my ($self, $thingId, $thingData) = @_;
+    my $session = $self->session;
+    return unless $thingId;
+    my $thing = $self->getThing($thingId);
+    my $index = WebGUI::Search::Index->new($self);
+    my $keywords;
+    ##Get the Thingy's fields
+    my $fields = $session->db->read('select * from Thingy_fields where assetId = ? and thingId = ?',
+        [$self->getId, $thingId]);
+    ##Walk the fields
+    my @viewScreenTitleFields = ();
+    FIELD: while (my %field = $fields->hash) {
+        my $fieldName = 'field_'.$field{fieldId};
+        $field{value} = $thingData->{$fieldName} || $field{defaultValue};
+        my $subkeywords = '';
+        my $value       = '';
+        if ($self->field_isa($field{fieldType}, 'WebGUI::Form::File')) {
+            my $storage = WebGUI::Storage->get($session, $field{value});
+            if ($storage) {
+                foreach my $file (@{$storage->getFiles()}) {
+                    $subkeywords =  $index->getKeywordsForFile($storage->getPath($file));
+                }
+            }
+        }
+        else {
+            $value = $self->getFieldValue($field{value}, \%field);
+            ##If it's a file type, then get keywords from the file.
+            ##Accumulate keywords
+            $subkeywords = $value;
+        }
+        if ($value && $field{viewScreenTitle}) {
+            push @viewScreenTitleFields, $value;
+        }
+        ##We don't index date fields, since they're unix epochs and they'd be different for everyone based on timezone.
+        next FIELD if $field{fieldType} eq 'date'
+                   || $field{fieldType} eq 'datetime'
+                   || $field{fieldType} eq 'time';
+        ##Don't show what shouldn't be shown
+        next FIELD unless $field{displayInSearch};
+        $keywords = join ' ', $keywords, $subkeywords;
+    }
+    return unless $keywords;  ##No sense indexing nothing;
+    my $title = join('', @viewScreenTitleFields)
+             || $thing->{label}
+             || $self->getTitle;
+    $index->addRecord(
+        assetId     => $self->getId,
+        url         => $self->getUrl('func=viewThingData;thingId='. $thing->{thingId} . ';thingDataId='. $thingData->{thingDataId}),
+        groupIdView => $thing->{groupIdView},
+        title       => $title,
+        subId       => $thing->{thingId} . '-' . $thingData->{thingDataId},
+        keywords    => $keywords,
+    );
 }
 
 
@@ -1486,6 +1652,30 @@ sub purge {
 
     return $self->SUPER::purge;
 }
+
+#-------------------------------------------------------------------
+
+=head2 reindexThings ( )
+
+Reindex every Thing, and every row in every Thing.
+
+=cut
+
+sub reindexThings {
+    my ($self)  = @_;
+    my $session = $self->session;
+    my $things = $self->getThings;
+    THING: while (my $thing = $things->hashRef) {
+        $self->deleteThingIndex($thing->{thingId});
+        $self->indexThing($thing);
+        my $sth = $session->db->read('select * from '. $session->db->dbh->quote_identifier('Thingy_'.$thing->{thingId}));
+        while (my $thingData = $sth->hashRef) {
+            $self->indexThingData($thing->{thingId}, $thingData);
+        }
+        $sth->finish;
+    }
+}
+
 
 #-------------------------------------------------------------------
 
@@ -2222,44 +2412,44 @@ sub www_editThingSave {
 
     my $self = shift;
     return $self->session->privilege->insufficient() unless $self->canEdit;
-    my $form = $self->session->form;
-    my ($thingId, $fields);
-    $thingId = $self->session->form->process("thingId");
+    my $form    = $self->session->form;
+    my $thingId = $self->session->form->process("thingId");
+    my $fields  = $self->getFields($thingId);
 
-    $fields = $self->getFields($thingId);
-
+    my $thing = {
+        thingId            => $thingId,
+        label              => $form->process("label"),
+        editScreenTitle    => $form->process("editScreenTitle"),
+        editInstructions   => $form->process("editInstructions"),
+        groupIdAdd         => $form->process("groupIdAdd"),
+        groupIdEdit        => $form->process("groupIdEdit"),
+        saveButtonLabel    => $form->process("saveButtonLabel"),
+        afterSave          => $form->process("afterSave"),
+        editTemplateId     => $form->process("editTemplateId") || 1,
+        onAddWorkflowId    => $form->process("onAddWorkflowId"),
+        onEditWorkflowId   => $form->process("onEditWorkflowId"),
+        onDeleteWorkflowId => $form->process("onDeleteWorkflowId"),
+        groupIdView        => $form->process("groupIdView"),
+        viewTemplateId     => $form->process("viewTemplateId") || 1,
+        defaultView        => $form->process("defaultView"),
+        searchScreenTitle  => $form->process("searchScreenTitle"),
+        searchDescription  => $form->process("searchDescription"),
+        groupIdSearch      => $form->process("groupIdSearch"),
+        groupIdImport      => $form->process("groupIdImport"),
+        groupIdExport      => $form->process("groupIdExport"),
+        searchTemplateId   => $form->process("searchTemplateId") || 1,
+        thingsPerPage      => $form->process("thingsPerPage") || 25,
+        sortBy             => $form->process("sortBy") || '',
+        exportMetaData     => $form->process("exportMetaData") || '',
+        maxEntriesPerUser  => $form->process("maxEntriesPerUser") || '',
+    };
+    $self->setCollateral("Thingy_things", "thingId", $thing, 0, 1);
+    
     if($fields->rows < 1){
         $self->session->log->warn("Thing failed to create because it had no fields");
         my $i18n = WebGUI::International->new($self->session, "Asset_Thingy");
         return $self->www_editThing($i18n->get("thing must have fields"));
     }
-    $self->setCollateral("Thingy_things","thingId",{
-        thingId=>$thingId,
-        label=>$form->process("label"),
-        editScreenTitle=>$form->process("editScreenTitle"),
-        editInstructions=>$form->process("editInstructions"),
-        groupIdAdd=>$form->process("groupIdAdd"),
-        groupIdEdit=>$form->process("groupIdEdit"),
-        saveButtonLabel=>$form->process("saveButtonLabel"),
-        afterSave=>$form->process("afterSave"),
-        editTemplateId=>$form->process("editTemplateId") || 1,
-        onAddWorkflowId=>$form->process("onAddWorkflowId"),
-        onEditWorkflowId=>$form->process("onEditWorkflowId"),
-        onDeleteWorkflowId=>$form->process("onDeleteWorkflowId"),
-        groupIdView=>$form->process("groupIdView"),
-        viewTemplateId=>$form->process("viewTemplateId") || 1,
-        defaultView=>$form->process("defaultView"),
-        searchScreenTitle=>$form->process("searchScreenTitle"),
-        searchDescription=>$form->process("searchDescription"),
-        groupIdSearch=>$form->process("groupIdSearch"),
-        groupIdImport=>$form->process("groupIdImport"),
-        groupIdExport=>$form->process("groupIdExport"),
-        searchTemplateId=>$form->process("searchTemplateId") || 1,
-        thingsPerPage=>$form->process("thingsPerPage") || 25,
-        sortBy=>$form->process("sortBy") || '',
-        exportMetaData=>$form->process("exportMetaData") || '',
-        maxEntriesPerUser=>$form->process("maxEntriesPerUser") || '',
-        },0,1);
 
     while (my $field = $fields->hashRef) {
         my $display = $self->session->form->process("display_".$field->{fieldId}) || 0;
@@ -2269,6 +2459,7 @@ sub www_editThingSave {
 
         $self->session->db->write("update Thingy_fields set display = ?, viewScreenTitle = ?, displayinSearch = ?, searchIn = ? where fieldId = ? and thingId = ?",[$display, $viewScreenTitle, $displayInSearch, $searchIn, $field->{fieldId}, $thingId]);
     }
+    $self->indexThing($thing);
     return $self->www_manage;
 }
 #-------------------------------------------------------------------
@@ -3135,13 +3326,7 @@ sub www_manage {
             'thing_searchUrl' => $session->url->append($url, 'func=search;thingId='.$thing->{thingId}), 
         );
         # set the url for the view icon to the things default view
-        my $viewParams;
-        if ($thing->{defaultView} eq "addThing") {
-            $viewParams = 'func=editThingData;thingId='.$thing->{thingId}.';thingDataId=new';
-        }
-        else{
-            $viewParams = 'func=search;thingId='.$thing->{thingId};
-        }
+        my $viewParams = $self->getThingUrl($thing);
         $templateVars{'thing_viewIcon'} = $session->icon->view($viewParams);
         push (@things_loop, \%templateVars);
     }
@@ -3602,6 +3787,11 @@ The unique id of a thing.
 
 The unique id of a row of thing data.
 
+=head3 templateId
+
+Optional.  The unique id or url of the template to be used.  When specified, the style template is not used.
+If omitted, the thing data view template and style will be used.
+
 =cut
 
 sub www_viewThingData {
@@ -3610,7 +3800,7 @@ sub www_viewThingData {
     my $session     = $self->session;
     my $thingId     = shift || $session->form->process('thingId');
     my $thingDataId = shift || $session->form->process('thingDataId');
-    
+    my $templateId 	= shift || $session->form->process('templateId');
     my $var     = $self->get;
     my $url     = $self->getUrl;
     my $i18n    = WebGUI::International->new($self->session, "Asset_Thingy");
@@ -3640,9 +3830,19 @@ sub www_viewThingData {
 
     $self->getViewThingVars($thingId,$thingDataId,$var);
     $self->appendThingsVars($var, $thingId);
+	
+	my $template;
+	if( $templateId )
+	{
+		$template = WebGUI::Asset::Template->newByUrl( $session, $templateId ) ||
+					WebGUI::Asset::Template->newByDynamicClass( $session, $templateId );
+	}
+	
     return $self->processStyle(
-        $self->processTemplate($var,$thingProperties->{viewTemplateId})
-    );
+		$self->processTemplate($var,$thingProperties->{viewTemplateId})
+    ) if !$template;
+	
+    return $self->processTemplate($var,$template->getId,$template);
 }
 
 #-------------------------------------------------------------------

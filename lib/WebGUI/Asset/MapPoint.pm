@@ -18,6 +18,9 @@ use strict;
 use Tie::IxHash;
 use base 'WebGUI::Asset';
 use WebGUI::Utility;
+use Geo::Coder::Googlev3;
+use Data::Dumper;
+
 
 # To get an installer for your wobject, add the Installable AssetAspect
 # See WebGUI::AssetAspect::Installable and sbin/installClass.pl for more
@@ -143,6 +146,12 @@ sub definition {
             hoverHelp       => $i18n->get("storageIdPhoto description"),
             noFormPost      => 1,
         },
+        isGeocoded   => {
+            fieldType       => "yesNo",
+            tab             => "properties",
+            label           => $i18n->get("isGeocoded label"),
+            hoverHelp       => $i18n->get("isGeocoded description"),
+        },
         userDefined1 => {
             fieldType       => "hidden",
         },
@@ -159,6 +168,7 @@ sub definition {
             fieldType       => "hidden",
         },
     );
+
     push @{$definition}, {
         assetName         => $i18n->get('assetName'),
         icon              => 'mappoint.png',
@@ -212,6 +222,7 @@ AT LEAST the following keys:
     title           - The title of the point
     content         - HTML content to show details about the point
     url             - The URL of the point
+    userDefined1-5  - The userDefined fields 
 
 The following keys are optional
 
@@ -227,7 +238,7 @@ sub getMapInfo {
     # Get asset properties
     $var->{ url         } = $self->getUrl;
     $var->{ assetId     } = $self->getId;
-    my @keys    = qw( latitude longitude title );
+    my @keys    = qw( latitude longitude title userDefined1 userDefined2 userDefined3 userDefined4 userDefined5 isGeocoded );
     for my $key ( @keys ) {
         $var->{ $key } = $self->get( $key );
     }
@@ -273,6 +284,15 @@ sub getTemplateVarsEditForm {
     my $self    = shift;
     my $session = $self->session;
     my $var     = $self->getTemplateVars;
+
+    my $parent  = $self->getParent;
+    #If it's a new point, we have to get the parent from the url
+    unless ($parent) {
+        my $url = $session->url->page;
+        $parent = WebGUI::Asset->newByUrl($session,$url);
+    }
+
+    $var->{'can_edit_map'} = $parent->canEdit;
 
     $var->{ form_header } 
         = WebGUI::Form::formHeader( $session )
@@ -323,8 +343,25 @@ sub getTemplateVarsEditForm {
             name        => "synopsis",
             value       => $self->get("synopsis"),
             resizable   => 0,
-        } );	
+        } );
 
+    #Only allow people who can edit the parent to change isHidden
+    if($var->{'can_edit_map'}) {
+        my $isHidden = (defined $self->get("isHidden")) ? $self->get("isHidden") : 1;
+        $var->{ "form_isHidden" }
+            = WebGUI::Form::yesNo( $session, {
+                name        => "isHidden",
+                value       => $isHidden,
+            } );
+    }
+    
+    my $isGeocoded = ( $self->getId ) ? $self->get("isGeocoded") : 1;
+    $var->{"form_isGeocoded"}
+        = WebGUI::Form::checkbox( $session, {
+            name        => "isGeocoded",
+            value       => 1,
+            checked     => $isGeocoded
+        } );
     # Fix storageIdPhoto because scripts do not get executed in ajax requests
     $var->{ "form_storageIdPhoto" }
 	= '<input type="file" name="storageIdPhoto" />';
@@ -335,6 +372,35 @@ sub getTemplateVarsEditForm {
     }
 
     return $var;
+}
+
+#-------------------------------------------------------------------
+
+=head2 indexContent ( )
+
+Indexing the content of attachments and user defined fields. See WebGUI::Asset::indexContent() for additonal details.
+
+=cut
+
+sub indexContent {
+    my $self = shift;
+    my $indexer = $self->SUPER::indexContent;
+    $indexer->addKeywords($self->get("website"));
+    $indexer->addKeywords($self->get("address1"));
+    $indexer->addKeywords($self->get("address2"));
+    $indexer->addKeywords($self->get("city"));
+    $indexer->addKeywords($self->get("region"));
+    $indexer->addKeywords($self->get("zipCode"));
+    $indexer->addKeywords($self->get("country"));
+    $indexer->addKeywords($self->get("phone"));
+    $indexer->addKeywords($self->get("fax"));
+    $indexer->addKeywords($self->get("email"));
+    $indexer->addKeywords($self->get("userDefined1"));
+    $indexer->addKeywords($self->get("userDefined2"));
+    $indexer->addKeywords($self->get("userDefined3"));
+    $indexer->addKeywords($self->get("userDefined4"));
+    $indexer->addKeywords($self->get("userDefined5"));
+    return $indexer;
 }
 
 #-------------------------------------------------------------------
@@ -367,6 +433,29 @@ sub processAjaxEditForm {
     $prop->{ synopsis       } = $form->get('synopsis');
     $prop->{ url            } = $session->url->urlize( $self->getParent->getUrl . '/' . $prop->{title} );
     $prop->{ ownerUserId    } = $form->get('ownerUserId') || $session->user->userId;
+    #Only users who can edit the map can set this property
+    if($self->getParent->canEdit) {
+        $prop->{ isHidden       } = $form->get('isHidden');
+    }
+    $prop->{isGeocoded      } = $form->get('isGeocoded') || 0;
+    if($prop->{isGeocoded} &&
+        (
+               ( $form->get("address1") ne $self->get("address1") )
+            || ( $form->get("address2") ne $self->get("address2") )
+            || ( $form->get("city") ne $self->get("city") )
+            || ( $form->get("region") ne $self->get("region") )
+            || ( $form->get("zipCode") ne $self->get("zipCode") )
+            || ( $form->get("country") ne $self->get("country") )
+        )
+    ) {
+        my $geocoder = Geo::Coder::Googlev3->new;
+        my $address_str   = $form->get("address1");
+        $address_str     .= " ".$form->get("address2") if($form->get("address2"));
+        $address_str     .= ", ".$form->get("city").", ".$form->get("region").", ".$form->get("zipCode").", ".$form->get("country");
+        my $location = $geocoder->geocode( location => $address_str );
+        $prop->{latitude } = $location->{geometry}->{location}->{lat};
+        $prop->{longitude} = $location->{geometry}->{location}->{lng};
+    }
     
     $self->update( $prop );
 
@@ -419,6 +508,7 @@ sub www_view {
     );
     return "redirect";
 }
+
 
 1;
 

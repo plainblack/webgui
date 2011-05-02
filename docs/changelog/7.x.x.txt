@@ -5,6 +5,10 @@
  - fixed #12106: CalendarUpdateFeeds activity does not handle time zones correctly
  - fixed #11213: Gooey on the Go format problem
  - mark makeUrlCompliant as deprecated.
+ - fixed #12059: WebGUI::Asset::Wobject::Map - Set Default Viewing Area button does not work.
+ - added: Setting MapPoint locations via address.
+ - added: Make Thing data searchable
+ - added: AssetProxy like macro for Thing data, ViewThingData
 
 7.10.14
  - fixed #12094: Cannot enter in Macros in URLs inside TinyMCE.

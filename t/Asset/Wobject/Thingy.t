@@ -38,6 +38,8 @@ my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Thingy Test"});
 WebGUI::Test->addToCleanup($versionTag);
 my $thingy = $node->addChild({className=>'WebGUI::Asset::Wobject::Thingy'});
+$versionTag->commit;
+$thingy = $thingy->cloneFromDb;
 
 # Test for a sane object type
 isa_ok($thingy, 'WebGUI::Asset::Wobject::Thingy');
@@ -257,6 +259,7 @@ cmp_deeply(
             field_type => "textarea",
             }], 
         viewScreenTitle => "",
+        'Thingy field' => 'test value',
         },
         'Getting newly added thing data as JSON: www_viewThingDataViaAjax returns correct data as JSON.'
     );  

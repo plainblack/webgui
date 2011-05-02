@@ -152,6 +152,12 @@ our $HELP = {
                     { 'name' => 'field_pretext' },
                 ],
             },
+            {
+                'name' => 'variables by label',
+            }
+            {
+                'name' => 'fields',
+            }
         ],
         related => [
             {   tag       => 'edit thing template',

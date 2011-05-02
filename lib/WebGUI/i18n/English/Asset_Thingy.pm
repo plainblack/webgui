@@ -1144,6 +1144,12 @@ below/after the form element.|,
         context => q|Status message in the Export Thingy progress bar. %s is the name of the Thing that is being exported.|,
     },
 
+    'variables by label' => {
+        message => q|In addition to the <b>field_loop</b>, field values may be directly accessed via their label.  Please check the documentation for the template plugin that you are using to handle odd characters like spaces or quotes in the label.|,
+        lastUpdated => 1231180362,
+        context => q|Template variable help for getViewThingData|,
+    },
+
 };
 
 1;

@@ -213,30 +213,31 @@ sub view {
         );
 
         my @results   = ();
-        foreach my $data (@{$p->getPageData}) {
-            next unless (
+        ENTRY: foreach my $data (@{$p->getPageData}) {
+            next ENTRY unless (
                 $user->userId eq $data->{ownerUserId}
                 || $user->isInGroup($data->{groupIdView})
                 || $user->isInGroup($data->{groupIdEdit})
             );
 
             my $asset = WebGUI::Asset->new($session, $data->{assetId}, $data->{className});
-            if (defined $asset) {
-                my $properties = $asset->get;
-                if ( $self->get("useContainers") && $asset->getContainer->canView ) {
-                    $properties->{url} = $asset->isa('WebGUI::Asset::Post::Thread') ? $asset->getCSLinkUrl()
-                                       :                                              $asset->getContainer->get("url");
-                }
-                #Add highlighting
-                $properties->{'title'               } = $hl->highlight($properties->{title} || '');
-                $properties->{'title_nohighlight'   } = $properties->{title};
-                my $synopsis = $data->{'synopsis'} || '';
-                WebGUI::Macro::process($self->session, \$synopsis);
-                $properties->{'synopsis'            } = $hl->highlight($synopsis);
-                $properties->{'synopsis_nohighlight'} = $synopsis;
-                push(@results, $properties);
-                $var{results_found} = 1;
-            } 
+            next ENTRY unless defined $asset;
+            my $properties = $asset->get;
+            ##Overlay the asset properties with the original data to handle sub-entries for assets
+            $properties = { %{ $properties }, %{ $data} };
+            if ( $self->get("useContainers") && $asset->getContainer->canView ) {
+                $properties->{url} = $asset->isa('WebGUI::Asset::Post::Thread') ? $asset->getCSLinkUrl()
+                                   :                                              $asset->getContainer->get("url");
+            }
+            #Add highlighting
+            $properties->{'title'               } = $hl->highlight($properties->{title} || '');
+            $properties->{'title_nohighlight'   } = $properties->{title};
+            my $synopsis = $properties->{'synopsis'} || '';
+            WebGUI::Macro::process($self->session, \$synopsis);
+            $properties->{'synopsis'            } = $hl->highlight($synopsis);
+            $properties->{'synopsis_nohighlight'} = $synopsis;
+            push(@results, $properties);
+            $var{results_found} = 1;
 		}
 
         $var{result_set} = \@results;

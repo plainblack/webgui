@@ -35,12 +35,12 @@ These methods are available from this package:
 
 =cut
 
-
 #-------------------------------------------------------------------
 
 =head2 addFile ( path ) 
 
-Use an external filter defined in the config file as searchIndexerPlugins.
+Use an external filter defined in the config file as searchIndexerPlugins to pull keywords from a file and
+add them to the index.
 
 =head3 path
 
@@ -51,21 +51,10 @@ The path to the filename to index, including the filename.
 sub addFile {
     my $self = shift;
     my $path = shift;
-    my $filters = $self->session->config->get("searchIndexerPlugins");
-    my $content;
-    if ($path =~ m/\.(\w+)$/) {
-        my $type = lc($1);
-        if ($filters->{$type}) {
-            open my $fh, "$filters->{$type} $path |" or return undef; # open pipe to filter
-            $content = do { local $/; <$fh> };  # slurp file
-            close $fh;
-        }
-    }
-    return $self->addKeywords($content)
-        if $content =~ m/\S/; # only index if we fine non-whitespace
-    return undef;
+    my $keywords = $self->getKeywordsForFile($path);
+    return unless $keywords =~ /\S/;
+    return $self->addKeywords($keywords)
 }
-
 
 #-------------------------------------------------------------------
 
@@ -84,8 +73,39 @@ sub addKeywords {
 	my $text = join(" ", @_);
 
     $text = $self->_filterKeywords($text);
-	my ($keywords) = $self->session->db->quickArray("select keywords from assetIndex where assetId=?",[$self->getId]);
-	$self->session->db->write("update assetIndex set keywords =? where assetId=?", [$keywords.' '.$text, $self->getId]);
+	my ($keywords) = $self->session->db->quickArray("select keywords from assetIndex where assetId=? and url=?",[$self->getId, $self->asset->get('url')]);
+	$self->session->db->write("update assetIndex set keywords =? where assetId=? and url=?", [$keywords.' '.$text, $self->getId, $self->asset->get('url')]);
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 addRecord ( %fields )
+
+Adds a duplicate record for the current asset, along with fields that are overridden.
+
+=head3 %fields
+
+A hash of fields to override in the record.  Entries for url and keywords are mandatory, and
+no record will be added unless they exist in the hash.
+
+The lineage entry cannot be overridden.
+
+=cut
+
+sub addRecord {
+    my $self   = shift;
+    my %fields = @_;
+    return unless $fields{url} and $fields{keywords};
+    my $asset  = $self->asset;
+    ##Get the asset's record from the database.
+    my %defaults = $self->session->db->quickHash('select * from assetIndex where assetId=? and url=?', [$asset->get('assetId'), $asset->get('url')]);
+    $fields{keywords} = $self->_filterKeywords($fields{keywords});
+    %fields           = (%defaults, %fields);
+    $fields{lineage}  = $defaults{lineage};
+    my $add = $self->session->db->prepare("replace into assetIndex (assetId, url, title, creationDate, revisionDate, 
+        ownerUserId, groupIdView, groupIdEdit, lineage, className, synopsis, keywords, subId) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )");
+    $add->execute([@fields{qw/assetId url title creationDate revisionDate ownerUserId groupIdView groupIdEdit lineage className synopsis keywords subId/}]);
 }
 
 
@@ -213,6 +233,36 @@ sub getId {
 	my $self = shift;
 	return $self->{_id};
 }
+
+#-------------------------------------------------------------------
+
+=head2 getKeywordsForFile ( path ) 
+
+Use an external filter defined in the config file as searchIndexerPlugins to get keywords
+from a file.
+
+=head3 path
+
+The path to the filename to index, including the filename.
+
+=cut
+
+sub getKeywordsForFile {
+    my $self = shift;
+    my $path = shift;
+    my $filters = $self->session->config->get("searchIndexerPlugins");
+    my $content;
+    if ($path =~ m/\.(\w+)$/) {
+        my $type = lc($1);
+        if ($filters->{$type}) {
+            open my $fh, "$filters->{$type} $path |" or return undef; # open pipe to filter
+            $content = do { local $/; <$fh> };  # slurp file
+            close $fh;
+        }
+    }
+    return $content;
+}
+
 
 #-------------------------------------------------------------------
 

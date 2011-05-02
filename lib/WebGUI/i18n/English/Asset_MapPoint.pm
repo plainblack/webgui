@@ -133,7 +133,16 @@ our $I18N = {
         lastUpdated => 0,
         context     => 'Description of asset property',
     },
-
+    'isGeocoded label' => {
+        message     => 'Automatically Position',
+        lastUpdated => 0,
+        context     => 'Label for asset property',
+    },
+    'isGeocoded description' => {
+        message     => q{Choose whether or not this map point should be automatically positioned having it's latitude and longitude dynamically set based on the address.  Choosing "Yes" will make the point unable to be moved on the map.},
+        lastUpdated => 0,
+        context     => 'Description of asset property',
+    },
     'assetName' => {
         message     => "MapPoint",
         lastUpdated => 0,
@@ -380,6 +389,17 @@ our $I18N = {
         context     => "template variable help",
     },
 
+    'form_isHidden' => {
+        message     => "A yes/no field indicating whether or not the Map Point should display in navigations.",
+        lastUpdated => 0,
+        context     => "template variable help",
+    },
+
+    'form_isGeocoded' => {
+        message     => "A checkbox field indicating whether or not the Map Point should be automatically placed on the map based on it's address.",
+        lastUpdated => 0,
+        context     => "template variable help",
+    },
 };
 
 1;

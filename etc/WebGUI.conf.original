@@ -848,6 +848,7 @@
     "PickLanguage"     : "PickLanguage",
     "RandomAssetProxy" : "RandomAssetProxy", 
     "RandomThread"     : "RandomThread", 
+    "RenderThingData"  : "RenderThingData",
     "RootTitle"        : "RootTitle", 
     "r"                : "r_printable", 
     "Spacer"           : "Spacer", 

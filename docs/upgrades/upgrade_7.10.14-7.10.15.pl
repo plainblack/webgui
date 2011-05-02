@@ -22,7 +22,9 @@ use Getopt::Long;
 use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::Asset;
-
+use WebGUI::AssetAspect::Installable;
+use WebGUI::Asset::MapPoint;
+use WebGUI::Asset::Wobject::Thingy;
 
 my $toVersion = '7.10.15';
 my $quiet; # this line required
@@ -31,6 +33,10 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+alterAssetIndexTable($session);
+reindexAllThingys($session);
+WebGUI::AssetAspect::Installable::upgrade("WebGUI::Asset::MapPoint",$session);
+addRenderThingDataMacro($session);
 
 finish($session); # this line required
 
@@ -44,6 +50,37 @@ finish($session); # this line required
 #    print "DONE!\n" unless $quiet;
 #}
 
+sub addRenderThingDataMacro {
+    my $session = shift;
+    print "\tAdd the new RenderThingData macro to the site config... " unless $quiet;
+    $session->config->addToHash('macros', 'RenderThingData', 'RenderThingData');
+    print "DONE!\n" unless $quiet;
+}
+
+sub alterAssetIndexTable {
+    my $session = shift;
+    print "\tExtend the assetIndex table so we can search things other than assets... " unless $quiet;
+    $session->db->write(<<EOSQL);
+alter table assetIndex
+    drop primary key,
+    add column subId char(255) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+    add primary key (assetId, url)
+EOSQL
+    print "DONE!\n" unless $quiet;
+}
+
+sub reindexAllThingys {
+    my $session = shift;
+    print "\tReindex all Thingys... " unless $quiet;
+    my $get_thingy = WebGUI::Asset::Wobject::Thingy->getIsa($session);
+    THINGY: while (1) {
+        my $thingy = eval { $get_thingy->() };
+        next THINGY if Exception::Class->caught();
+        last THINGY unless $thingy;
+        $thingy->indexContent;
+    }
+    print "DONE!\n" unless $quiet;
+}
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
 

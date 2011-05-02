@@ -168,11 +168,133 @@ our $I18N = {
         lastUpdated => 0,
         context     => "Choose from the list of points that existon the map",
     },
+
     'assetName' => {
         message     => "Map",
         lastUpdated => 0,
         context     => "Name of this asset",
     },
+
+    'canAddPoint' => {
+        message     => "A boolean which is true if the current user can add a new point to the map",
+        lastUpdated => 0,
+        context     => "template variable help",
+    },
+
+    'canEdit' => {
+        message     => "A boolean which is true if the current user can edit this Map asset",
+        lastUpdated => 0,
+        context     => "template variable help",
+    },
+
+    'map asset template variables' => {
+        message     => "Map Asset Template Variables",
+        lastUpdated => 0,
+        context     => "template variable help",
+    },
+
+    'view template' => {
+        message     => "Map Asset View Template",
+        lastUpdated => 0,
+        context     => "template variable help",
+    },
+
+    'groupIdAddPoint' => {
+        message     => "The GUID of the group that can add points to the Map",
+        lastUpdated => 0,
+        context     => "template variable help",
+    },
+
+    'mapApiKey' => {
+        message     => "The Google Maps API key",
+        lastUpdated => 0,
+        context     => "template variable help",
+    },
+
+    'mapHeight' => {
+        message     => "The height of the map, in pixels",
+        lastUpdated => 0,
+        context     => "template variable help",
+    },
+
+    'mapWidth' => {
+        message     => "The width of the map, in pixels",
+        lastUpdated => 0,
+        context     => "template variable help",
+    },
+
+    'startLatitude' => {
+        message     => "The starting latitude of the map, for the center",
+        lastUpdated => 0,
+        context     => "template variable help",
+    },
+
+    'startLongitude' => {
+        message     => "The starting longitude of the map, for the center",
+        lastUpdated => 0,
+        context     => "template variable help",
+    },
+
+    'startZoom' => {
+        message     => "The starting zoom level of the map",
+        lastUpdated => 0,
+        context     => "template variable help",
+    },
+
+    'templateIdEditPoint' => {
+        message     => "The GUID of the template for addding or editing a point.",
+        lastUpdated => 0,
+        context     => "template variable help",
+    },
+
+    'templateIdView' => {
+        message     => "The GUID of the template for viewing the map.",
+        lastUpdated => 0,
+        context     => "template variable help",
+    },
+
+    'templateIdViewPoint' => {
+        message     => "The GUID of the template for viewing a point of the map.",
+        lastUpdated => 0,
+        context     => "template variable help",
+    },
+
+    'workflowIdPoint' => {
+        message     => "The GUID of the workflow for committing a Map Point.",
+        lastUpdated => 0,
+        context     => "template variable help",
+    },
+
+    'mapPoints' => {
+        message     => "A loop of map points.  See the MapPoint template variables for a list of available ones.",
+        lastUpdated => 0,
+        context     => "template variable help",
+    },
+
+    'mapPoints' => {
+        message     => "A loop of map points.  See the MapPoint template variables for a list of available ones.",
+        lastUpdated => 0,
+        context     => "template variable help",
+    },
+
+    'button_addPoint' => {
+        message     => "A templated button with internationalized label to add a button.",
+        lastUpdated => 0,
+        context     => "template variable help",
+    },
+
+    'button_setCenter' => {
+        message     => "A templated button with internationalized label to set the center of the map back to the default.",
+        lastUpdated => 0,
+        context     => "template variable help",
+    },
+
+    'selectPoint' => {
+        message     => "A templated dropdown to center the map on a point, and to display it's information.",
+        lastUpdated => 0,
+        context     => "template variable help",
+    },
+
 };
 
 1;

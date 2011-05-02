@@ -10,6 +10,9 @@ our $HELP = {
             {   namespace => 'Asset_Template',
                 tag       => 'template variables'
             },
+            {   namespace => 'Asset_MapPoint',
+                tag       => 'map point asset template variables'
+            },
         ],
         fields    => [],
         variables => [
@@ -32,6 +35,8 @@ our $HELP = {
             { name      => 'form_fax', },
             { name      => 'form_email', },
             { name      => 'user defined variables', },
+            { name      => 'form_isHidden', },
+            { name      => 'form_isGeocoded', },
         ],
         related => []
     },
