@@ -156,7 +156,7 @@ checkModule('Net::Twitter',                 "3.13006"    );
 checkModule('PerlIO::eol',                  "0.14"       );
 checkModule('Monkey::Patch',                '0.03'       );
 checkModule('Data::ICal',                   '0.16'       );
-checkModule('Geo::Coder::Googlev3',         '2.18'       );
+checkModule('Geo::Coder::Googlev3',         '0.07'       );
 
 failAndExit("Required modules are missing, running no more checks.") if $missingModule;
 
