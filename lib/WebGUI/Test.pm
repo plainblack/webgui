@@ -639,6 +639,7 @@ were passed in.  Currently able to destroy:
     WebGUI::DatabaseLink
     WebGUI::LDAPLink
     WebGUI::Inbox::Message
+    WebGUI::Fork
 
 Example call:
 
@@ -766,6 +767,11 @@ Example call:
         },
         'SQL' => sub {
             (shift)->();
+        },
+        'WebGUI::Fork' => sub {
+            my $fork = shift;
+            my $id = $fork->getId;
+            session()->db->write("update Fork set finished = 1 where id = ?", [ $id ] );
         },
     );
 
