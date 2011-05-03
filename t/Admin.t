@@ -86,8 +86,8 @@ $mech->session->user({ userId => '3' });
 $mech->get_ok( '/?op=admin;method=processAssetHelper;helperId=cut;assetId=' . $snip->getId );
 
 cmp_deeply(
-    map( { delete $_->{forkId}; $_ } JSON->new->decode( $mech->content )), 
-    map( { delete $_->{forkId}; $_ } WebGUI::AssetHelper::Cut->new( id => 'cut', session => $session, asset => $snip )->process( )),
+    JSON->new->decode( $mech->content ), 
+    map( { $_->{forkId} = ignore(); $_ } WebGUI::AssetHelper::Cut->new( id => 'cut', session => $session, asset => $snip )->process( )),
     'www_processAssetHelper',
 );
 
@@ -118,8 +118,8 @@ $snip->cut;
 $mech->get_ok( '/?op=admin;method=getClipboard' );
 $output = $mech->content;
 cmp_deeply(
-    JSON->new->decode( $output ),
-    superbagof({
+    JSON->new->decode( $output )->[0],
+    superhashof({
         assetId         => $snip->getId,
         url             => $snip->getUrl,
         title           => $snip->menuTitle,
@@ -178,12 +178,12 @@ $mech->get_ok( '/?op=admin;method=getTreeData;assetUrl=' . $import->url );
 $output = $mech->content;
 cmp_deeply(
     JSON->new->decode( $output ),
-    {
+    superhashof({
         totalAssets     => $import->getChildCount,
         sort            => ignore(),
         dir             => ignore(),
         assets          => [
-            map { {
+            map { superhashof({
                 assetId         => $_->getId,
                 url             => $_->getUrl,
                 lineage         => $_->lineage,
@@ -195,25 +195,26 @@ cmp_deeply(
                 canEdit         => $_->canEdit && $_->canEditIfLocked,
                 helpers         => $_->getHelpers,
                 icon            => $_->getIcon("small"),
-                className       => $_->getName,
-            } } @{ $import->getLineage( ['children'], { returnObjects => 1, maxAssets => 25 } ) }
+                className       => $_->get('className'),
+            }) } @{ $import->getLineage( ['children'], { returnObjects => 1, maxAssets => 25 } ) }
         ],
-        currentAsset    => {
+        currentAsset    => superhashof({
             assetId => $import->getId,
             url     => $import->getUrl,
-            title   => $import->getTitle,
+            title   => $import->get('menuTitle'), # "Import" vs "Import Node"
             icon    => $import->getIcon("small"),
             helpers => $import->getHelpers,
-        },
+        }),
         crumbtrail      => [
-            map { { title => $_->getTitle, url => $_->getUrl } } 
+            map { superhashof({ title => $_->getTitle, url => $_->getUrl }) } 
                 @{ $import->getLineage( ['ancestors'], { returnObjects => 1 } ) }
         ],
-    },
+    }),
     'www_getTreeData',
 );
 
 # www_searchAssets
+
 $mech->get_ok( '/?op=admin;method=searchAssets;query=aReallyLongWordToGetIndexed' );
 $output = $mech->content;
 cmp_deeply(
@@ -235,7 +236,9 @@ cmp_deeply(
                 canEdit         => $snip->canEdit && $snip->canEditIfLocked,
                 helpers         => $snip->getHelpers,
                 icon            => $snip->getIcon('small'),
-                className       => $snip->getName,
+                className       => $snip->get('className'), # getName is 'Snippet', className is 'WebGUI::Asset::Snippet'
+                revisions       => ignore(),
+                type            => ignore(),
             }
         ],
     },
