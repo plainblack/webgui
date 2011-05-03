@@ -154,10 +154,7 @@ our $HELP = {
             },
             {
                 'name' => 'variables by label',
-            }
-            {
-                'name' => 'fields',
-            }
+            },
         ],
         related => [
             {   tag       => 'edit thing template',
