@@ -181,6 +181,7 @@ This is hardcoded for now, but should eventually become a config file of some ki
 =cut
 
 my $DT_NOW = DateTime->now;
+my @numbers = ( 1..10 );
 
 # The first set is the default properties, every other set will combine the
 # default properties with the set properties
@@ -423,7 +424,14 @@ my $DT_NOW = DateTime->now;
         },
     ],
     'WebGUI::Asset::Wobject::Poll' => [
-
+        {
+            title       => 'Poll',
+            description => 'What is the air-speed velocity of an unladen swallow?',
+            a1          => 'Blue',
+            a2          => 'No wait, Yellow',
+            a3          => 'African or European',
+            a4          => 'Your father was a hamster',
+        },
     ],
     'WebGUI::Asset::Wobject::Search' => [
         {
@@ -929,64 +937,233 @@ my $DT_NOW = DateTime->now;
         },
     ],
     'WebGUI::Asset::Wobject::WikiMaster' => [
-
+        {
+            title       => 'Wiki',
+            isHidden    => 1,
+            _children   => [
+                {
+                    className   => 'WebGUI::Asset::WikiPage',
+                    content     => lorem(0,1,2),
+                    keywords    => 'lorem, ipsum',
+                },
+                {
+                    className   => 'WebGUI::Asset::WikiPage',
+                    content     => lorem(3,4,5),
+                    keywords    => 'lorem',
+                },
+                {
+                    className   => 'WebGUI::Asset::WikiPage',
+                    content     => lorem( 1, 3, 5 ),
+                    keywords    => 'lorem',
+                },
+            ],
+        },
     ],
     'WebGUI::Asset::Wobject::Dashboard' => [
+        {
+            title       => 'Dashboard',
+            isHidden    => 1,
+            _children   => [
+                {
+                    className       => 'WebGUI::Asset::Wobject::StockData',
+                    title           => 'Stock Data',
+                },
+                {
+                    className       => 'WebGUI::Asset::Wobject::WeatherData',
+                    title           => 'Weather Data',
 
-    ],
-    'WebGUI::Asset::Wobject::StockData' => [
-
+                },
+            ],
+        },
     ],
     'WebGUI::Asset::Wobject::Thingy' => [
-
+        {
+            title       => 'Thingy',
+            isHidden    => 1,
+        },
     ],
     'WebGUI::Asset::Wobject::UserList' => [
-
-    ],
-    'WebGUI::Asset::Wobject::WeatherData' => [
-
+        {
+            title       => 'UserList',
+            isHidden    => 1,
+        },
     ],
     'WebGUI::Asset::Sku::Donation' => [
-
+        {
+            title           => 'Donation',
+            isHidden        => 1,
+            defaultPrice    => '20.00',
+        },
     ],
     'WebGUI::Asset::Sku::FlatDiscount' => [
-
+        {
+            title           => 'Flat Discount',
+            isHidden        => 1,
+            priceDiscount   => '5.00',
+        },
     ],
     'WebGUI::Asset::Sku::Product' => [
-
+        {
+            title       => 'Product',
+            isHidden    => 1,
+            keywords    => 'adminSubscription',
+            relatedJSON => JSON->new->encode([]),
+            specificationJSON => JSON->new->encode([]),
+            featureJSON => JSON->new->encode([]),
+            benefitJSON => JSON->new->encode([]),
+            accessoryJSON => JSON->new->encode([]),
+            variantsJSON => JSON->new->encode([]),
+            _files  => [
+                {
+                    property    => 'image1',
+                    file        => catfile( WebGUI::Paths->extras, 'wg.png' ),
+                },
+                {
+                    property    => 'image2',
+                    file        => catfile( WebGUI::Paths->extras, 'plainblack.gif' ),
+                },
+            ],
+        },
     ],
     'WebGUI::Asset::Wobject::Shelf' => [
-
+        {
+            title       => 'Shelf',
+            isHidden    => 1,
+            keywords    => 'adminSubscription',
+            _children   => [
+                {
+                    className   => 'WebGUI::Asset::Sku::Product',
+                    title       => 'Product',
+                    price       => '5.00',
+                    _files      => [
+                        {
+                            property    => 'image1',
+                            file        => catfile( WebGUI::Paths->extras, 'plainblack.gif' ),
+                        },
+                    ],
+                },
+                {
+                    className   => 'WebGUI::Asset::Sku::Product',
+                    title       => 'Product x10',
+                    price       => '50.00',
+                    _files      => [
+                        {
+                            property    => 'image1',
+                            file        => catfile( WebGUI::Paths->extras, 'wg.png' ),
+                        },
+                    ],
+                },
+            ],
+        },
     ],
     'WebGUI::Asset::Sku::Subscription' => [
-
+        {
+            title       => 'Subscription',
+            isHidden    => 1,
+            subscriptionGroupId => '12',
+            price       => '5.00',
+            keywords    => 'adminSubscription',
+        },
     ],
     'WebGUI::Asset::Wobject::AssetReport' => [
-
+        {
+            title       => 'AssetReport',
+            isHidden    => 1,
+            settings    => JSON->new->encode({
+                className       => 'WebGUI::Asset::Wobject::Layout',
+            }),
+        },
     ],
     'WebGUI::Asset::Wobject::Carousel' => [
-
+        {
+            title       => 'Carousel',
+            isHidden    => 1,
+            items       => JSON->new->encode({
+                items   => [
+                    {
+                        sequenceNumber  => 1,
+                        text        => lorem(0),
+                        itemId      => 1,
+                    },
+                    {
+                        sequenceNumber => 2,
+                        text        => lorem(1),
+                        itemId      => 2,
+                    },
+                    {
+                        sequenceNumber => 3,
+                        text        => lorem(2),
+                        itemId      => 3,
+                    },
+                    {
+                        sequenceNumber  => 4,
+                        text        => lorem(3),
+                        itemId      => 4,
+                    },
+                ],
+            }),
+        },
     ],
     'WebGUI::Asset::File' => [
-
+        {
+            title       => 'File',
+            isHidden    => 1,
+            filename    => 'wg.png',
+            _files  => [
+                {
+                    property    => 'storageId',
+                    file        => catfile( WebGUI::Paths->extras, 'wg.png' ),
+                },
+            ],
+        },
     ],
     'WebGUI::Asset::File::Image' => [
-
+        {
+            title       => 'Image',
+            isHidden    => 1,
+            filename    => 'wg.png',
+            _files  => [
+                {
+                    property    => 'storageId',
+                    file        => catfile( WebGUI::Paths->extras, 'wg.png' ),
+                },
+            ],
+        },
     ],
     'WebGUI::Asset::Wobject::Navigation' => [
-
+        {
+            title       => 'Navigation',
+            isHidden    => 1,
+        },
     ],
     'WebGUI::Asset::Redirect' => [
-
+        {
+            title       => 'Redirect',
+            menuTitle   => 'Redirect to WebGUI.org',
+            redirectUrl => 'http://webgui.org',
+        },
     ],
     'WebGUI::Asset::Wobject::SQLReport' => [
-
+        {
+            title       => 'SQLReport',
+            isHidden    => 1,
+            dbQuery1    => 'SELECT userId, username FROM users',
+        },
     ],
     'WebGUI::Asset::Wobject::SyndicatedContent' => [
-
+        {
+            title       => 'Syndicated Content',
+            isHidden    => 1,
+            rssUrl      => 'http://www.webgui.org/download/advisories.rss',
+        },
     ],
     'WebGUI::Asset::Template' => [
-
+        {
+            title       => 'Template',
+            isHidden    => 1,
+            namespace   => 'style',
+            template    => '[% head_tags %][% body_content %]',
+        },
     ],
 );
 
