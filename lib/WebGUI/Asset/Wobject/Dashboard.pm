@@ -180,12 +180,12 @@ Extend the base method to display lists of assets to hide or show.
 
 =cut
 
-sub getEditForm {
+override getEditForm => sub {
 	my $self = shift;
-	my $tabform = $self->SUPER::getEditForm;
-	my $i18n = WebGUI::International->new($self->session, "Asset_Dashboard");
+	my $tabform = super();
 	if ($self->session->form->process("func") ne "add") {
-		my @assetsToHide = split("\n",$self->getValue("assetsToHide"));
+            my $i18n = WebGUI::International->new($self->session, "Asset_Dashboard");
+		my @assetsToHide = split("\n",$self->assetsToHide);
 		my $childIter = $self->getLineageIterator(["children"],{excludeClasses=>["WebGUI::Asset::Wobject::Layout"]});
 		my %childIds;
                 while ( 1 ) {
@@ -198,18 +198,18 @@ sub getEditForm {
                     last unless $child;
 			$childIds{$child->getId} = $child->getTitle.' ['.ref($child).']';	
 		}
-		$tabform->getTab("display")->checkList(
-			-name=>"assetsToHide",
-			-value=>\@assetsToHide,
-			-options=>\%childIds,
-			-label=>$i18n->get('assets to hide'),
-			-hoverHelp=>$i18n->get('assets to hide description'),
-			-vertical=>1,
-			-uiLevel=>9
+		$tabform->getTab("display")->addField( "checkList",
+			name=>"assetsToHide",
+			value=>\@assetsToHide,
+			options=>\%childIds,
+			label=>$i18n->get('assets to hide'),
+			hoverHelp=>$i18n->get('assets to hide description'),
+			vertical=>1,
+			uiLevel=>9
 		);
 	}
 	return $tabform;
-}
+};
 
 #-------------------------------------------------------------------
 
