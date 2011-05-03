@@ -70,6 +70,8 @@ my $snip = $import->addChild( {
 $snip->commit;
 addToCleanup( $snip );
 
+ok(WebGUI::Test->waitForAllForks(10), "... Forks finished");
+
 #----------------------------------------------------------------------------
 # Tests
 
@@ -82,11 +84,14 @@ $mech->session->user({ userId => '3' });
 
 # www_processAssetHelper
 $mech->get_ok( '/?op=admin;method=processAssetHelper;helperId=cut;assetId=' . $snip->getId );
-cmp_deeply( 
-    JSON->new->decode( $mech->content ), 
-    WebGUI::AssetHelper::Cut->new( id => 'cut', session => $session )->process( $snip ),
+
+cmp_deeply(
+    map( { delete $_->{forkId}; $_ } JSON->new->decode( $mech->content )), 
+    map( { delete $_->{forkId}; $_ } WebGUI::AssetHelper::Cut->new( id => 'cut', session => $session, asset => $snip )->process( )),
     'www_processAssetHelper',
 );
+
+ok(WebGUI::Test->waitForAllForks(10), "... Forks finished");
 
 # www_processPlugin
 $mech->get_ok( '/?op=admin;method=processPlugin;id=test' );
@@ -237,6 +242,7 @@ cmp_deeply(
     'www_searchAssets',
 );
 
+ok(WebGUI::Test->waitForAllForks(10), "Forks finished");
 
 done_testing;
 
