@@ -250,6 +250,7 @@ The height of the image in pixels.
 sub setImageHeight {
 	my $self = shift;
 	my $height = shift;
+        die "Must have a height" unless $height;
 	$self->image->Extent(height => $height);
 	$self->image->Colorize(fill => $self->getBackgroundColor);
 	$self->{_properties}->{height} = $height;
@@ -270,6 +271,7 @@ Teh width of the image in pixels.
 sub setImageWidth {
 	my $self = shift;
 	my $width = shift;
+        die "Must have a width" unless $width;
 	$self->image->Extent(width => $width);
 	$self->image->Colorize(fill => $self->getBackgroundColor);
 	$self->{_properties}->{width} = $width;

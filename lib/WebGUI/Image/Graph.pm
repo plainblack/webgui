@@ -621,6 +621,9 @@ sub setConfiguration {
 	my $self = shift;
 	my $config = shift;
 
+        $config->{graph_imageWidth}     ||= 300;
+        $config->{graph_imageHeight}    ||= 300;
+
 	$self->setPalette(WebGUI::Image::Palette->new($self->session, $config->{graph_paletteId}));
 	$self->setLabelOffset($config->{graph_labelOffset});
 	$self->setLabelFontSize($config->{graph_labelFontSize});
