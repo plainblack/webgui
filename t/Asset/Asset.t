@@ -497,12 +497,8 @@ TODO: {
 ################################################################
 
 $session->user({ userId => 3 });
-$session->switchAdminOff;
-is($rootAsset->addMissing('/nowhereMan'), undef, q{addMissing doesn't return anything unless user is in Admin Mode});
-
-$session->switchAdminOn;
 my $addMissing = $rootAsset->addMissing('/nowhereMan');
-ok($addMissing, 'addMissing returns some output when in Admin Mode');
+ok($addMissing, 'addMissing returns some output when in Turn Admin On group');
 
 {
 
