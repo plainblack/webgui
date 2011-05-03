@@ -101,6 +101,8 @@ close $pipe;
 backgroundTest('On-demand fork');
 is $forkCount, 1, 'we did fork';
 
+ok(WebGUI::Test->waitForAllForks(10), "Forks finished");
+
 done_testing;
 
 #vim:ft=perl
