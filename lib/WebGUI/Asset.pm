@@ -2808,8 +2808,13 @@ sub www_edit {
     my $func    = $self->session->form->get('func');
 
     my $f   = eval { $self->getEditForm };
+    if ( $@ ) {
+        $self->session->log->error( 
+            sprintf "Couldn't build asset edit form for URL: '%s' because: %s", $self->url, $@ 
+        );
+        return $@;
+    }
     $self->addEditSaveButtons( $f );
-    return $@ if $@;
     $f->addField( "Hidden", name => "func", value => "editSave" );
     $f->action( $self->getUrl );
 
