@@ -30,7 +30,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 2;        # Increment this number for each test you create
+plan tests => 3;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -53,7 +53,8 @@ my $helper = WebGUI::AssetHelper::Duplicate->new( id => 'duplicate', session => 
     );
 }
 
-WebGUI::Test->waitForAllForks;
+ok(WebGUI::Test->waitForAllForks(10), "Forks finished");
+
 $session->cache->clear;
 my $children = $root->getLineage(["children"]);
 is @{ $children }, 2, '... created a new asset';
