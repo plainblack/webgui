@@ -23,6 +23,8 @@ use WebGUI::Session;
 use WebGUI::AssetHelper::ChangeUrl;
 use WebGUI::Test::Mechanize;
 
+$SIG{HUP} = sub { use Carp; confess "hup"; };
+
 #----------------------------------------------------------------------------
 # Init
 my $session         = WebGUI::Test->session;

@@ -83,7 +83,8 @@ $mech->submit_form_ok({
     fields  => {
     },
 });
-WebGUI::Test->waitForAllForks;
+
+ok(WebGUI::Test->waitForAllForks(10), "Forks finished");
 
 ok( -e File::Spec->catfile( $dir->dirname, 'top', 'index.html' ), 'top export exists' );
 ok( -e File::Spec->catfile( $dir->dirname, 'top', 'child', 'index.html' ), 'child export exists' );
