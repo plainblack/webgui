@@ -132,47 +132,6 @@ sub is_tree_of_folders {
     return $pass ? pass $message : fail $message;
 }
 
-# test www_copy
-my $tag = WebGUI::VersionTag->create($session);
-$tag->setWorking;
-WebGUI::Test->addToCleanup($tag);
-
-my $tempspace  = WebGUI::Asset->getTempspace($session);
-my $folder     = {
-    className   => 'WebGUI::Asset::Wobject::Folder',
-    tagId       => $tag->getId,
-    status      => "pending",
-};
-my $root       = $tempspace->addChild($folder);
-my $child      = $root->addChild($folder);
-my $grandchild = $child->addChild($folder);
-
-sub copied {
-    for my $a (@{$tempspace->getAssetsInClipboard}) {
-        if ($a->getParent->getId eq $tempspace->getId) {
-            return $a;
-        }
-    }
-    return undef;
-}
-
-my $process = Test::MockObject->new->mock(update => sub {});
-my @methods = (
-    # single duplicate doesn't fork, so we can just test the www method to
-    # make sure it gets it right
-    sub { shift->www_copy },
-    sub { shift->duplicateBranch(1, 'clipboard') },
-    sub { shift->duplicateBranch(0, 'clipboard') },
-);
-my @prefixes = qw(single children descendants);
-for my $i (0..2) {
-    my $meth = $methods[$i];
-    $root->$meth();
-    my $clip = copied();
-    is_tree_of_folders($clip, $i+1, @prefixes[$i]);
-    $clip->purge;
-}
-
 ####################################################
 #
 # paste
