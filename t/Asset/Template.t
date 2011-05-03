@@ -189,7 +189,6 @@ $template3rev->purgeRevision();
 ## Check how templates in the trash and clipboard are handled.
 
 $session->asset($importNode);
-$session->switchAdminOff;
 
 my $trashTemplate = $importNode->addChild({
     className => "WebGUI::Asset::Template",
@@ -204,7 +203,7 @@ is($trashTemplate->process, '', 'process: returns nothing when the template is i
 $trashTemplate->cut;
 is($trashTemplate->process, '', '... returns nothing when the template is in the trash, and admin mode is off');
 
-$session->switchAdminOn;
+$session->user({ userId => 3 });
 
 $trashTemplate->trash;
 is($trashTemplate->process, 'Template in trash', '... returns message when the template is in the trash, and admin mode is on');
@@ -212,7 +211,7 @@ is($trashTemplate->process, 'Template in trash', '... returns message when the t
 $trashTemplate->cut;
 is($trashTemplate->process, 'Template in clipboard', '... returns message when the template is in the trash, and admin mode is on');
 
-$session->switchAdminOff;
+$session->user({ userId => 1 });
 
 # Check error logging for bad templates
 
