@@ -20,7 +20,7 @@ use WebGUI::VersionTag;
 use Test::MockObject;
 
 use Test::More; # increment this value for each test you create
-plan tests => 29;
+plan tests => 14;
 
 my $session = WebGUI::Test->session;
 $session->user({userId => 3});
