@@ -141,6 +141,7 @@ sub is_tree_of_folders {
 my $versionTag2 = WebGUI::VersionTag->getWorking($session);
 WebGUI::Test->addToCleanup($versionTag2);
 
+my $tempspace = WebGUI::Test->asset;
 my $page = $tempspace->addChild({
     className   => 'WebGUI::Asset::Wobject::Layout',
     title       => 'Parent asset',
