@@ -62,12 +62,11 @@ isa_ok($slave2, 'WebGUI::SQL::db');
 
 cmp_ok($session->get("lastPageView"), '>', 0, "lastPageView set to something");
 
-can_ok($session, qw/isAdminOn switchAdminOn switchAdminOff/);
-is($session->isAdminOn, 0, "isAdminOn()");
-$session->switchAdminOn;
-is($session->isAdminOn, 1, "switchAdminOn()");
-$session->switchAdminOff;
-is($session->isAdminOn, 0, "switchAdminOff()");
+can_ok($session, qw/isAdminOn/);
+$session->user({userId => 3});
+is($session->isAdminOn, 1, "admin has admin on");
+$session->user({userId => 1});
+is($session->isAdminOn, 0, "visitor has admin off");
 
 my $token = $session->scratch->get('webguiCsrfToken');
 ok( $token, 'CSRF token set');
@@ -139,7 +138,7 @@ ok($count == 0,"end() removes current entry from database");
 {
     my $expire = WebGUI::Session->open($session->config);
     my $guard  = WebGUI::Test->cleanupGuard($expire);
-    $expire->switchAdminOn;
+    $expire->user({ userId => 3 });
     # jury rig the database and the cache to expire
     my $expire_time = $expire->get('lastPageView') - 1;
     $session->db->write("update userSession set userId=?, expires=? where sessionId=?",  [3, $expire_time, $expire->getId]);
