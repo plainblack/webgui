@@ -17,6 +17,7 @@ use strict;
 use Test::More;
 use Test::Deep;
 use Test::Warn;
+use Test::Exception;
 use HTML::Form;
 use JSON;
 use WebGUI::Test; # Must use this before any other WebGUI modules
@@ -309,7 +310,7 @@ cmp_deeply($sub1->get('comments')->[0],{
       comment => 'this is a test comment',
       rating => 0,
       date => re( qr/\d{10}/ ),
-      ip => undef,
+      ip => ignore(),
 }, "successfully added comment" );
 
 $sub1->update({
@@ -361,8 +362,7 @@ $cleanupSubmissions->reset;
 is($cleanupSubmissions->run, 'complete', 'cleanup complete');
 is($cleanupSubmissions->run, 'done', 'cleanup done');
 
-$sub2 = WebGUI::Asset->newById($session, $sub2Id);
-is( $sub2, undef, 'submission deleted');
+dies_ok { WebGUI::Asset->newById($session, $sub2Id) } 'submission deleted';
 
 } # end of workflow skip
 
@@ -419,10 +419,10 @@ my $expected = {
                                },
           'description' => undef,
           '_isValid' => 1,
-          'deleteCreatedItems' => undef,
+          'deleteCreatedItems' => '0',
           'canSubmitGroupId' => '2',
           'assetId' => 'new',
-          'url' => undef,
+          'url' => '',
           'daysBeforeCleanup' => '7',
           'title' => 'Untitled',
         } ;

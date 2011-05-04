@@ -156,7 +156,7 @@ sub definition {
 	my $definition = shift || [];
 	push(@{$definition}, {
 		name=>{
-			defaultValue=>undef
+			defaultValue=>''
 			},
 		value=>{
 			defaultValue=>undef

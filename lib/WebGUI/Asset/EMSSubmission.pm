@@ -19,6 +19,10 @@ use Moose;
 use WebGUI::Definition::Asset;
 use WebGUI::Asset;
 use WebGUI::International;
+use WebGUI::Form::Combo;
+use WebGUI::Form::SelectBox;
+use WebGUI::Form::CheckList;
+
 extends 'WebGUI::Asset';
 define tableName => 'EMSSubmission';
 define assetNae  => ['assetName', 'Asset_EMSSubmission'];
@@ -204,17 +208,17 @@ sub drawLocationField {
 	my $ems = $self->ems;
 	my $options = { map { $_ => $_ } ( @{ $ems->getSubmissionLocations || [ $ems->getLocations ] } ) } ;
 	if( $ems->isRegistrationStaff ) {
-	    return WebGUI::Form::combo($self->session, {
+	    return WebGUI::Form::Combo->new($self->session, {
 		    name    => 'location',
 		    value   => $self->get('location'),
 		    options => $options,
-		});
+		})->toHtml;
 	} else {
-	    return WebGUI::Form::selectBox($self->session, {
+	    return WebGUI::Form::SelectBox->new($self->session, {
 		    name    => 'location',
 		    value   => $self->get('location'),
 		    options => $options,
-		});
+		})->toHtml;
 	}
 }
 
@@ -228,12 +232,12 @@ Draws the field for the relatedBadgeGroups property.
 
 sub drawRelatedBadgeGroupsField {
         my ($self, $params) = @_;
-        return WebGUI::Form::checkList($self->session, {
+        return WebGUI::Form::CheckList->new($self->session, {
                 name            => $params->{name},
                 value           => $self->get($params->{name}),
                 vertical        => 1,
                 options         => $self->getParent->getParent->getBadgeGroups,
-                });
+                })->toHtml;
 }
 
 #-------------------------------------------------------------------
@@ -250,12 +254,12 @@ sub drawRelatedRibbonsField {
         foreach my $ribbon (@{$self->getParent->getParent->getRibbons}) {
                 $ribbons{$ribbon->getId} = $ribbon->getTitle;
         }
-        return WebGUI::Form::checkList($self->session, {
+        return WebGUI::Form::CheckList->new($self->session, {
                 name            => $params->{name},
                 value           => $self->get($params->{name}),
                 vertical        => 1,
                 options         => \%ribbons,
-                });
+                })->toHtml;
 }
 
 #-------------------------------------------------------------------
@@ -271,11 +275,11 @@ sub drawStatusField {
         for my $key ( qw/pending created failed/ ) {
             delete $options->{$key} unless $currentStatus eq $key;
         }
-        return WebGUI::Form::SelectBox($self->session, {
+        return WebGUI::Form::SelectBox->new($self->session, {
                 name    => 'submissionStatus',
                 value   => $currentStatus,
                 options => $options,
-                });
+                })->toHtml;
 }
 
 
@@ -356,23 +360,23 @@ sub www_editSubmission {
         my $newform = WebGUI::FormBuilder->new($session,action => $url);
         $newform->addField( "hidden", name => 'assetId', value => $assetId);
 	my $formDescription = $parent->getFormDescription;
-	my @defs = reverse @{__PACKAGE__->definition($session)};
         my @fieldNames = qw/title submissionStatus startDate duration seatsAvailable location description/;
         my $fields;
-        for my $def ( @defs ) {
-	    my $properties = $def->{properties};
-	    for my $fieldName ( keys %$properties ) {
-		if( defined $formDescription->{$fieldName} ) {
-		      $fields->{$fieldName} = { %{$properties->{$fieldName}} }; # a simple first level copy
-		      if( $fieldName eq 'description' ) {
-		          $fields->{description}{height} = 200;
-		          $fields->{description}{width} = 350;
-		      }
-		      $fields->{$fieldName}{fieldId} = $fieldName;
-		      $fields->{$fieldName}{name} = $fieldName;
-		      $fields->{$fieldName}{value} = $self->get($fieldName) if $self;
-		}
-	    }
+        my $class   = 'WebGUI::Asset::EMSSubmission';
+        foreach my $fieldName (@fieldNames) {
+            my $attr            = $class->meta->find_attribute_by_name( $fieldName );
+            $fields->{$fieldName} = {
+                                fieldId     => $fieldName,
+                                name        => $fieldName,
+                                fieldType   => $attr->fieldType,
+                                noFormPost  => $attr->noFormPost,
+                                %{ $class->getFormProperties( $session, $fieldName ) },
+                    };
+              if( $fieldName eq 'description' ) {
+                  $fields->{description}{height} = 200;
+                  $fields->{description}{width} = 350;
+              }
+              $fields->{$fieldName}{value} = $self->get($fieldName) if $self;
         }
         # add the meta field
         for my $metaField ( @{$parent->getParent->getEventMetaFields} ) {
@@ -397,11 +401,11 @@ sub www_editSubmission {
 		    my $drawMethod = __PACKAGE__ . '::' . $field->{customDrawMethod};
 		    if ($asset->can( $drawMethod )) {
 			$field->{value} = $asset->$drawMethod($field);
-			delete $field->{name}; # don't want readOnly to generate a hidden field
+			$field->{addHidden} = 0;
 			$field->{fieldType} = "readOnly";
 		    }
  
-	        $newform->addField( "dynamicField", %$field);
+	        $newform->addField( $field->{fieldType}, %$field);
 	    } else {
 	        my $value;
 	        # TODO see that the data gets formatted

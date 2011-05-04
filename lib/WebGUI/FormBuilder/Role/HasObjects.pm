@@ -122,7 +122,7 @@ sub toTemplateVars {
             }
             # Form field objects
             when ( $_->isa( 'WebGUI::Form::Control' ) ) {
-                my $name    = $obj->get('name');
+                my $name    = $obj->get('name') || '';
                 $props      = $obj->toTemplateVars;
                 # Add the whole field to the vars
                 $props->{ field } = $obj->toHtmlWithWrapper;

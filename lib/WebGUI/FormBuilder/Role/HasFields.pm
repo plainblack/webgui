@@ -67,7 +67,7 @@ sub addField {
 
     push @{$self->fields}, $field;
     $self->addObject( $field );
-    $self->{_fieldsByName}{ $field->get('name') } = $field; # TODO: Must allow multiple fields per name
+    $self->{_fieldsByName}{ $field->get('name') || '' } = $field; # TODO: Must allow multiple fields per name
     return $field;
 }
 

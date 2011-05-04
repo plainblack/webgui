@@ -162,7 +162,7 @@ sub toHtml {
     $self->headTags;
     my $session = $self->session;
     my $output = '<fieldset style="border:none;margin:0;padding:0">';
-    $output .= WebGUI::Form::Hidden($session, { name => $self->privateName('isIn'), value => 1, });
+    $output .= WebGUI::Form::Hidden->new($session, { name => $self->privateName('isIn'), value => 1, })->toHtml;
 	my $alignment   = $self->alignmentSeparator;
 
     # Add the select all button

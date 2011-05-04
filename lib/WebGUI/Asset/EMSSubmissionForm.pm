@@ -238,17 +238,16 @@ sub www_editSubmissionForm {
     $newform->addField( "hidden",name => 'assetId', value => $assetId );
     my @fieldNames = qw/title description startDate duration seatsAvailable location/;
     my $fields;
-    my @defs = reverse @{ WebGUI::Asset::EMSSubmission->definition($session) };
-
-    for my $def (@defs) {
-        foreach my $fieldName (@fieldNames) {
-            my $properties = $def->{properties};
-            if ( defined $properties->{$fieldName} ) {
-                $fields->{$fieldName} = { %{ $properties->{$fieldName} } };    # a simple first level copy
-                     # field definitions don't contain their own name, we will need it later on
-                $fields->{$fieldName}{fieldId} = $fieldName;
-            }
-        }
+    my $class   = 'WebGUI::Asset::EMSSubmission';
+    foreach my $fieldName (@fieldNames) {
+        my $attr            = $class->meta->find_attribute_by_name( $fieldName );
+        $fields->{$fieldName} = {
+                            fieldId     => $fieldName,
+                            name        => $fieldName,
+                            fieldType   => $attr->fieldType,
+                            noFormPost  => $attr->noFormPost,
+                            %{ $class->getFormProperties( $session, $fieldName ) },
+                };
     }
     for my $metaField ( @{ $parent->getEventMetaFields } ) {
         push @fieldNames, $metaField->{fieldId};
@@ -258,21 +257,23 @@ sub www_editSubmissionForm {
         $fields->{ $metaField->{fieldId} }{hoverHelp} = $metaField->{helpText};
     }
     $newform->addField( "hidden", name => 'fieldNames', value => join( ' ', @fieldNames ) );
-    @defs = reverse @{ WebGUI::Asset::EMSSubmissionForm->definition($session) };
-    for my $def (@defs) {
-        my $properties = $def->{properties};
-        for my $fieldName (
-            qw/title menuTitle url description canSubmitGroupId daysBeforeCleanup
-            deleteCreatedItems submissionDeadline pastDeadlineMessage/
-            )
-        {
-            if ( defined $properties->{$fieldName} ) {
-                my %fieldParams = %{ $properties->{$fieldName} };
-                $fieldParams{name} = $fieldName;
-                $fieldParams{value} = $params->{$fieldName} || $self ? $self->get($fieldName) : undef;
-                $newform->addField( "dynamicField", %fieldParams);
-            }
-        }
+    $class  = 'WebGUI::Asset::EMSSubmissionForm';
+    for my $fieldName (
+        qw/title menuTitle url description canSubmitGroupId daysBeforeCleanup
+        deleteCreatedItems submissionDeadline pastDeadlineMessage/
+        )
+    {
+        my $attr            = $class->meta->find_attribute_by_name( $fieldName );
+        next unless $attr;
+        my %fieldParams = (
+            fieldId     => $fieldName,
+            name        => $fieldName,
+            fieldType   => $attr->fieldType,
+            noFormPost  => $attr->noFormPost,
+            %{ $class->getFormProperties( $session, $fieldName ) },
+            value       => $params->{$fieldName} || $self ? $self->get($fieldName) : undef,
+        );
+        $newform->addField( $attr->fieldType, %fieldParams);
     }
 
     my $formDescription = $params->{formDescription} || $self ? $self->getFormDescription : {};
