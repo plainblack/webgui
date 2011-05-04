@@ -220,10 +220,6 @@ If supplied, provides a list of defaults such as title and icons for the admin c
 
 A hash reference of options with the following keys
 
-=head4 showAdminBar
-
-If true, will show the admin bar on this admin console page
-
 =cut
 
 sub new {
@@ -311,10 +307,6 @@ sub render {
             $session,
             $session->setting->get("AdminConsoleTemplate")
         );
-    if ( $self->{_options}->{showAdminBar} ) {
-        $var{adminBar}
-            = WebGUI::Macro::AdminBar::process($session);
-    }
     my $output  = $template->process(\%var);
     return $session->style->process($output,"PBtmpl0000000000000137");
 }

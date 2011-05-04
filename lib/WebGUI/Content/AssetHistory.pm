@@ -125,9 +125,7 @@ sub www_view {
     return $session->privilege->insufficient
         unless $session->user->isInGroup(12);
     ##YUI specific datatable CSS
-    my $ac = WebGUI::AdminConsole->new( $session, "assetHistory", {
-               showAdminBar        => 1
-           } );
+    my $ac = WebGUI::AdminConsole->new( $session, "assetHistory" );
     my ($style, $url) = $session->quick(qw(style url));
     $style->setCss($url->extras('/yui/build/fonts/fonts-min.css'));
     $style->setCss($url->extras('yui/build/datatable/assets/skins/sam/datatable.css'));
