@@ -141,7 +141,7 @@ $canViewMaker->prepare(
     },
 );
 
-plan tests => 113
+plan tests => 109
             + 2*scalar(@getTitleTests) #same tests used for getTitle and getMenuTitle
             ;
 
@@ -517,19 +517,6 @@ ok($addMissing, 'addMissing returns some output when in Turn Admin On group');
 
 is($rootAsset->getContainer->getId, $rootAsset->getId, 'getContainer: A folder is a container, its container is itself');
 is($fixTitleAsset->getContainer->getId, $defaultAsset->getId, 'getContainer: A snippet is not a container, its container is its parent');
-
-################################################################
-#
-# getToolbarState
-# toggleToolbar
-#
-################################################################
-
-is($getTitleAsset->getToolbarState, undef, 'getToolbarState: default toolbar state is undef');
-$getTitleAsset->toggleToolbar();
-is($getTitleAsset->getToolbarState, 1, 'getToolbarState: toggleToolbarState toggled the state to 1');
-$getTitleAsset->toggleToolbar();
-is($getTitleAsset->getToolbarState, 0, 'getToolbarState: toggleToolbarState toggled the state to 0');
 
 ################################################################
 #
