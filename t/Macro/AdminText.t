@@ -29,11 +29,7 @@ is($output, '', 'user is not admin');
 
 $session->user({userId => 3});
 $output = WebGUI::Macro::AdminText::process($session, 'admin');
-is($output, '', 'user is admin, not in admin mode');
-
-$session->switchAdminOn;
-$output = WebGUI::Macro::AdminText::process($session, 'admin');
-is($output, 'admin', 'admin in admin mode');
+is($output, '', 'user is admin');
 
 $output = WebGUI::Macro::AdminText::process($session, '');
 is($output, '', 'null text');
@@ -41,6 +37,3 @@ is($output, '', 'null text');
 $output = WebGUI::Macro::AdminText::process($session);
 is($output, undef, 'undef text');
 
-$session->switchAdminOff;
-$output = WebGUI::Macro::AdminText::process($session, 'admin');
-is($output, '', 'user is admin, not in admin mode');
