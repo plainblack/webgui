@@ -505,7 +505,7 @@ ok($addMissing, 'addMissing returns some output when in Turn Admin On group');
     my $parser = HTML::TokeParser->new(\$addMissing);
     my $link = $parser->get_tag('a');
     my $url = $link->[1]{'href'} || '-';
-    like($url, qr{func=add;class=WebGUI::Asset::Wobject::Layout;url=/nowhereMan$}, 'addMissing: Link will add a new page asset with correct URL');
+    like($url, qr{func=add;className=WebGUI::Asset::Wobject::Layout;url=/nowhereMan$}, 'addMissing: Link will add a new page asset with correct URL');
 
 }
 
