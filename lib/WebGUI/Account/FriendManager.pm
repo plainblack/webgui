@@ -254,7 +254,7 @@ sub www_editFriends {
         $fb->addField( "Checkbox", name => 'addManagers', value => 'addManagers' );
     }
     $fb->addField( 'Submit', name => "submit" );
-    $fb->toTemplateVars( "form", $var );
+    $fb->toTemplateVars( "form_", $var );
 
     return $self->processTemplate($var,$session->setting->get("fmEditTemplateId"));
 }

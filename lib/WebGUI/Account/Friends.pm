@@ -432,7 +432,7 @@ sub www_sendFriendsRequest {
         name        => "submit",
     );
 
-    $form->toTemplateVars( "form", $var );
+    $form->toTemplateVars( "form_", $var );
 
     return $self->processTemplate($var,$self->getSendRequestTemplateId);
 }
