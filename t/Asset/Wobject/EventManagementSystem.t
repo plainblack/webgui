@@ -348,6 +348,7 @@ is($printRemainingTicketsTemplateId, "hreA_bgxiTX-EzWCSZCZJw", 'Default print re
             'keywords'                          => ignore(),
             'uiLevel'                           => ignore(),
             'tickets_loop'                      => \@ticketArray,
+            controls                            => ignore(),
          },
         "www_printRemainingTickets: template variables valid"
     );
