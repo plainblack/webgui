@@ -85,8 +85,9 @@ if old data has been deleted and new has been inserted.
 
 sub importProducts {
     my ( $process, $args ) = @_;
+    $args       ||= {};
     my $session  = $process->session;
-    my $asset    = WebGUI::Asset->newById( $session, $args->{assetId} );
+    my $parent   = WebGUI::Asset->newById( $session, $args->{assetId} );
     my $filePath = $args->{filePath};
     WebGUI::Error::InvalidParam->throw(error => q{Must provide the path to a file})
         unless $filePath;
@@ -191,7 +192,7 @@ sub importProducts {
         else {
             ##Insert a new product;
             $session->log->warn("Making a new product: $productRow{sku}\n");
-            my $newProduct = $asset->addChild({className => 'WebGUI::Asset::Sku::Product'});
+            my $newProduct = $parent->addChild({className => 'WebGUI::Asset::Sku::Product'});
             $newProduct->update({
                 title     => $productRow{title},
                 menuTitle => $productRow{title},
@@ -245,6 +246,7 @@ Import the products from the CSV file in a forked process
 sub www_importProductsSave {
     my ( $self ) = @_;
     my $session = $self->session;
+    return $session->privilege->insufficient unless $self->asset->canEdit;
 
     my $storage = WebGUI::Storage->create($session);
     my $productFile = $storage->addFileFromFormPost( 'importFile_file', 1 );
