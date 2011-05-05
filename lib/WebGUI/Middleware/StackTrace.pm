@@ -353,7 +353,17 @@ Plack^HWebGUI::Middleware::StackTrace - Displays stack trace when your app dies
 This middleware is a copy and modification of L<Plack::Middleware::StackTrace>, a
 middleware which catches exceptions (run-time errors) happening in your
 application and displays nice stack trace screen.
+
 This copy has been extended to display additional WebGUI specific information.
+The stack trace is annotated with titles and object types of assets for
+stack frames running inside of method calls to assets.
+
+This fork of C<StackTrace> also hooks into L<WebGUI::Session::Log>.
+Stack traces are generated on call to C<< $session->log->error >>
+or C<< $session->log->fatal >>.
+L<Plack::Middleware::StackTrace> will (almost) never display a
+stack trace for WebGUI as errors are caught and turned into HTTP
+C<200> replies.
 
 You're recommended to use this middleware during the development and
 use L<Plack::Middleware::HTTPExceptions> in the deployment mode as a
@@ -396,16 +406,14 @@ standard error.
 
 =head1 AUTHOR
 
-Tokuhiro Matsuno
-
-Tatsuhiko Miyagawa
-
 Scott Walters
 
 With code taken from:
 
 Tatsuhiko Miyagawa E<lt>miyagawa@bulknews.netE<gt>
-    
+
+Tokuhiro Matsuno
+
 Shawn M Moore
 
 HTML generation code is ripped off from L<CGI::ExceptionManager> written by Tokuhiro Matsuno and Kazuho Oku.
@@ -414,7 +422,7 @@ HTML generation code is ripped off from L<CGI::ExceptionManager> written by Toku
 
 L<Plack::Middleware::StackTrace>
 
-L<Devel::StackTrace::AsHTML> L<Plack::Middleware> L<Plack::Middleware::HTTPExceptions>
+L<Devel::StackTrace::AsHTML> L<Plack::Middleware> L<Plack::Middleware::HTTPExceptions> L<WebGUI::Session::Log>
 
 =cut
 
