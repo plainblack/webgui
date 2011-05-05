@@ -16,6 +16,7 @@ BEGIN {
 
     our $StackTraceClass = "Devel::StackTrace";
     if (try { require Devel::StackTrace::WithLexicals; 1 }) {
+        # Optional since it needs PadWalker
         $StackTraceClass = "Devel::StackTrace::WithLexicals";
     }
 
@@ -30,8 +31,6 @@ BEGIN {
     };
 
 }
-
-# Optional since it needs PadWalker
 
 sub call {
     my($self, $env) = @_;
@@ -62,7 +61,8 @@ sub trace_as_string {
 
     my $st = '';
     my $first = 1;
-    foreach my $f ( $trace->frames() ) {
+    $trace->reset_pointer;
+    while( my $f = $trace->next_frame ) {
         $st .= "\t" unless $first;
         $st .= $f->as_string($first) . "\n";
         $first = 0;
@@ -78,7 +78,6 @@ do {
     *_build_context = *Devel::StackTrace::AsHTML::_build_context{CODE};
     *_build_arguments = *Devel::StackTrace::AsHTML::_build_arguments{CODE};
     *_build_lexicals = *Devel::StackTrace::AsHTML::_build_lexicals{CODE};
-    # XXX what else?
 };
 
 sub trace_as_html {
@@ -87,9 +86,8 @@ sub trace_as_html {
     my $session = shift or die;
     my %opt   = @_;
 
-    # replaces: my $ret = $trace->as_html;  
-    # ... which just did __PACKAGE__->render
-    # render copied and inlined here
+    # copied and modified render() from Devel::StackTrace::WithLexicals
+    # "$trace->as_html" just does "__PACKAGE__->render" in D::ST::WL
 
     my $extras = sub { $session->url->extras(@_) };
 
@@ -141,14 +139,16 @@ function toggleLexicals(ref) {
  toggleThing(ref, 'lexicals', 'Hide lexical variables', 'Show lexical variables');
 }
 </script>
+<!--
+   not doing asset dump right now
 <link rel="stylesheet" type="text/css" href="@{[ $extras->('yui/build/treeview/assets/skins/sam/treeview.css') ]}" />
+<script type="text/javascript" src="@{[ $extras->('yui/build/treeview/treeview-min.js') ]}"></script>
+  -->
 <link rel="stylesheet" type="text/css" href="@{[ $extras->('yui/build/button/assets/skins/sam/button.css') ]}" />
-<link rel="stylesheet" type="text/css" href="@{[ $extras->('yui/build/button/assets/skins/sam/button.css') ]}" /> 
 <script type="text/javascript" src="@{[ $extras->('yui/build/yahoo-dom-event/yahoo-dom-event.js') ]}"></script>
 <script type="text/javascript" src="@{[ $extras->('yui/build/yuiloader/yuiloader-min.js') ]}"></script>
 <script type="text/javascript" src="@{[ $extras->('yui/build/event/event-min.js') ]}"></script>
 <script type="text/javascript" src="@{[ $extras->('yui/build/dom/dom-min.js') ]}"></script>
-<script type="text/javascript" src="@{[ $extras->('yui/build/treeview/treeview-min.js') ]}"></script>
 <script type="text/javascript" src="@{[ $extras->('yui/build/element/element-min.js') ]}"></script>
 <script type="text/javascript" src="@{[ $extras->('yui/build/button/button-min.js') ]}"></script>
 
@@ -157,11 +157,10 @@ function toggleLexicals(ref) {
 <h1>Error trace</h1><pre class="message">$msg</pre><ol>
 HEAD
 
-warn "came up with URL to treeview-min.js: @{[ $extras->('yui/build/treeview/treeview-min.js') ]}";
-
     my $accumulated_asset_info = [];  # record the stack frames from when we find an asset on the call stack
 
-    $trace->next_frame; # ignore the head
+    $trace->reset_pointer;
+    $trace->next_frame; # for 1..2;
     my $i = 0;
     while (my $frame = $trace->next_frame) {
 
@@ -185,57 +184,57 @@ warn "came up with URL to treeview-min.js: @{[ $extras->('yui/build/treeview/tre
     }
     $out .= qq{</ol>};
 
-    # dump the asset tree
-
-    my $assets = WebGUI::Asset->getRoot($session)->getLineage(['descendants'], {returnObjects=>1});
-
-    my $tree = { type => 'text', label => 'root', children => [], };
-    
-    for my $asset (@$assets) {
-        # create a tree structure of assets matching their lineage
-        # the format (arrays, hashes, fields) matches what YAHOO.treeview expects
-        # when we find an asset mentioned in one of the stack trace frames above, we add the saved file/line/etc info to the label
-        my $lineage = $asset->get('lineage');
-        my @parts = $lineage =~ m/(.{6})/g;
-        # warn "asset:  $asset lineage: $lineage parts: @parts";
-        my $node = $tree;
-        while(@parts) {
-            my $part = shift @parts;
-            if((my $child_node) = grep $_->{lineage_chunk} eq $part, @{$node->{children}}) {
-                $node = $child_node;
-            } else {
-                my $label = $asset->get('title') . ': Id: ' . $asset->getId . ' Class: ' . ref($asset);
-                for my $message ( map $_->{message}, grep $_->{asset_id} eq $asset->getId, @$accumulated_asset_info ) {
-                    $label .= " <----- $message";
-                } 
-                my $child_node = { 
-                    type => 'text', 
-                    label => $label,
-                    lineage_chunk => $part, 
-                    children => [ ], 
-                };
-                push @{$node->{children}}, $child_node;
-                $node = $child_node;
-            }
-        }
-    }
-    
-    use JSON::PP; # JSON::XS creates something that's mangled
-    my $json_tree = JSON::PP->new->ascii->pretty->encode( [ $tree ] );
-
+    # # dump the asset tree
+    #
+    # my $assets = WebGUI::Asset->getRoot($session)->getLineage(['descendants'], {returnObjects=>1});
+    #
+    # my $tree = { type => 'text', label => 'root', children => [], };
+    #
+    # for my $asset (@$assets) {
+    #     # create a tree structure of assets matching their lineage
+    #     # the format (arrays, hashes, fields) matches what YAHOO.treeview expects
+    #     # when we find an asset mentioned in one of the stack trace frames above, we add the saved file/line/etc info to the label
+    #     my $lineage = $asset->get('lineage');
+    #     my @parts = $lineage =~ m/(.{6})/g;
+    #     # warn "asset:  $asset lineage: $lineage parts: @parts";
+    #     my $node = $tree;
+    #     while(@parts) {
+    #         my $part = shift @parts;
+    #         if((my $child_node) = grep $_->{lineage_chunk} eq $part, @{$node->{children}}) {
+    #             $node = $child_node;
+    #         } else {
+    #             my $label = $asset->get('title') . ': Id: ' . $asset->getId . ' Class: ' . ref($asset);
+    #             for my $message ( map $_->{message}, grep $_->{asset_id} eq $asset->getId, @$accumulated_asset_info ) {
+    #                 $label .= " <----- $message";
+    #             } 
+    #             my $child_node = { 
+    #                 type => 'text', 
+    #                 label => $label,
+    #                 lineage_chunk => $part, 
+    #                 children => [ ], 
+    #             };
+    #             push @{$node->{children}}, $child_node;
+    #             $node = $child_node;
+    #         }
+    #     }
+    # }
+    # 
+    # use JSON::PP; # JSON::XS creates something that's mangled
+    # my $json_tree = JSON::PP->new->ascii->pretty->encode( [ $tree ] );
+    #
     # warn "json_tree: $json_tree";
     # do { open my $fh, '>', 'json.debug2.js' or die $!; $fh->print($json_tree); };
- 
-    $out .= qq{
-          <ol><li>
-             <div id="treeDiv1"></div> 
-          </ol></li>
-          <script language="javascript">
-              var tree = new YAHOO.widget.TreeView("treeDiv1", $json_tree); 
-              tree.expandAll();
-              tree.draw();
-          </script>
-    };
+    # 
+    # $out .= qq{
+    #       <ol><li>
+    #          <div id="treeDiv1"></div> 
+    #       </ol></li>
+    #       <script language="javascript">
+    #           var tree = new YAHOO.widget.TreeView("treeDiv1", $json_tree); 
+    #           tree.expandAll();
+    #           tree.draw();
+    #       </script>
+    # };
 
     $out .= "</body></html>";
 

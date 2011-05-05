@@ -61,6 +61,7 @@ if ($] >= 5.010) {
 ##Doing this as a global is not nice, but it works
 my $missingModule = 0;
 
+checkModule("Test::Tester",                 "0"          );
 checkModule("LWP",                          5.833        );
 checkModule("HTTP::Request",                1.40         );
 checkModule("HTTP::Headers",                1.61         );
@@ -152,7 +153,6 @@ checkModule("Locales",                      "0.10"       );
 checkModule("Test::Harness",                "3.17"       );
 checkModule("DateTime::Event::ICal",        "0.10"       );
 checkModule("Cache::FastMmap",              "1.35"       );
-checkModule("Test::Tester",                 "0"          );
 checkModule("Test::Log::Dispatch",          "0"          );
 checkModule("CHI",                          "0.34"       );
 checkModule('IO::Socket::SSL',                           );
@@ -168,8 +168,9 @@ checkModule('Search::QueryParser',                       );
 checkModule('Monkey::Patch',                '0.03'       );
 checkModule('UUID::Tiny',                	'1.03'       );
 checkModule('Starman',						'0.2010',	2);
-checkModule('App::Cmd',                     '0.311'     );
-
+checkModule('App::Cmd',                     '0.311'      );
+checkModule('Devel::StackTrace',            '1.27'       );
+checkModule('Devel::StackTrace::WithLexicals',  '0.03'   );
 
 failAndExit("Required modules are missing, running no more checks.") if $missingModule;
 
