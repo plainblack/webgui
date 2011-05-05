@@ -34,7 +34,9 @@ builder {
 
     enable '+WebGUI::Middleware::Maintenance';
 
-    enable_if { $_[0]->{'webgui.debug'} } 'StackTrace';
+    # enable_if { $_[0]->{'webgui.debug'} } 'StackTrace';
+    enable_if { $_[0]->{'webgui.debug'} } '+WebGUI::Middleware::StackTrace';
+
     enable_if { $_[0]->{'webgui.debug'} } 'Debug', panels => [
         'Timer',
         'Memory',

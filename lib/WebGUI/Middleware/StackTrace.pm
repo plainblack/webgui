@@ -40,12 +40,15 @@ sub call {
     if( my $trace = $env->{'webgui.session'}->log->{_stacktrace} ) {
 
         undef $env->{'webgui.session'}->log->{_stacktrace};  # the stack trace modules do create circular references; this is necessary
+                                                             # this should also keep us from doing this work twice if we get stacked twice
+
+        my @previous_html = $res && $res->[2] ? (map ref $_ ? @{ $_ } : $_, $res->[2]) : ();
 
         my $text = trace_as_string($trace);
         $env->{'psgi.errors'}->print($text) unless $self->no_print_errors;
         my $html = eval { trace_as_html($trace, $env->{'webgui.session'}) };
         if ( $html and ($env->{HTTP_ACCEPT} || '*/*') =~ /html/) {
-            $res = [500, ['Content-Type' => 'text/html; charset=utf-8'], [ utf8_safe($html) ]];
+            $res = [500, ['Content-Type' => 'text/html; charset=utf-8'], [ utf8_safe($html), @previous_html ] ];
         } else {
             $res = [500, ['Content-Type' => 'text/plain; charset=utf-8'], [ utf8_safe($text) ]];
         }
@@ -76,8 +79,8 @@ do {
     no strict 'refs'; 
     *encode_html = *Devel::StackTrace::AsHTML::encode_html{CODE};
     *_build_context = *Devel::StackTrace::AsHTML::_build_context{CODE};
-    *_build_arguments = *Devel::StackTrace::AsHTML::_build_arguments{CODE};
-    *_build_lexicals = *Devel::StackTrace::AsHTML::_build_lexicals{CODE};
+    # *_build_arguments = *Devel::StackTrace::AsHTML::_build_arguments{CODE};
+    # *_build_lexicals = *Devel::StackTrace::AsHTML::_build_lexicals{CODE};
 };
 
 sub trace_as_html {
@@ -255,6 +258,66 @@ sub _build_asset_info {
     push @$accumulated_asset_info, { asset_id => $asset_id, message => $message, };
 
     return $message;
+}
+
+my $dumper = sub {
+    my $value = shift;
+    $value = $$value if ref $value eq 'SCALAR' or ref $value eq 'REF';
+    my $d = Data::Dumper->new([ $value ]);
+    # $d->Indent(1)->Terse(1)->Deparse(1);
+    $d->Indent(1)->Terse(1)->Maxdepth(1);
+    chomp(my $dump = $d->Dump);
+    $dump;
+};
+
+# copied this in so that we could use a differently configured Data::Dumper
+
+sub _build_arguments {
+    my($id, $args) = @_;
+    my $ref = "arg-$id";
+
+    return '' unless @$args;
+
+    my $html = qq(<p><a class="toggle" id="toggle-$ref" href="javascript:toggleArguments('$ref')">Show function arguments</a></p><table class="arguments" id="arguments-$ref">);
+
+    # Don't use while each since Dumper confuses that
+    for my $idx (0 .. @$args - 1) {
+        my $value = $args->[$idx];
+        my $dump = $dumper->($value);
+        $html .= qq{<tr>};
+        $html .= qq{<td class="variable">\$_[$idx]</td>};
+        $html .= qq{<td class="value">} . encode_html($dump) . qq{</td>};
+        $html .= qq{</tr>};
+    }
+    $html .= qq(</table>);
+
+    return $html;
+}
+
+# copied this in so that we could use a differently configured Data::Dumper
+
+sub _build_lexicals {
+    my($id, $lexicals) = @_;
+    my $ref = "lex-$id";
+
+    return '' unless keys %$lexicals;
+
+    my $html = qq(<p><a class="toggle" id="toggle-$ref" href="javascript:toggleLexicals('$ref')">Show lexical variables</a></p><table class="lexicals" id="lexicals-$ref">);
+
+    # Don't use while each since Dumper confuses that
+    for my $var (sort keys %$lexicals) {
+        my $value = $lexicals->{$var};
+        my $dump = $dumper->($value);
+        $dump =~ s/^\{(.*)\}$/($1)/s if $var =~ /^\%/;
+        $dump =~ s/^\[(.*)\]$/($1)/s if $var =~ /^\@/;
+        $html .= qq{<tr>};
+        $html .= qq{<td class="variable">} . encode_html($var)  . qq{</td>};
+        $html .= qq{<td class="value">}    . encode_html($dump) . qq{</td>};
+        $html .= qq{</tr>};
+    }
+    $html .= qq(</table>);
+
+    return $html;
 }
 
 sub utf8_safe {
