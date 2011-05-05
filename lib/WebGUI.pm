@@ -68,23 +68,37 @@ sub call {
     my $self = shift;
     my $env = shift;
 
-    # Use the PSGI callback style response, which allows for nice things like 
-    # delayed response/streaming body (server push). For now we just use this for 
-    # unbuffered response writing
-    return sub {
-        my $responder = shift;
-        my $session = $env->{'webgui.session'}
-            or die 'Missing WebGUI Session - check WebGUI::Middleware::Session';
+    my $session = $env->{'webgui.session'}
+        or die 'Missing WebGUI Session - check WebGUI::Middleware::Session';
 
-        # Handle the request
-        $self->handle($session);
+    # Handle the request
 
-        # Construct the PSGI response
-        my $response = $session->response;
-        my $psgi_response = $response->finalize;
+    $self->handle($session);
 
-        # See if the content handler is doing unbuffered response writing
-        if ( $response->streaming ) {
+    my $response = $session->response;
+    my $psgi_response = $response->finalize;
+
+    if ( ! $response->streaming ) {
+
+        # Not streaming, so immediately tell the callback to return 
+        # the response. In the future we could use an Event framework here 
+        # to make this a non-blocking delayed response.
+
+        return $psgi_response;
+
+    }
+    else {
+
+        # Use the PSGI callback style response, which allows for nice things like 
+        # delayed response/streaming body (server push). 
+        # Delayed response prevents any nice MiddleWare::StackTrace-like modules from 
+        # engaging so minimal error handling is done here.
+
+        return sub {
+            my $responder = shift;
+
+            # Construct the PSGI response
+
             try {
                 # Ask PSGI server for a streaming writer object by returning only the first
                 # two elements of the array reference
@@ -114,18 +128,12 @@ sub call {
                 }
             };
         }
-        else {
-            # Not streaming, so immediately tell the callback to return 
-            # the response. In the future we could use an Event framework here 
-            # to make this a non-blocking delayed response.
-            $responder->($psgi_response);
-        }
-    };
+    }
 }
 
 sub handle {
     my ( $self, $session ) = @_;
-    
+
     # uncomment the following to short-circuit contentHandlers (for benchmarking PSGI scaffolding vs. modperl)
     # $session->output->print("WebGUI PSGI with contentHandlers short-circuited for benchmarking\n");
     # return;

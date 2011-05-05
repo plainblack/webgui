@@ -74,7 +74,7 @@ sub call {
             my $res = shift;
 
             # Close the Session if we aren't streaming
-            if ( !$env->{'webgui.session'}->response->streaming ) { 
+            if ( $env->{'webgui.session'} and $env->{'webgui.session'}->response and ! $env->{'webgui.session'}->response->streaming ) {
                 $env->{'webgui.session'}->close();
                 delete $env->{'webgui.session'};
             }
