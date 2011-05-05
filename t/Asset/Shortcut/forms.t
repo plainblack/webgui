@@ -52,6 +52,14 @@ $mech->submit_form_ok( {
 } );
 is( $mech->session->user->get('alias'), "myself", "alias gets set" );
 
+# Admin is allowed to edit visitor's prefs
+$mech->get_ok( $shortcut->getUrl( 'func=getUserPrefsForm;visitor=1' ) );
+$mech->submit_form_ok( {
+    fields => { alias => "visitor" },
+} );
+isnt( $mech->session->user->get('alias'), "visitor", "admin alias doesn't get set" );
+is( WebGUI::User->new( $mech->session, '1' )->get('alias'), 'visitor', 'visitors alias set' );
+
 #----------------------------------------------------------------------------
 # editOverrides
 
@@ -62,7 +70,6 @@ $mech->session->user({ userId => 3 });
 
 # Make sure edit form has a link to edit the override
 $mech->get_ok( $shortcut->getUrl( 'func=edit' ) );
-diag( $mech->content );
 $mech->follow_link_ok( 
     { url_regex => qr/func=editOverride;fieldName=title/ },
     "Follow the link to edit the override",

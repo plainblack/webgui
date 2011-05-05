@@ -216,7 +216,6 @@ sub canManage {
 }
 
 #-------------------------------------------------------------------
-
 =head2 discernUserId 
 
 This utility method is used to determine if the user should be shown the view of the
@@ -225,8 +224,8 @@ Shortcut that the Visitor would see, or their own.
 =cut
 
 sub discernUserId {
-	my $self = shift;
-	return ($self->canManage && $self->session->isAdminOn) ? '1' : $self->session->user->userId;
+   my $self = shift;
+   return ($self->canManage && $self->session->form->get('visitor')) ? '1' : $self->session->user->userId;
 }
 
 #-------------------------------------------------------------------
@@ -481,7 +480,7 @@ admin mode is on.
 sub _overridesCacheTag {
 	my $self = shift;
 	#cache by userId, assetId of this shortcut, and whether adminMode is on or not.
-	return join "", "shortcutOverrides", $self->getId, $self->session->user->userId, $self->session->isAdminOn;
+	return join "", "shortcutOverrides", $self->getId, $self->session->user->userId;
 }
 
 #-------------------------------------------------------------------
@@ -995,13 +994,18 @@ sub www_getUserPrefsForm {
             action => $self->getUrl,
             extras => 'onsubmit="submitForm(this,\''.$self->getId.'\',\''.$self->getUrl.'\');return false;"',
         );
-    my $allowedToSave = ( ! $session->isAdminOn && $self->getParent->canPersonalize )
-                     || (   $session->isAdminOn && $session->user->isInGroup($session->setting->get('groupIdAdminUser')) );
+    # Admins are allowed to edit visitor's preferences
+    my $editingVisitor  = $session->form->get('visitor') eq 1;
+    my $allowedToSave = ( ! $editingVisitor && $self->getParent->canPersonalize )
+                     || (   $editingVisitor && $session->user->isInGroup($session->setting->get('groupIdAdminUser')) );
     if ($allowedToSave) {
         $f->addField( "hidden",   
             name => 'func', 
             value => 'saveUserPrefs'
         );
+        if ( $editingVisitor ) {
+            $f->addField( "hidden", name => 'visitor', value => 1 );
+        }
     }
 	my $u = WebGUI::User->new($session, $self->discernUserId);
 	FIELD: foreach my $fieldId (@fielden) {
@@ -1093,13 +1097,14 @@ the form would allow someone who is not a User Admin to alter Visitor's profile.
 sub www_saveUserPrefs {
 	my $self    = shift;
     my $session = $self->session;
+    my $editingVisitor  = $session->form->get('visitor') eq 1;
 	return '' unless $self->getParent->canPersonalize
-                  || ( $session->isAdminOn && $session->user->isInGroup($session->setting->get('groupIdAdminUser')) );
+                  || ( $editingVisitor && $session->user->isInGroup($session->setting->get('groupIdAdminUser')) );
 	my @fellowFields = $self->getPrefFieldsToShow;
 	my %data = ();
 	$self->uncacheOverrides;
 	my $i18n = WebGUI::International->new($session);
-	my $u = WebGUI::User->new($session, $self->discernUserId);
+	my $u = $editingVisitor ? WebGUI::User->new( $session, '1' ) : $session->user;
 	foreach my $fieldId ($session->form->param) {
 		my $field = WebGUI::ProfileField->new($session,$fieldId);
 		next unless $field;
