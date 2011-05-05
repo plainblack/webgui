@@ -88,7 +88,7 @@ cmp_deeply(
 my $expected = {
     "url_addPhoto" 
         => all( 
-            re( qr/class=WebGUI::Asset::File::GalleryFile::Photo/ ), 
+            re( qr/className=WebGUI::Asset::File::GalleryFile::Photo/ ), 
             re( qr/func=add/ ),
             re( $album->getUrl ),
         ),
