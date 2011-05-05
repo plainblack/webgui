@@ -14,7 +14,7 @@ use strict;
 
 use WebGUI::Test;
 use WebGUI::Session;
-use Test::More tests => 23; # increment this value for each test you create
+use Test::More tests => 21; # increment this value for each test you create
 use Test::Exception;
 use WebGUI::Asset::Snippet;
 
@@ -40,15 +40,6 @@ $snippet->update($properties);
 
 foreach my $property (keys %{$properties}) {
 	is ($snippet->get($property), $properties->{$property}, "updated $property is ".$properties->{$property});
-}
-
-# Test the getToolbar method
-for (1..2) {
-	my $toolbarState = $snippet->getToolbarState;
-	my $toolbar = $snippet->getToolbar;
-	is($toolbar, undef, 'getToolbar method returns undef when _toolbarState is set') if $toolbarState;
-	isnt($toolbar, undef, 'getToolbar method returns something other than undef when _toolbarState is not set') unless $toolbarState;
-	$snippet->toggleToolbar;
 }
 
 # Rudimentry test of the view method
