@@ -143,8 +143,8 @@ my $batchId = $session->db->setRow( 'Subscription_codeBatch', 'batchId', {
 });
 
 $mech->get_ok( $sku->getUrl( 'func=listSubscriptionCodeBatches' ) );
-$mech->text_contains( "Sign up to get your paycheck!" );
-$mech->text_contains( "Sign up to get fired!" );
+$mech->content_contains( "Sign up to get your paycheck!" );
+$mech->content_contains( "Sign up to get fired!" );
 $mech->submit_form_ok( {
     fields => {
         selection => "dc",
@@ -153,7 +153,7 @@ $mech->submit_form_ok( {
     },
 }, 'limit subscription code batches' );
 $mech->content_lacks( "Sign up to get your paycheck!" );
-$mech->text_contains( "Sign up to get fired!" );
+$mech->content_contains( "Sign up to get fired!" );
 
 
 #----------------------------------------------------------------------------
@@ -229,7 +229,7 @@ $mech->submit_form_ok({
 my $i18n = WebGUI::International->new($session, "Asset_Subscription");
 $mech->content_contains( $i18n->get('redeem code success') );
 
-my %redeemed = $session->db->quickHash( "SELECT * FROM Subscription_code WHERE code=?", [ $codeId ] );
+my %redeemed = $session->db->quickHash( "SELECT * FROM Subscription_code WHERE code=?", [ $codes->[0]{code} ] );
 is( $redeemed{status}, 'Used', "status updated" );
 is( $redeemed{usedBy}, $mech->session->user->userId, "used by updated" );
-cmp_ok( $redeemed{dateUsed}, '>=', time, "dateUsed updated" );
+cmp_ok( $redeemed{dateUsed}, '>=', time - 10, "dateUsed updated" );

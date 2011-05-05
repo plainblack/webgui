@@ -519,8 +519,9 @@ sub redeemCode {
         $self->apply;
 
         # Set code to Used
-        $session->db->write("update Subscription_code set status='Used', dateUsed=? where code =?", [
+        $session->db->write("update Subscription_code set status='Used', dateUsed=?, usedBy=? where code =?", [
             time,
+            $self->session->user->userId,
             $code,
         ]);
     } else {
