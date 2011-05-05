@@ -76,6 +76,7 @@ sub getValue {
     if ($value =~ m/[A-Za-z0-9\-_]{1,22}/) {
         return $value;
     }
+    $self->session->log->warn("Invalid GUID '$value' passed into form");
     return undef;
 }
 
