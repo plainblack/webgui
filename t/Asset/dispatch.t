@@ -146,7 +146,7 @@ WebGUI::Test->interceptLogging(sub {
         func        => 'dies',
     } );
     is( $td->dispatch, "www_view", "if a query method dies, view is returned instead" );
-    is $log_data->{warn}, "Couldn't call method www_dies on asset for url:  Root cause: ...aside from that bullet\n", '.. and logged a warn';
+    is $log_data->{warn}, "Couldn't call method www_dies on asset for url: / Root cause: ...aside from that bullet\n", '.. and logged a warn';
 });
 
 #vim:ft=perl
