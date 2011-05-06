@@ -19,7 +19,7 @@ my $session = WebGUI::Test->session;
 
 use Test::More; # increment this value for each test you create
 
-plan tests => 6;
+plan tests => 4;
 
 my $output;
 
@@ -29,7 +29,7 @@ is($output, '', 'user is not admin');
 
 $session->user({userId => 3});
 $output = WebGUI::Macro::AdminText::process($session, 'admin');
-is($output, '', 'user is admin');
+is($output, 'admin', 'user is admin');
 
 $output = WebGUI::Macro::AdminText::process($session, '');
 is($output, '', 'null text');
