@@ -57,7 +57,7 @@ $session->request->setup_body({
 }
 
 is $templateVars->{addPageUrl},
-    $wiki->getUrl('func=add;class=WebGUI::Asset::WikiPage;title=Red%26Andy'),
+    $wiki->getUrl('func=add;className=WebGUI::Asset::WikiPage;title=Red%26Andy'),
     'search encodes unsafe characters in addPageUrl';
 
 #----------------------------------------------------------------------------
