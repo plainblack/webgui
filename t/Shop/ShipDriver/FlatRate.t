@@ -75,16 +75,16 @@ is (WebGUI::Shop::ShipDriver::FlatRate->getName($session), 'Flat Rate', 'getName
 
 my $form = $driver2->getEditForm;
 
-isa_ok($form, 'WebGUI::HTMLForm', 'getEditForm returns an HTMLForm object');
+isa_ok($form, 'WebGUI::FormBuilder', 'getEditForm returns an HTMLForm object');
 
-my $html = $form->print;
+my $html = $form->toHtml;
 
 ##Any URL is fine, really
 my @forms = HTML::Form->parse($html, 'http://www.webgui.org');
 is (scalar @forms, 1, 'getEditForm generates just 1 form');
 
 my @inputs = $forms[0]->inputs;
-is (scalar @inputs, 14, 'getEditForm: the form has 14 controls');
+is (scalar @inputs, 13, 'getEditForm: the form has 13 controls');
 
 my @interestingFeatures;
 foreach my $input (@inputs) {
@@ -97,11 +97,7 @@ cmp_deeply(
     \@interestingFeatures,
     [
         {
-            name => 'webguiCsrfToken',
-            type => 'hidden',
-        },
-        {
-            name => undef,
+            name => "submit",
             type => 'submit',
         },
         {
