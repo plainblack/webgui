@@ -1,4 +1,5 @@
 7.10.16
+ - fixed #12121: typ-o Asset_Map.templateIdEditPoint
 
 7.10.15
  - fixed #12117: Thingy - www_searchViaAjax broken
