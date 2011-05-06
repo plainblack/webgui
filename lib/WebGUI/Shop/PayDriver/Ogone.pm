@@ -418,7 +418,8 @@ sub www_edit {
     return $session->privilege->insufficient() unless $admin->canManage;
 
     my $form = $self->getEditForm;
-    $form->submit;
+    $form->addField( 'csrfToken', name => 'csrfToken' );
+    $form->addField( "submit", name => "submit" );
 
     my $processUrl = $self->session->url->getSiteURL.'/?shop=pay&method=do&do=processTransaction&paymentGatewayId='.$self->getId;
     my $output = '<br />';

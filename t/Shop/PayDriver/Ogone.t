@@ -124,16 +124,16 @@ isa_ok      ($cart, 'WebGUI::Shop::Cart', 'getCart returns an instantiated WebGU
 
 my $form = $driver->getEditForm;
 
-isa_ok      ($form, 'WebGUI::HTMLForm', 'getEditForm returns an HTMLForm object');
+isa_ok      ($form, 'WebGUI::FormBuilder', 'getEditForm returns an HTMLForm object');
 
-my $html = $form->print;
+my $html = $form->toHtml;
 
 ##Any URL is fine, really
 my @forms = HTML::Form->parse($html, 'http://www.webgui.org');
 is          (scalar @forms, 1, 'getEditForm generates just 1 form');
 
 my @inputs = $forms[0]->inputs;
-is          (scalar @inputs, 18, 'getEditForm: the form has 18 controls');
+is          (scalar @inputs, 17, 'getEditForm: the form has 18 controls');
 
 my @interestingFeatures;
 foreach my $input (@inputs) {
@@ -146,11 +146,7 @@ cmp_deeply(
     \@interestingFeatures,
     [
         {
-            name    => 'webguiCsrfToken',
-            type    => 'hidden',
-        },
-        {
-            name    => undef,
+            name    => 'submit',
             type    => 'submit',
         },
         {
