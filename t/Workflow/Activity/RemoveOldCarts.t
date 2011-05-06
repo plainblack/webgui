@@ -18,7 +18,7 @@ use WebGUI::Shop::Cart;
 use Test::More;
 use Test::Deep;
 
-plan tests => 6; # increment this value for each test you create
+plan tests => 7; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 $session->user({userId => 3});
@@ -40,9 +40,9 @@ $cart2->update({creationDate => time()-10000});
 WebGUI::Test->addToCleanup($cart2);
 
 my @cartIds = $session->db->buildArray('select cartId from cart');
-cmp_bag(
+cmp_deeply(
     \@cartIds,
-    [ $cart1->getId, $cart2->getId ],
+    superbagof( $cart1->getId, $cart2->getId ),
     'Made two carts for testing'
 );
 
@@ -52,7 +52,10 @@ my $item1 = $cart1->addItem($donation);
 $donation->applyOptions({ price => 2222});
 my $item2 = $cart2->addItem($donation);
 
-my @itemIds = $session->db->buildArray('select itemId from cartItem');
+my @itemIds = $session->db->buildArray(
+    'select itemId from cartItem where cartId IN ( ?,? )',
+    [ $cart1->getId, $cart2->getId ],
+);
 cmp_bag(
     \@itemIds,
     [ $item1->getId, $item2->getId ],
@@ -87,13 +90,17 @@ is($retVal, 'done', 'cleanup: activity is done');
 $instance1->delete('skipNotify');
 
 @cartIds = $session->db->buildArray('select cartId from cart');
-cmp_bag(
+cmp_deeply(
     \@cartIds,
-    [ $cart1->getId, ],
-    'Deleted 1 cart, the correct one'
+    superbagof( $cart1->getId, ),
+    'Cart 1 remains'
 );
+ok( !grep( { $_ eq $cart2->getId } @cartIds ), 'Cart 2 deleted' );
 
-@itemIds = $session->db->buildArray('select itemId from cartItem');
+@itemIds = $session->db->buildArray(
+    'select itemId from cartItem where cartId IN ( ?,? )',
+    [ $cart1->getId, $cart2->getId ],
+);
 cmp_bag(
     \@itemIds,
     [ $item1->getId, ],
