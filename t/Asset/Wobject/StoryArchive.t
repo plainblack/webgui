@@ -342,7 +342,7 @@ cmp_deeply(
     $templateVars,
     {
         canPostStories => 1,
-        addStoryUrl    => '/home/mystories?func=add;class=WebGUI::Asset::Story',
+        addStoryUrl    => '/home/mystories?func=add;className=WebGUI::Asset::Story',
         date_loop      => [
             {
                 epochDate => ignore(),
