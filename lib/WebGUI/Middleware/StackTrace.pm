@@ -47,12 +47,7 @@ sub call {
         my $text = trace_as_string($trace);
         $env->{'psgi.errors'}->print($text) unless $self->no_print_errors;
         my $html = eval { trace_as_html($trace, $env->{'webgui.session'}) };
-        if ( $html and ($env->{HTTP_ACCEPT} || '*/*') =~ /html/) {
-            $res = [500, ['Content-Type' => 'text/html; charset=utf-8'], [ utf8_safe($html), @previous_html ] ];
-        } else {
-            $res = [500, ['Content-Type' => 'text/plain; charset=utf-8'], [ utf8_safe($text) ]];
-        }
-
+        $res = [500, ['Content-Type' => 'text/html; charset=utf-8'], [ utf8_safe($html), @previous_html ] ];
     }    
      
     return $res;
