@@ -54,7 +54,7 @@ sub exportProducts {
     # This should be perhaps genericized and placed into WebGUI::Asset
     my $tableName   = $session->db->dbh->quote_identifier( WebGUI::Asset::Sku::Product->tableName );
     my $productIds  = $session->db->buildArrayRef(
-        "SELECT assetId FROM asset JOIN assetData USING (assetId) JOIN $tableName USING (assetId, revisionDate) WHERE status=? OR status=? HAVING MAX(revisionDate)",
+        "SELECT assetId FROM asset JOIN assetData USING (assetId) JOIN $tableName USING (assetId, revisionDate) WHERE status=? OR status=? GROUP BY (assetId) HAVING MAX(revisionDate)",
         ['approved','archived'],
     );
 
