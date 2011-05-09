@@ -1,5 +1,6 @@
 7.10.16
  - fixed #12121: typ-o Asset_Map.templateIdEditPoint
+ - rfe #2123: Layouts related for export purposes
 
 7.10.15
  - fixed #12117: Thingy - www_searchViaAjax broken

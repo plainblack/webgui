@@ -522,9 +522,13 @@ sub exportGetAssetIds {
     my $session = $self->session;
     my $ids     = $self->exportGetDescendants( undef, $options->{depth} );
     return $ids unless $options->{exportRelated};
-    # We want the ids in a descendant order, but we don't want to repeat
-    # assetIds, so we're using Tie::IxHash to get an ordered set.
-    tie my %set, 'Tie::IxHash';
+
+    # We don't particularly care about the order of the assetIds. The only
+    # thing that might care is the ProgressTree page, and it computes the tree
+    # by looking at asset lineage anyway. We do want to follow chains of
+    # related assets though, so we'll use $ids as a queue and push related
+    # assets onto the end (unless, of course, they're already in the set).
+    my %set;
     while (my $id = shift @$ids) {
         my $asset = WebGUI::Asset->new($session, $id);
         undef $set{$id};
@@ -623,21 +627,25 @@ sub exportGetDescendants {
 
 =head2 exportGetRelatedAssetIds
 
-Normally all an asset's shorcuts,  but override if exporting your asset would
-invalidate other exported assets. If exportRelated is checked, this will be
-called and any assetIds it returns will be exported when your asset is
-exported.
+Normally all an asset's shorcuts and its container (via $asset->getContainer),
+but override if exporting your asset would invalidate other exported assets.
+If exportRelated is checked, this will be called and any assetIds it returns
+will be exported when your asset is exported.
 
-Note: You should NOT include parents as related assets simply because they're
-your parents. If the user wants to export your parent, he can do that. This is
-for assets that aren't necessarily in your ancestry. If parents were always
-related, exporting anything would export everything.
+This method returns an arrayref, and IS ALLOWED to contain the same assetId
+more than once. Anyone calling this function should check for duplicates. No
+particular order should be assumed.
 
 =cut
 
 sub exportGetRelatedAssetIds {
     my $self = shift;
-    WebGUI::Asset::Shortcut->getShortcutsForAssetId($self->session, $self->getId);
+    my $related = WebGUI::Asset::Shortcut->getShortcutsForAssetId(
+        $self->session,
+        $self->getId
+    );
+    push @$related, $self->getContainer->getId;
+    return $related;
 }
 
 #-------------------------------------------------------------------

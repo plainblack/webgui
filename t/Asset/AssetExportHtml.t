@@ -647,9 +647,18 @@ subtest exportRelated => sub {
     });
     $tag->commit();
     my $cleanup = guard { $tag->rollback; if ($old) { $old->setWorking(); } };
-    cmp_deeply(
+
+    # This will include some folders, because of the way Archive works
+    my $expected = $archive->getLineage(['self', 'descendants']);
+    push @$expected, $topic->getId;
+
+    # getContainer should be included; since parent is a Layout, the
+    # upward-recursion will stop there.
+    push @$expected, $topic->getContainer->getId;
+
+    cmp_bag(
         $archive->exportGetAssetIds({ depth => 99, exportRelated => 1}),
-        superbagof(map { $_->getId } ($topic, $archive, $story)),
+        $expected,
         'exporting archive includes topic with exportRelated'
     );
     is(0, scalar grep { $_ eq $topic->getId }
