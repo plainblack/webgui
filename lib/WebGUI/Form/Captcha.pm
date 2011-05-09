@@ -109,7 +109,7 @@ sub getValue {
         my $response = $self->session->form->param('recaptcha_response_field');
 
         my $ua = LWP::UserAgent->new;
-        my $res = $ua->post('http://api-verify.recaptcha.net/verify', {
+        my $res = $ua->post('http://www.google.com/recaptcha/api/verify', {
             privatekey  => $privKey,
             remoteip    => $self->session->env->getIp,
             challenge   => $challenge,
@@ -160,9 +160,9 @@ sub toHtml {
     if ($self->session->setting->get('useRecaptcha')) {
         my $env = $self->session->env;
         my $pubKey = $self->session->setting->get('recaptchaPublicKey');
-        my $server = "http://api.recaptcha.net";
+        my $server = "http://www.google.com/recaptcha/api";
         if ($env->sslRequest) {
-            $server = "https://api-secure.recaptcha.net";
+            $server = "https://www.google.com/recaptcha/api";
         }
         return
             '<script type="text/javascript" src="' . $server . '/challenge?k=' . $pubKey . '"></script>'
