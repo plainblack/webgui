@@ -1,6 +1,7 @@
 7.9.28
  - fixed #11213: Gooey on the Go format problem
  - fixed #12121: typ-o Asset_Map.templateIdEditPoint
+ - fixed #12125: Recaptcha API url
 
 7.9.27
  - fixed #12103: PayPalStd driver fails occasionally
