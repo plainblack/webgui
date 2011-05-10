@@ -1,3 +1,5 @@
+7.9.29
+
 7.9.28
  - fixed #11213: Gooey on the Go format problem
  - fixed #12121: typ-o Asset_Map.templateIdEditPoint
