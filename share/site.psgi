@@ -56,6 +56,12 @@ builder {
         Plack::App::File->new(root => $config->get('uploadsPath'));
     };
 
+    # enable config defined Middleware
+
+    for my $mw ( @{ $config->get('plackMiddleware') || [] } ) {
+        enable $mw;
+    }
+
     # Return the app
     mount '/' => $wg->to_app;
 };
