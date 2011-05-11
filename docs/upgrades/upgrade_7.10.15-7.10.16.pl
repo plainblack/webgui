@@ -31,6 +31,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+addAssetPropertyMacro($session);
 
 finish($session); # this line required
 
@@ -44,6 +45,17 @@ finish($session); # this line required
 #    print "DONE!\n" unless $quiet;
 #}
 
+#----------------------------------------------------------------------------
+sub addAssetPropertyMacro {
+    my $session = shift;
+    my $c       = $session->config;
+    my $hash    = $c->get('macros');
+    unless (grep { $_ eq 'AssetProperty' } values %$hash) {
+        print "\tAdding AssetProperty macro... " unless $quiet;
+        $c->set('macros/AssetProperty' => 'AssetProperty');
+        print "DONE!\n" unless $quiet;
+    }
+}
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
 
