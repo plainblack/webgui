@@ -81,7 +81,11 @@ sub process {
             POST_CHOMP   => 1,               # cleanup whitespace 
             EVAL_PERL    => 0,               # evaluate Perl code blocks
         });
-        unless ($t->process( \$template, _rewriteVars($vars),\$output)) {
+        $vars = _rewriteVars($vars);
+        # store the session so plugins can access it.
+        # underscore prefix prevents direct access from templates
+        $vars->{_session} = $self->session;
+        unless ($t->process( \$template, $vars,\$output)) {
             my $e = $t->error;
             $self->session->log->error($e);
             die $e;
