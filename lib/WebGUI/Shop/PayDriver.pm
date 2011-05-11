@@ -668,7 +668,7 @@ sub www_editSave {
     return $session->privilege->insufficient() unless $session->user->isAdmin;
 
     $self->processPropertiesFromFormPost;
-    $session->http->setRedirect($session->url->page('shop=pay;method=manage'));
+    $session->response->setRedirect($session->url->page('shop=pay;method=manage'));
 
     return undef;
 }

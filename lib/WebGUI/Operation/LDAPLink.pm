@@ -348,7 +348,7 @@ sub www_editLDAPLinkSave {
 	$properties->{ldapLoginTemplate} = $session->form->template("ldapLoginTemplate");
 	$session->db->setRow("ldapLink","ldapLinkId",$properties);
 	if($session->form->process("returnUrl")) {
-		$session->http->setRedirect($session->form->process("returnUrl"));
+		$session->response->setRedirect($session->form->process("returnUrl"));
         return undef;
 	}
 	return www_listLDAPLinks($session);

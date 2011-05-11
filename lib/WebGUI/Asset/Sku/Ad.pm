@@ -584,8 +584,8 @@ sub www_manage {
     my $self = shift;
     my $check = $self->checkView;
     return $check if (defined $check);
-    $self->session->http->setLastModified($self->getContentLastModified);
-    $self->session->http->sendHeader;
+    $self->session->response->setLastModified($self->getContentLastModified);
+    $self->session->response->sendHeader;
     $self->prepareView($self->manageTemplate);
     my $style = $self->processStyle($self->getSeparator);
     my ($head, $foot) = split($self->getSeparator,$style);

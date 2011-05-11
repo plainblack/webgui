@@ -8,6 +8,11 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
+# this test file is now slightly badly named since the functions in 
+# WebGUI::Session::HTTML have all been migrated to 
+# WebGUI::Session::Request and ::Response.  still, these tests need
+# to continue to pass.
+
 use strict;
 
 use WebGUI::Test;

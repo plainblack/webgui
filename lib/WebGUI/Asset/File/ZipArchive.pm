@@ -270,7 +270,7 @@ sub www_view {
 	if ($self->session->isAdminOn) {
 		return $self->session->asset($self->getContainer)->www_view;
 	}
-	$self->session->http->setRedirect($self->getFileUrl($self->showPage));
+	$self->session->response->setRedirect($self->getFileUrl($self->showPage));
 	return "1";
 }
 

@@ -181,7 +181,7 @@ form variable C<classLimiter>.  A crumb trail is provided for navigation.
 
 sub www_assetTree {
 	my $session = shift;
-	$session->http->setCacheControl("none");
+	$session->response->setCacheControl("none");
 	my $base = WebGUI::Asset->newByUrl($session) || WebGUI::Asset->getRoot($session);
 	my @crumb;
 	my $ancestorIter = $base->getLineageIterator(["self","ancestors"]);

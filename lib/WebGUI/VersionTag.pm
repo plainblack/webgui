@@ -100,7 +100,7 @@ sub autoCommitWorkingIfEnabled {
         }
         else {
             my $url = $versionTag->autoCommitUrl($options->{returnUrl});
-            $session->http->setRedirect($url);
+            $session->response->setRedirect($url);
             return 'redirect';
         }
     }

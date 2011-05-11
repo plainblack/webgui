@@ -69,7 +69,7 @@ is returned.
 
 sub www_auth {
 	my $session = shift;
-	$session->http->setCacheControl("none");
+	$session->response->setCacheControl("none");
 	my $auth;
 	($auth) = $session->db->quickArray("select authMethod from users where username=".$session->db->quote($session->form->process("username"))) if($session->form->process("username"));
 	my $authMethod = getInstance($session,$auth);

@@ -43,7 +43,7 @@ status of.
         );
         # See WebGUI::Operation::Fork
         my $pairs = $process->contentPairs('DoWork');
-        $session->http->setRedirect($self->getUrl($pairs));
+        $session->response->setRedirect($self->getUrl($pairs));
         return 'redirect';
     }
 

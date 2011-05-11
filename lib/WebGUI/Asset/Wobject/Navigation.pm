@@ -504,7 +504,7 @@ Do a redirect to the form parameter returnUrl if it exists.
 
 sub www_goBackToPage {
 	my $self = shift;
-	$self->session->http->setRedirect($self->session->form->process("returnUrl")) if ($self->session->form->process("returnUrl"));
+	$self->session->response->setRedirect($self->session->form->process("returnUrl")) if ($self->session->form->process("returnUrl"));
 	return undef;
 }
 

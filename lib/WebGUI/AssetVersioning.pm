@@ -615,7 +615,7 @@ sub www_purgeRevision {
     $asset->purgeRevision;
     if ($session->form->process("proceed") eq "manageRevisionsInTag") {
         my $working = (defined $self) ? $self : $parent;
-        $session->http->setRedirect($working->getUrl("op=manageRevisionsInTag"));
+        $session->response->setRedirect($working->getUrl("op=manageRevisionsInTag"));
         return undef;
     }
     unless (defined $self) {

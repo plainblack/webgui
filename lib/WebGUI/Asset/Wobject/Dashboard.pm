@@ -460,10 +460,10 @@ sub www_view {
                 if ($self->state eq "published") { # no privileges, make em log in
                         return $self->session->privilege->noAccess();
                 } elsif ($self->session->isAdminOn && $self->state =~ /^trash/) { # show em trash
-                        $self->session->http->setRedirect($self->getUrl("func=manageTrash"));
+                        $self->session->response->setRedirect($self->getUrl("func=manageTrash"));
                         return undef;
                 } elsif ($self->session->isAdminOn && $self->state =~ /^clipboard/) { # show em clipboard
-                        $self->session->http->setRedirect($self->getUrl("func=manageClipboard"));
+                        $self->session->response->setRedirect($self->getUrl("func=manageClipboard"));
                         return undef;
                 } else { # tell em it doesn't exist anymore
                         $self->session->response->status(410);

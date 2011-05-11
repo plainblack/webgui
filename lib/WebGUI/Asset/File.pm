@@ -619,9 +619,9 @@ sub www_view {
 		return sprintf($i18n->get("file not found"), $self->getUrl());
 	}
 
-    $session->http->setRedirect($self->getFileUrl) unless $session->config->get('enableStreamingUploads');
-    $session->http->setStreamedFile($self->getStorageLocation->getPath($self->filename));
-    $session->http->sendHeader;
+    $session->response->setRedirect($self->getFileUrl) unless $session->config->get('enableStreamingUploads');
+    $session->response->setStreamedFile($self->getStorageLocation->getPath($self->filename));
+    $session->response->sendHeader;
     return 'chunked';
 }
 

@@ -53,7 +53,7 @@ Checks to ensure the requestor is who we think it is, and then returns a JSON st
 sub www_spectreGetSiteData {
     my $session = shift;
 	$session->response->content_type("application/json");
-	$session->http->setCacheControl("none");
+	$session->response->setCacheControl("none");
 	my %siteData = ();
     my $subnets = $session->config->get("spectreSubnets");
     if (!defined $subnets) {
@@ -117,7 +117,7 @@ sub www_spectreStatus {
     my $ac = WebGUI::AdminConsole->new($session, 'spectre');
     my $i18n = WebGUI::International->new($session, 'Spectre');
 
-    $session->http->setCacheControl("none");
+    $session->response->setCacheControl("none");
 
     my $remote = create_ikc_client(
 		port=>$session->config->get("spectrePort"),
@@ -174,7 +174,7 @@ spectreSubnet, instead of checking the IP address of the spectre process.
 sub www_spectreTest {
 	my $session = shift;
 	$session->response->content_type("text/plain");
-	$session->http->setCacheControl("none");
+	$session->response->setCacheControl("none");
 
     my $subnets = $session->config->get("spectreSubnets");
     if (!defined $subnets) {

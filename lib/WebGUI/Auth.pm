@@ -966,12 +966,12 @@ sub www_createAccountSave {
         return $self->showMessageOnLogin;
     }
     elsif ($self->session->form->get('returnUrl')) {
-        $self->session->http->setRedirect( $self->session->form->get('returnUrl') );
+        $self->session->response->setRedirect( $self->session->form->get('returnUrl') );
         $self->session->scratch->delete("redirectAfterLogin");
     }
     elsif ($self->session->scratch->get("redirectAfterLogin")) {
         my $url = $self->session->scratch->delete("redirectAfterLogin");
-        $self->session->http->setRedirect($url);
+        $self->session->response->setRedirect($url);
         return undef;
     } 
     else {
@@ -1178,7 +1178,7 @@ sub www_login {
 	if ($self->session->setting->get('encryptLogin')) {
 		my $currentUrl = $self->session->url->page(undef,1);
 		$currentUrl =~ s/^https:/http:/;
-		$self->session->http->setRedirect($currentUrl);
+		$self->session->response->setRedirect($currentUrl);
 	}
 
         # Run on login
@@ -1198,14 +1198,14 @@ sub www_login {
         return $self->showMessageOnLogin;
     }
     elsif ( $self->session->form->get('returnUrl') ) {
-		$self->session->http->setRedirect( $self->session->form->get('returnUrl') );
+		$self->session->response->setRedirect( $self->session->form->get('returnUrl') );
 	  	$self->session->scratch->delete("redirectAfterLogin");
     }
 	elsif ( my $url = $self->session->scratch->delete("redirectAfterLogin") ) {
-		$self->session->http->setRedirect($url);
+		$self->session->response->setRedirect($url);
 	}
     elsif ( $self->session->setting->get("redirectAfterLoginUrl") ) {
-        $self->session->http->setRedirect($self->session->setting->get("redirectAfterLoginUrl"));
+        $self->session->response->setRedirect($self->session->setting->get("redirectAfterLoginUrl"));
         $self->session->scratch->delete("redirectAfterLogin");
     }
 
@@ -1242,7 +1242,7 @@ sub www_logout {
     }
 
     # Do not allow caching of the logout page (to ensure the page gets requested)
-    $self->session->http->setCacheControl( "none" );
+    $self->session->response->setCacheControl( "none" );
    
 	return undef;
 }

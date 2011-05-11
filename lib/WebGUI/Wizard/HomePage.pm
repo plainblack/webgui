@@ -242,7 +242,7 @@ sub www_chooseContent {
     my ($self)  = @_;
     my $session = $self->session;
     my $form    = $session->form;
-    $session->http->setCacheControl("none");
+    $session->response->setCacheControl("none");
     my $i18n = WebGUI::International->new( $session, "WebGUI" );
 
     my $output = '<h1>' . $i18n->get('Initial Pages') . '</h1>';

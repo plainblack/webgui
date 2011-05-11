@@ -571,6 +571,7 @@ sub open {
     ##Set defaults
     $self->{_response} = $request->new_response( 200 );
     $self->{_response}->content_type('text/html; charset=UTF-8');
+    $self->{_response}->session( $self );
 
     # Use the WebGUI::Session::Request object to look up the sessionId from cookies, if it
     # wasn't given explicitly

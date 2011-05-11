@@ -287,7 +287,7 @@ sub displayContent {
     
     return $output if($noStyle);
     #Wrap the layout in the user style
-    $session->http->setCacheControl("none");
+    $session->response->setCacheControl("none");
     return $session->style->process($output,$self->getStyleTemplateId);    
 }
 

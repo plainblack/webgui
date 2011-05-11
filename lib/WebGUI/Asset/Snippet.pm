@@ -275,7 +275,7 @@ sub www_view {
     return $self->session->privilege->insufficient() unless $self->canView;
     my $mimeType=$self->mimeType;
     $self->session->response->content_type($mimeType || 'text/html');
-    $self->session->http->setCacheControl($self->cacheTimeout);
+    $self->session->response->setCacheControl($self->cacheTimeout);
     my $output = $self->view(1);
     if (!defined $output) {
         $output = 'empty';

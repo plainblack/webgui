@@ -170,6 +170,7 @@ checkModule('Starman',						'0.2010',	2);
 checkModule('App::Cmd',                     '0.311'      );
 checkModule('Devel::StackTrace',            '1.27'       );
 checkModule('Devel::StackTrace::WithLexicals',  '0.03'   );
+checkModule('IO::File::WithPath',                        );
 
 failAndExit("Required modules are missing, running no more checks.") if $missingModule;
 

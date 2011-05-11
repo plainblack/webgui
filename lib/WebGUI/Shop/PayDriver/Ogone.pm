@@ -350,7 +350,7 @@ sub www_cancelTransaction {
     $self->_setPaymentStatus( 0, $form->process('PAYID'), $form->process('STATUS'), 'Cancelled' );
     $self->processTransaction( $transaction );
 
-    $session->http->setRedirect($self->session->url->getSiteURL.'?shop=cart');
+    $session->response->setRedirect($self->session->url->getSiteURL.'?shop=cart');
     return $session->style->userStyle('Transaction cancelled');
 }
 
@@ -373,7 +373,7 @@ sub www_declineTransaction {
     $self->_setPaymentStatus( 0, $form->process('PAYID'), $form->process('STATUS'), 'Declined' );
     $self->processTransaction( $transaction );
 
-    $session->http->setRedirect($self->session->url->getSiteURL.'?shop=cart');
+    $session->response->setRedirect($self->session->url->getSiteURL.'?shop=cart');
     return $session->style->userStyle('Transaction declined');
 }
 
@@ -396,7 +396,7 @@ sub www_exceptionTransaction {
     $self->_setPaymentStatus( 0, $form->process('PAYID'), $form->process('STATUS'), 'Transaction exception occurred' );
     $self->processTransaction( $transaction );
 
-    $session->http->setRedirect($self->session->url->getSiteURL.'?shop=cart');
+    $session->response->setRedirect($self->session->url->getSiteURL.'?shop=cart');
     return $session->style->userStyle('A transaction exception occurred.');
 }
 

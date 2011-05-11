@@ -548,7 +548,7 @@ sub www_purgeRevision {
 	$asset->purgeRevision;
 	if ($session->form->process("proceed") eq "manageRevisionsInTag") {
 		my $working = (defined $self) ? $self : $parent;
-		$session->http->setRedirect($working->getUrl("op=manageRevisionsInTag"));
+		$session->response->setRedirect($working->getUrl("op=manageRevisionsInTag"));
 		return undef;
 	}
 	unless (defined $self) {
@@ -601,9 +601,9 @@ sub www_view {
 	return $self->session->privilege->noAccess unless $self->canView;
 	$self->update({ views => $self->views+1 });
 	# TODO: This should probably exist, as the CS has one.
-#	$self->session->http->setCacheControl($self->getWiki->get('visitorCacheTimeout'))
+#	$self->session->response->setCacheControl($self->getWiki->get('visitorCacheTimeout'))
 #	    if ($self->session->user->isVisitor);
-	$self->session->http->sendHeader;
+	$self->session->response->sendHeader;
 	$self->prepareView;
 	return $self->getWiki->processStyle($self->view);
 }

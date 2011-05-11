@@ -1424,20 +1424,20 @@ Renders self->view based upon current style, subject to timeouts. Returns Privil
 =cut
 
 sub www_view {
-        my $self = shift;
-	my $currentPost = shift;
-	return $self->session->privilege->noAccess() unless $self->canView;
-	my $check = $self->checkView;
-	return $check if (defined $check);
-	$self->session->http->setCacheControl($self->visitorCacheTimeout) if ($self->session->user->isVisitor);
-        $self->session->http->sendHeader;    
-        $self->prepareView;
-        my $style = $self->getParent->processStyle($self->getSeparator);
-        my ($head, $foot) = split($self->getSeparator,$style);
-        $self->session->output->print($head,1);
-        $self->session->output->print($self->view($currentPost));
-        $self->session->output->print($foot,1);
-        return "chunked";
+    my $self = shift;
+    my $currentPost = shift;
+    return $self->session->privilege->noAccess() unless $self->canView;
+    my $check = $self->checkView;
+    return $check if (defined $check);
+    $self->session->response->setCacheControl($self->visitorCacheTimeout) if ($self->session->user->isVisitor);
+    $self->session->response->sendHeader;    
+    $self->prepareView;
+    my $style = $self->getParent->processStyle($self->getSeparator);
+    my ($head, $foot) = split($self->getSeparator,$style);
+    $self->session->output->print($head,1);
+    $self->session->output->print($self->view($currentPost));
+    $self->session->output->print($foot,1);
+    return "chunked";
 }
 
 

@@ -150,7 +150,7 @@ The url to the icon you want to display.
 
 sub start {
     my ($self, $title, $icon) = @_;
-    $self->session->http->setCacheControl("none");
+    $self->session->response->setCacheControl("none");
     my %var      =  (
         title   => $title,
         icon    => $icon
@@ -159,7 +159,7 @@ sub start {
     my $output = $self->session->style->process($template->process(\%var).'~~~', "PBtmpl0000000000000137");
     my ($head, $foot) = split '~~~', $output;
     local $| = 1; # Tell modperl not to buffer the output
-    $self->session->http->sendHeader;
+    $self->session->response->sendHeader;
     $self->session->output->print($head, 1); #skipMacros
     $self->{_foot} = $foot;
     return '';

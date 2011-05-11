@@ -437,7 +437,7 @@ sub www_exportTax {
     return $session->privilege->insufficient unless $self->canManage;
 
     my $storage = $self->exportTaxData();
-    $self->session->http->setRedirect($storage->getUrl($storage->getFiles->[0]));
+    $self->session->response->setRedirect($storage->getUrl($storage->getFiles->[0]));
     return "redirect";
 }
 

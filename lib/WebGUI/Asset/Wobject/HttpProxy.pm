@@ -497,7 +497,7 @@ sub www_view {
     if ($self->session->response->content_type ne "text/html") {
         return $output;
     } else {
-        $self->session->http->sendHeader;
+        $self->session->response->sendHeader;
         my $style = $self->processStyle($self->getSeparator, { noHeadTags => 1 });
         my ($head, $foot) = split($self->getSeparator,$style);
         $self->session->output->print($head);

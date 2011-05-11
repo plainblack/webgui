@@ -785,10 +785,10 @@ sub www_click {
 
     $self->incrementCounter('clicks');
     if ($session->form->process("manufacturer")) {
-        $session->http->setRedirect( $self->get('manufacturerURL') );
+        $session->response->setRedirect( $self->get('manufacturerURL') );
     }
     else {
-        $session->http->setRedirect( $self->get('productURL') );
+        $session->response->setRedirect( $self->get('productURL') );
     }
     return undef;
 }

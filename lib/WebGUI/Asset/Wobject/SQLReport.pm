@@ -704,7 +704,7 @@ sub www_download {
         $self->downloadType eq 'csv' ? "application/octet-stream" : $self->downloadMimeType
     );
 	
-	$self->session->http->sendHeader;
+	$self->session->response->sendHeader;
 	
 	
 	return $self->download;
@@ -722,7 +722,7 @@ See WebGUI::Asset::Wobject::www_view() for details.
 
 override www_view => sub {
 	my $self = shift;
-	$self->session->http->setCacheControl($self->cacheTimeout);
+	$self->session->response->setCacheControl($self->cacheTimeout);
 	super();
 };
 
