@@ -46,6 +46,12 @@ use WebGUI::Paths -inc;
 use namespace::clean;
 use WebGUI::User;
 
+use Plack::Test;
+use Plack::Util;
+use HTTP::Request::Common;
+use WebGUI::GUID;
+
+
 our @EXPORT = qw(cleanupGuard addToCleanup);
 our @EXPORT_OK = qw(session config collateral);
 
@@ -377,6 +383,7 @@ below.
 
 # I think that getPage should be entirely replaced with calles to Plack::Test::test_psgi
 # - testing with the callback is better and it means we can run on any backend
+# I agree.
 sub getPage {
     my $class       = shift;
     my $actor       = shift;    # The actor to work on
@@ -429,6 +436,90 @@ sub getPage {
 
     # Return the page's output
     return join '', @{$session->response->body};
+}
+
+=head2 getPage2 ( request|url [, opts] )
+
+Get the entire response from a page request using L<Plack::Test>.
+
+Accepts an L<HTTP::Request> object as an argument, which cooked up auth info will be added to.
+An L<HTTP::Request> will be constructed from a simple relative URL such as C<home> if a string is passed instead.
+
+Returns an L<HTTP::Response> object on which you may call C<< decoded_content() >> to get the body content as a string.
+C<options> is a hash reference of options with keys outlined below. 
+
+ user           => A user object to set for this request
+ userId         => A userId to set for this request
+ formParams     => A hash reference of form parameters
+
+Compared to C<getPage> above, these are not yet supported:
+
+ uploads
+ args
+
+=cut
+
+sub getPage2 {
+    my $class       = shift;
+    my $request     = shift;
+    my $optionsRef  = shift;    # A hashref of options
+                                # args      => Array ref of args to the page sub
+                                # user      => A user object to set
+                                # userId    => A user ID to set, "user" takes
+                                #              precedence
+
+    die "not supported" if exists $optionsRef->{args};
+    die "not supported" if exists $optionsRef->{formParams};
+    die "not supported" if exists $optionsRef->{uploads};
+
+    my $session = $CLASS->session;
+
+    # Save state
+    my $oldUser     = $session->user;
+    my $oldRequest  = $session->request;
+
+    # Set the appropriate user
+    if ($optionsRef->{user}) {
+        $session->user({ user => $optionsRef->{user} });
+    }
+    elsif ($optionsRef->{userId}) {
+        $session->user({ userId => $optionsRef->{userId} });
+    }
+    $session->user->uncache;
+
+    # Fake up a logged in session
+    my $wgSession = WebGUI::GUID->generate;
+    $session->db->write(qq{
+        replace into userSession (sessionId, expires, lastPageView, userId)
+        values (?, ?, ?, ?)
+    }, [ 
+        $wgSession, scalar time + 60 * 20, scalar time, $session->user->userId,
+    ] ) or die;
+
+    my $response;
+
+    # Create a new request object, or fix up the one given to us
+    if( ! eval { $request->isa('HTTP::Request') } ) {
+        if( $optionsRef->{formParams} ) {
+            $request = HTTP::Request::Common::POST( "http://127.0.0.1/$request", [ %{ $optionsRef->{formParams} } ] ) or die;
+        } else {
+            $request = HTTP::Request->new( GET => "http://127.0.0.1/$request" ) or die;
+        }
+    }
+    $request->header( 'Set-Cookie3' => qq{wgSession=$wgSession; path="/"; domain=127.0.0.1; path_spec; discard; version=0} );
+
+    my $app = Plack::Util::load_psgi( WebGUI::Paths->defaultPSGI ) or die;
+
+    test_psgi $app, sub {
+        my $cb = shift;
+        $response = $cb->( $request );
+    };
+
+    # Restore the former user and request
+    $session->user({ user => $oldUser });
+    $session->{_request} = $oldRequest; # dubious about this; if we're going to try to support requests inside of other requests, it should be tested and actually supported rather than just some optimistic arm waving done
+
+    return $response;
 }
 
 #----------------------------------------------------------------------------

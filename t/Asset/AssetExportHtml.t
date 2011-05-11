@@ -378,7 +378,7 @@ is($fileAsPath->absolute($exportPath)->stringify, $litmus->absolute($exportPath)
 # we need to be tricky here and call code in wG proper which calls www_ methods
 # even though we don't have access to modperl. the following hack lets us do
 # that.
-#$session->http->setNoHeader(1);
+#$session->response->setNoHeader(1);
 
 $session->user( { userId => 1 } );
 my $content;
@@ -392,7 +392,12 @@ is($@, '', "exportWriteFile works when creating exportPath");
 ok(-e $parent->exportGetUrlAsPath->absolute->stringify, "exportWriteFile actually writes the file when creating exportPath");
 
 # now make sure that it contains the correct content
-eval { $content = WebGUI::Test->getPage($parent, 'exportHtml_view', { user => WebGUI::User->new($session, 1) } ) };
+eval { 
+    $content = WebGUI::Test->getPage2(
+        $parent->get('url').'?func=exportHtml_view', 
+        { user => WebGUI::User->new($session, 1) },
+    )->decoded_content 
+};
 is(scalar $parent->exportGetUrlAsPath->slurp, $content, "exportWriteFile puts the correct contents in exported parent");
 
 
@@ -405,7 +410,7 @@ my $unwritablePath = Path::Class::Dir->new($config->get('uploadsPath'), 'temp', 
 chmod 0000, $guidPath->stringify;
 $config->set('exportPath', $unwritablePath->absolute->stringify);
 
-$session->http->setNoHeader(1);
+$session->response->setNoHeader(1);
 SKIP: {
     skip 'Root will cause this test to fail since it does not obey file permissions', 2
         if $< == 0;
@@ -436,7 +441,7 @@ $config->set('exportPath', $guidPath->absolute->stringify);
 chmod 0755, $guidPath->stringify;
 $unwritablePath->remove;
 
-$session->http->setNoHeader(1);
+$session->response->setNoHeader(1);
 eval { $firstChild->exportWriteFile() };
 is($@, '', "exportWriteFile works for first_child");
 
@@ -444,14 +449,14 @@ is($@, '', "exportWriteFile works for first_child");
 ok(-e $firstChild->exportGetUrlAsPath->absolute->stringify, "exportWriteFile actually writes the first_child file");
 
 # verify it has the correct contents
-eval { $content = WebGUI::Test->getPage($firstChild, 'exportHtml_view') };
+eval { $content = WebGUI::Test->getPage2( $firstChild->get('url').'?func=exportHtml_view', )->decoded_content };
 is(scalar $firstChild->exportGetUrlAsPath->absolute->slurp, $content, "exportWriteFile puts the correct contents in exported first_child");
 
 # and one more level. remove the export path to ensure directory creation keeps
 # working.
 $guidPath->rmtree;
 
-$session->http->setNoHeader(1);
+$session->response->setNoHeader(1);
 $session->user( { userId => 1 } );
 eval { $grandChild->exportWriteFile() };
 is($@, '', "exportWriteFile works for grandchild");
@@ -461,13 +466,13 @@ ok(-e $grandChild->exportGetUrlAsPath->absolute->stringify, "exportWriteFile act
 
 # finally, check its contents
 $session->style->sent(0);
-eval { $content = WebGUI::Test->getPage($grandChild, 'exportHtml_view') };
+eval { $content = WebGUI::Test->getPage2( $grandChild->get('url').'?func=exportHtml_view', )->decoded_content };
 is(scalar $grandChild->exportGetUrlAsPath->absolute->slurp, $content, "exportWriteFile puts correct content in exported grandchild");
 
 # test different extensions
 $guidPath->rmtree;
 $asset = WebGUI::Asset->newById($session, 'ExportTest000000000001');
-$session->http->setNoHeader(1);
+$session->response->setNoHeader(1);
 eval { $asset->exportWriteFile() };
 is($@, '', 'exportWriteFile for perl file works');
 
@@ -488,7 +493,7 @@ $guidPath->rmtree;
 # isn't allowed to see. this means that we'll need to temporarily change the
 # permissions on something.
 $parent->update( { groupIdView => 3 } ); # admins
-$session->http->setNoHeader(1);
+$session->response->setNoHeader(1);
 eval { $parent->exportWriteFile() }; 
 $e = Exception::Class->caught();
 isa_ok($e, 'WebGUI::Error', "exportWriteFile throws when user can't view asset");
@@ -912,7 +917,7 @@ SKIP: {
 
 # user can't view asset
 $parent->update( { groupIdView => 3 } );
-$session->http->setNoHeader(1);
+$session->response->setNoHeader(1);
 
 chmod 0755, $tempDirectory;
 eval { ($message) = $parent->exportAsHtml( { userId => 1, depth => 99 } ) };
