@@ -392,12 +392,10 @@ is($@, '', "exportWriteFile works when creating exportPath");
 ok(-e $parent->exportGetUrlAsPath->absolute->stringify, "exportWriteFile actually writes the file when creating exportPath");
 
 # now make sure that it contains the correct content
-eval { 
-    $content = WebGUI::Test->getPage2(
-        $parent->get('url').'?func=exportHtml_view', 
-        { user => WebGUI::User->new($session, 1) },
-    )->decoded_content 
-};
+$content = WebGUI::Test->getPage2(
+    $parent->get('url').'?func=exportHtml_view', 
+    { user => WebGUI::User->new($session, 1) },
+);
 is(scalar $parent->exportGetUrlAsPath->slurp, $content, "exportWriteFile puts the correct contents in exported parent");
 
 
@@ -449,7 +447,7 @@ is($@, '', "exportWriteFile works for first_child");
 ok(-e $firstChild->exportGetUrlAsPath->absolute->stringify, "exportWriteFile actually writes the first_child file");
 
 # verify it has the correct contents
-eval { $content = WebGUI::Test->getPage2( $firstChild->get('url').'?func=exportHtml_view', )->decoded_content };
+eval { $content = WebGUI::Test->getPage2( $firstChild->get('url').'?func=exportHtml_view', ) };
 is(scalar $firstChild->exportGetUrlAsPath->absolute->slurp, $content, "exportWriteFile puts the correct contents in exported first_child");
 
 # and one more level. remove the export path to ensure directory creation keeps
@@ -466,7 +464,7 @@ ok(-e $grandChild->exportGetUrlAsPath->absolute->stringify, "exportWriteFile act
 
 # finally, check its contents
 $session->style->sent(0);
-eval { $content = WebGUI::Test->getPage2( $grandChild->get('url').'?func=exportHtml_view', )->decoded_content };
+eval { $content = WebGUI::Test->getPage2( $grandChild->get('url').'?func=exportHtml_view', ) };
 is(scalar $grandChild->exportGetUrlAsPath->absolute->slurp, $content, "exportWriteFile puts correct content in exported grandchild");
 
 # test different extensions

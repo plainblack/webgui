@@ -58,10 +58,15 @@ sub new {
 
 sub session {
     my $self = shift;
+    if( @_ ) {
+        $self->{_webgui_session} = shift;  # take session as an arg
+        $self->{_webgui_sessionId} ||= $self->{_webgui_session}->getId;
+    }
     return $self->{_webgui_session}
         if $self->{_webgui_session};
-    my $session = WebGUI::Session->open($self->{_webgui_config}, undef, $self->sessionId);
+    my $session = WebGUI::Session->open($self->{_webgui_config}, undef, $self->sessionId) or die;
     $self->{_webgui_session} = $session;
+    $self->{_webgui_sessionId} ||= $session->getId; # sessionId() sets it from
     return $session;
 }
 
@@ -78,7 +83,9 @@ sub sessionId {
         }
     });
     if (! $sessionId) {
-        die "Unable to find session cookie!";
+        # die "Unable to find session cookie!";
+        # when called from session() above, there is no session yet and no sessionId; that's okay
+        return; # empty list; make WebGUI::Session generate one for us
     }
     $self->{_webgui_sessionId} = $sessionId;
     return $sessionId;

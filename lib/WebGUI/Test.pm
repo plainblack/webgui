@@ -45,12 +45,8 @@ use Scope::Guard;
 use WebGUI::Paths -inc;
 use namespace::clean;
 use WebGUI::User;
-
-use Plack::Test;
-use Plack::Util;
+use WebGUI::Test::Mechanize;
 use HTTP::Request::Common;
-use WebGUI::GUID;
-
 
 our @EXPORT = qw(cleanupGuard addToCleanup);
 our @EXPORT_OK = qw(session config collateral);
@@ -440,12 +436,14 @@ sub getPage {
 
 =head2 getPage2 ( request|url [, opts] )
 
-Get the entire response from a page request using L<Plack::Test>.
+Get the entire response from a page request using L<WebGUI::Test::Mechanize>.
+This is a wrapper around L<WebGUI::Test::Mechanize> for the purpose of easing conversion of tests that use C<getPage>.
 
 Accepts an L<HTTP::Request> object as an argument, which cooked up auth info will be added to.
 An L<HTTP::Request> will be constructed from a simple relative URL such as C<home> if a string is passed instead.
 
-Returns an L<HTTP::Response> object on which you may call C<< decoded_content() >> to get the body content as a string.
+Returns a string containing the body of the requested page.
+
 C<options> is a hash reference of options with keys outlined below. 
 
  user           => A user object to set for this request
@@ -469,7 +467,6 @@ sub getPage2 {
                                 #              precedence
 
     die "not supported" if exists $optionsRef->{args};
-    die "not supported" if exists $optionsRef->{formParams};
     die "not supported" if exists $optionsRef->{uploads};
 
     my $session = $CLASS->session;
@@ -478,48 +475,39 @@ sub getPage2 {
     my $oldUser     = $session->user;
     my $oldRequest  = $session->request;
 
+    my $mech  = WebGUI::Test::Mechanize->new( config => WebGUI::Test->file );
+
     # Set the appropriate user
     if ($optionsRef->{user}) {
-        $session->user({ user => $optionsRef->{user} });
+        $mech->session->user({ user => $optionsRef->{user} });
     }
     elsif ($optionsRef->{userId}) {
-        $session->user({ userId => $optionsRef->{userId} });
+        $mech->session->user({ userId => $optionsRef->{userId} });
     }
     $session->user->uncache;
 
-    # Fake up a logged in session
-    my $wgSession = WebGUI::GUID->generate;
-    $session->db->write(qq{
-        replace into userSession (sessionId, expires, lastPageView, userId)
-        values (?, ?, ?, ?)
-    }, [ 
-        $wgSession, scalar time + 60 * 20, scalar time, $session->user->userId,
-    ] ) or die;
+    $mech->session or die; # force a session to be created for the request
+    my $session_id = $mech->sessionId or die;
 
-    my $response;
-
-    # Create a new request object, or fix up the one given to us
+    # Build or fix up a request object
     if( ! eval { $request->isa('HTTP::Request') } ) {
         if( $optionsRef->{formParams} ) {
             $request = HTTP::Request::Common::POST( "http://127.0.0.1/$request", [ %{ $optionsRef->{formParams} } ] ) or die;
-        } else {
+        }
+        else {
             $request = HTTP::Request->new( GET => "http://127.0.0.1/$request" ) or die;
         }
-    }
-    $request->header( 'Set-Cookie3' => qq{wgSession=$wgSession; path="/"; domain=127.0.0.1; path_spec; discard; version=0} );
+    } 
+    $request->header( 'Set-Cookie3' => qq{wgSession=$session_id; path="/"; domain=127.0.0.1; path_spec; discard; version=0} );
 
-    my $app = Plack::Util::load_psgi( WebGUI::Paths->defaultPSGI ) or die;
-
-    test_psgi $app, sub {
-        my $cb = shift;
-        $response = $cb->( $request );
-    };
+    $mech->request( $request );
 
     # Restore the former user and request
     $session->user({ user => $oldUser });
     $session->{_request} = $oldRequest; # dubious about this; if we're going to try to support requests inside of other requests, it should be tested and actually supported rather than just some optimistic arm waving done
 
-    return $response;
+    return $mech->response->decoded_content;
+
 }
 
 #----------------------------------------------------------------------------
