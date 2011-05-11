@@ -64,7 +64,7 @@ if ( $gallery && $gallery->isa('WebGUI::Asset::Wobject::Gallery') ) {
     else {
         my $fromAsset = undef;
         if (defined $fromAssetId) {
-            $fromAsset = WebGUI::Asset->newByDynamicClass($session, $fromAssetId);
+            $fromAsset = WebGUI::Asset->newById($session, $fromAssetId);
         }
         else {
             $fromAsset = WebGUI::Asset->newByUrl($session, $fromAssetUrl);
@@ -241,7 +241,7 @@ sub addAlbumFromFolder {
         } );
 
     for my $fileId ( @{ $fileIds } ) {
-        my $oldFile     = WebGUI::Asset->newByDynamicClass( $session, $fileId );
+        my $oldFile     = WebGUI::Asset->newById( $session, $fileId );
         my $oldStorage  = $oldFile->getStorageLocation;
         my $className   = $gallery->getAssetClassForFile( $oldStorage->getPath( $oldFile->get('filename') ) );
         if ( !$className ) {
