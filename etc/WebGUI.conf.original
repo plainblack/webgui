@@ -172,6 +172,24 @@
 #     "password" : "password"
 #     },
 
+# If you have a multi-master set up, you must define increment_step and increment_offset
+# to prevent merge conflicts between the different masters. increment_step should be set
+# to the number of masters, and offset should be unique to each master, starting at 0.
+#
+# So, a 2-master cluster would define:
+#   Master 1:
+#       increment_step: 2
+#       increment_offset: 0
+#   Master 2:
+#       increment_step: 2
+#       increment_offset: 1
+#
+# "db" : {
+#       "increment_step" : 1,
+#       "increment_offset" : 0
+#   },
+
+
 # Set this value if you wish to override all outbound emails to a specific
 # user for testing purposes.
 
@@ -840,6 +858,7 @@
     "If"               : "If",
     "International"    : "International", 
     "LastModified"     : "LastModified", 
+    "LastModifiedBy"   : "LastModifiedBy", 
     "L"                : "L_loginBox", 
     "LoginToggle"      : "LoginToggle", 
     "MiniCart"         : "MiniCart",
@@ -849,6 +868,7 @@
     "PickLanguage"     : "PickLanguage",
     "RandomAssetProxy" : "RandomAssetProxy", 
     "RandomThread"     : "RandomThread", 
+    "RenderThingData"  : "RenderThingData",
     "RootTitle"        : "RootTitle", 
     "r"                : "r_printable", 
     "Spacer"           : "Spacer", 
@@ -917,6 +937,9 @@
     ],
     "WebGUI::Asset::Wobject::Thingy" : [
         "WebGUI::Workflow::Activity::NotifyAboutThing"
+    ],
+    "WebGUI::Asset" : [
+        "WebGUI::Workflow::Activity::UpdateAssetSubscribers"
     ],
     "WebGUI::User" : [
         "WebGUI::Workflow::Activity::CreateCronJob",
@@ -1070,6 +1093,9 @@
 # An array of SPAM words.  Used in the Post and WikiPage to block spam by sending the asset directly
 # to the trash.
    "spamStopWords" : [
-   ]
+   ],
+
+# A flag to enable a very simple SSO mechanism using sessionIds.
+   "enableSimpleSSO" : 0
 
 }

@@ -465,6 +465,7 @@ sub setup_assets {
 	my $properties = {
 		title => 'personal style test template',
 		className => 'WebGUI::Asset::Template',
+		parser    => 'WebGUI::Asset::Template::HTMLTemplate',
 		url => 'personal_style',
 		namespace => 'Style',
 		template => "PERSONAL STYLE TEMPLATE\n\nBODY=<tmpl_var body.content>\n\nHEAD=<tmpl_var head.tags>",
@@ -475,6 +476,7 @@ sub setup_assets {
 	$properties = {
 		title => 'personal style test template with extraHeadTags',
 		className => 'WebGUI::Asset::Template',
+		parser    => 'WebGUI::Asset::Template::HTMLTemplate',
 		url => 'headblock_style',
 		namespace => 'Style',
 		template => 'HEADBLOCK STYLE TEMPLATE\n\nBODY=<tmpl_var body.content>\n\nHEAD=<tmpl_var head.tags>',
@@ -486,6 +488,7 @@ sub setup_assets {
 	$properties = {
 		title => 'personal style test template for printing',
 		className => 'WebGUI::Asset::Template',
+		parser    => 'WebGUI::Asset::Template::HTMLTemplate',
 		url => 'personal_style_printable',
 		namespace => 'Style',
 		##Note, at this point 
@@ -497,6 +500,7 @@ sub setup_assets {
 	$properties = {
 		title => 'asset template for printing',
 		className => 'WebGUI::Asset::Template',
+		parser    => 'WebGUI::Asset::Template::HTMLTemplate',
 		url => 'asset_style_printable',
 		namespace => 'Style',
 		##Note, at this point 
@@ -508,6 +512,7 @@ sub setup_assets {
 	$properties = {
 		title => 'user template for printing',
 		className => 'WebGUI::Asset::Template',
+		parser    => 'WebGUI::Asset::Template::HTMLTemplate',
 		url => 'user_style_printable',
 		namespace => 'Style',
 		##Note, at this point 
@@ -519,6 +524,7 @@ sub setup_assets {
 	$properties = {
 		title => 'asset for printing',
 		className => 'WebGUI::Asset::Wobject::Article',
+		parser    => 'WebGUI::Asset::Template::HTMLTemplate',
 		url => 'printable_article',
 		id => 'printableAsset00000000',
 		printableStyleTemplateId => $templates->{asset}->getId,
@@ -531,6 +537,7 @@ sub setup_assets {
 	$properties = {
 		title => 'Daddy Snippet',
 		className => 'WebGUI::Asset::Snippet',
+		parser    => 'WebGUI::Asset::Template::HTMLTemplate',
 		url => 'daddy_snippet',
 		id => 'printableSnippet0Daddy',
 		#     '1234567890123456789012'
@@ -540,6 +547,7 @@ sub setup_assets {
 	$properties = {
 		title => 'My Snippet',
 		className => 'WebGUI::Asset::Snippet',
+		parser    => 'WebGUI::Asset::Template::HTMLTemplate',
 		url => 'printable_snippet',
 		id => 'printableSnippet123456',
 		#     '1234567890123456789012'

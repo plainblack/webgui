@@ -145,6 +145,7 @@ sub renderBar {
     my ( $process, $template, $extras ) = @_;
     my $session = $process->session;
     my $url     = $session->url;
+    my $style   = $session->style;
     my $f       = $session->form->paramsHashRef;
     my $tt      = Template->new;
     my $dialog  = delete $f->{dialog};
@@ -211,13 +212,18 @@ sub renderBar {
         return $styled;
     }
     else {
-        my $console = WebGUI::AdminConsole->new( $session, $f->{icon} );
-        my $style   = $session->style;
-        $link->query_form($f);
-        $console->addSubmenuItem( $link->as_string, $label );
         $style->setLink($_, { rel => 'stylesheet' }) for @sheets;
         $style->setScript($_) for @scripts;
-        return $console->render( $content, $title );
+        if ( $session->var->isAdminOn ) {
+            my $console = WebGUI::AdminConsole->new( $session, $f->{icon} );
+            my $style   = $session->style;
+            $link->query_form($f);
+            $console->addSubmenuItem( $link->as_string, $label );
+            return $console->render( $content, $title );
+        }
+        else {
+            return $session->style->userStyle( $content );
+        }
     }
 } ## end sub renderBar
 

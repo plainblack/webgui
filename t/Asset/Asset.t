@@ -141,7 +141,7 @@ $canViewMaker->prepare(
     },
 );
 
-plan tests => 109
+plan tests => 114
             + 2*scalar(@getTitleTests) #same tests used for getTitle and getMenuTitle
             ;
 
@@ -773,6 +773,59 @@ is $session->response->location, $trashedAsset->getUrl('func=manageTrash'), '...
 $session->response->location('');
 is $clippedAsset->checkView(), 'chunked', 'checkView: returns "chunked" when admin for cut asset';
 is $session->response->location, $clippedAsset->getUrl('func=manageClipboard'), '... cut asset sets redirect to manageClipboard';
+
+################################################################
+#
+# Packed head tags
+#
+################################################################
+
+use HTML::Packer;
+my $asset   = WebGUI::Asset->getImportNode( $session )->addChild({
+    className       => 'WebGUI::Asset::Snippet',
+});
+addToCleanup( $asset );
+my $unpacked = qq{<title>
+                                                                             
+                                                                             
+this is my title
+</title>
+};
+my $packed = $unpacked;
+HTML::Packer::minify( \$packed, {
+    remove_newlines     => 1,
+    do_javascript       => "shrink",
+    do_stylesheet       => "minify",
+} );
+$asset->update({ extraHeadTags => $unpacked });
+is $asset->get('extraHeadTagsPacked'), $packed, 'extraHeadTagsPacked';
+$asset->update({ extraHeadTags => '' });
+ok !$asset->get('extraHeadTagsPacked'), 'extraHeadTagsPacked cleared';
+
+################################################################
+#
+# getContentLastModifiedBy
+#
+################################################################
+
+{
+    my $revised_user1 = WebGUI::User->new($session, 'new');
+    my $revised_user2 = WebGUI::User->new($session, 'new');
+    WebGUI::Test->addToCleanup($revised_user1, $revised_user2 );
+    $session->user({user => $revised_user1});
+    my $versionTag = WebGUI::VersionTag->getWorking($session);
+    my $asset   = WebGUI::Asset->getImportNode( $session )->addChild({
+        className       => 'WebGUI::Asset::Snippet',
+    }, undef, 12);
+    $versionTag->commit;
+    $asset = $asset->cloneFromDb;
+    WebGUI::Test->addToCleanup($asset, $versionTag);
+    is $asset->getContentLastModifiedBy, $asset->get('revisedBy'), 'getContentLastModifiedBy returns revisedBy for most assets';
+    is $asset->getContentLastModifiedBy, $revised_user1->userId, '... real userId check';
+    $session->user({user => $revised_user2});
+    $asset = $asset->addRevision({ title => 'titular', }, 14);
+    is $asset->getContentLastModifiedBy, $revised_user2->userId, '... check that a new revision tracks';
+}
 
 ##Return an array of hashrefs.  Each hashref describes a test
 

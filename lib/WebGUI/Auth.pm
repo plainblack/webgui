@@ -900,7 +900,7 @@ sub www_createAccountSave {
 	my $username = $_[0];
 	my $properties = $_[1];
 	my $password = $_[2];
-	my $profile = $_[3];
+	my $profile = $_[3] || {};
 	
 	my $i18n = WebGUI::International->new($self->session);
 	
@@ -910,6 +910,13 @@ sub www_createAccountSave {
 	my $userId = $u->userId;
 	$u->username($username);
 	$u->authMethod($self->authMethod);
+        $self->session->log->info( " override: " . $self->session->scratch->getLanguageOverride );
+        use Data::Dumper;
+        $self->session->log->info( Dumper $profile );
+
+	if (!$profile->{'language'} && $self->session->scratch->getLanguageOverride) {
+	    $profile->{'language'} = $self->session->scratch->getLanguageOverride;
+	}
 	$u->karma($self->session->setting->get("karmaPerLogin"),"Login","Just for logging in.") if ($self->session->setting->get("useKarma"));
 	$u->updateProfileFields($profile) if ($profile);
     $self->update($properties);

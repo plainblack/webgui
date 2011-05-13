@@ -231,8 +231,9 @@ plan tests => $tests;
         'addVATNumber returns the correct message when VIES is unavailable',
     );
 
-    my $workflows = WebGUI::Workflow::Instance->getAllInstances( $session );
-    my ($workflow) = grep { $_->get('parameters')->{ vatNumber } eq $noServiceVAT } @{ $workflows };
+    my ($workflow) = grep { $_->get('parameters')->{ vatNumber } eq $noServiceVAT }
+                    grep { ref $_->get('parameters') eq 'HASH' }
+                    @{ WebGUI::Workflow::Instance->getAllInstances( $session ) };
     ok( defined $workflow , 'addVATNumber fires a recheck workflow when VIES is down' );
 
     #----- valid number

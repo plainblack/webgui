@@ -188,7 +188,7 @@ sub www_editFriends {
     my @manageableUsers = ();
     if ($groupName) { # Only adding users from a single group
         my $group = WebGUI::Group->find($session, $groupName);
-        push @manageableUsers, @{ $group->getUsersNotIn($user->{_user}->{'friendsGroup'}, 'withoutExpired') };
+        push @manageableUsers, @{ $group->getUsersNotIn($user->friends->getId, 'withoutExpired') };
     }
     else { # Defaults to groups selected in settings
         my $groupIds = $session->setting->get('groupsToManageFriends');
@@ -196,7 +196,7 @@ sub www_editFriends {
         foreach my $groupId (@groupIds) {
             my $group = WebGUI::Group->new($session, $groupId);
             next GROUP unless $group->getId || $group->getId eq 'new';
-            push @manageableUsers, @{ $group->getUsersNotIn($user->{_user}->{'friendsGroup'}, 'withoutExpired') };
+            push @manageableUsers, @{ $group->getUsersNotIn($user->friends->getId, 'withoutExpired') };
         }
         @manageableUsers = uniq @manageableUsers;
     }

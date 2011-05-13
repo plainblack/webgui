@@ -72,6 +72,11 @@ property shippingName => (
     noFormPost => 1,
     default => '',
 );
+property shippingOrganization => (
+    is => 'rw',
+    noFormPost => 1,
+    default => '',
+);
 property shippingAddress1 => (
     is => 'rw',
     noFormPost => 1,
@@ -356,15 +361,20 @@ sub getSku {
 
 =head2 issueCredit ( )
 
-Returns the money from this item to the user in the form of in-store credit.
+Returns the money from this item to the user in the form of in-store credit.  Items marked
+cancelled cannot be refunded.
 
 =cut
 
 sub issueCredit {
     my $self = shift;
+    return if $self->orderStatus eq 'Cancelled';
+    return unless $self->transaction->isSuccessful;
     my $credit = WebGUI::Shop::Credit->new($self->transaction->session, $self->transaction->userId);
     $credit->adjust(($self->price * $self->quantity), "Issued credit on sku ".$self->assetId." for transaction item ".$self->getId." on transaction ".$self->transaction->getId);
-    $self->getSku->onRefund($self);
+    if (my $sku = eval {$self->getSku}) {
+        $sku->onRefund($self);
+    }
     $self->update({orderStatus=>'Cancelled'});
 }
 

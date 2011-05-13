@@ -826,6 +826,11 @@ sub www_emailGroup {
 		-label=>$i18n->get(229),
 		-hoverHelp=>$i18n->get('229 description'),
 		);
+	$f->yesNo(
+		-name=>'override',
+		-label=>$i18n->get('override user email preference'),
+		-hoverHelp=>$i18n->get('override user email preference description'),
+		);
 	$f->HTMLArea(
 		-name=>"message",
 		-label=>$i18n->get(230),
@@ -851,11 +856,21 @@ A WebGUI::Session object
 
 sub www_emailGroupSend {
 	my $session = shift;
-	return $session->privilege->adminOnly() unless (canEditGroup($session,$session->form->process("gid")) && $session->form->validToken);
-	my $mail = WebGUI::Mail::Send->create($session, {toGroup=>$session->form->process("gid"),subject=>$session->form->process("subject"),from=>$session->form->process("from")});
-	$mail->addHtml($session->form->process("message","HTMLArea"));
-	$mail->addFooter;
-	$mail->queue;
+	my $f = $session->form;
+	return $session->privilege->adminOnly()
+		unless (canEditGroup($session,$f->get('gid')) && $f->validToken);
+
+	WebGUI::Inbox::Message->create(
+		$session, {
+			groupId                 => $f->get('gid'),
+			subject                 => $f->get('subject'),
+			status                  => 'unread',
+			message                 => $f->process('message', 'HTMLArea'),
+			sentBy                  => $session->user->userId,
+			overridePerUserDelivery => $f->get('override'),
+			extraHeaders            => { from => $f->get('from') }
+		}
+	);
 	my $i18n = WebGUI::International->new($session);
 	return _submenu($session,$i18n->get(812));
 }

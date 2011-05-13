@@ -58,9 +58,9 @@ our $I18N = {
     },
 
     'story_loop' => {
-        message => q|A loop containing the most recent stories for this topic.|,
+        message => q|A loop containing the most recent stories for this topic.  In addition to the listed variables, all the view template variables from Story are available.|,
         context => q|Template variable.|,
-        lastUpdated => 0,
+        lastUpdated => 1294679882,
     },
 
     'url' => {
@@ -91,6 +91,12 @@ our $I18N = {
         message => q|An icon to edit this story.  If the user is not allowed to edit the story, or their UI level is set too low, this variable will be empty.|,
         context => q|Template variable.|,
         lastUpdated => 1248191575,
+    },
+
+    'topStory' => {
+        message => 'Variable containing the same kind of values as story_loop, but for the topStory.  Accessible via topStory.hasPhotos, etc.',
+        context => 'Template variable.',
+        lastUpdated => 1294761543,
     },
 
     'topStoryUrl' => {

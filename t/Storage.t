@@ -29,7 +29,7 @@ my $cwd = Cwd::cwd();
 
 my ($extensionTests, $fileIconTests, $block_extension_tests) = setupDataDrivenTests($session);
 
-plan tests => 139
+plan tests => 155
             + scalar @{ $extensionTests }
             + scalar @{ $fileIconTests  }
             + scalar @{ $block_extension_tests }
@@ -54,7 +54,7 @@ my $storage1 = WebGUI::Storage->get($session);
 is( $storage1, undef, "get requires id to be passed");
 
 $storage1 = WebGUI::Storage->get($session, 'foobar');
-addToCleanup($storage1);
+WebGUI::Test->addToCleanup($storage1);
 
 isa_ok( $storage1, "WebGUI::Storage", "storage will accept non GUID arguments");
 is ( $storage1->getId, 'foobar', 'getId returns the requested GUID');
@@ -81,7 +81,7 @@ $guidDir->mkpath();
 ok(-e $guidDir->stringify, 'created GUID storage location for backwards compatibility testing');
 
 my $guidStorage = WebGUI::Storage->get($session, $newGuid);
-addToCleanup($guidStorage);
+WebGUI::Test->addToCleanup($guidStorage);
 isa_ok($guidStorage, 'WebGUI::Storage');
 is($guidStorage->getId, $newGuid, 'GUID storage has correct id');
 is($guidStorage->getDirectoryId, $newGuid, '... getDirectoryId');
@@ -115,7 +115,7 @@ undef $storage1;
 
 $storage1 = WebGUI::Storage->get($session, 'notAGUID');
 my $storage2 = WebGUI::Storage->get($session, 'notAGoodId');
-addToCleanup($storage2);
+WebGUI::Test->addToCleanup($storage2);
 
 ok(! $storage2->getErrorCount, 'No errors due to a shared common root');
 
@@ -147,7 +147,7 @@ CHECKDIR: while ($dirOpt = pop @dirOptions) {
 	last CHECKDIR if !-e $dir3;
 }
 my $storage3 = WebGUI::Storage->get($session, $dirOpt);
-addToCleanup($storage3);
+WebGUI::Test->addToCleanup($storage3);
 
 is( $storage3->getErrorCount, 1, 'Error during creation of object due to short GUID');
 
@@ -157,6 +157,17 @@ SKIP: {
 }
 
 undef $storage3;
+
+####################################################
+#
+# storageExists
+#
+####################################################
+
+my $existingStorage = WebGUI::Storage->create($session);
+WebGUI::Test->addToCleanup($existingStorage);
+ok(WebGUI::Storage->storageExists($session, $existingStorage->getId), "storageExists returns true when the storage exists");
+ok(!WebGUI::Storage->storageExists($session, 'Never_WebGUI_GUID'), "... and false when it doesn't");
 
 ####################################################
 #
@@ -223,7 +234,7 @@ foreach my $extTest (@{ $extensionTests }) {
 ####################################################
 
 my $fileStore = WebGUI::Storage->create($session);
-addToCleanup($fileStore);
+WebGUI::Test->addToCleanup($fileStore);
 cmp_bag($fileStore->getFiles(1), ['.'], 'Starting with an empty storage object, no files in here except for . ');
 $fileStore->addFileFromScalar('.dotfile', 'dot file');
 cmp_bag($fileStore->getFiles(),  [                     ], 'getFiles() by default does not return dot files');
@@ -303,22 +314,22 @@ ok(
 ####################################################
 
 my $copiedStorage = $storage1->copy();
-addToCleanup($copiedStorage);
+WebGUI::Test->addToCleanup($copiedStorage);
 cmp_bag($copiedStorage->getFiles(), $storage1->getFiles(), 'copy: both storage objects have the same files');
 
 my $secondCopy = WebGUI::Storage->create($session);
-addToCleanup($secondCopy);
+WebGUI::Test->addToCleanup($secondCopy);
 $storage1->copy($secondCopy);
 cmp_bag($secondCopy->getFiles(), $storage1->getFiles(), 'copy: passing explicit variable');
 
 my $s3copy = WebGUI::Storage->create($session);
-addToCleanup($s3copy);
+WebGUI::Test->addToCleanup($s3copy);
 my @filesToCopy = qw/littleTextFile testfile-hash-renamed.file/;
 $storage1->copy($s3copy, [@filesToCopy]);
 cmp_bag($s3copy->getFiles(), [ @filesToCopy ], 'copy: passing explicit variable and files to copy');
 {
     my $deepStorage = WebGUI::Storage->create($session);
-    addToCleanup($deepStorage);
+    WebGUI::Test->addToCleanup($deepStorage);
     my $deepDir     = $deepStorage->getPathClassDir();
     my $deepDeepDir = $deepDir->subdir('deep');
     my $errorStr;
@@ -330,7 +341,7 @@ cmp_bag($s3copy->getFiles(), [ @filesToCopy ], 'copy: passing explicit variable 
         '... storage setup for deep clear test'
     );
     my $deepCopy = $deepStorage->copy();
-    addToCleanup($deepCopy);
+    WebGUI::Test->addToCleanup($deepCopy);
     cmp_bag(
         $deepCopy->getFiles('all'),
         [ '.', 'deep', 'deep/file' ],
@@ -353,7 +364,7 @@ cmp_bag($storage1->getFiles, [$filename], 'deleteFile: storage1 has only 1 file'
 
 ##Test for out of object file deletion
 my $hackedStore = WebGUI::Storage->create($session);
-addToCleanup($hackedStore);
+WebGUI::Test->addToCleanup($hackedStore);
 $hackedStore->addFileFromScalar('fileToHack', 'Can this file be deleted from another object?');
 ok(-e $hackedStore->getPath('fileToHack'), 'set up a file for deleteFile to try and delete illegally');
 my $hackedPath = '../../../'.$hackedStore->getPathFrag().'/fileToHack';
@@ -367,7 +378,7 @@ ok(-e $hackedStore->getPath('fileToHack'), 'deleteFile did not delete the file i
 ####################################################
 
 my $tempStor = WebGUI::Storage->createTemp($session);
-addToCleanup($tempStor);
+WebGUI::Test->addToCleanup($tempStor);
 
 isa_ok( $tempStor, "WebGUI::Storage", "createTemp creates WebGUI::Storage object");
 is (substr($tempStor->getPathFrag, 0, 5), 'temp/', '... puts stuff in the temp directory');
@@ -393,7 +404,7 @@ foreach my $extTest (@{ $block_extension_tests }) {
 ####################################################
 
 my $tarStorage = $copiedStorage->tar('tar.tar');
-addToCleanup($tarStorage);
+WebGUI::Test->addToCleanup($tarStorage);
 isa_ok( $tarStorage, "WebGUI::Storage", "tar: returns a WebGUI::Storage object");
 is (substr($tarStorage->getPathFrag, 0, 5), 'temp/', 'tar: puts stuff in the temp directory');
 cmp_bag($tarStorage->getFiles(), [ 'tar.tar' ], 'tar: storage contains only the tar file');
@@ -406,7 +417,7 @@ isnt($tarStorage->getPath, $copiedStorage->getPath, 'tar did not reuse the same 
 ####################################################
 
 my $untarStorage = $tarStorage->untar('tar.tar');
-addToCleanup($untarStorage);
+WebGUI::Test->addToCleanup($untarStorage);
 isa_ok( $untarStorage, "WebGUI::Storage", "untar: returns a WebGUI::Storage object");
 is (substr($untarStorage->getPathFrag, 0, 5), 'temp/', 'untar: puts stuff in the temp directory');
 cmp_bag($untarStorage->getFiles, $copiedStorage->getFiles, 'tar and untar loop preserve all files');
@@ -415,8 +426,6 @@ isnt($untarStorage->getPath, $tarStorage->getPath, 'untar did not reuse the same
 $tarStorage->addFileFromFilesystem(WebGUI::Test->getTestCollateralPath('extensions.tar'));
 my $extensionStorage = $tarStorage->untar('extensions.tar');
 WebGUI::Test->addToCleanup($extensionStorage);
-use Data::Dumper;
-note Dumper $extensionStorage->getFiles;
 cmp_bag(
     $extensionStorage->getFiles, 
     [ qw{ extension_pm.txt extension_perl.txt extension_html.txt extensions extensions/extension_html.txt }], 
@@ -457,7 +466,7 @@ cmp_bag(
 
 {
     my $deepStorage = WebGUI::Storage->create($session);
-    addToCleanup($deepStorage);
+    WebGUI::Test->addToCleanup($deepStorage);
     my $deepDir     = $deepStorage->getPathClassDir();
     my $deepDeepDir = $deepDir->subdir('deep');
     my $errorStr;
@@ -488,7 +497,7 @@ is($fileStore->addFileFromFormPost(), '', 'addFileFromFormPost returns empty str
 $session->response->status(200);
 $session->request->upload('files', []);
 my $formStore = WebGUI::Storage->create($session);
-addToCleanup($formStore);
+WebGUI::Test->addToCleanup($formStore);
 is($formStore->addFileFromFormPost('files'), undef, 'addFileFromFormPost returns empty string when asking for a form variable with no files attached');
 
 use HTTP::Request;
@@ -522,6 +531,64 @@ foreach my $iconTest (@{ $fileIconTests }) {
 	is( $storage1->getFileIconUrl($iconTest->{filename}), $iconTest->{iconUrl}, $iconTest->{comment} );
 }
 
+#----------------------------------------------------------------------------
+# writeAccess
+my $shallowStorage = WebGUI::Storage->create($session);
+WebGUI::Test->addToCleanup($shallowStorage);
+$shallowStorage->writeAccess( users => ["3"], groups => ["2"], assets => ["1"] );
+my $shallowDir = $shallowStorage->getPathClassDir();
+ok(-e $shallowDir->file('.wgaccess')->stringify, 'writeAccess: .wgaccess file created in shallow storage');
+my $privs;
+$privs = $shallowStorage->getFileContentsAsScalar('.wgaccess');
+is ($privs, '{"assets":["1"],"groups":["2"],"users":["3"]}', '... correct group contents');
+$shallowStorage->deleteFile('.wgaccess');
+
+my $deepStorage = WebGUI::Storage->create($session);
+WebGUI::Test->addToCleanup($deepStorage);
+my $deepDir     = $deepStorage->getPathClassDir();
+my $deepDeepDir = $deepDir->subdir('deep');
+my $errorStr;
+$deepDeepDir->mkpath({ error => \$errorStr } );
+ok(-e $deepDeepDir->stringify, 'created storage directory with a subdirectory for testing');
+
+$deepStorage->writeAccess( users => ["3"], groups => ["2"], assets => ["1"] );
+ok(-e $deepDir->file('.wgaccess')->stringify,     '.wgaccess file created in deep storage');
+ok(-e $deepDeepDir->file('.wgaccess')->stringify, '.wgaccess file created in deep storage subdir');
+
+$privs = $deepStorage->getFileContentsAsScalar('.wgaccess');
+is ($privs, '{"assets":["1"],"groups":["2"],"users":["3"]}', '... correct group contents, deep storage');
+$privs = $deepStorage->getFileContentsAsScalar('deep/.wgaccess');
+is ($privs, '{"assets":["1"],"groups":["2"],"users":["3"]}', '... correct group contents, deep storage subdir');
+
+#----------------------------------------------------------------------------
+# trash
+my $shallowStorage = WebGUI::Storage->create($session);
+WebGUI::Test->addToCleanup($shallowStorage);
+$shallowStorage->trash;
+my $shallowDir = $shallowStorage->getPathClassDir();
+ok(-e $shallowDir->file('.wgaccess')->stringify, 'trash: .wgaccess file created in shallow storage');
+my $privs;
+$privs = $shallowStorage->getFileContentsAsScalar('.wgaccess');
+is ($privs, '{"state":"trash"}', '... correct state');
+$shallowStorage->deleteFile('.wgaccess');
+
+my $deepStorage = WebGUI::Storage->create($session);
+WebGUI::Test->addToCleanup($deepStorage);
+my $deepDir     = $deepStorage->getPathClassDir();
+my $deepDeepDir = $deepDir->subdir('deep');
+my $errorStr;
+$deepDeepDir->mkpath({ error => \$errorStr } );
+ok(-e $deepDeepDir->stringify, 'created storage directory with a subdirectory for testing');
+
+$deepStorage->trash;
+ok(-e $deepDir->file('.wgaccess')->stringify,     '.wgaccess file created in deep storage');
+ok(-e $deepDeepDir->file('.wgaccess')->stringify, '.wgaccess file created in deep storage subdir');
+
+$privs = $deepStorage->getFileContentsAsScalar('.wgaccess');
+is ($privs, '{"state":"trash"}', '... correct state contents, deep storage');
+$privs = $deepStorage->getFileContentsAsScalar('deep/.wgaccess');
+is ($privs, '{"state":"trash"}', '... correct state contents, deep storage subdir');
+
 ####################################################
 #
 # setPrivileges
@@ -529,7 +596,7 @@ foreach my $iconTest (@{ $fileIconTests }) {
 ####################################################
 
 my $shallowStorage = WebGUI::Storage->create($session);
-addToCleanup($shallowStorage);
+WebGUI::Test->addToCleanup($shallowStorage);
 $shallowStorage->setPrivileges(3,3,3);
 my $shallowDir = $shallowStorage->getPathClassDir();
 ok(-e $shallowDir->file('.wgaccess')->stringify, 'setPrivilege: .wgaccess file created in shallow storage');
@@ -539,7 +606,7 @@ is ($privs, '{"assets":[],"groups":["3","3"],"users":["3"]}', '... correct group
 $shallowStorage->deleteFile('.wgaccess');
 
 my $deepStorage = WebGUI::Storage->create($session);
-addToCleanup($deepStorage);
+WebGUI::Test->addToCleanup($deepStorage);
 my $deepDir     = $deepStorage->getPathClassDir();
 my $deepDeepDir = $deepDir->subdir('deep');
 my $errorStr;
@@ -557,7 +624,7 @@ is ($privs, '{"assets":[],"groups":["3","3"],"users":["3"]}', '... correct group
 
 {
     my $storage = WebGUI::Storage->create($session);
-    addToCleanup($storage);
+    WebGUI::Test->addToCleanup($storage);
     my $asset = WebGUI::Asset->getRoot($session);
     $storage->setPrivileges( $asset );
     my $accessFile = $storage->getPathClassDir->file('.wgaccess');
@@ -574,7 +641,7 @@ is ($privs, '{"assets":[],"groups":["3","3"],"users":["3"]}', '... correct group
 
 # Create new storage for test of 'rotate' method
 my $rotateTestStorage = WebGUI::Storage->create($session);
-addToCleanup($rotateTestStorage);
+WebGUI::Test->addToCleanup($rotateTestStorage);
 
 # Add test image from file system
 my $file = "rotation_test.png";
@@ -621,7 +688,7 @@ $session->config->set('cdn', $cdnCfg);
 my $cdnUrl = $cdnCfg->{'url'};
 my $cdnUlen = length $cdnUrl;
 my $cdnStorage = WebGUI::Storage->create($session);
-addToCleanup($cdnStorage);
+WebGUI::Test->addToCleanup($cdnStorage);
 # Functional URL before sync done
 my $hexId = $session->id->toHex($cdnStorage->getId);
 my $initUrl = join '/', $uploadUrl, $cdnStorage->getPathFrag;
@@ -685,7 +752,7 @@ $env->{'psgi.url_scheme'} = 'http';
 is ($cdnStorage->getUrl, $locUrl, 'CDN: getUrl: cleartext request to not use sslUrl');
 # Copy
 my $cdnCopy = $cdnStorage->copy;
-addToCleanup($cdnCopy);
+WebGUI::Test->addToCleanup($cdnCopy);
 my $qcp = $cdnCfg->{'queuePath'} . '/' . $session->id->toHex($cdnCopy->getId);
 ok (-e $qcp, 'CDN: queue file created when storage location copied');
 my $dotcp = $cdnCopy->getPath . '/.cdn';
@@ -722,7 +789,7 @@ $session->config->delete('cdn');
 ####################################################
 
 my $zombieStorage = WebGUI::Storage->create($session);
-addToCleanup($zombieStorage);
+WebGUI::Test->addToCleanup($zombieStorage);
 my $zombieDir = $zombieStorage->getPathClassDir;
 $zombieDir->remove;
 

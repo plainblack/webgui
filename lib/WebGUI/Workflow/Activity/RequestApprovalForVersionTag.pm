@@ -295,7 +295,7 @@ sub sendMessage {
         comments => $versionTag->get('comments'),
         url      => $approvalUrl,
     };
-    my $template     = WebGUI::Asset->newByDynamicClass($self->session, $self->get('templateId'));
+    my $template     = WebGUI::Asset->newById($self->session, $self->get('templateId'));
     my $messageText  = $template->process($var);
     for my $groupId ( @{ $self->getGroupToApprove } ) {
         my $message 

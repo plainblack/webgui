@@ -93,6 +93,7 @@ sub addTemplate {
 	my $properties = {
 		title => 'H_homeLink test template',
 		className => 'WebGUI::Asset::Template',
+		parser    => 'WebGUI::Asset::Template::HTMLTemplate',
 		url => 'h_homelink-test',
 		namespace => 'Macro/H_homeLink',
 		template => "HREF=<tmpl_var homeLink.url>\nLABEL=<tmpl_var homeLink.text>",
@@ -100,7 +101,6 @@ sub addTemplate {
         usePacked => 1,
 	};
 	my $template = $importNode->addChild($properties, $properties->{id});
-    WebGUI::Test->addToCleanup($template);
 	return ($template);
 }
 

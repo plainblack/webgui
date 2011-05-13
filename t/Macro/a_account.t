@@ -86,6 +86,7 @@ sub addTemplate {
 	my $properties = {
 		title => 'a_account test template',
 		className => 'WebGUI::Asset::Template',
+		parser    => 'WebGUI::Asset::Template::HTMLTemplate',
 		url => 'a_account-test',
 		namespace => 'Macro/a_account',
 		template => "HREF=<tmpl_var account_url>\nLABEL=<tmpl_var account_text>",

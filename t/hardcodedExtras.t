@@ -42,6 +42,16 @@ TEMPLATE: while (my $templateAsset = $getATemplate->()) {
             type       => 'Template',
         }
     }
+    foreach my $attachment (@{ $templateAsset->getAttachments }) {
+        if ($attachment->{url} =~ m!$hardcodedExtras! ) {
+            push @hardcodedExtras, {
+                url        => $templateAsset->getUrl,
+                id         => $templateAsset->getId,
+                title      => $templateAsset->getTitle,
+                type       => 'Template',
+            }
+        }
+    }
 }
 
 my $getASnippet = WebGUI::Asset::Snippet->getIsa($session);

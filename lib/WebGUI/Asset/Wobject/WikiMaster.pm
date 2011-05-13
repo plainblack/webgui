@@ -869,6 +869,8 @@ Return search results that match the keyword from the form variable C<keyword>.
 
 sub www_byKeyword {
     my $self    = shift;
+	my $check   = $self->checkView;
+	return $self->session->privilege->noAccess() unless $self->canView;
     my $session = $self->session;
     my $keyword = $session->form->process("keyword");
 
@@ -980,6 +982,8 @@ Render a search form and process the contents, returning the results.
 
 sub www_search {
 	my $self = shift;
+	my $check = $self->checkView;
+	return $self->session->privilege->noAccess() unless $self->canView;
 	my $i18n = WebGUI::International->new($self->session, "Asset_WikiMaster");
 	my $queryString = $self->session->form->process('query', 'text');
 	my $var = {

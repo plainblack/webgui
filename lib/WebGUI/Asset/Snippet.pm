@@ -91,13 +91,6 @@ property cacheTimeout => (
 	label           => ["cache timeout",'Asset_Snippet'],
 	hoverHelp       => ["cache timeout help",'Asset_Snippet'],
 );
-property processAsTemplate => (
-   	fieldType       => 'yesNo',
-	label           => ['process as template','Asset_Snippet'],
-	hoverHelp       => ['process as template description','Asset_Snippet'],
-	tab             => "properties",
-    default         => 0,
-);
 property mimeType => (
 	tab             => "properties",
 	hoverHelp       => ['mimeType description','Asset_Snippet'],
@@ -105,6 +98,15 @@ property mimeType => (
    	fieldType       => 'mimeType',
     default         => 'text/html',
 );
+property templateParser => (
+        fieldType    => 'templateParser',
+        allowNone    => 1,
+        label        => ['parser','Asset_Template'],
+        hoverHelp    => ['parser description','Asset_Template'],
+        tab          => 'properties',
+        defaultValue => '',
+    );
+
 has '+uiLevel' => (
     default         => 5,
 );
@@ -247,13 +249,15 @@ sub view {
         my $out = $session->cache->get( $cacheKey );
 		return $out if $out;
 	}
-	my $output = $self->usePacked
-               ? $self->snippetPacked
-               : $self->snippet
-               ;
+	my $output = $self->get('usePacked')
+                ? $self->get("snippetPacked")
+                : $self->get('snippet')
+                ;
 	$output = $self->getToolbar.$output if ($session->isAdminOn && !$calledAsWebMethod);
-	if ($self->processAsTemplate) {
-		$output = WebGUI::Asset::Template->processRaw($session, $output, $self->get);
+	if (my $parser = $self->templateParser) {
+		$output = WebGUI::Asset::Template->processRaw(
+			$session, $output, $self->get, $parser
+		);
 	}
 	WebGUI::Macro::process($session,\$output);
     unless ($noCache) {

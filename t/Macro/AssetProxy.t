@@ -12,24 +12,22 @@ use strict;
 
 use WebGUI::Test;
 use WebGUI::Session;
-use HTML::TokeParser;
+use WebGUI::Asset;
 
 use Test::More; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
-my $numTests = 0;
+plan tests => 2;
 
-$numTests += 1; #For the use_ok
+use WebGUI::Macro::AssetProxy;
 
-plan tests => $numTests;
+$session->asset(WebGUI::Asset->getDefault($session));
 
-my $macro = 'WebGUI::Macro::AssetProxy';
-my $loaded = use_ok($macro);
+my $output;
+$output = WebGUI::Macro::AssetProxy::process($session);
+is $output,  undef, 'calling AssetProxy with no identifier returns no error message in normal mode';
 
-SKIP: {
-
-skip "Unable to load $macro", $numTests-1 unless $loaded;
-
-}
-
+$session->user({userId => 3});
+$output = WebGUI::Macro::AssetProxy::process($session);
+like $output, qr/Invalid Asset URL/, '..., adminOn, return error message';

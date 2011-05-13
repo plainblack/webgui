@@ -23,7 +23,7 @@ use JSON;
 
 use Test::More; # increment this value for each test you create
 use Test::Deep;
-plan tests => 13;
+plan tests => 18;
 
 #TODO: This script tests certain aspects of WebGUI::Storage and it should not
 
@@ -125,6 +125,39 @@ cmp_deeply(
 my $newRev  = $asset->addRevision( { groupIdView => '7' }, time + 8 );
 addToCleanup( $newRev );
 is( $newRev->getStorageLocation->getFileContentsAsScalar('.wgaccess'), undef, "wgaccess doesn't exist" );
+
+#----------------------------------------------------------------------------
+# commit on new revision trashes old revision
+$newRev->commit;
+my $storage = $asset->getStorageLocation;
+my $dir = $storage->getPathClassDir();
+ok(-e $dir->file('.wgaccess')->stringify, 'commit: .wgaccess file created');
+my $privs;
+$privs = $storage->getFileContentsAsScalar('.wgaccess');
+is ($privs, '{"state":"trash"}', '... correct state');
+
+#----------------------------------------------------------------------------
+# trash should update storage location
+$asset  = $defaultAsset->addChild( $properties );
+$asset->getStorageLocation->addFileFromScalar($filename, $filename);
+$asset->update({
+    filename => $filename,
+});
+
+addToCleanup( $asset );
+$asset->trash;
+my $storage = $asset->getStorageLocation;
+my $dir = $storage->getPathClassDir();
+ok(-e $dir->file('.wgaccess')->stringify, 'trash: .wgaccess file created') 
+    or note( $dir->file('.wgaccess')->stringify );
+my $privs;
+$privs = $storage->getFileContentsAsScalar('.wgaccess');
+is ($privs, '{"state":"trash"}', '... correct state');
+
+#----------------------------------------------------------------------------
+# restore should de-trash storage location
+$asset->restore;
+unlike( $storage->getFileContentsAsScalar('.wgaccess'), qr{"state"\:"trash"}, "wgaccess not trashed" );
 
 ############################################
 #

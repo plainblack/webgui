@@ -133,6 +133,24 @@ sub setPrivileges {
     );
 }
 
+#----------------------------------------------------------------------------
+
+=head2 commit ( )
+
+Override commit to remove all privileges for previous revisions' storage 
+locations
+
+=cut
+
+sub commit {
+    my ( $self, @args ) = @_;
+
+    for my $rev ( grep { $_->get("revisionDate") < $self->get("revisionDate") } @{$self->getRevisions} ) {
+        $rev->getStorageLocation->trash;
+    }
+
+    return $self->SUPER::commit( @args );
+}
 
 #-------------------------------------------------------------------
 
@@ -401,7 +419,6 @@ override processEditForm => sub {
     return undef;
 };
 
-
 #-------------------------------------------------------------------
 
 =head2 purge 
@@ -447,6 +464,20 @@ override purgeRevision => sub {
 	$self->getStorageLocation->delete;
 	return super();
 };
+
+#----------------------------------------------------------------------------
+
+=head2 restore ( )
+
+Override trash restore to restore storage location
+
+=cut
+
+sub restore {
+    my ( $self, @args ) = @_;
+    $self->setPrivileges;
+    return $self->SUPER::restore( @args );
+}
 
 #----------------------------------------------------------------------------
 
@@ -531,6 +562,23 @@ sub setStorageLocation {
     else {
         $self->{_storageLocation} = $self->getStorageClass->get($self->session,$self->storageId);
     }
+}
+
+#----------------------------------------------------------------------------
+
+=head2 trash ( )
+
+Override to put the attached file in the trash too
+
+=cut
+
+sub trash {
+    my ( $self, @args ) = @_;
+    my $return = $self->SUPER::trash( @args );
+
+    $self->getStorageLocation->trash;
+
+    return $return;
 }
 
 #----------------------------------------------------------------------------

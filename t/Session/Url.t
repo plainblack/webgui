@@ -123,8 +123,9 @@ $session->setting->set(preventProxyCache => $preventProxyCache );
 my $setting_hostToUse = $session->setting->get('hostToUse');
 $session->setting->set('hostToUse', 'HTTP_HOST');
 my $sitename = $session->config->get('sitename')->[0];
-is( $session->url->getSiteURL, 'http://'.$sitename, 'getSiteURL from config as http_host');
 WebGUI::Test->originalConfig('webServerPort');
+$session->config->delete('webServerPort');
+is( $session->url->getSiteURL, 'http://'.$sitename, 'getSiteURL from config as http_host');
 
 $session->url->setSiteURL('http://webgui.org');
 is( $session->url->getSiteURL, 'http://webgui.org', 'override config setting with setSiteURL');

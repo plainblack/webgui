@@ -389,7 +389,7 @@ sub makeAbsolute {
 
 =head2 makeCompliant ( string )
 
-Returns a string that has made into a WebGUI compliant URL based upon the language being submitted.
+Returns a string that has been made into a WebGUI compliant URL.
 
 =head3 string
 

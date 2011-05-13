@@ -1,4 +1,163 @@
+7.10.15
+ - fixed #12117: Thingy - www_searchViaAjax broken
+ - fixed #12116: JsonTable form control needs i18n
+ - fixed #12102: User profiling field extras information
+ - fixed #12106: CalendarUpdateFeeds activity does not handle time zones correctly
+ - fixed #11213: Gooey on the Go format problem
+ - mark makeUrlCompliant as deprecated.
+ - fixed #12059: WebGUI::Asset::Wobject::Map - Set Default Viewing Area button does not work.
+ - added: Setting MapPoint locations via address.
+ - added: Make Thing data searchable
+ - added: AssetProxy like macro for Thing data, ViewThingData
+
+7.10.14
+ - fixed #12094: Cannot enter in Macros in URLs inside TinyMCE.
+ - rfe   #12093: Remotely stored photos for Story assets
+ - fixed #12088: Organization left out of transaction
+ - fixed #12095: Shop admin screen has JS errors?
+ - fixed #12097: GroupManager pop-up not working
+ - fixed #12098: Missing template breaks WebGUI password recovery by email
+ - remove extra Underground style templates that were part of the 7.10.13 upgrade.
+ - fixed #12056: Adding a Thing always creates a table
+ - fixed #11955: Rich Text Editor for Forums doesn't work on the iPad
+ - fixed #11992: html source editor
+ - fixed #12100: Carousel and/or RichEdit
+ - fixed #12103: PayPalStd driver fails occasionally
+ - rfe   #12105: Make shortcuts related for export purposes
+ - rfe   #12108: Mail to Group preference field
+ - fixed #12107: Viewing an individual transaction item fails
+ - fixed #12104: Calendar iCal feed status and lastUPdated fields missing
+
+7.10.13
+ - added #12079: Carousel Auto Play
+ - fixed #12075: Underground Style - Search does not search
+ - fixed #12084: Greenportal links are sometimes white on white
+ - rfe   #618:   Syndicated Content Asset: Make images in the downloaded RSS-feeds available in the template.
+ - fixed #12086: Shop Billing Address Unpopulated
+ - Snippets can now select a template parser (instead of being restricted to the configured default)
+ - fixed #12081: addrees not in addressbook after user change in session
+ - fixed #12089: Cannot refund item in transaction if the sku no longer exists.
+ - rfe   #12085: Export Related Story Topics
+ - fixed #12076: Paginator shows no results with cached page index
+ - fixed #12087: Extend WebGUI tests to check template attachments
+ - fixed #12091: Survey Statistical Overview display
+
+7.10.12
+ - fixed #12072: Product, related and accessory assets
+ - added: Add Asset Dashlets to Dashboard
+ - added: Required and Static properties to assets in a dashboard.
+ - added: Caching to StockData and WeatherData asset.
+ - added: LastModifiedBy macro
+ - added: Group Manager form control
+ - fixed #12050: Thing query caching #1
+ - added: Let CHI cache request $dbh via an "args" : [ "dbh" ] cache conf
+ - added: lineage increment_step and increment_offset for multi-master DB clusters
+ - Change Group INSERT to REPLACE to prevent merge problems in multi-master DB clusters
+ - added #12078: Add alt tag to default Image template
+ - fixed #12077: Carousel update not possible
+ - Try to reconnect to MySQL if sbin/rebuildLineage.pl takes too long
+
+7.10.11
+ - fixed #12057: WebGUI::Search, assetIds search clause
+ - fixed #12051: Prevent Proxy Caching Breaks Edit/Add Thing
+ - fixed #12053: Thingy: View Thing Data
+ - fixed #12062: Thingy: column headers missing from exported file
+ - fixed #12063: Return URL from export doesn't work on non-default Thingy's
+ - fixed #12054: Thingy: Time fields and formatting
+ - fixed #12061: TimeField form plugin doesn't work with all names.
+ - fixed #12055: Thingy pagination breaks after editing data
+ - fixed #12066: Thingy CSV export overrides ExportHTML
+ - fixed #12068: www_editSave not strict enough in permission checks
+ - fixed #12060: Thingy: importAssetCollateralData and asset checking
+
+7.10.10
+ - fixed #12035: Story Manager - make keywords from Story view work
+ - fixed #12042: userDefined variables have no template variable help
+ - fixed #12045: Job listing template, missing summary
+ - fixed #12043: Collaboration Systems don't pull mail that fast!
+ - fixed #12044: Spectre::Cron and non-integer time units
+ - fixed #12046: Empty AssetProxy creates infinite loop (Dale Trexel)
+ - Metadata is now versioned
+ - Metadata fields can be restricted by asset class
+ - fixed #12049: gotcha: 7.10.9 needs perl > 5.8.8   
+ - fixed #12048: Asset Manager Search
+
+7.10.9
+ - fixed #12030: Calendar Feed Time Zone Issue
+ - fixed: Permission on who can create a shortcut of an Asset.
+ - fixed #12032: deleting forum posts
+ - fixed #12033: scratch variable problems during export
+ - fixed: Underground label style forces radio buttons and check boxes to render vertically.
+ - fixed #11704: JavaScript::Packer, HTML::Packer, and CSS::Packer use $& variable
+ - fixed #12038: Incorrect caching of groups with 0 second cache setting (Dale Trexel)
+
+7.10.8
+ - rfe #12016 for the top story as well
+ - fixed #12029: issue with keywords
+ - fixed #11965: Friend Manager only shows 15 people
+ - fixed #12023: International URLs of aattachments & files in folder
+ - fixed #12024: Copied Collaboration System re-sends subscription mail
+ - fixed #12027: Wiki Search and Keyword security, pages visible to visitors when wiki is restricted.
+ - fixed #12020: Event Recurrend end date field is always active
+ - fixed #11991: calendar view event formatting
+ - fixed #11990: calendar event view
+ - fixed #12028: i18n Account_Shop
+ - fixed #11989: calendar list view
+ - fixed #12024: Copied Collaboration System re-sends subscription mail
+
+7.10.7
+ - rfe #10521: Use monospaced font in template edit textarea
+ - rfe #12016: add more functionality to story_loop
+ - Added a Preview button the the Template asset's edit page
+ - fixed #12009: Export JS errors in IE7
+ - added #11968: use the language override in the registration form (Jukka Raimovaara / Mentalhouse Oy)
+ - Changed Carousel to use TinyMCE with WebGUI plugins
+ - fixed #11984: No JS allows invalid dates in Event asset
+ - fixed bug in shopping cart where in some cases the shipper selectbox would
+   be empty ( Martin Kamerbeek / Oqapi )
+ - fixed bug where an invalid address ids would prevent a customer from ever
+   checking out again ( Martin Kamerbeek / Oqapi )
+ - fixed #11997: maximumAssets in config is ignored (Arjan Widlak / United Knowledge)
+ - fixed #11998: maximumAssets affects not only new assets, but als prevents editing existing assets if maximum is reached
+ - fixed #12003: WebGUI::User->delete leaves around cache data
+ - fixed #12007: Hardcoded js in cart view ( Martin Kamerbeek / Oqapi )
+ - fixed #12010: Related URLs are not copied for events created through recurrence
+ - fixed #12012: WebGUI Account system does not present login to visitors for proper redirect
+ - fixed #12015: Thingy: Custom 'File' form fields get deleted upon save
+ - fixed #11994: recurring calendar entries
+ - fixed #11995: recurring calendar entries in trash
+ - fixed #11986: Finance::Quote can give invalid dates to StockData asset
+ - fixed #12001: Shelf product import mangles price
+ - fixed #11945: Slow SQL access for duplicate e-mail address lookups
+ - fixed #11960: Billing address mandatory fields not specified
+ - fixed #11975: Cannot paste threads: "Cannot call method isa()"
+ - fixed #11976: Use Container URL in search gives user Permission Denied
+ - fixed #11985: Search.pl should warn on bad assets
+ - fixed #12008: Activity CleanLoginHistory is too slow
+ - fixed #12004: SSO operation vulnerable to session fixation attacks
+ - fixed #11996: Mandatory field in Thingy saves empty
+ - fixed #11987: Map displays white text on white background
+ - fixed #11988: Dataform list view doesn't allow moving fields
+ - fixed #11989: Calendar list view isn't uniform and missing fields
+ - fixed: Calendar list view sections don't use timezones
+
+7.10.6
+ - fixed #11974: Toolbar icons unclickable in Webkit using HTML5
+ - fixed #11978: Pasting links into TinyMCE
+ - fixed #11980: DataForm broken
+ - fixed #11971: Still subscribed to forums you no longer have privilege to view
+
 7.10.5
+ - fixed #11950: Username set to 0 when edit user 
+ - fixed #11946: Double time zone correction when addding an event
+ - fixed #11952: Navigation template help error
+ - fixed #11951: Privacy setting of new profile field
+ - fixed #11947: PayPal does not register in-state sales taxes
+ - fixed #11956: ExtendCalenderRecurrence bug
+ - fixed #11965: FriendManager pagination and getUsersNotIn
+ - fixed #11964: files show in trash and in old revisions
+ - fixed #11954: Can't clear packed head tags
+ - fixed #11957: finBrokenAsset --fix does not fix per se
 
 7.10.4
  - Added WebGUI::Fork api

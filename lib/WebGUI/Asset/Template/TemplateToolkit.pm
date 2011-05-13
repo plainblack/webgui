@@ -17,6 +17,7 @@ package WebGUI::Asset::Template::TemplateToolkit;
 use strict;
 use base 'WebGUI::Asset::Template::Parser';
 use Template;
+use WebGUI::Template::Provider;
 
 #-------------------------------------------------------------------
 sub _rewriteVars { # replace dots with underscrores in keys (except in keys that aren't usable as variables (URLs etc.))
@@ -81,12 +82,30 @@ sub process {
     my $vars = $self->addSessionVars(shift);
     my ($t,$output);
     eval {
-        $t = Template->new({
-            INTERPOLATE  => 1,               # expand "$var" in plain text
-            POST_CHOMP   => 1,               # cleanup whitespace 
-            EVAL_PERL    => 0,               # evaluate Perl code blocks
-        });
-        $t->process( \$template, _rewriteVars($vars),\$output) || $self->session->log->error($t->error());
+        my $config = $self->session->config->get( 'template' ) || {};
+        $config->{INTERPOLATE}  //= 1; # expand "$var" in plain text
+        $config->{POST_CHOMP}   //= 1; # cleanup whitespace
+        $config->{EVAL_PERL}    //= 0; # evaluate Perl code blocks
+        # Add WebGUI::Template::Plugin to PLUGIN_BASE
+        if ( defined $config->{PLUGIN_BASE} && !ref $config->{PLUGIN_BASE} ) {
+            $config->{PLUGIN_BASE} = [ $config->{PLUGIN_BASE} ];
+        }
+        elsif ( !defined $config->{PLUGIN_BASE} ) {
+            $config->{PLUGIN_BASE} = [];
+        }
+        push @{$config->{PLUGIN_BASE}}, 'WebGUI::Template::Plugin';
+
+        # Allow WebGUI assets to be included in templates
+        $config->{LOAD_TEMPLATES} = [ WebGUI::Template::Provider->new( $self->session, $config ) ];
+
+        $t = Template->new( $config );
+        $vars = _rewriteVars($vars);
+        $vars->{_session} = $self->session;
+        unless ($t->process( \$template, $vars, \$output)) {
+            my $e = $t->error;
+            $self->session->log->error($e);
+            die $e;
+        }
     };
     if ($@) {
         WebGUI::Error::Template->throw( error => $@ );

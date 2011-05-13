@@ -288,11 +288,17 @@ function initAddFieldDialog() {
 
     var handleSuccess = function(o) {
         var response = o.responseText;
-        var listItemId = response.slice(0,22);
-        var newInnerHTML = response.slice(22);
+		var thingId = response.slice(0,22);
+        var listItemId = response.slice(22,44);
+        var newInnerHTML = response.slice(44);
         var label = addFieldDialog.getData().label;
         addListItemHTML(listItemId, newInnerHTML,label);
-      
+		var idTags = document.getElementsByName( "thingId" );
+		for( var index = 0; index < idTags.length; index++  ) {
+			idTags[index].value = thingId;
+			window.newThingId = thingId;
+		}
+		setCancelButton();
 	};
 	
 	var handleFailure = function(o) {

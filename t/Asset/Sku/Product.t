@@ -135,6 +135,7 @@ isnt($newImagedProduct->get('image1'), $imagedProduct->get('image1'), '... and i
 
 my $jsonTemplate = WebGUI::Test->asset(
     className => 'WebGUI::Asset::Template',
+    parser    => 'WebGUI::Asset::Template::HTMLTemplate',
     title     => 'JSON template for Product testing',
     template  => q|
 {

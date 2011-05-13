@@ -92,6 +92,12 @@ our $I18N = {
 		lastUpdated => 1096319562
 	},
 
+	'Add' => {
+		message => q|Add|,
+		lastUpdated => 1096319562,
+        context => q|to add something new, to create/acquire|,
+	},
+
 	'Edit help' => {
 		message => q|Edit the properties of this Asset.  This icon is only available if the asset isn't locked, or if it is locked and you are using the tag it was edited under.|,
 		lastUpdated => 1165448622

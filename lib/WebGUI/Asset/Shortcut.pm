@@ -637,7 +637,8 @@ sub getShortcutByCriteria {
 
         	my $replacement = $expression;	# We don't want to modify $expression.
 						# We need it later.
-		push(@joins," left join metaData_values ".$counter."_v on a.assetId=".$counter."_v.assetId ");
+		my $alias = $counter . '_v';
+		push(@joins," left join metaData_values $alias on a.assetId=$alias.assetId and d.revisionDate = $alias.revisionDate ");
 		# Get the field (State) and the value (Wisconsin) from the $expression.
 	        $expression =~ /($attribute)\s*($operator)\s*($attribute)/gi;
 	        my $field = $1;
@@ -670,7 +671,12 @@ sub getShortcutByCriteria {
 	}
 
 	my $sql = "select a.assetId from asset a
-			".join("\n", @joins)."
+               left join assetData d on a.assetId = d.assetId
+                   and d.revisionDate=(
+                       select max(revisionDate)
+                       from assetData d2
+                       where d2.assetId = a.assetId
+                   ) ".join("\n", @joins)."
 			where a.className = ".$db->quote($self->getShortcutDefault->get("className"));
 	# Add constraint only if it has been modified.
 	$sql .= " and ".$constraint if (($constraint ne $criteria) && $constraint ne "");

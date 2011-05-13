@@ -15,7 +15,7 @@ use strict;
 use WebGUI::Test;
 use WebGUI::Test::MockAsset;
 use WebGUI::Session;
-use Test::More tests => 11; # increment this value for each test you create
+use Test::More tests => 13; # increment this value for each test you create
 use Test::Deep;
 use WebGUI::Asset::Wobject::Search;
 use Data::Dumper;
@@ -28,7 +28,7 @@ my $node = WebGUI::Asset->getDefault($session);
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Search Test"});
 my %tag = ( tagId => $versionTag->getId, status => "pending" );
-addToCleanup($versionTag);
+WebGUI::Test->addToCleanup($versionTag);
 my $search = $node->addChild({className=>'WebGUI::Asset::Wobject::Search', %tag});
 
 # Test for a sane object type
@@ -110,7 +110,7 @@ $search->update({
     my $thread = $collab->addChild($props, @addArgs);
     $thread->setSkipNotification;
     $versionTag2->commit();
-    addToCleanup($versionTag2);
+    WebGUI::Test->addToCleanup($versionTag2);
 
     $session->request->setup_body({
         doit     => 1,
@@ -128,6 +128,49 @@ $search->update({
     $search->update({useContainers => 0});
 }
 
+{
+    # Test useContainers when the user cannot view the container
+    my $versionTag3 = WebGUI::VersionTag->getWorking($session);
+    $versionTag3->set({name=>"Folder setup"});
+    $tag{tagId} = $versionTag3->getId;
+    my @addArgs = ( undef, undef, { skipAutoCommitWorkflows => 1, skipNotification => 1 } );
+    my $folder = $node->addChild({
+            className      => 'WebGUI::Asset::Wobject::Folder',
+            groupIdView     => '3', # Admins
+            %tag,
+        },
+        @addArgs);
+    # add an article anyone can see
+    my $props = {
+        className   => 'WebGUI::Asset::Wobject::Article',
+        synopsis => 'juxtaposition coolwhip cheezewhiz',
+        groupIdView => '7', # Everyone
+        tagId   => $versionTag3->getId,
+        status  => 'pending',
+    };
+
+    my $snippet = $folder->addChild($props, @addArgs);
+    $versionTag3->commit();
+    WebGUI::Test->addToCleanup($versionTag3);
+
+    $session->request->setup_body({
+        doit     => 1,
+        keywords => 'juxtaposition',
+    });
+    WebGUI::Test::MockAsset->mock_id($templateId, $templateMock);
+    $search->prepareView;
+    $search->view;
+    $search->update({useContainers => 0});
+    note( explain $templateVars );
+    is $templateVars->{result_set}->[0]->{url}, $snippet->get('url'), 'search returns regular URL for article';
+    $search->update({useContainers => 1});
+    $search->view;
+    is $templateVars->{result_set}->[0]->{url}, $snippet->get('url'), 'search returns regular URL for article because user cannot see container';
+
+    WebGUI::Test::MockAsset->unmock_id($templateId);
+    $session->request->setup_body({});
+    $search->update({useContainers => 0});
+}
 
 TODO: {
         local $TODO = "Tests to make later";

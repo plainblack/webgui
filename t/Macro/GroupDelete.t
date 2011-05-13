@@ -155,6 +155,7 @@ sub setupTest {
 	my $properties = {
 		title => 'GroupDelete test template',
 		className => 'WebGUI::Asset::Template',
+		parser    => 'WebGUI::Asset::Template::HTMLTemplate',
 		url => 'groupdelete-test',
 		namespace => 'Macro/GroupDelete',
 		template => "HREF=<tmpl_var group.url>\nLABEL=<tmpl_var group.text>",

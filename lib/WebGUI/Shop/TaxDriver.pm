@@ -93,7 +93,7 @@ Base class for all modules which do tax calculations in the Shop.
 
 =head1 SYNOPSIS
 
- use base WebGUI::Shop::TaxDriver;
+ use base 'WebGUI::Shop::TaxDriver';
 
  my $driver = WebGUI::Shop::TaxDriver->new($session);
 

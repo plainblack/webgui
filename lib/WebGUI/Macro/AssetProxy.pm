@@ -43,6 +43,15 @@ Defaults to 'url'. But if you want to use an assetId as the first parameter, the
 #-------------------------------------------------------------------
 sub process {
     my ($session, $identifier, $type) = @_;
+    if (!$identifier) {
+        $session->errorHandler->warn('AssetProxy macro called without an asset to proxy. ' 
+        . 'The macro was called through this url: '.$session->asset->get('url'));
+        if ($session->isAdminOn) {
+            my $i18n = WebGUI::International->new($session, 'Macro_AssetProxy');
+            return $i18n->get('invalid url');
+        }
+        return;
+    }
     my $perfLog = $session->log->performanceLogger;
     my $t = $perfLog ? [Time::HiRes::gettimeofday()] : undef;
     my $asset;

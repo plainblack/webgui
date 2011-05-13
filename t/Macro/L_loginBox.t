@@ -200,6 +200,7 @@ sub setupTest {
 	my $properties = {
 		title => 'L_loginBox test template',
 		className => 'WebGUI::Asset::Template',
+		parser    => 'WebGUI::Asset::Template::HTMLTemplate',
 		url => 'L-loginbox-test',
 		namespace => 'Macro/L_loginBox',
 		groupIdEdit => 3,

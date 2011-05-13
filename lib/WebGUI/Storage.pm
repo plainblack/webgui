@@ -44,6 +44,8 @@ This package provides a mechanism for storing and retrieving files that are not 
  $store = WebGUI::Storage->createTemp($self->session);
  $store = WebGUI::Storage->get($self->session,$id);
 
+ $exists = WebGUI::Storage->storageExists($session, $id);
+
  $filename = $store->addFileFromFilesystem($pathToFile);
  $filename = $store->addFileFromFormPost($formVarName,$attachmentLimit);
  $filename = $store->addFileFromHashref($filename,$hashref);
@@ -304,7 +306,10 @@ sub addFileFromFilesystem {
     if (! defined $pathToFile) {
         return undef;
     }
+    ##Handle UTF-8 filenames.
+    $pathToFile = Encode::encode_utf8($pathToFile);
     $pathToFile = Cwd::realpath($pathToFile); # trace any symbolic links
+    $pathToFile = Encode::decode_utf8($pathToFile);
     if (-d $pathToFile) {
         $self->session->log->error($pathToFile." is a directory, not a file.");
         return undef;
@@ -370,6 +375,7 @@ sub addFileFromFormPost {
             return $filename;
         }
         my $clientFilename = $upload->filename;
+        $clientFilename = Encode::decode_utf8($clientFilename);
         next
             unless $clientFilename;
         next
@@ -1078,7 +1084,7 @@ sub getFiles {
         callback => sub {
             my $obj = shift;
             my $rel = $obj->relative($dir);
-            my $str = $rel->stringify;
+            my $str = Encode::decode_utf8($rel->stringify);
             if (! $showAll ) {
                 return if $str =~ /^thumb-/;
                 return if $str =~ /^\./;
@@ -1704,36 +1710,34 @@ sub setPrivileges {
         }
     }
 
-    my $public;
-    for my $user (@{ $privs{users} }) {
-        if ($user eq '1') {
-            $public = 1;
-        }
-    }
-    for my $group (@{ $privs{groups} }) {
-        if ($group eq '1' || $group eq '7') {
-            $public = 1;
-        }
-    }
-    my $accessFile = JSON->new->encode( \%privs );
+    return $self->writeAccess( %privs );
+}
 
-    my $dirObj = $self->getPathClassDir();
-    return undef if ! defined $dirObj;
-    $dirObj->recurse(
-        callback => sub {
-            my $obj = shift;
-            return unless $obj->is_dir;
-            my $rel = $obj->relative($dirObj);
 
-            if ($public) {
-                $self->deleteFile($rel->file('.wgaccess')->stringify);
-            }
-            else {
-                $self->addFileFromScalar($rel->file('.wgaccess')->stringify, $accessFile);
-            }
-        }
-    );
+#-------------------------------------------------------------------
 
+=head2 storageExists ( $session, $storageId )
+
+Class method to determine if a storage location exists.  This can't be done
+with C<get> since it will create it if it doesn't exist.  Returns true if the
+storage directory exists.
+
+=head3 $session
+
+A session object, used to find the uploadsPath location
+
+=head3 $storageId
+
+A WebGUI::Storage GUID.
+
+=cut
+
+sub storageExists {
+    my ($class, $session, $storageId) = @_;
+    my $hexId = $session->id->toHex($storageId);
+    my @parts = ($hexId =~ m/^((.{2})(.{2}).+)/)[1,2,0];
+    my $dir = Path::Class::Dir->new($session->config->get('uploadsPath'), @parts);
+    return (-e $dir->stringify && -d _ ? 1 : 0);
 }
 
 
@@ -1808,6 +1812,19 @@ sub tar {
     return $temp;
 }
 
+#----------------------------------------------------------------------------
+
+=head2 trash ( )
+
+Set this storage location as trashed
+
+=cut
+
+sub trash {
+    my ( $self ) = @_;
+    return $self->writeAccess( state => "trash" );
+}
+
 #-------------------------------------------------------------------
 
 =head2 untar ( filename [, storage ] )
@@ -1865,6 +1882,65 @@ the uploads path.
 sub getDirectoryId {
     my $self = shift;
     return $self->{_pathParts}[2];
+}
+
+#----------------------------------------------------------------------------
+
+=head2 writeAccess( pairs )
+
+Write the given pairs to the wgaccess files in this storage location.
+
+If the storage location should be public, will remove all wgaccess files.
+
+Possible keys:
+
+ users      - an arrayref of userIds to allow access to
+ groups     - an arrayref of groupIds to allow access to
+ assets     - an arrayref of assetIds to validate permissions against
+ state      - a string describing a special state.
+                valid values: "trash" - storage location is trashed
+
+
+=cut
+
+sub writeAccess {
+    my ( $self, %privs ) = @_;
+
+    my $public;
+    if ( $privs{users} ) {
+        for my $user (@{ $privs{users} }) {
+            if ($user eq '1') {
+                $public = 1;
+            }
+        }
+    }
+    if ( $privs{groups} ) {
+        for my $group (@{ $privs{groups} }) {
+            if ($group eq '1' || $group eq '7') {
+                $public = 1;
+            }
+        }
+    }
+    my $accessFile = JSON->new->encode( \%privs );
+
+    my $dirObj = $self->getPathClassDir();
+    return undef if ! defined $dirObj;
+    $dirObj->recurse(
+        callback => sub {
+            my $obj = shift;
+            return unless $obj->is_dir;
+            my $rel = $obj->relative($dirObj);
+
+            if ($public) {
+                $self->deleteFile($rel->file('.wgaccess')->stringify);
+            }
+            else {
+                $self->addFileFromScalar($rel->file('.wgaccess')->stringify, $accessFile);
+            }
+        }
+    );
+
+    return;
 }
 
 1;

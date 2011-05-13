@@ -46,14 +46,17 @@ sub process {
     my $asset = eval { WebGUI::Asset->newByUrl($session,$url); };
     my $i18n = WebGUI::International->new($session, 'Macro_FileUrl');
     if (Exception::Class->caught()) {
+        $session->log->warn("Invalid Asset URL for url: " . $url);
         return $i18n->get('invalid url');
     }
     my $storageId = $asset->can('storageId') ? $asset->storageId : undef;
     if (not defined $storageId) {
+        $session->log->warn("No Storage Location for assetId: " . $asset->getId . " url: $url");
         return $i18n->get('no storage');
     }
     my $filename = $asset->can('filename') ? $asset->filename : undef;
     if (not defined $filename) {
+        $session->log->warn("No Filename for assetId: " . $asset->getId . " url: $url");
         return $i18n->get('no filename');
     }
     my $storage = WebGUI::Storage->get($session,$storageId);

@@ -50,7 +50,9 @@ $mech->get_ok( $shortcut->getUrl( 'func=getUserPrefsForm' ) );
 $mech->submit_form_ok( {
     fields => { alias => "myself" },
 } );
-is( $mech->session->user->get('alias'), "myself", "alias gets set" );
+$mech->session->user->uncache;
+my $user = WebGUI::User->new( $session, $mech->session->user->getId );
+is( $user->get('alias'), "myself", "alias gets set" );
 
 # Admin is allowed to edit visitor's prefs
 $mech->get_ok( $shortcut->getUrl( 'func=getUserPrefsForm;visitor=1' ) );

@@ -292,6 +292,12 @@ our $I18N = {
         lastUpdated => 0,
     },
 
+    'imgRemoteUrlForm' => {
+        message => q|A form field to specify a remote url for a photo.|,
+        context => q|Template variable for edit form.|,
+        lastUpdated => 0,
+    },
+
     'newUploadForm' => {
         message => q|A form field to upload an image.|,
         context => q|Template variable for edit form.|,
@@ -331,6 +337,13 @@ our $I18N = {
     'imgDeleteForm' => {
         message => q|A field to delete the image, along with all data attached to it.  This form will not be present in the set of variables in the loop for adding a new image.|,
         context => q|Template variable for edit form.|,
+        lastUpdated => 0,
+    },
+
+    'photo remote url' => {
+        message => 'Photo Remote URL',
+        context => 'Label in the edit story form. Location of image (instead
+        of uploaded location)',
         lastUpdated => 0,
     },
 

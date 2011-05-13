@@ -1324,6 +1324,12 @@ our $I18N = {
         context => q|Template variable for email receipt template|,
     },
 
+    'hasSku' => {
+        message => q|A boolean which is true if the Asset that this item refers to is still in WebGUI.  If this variable is false, then <b>viewItemUrl</b> should not be used.|,
+        lastUpdated => 1213135218,
+        context => q|Template variable for email receipt template|,
+    },
+
     'price help' => {
         message => q|The price of this item, formatted to two decimal places.|,
         lastUpdated => 1213135218,
@@ -2009,6 +2015,12 @@ our $I18N = {
 
     'item extendedPricePlusTax help' => { 
         message => q|The amount of tax plus the price for this item, times the quantity of this item in the cart.  This variable will only be populated if the current user is not Visitor.|,
+        lastUpdated => 0,
+        context => q|Template variable help|
+    },
+
+    'item sku deleted' => { 
+        message => q|The Asset for this item cannot be instanced.|,
         lastUpdated => 0,
         context => q|Template variable help|
     },

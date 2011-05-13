@@ -77,8 +77,8 @@ WebGUI::Test->addToCleanup($storage1, $storage2);
 #
 ############################################################
 
-my $tests = 44;
-plan tests => $tests
+my $tests = 45;
+plan tests => 1 + $tests
             + $canEditMaker->plan
             ;
 
@@ -243,6 +243,12 @@ cmp_deeply(
     'getCrumbTrail: with topic set'
 );
 
+is_deeply(
+    $story->exportGetRelatedAssetIds,
+    [ $topic->getId ],
+    'exportGetRelatedAssetIds',
+);
+
 $story->topic('');
 
 ############################################################
@@ -303,6 +309,14 @@ $story->setPhotoData([
         title     => '',
         url       => 'http://www.lamp.com',
     },
+    {
+        remoteUrl => 'http://www.plainblack.com/rockstar.jpg',
+        caption   => 'Elvis',
+        byLine    => 'The King',
+        alt       => '(impersonator)',
+        title     => 'Rockstar Support',
+        url       => 'http://plainblack.com/services/support/rockstar-support',
+    },
 ]);
 
 
@@ -333,6 +347,15 @@ cmp_bag(
 
 is ($viewVariables->{updatedTimeEpoch}, $story->revisionDate, 'viewTemplateVariables: updatedTimeEpoch');
 
+my $rockstarVar = {
+    imageUrl     => 'http://www.plainblack.com/rockstar.jpg',
+    imageCaption => 'Elvis',
+    imageByline  => 'The King',
+    imageAlt     => '(impersonator)',
+    imageTitle   => 'Rockstar Support',
+    imageLink    => 'http://plainblack.com/services/support/rockstar-support',
+};
+
 cmp_deeply(
     $viewVariables->{photo_loop},
     [
@@ -352,6 +375,7 @@ cmp_deeply(
             imageTitle   => '',
             imageLink    => 'http://www.lamp.com',
         },
+        $rockstarVar,
     ],
     'viewTemplateVariables: photo_loop is okay'
 );
@@ -360,20 +384,14 @@ ok(! $viewVariables->{singlePhoto}, 'viewVariables: singlePhoto: there is more t
 ok(  $viewVariables->{hasPhotos},   'viewVariables: hasPhotos: it has photos');
 
 ##Simulate someone deleting the file stored in the storage object.
+$storage1->deleteFile('gooey.jpg');
 $storage2->deleteFile('lamp.jpg');
 $viewVariables = $story->viewTemplateVariables;
 
 cmp_deeply(
     $viewVariables->{photo_loop},
     [
-        {
-            imageUrl     => re('gooey.jpg'),
-            imageCaption => 'Mascot for a popular CMS',
-            imageByline  => 'Darcy Gibson',
-            imageAlt     => 'Gooey',
-            imageTitle   => 'Mascot',
-            imageLink    => 'http://www.webgui.org',
-        },
+        $rockstarVar,
     ],
     'viewTemplateVariables: photo_loop: if the storage has no files, it is not shown'
 );
@@ -420,5 +438,25 @@ cmp_bag(
     ],
     '...asset package data has the storage locations in it'
 );
+
+############################################################
+#
+# keyword variables in export mode
+#
+############################################################
+
+$session->scratch->set('isExporting', 1);
+
+my $keyword_loop = $story->viewTemplateVariables->{keyword_loop};
+cmp_bag(
+    $keyword_loop,
+    [
+        { keyword => "foxtrot", url => '../keyword_foxtrot.html', },
+        { keyword => "tango",   url => '../keyword_tango.html', },
+        { keyword => "whiskey", url => '../keyword_whiskey.html', },
+    ],
+    'viewTemplateVariables: keywords_loop is okay'
+) or diag Dumper( $keyword_loop );
+$session->scratch->delete('isExporting');
 
 #vim:ft=perl

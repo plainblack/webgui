@@ -76,14 +76,15 @@ override duplicate => sub {
 
 =head2 addRevision ( properties [, revisionDate, options ] )
 
-Extend addRevision to set skipNotification to 0 for each new revision.
+Override addRevision to set skipNotification to 0 for each new revision.  This preserves whether or
+not a notification was sent for the previous revision.
 
 =cut
 
 around addRevision => sub {
     my $orig        = shift;
     my $self        = shift;
-    my $properties  = shift;
+    my $properties  = shift || {};
     
     $properties->{ skipNotification     } = 0;
 

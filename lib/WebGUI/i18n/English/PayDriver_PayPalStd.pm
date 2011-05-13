@@ -51,7 +51,7 @@ our $I18N = {
     },
 
     'identity token help' => {
-        message => q{The identity token listed under the Payment Data Transfer radio button in your website payment preference on PayPal},
+        message => q{The identity token listed under the Payment Data Transfer radio button in your website payment preference on PayPal.  To enable, this, log into your PayPal account, go to Profile.  Under Seller Preferences, choose Website Payment Preferences.  Select Auto Return and enter in your website's address.  Then select Payment Data Transfer.  The next time you enter this screen, your PDT Identity token will be listed.},
         lastUpdated => 1248297326,
     },
 

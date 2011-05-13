@@ -156,6 +156,9 @@ sub handle {
     # );
     # return;
     
+    # Look for the template preview HTTP headers
+    WebGUI::Asset::Template->processVariableHeaders($session);
+
     # TODO: refactor the following loop, find all instances of "chunked" and "empty" in codebase, etc..
     for my $handler (@{$session->config->get("contentHandlers")}) {
         my $output = eval { WebGUI::Pluggable::run($handler, "handler", [ $session ] )};
@@ -177,12 +180,12 @@ sub handle {
             if ( defined $output && blessed $output && $output->isa( 'WebGUI::Asset::Template' ) ) {
                 $session->http->sendHeader;
                 $session->output->print( $output->process );
-                return;
+                last;
             }
             # "chunked" or "empty" means it took care of its own output needs
             elsif (defined $output && ( $output eq "chunked" || $output eq "empty" )) {
                 #warn "chunked and empty no longer stream, use session->response->stream() instead";
-                return;
+                last;
             }
             # other non-empty output should be used as the response body
             elsif (defined $output && $output ne "") {
@@ -191,15 +194,21 @@ sub handle {
                 
                 # Use contentHandler's return value as the output
                 $session->output->print($output);
-                return;
+                last;
             }
             # Keep processing for success codes
             elsif ($session->response->status < 200 || $session->response->status > 299) {
                 $session->http->sendHeader;
-                return;
+                last;
             }
         }
     }
+
+    # Print out the template preview variables
+    $session->output->print(
+        WebGUI::Asset::Template->getVariableJson($session), 1
+    );
+
     return;
 }
 

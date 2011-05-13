@@ -35,6 +35,7 @@ my $wiki
         topLevelKeywords => 'criminals,inmates,staff',
         url              => 'testwiki',
         title            => 'testwiki',
+        groupIdView      => '2',
     }, @childCoda );
 
 my %page_set = ();
@@ -48,7 +49,7 @@ foreach my $keywords (qw/staff inmates criminals/) {
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 11;        # Increment this number for each test you create
+plan tests => 15;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # 
@@ -235,5 +236,16 @@ cmp_deeply(
 );
 
 $page_set{criminals}->update({keywords => 'red,andy,tommy'});
+
+$session->user({userId => 3});
+ok $wiki->canView(), 'checking permission handling in www_byKeyword: Admin can view the wiki';
+$wiki->www_byKeyword;
+is $session->response->status, 201, '... HTTP status set to 201';
+
+$session->user({userId => 1});
+ok !$wiki->canView(), '... visitor cannot view the wiki';
+$wiki->www_byKeyword;
+is $session->response->status, 401, '... HTTP status set to 401, no access';
+
 
 #vim:ft=perl

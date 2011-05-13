@@ -180,7 +180,7 @@ sub addGroups {
 		my $group = WebGUI::Group->new($self->session, $gid);
 		my $recursive = $self->getId ~~ $group->getGroupsIn(1);
         next GROUP if $recursive;
-        $self->session->db->write("insert into groupGroupings (groupId,inGroup) values (?,?)",[$gid, $self->getId]);
+        $self->session->db->write("REPLACE into groupGroupings (groupId,inGroup) values (?,?)",[$gid, $self->getId]);
 	}
 	$self->clearCaches();
 	return 1;
@@ -212,7 +212,7 @@ sub addUsers {
 	foreach my $uid (@{$users}) {
 		my ($isIn) = $self->session->db->quickArray("select count(*) from groupings where groupId=? and userId=?", [$self->getId, $uid]);
 		unless ($isIn) {
-			$self->session->db->write("insert into groupings (groupId,userId,expireDate) values (?,?,?)", [$self->getId, $uid, (time()+$expireOffset)]);
+			$self->session->db->write("REPLACE into groupings (groupId,userId,expireDate) values (?,?,?)", [$self->getId, $uid, (time()+$expireOffset)]);
 			$self->session->stow->delete("gotGroupsForUser");
 		} else {
 			$self->userGroupExpireDate($uid,(time()+$expireOffset));
@@ -1007,24 +1007,33 @@ sub getUsersNotIn {
     if($groupId eq "") {
         return $self->getUsers($withoutExpired);
     }
+    my $selfWhere;
+    if ( $self->getId ne '2' ) {
+        $selfWhere  = "and groupId=" . $self->session->db->dbh->quote( $self->getId );
+    }
+    else {
+        $selfWhere  = 'and userId != ' . $self->session->db->dbh->quote( "1" );
+    }
 	
     my $expireTime = 0;
 	if ($withoutExpired) {
 		$expireTime = time();
 	}
 
-    my $sql = q{
+    my $sql = qq{
         select
             userId
         from
-            groupings
+            users
+        left join
+            groupings using (userId)
         where
             expireDate > ?
-            and groupId=?
+            $selfWhere
             and userId not in (select userId from groupings where expireDate > ? and groupId=?)
     };
 
-	my @users = $self->session->db->buildArray($sql, [$expireTime,$self->getId,$expireTime,$groupId]);
+	my @users = $self->session->db->buildArray($sql, [$expireTime,$expireTime,$groupId]);
 	return \@users;
 
 }

@@ -193,9 +193,11 @@ sub commit {
 	my $now = time;
 	my $finished = 1;
 	foreach my $asset (@{$self->getAssets({"byLineage"=>1, onlyPending=>1})}) {
+                $self->session->log->info( "Committing " . $asset->getId );
 		$asset->commit;
 		if ($now + $timeout < time) {
 			$finished = 0;	
+                        $self->session->log->info( "NOES!" );
 			last;
 		}
 	}

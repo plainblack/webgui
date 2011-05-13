@@ -16,6 +16,7 @@
 use strict;
 use Test::More;
 use Test::Deep;
+use Test::LongString;
 use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Test::MockAsset;
 use WebGUI::Session;
@@ -31,7 +32,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 77;        # Increment this number for each test you create
+plan tests => 83;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -39,6 +40,7 @@ plan tests => 77;        # Increment this number for each test you create
 my $transaction = WebGUI::Shop::Transaction->new($session,{
     amount              => 40,
     shippingAddressId   => 'xxx1',
+    shippingOrganization => 'Ship To Us',
     shippingAddressName => 'abc',
     shippingAddress1    => 'def',
     shippingAddress2    => 'hij',
@@ -53,6 +55,7 @@ my $transaction = WebGUI::Shop::Transaction->new($session,{
     shippingPrice       => 5,
     paymentAddressId    => 'xxx3',
     paymentAddressName  => 'abc1',
+    paymentOrganization  => 'Pay To Us',
     paymentAddress1     => 'def1',
     paymentAddress2     => 'hij1',
     paymentAddress3     => 'lmn1',
@@ -76,6 +79,7 @@ isa_ok($transaction->session, "WebGUI::Session");
 is($transaction->amount, 40, "set and get amount");
 is($transaction->shippingAddressId, 'xxx1', "set and get shipping address id");
 is($transaction->shippingAddressName, 'abc', "set and get shipping address name");
+is($transaction->shippingOrganization, 'Ship To Us', "set and get shipping organization");
 is($transaction->shippingAddress1, 'def', "set and get shipping address 1");
 is($transaction->shippingAddress2, 'hij', "set and get shipping address 2");
 is($transaction->shippingAddress3, 'lmn', "set and get shipping address 3");
@@ -89,6 +93,7 @@ is($transaction->shippingDriverLabel, 'foo', "set and get shipping driver label"
 is($transaction->shippingPrice, 5, "set and get shipping price");
 is($transaction->paymentAddressId, 'xxx3', "set and get payment address id");
 is($transaction->paymentAddressName, 'abc1', "set and get payment address name");
+is($transaction->paymentOrganization, 'Pay To Us', "set and get payment organization");
 is($transaction->paymentAddress1, 'def1', "set and get payment address 1");
 is($transaction->paymentAddress2, 'hij1', "set and get payment address 2");
 is($transaction->paymentAddress3, 'lmn1', "set and get payment address 3");
@@ -101,7 +106,6 @@ is($transaction->paymentDriverId, 'xxx4', "set and get payment driver id");
 is($transaction->paymentDriverLabel, 'kkk', "set and get payment driver label");
 is($transaction->taxes, 7, "set and get taxes");
 
-
 $transaction->update({
     isSuccessful        => 1,
     transactionCode     => 'yyy',
@@ -109,11 +113,11 @@ $transaction->update({
     statusMessage       => 'was a success',
 });
  
-is($transaction->get("isSuccessful"), 1,"update and get isSuccessful");
-is($transaction->get("transactionCode"), 'yyy',"update and get transaction code");
-is($transaction->get("statusCode"), 'jd31',"update and get status code");
-is($transaction->get("statusMessage"), 'was a success',"update and get status message");
-is($transaction->get('taxes'), 7, 'update does not modify things it was not sent');
+is($transaction->isSuccessful, 1,"update and get isSuccessful");
+is($transaction->transactionCode, 'yyy',"update and get transaction code");
+is($transaction->statusCode, 'jd31',"update and get status code");
+is($transaction->statusMessage, 'was a success',"update and get status message");
+is($transaction->taxes, 7, 'update does not modify things it was not sent');
 
 # make sure new() works
 my $tcopy = WebGUI::Shop::Transaction->new($session, $transaction->getId);
@@ -127,6 +131,7 @@ my $item = $transaction->addItem({
     assetId                 => 'a',
     configuredTitle         => 'b',
     options                 => {color=>'blue'},
+    shippingOrganization    => 'organized',
     shippingAddressId       => 'c',
     shippingName            => 'd',
     shippingAddress1        => 'e',
@@ -161,6 +166,7 @@ is($item->get("shippingPhoneNumber"), 'l', "set and get shipping phone number");
 is($item->get("quantity"), 5, "set and get quantity");
 is($item->get("price"), 33,  "set and get price");
 is($item->get('taxRate'), 19, 'set and get taxRate' );
+is($item->shippingOrganization, 'organized', 'set and get shipping organization' );
 
 $item->update({
     shippingTrackingNumber  => 'adfs',
@@ -278,6 +284,50 @@ $session->setting->set('shopReceiptEmailTemplateId', $templateId);
     like($templateVars[0]->{viewDetailUrl}, qr/shop=transaction;method=viewMy;/, '... viewDetailUrl okay for user');
     like($templateVars[1]->{viewDetailUrl}, qr/shop=transaction;method=view;/  , '... viewDetailUrl okay for admin');
 }
+
+#######################################################################
+#
+# formatAddress
+#
+#######################################################################
+
+my $formattedAddress = $transaction->formatAddress({
+    name        => 'Red',
+    address1    => 'Cell Block #5',
+    city        => 'Shawshank',
+    state       => 'MN',
+    code        => 55555,
+    country     => 'USA',
+    phoneNumber => '555.555.5555',
+});
+
+is_string $formattedAddress, 'Red<br />Cell Block #5<br />Shawshank, MN 55555<br />USA<br />555.555.5555', 'formatAddress: a regular address';
+
+my $formattedAddress = $transaction->formatAddress({
+    name        => 'Red',
+    address1    => 'Cell Block #5',
+    address2    => 'Next to Andy',
+    city        => 'Shawshank',
+    state       => 'MN',
+    code        => 55555,
+    country     => 'USA',
+    phoneNumber => '555.555.5555',
+});
+
+is_string $formattedAddress, 'Red<br />Cell Block #5<br />Next to Andy<br />Shawshank, MN 55555<br />USA<br />555.555.5555', '... a regular address with address2';
+
+my $formattedAddress = $transaction->formatAddress({
+    name         => 'Red',
+    organization => 'Shawshank Prison',
+    address1     => 'Cell Block #5',
+    city         => 'Shawshank',
+    state        => 'MN',
+    code         => 55555,
+    country      => 'USA',
+    phoneNumber  => '555.555.5555',
+});
+
+is_string $formattedAddress, 'Red<br />Shawshank Prison<br />Cell Block #5<br />Shawshank, MN 55555<br />USA<br />555.555.5555', '... a regular address with address2';
 
 #######################################################################
 #

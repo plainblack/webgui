@@ -1127,7 +1127,13 @@ sub www_emailRecoverPasswordFinish {
     my $mail = WebGUI::Mail::Send->create($session, { to=>$email, subject=>$i18n->get('WebGUI password recovery')});
     my $vars = { };
     $vars->{recoverPasswordUrl} = $session->url->append($session->url->getSiteURL,'op=auth;method=emailResetPassword;token='.$recoveryGuid);
-    my $template  = WebGUI::Asset->newByDynamicClass($session, $session->setting->get('webguiPasswordRecoveryEmailTemplate'));
+    my $templateId = $session->setting->get('webguiPasswordRecoveryEmailTemplate');
+    my $template  = WebGUI::Asset->newById($session, $templateId);
+    if (!$template) {
+        $session->errorHandler->error("Can't instantiate template $templateId for template email recovery");
+        my $i18n = WebGUI::International->new($self->session, 'Asset');
+        return $i18n->get('Error: Cannot instantiate template').' '.$templateId;
+    }
     my $emailText = $template->process($vars);
     WebGUI::Macro::process($session, \$emailText);
     $mail->addText($emailText);

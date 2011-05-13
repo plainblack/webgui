@@ -99,6 +99,10 @@ A hash reference of options that can modify how this method works.
 
 Assets that normally autocommit their workflows (like CS Posts, and Wiki Pages) won't if this is true.
 
+=head4 skipNotification
+
+Disable sending a notification that a new revision was added, for those assets that support it.
+
 =head4 state
 
 A state for the duplicated asset (defaults to 'published')
@@ -110,8 +114,15 @@ sub duplicate {
     my $session     = $self->session;
     my $options     = shift;
     my $parent      = $self->getParent;
+    ##Remove state and pass all other options along to addChild
+    my $asset_state = delete $options->{state};
     my $newAsset    
-        = $parent->addChild( $self->get, undef, $self->get("revisionDate"), { skipAutoCommitWorkflows => $options->{skipAutoCommitWorkflows} } );
+        = $parent->addChild(
+            $self->get,
+            undef,
+            $self->get("revisionDate"),
+            $options,
+        );
 
     if (! $newAsset) {
         $self->session->log->error(
@@ -120,12 +131,13 @@ sub duplicate {
         return undef;
     }
     # Duplicate metadata fields
-    my $sth = $session->db->read(
-        "select * from metaData_values where assetId = ?", 
-        [$self->getId]
+    my $sth = $self->session->db->read(
+        "select * from metaData_values where assetId = ? and revisionDate = ?",
+        [$self->getId, $self->get('revisionDate')]
     );
     while (my $h = $sth->hashRef) {
-        $session->db->write("insert into metaData_values (fieldId, assetId, value) values (?, ?, ?)", [$h->{fieldId}, $newAsset->getId, $h->{value}]);
+        $self->session->db->write("insert into metaData_values (fieldId,
+            assetId, revisionDate, value) values (?, ?, ?, ?)", [$h->{fieldId}, $newAsset->getId, $newAsset->get('revisionDate'), $h->{value}]);
     }
 
     # Duplicate keywords
@@ -139,8 +151,8 @@ sub duplicate {
         keywords    => $keywords,
     } );
 
-    if (my $state = $options->{state}) {
-        $newAsset->setState($state);
+    if ($asset_state) {
+        $newAsset->setState($asset_state);
     }
 
     return $newAsset;
@@ -263,11 +275,12 @@ WebGUI::Fork method called by www_pasteList
 sub pasteInFork {
     my ( $process, $args ) = @_;
     my $session = $process->session;
+    $session->log->info( "Trying " . $args->{assetId} );
     my $self    = WebGUI::Asset->newById( $session, $args->{assetId} );
     $session->asset($self);
 
     my @roots = grep { $_ && $_->canEdit }
-        map { WebGUI::Asset->newPending( $session, $_ ) } @{ $args->{list} };
+        map { $session->log->info( " Trying " . $_ ); WebGUI::Asset->newPending( $session, $_ ) } @{ $args->{list} };
 
     my @ids = map {
         my $list

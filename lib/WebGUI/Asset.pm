@@ -177,7 +177,7 @@ property  extraHeadTags => (
 around extraHeadTags => sub {
     my $orig = shift;
     my $self = shift;
-    if (@_ > 1) {
+    if (@_ > 0) {
         my $unpacked = $_[0];
         my $packed   = $unpacked;  ##Undo magic aliasing since a reference is passed below
         HTML::Packer::minify( \$packed, {
@@ -1709,6 +1709,19 @@ sub getViewCacheKey {
 
 #-------------------------------------------------------------------
 
+=head2 getContentLastModifiedBy ( )
+
+Returns the userId that modified the content last.
+
+=cut
+
+sub getContentLastModifiedBy {
+        my $self = shift;
+        return $self->get("revisedBy");
+}
+
+#-------------------------------------------------------------------
+
 =head2 getWwwCacheKey ( )
 
 Returns a cache object specific to this asset, and whether or not the request is in SSL mode.
@@ -2387,7 +2400,7 @@ sub publish {
         
 	$self->session->db->write("update asset set state='published', stateChangedBy=".$self->session->db->quote($self->session->user->userId).", stateChanged=".time()." where assetId in (".$idList.")");
         foreach my $id (@{$assetIds}) {
-                my $asset = WebGUI::Asset->newById($self->session, $id);
+                my $asset = WebGUI::Asset->newPending($self->session, $id);
                 if (defined $asset) {
                     $asset->purgeCache;
                 }
@@ -2422,6 +2435,21 @@ sub purgeCache {
 	$stow->delete('assetRevision');
     $self->session->cache->remove("asset".$self->getId.$self->revisionDate);
     $self->{_parent};
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 refused ( )
+
+Returns an error message to the user, wrapped in the user's style.  This is most useful for
+handling UI errors.  Privilege errors should be still be sent to $session->privilege.
+
+=cut
+
+sub refused {
+	my ($self) = @_;
+	return $self->{_session};
 }
 
 
@@ -2683,10 +2711,10 @@ sub www_addSave {
     my ( $form ) = $session->quick(qw{ form });
 
     return $session->privilege->insufficient() unless $self->canEdit;
-    if ($self->session->config("maximumAssets")) {
+    if ($self->session->config->get("maximumAssets")) {
         my ($count) = $self->session->db->quickArray("select count(*) from asset");
         my $i18n = WebGUI::International->new($self->session, "Asset");
-        return $self->session->style->userStyle($i18n->get("over max assets")) if ($self->session->config("maximumAssets") <= $count);
+        return $self->session->style->userStyle($i18n->get("over max assets")) if ($self->session->config->get("maximumAssets") <= $count);
     }
 
     # Determine what version tag we should use

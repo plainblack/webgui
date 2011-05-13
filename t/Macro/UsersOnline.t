@@ -231,7 +231,7 @@ sub setupJSONtemplate {
     ]	
     }
 EOTMPL
-    my $template = WebGUI::Asset->getImportNode($session)->addChild({className=>'WebGUI::Asset::Template', namespace => 'Macro/UsersOnline', template=>$templateBody});
+    my $template = WebGUI::Asset->getImportNode($session)->addChild({className=>'WebGUI::Asset::Template', parser => 'WebGUI::Asset::Template::HTMLTemplate', namespace => 'Macro/UsersOnline', template=>$templateBody});
     addToCleanup($template);
     return $template;
 }

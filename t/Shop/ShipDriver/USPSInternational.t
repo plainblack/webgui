@@ -308,7 +308,7 @@ SKIP: {
                             SvcCommitments => ignore(),
                             SvcDescription => ignore(),
                         },
-                        (ignore())x12,
+                        (ignore())x20,
                     ],
                 },
             ],

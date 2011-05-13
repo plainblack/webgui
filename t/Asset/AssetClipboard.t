@@ -18,9 +18,11 @@ use WebGUI::Session;
 use WebGUI::Asset;
 use WebGUI::VersionTag;
 use Test::MockObject;
+use Test::MockObject::Extends;
+use WebGUI::Fork;
 
 use Test::More; # increment this value for each test you create
-plan tests => 14;
+plan tests => 15;
 
 my $session = WebGUI::Test->session;
 $session->user({userId => 3});
@@ -88,7 +90,7 @@ is($snippet->getId,                  $snippetAssetId,  'original snippet has cor
 is($snippet->getParent->getId,           $root->getId, 'original snippet is a child of root');
 is($duplicatedSnippet->getParent->getId, $root->getId, 'duplicated snippet is also a child of root');
 
-addToCleanup( $duplicatedSnippet );
+WebGUI::Test->addToCleanup( $duplicatedSnippet );
 
 ####################################################
 #
@@ -171,3 +173,29 @@ $shortcut->publish;
 $page->cut;
 
 is $shortcut->paste($page->getId), 0, 'cannot paste below shortcuts';
+
+####################################################
+#
+# pasteInFork
+#
+####################################################
+
+$session->user({ userId => "3" });
+my $process = Test::MockObject::Extends->new( 'WebGUI::Fork' );
+$process->mock( "update" => sub { } ); # do nothing on update. we don't care
+$process->mock( "session" => sub { return $session } );
+
+
+# Try with a Collaboration and some Threads
+my $collab = WebGUI::Test->asset(
+    className => 'WebGUI::Asset::Wobject::Collaboration',
+    groupIdEdit => "3",
+);
+my $thread = $collab->addChild({
+    className => 'WebGUI::Asset::Post::Thread',
+    groupIdEdit => "3",
+}, undef, undef, { skipNotification => 1 });
+$thread->cut;
+WebGUI::Asset::pasteInFork( $process, { assetId => $collab->getId, list => [ $thread->getId ] } );
+$thread = $thread->cloneFromDb;
+is( $thread->get('state'), 'published', 'thread is pasted' );

@@ -320,13 +320,17 @@ override purge => sub {
 
 =head2 view 
 
-Render the dashboard.
+Render the dashboard.  Of all the positions for content, position1 is reserved for hidden content
+or content to be placed.  Deleting content causes it to go into position1.
 
 =cut
 
 sub view {
-	my $self = shift;
+	my $self    = shift;
+    my $session = $self->session;
 	my %vars = %{$self->get()};
+    $vars{canEdit} = $self->canEdit;
+    $vars{fullUrl} = $self->getUrl;
 	
 	$self->session->style->setScript( $self->session->url->extras('yui/build/utilities/utilities.js'));
 	
@@ -356,60 +360,85 @@ sub view {
 
 	my @found;
 	my $newStuff;
+	my $showPerformance = $self->session->log->performanceLogger();
+    my $user = $self->session->user;
 	foreach my $position (@positions) {
 		my @assets = split(",",$position);
 		foreach my $asset (@assets) {
-			foreach my $child (@{$children}) {
+			CHILD: foreach my $child (@{$children}) {
 				if ($asset eq $child->getId) {
-					unless ($asset ~~ @hidden || !$child->canView) {
-						$self->session->style->setRawHeadTags($child->getExtraHeadTags);
-						$child->{_properties}{title} = $child->getTitle;
-						$child->{_properties}{title} = $child->getShortcut->getTitle if (ref $child eq 'WebGUI::Asset::Shortcut');
-						if ($i == 1 || $i > $numPositions) {
-							push(@{$vars{"position1_loop"}},{
-								id=>$child->getId,
-								content=>'', #so things in the New Content bar don't display.
-								dashletTitle=>$child->{_properties}{title},
-								shortcutUrl=>$child->getUrl,
-								canPersonalize=>$self->canPersonalize,
-								showReloadIcon=>$child->{_properties}{showReloadIcon},
-								canEditUserPrefs=>(($self->session->user->isRegistered) && (ref $child eq 'WebGUI::Asset::Shortcut') && (scalar($child->getPrefFieldsToShow) > 0))
-							});
-							$newStuff .= 'available_dashlets["'.$child->getId.'"]=\''.$child->getUrl.'\';';
-
-						} else {
-							$child->prepareView;
-							push(@{$vars{"position".$i."_loop"}},{
-								id=>$child->getId,
-								content=>$child->view,
-								dashletTitle=>$child->{_properties}{title},
-								shortcutUrl=>$child->getUrl,
-								canPersonalize=>$self->canPersonalize,
-								showReloadIcon=>$child->{_properties}{showReloadIcon},
-								canEditUserPrefs=>(($self->session->user->isRegistered) && (ref $child eq 'WebGUI::Asset::Shortcut') && (scalar($child->getPrefFieldsToShow) > 0))
-							});
-							$newStuff .= 'available_dashlets["'.$child->getId.'"]=\''.$child->getUrl.'\';';
-						}
-					}
 					push(@found, $child->getId);
-				}
+                    ##Filter based on visibility
+                    next CHILD unless $child->canView;
+                    next CHILD if isIn($asset, @hidden);
+                    ##Detect child types
+                    my $is_shortcut = $child->isa('WebGUI::Asset::Shortcut');
+                    my $is_dashlet  = $child->can('getOverrideFormDefinition');
+                    $self->session->style->setRawHeadTags($child->getExtraHeadTags);
+                    ##Override the title for shortcuts
+                    if ($is_shortcut) {
+                        $child->{_properties}{title} = $child->getShortcut->getTitle;
+                    }
+                    ##Fetch dashlet options from the database
+                    my $options = $session->db->quickHashRef('select * from Dashboard_dashlets where dashboardAssetId=? and dashletAssetId=?', [$self->getId, $child->getId]);
+                    if (!($i == 1 || $i > $numPositions)) {
+                        $child->prepareView;
+                    }
+                    my $spot        = $i > $numPositions ? 1 : $i;
+                    my $canMove     = $self->canPersonalize && !$options->{isStatic};
+                    my $editFormUrl = ($is_shortcut && $child->getPrefsFieldToShow)       ? $child->getUrl('func=getUserPrefsForm')
+                                    : ($is_dashlet  && $child->getOverrideFormDefinition) ? $self->getUrl('func=customizeDashlet;dashletAssetId='.$child->getId)
+                                    : ''
+                                    ;
+                    my $canEditUserPrefs = $user->isRegistered && $editFormUrl;
+
+                    push(@{$vars{"position".$spot."_loop"}},{
+                        id               => $child->getId,
+                        content          => $child->view,
+                        dashletTitle     => $child->get('title'),
+                        shortcutUrl      => ($is_shortcut ? $child->getUrl : ''),
+                        editFormUrl      => $editFormUrl,
+                        dashletUrl       => ($is_dashlet  ? $child->getUrl : ''),
+                        canDelete        => $self->canPersonalize && !$options->{isRequired},
+                        canMove          => $canMove,
+                        canPersonalize   => $self->canPersonalize,
+                        showReloadIcon   => $is_shortcut && $child->get('showReloadIcon'),
+                        canEditUserPrefs => $canEditUserPrefs,
+                    });
+                    if ($canMove) {
+                        $newStuff .= 'available_dashlets["'.$child->getId.'"]=\''.$child->getUrl.'\';';
+                    }
+                }
 			}
 		}
 		$i++;
 	}
-	# deal with unplaced children
+	# deal with unplaced children, they go into position 1
 	foreach my $child (@{$children}) {
 		unless ($child->getId ~~ @found || $child->getId ~~ @hidden) {
 			if ($child->canView) {
-				$child->{_properties}{title} = $child->getShortcut->title if (ref $child eq 'WebGUI::Asset::Shortcut');
+                my $is_shortcut = $child->isa('WebGUI::Asset::Shortcut');
+                my $is_dashlet  = $child->can('getOverrideFormDefinition');
+                my $title       = $child->{_properties}{title} = $is_shortcut ? $child->getShortcut->getTitle : $child->getTitle;
+                my $options = $session->db->quickHashRef('select * from Dashboard_dashlets where dashboardAssetId=? and dashletAssetId=?', [$self->getId, $child->getId]);
+                my $canMove     = $self->canPersonalize && !$options->{isStatic};
+                my $editFormUrl = ($is_shortcut && $child->getPrefFieldsToShow)       ? $child->getUrl('func=getUserPrefsForm')
+                                : ($is_dashlet  && $child->getOverrideFormDefinition) ? $self->getUrl('func=customizeDashlet;dashletAssetId='.$child->getId)
+                                : ''
+                                ;
+                my $canEditUserPrefs = $user->isRegistered && $editFormUrl;
 				push(@{$vars{"position1_loop"}},{
-					id=>$child->getId,
-					content=>'',
-					dashletTitle=>$child->getTitle,
-					shortcutUrl=>$child->getUrl,
-					showReloadIcon=>$child->{_properties}{showReloadIcon},
-					canPersonalize=>$self->canPersonalize,
-					canEditUserPrefs=>(($self->session->user->isRegistered) && (ref $child eq 'WebGUI::Asset::Shortcut') && (scalar($child->getPrefFieldsToShow) > 0))
+					id               => $child->getId,
+					content          => '',
+					dashletTitle     => $title,
+                    shortcutUrl      => ($is_shortcut ? $child->getUrl : ''),
+                    editFormUrl      => $editFormUrl,
+                    dashletUrl       => ($is_dashlet  ? $child->getUrl : ''),
+                    canDelete        => $self->canPersonalize && !$options->{isRequired},
+                    canMove          => $canMove,
+					canPersonalize   => $self->canPersonalize,
+					showReloadIcon   => $is_shortcut && $child->{_properties}{showReloadIcon},
+					canEditUserPrefs => $canEditUserPrefs,
 				});
 				$newStuff .= 'available_dashlets["'.$child->getId.'"]=\''.$child->getUrl.'\';';
 			}
@@ -418,12 +447,134 @@ sub view {
 	$vars{showAdmin} = ($self->session->isAdminOn && $self->canEdit);
 	$vars{"dragger.init"} = '
 		<script type="text/javascript">
-			dragable_init("'.$self->getUrl.'");
 		var available_dashlets= new Array();
 		'.$newStuff.'
+			dragable_init("'.$self->getUrl.'");
 		</script>
 	';
 	return $self->processTemplate(\%vars, $templateId);
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_customizeDashlet
+
+Web facing method for saving per dashlet configuration, such as being required, or movable.
+
+=cut
+
+sub www_customizeDashlet {
+    my $self    = shift;
+    my $session = $self->session;
+    return $session->privilege->insufficient() unless ($session->user->isRegistered);
+    my $dashletAssetId = $session->form->get('dashletAssetId');
+    my $dashlet        = WebGUI::Asset->newById($session, $dashletAssetId);
+    return $session->privilege->insufficient() unless ($dashlet && $dashlet->canView && $dashlet->can('getOverrideFormDefinition'));
+
+    my $i18n = WebGUI::International->new($session, 'Asset_Dashboard');
+
+    my $form = $session->form;
+    my $html_form = WebGUI::HTMLForm->new($session, action => $self->getUrl, method => 'POST', );
+    $html_form->hidden(name => 'func', value => 'customizeDashletSave', );
+    $html_form->hidden(name => 'dashletAssetId', value => $dashletAssetId, );
+    $html_form->readOnly(name => $i18n->get(), value => $dashlet->getTitle, );
+
+    my $overrides = $dashlet->fetchUserOverrides($self->getId);
+    my @dashlet_properties = $dashlet->getOverrideFormDefinition;
+    foreach my $property (@dashlet_properties) {
+        my %properties = %{ $property };
+        $properties{value} = $overrides->{$property->{name}} || $dashlet->get($property->{name});
+        $html_form->dynamicField(%properties);
+    }
+
+    $html_form->submit();
+    return $html_form->print;
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_customizeDashletSave
+
+Web facing method for saving per dashlet configuration, such as being required, or movable.
+
+=cut
+
+sub www_customizeDashletSave {
+    my $self    = shift;
+    my $session = $self->session;
+    return $session->privilege->insufficient() unless ($session->user->isRegistered);
+    my $dashletAssetId = $session->form->get('dashletAssetId');
+    my $dashlet        = WebGUI::Asset->newById($session, $dashletAssetId);
+    return $session->privilege->insufficient() unless ($dashlet && $dashlet->canView && $dashlet->can('getOverrideFormDefinition'));
+    my $overrides          = {};
+    my @dashlet_properties = $dashlet->getOverrideFormDefinition;
+    my $form               = $session->form;
+    foreach my $property (@dashlet_properties) {
+        my $value = $form->process($property->{name}, $property->{fieldType}, $property->{value});
+        $overrides->{$property->{name}} = $value;
+    }
+    $dashlet->storeUserOverrides($self->getId, $overrides);
+    return $self->www_view;
+}
+
+##-------------------------------------------------------------------
+
+=head2 www_editDashlet
+
+Web facing method for saving per dashlet configuration, such as being required, or movable.
+
+=cut
+
+sub www_editDashlet {
+    my $self    = shift;
+    my $session = $self->session;
+    return $session->privilege->insufficient() unless ($self->canEdit);
+    my $dashletAssetId = $session->form->get('dashletAssetId');
+    my $dashlet        = WebGUI::Asset->newById($session, $dashletAssetId);
+    return $session->privilege->insufficient() unless ($dashletAssetId);
+
+    my $i18n = WebGUI::International->new($session, 'Asset_Dashboard');
+
+    my $form = $session->form;
+    my $html_form = WebGUI::HTMLForm->new($session, action => $self->getUrl, method => 'POST', );
+    $html_form->hidden(name => 'func', value => 'editDashletSave', );
+    $html_form->hidden(name => 'dashletAssetId', value => $dashletAssetId, );
+    $html_form->readOnly(name => $i18n->get(), value => $dashlet->getTitle, );
+    my $options = $session->db->quickHashRef('select * from Dashboard_dashlets where dashboardAssetId=? and dashletAssetId=?', [$self->getId, $dashletAssetId]);
+    $html_form->yesNo(
+        name      => 'isStatic',
+        label     => $i18n->get('Is static'),
+        hoverHelp => $i18n->get('Is static help'),
+        value     => $form->get('isStatic') || $options->{isStatic},
+    );
+    $html_form->yesNo(
+        name      => 'isRequired',
+        label     => $i18n->get('Is required'),
+        hoverHelp => $i18n->get('Is required help'),
+        value     => $form->get('isRequired') || $options->{isRequired},
+    );
+    $html_form->submit();
+    return $html_form->print;
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_editDashletSave
+
+Web facing method for saving per dashlet configuration, such as being required, or movable.
+
+=cut
+
+sub www_editDashletSave {
+    my $self    = shift;
+    my $session = $self->session;
+    return $session->privilege->insufficient() unless ($self->canEdit);
+    my $dashletAssetId = $session->form->get('dashletAssetId');
+    my $isStatic       = $session->form->get('isStatic', 'yesNo');
+    my $isRequired     = $session->form->get('isRequired', 'yesNo');
+    $session->db->write('DELETE FROM Dashboard_dashlets where dashboardAssetId=? and dashletAssetId=?',[$self->getId, $dashletAssetId, ]);
+    $session->db->write('INSERT INTO Dashboard_dashlets (dashboardAssetId, dashletAssetId, isStatic, isRequired) VALUES (?,?,?,?)', [$self->getId, $dashletAssetId, $isStatic, $isRequired, ]);
+    return $self->www_view;
 }
 
 #-------------------------------------------------------------------

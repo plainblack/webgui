@@ -39,10 +39,6 @@ use WebGUI::Exception;
 use WebGUI::DateTime;
 use WebGUI::Asset::Wobject::DataForm;
 
-#readonly    session         => my %session;
-#readonly    assetId         => my %assetId;
-#readonly    asset           => my %asset;
-
 has session => (
     is       => 'ro',
     required => 1,
@@ -100,13 +96,6 @@ has entryId => (
     is     => 'ro',
     writer => '_set_entryId',
 );
-
-#private     entryData       => my %entryData;
-#private     entryId         => my %entryId;
-#private     userId          => my %userId;
-#readonly    username        => my %username;
-#public      ipAddress       => my %ipAddress;
-#public      submissionDate  => my %submissionDate;
 
 #-------------------------------------------------------------------
 

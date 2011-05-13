@@ -120,6 +120,7 @@ sub setup_assets {
 	my $properties = {
 		title => 'user template for printing',
 		className => 'WebGUI::Asset::Template',
+		parser    => 'WebGUI::Asset::Template::HTMLTemplate',
 		url => 'user_style_printable',
 		namespace => 'Style',
 		##Note, at this point 

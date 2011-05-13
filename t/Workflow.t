@@ -45,7 +45,7 @@ is_deeply($wf->getCrons, [], 'workflow has no crons');
 isa_ok(WebGUI::Workflow->getList($session), 'HASH', 'getList returns a hashref');
 
 ok(! exists WebGUI::Workflow->getList($session)->{$wfId}, 'workflow not in enabled list');
-is(scalar keys %{WebGUI::Workflow->getList($session)}, 12, 'There are twelve enabled, default workflows, of all types, shipped with WebGUI');
+is(scalar keys %{WebGUI::Workflow->getList($session)}, 13, 'There are thirteen enabled, default workflows, of all types, shipped with WebGUI');
 
 $wf->set({enabled => 1});
 ok($wf->get('enabled'), 'workflow is enabled');

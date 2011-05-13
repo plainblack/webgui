@@ -15,12 +15,14 @@
 
 use strict;
 use Test::More;
+use Test::Deep;
 use Scalar::Util qw/refaddr/;
 use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
 use WebGUI::Asset;
 use WebGUI::Shop::Cart;
 use WebGUI::TestException;
+use JSON 'from_json';
 
 
 #----------------------------------------------------------------------------
@@ -31,7 +33,7 @@ my $i18n = WebGUI::International->new($session, "Shop");
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 29;        # Increment this number for each test you create
+plan tests => 35;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -172,6 +174,48 @@ $cart3->delete;
 $cart->delete;
 is($cart->delete, undef, "Can destroy cart.");
 
+
+# Test (shipping part of) www_ajaxPrices
+{
+    local *WebGUI::Shop::Ship::getOptions = sub { [ qw{ a b c } ] };
+    
+    $cart->update( { shippingAddressId   => $address->getId } );
+
+    my $response = from_json $cart->www_ajaxPrices;
+    cmp_deeply(
+        $response->{ shipping },
+        [ qw{ a b c } ],
+        'shipping contains available shipping option when no shipper is passed',
+    );
+    is( $cart->get('shippingAddressId'), $address->getId, 'calling www_ajaxPrices w/o shipperId doesn\'t change the cart shipperId' );
+
+    local *WebGUI::Session::Form::get = sub { return 'OtherShippert' };
+    $response = from_json $cart->www_ajaxPrices;
+    cmp_deeply(
+        $response->{ shipping },
+        [ qw{ a b c } ],
+        'shipping contains available shipping option when a shipper is passed',
+    );
+    is( $cart->get('shippingAddressId'), 'OtherShippert', 'calling www_ajaxPrices w/ shipperId updates the cart shipperId' );
+
+    $cart->update( { shippingAddressId => $shipper->getId } );
+}
+
+# Test (part of) www_view
+{
+    my $shippingAddressId   = $cart->get( 'shippingAddressId'   );
+    my $billingAddressId    = $cart->get( 'billingAddressId'    );
+
+    $cart->update( { shippingAddressId => 'NoWayDude' } );
+    eval { $cart->www_view };
+    is( $@, '', 'Invalid shippingAddressId doesn\'t make www_view crash' );
+
+    $cart->update( { billingAddressId => 'WRONG!!!!', shippingAddressId => $shippingAddressId } );
+    eval { $cart->www_view };
+    is( $@, '', 'Invalid billingAddressId doesn\'t make www_view crash' );
+
+    $cart->update( { billingAddressId => $billingAddressId } );
+}
 
 $product->purge;
 

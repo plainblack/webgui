@@ -99,9 +99,20 @@ sub execute {
             $log->info("Found subscription $subscription");
             my ($fieldId, $value) = split("~", $subscription);
             $log->info("Searching for threads that match $subscription");
-            my $matchingThreads = $db->read("select metaData_values.assetId from metaData_values
-                left join asset using (assetId) where fieldId=? and value like ? and creationDate > ?
-                and className like ?  and lineage like ? and state = ?", 
+            my $matchingThreads = $db->read("
+                select mv.assetId
+                from metaData_values mv
+                left join asset a using (assetId)
+                left join assetData d on
+                    mv.assetId = d.assetId
+                    and mv.revisionDate = d.revisionDate
+                    and d.revisionDate = (
+                        select max(revisionDate)
+                        from assetData d2
+                        where d2.assetId = d.assetId
+                    )
+                where mv.fieldId=? and mv.value like ? and a.creationDate > ?
+                and a.className like ? and a.lineage like ? and a.state = ?",
                 [$fieldId, '%'.$value.'%', $lastTimeSent, 'WebGUI::Asset::Post::Thread%', $newsletter->get("lineage").'%', 'published']); 
             while (my ($threadId) = $matchingThreads->array) {
                 next

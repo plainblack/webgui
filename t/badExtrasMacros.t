@@ -49,9 +49,12 @@ my @templateLabels;
 while (my $templateAsset = $getATemplate->()) {
     my $template = $templateAsset->get('template');
     my $header   = $templateAsset->get('extraHeadTags');
-    my $match =  ($template =~ $macro);
+    my $match    = ($template =~ $macro);
     if ($header) {
         $match ||= ($header =~ $macro);
+    }
+    foreach my $attachment (@{ $templateAsset->getAttachments }) {
+        $match ||= ($attachment->{url} =~ $macro);
     }
     ok(!$match, sprintf "%s: %s (%s) has no bad extras macros", $templateAsset->getTitle, $templateAsset->getId, $templateAsset->getUrl);
 }

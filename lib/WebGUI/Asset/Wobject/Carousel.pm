@@ -48,6 +48,20 @@ property items => (
     noFormPost   => 1,
     fieldType    => 'text',
 );
+property autoPlay    => (
+    fieldType       => 'yesNo',
+    defaultValue    => 0,
+    tab             => "properties",
+    hoverHelp       => ['carousel autoPlay description', 'Asset_Carousel' ],
+    label           => ['carousel autoPlay label', 'Asset_Carousel' ],
+);
+property autoPlayInterval => (
+    fieldType       => 'Integer',
+    defaultValue    => 4,
+    tab             => 'properties',
+    hoverHelp       => ['carousel autoPlayInterval description', 'Asset_Carousel'],
+    label           => ['carousel autoPlayInterval label', 'Asset_Carousel'],
+);
 
 #-------------------------------------------------------------------
 
@@ -63,16 +77,30 @@ override getEditForm => sub {
 	my $tabform = super();
     my $i18n    = WebGUI::International->new($self->session, "Asset_Carousel");
 
-    $self->session->style->setScript($self->session->url->extras('yui/build/editor/editor-min.js'));
-    $self->session->style->setCss($self->session->url->extras('yui/build/editor/assets/skins/sam/editor.css'));
-    $self->session->style->setScript($self->session->url->extras('wobject/Carousel/carousel.js'));
+    $self->session->style->setScript($self->session->url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'), {type =>
+    'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/element/element-min.js'), {type =>
+    'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/tabview/tabview-min.js'), {type =>
+    'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/editor/editor-min.js'), {type =>
+    'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/json/json-min.js'), {type =>
+    'text/javascript'});
+    $self->session->style->setLink($self->session->url->extras('yui/build/editor/assets/skins/sam/editor.css'), {type
+    =>'text/css', rel=>'stylesheet'});
+    $self->session->style->setLink($self->session->url->extras('yui/build/tabview/assets/skins/sam/tabview.css'), {type
+    =>'text/css', rel=>'stylesheet'});
+    $self->session->style->setScript($self->session->url->extras('wobject/Carousel/carousel.js'), {type =>
+    'text/javascript'});
 
     my $tableRowStart = 
         '<tr id="items_row">'
         .'    <td class="formDescription"  valign="top" style="width: 180px;"><label for="item1">'
               .$i18n->get("items label").'</label><div class="wg-hoverhelp">'.$i18n->get("items description").'</div></td>'
         .'    <td id="items_td" valign="top" class="tableData">'
-        .'    <input type="button" value="Add item" onClick="javascript:addItem()"></input><br />'
+        .'    <input type="hidden" id="items_formId" name="items" />'
+        .'    <input type="button" value="Add item" onclick="window.carouselEditor.addTab()"></input><br />'
         ."    <br />\n";
 
     $tabform->getTab("properties")->addField('ReadOnly', value => $tableRowStart);
@@ -122,6 +150,27 @@ onClick='javascript:deleteItem(this.id)'></input>\n"
                 ."</script>\n";
         $tabform->getTab("properties")->addField('ReadOnly', value => $itemHTML);
     }
+    
+
+    $self->session->log->warn('richedit:' .$self->get('richEditor'));
+    my $richEditId      = $self->get('richEditor') || "PBrichedit000000000001";
+    my $richedit        = WebGUI::Asset->newById( $self->session, $richEditId );
+    my $config          = JSON->new->encode( $richedit->getConfig );
+    my $loadMcePlugins  = $richedit->getLoadPlugins;
+    my $items           = $self->get('items') ? JSON->new->decode($self->get('items'))->{items} : [];
+    $items              = JSON->new->encode( $items );
+    my $i18nJson        = JSON->new->encode( { "delete" => $i18n->get("delete") } );
+
+    $tabform->getTab('properties')->raw(<<"ENDHTML");
+    <div id="carouselEditor"></div>
+    <script type="text/javascript">
+    $loadMcePlugins
+    YAHOO.util.Event.onDOMReady( function() {
+        window.carouselEditor = new WebGUI.Carousel.Editor( "carouselEditor", $config, $items, $i18nJson );
+    } );
+    </script>
+ENDHTML
+
     my $tableRowEnd = qq|
             </td>
         </tr>
@@ -165,32 +214,9 @@ Used to process properties from the form posted.
 override processEditForm => sub {
     my $self    = shift;
     my $form    = $self->session->form;
-    my (@items,$items);
     super();
-
-    foreach my $param ($form->param) {
-        if ($param =~ m/^item_/){
-            my $sequenceNumber = $param;
-            $sequenceNumber =~ s/^item_//;
-            if($form->process('itemId_'.$sequenceNumber)){
-            push(@items,{
-                sequenceNumber  => $sequenceNumber,
-                text            => $form->process($param),
-                itemId              => $form->process('itemId_'.$sequenceNumber),
-            });
-            }
-        }
-    }
-    
-    my  @sortedItems = sort { $a->{sequenceNumber} cmp $b->{sequenceNumber} } @items;
-    @items = ();
-    for (my $i=0; $i<scalar @sortedItems; $i++) {
-        $sortedItems[$i]->{sequenceNumber} = $i + 1;
-        push(@items,$sortedItems[$i]);
-    }        
-   
-    $items = JSON->new->encode({items => \@items});
-    $self->update({items => $items});
+    my $items = JSON->new->decode( $form->get("items") ); 
+    $self->update({ items => JSON->new->encode({ items => $items }) });
     return undef;
 };
 

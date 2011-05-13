@@ -26,12 +26,15 @@ TODO
 
 =head2 www_ssoViaSessionId
 
-TODO: DOCUMENT ME
+Allows a user to login as another user, by referencing that user's sessionId.  Requires that
+sessionId is passed as a form or URL parameter.  It does NOT duplicate the original user's session,
+it just switches you to that user.
 
 =cut
 
 sub www_ssoViaSessionId {
 	my $session = shift;
+    return undef unless $session->config->get('enableSimpleSSO');
 	my $sessionId = $session->form->get("sessionId");
 	if (defined $sessionId && $sessionId ne "") {
 		if ($sessionId eq $session->getId) {

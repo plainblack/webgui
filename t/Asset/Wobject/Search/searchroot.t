@@ -42,6 +42,7 @@ my $defaultArticle = $default->addChild({
 });
 my $template = $node->addChild({
     className  => 'WebGUI::Asset::Template',
+    parser    => 'WebGUI::Asset::Template::HTMLTemplate',
     template   => qq{[<tmpl_loop result_set>"<tmpl_var assetId>"<tmpl_unless __LAST__>,</tmpl_unless></tmpl_loop>]},
     %tag,
 });

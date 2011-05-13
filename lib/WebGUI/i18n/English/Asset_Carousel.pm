@@ -50,6 +50,12 @@ our $I18N = {
         lastUpdated => 0,
         context => q|Description of the carousel template field, used as hover help.|
     },
+    
+    'delete' => {
+        message     => q{Delete},
+        lastUpdated => 0,
+        context     => q{Label for button to delete an item from the carousel},
+    },
 
     'slideHeight' => {
         message => q|The height set for each slide in the Carousel|,
@@ -109,7 +115,38 @@ our $I18N = {
         message => q|This carousel item's sequenceNumber.|,
         lastUpdated => 0,
         context => q|Description of the sequenceNumber tmpl_var for the template help.|
-    }
+    },
+
+    'carousel autoPlay description' => {
+        message     => q{Should this carousel automatically scroll through its items?},
+        lastUpdated => 0,
+        context     => 'Description of asset property',
+    },
+
+    'carousel autoPlay label' => {
+        message     => q{Auto Play},
+        lastUpdated => 0,
+        context     => 'Label for asset property',
+    },
+
+    'carousel autoPlayInterval label' => {
+        message     => q{Auto Play Interval},
+        lastUpdated => 0,
+        context     => 'Label for asset property',
+    },
+
+    'carousel autoPlayInterval description' => {
+        message     => q{Length of time in seconds between carousel slides},
+        lastUpdated => 0,
+        context     => 'Description of asset property',
+    },
+
+    'rich editor description' => {
+        message     => q{Choose a rich editor to use for entering content in each pane of the Carousel.  The new setting will take effect the next time the Carousel is edited.},
+        lastUpdated => 0,
+        context     => 'Description of asset property',
+    },
+
 };
 
 1;

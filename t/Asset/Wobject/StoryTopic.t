@@ -29,14 +29,12 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 20;
+plan tests => 21;
 
 #----------------------------------------------------------------------------
 # put your tests here
 
 my $class  = 'WebGUI::Asset::Wobject::StoryTopic';
-
-my $versionTag = WebGUI::VersionTag->getWorking($session);
 
 my $archive    = WebGUI::Test->asset->addChild({className => 'WebGUI::Asset::Wobject::StoryArchive', title => 'My Stories', url => '/home/mystories'});
 
@@ -47,8 +45,6 @@ my $yesterday = $now-24*3600;
 my $newFolder = $archive->getFolder($yesterday);
 
 my $creationDateSth = $session->db->prepare('update asset set creationDate=? where assetId=?');
-$versionTag->commit;
-WebGUI::Test->addToCleanup($versionTag);
 
 my $pastStory = $newFolder->addChild({ className => 'WebGUI::Asset::Story', title => "Yesterday is history", keywords => 'andy,norton'});
 $creationDateSth->execute([$yesterday, $pastStory->getId]);
@@ -71,7 +67,6 @@ STORY: foreach my $name (@characters) {
 
 $storyHandler->{bogs}->update({subtitle => 'drinking his food through a straw'});
 
-my $topicTag = WebGUI::VersionTag->getWorking($session);
 my $topic = WebGUI::Test->asset->addChild({
     className   => 'WebGUI::Asset::Wobject::StoryTopic',
     title       => 'Popular inmates in Shawshank Prison',
@@ -85,9 +80,6 @@ $topic->update({
     storiesShort => 3,
 });
 
-$topicTag->commit;
-WebGUI::Test->addToCleanup($topicTag);
-
 $topic = $topic->cloneFromDb;
 
 ################################################################
@@ -95,6 +87,39 @@ $topic = $topic->cloneFromDb;
 #  viewTemplateVariables
 #
 ################################################################
+
+# When it's okay that the variables we get will have extra keys and
+# values beyond what we're checking for, we'll use this function.
+sub cmp_variable_loop {
+    my ($got, $expected, $name) = @_;
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+    my $sg = @$got;
+    my $se = @$expected;
+    unless (@$got == @$expected) {
+        fail($name);
+        diag(<<EOM);
+Arrayrefs are not the same length.
+   got : $sg
+expect : $se
+EOM
+        return 0;
+    }
+
+    my $failed;
+    for my $i (0..$#$got) {
+        my $g = $got->[$i];
+        my $e = $expected->[$i];
+        my ($ok, $stack) = Test::Deep::cmp_details($g, superhashof($e));
+        unless ($ok) {
+            unless ($failed) {
+                fail($name);
+                $failed = 1;
+            }
+            diag(Test::Deep::deep_diag($stack));
+        }
+    }
+    return $failed ? 0 : pass($name);
+}
 
 my $templateVars;
 $templateVars = $topic->viewTemplateVariables();
@@ -108,7 +133,7 @@ cmp_deeply(
     }),
     'viewTemplateVars: RSS and Atom feed template variables'
 );
-cmp_deeply(
+cmp_variable_loop(
     $templateVars->{story_loop},
     [
         {
@@ -126,7 +151,8 @@ cmp_deeply(
 );
 
 ok(
-    exists $templateVars->{topStoryTitle}
+    exists $templateVars->{topStory}
+ && exists $templateVars->{topStoryTitle}
  && exists $templateVars->{topStoryUrl}
  && exists $templateVars->{topStoryCreationDate}
  && exists $templateVars->{topStorySubtitle},
@@ -136,7 +162,7 @@ ok(! $templateVars->{standAlone}, 'viewTemplateVars: not in standalone mode');
 
 $topic->{_standAlone} = 1;
 $templateVars = $topic->viewTemplateVariables();
-cmp_deeply(
+cmp_variable_loop(
     $templateVars->{story_loop},
     [
         {
@@ -167,6 +193,13 @@ cmp_deeply(
     ],
     'viewTemplateVars has right number and contents in the story_loop in standalone mode.  Top story not present in story_loop'
 );
+
+cmp_deeply($templateVars->{topStory}, superhashof({
+    title        => 'bogs',
+    subtitle     => 'drinking his food through a straw',
+    creationDate => $now,
+}));
+
 
 is($templateVars->{topStoryTitle}, 'bogs', '... topStoryTitle');
 is(
@@ -243,7 +276,7 @@ $topic->update({
     storiesShort => 3,
 });
 $templateVars = $topic->viewTemplateVariables;
-cmp_deeply(
+cmp_variable_loop(
     $templateVars->{story_loop},
     [
         {
@@ -326,7 +359,7 @@ $topic->update( { storySortOrder => 'Alphabetically' } );
 
 $templateVars = $topic->viewTemplateVariables();
 
-cmp_deeply(
+cmp_variable_loop(
     [
         {
             title        => $templateVars->{topStoryTitle},
@@ -370,9 +403,7 @@ my $emptyarchive    = WebGUI::Test->asset->addChild({
     url => '/home/badstories', 
     keywords => 'aksjhgkja asgjhshs assajshhsg5',
 });
-WebGUI::Test->addToCleanup($emptyarchive); # blows up under the debugger...?
 
-$versionTag->commit;
 $emptyarchive->{_standAlone} = 1;  
 ok(eval { $emptyarchive->viewTemplateVariables() }, "viewTemplateVariables with _standAlone = 1 doesn't throw an error");
 

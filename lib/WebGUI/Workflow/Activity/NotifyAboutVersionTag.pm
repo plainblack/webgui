@@ -108,7 +108,7 @@ sub execute {
         comments => $versionTag->get('comments'),
         url      => $urlOfSingleAsset,
     };
-    my $template   = WebGUI::Asset->newByDynamicClass($self->session, $self->get('templateId'));
+    my $template   = WebGUI::Asset->newById($self->session, $self->get('templateId'));
     my $message    = $template->process($var);
 	my $properties = {
 		status=>"completed",

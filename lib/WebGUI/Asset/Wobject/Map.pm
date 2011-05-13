@@ -371,7 +371,9 @@ sub view {
     google.setOnLoadCallback( function() {
         var mapId           = "%s";
         var mapUrl          = "%s";
-        var map             = new GMap2( document.getElementById("map_" + mapId) );
+        var element         = document.getElementById("map_" + mapId);
+        var map             = new GMap2( element );
+        element.mapObject   = map;
         map.url             = mapUrl;
         map.assetId         = mapId;
         map.setCenter(new GLatLng(%s, %s), %s);
@@ -379,6 +381,10 @@ sub view {
         map.extrasUrl       = "%s";
 
         var markermanager   = new MarkerManager(map, {trackMarkers: true});
+        map.markermanager   = markermanager;
+        map.fancyClickHandler = null;
+        map.panOnClick      = true;
+        map.clickToEdit     = false;
 ENDHTML
 
     
@@ -392,9 +398,9 @@ ENDHTML
         for my $pointId ( @{$pointIds} ) {
             my $point   = WebGUI::Asset->newById( $session, $pointId );
             next unless $point;
-            $mapHtml    .= sprintf '        points.push(%s);'."\n", 
-                            JSON->new->encode($point->getMapInfo),
-                            ;
+            my $buffer = JSON->new->encode( $point->getMapInfo );
+            
+            $mapHtml    .= sprintf '        points.push(%s);'."\n", $buffer;
 
             push @{$var->{ mapPoints }}, $point->getTemplateVars;
         }
@@ -416,11 +422,11 @@ ENDHTML
     }
 
     # Script to control addPoint and setPoint buttons
-    $mapHtml    .= <<'ENDHTML';
+    $mapHtml    .= sprintf <<'ENDHTML', $self->getUrl;
         if ( document.getElementById( "setCenter_" + mapId ) ) {
             var button = document.getElementById( "setCenter_" + mapId );
             GEvent.addDomListener( button, "click", function () { 
-                WebGUI.Map.setCenter( map );
+                WebGUI.Map.setCenter( map, '%s' );
             } );
         }
         if ( document.getElementById( "addPoint_" + mapId ) ) {

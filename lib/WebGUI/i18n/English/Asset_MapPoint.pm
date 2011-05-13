@@ -133,7 +133,16 @@ our $I18N = {
         lastUpdated => 0,
         context     => 'Description of asset property',
     },
-
+    'isGeocoded label' => {
+        message     => 'Automatically Position',
+        lastUpdated => 0,
+        context     => 'Label for asset property',
+    },
+    'isGeocoded description' => {
+        message     => q{Choose whether or not this map point should be automatically positioned having it's latitude and longitude dynamically set based on the address.  Choosing "Yes" will make the point unable to be moved on the map.},
+        lastUpdated => 0,
+        context     => 'Description of asset property',
+    },
     'assetName' => {
         message     => "MapPoint",
         lastUpdated => 0,
@@ -344,6 +353,53 @@ our $I18N = {
         context     => "template variable help",
     },
 
+    'userDefined1' => {
+        message     => "The value of userDefined field 1.",
+        lastUpdated => 0,
+        context     => "template variable help",
+    },
+
+    'userDefined2' => {
+        message     => "The value of userDefined field 2.",
+        lastUpdated => 0,
+        context     => "template variable help",
+    },
+
+    'userDefined3' => {
+        message     => "The value of userDefined field 3.",
+        lastUpdated => 0,
+        context     => "template variable help",
+    },
+
+    'userDefined4' => {
+        message     => "The value of userDefined field 4.",
+        lastUpdated => 0,
+        context     => "template variable help",
+    },
+
+    'userDefined5' => {
+        message     => "The value of userDefined field 5.",
+        lastUpdated => 0,
+        context     => "template variable help",
+    },
+
+    'user defined variables' => {
+        message     => "Unlike the Collaboration System, the Map Point does not provide predefined form fields for the userdefined variables.  Instead, create any kind of form field that you need and give the field the name of the userDefined variable that you want to use.  WebGUI will handle saving it.",
+        lastUpdated => 0,
+        context     => "template variable help",
+    },
+
+    'form_isHidden' => {
+        message     => "A yes/no field indicating whether or not the Map Point should display in navigations.",
+        lastUpdated => 0,
+        context     => "template variable help",
+    },
+
+    'form_isGeocoded' => {
+        message     => "A checkbox field indicating whether or not the Map Point should be automatically placed on the map based on it's address.",
+        lastUpdated => 0,
+        context     => "template variable help",
+    },
 };
 
 1;

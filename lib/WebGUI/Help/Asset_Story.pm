@@ -37,6 +37,7 @@ our $HELP = {
                 { name      => 'imgUrl',         },
                 { name      => 'imgFilename',    },
                 { name      => 'newUploadForm',  },
+                { name      => 'imgRemoteUrlForm',  },
                 { name      => 'imgCaptionForm', },
                 { name      => 'imgBylineForm',  },
                 { name      => 'imgAltForm',     },

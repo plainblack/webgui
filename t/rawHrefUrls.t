@@ -40,7 +40,7 @@ my $macro     = qr{
 
 $numTests = $session->db->quickScalar('select count(distinct(assetId)) from template');
 
-plan tests => 2*$numTests;
+plan tests => 3*$numTests;
 
 my $validLinks = 0;
 
@@ -93,4 +93,9 @@ TEMPLATE: while (my $templateAsset = $getATemplate->()) {
         $parser->parse($template);
         ok($validLinks, sprintf "%s: %s (%s) has no rooted link urls in the template", $templateAsset->getTitle, $templateAsset->getId, $templateAsset->getUrl);
     }
+    my $bad_attachments = 0;
+    foreach my $attachment (@{ $templateAsset->getAttachments }) {
+        ++$bad_attachments if $attachment->{url} !~ $nonRootLink;
+    }
+    ok $bad_attachments == 0, sprintf "%s: %s (%s) has no rooted link urls in the template attachments", $templateAsset->getTitle, $templateAsset->getId, $templateAsset->getUrl;
 }

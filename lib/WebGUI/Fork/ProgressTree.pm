@@ -154,7 +154,7 @@ my $template = <<'TEMPLATE';
         }
         tree = document.getElementById('tree');
         tree.innerHTML = '';
-        _.each(JSON.parse(data.status), function (root) {
+        _.each(YAHOO.lang.JSON.parse(data.status), function (root) {
             recurse(root, tree);
         });
         bar.update(finished, total);

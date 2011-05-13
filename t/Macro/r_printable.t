@@ -112,6 +112,7 @@ sub setupTest {
 	my $properties = {
 		title => 'printable test template',
 		className => 'WebGUI::Asset::Template',
+		parser    => 'WebGUI::Asset::Template::HTMLTemplate',
 		url => 'printable-test',
 		namespace => 'Macro/r_printable',
 		template => "HREF=<tmpl_var printable.url>\nLABEL=<tmpl_var printable.text>",

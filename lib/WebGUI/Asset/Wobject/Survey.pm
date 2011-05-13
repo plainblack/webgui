@@ -2336,12 +2336,12 @@ sub www_viewStatisticalOverview {
             }
         }
         else{
-            my $responses = $db->read('select value,answerComment from Survey_tempReport'
+            my $responses = $db->read('select answerValue,answerComment from Survey_tempReport'
                 . ' where sectionNumber=? and questionNumber=?',
                 [$sectionIndex,$questionIndex]);
             while (my $response = $responses->hashRef) {
                 push @answerloop,{
-                    'answer_value'      =>$response->{value},
+                    'answer_value'      =>$response->{answerValue},
                     'answer_comment'    =>$response->{answerComment}
                     };
             }

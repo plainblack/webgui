@@ -102,6 +102,12 @@ our $I18N = {
 		lastUpdated => 1167972337
 	},
 
+	'cache timeout help' => {
+		message => q|How long should lookups for each location be cached internally?|,
+		context => q|Template variable help|,
+		lastUpdated => 1229493261,
+	},
+
 };
 
 1;

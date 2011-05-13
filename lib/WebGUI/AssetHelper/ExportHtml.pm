@@ -88,6 +88,12 @@ ENDHTML
         name           => "depth",
         value          => 99,
     );
+    $f->addField( "YesNo",
+        label          => $i18n->get('Export Related Assets'),
+        hoverHelp      => $i18n->get('Export Related Assets description'),
+        name           => "exportRelated",
+        value          => '',
+    );
     $f->addField( "selectBox",
         label          => $i18n->get('Export as user'),
         hoverHelp      => $i18n->get('Export as user description'),
@@ -157,7 +163,7 @@ sub www_exportStatus {
         unless $session->user->isInGroup(13);
     my $form    = $session->form;
     my @vars    = qw(
-        index depth userId extrasUploadsAction rootUrlAction exportUrl
+        index depth userId extrasUploadsAction rootUrlAction exportUrl exportRelated
     );
     $asset->forkWithStatusPage({
             plugin   => 'ProgressTree',

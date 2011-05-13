@@ -151,6 +151,7 @@ sub importProducts {
         my %productRow;
         ##Order the data according to the headers, in whatever order they exist.
         @productRow{ @headers } = @{ $productRow };
+        $productRow{price} =~ tr/0-9.//cd;
         ##Isolate just the collateral from the other product information
         my %productCollateral;
         @productCollateral{ @collateralFields } = @productRow{ @collateralFields };

@@ -17,6 +17,7 @@ use Moose;
 use Tie::IxHash;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Wobject';
+with 'WebGUI::Role::Asset::JSONCollateral';
 
 define assetName   => ['assetName', 'Asset_Calendar'];
 define icon        => 'calendar.gif';
@@ -260,7 +261,7 @@ property icalFeeds    => (
                     label       => ['Feed URL','Asset_Calendar'],
                 },
                 {
-                    name        => 'status',
+                    name        => 'lastResult',
                     type        => 'readonly',
                     label       => ['434','WebGUI'],
                 },
@@ -303,6 +304,7 @@ use WebGUI::Search;
 use WebGUI::Form;
 use WebGUI::HTML;
 use WebGUI::DateTime;
+use WebGUI::ICal;
 
 use DateTime;
 use JSON;
@@ -347,10 +349,6 @@ The date this feed was added, or edited last.
 =head4 lastResult
 
 The results of what happened the last time this feed was accessed to pull iCal.
-
-=head4 feedType
-
-What kind of feed this is.
 
 =cut
 
@@ -858,6 +856,17 @@ override processEditForm => sub {
 
     unless ($self->groupIdSubscribed) {
         $self->createSubscriptionGroup();
+    }
+
+    my @feeds = @{ $self->getFeeds };
+    foreach my $feed (@feeds) {
+        if ($feed->{lastUpdated} eq 'new') {
+            $feed->{lastUpdated} = 'never';
+        }
+        if ($feed->{lastResult} eq 'new') {
+            $feed->{lastResult} = '';
+        }
+        $self->setFeed($feed->{feedId}, $feed);
     }
 
     return;
@@ -1706,97 +1715,20 @@ sub www_ical {
         $dt_end = $dt_start->clone->add( seconds => $self->icalInterval );
     }
 
+    my $ical = WebGUI::ICal->new();
+
     # Get all the events we're going to display
     my @events    = $self->getEventsIn($dt_start->toMysql,$dt_end->toMysql);
 
-
-    my $ical    = qq{BEGIN:VCALENDAR\r\n}
-                . qq{PRODID:WebGUI }.$WebGUI::VERSION."-".$WebGUI::STATUS.qq{\r\n}
-                . qq{VERSION:2.0\r\n};
-
-    # VEVENT:
     EVENT: for my $event (@events) {
         next EVENT unless $event->canView();
-        $ical   .= qq{BEGIN:VEVENT\r\n};
-
-        ### UID
-        # Use feed's UID to prevent over-propagation
-        if ($event->feedUid) {
-            $ical       .= qq{UID:}.$event->feedUid."\r\n";
-        }
-        # Create a UID for feeds native to this calendar
-        else {
-            my $domain  = $session->config->get("sitename")->[0];
-            $ical       .= qq{UID:}.$event->assetId.'@'.$domain."\r\n";
-        }
-
-        # LAST-MODIFIED (revisionDate)
-        $ical   .= qq{LAST-MODIFIED:}
-                . WebGUI::DateTime->new($self->session, $event->revisionDate)->toIcal
-                . "\r\n";
-
-        # CREATED (creationDate)
-        $ical   .= qq{CREATED:}
-                . WebGUI::DateTime->new($self->session, $event->creationDate)->toIcal
-                . "\r\n";
-
-        # SEQUENCE
-        my $sequenceNumber = $event->iCalSequenceNumber;
-        if (defined $sequenceNumber) {
-            $ical   .= qq{SEQUENCE:}
-                    . $event->iCalSequenceNumber
-                    . "\r\n";
-        }
-
-        # DTSTART
-        my $eventStart = $event->getIcalStart;
-        $ical .= 'DTSTART';
-        if ($eventStart !~ /T/) {
-            $ical .= ';VALUE=DATE';
-        }
-        $ical .= ":$eventStart\r\n";
-
-        # DTEND
-        my $eventEnd = $event->getIcalEnd;
-        $ical .= 'DTEND';
-        if ($eventEnd !~ /T/) {
-            $ical .= ';VALUE=DATE';
-        }
-        $ical .= ":$eventEnd\r\n";
-
-        # Summary (the title)
-        # Wrapped at 75 columns
-        $ical   .= $self->wrapIcal("SUMMARY:".$event->title)."\r\n";
-
-        # Description (the text)
-        # Wrapped at 75 columns
-        $ical   .= $self->wrapIcal("DESCRIPTION:".$event->description)."\r\n";
-
-        # Location (the text)
-        # Wrapped at 75 columns
-        $ical   .= $self->wrapIcal("LOCATION:".$event->location)."\r\n";
-
-        # X-WEBGUI lines
-        if ($event->groupIdView) {
-            $ical   .= "X-WEBGUI-GROUPIDVIEW:".$event->groupIdView."\r\n";
-        }
-        if ($event->get("groupIdEdit")) {
-            $ical   .= "X-WEBGUI-GROUPIDEDIT:".$event->groupIdEdit."\r\n";
-        }
-        $ical   .= "X-WEBGUI-URL:".$event->get("url")."\r\n";
-        $ical   .= "X-WEBGUI-MENUTITLE:".$event->menuTitle."\r\n"; 
-
-        $ical   .= qq{END:VEVENT\r\n};
+        $event->add_to_calendar($ical);
     }
-    # ENDVEVENT
-
-    $ical       .= qq{END:VCALENDAR\r\n};
-
 
     # Set mime of text/icalendar
-    $self->session->response->header( 'Content-Disposition' => qq{attachment; filename="feed.ics"});
-    $self->session->response->content_type("text/calendar");
-    return $ical;
+    #$self->session->http->setMimeType("text/plain");
+    $self->session->http->setFilename("feed.ics","text/calendar");
+    return $ical->as_string;
 }
 
 #----------------------------------------------------------------------------

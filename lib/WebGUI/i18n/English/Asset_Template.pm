@@ -399,7 +399,54 @@ Any scratch variables will be available in the template with this syntax:<br/>
         message     => 'An example image to show what the template looks like before the user selects it',
         lastUpdated => 0,
     },
-
+    'Configure' => {
+        message => 'Configure',
+        lastUpdated => 1294247160,
+    },
+    'Fetch Variables' => {
+        message => 'Fetch Variables',
+        lastUpdated => 1294165643,
+    },
+    'Fetch Variables hoverHelp' => {
+        message => 'Try to guess variables from a url that uses this template.',
+        lastUpdated => 1294165643,
+    },
+    'Fetch' => {
+        message => 'Fetch',
+        lastUpdated => 1294165643,
+    },
+    'URL' => {
+        message => 'URL',
+        lastUpdated => 1294165643,
+    },
+    'URL hoverHelp' => {
+        message => 'URL used by the fetch button.',
+        lastUpdated => 1294165643,
+    },
+    'Plain Text?' => {
+        message => 'Preview as Plain Text?',
+        lastUpdated => 1294165643,
+    },
+    'Plain Text hoverHelp' => {
+        message => 'If you mark yes, you will get a plain-text response (useful for seeing the raw output of a template). Otherwise, the output will be rendered as html.',
+        lastUpdated => 1294165643,
+    },
+    'Preview' => {
+        message => 'Preview',
+        lastUpdated => 1294247388,
+    },
+    'Variables' => {
+        message => 'Variables',
+        lastUpdated => 1294165651,
+    },
+    'Variables hoverHelp' => {
+        message => 'Variables used by the render button (in JSON).',
+        lastUpdated => 1294165652,
+    },
+    'Configure Preview' => {
+        message => 'Configure Preview',
+        lastUpdated => 1294251507,
+    },
 };
 
 1;

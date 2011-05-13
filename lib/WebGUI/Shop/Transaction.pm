@@ -42,6 +42,11 @@ property shippingAddressName => (
     noFormPost => 1,
     default => '',
 );
+property shippingOrganization => (
+    is => 'rw',
+    noFormPost => 1,
+    default => '',
+);
 property shippingAddress1 => (
     is => 'rw',
     noFormPost => 1,
@@ -118,6 +123,11 @@ property originatingTransactionId => (
     default => '',
 );
 property isRecurring => (
+    is => 'rw',
+    noFormPost => 1,
+    default => '',
+);
+property paymentOrganization => (
     is => 'rw',
     noFormPost => 1,
     default => '',
@@ -663,7 +673,9 @@ A hash reference with the address properties.
 
 sub formatAddress {
     my ($self, $address) = @_;
-    my $formatted = $address->{name} . "<br />" . $address->{address1} . "<br />";
+    my $formatted = $address->{name} . "<br />";
+    $formatted .= $address->{organization} . "<br />" if ($address->{organization} ne "");
+    $formatted .= $address->{address1} . "<br />";
     $formatted .= $address->{address2} . "<br />" if ($address->{address2} ne "");
     $formatted .= $address->{address3} . "<br />" if ($address->{address3} ne "");
     $formatted .= $address->{city} . ", ";
@@ -797,6 +809,7 @@ sub getTransactionVars {
         shippingPrice           => sprintf( "%.2f", $self->shippingPrice ),
         shippingAddress         => $self->formatAddress( {
             name        => $self->shippingAddressName,
+            organization => $self->shippingOrganization,
             address1    => $self->shippingAddress1,
             address2    => $self->shippingAddress2,
             address3    => $self->shippingAddress3,
@@ -808,6 +821,7 @@ sub getTransactionVars {
         } ),
         paymentAddress          =>  $self->formatAddress({
             name        => $self->paymentAddressName,
+            organization => $self->paymentOrganization,
             address1    => $self->paymentAddress1,
             address2    => $self->paymentAddress2,
             address3    => $self->paymentAddress3,
@@ -825,25 +839,31 @@ sub getTransactionVars {
         my $address = '';
         if ($self->shippingAddressId ne $item->get('shippingAddressId')) {
             $address = $self->formatAddress({
-                            name        => $item->get('shippingAddressName'),
-                            address1    => $item->get('shippingAddress1'),
-                            address2    => $item->get('shippingAddress2'),
-                            address3    => $item->get('shippingAddress3'),
-                            city        => $item->get('shippingCity'),
-                            state       => $item->get('shippingState'),
-                            code        => $item->get('shippingCode'),
-                            country     => $item->get('shippingCountry'),
-                            phoneNumber => $item->get('shippingPhoneNumber'),
+                            name         => $item->get('shippingAddressName'),
+                            organization => $self->get('shippingOrganization'),
+                            address1     => $item->get('shippingAddress1'),
+                            address2     => $item->get('shippingAddress2'),
+                            address3     => $item->get('shippingAddress3'),
+                            city         => $item->get('shippingCity'),
+                            state        => $item->get('shippingState'),
+                            code         => $item->get('shippingCode'),
+                            country      => $item->get('shippingCountry'),
+                            phoneNumber  => $item->get('shippingPhoneNumber'),
                             });
         }
  
         # Post purchase actions
         my $actionsLoop = [];
-        my $actions     = $item->getSku->getPostPurchaseActions( $item );
-        for my $label ( keys %{$actions} ) {
-            push @{$actionsLoop}, {
-                label       => $label,
-                url         => $actions->{$label},
+        my $sku = eval { $item->getSku };
+        my $has_sku = 0;
+        if (! WebGUI::Error->caught) {
+            my $actions = $sku->getPostPurchaseActions( $item );
+            $has_sku    = 1;
+            for my $label ( keys %{$actions} ) {
+                push @{$actionsLoop}, {
+                    label       => $label,
+                    url         => $actions->{$label},
+                }
             }
         }
 
@@ -861,7 +881,8 @@ sub getTransactionVars {
             %{$item->get},
             %taxVars,
             viewItemUrl             => $url->page('shop=transaction;method=viewItem;transactionId='.$self->getId.';itemId='.$item->getId, 1),
-            price                   => sprintf("%.2f", $item->get('price')),
+            hasSku                  => $has_sku,
+            price                   => sprintf( "%.2f", $item->get('price') ),
             pricePlusTax            => sprintf( "%.2f", $price + $taxAmount ),
             extendedPrice           => sprintf( "%.2f", $quantity * $price ),
             extendedPricePlusTax    => sprintf( "%.2f", $quantity * ( $price + $taxAmount ) ),
@@ -1222,8 +1243,8 @@ Refunds a specific item from a transaction and then issues shop credit.
 sub www_refundItem {
     my ($class, $session) = @_;
     return $session->privilege->insufficient unless (WebGUI::Shop::Admin->new($session)->canManage);
-    my $self = $class->new($session, $session->form->get("transactionId"));
     my $form = $session->form;
+    my $self = $class->new($session, $form->get("transactionId"));
     my $item = eval { $self->getItem($form->get("itemId")) };
     if (WebGUI::Error->caught()) {
         $session->log->error("Can't get item ".$form->get("itemId"));
@@ -1327,15 +1348,16 @@ sub www_view {
             </tr>
             <tr>
                 <th>}. $i18n->get("shipping address") .q{</th><td>}. $transaction->formatAddress({
-                        name        => $transaction->get('shippingAddressName'),
-                        address1    => $transaction->get('shippingAddress1'),
-                        address2    => $transaction->get('shippingAddress2'),
-                        address3    => $transaction->get('shippingAddress3'),
-                        city        => $transaction->get('shippingCity'),
-                        state       => $transaction->get('shippingState'),
-                        code        => $transaction->get('shippingCode'),
-                        country     => $transaction->get('shippingCountry'),
-                        phoneNumber => $transaction->get('shippingPhoneNumber'),
+                        name         => $transaction->get('shippingAddressName'),
+                        organization => $transaction->get('shippingOrganization'),
+                        address1     => $transaction->get('shippingAddress1'),
+                        address2     => $transaction->get('shippingAddress2'),
+                        address3     => $transaction->get('shippingAddress3'),
+                        city         => $transaction->get('shippingCity'),
+                        state        => $transaction->get('shippingState'),
+                        code         => $transaction->get('shippingCode'),
+                        country      => $transaction->get('shippingCountry'),
+                        phoneNumber  => $transaction->get('shippingPhoneNumber'),
                         }) .q{</td>
             </tr>
             <tr>
@@ -1346,15 +1368,16 @@ sub www_view {
             </tr>
             <tr>
                 <th>}. $i18n->get("payment address") .q{</th><td>}. $transaction->formatAddress({
-                        name        => $transaction->get('paymentAddressName'),
-                        address1    => $transaction->get('paymentAddress1'),
-                        address2    => $transaction->get('paymentAddress2'),
-                        address3    => $transaction->get('paymentAddress3'),
-                        city        => $transaction->get('paymentCity'),
-                        state       => $transaction->get('paymentState'),
-                        code        => $transaction->get('paymentCode'),
-                        country     => $transaction->get('paymentCountry'),
-                        phoneNumber => $transaction->get('paymentPhoneNumber'),
+                        name         => $transaction->get('paymentAddressName'),
+                        organization => $transaction->get('paymentOrganization'),
+                        address1     => $transaction->get('paymentAddress1'),
+                        address2     => $transaction->get('paymentAddress2'),
+                        address3     => $transaction->get('paymentAddress3'),
+                        city         => $transaction->get('paymentCity'),
+                        state        => $transaction->get('paymentState'),
+                        code         => $transaction->get('paymentCode'),
+                        country      => $transaction->get('paymentCountry'),
+                        phoneNumber  => $transaction->get('paymentPhoneNumber'),
                         }) .q{</td>
             </tr>
         </table>
@@ -1379,6 +1402,8 @@ sub www_view {
         <tbody>
     };
     foreach my $item (@{$transaction->getItems}) {
+        eval { $item->getSku; };
+        my $sku_exists = !WebGUI::Error->caught;
         $output .= WebGUI::Form::formHeader($session)
             .WebGUI::Form::hidden($session, {name=>"shop",value=>"transaction"})
             .WebGUI::Form::hidden($session, {name=>"method",value=>"updateItem"})
@@ -1386,9 +1411,15 @@ sub www_view {
             .WebGUI::Form::hidden($session, {name=>"itemId",value=>$item->getId})
             .q{
             <tr>
-            <td>}.$item->get('lastUpdated').q{</td>
-            <td><a href="}.$url->page('shop=transaction;method=viewItem;transactionId='.$transaction->getId.';itemId='.$item->getId).q{">}.$item->get('configuredTitle').q{</a></td>
-            <td>}.$transaction->formatCurrency($item->get('price')).q{</td>
+            <td>}.$item->get('lastUpdated').qq{</td>\n}.
+            (
+                $sku_exists
+                ?  q{<td><a href="}.$url->page('shop=transaction;method=viewItem;transactionId='.$transaction->getId
+                   . ';itemId='.$item->getId).q{">}.$item->get('configuredTitle').qq{</a></td>\n}
+                :  q{<td>}.$item->get('configuredTitle').q{<br />}.$i18n->get('item sku deleted').qq{</td>\n}
+ 
+            )
+            . q{<td>}.$transaction->formatCurrency($item->get('price')).q{</td>
             <td>}.$item->get('quantity').q{</td>
         };
         if ($item->get('shippingAddressId') eq $transaction->get('shippingAddressId')) {
@@ -1397,15 +1428,16 @@ sub www_view {
         else {
             $output .= q{
                 <td class="smallAddress">}. $transaction->formatAddress({
-                            name        => $item->get('shippingAddressName'),
-                            address1    => $item->get('shippingAddress1'),
-                            address2    => $item->get('shippingAddress2'),
-                            address3    => $item->get('shippingAddress3'),
-                            city        => $item->get('shippingCity'),
-                            state       => $item->get('shippingState'),
-                            code        => $item->get('shippingCode'),
-                            country     => $item->get('shippingCountry'),
-                            phoneNumber => $item->get('shippingPhoneNumber'),
+                            name         => $item->get('shippingAddressName'),
+                            organization => $item->get('shippingOrganization'),
+                            address1     => $item->get('shippingAddress1'),
+                            address2     => $item->get('shippingAddress2'),
+                            address3     => $item->get('shippingAddress3'),
+                            city         => $item->get('shippingCity'),
+                            state        => $item->get('shippingState'),
+                            code         => $item->get('shippingCode'),
+                            country      => $item->get('shippingCountry'),
+                            phoneNumber  => $item->get('shippingPhoneNumber'),
                             }) .q{</td>
             };
         }
@@ -1464,7 +1496,12 @@ sub www_viewItem {
         $session->log->error("Can't get item ".$session->form->get("itemId"));
         return $class->www_view($session);
     }
-    return $item->getSku->www_view;
+    my $sku = eval { $item->getSku };
+    if (WebGUI::Error->caught()) {
+        $session->errorHandler->error("Can't get sku for ".$session->form->get("itemId"));
+        return $class->www_view($session);
+    }
+    return $sku->www_view;
 }
 
 #-------------------------------------------------------------------

@@ -26,10 +26,12 @@ use WebGUI::Image;
 use WebGUI::Storage;
 use WebGUI::Asset::File::Image;
 use WebGUI::Form::File;
+use Image::Magick;
 
 use Test::More; # increment this value for each test you create
 use Test::Deep;
 use Data::Dumper;
+plan tests => 14;
 
 my $session = WebGUI::Test->session;
 

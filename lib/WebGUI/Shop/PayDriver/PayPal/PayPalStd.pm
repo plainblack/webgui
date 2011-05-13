@@ -271,8 +271,9 @@ sub processPayment {
         at  => $self->identityToken,
     );
     my $response = LWP::UserAgent->new->post($self->payPalUrl, \%form);
-    my ($status, @lines) = split("\n", uri_unescape($response->content));
-    my %params = map { split /=/ } @lines;
+    my ($status, @lines) = split("\n", $response->content);
+    my %params = map { split /=/ }
+                 map { uri_unescape($_) } @lines;
 
     if ($status =~ /FAIL/) {
         my $message = '<table><tr><th>Field</th><th>Value</th></tr>';

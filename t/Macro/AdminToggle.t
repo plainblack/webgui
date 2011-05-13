@@ -103,6 +103,7 @@ sub addTemplate {
 		template => "HREF=<tmpl_var toggle_url>\nLABEL=<tmpl_var toggle_text>",
 		id => 'AdminToggleTemplate--Z',
         usePacked => 0,
+        parser => 'WebGUI::Asset::Template::HTMLTemplate',
 	};
 	my $template = $importNode->addChild($properties, $properties->{id});
 	return $template;

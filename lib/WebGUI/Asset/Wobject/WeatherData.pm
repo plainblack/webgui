@@ -20,6 +20,7 @@ use WebGUI::International;
 use Moose;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Wobject';
+with 'WebGUI::Role::Asset::Dashlet';
 define tableName => 'WeatherData';
 define assetName => ["assetName", 'Asset_WeatherData'];
 define icon      => 'weatherData.gif';
@@ -57,6 +58,7 @@ property locations => (
             tab         => "properties",
             hoverHelp   => ["Your list of default weather locations", 'Asset_WeatherData'],
             label       => ["Default Locations", 'Asset_WeatherData'],
+            dashletOverridable => 1,
          );
 
 #-------------------------------------------------------------------
@@ -93,49 +95,70 @@ to be displayed within the page style
 
 sub view {
 	my $self = shift;
+    my $session = $self->session;
 	my %var;
     my $url = $self->session->url;
     
 	if ($self->partnerId ne "" && $self->licenseKey ne "") {
-		foreach my $location (split("\n", $self->locations)) {
-		    my $weather = Weather::Com::Finder->new({
-				'partner_id' => $self->partnerId, 
-       	        'license'    => $self->licenseKey,
-				'cache'		 => '/tmp',
-				});	
-			next unless defined $weather;
+        my $overrides = $self->fetchUserOverrides($self->getParent->getId);
+        my $locations = $overrides->{locations} || $self->locations;
+		foreach my $location (split("\n", $locations)) {
+            my $loop_data;
+            my $link_data = [];
+            my $cached_data = $session->cache->get( join "", $self->getId, $location );
+            if ($cached_data) {
+                $loop_data = $cached_data->{locations};
+                $link_data = $cached_data->{links} || [];
+            }
+            else {
+                my $weather = Weather::Com::Finder->new({
+                    'partner_id' => $self->partnerId, 
+                    'license'    => $self->licenseKey,
+                    'cache'		 => '/tmp',
+                    });	
+                next unless defined $weather;
 
-            foreach my $foundLocation(@{$weather->find($location)}) {
-                my $current_conditions = $foundLocation->current_conditions;
-                my $conditions = $current_conditions->description;
-                $conditions    =~ s/\b(\w)/uc($1)/eg;
-                my $tempC      = $current_conditions->temperature;
-                my $tempF;
-                $tempF = sprintf("%.0f",(((9/5)*$tempC) + 32)) if($tempC);
-                my $icon = $current_conditions->icon || "na";
+                foreach my $foundLocation(@{$weather->find($location)}) {
+                    my $current_conditions = $foundLocation->current_conditions;
+                    my $conditions = $current_conditions->description;
+                    $conditions    =~ s/\b(\w)/uc($1)/eg;
+                    my $tempC      = $current_conditions->temperature;
+                    my $tempF;
+                    $tempF = sprintf("%.0f",(((9/5)*$tempC) + 32)) if($tempC);
+                    my $icon = $current_conditions->icon || "na";
 
-                push(@{$var{'ourLocations.loop'}}, {
-                    query       => $location,
-                    cityState   => $foundLocation->name || $location,
-                    sky         => $conditions || 'N/A',
-                    tempF       => (defined $tempF)?$tempF:'N/A',
-                    tempC       => (defined $tempC)?$tempC:'N/A',
-                    smallIcon   => $url->extras("wobject/WeatherData/small_icons/".$icon.".png"),
-                    mediumIcon  => $url->extras("wobject/WeatherData/medium_icons/".$icon.".png"),
-                    largeIcon   => $url->extras("wobject/WeatherData/large_icons/".$icon.".png"),
-                    iconUrl     => $url->extras("wobject/WeatherData/medium_icons/".$icon.".png"),
-                    iconAlt     => $conditions,
-                });
-                if (!$var{links_loop}) {
-                    $var{links_loop} = [];
+                    push @{$loop_data}, {
+                        query       => $location,
+                        cityState   => $foundLocation->name || $location,
+                        sky         => $conditions || 'N/A',
+                        tempF       => (defined $tempF)?$tempF:'N/A',
+                        tempC       => (defined $tempC)?$tempC:'N/A',
+                        smallIcon   => $url->extras("wobject/WeatherData/small_icons/".$icon.".png"),
+                        mediumIcon  => $url->extras("wobject/WeatherData/medium_icons/".$icon.".png"),
+                        largeIcon   => $url->extras("wobject/WeatherData/large_icons/".$icon.".png"),
+                        iconUrl     => $url->extras("wobject/WeatherData/medium_icons/".$icon.".png"),
+                        iconAlt     => $conditions,
+                        last_fetch  => time(),
+                    };
                     for my $lnk (@{$foundLocation->current_conditions->{WEATHER}{lnks}{link}} ) {
-                        push @{$var{links_loop}}, {
-                            link_url    => $lnk->{l},
-                            link_title  => $lnk->{t},
-                        };
+                        if (! $link_data) {
+                            push @{ $link_data }, {
+                                link_url    => $lnk->{l},
+                                link_title  => $lnk->{t},
+                            };
+                        }
                     }
                 }
-			}
+                my $cached_data = {
+                    locations => $loop_data,
+                    links     => $link_data,
+                };
+                $session->cache->set( join( "", $self->getId, $location ), $cached_data, $self->get('cacheTimeout'));
+            }
+            push @{$var{'ourLocations.loop'}}, @{ $loop_data };
+            if (!$var{links_loop}) {
+                $var{links_loop} = $link_data;
+            }
 		}
 	}
 	return $self->processTemplate(\%var, undef, $self->{_viewTemplate});

@@ -421,8 +421,8 @@ the Navigation Template to determine who can see them in the menu.</p>
 	},
 
 	'page.depthDiff' => {
-		message => q|The difference in depth between the previous page and this page, parent.absDepth - page.absDepth, although parent.absDepth is not a template variable.|,
-		lastUpdated => 1149394665,
+		message => q|The difference in depth between the previous page and this page, previous.absDepth - page.absDepth, although previous.absDepth is not a template variable. For the very first page (which has no previous page), this is set to 0.|,
+		lastUpdated => 1289253145,
 	},
 
 	'page.depthDiffIsN' => {

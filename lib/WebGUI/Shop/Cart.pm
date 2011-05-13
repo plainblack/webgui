@@ -936,8 +936,10 @@ sub www_ajaxPrices {
         } || 0,
 
         shipping => eval {
-            die unless $shipping;
-            $self->update({ shippingAddressId => $shipping });
+            #die unless $shipping;
+            if ( $shipping ) {
+                $self->update({ shippingAddressId => $shipping });
+            }
             my $ship = WebGUI::Shop::Ship->new($self->session);
             $ship->getOptions($self);
         } || [],
@@ -1234,7 +1236,13 @@ sub www_view {
 
         my $billingAddressId = $self->billingAddressId;
         if ($billingAddressId) {
-            $billingAddressOptions{'update_address'} = sprintf $i18n->get('Update %s'), $self->getBillingAddress->get('label');
+            my $billingAddress = eval { $self->getBillingAddress };
+            if ( defined $billingAddress ) {
+                $billingAddressOptions{'update_address'} = sprintf $i18n->get('Update %s'), $billingAddress->get('label');
+            }
+            elsif (my $e = WebGUI::Error->caught("WebGUI::Error::ObjectNotFound") && $self->get('billingAddressId')) {
+                $self->update({billingAddressId=>''});
+            }
         }
 
         %billingAddressOptions = (%billingAddressOptions, %addressOptions);
@@ -1250,7 +1258,10 @@ sub www_view {
 
         my $shippingAddressId = $self->shippingAddressId;
         if ($shippingAddressId) {
-            $shippingAddressOptions{'update_address'} = sprintf $i18n->get('Update %s'), $self->getShippingAddress->get('label');
+            my $shippingAddress = eval { $self->getShippingAddress };
+            if ( defined $shippingAddress ) {
+               $shippingAddressOptions{'update_address'} = sprintf $i18n->get('Update %s'), $shippingAddress->get('label');
+            }
         }
         %shippingAddressOptions = (%shippingAddressOptions, %addressOptions);
 

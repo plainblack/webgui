@@ -30,7 +30,7 @@ my ($request, $oldRequest, $output);
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 3;        # Increment this number for each test you create
+plan tests => 4;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # Test createAccountSave and returnUrl together
@@ -41,8 +41,17 @@ my $createAccountSession = WebGUI::Test->newSession(0, {
 
 $auth           = WebGUI::Auth->new( $createAccountSession );
 my $username    = $createAccountSession->id->generate;
+my $language	= "PigLatin";
 push @cleanupUsernames, $username;
-$output         = $auth->createAccountSave( $username, { }, "PASSWORD" ); 
+installPigLatin();
+WebGUI::Test->addToCleanup(sub {
+	unlink File::Spec->catfile(WebGUI::Test->lib, qw/WebGUI i18n PigLatin WebGUI.pm/);
+	unlink File::Spec->catfile(WebGUI::Test->lib, qw/WebGUI i18n PigLatin.pm/);
+	rmdir File::Spec->catdir(WebGUI::Test->lib, qw/WebGUI i18n PigLatin/);
+});
+
+$createAccountSession->scratch->setLanguageOverride($language);
+$output         = $auth->www_createAccountSave( $username, { }, "PASSWORD" ); 
 WebGUI::Test->addToCleanup(sub {
     for my $username ( @cleanupUsernames ) {
         # We don't create actual, real users, so we have to cleanup by hand
@@ -68,6 +77,9 @@ is(
     "returnUrl field is used to set redirect after createAccountSave",
 );
 
+is $createAccountSession->user->profileField('language'), $language, 'languageOverride is taken in to account in createAccountSave';
+$createAccountSession->scratch->delete('language');  ##Remove language override
+
 #----------------------------------------------------------------------------
 # Test login and returnUrl together
 # Set up request
@@ -87,4 +99,19 @@ is(
     "returnUrl field is used to set redirect after login",
 );
 is $output, undef, 'login returns undef when showMessageOnLogin is false';
+
+# Session Cleanup
+$session->{_request} = $oldRequest;
+sub installPigLatin {
+    use File::Copy;
+	mkdir File::Spec->catdir(WebGUI::Test->lib, 'WebGUI', 'i18n', 'PigLatin');
+	copy( 
+		WebGUI::Test->getTestCollateralPath('International/lib/WebGUI/i18n/PigLatin/WebGUI.pm'),
+		File::Spec->catfile(WebGUI::Test->lib, qw/WebGUI i18n PigLatin WebGUI.pm/)
+	);
+	copy(
+		WebGUI::Test->getTestCollateralPath('International/lib/WebGUI/i18n/PigLatin.pm'),
+		File::Spec->catfile(WebGUI::Test->lib, qw/WebGUI i18n PigLatin.pm/)
+	);
+}
 

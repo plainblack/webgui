@@ -253,6 +253,7 @@ cmp_deeply(
             field_type => "textarea",
             }], 
         viewScreenTitle => "",
+        'Thingy field' => 'test value',
         },
         'Getting newly added thing data as JSON: www_viewThingDataViaAjax returns correct data as JSON.'
     );  
@@ -430,7 +431,6 @@ $session->request->setup_body({
 $session->user({userId => '3'});
 $session->response->status(200);
 my $json = $thingy->www_editThingDataSaveViaAjax();
-diag "json: ".$json;
 is $json, '{}', 'www_editThingDataSaveViaAjax: Empty JSON hash';
 is $session->response->status, 200, '... http status=200';
 

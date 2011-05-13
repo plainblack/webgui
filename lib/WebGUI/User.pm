@@ -21,6 +21,7 @@ use JSON ();
 use WebGUI::Exception;
 use WebGUI::ProfileField;
 use WebGUI::Inbox;
+use List::MoreUtils qw( any );
 use Scalar::Util qw( weaken );
 use Net::CIDR::Lite;
 use WebGUI::Friends;
@@ -395,7 +396,6 @@ sub delete {
     my $userId  = $self->userId;
     my $session = $self->session;
     my $db      = $session->db;
-    $self->uncache;
 
     foreach my $groupId ( @{ $self->getGroups } ) {
         my $group = WebGUI::Group->new($session, $groupId);
@@ -446,6 +446,7 @@ sub delete {
     $credit->purge;
 
     # remove user itself
+    $self->uncache;
     $db->write("DELETE FROM userProfileData WHERE userId=?",[$userId]);
     $db->write("DELETE FROM users WHERE userId=?",[$userId]);
 }
@@ -806,7 +807,7 @@ Field to get privacy setting for.
 sub getProfileFieldPrivacySetting {
     my $self      = shift;
     my $session   = $self->session;
-    my $field     = shift;
+    my $fieldId   = shift;
 
     unless ($self->{_privacySettings}) {
         #Look it up manually because we want to cache this separately.
@@ -818,12 +819,16 @@ sub getProfileFieldPrivacySetting {
         $self->{_privacySettings} = JSON->new->decode($privacySettings);
     }
     
-    return $self->{_privacySettings} unless ($field);
+    return $self->{_privacySettings} unless ($fieldId);
 
     #No privacy settings returned the privacy setting field
-    return "none" if($field eq "privacyFields");
+    return "none" if($fieldId eq "privacyFields");
 
-    return $self->{_privacySettings}->{$field};
+    if (exists $self->{_privacySettings}->{$fieldId}) {
+        return $self->{_privacySettings}->{$fieldId};
+    }
+    my $field = WebGUI::ProfileField->new($session, $fieldId);
+    return $field && $field->get('defaultPrivacySetting');
 }   
 
 
@@ -915,6 +920,25 @@ Returns 1 if the user is in the admins group.
 sub isAdmin {
 	my $self = shift;
 	return $self->isInGroup(3);
+}
+
+#-------------------------------------------------------------------
+
+=head2 isDuplicateEmail( email )
+
+Returns true if the email passed is also being used by any other user
+
+=cut
+
+sub isDuplicateEmail {
+    my ( $self, $email ) = @_;
+
+    my @userIds = $self->session->db->quickArray(
+        "SELECT userId FROM users WHERE email = ?",
+        [ $email ],
+    );
+
+    return any { $_ ne $self->userId } @userIds;
 }
 
 #-------------------------------------------------------------------
@@ -1593,7 +1617,7 @@ sub validateProfileDataFromForm {
             push(@{$errorFields},$fieldId);
         }
         #Duplicate emails throw warnings
-        elsif($fieldId eq "email" && $field->isDuplicate($fieldValue,$self->userId)) {
+        elsif($fieldId eq "email" && $self->isDuplicateEmail($fieldValue)) {
             $errorCat = $field->get("profileCategoryId") unless (defined $errorCat);
             push (@{$warnings},$i18n->get(1072));
             push(@{$warnFields},$fieldId);

@@ -363,6 +363,8 @@ sub trash {
     return 1;
 }
 
+#-------------------------------------------------------------------
+
 require WebGUI::Workflow::Activity::DeleteExportedFiles;
 sub _invokeWorkflowOnExportedFiles {
 	my $self = shift;

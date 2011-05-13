@@ -8,6 +8,12 @@ our $I18N = {
 		lastUpdated => 1134969093
 	},
 
+	'Unknown' => {
+		message => q|Unknown|,
+		lastUpdated => 1134969093,
+        context => q|meaning, we do not know who it is, and it is not Visitor|,
+	},
+
 };
 
 1;

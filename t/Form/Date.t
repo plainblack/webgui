@@ -48,7 +48,7 @@ my $testBlock = [
 
 my $formType = 'date';
 
-my $numTests = 27 + scalar @{ $testBlock } ;
+my $numTests = 28 + scalar @{ $testBlock } ;
 
 
 plan tests => $numTests;
@@ -143,7 +143,7 @@ is(
 $date2 = WebGUI::Form::Date->new($session, {defaultValue => '2008-008-001'});
 is(
     getValueFromForm($session, $date2->toHtml),
-    '1969-12-31',
+    '1970-01-01',
     "toHtml: defaultValue in bad mysql format returns date from epoch 0"
 );
 
@@ -170,6 +170,12 @@ my $epochal_value = $date_form->getValue;
 $date_form->set(value => $epochal_value);
 my $mysql_date = getValueFromForm($session, $date_form->toHtml);
 is $mysql_date, '2001-08-16', 'Form data processed and rendered round trip';
+$session->request->setup_body({});
+
+$session->user({userId => 1, });
+my $day_form = WebGUI::Form::Date->new($session, { name => 'day_date', value=>'2001-08-16'});
+my $day16 = getValueFromForm($session, $day_form->toHtml);
+is $day16, '2001-08-16', 'day set correctly in form';
 
 sub getValueFromForm {
     my ($session, $textForm) = @_;

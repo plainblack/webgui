@@ -15,7 +15,7 @@ use WebGUI::Keyword;
 use WebGUI::Asset;
 # load your modules here
 
-use Test::More tests => 16; # increment this value for each test you create
+use Test::More tests => 17; # increment this value for each test you create
 use Test::Deep;
 use Data::Dumper;
 
@@ -28,12 +28,12 @@ isa_ok($home, "WebGUI::Asset");
 my $keyword = WebGUI::Keyword->new($session);
 isa_ok($keyword, "WebGUI::Keyword");
 
-$keyword->setKeywordsForAsset({ asset=>$home, keywords=>"test key, word, foo bar"});
+$keyword->setKeywordsForAsset({ asset=>$home, keywords=>"test key, word, foo & bar"});
 my ($count) = $session->db->quickArray("select count(*) from assetKeyword where assetId=?", [$home->getId]);
 is($count, 3, "setKeywordsForAsset() create");
 cmp_bag(
     $keyword->getKeywordsForAsset({ asset => $home,  asArrayRef => 1}),
-    ['test key', 'word', 'foo bar'],
+    ['test key', 'word', 'foo & bar'],
     '... check correct keywords set, returns array ref'
 );
 
@@ -41,9 +41,18 @@ my $keywords = $keyword->getKeywordsForAsset({ asset => $home, });
 my @keywords = split ',\s*', $keywords;
 cmp_bag(
     \@keywords,
-    ['test key', 'word', 'foo bar'],
+    ['test key', 'word', 'foo & bar'],
     '... check correct keywords set, returns string'
 );
+
+my $cloud = $keyword->generateCloud(
+    {
+        startAsset  => $home,
+        displayFunc => 'view',
+    }
+);
+my $url = $session->url->escape('foo & bar');
+like($cloud, qr/\Q$url\E/, 'escaped urls in generateCloud');
 
 $keyword->setKeywordsForAsset({ asset=>$home, keywords=>"webgui, rules"});
 my ($count) = $session->db->quickArray("select count(*) from assetKeyword where assetId=?", [$home->getId]);

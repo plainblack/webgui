@@ -51,6 +51,11 @@ our $I18N = {
 		lastUpdated => 0,
 	},
 
+	'media' => {
+		message => q|Any MediaRSS entries for this item: structure is directly copied from <a href="http://search.cpan.org/perldoc?XML::FeedPP::MediaRSS#KEYS" >XML::FeedPP::MediaRSS</a>|,
+		lastUpdated => 1301495766,
+	},
+
 	'channel_description' => {
 		message => q|A description of the content available through this channel. This variable will be populated by the first feed in a multi-feed list.|,
 		lastUpdated => 0,

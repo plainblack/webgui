@@ -808,6 +808,15 @@ case of the check box list, then enter one per line.  The total amount of data i
                      context => q|Field label for the Export Page operation|,
                      message => q|Depth|,
                    },
+        'Export Related Assets' => {
+                     lastUpdated => 1301501028,
+                     context => q|Field label for the Export Page operation|,
+                     message => q|Export Related Assets|,
+                   },
+        'Export Related Assets description' => {
+                     lastUpdated => 1301501028,
+                     message => q|Include related assets in export?|,
+                   },
         '964' => {
                    lastUpdated => 1052850265,
                    message => q|Manage system trash.|,
@@ -1015,7 +1024,6 @@ Couldn't open %-s because %-s <br />
 <dd>The new URL will be based on the Asset's present URL.</dd>
 </dl>
 </div>
-<p>New URLs will be passed through the makeUrlCompliant function that is specific to the default language for your site.</p>
 |,
 		lastUpdated => 0,
 	},
@@ -1486,6 +1494,14 @@ Couldn't open %-s because %-s <br />
         lastUpdated => 0,
         context     => q{Label for asset helper},
     },
+    'Allowed Classes' => {
+        message     => 'Allowed Classes',
+        lastUpdated => 1295986062,
+    },
+    'Allowed Classes hoverHelp' => {
+        message     => 'Which assets use this metadata?',
+        lastUpdated => 1295986062,
+    }
 };
 
 1;

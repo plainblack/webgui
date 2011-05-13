@@ -115,7 +115,8 @@ use List::MoreUtils qw{ any };
 use Tie::IxHash;
 use Clone qw/clone/;
 use HTML::Packer;
-use JSON qw{ to_json };
+use JSON qw{ to_json from_json };
+use Try::Tiny;
 
 =head1 NAME
 
@@ -227,6 +228,8 @@ around cut => sub {
     return $returnValue;
 };
 
+#-------------------------------------------------------------------
+
 =head2 addRevision ( )
 
 Override the master addRevision to copy attachments
@@ -324,19 +327,22 @@ Returns the WebGUI::FormBuilder object that will be used in generating the edit 
 override getEditForm => sub {
 	my $self = shift;
 	my $tabform = super();
-	my $i18n = WebGUI::International->new($self->session, 'Asset_Template');
+        my $session = $self->session;
+        my ( $url, $style ) = $session->quick(qw( url style ));
+	my $i18n = WebGUI::International->new($session, 'Asset_Template');
+        my $returnUrl = $session->form->get("returnUrl");
 	$tabform->addField( "hidden",
 		name=>"returnUrl",
-		value=>$self->session->form->get("returnUrl")
+		value=>$returnUrl,
 		);
 	if ($self->namespace eq "") {
-		my $namespaces = $self->session->dbSlave->buildHashRef("select distinct(namespace) from template order by namespace");
+		my $namespaces = $session->dbSlave->buildHashRef("select distinct(namespace) from template order by namespace");
 		$tabform->getTab("properties")->addField( "combo",
 			name=>"namespace",
 			options=>$namespaces,
 			label=>$i18n->get('namespace'),
 			hoverHelp=>$i18n->get('namespace description'),
-			value=>[$self->session->form->get("namespace")] 
+			value=>[$session->form->get("namespace")] 
 			);
 	} else {
 		$tabform->getTab("meta")->addField( "ReadOnly",
@@ -346,14 +352,68 @@ override getEditForm => sub {
 			value=>$self->namespace
 			);
 	}
-	if($self->session->config->get("templateParsers")){
-		my @temparray = @{$self->session->config->get("templateParsers")};
+
+	my $previewButtons 
+            = $tabform->getTab('properties')->addField( "ButtonGroup", 
+                name => 'previewButtons', 
+                label => $i18n->get('Preview'),
+            );
+        $previewButtons->addButton( 'Button' => { id => 'preview', value => $i18n->get('Preview') } );
+        $previewButtons->addButton( 'Button' => { id => 'previewConfig', value => $i18n->get('Configure') } );
+	my $cform = WebGUI::HTMLForm->new($session);
+	$cform->yesNo(
+	    id        => 'previewRaw',
+	    name      => 'previewRaw',
+	    label     => $i18n->get('Plain Text?'),
+	    hoverHelp => $i18n->get('Plain Text hoverHelp'),
+	);
+	$cform->text(
+	    id           => 'previewFetchUrl',
+	    label        => $i18n->get('URL'),
+	    hoverHelp    => $i18n->get('URL hoverHelp'),
+	    defaultValue => $returnUrl,
+	);
+	$cform->button(
+	    id        => 'previewFetch',
+	    label     => $i18n->get('Fetch Variables'),
+	    hoverHelp => $i18n->get('Fetch Variables hoverHelp'),
+	    value     => $i18n->get('Fetch'),
+	);
+	$cform->codearea(
+	    id        => 'previewVars',
+	    label     => $i18n->get('Variables'),
+	    hoverHelp => $i18n->get('Variables hoverHelp'),
+	);
+
+	$cform->hidden(id => 'previewId', value => $self->getId);
+	$cform->hidden(id => 'previewGateway', value => $url->gateway);
+	$tabform->getTab('properties')->addField("ReadOnly", 
+            name => 'previewDialog', 
+            value => qq(
+	        <div id='previewConfigForm'>
+	            <div class='hd'>${\ $i18n->get('Configure Preview') }</div>
+	            <table class='bd'>${\ $cform->printRowsOnly }</table>
+	            <div class='ft' style='margin:0 auto; text-align: center'>
+	                <button id='previewConfigClose'>Close</button>
+	            </div>
+	        </div>
+	    ),
+        );
+
+	$style->setScript($url->extras($_)) for qw(
+	    yui/build/json/json-min.js
+	    yui/build/container/container-min.js
+	    templatePreview.js
+	);
+
+	if($session->config->get("templateParsers")){
+		my @temparray = @{$session->config->get("templateParsers")};
 		tie my %parsers, 'Tie::IxHash';
 		while(my $a = shift @temparray){
-			$parsers{$a} = $self->getParser($self->session, $a)->getName();
+			$parsers{$a} = $self->getParser($session, $a)->getName();
 		}
 		my $value = [$self->parser];
-		$value = \[$self->session->config->get("defaultTemplateParser")] if(!$self->parser);
+		$value = \[$session->config->get("defaultTemplateParser")] if(!$self->parser);
 		$tabform->getTab("properties")->addField( "SelectBox",
 			name=>"parser",
 			options=>\%parsers,
@@ -502,6 +562,22 @@ sub getParser {
 }
 
 #-------------------------------------------------------------------
+#
+# See the warning about using this on processVariableHeaders(). If no
+# variables were captured, we'll return the empty string.
+
+sub getVariableJson {
+    my ($class, $session) = @_;
+    my ($show, $vars, $json);
+
+    return ($show = $session->stow->get('showTemplateVars'))
+        && ($vars = $show->{vars})
+        && ($json = eval { JSON::encode_json($vars) })
+        && ($show->{startDelimiter} . $json . $show->{endDelimiter})
+        or '';
+}
+
+#-------------------------------------------------------------------
 
 =head2 importAssetCollateralData ( data )
 
@@ -631,6 +707,15 @@ sub process {
        return to_json( $self->param );
     }
 
+    my $stow = $session->stow;
+    my $show = $stow->get('showTemplateVars');
+    if ( $show && $show->{assetId} eq $self->getId && $self->canEdit ) {
+        # This will never be true again, cause we're getting rid of assetId
+        delete $show->{assetId};
+        $show->{vars} = $vars;
+        $stow->set( showTemplateVars => $show );
+    }
+
 	$self->prepare unless ($self->{_prepared});
     my $parser      = $self->getParser($session, $self->parser);
     my $template    = $self->usePacked
@@ -653,6 +738,59 @@ sub process {
 	return $output;
 }
 
+#-------------------------------------------------------------------
+
+# Used for debugging and the template test renderer.
+
+# WARNING: Please do not rely on this behavior. It's a bit of a hack, and
+# should not be considered part of the core API. Eventually, we will have
+# introspectable template objects so that you can more easily (and
+# efficiently) get this kind of information.
+
+# If the first value for the 'X-Webgui-Template-Variables' header is our
+# assetId, then in addition to processing the template, append add a json
+# representation of our template variables to the response. The headers
+# "X-Webgui-Template-Variables-Start" and "X-Webgui-Template-Variables-End"
+# will contain the delimiters for the start and end of this content so that
+# the user agent (who had to have stuck the header in in the first place) can
+# parse it out.  The delimiters will make the whole thing look like an xml
+# comment (<!-- ... -->) just in case.
+
+# We would just send the vars in the header, but different webservers have
+# different limits on header field size and it's impossible to say whether our
+# data will fit inside them or not.
+
+# This is intended to be called earlier in the request cycle (in the Content
+# URL handler) so that the headers get sent before any chunked content starts
+# being set up.  We set the stow here and check it during process() to see
+# whether we need to include the delimited json. Later on, Content will call
+# call getVariableJson to get the results.
+
+{
+    my $head = 'X-Webgui-Template-Variables';
+    my @chr  = ('0'..'9', 'a'..'z', 'A'..'Z');
+
+    sub processVariableHeaders {
+        my ($class, $session) = @_;
+        my $r = $session->request;
+        if (my $id = $r->headers->header($head)) {
+            my $rnd = join('', map { $chr[int(rand($#chr))] } (1..32));
+            my $out = {};
+            my $st  = "<!-- $rnd ";
+            my $end = " $rnd -->";
+            $out->{"$head-Start"} = $st;
+            $out->{"$head-End"}   = $end;
+            $session->response->headers( $out );
+            $session->stow->set(
+                showTemplateVars => {
+                    assetId        => $id,
+                    startDelimiter => $st,
+                    endDelimiter   => $end,
+                }
+            );
+        }
+    }
+}
 
 #-------------------------------------------------------------------
 
@@ -917,6 +1055,42 @@ sub www_manage {
 	my $self = shift;
 	#takes the user to the folder containing this template.
 	return $self->getParent->www_manageAssets;
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_preview
+
+Rendes this template with the given variables (posted as JSON)
+
+=cut
+
+sub www_preview {
+    my $self    = shift;
+    my $session = $self->session;
+    return $session->privilege->insufficient unless $self->canEdit;
+
+    my $form = $session->form;
+    my $http = $session->http;
+
+    try {
+        my $output = $self->processRaw(
+            $session,
+            $form->get('template'),
+            from_json($form->get('variables')),
+            $form->get('parser'),
+        );
+        if ($form->get('plainText')) {
+            $http->setMimeType('text/plain');
+        }
+        elsif ($output !~ /<html>/) {
+            $output = $session->style->userStyle($output);
+        }
+        return $output;
+    } catch {
+        $http->setMimeType('text/plain');
+        $_[0];
+    }
 }
 
 #-------------------------------------------------------------------

@@ -32,13 +32,45 @@ my $event = $calendar->addChild(
     {   className => 'WebGUI::Asset::Event',
         startDate => $one_year_ago,
         endDate   => $one_year_ago,
-    }
+    }, undef, undef, {skipAutoCommitWorkflows => 1, }
 );
+
+my $trashed_event = $calendar->addChild(
+    {   className => 'WebGUI::Asset::Event',
+        startDate => $one_year_ago,
+        endDate   => $one_year_ago,
+    }, undef, undef, {skipAutoCommitWorkflows => 1, }
+);
+$trashed_event->trash;
+
+my $clipped_event = $calendar->addChild(
+    {   className => 'WebGUI::Asset::Event',
+        startDate => $one_year_ago,
+        endDate   => $one_year_ago,
+    }, undef, undef, {skipAutoCommitWorkflows => 1, }
+);
+$clipped_event->cut;
 
 my $recurId = $event->setRecurrence(
     {   recurType => 'monthDay',
         every     => 2,
         startDate => $event->get('startDate'),
+        dayNumber => $eventStartDate->day,
+    }
+);
+
+$trashed_event->setRecurrence(
+    {   recurType => 'monthDay',
+        every     => 2,
+        startDate => $trashed_event->get('startDate'),
+        dayNumber => $eventStartDate->day,
+    }
+);
+
+$clipped_event->setRecurrence(
+    {   recurType => 'monthDay',
+        every     => 2,
+        startDate => $clipped_event->get('startDate'),
         dayNumber => $eventStartDate->day,
     }
 );
@@ -83,17 +115,21 @@ while (my $status = $instance->run ne 'complete') {
     last if $count++ > 30;
 }
 
-my $sql = q{
-    select e.startDate, e.endDate
-    from   asset a
-    inner join Event e on e.assetId = a.assetId
-    and    a.parentId = ?
-    order by e.startDate
-};
+#my $sql = q{
+#    select e.startDate, e.endDate
+#    from   asset a
+#    inner join Event e on e.assetId = a.assetId
+#    and    a.parentId = ?
+#    order by e.startDate
+#};
 
-my $dates = $session->db->buildArrayRefOfHashRefs($sql, [$calendar->getId]);
+#my $dates = $session->db->buildArrayRefOfHashRefs($sql, [$calendar->getId]);
+my $dates = $calendar->getLineage(['children'], { returnObjects => 1, });
 # 3 years at every other month (6 times) plus the one we started with
-is(@$dates, 19) or diag Dumper $dates;
+is(@{$dates}, 19, 'created right number of dates') or diag Dumper $dates;
+
+my @uncommitted_events = grep { $_->get('status') ne 'approved' } @{ $dates };
+is @uncommitted_events, 0, 'all events are committed (approved)';
 
 done_testing;
 

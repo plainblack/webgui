@@ -60,8 +60,21 @@ WebGUI.Form.JsonTable
         },
         this, true
     );
-
-    this.init();
+    this.i18n
+    = new WebGUI.i18n( { 
+            namespaces  : {
+                'WebGUI' : [
+                    "576",
+                    "Up",
+                    "Down"
+                ]
+            },
+            onpreload   : {
+                fn       : WebGUI.Form.JsonTable.prototype.init,
+                obj      : this,
+                override : true
+            }
+        } );
 
     return this;
 };
@@ -69,6 +82,7 @@ WebGUI.Form.JsonTable
 /****************************************************************************
  * addActions( row )
  * Add the row actions to the given row
+ * Delay creating this so that the i18n object exists
  */
 WebGUI.Form.JsonTable.prototype.addActions
 = function (row) {
@@ -76,7 +90,7 @@ WebGUI.Form.JsonTable.prototype.addActions
     var buttonCell      = row.lastChild;
     var deleteButton    = document.createElement('input');
     deleteButton.type   = "button";
-    deleteButton.value  = "Delete";
+    deleteButton.value  = this.i18n.get('WebGUI', '576');
     YAHOO.util.Event.addListener( deleteButton, "click", 
         function (e) {
             this.deleteRow( row );
@@ -87,7 +101,7 @@ WebGUI.Form.JsonTable.prototype.addActions
 
     var moveUpButton    = document.createElement('input');
     moveUpButton.type   = "button";
-    moveUpButton.value  = "Up";
+    moveUpButton.value  = this.i18n.get('WebGUI', 'Up');
     YAHOO.util.Event.addListener( moveUpButton, "click", 
         function (e) {
             this.moveRowUp( row );
@@ -98,7 +112,7 @@ WebGUI.Form.JsonTable.prototype.addActions
 
     var moveDownButton      = document.createElement('input');
     moveDownButton.type     = "button";
-    moveDownButton.value    = "Down";
+    moveDownButton.value    = this.i18n.get('WebGUI', 'Down');
     YAHOO.util.Event.addListener( moveDownButton, "click", 
         function (e) {
             this.moveRowDown( row );
@@ -164,6 +178,7 @@ WebGUI.Form.JsonTable.prototype.init
             }
         }
     }
+
 };
 
 /****************************************************************************

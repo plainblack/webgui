@@ -14,7 +14,7 @@
 use strict;
 use WebGUI::Test;
 use WebGUI::Session;
-use Test::More tests => 9; # increment this value for each test you create
+use Test::More tests => 12; # increment this value for each test you create
 use WebGUI::Asset::Wobject::Collaboration;
 use WebGUI::Asset::Post;
 use WebGUI::Asset::Post::Thread;
@@ -36,6 +36,7 @@ my @addArgs = ( undef, undef, { skipAutoCommitWorkflows => 1, skipNotification =
 my $notification_template = WebGUI::Test->asset(
     className => 'WebGUI::Asset::Template',
     template  => "<body>!!!url:<tmpl_var url>!!!content:<tmpl_var content>!!!</body>",
+    parser    => 'WebGUI::Asset::Template::HTMLTemplate',
     %tag,
 );
 
@@ -100,6 +101,31 @@ utf8::encode($expected_url);
 is $url,
     $expected_url,
     'url UTF8 checks out';
+
+my $before_copy = $session->db->quickScalar('select count(*) from mailQueue');
+
+{
+
+    ##Disable sending email
+    my $sendmock = Test::MockObject->new( {} );
+    $sendmock->set_isa('WebGUI::Mail::Send');
+    $sendmock->set_true('addText', 'send', 'addHeaderField', 'addHtml', 'queue', 'addFooter');
+    my $was_sent   = 0;
+    my $was_queued = 0;
+    $sendmock->set_bound('send',  $was_sent);
+    $sendmock->set_bound('queue', $was_queued);
+    local *WebGUI::Mail::Send::create;
+    $sendmock->fake_module('WebGUI::Mail::Send',
+        create => sub { return $sendmock },
+    );
+
+    my $t1p1_copy = $t1p1->duplicate();
+    WebGUI::Test->addToCleanup($t1p1_copy);
+    is $was_sent,   0, 'email not sent when Post is duplicated';
+    is $was_queued, 0, '... nor queued';
+    my $after_copy = $session->db->quickScalar('select count(*) from mailQueue');
+    is $after_copy, $before_copy, '... and no additional mails in the queue';
+}
 
 #vim:ft=perl
 

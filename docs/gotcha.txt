@@ -21,6 +21,50 @@ save you many hours of grief.
        Account Macro template
        Admin Toggle Macro template
 
+7.10.15
+--------------------------------------------------------------------
+    * WebGUI now depends on Geo::Coder::Googlev3 for it's Map asset
+
+7.10.13
+--------------------------------------------------------------------
+    * WebGUI now depends on XML::FeedPP::MediaRSS.
+
+7.10.12
+--------------------------------------------------------------------
+    * The Dashboard has been extended to include Asset Dashlets.  This gives
+      Assets fine control over which properties can be extended and which can't.
+      Assets in the Dashboard can be set to be required, which prevents them from
+      being deleted, and fixed, which prevents them from moved.
+    * The StockData and WeatherData assets now include cache settings to reduce
+      server side load.  The browser interface for the StockData asset still does
+      real time lookups.
+    * A new macro has been added, LastModifiedBy.  This returns the username of
+      the user who last modified an Asset.  If the asset in question is a Page
+      Layout or Folder, then querying that asset will also check all children.
+    * The Group form control has been extended to add a simple interface for
+      adding new Groups and changing their membership.
+
+7.10.11
+--------------------------------------------------------------------
+    * Modified TimeField, now provides popupless immediate validation with
+      an alert if the value is not interpretable when the user leaves that field
+
+7.10.10
+--------------------------------------------------------------------
+    * Asset metadata is now versioned.
+
+    * The updated versions of HTML::Packer, JavaScript::Packer and CSS::Packer
+      added for 7.10.9 require perl 5.8.9 or higher to run.
+
+7.10.9
+--------------------------------------------------------------------
+    * WebGUI now depends on Data::ICal for making and reading iCal feeds
+      for the Calendar.
+
+    * WebGUI now depends on updated versions of the HTML::Packer, JavaScript::Packer and
+      CSS::Packer modules.  These new versions have much better performance than their
+      earlier incarnations.
+
 7.10.4
 --------------------------------------------------------------------
     * WebGUI now depends on Monkey::Patch for doing sanely scoped

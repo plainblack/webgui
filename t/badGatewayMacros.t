@@ -52,6 +52,9 @@ while (my $templateAsset = $getATemplate->()) {
     if ($header) {
         $match ||= ($header =~ $macro);
     }
+    foreach my $attachment (@{ $templateAsset->getAttachments }) {
+        $match ||= ($attachment->{url} =~ $macro);
+    }
     ok(!$match, sprintf "%s: %s (%s) has no bad gateway macros", $templateAsset->getTitle, $templateAsset->getId, $templateAsset->getUrl);
 }
 

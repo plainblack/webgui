@@ -89,13 +89,33 @@ sub addRevision {
     foreach my $table ($self->meta->get_tables) {
         $session->db->write( "insert into ".$table." (assetId,revisionDate) values (?,?)", [$self->getId, $now]);
     }
+
+    # Copy metadata values
+    my $db    = $self->session->db;
+    my $id    = $self->getId;
+    my $then  = $self->get('revisionDate');
+    my $mdget = q{
+        select fieldId, value from metaData_values
+        where assetId = ? and revisionDate = ?
+    };
+    my $mdset = q{
+        insert into metaData_values (fieldId, value, assetId, revisionDate)
+        values (?, ?, ?, ?)
+    };
+    for my $row (@{ $db->buildArrayRefOfHashRefs($mdget, [ $id, $then ]) }) {
+        $db->write($mdset, [ $row->{fieldId}, $row->{value}, $id, $now ]);
+    }
+
     $session->db->commit;
 
 	# current values, and the user set properties
 	my %mergedProperties = (%{$self->get}, %{$properties}, );
 
     # Set some defaults
-    $mergedProperties{ revisedBy    } ||= $session->user->userId;
+    $mergedProperties{ revisedBy } = $properties->{ revisedBy } || $session->user->userId;
+
+    # Force the packed head block to be regenerated
+    delete $mergedProperties{extraHeadTagsPacked};
 
     #Instantiate new revision and fill with real data
     my $newVersion = WebGUI::Asset->newById($session, $self->getId, $now);
@@ -330,6 +350,10 @@ sub purgeRevision {
 		if ($count < 1) {
 			$db->write("update asset set isLockedBy=null where assetId=?",[$self->getId]);
 		}
+		$db->write(
+			'delete from metaData_values where assetId=?  and revisionDate=?',
+			[ $self->getId, $self->get('revisionDate') ]
+		);
         $db->commit;
 		$self->purgeCache;
 		$self->updateHistory("purged revision ".$self->get("revisionDate"));

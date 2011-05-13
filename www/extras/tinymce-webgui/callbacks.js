@@ -1,26 +1,44 @@
 // WebGUI Specific javascript functions for TinyMCE
 
-function tinyMCE_WebGUI_URLConvertor(url, node, on_save) {
-    // Do custom WebGUI convertion, replace back ^();
+(function () {
+    var carat      = /%5E/g,
+        colon      = /%3B/g,
+        leftParen  = /%28/g,
+        rightParen = /%29/g,
+        quot       = /&quot;/g;
 
-    // turn escaped macro characters back into the real thing
-    url = url.replace(new RegExp("%5E", "g"), "^");
-    url = url.replace(new RegExp("%3B", "g"), ";");
-    url = url.replace(new RegExp("%28", "g"), "(");
-    url = url.replace(new RegExp("%29", "g"), ")");
-
-    // if there is a macro in the line, remove everything in front of the macro
-    url = url.replace(/^.*(\^.*)$/,"$1");
-
-    return url;
-}
-
-function tinyMCE_WebGUI_Cleanup(type,value) {
-    switch (type) {
-        case "get_from_editor":
-            value = value.replace(/&quot;/g, '"');
-            break;
+    function convert(url) {
+        return url.replace(carat, '^')
+            .replace(colon, ':')
+            .replace(leftParen, '(')
+            .replace(rightParen, ')');
     }
-    return value;
-}
 
+    function recurse(el) {
+        var i, nodes = el.childNodes, len = nodes.length;
+        if (el.href) {
+            el.href = convert(el.href);
+        }
+        if (el.src) {
+            el.src = convert(el.src);
+        }
+        for (i = 0; i < len; i += 1) {
+            recurse(nodes[i]);
+        }
+    }
+
+    function postproc (pl, o) {
+        recurse(o.node);
+    }
+
+    function cleanup (type, value) {
+        if (type === 'get_from_editor') {
+            value = value.replace(quot, '"');
+        }
+        return value;
+    }
+
+    window.tinyMCE_WebGUI_URLConvertor = convert;
+    window.tinyMCE_WebGUI_paste_postprocess = postproc;
+    window.tinyMCE_WebGUI_Cleanup = cleanup;
+}());

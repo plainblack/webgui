@@ -18,9 +18,6 @@ use WebGUI::Session;
 use Test::More tests => 1; # increment this value for each test you create
 use Test::Deep;
 
-my $one = [1, 2, 3, 4];
-my @two = ();
-
 my $session = WebGUI::Test->session;
 
 my $dataFormIds = $session->db->buildArrayRef("select asset.assetId, assetData.revisionDate from DataForm left join asset on asset.assetId=DataForm.assetId left join assetData on assetData.revisionDate=DataForm.revisionDate and assetData.assetId=DataForm.assetId where asset.state='published' and assetData.revisionDate=(SELECT max(revisionDate) from assetData where assetData.assetId=asset.assetId and (assetData.status='approved' or assetData.tagId=?)) order by assetData.title");

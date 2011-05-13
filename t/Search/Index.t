@@ -35,7 +35,7 @@ my $article         = WebGUI::Test->asset->addChild( {
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 16;        # Increment this number for each test you create
+plan tests => 24;        # Increment this number for each test you create
 
 use_ok( 'WebGUI::Search::Index' );
 
@@ -67,6 +67,7 @@ cmp_deeply (
             re("keyword1"), re("keyword2"),
         ),
         lineage         => $article->get('lineage'),
+        subId           => undef,
     },
     "Index has correct information" 
 );
@@ -79,7 +80,7 @@ is( $indexer->getId, $article->getId, "getId() returns assetId" );
 
 # setIsPublic
 $indexer->setIsPublic(0);
-is( $db->quickScalar( "SELECT isPublic FROM assetIndex WHERE assetId=?", [$article->getId] ),
+is( $db->quickScalar( "SELECT isPublic FROM assetIndex WHERE assetId=? and url=?", [$article->getId, $article->get('url')] ),
     0,
     "setIsPublic updates database",
 );
@@ -89,7 +90,7 @@ isa_ok( $indexer->session, 'WebGUI::Session', 'session returns session' );
 
 # updateSynopsis
 $indexer->updateSynopsis( "A new synopsis" );
-is( $db->quickScalar( "SELECT synopsis FROM assetIndex WHERE assetId=?", [$article->getId] ),
+is( $db->quickScalar( "SELECT synopsis FROM assetIndex WHERE assetId=? and url=?", [$article->getId, $article->get('url')] ),
     "A new synopsis",
     "updateSynopsis updates assetIndex"
 );
@@ -104,9 +105,9 @@ isnt(
 # TODO
  
 # addKeywords
-my $currentKeywords = $db->quickScalar( "SELECT keywords FROM assetIndex WHERE assetId=?", [$article->getId] );
+my $currentKeywords = $db->quickScalar( "SELECT keywords FROM assetIndex WHERE assetId=? and url=?", [$article->getId, $article->get('url')] );
 $indexer->addKeywords("shawshank");
-my $newKeywords     = $db->quickScalar( "SELECT keywords FROM assetIndex WHERE assetId=?", [$article->getId] );
+my $newKeywords     = $db->quickScalar( "SELECT keywords FROM assetIndex WHERE assetId=? and url=?", [$article->getId, $article->get('url')] );
 like( $newKeywords, qr{$currentKeywords}, "addKeywords keeps old keywords" );
 like( $newKeywords, qr{shawshank}, "addKeywords adds the keywords" );
 
@@ -118,7 +119,7 @@ $article->update({
 } );
 $indexer = WebGUI::Search::Index->create( $article );
 
-ok ( $row = $db->quickHashRef( "SELECT * FROM assetIndex WHERE assetId=?", [ $article->getId ] ),
+ok ( $row = $db->quickHashRef( "SELECT * FROM assetIndex WHERE assetId=? and url=?", [ $article->getId, $article->get('url') ] ),
     "assetId exists in assetIndex"
 );
 cmp_deeply ( 
@@ -143,6 +144,7 @@ cmp_deeply (
             re("keyword1"), re("keyword2"),
         ),
         lineage         => $article->get('lineage'),
+        subId           => undef,
     },
     "Index has synopsis information in keywords" 
 );
@@ -156,7 +158,7 @@ $article->update({
 });
 $indexer = WebGUI::Search::Index->create( $article );
 
-$row = $db->quickHashRef( "SELECT * FROM assetIndex WHERE assetId=?", [ $article->getId ]);
+$row = $db->quickHashRef( "SELECT * FROM assetIndex WHERE assetId=? and url=?", [ $article->getId, $article->get('url') ]);
 cmp_deeply ( 
     $row,
     {
@@ -179,6 +181,7 @@ cmp_deeply (
             re("keyword1"), re("keyword2"),
         ),
         lineage         => $article->get('lineage'),
+        subId           => undef,
     },
     "Index has description in keywords" 
 );
@@ -192,7 +195,7 @@ $article->update({
 });
 $indexer = WebGUI::Search::Index->create( $article );
 
-$row = $db->quickHashRef( "SELECT * FROM assetIndex WHERE assetId=?", [ $article->getId ] );
+$row = $db->quickHashRef( "SELECT * FROM assetIndex WHERE assetId=? and url=?", [ $article->getId, $article->get('url') ] );
 cmp_deeply ( 
     $row,
     {
@@ -214,6 +217,7 @@ cmp_deeply (
             re("keyword1"), re("keyword2"),
         ),
         lineage         => $article->get('lineage'),
+        subId           => undef,
     },
     "Index has synopsis and description in keywords" 
 );
@@ -225,7 +229,7 @@ $article->update({
 });
 $indexer = WebGUI::Search::Index->create( $article );
 
-$row = $db->quickHashRef( "SELECT * FROM assetIndex WHERE assetId=?", [ $article->getId ] );
+$row = $db->quickHashRef( "SELECT * FROM assetIndex WHERE assetId=? and url=?", [ $article->getId, $article->get('url') ] );
 cmp_deeply ( 
     $row,
     superhashof({
@@ -251,7 +255,7 @@ SKIP: {
     });
     $indexer = WebGUI::Search::Index->create( $article );
 
-    $row = $db->quickHashRef( "SELECT * FROM assetIndex WHERE assetId=?", [ $article->getId ] );
+    $row = $db->quickHashRef( "SELECT * FROM assetIndex WHERE assetId=? and url=?", [ $article->getId, $article->get('url') ] );
     cmp_deeply ( 
         $row,
         superhashof({
@@ -264,5 +268,40 @@ SKIP: {
         "Index has Chinese ideographs, separated by spaces and delimited with quotes to pad the length" 
     );
 }
+
+#----------------------------------------------------------------------------
+# Test addRecord
+note "addRecord";
+$article->update({
+    description     => "descriptive",
+});
+$indexer = WebGUI::Search::Index->create( $article );
+is $session->db->quickScalar('select count(*) from assetIndex where assetId=?', [$article->getId]), 1, 'create puts 1 record into the db';
+$indexer->addRecord( url => 'something else');
+is $session->db->quickScalar('select count(*) from assetIndex where assetId=?', [$article->getId]), 1, 'addRecord does nothing without url and keywords entries';
+$indexer->addRecord( keywords => 'something else');
+is $session->db->quickScalar('select count(*) from assetIndex where assetId=?', [$article->getId]), 1, 'addRecord does nothing without url and keywords entries';
+$indexer->addRecord( keywords => 'something else', url => '', );
+is $session->db->quickScalar('select count(*) from assetIndex where assetId=?', [$article->getId]), 1, 'addRecord does nothing without url and keywords entries';
+$indexer->addRecord( keywords => 'something else', url => 'another/thing/coming', );
+is $session->db->quickScalar('select count(*) from assetIndex where assetId=?', [$article->getId]), 2, 'new record added';
+
+my %original_record = $session->db->quickHash('select * from assetIndex where assetId=? and url=?', [$article->getId, $article->get('url')]);
+my %new_record      = $session->db->quickHash('select * from assetIndex where assetId=? and url=?', [$article->getId, 'another/thing/coming']);
+
+delete @original_record{qw/url keywords/};
+delete @new_record{qw/url keywords/};
+
+cmp_deeply(\%original_record, \%new_record, 'records are the same, aside from url and keywords');
+
+$indexer->delete;
+is $session->db->quickScalar('select count(*) from assetIndex where assetId=?', [$article->getId]), 0, 'all records deleted';
+
+$indexer = WebGUI::Search::Index->create( $article );
+$indexer->addRecord(url => 'other', keywords => 'yada yada yada', lineage => 'hike');
+my %original_record = $session->db->quickHash('select * from assetIndex where assetId=? and url=?', [$article->getId, $article->get('url')]);
+my %new_record      = $session->db->quickHash('select * from assetIndex where assetId=? and url=?', [$article->getId, 'other']);
+
+is $original_record{lineage}, $new_record{lineage}, 'lineage is not allowed to be overridden';
 
 #vim:ft=perl

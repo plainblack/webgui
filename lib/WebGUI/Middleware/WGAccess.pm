@@ -60,6 +60,9 @@ sub call {
             $privs = JSON->new->utf8->decode($contents);
         }
 
+        return @$r = (403, [ 'Content-Type' => 'text/plain' ], [ 'Forbidden' ])
+            if $privs->{state} eq 'trash';
+
         require WebGUI::Asset;
         my $userId = $session->get('userId');
 

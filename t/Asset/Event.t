@@ -11,12 +11,15 @@
 use strict;
 
 use WebGUI::Test;
-use WebGUI::Session;
-use WebGUI::Storage;
-use WebGUI::Asset::Event;
 
 use Test::More; # increment this value for each test you create
 use Test::Deep;
+
+plan tests => 30;
+
+use WebGUI::Session;
+use WebGUI::Storage;
+use WebGUI::Asset::Event;
 
 my $session = WebGUI::Test->session;
 
@@ -148,13 +151,98 @@ is ($event7->get('startDate'), '2000-09-01', 'startDate bumped by 1 day');
 is ($event7->get('endTime'), '00:00:00',   'endTime set to 00:00:00 if the hour is more than 23');
 is ($event7->get('endDate'), '2000-09-02', 'endDate bumped by 1 day');
 
+#############################################################################
+# Valid dates
+$session->request->setup_body({ startDate => '0000-00-01', endDate => '1000-00-01' });
+my $event = $cal->addChild({ className => 'WebGUI::Asset::Event' }, undef, time()+10);
+my $output = $event->processEditForm;
+is( ref $output, 'ARRAY', 'returns error array' );
+is( scalar @$output, 2, 'has two errors' );
+
+#######################################
+#
+# setRelatedLinks, getRelatedLinks
+#
+#######################################
+$event6->setRelatedLinks([
+{
+    new_event => 1,
+    sequenceNumber => 1,
+    linkurl => 'http://www.nowhere.com',
+    linktext => 'Great link',
+    groupIdView => '7',
+    eventlinkId => '27',
+},
+{
+    new_event => 1,
+    sequenceNumber => 2,
+    linkurl => 'http://www.somewhere.com',
+    linktext => 'Another great link',
+    groupIdView => '7',
+    eventlinkId => '28',
+},
+]);
+cmp_deeply(
+    $event6->getRelatedLinks(),
+    [{
+        sequenceNumber => 1,
+        linkURL        => 'http://www.nowhere.com',
+        linktext       => 'Great link',
+        groupIdView    => '7',
+        eventlinkId    => '27',
+        assetId        => $event6->getId,
+    },
+    {
+        sequenceNumber => 2,
+        linkURL        => 'http://www.somewhere.com',
+        linktext       => 'Another great link',
+        groupIdView    => '7',
+        eventlinkId    => '28',
+        assetId        => $event6->getId,
+    }],
+    'related links stored in the database correctly'
+);
+
 #######################################
 #
 # duplicate
 #
 #######################################
 
-
 my $event6b = $event6->duplicate();
+ok($session->id->valid($event6b->get('storageId')), 'duplicated event got a valid storageId');
 isnt($event6b->get('storageId'), $event6->get('storageId'), 'duplicating an asset creates a new storage location');
-done_testing;
+cmp_deeply(
+    $event6b->getRelatedLinks(),
+    [{
+        sequenceNumber => 1,
+        linkURL        => 'http://www.nowhere.com',
+        linktext       => 'Great link',
+        groupIdView    => '7',
+        eventlinkId    => ignore(),
+        assetId        => $event6b->getId,
+    },
+    {
+        sequenceNumber => 2,
+        linkURL        => 'http://www.somewhere.com',
+        linktext       => 'Another great link',
+        groupIdView    => '7',
+        eventlinkId    => ignore(),
+        assetId        => $event6b->getId,
+    }],
+    'duplicated event has relatedLinks'
+);
+
+#######################################
+#
+# purge
+#
+#######################################
+{
+    my $storage   = $event6b->getStorageLocation;
+    my $assetId   = $event6b->getId;
+    $event6b->purge;
+    my $count = $session->db->quickScalar('select count(*) from Event_relatedlink where assetId=?',[$assetId]);
+    is $count, 0, 'purge: related links cleaned up in the database';
+    ok ! -d $storage->getPath(), '... storage location removed, too';
+}

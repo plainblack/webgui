@@ -336,7 +336,7 @@ SKIP: {
                     ZipOrigination => ignore(), ZipDestination => ignore(),
                     Machinable     => ignore(), Ounces         => ignore(),
                     Pounds         => ignore(), Size           => ignore(),
-                    Zone           => ignore(),
+                    Zone           => ignore(), Container      => {},
                     Postage        => {
                         CLASSID     => ignore(),
                         MailService => ignore(),
@@ -421,7 +421,7 @@ SKIP: {
                     ZipOrigination => ignore(), ZipDestination => ignore(),
                     Machinable     => ignore(), Ounces         => '0.0',
                     Pounds         => 2,        Size           => ignore(),
-                    Zone           => ignore(),
+                    Zone           => ignore(), Container      => {},
                     Postage        => {
                         CLASSID     => ignore(),
                         MailService => ignore(),
@@ -433,7 +433,7 @@ SKIP: {
                     ZipOrigination => ignore(), ZipDestination => ignore(),
                     Machinable     => ignore(), Ounces         => '8.0',
                     Pounds         => 1,        Size           => ignore(),
-                    Zone           => ignore(),
+                    Zone           => ignore(), Container      => {},
                     Postage        => {
                         CLASSID     => ignore(),
                         MailService => ignore(),
@@ -559,7 +559,7 @@ SKIP: {
                     ZipOrigination => ignore(), ZipDestination => ignore(),
                     Machinable     => ignore(), Ounces         => '0.0',
                     Pounds         => 2,        Size           => ignore(),
-                    Zone           => ignore(),
+                    Zone           => ignore(), Container      => {},
                     Postage        => {
                         CLASSID     => ignore(),
                         MailService => ignore(),
@@ -571,7 +571,7 @@ SKIP: {
                     ZipOrigination => ignore(), ZipDestination => ignore(),
                     Machinable     => ignore(), Ounces         => '8.0',
                     Pounds         => 1,        Size           => ignore(),
-                    Zone           => ignore(),
+                    Zone           => ignore(), Container      => {},
                     Postage        => {
                         CLASSID     => ignore(),
                         MailService => ignore(),
@@ -583,7 +583,7 @@ SKIP: {
                     ZipOrigination => ignore(), ZipDestination => 53703,
                     Machinable     => ignore(), Ounces         => '0.0',
                     Pounds         => 12,       Size           => ignore(),
-                    Zone           => ignore(),
+                    Zone           => ignore(), Container      => {},
                     Postage        => {
                         CLASSID     => ignore(),
                         MailService => ignore(),
@@ -719,7 +719,7 @@ SKIP: {
         {
             Package => [
                 {
-                    ID             => 0,
+                    ID             => 0,        Container      => {},
                     ZipOrigination => ignore(), ZipDestination => ignore(),
                     Ounces         => ignore(), Pounds         => ignore(),
                     Size           => ignore(), Zone           => ignore(),
@@ -783,7 +783,7 @@ SKIP: {
         {
             Package => [
                 {
-                    ID             => 0,
+                    ID             => 0,        Container      => {},
                     ZipOrigination => ignore(), ZipDestination => ignore(),
                     Ounces         => ignore(), Pounds         => ignore(),
                     Size           => ignore(), Zone           => ignore(),

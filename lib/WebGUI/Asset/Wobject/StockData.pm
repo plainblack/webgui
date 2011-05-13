@@ -20,6 +20,7 @@ use Number::Format ();
 use Moose;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Wobject';
+with 'WebGUI::Role::Asset::Dashlet';
 define tableName => 'StockData';
 define icon      => 'stockData.gif';
 define assetName => ["assetName", 'Asset_StockData'];
@@ -45,6 +46,7 @@ property defaultStocks => (
             tab         => 'properties',
             label       => ["default_stock_label", 'Asset_StockData'],
             hoverHelp   => ["default_stock_label_description", 'Asset_StockData'],
+            dashletOverridable => 1,
         );
 property source => (
             fieldType   => "selectList",
@@ -208,9 +210,12 @@ sub _convertToEpoch {
    if($time =~ m/pm/i) {
       $hour += 12;
    }
+   $hour ||= 0;
    $hour = $self->_appendZero($hour);
+   $minute ||= 0;
    $minute = $self->_appendZero($minute);
-   return $self->session->datetime->humanToEpoch("$year-$month-$day $hour:$minute:00");
+   my $epoch = eval {$self->session->datetime->humanToEpoch("$year-$month-$day $hour:$minute:00")};
+   return $epoch;
 }
 
 #-------------------------------------------------------------------
@@ -226,21 +231,45 @@ List of stock symbols to find passed in as an array reference.  Stock symbols sh
 =cut
 
 sub _getStocks {
-   my $self = shift;
-   my $stocks = $_[0];
+    my $self = shift;
+    my $stocks = $_[0];
+    my $session = $self->session;
 
-   # Create a new Finance::Quote object
-   my $q = Finance::Quote->new;
-   # Disable failover if specified
-   unless ($self->failover) {
-	   $q->failover(0);
-   }
+    # Create a new Finance::Quote object
+    my $q = Finance::Quote->new;
+    # Disable failover if specified
+    unless ($self->failover) {
+       $q->failover(0);
+    }
+    # Hardcoded timeout for now.
+    $q->timeout(15);
 
-   # Hardcoded timeout for now.
-   $q->timeout(15);
+    my $source = $self->source;
+    my %stocks = ();
+    my @stocks_to_fetch = ();
+    STOCK: foreach my $stock (@{$stocks}) {
+        $stock = uc $stock;
+        my $value = $session->cache->get( join "", $self->getId, $source, $stock );
+        if ($value) {
+            %stocks = (%stocks, %{ $value });
+        }
+        else {
+            push @stocks_to_fetch, $stock;
+        }
+    }
 
-   # Fetch the stock information and return the results
-   return $q->fetch($self->source,@{$stocks});
+    # Fetch the information for uncached stocks, cache them individually, and build the composite data.
+    my %new_stocks = $q->fetch($source, @stocks_to_fetch);
+    foreach my $stock (@stocks_to_fetch) {
+        $stock = uc $stock;
+        my @stock_keys = grep { /$stock\b/ } keys %new_stocks;
+        my %slice;
+        @slice{ @stock_keys } = @new_stocks{ @stock_keys };
+        $slice{$stock,'last_fetch'} = time();
+        $session->cache->set( join( "", $self->getId, $source, $stock ), \%slice, $self->get('cacheTimeout') );
+        %stocks = (%stocks, %slice);
+    }
+    return \%stocks;
 }
 
 #-------------------------------------------------------------------
@@ -330,7 +359,8 @@ sub view {
 	$var->{'stock.display.url'} = $self->getUrl("func=displayStock;symbol=");
 	
 	#Build list of stocks as an array
-	my $defaults = $self->defaultStocks;
+    my $overrides = $self->fetchUserOverrides($self->getParent->getId);
+	my $defaults  = $overrides->{defaultStocks} || $self->defaultStocks;
 	#replace any windows newlines
 	$defaults =~ s/\r//;
 	my @array = split("\n",$defaults);

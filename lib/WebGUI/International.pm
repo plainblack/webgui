@@ -35,8 +35,6 @@ This package provides an interface to the internationalization system.
  $string = $i->get($internationalId);
  $string = $i->get($internationalId, $otherNamespace);
 
- $url = $i->makeUrlCompliant($url);
-
  $hashRef = $i->getLanguage($lang);
 
  $hashRef = $i->getLanguages();
@@ -206,6 +204,7 @@ sub getLanguages {
 	my ($self) = @_;
     my $hashRef;
     for my $lang ( findsubmod 'WebGUI::i18n' ) {
+        $self->session->log->info( "Found language $lang" );
         $lang =~ s/^WebGUI::i18n:://;
         $hashRef->{$lang} = $self->getLanguage($lang, "label");
     }
@@ -216,6 +215,8 @@ sub getLanguages {
 #-------------------------------------------------------------------
 
 =head2 makeUrlCompliant ( url [ , language ] )
+
+THIS METHOD IS DEPRECATED AND WILL BE REMOVED FROM WEBGUI.
 
 Manipulates a URL to make sure it will work on the internet. It removes things like non-latin characters, etc.
 
@@ -231,11 +232,7 @@ Specify a default language. Defaults to user preference or "English".
 
 sub makeUrlCompliant {
 	my ($self, $url, $language) = @_;
-	$language = $language || $self->{_language} || $self->session->user->get("language") || "English";
-	my $cmd = "WebGUI::i18n::".$language;
-    WebGUI::Pluggable::load($cmd);
-	my $output = WebGUI::Pluggable::run($cmd, 'makeUrlCompliant', [$url]);
-	return $output;
+    return $url;
 }
 
 

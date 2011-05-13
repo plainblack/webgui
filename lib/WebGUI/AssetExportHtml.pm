@@ -379,8 +379,8 @@ sub exportBranch {
 
         # try to write the file
         eval { $asset->exportWriteFile };
-        if( $@ ) {
-            WebGUI::Error->throw(error => "could not export asset with URL " . $asset->getUrl . ": $@");
+        if( my $e = WebGUI::Error->caught() || $@ ) {
+            WebGUI::Error->throw(error => "could not export asset with URL " . $asset->getUrl . ": $e");
         }
 
         # next, tell the asset that we're exporting, so that it can export any
@@ -419,7 +419,7 @@ sub exportBranch {
         $asset->$report('done');
     };
 
-    my $assetIds = $self->exportGetDescendants(undef, $depth);
+    my $assetIds = $self->exportGetAssetIds($options);
     foreach my $assetId ( @{$assetIds} ) {
         $exportAsset->( $assetId );
     }
@@ -507,6 +507,33 @@ sub exportCheckExportable {
 
 #-------------------------------------------------------------------
 
+=head2 exportGetAssetIds ( options )
+
+Gets the ids of all the assets to be exported in this run as an arrayref.
+Takes the same options spec as exportBranch.
+
+=cut
+
+sub exportGetAssetIds {
+    my ($self, $options) = @_;
+    my $session = $self->session;
+    my $ids     = $self->exportGetDescendants( undef, $options->{depth} );
+    return $ids unless $options->{exportRelated};
+    # We want the ids in a descendant order, but we don't want to repeat
+    # assetIds, so we're using Tie::IxHash to get an ordered set.
+    tie my %set, 'Tie::IxHash';
+    while (my $id = shift @$ids) {
+        my $asset = WebGUI::Asset->newById($session, $id);
+        undef $set{$id};
+        for my $id (@{ $asset->exportGetRelatedAssetIds }) {
+            push(@$ids, $id) unless exists $set{$id};
+        }
+    }
+    return [ keys %set ];
+}
+
+#-------------------------------------------------------------------
+
 =head2 exportGetDescendants ( user, depth )
 
 Gets the descendants of this asset for exporting, walking the lineage as the
@@ -587,6 +614,27 @@ sub exportGetDescendants {
 
 #-------------------------------------------------------------------
 
+=head2 exportGetRelatedAssetIds
+
+Normally all an asset's shorcuts,  but override if exporting your asset would
+invalidate other exported assets. If exportRelated is checked, this will be
+called and any assetIds it returns will be exported when your asset is
+exported.
+
+Note: You should NOT include parents as related assets simply because they're
+your parents. If the user wants to export your parent, he can do that. This is
+for assets that aren't necessarily in your ancestry. If parents were always
+related, exporting anything would export everything.
+
+=cut
+
+sub exportGetRelatedAssetIds {
+    my $self = shift;
+    WebGUI::Asset::Shortcut->getShortcutsForAssetId($self->session, $self->getId);
+}
+
+#-------------------------------------------------------------------
+
 =head2 exportGetUrlAsPath ( index )
 
 Translates an asset's URL into an appropriate path and filename for exporting. For
@@ -663,7 +711,7 @@ sub exportInFork {
     my $session = $process->session;
     my $self = WebGUI::Asset->newById( $session, delete $args->{assetId} );
     $args->{indexFileName} = delete $args->{index};
-    my $assetIds = $self->exportGetDescendants( undef, $args->{depth} );
+    my $assetIds = $self->exportGetAssetIds($args);
     my $tree = WebGUI::ProgressTree->new( $session, $assetIds );
     $process->update( sub { $tree->json } );
     my %reports = (

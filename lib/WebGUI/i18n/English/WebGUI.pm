@@ -296,6 +296,11 @@ our $I18N = {
 		lastUpdated => 1065356764
 	},
 
+    'or' => {
+        message => q|or|,
+		lastUpdated => 1053804577,
+    },
+
 	'978' => {
 		message => q|User added successfully.|,
 		lastUpdated => 1053804577
@@ -524,6 +529,11 @@ our $I18N = {
 	'487' => {
 		message => q|Select Box|,
 		lastUpdated => 1133087205
+	},
+
+	'Template Parser' => {
+		message => q|Template Parser|,
+		lastUpdated => 1301593691
 	},
 
 	'391' => {
@@ -1441,6 +1451,11 @@ You must be using mod_perl and configure <b>PerlSetEnv SYBASE /opt/sybase/11.0.2
                 lastUpdated => 1122093200,
         },
 
+        'override user email preference description' => {
+                message => q|Send mail regardless of the users' preferences about receiving inbox notifications|,
+                lastUpdated => 1302878213,
+        },
+
         '230 description' => {
                 message => q|The message that will be sent to all members of the group.  The message will be
 sent in HTML format. No attachments can be included.|,
@@ -2237,6 +2252,11 @@ This group could then be named "Employees in HMO 1", and would allow you to rest
 	'229' => {
 		message => q|Subject|,
 		lastUpdated => 1031514049
+	},
+
+	'override user email preference' => {
+		message => 'Override user email preference?',
+		lastUpdated => 1302878112,
 	},
 
 	'866' => {
@@ -3054,6 +3074,12 @@ or are under your current version tag.</p>
 		lastUpdated =>1092930637,
                 context => q|Label of the cancel button|
         },
+
+    'Cancel' => {
+        message => q|Cancel|,
+        lastUpdated =>1092930637,
+        context => q|Label of the cancel button, with capital C|
+    },
 
 	'trash' => {
 		message => q|Trash|,
@@ -4726,6 +4752,24 @@ Users may override this setting in their profile.
         lastUpdated => 0,
         context     => q{Message after a shortcut is created successfully},
     },
+    'Up' => {
+        message     => 'Up',
+        lastUpdate  => 0,
+        context     => 'Up, as in move up.',
+    },
+
+    'Down' => {
+        message     => 'Down',
+        lastUpdate  => 0,
+        context     => 'Down, as in move down.',
+    },
+
+    'Add' => {
+        message     => 'Add',
+        lastUpdate  => 0,
+        context     => 'Add, as in to append or add more',
+    },
+
 };
 
 1;

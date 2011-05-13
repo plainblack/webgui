@@ -235,12 +235,16 @@ Returns a boolean indicating whether the user can view the current post.
 
 sub canView {
         my $self = shift;
-        if (($self->status eq "approved" || $self->status eq "archived") && $self->getThread->getParent->canView) {
+        my $userId = shift || $self->session->user->userId;
+        $self->session->log->info( "$userId " . $self->status );
+        if (($self->status eq "approved" || $self->status eq "archived") && $self->getThread->getParent->canView( $userId )) {
+                $self->session->log->info( "CAN VIEW" );
                 return 1;
-        } elsif ($self->canEdit) {
+        } elsif ($self->canEdit( $userId )) {
+                $self->session->log->info( "CAN EDIT" );
                 return 1;
         } else {
-                $self->getThread->getParent->canEdit;
+                return $self->getThread->getParent->canEdit( $userId );
         }
 }
 
@@ -358,6 +362,26 @@ sub disqualifyAsLastPost {
             $cs->update({ lastPostId => '', lastPostDate => '', });
         }
     }
+}
+
+#-------------------------------------------------------------------
+
+=head2 duplicate ( )
+
+Extend the base method to handle duplicate storage locations and groups.
+
+=cut
+
+sub duplicate {
+	my $self    = shift;
+    my $session = $self->session;
+    my $copy    = $self->SUPER::duplicate(@_);
+    if ($self->get('storageId')) {
+        my $storage        = $self->getStorageLocation;
+        my $copied_storage = $storage->copy;
+        $copy->update({storageId => $copied_storage->getId});
+    }
+    return $copy;
 }
 
 #-------------------------------------------------------------------

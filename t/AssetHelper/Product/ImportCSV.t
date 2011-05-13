@@ -427,5 +427,50 @@ is($shelf2->getChildCount, 2, 'imported 2 children skus for shelf2 with old head
 $shelf2->purge;
 undef $shelf2;
 
+#######################################################################
+#
+# import, funky data in the price column
+#
+#######################################################################
+
+my $shelf3 = WebGUI::Test->asset->addChild({className => $class});
+$helper = WebGUI::AssetHelper::Product::ImportCSV->new( 
+    session => $session,
+    asset   => $shelf3,
+    id      => 'importProducts',
+);
+
+$pass = 0;
+eval {
+    $pass = $importProducts->( $process, {
+        assetId => $helper->asset->getId,
+        filePath => WebGUI::Test->getTestCollateralPath('productTables/dollarsigns.csv'),
+    });
+};
+ok($pass, 'Able to load a table with odd characters in the price column');
+$e = Exception::Class->caught();
+is($e, '', '... no exception thrown');
+is($shelf3->getChildCount, 1, '...imported 1 child sku for shelf3 with old headers');
+
+my $sign = $shelf3->getFirstChild();
+my $signCollateral = $sign->getAllCollateral('variantsJSON');
+cmp_deeply(
+    $signCollateral,
+    [
+        {
+            varSku    => 'dollar signs',
+            shortdesc => 'Silver Dollar Signs',
+            price     => '5.00',
+            weight    => '0.33',
+            quantity  => '1000',
+            variantId => ignore(),
+        },
+    ],
+    'collateral set correctly for sign'
+);
+
+$shelf3->purge;
+undef $shelf3;
+
 done_testing();
 #vim:ft=perl

@@ -24,7 +24,7 @@ use WebGUI::Test::Maker::Permission;
 my $session         = WebGUI::Test->session;
 $session->user( { userId => 3 } );
 my $maker           = WebGUI::Test::Maker::Permission->new;
-my $node            = WebGUI::Asset->getImportNode( $session );
+my $node            = WebGUI::Test->asset();
 
 my %user;
 $user{"2"}          = WebGUI::User->new( $session, "new" );
