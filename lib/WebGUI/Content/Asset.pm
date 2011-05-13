@@ -176,19 +176,6 @@ sub handler {
     else {
         $output = dispatch($session, getRequestedAssetUrl($session));
     }
-
-    my $filename = $session->response->getStreamedFile();
-    if ((defined $filename) && ($config->get("enableStreamingUploads") eq "1")) {
-        my $ct = guess_media_type($filename);
-        my $oldContentType = $request->content_type($ct);
-        if ($request->sendfile($filename) ) {
-            return; # TODO - what should we return to indicate streaming?
-        } 
-        else {
-            $request->content_type($oldContentType);
-        }
-    }
-
     return $output;
 }
 

@@ -66,11 +66,22 @@ $response->status('200');
 
 $http->setStreamedFile('');
 is($http->getStreamedFile, undef, 'set/get StreamedFile: false values return undef, empty string');
-$http->setStreamedFile(0);
+$http->setStreamedFile(undef);
 is($http->getStreamedFile, undef, 'set/get StreamedFile: false values return undef, empty string');
 
-$http->setStreamedFile('/home/streaming');
-is($http->getStreamedFile, '/home/streaming', 'set/get StreamedFile: set specific location and get it');
+my $actual_file = $session->config->get('uploadsPath') . '/9e/a3/9ea37e148e517d4ae3d6326f691d848f/previous.gif'; # arbitrary file that exactually exists and hopefully will continue for a while
+$http->setStreamedFile( $actual_file );
+is($http->getStreamedFile, $actual_file, 'set/get StreamedFile: set specific location and get it');
+
+do {
+    eval { 
+        $http->setStreamedFile( $actual_file . '_but_actually_not_an_actual_file_because_someone_appended_a_bunch_of_bloody_garbage_to_it' );
+    };
+    my $e = WebGUI::Error->caught("WebGUI::Error::InvalidFile");
+    my $errorMessage = $e->error;
+    ok($errorMessage =~ m/No such file or directory/, "set/get StreamedFile: setting a non-existant file blows stuff up but that's okay because it's handled gracefully" );
+};
+
 $http->setStreamedFile('');
 
 ####################################################

@@ -6,6 +6,8 @@ use warnings;
 use parent qw(Plack::Response);
 
 use IO::File::WithPath;
+use Class::C3;
+use LWP::MediaTypes;
 
 use Plack::Util::Accessor qw(session streaming writer streamer);
 
@@ -212,7 +214,7 @@ Returns the stored epoch date when the page as last modified.
 sub getLastModified {
     my $self = shift;
     return $self->{_http}{lastModified};
-}  
+}
 
 #
 #
@@ -304,15 +306,65 @@ sub getStreamedFile {
  
 =head2 setStreamedFile ( ) {
  
-Set a file to be streamed thru mod_perl.
- 
+Set a file to be streamed through mod_perl.
+Rrequires that C<enableStreamingUploads> be set in the config file and then
+some middleware or reverse-proxy in front of L<WebGUI> to catch the X-Sendfile
+headers and replace that with the file to be sent.
+
 =cut
 
 sub setStreamedFile {
     my $self = shift;
     my $fn = shift;
+
+    if( ! defined $fn or ! length $fn ) {
+        # t/Session/Http.t tests that it can call this with '' as an arg
+        # really, it looks like it is testing implementation rather than behavior but I don't know what behavior it's getting at so, voodoo
+        $self->body(undef);
+        $self->{_http}{streamlocation} = undef;
+        return;
+    }
+
     $self->{_http}{streamlocation} = $fn;
-    # $self->body( IO::File::WithPath->new( $fn ) );  # let Plack handle the streaming, or let Plack::Middleware::XSendfile punt it; we don't want to send a 302 header and send the file, too; should be one or the other, selectable
+
+    # return undef unless $self->session->config->get('enableStreamingUploads'); # throw an error?  handle gracefully? XX
+
+    my $fh = eval { IO::File::WithPath->new( $fn ) } or WebGUI::Error::InvalidFile->throw(
+        error => "Couldn't create an IO::File::WithPath object: $@ $!",
+        brokenFile => $fn,
+    );
+
+    $self->body( $fh );
+
+    1;
+
+}
+
+#
+#
+#
+
+=head2 sendFile ( ) {
+
+Either redirect (C<setRedirect()>) or trigger a stream (C<setStreamedFile()>) depending on how L<WebGUI> is configured.
+If C<enableStreamingUploads> is set in the config file, C<setStreamedFile()> is used.
+
+=cut
+
+#    $session->response->sendFile($self->getStorageLocation, $self->filename); 
+
+ 
+sub sendFile {
+    my $self = shift;
+    my $storage = shift;
+    my $filename = shift;
+    if( $self->session->config->get('enableStreamingUploads') ) {
+        $self->setStreamedFile( $storage->getPath($filename) );
+    }
+    else {
+         $self->setRedirect( $storage->getUrl($filename) );
+    }
+    1;
 }
 
 #
@@ -349,5 +401,40 @@ sub getCacheControl {
     my $self = shift;
     return $self->{_http}{cacheControl} || 1;
 }   
+
+=head2 finalize ( ) 
+
+Subclasses Plack::Response C<finalize()>, doing L<WebGUI> specific finalization chores.
+
+=cut
+
+#
+#
+#
+
+sub finalize {
+
+    my $self = shift;
+
+    my $filename = $self->getStreamedFile();
+    if (defined $filename and $self->session->config->get("enableStreamingUploads") ) {
+        # at this point, $request->body contains an IO::File::WithPath object, and that's all Plack needs
+        my $ct = LWP::MediaTypes::guess_media_type($filename);
+        $self->content_type($ct);
+    }
+
+    # in the future, sendHeader's logic should be moved into here and sendHeader should vanish.
+    # the rest of WebGUI should essentially never need to call sendHeader explicitly but should
+    # just call methods in here to configure the response and then return back up to the top where
+    # WebGUI.pm calls finalize and returns the response object back to Plack.
+    # for now, I've added this extra (harmless) call to sendHeader to get started on removing the
+    # others.
+
+    $self->sendHeader(); # doesn't send the header, only fixes the response up based on options set
+
+    $self->next::method(@_);
+
+}
+
 
 1;
