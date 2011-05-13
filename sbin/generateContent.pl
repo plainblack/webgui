@@ -47,7 +47,7 @@ if ($url) {
 	$asset = WebGUI::Asset->newByUrl($session,$url);
 }
 else {
-	$asset = WebGUI::Asset->newByDynamicClass($session,$assetId);
+	$asset = WebGUI::Asset->newById($session,$assetId);
 }
 
 if (defined $asset) {

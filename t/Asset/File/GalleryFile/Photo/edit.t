@@ -148,7 +148,7 @@ $mech->submit_form_ok({
     }, 
     'Submit Photo edit form' );    
 # Re-create instance of Photo asset
-$photo = WebGUI::Asset->newByDynamicClass($session, $photo->getId);
+$photo = WebGUI::Asset->newById($session, $photo->getId);
 # Check whether properties were changed correctly
 cmp_deeply($photo->get, superhashof(\%properties), 'All changes applied');
 

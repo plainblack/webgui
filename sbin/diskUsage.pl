@@ -66,7 +66,7 @@ sub du {
 	my $totalSize; # disk space used
 
 	if ($assetId) { # They specified an assetId to start with
-		$asset = WebGUI::Asset->newByDynamicClass($session,$assetId);
+		$asset = WebGUI::Asset->newById($session,$assetId);
 		die ("Unable to instanciate asset $assetId") unless defined $asset;
 		print "\nStarting with asset $assetId...\n" unless $quiet;
 	}

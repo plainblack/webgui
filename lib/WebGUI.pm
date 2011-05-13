@@ -178,7 +178,7 @@ sub handle {
             
             # A WebGUI::Asset::Template object means we should process it
             if ( defined $output && blessed $output && $output->isa( 'WebGUI::Asset::Template' ) ) {
-                $session->http->sendHeader;
+                $session->response->sendHeader;
                 $session->output->print( $output->process );
                 last;
             }
@@ -190,7 +190,7 @@ sub handle {
             # other non-empty output should be used as the response body
             elsif (defined $output && $output ne "") {
                 # Auto-set the headers
-                $session->http->sendHeader;
+                $session->response->sendHeader;
                 
                 # Use contentHandler's return value as the output
                 $session->output->print($output);
@@ -198,7 +198,7 @@ sub handle {
             }
             # Keep processing for success codes
             elsif ($session->response->status < 200 || $session->response->status > 299) {
-                $session->http->sendHeader;
+                $session->response->sendHeader;
                 last;
             }
         }

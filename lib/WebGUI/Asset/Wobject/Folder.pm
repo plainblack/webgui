@@ -336,7 +336,7 @@ See WebGUI::Asset::Wobject::www_view() for details.
 
 override www_view => sub {
 	my $self = shift;
-	$self->session->http->setCacheControl($self->visitorCacheTimeout) if ($self->session->user->isVisitor);
+	$self->session->response->setCacheControl($self->visitorCacheTimeout) if ($self->session->user->isVisitor);
 	super();
 };
 

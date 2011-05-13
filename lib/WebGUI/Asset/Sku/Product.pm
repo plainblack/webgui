@@ -1904,7 +1904,7 @@ Extend the base method to handle caching.
 
 override www_view => sub {
     my $self = shift;
-    $self->session->http->setCacheControl($self->cacheTimeout);
+    $self->session->response->setCacheControl($self->cacheTimeout);
     super();
 };
 

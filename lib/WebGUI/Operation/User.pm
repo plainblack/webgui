@@ -943,7 +943,7 @@ A reference to the current session.
 
 sub www_formUsers {
 	my $session = shift;
-	$session->http->setCacheControl("none");
+	$session->response->setCacheControl("none");
 	return $session->privilege->insufficient() unless $session->user->isInGroup(12);
 	$session->style->useEmptyStyle("1");
     my $output = getUserSearchForm($session,"formUsers",{formId=>$session->form->process("formId")},1);

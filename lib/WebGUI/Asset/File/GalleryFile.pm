@@ -1154,8 +1154,8 @@ sub www_view {
     # Add to views
     $self->update({ views => $self->views + 1 });
 
-    $self->session->http->setLastModified($self->getContentLastModified);
-    $self->session->http->sendHeader;
+    $self->session->response->setLastModified($self->getContentLastModified);
+    $self->session->response->sendHeader;
     $self->prepareView;
     my $style = $self->processStyle($self->getSeparator);
     my ($head, $foot) = split($self->getSeparator,$style);

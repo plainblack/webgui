@@ -71,7 +71,7 @@ sub dispatch {
             if ($session->user->isVisitor
              && !$session->request->ifModifiedSince($asset->getContentLastModified, $session->setting->get('maxCacheTimeout'))) {
                 $session->response->status("304");
-                $session->http->sendHeader;
+                $session->response->sendHeader;
                 return "chunked";
             } 
 
@@ -166,7 +166,7 @@ The content handler for this package.
 
 sub handler {
     my ($session) = @_;
-    my ($log, $http, $asset, $request, $config) = $session->quick(qw(errorHandler http asset request config));
+    my ($log, $asset, $request, $config) = $session->quick(qw(errorHandler asset request config));
     my $output = "";
     if (my $perfLog = $log->performanceLogger) { #show performance indicators if required
         my $t = [Time::HiRes::gettimeofday()];
@@ -176,19 +176,6 @@ sub handler {
     else {
         $output = dispatch($session, getRequestedAssetUrl($session));
     }
-
-    my $filename = $http->getStreamedFile();
-    if ((defined $filename) && ($config->get("enableStreamingUploads") eq "1")) {
-        my $ct = guess_media_type($filename);
-        my $oldContentType = $request->content_type($ct);
-        if ($request->sendfile($filename) ) {
-            return; # TODO - what should we return to indicate streaming?
-        } 
-        else {
-            $request->content_type($oldContentType);
-        }
-    }
-
     return $output;
 }
 

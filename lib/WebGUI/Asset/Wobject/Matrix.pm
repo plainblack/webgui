@@ -1080,7 +1080,7 @@ sub www_exportAttributes {
 
     $session->response->header( 'Content-Disposition' => qq{attachment; filename="export_matrix_attributes.csv"});
     $session->response->content_type('application/octet-stream');
-    $self->session->http->sendHeader;
+    $self->session->response->sendHeader;
     return $output;
 }
 

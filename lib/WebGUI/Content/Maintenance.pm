@@ -47,7 +47,7 @@ The content handler for this package.
 sub handler {
     my $session = shift;
     if ($session->setting->get("specialState") eq "upgrading") {
-        $session->http->sendHeader;
+        $session->response->sendHeader;
         open my $fh, '<', $session->config->get('maintenancePage');
         my $output = do { local $/; <$fh> };
         close $fh;

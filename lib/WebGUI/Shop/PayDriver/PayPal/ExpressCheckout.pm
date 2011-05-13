@@ -337,7 +337,7 @@ sub www_sendToPayPal {
         }
     );
 
-    return $session->http->setRedirect($dest);
+    return $session->response->setRedirect($dest);
 } ## end sub www_sendToPayPal
 
 =head1 LIMITATIONS

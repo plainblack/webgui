@@ -195,7 +195,7 @@ $session->setting->set('userFunctionStyleId', $templates->{user}->getId);
 
 is($style->userStyle('userStyle'), 'USER PRINTABLE STYLE TEMPLATE:userStyle',
 'userStyle returns templated output according to userFunctionStyleId in settings');
-is($session->http->{_http}{cacheControl}, 'none', 'userStyle(via process): HTTP cacheControl set to none to prevent proxying');
+is($session->http->getCacheControl, 'none', 'userStyle(via process): HTTP cacheControl set to none to prevent proxying');
 
 is($style->userStyle('userStyle'), 'USER PRINTABLE STYLE TEMPLATE:userStyle',
 'userStyle returns templated output according to userFunctionStyleId in settings');
@@ -306,8 +306,7 @@ $head =~ s/(^HEAD=.+$)/$1/s;
 cmp_bag(\@metas, $expectedMetas, 'process:default meta tags with no caching head tags, preventProxyCache setting');
 $session->setting->set('preventProxyCache', $origPreventProxyCache);
 
-##No accessor
-is($session->http->{_http}{cacheControl}, 'none', 'process: HTTP cacheControl set to none to prevent proxying');
+is($session->http->getCacheControl, 'none', 'process: HTTP cacheControl set to none to prevent proxying');
 
 ####################################################
 #

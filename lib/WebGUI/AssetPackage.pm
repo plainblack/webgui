@@ -356,9 +356,9 @@ sub www_deployPackage {
         return undef;
     };
 	if ($session->form->param("proceed") eq "manageAssets") {
-		$session->http->setRedirect($self->getManagerUrl);
+		$session->response->setRedirect($self->getManagerUrl);
 	} else {
-		$session->http->setRedirect($self->getUrl());
+		$session->response->setRedirect($self->getUrl());
 	}
 	return undef;
 }
@@ -376,7 +376,7 @@ sub www_exportPackage {
     return $self->session->privilege->insufficient() unless ($self->canEdit);
     my $storage = $self->exportPackage;
     my $filename = $storage->getFiles->[0];
-    $self->session->http->setRedirect($storage->getUrl($storage->getFiles->[0]));
+    $self->session->response->setRedirect($storage->getUrl($storage->getFiles->[0]));
     return "redirect";
 }
 

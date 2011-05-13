@@ -470,7 +470,7 @@ so that this point is automatically shown.
 sub www_view {
     my $self    = shift;
 
-    $self->session->http->setRedirect( 
+    $self->session->response->setRedirect( 
         $self->getParent->getUrl('focusOn=' . $self->getId )
     );
     return "redirect";

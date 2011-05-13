@@ -912,7 +912,7 @@ sub www_rollbackVersionTag {
 	my $method = $session->form->process("proceed");
     $method    = $method eq "manageCommittedVersions" ? $method : 'manageVersions';
     my $redir = WebGUI::Asset->getDefault($session)->getUrl("op=$method");
-    $session->http->setRedirect(
+    $session->response->setRedirect(
         $session->url->page(
             $process->contentPairs(
                 'ProgressBar', {

@@ -6,6 +6,7 @@ use WebGUI;
 builder {
     my $wg = WebGUI->new( config => $ENV{WEBGUI_CONFIG} );
     my $config = $wg->config;
+    my $streaming_uploads = $config->get('enableStreamingUploads'); # have to restart for changes to this to take effect
 
     enable 'Log4perl', category => $config->getFilename, conf => WebGUI::Paths->logConfig;
     enable 'SimpleContentFilter', filter => sub {
@@ -20,9 +21,13 @@ builder {
 
     # For PassThru, use Plack::Builder::mount
 
-    # Extras fallback (you should be using something else to serve static files in production)
+    # Serve "Extras"
+    # Plack::Middleware::Static is fallback (you should be using something else to serve static files in production,
+    # unless you're using the corona Plack server, then it doesn't matter nearly so much)
+
     my ( $extrasURL, $extrasPath ) = ( $config->get('extrasURL'), $config->get('extrasPath') );
-    enable 'Static', root => "$extrasPath/", path => sub {s{^\Q$extrasURL/}{}};
+    enable_if {   $streaming_uploads } 'XSendfile';
+    enable_if { ! $streaming_uploads } 'Static', root => "$extrasPath/", path => sub {s{^\Q$extrasURL/}{}};
 
     # Open/close the WebGUI::Session at the outer-most onion layer
     enable '+WebGUI::Middleware::Session', config => $config;
@@ -55,6 +60,12 @@ builder {
         enable '+WebGUI::Middleware::WGAccess';
         Plack::App::File->new(root => $config->get('uploadsPath'));
     };
+
+    # enable config defined Middleware
+
+    for my $mw ( @{ $config->get('plackMiddleware') || [] } ) {
+        enable $mw;
+    }
 
     # Return the app
     mount '/' => $wg->to_app;

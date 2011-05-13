@@ -57,7 +57,7 @@ sub wrapStyle {
     my ( $self, $output ) = @_;
     my $session = $self->session;
     my $form    = $session->form;
-    $session->http->setCacheControl("none");
+    $session->response->setCacheControl("none");
     my $i18n = WebGUI::International->new( $session, "WebGUI" );
     my $page = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -142,7 +142,7 @@ sub www_adminAccount {
     my ( $self ) = @_;
     my $session = $self->session;
     my $form    = $session->form;
-    $session->http->setCacheControl("none");
+    $session->response->setCacheControl("none");
     my $i18n = WebGUI::International->new( $session, "WebGUI" );
 
     my $legend = $i18n->get('admin account');
@@ -246,7 +246,7 @@ sub www_companyInformation {
     my ( $self ) = @_;
     my $session = $self->session;
     my $form    = $session->form;
-    $session->http->setCacheControl("none");
+    $session->response->setCacheControl("none");
     my $i18n = WebGUI::International->new( $session, "WebGUI" );
 
     my $output = '<h1>' . $i18n->get('company information') . '</h1>';
@@ -306,7 +306,7 @@ sub www_siteStats {
     my ( $self ) = @_;
     my $session = $self->session;
     my $form    = $session->form;
-    $session->http->setCacheControl("none");
+    $session->response->setCacheControl("none");
     my $i18n = WebGUI::International->new( $session, "WebGUI" );
 
     my $enableForm  = $self->getForm;
@@ -390,7 +390,7 @@ sub www_cleanup {
     my ( $self ) = @_;
     my $session = $self->session;
     my $form    = $session->form;
-    $session->http->setCacheControl("none");
+    $session->response->setCacheControl("none");
     my $i18n = WebGUI::International->new( $session, "WebGUI" );
 
     $self->cleanup;

@@ -85,7 +85,7 @@ sub exportHtml_view {
         my $url = $self->redirectUrl;
         WebGUI::Macro::process($self->session, \$url);
 	return '' if ($url eq $self->url);
-	$self->session->http->setRedirect($url);
+	$self->session->response->setRedirect($url);
 	return $self->session->style->process('', 'PBtmpl0000000000000060');
 }
 
@@ -130,7 +130,7 @@ sub www_view {
              </ul>',$i18n->get("assetName"));
     }
     unless ($url eq $self->url) {
-        $self->session->http->setRedirect($url,$self->redirectType);
+        $self->session->response->setRedirect($url,$self->redirectType);
 		return undef;
 	}
     return $i18n->get('self_referential');

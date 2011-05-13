@@ -100,9 +100,10 @@ WebGUI.Toolbar.prototype.render
 
     // Edit button
     var editButton = new YAHOO.widget.Button({
-        type        : "push",
+        type        : "link",
         "container" : this.container,
         label       : assetData.helpers["edit"].label,
+        href        :  assetData.helpers["edit"].url,
         onclick     : {
             fn: window.parent.admin.getHelperHandler( this.assetId, "edit", assetData.helpers["edit"] )
         }

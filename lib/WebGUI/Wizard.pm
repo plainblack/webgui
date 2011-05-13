@@ -377,7 +377,7 @@ sub www_cleanup {
     my ( $self ) = @_;
 
     $self->cleanup;
-    $self->session->http->setRedirect( $self->session->url->page );
+    $self->session->response->setRedirect( $self->session->url->page );
     return "redirect";
 }
 

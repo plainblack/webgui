@@ -393,7 +393,7 @@ See WebGUI::Asset::Wobject::www_view() for details.
 
 override www_view => sub {
     my $self = shift;
-    $self->session->http->setCacheControl($self->cacheTimeout);
+    $self->session->response->setCacheControl($self->cacheTimeout);
     super();
 };
 

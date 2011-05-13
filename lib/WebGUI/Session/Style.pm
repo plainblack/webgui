@@ -242,7 +242,7 @@ if ($self->session->user->isRegistered || $self->session->setting->get("preventP
 <meta http-equiv="Cache-Control" content="no-cache, must-revalidate, max-age=0, private" />
 <meta http-equiv="Expires" content="0" />
 ';
-	$self->session->http->setCacheControl("none");
+	$self->session->response->setCacheControl("none");
 } else {
 	$var{'head.tags'} .= '<meta http-equiv="Cache-Control" content="must-revalidate" />'
 }
@@ -559,7 +559,7 @@ The content to be wrappered.
 sub userStyle {
 	my $self = shift;
         my $output = shift;
-	$self->session->http->setCacheControl("none");
+	$self->session->response->setCacheControl("none");
         if (defined $output) {
                 return $self->process($output,$self->session->setting->get("userFunctionStyleId"));
         } else {

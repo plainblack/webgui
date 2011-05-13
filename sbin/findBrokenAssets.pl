@@ -109,9 +109,9 @@ while ( my %row = $sth->hash ) {
             }
             print "Fixed.\n";
 
-            my $asset   = WebGUI::Asset->newByDynamicClass( $session, $row{assetId} );
+            my $asset   = WebGUI::Asset->newById( $session, $row{assetId} );
             # Make sure we have a valid parent
-            unless ( $asset && WebGUI::Asset->newByDynamicClass( $session, $row{parentId} ) ) {
+            unless ( WebGUI::Asset->newById( $session, $row{parentId} ) ) {
                 $asset->setParent( WebGUI::Asset->getImportNode( $session ) );
                 print "\tNOTE: Invalid parent. Asset moved to Import Node\n";
             }
@@ -145,7 +145,7 @@ while ( my %row = $sth->hash ) {
             printf "%10s: %s\n", "class", $row{className};
 
             # Parent
-            if ( my $parent = WebGUI::Asset->newByDynamicClass( $session, $row{parentId} ) ) {
+            if ( my $parent = WebGUI::Asset->newById( $session, $row{parentId} ) ) {
                 printf "%10s: %s (%s)\n", "parent", $parent->getTitle, $parent->getId;
             }
             elsif ( $session->db->quickScalar( "SELECT * FROM asset WHERE assetId=?", [$row{parentId}] ) ) {

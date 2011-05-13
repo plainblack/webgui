@@ -985,7 +985,7 @@ the user back to the site.
 
 sub www_goBackToPage {
 	my $self = shift;
-	$self->session->http->setRedirect($self->session->form->get("returnUrl")) if ($self->session->form->get("returnUrl"));
+	$self->session->response->setRedirect($self->session->form->get("returnUrl")) if ($self->session->form->get("returnUrl"));
 	return undef;
 }
 

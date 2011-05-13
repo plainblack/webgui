@@ -185,7 +185,7 @@ sub www_login {
         ->extend_permissions(qw(email))
         ->uri_as_string;
 
-    $session->http->setRedirect($auth_url);
+    $session->response->setRedirect($auth_url);
     return "redirect";
 }
 

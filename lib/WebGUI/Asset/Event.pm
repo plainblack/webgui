@@ -2425,7 +2425,7 @@ ENDJS
 
 
     ### Show the processed template
-    $session->http->sendHeader;
+    $session->response->sendHeader;
     my $style = $self->getParent->processStyle($self->getSeparator);
     my ($head, $foot) = split($self->getSeparator,$style);
     $self->session->output->print($head, 1);
@@ -2461,8 +2461,8 @@ sub www_view {
     return $self->session->privilege->noAccess() unless $self->canView;
     my $check = $self->checkView;
     return $check if (defined $check);
-    $self->session->http->setCacheControl($self->getParent->visitorCacheTimeout) if ($self->session->user->isVisitor);
-    $self->session->http->sendHeader;
+    $self->session->response->setCacheControl($self->getParent->visitorCacheTimeout) if ($self->session->user->isVisitor);
+    $self->session->response->sendHeader;
     $self->prepareView;
     my $style = $self->getParent->processStyle($self->getSeparator);
     my ($head, $foot) = split($self->getSeparator,$style);

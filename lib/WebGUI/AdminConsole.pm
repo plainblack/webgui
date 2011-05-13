@@ -255,7 +255,7 @@ A string that defaults to _function's title.
 sub render {
 	my $self = shift;
     my $session = $self->session;
-	$session->http->setCacheControl("none");
+	$session->response->setCacheControl("none");
 	my %var;
 	$var{"application_loop"} = $self->getAdminFunction;
 	$var{"application.workarea"} = shift;

@@ -288,7 +288,7 @@ is not passed in, it will attempt to get one from the L<page> method, or finally
 sub forceSecureConnection {
     my $self = shift;
     my $url = shift;
-    my ($conf, $http) = $self->session->quick(qw(config http));
+    my ($conf, $response) = $self->session->quick(qw(config response));
    
     if ($conf->get("sslEnabled") && ! $self->session->request->secure){
    
@@ -305,7 +305,7 @@ sub forceSecureConnection {
         }
         if($url =~ /^http/i) {
             $url =~ s/^https?/https/i;
-            $http->setRedirect($url);
+            $response->setRedirect($url);
             return 1;
         }
     } 

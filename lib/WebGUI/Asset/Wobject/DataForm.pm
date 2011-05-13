@@ -1341,7 +1341,7 @@ sub viewForm {
     }
     $var = $passedVars || $self->getRecordTemplateVars($var, $entry);
     if ($self->hasCaptcha) {
-        $self->session->http->setCacheControl('none');
+        $self->session->response->setCacheControl('none');
     }
     return $self->processTemplate($var, undef, $self->{_viewFormTemplate});
 }
@@ -1891,7 +1891,7 @@ sub www_exportTab {
 
     $session->response->header( 'Content-Disposition' => qq{attachment; filename="}.$self->url.'.tab"');
     $session->response->content_type('text/plain');
-    $session->http->sendHeader;
+    $session->response->sendHeader;
     $session->output->print($tsv->string, 1);
 
     my $entryIter = $self->entryClass->iterateAll($self);

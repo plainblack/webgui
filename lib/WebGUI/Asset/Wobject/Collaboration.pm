@@ -1885,7 +1885,7 @@ Extend the base method to handle the visitor cache timeout.
 sub www_view {
 	my $self = shift;
 	my $disableCache = ($self->session->form->process("sortBy") ne "");
-	$self->session->http->setCacheControl($self->visitorCacheTimeout) if ($self->session->user->isVisitor && !$disableCache);
+	$self->session->response->setCacheControl($self->visitorCacheTimeout) if ($self->session->user->isVisitor && !$disableCache);
 	return $self->next::method(@_);
 }
 

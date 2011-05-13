@@ -90,7 +90,7 @@ sub exportSomething {
         $csvData .= WebGUI::Text::joinCSV(@row) . "\n";
     }
     $storage->addFileFromScalar($filename, $csvData);
-    $session->http->setRedirect($storage->getUrl($filename));
+    $session->response->setRedirect($storage->getUrl($filename));
 }
 
 #-------------------------------------------------------------------

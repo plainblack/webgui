@@ -187,7 +187,7 @@ sub www_login {
     $scratch->set( 'AuthTwitterToken', $nt->request_token );
     $scratch->set( 'AuthTwitterTokenSecret', $nt->request_token_secret );
 
-    $session->http->setRedirect($auth_url);
+    $session->response->setRedirect($auth_url);
     return "redirect";
 }
 

@@ -983,7 +983,7 @@ the Story Archive that contains them.
 sub www_view {
 	my $self = shift;
 	return $self->session->privilege->noAccess unless $self->canView;
-	$self->session->http->sendHeader;
+	$self->session->response->sendHeader;
 	$self->prepareView;
 	return $self->getArchive->processStyle($self->view);
 }

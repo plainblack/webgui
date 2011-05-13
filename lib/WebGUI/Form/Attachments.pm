@@ -213,7 +213,7 @@ sub www_show {
     else {
         @assetIds = $session->form->param("attachments");
     }
-	$session->http->setCacheControl("none");
+	$session->response->setCacheControl("none");
     $style->setScript($url->extras("/AttachmentsControl/AttachmentsControl.js"));
     $style->setCss($url->extras("/AttachmentsControl/AttachmentsControl.css"));
     my $uploadControl = '';

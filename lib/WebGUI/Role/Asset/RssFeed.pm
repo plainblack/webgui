@@ -157,7 +157,7 @@ sub _httpBasicLogin {
         'WWW-Authenticate' => 'Basic realm="'.$self->session->setting->get('companyName').'"'
     );
     $self->session->response->status(401);
-    $self->session->http->sendHeader;
+    $self->session->response->sendHeader;
     return '';
 }
 

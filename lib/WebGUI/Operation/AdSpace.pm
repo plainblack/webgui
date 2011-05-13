@@ -56,7 +56,7 @@ sub www_clickAd {
 	my $id = $session->form->param("id");
 	return undef unless $id;
 	my $url = WebGUI::AdSpace->countClick($session, $id);
-	$session->http->setRedirect($url);
+	$session->response->setRedirect($url);
 	return undef;
 }
 

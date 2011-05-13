@@ -178,6 +178,7 @@ checkModule('Devel::StackTrace',            '1.27'       );
 checkModule('Devel::StackTrace::WithLexicals',  '0.03'   );
 checkModule('Data::ICal',                   '0.16'       );
 checkModule('Geo::Coder::Googlev3',         '0.07'       );
+checkModule('IO::File::WithPath',                        );
 
 failAndExit("Required modules are missing, running no more checks.") if $missingModule;
 

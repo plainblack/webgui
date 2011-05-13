@@ -653,11 +653,11 @@ sub checkView {
 	my $self = shift;
 	return $self->session->privilege->noAccess() unless $self->canView;
     my $session = $self->session;
-	my ($conf, $http) = $self->session->quick(qw(config http));
+	my ($conf, $response) = $self->session->quick(qw(config response));
     if ($conf->get("sslEnabled") && $self->get("encryptPage") && ! $self->session->request->secure) {
         # getUrl already changes url to https if 'encryptPage'
-        $http->setRedirect($self->getUrl);
-        $http->sendHeader;
+        $response->setRedirect($self->getUrl);
+        $response->sendHeader;
         return "chunked";
 	}
     elsif ($session->isAdminOn && $self->get("state") =~ /^trash/) { # show em trash
@@ -665,8 +665,8 @@ sub checkView {
         if ($self->session->form->process('revision')) {
             $queryFrag .= ";revision=".$self->session->form->process('revision');
         }
-		$http->setRedirect($self->getUrl($queryFrag));
-        $http->sendHeader;
+		$response->setRedirect($self->getUrl($queryFrag));
+        $response->sendHeader;
 		return "chunked";
 	} 
     elsif ($session->isAdminOn && $self->get("state") =~ /^clipboard/) { # show em clipboard
@@ -674,8 +674,8 @@ sub checkView {
         if ($self->session->form->process('revision')) {
             $queryFrag .= ";revision=".$self->session->form->process('revision');
         }
-		$http->setRedirect($self->getUrl($queryFrag));
-        $http->sendHeader;
+		$response->setRedirect($self->getUrl($queryFrag));
+        $response->sendHeader;
 		return "chunked";
 	} 
     elsif ($self->get("state") ne "published") { # tell em it doesn't exist anymore
@@ -949,7 +949,7 @@ sub forkWithStatusPage {
             proceed => $args->{redirect} || '',
         }
     );
-    $session->http->setRedirect( $self->getUrl($pairs) );
+    $session->response->setRedirect( $self->getUrl($pairs) );
     return 'redirect';
 } ## end sub forkWithStatusPage
 
@@ -2212,23 +2212,23 @@ sub proceed {
         return $session->asset->www_manageAssets;
     }
     elsif ($proceed eq "viewParent") {
-        $session->http->setRedirect( $self->getParent->getUrl );
+        $session->response->setRedirect( $self->getParent->getUrl );
         return "redirect";
     }
     elsif ($proceed eq "editParent") {
-        $session->http->setRedirect( $self->getParent->getUrl('func=edit') );
+        $session->response->setRedirect( $self->getParent->getUrl('func=edit') );
         return "redirect";
     }
     elsif ($proceed eq "goBackToPage" && $session->form->process('returnUrl')) {
-        $session->http->setRedirect($session->form->process("returnUrl"));
+        $session->response->setRedirect($session->form->process("returnUrl"));
         return "redirect";
     }
     elsif ($proceed ne "") {
-        $session->http->setRedirect( $self->getUrl( 'func=' . $proceed ) );
+        $session->response->setRedirect( $self->getUrl( 'func=' . $proceed ) );
         return "redirect";
     }
 
-    $session->http->setRedirect( $self->getUrl );
+    $session->response->setRedirect( $self->getUrl );
     return "redirect";
 }
 
@@ -2964,7 +2964,7 @@ sub www_view {
     
     # don't allow viewing of the root asset
 	if ($self->getId eq "PBasset000000000000001") {
-		$self->session->http->setRedirect($self->getDefault($self->session)->getUrl);
+		$self->session->response->setRedirect($self->getDefault($self->session)->getUrl);
 		return undef;
 	}
 

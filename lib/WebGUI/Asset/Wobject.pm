@@ -505,8 +505,8 @@ sub www_view {
 	my $self = shift;
 	my $check = $self->checkView;
 	return $check if (defined $check);
-	$self->session->http->setLastModified($self->getContentLastModified);
-	$self->session->http->sendHeader;
+	$self->session->response->setLastModified($self->getContentLastModified);
+	$self->session->response->sendHeader;
     ##Have to dupe this code here because Wobject does not call SUPER.
 	$self->prepareView;
 	my $style = $self->processStyle($self->getSeparator, { noHeadTags => 1 });

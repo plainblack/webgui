@@ -426,8 +426,8 @@ override www_view => sub {
             my $ad = $adSpace->displayImpression if (defined $adSpace);
             $out =~ s/\Q$code/$ad/ges;
         }
-        $session->http->setLastModified($self->getContentLastModified);
-        $session->http->sendHeader;
+        $session->response->setLastModified($self->getContentLastModified);
+        $session->response->sendHeader;
         $session->output->print($out, 1);
         return "chunked";
     }

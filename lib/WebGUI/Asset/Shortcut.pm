@@ -1261,8 +1261,8 @@ sub www_view {
         $shortcut->purgeCache();
 
         if ($shortcut->isa('WebGUI::Asset::Wobject')) {
-                $self->session->http->setLastModified($self->getContentLastModified);
-                $self->session->http->sendHeader;
+                $self->session->response->setLastModified($self->getContentLastModified);
+                $self->session->response->sendHeader;
                 ##Tell processStyle not to set the h
                 my $style = $shortcut->processStyle($shortcut->getSeparator, { noHeadTags => 1 });
                 my ($head, $foot) = split($shortcut->getSeparator,$style);

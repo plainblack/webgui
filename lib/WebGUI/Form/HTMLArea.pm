@@ -213,7 +213,7 @@ Asset picker for the rich editor.
 
 sub www_pageTree {
     my $session = shift;
-    $session->http->setCacheControl("none");
+    $session->response->setCacheControl("none");
     $session->style->setCss($session->url->extras('/tinymce-webgui/plugins/wgpagetree/css/pagetree.css'));
     $session->style->setRawHeadTags(<<"JS");
 <style type="text/css">body { margin: 0 }</style>
@@ -270,7 +270,7 @@ Each link display a thumbnail of the image via www_viewThumbnail.
 
 sub www_imageTree {
     my $session = shift;
-    $session->http->setCacheControl("none");
+    $session->response->setCacheControl("none");
     $session->style->setCss($session->url->extras('/tinymce-webgui/plugins/wginsertimage/css/insertimage.css'));
     $session->style->setRawHeadTags(<<"JS");
 <style type="text/css">body { margin: 0 }</style>
@@ -349,7 +349,7 @@ URL in the session object is used to determine which Image is used.
 
 sub www_viewThumbnail {
     my $session = shift;
-    $session->http->setCacheControl("none");
+    $session->response->setCacheControl("none");
     $session->style->setCss($session->url->extras('/tinymce-webgui/plugins/wginsertimage/css/insertimage.css'));
     my $image = WebGUI::Asset->newByUrl($session);
     my $i18n = WebGUI::International->new($session);
@@ -375,7 +375,7 @@ Returns a form to add a folder using the rich editor. The purpose of this featur
 
 sub www_addFolder {
 	my $session = shift;
-	$session->http->setCacheControl("none");
+	$session->response->setCacheControl("none");
 	my $i18n = WebGUI::International->new($session, 'Operation_FormHelpers');
 	my $f = WebGUI::HTMLForm->new($session);
 	$f->hidden(
@@ -416,7 +416,7 @@ Creates a directory under the current asset. The filename should be specified in
 
 sub www_addFolderSave {
 	my $session = shift;
-	$session->http->setCacheControl("none");
+	$session->response->setCacheControl("none");
 	# get base url
 	my $base = WebGUI::Asset->newByUrl($session) || WebGUI::Asset->getRoot($session);
 	# check if user can edit the current asset
@@ -453,7 +453,7 @@ sub www_addFolderSave {
 		#filename                 => $filename,
 		});
     WebGUI::VersionTag->autoCommitWorkingIfEnabled($session, { allowComments => 0 });
-	$session->http->setRedirect($base->getUrl('op=formHelper;class=HTMLArea;sub=imageTree'));
+	$session->response->setRedirect($base->getUrl('op=formHelper;class=HTMLArea;sub=imageTree'));
 	return undef;
 }
 
@@ -467,7 +467,7 @@ Returns a form to add an image using the rich editor. The purpose of this featur
 
 sub www_addImage {
 	my $session = shift;
-	$session->http->setCacheControl("none");
+	$session->response->setCacheControl("none");
 	my $i18n = WebGUI::International->new($session, 'Operation_FormHelpers');
 	my $f = WebGUI::HTMLForm->new($session);
 	$f->hidden(
@@ -508,7 +508,7 @@ Creates an Image asset under the current asset. The filename should be specified
 
 sub www_addImageSave {
 	my $session = shift;
-	$session->http->setCacheControl("none");
+	$session->response->setCacheControl("none");
 	# get base asset
 	my $base = WebGUI::Asset->newByUrl($session) || WebGUI::Asset->getRoot($session);
 
@@ -539,7 +539,7 @@ sub www_addImageSave {
         $child->applyConstraints;
     }
     WebGUI::VersionTag->autoCommitWorkingIfEnabled($session, { allowComments => 0 });
-    $session->http->setRedirect($base->getUrl('op=formHelper;class=HTMLArea;sub=imageTree'));
+    $session->response->setRedirect($base->getUrl('op=formHelper;class=HTMLArea;sub=imageTree'));
     return undef;
 }
 
