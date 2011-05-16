@@ -23,6 +23,7 @@ use WebGUI::Asset::Sku;
 use WebGUI::Asset::Sku::Product;
 use WebGUI::AssetVersioning;
 use WebGUI::VersionTag;
+use Monkey::Patch;
 
 use Test::More;
 use Test::Deep;
@@ -172,7 +173,7 @@ sub definition {
 
 package main;
 
-plan tests => 134
+plan tests => 135
             + scalar(@fixIdTests)
             + scalar(@fixTitleTests)
             + 2*scalar(@getTitleTests) #same tests used for getTitle and getMenuTitle
@@ -1184,4 +1185,25 @@ sub getTitleTests {
     );
 }
 
+subtest 'canAdd tolerates being called as an object method', sub {
+    my $class = 'WebGUI::Asset::Snippet';
+    my $snip = $tempNode->addChild({className => $class});
 
+    # Make a test user who's just in Turn Admin On
+    my $u = WebGUI::User->create($session);
+    WebGUI::Test->addToCleanup($u);
+    $u->addToGroups(['12']);
+    $session->user({ user => $u });
+
+    # default addGroup is Turn Admin On
+    ok $class->canAdd($session), 'can add when called as a class method';
+    ok $snip->canAdd($session), '...or an object method';
+
+    my $key = "assets/$class/addGroup";
+    WebGUI::Test->originalConfig($key);
+    $session->config->set($key, 3);
+
+    # now only admins can add snippets, so canAdd should return false
+    ok !$class->canAdd($session), 'Cannot add when called as a class method';
+    ok !$snip->canAdd($session), '...or an object method';
+};

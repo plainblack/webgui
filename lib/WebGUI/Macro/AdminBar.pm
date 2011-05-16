@@ -160,12 +160,13 @@ sub process {
 		
 		# prototypes
 		foreach my $prototype (@{ $session->asset->getPrototypeList }) {
-            next unless ($prototype->canView && $prototype->canAdd($session) && $prototype->getUiLevel <= $userUiLevel);
+            my $class = $prototype->get('className');
+            next unless ($prototype->canView && $class->canAdd($session) && $prototype->getUiLevel <= $userUiLevel);
             $categories{prototypes}{items} ||= [];
             push @{$categories{prototypes}{items}}, {
                 title   => $prototype->getTitle,
                 url     => $asset->getUrl(
-                    "func=add;class=".$prototype->get('className').";prototype=".$prototype->getId.$proceed
+                    "func=add;class=$class;prototype=".$prototype->getId.$proceed
                 ),
                 icon    => $prototype->getIcon(1),
             };
