@@ -23,7 +23,6 @@ use WebGUI::Asset::Sku;
 use WebGUI::Asset::Sku::Product;
 use WebGUI::AssetVersioning;
 use WebGUI::VersionTag;
-use Monkey::Patch;
 
 use Test::More;
 use Test::Deep;
