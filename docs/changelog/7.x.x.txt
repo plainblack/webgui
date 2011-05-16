@@ -3,6 +3,7 @@
  - rfe #2123: Layouts related for export purposes
  - fixed #12125: Recaptcha API url
  - rfe #12127: AssetProperty macro
+ - fixed #12129: AdminBar calls canAdd as an object method
 
 7.10.15
  - fixed #12117: Thingy - www_searchViaAjax broken

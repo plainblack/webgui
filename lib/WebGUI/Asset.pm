@@ -226,6 +226,10 @@ The "turn admin on" group which is group id 12.
 
 sub canAdd {
     my $className = shift;
+
+    # just in case we get called as object method
+    $className = $className->get('className') if blessed $className;
+
     my $session = shift;
     my $userId = shift || $session->user->userId;
     my $user = WebGUI::User->new($session, $userId);
