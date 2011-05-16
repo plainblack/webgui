@@ -190,7 +190,6 @@ PayPal API spit back.
 
 sub processPayment {
     my ( $self, $transaction ) = @_;
-    my ( $isSuccess, $gatewayCode, $status, $message );
 
     my $form = $self->payPalForm(
         METHOD        => 'DoExpressCheckoutPayment',
