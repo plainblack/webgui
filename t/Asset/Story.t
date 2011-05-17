@@ -266,11 +266,11 @@ cmp_deeply(
     'getCrumbTrail: with topic set'
 );
 
-is_deeply(
+cmp_bag(
     $story->exportGetRelatedAssetIds,
-    [ $topic->getId ],
+    [ $topic->getId, $archive->getId ],
     'exportGetRelatedAssetIds',
-);
+) or diag Dumper $story->exportGetRelatedAssetIds;
 
 $story->topic('');
 
