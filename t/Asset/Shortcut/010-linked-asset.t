@@ -19,8 +19,10 @@ use Scalar::Util qw( blessed );
 use WebGUI::Test;
 use WebGUI::Session;
 use Test::More; 
+use Test::Deep; 
 use WebGUI::Asset::Shortcut;
 use WebGUI::Asset::Snippet;
+use Data::Dumper;
 
 #----------------------------------------------------------------------------
 # Init
@@ -54,11 +56,11 @@ is(
     "Original assetId is correct"
 );
 
-is_deeply(
-    [ $shortcut->getId ],
+cmp_bag(
     $original->exportGetRelatedAssetIds,
+    [ $shortcut->getId, $node->getId ],
     'shortcut is related for the purpose of exports',
-);
+) or diag Dumper $original->exportGetRelatedAssetIds;
 
 #----------------------------------------------------------------------------
 # Test trashing snippet trashes shortcut also
