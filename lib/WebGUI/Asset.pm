@@ -1496,7 +1496,12 @@ Returns the human readable name of the asset.
 
 sub getName {
 	my $self = shift;
-    return WebGUI::International->new($self->session, 'Asset')->get(@{ $self->assetName });
+    if ( ref $self->assetName eq 'ARRAY' ) {
+        return WebGUI::International->new($self->session, 'Asset')->get(@{ $self->assetName });
+    }
+    else {
+        return $self->assetName;
+    }
 }
 
 
