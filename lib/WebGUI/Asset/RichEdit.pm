@@ -513,116 +513,6 @@ sub getRichEditor {
 	my $self = shift;
 	return '' if ($self->disableRichEditor);
 	my $nameId = shift;
-<<<<<<< HEAD
-    my @plugins;
-    my %loadPlugins;
-    push @plugins, "safari";
-    push @plugins, "contextmenu"
-        if $self->enableContextMenu;
-    push @plugins, "inlinepopups"
-        if $self->inlinePopups;
-    push @plugins, "media"
-        if $self->allowMedia;
-
-    my @toolbarRows = map{[split "\n", $self->get("toolbarRow$_")]} (1..3);
-    my @toolbarButtons = map{ @{$_} } @toolbarRows;
-	my $i18n = WebGUI::International->new($self->session, 'Asset_RichEdit');
-    my $ask = $self->askAboutRichEdit;
-	my %config = (
-		mode     => $ask ? "none" : "exact",
-		elements => $nameId,
-		theme    => "advanced",
-		relative_urls => JSON::false(),
-		remove_script_host => JSON::true(),
-		auto_reset_designmode => JSON::true(),
-		cleanup_callback => "tinyMCE_WebGUI_Cleanup",
-		urlconverter_callback => "tinyMCE_WebGUI_URLConvertor",
-		theme_advanced_resizing => JSON::true(),
-		      (map { "theme_advanced_buttons".($_+1) => (join ',', @{$toolbarRows[$_]}) }
-		       (0..$#toolbarRows)),
-		#ask => $self->getValue("askAboutRichEdit") ? JSON::true() : JSON::false(),
-		ask => JSON::false(),
-		preformatted => $self->preformatted ? JSON::true() : JSON::false(),
-		force_br_newlines => $self->useBr ? JSON::true() : JSON::false(),
-		force_p_newlines => $self->useBr ? JSON::false() : JSON::true(),
-        $self->useBr ? ( forced_root_block => JSON::false() ) : (),
-		remove_linebreaks => $self->removeLineBreaks ? JSON::true() : JSON::false(),
-		nowrap => $self->nowrap ? JSON::true() : JSON::false(),
-		directionality => $self->directionality,
-		theme_advanced_toolbar_location => $self->toolbarLocation,
-		theme_advanced_statusbar_location => "bottom",
-		valid_elements => $self->validElements,
-		wg_userIsVisitor => $self->session->user->isVisitor ? JSON::true() : JSON::false(),
-		);
-#    if ($ask) {
-#        $config{oninit} = 'turnOffTinyMCE_'.$nameId;
-#    }
-	foreach my $button (@toolbarButtons) {
-		if ($button eq "spellchecker" && $self->session->config->get('availableDictionaries')) {
-            push(@plugins,"-wgspellchecker");
-            $loadPlugins{wgspellchecker} = $self->session->url->extras("tinymce-webgui/plugins/wgspellchecker/editor_plugin.js");
-			$config{spellchecker_rpc_url} = $self->session->url->gateway('', "op=spellCheck");
-			$config{spellchecker_languages} = 
-			join(',', map { ($_->{default} ? '+' : '').$_->{name}.'='.$_->{id} } @{$self->session->config->get('availableDictionaries')});
-		}
-		push(@plugins,"table") if ($button eq "tablecontrols");
-		push(@plugins,"save") if ($button eq "save");
-		push(@plugins,"advhr") if ($button eq "advhr");
-		push(@plugins,"fullscreen") if ($button eq "fullscreen");
-		if ($button eq "advimage") {
-			push(@plugins,"advimage");
-			$config{external_link_list_url} = "";
-		}
-		if ($button eq "advlink") {
-			$config{external_image_list_url} = "";
-			$config{file_browser_callback} = "mcFileManager.filebrowserCallBack";
-			push(@plugins,"advlink");
-		}
-		push(@plugins,"emotions") if ($button eq "emotions");
-		push(@plugins,"iespell") if ($button eq "iespell");
-		$config{gecko_spellcheck} = 'true' if ($button eq "iespell");
-		if ($button eq "paste" || $button eq "pastetext" || $button eq "pasteword") {
-			push(@plugins,"paste");
-		}
-		if ($button eq "insertdate" || $button eq "inserttime" || $button eq "insertdatetime") {
-			$config{plugin_insertdate_dateFormat} = "%Y-%m-%d";
-			$config{plugin_insertdate_timeFormat} = "%H:%M:%S";
-			push(@plugins,"insertdatetime");
-		}
-		push(@plugins,"preview") if ($button eq "preview");
-		if ($button eq "media") {
-			push(@plugins,"media");
-		}
-		push(@plugins,"searchreplace") if ($button eq "search" || $button eq "replace" || $button eq "searchreplace");
-		push(@plugins,"print") if ($button eq "print");
-        if ($button eq "wginsertimage") {
-            push @plugins, "-wginsertimage";
-            $loadPlugins{wginsertimage} = $self->session->url->extras("tinymce-webgui/plugins/wginsertimage/editor_plugin.js");
-        }
-        if ($button eq "wgpagetree") {
-            push @plugins, "-wgpagetree";
-            $loadPlugins{wgpagetree} = $self->session->url->extras("tinymce-webgui/plugins/wgpagetree/editor_plugin.js");
-        }
-        if ($button eq "wgmacro") {
-            push @plugins, "-wgmacro";
-            $loadPlugins{wgmacro} = $self->session->url->extras("tinymce-webgui/plugins/wgmacro/editor_plugin.js");
-        }
-		if ($button eq "code") {
-			$config{theme_advanced_source_editor_width} = $self->sourceEditorWidth if ($self->sourceEditorWidth > 0);
-			$config{theme_advanced_source_editor_height} = $self->sourceEditorHeight if ($self->sourceEditorHeight > 0);
-		}
-	}
-	my $language  = $i18n->getLanguage('' ,"languageAbbreviation");
-	unless ($language) {
-		$language = $i18n->getLanguage("English","languageAbbreviation");
-	}
-	$config{language} = $language;
-	$config{content_css} = $self->cssFile || $self->session->url->extras('tinymce-webgui/defaultcontent.css');
-	$config{width} = $self->editorWidth || "100%";
-	$config{height} = $self->editorHeight || "100%";
-	$config{plugins} = join(",",@plugins);
-
-=======
 	my $i18n = WebGUI::International->new($self->session, 'Asset_RichEdit');
     my $ask = $self->getValue("askAboutRichEdit");
 #    if ($ask) {
@@ -632,7 +522,6 @@ sub getRichEditor {
     $self->session->style->setScript($self->session->url->extras('yui/build/event/event-min.js'),{type=>"text/javascript"});
     $self->session->style->setScript($self->session->url->extras('tinymce/jscripts/tiny_mce/tiny_mce_src.js'),{type=>"text/javascript"});
     $self->session->style->setScript($self->session->url->extras("tinymce-webgui/callbacks.js"),{type=>"text/javascript"});
->>>>>>> fix carousel editor panel
     my $out = '';
     if ($ask) {
         $out = q|<a style="display: block;" href="javascript:toggleEditor('|.$nameId.q|')">|.$i18n->get('Toggle editor').q|</a>|;
