@@ -73,17 +73,19 @@ sub _template_content {
 
 sub getAsset {
     my ( $self, $id ) = @_;
-    try  {
-        return WebGUI::Asset->newByUrl( $self->session, $id );
+    my ( $asset );
+    try {
+        $asset = WebGUI::Asset->newByUrl( $self->session, $id );
     }
     catch {
         try {
-            return WebGUI::Asset->newById( $self->session, $id );
+            $asset = WebGUI::Asset->newById( $self->session, $id );
         }
         catch {
             die "Could not find asset $id to include in template: " . $_;
         };
     };
+    return $asset;
 }
 
 1;
