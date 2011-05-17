@@ -80,6 +80,37 @@ sub addObjectAt {
     return $object;
 }
 
+=head2 process ( )
+
+Process the form and return a hashref of values.
+
+=cut
+
+sub process {
+    my ( $self ) = @_;
+    my $values  = {};
+    for my $obj ( @{$self->objects} ) {
+        if ( $obj->isa( 'WebGUI::Form::Control' ) ) {
+            $values->{ $obj->get('name') } = $obj->getValue;
+        }
+        elsif ( $obj->does( 'WebGUI::FormBuilder::Role::HasObjects' ) ) {
+            my $merge = $obj->process;
+            for my $key ( keys %$merge ) {
+                if ( $values->{ $key } ) {
+                    if ( !ref $values->{ $key } ) {
+                        $values->{ $key } = [ $values->{ $key } ];
+                    }
+                    push @{ $values->{ $key } }, $merge->{ $key };
+                }
+                else {
+                    $values->{ $key } = $merge->{ $key };
+                }
+            }
+        }
+    }
+    return $values;
+}
+
 =head2 toTemplateVars ( prefix, var )
 
 Get all the objects as a set of template vars with the given prefix. $var is 
