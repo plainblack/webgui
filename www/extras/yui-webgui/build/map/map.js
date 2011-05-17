@@ -133,12 +133,12 @@ WebGUI.Map.editPoint
                     } );
                     divButton.appendChild( deleteButton );
                 }
+                WebGUI.Map.hideLoading();
+
                 marker.bindInfoWindow( infoWin );
                 GEvent.addListener( marker, "dragend", function (latlng) {
                     WebGUI.Map.setPointLocation( marker, latlng );
                 } );
-                WebGUI.Map.hideLoading();
-
                 WebGUI.Map.markers[map.assetId][marker.assetId] = marker;
                 WebGUI.Map.updateSelectPoint( map );
             }
