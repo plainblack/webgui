@@ -1,3 +1,5 @@
+7.10.17
+
 7.10.16
  - fixed #12121: typ-o Asset_Map.templateIdEditPoint
  - rfe #2123: Layouts related for export purposes
