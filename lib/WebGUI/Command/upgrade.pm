@@ -23,10 +23,10 @@ sub opt_spec {
         [ 'override',   'Force upgrade to run even if not running as root' ],
         [ 'quiet',      'Don\'t show progress reports' ],
         [ 'doit',       'Run upgrade' ],
-        [ 'skipDelete', 'Don\'t clear cache' ],
-        [ 'skipMaintenance', 'Don\'t turn on maintenance mode for sites while upgrading' ],
-        [ 'skipBackup', 'Don\'t create database backups' ],
-        [ 'backupDir=s', 'Directory to store database backups' ],
+        [ 'skipdelete', 'Don\'t clear cache' ],
+        [ 'skipmaintenance', 'Don\'t turn on maintenance mode for sites while upgrading' ],
+        [ 'skipbackup', 'Don\'t create database backups' ],
+        [ 'backupdir=s', 'Directory to store database backups' ],
         [ 'mysql=s',    'mysql command line client to use' ],
         [ 'mysqldump=s', 'mysqldump command line client to use' ],
     );
@@ -85,17 +85,17 @@ sub run_upgrade {
     my ($self, $opt, $args) = @_;
     my $upgrade = WebGUI::Upgrade->new(
         quiet               => $opt->{quiet},
-        clearCache          => ! $opt->{skipDelete},
-        createBackups       => ! $opt->{skipBackup},
-        useMaintenanceMode  => ! $opt->{skipMaintenance},
+        clearCache          => ! $opt->{skipdelete},
+        createBackups       => ! $opt->{skipbackup},
+        useMaintenanceMode  => ! $opt->{skipmaintenance},
         $opt->{mysql} ? (
             mysql               => $opt->{mysql},
         ) : (),
         $opt->{mysqldump} ? (
             mysqldump           => $opt->{mysqldump},
         ) : (),
-        $opt->{backupDir} ? (
-            backupPath          => $opt->{backupDir},
+        $opt->{backupdir} ? (
+            backupPath          => $opt->{backupdir},
         ) : (),
     );
     $upgrade->upgradeSites;
