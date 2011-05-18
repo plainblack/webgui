@@ -104,18 +104,18 @@ our $I18N = {
     'summary template help' => {
         message => q|Pick a template to display the screen where the user confirms the cart summary info and agrees to pay.|,
         lastUpdated => 0,
-        context => q|Hover help for the summary template field in the configuration form of the Cash module.|
+        context => q|Hover help for the summary template field in the configuration form.|
     },
  
 	'password' => {
 		message => q|Password|,
 		lastUpdated => 0,
-		context => q|Form label in the configuration form of the iTransact module.|
+		context => q|Form label in the configuration form of the PayPal Express module.|
 	},
 	'password help' => {
-		message => q|The password for your ITransact account.|,
+		message => q|The password for your PayPal account.|,
 		lastUpdated => 0,
-		context => q|Hover help for the password field in the configuration form of the iTransact module.|
+		context => q|Hover help for the password field in the configuration form of the PayPal Express module.|
 	},
 
 	'Pay' => {
