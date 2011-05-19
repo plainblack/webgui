@@ -1,5 +1,6 @@
 7.9.29
  - fixed #12129: AdminBar calls canAdd as an object method
+ - fixed: Forced to use a PayDriver even with a balance of 0 in the cart.
 
 7.9.28
  - fixed #11213: Gooey on the Go format problem
