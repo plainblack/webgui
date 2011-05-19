@@ -1,4 +1,5 @@
 7.10.17
+ - fixed: Forced to use a PayDriver even with a balance of 0 in the cart.
 
 7.10.16
  - fixed #12121: typ-o Asset_Map.templateIdEditPoint

@@ -925,7 +925,7 @@ sub www_checkout {
         my $total = $self->calculateTotal;
         ##Handle rounding errors, and checkout immediately if the amount is 0 since
         ##at least the ITransact driver won't accept $0 checkout.
-        if (sprintf('%.2f', $total + $self->calculateShopCreditDeduction($total)) eq '0.00') {
+        if (sprintf('%.2f', abs($total + $self->calculateShopCreditDeduction($total))) eq '0.00') {
             my $transaction = WebGUI::Shop::Transaction->create($session, {cart => $self});
             $transaction->completePurchase('zero', 'success', 'success');
             $self->onCompletePurchase;
