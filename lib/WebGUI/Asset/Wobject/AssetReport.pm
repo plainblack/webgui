@@ -191,7 +191,10 @@ sub getTemplateVars {
     my $data = $p->getPageData;
     foreach my $row (@{$data}) {
         my $returnAsset = WebGUI::Asset->new($session,$row->{assetId},$row->{className},$row->{revisionDate});
-        push(@{$var->{'asset_loop'}},$returnAsset->get);
+        push(@{$var->{'asset_loop'}}, {
+                %{$returnAsset->get}, 
+                %{$returnAsset->getMetaDataAsTemplateVariables}
+            });
     }
 
     #Append template variables
