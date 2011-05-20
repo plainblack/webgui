@@ -1,6 +1,10 @@
 7.10.17
  - fixed: Forced to use a PayDriver even with a balance of 0 in the cart.
  - add #12134: Access metadata for assets inside an AssetReport
+ - fixed : Thingy CSV import not counting towards maxEntriesPerUser
+ - fixed : Thingy CSV new records not updated with createdById and dateCreated and ipAddress
+ - added : Thingy fields can now be set as unique and checked upon insert
+ - added : Thingy max entries of thingy records added
 
 7.10.16
  - fixed #12121: typ-o Asset_Map.templateIdEditPoint

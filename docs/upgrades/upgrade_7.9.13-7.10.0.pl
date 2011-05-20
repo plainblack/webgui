@@ -35,7 +35,6 @@ addAddonsToAdminConsole($session);
 
 finish($session); # this line required
 
-
 #----------------------------------------------------------------------------
 # Describe what our function does
 sub addAddonsToAdminConsole {

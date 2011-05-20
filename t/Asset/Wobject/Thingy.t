@@ -16,7 +16,7 @@ use lib "$FindBin::Bin/../../lib";
 
 use WebGUI::Test;
 use WebGUI::Session;
-use Test::More tests => 30; # increment this value for each test you create
+use Test::More tests => 38; # increment this value for each test you create
 use Test::Deep;
 use JSON;
 use WebGUI::Asset::Wobject::Thingy;
@@ -129,6 +129,7 @@ cmp_deeply(
             field_loop=>[],
             exportMetaData=>undef,
             maxEntriesPerUser=>undef,
+            maxEntriesTotal=>undef,
         },
         'Getting newly added thing as JSON: www_getThingViaAjax returns correct data as JSON.'
     );
@@ -172,6 +173,7 @@ cmp_deeply(
             canSearch=>1,
             exportMetaData=>undef,
             maxEntriesPerUser=>undef,
+            maxEntriesTotal=>undef,
         }],
         'Getting all things in Thingy as JSON: www_getThingsViaAjax returns correct data as JSON.'
     );
@@ -357,6 +359,58 @@ ok( $thingy->hasEnteredMaxPerUser($otherThingId), 'hasEnteredMaxPerUser returns 
 
 #################################################################
 #
+# maxEntriesTotal
+#
+#################################################################
+
+my %otherThingProperties = %thingProperties;
+$otherThingProperties{maxEntriesTotal} = 1;
+$otherThingProperties{editTemplateId   } = $templateId;
+my $otherThingId = $thingy->addThing(\%otherThingProperties, 0); 
+my %otherFieldProperties = %fieldProperties;
+$otherFieldProperties{thingId} = $otherThingId;
+my $otherFieldId = $thingy->addField(\%otherFieldProperties, 0);
+ok( ! $thingy->hasEnteredMaxEntries($otherThingId), 'hasEnteredMaxEntries: returns false with no data entered');
+
+my @edit_thing_form_fields = qw/form_start form_end form_submit field_loop/;
+
+{
+    WebGUI::Test->mockAssetId($templateId, $templateMock);
+    $thingy->editThingData($otherThingId);
+    my %miniVars;
+    @miniVars{@edit_thing_form_fields} = @{ $templateVars }{ @edit_thing_form_fields };
+    cmp_deeply(
+        \%miniVars,
+        {
+            form_start  => ignore,
+            form_end    => ignore,
+            form_submit => ignore,
+            field_loop  => ignore,
+        },
+        'thing edit form variables exist, because max entries not reached yet'
+    );
+}
+
+$thingy->editThingDataSave($otherThingId, 'new', {"field_".$otherFieldId => 'other test value'} );
+ok( $thingy->hasEnteredMaxEntries($otherThingId), 'hasEnteredMaxEntries returns true with one row entered, and maxEntriesTotal=1');
+
+{
+    WebGUI::Test->mockAssetId($templateId, $templateMock);
+    $thingy->editThingData($otherThingId);
+    my %miniVars;
+    @miniVars{@edit_thing_form_fields} = @{ $templateVars }{ @edit_thing_form_fields };
+    my $existance = 0;
+    foreach my $tmplVar (@edit_thing_form_fields) {
+        $existance ||= exists $templateVars->{$tmplVar}
+    }
+    ok(
+        ! $existance,
+        'thing edit form variables do not exist, because max entries was reached'
+    );
+}
+
+#################################################################
+#
 # deleteThing
 #
 #################################################################
@@ -443,3 +497,28 @@ is $json, '{}', 'www_editThingDataSaveViaAjax: Empty JSON hash';
 is $session->http->getStatus, 200, '... http status=200';
 
 $session->request->setup_body({ });
+
+#################################################################
+#
+# Unique fields
+#
+#################################################################
+
+{
+    my %newThingProperties                = %thingProperties;
+    $newThingProperties{'groupIdView'} = 3;
+    my $newThingId                        = $thingy->addThing(\%newThingProperties, 0); 
+    my %newFieldProperties                = %fieldProperties;
+    $newFieldProperties{thingId}       = $newThingId;
+    $newFieldProperties{isUnique}       = 1;
+    my $newFieldId                        = $thingy->addField(\%newFieldProperties, 0);
+    my $fieldValue = 'value 1';
+    my ($dataId,undef) = $thingy->editThingDataSave($newThingId, 'new', {"field_".$newFieldId => $fieldValue} );
+    ok( $thingy->isUniqueEntry($newThingId,"field_${newFieldId}",$fieldValue,$dataId), "unique if the same entry" );
+    ok( !$thingy->isUniqueEntry($newThingId,"field_${newFieldId}",$fieldValue,"new"), "new data is not unique" );
+    my ( undef, $errors ) = $thingy->editThingDataSave($newThingId, 'new', {"field_".$newFieldId => $fieldValue} );
+    ok( @$errors >= 1, "an error was returned" );
+    my $errorMessage = $i18n->get('needs to be unique error');
+    ok( grep( { $_->{error_message} =~ m/$errorMessage/ } @$errors), "error about uniqueness in right field" );
+}
+

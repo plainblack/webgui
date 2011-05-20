@@ -31,6 +31,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+createThingyDBColumns($session);
 
 finish($session); # this line required
 
@@ -44,6 +45,21 @@ finish($session); # this line required
 #    print "DONE!\n" unless $quiet;
 #}
 
+#----------------------------------------------------------------------------
+# Creates new column in tables for Thingy_fields and Thingy_things
+sub createThingyDBColumns {
+    my $session = shift;
+    print "\tAdding db. columns Thingy_fields.isUnique and Thingy_things.maxEntriesTotal.." unless $quiet;
+    # and here's our code
+
+    my %tfHash =  $session->db->quickHash("show columns from Thingy_fields where Field='isUnique'");
+    my %ttHash =  $session->db->quickHash("show columns from Thingy_things where Field='maxEntriesTotal'");
+
+    unless ( $tfHash{'Field'}) { $session->db->write("alter table Thingy_fields add isUnique int(1) default 0"); }
+    unless ( $ttHash{'Field'}) { $session->db->write("alter table Thingy_things add maxEntriesTotal int default null"); }
+
+    print "DONE!\n" unless $quiet;
+}
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
 
