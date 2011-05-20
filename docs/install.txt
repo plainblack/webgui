@@ -28,6 +28,9 @@ WebGUI 7.
   to insert your site's URL and the database connection information 
   (dbuser, dbpass, dsn).
 
+  Set uploadsPath in the .conf file to eg 
+  /data/domains/www.example.com/public/uploads/.
+
   Edit "etc/spectre.conf" to define port and worker settings for spectre.
 
   Set WEBGUI_CONFIG to point at your new configuration file:
