@@ -855,6 +855,7 @@
     "H"                : "H_homeLink", 
     "If"               : "If",
     "International"    : "International", 
+    "i18n"             : "International", 
     "LastModified"     : "LastModified", 
     "LastModifiedBy"   : "LastModifiedBy", 
     "L"                : "L_loginBox", 
