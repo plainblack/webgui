@@ -63,7 +63,22 @@ sub _template_content {
             return wantarray ? ( "", $@, 0 ) : "";
         }
 
-        my $content = $type eq 'template' ? $asset->template : $asset->view;
+        my $content;
+        # If not a TT template, process it.
+        if ( $type eq 'template' ) {
+            if ( $asset->parser ne 'WebGUI::Asset::Template::TemplateToolkit' ) {
+                $content = $asset->process( $self->context->stash );
+            }
+            else {
+                # It may or may not get processed, according to the user's desire
+                $content = $asset->template;
+            }
+        }
+        # Normal assets, call view
+        else {
+            $content = $asset->view;
+        }
+
         return wantarray ? ( $content, "", $asset->getLastModified ) : $content;
     }
     else {
