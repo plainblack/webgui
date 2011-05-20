@@ -329,7 +329,7 @@ override getEditForm => sub {
 # Get a list of all the buttons in this MCE
 sub getAllButtons {
     my ( $self ) = @_;
-    my @toolbarRows = map{[split "\n", $self->getValue("toolbarRow$_")]} (1..3);
+    my @toolbarRows = map{[split "\n", $self->get("toolbarRow$_")]} (1..3);
     my @toolbarButtons = map{ @{$_} } @toolbarRows;
     return @toolbarButtons;
 }
@@ -344,13 +344,13 @@ sub getConfig {
     my @plugins;
     push @plugins, "safari";
     push @plugins, "contextmenu"
-        if $self->getValue("enableContextMenu");
+        if $self->get("enableContextMenu");
     push @plugins, "inlinepopups"
-        if $self->getValue("inlinePopups");
+        if $self->get("inlinePopups");
     push @plugins, "media"
-        if $self->getValue( 'allowMedia' );
+        if $self->get( 'allowMedia' );
 
-    my @toolbarRows = map{[split "\n", $self->getValue("toolbarRow$_")]} (1..3);
+    my @toolbarRows = map{[split "\n", $self->get("toolbarRow$_")]} (1..3);
     my @toolbarButtons = map{ @{$_} } @toolbarRows;
     my %config = (
         mode                    => 'exact',
@@ -364,16 +364,16 @@ sub getConfig {
         ( map { "theme_advanced_buttons" . ( $_ + 1 ) => ( join ',', @{ $toolbarRows[$_] } ) } ( 0 .. $#toolbarRows ) ),
 
         ask               => JSON::false(),
-        preformatted      => $self->getValue("preformatted") ? JSON::true() : JSON::false(),
-        force_br_newlines => $self->getValue("useBr") ? JSON::true() : JSON::false(),
-        force_p_newlines  => $self->getValue("useBr") ? JSON::false() : JSON::true(),
-        $self->getValue("useBr") ? ( forced_root_block => JSON::false() ) : (),
-        remove_linebreaks => $self->getValue("removeLineBreaks") ? JSON::true() : JSON::false(),
-        nowrap            => $self->getValue("nowrap")           ? JSON::true() : JSON::false(),
-        directionality    => $self->getValue("directionality"),
-        theme_advanced_toolbar_location   => $self->getValue("toolbarLocation"),
+        preformatted      => $self->get("preformatted") ? JSON::true() : JSON::false(),
+        force_br_newlines => $self->get("useBr") ? JSON::true() : JSON::false(),
+        force_p_newlines  => $self->get("useBr") ? JSON::false() : JSON::true(),
+        $self->get("useBr") ? ( forced_root_block => JSON::false() ) : (),
+        remove_linebreaks => $self->get("removeLineBreaks") ? JSON::true() : JSON::false(),
+        nowrap            => $self->get("nowrap")           ? JSON::true() : JSON::false(),
+        directionality    => $self->get("directionality"),
+        theme_advanced_toolbar_location   => $self->get("toolbarLocation"),
         theme_advanced_statusbar_location => "bottom",
-        valid_elements                    => $self->getValue("validElements"),
+        valid_elements                    => $self->get("validElements"),
         wg_userIsVisitor                  => $self->session->user->isVisitor ? JSON::true() : JSON::false(),
     );
     foreach my $button (@toolbarButtons) {
@@ -425,10 +425,10 @@ sub getConfig {
             push @plugins, "-wgmacro";
         }
         if ( $button eq "code" ) {
-            $config{theme_advanced_source_editor_width} = $self->getValue("sourceEditorWidth")
-                if ( $self->getValue("sourceEditorWidth") > 0 );
-            $config{theme_advanced_source_editor_height} = $self->getValue("sourceEditorHeight")
-                if ( $self->getValue("sourceEditorHeight") > 0 );
+            $config{theme_advanced_source_editor_width} = $self->get("sourceEditorWidth")
+                if ( $self->get("sourceEditorWidth") > 0 );
+            $config{theme_advanced_source_editor_height} = $self->get("sourceEditorHeight")
+                if ( $self->get("sourceEditorHeight") > 0 );
         }
     } ## end foreach my $button (@toolbarButtons)
     my $language = $i18n->getLanguage( '', "languageAbbreviation" );
@@ -436,10 +436,10 @@ sub getConfig {
         $language = $i18n->getLanguage( "English", "languageAbbreviation" );
     }
     $config{language}    = $language;
-    $config{content_css} = $self->getValue("cssFile")
+    $config{content_css} = $self->get("cssFile")
         || $self->session->url->extras('tinymce-webgui/defaultcontent.css');
-    $config{width}  = $self->getValue("editorWidth")  if ( $self->getValue("editorWidth") > 0 );
-    $config{height} = $self->getValue("editorHeight") if ( $self->getValue("editorHeight") > 0 );
+    $config{width}  = $self->get("editorWidth")  if ( $self->get("editorWidth") > 0 );
+    $config{height} = $self->get("editorHeight") if ( $self->get("editorHeight") > 0 );
     $config{plugins} = join( ",", @plugins );
 
     return \%config;
@@ -514,7 +514,7 @@ sub getRichEditor {
 	return '' if ($self->disableRichEditor);
 	my $nameId = shift;
 	my $i18n = WebGUI::International->new($self->session, 'Asset_RichEdit');
-    my $ask = $self->getValue("askAboutRichEdit");
+    my $ask = $self->askAboutRichEdit;
 #    if ($ask) {
 #        $config{oninit} = 'turnOffTinyMCE_'.$nameId;
 #    }
