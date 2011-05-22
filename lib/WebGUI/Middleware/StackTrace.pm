@@ -20,14 +20,24 @@ BEGIN {
         $StackTraceClass = "Devel::StackTrace::WithLexicals";
     }
 
-    my $old_fatal = *WebGUI::Session::Log::fatal{CODE};
     no warnings 'redefine';
+
+    my $old_fatal = *WebGUI::Session::Log::fatal{CODE};
 
     *WebGUI::Session::Log::fatal = sub {
         my $self = shift;
         my $message = shift;
         $self->{_stacktrace} = $StackTraceClass->new;
         $old_fatal->($self, $message, @_);
+    };
+
+    my $old_error = *WebGUI::Session::Log::error{CODE};
+
+    *WebGUI::Session::Log::error = sub {
+        my $self = shift;
+        my $message = shift;
+        $self->{_stacktrace} = $StackTraceClass->new;
+        $old_error->($self, $message, @_);
     };
 
 }
