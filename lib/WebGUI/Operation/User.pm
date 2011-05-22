@@ -232,10 +232,10 @@ sub doUserSearch {
                 and users.userId not in (".$session->db->quoteAndJoin($userFilter).")  order by users.username";
 	if ($returnPaginator) {
         	my $p = WebGUI::Paginator->new($session,$session->url->page("op=".$op));
-		$p->setDataByQuery($sql, undef, undef, [$keyword, $keyword, $keyword, $keyword, $keyword]);
+		$p->setDataByQuery($sql, undef, undef, [$keyword, $keyword, $keyword, $keyword, $keyword, $keyword]);
 		return $p;
 	} else {
-		my $sth = $session->dbSlave->read($sql, [$keyword, $keyword, $keyword, $keyword, $keyword]);
+		my $sth = $session->dbSlave->read($sql, [$keyword, $keyword, $keyword, $keyword, $keyword, $keyword]);
 		return $sth;
 	}
 }
