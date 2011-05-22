@@ -757,7 +757,7 @@ sub dispatch {
     }
     elsif ($@) {
         my $message = $@;
-        $session->log->warn("Couldn't call method www_".$func." on asset for url: ".$session->url->getRequestedUrl." Root cause: ".$message);
+        $session->log->error("Couldn't call method www_".$func." on asset for url: ".$session->url->getRequestedUrl." Root cause: ".$message);
     }
     return $output if $output || $viewing;
     ##No output, try the view method instead
