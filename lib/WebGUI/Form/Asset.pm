@@ -149,7 +149,7 @@ Renders an asset selector.
 
 sub toHtml {
 	my $self = shift;
-    my $asset = WebGUI::Asset->newById($self->session, $self->getOriginalValue) || WebGUI::Asset->getRoot($self->session);
+    my $asset = $self->getOriginalValue ? WebGUI::Asset->newById($self->session, $self->getOriginalValue) : WebGUI::Asset->getRoot($self->session); 
 	my $url = $asset->getUrl("op=formHelper;sub=assetTree;class=Asset;formId=".$self->get('id'));
 	$url .= ";classLimiter=".$self->get("class") if ($self->get("class"));
         return WebGUI::Form::Hidden->new($self->session,
