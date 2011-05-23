@@ -35,7 +35,7 @@ pod2usage() if $configFile eq "";
 my $session = WebGUI::Session->open($configFile);
 $session->setting->remove('specialState');
 $session->setting->add('specialState','upgrading') unless $stop;
-$session->var->end;
+$session->end;
 $session->close;
 
 __END__
