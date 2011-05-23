@@ -85,6 +85,7 @@ sub notify {
 	} else {
 		$error->warn("Couldn't connect to Spectre because ".$POE::Component::IKC::ClientLite::error);
 	}
+	return 0;
 }
 
 #-------------------------------------------------------------------
