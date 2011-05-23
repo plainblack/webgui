@@ -22,12 +22,13 @@ BEGIN {
 
     no warnings 'redefine';
 
-    my $old_fatal = *WebGUI::Session::Log::fatal{CODE};
+    my $old_fatal = *WebGUI::Session::Log::fatal{CODE} || sub { };
 
     *WebGUI::Session::Log::fatal = sub {
         my $self = shift;
         my $message = shift;
-        $self->{_stacktrace} = $StackTraceClass->new;
+        $self->{_stacktrace} ||= $StackTraceClass->new;  # favor the first stack trace
+        $self->{_message} ||= $message;
         $old_fatal->($self, $message, @_);
     };
 
@@ -36,7 +37,8 @@ BEGIN {
     *WebGUI::Session::Log::error = sub {
         my $self = shift;
         my $message = shift;
-        $self->{_stacktrace} = $StackTraceClass->new;
+        $self->{_stacktrace} ||= $StackTraceClass->new;
+        $self->{_message} ||= $message;
         $old_error->($self, $message, @_);
     };
 
@@ -52,22 +54,25 @@ sub call {
         undef $env->{'webgui.session'}->log->{_stacktrace};  # the stack trace modules do create circular references; this is necessary
                                                              # this should also keep us from doing this work twice if we get stacked twice
 
+        my $text = trace_as_string($trace);
+        my $message = $env->{'webgui.session'}->log->{_message};
+        delete $env->{'webgui.session'}->log->{_message};
+
         my @previous_html = $res && $res->[2] ? (map ref $_ ? @{ $_ } : $_, $res->[2]) : ();
 
-        my $text = trace_as_string($trace);
         $env->{'psgi.errors'}->print($text) unless $self->no_print_errors;
-        my $html = eval { trace_as_html($trace, $env->{'webgui.session'}) };
+        my $html = eval { trace_as_html($trace, $env->{'webgui.session'}, $message) };
         $res = [500, ['Content-Type' => 'text/html; charset=utf-8'], [ utf8_safe($html), @previous_html ] ];
     }    
      
     return $res;
 }
 
-
 sub trace_as_string {
     my $trace = shift;
+    my $message = shift;
 
-    my $st = '';
+    my $st = "$message:\n";
     my $first = 1;
     $trace->reset_pointer;
     while( my $f = $trace->next_frame ) {
@@ -92,6 +97,7 @@ sub trace_as_html {
 
     my $trace = shift;
     my $session = shift or die;
+    my $message = shift;
     my %opt   = @_;
 
     # copied and modified render() from Devel::StackTrace::WithLexicals
@@ -162,7 +168,7 @@ function toggleLexicals(ref) {
 
 </head>
 <body>
-<h1>Error trace</h1><pre class="message">$msg</pre><ol>
+<h1>Error trace</h1><pre class="message">$message<br>$msg</pre><ol>
 HEAD
 
     my $accumulated_asset_info = [];  # record the stack frames from when we find an asset on the call stack
