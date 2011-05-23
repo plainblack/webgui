@@ -887,7 +887,7 @@ Returns a reference to the WebGUI::Session::Var object.
 =cut
 
 sub var {
-	return $_->[0];
+	return $_[0];
 }
 
 1;
