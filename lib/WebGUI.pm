@@ -156,8 +156,6 @@ sub handle {
     # );
     # return;
 
-    local $SIG{__DIE__} = sub { $session->log->error(@_); die @_; };
-    
     # Look for the template preview HTTP headers
     WebGUI::Asset::Template->processVariableHeaders($session);
 
