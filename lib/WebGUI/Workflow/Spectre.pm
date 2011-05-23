@@ -82,7 +82,6 @@ sub notify {
 		my $result = $remote->post($module, $params);
 		return 1 if defined $result;
 		$error->warn("Couldn't send command to Spectre because ".$POE::Component::IKC::ClientLite::error);
-		}
 	} else {
 		$error->warn("Couldn't connect to Spectre because ".$POE::Component::IKC::ClientLite::error);
 	}

@@ -679,7 +679,7 @@ sub start {
 	my $spectre = WebGUI::Workflow::Spectre->new($self->session);
 	my $success = $spectre->notify("workflow/addInstance", {cookieName=>$self->session->config->getCookieName, gateway=>$self->session->config->get("gateway"), sitename=>$self->session->config->get("sitename")->[0], instanceId=>$self->getId, priority=>$self->{_data}{priority}});
 
-	return $success ? undef : WebGUI::International->new($self->session, "Macro_SpectreCheck")->get($spectreTest);
+	return $success ? undef : 'Could not connect to spectre';
 }
 
 1;
