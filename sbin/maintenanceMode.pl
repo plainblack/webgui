@@ -35,6 +35,16 @@ pod2usage() if $configFile eq "";
 my $session = WebGUI::Session->open($configFile);
 $session->setting->remove('specialState');
 $session->setting->add('specialState','upgrading') unless $stop;
+
+my $upgradeState = $session->setting->get('upgradeState');
+if( $upgradeState eq WebGUI->VERSION ) {
+    $session->setting->remove('upgradeState');
+}
+elsif( $upgradeState ) {
+    print "Warning!  WebGUI will continue to show the maintenance screen due to database/code version mismatch:\n";
+    print "Code: @{[ WebGUI->VERSION ]} versus upgradeState setting in database: $upgradeState\n";
+}                  
+
 $session->end;
 $session->close;
 
