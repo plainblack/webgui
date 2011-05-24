@@ -43,7 +43,7 @@ our $I18N = {
         context     => q{The name of the payment driver},
     },
     'password' => { 
-        message     => q{Password},
+        message     => q{API Password},
         lastUpdated => 1247254156,
     },
     'password help' => { 
@@ -88,7 +88,7 @@ our $I18N = {
         lastUpdated => 1247253981,
     },
     'user' => { 
-        message     => q{Username},
+        message     => q{API Username},
         lastUpdated => 1247254097,
     },
     'user help' => { 
@@ -107,17 +107,6 @@ our $I18N = {
         context => q|Hover help for the summary template field in the configuration form.|
     },
  
-	'password' => {
-		message => q|Password|,
-		lastUpdated => 0,
-		context => q|Form label in the configuration form of the PayPal Express module.|
-	},
-	'password help' => {
-		message => q|The password for your PayPal account.|,
-		lastUpdated => 0,
-		context => q|Hover help for the password field in the configuration form of the PayPal Express module.|
-	},
-
 	'Pay' => {
 		message => q|Pay|,
 		lastUpdated => 0,
