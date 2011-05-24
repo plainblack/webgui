@@ -118,6 +118,12 @@ our $I18N = {
         context => q|Status message|,
     },
 
+    'unable to finish transaction' => {
+        message => q|We are unable to lookup the transaction to finish checking out.|,
+        lastUpdated => 0,
+        context => q|Error message when the transaction cannot be looked up.|,
+    },
+
 };
 
 1;

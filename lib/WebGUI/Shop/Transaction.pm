@@ -802,9 +802,15 @@ sub update {
         $newProperties->{paymentDriverId}    = $pay->getId;
         $newProperties->{paymentDriverLabel} = $pay->get('label');
 
+        ##Clear out current transaction items before adding new ones.
+        foreach my $item (@{$self->getItems}) {
+            $item->delete;
+        } 
         foreach my $item (@{$cart->getItems}) {
             $self->addItem({item=>$item});
         }
+
+        $newProperties->{isRecurring} = $cart->requiresRecurringPayment;
     }
     if (exists $newProperties->{paymentMethod}) {
         my $pay = $newProperties->{paymentMethod};

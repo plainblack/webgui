@@ -156,7 +156,7 @@ is a hashref, it will be modified in place.
 sub payPalForm {
     my $self = shift;
     my $args = ref $_[0] eq 'HASH' ? shift : {@_};
-    $args->{VERSION}   = '58.0';
+    $args->{VERSION}   = '2.3';
     $args->{USER}      = $self->get('user');
     $args->{PWD}       = $self->get('password');
     $args->{SIGNATURE} = $self->get('signature');
@@ -300,6 +300,7 @@ sub www_sendToPayPal {
     if ($params) {
         unless ( $params->{ACK} =~ /^Success/ ) {
             my $log = sprintf "Paypal error: Request/response below: %s\n%s\n", Dumper($form), Dumper($params);
+            $log .= $response->request->as_string;
             $session->log->error($log);
             $error = $i18n->get('internal paypal error');
         }

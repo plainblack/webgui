@@ -5,6 +5,7 @@
  - fixed : Thingy CSV new records not updated with createdById and dateCreated and ipAddress
  - added : Thingy fields can now be set as unique and checked upon insert
  - added : Thingy max entries of thingy records added
+ - fixed #12140: PayPal standard can be used to to purchase items without paying for them
 
 7.10.16
  - fixed #12121: typ-o Asset_Map.templateIdEditPoint

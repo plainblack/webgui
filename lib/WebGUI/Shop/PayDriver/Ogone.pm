@@ -149,7 +149,7 @@ sub processPayment {
     my $self = shift;
     # Since we'll have to create a transaction before doing the actual tranasction, we let it fail
     # initially with a message that it is pending.
-    # Unless the transaction result with _setPaymentStatus the transaction will fail.
+    # Unless the transaction result is updated via _setPaymentStatus the transaction will fail.
     
     my $success = $self->{_transactionSuccessful}   || 0;
     my $id      = $self->{_ogoneId}                 || undef;
@@ -157,7 +157,6 @@ sub processPayment {
     my $message = $self->{_statusMessage}           || 'Waiting for checkout';
 
     return ( $success, $id, $status, $message );
-    return (0, undef, 1, 'Pending');
 }
 
 #-------------------------------------------------------------------

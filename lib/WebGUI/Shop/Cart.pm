@@ -970,9 +970,6 @@ sub www_lookupPosUser {
 Updates the cart totals, addresses, shipping driver and payment gateway. If requested, and the
 cart is ready, calls the www_getCredentials method from the selected payment gateway.
 
-If the cart total, after taxes, shipping, coupons and shop credit is zero, does the checkout
-immediately without calling a payment gateway.
-
 Otherwise, returns the user back to the cart.
 
 =cut

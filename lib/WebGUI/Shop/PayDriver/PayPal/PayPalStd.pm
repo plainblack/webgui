@@ -22,6 +22,7 @@ use URI;
 use URI::Escape;
 use LWP::UserAgent;
 use Readonly;
+use WebGUI::Shop::Transaction;
 
 Readonly my $I18N => 'PayDriver_PayPalStd'; 
 
@@ -161,7 +162,9 @@ sub getButton {
 
     # All the API stuff is done in paymentVariables; we'll just turn it into
     # hidden form fields here
-    my $v      = $self->paymentVariables;
+    my $v           = $self->paymentVariables;
+    my $transaction = $self->processTransaction();
+    $v->{custom}    = $transaction->getId;
     my $fields = join "\n", map {
         WebGUI::Form::hidden( $session, { name => $_, value => $v->{$_} } )
     } (keys %$v);
@@ -189,6 +192,38 @@ sub getButton {
 
     my $footer = WebGUI::Form::formFooter($session);
     return join "\n", $header, $fields, $button, $footer;
+}
+
+#-------------------------------------------------------------------
+
+=head2 getPayPalParams
+
+Using the tx form variable, dial up PayPal and ask them for details about the transaction.
+Return a hashreference of name/value pairs, along with PAYPAL_TX, the transactionId and
+PAYPAL_REQUEST_STATUS, the HTTP code from the response from PayPal.
+
+=cut
+
+sub getPayPalParams {
+    my $self    = shift;
+    my $session = $self->session;
+    # instead of relying on what was passed to us.
+    return $self->{_params} if $self->{_params};
+    my $tx = $session->form->process('tx');
+
+    my %form = (
+        cmd => '_notify-synch',
+        tx  => $tx,
+        at  => $self->get('identityToken'),
+    );
+    my $response = LWP::UserAgent->new->post($self->payPalUrl, \%form);
+    my ($status, @lines) = split("\n", $response->content);
+    my %params = map { split /=/ }
+                 map { uri_unescape($_) } @lines;
+    $params{PAYPAL_REQUEST_STATUS} = $status;
+    $params{PAYPAL_TX} = $tx;
+    $self->{_params} = \%params;
+    return $self->{_params};
 }
 
 #-------------------------------------------------------------------
@@ -274,49 +309,49 @@ passed to us.
 =cut
 
 sub processPayment {
-    my ( $self, $transaction ) = @_;
-    my $session = $self->session;
+    my ( $self ) = @_;
 
-    # To prevent a spoofed post to this url, we'll get the info from paypal
-    # instead of relying on what was passed to us.
-    my $tx = $session->form->process('tx');
+    my $success = $self->{_transactionSuccessful}   || 0;
+    my $id      = $self->{_tx}                      || undef;
+    my $status  = $self->{_statusCode}              || undef;
+    my $message = $self->{_statusMessage}           || 'Waiting for checkout';
 
-    my %form = (
-        cmd => '_notify-synch',
-        tx  => $tx,
-        at  => $self->get('identityToken'),
-    );
-    my $response = LWP::UserAgent->new->post($self->payPalUrl, \%form);
-    my ($status, @lines) = split("\n", $response->content);
-    my %params = map { split /=/ }
-                 map { uri_unescape($_) } @lines;
+    return ( $success, $id, $status, $message );
+}
 
-    if ($status =~ /FAIL/) {
-        my $message = '<table><tr><th>Field</th><th>Value</th></tr>';
-        foreach my $key ( keys %params ) {
-            $message .= "<tr><td>$key</td><td>$params{$key}</td></tr>";
-        }
-        $message .= '</table>';
-        return ( 0, $tx, $status, $message );
-    }
+#-------------------------------------------------------------------
 
-    # Make sure the transaction is for this cart to prevent spoofing
-    my $cartId = $self->getCart->getId;
-    if ($params{custom} ne $cartId) {
-        my $user = $session->user;
-        my $name = $user->username;
-        my $id   = $user->userId;
-        $session->log->warn("SECURITY WARNING: $name (id: $id) tried to " .
-            "checkout cart $cartId with PayPal transaction $tx, which " .
-            "did not match the cart we passed ($params{custom})");
+=head2 _setPaymentStatus ( transactionSuccessful, ogoneId, statusCode, statusMessage )
 
-        my $i18n = WebGUI::International->new( $session, $I18N );
-        return ( 0, $tx, 'FAIL', $i18n->get('cart transaction mismatch') );
-    }
+Update the internal status of a payment, so that the next call to processPayment
+returns the correct data.
 
-    $status = $params{payment_status};
-    return ( 1, $tx, $status, $status, $status );
-} ## end sub processPayment
+=head3 transactionSuccessful
+
+A boolean indicating whether or not the payment was successful.
+
+=head3 tx
+
+The PayPal issued transaction ID.
+
+=head3 statusCode
+
+The PayPal issued status code.
+
+=head3 statusMessage
+
+An updates status message
+
+=cut
+
+sub _setPaymentStatus {
+    my ( $self ) = @_;
+
+    $self->{_transactionSuccessful} = shift || 0;
+    $self->{_tx}                    = shift || undef;
+    $self->{_statusCode}            = shift || undef;
+    $self->{_statusMessage}         = shift || undef;
+}
 
 #-------------------------------------------------------------------
 
@@ -327,9 +362,24 @@ Where paypal comes back to when a transaction has been completed.
 =cut
 
 sub www_completeTransaction {
-    my $self = shift;
+    my $self    = shift;
+    my $session = $self->session;
 
-    my $transaction = $self->processTransaction;
+    my $params  = $self->getPayPalParams;
+    if ($params->{PAYPAL_REQUEST_STATUS} =~ /FAIL/) {
+        my $message = "<table><tr><th>Field</th><th>Value</th></tr>\n";
+        foreach my $key ( keys %{ $params } ) {
+            $message .= sprintf "<tr><td>%s</td><td>%s</td></tr>\n", $key, $params->{key};
+        }
+        $message .= "</table>\n";
+        return ( 0, $params->{PAYPAL_TX}, $params->{PAYPAL_REQUEST_STATUS}, $message );
+    }
+    my $transaction = eval { WebGUI::Shop::Transaction->new($session, $params->{custom}); };
+    if (my $e = Exception::Class->caught) {
+        return $self->displayPaymentError();
+    }
+    $self->_setPaymentStatus(1, $params->{PAYPAL_TX}, $params->{payment_status}, 'Complete');
+    $self->processTransaction($transaction);
 
     return $transaction->get('isSuccessful')
         ? $transaction->thankYou
