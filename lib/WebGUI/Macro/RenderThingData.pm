@@ -11,8 +11,8 @@ package WebGUI::Macro::RenderThingData;
 #-------------------------------------------------------------------
 
 use strict;
-use WebGUI::Group;
 use WebGUI::Asset::Template;
+use WebGUI::International;
 use WebGUI::Asset::Wobject::Thingy;
 
 =head1 NAME
@@ -39,6 +39,8 @@ Optional.  Specifies the templateId or template url to use.  If omitted, the def
 #-------------------------------------------------------------------
 sub process {
 	my ($session, $thingDataUrl, $templateHint ) = @_;
+    my $i18n = WebGUI::International->new($session, 'Macro_RenderThingData');
+    return $i18n->get('no template') if !$templateHint;
 	
     my $uri = URI->new( $thingDataUrl );
     
@@ -55,7 +57,6 @@ sub process {
     my $output = $thing->www_viewThingData( $thingId, $thingDataId, $templateHint );
     
     # FIX: Temporary solution (broken map due to template rendering <script> tags)
-    return "RenderThingData: Please specify a template." if !$templateHint;
     return "RenderThingData: Contained bad tags!" if $output =~ /script>/;
 
     return $output;
