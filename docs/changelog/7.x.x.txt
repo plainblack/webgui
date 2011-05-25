@@ -1,4 +1,5 @@
 7.9.30
+ - fixed #12142: Copy fails on imported threads
 
 7.9.29
  - fixed #12129: AdminBar calls canAdd as an object method
