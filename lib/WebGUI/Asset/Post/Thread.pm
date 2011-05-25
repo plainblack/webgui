@@ -265,14 +265,18 @@ Extends the base method to handle creating a new subscription group.
 =cut
 
 sub duplicate {
-	my $self    = shift;
-    my $session = $self->session;
-	my $copy    = $self->SUPER::duplicate(@_);
-    if ($self->get('subscriptionGroupId')) {
-        my $group        = WebGUI::Group->new($session, $self->get('subscriptionGroupId'));
-        my $copied_group = WebGUI::Group->new($session, 'new');
-        $copied_group->addUsers($group->getUsers('withoutExpired'));
-        $copy->update({subscriptionGroupId => $copied_group->getId});
+    my $self       = shift;
+    my $session    = $self->session;
+    my $copy       = $self->SUPER::duplicate(@_);
+    my $oldGroupId = $self->get('subscriptionGroupId');
+
+    if ($oldGroupId) {
+        my $newGroup = WebGUI::Group->new($session, 'new');
+        my $oldGroup = WebGUI::Group->new($session, $oldGroupId);
+        if ($oldGroup) {
+            $newGroup->addUsers($oldGroup->getUsers('withoutExpired'));
+        }
+        $copy->update({subscriptionGroupId => $newGroup->getId});
     }
     return $copy;
 }
