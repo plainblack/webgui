@@ -41,6 +41,7 @@ SKIP: {
     my $copy;
     skip('duplicate died', 3) unless
         lives_ok { $copy = $thread->duplicate() } q"duplicate() doesn't die";
+    WebGUI::Test->addToCleanup($copy);
     my $groupId = $copy->get('subscriptionGroupId');
     ok $groupId, 'Copy has a group id';
     isnt $groupId, $thread->get('subscriptionGroupId'), '...a different one';
