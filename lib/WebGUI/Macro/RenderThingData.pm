@@ -51,13 +51,13 @@ sub process {
     my $thing = WebGUI::Asset::Wobject::Thingy->newByUrl( $session, $uri->path );
     
     # TODO: i18n
-    return ( "Bad URL: " . $thingDataUrl ) if !$thing || !$thingId || !$thingDataId;
+    return ( $i18n->get('bad url') . $thingDataUrl ) if !$thing || !$thingId || !$thingDataId;
     
     # Render
     my $output = $thing->www_viewThingData( $thingId, $thingDataId, $templateHint );
     
     # FIX: Temporary solution (broken map due to template rendering <script> tags)
-    return "RenderThingData: Contained bad tags!" if $output =~ /script>/;
+    return $i18n->get('bad tags') if $output =~ /script>/;
 
     return $output;
 }
