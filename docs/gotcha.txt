@@ -7,6 +7,13 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+7.9.30
+--------------------------------------------------------------------
+    * canView has to pass for any www_ methods to get called at all on account
+      plugins. This is the correct behavior, but is a change in this version.
+      Please review your custom account plugins to make sure you aren't
+      relying on the old buggy behavior.
+
 7.9.21
 --------------------------------------------------------------------
     * WebGUI now depends on Data::ICal for making and reading iCal feeds
