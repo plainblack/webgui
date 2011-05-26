@@ -1,6 +1,8 @@
 7.10.18
  - fixed #12141: Macro_RenderThingData (bad tags) nothing to translate
  - fixed #12142: Copy fails on imported threads
+ - canView will now be checked before calling ANY www_ method on account
+   plugins to fix an Inbox security bug (and other similar potential bugs).
 
 7.10.17
  - fixed: Forced to use a PayDriver even with a balance of 0 in the cart.

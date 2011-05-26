@@ -10,6 +10,10 @@ save you many hours of grief.
 7.10.15
 --------------------------------------------------------------------
     * WebGUI now depends on Geo::Coder::Googlev3 for it's Map asset
+    * canView has to pass for any www_ methods to get called at all on account
+      plugins. This is the correct behavior, but is a change in this version.
+      Please review your custom account plugins to make sure you aren't
+      relying on the old buggy behavior.
 
 7.10.13
 --------------------------------------------------------------------
