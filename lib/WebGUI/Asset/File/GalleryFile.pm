@@ -657,7 +657,6 @@ Prepare the template to be used for the C<view> method.
 
 sub prepareView {
     my $self        = shift;
-    $self->SUPER::prepareView();
 
     my $template    
         = WebGUI::Asset::Template->newById($self->session, $self->getGallery->templateIdViewFile);
