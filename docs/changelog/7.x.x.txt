@@ -1,4 +1,5 @@
 7.10.18
+ - Added the WebGUI::Event API
  - fixed #12141: Macro_RenderThingData (bad tags) nothing to translate
  - fixed #12142: Copy fails on imported threads
  - canView will now be checked before calling ANY www_ method on account

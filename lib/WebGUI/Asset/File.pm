@@ -21,7 +21,7 @@ use WebGUI::Cache;
 use WebGUI::Storage;
 use WebGUI::SQL;
 use WebGUI::Utility;
-
+use WebGUI::Event;
 
 =head1 NAME
 
@@ -228,6 +228,7 @@ sub exportWriteFile {
         WebGUI::Error->throw(error => "can't copy " . $self->getStorageLocation->getPath($self->get('filename'))
             . ' to ' . $dest->absolute->stringify . ": $!");
     }
+    fire $self->session, 'asset::export' => $dest;
 }
 
 #-------------------------------------------------------------------

@@ -26,6 +26,7 @@ use Image::Magick;
 use Path::Class::Dir;
 use Storable ();
 use WebGUI::Utility qw(isIn);
+use WebGUI::Event;
 use JSON ();
 
 
@@ -107,6 +108,19 @@ sub _addError {
 	my $errorMessage = shift;
 	push(@{$self->{_errors}},$errorMessage);
 	$self->session->errorHandler->error($errorMessage);
+}
+
+#-------------------------------------------------------------------
+
+=head2 _addFile ( $filename )
+
+Emits the storage::addFile event for this storage/filename.
+
+=cut
+
+sub _addFile {
+    my ($self, $filename) = @_;
+    fire $self->session, 'storage::addFile', $self, $filename;
 }
 
 #-------------------------------------------------------------------
@@ -338,6 +352,7 @@ sub addFileFromFilesystem {
     close $dest;
     close $source;
     $self->_cdnAdd;
+    $self->_addFile($filename);
     return $filename;
 }
 
@@ -392,6 +407,7 @@ sub addFileFromFormPost {
         $attachmentCount++;
         if ($upload->link($filePath)) {
             $self->_changeOwner($filePath);
+            $self->_addFile($filename);
             $self->session->errorHandler->info("Got ".$upload->filename);
         }
         else {
@@ -428,6 +444,7 @@ sub addFileFromHashref {
     Storable::nstore($hashref, $self->getPath($filename))
         or $self->_addError("Couldn't create file ".$self->getPath($filename)." because ".$!);
     $self->_changeOwner($self->getPath($filename));
+    $self->_addFile($filename);
 	$filename  and  $self->_cdnAdd;
 	return $filename;
 }
@@ -457,6 +474,7 @@ sub addFileFromScalar {
 		print $FILE $content;
 		close($FILE);
         $self->_changeOwner($self->getPath($filename));
+        $self->_addFile($filename);
         $self->_cdnAdd;
 	}
     else {
@@ -588,7 +606,12 @@ sub copy {
         else {
             open my $source, '<:raw', $origFile or next FILE;
             open my $dest,   '>:raw', $copyFile or next FILE;
-            File::Copy::copy($source, $dest) or $self->_addError("Couldn't copy file ".$origFile." to ".$copyFile." because ".$!);
+            if (File::Copy::copy($source, $dest)) {
+                $newStorage->_addFile($file);
+            }
+            else {
+                $self->_addError("Couldn't copy file $origFile to $copyFile because $!");
+            }
             close $dest;
             close $source;
         }
@@ -621,6 +644,7 @@ sub copyFile {
     File::Copy::copy( $self->getPath($filename), $self->getPath($newFilename) )
         || croak "Couldn't copy '$filename' to '$newFilename': $!";
     $self->_changeOwner($self->getPath($filename));
+    $self->_addFile($filename);
 
     $self->_cdnAdd;
     return undef;

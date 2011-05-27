@@ -23,6 +23,7 @@ use WebGUI::PseudoRequest;
 use WebGUI::Session;
 use WebGUI::Asset;
 use WebGUI::Exception;
+use WebGUI::Test::Event;
 
 use Cwd;
 use Exception::Class;
@@ -40,10 +41,26 @@ my $session             = WebGUI::Test->session;
 # Tests
 
 WebGUI::Test->originalConfig('exportPath');
+my @events;
 
 my $testRan = 1;
 
-plan tests => 128;        # Increment this number for each test you create
+plan tests => 124;        # Increment this number for each test you create
+
+sub export_ok {
+    my ($asset, $message) = @_;
+    subtest $message => sub {
+        plan tests => 3;
+        my $e;
+        my @events = trap {
+            eval { $asset->exportWriteFile() };
+            $e = $@;
+        } $asset->session, 'asset::export';
+        ok !$e, 'ran without exception';
+        is scalar @events, 1, 'event fired once';
+        is $events[0][2], $asset->exportGetUrlAsPath->absolute;
+    };
+}
 
 #----------------------------------------------------------------------------
 # exportCheckPath()
@@ -378,11 +395,7 @@ my $content;
 my $guid = $session->id->generate;
 my $guidPath = Path::Class::Dir->new($config->get('uploadsPath'), 'temp', $guid);
 $config->set('exportPath', $guidPath->absolute->stringify);
-eval { $parent->exportWriteFile() };
-is($@, '', "exportWriteFile works when creating exportPath");
-
-# ensure that the file was actually written
-ok(-e $parent->exportGetUrlAsPath->absolute->stringify, "exportWriteFile actually writes the file when creating exportPath");
+export_ok $parent, 'exportWriteFile works when creating exportPath';
 
 # now make sure that it contains the correct content
 eval { $content = WebGUI::Test->getPage($parent, 'exportHtml_view', { user => WebGUI::User->new($session, 1) } ) };
@@ -430,11 +443,7 @@ chmod 0755, $guidPath->stringify;
 $unwritablePath->remove;
 
 $session->http->setNoHeader(1);
-eval { $firstChild->exportWriteFile() };
-is($@, '', "exportWriteFile works for first_child");
-
-# ensure that the file was actually written
-ok(-e $firstChild->exportGetUrlAsPath->absolute->stringify, "exportWriteFile actually writes the first_child file");
+export_ok $firstChild, 'exportWriteFile works for first_child';
 
 # verify it has the correct contents
 eval { $content = WebGUI::Test->getPage($firstChild, 'exportHtml_view') };
@@ -446,11 +455,7 @@ $guidPath->rmtree;
 
 $session->http->setNoHeader(1);
 $session->user( { userId => 1 } );
-eval { $grandChild->exportWriteFile() };
-is($@, '', "exportWriteFile works for grandchild");
-
-# ensure that the file was written
-ok(-e $grandChild->exportGetUrlAsPath->absolute->stringify, "exportWriteFile actually writes the grandchild file");
+export_ok $grandChild, 'exportWriteFile works for grandchild';
 
 # finally, check its contents
 $session->style->sent(0);
@@ -461,17 +466,12 @@ is(scalar $grandChild->exportGetUrlAsPath->absolute->slurp, $content, "exportWri
 $guidPath->rmtree;
 $asset = WebGUI::Asset->new($session, 'ExportTest000000000001');
 $session->http->setNoHeader(1);
-eval { $asset->exportWriteFile() };
-is($@, '', 'exportWriteFile for perl file works');
 
-ok(-e $asset->exportGetUrlAsPath->absolute->stringify, "exportWriteFile actually writes the perl file");
+export_ok $asset, 'exportWriteFile for perl file works';
 
 $guidPath->rmtree;
 $asset = WebGUI::Asset->new($session, 'ExportTest000000000002');
-eval { $asset->exportWriteFile() };
-is($@, '', 'exportWriteFile for plain file works');
-
-ok(-e $asset->exportGetUrlAsPath->absolute->stringify, "exportWriteFile actuall writes the plain file");
+export_ok $asset, 'exportWriteFile for plain file works';
 
 $guidPath->rmtree;
 
@@ -482,8 +482,11 @@ $guidPath->rmtree;
 # permissions on something.
 $parent->update( { groupIdView => 3 } ); # admins
 $session->http->setNoHeader(1);
-eval { $parent->exportWriteFile() }; 
-$e = Exception::Class->caught();
+@events = trap {
+    eval { $parent->exportWriteFile() };
+    $e = Exception::Class->caught();
+} $session, 'asset::export';
+
 isa_ok($e, 'WebGUI::Error', "exportWriteFile throws when user can't view asset");
 cmp_deeply(
     $e,
@@ -497,6 +500,7 @@ cmp_deeply(
 # no directory or file written
 ok(!-e $parent->exportGetUrlAsPath->absolute->stringify, "exportWriteFile doesn't write file when user can't view asset");
 ok(!-e $parent->exportGetUrlAsPath->absolute->parent, "exportWriteFile doesn't write directory when user can't view asset");
+is scalar @events, 0, 'event not fired';
 
 # undo our viewing changes
 $parent->update( { groupIdView => 7 } ); # everyone
