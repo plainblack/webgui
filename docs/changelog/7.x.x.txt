@@ -3,6 +3,7 @@
  - fixed #12142: Copy fails on imported threads
  - canView will now be checked before calling ANY www_ method on account
    plugins to fix an Inbox security bug (and other similar potential bugs).
+ - fixed #12139: break on calander feeds during upgrade
 
 7.10.17
  - fixed: Forced to use a PayDriver even with a balance of 0 in the cart.

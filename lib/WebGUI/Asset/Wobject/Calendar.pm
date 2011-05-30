@@ -712,7 +712,8 @@ sub getFeed {
 
 =head2 getFeeds ( )
 
-Gets an arrayref of hashrefs of all the feeds attached to this calendar.
+Gets an arrayref of hashrefs of all the feeds attached to this calendar.  Since the icalFeeds
+property does double duty as JSON and Perl, deserialize from JSON if it's not already perl.
 
 TODO: Format lastUpdated into the user's time zone
 
@@ -720,7 +721,10 @@ TODO: Format lastUpdated into the user's time zone
 
 sub getFeeds {
     my $self    = shift;
-    return $self->get('icalFeeds');
+    my $feeds   = $self->get('icalFeeds');
+    return $feeds if (ref $feeds);
+    $self->session->log->warn('improperly stored icalFeed in calendar assetId:'.$self->getId);
+    return JSON::from_json($feeds);
 }
 
 #----------------------------------------------------------------------------
