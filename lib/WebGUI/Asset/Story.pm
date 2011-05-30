@@ -632,8 +632,6 @@ sub processPropertiesFromFormPost {
     my $session = $self->session;
     $self->next::method;
     my $archive = delete $self->{_parent};  ##Force a new lookup.
-    #$session->log->warn($self->getParent->get('className'));
-    #$session->log->warn($self->getParent->getParent->get('className'));
     my $form    = $session->form;
     ##Handle old data first, to avoid iterating across a newly added photo.
     my $photoData      = $self->getPhotoData;
