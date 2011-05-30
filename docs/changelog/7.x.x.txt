@@ -2,6 +2,7 @@
  - fixed #12142: Copy fails on imported threads
  - canView will now be checked before calling ANY www_ method on account
    plugins to fix an Inbox security bug (and other similar potential bugs).
+ - fixed #12139: break on calander feeds during upgrade
 
 7.9.29
  - fixed #12129: AdminBar calls canAdd as an object method
