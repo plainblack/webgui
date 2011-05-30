@@ -38,7 +38,7 @@ $session->user({userId => 3});
 
 my $addExceptions = getAddExceptions($session);
 
-my $tests = 78 + 2*scalar(@{$addExceptions});
+my $tests = 79 + 2*scalar(@{$addExceptions});
 plan tests => $tests;
 
 WebGUI::Test->addToCleanup(SQL => 'delete from tax_generic_rates');
@@ -527,6 +527,20 @@ cmp_deeply(
     [0.0, 8.25], #Hits USA and Los Angeles, California using the alternate spelling of the state
     'getTaxRates: return correct data for a state when the address has alternations'
 );
+
+my $capitalized = $taxer->add({
+    country => 'USA',
+    state   => 'wi',
+    taxRate => '50',
+});
+
+cmp_deeply(
+    $taxer->getTaxRates($taxingAddress),
+    [0, 5, 0.5],
+    '... multiple entries with different capitalization, first matches'
+);
+
+$taxer->delete({ taxId => $capitalized });
 
 #######################################################################
 #
