@@ -86,7 +86,7 @@ WebGUI::Test->addToCleanup($storage1, $storage2);
 #
 ############################################################
 
-my $tests = 49;
+my $tests = 50;
 plan tests => 1
             + $tests
             + $canEditMaker->plan
