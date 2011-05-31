@@ -21,8 +21,6 @@ use Tie::IxHash;
 use WebGUI::Utility;
 use WebGUI::International;
 use JSON qw/from_json to_json/;
-use Storable qw/dclone/;
-use Data::Dumper;
 
 =head1 NAME
 
@@ -70,15 +68,8 @@ sub addRevision {
     my $session = $self->session;
     my $newSelf = $self->next::method(@_);
 
-    my $newProperties = {
-        isHidden => 1,
-    };
-
-    $newSelf->update($newProperties);
-
     my $newPhotoData = $newSelf->duplicatePhotoData;
     $newSelf->setPhotoData($newPhotoData);
-    #$newSelf->requestAutoCommit;
 
     return $newSelf;
 }
@@ -516,12 +507,10 @@ Returns the photo hash formatted as perl data.  See also L<setPhotoData>.
 
 sub getPhotoData {
 	my $self     = shift;
-	if (!exists $self->{_photoData}) {
-        my $json = $self->get('photo');
-        $json ||= '[]';
-        $self->{_photoData} = from_json($json);
-	}
-	return dclone($self->{_photoData});
+    my $json = $self->get('photo');
+    $json ||= '[]';
+    my $photoData = from_json($json);
+	return $photoData;
 }
 
 #-------------------------------------------------------------------
@@ -756,7 +745,6 @@ sub setPhotoData {
     my $photo     = to_json($photoData);
     ##Update the db.
     $self->update({photo => $photo});
-    delete $self->{_photoData};
     return;
 }
 
@@ -817,7 +805,6 @@ Extend the superclass to make sure that the asset always stays hidden from navig
 sub update {
     my $self   = shift;
     my $properties = shift;
-    #$self->session->log->warn('story update');
     return $self->next::method({%$properties, isHidden => 1});
 }
 
