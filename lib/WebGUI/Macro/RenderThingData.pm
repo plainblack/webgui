@@ -41,21 +41,24 @@ sub process {
 	my ($session, $thingDataUrl, $templateHint ) = @_;
     my $i18n = WebGUI::International->new($session, 'Macro_RenderThingData');
     return $i18n->get('no template') if !$templateHint;
-	
-    my $uri = URI->new( $thingDataUrl );
-    
+
+    my $gateway = $session->config->get('gateway');
+    my $uri     = URI->new( $thingDataUrl );
+    my $thingy_url = $uri->path;
+    $thingy_url =~ s/^$gateway//;
+
     my $urlHash = { $uri->query_form };
     my $thingId = $urlHash->{'thingId'};
     my $thingDataId = $urlHash->{'thingDataId'};
-    
-    my $thing = WebGUI::Asset::Wobject::Thingy->newByUrl( $session, $uri->path );
-    
+
+    my $thing = WebGUI::Asset::Wobject::Thingy->newByUrl( $session, $thingy_url );
+
     # TODO: i18n
     return ( $i18n->get('bad url') . $thingDataUrl ) if !$thing || !$thingId || !$thingDataId;
-    
+
     # Render
     my $output = $thing->www_viewThingData( $thingId, $thingDataId, $templateHint );
-    
+
     # FIX: Temporary solution (broken map due to template rendering <script> tags)
     return $i18n->get('bad tags') if $output =~ /script>/;
 

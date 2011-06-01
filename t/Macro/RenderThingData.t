@@ -39,7 +39,7 @@ WebGUI::Test->addToCleanup(sub {
     WebGUI::Test->unmockAssetUrl($templateUrl);
 });
 
-plan tests => 4;
+plan tests => 6;
 
 my $node = WebGUI::Asset->getImportNode($session);
 my $versionTag = WebGUI::VersionTag->getWorking($session);
@@ -105,5 +105,17 @@ $templateProcessed = 0;
 
 $output = WebGUI::Macro::RenderThingData::process($session, $thing_url, $templateUrl);
 ok $templateProcessed, 'passed template url, template processed';
+$templateProcessed = 0;
 
+WebGUI::Test->originalConfig('gateway');
+$session->config->set('gateway', '/gated');
+my $thing_url = $thingy->getUrl('thingId='.$thingId.';thingDataId='.$thingDataId);
+
+$output = WebGUI::Macro::RenderThingData::process($session, $thing_url, $templateId);
+ok $templateProcessed, 'gateway set, passed templateId, template processed';
+$templateProcessed = 0;
+
+$output = WebGUI::Macro::RenderThingData::process($session, $thing_url, $templateUrl);
+ok $templateProcessed, '... passed template url, template processed';
+$templateProcessed = 0;
 
