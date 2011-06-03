@@ -628,25 +628,6 @@ sub view {
     return $out;
 }
 
-
-#-------------------------------------------------------------------
-
-=head2 www_edit 
-
-Display the edit form to the user.  Manually handles the template for displaying
-the inline view of the asset.
-
-=cut
-
-sub www_edit {
-	my $self = shift;
-	return $self->session->privilege->insufficient() unless $self->canEdit;
-	return $self->session->privilege->locked() unless $self->canEditIfLocked;
-	my $i18n = WebGUI::International->new($self->session);
-	my $f = $self->getEditForm;
-	return $self->getAdminConsole->render($f->print,$self->addEditLabel);
-}
-
 #-------------------------------------------------------------------
 
 =head2 www_view 

@@ -24,4 +24,10 @@ sub parent_list {
     return ['WebGUI::Asset::Wobject::Calendar'];
 }
 
+sub postProcessMergedProperties {
+    my ( $test, $props ) = @_;
+    $props->{startDate} = "2010-01-01";
+    $props->{endDate} = "2010-01-02";
+}
+
 1;

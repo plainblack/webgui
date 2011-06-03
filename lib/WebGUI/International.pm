@@ -204,7 +204,6 @@ sub getLanguages {
 	my ($self) = @_;
     my $hashRef;
     for my $lang ( findsubmod 'WebGUI::i18n' ) {
-        $self->session->log->info( "Found language $lang" );
         $lang =~ s/^WebGUI::i18n:://;
         $hashRef->{$lang} = $self->getLanguage($lang, "label");
     }

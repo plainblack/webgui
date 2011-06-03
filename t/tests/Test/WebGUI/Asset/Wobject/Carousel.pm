@@ -21,4 +21,17 @@ sub list_of_tables {
      return [qw/assetData wobject Carousel/];
 }
 
+sub postProcessMergedProperties {
+    my ( $test, $props ) = @_;
+    $props->{something} = JSON->new->encode({
+        items   => [
+            {
+                sequenceNumber => 1,
+                text => "Item 1",
+            },
+        ],
+    });
+    return $props;
+}
+
 1;

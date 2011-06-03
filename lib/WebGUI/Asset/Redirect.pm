@@ -122,12 +122,14 @@ sub www_view {
     my $url = $self->redirectUrl;
     WebGUI::Macro::process($self->session, \$url);
     if ($self->session->isAdminOn() && $self->canEdit) {
-        return $self->getAdminConsole->render($i18n->get("what do you want to do with this redirect").'
+        return '<h1>' . $i18n->get('assetName') . '</h1>'
+            . $i18n->get("what do you want to do with this redirect").'
             <ul>
                 <li><a href="'.$url.'">'.$i18n->get("go to the redirect url").'</a></li>
                 <li><a href="'.$self->getUrl("func=edit").'">'.$i18n->get("edit the redirect properties").'</a></li>
                 <li><a href="'.$self->getParent->getUrl.'">'.$i18n->get("go to the redirect parent page").'</a></li>
-             </ul>',$i18n->get("assetName"));
+            </ul>'
+            ;
     }
     unless ($url eq $self->url) {
         $self->session->response->setRedirect($url,$self->redirectType);

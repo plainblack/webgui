@@ -20,6 +20,10 @@ use Test::Exception;
 use WebGUI::Test;
 use Data::Dumper;
 use List::MoreUtils;
+use WebGUI::Test::Mechanize;
+
+use UNIVERSAL::isa;
+no warnings 'UNIVERSAL::isa';
 
 # XXXX fix the Test(n) numbers to match reality
 
@@ -109,14 +113,23 @@ sub getAnchoredAsset {
         status  => "pending",
         tagId   => $tag->getId,
         $test->constructorExtras($session),
-    }, undef, undef, {skipNotification => 1});
+    }, undef, (time-10), {skipNotification => 1});
     # warn "XXX getAnchoredAsset:  created new asset of Id: " . $asset->getId . ' of type: ' . ref $asset;
     $tag->commit;
     foreach my $a ($asset, @parents) {
         $a = $a->cloneFromDb;
     }
     WebGUI::Test->addToCleanup($tag);
+    $test->{_currentTag} = $tag;
     return ($tag, $asset, @parents);
+}
+
+sub deleteAssets : Test(teardown) {
+    my ( $test ) = shift;
+    if ( $test->{_currentTag} ) {
+        $test->{_currentTag}->rollback;
+        delete $test->{_currentTag};
+    }
 }
 
 sub getMyParents {
@@ -127,17 +140,17 @@ sub getMyParents {
     my $default        = WebGUI::Asset->getDefault($session);
     push @parents, $default;
     my $parent = $default;
-    my $tag     = WebGUI::VersionTag->getWorking($session);
+    my $tag = WebGUI::VersionTag->getWorking( $session );
     foreach my $parent_class (@{ $parent_classes }) {
         my $new_parent = $parent->addChild(
             {   
                 className => $parent_class, 
-                status => "pending", 
-                tagId => $tag->getId,
                 $test->constructorExtras($session), 
+                status  => 'pending',
+                tagId   => $tag->getId,
             }, 
             undef, 
-            undef, 
+            (time-10), 
             {skipNotification => 1,},
         );
         push @parents, $new_parent;
@@ -564,8 +577,6 @@ sub t_20_www_editSave : Tests {
     $asset->groupIdEdit( 7 ); # Everybody! Everybody!
 
     $asset->commit;
-    $tag->setWorking;
-    sleep 2; # XXXX Todo -- investigate whether this is actually fixing duplicate commit problems
 
     my %mergedProperties = (   
         formProperties($asset),  
@@ -577,15 +588,28 @@ sub t_20_www_editSave : Tests {
     # local $SIG{__DIE__} = sub { use Carp; Carp::confess "@_"; };
     # local $SIG{__DIE__} = sub { use wth; wth::wth "@_"; };  # see note above about wth
 
-    $session->request->setup_body( \%mergedProperties );
+    my $mech    = WebGUI::Test::Mechanize->new( config => WebGUI::Test->file );
+    $mech->get('/');
+    $mech->session->user({ userId => 3 });
+    $tag = WebGUI::VersionTag->getWorking( $mech->session );
+    $tag->setWorking;
+    $mech->get_ok( $asset->getUrl('func=edit') );
 
-    my $content;
-    ok(eval { $asset->www_editSave; }, 'www_editSave returns true');
-    debug($@);
-    undef $@;
+    my $form_content = $mech->content;
+    if ( $test->isa( 'Test::WebGUI::Asset::File::GalleryFile::Photo' )
+        || $test->isa( 'Test::WebGUI::Asset::Wobject::GalleryAlbum' )
+        || $test->isa( 'Test::WebGUI::Asset::Event' )
+    ) {
+        $session->log->info( $form_content );
+    }
+    $mech->submit_form_ok( {
+            fields  => \%mergedProperties,
+        },
+        "submit www_editSave form"
+    );
 
     # Get the newly-created revision of the asset
-    ok( my $newRevision = eval { WebGUI::Asset->newPending( $session, $asset->getId ); }, 'newPending returns true' );
+    ok( my $newRevision = eval { WebGUI::Asset->newPending( $mech->session, $asset->getId ); }, 'newPending returns true' );
     debug($@);
     undef $@;
 

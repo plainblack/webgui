@@ -1128,6 +1128,7 @@ override processEditForm => sub {
     }
 	delete $self->{_storageLocation};
 	$self->postProcess;
+        return;
 };
 
 
@@ -1593,7 +1594,7 @@ sub www_edit {
         });
         $var{'form.header'} .= WebGUI::Form::hidden($session, {
             name=>"revision",
-            value=>$form->param("revision")
+            value=>$form->param("revision") || $self->revisionDate
         });
 	    $var{'form.header'} .= WebGUI::Form::hidden($session, {
             name=>"ownerUserId",

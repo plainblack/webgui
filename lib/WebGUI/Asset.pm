@@ -2282,8 +2282,6 @@ sub processEditForm {
         }
     }
 
-    $self->session->log->info( Dumper \%data );
-
     $self->session->db->beginTransaction;
     $self->update( \%data );
     $self->session->db->commit;
@@ -2939,7 +2937,7 @@ sub www_editSave {
         });
         if ($commitStatus eq 'redirect') {
             ##Redirect set by tag.  Return nothing to send the user over to the redirect.
-            return undef;
+            return 'redirect';
         }
         elsif ($commitStatus eq 'commit') {
             ##Commit was successful.  Update the local object cache so that it will no longer

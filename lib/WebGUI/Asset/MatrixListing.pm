@@ -833,7 +833,7 @@ sub www_edit {
     my $var         = $self->get;
     my $matrix      = $self->getParent;
     # TODO: Change to FormBuilder
-    $var->{form}    = $self->getEditForm->print;
+    $var->{form}    = $self->getEditForm->toHtml;
         
     return $matrix->processStyle($self->processTemplate($var,$matrix->get("editListingTemplateId")));
 }

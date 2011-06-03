@@ -1,6 +1,7 @@
 package WebGUI::Role::Asset::Dashlet;
 
 use Moose::Role;
+use JSON;
 
 =head1 NAME
 
@@ -38,7 +39,7 @@ sub fetchUserOverrides {
     my $userId           = shift || $self->session->user->userId;
     my $properties_json  = $self->session->db->quickScalar('select properties from Dashboard_userPrefs where dashboardAssetId=? and userId=? and dashletAssetId=?',[$dashboardAssetId, $userId, $self->getId,]);
     $properties_json ||= '{}';
-    my $properties = from_json($properties_json);
+    my $properties = JSON->new->decode($properties_json);
     return $properties;
 }
 
@@ -115,7 +116,7 @@ sub storeUserOverrides {
     my $dashboardAssetId = shift;
     my $properties       = shift;
     my $userId           = shift || $session->user->userId;
-    my $properties_json  = to_json($properties);
+    my $properties_json  = JSON->new->encode($properties);
     $session->db->write('DELETE FROM Dashboard_userPrefs where dashboardAssetId=? and userId=? and dashletAssetId=?',[$dashboardAssetId, $userId, $self->getId]);
     $session->db->write('INSERT INTO Dashboard_userPrefs (dashboardAssetId, userId, dashletAssetId, properties) VALUES (?,?,?,?)', [$dashboardAssetId, $userId, $self->getId, $properties_json]);
 }

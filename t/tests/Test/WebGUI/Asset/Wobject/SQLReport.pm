@@ -25,4 +25,9 @@ sub list_of_tables {
      return [qw/assetData wobject SQLReport/];
 }
 
+sub postProcessMergedProperties {
+    my ( $test, $props ) = @_;
+    $props->{dbQuery1} = "SELECT * FROM users";
+}
+
 1;

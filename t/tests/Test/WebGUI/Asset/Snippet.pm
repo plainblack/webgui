@@ -25,4 +25,9 @@ sub list_of_tables {
      return [qw/assetData snippet/];
 }
 
+sub postProcessMergedProperties {
+    my ( $test, $props ) = @_;
+    $props->{snippet} = "some text";
+}
+
 1;

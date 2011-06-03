@@ -94,14 +94,11 @@ override getEditForm => sub {
     $self->session->style->setScript($self->session->url->extras('wobject/Carousel/carousel.js'), {type =>
     'text/javascript'});
 
-    my $tableRowStart = 
-        '<tr id="items_row">'
-        .'    <td class="formDescription"  valign="top" style="width: 180px;"><label for="item1">'
-              .$i18n->get("items label").'</label><div class="wg-hoverhelp">'.$i18n->get("items description").'</div></td>'
-        .'    <td id="items_td" valign="top" class="tableData">'
-        .'    <input type="hidden" id="items_formId" name="items" />'
-        .'    <input type="button" value="Add item" onclick="window.carouselEditor.addTab()"></input><br />'
-        ."    <br />\n";
+    my $tableRowStart = '    <label for="item1">'
+        . $i18n->get("items label").'</label><div class="wg-hoverhelp">'.$i18n->get("items description").'</div>'
+        . '    <input type="hidden" id="items_formId" name="items" />'
+        . '    <input type="button" value="Add item" onclick="window.carouselEditor.addTab()"></input><br />'
+        . "    <br />\n";
 
     $tabform->getTab("properties")->addField('ReadOnly', value => $tableRowStart);
 
@@ -161,7 +158,7 @@ onClick='javascript:deleteItem(this.id)'></input>\n"
     $items              = JSON->new->encode( $items );
     my $i18nJson        = JSON->new->encode( { "delete" => $i18n->get("delete") } );
 
-    $tabform->getTab('properties')->raw(<<"ENDHTML");
+    $tabform->getTab('properties')->addField( "ReadOnly", name => 'editor', value => <<"ENDHTML");
     <div id="carouselEditor"></div>
     <script type="text/javascript">
     $loadMcePlugins
@@ -171,12 +168,6 @@ onClick='javascript:deleteItem(this.id)'></input>\n"
     </script>
 ENDHTML
 
-    my $tableRowEnd = qq|
-            </td>
-        </tr>
-    |;
-    $tabform->getTab("properties")->addField('ReadOnly', value => $tableRowEnd);
-    
     return $tabform;
 };
 

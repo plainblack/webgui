@@ -25,4 +25,9 @@ sub parent_list {
     return [ map { "WebGUI::Asset::$_"} qw/Wobject::Collaboration Post::Thread/ ];
 }
 
+sub postProcessMergedProperties {
+    my ( $test, $props ) = @_;
+    $props->{func} = "editSave"; # func defaults to preview mode
+}
+
 1;

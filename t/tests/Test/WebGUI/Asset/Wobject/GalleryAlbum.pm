@@ -25,4 +25,9 @@ sub parent_list {
     return [qw/WebGUI::Asset::Wobject::Gallery/];
 }
 
+sub postProcessMergedProperties {
+    my ( $test, $props ) = @_;
+    $props->{save} = "save"; # GalleryAlbum www_edit checks for this to go to editSave
+}
+
 1;
