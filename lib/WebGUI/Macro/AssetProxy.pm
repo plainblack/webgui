@@ -44,7 +44,7 @@ sub process {
     my ($session, $identifier, $type) = @_;
     if (!$identifier) {
         $session->errorHandler->warn('AssetProxy macro called without an asset to proxy. ' 
-        . 'The macro was called through this url: '.$session->asset->get('url'));
+        . 'The macro was called through this url: '.$session->url->page);
         if ($session->var->isAdminOn) {
             my $i18n = WebGUI::International->new($session, 'Macro_AssetProxy');
             return $i18n->get('invalid url');
@@ -61,7 +61,7 @@ sub process {
     }
     if (!defined $asset) {
         $session->errorHandler->warn('AssetProxy macro called invalid asset: '.$identifier
-            .'. The macro was called through this url: '.$session->asset->get('url'));
+            .'. The macro was called through this url: '.$session->url->page);
         if ($session->var->isAdminOn) {
             my $i18n = WebGUI::International->new($session, 'Macro_AssetProxy');
             return $i18n->get('invalid url');
@@ -69,7 +69,7 @@ sub process {
     }
     elsif ($asset->get('state') =~ /^trash/) {
         $session->errorHandler->warn('AssetProxy macro called on asset in trash: '.$identifier
-            .'. The macro was called through this url: '.$session->asset->get('url'));
+            .'. The macro was called through this url: '.$session->url->page);
         if ($session->var->isAdminOn) {
             my $i18n = WebGUI::International->new($session, 'Macro_AssetProxy');
             return $i18n->get('asset in trash');
@@ -77,7 +77,7 @@ sub process {
     }
     elsif ($asset->get('state') =~ /^clipboard/) {
         $session->errorHandler->warn('AssetProxy macro called on asset in clipboard: '.$identifier
-            .'. The macro was called through this url: '.$session->asset->get('url'));
+            .'. The macro was called through this url: '.$session->url->page);
         if ($session->var->isAdminOn) {
             my $i18n = WebGUI::International->new($session, 'Macro_AssetProxy');
             return $i18n->get('asset in clipboard');
