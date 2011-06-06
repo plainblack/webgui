@@ -240,6 +240,7 @@ sub paymentVariables {
     my $url  = $self->session->url;
     my $base = $url->getSiteURL . $url->page;
     my $cart = $self->getCart;
+    my $i18n = WebGUI::International->new($self->session);
 
     my $return = URI->new($base);
     $return->query_form( {
@@ -262,6 +263,7 @@ sub paymentVariables {
 
         return        => $return->as_string,
         cancel_return => $cancel->as_string,
+        lc            => $i18n->getLanguage->{locale},
 
         handling_cart        => $cart->calculateShipping,  ##According to https://www.x.com/message/180018#180018
         tax_cart             => $cart->calculateTaxes,
