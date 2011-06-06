@@ -22,7 +22,7 @@ use WebGUI::User;
 use WebGUI::ProfileField;
 use WebGUI::Shop::AddressBook;
 
-use Test::More tests => 233; # increment this value for each test you create
+use Test::More tests => 235; # increment this value for each test you create
 use Test::Deep;
 use Data::Dumper;
 
@@ -78,6 +78,7 @@ cmp_ok(abs($user->lastUpdated-$lastUpdate), '<=', 1, 'lastUpdated() -- status ch
 
 $user->status('Selfdestructed');
 is($user->status, "Selfdestructed", 'status("Selfdestructed")');
+is($user->get('status'), "Selfdestructed", 'status("Selfdestructed") via get');
 
 
 # Deactivation user deletes all sessions and scratches
@@ -87,6 +88,7 @@ $newSession->scratch->set("hasStapler" => "no");
 
 $user->status('Deactivated');
 is($user->status, "Deactivated", 'status("Deactivated")');
+is($user->get('status'), "Deactivated", 'status("Deactivated") via get');
 
 ok( 
     !$session->db->quickScalar("SELECT COUNT(*) from userSession where userId=?",[$user->userId]),
