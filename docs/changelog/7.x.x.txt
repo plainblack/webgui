@@ -6,6 +6,7 @@
  - fixed #12139: break on calander feeds during upgrade
  - fixed #12136: Unable to add more than one image in Story
  - fixed #12152: PayPal Standard ignores shop-credit
+ - fixed #12119: Locale setting for paypal
 
 7.9.29
  - fixed #12129: AdminBar calls canAdd as an object method

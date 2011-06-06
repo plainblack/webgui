@@ -192,6 +192,7 @@ sub processPayment {
     my ( $self, $transaction ) = @_;
     my ( $isSuccess, $gatewayCode, $status, $message );
 
+    my $i18n = WebGUI::International->new($self->session);
     my $form = $self->payPalForm(
         METHOD        => 'DoExpressCheckoutPayment',
         PAYERID       => $self->session->form->process('PayerId'),
@@ -199,6 +200,7 @@ sub processPayment {
         AMT           => $self->getCart->calculateTotal,
         CURRENCYCODE  => $self->get('currency'),
         PAYMENTACTION => 'SALE',
+        LOCALECODE    => $i18n->getLanguage->{locale},
     );
     my $response = LWP::UserAgent->new->post( $self->apiUrl, $form );
     my $params = $self->responseHash($response);
