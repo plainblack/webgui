@@ -7,6 +7,12 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+7.10.17
+--------------------------------------------------------------------
+    * Due to a formatting problem with form variables in the PayPal driver, WebGUI
+      in-shop credit was not being recieved by PayPal.  This means that Shop users
+      were charged the full amount of the cart instead of the discounted amount.
+
 7.10.15
 --------------------------------------------------------------------
     * WebGUI now depends on Geo::Coder::Googlev3 for it's Map asset

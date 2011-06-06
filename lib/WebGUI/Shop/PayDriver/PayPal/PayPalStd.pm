@@ -265,7 +265,7 @@ sub paymentVariables {
 
         handling_cart        => $cart->calculateShipping,  ##According to https://www.x.com/message/180018#180018
         tax_cart             => $cart->calculateTaxes,
-        discount_amount_cart => -($cart->calculateShopCreditDeduction),
+        discount_amount_cart => abs($cart->calculateShopCreditDeduction),
 
         # When we verify that we have a valid transaction ID later on in
         # processPayment, we'll make sure it's the cart we think it is.
