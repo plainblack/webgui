@@ -7,6 +7,7 @@
 if ( typeof WebGUI == "undefined" ) {
     WebGUI  = {};
 }
+
 if ( typeof WebGUI.AssetManager == "undefined" ) {
     WebGUI.AssetManager = {};
 }
@@ -82,37 +83,52 @@ WebGUI.AssetManager.findRow = function ( child ) {
     }
 };
 
+WebGUI.AssetManager.assetActionCache = {};
+
 /*---------------------------------------------------------------------------
     WebGUI.AssetManager.formatActions ( )
     Format the Edit and More links for the row
 */
 WebGUI.AssetManager.formatActions = function ( elCell, oRecord, oColumn, orderNumber ) {
-    if ( oRecord.getData( 'actions' ) ) {
-        elCell.innerHTML 
-            = '<a href="' + WebGUI.AssetManager.appendToUrl(oRecord.getData( 'url' ), 'func=edit;proceed=manageAssets') + '">'
-            + WebGUI.AssetManager.i18n.get('Asset', 'edit') + '</a>'
-            + ' | '
-            ;
-    }
-    else {
-        elCell.innerHTML = "";
-    }
-    var more    = document.createElement( 'a' );
-    elCell.appendChild( more );
-    more.appendChild( document.createTextNode( WebGUI.AssetManager.i18n.get('Asset','More' ) ) );
-    more.href   = '#';
+    var data    = oRecord.getData(),
+        id      = data.assetId,
+        assets  = WebGUI.AssetManager.assetActionCache,
+        asset   = assets[id],
+        edit, more;
 
-    // Delete the old menu
-    if ( document.getElementById( 'moreMenu' + oRecord.getData( 'assetId' ) ) ) {
-        var oldMenu = document.getElementById( 'moreMenu' + oRecord.getData( 'assetId' ) );
-        oldMenu.parentNode.removeChild( oldMenu );
+    elCell.innerHTML = '';
+
+    if (!data.actions) {
+        return;
     }
 
-    var options = WebGUI.AssetManager.buildMoreMenu(oRecord.getData( 'url' ), more, oRecord.getData( 'actions' ));
+    if (!asset) {
+        assets[id] = asset = {};
+        asset.data = data;
+        asset.bar  = document.createTextNode(' | ');
 
-    var menu    = new YAHOO.widget.Menu( "moreMenu" + oRecord.getData( 'assetId' ), options );
-    YAHOO.util.Event.onDOMReady( function () { menu.render( document.getElementById( 'assetManager' ) ); } );
-    YAHOO.util.Event.addListener( more, "click", function (e) { YAHOO.util.Event.stopEvent(e); menu.show(); menu.focus(); }, null, menu );
+        edit = asset.edit = document.createElement('a');
+        edit.href = WebGUI.AssetManager.appendToUrl(
+            data.url, 'func=edit;proceed=manageAssets'
+        );
+        edit.appendChild(document.createTextNode(
+            WebGUI.AssetManager.i18n.get('Asset', 'edit')
+        ));
+
+        more = asset.more = document.createElement('a');
+        more.href = '#';
+        more.appendChild(document.createTextNode(
+            WebGUI.AssetManager.i18n.get('Asset','More')
+        ));
+
+        YAHOO.util.Event.addListener(
+            more, 'click', WebGUI.AssetManager.onMoreClick, asset
+        );
+    }
+
+    elCell.appendChild(asset.edit);
+    elCell.appendChild(asset.bar);
+    elCell.appendChild(asset.more);
 };
 
 /*---------------------------------------------------------------------------
@@ -171,6 +187,21 @@ WebGUI.AssetManager.formatRank = function ( elCell, oRecord, oColumn, orderNumbe
         + 'onchange="WebGUI.AssetManager.selectRow( this )" />';
 };
 
+/*---------------------------------------------------------------------------
+    WebGUI.AssetManager.onMoreClick ( event, asset )
+    Event handler for the more menu's click event
+*/
+WebGUI.AssetManager.onMoreClick = function (e, a) {
+    var options, menu = a.menu, d = a.data;
+    YAHOO.util.Event.stopEvent(e);
+    if (!menu) {
+        options = WebGUI.AssetManager.buildMoreMenu(d.url, a.more, d.actions);
+        a.menu = menu = new YAHOO.widget.Menu('assetMenu'+d.assetId, options);
+        menu.render(document.getElementById('assetManager'));
+    }
+    menu.show();
+    menu.focus();
+};
 
 /*---------------------------------------------------------------------------
     WebGUI.AssetManager.DefaultSortedBy ( )

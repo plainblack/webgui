@@ -10,6 +10,7 @@
  - fixed #12133: RenderThingData macro doesn't accept templateId
  - fixed #12152: PayPal Standard ignores shop-credit
  - fixed #12119: Locale setting for paypal
+ - fixed #12156: Asset Manager performance
 
 7.10.17
  - fixed: Forced to use a PayDriver even with a balance of 0 in the cart.
