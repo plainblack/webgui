@@ -13,6 +13,7 @@
  - fixed #12156: Asset Manager performance
  - fixed #12158: Shop credit cannot be used to pay for Shipping on PayPal
  - rfe #12159: Asset Manager sort preferences
+ - added: new default Collaboration System notification template.
 
 7.10.17
  - fixed: Forced to use a PayDriver even with a balance of 0 in the cart.
