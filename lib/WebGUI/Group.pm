@@ -1610,6 +1610,7 @@ sub resetGroupFields {
     ##Note, I did assets in SQL instead of using the API because you would have to
     ##instanciate every version of the asset that used the group.  This should be much quicker
     ASSET: foreach my $assetClass ($db->buildArray('SELECT DISTINCT className FROM asset')) {
+        next ASSET unless $db->quickScalar( "SELECT COUNT(*) FROM asset WHERE className=?", [$assetClass] );
         my $definition = WebGUI::Pluggable::instanciate($assetClass, 'definition', [$session]);
         SUBDEF: foreach my $subdef (@{ $definition }) {
             next SUBDEF if exists $tableCache->{$subdef->{tableName}}; 
@@ -1659,7 +1660,11 @@ sub resetGroupFields {
             push @activities, @{ $wfActivities };
         }
         foreach my $activity (@activities) {
-            my $definition = WebGUI::Pluggable::instanciate($activity, 'definition', [$session]);
+            my $definition = eval { WebGUI::Pluggable::instanciate($activity, 'definition', [$session]) };
+            if ( $@ ) {
+                $session->log->warn( "Couldn't instanciate activity class $activity to reset groups, skipping..." );
+                next;
+            }
             my $sth = $db->prepare('UPDATE WorkflowActivityData set value=3 where name=? and value=?');
             SUBDEF: foreach my $subdef (@{ $definition }) {
                 PROP: while (my ($fieldName, $properties) = each %{ $subdef->{properties} }) {
