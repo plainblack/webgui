@@ -105,7 +105,7 @@ cmp_deeply(
         title        => 'Dummy Title',
         description  => 'Dummy Synopsis',  ##Not description
         link         => $session->url->getSiteURL . '/home/shawshank',
-        copyright    => undef,
+        copyright    => '',
     ),
     '... title, description, link inherit from asset by default, copyright unset'
 );
