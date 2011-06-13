@@ -1,5 +1,6 @@
 7.9.31
  - fixed #12156: Asset Manager performance
+ - fixed #12158: Shop credit cannot be used to pay for Shipping on PayPal
 
 7.9.30
  - fixed #12138: Corrected leaveVersionTag creating a version tag
