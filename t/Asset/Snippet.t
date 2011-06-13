@@ -27,6 +27,10 @@ $versionTag->set({name=>"Snippet Test"});
 addToCleanup($versionTag);
 my $snippet = $node->addChild({className=>'WebGUI::Asset::Snippet'});
 
+# Make sure TemplateToolkit is in the config file
+WebGUI::Test->originalConfig( 'templateParsers' );
+$session->config->addToArray( 'templateParsers' => 'WebGUI::Asset::Template::TemplateToolkit' );
+
 # Test for a sane object type
 isa_ok($snippet, 'WebGUI::Asset::Snippet');
 
