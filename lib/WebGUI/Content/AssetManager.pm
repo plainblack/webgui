@@ -100,15 +100,26 @@ filled with asset IDs.
 
 sub getManagerPaginator {
     my $session             = shift;
+    my $user                = $session->user;
     my $asset               = getCurrentAsset( $session );
+    my %update;
 
-    my $orderByColumn       = $session->form->get( 'orderByColumn' ) 
-                            || "lineage"
-                            ;
-    my $orderByDirection    = lc $session->form->get( 'orderByDirection' ) eq "desc"
-                            ? "DESC"
-                            : "ASC"
-                            ;
+    my $orderByColumn = $session->form->get( 'orderByColumn' );
+    if ($orderByColumn) {
+        $update{assetManagerSortColumn} = $orderByColumn;
+    }
+    else {
+        $orderByColumn = $user->get( 'assetManagerSortColumn' ) || 'lineage';
+    }
+    my $orderByDirection = lc $session->form->get( 'orderByDirection' );
+    if ($orderByDirection) {
+        $update{assetManagerSortDirection} = $orderByDirection;
+    }
+    else {
+        $orderByDirection = $user->get( 'assetManagerSortDirection' );
+    }
+    $orderByDirection = $orderByDirection eq 'desc' ? 'DESC' : 'ASC';
+    $user->update( \%update ) if ( keys %update );
 
     my $recordOffset        = $session->form->get( 'recordOffset' ) || 1;
     my $rowsPerPage         = $session->form->get( 'rowsPerPage' ) || 100;
@@ -119,7 +130,11 @@ sub getManagerPaginator {
     my $orderBy     = $session->db->dbh->quote_identifier( $orderByColumn ) . ' ' . $orderByDirection;
     $p->setDataByArrayRef( $asset->getLineage( ['children'], { orderByClause => $orderBy } ) );
     
-    return $p;
+    return {
+        paginator     => $p,
+        sortColumn    => $orderByColumn,
+        sortDirection => lc $orderByDirection,
+    };
 }
 
 #----------------------------------------------------------------------------
@@ -288,7 +303,8 @@ sub www_ajaxGetManagerPage {
     my $session         = shift;
     my $i18n            = WebGUI::International->new( $session, "Asset" );
     my $assetInfo       = { assets => [] };
-    my $p               = getManagerPaginator( $session );
+    my $pageInfo        = getManagerPaginator( $session );
+    my $p               = $pageInfo->{paginator};
 
     for my $assetId ( @{ $p->getPageData } ) {
         my $asset       = WebGUI::Asset->newByDynamicClass( $session, $assetId );
@@ -319,8 +335,8 @@ sub www_ajaxGetManagerPage {
     }
 
     $assetInfo->{ totalAssets   } = $p->getRowCount;
-    $assetInfo->{ sort          } = $session->form->get( 'orderByColumn' );
-    $assetInfo->{ dir           } = lc $session->form->get( 'orderByDirection' );
+    $assetInfo->{ sort          } = $pageInfo->{sortColumn};
+    $assetInfo->{ dir           } = $pageInfo->{sortDirection};
     
     $session->http->setMimeType( 'application/json' );
 

@@ -31,9 +31,58 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+addAssetManagerSortPreferences($session);
 
 finish($session); # this line required
 
+
+#----------------------------------------------------------------------------
+sub addAssetManagerSortPreferences {
+    my $cn   = 'assetManagerSortColumn';
+    my $on   = 'assetManagerSortDirection';
+    unless (WebGUI::ProfileField->new($session, $cn)) {
+        print 'Adding Asset Manager Sort Column profile field...'
+            unless $quiet;
+
+        WebGUI::ProfileField->create($session, $cn => {
+            label =>
+                "WebGUI::International::get('$cn label', 'Account_Profile')",
+            protected      => 1,
+            fieldType      => 'selectBox',
+            dataDefault    => 'lineage',
+            possibleValues => <<'VALUES',
+{
+    lineage      => WebGUI::International::get('rank',          'Asset'),
+    title        => WebGUI::International::get(99,              'Asset'),
+    className    => WebGUI::International::get('type',          'Asset'),
+    revisionDate => WebGUI::International::get('revision date', 'Asset'),
+    assetSize    => WebGUI::International::get('size',          'Asset'),
+    lockedBy     => WebGUI::International::get('locked',        'Asset'),
+}
+VALUES
+        }, 4);
+        print "Done!\n" unless $quiet;
+    }
+    unless (WebGUI::ProfileField->new($session, $on)) {
+        print 'Adding Asset Manager Sort Direction profile field...'
+            unless $quiet;
+
+        WebGUI::ProfileField->create($session, $on => {
+            label =>
+                "WebGUI::International::get('$on label', 'Account_Profile')",
+            protected      => 1,
+            fieldType      => 'selectBox',
+            dataDefault    => 'asc',
+            possibleValues => <<'VALUES',
+{
+    asc  => WebGUI::International::get('ascending',  'Account_Profile'),
+    desc => WebGUI::International::get('descending', 'Account_Profile'),
+}
+VALUES
+        }, 4);
+        print "Done!\n" unless $quiet;
+    }
+}
 
 #----------------------------------------------------------------------------
 # Describe what our function does

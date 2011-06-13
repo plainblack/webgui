@@ -204,14 +204,6 @@ WebGUI.AssetManager.onMoreClick = function (e, a) {
 };
 
 /*---------------------------------------------------------------------------
-    WebGUI.AssetManager.DefaultSortedBy ( )
-*/
-WebGUI.AssetManager.DefaultSortedBy = { 
-    "key"       : "lineage",
-    "dir"       : YAHOO.widget.DataTable.CLASS_ASC
-};
-
-/*---------------------------------------------------------------------------
     WebGUI.AssetManager.BuildQueryString ( )
 */
 WebGUI.AssetManager.BuildQueryString = function ( state, dt ) {
@@ -314,7 +306,9 @@ WebGUI.AssetManager.initDataTable = function (o) {
                 { key: 'childCount' }
             ],
             metaFields: {
-                totalRecords: "totalAssets" // Access to value in the server response
+                totalRecords  : 'totalAssets',
+                sortColumn    : 'sort',
+                sortDirection : 'dir'
             }
         };
 
@@ -329,13 +323,19 @@ WebGUI.AssetManager.initDataTable = function (o) {
                 initialRequest          : 'recordOffset=0',
                 dynamicData             : true,
                 paginator               : assetPaginator,
-                sortedBy                : WebGUI.AssetManager.DefaultSortedBy,
                 generateRequest         : WebGUI.AssetManager.BuildQueryString
             }
         );
 
     WebGUI.AssetManager.DataTable.handleDataReturnPayload = function(oRequest, oResponse, oPayload) {
-        oPayload.totalRecords = oResponse.meta.totalRecords;
+        var m = oResponse.meta;
+        oPayload.totalRecords = m.totalRecords;
+        this.set('sortedBy', {
+            key: m.sortColumn,
+            dir: m.sortDirection === 'desc' ?
+                YAHOO.widget.DataTable.CLASS_DESC :
+                YAHOO.widget.DataTable.CLASS_ASC
+        });
         return oPayload;
     };
 
