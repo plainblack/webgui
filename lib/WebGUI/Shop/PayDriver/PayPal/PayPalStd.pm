@@ -265,7 +265,7 @@ sub paymentVariables {
         cancel_return => $cancel->as_string,
         lc            => $i18n->getLanguage->{locale},
 
-        handling_cart        => $cart->calculateShipping,  ##According to https://www.x.com/message/180018#180018
+        #handling_cart        => $cart->calculateShipping,  ##According to https://www.x.com/message/180018#180018
         tax_cart             => $cart->calculateTaxes,
         discount_amount_cart => abs($cart->calculateShopCreditDeduction),
 
@@ -276,11 +276,18 @@ sub paymentVariables {
     
     my $counter = 0;
     foreach my $item (@{ $cart->getItems}) {
-        my $n = ++$counter;
-        $params{"amount_$n"}      = $item->getSku->getPrice;
-        $params{"quantity_$n"}    = $item->get('quantity');
-        $params{"item_name_$n"}   = $item->get('configuredTitle');
-        $params{"item_number_$n"} = $item->get('itemId');
+        ++$counter;
+        $params{"amount_$counter"}      = $item->getSku->getPrice;
+        $params{"quantity_$counter"}    = $item->get('quantity');
+        $params{"item_name_$counter"}   = $item->get('configuredTitle');
+        $params{"item_number_$counter"} = $item->get('itemId');
+    }
+    if ($cart->requiresShipping) {
+        ++$counter;
+        $params{"amount_$counter"}      = $cart->calculateShipping;
+        $params{"quantity_$counter"}    = 1;
+        $params{"item_name_$counter"}   = $i18n->get('shipping', 'Shop');
+        $params{"item_number_$counter"} = 'Shipping';
     }
 
     return \%params;
