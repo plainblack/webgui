@@ -49,7 +49,7 @@ WebGUI::Test->addToCleanup($versionTag);
 # Create a map point
 my $test_point = {
     website      => 'http://www.plainblack.com',
-    address1     => '520 University Ave',
+    address1     => '520 University',
     address2     => 'Suite 320',
     city         => 'Madison',
     region       => 'Wisconsin',
