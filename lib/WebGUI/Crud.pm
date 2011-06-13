@@ -54,6 +54,12 @@ has _dirty => (
     default  => 0,
 );
 
+# True if the object was created by this instance
+has _new => (
+    is      => 'ro',
+    default => 0,
+);
+
 sub _now {
     my $self = shift;
     return WebGUI::DateTime->new($self->session)->toDatabase;
@@ -103,6 +109,7 @@ around BUILDARGS => sub {
         $data->{sequenceNumber} = $sequenceNumber;
         $data->{$tableKey}      = $data->{id} || $session->id->generate;
         $data->{_dirty}         = 1;
+        $data->{_new}           = 1;
 
         return $class->$orig($data);
     }
