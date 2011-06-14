@@ -38,7 +38,7 @@ Optional.  Specifies the templateId or template url to use.  If omitted, the def
 
 #-------------------------------------------------------------------
 sub process {
-	my ($session, $thingDataUrl, $templateHint ) = @_;
+	my ($session, $thingDataUrl, $templateHint, $callerAssetId ) = @_;
     my $i18n = WebGUI::International->new($session, 'Macro_RenderThingData');
     return $i18n->get('no template') if !$templateHint;
 
@@ -57,7 +57,7 @@ sub process {
     return ( $i18n->get('bad url') . $thingDataUrl ) if !$thing || !$thingId || !$thingDataId;
 
     # Render
-    my $output = $thing->www_viewThingData( $thingId, $thingDataId, $templateHint );
+    my $output = $thing->www_viewThingData( $thingId, $thingDataId, $templateHint, $callerAssetId );
 
     # FIX: Temporary solution (broken map due to template rendering <script> tags)
     return $i18n->get('bad tags') if $output =~ /script>/;

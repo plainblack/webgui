@@ -3933,6 +3933,7 @@ sub www_viewThingData {
     my $thingId     = shift || $session->form->process('thingId');
     my $thingDataId = shift || $session->form->process('thingDataId');
     my $templateId 	= shift || $session->form->process('templateId');
+	my $callerAssetId	= shift || $session->form->process('callerAssetId');
     my $var     = $self->get;
     my $url     = $self->getUrl;
     my $i18n    = WebGUI::International->new($self->session, "Asset_Thingy");
@@ -3945,6 +3946,7 @@ sub www_viewThingData {
     $var->{"addThing_url"}  = $session->url->append($url, 'func=editThing;thingId=new');
     $var->{"manage_url"}    = $session->url->append($url, 'func=manage');
     $var->{"thing_label"}   = $thingProperties->{label};
+	$var->{"callerAssetId"} = $callerAssetId;
 
     if($self->hasPrivileges($thingProperties->{groupIdEdit})){
         $var->{"edit_url"} = $session->url->append($url,'func=editThingData;thingId='
