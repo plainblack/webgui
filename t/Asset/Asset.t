@@ -1215,6 +1215,7 @@ sub getTitleTests {
 subtest 'canAdd tolerates being called as an object method', sub {
     my $class = 'WebGUI::Asset::Snippet';
     my $snip = $tempNode->addChild({className => $class});
+    WebGUI::Test->addToCleanup($snip);
 
     # Make a test user who's just in Turn Admin On
     my $u = WebGUI::User->create($session);
