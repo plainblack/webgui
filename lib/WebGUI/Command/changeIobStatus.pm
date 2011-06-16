@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+package WebGUI::Command::changeIobStatus;
 
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001-2009 Plain Black Corporation.
@@ -10,39 +10,38 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
+use WebGUI::Command -command;
 use strict;
-use WebGUI::Paths -inc;
-use Getopt::Long;
-use Pod::Usage;
-use WebGUI::Session;
-use WebGUI::User;
-use WebGUI::Inbox;
+use warnings;
 
-$|=1;
+sub opt_spec {
+    return (
+        [ 'configFile=s', 'The WebGUI config file to use.  This parameter is required.'],
+        [ 'quiet', q{Disable all output unless there's an error.} ],
+        [ 'whatsHappening:s', q{The message attached to the InOut Board when changing status.  If left unspecified it defaults to 'Automatically signed out.'}],
+        [ 'userMessage:s', q{Text of the message to be sent to the user after changing the status.  If left unspecified it will default to 'You were logged out of the In/Out Board automatically.'}],
+        [ 'userMessageFile:s', q{Pathname to a file whose contents will be sent to the user after changing the status. Using this option overrides whatever messages is set with --userMessage (see above).}],
+        [ 'currentStatus:s', q{Check users in the IOB having status status. If left unspecified, it will default to In.}],
+        [ 'newStatus:s', q{Change users status in the IOB to status status. If left unspecified, it will default to Out.}],
+    );
+}
 
-my $configFile;
-my $help;
-my $quiet;
-my $whatsHappening = "Automatically signed out.";
-my $newStatus = "Out";
-my $currentStatus = "In";
-my $userMessage = "You were logged out of the In/Out Board automatically.";
-my $userMessageFile;
+sub validate_args {
+    my ($self, $opt, $args) = @_;
+    if (! $opt->{configfile}) {
+        $self->usage_error('You must specify the --configFile option.');
+    }
+}
 
+sub run {
+    my ($self, $opt, $args) = @_;
 
-GetOptions(
-	'configfile=s'=>\$configFile,
-	'help'=>\$help,
-	'quiet'=>\$quiet,
-	'whatsHappening:s'=>\$whatsHappening,
-	'userMessage:s'=>\$userMessage,
-	'userMessageFile:s'=>\$userMessageFile,
-	'currentStatus:s'=>\$currentStatus,
-	'newStatus:s'=>\$newStatus
-);
-
-pod2usage( verbose => 2 ) if $help;
-pod2usage() unless $configFile;
+my ($configFile, $help, $quiet, $whatsHappening, $newStatus, $currentStatus, $userMessage, $userMessageFile) =
+    @{$opt}{qw(configfile help quiet whatshappening newstatus currentstatus usermessage usermessagefile)};
+$whatsHappening ||= "Automatically signed out.";
+$newStatus ||= "Out";
+$currentStatus ||= "In";
+$userMessage ||= "You were logged out of the In/Out Board automatically.";
 
 print "Starting up...\n" unless ($quiet);
 my $session = WebGUI::Session->open($configFile);
@@ -100,22 +99,26 @@ $session->var->end;
 $session->close;
 print "OK\n" unless ($quiet);
 
+}
+
+1;
+
 __END__
 
 =head1 NAME
 
-changeIobStatus - Automate WebGUI's InOut Board User status switching.
+WebGUI::Command::changeIobStatus - Automate WebGUI's InOut Board User status switching.
 
 =head1 SYNOPSIS
 
- changeIobStatus --configFile config.conf
+ webgui.pl changeiobstatus --configFile config.conf
                  [--currentStatus status]
                  [--newStatus status]
                  [--userMessage text|--userMessageFile pathname]
                  [--whatsHappening text]
                  [--quiet]
 
- changeIobStatus --help
+ webgui.pl changeiobstatus --help
 
 =head1 DESCRIPTION
 
@@ -177,3 +180,4 @@ Shows this documentation, then exits.
 Copyright 2001-2009 Plain Black Corporation.
 
 =cut
+
