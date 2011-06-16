@@ -23,7 +23,7 @@ Package WebGUI::Macro::RenderThingData
 
 Macro that allows users to render thing data.
 
-=head2 process ( thingURL, templateHint )
+=head2 process ( thingURL, templateHint, callerAssetId )
 
 =head3 thingHint
 
@@ -32,6 +32,11 @@ The URL from which to pull the thingId and thingDataId
 =head3 templateHint
 
 Optional.  Specifies the templateId or template url to use.  If omitted, the default thingy view template will be used.
+
+=head3 callerAssetId
+
+Optional.  Passes an assetId to the template (as a template var named callerAssetId) so that the the assetId of of
+the caller can be known by the called template.  Generally you should pass <tmpl_var assetId>.
 
 =cut
 

@@ -39,7 +39,7 @@ WebGUI::Test->addToCleanup(sub {
     WebGUI::Test->unmockAssetUrl($templateUrl);
 });
 
-plan tests => 6;
+plan tests => 7;
 
 my $node = WebGUI::Asset->getImportNode($session);
 my $versionTag = WebGUI::VersionTag->getWorking($session);
@@ -119,3 +119,6 @@ $output = WebGUI::Macro::RenderThingData::process($session, $thing_url, $templat
 ok $templateProcessed, '... passed template url, template processed';
 $templateProcessed = 0;
 
+$output = WebGUI::Macro::RenderThingData::process($session, $thing_url, $templateUrl, "fakeAssetId");
+ok $templateVars->{'callerAssetId'} eq 'fakeAssetId', '... passed callerAssetId, template var was passed';
+$templateProcessed = 0;
