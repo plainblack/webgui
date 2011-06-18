@@ -15,7 +15,7 @@ use WebGUI::Session;
 use WebGUI::User;
 
 use WebGUI::Asset;
-use Test::More tests => 110; # increment this value for each test you create
+use Test::More tests => 111; # increment this value for each test you create
 use Test::Deep;
 use Test::Exception;
 use Data::Dumper;
@@ -485,7 +485,7 @@ is($snippets[6]->getRank(), '5', 'setRank was able to set an arbitrary rank(lowe
 $lineageIds = $folder->getLineage(['descendants']);
 cmp_bag(\@snipIds, $lineageIds, 'setRank reordered the other siblings appropiately');
 
-$snippets[6]->setRank('000007');
+ok $snippets[6]->setRank('000007'), 'move snippet 6 to rank 7';
 is($snippets[6]->getRank(), '7', 'setRank: move the Asset back (higher rank)');
 
 @snipIds = map { $_->getId } @snippets;

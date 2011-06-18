@@ -293,9 +293,15 @@ sub _mine_cart {
     $self->paymentDriverId($pay->getId);
     $self->paymentDriverLabel($pay->get('label'));
 
+    ##Clear out current transaction items before adding new ones.
+    foreach my $item (@{$self->getItems}) {
+        $item->delete;
+    } 
     foreach my $item (@{$cart->getItems}) {
         $self->addItem({item=>$item});
     }
+
+    $self->isRecurring( $cart->requiresRecurringPayment );
 
     $self->cashierUserId($cart->getPosUser->userId);
 

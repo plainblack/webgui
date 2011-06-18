@@ -169,10 +169,13 @@ sub getTemplateVars {
     #Build the data for all the assets on the page
     $var->{'asset_loop'} = [];
     my $data = $p->getPageData;
-    ROW: foreach my $row (@{$data}) {
+    foreach my $row (@{$data}) {
         my $returnAsset = eval { WebGUI::Asset->newById($session, $row->{assetId}); };
         next ROW if Exception::Class->caught();
-        push(@{$var->{'asset_loop'}}, $returnAsset->get);
+        push(@{$var->{'asset_loop'}}, {
+                %{$returnAsset->get}, 
+                %{$returnAsset->getMetaDataAsTemplateVariables}
+            });
     }
 
     #Append template variables

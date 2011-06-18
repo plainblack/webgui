@@ -141,9 +141,25 @@ $canViewMaker->prepare(
     },
 );
 
-plan tests => 114
-            + 2*scalar(@getTitleTests) #same tests used for getTitle and getMenuTitle
-            ;
+#### TestAsset class to test definition / update relationship
+BEGIN { $INC{ 'WebGUI/Asset/TestAsset.pm' } = __FILE__ }
+package WebGUI::Asset::TestAsset;
+
+our @ISA = ( 'WebGUI::Asset' );
+sub definition {
+    my ( $class, $session, $definition ) = @_;
+
+    # Alter assetData fields for testing purposes. Do not do 
+    # this in normal circumstances. Ever.
+    $definition = $class->SUPER::definition( $session, $definition );
+
+    # Make synopsis serialized
+    $definition->[0]->{properties}->{synopsis}->{serialize} = 1;
+
+    return $definition;
+}
+
+package main;
 
 note "loadModule";
 {
@@ -863,4 +879,27 @@ sub getTitleTests {
     );
 }
 
+subtest 'canAdd tolerates being called as an object method', sub {
+    my $class = 'WebGUI::Asset::Snippet';
+    my $snip = $tempNode->addChild({className => $class});
 
+    # Make a test user who's just in Turn Admin On
+    my $u = WebGUI::User->create($session);
+    WebGUI::Test->addToCleanup($u);
+    $u->addToGroups(['12']);
+    $session->user({ user => $u });
+
+    # default addGroup is Turn Admin On
+    ok $class->canAdd($session), 'can add when called as a class method';
+    ok $snip->canAdd($session), '...or an object method';
+
+    my $key = "assets/$class/addGroup";
+    WebGUI::Test->originalConfig($key);
+    $session->config->set($key, 3);
+
+    # now only admins can add snippets, so canAdd should return false
+    ok !$class->canAdd($session), 'Cannot add when called as a class method';
+    ok !$snip->canAdd($session), '...or an object method';
+};
+
+done_testing;

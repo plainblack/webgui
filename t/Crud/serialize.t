@@ -41,6 +41,7 @@ isa_ok($cereal, 'WebGUI::Serialize');
 cmp_deeply(
     $cereal->get,
     {
+        _new           => 1,
         _dirty         => 0,
         someName       => 'someName',
         jsonField      => [],

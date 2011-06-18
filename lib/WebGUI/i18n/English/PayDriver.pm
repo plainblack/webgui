@@ -124,6 +124,12 @@ our $I18N = {
         context => q|Name of the base Payment Driver|,
     },
 
+    'unable to finish transaction' => {
+        message => q|We are unable to lookup the transaction to finish checking out.|,
+        lastUpdated => 0,
+        context => q|Error message when the transaction cannot be looked up.|,
+    },
+
 };
 
 1;

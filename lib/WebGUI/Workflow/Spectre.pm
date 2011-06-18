@@ -41,7 +41,8 @@ These methods are available from this class:
 
 =head2 notify ( module, params )
 
-Sends a message to Spectre.
+Sends a message to Spectre. Returns true iff the message was successfully
+sent.
 
 =head3 module
 
@@ -65,15 +66,13 @@ sub notify {
                 timeout=>10
                 );
 	if (defined $remote) {
-        	my $result = $remote->post($module, $params);
-		unless (defined $result) {
-			$log->warn("Couldn't send command to Spectre because ".$POE::Component::IKC::ClientLite::error);
-		}
-		$remote->disconnect;
-		undef $remote;
+		my $result = $remote->post($module, $params);
+		return 1 if defined $result;
+		$log->warn("Couldn't send command to Spectre because ".$POE::Component::IKC::ClientLite::error);
 	} else {
 		$log->warn("Couldn't connect to Spectre because ".$POE::Component::IKC::ClientLite::error);
 	}
+	return 0;
 }
 
 #-------------------------------------------------------------------

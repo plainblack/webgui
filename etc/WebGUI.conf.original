@@ -835,6 +835,7 @@
     "AdSpace"          : "AdSpace",
     "AOIHits"          : "AOIHits", 
     "AOIRank"          : "AOIRank", 
+    "AssetProperty"    : "AssetProperty",
     "AssetProxy"       : "AssetProxy", 
     "BackToSite"       : "BackToSite",
     "CanEditText"      : "CanEditText", 

@@ -129,8 +129,13 @@ around BUILDARGS => sub {
 
 =head2 appendCartVariables ( $var )
 
-Append the subtotal, shipping, tax, and shop credeductions to a set of template
-variables.
+Append the subtotal, shipping, tax, and shop credit deductions to a set of template
+variables.  Returns the modified hashreference of variables.
+
+=head3 $var
+
+A hashref.  Template variables will be added to it.  If $var is not passed, a new
+hashref is created, and that is returned.
 
 =cut
 
@@ -148,7 +153,7 @@ sub appendCartVariables {
     $var->{inShopCreditAvailable} = $credit->getSum;
     $var->{inShopCreditDeduction} = $credit->calculateDeduction($totalPrice);
     $var->{totalPrice           } = $cart->formatCurrency($totalPrice + $var->{inShopCreditDeduction});
-    return $self;
+    return $var;
 }
 
 
@@ -259,10 +264,14 @@ sub displayPaymentError {
     my ($self, $transaction) = @_;
     my $i18n    = WebGUI::International->new($self->session, "PayDriver");
     my $output  = q{<h1>} . $i18n->get('error processing payment') . q{</h1>}
-                . q{<p>} . $i18n->get('error processing payment message') . q{</p>}
-                . q{<p>} . $transaction->get('statusMessage') . q{</p>}
-                . q{<p><a href="?shop=cart;method=checkout">} . $i18n->get( 'try again' ) . q{</a></p>}
-                ;
+                . q{<p>} . $i18n->get('error processing payment message') . q{</p>};
+    if ($transaction) {
+        $output .= q{<p>} . $transaction->get('statusMessage') . q{</p>};
+    }
+    else {
+        $output .= q{<p>} . $i18n->get('unable to finish transaction') . q{</p>};
+    }
+    $output     .= q{<p><a href="?shop=cart;method=checkout">} . $i18n->get( 'try again' ) . q{</a></p>};
     return $self->session->style->userStyle($output);
 }
 
@@ -540,7 +549,7 @@ sub processTransaction {
         $transactionProperties->{ cart          } = $cart;
         $transactionProperties->{ isRecurring   } = $cart->requiresRecurringPayment;
         $transactionProperties->{ session       } = $self->session;
-    
+
         # Create a transaction...
         $transaction = WebGUI::Shop::Transaction->new( $transactionProperties );
         $transaction->write;

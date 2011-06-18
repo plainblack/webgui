@@ -1,3 +1,19 @@
+7.10.17
+ - fixed: Forced to use a PayDriver even with a balance of 0 in the cart.
+ - add #12134: Access metadata for assets inside an AssetReport
+ - fixed : Thingy CSV import not counting towards maxEntriesPerUser
+ - fixed : Thingy CSV new records not updated with createdById and dateCreated and ipAddress
+ - added : Thingy fields can now be set as unique and checked upon insert
+ - added : Thingy max entries of thingy records added
+ - fixed #12140: PayPal standard can be used to to purchase items without paying for them
+
+7.10.16
+ - fixed #12121: typ-o Asset_Map.templateIdEditPoint
+ - rfe #2123: Layouts related for export purposes
+ - fixed #12125: Recaptcha API url
+ - rfe #12127: AssetProperty macro
+ - fixed #12129: AdminBar calls canAdd as an object method
+
 7.10.15
  - fixed #12117: Thingy - www_searchViaAjax broken
  - fixed #12116: JsonTable form control needs i18n

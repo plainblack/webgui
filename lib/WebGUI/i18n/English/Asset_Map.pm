@@ -242,8 +242,8 @@ our $I18N = {
     },
 
     'templateIdEditPoint' => {
-        message     => "The GUID of the template for addding or editing a point.",
-        lastUpdated => 0,
+        message     => "The GUID of the template for adding or editing a point.",
+        lastUpdated => 1304717948,
         context     => "template variable help",
     },
 

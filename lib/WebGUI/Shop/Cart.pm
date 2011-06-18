@@ -986,7 +986,7 @@ sub www_checkout {
         my $total = $self->calculateTotal;
         ##Handle rounding errors, and checkout immediately if the amount is 0 since
         ##at least the ITransact driver won't accept $0 checkout.
-        if (sprintf('%.2f', $total + $self->calculateShopCreditDeduction($total)) eq '0.00') {
+        if (sprintf('%.2f', abs($total + $self->calculateShopCreditDeduction($total))) eq '0.00') {
             my $transaction = WebGUI::Shop::Transaction->new({session => $session, cart => $self});
             $transaction->write;
             $transaction->completePurchase('zero', 'success', 'success');
@@ -1031,9 +1031,6 @@ sub www_lookupPosUser {
 
 Updates the cart totals, addresses, shipping driver and payment gateway. If requested, and the
 cart is ready, calls the www_getCredentials method from the selected payment gateway.
-
-If the cart total, after taxes, shipping, coupons and shop credit is zero, does the checkout
-immediately without calling a payment gateway.
 
 Otherwise, returns the user back to the cart.
 

@@ -86,6 +86,13 @@ $ar->update( {
 #----------------------------------------------------------------------------
 # getTemplateVars
 
+# Add a metadata variable to test
+my $mdFieldId = $sn->addMetaDataField( undef, "TESTFIELD", undef, undef, "Text", );
+WebGUI::Test->addToCleanup( sub{ 
+    WebGUI::Asset->getRoot( $session )->deleteMetaDataField( $mdFieldId ) 
+} );
+$sn->updateMetaData( $mdFieldId, "TESTVALUE" );
+
 cmp_deeply(
     $ar->getTemplateVars,
     hash( {
@@ -116,7 +123,7 @@ cmp_deeply(
         'pagination.isFirstPage'            => ignore(),
         'pagination.nextPageText'           => ignore(),
         'pagination.firstPage'              => ignore(),
-        'asset_loop'                        => [{ %{ $sn->get } }],
+        'asset_loop'                        => [{ %{ $sn->get }, %{ $sn->getMetaDataAsTemplateVariables } }],
     } ),
     "getTemplateVars returns complete and correct data structure",
 );
