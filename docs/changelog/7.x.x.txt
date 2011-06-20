@@ -1,5 +1,6 @@
 7.10.19
  - Added ability to pass caller assetId to RenderThingMacro
+ - Allow specific expirations for groups in userImport.pl
 
 7.10.18
  - fixed #12138: Version tag gets create by entering and direct leaving
