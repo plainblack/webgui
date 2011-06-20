@@ -2277,6 +2277,36 @@ normal templates.|,
 #    },
 
 
+    'help badgeMeta' => {
+        message     => 'Add a metadata value to the template by adding the name after "badgeMeta_". ex: badgeMeta_department',
+        lastUpdated => 0,
+        context     => 'help text for template variable',
+    },
+
+    'help ticketMeta' => {
+        message     => 'Add a metadata value to the template by adding the name after "ticketMeta_". ex: ticketMeta_department',
+        lastUpdated => 0,
+        context     => 'help text for template variable',
+    },
+
+    'badge group ticketsPerBadge' => {
+        message     => 'Tickets Per Badge',
+        lastUpdated => 0,
+        context     => 'Label for badge group property',
+    },
+
+    'badge group ticketsPerBadge help' => {
+        message     => "The number of tickets each badge in this group is allowed to purchase",
+        lastUpdated => 0,
+        context     => 'Help text for badge group property',
+    },
+    
+    'error badge group ticket limit' => {
+        message     => q{Cannot add %s because ticket limit reached},
+        lastUpdated => 0,
+        context     => q{Error message when trying to add too many tickets to a badge},
+    },
+
 };
 
 1;

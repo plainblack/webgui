@@ -127,6 +127,7 @@ our $HELP = {
             { 'name' => 'purchaseComplete'},
             { 'name' => 'hasCheckedIn'},
             { 'name' => 'transactionItemId'},
+            { 'name' => 'badgeMeta_', description => 'help badgeMeta' },
         ],
         isa   => [
             {   namespace => "Asset_Template",
@@ -217,6 +218,7 @@ our $HELP = {
             { 'name' => 'purchaseComplete'},
             { 'name' => 'hasCheckedIn'},
             { 'name' => 'transactionItemId'},
+            { 'name' => 'ticketMeta_', description => 'help ticketMeta' },
         ],
         isa   => [
             {   namespace => "Asset_Template",

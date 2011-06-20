@@ -31,6 +31,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+addTicketLimitToBadgeGroup( $session );
 
 finish($session); # this line required
 
@@ -44,6 +45,21 @@ finish($session); # this line required
 #    print "DONE!\n" unless $quiet;
 #}
 
+#----------------------------------------------------------------------------
+# Add a ticket limit to badges in a badge group
+sub addTicketLimitToBadgeGroup {
+    my $session = shift;
+    print "\tAdd ticket limit to badge groups... " unless $quiet;
+    # Make sure it hasn't been done already...
+    my $columns = $session->db->buildHashRef('describe EMSBadgeGroup');
+    use List::MoreUtils qw(any);
+    if(!any { $_ eq 'ticketsPerBadge' } keys %{$columns}) {
+        $session->db->write(q{
+            ALTER TABLE EMSBadgeGroup ADD COLUMN `ticketsPerBadge` INTEGER
+        });
+    }
+    print "DONE!\n" unless $quiet;
+}
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
 
