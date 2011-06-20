@@ -1162,7 +1162,7 @@ below/after the form element.|,
         context => q|Hoverhelp for edit field screen|,
     },
 
-    'caller assetId' => {
+    'callerAssetId' => {
         message => q|When passed into the www_viewThingData, provides the assetId of the caller asset.  Used by RenderThingMacro.  See POD.|,
         lastUpdated => 0,
         context => q|Template variable help for www_viewThingData|,
