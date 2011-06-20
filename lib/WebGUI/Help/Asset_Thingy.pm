@@ -155,6 +155,7 @@ our $HELP = {
             {
                 'name' => 'variables by label',
             },
+            { 'name' => 'caller assetId' },
         ],
         related => [
             {   tag       => 'edit thing template',
