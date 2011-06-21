@@ -1076,16 +1076,16 @@ sub www_exportStatus {
     return $session->privilege->insufficient
         unless $session->user->isInGroup(13);
     my $form    = $session->form;
-    my @vars    = qw(
-        index depth userId extrasUploadsAction rootUrlAction exportUrl
-        exportRelated
-    );
+    my @vars    = qw(index depth userId rootUrlAction exportUrl exportRelated);
     $self->forkWithStatusPage({
             plugin   => 'ProgressTree',
             title    => 'Page Export Status',
             method   => 'exportInFork',
             groupId  => 13,
             args     => {
+                # Note the difference in spelling...
+                #           v---no s                           s-----v
+                extrasUploadAction => scalar $form->get('extrasUploadsAction'),
                 assetId => $self->getId,
                 map { $_ => scalar $form->get($_) } @vars
             }
