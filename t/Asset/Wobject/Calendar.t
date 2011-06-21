@@ -55,7 +55,7 @@ use Data::Dumper;
 use WebGUI::Asset::Wobject::Calendar;
 use WebGUI::Asset::Event;
 
-plan tests => 12 + scalar @icalWrapTests;
+plan tests => 14 + scalar @icalWrapTests;
 
 my $session = WebGUI::Test->session;
 
@@ -314,8 +314,6 @@ addToCleanup($tag2);
 
 is(scalar @{ $windowCal->getLineage(['children'])}, 17, 'added events to the window calendar');
 
-diag "startDate: ". $windowStart->toDatabase;
-diag "endDate: ". $windowEnd->toDatabase;
 my @window = $windowCal->getEventsIn($windowStart->toDatabase, $windowEnd->toDatabase);
 
 cmp_bag(
@@ -589,4 +587,14 @@ cmp_deeply(
     $feedCal->getFeeds(),
     [],
     'getFeeds: returns an empty array ref with no feeds'
+);
+
+##Update with JSON and try again :)
+$feedCal->update({icalFeeds => '[]'});
+is_deeply $feedCal->get('icalFeeds'), [], 'set as JSON, returned perl';
+
+cmp_deeply(
+    $feedCal->getFeeds(),
+    [],
+    'but getFeeds still returns a data structure.'
 );

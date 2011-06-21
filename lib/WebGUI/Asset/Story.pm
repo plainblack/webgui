@@ -73,8 +73,6 @@ with 'WebGUI::Role::Asset::AlwaysHidden';
 
 use WebGUI::International;
 use JSON qw/from_json to_json/;
-use Storable qw/dclone/;
-use Data::Dumper;
 
 =head1 NAME
 
@@ -513,12 +511,10 @@ Returns the photo hash formatted as perl data.  See also L<setPhotoData>.
 
 sub getPhotoData {
 	my $self     = shift;
-	if (!exists $self->{_photoData}) {
-        my $json = $self->photo;
-        $json ||= '[]';
-        $self->{_photoData} = from_json($json);
-	}
-	return dclone($self->{_photoData});
+    my $json = $self->photo;
+    $json ||= '[]';
+    my $photoData = from_json($json);
+	return $photoData;
 }
 
 #-------------------------------------------------------------------
@@ -600,8 +596,6 @@ sub processEditForm {
     my $session = $self->session;
     $self->next::method;
     my $archive = delete $self->{_parent};  ##Force a new lookup.
-    #$session->log->warn($self->getParent->get('className'));
-    #$session->log->warn($self->getParent->getParent->get('className'));
     my $form    = $session->form;
     ##Handle old data first, to avoid iterating across a newly added photo.
     my $photoData      = $self->getPhotoData;
@@ -773,7 +767,6 @@ sub setPhotoData {
     my $photo     = to_json($photoData);
     ##Update the db.
     $self->update({photo => $photo});
-    delete $self->{_photoData};
     return;
 }
 

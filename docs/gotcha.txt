@@ -21,9 +21,19 @@ save you many hours of grief.
        Account Macro template
        Admin Toggle Macro template
 
+7.10.17
+--------------------------------------------------------------------
+    * Due to a formatting problem with form variables in the PayPal driver, WebGUI
+      in-shop credit was not being recieved by PayPal.  This means that Shop users
+      were charged the full amount of the cart instead of the discounted amount.
+
 7.10.15
 --------------------------------------------------------------------
     * WebGUI now depends on Geo::Coder::Googlev3 for it's Map asset
+    * canView has to pass for any www_ methods to get called at all on account
+      plugins. This is the correct behavior, but is a change in this version.
+      Please review your custom account plugins to make sure you aren't
+      relying on the old buggy behavior.
 
 7.10.13
 --------------------------------------------------------------------

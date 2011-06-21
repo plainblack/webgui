@@ -1809,6 +1809,12 @@ the Collaboration Asset, the user will be notified.|,
         lastUpdated => 0,
     },
 
+    'View this message on the website' => {
+        message     => q{View this message on the website},
+        context     => q{label in the default notification email template},
+        lastUpdated => 0,
+    },
+
 };
 
 1;

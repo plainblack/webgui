@@ -1150,6 +1150,18 @@ below/after the form element.|,
         context => q|Template variable help for getViewThingData|,
     },
 
+    'unique label' => {
+        message => q|Unique|,
+        lastUpdated => 1308006166,
+        context => q|Label in the edit field screen.|,
+    },
+
+    'unique description' => {
+        message => q|Is this a unique field?  In simple terms, values in unique fields can't have any duplicates in other rows.|,
+        lastUpdated => 1308006162,
+        context => q|Hoverhelp for edit field screen|,
+    },
+
 };
 
 1;

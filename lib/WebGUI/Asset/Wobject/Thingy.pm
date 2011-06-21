@@ -2075,7 +2075,7 @@ sub www_editThing {
             maxEntriesPerUser=>undef,
             maxEntriesTotal=>undef,
         );
-        $thingId = $self->addThing(\%properties,0);
+        $thingId = "new";
     }
     else{
         %properties = %{$self->getThing($thingId)};
@@ -2600,13 +2600,14 @@ sub www_editFieldSave {
         $defaultValue = $session->form->process("defaultFieldInThing");
     }
     
+    $thingId = $self->addThing({ thingId => 'new' },0) if $thingId eq 'new';
     $fieldId = $session->form->process("fieldId");
     %properties = (
         fieldId             => $fieldId,
         thingId             => $thingId,
         label               => $label,
         fieldType           => $fieldType,
-	isUnique            => $uniqueField,
+        isUnique            => $uniqueField,
         defaultValue        => $defaultValue,
         possibleValues      => $session->form->process("possibleValues"),
         pretext             => $session->form->process("pretext"),
@@ -2664,7 +2665,7 @@ sub www_editFieldSave {
     # Make sure we send debug information along with the field.
     $log->preventDebugOutput;
 
-    $session->output->print($newFieldId.$listItemHTML);
+    $session->output->print($thingId.$newFieldId.$listItemHTML);
     return "chunked";
 }
 

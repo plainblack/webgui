@@ -286,12 +286,14 @@ sub www_sendToPayPal {
     my $url     = $session->url;
     my $base    = $url->getSiteURL . $url->page;
 
+    my $i18n    = WebGUI::International->new( $self->session, $I18N );
     my $returnUrl = URI->new($base);
     $returnUrl->query_form( {
             shop             => 'pay',
             method           => 'do',
             do               => 'payPalCallback',
             paymentGatewayId => $self->getId,
+            LOCALECODE       => $i18n->getLanguage->{locale},
         }
     );
 
@@ -310,7 +312,6 @@ sub www_sendToPayPal {
     my $testMode = $self->testMode;
     my $response = LWP::UserAgent->new->post( $self->apiUrl, $form );
     my $params   = $self->responseHash($response);
-    my $i18n     = WebGUI::International->new( $self->session, $I18N );
     my $error;
 
     if ($params) {

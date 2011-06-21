@@ -32,7 +32,7 @@ my $session = WebGUI::Test->session;
 $templateMock->mock_id( $templateId );
 $templateMock->mock_url( $templateUrl );
 
-plan tests => 4;
+plan tests => 6;
 
 my $node = WebGUI::Test->asset;
 my $thingy = $node->addChild({
@@ -93,5 +93,17 @@ $templateProcessed = 0;
 
 $output = WebGUI::Macro::RenderThingData::process($session, $thing_url, $templateUrl);
 ok $templateProcessed, 'passed template url, template processed';
+$templateProcessed = 0;
 
+WebGUI::Test->originalConfig('gateway');
+$session->config->set('gateway', '/gated');
+my $thing_url = $thingy->getUrl('thingId='.$thingId.';thingDataId='.$thingDataId);
+
+$output = WebGUI::Macro::RenderThingData::process($session, $thing_url, $templateId);
+ok $templateProcessed, 'gateway set, passed templateId, template processed';
+$templateProcessed = 0;
+
+$output = WebGUI::Macro::RenderThingData::process($session, $thing_url, $templateUrl);
+ok $templateProcessed, '... passed template url, template processed';
+$templateProcessed = 0;
 

@@ -1,3 +1,20 @@
+7.10.18
+ - fixed #12138: Version tag gets create by entering and direct leaving
+ - Added the WebGUI::Event API
+ - fixed #12141: Macro_RenderThingData (bad tags) nothing to translate
+ - fixed #12142: Copy fails on imported threads
+ - canView will now be checked before calling ANY www_ method on account
+   plugins to fix an Inbox security bug (and other similar potential bugs).
+ - fixed #12139: break on calander feeds during upgrade
+ - fixed #12136: Unable to add more than one image in Story
+ - fixed #12133: RenderThingData macro doesn't accept templateId
+ - fixed #12152: PayPal Standard ignores shop-credit
+ - fixed #12119: Locale setting for paypal
+ - fixed #12156: Asset Manager performance
+ - fixed #12158: Shop credit cannot be used to pay for Shipping on PayPal
+ - rfe #12159: Asset Manager sort preferences
+ - added: new default Collaboration System notification template.
+
 7.10.17
  - fixed: Forced to use a PayDriver even with a balance of 0 in the cart.
  - add #12134: Access metadata for assets inside an AssetReport

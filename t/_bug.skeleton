@@ -1,0 +1,32 @@
+# vim:syntax=perl
+#-------------------------------------------------------------------
+# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+#-------------------------------------------------------------------
+# Please read the legal notices (docs/legal.txt) and the license
+# (docs/license.txt) that came with this distribution before using
+# this software.
+#------------------------------------------------------------------
+# http://www.plainblack.com                     info@plainblack.com
+#------------------------------------------------------------------
+
+=head1 BUG DESCRIPTION
+
+Blah blah blah, whatever the bug poster said in the initial post plus any
+relevant clarification from the discussion thread.
+
+=cut
+
+use warnings;
+use strict;
+
+use Test::More tests => 0;
+use FindBin;
+
+use lib "$FindBin::Bin/../lib";
+use WebGUI::Test;
+
+my $session = WebGUI::Test->session;
+
+# A bug test should test the bug it is named for and be placed in an
+# appropriate place in the test tree. For example, if bug #34721 was a Snippet
+# bug, it would go in t/Asset/Snippet/bug_34721_short_description.t.

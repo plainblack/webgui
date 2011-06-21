@@ -225,6 +225,7 @@ sub paymentVariables {
     my $url  = $self->session->url;
     my $base = $url->getSiteURL . $url->page;
     my $cart = $self->getCart;
+    my $i18n = WebGUI::International->new($self->session);
 
     my $return = URI->new($base);
     $return->query_form( {
@@ -247,10 +248,11 @@ sub paymentVariables {
 
         return        => $return->as_string,
         cancel_return => $cancel->as_string,
+        lc            => $i18n->getLanguage->{locale},
 
-        handling_cart        => $cart->calculateShipping,  ##According to https://www.x.com/message/180018#180018
+        #handling_cart        => $cart->calculateShipping,  ##According to https://www.x.com/message/180018#180018
         tax_cart             => $cart->calculateTaxes,
-        discount_amount_cart => -($cart->calculateShopCreditDeduction),
+        discount_amount_cart => abs($cart->calculateShopCreditDeduction),
 
         # When we verify that we have a valid transaction ID later on in
         # processPayment, we'll make sure it's the cart we think it is.
@@ -259,11 +261,18 @@ sub paymentVariables {
     
     my $counter = 0;
     foreach my $item (@{ $cart->getItems}) {
-        my $n = ++$counter;
-        $params{"amount_$n"}      = $item->getSku->getPrice;
-        $params{"quantity_$n"}    = $item->quantity;
-        $params{"item_name_$n"}   = $item->configuredTitle;
-        $params{"item_number_$n"} = $item->itemId;
+        ++$counter;
+        $params{"amount_$counter"}      = $item->getSku->getPrice;
+        $params{"quantity_$counter"}    = $item->get('quantity');
+        $params{"item_name_$counter"}   = $item->get('configuredTitle');
+        $params{"item_number_$counter"} = $item->get('itemId');
+    }
+    if ($cart->requiresShipping) {
+        ++$counter;
+        $params{"amount_$counter"}      = $cart->calculateShipping;
+        $params{"quantity_$counter"}    = 1;
+        $params{"item_name_$counter"}   = $i18n->get('shipping', 'Shop');
+        $params{"item_number_$counter"} = 'Shipping';
     }
 
     return \%params;

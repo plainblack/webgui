@@ -25,6 +25,7 @@ use URI::URL ();
 use Scope::Guard qw(guard);
 use WebGUI::ProgressTree;
 use WebGUI::FormBuilder;
+use WebGUI::Event;
 
 =head1 NAME
 
@@ -957,6 +958,7 @@ sub exportWriteFile {
         $self->session->output->print($contents);
     }
     $fh->close;
+    fire $self->session, 'asset::export' => $dest;
 }
 
 #-------------------------------------------------------------------

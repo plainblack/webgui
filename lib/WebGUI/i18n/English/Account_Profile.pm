@@ -169,6 +169,24 @@ our $I18N = {
         message     => q{required },
         lastUpdated => 1225724810,
     },
+    'assetManagerSortDirection label' => {
+        message     => 'Asset Manager Sort Direction',
+        lastUpdated => 1307982524,
+    },
+    'assetManagerSortColumn label' => {
+        message     => 'Asset Manager Sort Column',
+        lastUpdated => 1307982524,
+    },
+    'ascending' => {
+        message     => 'Ascending',
+        lastUpdated => 1307982524,
+        context     => 'Ascending sort order (lowest to highest)',
+    },
+    'descending' => {
+        message     => 'Descending',
+        lastUpdated => 1307982524,
+        context     => 'Descending sort order (highest to lowest)',
+    },
 };
 
 1;

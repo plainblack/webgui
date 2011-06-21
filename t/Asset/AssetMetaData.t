@@ -270,6 +270,7 @@ subtest 'asset metadata versioning' => sub {
     is $meta->get(), 'version one', 'v1 has not been changed';
 
     my $dup = $asset->duplicate;
+    WebGUI::Test->addToCleanup($dup);
 
     my $db    = $session->db;
     my $count_rev = sub {

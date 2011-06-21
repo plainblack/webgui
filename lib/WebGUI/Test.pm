@@ -843,7 +843,7 @@ Example call:
         },
         'WebGUI::LDAPLink'         => sub {
             my $link = shift;
-            $link->session->db->write("delete from ldapLink where ldapLinkId=?", [$link->{ldapLinkId}]);
+            $link->session->db->write("delete from ldapLink where ldapLinkId=?", [$link->{_ldapLinkId}]);
         },
         'CODE' => sub {
             (shift)->();

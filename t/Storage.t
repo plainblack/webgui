@@ -11,6 +11,7 @@
 use strict;
 
 use WebGUI::Test;
+use WebGUI::Test::Event;
 use WebGUI::Session;
 use WebGUI::Storage;
 
@@ -29,7 +30,7 @@ my $cwd = Cwd::cwd();
 
 my ($extensionTests, $fileIconTests, $block_extension_tests) = setupDataDrivenTests($session);
 
-plan tests => 155
+plan tests => 161
             + scalar @{ $extensionTests }
             + scalar @{ $fileIconTests  }
             + scalar @{ $block_extension_tests }
@@ -196,7 +197,16 @@ Hi, I'm a file.
 I have two lines.
 EOCON
 
-my $filename = $storage1->addFileFromScalar('content', $content);
+sub fired_ok(&@) {
+    my ($block, @expected) = @_;
+    my @events = trap { $block->() } $session, 'storage::addFile';
+    my @got = map { $_->[3] } @events;
+    cmp_bag \@got, \@expected, 'events fired for ' . join ', ', @expected;
+}
+
+my $filename; fired_ok {
+    $filename = $storage1->addFileFromScalar('content', $content)
+} 'content';
 
 is ($filename, 'content', 'processed filename returned by addFileFromScalar');
 
@@ -236,10 +246,10 @@ foreach my $extTest (@{ $extensionTests }) {
 my $fileStore = WebGUI::Storage->create($session);
 WebGUI::Test->addToCleanup($fileStore);
 cmp_bag($fileStore->getFiles(1), ['.'], 'Starting with an empty storage object, no files in here except for . ');
-$fileStore->addFileFromScalar('.dotfile', 'dot file');
+fired_ok { $fileStore->addFileFromScalar('.dotfile', 'dot file') } '.dotfile';
 cmp_bag($fileStore->getFiles(),  [                     ], 'getFiles() by default does not return dot files');
 cmp_bag($fileStore->getFiles(1), ['.', '.dotfile'], 'getFiles(1) returns all files, including dot files');
-$fileStore->addFileFromScalar('dot.file', 'dot.file');
+fired_ok { $fileStore->addFileFromScalar('dot.file', 'dot.file') } 'dot.file';
 cmp_bag($fileStore->getFiles(),  ['dot.file'],            'getFiles() returns normal files');
 cmp_bag($fileStore->getFiles(1), ['.', '.dotfile', 'dot.file'], 'getFiles(1) returns all files, including dot files');
 
@@ -260,7 +270,9 @@ is($obj->stringify, $storage1->getPath, '... Path::Class::Dir object has correct
 ####################################################
 
 my $storageHash = {'blah'=>"blah",'foo'=>"foo"};
-$storage1->addFileFromHashref("testfile-hash.file", $storageHash);
+fired_ok {
+    $storage1->addFileFromHashref("testfile-hash.file", $storageHash);
+} 'testfile-hash.file';
 ok (-e $storage1->getPath("testfile-hash.file"), 'addFileFromHashRef creates file');
 
 ####################################################
@@ -298,9 +310,11 @@ ok (!(-e $storage1->getPath("testfile-hash.file")), "rename file original file i
 #
 ####################################################
 
-$storage1->addFileFromFilesystem(
-    WebGUI::Test->getTestCollateralPath('littleTextFile'),
-);
+fired_ok {
+    $storage1->addFileFromFilesystem(
+        WebGUI::Test->getTestCollateralPath('littleTextFile'),
+    );
+} 'littleTextFile';
 
 ok(
     grep(/littleTextFile/, @{ $storage1->getFiles }),
@@ -334,7 +348,9 @@ cmp_bag($s3copy->getFiles(), [ @filesToCopy ], 'copy: passing explicit variable 
     my $deepDeepDir = $deepDir->subdir('deep');
     my $errorStr;
     my @foo = $deepDeepDir->mkpath({ error => \$errorStr } );
-    $deepStorage->addFileFromScalar('deep/file', 'deep file');
+    fired_ok {
+        $deepStorage->addFileFromScalar('deep/file', 'deep file')
+    } 'deep/file';
     cmp_bag(
         $deepStorage->getFiles('all'),
         [ '.', 'deep', 'deep/file' ],

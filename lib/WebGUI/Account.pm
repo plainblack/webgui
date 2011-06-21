@@ -190,6 +190,12 @@ sub callMethod {
         );
         return undef;
     }
+
+    unless ($self->canView) {
+        my $session = $self->session;
+        $session->output->print($session->privilege->insufficient);
+        return undef;
+    }
    
     #Try to call the method
     my $output = eval { $self->$method(@{$args}) };
