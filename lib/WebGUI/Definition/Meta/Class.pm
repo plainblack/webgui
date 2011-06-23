@@ -51,7 +51,7 @@ These methods are available from this class:
 sub add_property {
     my ($self, $name, %options) = @_;
     if (! (exists $options{noFormPost} || exists $options{label}) ) {
-        Moose->throw_error("Must pass either noFormPost or label when making a property");
+        $options{label} = $name;
     }
     $options{traits} ||= [];
     push @{ $options{traits} }, @{ $self->property_metaroles };
