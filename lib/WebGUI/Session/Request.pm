@@ -144,22 +144,6 @@ sub requestNotViewed {
 
 }
 
-#-------------------------------------------------------------------
-
-=head2 secure ( )
-
-Returns true if this is a secure connection. The connection is secure if it's 
-https or if SSLPROXY is true
-
-=cut
-
-sub secure {
-    my ( $self ) = @_;
-    if ( $self->header('SSLPROXY') ) {
-        return 1;
-    }
-    return $self->SUPER::secure;
-}
 
 # This is only temporary
 sub TRACE { 
