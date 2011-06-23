@@ -159,7 +159,6 @@ The normal way to use WebGUI::Crud is to create a subclass that defines a specif
  define tableName => 'ambassador';
  define tableKey  => 'ambassadorId';
  has ambassadorId => (
-    fieldType => 'text',
     default =>undef,
  );
  property name => (
@@ -182,7 +181,6 @@ A more advanced approach is to create a subclass that dynamically generates a de
  define tableName => $config->get('tableName');
  define tableKey  => $config->get('tableKey');
  has $config->get('tableKey') => (
-    fieldType => 'text',
     default =>undef,
  );
  my $fields = $config->get('fields');
