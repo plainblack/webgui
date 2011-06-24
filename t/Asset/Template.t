@@ -15,7 +15,7 @@ use WebGUI::Session;
 use WebGUI::Asset::Template;
 use Exception::Class;
 
-use Test::More tests => 60; # increment this value for each test you create
+use Test::More tests => 62; # increment this value for each test you create
 use Test::Deep;
 use Data::Dumper;
 use Test::Exception;
@@ -75,6 +75,28 @@ $output = $template->process({});
 ok( $output =~ m{^<IGOTSTYLE>.+</IGOTSTYLE>$}, 'style template is added' );
 $template->style( undef );
 
+#-----------------------------------------------------------------------------
+# Forms in templates
+$template = WebGUI::Test->asset(
+    className   => 'WebGUI::Asset::Template',
+    template    => '<tmpl_var NAME_header>',
+    namespace   => 'WebGUI Test Template',
+    parser      => $ht,
+    %tag,
+);
+my $form = WebGUI::FormBuilder->new( $session );
+$template->addForm( NAME => $form );
+$output = $template->process;
+is( $output, $form->getHeader, 'form variables added to template' );
+
+# Params passed into process() override everything
+$output = $template->process({ NAME_header => 'NOT_SO_FAST' });
+is( $output, 'NOT_SO_FAST', "params passed into process() override all others" );
+$template->forms( {} );
+$template->param( {} );
+
+#------------------------------------------------------------------------------
+# JSON output
 # See if template listens the Accept header
 $session->request->header('Accept' => 'application/json');
 

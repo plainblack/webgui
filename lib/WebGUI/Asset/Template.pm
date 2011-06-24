@@ -135,6 +135,30 @@ Provides a mechanism to provide a templating system in WebGUI.
 
 =head1 ATTRIBUTES
 
+#----------------------------------------------------------------------------
+
+=head2 forms
+
+A hash of forms to be included in this template. The forms' template variables
+will be automatically added to the L<param> hash when the template is processed.
+
+Hash keys are the form's unique name, which will be prefixed to the form's
+template variables
+
+=cut
+
+has forms => (
+    traits  => ['Hash'],
+    is      => 'rw',
+    isa     => 'HashRef',
+    default => sub { {} },
+    handles => {
+        addForm => 'set',
+        getForm => 'get',
+        deleteForm => 'delete',
+        hasForms => 'count',
+    },
+);
 
 #----------------------------------------------------------------------------
 
@@ -150,7 +174,7 @@ Use L<setParam> method to set parameters.
 
 has param => (
     traits  => [ 'Hash' ],
-    is      => 'ro',
+    is      => 'rw',
     isa     => 'HashRef',
     default => sub { {} },
     handles => {
@@ -676,6 +700,8 @@ Will also process the style template attached to this template
 
 A hash reference containing template variables and loops. Automatically includes the entire WebGUI session.
 
+These parameters will override any parameters set by L<param> and L<forms>
+
 =cut
 
 sub process {
@@ -696,10 +722,19 @@ sub process {
         return $session->isAdminOn ? $i18n->get('template in clipboard') : '';
     }
 
+    # Merge the forms with the prepared vars
+    if ( $self->hasForms ) {
+        for my $name ( keys %{$self->forms} ) {
+            my $form = $self->forms->{$name};
+            $self->setParam( %{$form->toTemplateVars( "${name}_" )} );
+        }
+    }
+
     # Merge the passed-in vars with the prepared vars
     if ( keys %$vars > 0 ) { # can't call setParam with an empty hash
         $self->setParam( %$vars );
     }
+
 
     # Return a JSONinfied version of vars if JSON is the only requested content type.
     if ( defined $session->request && $session->request->header('Accept') eq 'application/json' ) {
