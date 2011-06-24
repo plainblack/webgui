@@ -139,8 +139,9 @@ Provides a mechanism to provide a templating system in WebGUI.
 
 =head2 forms
 
-A hash of forms to be included in this template. The forms' template variables
-will be automatically added to the L<param> hash when the template is processed.
+A hash of WebGUI::FormBuilder objects to be included in this template. 
+The forms' template variables will be automatically added to the L<param> hash 
+when the template is processed.
 
 Hash keys are the form's unique name, which will be prefixed to the form's
 template variables
