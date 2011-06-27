@@ -1,5 +1,6 @@
 7.9.32
  - fixed #12164: Calendar feeds with tons of ;adminId=XXXXXX added
+ - fixed #12167: Calendar Next/Prev Month/Year confusion
 
 7.9.31
  - fixed #12156: Asset Manager performance

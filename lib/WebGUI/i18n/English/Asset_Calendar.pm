@@ -954,13 +954,13 @@ our $I18N = {
     },
 
 	'pageNextUrl monthVar' => {
-		message 	=> q|A URL to the next month in the calendar.|,
-		lastUpdated 	=> 1269839944,
+		message 	=> q|A URL to the next year in the calendar.|,
+		lastUpdated 	=> 1309212604,
 	},
 
 	'pagePrevUrl monthVar' => {
-		message 	=> q|A URL to the previous month in the calendar.|,
-		lastUpdated 	=> 1269839951,
+		message 	=> q|A URL to the previous year in the calendar.|,
+		lastUpdated 	=> 1309212606,
 	},
 
 	'pageNextYear' => {
