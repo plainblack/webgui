@@ -15,7 +15,6 @@ use lib "$FindBin::Bin/../lib";
 use WebGUI::Test;
 
 use Test::More; # increment this value for each test you create
-use Test::Deep;
 plan tests => 30;
 
 use WebGUI::Session;

@@ -16,17 +16,16 @@ use WebGUI::Test;
 use WebGUI::Session;
 use WebGUI::Utility;
 use WebGUI::Workflow::Activity::CalendarUpdateFeeds;
-use WebGUI::Asset::Wobject::Calendar;
 
 use Test::More;
 use Test::Deep;
 use Test::LongString;
-use Data::Dumper;
+use WebGUI::Asset::Wobject::Calendar;
 
 plan skip_all => 'set WEBGUI_LIVE to enable this test'
     unless $ENV{WEBGUI_LIVE};
 
-plan tests => 23; # increment this value for each test you create
+plan tests => 27; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -176,7 +175,7 @@ SKIP: {
 ##Add an ical feed to check time zone processing
 
 $receiver->deleteFeed($feedId);
-$receiver->addFeed({
+$feedId = $receiver->addFeed({
     url      => $session->url->getSiteURL.$snippet_feed->getUrl,
     lastUpdated => 'never',
 });
@@ -203,5 +202,37 @@ $instance1->delete;
 $newEvents = $receiver->getLineage(['children'], { returnObjects => 1, });
 
 my $got_cpr = is(scalar @{ $newEvents }, 1, 'ical import of 1 event');
+
+##Add a feed that will fail, to test that feeds are not modified
+$receiver->deleteFeed($feedId);
+my $feedUrl = $session->url->getSiteURL.'do_not_hack_my_url';
+$feedId = $receiver->addFeed({
+    url         => $feedUrl,
+    lastUpdated => 'never',
+});
+
+$instance1->delete('skipNotify');
+$instance1 = WebGUI::Workflow::Instance->create($session,
+    {
+        workflowId              => $workflow->getId,
+        skipSpectreNotification => 1,
+    }
+);
+
+my $retVal;
+
+$retVal = $instance1->run();
+is($retVal, 'complete', 'cleanup: activity complete');
+$retVal = $instance1->run();
+is($retVal, 'done', 'cleanup: activity is done');
+$instance1->delete;
+
+$receiver = $receiver->cloneFromDb;
+my $feed = $receiver->getFeed($feedId);
+
+##Note, cannot use Test::Deep in here because Asset/Event.pm use Test::Deep::NoTest
+
+is $feed->{lastResult}, 'Error parsing iCal feed', 'After fetching a bad feed it updated the lastResult';
+is $feed->{url}, $feedUrl, '... nothing added to feed URL';
 
 #vim:ft=perl
