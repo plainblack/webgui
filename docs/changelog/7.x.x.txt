@@ -2,6 +2,7 @@
  - fixed #12169: extras uploads symlink export
  - Added ability to pass caller assetId to RenderThingMacro
  - Allow specific expirations for groups in userImport.pl
+ - fixed #12164: Calendar feeds with tons of ;adminId=XXXXXX added
 
 7.10.18
  - fixed #12138: Version tag gets create by entering and direct leaving

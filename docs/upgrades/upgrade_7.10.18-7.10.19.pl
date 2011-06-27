@@ -22,6 +22,8 @@ use Getopt::Long;
 use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::Asset;
+use WebGUI::Asset::Wobject::Calendar;
+use Exception::Class;
 
 
 my $toVersion = '7.10.19';
@@ -32,6 +34,7 @@ my $session = start(); # this line required
 
 # upgrade functions go here
 addTicketLimitToBadgeGroup( $session );
+fixBrokenCalendarFeedUrls ( $session );
 
 finish($session); # this line required
 
@@ -44,6 +47,25 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+#----------------------------------------------------------------------------
+# Fix calendar feed urls that had adminId attached to them until they blew up
+sub fixBrokenCalendarFeedUrls {
+    my $session = shift;
+    print "\tChecking all calendar feed URLs for adminId brokenness... " unless $quiet;
+    my $getCalendar = WebGUI::Asset::Wobject::Calendar->getIsa($session);
+    CALENDAR: while (1) {
+        my $calendar = eval { $getCalendar->(); };
+        next CALENDAR if Exception::Class->caught;
+        last CALENDAR unless $calendar;
+        FEED: foreach my $feed (@{ $calendar->getFeeds }) {
+            $feed->{url} =~ s/adminId=[^;]{22};?//g;
+            $feed->{url} =~ s/\?$//;
+            $calendar->setFeed($feed->{feedId}, $feed);
+        }
+    }
+    print "DONE!\n" unless $quiet;
+}
 
 #----------------------------------------------------------------------------
 # Add a ticket limit to badges in a badge group
