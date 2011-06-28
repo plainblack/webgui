@@ -2219,47 +2219,46 @@ database immediately.
 =cut
 
 sub www_editThingSave {
-
     my $self = shift;
     return $self->session->privilege->insufficient() unless $self->canEdit;
-    my $form = $self->session->form;
-    my ($thingId, $fields);
-    $thingId = $self->session->form->process("thingId");
-
-    $fields = $self->getFields($thingId);
+    my $form    = $self->session->form;
+    my $thingId = $self->session->form->process("thingId");
+    my $fields  = $self->getFields($thingId);
 
     if($fields->rows < 1){
         $self->session->log->warn("Thing failed to create because it had no fields");
         my $i18n = WebGUI::International->new($self->session, "Asset_Thingy");
         return $self->www_editThing($i18n->get("thing must have fields"));
     }
-    $self->setCollateral("Thingy_things","thingId",{
-        thingId=>$thingId,
-        label=>$form->process("label"),
-        editScreenTitle=>$form->process("editScreenTitle"),
-        editInstructions=>$form->process("editInstructions"),
-        groupIdAdd=>$form->process("groupIdAdd"),
-        groupIdEdit=>$form->process("groupIdEdit"),
-        saveButtonLabel=>$form->process("saveButtonLabel"),
-        afterSave=>$form->process("afterSave"),
-        editTemplateId=>$form->process("editTemplateId") || 1,
-        onAddWorkflowId=>$form->process("onAddWorkflowId"),
-        onEditWorkflowId=>$form->process("onEditWorkflowId"),
-        onDeleteWorkflowId=>$form->process("onDeleteWorkflowId"),
-        groupIdView=>$form->process("groupIdView"),
-        viewTemplateId=>$form->process("viewTemplateId") || 1,
-        defaultView=>$form->process("defaultView"),
-        searchScreenTitle=>$form->process("searchScreenTitle"),
-        searchDescription=>$form->process("searchDescription"),
-        groupIdSearch=>$form->process("groupIdSearch"),
-        groupIdImport=>$form->process("groupIdImport"),
-        groupIdExport=>$form->process("groupIdExport"),
-        searchTemplateId=>$form->process("searchTemplateId") || 1,
-        thingsPerPage=>$form->process("thingsPerPage") || 25,
-        sortBy=>$form->process("sortBy") || '',
-        exportMetaData=>$form->process("exportMetaData") || '',
-        maxEntriesPerUser=>$form->process("maxEntriesPerUser") || '',
-        },0,1);
+
+    my $thing = {
+        thingId            => $thingId,
+        label              => $form->process("label"),
+        editScreenTitle    => $form->process("editScreenTitle"),
+        editInstructions   => $form->process("editInstructions"),
+        groupIdAdd         => $form->process("groupIdAdd"),
+        groupIdEdit        => $form->process("groupIdEdit"),
+        saveButtonLabel    => $form->process("saveButtonLabel"),
+        afterSave          => $form->process("afterSave"),
+        editTemplateId     => $form->process("editTemplateId") || 1,
+        onAddWorkflowId    => $form->process("onAddWorkflowId"),
+        onEditWorkflowId   => $form->process("onEditWorkflowId"),
+        onDeleteWorkflowId => $form->process("onDeleteWorkflowId"),
+        groupIdView        => $form->process("groupIdView"),
+        viewTemplateId     => $form->process("viewTemplateId") || 1,
+        defaultView        => $form->process("defaultView"),
+        searchScreenTitle  => $form->process("searchScreenTitle"),
+        searchDescription  => $form->process("searchDescription"),
+        groupIdSearch      => $form->process("groupIdSearch"),
+        groupIdImport      => $form->process("groupIdImport"),
+        groupIdExport      => $form->process("groupIdExport"),
+        searchTemplateId   => $form->process("searchTemplateId") || 1,
+        thingsPerPage      => $form->process("thingsPerPage") || 25,
+        sortBy             => $form->process("sortBy") || '',
+        exportMetaData     => $form->process("exportMetaData") || '',
+        maxEntriesPerUser  => $form->process("maxEntriesPerUser") || '',
+    };
+    $self->setCollateral("Thingy_things", "thingId", $thing, 0, 1);
 
     while (my $field = $fields->hashRef) {
         my $display = $self->session->form->process("display_".$field->{fieldId}) || 0;
