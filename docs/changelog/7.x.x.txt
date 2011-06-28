@@ -1,3 +1,5 @@
+7.10.20
+
 7.10.19
  - fixed #12169: extras uploads symlink export
  - Added ability to pass caller assetId to RenderThingMacro
