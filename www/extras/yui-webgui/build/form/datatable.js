@@ -621,9 +621,9 @@ WebGUI.Form.DataTable
             // If the key has changed, update the row data
             if ( col && col.key != newKey ) {
                 var rows    = this.dataTable.getRecordSet().getRecords();
-                for ( var i = 0; i < rows.length; i++ ) {
-                    rows[ i ].setData( newKey, rows[ i ].getData( oldKey ) );
-                    rows[ i ].setData( oldKey, undefined ); 
+                for ( var r = 0; r < rows.length; r++ ) {
+                    rows[ r ].setData( newKey, rows[ r ].getData( oldKey ) );
+                    rows[ r ].setData( oldKey, undefined ); 
                 }
             }
 
