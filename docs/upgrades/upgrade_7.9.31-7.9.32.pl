@@ -22,7 +22,7 @@ use Getopt::Long;
 use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::Asset;
-
+use WebGUI::Asset::Wobject::Calendar;
 
 my $toVersion = '7.9.32';
 my $quiet; # this line required
@@ -32,6 +32,7 @@ my $session = start(); # this line required
 
 # upgrade functions go here
 fixBrokenCalendarFeedUrls ( $session );
+removeUndergroundUserStyleTemplate ( $session );
 
 finish($session); # this line required
 
@@ -63,7 +64,20 @@ sub fixBrokenCalendarFeedUrls {
     print "DONE!\n" unless $quiet;
 }
 
-
+#----------------------------------------------------------------------------
+# Add a ticket limit to badges in a badge group
+sub removeUndergroundUserStyleTemplate {
+    my $session = shift;
+    print "\tRemove Underground User Style template... " unless $quiet;
+    if ($session->setting->get('userFunctionStyleId') eq 'zfDnOJgeiybz9vnmoEXRXA') {
+        $session->setting->set('userFunctionStyleId', 'Qk24uXao2yowR6zxbVJ0xA');
+    }
+    my $underground_user = WebGUI::Asset->newByDynamicClass($session, 'zfDnOJgeiybz9vnmoEXRXA');
+    if ($underground_user) {
+        $underground_user->purge;
+    }
+    print "DONE!\n" unless $quiet;
+}
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
 
