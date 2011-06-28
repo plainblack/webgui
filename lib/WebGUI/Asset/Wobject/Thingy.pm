@@ -2508,6 +2508,12 @@ sub www_editThingSave {
     my $thingId = $self->session->form->process("thingId");
     my $fields  = $self->getFields($thingId);
 
+    if($fields->rows < 1){
+        $self->session->log->warn("Thing failed to create because it had no fields");
+        my $i18n = WebGUI::International->new($self->session, "Asset_Thingy");
+        return $self->www_editThing($i18n->get("thing must have fields"));
+    }
+
     my $thing = {
         thingId            => $thingId,
         label              => $form->process("label"),
@@ -2537,12 +2543,6 @@ sub www_editThingSave {
         maxEntriesTotal    => $form->process("maxEntriesTotal") || '',
     };
     $self->setCollateral("Thingy_things", "thingId", $thing, 0, 1);
-
-    if($fields->rows < 1){
-        $self->session->log->warn("Thing failed to create because it had no fields");
-        my $i18n = WebGUI::International->new($self->session, "Asset_Thingy");
-        return $self->www_editThing($i18n->get("thing must have fields"));
-    }
 
     while (my $field = $fields->hashRef) {
         my $display = $self->session->form->process("display_".$field->{fieldId}) || 0;
