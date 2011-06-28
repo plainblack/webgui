@@ -180,7 +180,7 @@ sub www_adminAccount {
         hoverHelp => $i18n->get('language help'),
         options   => $i18n->getLanguages(),
     );
-    $f->addField( "submit", name => "submit" );
+    $f->addField( "submit", name => "send" );
     return '<h1>' . $legend . '</h1>' . $f->toHtml;
 }
 
@@ -270,7 +270,7 @@ sub www_companyInformation {
         label     => $i18n->get(127),
         hoverHelp => $i18n->get('127 description'),
     );
-    $f->addField( "submit", name => "submit" );
+    $f->addField( "submit", name => "send" );
     $output .= $f->toHtml;
 
     return $output;
