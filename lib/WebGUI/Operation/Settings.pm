@@ -689,7 +689,7 @@ sub www_editSettings {
 		$tabform->getTab("account")->addFieldset( $settingsForm, name => $account->{identifier}, label => $title );
 	}
 
-	$tabform->addField( "submit", name => "submit" );
+	$tabform->addField( "submit", name => "send" );
     $output .= $tabform->toHtml;
 
 	my $ac = WebGUI::AdminConsole->new($session,"settings");
