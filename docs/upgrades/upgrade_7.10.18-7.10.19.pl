@@ -35,6 +35,7 @@ my $session = start(); # this line required
 # upgrade functions go here
 addTicketLimitToBadgeGroup( $session );
 fixBrokenCalendarFeedUrls ( $session );
+removeUndergroundUserStyleTemplate ( $session );
 
 finish($session); # this line required
 
@@ -63,6 +64,21 @@ sub fixBrokenCalendarFeedUrls {
             $feed->{url} =~ s/\?$//;
             $calendar->setFeed($feed->{feedId}, $feed);
         }
+    }
+    print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+# Add a ticket limit to badges in a badge group
+sub removeUndergroundUserStyleTemplate {
+    my $session = shift;
+    print "\tRemove Underground User Style template... " unless $quiet;
+    if ($session->setting->get('userFunctionStyleId') eq 'zfDnOJgeiybz9vnmoEXRXA') {
+        $session->setting->set('userFunctionStyleId', 'Qk24uXao2yowR6zxbVJ0xA');
+    }
+    my $underground_user = WebGUI::Asset->newByDynamicClass($session, 'zfDnOJgeiybz9vnmoEXRXA');
+    if ($underground_user) {
+        $underground_user->purge;
     }
     print "DONE!\n" unless $quiet;
 }
