@@ -941,7 +941,7 @@ sub www_addAccessory {
         label => $i18n->get(18),
         hoverHelp => $i18n->get('18 description'),
     );
-    $f->addField( "submit" );
+    $f->addField( "submit", name => "send" );
 
     return $f->toHtml;
 }
@@ -1023,7 +1023,7 @@ sub www_addRelated {
         label => $i18n->get(21),
         hoverHelp => $i18n->get('21 description'),
     );
-    $f->addField( "submit", name => "submit" );
+    $f->addField( "submit", name => "send" );
     return $f->toHtml;
 }
 
@@ -1218,7 +1218,7 @@ sub www_editBenefit {
         label => $i18n->get(52),
         hoverHelp => $i18n->get('52 description'),
     );
-    $f->addField( "submit", name => "submit" );
+    $f->addField( "submit", name => "send" );
     return $f->toHtml;
 }
 
@@ -1281,7 +1281,7 @@ sub www_editFeature {
         label     => $i18n->get(24),
         hoverHelp => $i18n->get('24 description'),
     );
-    $f->addField( "submit", name => "submit" );
+    $f->addField( "submit", name => "send" );
     return $f->toHtml;
 }
 
@@ -1358,7 +1358,7 @@ sub www_editSpecification {
         label => $i18n->get(28),
         hoverHelp => $i18n->get('28 description'),
     );
-    $f->addField( "submit", name => "submit" );
+    $f->addField( "submit", name => "send" );
     return $f->toHtml;
 }
 
@@ -1449,7 +1449,7 @@ sub www_editVariant {
         label     => $i18n->get('add another variant'),
         hoverHelp => $i18n->get('add another variant description'),
     );
-    $f->addField( "submit", name => "submit" );
+    $f->addField( "submit", name => "send" );
     return $f->toHtml;
 }
 

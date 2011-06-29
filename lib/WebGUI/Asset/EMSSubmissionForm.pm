@@ -287,7 +287,7 @@ sub www_editSubmissionForm {
             value        => $formDescription->{ $field->{fieldId} },
         );
     }
-    $newform->addField( "submit", name => "submit" );
+    $newform->addField( "submit", name => "send" );
     my $title = $assetId eq 'new' ? $i18n->get('new form') || 'new' : $asset->get('title');
     if ( $params->{asHashRef} ) {
         ;    # not setting mimie type

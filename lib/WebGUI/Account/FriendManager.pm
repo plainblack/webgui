@@ -253,7 +253,7 @@ sub www_editFriends {
     if (!$groupName) {
         $fb->addField( "Checkbox", name => 'addManagers', value => 'addManagers' );
     }
-    $fb->addField( 'Submit', name => "submit" );
+    $fb->addField( 'Submit', name => "send" );
     $fb->toTemplateVars( "form_", $var );
 
     return $self->processTemplate($var,$session->setting->get("fmEditTemplateId"));

@@ -1007,7 +1007,7 @@ sub www_editBadgeGroup {
 		label		=> $i18n->get('badge group name'),
 		hoverHelp	=> $i18n->get('badge group name help'),
 		);
-	$f->addField( "submit", name => "submit" );
+	$f->addField( "submit", name => "send" );
 	return $self->processStyle('<h1>'.$i18n->get('badge groups').'</h1>'.$f->toHtml);
 }
 
@@ -1180,7 +1180,7 @@ sub www_editEventMetaField {
 		hoverHelp => $i18n2->get('meta field help text description'),
 		value => $data->{helpText},
 	);
-	$f->addField( "submit", name => "submit" );
+	$f->addField( "submit", name => "send" );
 	return $self->processStyle($f->toHtml);
 }
 
@@ -2044,7 +2044,7 @@ sub www_importEvents {
 		value				=> scalar $form->get('fieldsToImport'),
 	);
 
-	$f->addField( "submit", name => "submit", value=>$i18n->get('import events'));
+	$f->addField( "submit", name => "send", value=>$i18n->get('import events'));
 
 	return $self->processStyle($page_header.'<p/>'.$f->toHtml);
 }
@@ -2295,7 +2295,7 @@ sub www_manageRegistrant {
 	
 	# build form
 	my $f = WebGUI::FormBuilder->new($session, action=>$self->getUrl, extras=>'class="manageRegistrant"');
-	$f->addField( "submit", name => "submit" );
+	$f->addField( "submit", name => "send" );
 	$f->addField( "hidden",name=>"func", value=>"editRegistrantSave");
 	$f->addField( "hidden",name=>'badgeId', value=>$badgeId);
 	$f->addField( "readOnly",
@@ -2365,7 +2365,7 @@ sub www_manageRegistrant {
 		label			=> $i18n->get('notes'),
 		defaultValue	=> $registrant->{notes}
 		);
-	$f->addField( "submit", name => "submit" );
+	$f->addField( "submit", name => "send" );
 	
 	# build html
 	my $output = q|

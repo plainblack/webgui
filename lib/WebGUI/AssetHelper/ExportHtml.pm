@@ -134,7 +134,7 @@ ENDHTML
             'none'     => $i18n->get('rootUrl form option none') },
         value          => ['none'],
     );
-    $f->addField( "submit", name => "submit" );
+    $f->addField( "submit", name => "send" );
     my $message;
     eval { $asset->exportCheckPath };
     if($@) {

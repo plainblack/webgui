@@ -436,7 +436,7 @@ sub www_editMetaDataField {
 		hoverHelp=>$i18n->get('default value description'),
 		value=>$fieldInfo->{defaultValue}
 	);
-	$f->addField( "submit", name => "submit" );
+	$f->addField( "submit", name => "send" );
 	return '<h1>' . $i18n->get('Edit Metadata') . '</h1>' . $f->toHtml;
 }
 

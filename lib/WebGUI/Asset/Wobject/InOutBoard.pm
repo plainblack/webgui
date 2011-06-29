@@ -245,7 +245,7 @@ sub view {
 		-name=>"func",
 		-value=>"setStatus"
 		);
-	$f->addField( "submit", name => "submit" );
+	$f->addField( "submit", name => "send" );
 	
 	my ($isInGroup) = $session->db->quickArray(
         "select count(*) from groupings where userId=? and groupId=?",
@@ -368,7 +368,7 @@ sub www_selectDelegates {
 	    value => $delegates,  ##My current delegates, if any
 	    subtext => $i18n->get('in/out status delegates subtext'),
 	);
-	$f->addField( "submit", name => "submit" );
+	$f->addField( "submit", name => "send" );
 	return '<h1>' .  $i18n->get('select delegate') . '</h1> ' . $f->toHtml;
 }
 

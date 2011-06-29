@@ -418,7 +418,7 @@ sub www_edit {
 
     my $form = $self->getEditForm;
     $form->addField( 'csrfToken', name => 'csrfToken' );
-    $form->addField( "submit", name => "submit" );
+    $form->addField( "submit", name => "send" );
 
     my $processUrl = $self->session->url->getSiteURL.'/?shop=pay&method=do&do=processTransaction&paymentGatewayId='.$self->getId;
     my $output = '<br />';

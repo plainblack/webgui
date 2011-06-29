@@ -88,7 +88,7 @@ sub www_changeUrl {
         hoverHelp=> $i18n->get("confirm change url message"),
         subtext  => '<br />'.$i18n->get("confirm change url message")
     );
-    $f->addField( "submit", name => "submit" );
+    $f->addField( "submit", name => "send" );
     return $f->toHtml;
 }
 

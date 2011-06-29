@@ -236,7 +236,7 @@ Returns the form that will be used to edit the properties of an activity.
 sub getEditForm {
     my $self = shift;
     my $form = WebGUI::FormBuilder->new($self->session);
-    $form->addField( "submit", name => "submit" );
+    $form->addField( "submit", name => "send" );
     $form->addField( "hidden", name=>"activityId", value=>$self->getId);
     $form->addField( "hidden", name=>"className", value=>$self->get("className"));
     my $fullDefinition = $self->definition($self->session);

@@ -422,7 +422,7 @@ sub www_editSubmission {
 	            );
 	    }
 	}
-        $newform->addField( "submit", name => "submit" );
+        $newform->addField( "submit", name => "send" );
 	my $title = $asset->get('title');
         my $content = 
                $asset->processTemplate({

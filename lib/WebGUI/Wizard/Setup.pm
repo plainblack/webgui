@@ -311,11 +311,11 @@ sub www_siteStats {
 
     my $enableForm  = $self->getForm;
     $enableForm->addField( "hidden", name => "enableStats", value => 1 );
-    $enableForm->addField( "submit", name => 'submit', value => $i18n->get( 'enable', 'Activity_SendWebguiStats' ) );
+    $enableForm->addField( "submit", name => 'send', value => $i18n->get( 'enable', 'Activity_SendWebguiStats' ) );
 
     my $disableForm = $self->getForm;
     $disableForm->addField( "hidden", name => "enableStats", value => 0 );
-    $disableForm->addField( "submit", name => 'submit', value => $i18n->get( 'disable', 'Activity_SendWebguiStats' ) );
+    $disableForm->addField( "submit", name => 'send', value => $i18n->get( 'disable', 'Activity_SendWebguiStats' ) );
 
     my $output = '<h1>' . $i18n->get( 'topicName', 'Activity_SendWebguiStats' ) . '</h1>';
     $output .= ' <p>' . $i18n->get( 'why to send', 'Activity_SendWebguiStats' ) . '</p>

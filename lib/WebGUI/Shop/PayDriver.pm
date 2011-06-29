@@ -371,7 +371,7 @@ sub getEditForm {
     my $self = shift;
     
     my $form = WebGUI::FormBuilder->new($self->session);
-    $form->addField( "submit", name => "submit" );
+    $form->addField( "submit", name => "send" );
     
     $self->getDoFormTags('editSave', $form);
     $form->addField( "hidden",
@@ -658,7 +658,7 @@ sub www_edit {
 
     my $form = $self->getEditForm;
     $form->addField( 'csrfToken', name => 'csrfToken' );
-    $form->addField( "submit", name => "submit" );
+    $form->addField( "submit", name => "send" );
   
     return '<h1>' . $i18n->get('payment methods') . '</h1>' . $form->toHtml;
 }

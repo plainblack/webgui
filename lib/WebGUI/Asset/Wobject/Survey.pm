@@ -2820,7 +2820,7 @@ sub www_editTest {
 	$form->addField( "hidden", name=>"testId", value=>$testId);
 	$form->addField( "hidden", name=>"assetId", value=>$self->getId);
     $test->crud_form($form, $test);
-	$form->addField( "submit", name => "submit" );
+	$form->addField( "submit", name => "save" );
 	
     if ($testId eq 'new') {
         $test->delete;

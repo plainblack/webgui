@@ -1208,7 +1208,7 @@ sub www_editOverride {
 		value		=> $overrides{overrides}{$fieldName}{parsedValue},
 		hoverHelp	=> $i18n->get("This is the example output of the field when parsed for user preference macros")
 	) if $self->isDashlet;
-	$f->addField( "submit", name => "submit" );
+	$f->addField( "submit", name => "send" );
 
 	$output .= $f->toHtml;
 	

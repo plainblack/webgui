@@ -388,7 +388,7 @@ sub www_editWorkflowActivity {
         $form->action( $session->url->page );
 	$form->addField( "hidden", name=>"op", value=>"editWorkflowActivitySave");
 	$form->addField( "hidden", name=>"workflowId", value=> scalar $session->form->get("workflowId"));
-	$form->addField( "submit", name => "submit" );
+	$form->addField( "submit", name => "send" );
 	my $i18n = WebGUI::International->new($session, "Workflow");
 	my $ac = WebGUI::AdminConsole->new($session,"workflow");
 	$ac->addSubmenuItem($session->url->page("op=addWorkflow"), $i18n->get("add a new workflow"));

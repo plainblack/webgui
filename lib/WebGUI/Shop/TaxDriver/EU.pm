@@ -349,7 +349,7 @@ sub getEditForm {
         hoverHelp   => $i18n->get('accept when vies unavailable help'),
     );
 
-    $f->addField( "submit", name => "submit" );
+    $f->addField( "submit", name => "send" );
     my $general = $f->toHtml;
 
     # VAT groups manager
@@ -364,7 +364,7 @@ sub getEditForm {
         . $i18n->get('rate')
         . WebGUI::Form::float(  $session, { name => 'rate' } )
         . '%'
-        . WebGUI::Form::submit( $session, { name => 'submit', value => 'Add' } )
+        . WebGUI::Form::submit( $session, { name => 'send', value => 'Add' } )
         . WebGUI::Form::formFooter( $session );
 
     # Wrap output in a YUI Tab widget.

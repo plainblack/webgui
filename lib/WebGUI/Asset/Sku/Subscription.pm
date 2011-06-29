@@ -593,7 +593,7 @@ sub www_createSubscriptionCodeBatch {
 	
     # Generate the properties form for this subscription code batch	
 	my $f = WebGUI::FormBuilder->new( $session, action => $self->getUrl );
-	$f->addField( "submit", name => "submit" );
+	$f->addField( "submit", name => "send" );
 	$f->addField( "hidden",
 		name       => 'func', 
 		value      => 'createSubscriptionCodeBatchSave'
@@ -628,7 +628,7 @@ sub www_createSubscriptionCodeBatch {
 		hoverHelp	=> $i18n->get('batch description description'),
 		value	    => $session->form->process("description"),
 		);
-	$f->addField( "submit", name => "submit" );
+	$f->addField( "submit", name => "send" );
 
 	return $errorMessage.$f->toHtml;
 }
@@ -1016,7 +1016,7 @@ sub www_redeemSubscriptionCode {
 		-maxLength	=> 64,
 		-size		=> 30
 		);
-	$f->addField( "submit", name => "submit" );
+	$f->addField( "submit", name => "send" );
 	$var->{ codeForm } = $f->toHtml;
 
     return $self->processStyle($self->processTemplate($var, $self->redeemSubscriptionCodeTemplateId));

@@ -324,7 +324,7 @@ sub getEditForm {
     }
 
     my $buttons = $form->addField( "ButtonGroup", name => "saveButtons", rowClass => "saveButtons" );
-    $buttons->addButton( "Submit", name => "submit" );
+    $buttons->addButton( "Submit", name => "send" );
     $buttons->addButton( "Button", 
         name => "cancel", 
         value => $i18n->get('cancel', 'WebGUI'),

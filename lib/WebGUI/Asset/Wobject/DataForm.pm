@@ -1610,7 +1610,7 @@ sub www_editField {
             value  => "editField"
         );
     }
-    $f->addField( "submit", name => "submit" );
+    $f->addField( "submit", name => "send" );
     return '<h1>' . $i18n->get('20') . '</h1>' . $f->toHtml;
 }
 
@@ -1813,7 +1813,7 @@ sub www_editTab {
             -value=>"editTab"
         );
     }
-    $f->addField( "submit", name => "submit" );
+    $f->addField( "submit", name => "send" );
     return '<h1>' . $i18n->get('103') . '</h1>' . $f->toHtml if $tabId eq "new";
     return '<h1>' . $i18n->get('102') . '</h1>' . $f->toHtml;
 }

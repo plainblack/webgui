@@ -366,7 +366,7 @@ sub www_annotate {
         -value=>$i18n->get('annotate'),
         -extras=>'onclick="switchState();"',
         );
-	$f->addField( "submit", name => "submit" );
+	$f->addField( "submit", name => "send" );
     my ($crop_js, $domMe) = $self->annotate_js();
     my $output = '<h1>' . $i18n->get('annotate image') . '</h1>' . $f->toHtml . $image . $crop_js . $domMe;
     return $style->process( $output, "PBtmplBlankStyle000001" );

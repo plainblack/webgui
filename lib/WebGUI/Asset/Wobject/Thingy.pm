@@ -3399,7 +3399,7 @@ sub www_importForm {
     }
     $fieldOptions .= "</table>";
     $form->addField( "ReadOnly", name => 'fieldOptions', value => $fieldOptions );
-    $form->addField( "submit", name => "submit" );
+    $form->addField( "submit", name => "send" );
 
     $output .= $form->toHtml;
     return $self->processStyle($output);

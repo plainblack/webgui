@@ -127,7 +127,7 @@ sub www_crop {
         -name      => "Left",
         -value     => $y,
     );
-    $f->addField( "submit", name => "submit" );
+    $f->addField( "submit", name => "send" );
 
     my $image
         = '<div align="center" class="yui-skin-sam"><img src="'

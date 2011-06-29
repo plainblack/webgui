@@ -119,7 +119,7 @@ sub www_resize {
         name      => "newHeight",
         value     => $y,
     );
-    $f->addField( "submit", name => "submit" );
+    $f->addField( "submit", name => "send" );
     my $image
         = '<div align="center" class="yui-skin-sam"><img src="'
         . $asset->getStorageLocation->getUrl( $asset->filename )

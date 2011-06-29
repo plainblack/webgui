@@ -201,7 +201,7 @@ sub getEditForm {
     my $self = shift;
 
     my $form = WebGUI::FormBuilder->new($self->session, action => $self->session->url->page );
-    $form->addField( "submit", name => "submit" );
+    $form->addField( "submit", name => "send" );
 
     $form->addField( "hidden", name => 'shop', value => "ship");
     $form->addField( "hidden", name => 'method', value => "do");
@@ -328,7 +328,7 @@ sub www_edit {
     my $admin = WebGUI::Shop::Admin->new($session);
     my $i18n = WebGUI::International->new($session, "Shop");
     my $form = $self->getEditForm;
-    $form->addField( "submit", name => "submit" );
+    $form->addField( "submit", name => "send" );
     $form->addField( 'csrfToken', name => 'webguiCsrfToken' );
     return '<h1>' . $i18n->get("shipping methods") . '</h1>' . $form->toHtml;
 }

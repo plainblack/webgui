@@ -69,7 +69,7 @@ sub www_rotate {
         name=>"Rotate",
         value=>0,
     );
-    $f->addField( "submit", name => "submit" );
+    $f->addField( "submit", name => "send" );
 
     my $output = '<h1>' . $i18n->get("rotate image") . '</h1>' . $f->toHtml . $image;
     return $style->process( $output, "PBtmplBlankStyle000001" );

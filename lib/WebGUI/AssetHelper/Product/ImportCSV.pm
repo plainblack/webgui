@@ -228,7 +228,7 @@ sub www_importProducts {
 
     my $f = $self->getForm( 'importProductsSave' );
     $f->addField( 'file', name => 'importFile' );
-    $f->addField( 'submit', name => 'submit', value => $i18n->get('import') );
+    $f->addField( 'submit', name => 'send', value => $i18n->get('import') );
 
     return $session->style->process(
         '<h1>' . $i18n->get('import') . '</h1>' . $f->toHtml,
