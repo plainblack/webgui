@@ -460,10 +460,12 @@ WebGUI.Form.DataTable
             format.name             = "format_" + i;
 
             for ( var x = 0; x < availableFormats.length; x++ ) {
+                var selected = cols[i].formatter == availableFormats[x].value;
                 var opt = new Option(
                     availableFormats[x].label, 
                     availableFormats[x].value,
-                    cols[i].formatter == availableFormats[x].value
+                    selected,
+                    selected
                 );
                 format.appendChild( opt );
             }
