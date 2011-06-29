@@ -1,4 +1,5 @@
 7.10.20
+ - fixed: Do not call group methods on an undefined value.
 
 7.10.19
  - fixed #12169: extras uploads symlink export
