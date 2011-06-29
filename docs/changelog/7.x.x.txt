@@ -1,7 +1,9 @@
 7.10.20
  - fixed: Do not call group methods on an undefined value.
  - fixed #12178: random deletion of columns may happen when a schema is saved
+   (Amir Plivatsky)
  - fixed #12179: DataTable Field types get reset to "Text" in Edit Schema
+   (Amir Plivatsky)
 
 7.10.19
  - fixed #12169: extras uploads symlink export

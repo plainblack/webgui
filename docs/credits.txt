@@ -55,6 +55,7 @@ Contributing Developers..............C.J. Adams-Collier / <cjac@colliertech.org>
                                      Ernesto Hernández-Novich / itverx C.A.
                                      Stephen Opal / Plain Black
                                      Tavis Parker / Plain Black
+                                     Amir Plivatsky
                                      Daniel Quinlan
                                      Jukka Raimovaara / Mentalhouse Oy
                                      Alan Ritari / DonorWare
