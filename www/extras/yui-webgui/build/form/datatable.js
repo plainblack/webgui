@@ -1,4 +1,5 @@
 
+/*global WebGUI*/
 // Initialize namespace
 if (typeof WebGUI == "undefined") {
     var WebGUI = {};
@@ -49,7 +50,7 @@ WebGUI.Form.DataTable
             data        = {};
             var columns = this.dataTable.getColumnSet().getDefinitions();
             for ( var i = 0; i < columns.length; i++ ) {
-                data[ columns[ i ].key ] = columns[i].formatter == "date" ? new Date : "";
+                data[ columns[ i ].key ] = columns[i].formatter == "date" ? new Date() : "";
             }
         }
         this.dataTable.addRow( data );
@@ -85,7 +86,7 @@ WebGUI.Form.DataTable
         
         // Get the columns
         var cols    = this.dataTable.getColumnSet().getDefinitions();
-        for ( var i = 0; i < cols.length; i++ ) {
+        for ( i = 0; i < cols.length; i++ ) {
             data.columns[ i ] = cols[i];
             delete data.columns[ i ].editor;
             delete data.columns[ i ].editorOptions;
@@ -608,7 +609,7 @@ WebGUI.Form.DataTable
             var oldKey  = data[ "oldKey_" + i ];
             var newKey  = data[ "newKey_" + i ];
             var format  = data[ "format_" + i ][0];
-            var col     = this.dataTable.getColumn( oldKey );
+            col         = this.dataTable.getColumn( oldKey );
 
             // Don't allow adding multiple columns with same key
             if ( oldKey != newKey && this.dataTable.getColumn( newKey ) ) {
@@ -657,7 +658,7 @@ WebGUI.Form.DataTable
                 var numRecords = allRecords.length;
                 for (j=0; j < numRecords; j++) {
                     if (format == "date") {
-                        allRecords[j].setData(newKey, new Date);
+                        allRecords[j].setData(newKey, new Date());
                     } else {
                         allRecords[j].setData(newKey, '');
                     }
