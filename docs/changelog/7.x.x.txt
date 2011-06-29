@@ -5,7 +5,9 @@
  - fixed #12157: www_editThingSave
  - fixed: Do not call group methods on an undefined value.
  - fixed #12178: random deletion of columns may happen when a schema is saved
+   (Amir Plivatsky)
  - fixed #12179: DataTable Field types get reset to "Text" in Edit Schema
+   (Amir Plivatsky)
 
 7.9.31
  - fixed #12156: Asset Manager performance

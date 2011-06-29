@@ -55,8 +55,9 @@ Contributing Developers..............C.J. Adams-Collier / <cjac@colliertech.org>
                                      Ernesto Hernández-Novich / itverx C.A.
                                      Stephen Opal / Plain Black
                                      Tavis Parker / Plain Black
+                                     Amir Plivatsky
                                      Daniel Quinlan
-                                     Jukka Raimovaara / Axxion Oy
+                                     Jukka Raimovaara / Mentalhouse Oy
                                      Alan Ritari / DonorWare
                                      Hal Roberts / Harvard
                                      Luke Robinson / Orchard Solutions
@@ -83,6 +84,7 @@ Contributing Developers..............C.J. Adams-Collier / <cjac@colliertech.org>
                                      Bernd Kalbfuß-Zimmermann
                                      Tabitha Zipperer / Plain Black
                                      Rory Zweistra / Oqapi
+                                     Chris Hanson / Plain Black
 
 The following are people/companies who didn't directly contribute
 to WebGUI, but whose work has made WebGUI possible:
