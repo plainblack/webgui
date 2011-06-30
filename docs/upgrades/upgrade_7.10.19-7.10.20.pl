@@ -32,6 +32,7 @@ my $session = start(); # this line required
 addFormFieldMacroToConfig();
 
 # upgrade functions go here
+fixSpacesInTaxInfo ( $session );
 
 sub addFormFieldMacroToConfig {
     print "\tAdd FormField macro to config... " unless $quiet;
@@ -50,6 +51,22 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+#----------------------------------------------------------------------------
+# Fix calendar feed urls that had adminId attached to them until they blew up
+sub fixSpacesInTaxInfo {
+    my $session = shift;
+    print "\tRemoving spaces around commas in generic tax rate information... " unless $quiet;
+    use WebGUI::Shop::TaxDriver::Generic;
+    my $taxer = WebGUI::Shop::TaxDriver::Generic->new($session);
+    my $taxIterator = $taxer->getItems;
+    while (my $taxInfo = $taxIterator->hashRef) {
+        my $taxId = $taxInfo->{taxId};
+        $taxer->add($taxInfo);  ##Automatically removes spaces now.
+        $taxer->delete({taxId => $taxId});
+    }
+    print "DONE!\n" unless $quiet;
+}
 
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------

@@ -49,7 +49,7 @@ finish($session); # this line required
 #    print "DONE!\n" unless $quiet;
 #}
 
-#----------------------------------------------------------------------------
+
 # Fix calendar feed urls that had adminId attached to them until they blew up
 sub fixBrokenCalendarFeedUrls {
     my $session = shift;
