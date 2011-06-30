@@ -233,7 +233,7 @@ sub readLines {
 sub start {
     my $webguiRoot = shift;
     my $configFile = shift;
-    my $session    = WebGUI::Session->open( $webguiRoot, $configFile );
+    my $session    = WebGUI::Session->open( $configFile );
     $session->user( { userId => 3 } );
     return $session;
 }
