@@ -27,10 +27,17 @@ use WebGUI::Asset;
 my $toVersion = '7.10.20';
 my $quiet; # this line required
 
-
 my $session = start(); # this line required
 
+addFormFieldMacroToConfig();
+
 # upgrade functions go here
+
+sub addFormFieldMacroToConfig {
+    print "\tAdd FormField macro to config... " unless $quiet;
+    $session->config->addToHash( 'macros', FormField => 'FormField' );
+    print "DONE!\n" unless $quiet;
+}    
 
 finish($session); # this line required
 
