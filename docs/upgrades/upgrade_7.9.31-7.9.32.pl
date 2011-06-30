@@ -33,6 +33,7 @@ my $session = start(); # this line required
 # upgrade functions go here
 fixBrokenCalendarFeedUrls ( $session );
 removeUndergroundUserStyleTemplate ( $session );
+fixSpacesInTaxInfo ( $session );
 
 finish($session); # this line required
 
@@ -45,6 +46,23 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+# Fix calendar feed urls that had adminId attached to them until they blew up
+sub fixSpacesInTaxInfo {
+    my $session = shift;
+    print "\tRemoving spaces around commas in generic tax rate information... " unless $quiet;
+    my $getCalendar = WebGUI::Asset::Wobject::Calendar->getIsa($session);
+    use WebGUI::Shop::TaxDriver::Generic;
+    my $taxer = WebGUI::Shop::TaxDriver::Generic->new($session);
+    my $taxIterator = $taxer->getItems;
+    while (my $taxInfo = $taxIterator->hashRef) {
+        my $taxId = $taxInfo->{taxId};
+        $taxer->add($taxInfo);  ##Automatically removes spaces now.
+        $taxer->delete({taxId => $taxId});
+    }
+    print "DONE!\n" unless $quiet;
+}
+
 
 # Fix calendar feed urls that had adminId attached to them until they blew up
 sub fixBrokenCalendarFeedUrls {
