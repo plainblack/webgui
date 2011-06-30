@@ -22,7 +22,6 @@ use Getopt::Long;
 use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::Asset;
-use WebGUI::Asset::Wobject::Calendar;
 
 my $toVersion = '7.9.32';
 my $quiet; # this line required
@@ -51,7 +50,6 @@ finish($session); # this line required
 sub fixSpacesInTaxInfo {
     my $session = shift;
     print "\tRemoving spaces around commas in generic tax rate information... " unless $quiet;
-    my $getCalendar = WebGUI::Asset::Wobject::Calendar->getIsa($session);
     use WebGUI::Shop::TaxDriver::Generic;
     my $taxer = WebGUI::Shop::TaxDriver::Generic->new($session);
     my $taxIterator = $taxer->getItems;
@@ -68,6 +66,7 @@ sub fixSpacesInTaxInfo {
 sub fixBrokenCalendarFeedUrls {
     my $session = shift;
     print "\tChecking all calendar feed URLs for adminId brokenness... " unless $quiet;
+    use WebGUI::Asset::Wobject::Calendar;
     my $getCalendar = WebGUI::Asset::Wobject::Calendar->getIsa($session);
     CALENDAR: while (1) {
         my $calendar = eval { $getCalendar->(); };
