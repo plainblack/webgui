@@ -31,6 +31,7 @@ property searchRoot => (
                 tab             => "properties",
                 hoverHelp       => ["search root description", 'Asset_Search'],
                 label           => ['search root', 'Asset_Search'],
+                lazy            => 1,
          );
 sub _searchRoot_builder {
     my $session = shift->session;
