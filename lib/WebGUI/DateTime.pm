@@ -491,7 +491,9 @@ sub session {
 Change a WebGUI format into a Strftime format.
 
 NOTE: %M in WebGUI's format has no equivalent in strftime format, so it will
-be replaced with "_varmonth_". Do something with it.
+be replaced with "{month}".  Single digit hours are handled similarly.  DateTime's
+strftime will use {method} to call a method on the object to fill in that part of
+the format.
 
 =cut
 
@@ -514,13 +516,13 @@ sub webguiToStrftime {
                 "c" => "B",
                 "C" => "b",
                 "d" => "d",
-                "D" => "e",
+                "D" => "{day}",
                 "h" => "I",
                 "H" => "l",
                 "j" => "H",
                 "J" => "k",
                 "m" => "m",
-                "M" => "_varmonth_",
+                "M" => "{month}",
                 "n" => "M",
                 "t" => "Z",
                 "O" => "z",
@@ -587,12 +589,7 @@ sub webguiDate {
 
    my $format = $self->webguiToStrftime( shift || "%z %Z" );
 
-   #--- %M
    my $datestr = $self->strftime($format);
-   my $temp = int($self->month);
-   $datestr =~ s/\%_varmonth_/$temp/g;
-
-   #--- return
    return $datestr;
 }
 #######################################################################

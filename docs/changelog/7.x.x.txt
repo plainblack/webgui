@@ -7,6 +7,7 @@
  - fixed #12178: random deletion of columns may happen when a schema is saved (Amir Plivatsky)
  - fixed #12179: DataTable Field types get reset to "Text" in Edit Schema (Amir Plivatsky)
  - fixed: Generic Tax driver does not like spaces around commas
+ - fixed: Date formatting with WebGUI::DateTime has extra spaces for single digit months and days.
 
 7.9.31
  - fixed #12156: Asset Manager performance
