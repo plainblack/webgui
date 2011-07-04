@@ -4,6 +4,7 @@
  - fixed #12179: DataTable Field types get reset to "Text" in Edit Schema (Amir Plivatsky)
  - added: FormField macro for rendering Form objects directly from templates
  - fixed: Generic Tax driver does not like spaces around commas
+ - fixed: Date formatting with WebGUI::DateTime has extra spaces for single digit months and days.
 
 7.10.19
  - fixed #12169: extras uploads symlink export
