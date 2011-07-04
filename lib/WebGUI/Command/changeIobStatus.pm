@@ -36,8 +36,8 @@ sub validate_args {
 sub run {
     my ($self, $opt, $args) = @_;
 
-my ($configFile, $help, $quiet, $whatsHappening, $newStatus, $currentStatus, $userMessage, $userMessageFile) =
-    @{$opt}{qw(configfile help quiet whatshappening newstatus currentstatus usermessage usermessagefile)};
+my ($configFile, $quiet, $whatsHappening, $newStatus, $currentStatus, $userMessage, $userMessageFile) =
+    @{$opt}{qw(configfile quiet whatshappening newstatus currentstatus usermessage usermessagefile)};
 $whatsHappening ||= "Automatically signed out.";
 $newStatus ||= "Out";
 $currentStatus ||= "In";
