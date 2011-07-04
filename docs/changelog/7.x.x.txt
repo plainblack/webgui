@@ -5,6 +5,7 @@
  - added: FormField macro for rendering Form objects directly from templates
  - fixed: Generic Tax driver does not like spaces around commas
  - fixed: Date formatting with WebGUI::DateTime has extra spaces for single digit months and days.
+ - fixed #12165:  Default date in Thingy doesn't work
 
 7.10.19
  - fixed #12169: extras uploads symlink export

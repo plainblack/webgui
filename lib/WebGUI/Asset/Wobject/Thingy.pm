@@ -1042,18 +1042,22 @@ sub getFieldValue {
     my $dateFormat = shift || "%z";
     my $dateTimeFormat = shift;
     my $processedValue = $value;    
-    my $dbh = $self->session->db->dbh;
+    my $session = $self->session;
+    my $dbh     = $session->db->dbh;
 
-    if (lc $field->{fieldType} eq "date"){
-        $processedValue = $self->session->datetime->epochToHuman($value,$dateFormat);
+    my $fieldType = lc $field->{fieldType};
+    if ($fieldType eq "date"){
+        my $dt = WebGUI::DateTime->new($session, $value);
+        $processedValue = $dt->webguiDate($dateFormat);
     }
-    elsif (lc $field->{fieldType} eq "datetime"){
-        $processedValue = $self->session->datetime->epochToHuman($value,$dateTimeFormat);
+    elsif ($fieldType eq "datetime"){
+        my $dt = WebGUI::DateTime->new($session, $value);
+        $processedValue = $dt->webguiDate($dateTimeFormat);
     }
     # TODO: The otherThing field type is probably also handled by getFormPlugin, so the elsif below can probably be
     # safely removed. However, this requires more testing than I can provide right now, so for now this stays the
     # way it was.
-    elsif ($field->{fieldType} =~ m/^otherThing/x) {
+    elsif ($field->{fieldType} =~ m/^otherthing/x) {
         my $otherThingId = $field->{fieldType};
         $otherThingId =~ s/^otherThing_//x;
         my $tableName = 'Thingy_'.$otherThingId;
@@ -2112,7 +2116,7 @@ sub www_editThing {
     $self->session->style->setLink($self->session->url->extras('wobject/Thingy/thingy.css'), {type
     =>'text/css', rel=>'stylesheet'});
 
-    $tab = $tabForm->getTab('fields');
+    $session->log->warn("one");
     foreach my $fieldType ( keys %{ WebGUI::Form::FieldType->new($session)->getTypes }) {
         my $form = eval { WebGUI::Pluggable::instanciate("WebGUI::Form::".$fieldType, "new", [$session]) };
         if ($@) {
