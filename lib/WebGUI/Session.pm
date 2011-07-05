@@ -244,11 +244,11 @@ sub db {
 	my $self = shift;
 	my $skipFatal = shift;
 	unless (exists $self->{_db}) {
-		my $db = WebGUI::SQL->connect($self,$self->config->get("dsn"), $self->config->get("dbuser"), $self->config->get("dbpass"));
+		my $db = WebGUI::SQL->connect($self->config->get("dsn"), $self->config->get("dbuser"), $self->config->get("dbpass"));
 		if (!defined $db && defined $self->config->get("failoverdb")) {
 			$self->log->warn("Main DB down, resorting to using failover.");
 			my $failover = $self->config->get("failoverdb");
-			$db = WebGUI::SQL->connect($self,$failover->{dsn}, $failover->{user}, $failover->{password});
+			$db = WebGUI::SQL->connect($failover->{dsn}, $failover->{user}, $failover->{password});
 		}
 		if (defined $db) {
 			$self->{_db} = $db;
@@ -286,7 +286,7 @@ sub dbSlave {
 		}
         if (scalar @slaves > 0) {
             my $slave = $slaves[rand @slaves];
-            $self->{_slave} = WebGUI::SQL->connect($self, $slave->{dsn},$slave->{user},$slave->{pass});
+            $self->{_slave} = WebGUI::SQL->connect($slave->{dsn},$slave->{user},$slave->{pass});
         }
 	}
     if (!exists $self->{_slave}) {

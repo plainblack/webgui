@@ -240,7 +240,7 @@ sub db {
     else {
         my ($scheme, $driver, $attr_string, $attr_hash, $driver_dsn) = DBI->parse_dsn($dsn);
         if ($driver) {
-            my $dbh = WebGUI::SQL->connect($self->session,$dsn,$username,$identifier,$parameters);
+            my $dbh = WebGUI::SQL->connect($dsn,$username,$identifier,$parameters);
             unless (defined $dbh) {
                 $self->session->log->warn("Cannot connect to DatabaseLink [".$self->getId."]");
             }

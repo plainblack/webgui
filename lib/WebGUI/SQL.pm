@@ -20,10 +20,9 @@ use Tie::IxHash ();
 use Text::CSV_XS ();
 use WebGUI::SQL::ResultSet ();
 use WebGUI::Exception;
-use Scalar::Util ();
+use WebGUI::GUID;
 use Try::Tiny;
 use namespace::clean;
-use Scalar::Util qw( weaken );
 
 =head1 NAME
 
@@ -37,7 +36,7 @@ Package for interfacing with SQL databases. This package implements Perl DBI fun
 
  use WebGUI::SQL;
 
- $db = WebGUI::SQL->connect($session,$dsn, $user, $pass);
+ $db = WebGUI::SQL->connect($dsn, $user, $pass);
  $db->disconnect;
  
  $sth = $db->prepare($sql);
@@ -75,13 +74,9 @@ our @ISA = qw(DBI);
 
 #-------------------------------------------------------------------
 
-=head2 connect ( session, dsn, user, pass )
+=head2 connect ( dsn, user, pass )
 
 Constructor. Connects to the database using DBI.
-
-=head2 session
-
-A reference to the active WebGUI::Session object.
 
 =head2 dsn
 
@@ -99,13 +94,9 @@ The password to use to connect to the database defined by dsn.
 
 sub connect {
     my $class   = shift;
-    my $session;
     my $dsn;
     my $user;
     my $pass;
-    if (ref $_[0] && $_[0]->isa('WebGUI::Session')) {
-        $session = shift;
-    }
     if (ref $_[0] && $_[0]->isa('WebGUI::Config')) {
         my $config = shift;
         $dsn = $config->get('dsn');
@@ -148,10 +139,6 @@ sub connect {
     unless (defined $dbh) {
         die "Couldn't connect to database: $dsn : $DBI::errstr";
     }
-    if ($session) {
-        $dbh->session($session);
-    }
-
     return $dbh;
 }
 
@@ -658,8 +645,7 @@ sub quickCSV {
 
     while (my @data = $sth->array) {
         if ( ! $csv->combine(@data) ) {
-            $self->session->log->error( "Problem creating CSV row: " . $csv->error_diag );
-            return undef;
+            WebGUI::Error->throw( "Problem creating CSV row: " . $csv->error_diag );
         }
         $output .= $csv->string();
     }
@@ -848,24 +834,6 @@ sub read {
 
 #-------------------------------------------------------------------
 
-=head2 session ( )
-
-Returns a reference to the current session.
-
-=cut
-
-sub session {
-    my $self = shift;
-    if (@_) {
-        $self->{private_webgui_session} = shift;
-        Scalar::Util::weaken $self->{private_webgui_session};
-    }
-    return $self->{private_webgui_session};
-}
-
-
-#-------------------------------------------------------------------
-
 =head2 setRow ( table, key, data [ ,id ] )
 
 Inserts/updates a row of data into the database. Returns the value of the key.
@@ -894,7 +862,7 @@ sub setRow {
     my $key = $self->quote_identifier($keyColumn);
 
     if ($data->{$keyColumn} eq 'new' || $id) {
-        $id ||= $self->session->id->generate;
+        $id ||= WebGUI::GUID->generate;
         $data->{$keyColumn} = $id;
     }
     else {

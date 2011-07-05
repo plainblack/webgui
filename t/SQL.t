@@ -175,7 +175,7 @@ SKIP: {
     $session->db->dbh->do('CREATE TABLE testTable (myIndex int(8) NOT NULL default 0, message CHAR(64), PRIMARY KEY(myIndex)) TYPE=InnoDB');
     addToCleanup( SQL => 'DROP TABLE testTable' );
 
-    my $dbh2 = WebGUI::SQL->connect($session,$session->config->get("dsn"), $session->config->get("dbuser"), $session->config->get("dbpass"));
+    my $dbh2 = WebGUI::SQL->connect($session->config->get("dsn"), $session->config->get("dbuser"), $session->config->get("dbpass"));
     my ($sth, $sth2, $rc);
 
     $sth  = $session->db->prepare('select myIndex from testTable');
