@@ -29,6 +29,7 @@ sub opt_spec {
         [ 'backupdir=s', 'Directory to store database backups' ],
         [ 'mysql=s',    'mysql command line client to use' ],
         [ 'mysqldump=s', 'mysqldump command line client to use' ],
+        [ 'configFile=s@', 'Config file to upgrade.  Multiple config files can be specified.  If not specified, all available config files are used.' ],
     );
 }
 
@@ -98,9 +99,14 @@ sub run_upgrade {
             backupPath          => $opt->{backupdir},
         ) : (),
     );
-    $upgrade->upgradeSites;
+    if ($opt->{configfile}) {
+        $upgrade->upgradeSites($opt->{configFile});
+    }
+    else {
+        $upgrade->upgradeSites;
+    }
 
-        print <<STOP;
+    print <<STOP;
 
         Upgrades complete.
         Please restart your web server and test your sites.
@@ -223,9 +229,11 @@ the sites while running, but this option will skip that step.
 
 Disable all output unless there's an error.
 
-=item C<--help>
+=item C<--configFile www.example.com.conf>
 
-Shows this documentation, then exits.
+Upgrade a specific config file.  Can be specified multiple times
+to upgrade multiple sites.  If not specified, all sites will be
+upgraded.
 
 =back
 

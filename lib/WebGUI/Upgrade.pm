@@ -180,16 +180,19 @@ has _files_run => (
 
 =head1 METHODS
 
-=head2 upgradeSites
+=head2 upgradeSites ( [ $configFiles ] )
 
 Upgrades all available sites to match the current WebGUI codebase.
+
+=head3 $configFiles
+
+An optional array reference of config file names.
 
 =cut
 
 sub upgradeSites {
     my $self = shift;
-        require Carp;
-    my @configs = WebGUI::Paths->siteConfigs;
+    my @configs = $_[0] ? @{ $_[0] } : WebGUI::Paths->siteConfigs;
     my $i = 0;
     for my $configFile (@configs) {
         $i++;
