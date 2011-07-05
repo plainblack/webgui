@@ -21,8 +21,6 @@ use WebGUI::Paths;
 use Cwd ();
 use File::Spec;
 
-my %config = ();
-
 =head1 NAME
 
 Package WebGUI::Config
@@ -34,8 +32,6 @@ This package parses the WebGUI config file.
 =head1 SYNOPSIS
 
  use WebGUI::Config;
-
- my $configs = WebGUI::Config->readAllConfigs;
 
  my $config = WebGUI::Config->new($configFileName);
 
@@ -94,7 +90,9 @@ sub getCookieTTL {
 
 =head2 new ( configFile )
 
-Returns a hash reference containing the configuration data. It tries to get the data out of the memory cache first, but reads the config file directly if necessary.
+Returns a WebGUI::Config object for the given file.  The file name
+can be either an absolute file path, or a path relative to the
+WebGUI configuration directory.
 
 =head3 configFile
 
@@ -109,26 +107,6 @@ around BUILDARGS => sub {
     $filename = Cwd::realpath(File::Spec->rel2abs($filename, WebGUI::Paths->configBase));
     return $class->$orig($filename);
 };
-
-#-------------------------------------------------------------------
-
-=head2 readAllConfigs ( )
-
-Reads all the config file data for all defined sites and returns a hash reference containing WebGUI::Config objects keyed by filename. This is a class method.
-
-Example: $configs->{$filename};
-
-=cut
-
-sub readAllConfigs {
-	my $class = shift;
-    my @configs = WebGUI::Paths->siteConfigs;
-    my %configs = map {
-        $_ => $class->new($_);
-    } @configs;
-    return \%configs;
-}
-
 
 1;
 
