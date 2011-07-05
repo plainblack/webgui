@@ -204,22 +204,26 @@ if ($version eq $WebGUI::VERSION."-".$WebGUI::STATUS) {
 	printResult("You are using ".$WebGUI::VERSION."-".$WebGUI::STATUS." and ".$version." is available.");
 }
 
+require WebGUI::Paths;
+require File::Spec;
 printTest("Locating WebGUI configs");
-my $configs = WebGUI::Config->readAllConfigs($webguiRoot);
+my @configs = WebGUI::Paths->siteConfigs;
 printResult("OK");
-foreach my $filename (keys %{$configs}) {
+foreach my $filename (@configs) {
+    my $shortName = (File::Spec->splitpath($filename))[2];
 	print "\n";	
 	###################################
 	# Checking Config File
 	###################################
 	printTest("Checking config file");
-	printResult($filename);
+	printResult($shortName);
+    my $config = WebGUI::Config->new($filename);
 
 	###################################
 	# Checking uploads folder
 	###################################
 	printTest("Verifying uploads folder");
-        if (opendir(DIR,$configs->{$filename}->get("uploadsPath"))) {
+        if (opendir(DIR,$config->get("uploadsPath"))) {
 		printResult("OK");
 		closedir(DIR);
 	} else {
@@ -227,7 +231,7 @@ foreach my $filename (keys %{$configs}) {
 	}
 	printTest("Verifying DSN");
 	my $dsnok = 0;
-	if ($configs->{$filename}->get("dsn") !~ /\DBI\:\w+\:\w+/) {
+	if ($config->get("dsn") !~ /\DBI\:\w+\:\w+/) {
 		printResult("DSN is improperly formatted.");
 	} else {
 		printResult("OK");
@@ -240,7 +244,7 @@ foreach my $filename (keys %{$configs}) {
 	if ($dsnok) {
 		printTest("Verifying database connection");
 		my ($dbh, $test);
-		unless (eval {$dbh = DBI->connect($configs->{$filename}->get("dsn"),$configs->{$filename}->get("dbuser"),$configs->{$filename}->get("dbpass"))}) {
+		unless (eval {$dbh = DBI->connect($config->get("dsn"),$config->get("dbuser"),$config->get("dbpass"))}) {
 			printResult("Can't connect with info provided!");
 		} else {
 			printResult("OK");
