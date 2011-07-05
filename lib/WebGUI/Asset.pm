@@ -343,6 +343,9 @@ around BUILDARGS => sub {
             WebGUI::Error::InvalidParam->throw(error => "Cannot find revision date for assetId", param => $assetId);
         }
     }
+    elsif ( $revisionDate =~ /[^0-9]/) {
+        WebGUI::Error::InvalidParam->throw(error => "Invalid revision date given", param => $revisionDate);
+    }
 
     my $properties = $session->cache->get("asset".$assetId.$revisionDate);
     unless (exists $properties->{assetId}) { # can we get it from cache?
@@ -353,7 +356,8 @@ around BUILDARGS => sub {
         # join all the tables
         foreach my $table ($className->meta->get_tables) {
             $sql .= ",".$table;
-            $where .= " and (asset.assetId=".$table.".assetId and ".$table.".revisionDate=".$revisionDate.")";
+            $where .= " and (asset.assetId=".$table.".assetId and ".$table.".revisionDate=?)";
+            push @$placeHolders, $revisionDate;
         }
 
         # fetch properties
