@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+package WebGUI::Command::diskUsage;
 
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001-2009 Plain Black Corporation.
@@ -10,58 +10,41 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
+use WebGUI::Command -command;
 use strict;
-use Getopt::Long;
-use Pod::Usage;
-use WebGUI::Paths -inc;
-use WebGUI::Session;
-use WebGUI::Asset;
+use warnings;
 
-my $configFile;
-my $quiet;
-my $assetId;
-my $assetUrl;
-my $summarize = 0;
-my $blockSize = 1;
-my $recurse = 1;
-my $help;
-
-$| = 1; # No buffering
-
-GetOptions(
-    'configFile=s'=>\$configFile,	# WebGUI Config file
-    'assetId=s'   =>\$assetId,		# AssetId to start with (optional) uses default page if not specified.
-    'assetUrl=s'  =>\$assetUrl,		# AssetUrl to start with (optional) uses default page if not specified
-    'quiet'       =>\$quiet,		# No output except for numeric file size (default unit is bytes, will use blockSize if specified)
-    'summary!'	  =>\$summarize,	# Displays total space used for asset and descendants (unless recurse flag is set to false in which case only the asset specified will be used)
-    'blockSize=i' =>\$blockSize,	# Change units in which space used is specified, defaults to bytes.
-    'recurse!'	  =>\$recurse,		# Flag indicating whether the disk space usage should consider asset and all descendants (default) or just the asset specified.
-    'help!'	  =>\$help,	
-);
-
-pod2usage( verbose => 2 ) if $help;
-pod2usage() unless $configFile;
-
-my $session = start();
-du();
-finish($session);
-
-#-------------------------------------------------
-sub start {
-        my $session = WebGUI::Session->open($configFile);
-        $session->user({userId=>3});
-        return $session;
+sub opt_spec {
+    return (
+        [ 'configFile=s', 'The WebGUI config file to use.  This parameter is required.'],
+        [ 'assetId=s', 'AssetId to start with (optional) uses default page if not specified.' ],
+        [ 'assetUrl=s', 'AssetUrl to start with (optional) uses default page if not specified'],
+        [ 'quiet',  'No output except for numeric file size (default unit is bytes, will use blockSize if specified)'],
+        [ 'summary!',   'Displays total space used for asset and descendants (unless recurse flag is set to false in which case only the asset specified will be used)'],
+        [ 'blockSize=i',    'Change units in which space used is specified, defaults to bytes.'],
+        [ 'recurse!',   'Flag indicating whether the disk space usage should consider asset and all descendants (default) or just the asset specified.'],
+    );
 }
 
-#-------------------------------------------------
-sub finish {
-        my $session = shift;
-	$session->var->end();
-        $session->close();
+sub validate_args {
+    my ($self, $opt, $args) = @_;
+    if (! $opt->{configfile}) {
+        $self->usage_error('You must specify the --configFile option.');
+    }
 }
 
-#-------------------------------------------------------
-sub du {
+sub run {
+    my ($self, $opt, $args) = @_;
+
+    my ($configFile, $assetId, $assetUrl, $quiet, $summarize, $blockSize, $recurse) =
+        @{$opt}{qw(configfile assetid asseturl quiet summary blocksize recurse)};
+    $summarize //= 0;
+    $blockSize //= 1;
+    $recurse //= 1;
+
+    my $session = WebGUI::Session->open($configFile);
+    $session->user({userId=>3});
+
 	my $asset;
 	my $totalSize; # disk space used
 
@@ -120,27 +103,28 @@ sub du {
 	else { # return script friendly output of the size only.
 		print $totalSize;
 	}
+
+    $session->var->end;
+    $session->close;
 }
+
+1;
 
 __END__
 
 =head1 NAME
 
-diskUsage - Display amount of disk space used by a WebGUI asset
-            an its desecendants.
+WebGUI::Command::diskUsage - Display amount of disk space used by a WebGUI asset and its desecendants.
 
 =head1 SYNOPSIS
 
-
- diskUsage --configFile config.conf
-           [--assetId id]
-	   [--assetUrl url]
-           [--blockSize bytes]
-	   [--norecurse]
-	   [--quiet]
-	   [--summary]
-
- diskUsage --help
+ webgui.pl diskusage --configFile config.conf
+                    [--assetId id]
+                    [--assetUrl url]
+                    [--blockSize bytes]
+                    [--norecurse]
+                    [--quiet]
+                    [--summary]
 
 =head1 DESCRIPTION
 
@@ -150,49 +134,45 @@ utility.
 
 =over
 
-=item B<--configFile config.conf>
+=item C<--configFile config.conf>
 
 The WebGUI config file to use. Only the file name needs to be specified,
 since it will be looked up inside WebGUI's configuration directory.
 This parameter is required.
 
-=item B<--assetId id>
+=item C<--assetId id>
 
 Calculate disk usage starting from WebGUI's Asset identified by B<id>.
 If this parameter is not supplied, calculations will start from
 WebGUI's default page as defined in the Site settings.
 
-=item B<--assetUrl url>
+=item C<--assetUrl url>
 
 Calculate disk usage starting from the particular URL given by B<url>,
-which must be relative to the server (e.g. B</home> instead of
+which must be relative to the server (e.g. C</home> instead of
 B<http://your.server/home>). If this parameter is not supplied, calculations
 will start from WebGUI's default page as defined in the Site settings.
 
-=item B<--blockSize bytes>
+=item C<--blockSize bytes>
 
-Use B<bytes> as scaling factor to change the units in which disk space
+Use C<bytes> as scaling factor to change the units in which disk space
 will be reported. If this parameter is not supplied, it defaults to B<1>,
 hence the results will be expressed in bytes. If you want to have kb,
-use B<--blockSize 1024>.
+use C<--blockSize 1024>.
 
-=item B<--norecurse>
+=item C<--norecurse>
 
 Prevent recursive calculation of disk space. This effectively computes
 the used disk space for the starting Asset only, without including
 its descendants.
 
-=item B<--quiet>
+=item C<--quiet>
 
 Just display the total amount of disk space as a raw value.
 
-=item B<--summary>
+=item C<--summary>
 
 Just display the total amount of disk space in a human readable format.
-
-=item B<--help>
-
-Shows this documentation, then exits.
 
 =back
 
