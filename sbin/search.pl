@@ -62,10 +62,11 @@ if ($configFile) {
 
 #-------------------------------------------------------------------
 sub reindexAllSites {
-	my $configs = WebGUI::Config->readAllConfigs;
-	foreach my $site (keys %{$configs}) {
+    my @configs = WebGUI::Paths->siteConfigs;
+    foreach my $filename (@configs) {
+        my $site = (File::Spec->splitpath($filename))[2];
 		print "Indexing ".$site."...\n";
-		my $session = WebGUI::Session->open($site);
+		my $session = WebGUI::Session->open($filename);
 		reindexSite($session);
 		$session->var->end;
 		$session->close;
@@ -81,7 +82,7 @@ sub reindexSite {
 	my $rs = $session->db->read("select assetId, className from asset where state='published'");
 	my @searchableAssetIds;	
 	while (my ($id, $class) = $rs->array) {
-		my $asset = WebGUI::Asset->new($session,$id,$class);
+		my $asset = WebGUI::Asset->newById($session,$id);
                 if ( !$asset ) {
                     warn sprintf "- Asset %s (%s) could not be instantiated\n", $id, $class;
                     next;
@@ -125,7 +126,7 @@ sub updateSite {
 		push(@searchableAssetIds, $id);
 		my ($done) = $session->db->quickArray("select count(*) from assetIndex where assetId=?",[$id]);
 		next if $done;
-		my $asset = WebGUI::Asset->new($session,$id,$class);
+		my $asset = WebGUI::Asset->newById($session,$id);
 		if (defined $asset && $asset->get("status") eq "approved" || defined $asset && $asset->get("status") eq "archived") {
 			print $asset->getId."\t".$asset->getTitle."\t";
 			my $t = [Time::HiRes::gettimeofday()];
