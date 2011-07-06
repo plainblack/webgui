@@ -69,6 +69,9 @@ property namespace => (
              default         => undef,
 			 label           => ['namespace', 'Asset_Template'],
 			 hoverHelp       => ['namespace description', 'Asset_Template'],
+            options => sub {
+                my $namespaces = shift->session->dbSlave->buildHashRef("select distinct(namespace) from template order by namespace");
+            },
          );
 property templatePacked => (
              fieldType       => 'hidden',
@@ -360,23 +363,6 @@ override getEditForm => sub {
 		name=>"returnUrl",
 		value=>$returnUrl,
 		);
-	if ($self->namespace eq "") {
-		my $namespaces = $session->dbSlave->buildHashRef("select distinct(namespace) from template order by namespace");
-		$tabform->getTab("properties")->addField( "combo",
-			name=>"namespace",
-			options=>$namespaces,
-			label=>$i18n->get('namespace'),
-			hoverHelp=>$i18n->get('namespace description'),
-			value=>[$session->form->get("namespace")] 
-			);
-	} else {
-		$tabform->getTab("meta")->addField( "ReadOnly",
-			name=>"namespace",
-			label=>$i18n->get('namespace'),
-			hoverHelp=>$i18n->get('namespace description'),
-			value=>$self->namespace
-			);
-	}
 
 	my $previewButtons 
             = $tabform->getTab('properties')->addField( "ButtonGroup", 
