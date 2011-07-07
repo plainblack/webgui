@@ -58,7 +58,14 @@ property parser => (
              fieldType       => 'selectBox',
              lazy            => 1,
              builder         => '_default_parser',
-             lazy            => 1,
+             options        => sub {
+                 my $self = shift;
+                 my $session = $self->session;
+                 tie my %parsers, 'Tie::IxHash';
+                 for my $class ( @{$session->config->get('templateParsers')} ) {
+                     $parsers{$class} = $self->getParser($session, $class)->getName();
+                 }
+             },
          );
 sub _default_parser {
     my $self = shift;
@@ -107,7 +114,25 @@ property storageIdExample => (
 
 property attachmentsJson => (
     fieldType       => 'JsonTable',
-    label           => [ "attachments display label", "Asset_Template" ],
+    label           => [ "attachment display label", "Asset_Template" ],
+    fields      => [
+        {
+            type            => "text",
+            name            => "url",
+            label           => [ 'attachment header url', 'Asset_Template' ],
+            size            => '48',
+        },
+        {
+            type            => "select",
+            name            => "type",
+            label           => ['attachment header type','Asset_Template'],
+            options         => [
+                stylesheet => ['css label','Asset_Template'],
+                headScript => ['js head label','Asset_Template'],
+                bodyScript => ['js body label','Asset_Template'],
+            ],
+        },
+    ],
 );
 
 use WebGUI::International;
@@ -416,47 +441,6 @@ override getEditForm => sub {
 	    yui/build/container/container-min.js
 	    templatePreview.js
 	);
-
-	if($session->config->get("templateParsers")){
-		my @temparray = @{$session->config->get("templateParsers")};
-		tie my %parsers, 'Tie::IxHash';
-		while(my $a = shift @temparray){
-			$parsers{$a} = $self->getParser($session, $a)->getName();
-		}
-		my $value = [$self->parser];
-		$value = \[$session->config->get("defaultTemplateParser")] if(!$self->parser);
-		$tabform->getTab("properties")->addField( "SelectBox",
-			name=>"parser",
-			options=>\%parsers,
-			value=>$value,
-			label=>$i18n->get('parser'),
-			hoverHelp=>$i18n->get('parser description'),
-			);
-	}
-
-    $tabform->getTab('properties')->addField( "jsonTable",
-        name        => 'attachmentsJson', 
-        value       => $self->get('attachmentsJson'),
-        label       => $i18n->get("attachment display label"),
-        fields      => [
-            {
-                type            => "text",
-                name            => "url",
-                label           => $i18n->get('attachment header url'),
-                size            => '48',
-            },
-            {
-                type            => "select",
-                name            => "type",
-                label           => $i18n->get('attachment header type'),
-                options         => [
-                    stylesheet => $i18n->get('css label'),
-                    headScript => $i18n->get('js head label'),
-                    bodyScript => $i18n->get('js body label'),
-                ],
-            },
-        ],
-    );
 
         $tabform->getTab('properties')->addField( image =>
             name        => 'storageIdExample',
