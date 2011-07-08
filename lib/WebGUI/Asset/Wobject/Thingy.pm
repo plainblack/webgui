@@ -1842,7 +1842,7 @@ sub www_editThing {
     $self->session->style->setLink($self->session->url->extras('wobject/Thingy/thingy.css'), {type
     =>'text/css', rel=>'stylesheet'});
 
-    $session->log->warn("one");
+    $tab = $tabForm->getTab('fields');
     foreach my $fieldType ( keys %{ WebGUI::Form::FieldType->new($session)->getTypes }) {
         my $form = eval { WebGUI::Pluggable::instanciate("WebGUI::Form::".$fieldType, "new", [$session]) };
         if ($@) {

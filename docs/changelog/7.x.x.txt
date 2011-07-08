@@ -1,4 +1,5 @@
 7.9.33
+ - fixed #12188: Thingy broken after upgrade to 7.9.32-stable
 
 7.9.32
  - fixed #12164: Calendar feeds with tons of ;adminId=XXXXXX added
