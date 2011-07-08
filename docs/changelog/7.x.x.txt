@@ -6,6 +6,7 @@
  - fixed: Generic Tax driver does not like spaces around commas
  - fixed: Date formatting with WebGUI::DateTime has extra spaces for single digit months and days.
  - fixed #12165:  Default date in Thingy doesn't work
+ - fixed #12188: Thingy broken after upgrade to 7.9.32-stable
 
 7.10.19
  - fixed #12169: extras uploads symlink export
