@@ -346,6 +346,7 @@ $templateMock->mock('process', sub { $templateVars = $_[1]; } );
             'eventSubmissionTemplateId'         => ignore(),
             'submittedLocationsList'            => ignore(),
             'tickets_loop'                      => \@ticketArray,
+            keywords                            => ignore(),
          },
         "www_printRemainingTickets: template variables valid"
     );
