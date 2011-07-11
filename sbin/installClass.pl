@@ -54,6 +54,15 @@ pod2usage("$0: Must specify a configFile")
 die "Config file '$configFile' does not exist!\n"
     if !-f '../etc/' . $configFile;
 
+foreach my $libDir ( readLines( "preload.custom" ) ) {
+    if ( !-d $libDir ) {
+        warn "WARNING: Not adding lib directory '$libDir' from preload.custom: Directory does not exist.\n";
+        next;
+    }
+    unshift @INC, $libDir;
+}
+
+
 # Open the session
 my $session = WebGUI::Session->open( "..", $configFile );
 $session->user( { userId => 3 } );
@@ -93,6 +102,24 @@ else {
 # End the session
 $session->var->end;
 $session->close;
+
+#-------------------------------------------------
+sub readLines {
+    my $file = shift;
+    my @lines;
+    if (open(my $fh, '<', $file)) {
+        while (my $line = <$fh>) {
+            $line =~ s/#.*//;
+            $line =~ s/^\s+//;
+            $line =~ s/\s+$//;
+            next if !$line;
+            push @lines, $line;
+        }
+        close $fh;
+    }
+    return @lines;
+}
+
 
 __END__
 
