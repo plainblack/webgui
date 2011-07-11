@@ -155,34 +155,21 @@ sub isDynamicCompatible {
 
 #-------------------------------------------------------------------
 
-=head2 toHtml ( )
+=head2 new ( )
 
-Returns a group pull-down field. A group pull down provides a select list that provides name value pairs for all the groups in the WebGUI system.  
+Extend the base "new" to set options.
 
 =cut
 
-sub toHtml {
-	my $self = shift;
+sub new {
+    my $class = shift;
+    my $self  = $class->SUPER::new(@_);
 	my $where = '';
 	if (($self->get('excludeGroups')->[0]||'') ne "") {
 		$where = "and groupId not in (".$self->session->db->quoteAndJoin($self->get("excludeGroups")).")";
 	}
 	$self->set('options', $self->session->db->buildHashRef("select groupId,groupName from groups where showInForms=1 $where order by groupName"));
-	return $self->SUPER::toHtml();
-}
-
-#-------------------------------------------------------------------
-
-=head2 toHtmlAsHidden ( )
-
-Creates a series of hidden fields representing the data in the list.
-
-=cut
-
-sub toHtmlAsHidden {
-        my $self = shift;
-	$self->set("options", $self->session->db->buildHashRef("select groupId,groupName from groups"));
-        return $self->SUPER::toHtmlAsHidden();
+    return $self;
 }
 
 #-------------------------------------------------------------------

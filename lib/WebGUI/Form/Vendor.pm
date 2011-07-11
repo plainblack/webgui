@@ -141,30 +141,17 @@ sub isDynamicCompatible {
 
 #-------------------------------------------------------------------
 
-=head2 toHtml ( )
+=head2 new ( )
 
-Returns a group pull-down field. A group pull down provides a select list that provides name value pairs for all the vendors in the WebGUI system.  
+Extend the base "new" to set options.
 
 =cut
 
-sub toHtml {
-	my $self = shift;
+sub new {
+    my $class = shift;
+    my $self  = $class->SUPER::new(@_);
 	$self->set('options', WebGUI::Shop::Vendor->getVendors($self->session, {asHashRef=>1}));
-	return $self->SUPER::toHtml();
-}
-
-#-------------------------------------------------------------------
-
-=head2 toHtmlAsHidden ( )
-
-Creates a series of hidden fields representing the data in the list.
-
-=cut
-
-sub toHtmlAsHidden {
-        my $self = shift;
-	$self->set("options", WebGUI::Shop::Vendor->getVendors($self->session, {asHashRef=>1}));
-        return $self->SUPER::toHtmlAsHidden();
+    return $self;
 }
 
 #-------------------------------------------------------------------
