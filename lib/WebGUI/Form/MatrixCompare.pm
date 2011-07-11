@@ -123,15 +123,7 @@ Shows either Yes or No.
 
 sub getValueAsHtml {
     my $self = shift;
-    my $i18n = WebGUI::International->new($self->session,'Form_MatrixCompare');
-    my %options = (
-        0 => $i18n->get('no'),
-        1 => $i18n->get('limited'),
-        2 => $i18n->get('costs extra'),
-        3 => $i18n->get('free add on'),
-        4 => $i18n->get('yes'),
-    );
-    return $options{$self->getOriginalValue};
+    return $self->get('options')->{$self->getOriginalValue};
 }
 
 #-------------------------------------------------------------------
@@ -148,14 +140,15 @@ sub isDynamicCompatible {
 
 #-------------------------------------------------------------------
 
-=head2 toHtml ( )
+=head2 new ( )
 
-Renders a fieldType selector.
+Extend the base "new" to set options.
 
 =cut
 
-sub toHtml {
-	my $self = shift;
+sub new {
+    my $class = shift;
+    my $self  = $class->SUPER::new(@_);
     my $i18n = WebGUI::International->new($self->session,'Form_MatrixCompare'); 
 	my %options;
 	tie %options, "Tie::IxHash";
@@ -168,10 +161,7 @@ sub toHtml {
     );
     $self->set('options', \%options);
     $self->set('defaultValue',0);
-	return $self->SUPER::toHtml();
+    return $self;
 }
 
-
-
 1;
-

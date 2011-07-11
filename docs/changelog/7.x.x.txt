@@ -9,6 +9,7 @@
  - fixed #12188: Thingy broken after upgrade to 7.9.32-stable
  - fixed #12184: Apache error in modperl.error.log (William McKee, Knowmad Technologies)
  - fixed #12186: keywords template variable not working properly in Article
+ - fixed #12190: List type form plugins that do not override getOptions show no value when getValueAsHtml is called
 
 7.10.19
  - fixed #12169: extras uploads symlink export

@@ -145,16 +145,17 @@ sub isDynamicCompatible {
 
 #-------------------------------------------------------------------
 
-=head2 toHtml ( )
+=head2 new ( )
 
-Renders a database connection picker control.
+Extend the base "new" to set options.
 
 =cut
 
-sub toHtml {
-	my $self = shift;
+sub new {
+    my $class = shift;
+    my $self  = $class->SUPER::new(@_);
 	$self->set("options",  WebGUI::DatabaseLink->getList($self->session));
-	return $self->SUPER::toHtml();
+    return $self;
 }
 
 #-------------------------------------------------------------------

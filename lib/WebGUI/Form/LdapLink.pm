@@ -152,30 +152,17 @@ sub isDynamicCompatible {
 
 #-------------------------------------------------------------------
 
-=head2 toHtml ( )
+=head2 new ( )
 
-Renders a database connection picker control.
-
-=cut
-
-sub toHtml {
-	my $self = shift;
-	$self->set("options", WebGUI::LDAPLink->getList($self->session));
-	return $self->SUPER::toHtml();
-}
-
-#-------------------------------------------------------------------
-
-=head2 toHtmlAsHidden ( )
-
-Creates a series of hidden fields representing the data in the list.
+Extend the base "new" to set options.
 
 =cut
 
-sub toHtmlAsHidden {
-        my $self = shift;
+sub new {
+    my $class = shift;
+    my $self  = $class->SUPER::new(@_);
 	$self->set("options", WebGUI::LDAPLink->getList($self->session));
-        return $self->SUPER::toHtmlAsHidden();
+    return $self;
 }
 
 #-------------------------------------------------------------------
