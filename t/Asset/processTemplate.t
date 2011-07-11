@@ -24,17 +24,13 @@ plan tests => 1;
 
 my $session = WebGUI::Test->session;
 
-##Set the maximum assets to 5
-WebGUI::Test->originalConfig('maximumAssets');
-$session->config->set('maximumAssets', 5);
-
 my $rootAsset = WebGUI::Asset->getRoot($session);
 
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 WebGUI::Test->addToCleanup($versionTag);
-$rootAsset->addRevision({keywords => 'one,two,three,four'});
+my $snippet = $rootAsset->addChild({keywords => 'one,two,three,four', className=>'WebGUI::Asset::Snippet'});
 $versionTag->commit;
-$rootAsset = $rootAsset->cloneFromDb;
+$snippet = $snippet->cloneFromDb;
 
 ##Override the user function style template so we can examine its output easily
                  #1234567890123456789012#
@@ -47,7 +43,7 @@ $templateMock->mock('process', sub { $templateVars = clone($_[1]); } );
 
 {
     WebGUI::Test->mockAssetId($templateId, $templateMock);
-    $rootAsset->processTemplate({}, $templateId);
+    $snippet->processTemplate({}, $templateId);
     use WebGUI::Keyword;
     my $keywords = WebGUI::Keyword::string2list($templateVars->{keywords});
     cmp_bag($keywords, [qw/one two three four/],  'Keywords are available when running processTemplate');
