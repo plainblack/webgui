@@ -1232,14 +1232,18 @@ Extend the base method to handle cleaning up storage locations.
 =cut
 
 sub purge {
-        my $self = shift;
+    my $self = shift;
+    my $purged = $self->next::method;
+    if ($purged) {
         my $sth = $self->session->db->read("select storageId from Post where assetId=".$self->session->db->quote($self->getId));
         while (my ($storageId) = $sth->array) {
-		my $storage = WebGUI::Storage->get($self->session, $storageId);
+        my $storage = WebGUI::Storage->get($self->session, $storageId);
                 $storage->delete if defined $storage;
         }
         $sth->finish;
-        return $self->next::method;
+        $self->disqualifyAsLastPost;
+    }
+    return $purged;
 }
 
 #-------------------------------------------------------------------
