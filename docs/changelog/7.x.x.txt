@@ -10,6 +10,7 @@
  - fixed #12184: Apache error in modperl.error.log (William McKee, Knowmad Technologies)
  - fixed #12186: keywords template variable not working properly in Article
  - fixed #12190: List type form plugins that do not override getOptions show no value when getValueAsHtml is called
+ - fixed #12135: Geo::Coder::Googlev3 needs common sense
 
 7.10.19
  - fixed #12169: extras uploads symlink export
