@@ -3,6 +3,7 @@
  - fixed #12184: Apache error in modperl.error.log (William McKee, Knowmad Technologies)
  - fixed #12186: keywords template variable not working properly in Article
  - fixed #12190: List type form plugins that do not override getOptions show no value when getValueAsHtml is called
+ - fixed #12183: Posts do not disqualify themselves when purged
 
 7.9.32
  - fixed #12164: Calendar feeds with tons of ;adminId=XXXXXX added
