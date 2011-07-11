@@ -1,6 +1,7 @@
 7.9.33
  - fixed #12188: Thingy broken after upgrade to 7.9.32-stable
  - fixed #12184: Apache error in modperl.error.log (William McKee, Knowmad Technologies)
+ - fixed #12186: keywords template variable not working properly in Article
 
 7.9.32
  - fixed #12164: Calendar feeds with tons of ;adminId=XXXXXX added
