@@ -143,6 +143,7 @@ sub authen {
 			}
 		}
 		$log->security($username." failed to login using HTTP Basic Authentication");
+		$request->auth_type('Basic');
 		$request->note_basic_auth_failure;
 		return Apache2::Const::HTTP_UNAUTHORIZED;
 	}
