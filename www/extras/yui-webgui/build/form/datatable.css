@@ -7,3 +7,15 @@
 .yui-dt-editable .yui-dt-liner {
 	min-height: 10px;
 }
+
+/* displaying the initial blank line in HTMLarea is not useful */
+.wg-dt-htmlarea>p:first-child {
+	margin-top: 0;
+}
+
+/* size of Textarea/HTMLarea cell */
+.wg-dt-textarea, .wg-dt-htmlarea {
+	height: 50px;
+	width: 150px;
+	overflow-y: auto;
+}
