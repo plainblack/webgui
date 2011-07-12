@@ -392,6 +392,8 @@ sub prepare {
         );
         $style->setLink( $url->extras('yui/build/container/assets/skins/sam/container.css'),
             { rel => "stylesheet", type => "text/css" } );
+        $style->setLink( $url->extras( 'yui-webgui/build/form/datatable.css'),
+            { rel => "stylesheet", type => "text/css" } );
         $style->setScript( $url->extras('yui/build/container/container-min.js') );
         $style->setScript( $url->extras('yui/build/button/button-min.js') );
         $style->setScript( $url->extras('yui/build/calendar/calendar-min.js') );
