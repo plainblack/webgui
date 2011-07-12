@@ -22,7 +22,7 @@ Renders an instance of a Form object.
 
 =head2 process( $session, $type, $field_name [, $default_value, @form_constructor_arguments ] )
 
-C<$type> is one of the L<WebGUI::Form::Control> subclasses in L<WebGUI::Form::>.
+C<$type> is one of the L<WebGUI::Form::Control> subclasses in L<WebGUI::Form>.
 
 C<$field_name> is the name the field will be given in the HTML "name" attribute.
 

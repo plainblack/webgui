@@ -72,9 +72,8 @@ $output = WebGUI::Macro::FormField::process(
     sortByValue => 1,
 );
 
-warn $output;
-
-my $numTests = 11 + scalar @{ $testBlock } + 1;
+#my $numTests = 11 + scalar @{ $testBlock } + 1;
+my $numTests = 8;
 
 plan tests => $numTests;
 
@@ -89,7 +88,6 @@ my @forms = HTML::Form->parse($html, 'http://www.webgui.org');
 is(scalar @forms, 1, '1 form was parsed');
 
 my $form = $forms[0];
-use Data::Dumper; warn Data::Dumper::Dumper $form; # XXX
 my @inputs = $form->inputs;
 is(scalar @inputs, 8, 'The form has 8 inputs');
 
