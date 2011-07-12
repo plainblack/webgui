@@ -59,11 +59,18 @@ WebGUI.Form.DataTable
     /************************************************************************
      * deleteSelectedRows ( )
      * Delete the selected rows after confirming
+     * If there is an editor in the deleted row, cancel it
      */
     this.deleteSelectedRows 
     = function ( ) {
         if ( confirm( this.i18n.get( "Form_DataTable", "delete confirm" ) ) ) {
             var rows    = this.dataTable.getSelectedRows();
+
+            // Cancel editor if present
+            if ( this.dataTable.getCellEditor() ) {
+                    this.dataTable.cancelCellEditor();
+            }
+
             for ( var i = 0; i < rows.length; i++ ) {
                 this.dataTable.deleteRow( this.dataTable.getRecord( rows[i] ) );
             }
