@@ -1087,12 +1087,9 @@ sub getEditForm {
     my $class;
     if ( $self->getId eq "new" ) {
         $assetId = "new";
-        # This should NOT be set here!
-        $class = $session->form->process( "className", "className" );
     }
     else {
         $assetId = $self->getId;
-        $class   = $self->get('className');
     }
     $f->getTab("meta")->addField( "Guid", 
         name        => "assetId",
@@ -1103,7 +1100,7 @@ sub getEditForm {
     );
     $f->getTab("meta")->addField( "ClassName", 
         name        => "className",
-        value       => $class,
+        value       => $self->className,
         label       => $i18n->get('class name', 'WebGUI'),
         uiLevel     => 9,
     );
@@ -1177,6 +1174,48 @@ sub setupFormField {
     $tab ||= 'properties';
     return $tabform->getTab($tab)->addField( delete $params{fieldType}, %params);
 } ## end sub setupFormField
+
+#-------------------------------------------------------------------
+
+=head2 getEditTemplate ( )
+
+Get the template to edit this asset. Used by www_edit and www_add to present
+the form to the user. Uses getEditTemplateId to get the template ID.
+
+=cut
+
+sub getEditTemplate {
+    my ( $self ) = @_;
+    my $f           = eval { $self->getEditForm };
+    if ( $@ ) {
+        $self->session->log->error( 
+            sprintf "Couldn't build asset edit form for URL: '%s' because: %s", $self->url, $@ 
+        );
+        die $@;
+    }
+    $self->addEditSaveButtons( $f );
+    $f->action( $self->getUrl ); # Must be changed for www_add/www_addSave
+
+    my $template    = WebGUI::Asset->newById( $self->session, $self->getEditTemplateId );
+    $template->addForm( form => $f );
+    $template->style( "PBtmpl0000000000000137" );
+
+    return $template;
+}
+
+#-------------------------------------------------------------------------
+
+=head2 getEditTemplateId
+
+Get the edit template ID for this asset. Defaults to the Asset Edit template from
+the settings
+
+=cut
+
+sub getEditTemplateId {
+    my ( $self ) = @_;
+    return $self->session->setting->get('templateIdAssetEdit');
+}
 
 #-------------------------------------------------------------------
 
@@ -2693,20 +2732,11 @@ sub www_add {
 	my $newAsset = WebGUI::Asset->newByPropertyHashRef($self->session,\%properties);
 	$newAsset->{_parent} = $self;
 
-    my $f   = eval { $newAsset->getEditForm };
+    my $template   = eval { $newAsset->getEditTemplate };
     return $@ if $@;
-    $self->addEditSaveButtons( $f );
-    $f->addField( "Hidden", name => "func", value => "addSave" );
-    $f->action( $self->getUrl );
-    $f->getTab('meta')->getField( 'className' )->set('value', $class);
-
-    my $template    = WebGUI::Asset->newById( $session, $session->setting->get('templateIdAssetEdit') );
-    $template->setParam( %{ $f->toTemplateVars } );
-
-    return $self->session->style->process(
-        $template->process,
-        "PBtmpl0000000000000137"
-    );
+    $template->getForm("form")->action( $self->getUrl );
+    $template->getForm("form")->addField( "Hidden", name => "func", value => "addSave" );
+    return $template;
 }
 
 #----------------------------------------------------------------------------
@@ -2764,7 +2794,11 @@ sub www_addSave {
         tagId       => $workingTag->getId,
         status      => "pending",
     });
-    return $self->www_view unless defined $object;
+    if ( !defined $object ) {
+        my $url = $session->url->page;
+        $session->log->error( "Could not add child $className to $url!" );
+        return $self->www_view;
+    }
     $object->{_parent} = $self;
     $object->url(undef);
 
@@ -2776,6 +2810,8 @@ sub www_addSave {
     # Process properties from form post
     my $errors = $object->processEditForm;
     if (ref $errors eq 'ARRAY') {
+        my $url = $session->url->page;
+        $session->log->error( "Cannot add asset $className to $url: '" . join( "', '", @$errors ) . q{'} );
         $session->stow->set('editFormErrors', $errors);
         $object->purge;
         return $self->www_add();
@@ -2845,23 +2881,10 @@ sub www_edit {
     my ( $style, $url ) = $session->quick(qw( style url ));
     return $self->session->privilege->insufficient() unless $self->canEdit;
     return $self->session->privilege->locked() unless $self->canEditIfLocked;
-    my $func    = $self->session->form->get('func');
 
-    my $f   = eval { $self->getEditForm };
-    if ( $@ ) {
-        $self->session->log->error( 
-            sprintf "Couldn't build asset edit form for URL: '%s' because: %s", $self->url, $@ 
-        );
-        return $@;
-    }
-    $self->addEditSaveButtons( $f );
-    $f->addField( "Hidden", name => "func", value => "editSave" );
-    $f->action( $self->getUrl );
+    my $template    = $self->getEditTemplate;
+    $template->getForm('form')->addField( "Hidden", name => "func", value => "editSave" );
 
-    my $template    = WebGUI::Asset->newById( $session, $session->setting->get('templateIdAssetEdit') );
-    $template->setParam( %{ $f->toTemplateVars } );
-
-    $template->style( "PBtmpl0000000000000137" );
     return $template;
 }
 
