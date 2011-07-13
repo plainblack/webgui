@@ -301,6 +301,14 @@ There is no Turn Admin On. In order to maintain some backwards compatibility,
 if you are a member of the Turn Admin On group, "Admin On" will be set when you
 log in.
 
+www_add/www_edit
+--------------------
+www_add is now its own page, it is no longer handled by www_edit. www_addSave
+is also its own page, it is no longer handled by www_addSave.
+
+If you had previously overrode www_edit to provide a template, you must move
+that code into an overridden getEditTemplate.
+
 WebGUI::Shop::Vendor
 ====================
 Object properties are no longer written to the database when an object is
