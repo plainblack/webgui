@@ -1,4 +1,3 @@
-
 /*global WebGUI*/
 // Initialize namespace
 if (typeof WebGUI == "undefined") {
@@ -7,7 +6,6 @@ if (typeof WebGUI == "undefined") {
 if (typeof WebGUI.Form == "undefined") {
     WebGUI.Form = {};
 }
-
 
 /**
  * This object contains scripts for the DataTable form control
@@ -40,6 +38,21 @@ WebGUI.Form.DataTable
     this.schemaDialog           = undefined;
 
     /************************************************************************
+     * editorByFormat ( event, data )
+     * Return the DataTable editor type that matches the given format
+     */
+    this.editorByFormat
+    = function ( format ) {
+        switch( format ) {
+        case "text":
+        case "number":
+        case "link":
+            return "textbox";
+        }
+        return format;
+    };
+
+    /************************************************************************
      * addRow ( event, data )
      * Add a row to the bottom of the table
      */
@@ -59,11 +72,18 @@ WebGUI.Form.DataTable
     /************************************************************************
      * deleteSelectedRows ( )
      * Delete the selected rows after confirming
+     * If there is an editor in the deleted row, cancel it
      */
     this.deleteSelectedRows 
     = function ( ) {
         if ( confirm( this.i18n.get( "Form_DataTable", "delete confirm" ) ) ) {
             var rows    = this.dataTable.getSelectedRows();
+
+            // Cancel editor if present
+            if ( this.dataTable.getCellEditor() ) {
+                    this.dataTable.cancelCellEditor();
+            }
+
             for ( var i = 0; i < rows.length; i++ ) {
                 this.dataTable.deleteRow( this.dataTable.getRecord( rows[i] ) );
             }
@@ -98,16 +118,21 @@ WebGUI.Form.DataTable
     /************************************************************************
      * handleEditorKeyEvent ( obj )
      * Handle a keypress when the Cell Editor is open
-     * Enter will close the editor and move down
+     * Not implemented: Enter will close the editor and move down
      * Tab will close the editor and move right.
-     * Use the handleTableKeyEvent() to handle the moving
      * Open a new cell editor on the newly focused cell
      */
     this.handleEditorKeyEvent
     = function ( obj ) {
         // 9 = tab, 13 = enter
         var e   = obj.event;
-        if ( e.keyCode == 9 || e.keyCode == 13 ) {
+
+        // Avoid terminating the editor on enter
+        if ( e.keyCode == 13) {
+            return false;
+        }
+
+        if ( e.keyCode == 9) {
             var cell        = this.dataTable.getCellEditor().getTdEl();
             var nextCell    = this.dataTable.getNextTdEl( cell );
             this.dataTable.saveCellEditor();
@@ -121,8 +146,6 @@ WebGUI.Form.DataTable
                 // No next cell, make a new row and open the editor for that one
                 this.dataTable.addRow( {} );
             }
-            // BUG: If pressing Enter, editor gets hidden right away due to YUI default event
-            // putting e.preventDefault() and return false here makes no difference
         }
     };
     
@@ -152,7 +175,10 @@ WebGUI.Form.DataTable
      * handleTableKeyEvent ( obj )
      * Handle a keypress inside the DataTable
      * Space will open the cell editor
+     * Note: it doesn't currently work: getSelectedTdEls() always returns [] when selectionMode is "standard"
+     * Commented out for now.
      */
+/*
     this.handleTableKeyEvent 
     = function ( obj ) {
         // 9 = tab, 13 = enter, 32 = space
@@ -164,6 +190,7 @@ WebGUI.Form.DataTable
             }
         }
     };
+*/
 
     /************************************************************************ 
      * hideSchemaDialog ( )
@@ -204,7 +231,13 @@ WebGUI.Form.DataTable
         }
 
         var dataTableOptions    = { 
-            dateOptions : { format : this.options.dateFormat }
+            dateOptions : {
+                format :        this.options.dateFormat,
+                MSG_LOADING :   this.i18n.get( "WebGUI", "Loading..." ),
+                MSG_ERROR :     this.i18n.get( "Form_DataTable", "data error" ),
+                MSG_SORTASC :   this.i18n.get( "Form_DataTable", "sort ascending" ),
+                MSG_SORTDESC :  this.i18n.get( "Form_DataTable", "sort descending" )
+            }
         };
 
         if ( this.options.showEdit ) {
@@ -215,6 +248,40 @@ WebGUI.Form.DataTable
             dataTableOptions.initialRequest     = "";
         }
 
+        for ( var i = 0; i < this.columns.length; i++ ) {
+            this.columns[ i ].editor = this.editorByFormat( this.columns[ i ].formatter );
+        }
+
+        var widget      = YAHOO.widget,
+            DT          = widget.DataTable;
+
+        // Dynamically add HTMLarea field type
+        // HTMLAreaCellEditor is like TextareaCellEditor, but with an additional property "htmlarea" which is true
+        var HTMLAreaCellEditor = function(a) {
+            widget.TextareaCellEditor.superclass.constructor.call(this, a);
+        };
+        YAHOO.lang.extend( HTMLAreaCellEditor, widget.TextareaCellEditor, {
+            htmlarea : true
+        } );
+        // Extend the static arrays of editors and formatters
+        DT.Editors[ "htmlarea" ] = HTMLAreaCellEditor;
+
+        // Define classes "wg-dt-textarea" and "wg-dt-htmlarea" that can be overided by a stylesheet
+        // (e.g. in the extraHeadTags of the asset).
+        var formatter = function ( type ) {
+            var fmt = function( el, oRecord, oColumn, oData ) {
+                var value = YAHOO.lang.isValue(oData) ? oData : "";
+                el.innerHTML = "<div class='wg-dt-" + type + "'>" + value + "</div>";
+            };
+            return fmt;
+        };
+        DT.Formatter[ "textarea" ] = formatter( "textarea" );
+        DT.Formatter[ "htmlarea" ] = formatter( "htmlarea" );
+
+        // XXX need to do it with YUI API
+        widget.BaseCellEditor.prototype.LABEL_SAVE   = this.i18n.get( "Form_DataTable", "save" );
+        widget.BaseCellEditor.prototype.LABEL_CANCEL = this.i18n.get( "Form_DataTable", "cancel" );
+
         this.dataTable = new YAHOO.widget.DataTable(
             this.containerId,
             this.columns,
@@ -223,12 +290,52 @@ WebGUI.Form.DataTable
         );
 
         if ( this.options.showEdit ) {
+            var tinymceEdit = "tinymce-edit";
+            var saveThis = this;
+
+            this.dataTable.doBeforeShowCellEditor = function( oCellEditor ) {
+                if ( !oCellEditor.htmlarea ) {
+                    return true;
+                }
+
+                oCellEditor.getInputValue = function() {
+                    return tinyMCE.activeEditor.getContent();
+                };
+
+                oCellEditor.textarea.setAttribute( 'id', tinymceEdit );
+                tinyMCE.execCommand( 'mceAddControl', false, tinymceEdit );
+                setTimeout(function(){ tinyMCE.execCommand( 'mceFocus',false, tinymceEdit ); }, 0);
+
+                // watch hitting tab, which should save the current cell and open an editor on the next
+                tinyMCE.activeEditor.onKeyDown.add(
+                    function( eh, t ) {
+                        return function(ed, e) {    // ed unused
+                            eh.call( t, { event: e } );
+                        };
+                    }( saveThis.handleEditorKeyEvent, saveThis )
+                );
+
+                return true;
+            };
+
+            // Remove TinyMCE on save or cancel
+            var mceRemoveControl = function ( oArgs ) {
+                var oCellEditor = oArgs.editor;
+                if ( oCellEditor.htmlarea ) {
+                    tinyMCE.execCommand( 'mceRemoveControl', false, tinymceEdit );
+                    oCellEditor.textarea.removeAttribute( 'id' );
+                }
+            };
+            this.dataTable.subscribe( "editorSaveEvent", mceRemoveControl );
+            this.dataTable.subscribe( "editorCancelEvent", mceRemoveControl );
+
             // Add the class so our editors get the right skin
             YAHOO.util.Dom.addClass( document.body, "yui-skin-sam" );
 
             this.dataTable.subscribe( "cellDblclickEvent", this.dataTable.onEventShowCellEditor ); 
             this.dataTable.subscribe( "rowClickEvent", this.dataTable.onEventSelectRow );
-            this.dataTable.subscribe( "tableKeyEvent", this.handleTableKeyEvent, this, true );
+	    /* this.handleTableKeyEvent() is commented out, see there for the reason */
+            /* this.dataTable.subscribe( "tableKeyEvent", this.handleTableKeyEvent, this, true ); */
             this.dataTable.subscribe( "editorKeydownEvent", this.handleEditorKeyEvent, this, true );
             this.dataTable.subscribe( "editorShowEvent", this.handleEditorShowEvent, this, true );
             this.dataTable.subscribe( "rowAddEvent", this.handleRowAdd, this, true );
@@ -281,7 +388,6 @@ WebGUI.Form.DataTable
                     scope       : this
                 }
             } );
-            
             // This data table will be submitted async
             if ( this.options.ajaxSaveUrl ) {
                 var save        = new YAHOO.widget.Button( {
@@ -333,6 +439,8 @@ WebGUI.Form.DataTable
                     "format link",
                     "format number",
                     "format date",
+                    "format textarea",
+                    "format htmlarea",
                     "add column",
                     "cancel",
                     "ok",
@@ -342,7 +450,13 @@ WebGUI.Form.DataTable
                     "help select row",
                     "help add row",
                     "help default sort",
-                    "help reorder column"
+                    "help reorder column",
+                    "data error",
+                    "sort ascending",
+                    "sort descending"
+                ],
+                'WebGUI' : [
+                    "Loading..."
                 ]
             },
             onpreload   : {
@@ -365,7 +479,7 @@ WebGUI.Form.DataTable
             var helpDialog  = new YAHOO.widget.Panel( "helpWindow", {
                 modal       : false,
                 draggable   : true,
-                zIndex      : 1000
+                zIndex      : 10000
             } );
             helpDialog.setHeader( "DataTable Help" );
             helpDialog.setBody( 
@@ -404,28 +518,16 @@ WebGUI.Form.DataTable
         };
 
         var buttonLabel = this.i18n.get( "Form_DataTable", "delete column" );
-        var availableFormats    = [
-            {
-                "value" : "text",
-                "label" : this.i18n.get( "Form_DataTable", "format text" )
-            },
-            {
-                "value" : "number",
-                "label" : this.i18n.get( "Form_DataTable", "format number" )
-            },
-            {
-                "value" : "email",
-                "label" : this.i18n.get( "Form_DataTable", "format email" )
-            },
-            {
-                "value" : "link",
-                "label" : this.i18n.get( "Form_DataTable", "format link" )
-            },
-            {
-                "value" : "date",
-                "label" : this.i18n.get( "Form_DataTable", "format date" )
-            }
-        ];
+        var availableFormats = [];
+        var formatType = [ "text", "number", "email", "link", "date", "textarea", "htmlarea" ];
+        for ( var fti = 0; fti < formatType.length; fti++) {
+            availableFormats.push(
+                {
+                    "value" : formatType[fti],
+                    "label" : this.i18n.get( "Form_DataTable", "format " + formatType[fti] )
+                }
+             );
+        }
         
         // function for creating new database columns to the table schema
         var createTableColumn = function(i,cols) {
@@ -595,7 +697,7 @@ WebGUI.Form.DataTable
     this.updateSchema
     = function () {
         var data        = this.schemaDialog.getData();
-        
+
         // First delete columns
         var deleteCols  = YAHOO.lang.JSON.parse( data[ "deleteCols" ] );
         for ( var x = 0; x < deleteCols.length; x++ ) {
@@ -623,7 +725,7 @@ WebGUI.Form.DataTable
                 var rows    = this.dataTable.getRecordSet().getRecords();
                 for ( var r = 0; r < rows.length; r++ ) {
                     rows[ r ].setData( newKey, rows[ r ].getData( oldKey ) );
-                    rows[ r ].setData( oldKey, undefined ); 
+                    rows[ r ].setData( oldKey, undefined );
                 }
             }
 
@@ -633,7 +735,7 @@ WebGUI.Form.DataTable
                 formatter   : format,
                 resizeable  : ( col ? col.resizeable : 1 ),
                 sortable    : ( col ? col.sortable : 1 ),
-                editor      : ( format == "date" ? "date" : "textbox")
+                editor      : this.editorByFormat( format )
             };
             if ( format == "date" ) {
                 newCol["dateOptions"] = { format : this.options.dateFormat };
@@ -664,9 +766,9 @@ WebGUI.Form.DataTable
                     }
                 }
             }
+
             i++;
         }
-
         this.dataTable.render();
         this.schemaDialog.cancel();
     };

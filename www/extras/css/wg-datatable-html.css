@@ -1,0 +1,60 @@
+/**
+ * wg-datatable-html.css
+ * CSS rules for DataTable assets
+ *
+ * Add as attachment to Default DetaTable template (HTML)
+ */
+
+
+/* start content at top of cells */
+.dataTable table>tbody>tr>td {
+ vertical-align: 0;
+}
+.dataTable>table>tbody>tr>td>p:first-child {    /* for htmlarea, but really applies to the starting p of any cell */
+ margin-top: 0;
+}
+
+/* padding in all data cells */
+.dataTable table>tbody>tr>td {
+ padding-left: 10px;
+ padding-right: 10px;
+}
+
+
+/* examples of further styles */
+
+/* limited textarea/htmlarea cells, show vertical scrollbar if needed */
+/*
+.dataTable table>tbody>tr>td {
+ height: 70px;
+ width: 200px;
+ overflow-y: auto;
+}
+*/
+
+/* styling a particular DataTable in the page, by assetId */
+/*
+#dataTablesrvp2vk8QJqY5E0imSRQag.dataTable table>tbody>tr>td {
+ color:red;
+ height:auto;
+ width:150px;
+ overflow-y: visible
+}
+*/
+
+/* minimum row height */
+/*
+.dataTable table>tbody>tr>td {
+ min-height:70px;
+ height:auto !important;
+ height:70px;
+}
+*/
+
+/* styling a particular column (e.g column 2), by assetId */
+/*
+#dataTablesvE67R6JQfmEI__T9pIAkQ.dataTable table>tbody>tr>td:first-child+td {
+ color:blue;
+}
+*/
+
