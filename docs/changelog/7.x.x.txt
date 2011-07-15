@@ -1,4 +1,6 @@
 7.10.21
+ - added the optional WebGUI::Content::PDFGenerator, not enabled by default
+   (see the module's documentation).
 
 7.10.20
  - fixed: Do not call group methods on an undefined value.
