@@ -74,6 +74,18 @@ our $I18N = {
         context     => q{Format for a column with a date},
     },
 
+    "format textarea" => {
+        message     => q{Textarea},
+        lastUpdated => 0,
+        context     => q{Format for a textarea column},
+    },
+
+    "format htmlarea" => {
+        message     => q{HTMLarea},
+        lastUpdated => 0,
+        context     => q{Format for an HTMLarea column},
+    },
+
     "add column" => {
         message     => q{Add Column},
         lastUpdated => 0,
@@ -152,6 +164,23 @@ our $I18N = {
         context     => q{The name of a newly added value to a column},
     },
 
+    "data error" => {
+        message     => q{Data error.},
+        lastUpdated => 0,
+        context     => q{Message to display when DataTable has data error},
+    },
+
+    "sort ascending" => {
+        message     => q{Click to sort ascending},
+        lastUpdated => 0,
+        context     => q{Message to display in tooltip to sort Column in ascending order},
+    },
+
+    "sort descending" => {
+        message     => q{Click to sort descending},
+        lastUpdated => 0,
+        context     => q{Message to display in tooltip to sort Column in descending order},
+    },
 };
 
 1;
