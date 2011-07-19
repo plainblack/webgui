@@ -17,6 +17,7 @@
  - fixed #12135: Geo::Coder::Googlev3 needs common sense
  - fixed #12183: Posts do not disqualify themselves when purged
  - fixed #12189: installClass ignores preload.custom
+ - fixed #12197: Default date Thingy disables date
 
 7.10.19
  - fixed #12169: extras uploads symlink export

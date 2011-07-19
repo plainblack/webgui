@@ -81,4 +81,4 @@ my $field1 = $thingy->getFields($thingId)->hashRef;
 
 note 'getFieldValue';
 is $thingy->getFieldValue(WebGUI::Test->webguiBirthday, $field1), '8/16/2001', 'with epoch as default';
-is $thingy->getFieldValue('2011-07-04', $field1), '7/4/2011', 'with mysql date as default';
+is $thingy->getFieldValue('2011-07-04', $field1), '7/3/2011', 'with mysql date as default';
