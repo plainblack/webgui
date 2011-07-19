@@ -1226,7 +1226,8 @@ sub setupFormField {
     my $overrideTab = delete $overrideParams{tab};
     $tab = $overrideTab if defined $overrideTab;
     foreach my $key (keys %overrideParams) {
-      $params{"-$key"} = $overrideParams{$key};
+      (my $canon = $key) =~ s/^-//;
+      $params{$canon} = $overrideParams{$key};
     }
   }
 
