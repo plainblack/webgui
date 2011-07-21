@@ -1,6 +1,97 @@
 7.10.21
  - added #9668 extension template variable to attachment loops for the following assets:
-		Article,Post,Event,File,Form::Attachments,Folder
+      Article,Post,Event,File,Form::Attachments,Folder
+ - added the optional WebGUI::Content::PDFGenerator, not enabled by default
+   (see the module's documentation).
+
+7.10.20
+ - fixed: Do not call group methods on an undefined value.
+ - fixed #12178: random deletion of columns may happen when a schema is saved (Amir Plivatsky)
+ - fixed #12179: DataTable Field types get reset to "Text" in Edit Schema (Amir Plivatsky)
+ - added: FormField macro for rendering Form objects directly from templates
+ - fixed: Generic Tax driver does not like spaces around commas
+ - fixed: Date formatting with WebGUI::DateTime has extra spaces for single digit months and days.
+ - fixed #12165:  Default date in Thingy doesn't work
+ - fixed #12188: Thingy broken after upgrade to 7.9.32-stable
+ - fixed #12184: Apache error in modperl.error.log (William McKee, Knowmad Technologies)
+ - fixed #12186: keywords template variable not working properly in Article
+ - fixed #12190: List type form plugins that do not override getOptions show no value when getValueAsHtml is called
+ - fixed #12135: Geo::Coder::Googlev3 needs common sense
+ - fixed #12183: Posts do not disqualify themselves when purged
+ - fixed #12189: installClass ignores preload.custom
+ - fixed #12197: Default date Thingy disables date
+
+7.10.19
+ - fixed #12169: extras uploads symlink export
+ - Added ability to pass caller assetId to RenderThingMacro
+ - Allow specific expirations for groups in userImport.pl
+ - fixed #12164: Calendar feeds with tons of ;adminId=XXXXXX added
+ - fixed #12167: Calendar Next/Prev Month/Year confusion
+ - fixed #12172: Underground User Style template shows up in Style wizard during site creation
+ - fixed #12157: www_editThingSave
+
+7.10.18
+ - fixed #12138: Version tag gets create by entering and direct leaving
+ - Added the WebGUI::Event API
+ - fixed #12141: Macro_RenderThingData (bad tags) nothing to translate
+ - fixed #12142: Copy fails on imported threads
+ - canView will now be checked before calling ANY www_ method on account
+   plugins to fix an Inbox security bug (and other similar potential bugs).
+ - fixed #12139: break on calander feeds during upgrade
+ - fixed #12136: Unable to add more than one image in Story
+ - fixed #12133: RenderThingData macro doesn't accept templateId
+ - fixed #12152: PayPal Standard ignores shop-credit
+ - fixed #12119: Locale setting for paypal
+ - fixed #12156: Asset Manager performance
+ - fixed #12158: Shop credit cannot be used to pay for Shipping on PayPal
+ - rfe #12159: Asset Manager sort preferences
+ - added: new default Collaboration System notification template.
+
+7.10.17
+ - fixed: Forced to use a PayDriver even with a balance of 0 in the cart.
+ - add #12134: Access metadata for assets inside an AssetReport
+ - fixed : Thingy CSV import not counting towards maxEntriesPerUser
+ - fixed : Thingy CSV new records not updated with createdById and dateCreated and ipAddress
+ - added : Thingy fields can now be set as unique and checked upon insert
+ - added : Thingy max entries of thingy records added
+ - fixed #12140: PayPal standard can be used to to purchase items without paying for them
+
+7.10.16
+ - fixed #12121: typ-o Asset_Map.templateIdEditPoint
+ - rfe #2123: Layouts related for export purposes
+ - fixed #12125: Recaptcha API url
+ - rfe #12127: AssetProperty macro
+ - fixed #12129: AdminBar calls canAdd as an object method
+
+7.10.15
+ - fixed #12117: Thingy - www_searchViaAjax broken
+ - fixed #12116: JsonTable form control needs i18n
+ - fixed #12102: User profiling field extras information
+ - fixed #12106: CalendarUpdateFeeds activity does not handle time zones correctly
+ - fixed #11213: Gooey on the Go format problem
+ - mark makeUrlCompliant as deprecated.
+ - fixed #12059: WebGUI::Asset::Wobject::Map - Set Default Viewing Area button does not work.
+ - added: Setting MapPoint locations via address.
+ - added: Make Thing data searchable
+ - added: AssetProxy like macro for Thing data, ViewThingData
+
+7.10.14
+ - fixed #12094: Cannot enter in Macros in URLs inside TinyMCE.
+ - rfe   #12093: Remotely stored photos for Story assets
+ - fixed #12088: Organization left out of transaction
+ - fixed #12095: Shop admin screen has JS errors?
+ - fixed #12097: GroupManager pop-up not working
+ - fixed #12098: Missing template breaks WebGUI password recovery by email
+ - remove extra Underground style templates that were part of the 7.10.13 upgrade.
+ - fixed #12056: Adding a Thing always creates a table
+ - fixed #11955: Rich Text Editor for Forums doesn't work on the iPad
+ - fixed #11992: html source editor
+ - fixed #12100: Carousel and/or RichEdit
+ - fixed #12103: PayPalStd driver fails occasionally
+ - rfe   #12105: Make shortcuts related for export purposes
+ - rfe   #12108: Mail to Group preference field
+ - fixed #12107: Viewing an individual transaction item fails
+ - fixed #12104: Calendar iCal feed status and lastUPdated fields missing
 
 7.10.13
  - added #12079: Carousel Auto Play
@@ -15,10 +106,6 @@
  - fixed #12076: Paginator shows no results with cached page index
  - fixed #12087: Extend WebGUI tests to check template attachments
  - fixed #12091: Survey Statistical Overview display
- - fixed : Thingy CSV import not counting towards maxEntriesPerUser
- - fixed : Thingy CSV new records not updated with createdById and dateCreated and ipAddress
- - added : Thingy fields can now be set as unique and checked upon insert
- - added : Thingy max entries of thingy records added
 
 7.10.12
  - fixed #12072: Product, related and accessory assets
@@ -4143,4 +4230,5 @@
    an IP other than 127.0.0.1.
  - Made the Include macro more secure.
  - Added Len's patch to fix some caching problems.
+
 
