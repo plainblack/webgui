@@ -418,6 +418,38 @@ sub www_ajaxCreateUser {
 
 #-------------------------------------------------------------------
 
+=head2 www_confirmUserEmail ( )
+
+Process links clicked from mails sent out by the WaitForUserConfmration
+workflow activity.
+
+=cut
+
+sub www_confirmUserEmail {
+    my $session    = shift;
+    my $f          = $session->form;
+    my $instanceId = $f->get('instanceId');
+    my $token      = $f->get('token');
+    my $actId      = $f->get('activityId');
+    my $activity   = WebGUI::Workflow::Activity->new($session, $actId)
+        or die;
+    my $instance   = WebGUI::Workflow::Instance->new($session, $instanceId)
+        or die;
+    if ($activity->confirm($instance, $token)) {
+        my $msg  = $activity->get('okMessage');
+        unless ($msg) {
+            my $i18n = WebGUI::International->new($session, 'WebGUI');
+            $msg = $i18n->get('ok');
+        }
+        return $session->style->userStyle($msg);
+    }
+    else {
+        return $session->privilege->noAccess;
+    }
+}
+
+#-------------------------------------------------------------------
+
 =head2 www_ajaxDeleteUser ( )
 
 Delete a user using a web service.

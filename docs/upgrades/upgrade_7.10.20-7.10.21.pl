@@ -29,11 +29,22 @@ my $quiet; # this line required
 
 
 my $session = start(); # this line required
-
-# upgrade functions go here
-
+addWaitForConfirmationWorkflow($session);
 finish($session); # this line required
 
+
+#----------------------------------------------------------------------------
+sub addWaitForConfirmationWorkflow {
+    my $session = shift;
+    my $c       = $session->config;
+    my $exists  = $c->get('workflowActivities/WebGUI::User');
+    my $class   = 'WebGUI::Workflow::Activity::WaitForUserConfirmation';
+    unless (grep { $_ eq $class } @$exists) {
+        print "Adding WaitForUserConfirmation workflow..." unless $quiet;
+        $c->addToArray('workflowActivities/WebGUI::User' => $class);
+        print "Done!\n" unless $quiet;
+    }
+}
 
 #----------------------------------------------------------------------------
 # Describe what our function does
