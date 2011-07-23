@@ -198,7 +198,7 @@ sub toHtml {
 
     # Existing rows are entirely built in javascript from the JSON in the hidden field
     $style->setScript(
-        $url->extras('yui/build/connect/connect-min.js'),
+        $url->extras('yui/build/connection/connection-min.js'),
         { type => 'text/javascript' },
     );
     $style->setScript(
