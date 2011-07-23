@@ -4,6 +4,7 @@
  - added the optional WebGUI::Content::PDFGenerator, not enabled by default
    (see the module's documentation).
  - fixed #12204: Default forum notification template produces invalid HTML
+ - fixed #12202: JsonTable refers to unexistent YUI file
 
 7.10.20
  - fixed: Do not call group methods on an undefined value.
