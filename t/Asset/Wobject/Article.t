@@ -17,7 +17,7 @@ use lib "$FindBin::Bin/../../lib";
 
 use WebGUI::Test;
 use WebGUI::Session;
-use Test::More tests => 23; # increment this value for each test you create
+use Test::More tests => 28; # increment this value for each test you create
 use WebGUI::Asset::Wobject::Article;
 
 my $session = WebGUI::Test->session;
@@ -66,8 +66,9 @@ foreach my $newSetting (keys %{$newArticleSettings}) {
 }
 
 # Test the duplicate method... not for assets, just the extended duplicate functionality of the article wobject
-my $filename = "page_title.jpg";
+my $filename = "extensions.tar";
 my $pathedFile = WebGUI::Test->getTestCollateralPath($filename);
+
 
 # Use some test collateral to create a storage location and assign it to our article
 my $storage = WebGUI::Storage->create($session);
@@ -79,6 +80,10 @@ diag(join("\n", @{ $storage->getErrors })) unless $filenameOK;
 
 $article->update({storageId=>$storage->getId});
 my $storageOK = is($article->get('storageId'), $storage->getId, 'correct storage id stored');
+
+
+
+
 
 SKIP: {
 
@@ -122,6 +127,46 @@ $cachedOutput = WebGUI::Cache->new($session, 'view_'.$article->getId)->get;  # C
 isnt ($output, $cachedOutput, 'purgeCache method deletes cache');
 
 
+# lets test that our new template variable for the fileloop in the main view method returns the
+# right values for the new field in the attached files loop: <tmpl_var extension>
+# first we create a new template with only the <tmpl_var extension> field in it
+# --------------------------------------------------------------------------------------------------
+
+my $viewTemplate = $node->addChild({className=>'WebGUI::Asset::Template'});
+
+my $tmplContent = "<tmpl_if attachment_loop><tmpl_loop attachment_loop><tmpl_var extension>|</tmpl_loop></tmpl_if>";
+
+my $newTemplateSettings = {
+        namespace => 'Article',
+        template   => $tmplContent,
+};
+
+
+my @extTestFiles = ("rotation_test.png","littleTextFile","jquery.js","tooWide.gif");
+
+foreach my $f (@extTestFiles) {
+    my $pathedFile = WebGUI::Test->getTestCollateralPath($f);
+    my $storedFilename = $storage->addFileFromFilesystem($pathedFile);
+}
+
+$viewTemplate->update($newTemplateSettings);
+$article->update({templateId=>$viewTemplate->getId});
+$article->prepareView;
+
+my $newFieldoutput = $article->view;
+$newFieldoutput =~ s/\|$//;
+
+my @tmplExtensions = split /\|/,$newFieldoutput;
+
+
+# rememer there is a tar file already stored from earlier test, we reuse this.
+ok (  $tmplExtensions[0] eq "tar", 'Yup, extension template variable in fileLoop working for tar');
+ok (  $tmplExtensions[1] eq "png", 'Yup, extension template variable in fileLoop working for png');
+ok (  $tmplExtensions[2] eq "", 'Yup, extension template variable in fileLoop working for file with no extension');
+ok (  $tmplExtensions[3] eq "js", 'Yup, extension template variable in fileLoop working for js');
+ok (  $tmplExtensions[4] eq "gif", 'Yup, extension template variable in fileLoop working for gif');
+
+
 TODO: {
         local $TODO = "Tests to make later";
         ok(0, 'Test exportAssetData method');
@@ -131,3 +176,7 @@ TODO: {
 	ok(0, 'Test www_deleteFile method');
 	ok(0, 'Test www_view method... maybe?');
 }
+
+
+
+

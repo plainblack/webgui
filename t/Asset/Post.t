@@ -19,7 +19,7 @@ use strict;
 use lib "$FindBin::Bin/../lib";
 use WebGUI::Test;
 use WebGUI::Session;
-use Test::More tests => 20; # increment this value for each test you create
+use Test::More tests => 23; # increment this value for each test you create
 use Test::Deep;
 use WebGUI::Asset::Wobject::Collaboration;
 use WebGUI::Asset::Post;
@@ -175,6 +175,13 @@ $storage->addFileFromFilesystem(WebGUI::Test->getTestCollateralPath('lamp.jpg'))
 $storage->addFileFromFilesystem(WebGUI::Test->getTestCollateralPath('littleTextFile'));
 my $attachment_loop = $post1->getTemplateVars()->{attachment_loop};
 
+
+ok ( $attachment_loop->[0]->{'extension'} eq 'jpg','Yup, extension template variable in attachment loop working for jpg');
+ok ( $attachment_loop->[1]->{'extension'} eq 'jpg','Yup, extension template variable in attachment loop working for jpg');
+ok ( $attachment_loop->[2]->{'extension'} eq '','Yup, extension template variable in attachment loop working for file with no extension');
+
+
+
 cmp_bag(
     $attachment_loop,
     [
@@ -183,6 +190,7 @@ cmp_bag(
             url       => $storage->getUrl('gooey.jpg'),
             icon      => $session->url->extras('fileIcons/jpg.gif'),
             thumbnail => $storage->getThumbnailUrl('gooey.jpg'),
+	    extension => 'jpg',
             isImage   => bool(1),
         },
         {
@@ -190,6 +198,7 @@ cmp_bag(
             url       => $storage->getUrl('lamp.jpg'),
             icon      => $session->url->extras('fileIcons/jpg.gif'),
             thumbnail => $storage->getThumbnailUrl('lamp.jpg'),
+	    extension => 'jpg',
             isImage   => bool(1),
         },
         {
@@ -197,6 +206,7 @@ cmp_bag(
             url       => $storage->getUrl('littleTextFile'),
             icon      => $session->url->extras('fileIcons/unknown.gif'),
             thumbnail => '',
+	    extension => '',
             isImage   => bool(0),
         },
     ],
