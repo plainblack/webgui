@@ -1,4 +1,6 @@
 7.10.21
+ - added #9668 extension template variable to attachment loops for the following assets:
+      Article,Post,Event,File,Form::Attachments,Folder
  - added the optional WebGUI::Content::PDFGenerator, not enabled by default
    (see the module's documentation).
 
@@ -4228,4 +4230,5 @@
    an IP other than 127.0.0.1.
  - Made the Include macro more secure.
  - Added Len's patch to fix some caching problems.
+
 
