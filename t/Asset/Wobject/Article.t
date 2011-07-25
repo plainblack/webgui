@@ -17,7 +17,10 @@ use lib "$FindBin::Bin/../../lib";
 
 use WebGUI::Test;
 use WebGUI::Session;
-use Test::More tests => 28; # increment this value for each test you create
+use Test::More tests => 24; # increment this value for each test you create
+use Test::Deep;
+use Test::MockObject;
+use Data::Dumper;
 use WebGUI::Asset::Wobject::Article;
 
 my $session = WebGUI::Test->session;
@@ -131,16 +134,14 @@ isnt ($output, $cachedOutput, 'purgeCache method deletes cache');
 # right values for the new field in the attached files loop: <tmpl_var extension>
 # first we create a new template with only the <tmpl_var extension> field in it
 # --------------------------------------------------------------------------------------------------
+my $templateId = 'DUMMY_TEMPLATE________';
 
-my $viewTemplate = $node->addChild({className=>'WebGUI::Asset::Template'});
-
-my $tmplContent = "<tmpl_if attachment_loop><tmpl_loop attachment_loop><tmpl_var extension>|</tmpl_loop></tmpl_if>";
-
-my $newTemplateSettings = {
-        namespace => 'Article',
-        template   => $tmplContent,
-};
-
+my $templateMock = Test::MockObject->new({});
+$templateMock->set_isa('WebGUI::Asset::Template');
+$templateMock->set_always('getId', $templateId);
+my $templateVars;
+$templateMock->set_true('prepare', sub {  } );
+$templateMock->mock('process', sub { $templateVars = $_[1]; } );
 
 my @extTestFiles = ("rotation_test.png","littleTextFile","jquery.js","tooWide.gif");
 
@@ -149,23 +150,39 @@ foreach my $f (@extTestFiles) {
     my $storedFilename = $storage->addFileFromFilesystem($pathedFile);
 }
 
-$viewTemplate->update($newTemplateSettings);
-$article->update({templateId=>$viewTemplate->getId});
-$article->prepareView;
+$article->update({templateId=>$templateId});
+{
+    WebGUI::Test->mockAssetId($templateId, $templateMock);
+    $article->prepareView;
+    $article->view;
+    WebGUI::Test->unmockAssetId($templateId);
+}
 
-my $newFieldoutput = $article->view;
-$newFieldoutput =~ s/\|$//;
-
-my @tmplExtensions = split /\|/,$newFieldoutput;
-
-
-# rememer there is a tar file already stored from earlier test, we reuse this.
-ok (  $tmplExtensions[0] eq "tar", 'Yup, extension template variable in fileLoop working for tar');
-ok (  $tmplExtensions[1] eq "png", 'Yup, extension template variable in fileLoop working for png');
-ok (  $tmplExtensions[2] eq "", 'Yup, extension template variable in fileLoop working for file with no extension');
-ok (  $tmplExtensions[3] eq "js", 'Yup, extension template variable in fileLoop working for js');
-ok (  $tmplExtensions[4] eq "gif", 'Yup, extension template variable in fileLoop working for gif');
-
+cmp_bag(
+    $templateVars->{attachment_loop},
+    [
+        superhashof({
+            filename  => 'rotation_test.png',
+            extension => 'png',
+        }),
+        superhashof({
+            filename  => 'littleTextFile',
+            extension => undef,
+        }),
+        superhashof({
+            filename  => 'jquery.js',
+            extension => 'js',
+        }),
+        superhashof({
+            filename  => 'tooWide.gif',
+            extension => 'gif',
+        }),
+        superhashof({
+            filename  => 'extensions.tar',
+            extension => 'tar',
+        }),
+    ],
+) or diag Dumper($templateVars->{attachment_loop});
 
 TODO: {
         local $TODO = "Tests to make later";

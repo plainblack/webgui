@@ -17,6 +17,7 @@ my $asset = WebGUI::Asset->getTempspace($session)->addChild(
         className => 'WebGUI::Asset::Wobject::Layout',
     }
 );
+WebGUI::Test->addToCleanup($asset);
 
 sub capture {
     my $save;
@@ -36,7 +37,7 @@ sub capture {
 my $config = $session->config;
 my $pfx = 'assets/WebGUI::Asset::Wobject::Layout/fields/assetsToHide';
 $config->set("$pfx/uiLevel", 1);
-is capture->get('uiLevel'), 1;
+is capture->get('uiLevel'), 1, 'uiLevel override to 1';
 
 $config->set("$pfx/uiLevel", "2");
-is capture->get('uiLevel'), 2;
+is capture->get('uiLevel'), 2, 'uiLEvel override to 2';
