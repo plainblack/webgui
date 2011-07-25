@@ -54,6 +54,12 @@ can also contain additional command line arguments to pass to wkhtmltopdf.
 #-------------------------------------------------------------------
 # Return the cached pdf, generating if necessary.
 
+=head2 cache ($asset) 
+
+Returns the cached PDF for an asset, if necessary
+
+=cut
+
 sub cache {
     my $asset   = shift;
     my $session = $asset->session;
@@ -71,6 +77,12 @@ sub cache {
 
 #-------------------------------------------------------------------
 # Generate the pdf unconditionally and return it as a string.
+
+=head2 generate ($asset) 
+
+Generate the pdf unconditionally and return it as a string.
+
+=cut
 
 sub generate {
     my $asset   = shift;
@@ -96,7 +108,12 @@ sub generate {
 }
 
 #-------------------------------------------------------------------
-# Figure out which asset we need to check permissions for
+
+=head2 cache ($asset) 
+
+Figure out which asset we need to check permissions for
+
+=cut
 
 sub getRequestedAsset {
     my $session  = shift;
@@ -111,6 +128,12 @@ sub getRequestedAsset {
 
 #-------------------------------------------------------------------
 # Top-level handler.
+
+=head2 handler ($session) 
+
+Top-level handler
+
+=cut
 
 sub handler {
     my $session = shift;
