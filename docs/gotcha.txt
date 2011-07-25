@@ -7,6 +7,10 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+7.10.21
+--------------------------------------------------------------------
+    * WebGUI now depends on Kwargs.
+
 7.10.17
 --------------------------------------------------------------------
     * Due to a formatting problem with form variables in the PayPal driver, WebGUI
