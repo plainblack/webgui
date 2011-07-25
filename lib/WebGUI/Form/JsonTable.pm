@@ -138,7 +138,7 @@ sub headTags {
     my $self = shift;
     my ( $url, $style ) = $self->session->quick(qw( url style ));
     $style->setScript(
-        $url->extras('yui/build/connect/connect-min.js'),
+        $url->extras('yui/build/connection/connection-min.js'),
         { type => 'text/javascript' },
     );
     $style->setScript(
@@ -229,27 +229,6 @@ sub toHtml {
     $output .= '<input type="hidden" name="' . $self->get('name') . '" value="' . $value . '" />';
 
     # Existing rows are entirely built in javascript from the JSON in the hidden field
-<<<<<<< HEAD
-=======
-    $style->setScript(
-        $url->extras('yui/build/connection/connection-min.js'),
-        { type => 'text/javascript' },
-    );
-    $style->setScript(
-        $url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'),
-        { type => 'text/javascript' },
-    );
-    $style->setScript(
-        $url->extras('yui/build/json/json-min.js'),
-        { type => 'text/javascript' },
-    );
-    $style->setScript(
-        $url->extras('yui-webgui/build/i18n/i18n.js'),
-        { type => 'text/javascript' },
-    );
-    $output .= sprintf '<script src="%s" type="text/javascript"></script>', 
-                $url->extras('yui-webgui/build/form/jsontable.js');
->>>>>>> 7d20406... Fix a bad script link in the JsonTable.  Fixes bug #12202.
     $output .= '<script type="text/javascript">'
             . q{new WebGUI.Form.JsonTable("} . $self->get('name') . q{","} . $self->get( 'id' ) . q{", }
             . JSON->new->encode( $self->get('fields') ) . q{ );}
