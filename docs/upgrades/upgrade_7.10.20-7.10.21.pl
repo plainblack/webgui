@@ -30,6 +30,7 @@ my $quiet; # this line required
 
 my $session = start(); # this line required
 addWaitForConfirmationWorkflow($session);
+addCreateUsersEnabledSetting($session);
 finish($session); # this line required
 
 
@@ -44,6 +45,17 @@ sub addWaitForConfirmationWorkflow {
         $c->addToArray('workflowActivities/WebGUI::User' => $class);
         print "Done!\n" unless $quiet;
     }
+}
+
+#----------------------------------------------------------------------------
+sub addCreateUsersEnabledSetting {
+    my $session = shift;
+    my $s       = $session->setting;
+    my $name    = 'enableUsersAfterAnonymousRegistration';
+    return if $s->has($name);
+    print "Adding $name setting..." unless $quiet;
+    $s->add($name => 1);
+    print "Done!\n" unless $quiet;
 }
 
 #----------------------------------------------------------------------------

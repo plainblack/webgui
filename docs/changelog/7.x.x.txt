@@ -2,6 +2,7 @@
  - added #9668 extension template variable to attachment loops for the following assets:
       Article,Post,Event,File,Form::Attachments,Folder
  - added WaitForUserConfirmation workflow activity
+ - added new setting - Enable Users after Anonymous Registration?
  - added the optional WebGUI::Content::PDFGenerator, not enabled by default
    (see the module's documentation).
  - fixed #12204: Default forum notification template produces invalid HTML

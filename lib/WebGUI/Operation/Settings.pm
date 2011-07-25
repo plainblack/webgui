@@ -381,6 +381,15 @@ sub definition {
 		hoverHelp=>$i18n->get('118 description'),
 		defaultValue=>$setting->get("anonymousRegistration")
 		});
+    push(@fields, {
+            tab          => 'user',
+            fieldType    => 'yesNo',
+            name         => 'enableUsersAfterAnonymousRegistration',
+            label        => $i18n->get('Enable Users after Anonymous Registration?'),
+            hoverHelp    => $i18n->get('enableUsersAfterAnonymousRegistration help'),
+            defaultValue => $setting->get('enableUsersAfterAnonymousRegistration')
+        }
+    );
 	push(@fields, {
 		tab=>"user",
 		fieldType=>"yesNo",
