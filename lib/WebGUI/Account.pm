@@ -198,12 +198,11 @@ sub callMethod {
     }
    
     #Try to call the method
-    my $output = eval { $self->$method(@{$args}) };
-
-    #Croak on error
-    if($@) {
-        croak "Unable to run $method on $module: $@";
-        return undef;
+    my $output = eval { $self->$method(@{$args}); };
+    if( $@ ) {
+        my $e = WebGUI::Error->caught;
+        $e->{message} = "Unable to run $method on $module: $e->{message}";
+        $e->rethrow;
     }
 
     #Return the output from the method call

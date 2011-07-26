@@ -14,49 +14,37 @@ use WebGUI::Session::Log;
 
 BEGIN { 
 
-    our $StackTraceClass = "Devel::StackTrace";
-    if (try { require Devel::StackTrace::WithLexicals; 1 }) {
-        # Optional since it needs PadWalker
-        $StackTraceClass = "Devel::StackTrace::WithLexicals";
-    }
-
     no warnings 'redefine';
 
-    my $old_fatal = *WebGUI::Session::Log::fatal{CODE} || sub { };
+    if (eval { require Devel::StackTrace::WithLexicals; 1 }) {
+        # Optional since it needs PadWalker
 
-    *WebGUI::Session::Log::fatal = sub {
-        my $self = shift;
-        my $message = shift;
-        $self->{_stacktrace} ||= $StackTraceClass->new;  # favor the first stack trace
-        $self->{_message} ||= $message;
-        $old_fatal->($self, $message, @_);
-    };
-
-    my $old_error = *WebGUI::Session::Log::error{CODE};
-
-    *WebGUI::Session::Log::error = sub {
-        my $self = shift;
-        my $message = shift;
-        $self->{_stacktrace} ||= $StackTraceClass->new;
-        $self->{_message} ||= $message;
-        $old_error->($self, $message, @_);
-    };
+        my $old_new = Devel::StackTrace->can('new');
+        *Devel::StackTrace::new = sub {
+            my $self = $old_new ? $old_new->(@_) : { };
+            bless $self, 'Devel::StackTrace::WithLexicals';  # rebless
+        };   
+    }   
 
 }
 
 sub call {
     my($self, $env) = @_;
 
-    my $res = try { $self->app->($env) };
+    # this won't be Middleware called by the .psgi in the default config unless $env->{'webgui.debug'} is true
 
-    if( my $trace = $env->{'webgui.session'}->log->{_stacktrace} ) {
+    local $SIG{__DIE__} = sub {
+        WebGUI::Error::RunTime->throw(error => $@);
+    };
 
-        undef $env->{'webgui.session'}->log->{_stacktrace};  # the stack trace modules do create circular references; this is necessary
-                                                             # this should also keep us from doing this work twice if we get stacked twice
+    my $res = try { $self->app->($env) }; # XXX this try is useless; plack doesn't let errors cross middlewares
+
+    if( my $e = delete $env->{'webgui.error'} ) {
+
+        my $trace = $e->trace;
+        my $message = $e->error;
 
         my $text = trace_as_string($trace);
-        my $message = $env->{'webgui.session'}->log->{_message};
-        delete $env->{'webgui.session'}->log->{_message};
 
         my @previous_html = $res && $res->[2] ? (map ref $_ ? @{ $_ } : $_, $res->[2]) : ();
 

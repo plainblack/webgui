@@ -470,7 +470,7 @@ sub graph {
     
     my $session = $self->session;
 
-    eval { local $SIG{'__DIE__'}; require GraphViz };
+    eval { require GraphViz };
     if ($@) {
         return;
     }
@@ -710,7 +710,7 @@ sub www_graph {
 
     my $i18n = WebGUI::International->new($session, "Asset_Survey");
     
-    eval { local $SIG{'__DIE__'}; require GraphViz };
+    eval { require GraphViz };
     if ($@) {
         return '<h1>' . $i18n->get('survey visualization') . '</h1>Survey Visualization requires the GraphViz module';
     }

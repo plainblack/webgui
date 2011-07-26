@@ -746,41 +746,51 @@ Any leftover part of the requested URL.
 sub dispatch {
     my ($self, $fragment) = @_;
     return undef if $fragment;
+
     my $session = $self->session;
     my $state = $self->get('state');
+
     ##Only allow interaction with assets in certain states
     return if $state ne 'published' && $state ne 'archived' && !$session->isAdminOn;
-    my $func    = $session->form->param('func') || 'view';
-    my $viewing = $func eq 'view' ? 1 : 0;
-    my $sub     = $self->can('www_'.$func);
-    if (!$sub && $func ne 'view') {
-        $sub     = $self->can('www_view');
-        $viewing = 1;
+
+    # needed for tests that call straight here but otherwise redundant with same in WebGUI.pm
+    local $SIG{__DIE__} = sub { WebGUI::Error::RunTime->throw( message => $_[0] ); };
+
+
+    for my $func ( $session->form->param('func'), 'view' ) {
+
+        # if there's no output from the user specified func, try view next
+
+        my $viewing = $func eq 'view' ? 1 : 0;
+        my $sub     = $self->can('www_'.$func);
+
+        if (!$sub && $func ne 'view') {
+            $sub     = $self->can('www_view');
+            $viewing = 1;
+        }
+
+        return undef unless $sub;
+
+        my $output = eval { $self->$sub(); };
+
+        if ( $@ ) {
+            my $e = Exception::Class->caught();
+            # previously, this only handled WebGUI::Error::ObjectNotFound::Template
+            my $errstr = sprintf(
+                "Couldn't call method ``%s'' on asset for url ``%s'':  Error: ``%s''", 
+                "www_$func", $session->url->getRequestedUrl, $e->error,
+            );
+            $errstr .= " templateId: " . $e->templateId if $e->can('templateId') and $e->templateId;
+            $errstr .= " assetId: " . $e->assetId if $e->can('assetId') and $e->assetId;
+            $session->log->error($errstr);
+            $e->rethrow if $session->request->env->{'webgui.debug'};
+        }
+
+        return $output if $output || $viewing;
+
     }
-    return undef unless $sub;
-    my $output = eval { $self->$sub(); };
-    if (my $e = Exception::Class->caught('WebGUI::Error::ObjectNotFound::Template')) {
-                                         #WebGUI::Error::ObjectNotFound::Template
-        $session->log->error(sprintf "%s templateId: %s assetId: %s", $e->error, $e->templateId, $e->assetId);
-    }
-    elsif ($@) {
-        my $message = $@;
-        $session->log->error("Couldn't call method www_".$func." on asset for url: ".$session->url->getRequestedUrl." Root cause: ".$message);
-    }
-    return $output if $output || $viewing;
-    ##No output, try the view method instead
-    $output = eval { $self->www_view };
-    if (my $e = Exception::Class->caught('WebGUI::Error::ObjectNotFound::Template')) {
-        $session->log->error(sprintf "%s templateId: %s assetId: %s", $e->error, $e->templateId, $e->assetId);
-        return "chunked";
-    }
-    elsif ($@) {
-        warn "logged another warn: $@";
-        my $message = $@;
-        $session->log->warn("Couldn't call method www_view on asset for url: ".$session->url->getRequestedUrl." Root cause: ".$@);
-        return "chunked";
-    }
-    return $output;
+
+    return '';  # not reached
 }
 
 

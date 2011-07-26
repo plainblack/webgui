@@ -79,15 +79,21 @@ sub dispatch {
             $fragment =~ s/$url//;
             $session->asset($asset);
             my $output = eval { $asset->dispatch($fragment); };
-            if ( $@ ) {
-                $session->log->error( "Problem with dispatching $url: " . $@ );
+            if( $@ ) {
+                my $e = WebGUI::Error->caught('WebGUI::Error');
+                if( $session->request->env->{'webgui.debug'} ) {
+                    $e->rethrow; 
+                } else
+                {
+                    $session->log->error( "Problem with dispatching $url: " . $e, $e );
+                }
             }
             return $output if defined $output;
         }
     }
     $session->clearAsset;
     if ($session->isAdminOn) {
-        my $asset = WebGUI::Asset->newByUrl($session, $session->url->getRefererUrl) || WebGUI::Asset->getDefault($session);
+        my $asset = eval { WebGUI::Asset->newByUrl($session, $session->url->getRefererUrl) } || WebGUI::Asset->getDefault($session);
         return $asset->addMissing($assetUrl);
     }
     return undef;

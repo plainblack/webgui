@@ -2,7 +2,7 @@ package WebGUI::FormBuilder::Role::HasFields;
 
 use strict;
 use Moose::Role;
-use Try::Tiny;
+use WebGUI::Exception;
 use Carp qw(confess);
 
 requires 'session', 'pack', 'unpack';
@@ -56,11 +56,13 @@ sub addField {
         # Load the class
         # Try to load the WebGUI Field first in case we conveniently overlap with a common name
         # (like Readonly)
-        if ( $INC{'WebGUI/Form/'. ucfirst $file} || try { local $SIG{'__DIE__'}; require 'WebGUI/Form/' . ucfirst $file } ) {
+        if ( $INC{'WebGUI/Form/'. ucfirst $file} || eval { require 'WebGUI/Form/' . ucfirst $file } ) {
             $type = 'WebGUI::Form::' . ucfirst $type;
         }
-        elsif ( !$INC{$file} && !try { require $file; } ) {
-            confess sprintf "Could not load form control class %s", $type;
+        elsif ( !$INC{$file} && ! eval { require $file; } ) {
+            my $e = WebGUI::Error->caught;
+            $e->{message} = "Could not load form control class $type";
+            $e->rethrow;
         }
         $field = $type->new( $self->session, { @properties } );
     }

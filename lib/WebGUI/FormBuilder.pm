@@ -4,6 +4,7 @@ use strict;
 use WebGUI::BestPractices;
 use Moose;
 use MooseX::Storage;
+use WebGUI::Exception;
 
 =head1 NAME
 

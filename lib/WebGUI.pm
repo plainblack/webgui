@@ -27,7 +27,7 @@ use WebGUI::Config;
 use WebGUI::Pluggable;
 use WebGUI::Paths;
 use WebGUI::Types;
-use Try::Tiny;
+use WebGUI::Exception; 
 
 extends 'Plack::Component';
 
@@ -99,7 +99,7 @@ sub call {
 
             # Construct the PSGI response
 
-            try {
+            eval {
                 # Ask PSGI server for a streaming writer object by returning only the first
                 # two elements of the array reference
                 my $writer = $responder->( [ $psgi_response->[0], $psgi_response->[1] ] );
@@ -116,17 +116,19 @@ sub call {
                 # Close the session, because the WebGUI::Middleware::Session didn't
                 $session->close;
                 delete $env->{'webgui.session'};
-            }
-            catch {
+            };
+            if ( my $e = WebGUI::Error->caught ) {
                 if ($response->writer) {
                     # Response has already been started, so log error and close writer
-                    $session->request->TRACE("Error detected after streaming response started");
+                    $session->request->TRACE(
+                        "Error detected after streaming response started: " . $e->message . "\n" . $e->trace->as_string
+                    );
                     $response->writer->close;
                 }
                 else {
                     $responder->( [ 500, [ 'Content-Type' => 'text/plain' ], [ "Internal Server Error" ] ] );
                 }
-            };
+            }
         }
     }
 }
@@ -156,20 +158,26 @@ sub handle {
     # );
     # return;
 
+    local $SIG{__DIE__} = sub { WebGUI::Error::RunTime->throw( message => $_[0] ); };
+
     # Look for the template preview HTTP headers
     WebGUI::Asset::Template->processVariableHeaders($session);
 
     # TODO: refactor the following loop, find all instances of "chunked" and "empty" in codebase, etc..
     for my $handler (@{$session->config->get("contentHandlers")}) {
         my $output = eval { WebGUI::Pluggable::run($handler, "handler", [ $session ] )};
-        if ( my $e = WebGUI::Error->caught ) {
-            $session->log->error($e->package.":".$e->line." - ".$e->full_message);
-            $session->log->debug($e->package.":".$e->line." - ".$e->trace);
-        }
-        elsif ( $@ ) {
-            $session->log->error( $@ );
+        if ( $@ ) {
+            # re-throwing errors back out to plack is useless; to get the exception through to any middleware that
+            # want to report on it, we have to stash it in $env
+            # as long as our $SIG{__DIE__} is in effect, errors should always be objects
+            my $e = WebGUI::Error->caught;
+            $session->request->env->{'webgui.error'} = $e if $session->request->env->{'webgui.debug'};
+            $session->log->error($e->package.":".$e->line." - ".$e->full_message, $@);
+            $session->log->debug($e->package.":".$e->line." - ".$e->trace, $@);
         }
         else {
+
+            # Not an error
             
             # Stop if the contentHandler is going to stream the response body
             return if $session->response->streaming;

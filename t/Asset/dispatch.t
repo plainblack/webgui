@@ -137,7 +137,8 @@ $session->request->setup_body( {
 WebGUI::Test->interceptLogging(sub {
     my $log_data = shift;
     is( $td->dispatch, "www_view", "if a query method throws a Template exception, view is returned instead" );
-    is $log_data->{error}, 'Template not found templateId: This is a GUID assetId: '. $td->getId, '... and logged an error';
+    my $template_id = $td->getId;
+    ok $log_data->{error} =~ m /Template not found/ && $log_data->{error} =~ m/templateId: / && $log_data->{error} =~ m/$template_id/, '... and logged an error';
 });
 
 WebGUI::Test->interceptLogging(sub {
@@ -146,7 +147,7 @@ WebGUI::Test->interceptLogging(sub {
         func        => 'dies',
     } );
     is( $td->dispatch, "www_view", "if a query method dies, view is returned instead" );
-    is $log_data->{warn}, "Couldn't call method www_dies on asset for url: / Root cause: ...aside from that bullet\n", '.. and logged a warn';
+    ok $log_data->{error} =~ m/Couldn't call method/ && $log_data->{error} =~ m/www_dies/ && $log_data->{error} =~ m/\.\.\.aside from that bullet/, '.. and logged an error';
 });
 
 #vim:ft=perl

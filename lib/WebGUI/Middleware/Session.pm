@@ -47,13 +47,8 @@ sub call {
         $app = Plack::Middleware::SimpleLogger->wrap( $app );
     }
 
-    my $session = try {
-        $env->{'webgui.session'} = WebGUI::Session->open( $config, $env );
-    } catch {
-        # We don't have a logger object, so for now just warn() the error
-        warn "Unable to instantiate WebGUI::Session - $_";
-        return; # make sure $session assignment is undef
-    };
+    my $session = $env->{'webgui.session'} = WebGUI::Session->open( $config, $env ) or 
+        die "Unable to instantiate WebGUI::Session - $_";
 
     if ( !$session ) {
 
