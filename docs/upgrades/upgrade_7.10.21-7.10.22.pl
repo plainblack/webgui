@@ -31,6 +31,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+addAuthorizePaymentDriver($session);
 
 finish($session); # this line required
 
@@ -43,6 +44,16 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+#----------------------------------------------------------------------------
+# Add the Authorize.net payment driver to each config file
+sub addAuthorizePaymentDriver {
+    my $session = shift;
+    print "\tAdd the Authorize.net payment driver... " unless $quiet;
+    # and here's our code
+    $session->config->addToArray('paymentDrivers', 'WebGUI::Shop::PayDriver::CreditCard::AuthorizeNet');
+    print "DONE!\n" unless $quiet;
+}
 
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------

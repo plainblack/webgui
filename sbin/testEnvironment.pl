@@ -144,6 +144,8 @@ checkModule("CSS::Minifier::XS",            "0.03"       );
 checkModule("JavaScript::Minifier::XS",     "0.05"       );
 checkModule("Readonly",                     "1.03"       );
 checkModule("Business::PayPal::API",        "0.62"       );
+checkModule("Business::OnlinePayment",      "3.01"       );
+checkModule("Business::OnlinePayment::AuthorizeNet",      "3.21"       );
 checkModule("Locales",                      "0.10"       );
 checkModule("Test::Harness",                "3.17"       );
 checkModule("DateTime::Event::ICal",        "0.10"       );
