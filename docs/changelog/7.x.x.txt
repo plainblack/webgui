@@ -1,4 +1,5 @@
 7.10.22
+ - fixed #12206: Bad Subscription Groups in Duplicated Threads
 
 7.10.21
  - added #9668 extension template variable to attachment loops for the following assets:

@@ -268,15 +268,17 @@ sub duplicate {
     my $self       = shift;
     my $session    = $self->session;
     my $copy       = $self->SUPER::duplicate(@_);
-    my $oldGroupId = $self->get('subscriptionGroupId');
+    my $key        = 'subscriptionGroupId';
+    my $oldGroupId = $self->get($key);
 
     if ($oldGroupId) {
-        my $newGroup = WebGUI::Group->new($session, 'new');
-        my $oldGroup = WebGUI::Group->new($session, $oldGroupId);
-        if ($oldGroup) {
+        $copy->update({ $key => '' });
+        $copy->createSubscriptionGroup();
+        if (my $oldGroup = WebGUI::Group->new($session, $oldGroupId)) {
+            my $newGroup = WebGUI::Group->new($session, $copy->get($key));
             $newGroup->addUsers($oldGroup->getUsers('withoutExpired'));
+            $newGroup->addGroups($oldGroup->getGroupsIn);
         }
-        $copy->update({subscriptionGroupId => $newGroup->getId});
     }
     return $copy;
 }
