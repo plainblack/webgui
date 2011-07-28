@@ -21,19 +21,35 @@ use Sub::Exporter -setup => {
             my $config_file  = $ENV{WEBGUI_CONFIG}
                 or die 'WEBGUI_CONFIG environment variable must be specified';
             my $version      = $ENV{WEBGUI_UPGRADE_VERSION};
-            my $upgrade_file = File::Spec->rel2abs( (caller 4)[1] );
-            (my $vol, my $dir, my $shortname) = File::Spec->splitpath( $upgrade_file );
-            $shortname =~ s/\.[^.]*$//;
-            my $last_dir = (File::Spec->splitdir($dir))[-1];
-            if ( !$version && $last_dir =~ /\A\d+\.\d+\.\d+-(\d+\.\d+\.\d+)\z/msx ) {
-                $version = $1;
+            my $upgrade_file;
+            my $shortname;
+            my $level = 1;
+            while (1) {
+                my ($pack, $file) = caller $level;
+                if (!defined $pack) {
+                    last;
+                }
+                elsif ($file eq '-e') {
+                    last;
+                }
+                elsif ($pack ne 'Sub::Exporter') {
+                    $upgrade_file = File::Spec->rel2abs( $file );
+                    (my $vol, my $dir, $shortname) = File::Spec->splitpath( $upgrade_file );
+                    $shortname =~ s/\.[^.]*$//;
+                    my $last_dir = (File::Spec->splitdir($dir))[-1];
+                    if ( !$version && $last_dir =~ /\A\d+\.\d+\.\d+-(\d+\.\d+\.\d+)\z/msx ) {
+                        $version = $1;
+                    }
+                    last;
+                }
+                $level++;
             }
             if (! $version) {
-                die 'WEBGUI_UPGRADE_VERSION must be set';
+                die 'WEBGUI_UPGRADE_VERSION environment variable must be set';
             }
 
-            $col->{config_file} = $config_file;
-            $col->{version} = $version;
+            $col->{config_file}  = $config_file;
+            $col->{version}      = $version;
             $col->{upgrade_file} = $upgrade_file;
             $col->{upgrade_name} = $shortname;
 
@@ -52,7 +68,7 @@ sub _build_exports {
 
     my $config_file  = $config->{config_file};
     my $version      = $config->{version};
-    my $upgrade_name = $config->{upgrade_name};
+    my $upgrade_name = $config->{upgrade_name} // 'Unknown upgrade';
 
     # need to be able to reference these directly in the cleanup code
     my $session;
@@ -99,7 +115,7 @@ sub _build_exports {
     };
     my $collateral_sub = sub () {
         state $collateral = do {
-            my $path = $config->{upgrade_file};
+            my $path = $config->{upgrade_file} || die "Cannot use collateral in non-file upgrade script.\n";
             $path =~ s/\.[^.]*$//;
             Path::Class::Dir->new($path);
         };
