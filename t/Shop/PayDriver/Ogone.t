@@ -146,7 +146,7 @@ cmp_deeply(
     \@interestingFeatures,
     [
         {
-            name    => 'submit',
+            name    => 'send',
             type    => 'submit',
         },
         {
