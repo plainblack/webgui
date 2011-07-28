@@ -22,6 +22,7 @@ use Test::Deep;
 use Clone qw/clone/;
 
 use WebGUI::Test; # Must use this before any other WebGUI modules
+use WebGUI::Test::MockAsset;
 use WebGUI::Session;
 
 #----------------------------------------------------------------------------
@@ -59,9 +60,7 @@ else {
                  #1234567890123456789012#
 my $templateId = 'FAKE_WEATHER_TEMPLATEq';
 
-my $templateMock = Test::MockObject->new({});
-$templateMock->set_isa('WebGUI::Asset::Template');
-$templateMock->set_always('getId', $templateId);
+my $templateMock = WebGUI::Test::MockAsset->new('WebGUI::Asset::Template');
 my $templateVars;
 $templateMock->mock('process', sub { $templateVars = clone $_[1]; } );
 
@@ -76,11 +75,10 @@ my $asset  = $node->addChild( {
 WebGUI::Test->addToCleanup($asset);
 
 my $now = time();
-diag $now;
 set_relative_time(-1000);
-diag time();
 
-WebGUI::Test->mockAssetId($templateId, $templateMock);
+$templateMock->mock_id($templateId);
+$templateMock->set_true('prepare');
 $asset->prepareView();
 $asset->view();
 
@@ -88,7 +86,6 @@ my $weather_data = $templateVars->{'ourLocations.loop'}->[0];
 
 is $weather_data->{cityState}, 'Madison, WI (53715)', 'data from weather.com returned';
 my $last_fetch = $weather_data->{last_fetch};
-diag $last_fetch;
 cmp_ok $last_fetch, '<', $now-500, 'last_fetch set in the past';
 
 is $session->cache->get(join "", $asset->getId, '53715' )->{'locations'}->[0]->{cityState}, 'Madison, WI (53715)', 'cache loaded with valid data';
