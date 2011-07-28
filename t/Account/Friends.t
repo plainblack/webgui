@@ -79,11 +79,11 @@ $mech->get_ok( '/' );
 my $admin   = WebGUI::User->new( $mech->session, "3" );
 
 # Add a user who can be a friend for admin
-my $edgar_friendly = WebGUI::Test->user( username => 'edgarfriendly', ableToBeFriend => 1 );
+my $edgar_friendly = WebGUI::Test->user( username => 'edgarfriendly', ableToBeFriend => 1, publicProfile => 'all', );
 $edgar_friendly = WebGUI::User->new( $mech->session, $edgar_friendly->getId ); # fix the session
 
 # Add a user who is not very nice
-my $simon_phoenix = WebGUI::Test->user( username => 'simonphoenix', ableToBeFriend => 0 );
+my $simon_phoenix = WebGUI::Test->user( username => 'simonphoenix', ableToBeFriend => 0, publicProfile => 'none' );
 $simon_phoenix = WebGUI::User->new( $mech->session, $simon_phoenix->getId ); # fix the session
 
 $mech->session->user({ user => $admin });
