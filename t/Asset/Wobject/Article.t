@@ -182,6 +182,7 @@ cmp_bag(
             extension => 'tar',
         }),
     ],
+    'extensions in the attachment_loop are correct'
 ) or diag Dumper($templateVars->{attachment_loop});
 
 TODO: {
