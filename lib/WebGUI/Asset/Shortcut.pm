@@ -216,6 +216,7 @@ sub canManage {
 }
 
 #-------------------------------------------------------------------
+
 =head2 discernUserId 
 
 This utility method is used to determine if the user should be shown the view of the
