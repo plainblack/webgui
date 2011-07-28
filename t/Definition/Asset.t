@@ -25,7 +25,7 @@ use WebGUI::Test;
 
     define tableName => 'asset';
     ::dies_ok  { property 'property1' => (); } 'must have a fieldType';
-    ::dies_ok  { property 'property1' => (fieldType => 'text'); } 'must pass either a label or noFormPost flag';
+    ::lives_ok { property 'property1' => (fieldType => 'text'); } 'label will default to name if not passed';
     ::lives_ok { property 'property1' => (
                                             fieldType  => 'YUI Super Form',
                                             noFormPost => '1',
