@@ -71,7 +71,7 @@ sub canView {
     my $user    = WebGUI::User->new($session,$uid);
     return 0 if($user->isVisitor); #This should never happen but let's make sure
     return 0 unless ($user->get('ableToBeFriend'));  #User doesn't have friends enabled
-    return WebGUI::User->new($session,$uid)->profileIsViewable($session->user);  #User's profile isn't viewable by this user
+    return $user->profileIsViewable($session->user);  #User's profile isn't viewable by this user
 }
 
 #-------------------------------------------------------------------
