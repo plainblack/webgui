@@ -55,6 +55,26 @@ A base class for all exception handling. It creates a few base exception objects
 
 B<NOTE>: Though the package name is WebGUI::Exception, the handler objects that are created are WebGUI::Error.
 
+=head1 DESCRIPTION
+
+To the new policies for API methods are: if there's an error message to the user, there's one to the log. 
+Only trap exceptions in C<www_> methods and always report them.
+
+API methods now have a policy of throwing errors from this class to be caught by C<eval { }>
+or C<catch { }> in the calling code.
+Code using the API (such as in C<www_> methods, upgrade scripts, and so forth) should 
+use C<Exception::Class> to identify it, then either handle it gracefully or else 
+propogate it.
+
+    eval {
+        my $expected_result = WebGUI::Somewhere->something(@args);
+    };
+    if( my $e = Exception::Class->caught('WebGUI::Error::InvalidParam') ) {
+        # clean up or retry but otherwise don't do anything and the error will just vanish
+    } elsif( my $e = Exception::Class->caught() {
+        $e->rethrow;  # rethrow all unexpected errors
+    }
+
 =head1 EXCEPTION TYPES
 
 These exception classes are defined in this class:
