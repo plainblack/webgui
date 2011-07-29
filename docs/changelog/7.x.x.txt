@@ -1,4 +1,5 @@
 7.10.22
+ - rfe #12207: Thingy. Field_name info returned by www_editThingDataSaveViaAjax
  - fixed #12206: Bad Subscription Groups in Duplicated Threads
 
 7.10.21
