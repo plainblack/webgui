@@ -24,6 +24,8 @@ Package WebGUI::Session::Id;
 
 =head1 DESCRIPTION
 
+This module is deprecated, and will be removed during the WebGUI 8.x series.
+
 This package generates global unique ids, sometimes called GUIDs. A global unique ID is guaranteed to be unique everywhere and at everytime.
 
 B<NOTE:> There is no such thing as perfectly unique ID's, but the chances of a duplicate ID are so minute that they are effectively unique.
@@ -35,6 +37,12 @@ B<NOTE:> There is no such thing as perfectly unique ID's, but the chances of a d
 =head1 METHODS
 
 These methods are available from this class:
+
+=cut
+
+=head2 new
+
+Object contructor
 
 =cut
 
