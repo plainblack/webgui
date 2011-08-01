@@ -451,7 +451,7 @@ around canEdit => sub {
     my $addNew    = $form->process("func"              ) eq "add";
     my $editSave  = $form->process("assetId"           ) eq "new"
                  && $form->process("func"              ) eq "editSave"
-                 && $form->process("class","className" ) eq "WebGUI::Asset::WikiPage";
+                 && $form->process("className","className" ) eq "WebGUI::Asset::WikiPage";
     my $canEdit = ( ($addNew || $editSave) && $self->canEditPages )
         || $self->$orig(@_);
     return $canEdit;

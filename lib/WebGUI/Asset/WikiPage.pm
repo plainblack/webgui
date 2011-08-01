@@ -107,7 +107,7 @@ sub canEdit {
     my $addNew    = $form->process("func"              ) eq "add";
     my $editSave  = $form->process("assetId"           ) eq "new"
                  && $form->process("func"              ) eq "editSave"
-                 && $form->process("class","className" ) eq "WebGUI::Asset::WikiPage";
+                 && $form->process("className","className" ) eq "WebGUI::Asset::WikiPage";
     return $wiki->canAdminister
         || ( $wiki->canEditPages && ( $addNew || $editSave || !$self->isProtected) );
 }
@@ -152,24 +152,23 @@ sub getAutoCommitWorkflowId {
 
 #-------------------------------------------------------------------
 
-=head2 getEditForm 
+=head2 getEditTemplate 
 
 Renders a templated edit form for adding or editing a wiki page.
 
 =cut
 
-sub getEditForm {
+sub getEditTemplate {
 	my $self = shift;
 	my $session = $self->session;
 	my $form = $session->form;
 	my $i18n = WebGUI::International->new($session, "Asset_WikiPage");
-	my $newPage = 0;
 	my $wiki = $self->getWiki;
 	my $url = ($self->getId eq "new") ? $wiki->getUrl : $self->getUrl;
 	my $var = {
 		title=> $i18n->get("editing")." ".(defined($self->title)? $self->title : $i18n->get("assetName")),
 		formHeader => WebGUI::Form::formHeader($session, { action => $url}) 
-			.WebGUI::Form::hidden($session, { name => 'func', value => 'editSave' }) 
+			.WebGUI::Form::hidden($session, { name => 'func', value => ( $self->getId eq 'new' ? 'addSave' : 'editSave' ) }) 
 			.WebGUI::Form::hidden($session, { name=>"proceed", value=>"showConfirmation" }),
 	 	formTitle => WebGUI::Form::text($session, { name => 'title', maxlength => 255, size => 40, 
                 value => $self->title, defaultValue=>$form->get("title","text") }),
@@ -197,7 +196,7 @@ sub getEditForm {
     my $children = [];
 	if ($self->getId eq "new") {
 		$var->{formHeader} .= WebGUI::Form::hidden($session, { name=>"assetId", value=>"new" }) 
-			.WebGUI::Form::hidden($session, { name=>"class", value=>$form->process("class","className") });
+			.WebGUI::Form::hidden($session, { name=>"className", value=>$form->process("className","className") });
 	} else {
         $children = $self->getLineage(["children"]);
     }
@@ -207,7 +206,10 @@ sub getEditForm {
         maxImageSize    => $wiki->maxImageSize,
         thumbnailSize   => $wiki->thumbnailSize,
         });
-	return $self->processTemplate($var, $wiki->pageEditTemplateId);
+    my $template    = WebGUI::Asset->newById( $session, $wiki->pageEditTemplateId );
+    $template->style( $wiki->styleTemplateId );
+    $template->setParam( %$var );
+    return $template;
 }
 
 #-------------------------------------------------------------------
