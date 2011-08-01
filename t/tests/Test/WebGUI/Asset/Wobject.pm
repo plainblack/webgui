@@ -21,4 +21,20 @@ sub list_of_tables {
      return [qw/assetData wobject/];
 }
 
+sub t_15_getStyleTemplateId : Test(2) {
+    note "getStyleTemplateId";
+    my ( $test ) = @_;
+    my $session  = $test->session;
+    $session->style->setMobileStyle(0);
+    $session->setting->set('useMobileStyle', 1);
+    my ( $tag, $asset, @parents ) = $test->getAnchoredAsset();
+    $asset->styleTemplateId('Style');
+    $asset->mobileStyleTemplateId('Mobile');
+    is $asset->getStyleTemplateId, 'Style', 'returns Style since mobile was not requested';
+    $session->style->setMobileStyle(1);
+    is $asset->getStyleTemplateId, 'Mobile', 'returns Mobile since mobile was set';
+    $session->style->setMobileStyle(0);
+    $session->setting->set('useMobileStyle', 0);
+}
+
 1;

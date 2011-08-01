@@ -228,6 +228,20 @@ sub getCollateral {
 
 #-------------------------------------------------------------------
 
+=head2 getStyleTemplateId
+
+This returns the correct style to use, either a regular style or a mobile style,
+based on $session->style->useMobileStyle.
+
+=cut
+
+sub getStyleTemplateId {
+	my $self = shift;
+    return $self->session->style->useMobileStyle ? $self->mobileStyleTemplateId : $self->styleTemplateId;
+}
+
+#-------------------------------------------------------------------
+
 =head2 moveCollateralDown ( tableName, keyName, keyValue [ , setName, setValue ] )
 
 Moves a collateral data item down one position. This assumes that the collateral data table has a column called "assetId" that identifies the wobject, and a column called "sequenceNumber" that determines the position of the data item.
@@ -345,10 +359,7 @@ override processStyle => sub {
 	my ($self, $output, $options) = @_;
     $output   = super();
     my $style = $self->session->style;
-    if ($style->useMobileStyle) {
-        return $style->process($output,$self->get("mobileStyleTemplateId"));
-    }
-    return $style->process($output,$self->get("styleTemplateId"));
+    return $style->process($output,$self->getStyleTemplateId);
 };
 
 
