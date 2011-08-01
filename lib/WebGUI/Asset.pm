@@ -2744,8 +2744,10 @@ sub www_add {
 
     my $template   = eval { $newAsset->getEditTemplate };
     return $@ if $@;
-    $template->getForm("form")->action( $self->getUrl );
-    $template->getForm("form")->addField( "Hidden", name => "func", value => "addSave" );
+    if ( $template->getForm("form") ) {
+        $template->getForm("form")->action( $self->getUrl );
+        $template->getForm("form")->addField( "Hidden", name => "func", value => "addSave" );
+    }
     return $template;
 }
 
@@ -2893,7 +2895,9 @@ sub www_edit {
     return $self->session->privilege->locked() unless $self->canEditIfLocked;
 
     my $template    = $self->getEditTemplate;
-    $template->getForm('form')->addField( "Hidden", name => "func", value => "editSave" );
+    if ( my $form = $template->getForm('form') ) {
+        $form->addField( "Hidden", name => "func", value => "editSave" );
+    }
 
     return $template;
 }
