@@ -397,7 +397,11 @@ sub processReplacements {
 	}
     foreach my $searchFor (keys %{$replacements}) {
         my $replaceWith = $replacements->{$searchFor};
-        $content =~ s/\b\Q$searchFor\E\b/$replaceWith/gs;
+        my $pattern = qr/\Q$searchFor\E/;
+        if ($searchFor =~ /^\w+/) {
+            $pattern = qr/\b$pattern\b/;
+        }
+        $content =~ s/$pattern/$replaceWith/gs;
     }
 	return $content;
 }

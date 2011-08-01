@@ -65,7 +65,7 @@ my @filterSets = (
 	},
 	{
 		inputText => q!<p>Paragraph</p>^H();!,
-		output => q!Paragraph &#94;H();!,
+		output => q|Paragraph &#94;H();|,
 		type => 'all',
 		comment => 'all filters macros and HTML',
 	},
@@ -83,12 +83,12 @@ my @filterSets = (
 	},
 	{
 		inputText => q!&nbsp;!,
-		output => q!&#x26;nbsp;!,
+		output => q|&#x26;nbsp;|,
 		type => 'xml',
 		comment => 'xml, &nbsp;',
 	},
 	{
-		inputText => q!> < "!,
+		inputText => q|> < "|,
 		output => q!&#x3E; &#x3C; &#x22;!,
 		type => 'xml',
 		comment => 'xml, other characters',
@@ -129,7 +129,7 @@ my @htmlTextSets = (
 my $numTests = scalar @filterSets
              + scalar @macroParamSets
              + scalar @htmlTextSets
-             + 3
+             + 6
              ;
 
 plan tests => $numTests;
@@ -149,6 +149,31 @@ foreach my $testSet (@htmlTextSets) {
 	is($text, $testSet->{output}, $testSet->{comment});
 }
 
+my @replacement_ids = ();
+push @replacement_ids, $session->db->setRow("replacements","replacementId",{
+    replacementId=>'new',
+    searchFor=>':)',
+    replaceWith=>'smiley.gif',
+});
+push @replacement_ids, $session->db->setRow("replacements","replacementId",{
+    replacementId=>'new',
+    searchFor=>'[]',
+    replaceWith=>'square brackets',
+});
+push @replacement_ids, $session->db->setRow("replacements","replacementId",{
+    replacementId=>'new',
+    searchFor=>'[IMAG]',
+    replaceWith=>'IMAGE',
+});
+WebGUI::Test->addToCleanup(sub {
+    foreach my $id (@replacement_ids) {
+        $session->db->write('delete from replacements where replacementId=?',[$id]);
+    }
+});
+
 is(WebGUI::HTML::processReplacements($session, 'grass'), 'grass', 'processReplacements: grass is not replaced');
 is(WebGUI::HTML::processReplacements($session, 'shitake'), 'shitake', '... shitake is not replaced');
 is(WebGUI::HTML::processReplacements($session, 'This is shit.'), 'This is crap.', '... shit is replaced');
+is(WebGUI::HTML::processReplacements($session, ':)'), 'smiley.gif', '... unbalanced paren is replaced');
+is(WebGUI::HTML::processReplacements($session, '[]'), 'square brackets', '... square brackets are replaced');
+is(WebGUI::HTML::processReplacements($session, '[IMAG]'), 'IMAGE', '... image sequence processed');
