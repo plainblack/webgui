@@ -207,7 +207,7 @@ sub getEditTemplate {
         thumbnailSize   => $wiki->thumbnailSize,
         });
     my $template    = WebGUI::Asset->newById( $session, $wiki->pageEditTemplateId );
-    $template->style( $wiki->styleTemplateId );
+    $template->style( $wiki->getStyleTemplateId );
     $template->setParam( %$var );
     return $template;
 }
