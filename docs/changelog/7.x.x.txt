@@ -2,6 +2,7 @@
  - rfe #12207: Thingy. Field_name info returned by www_editThingDataSaveViaAjax
  - fixed #12206: Bad Subscription Groups in Duplicated Threads
  - fixed #12208: replacements don't work
+ - fixed #12213: Unable to view cart when an asset is deleted.
 
 7.10.21
  - added #9668 extension template variable to attachment loops for the following assets:

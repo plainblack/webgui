@@ -676,8 +676,11 @@ sub requiresShipping {
     my $self    = shift;
 
     # Look for recurring items in the cart
-    foreach my $item (@{ $self->getItems }) {
-        return 1 if $item->getSku->isShippingRequired;
+    ITEM: foreach my $item (@{ $self->getItems }) {
+        my $sku = $item->getSku;
+        next ITEM unless $sku;
+        return 1 if $sku->isShippingRequired;
+
     }
 
     # No recurring items in cart so return false

@@ -175,7 +175,8 @@ sub getSku {
     my ($self) = @_;
     my $asset = '';
     $asset = WebGUI::Asset->newByDynamicClass($self->cart->session, $self->get("assetId"));
-    $asset->applyOptions($self->get("options")) if $asset;
+    return undef if ! $asset;
+    $asset->applyOptions($self->get("options"));
     return $asset;
 }
 

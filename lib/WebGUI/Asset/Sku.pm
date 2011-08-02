@@ -628,6 +628,22 @@ sub processStyle {
 
 #-------------------------------------------------------------------
 
+=head2 purge ( )
+
+Extent the base class to clean out any items using this Sku in all Carts.
+
+=cut
+
+sub purge {
+	my $self = shift;
+    my $assetId = $self->getId;
+    my $success = $self->SUPER::purge;
+    return $success unless $success;
+    $self->session->db->write('delete from cartItem where assetId=?',[$assetId]);
+}
+
+#-------------------------------------------------------------------
+
 =head2 setTaxConfiguration ($namespace, $configuration)
 
 =head3 $namespace
