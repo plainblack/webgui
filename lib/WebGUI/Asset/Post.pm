@@ -204,7 +204,7 @@ sub canEdit {
         ( $form->get("func") eq "add" 
             || ( $form->get("func") eq "editSave" && $form->get("assetId") eq "new" )
         )
-        && $form->get("class") eq "WebGUI::Asset::Post"
+        && $form->get("className") eq "WebGUI::Asset::Post"
     ) {
         return $self->getThread->getParent->canPost;
     }
