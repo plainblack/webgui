@@ -24,6 +24,9 @@ use WebGUI::Asset::Wobject::Shelf;
 use WebGUI::AssetHelper::Product::ImportCSV;
 use Test::MockObject::Extends;
 use WebGUI::Fork;
+use File::Temp;
+use File::Copy;
+
 
 #----------------------------------------------------------------------------
 # Init
@@ -75,23 +78,23 @@ SKIP: {
     skip 'Root will cause this test to fail since it does not obey file permissions', 3
         if $< == 0;
 
-    my $originalChmod = (stat $productsFile)[2];
-    chmod oct(0000), $productsFile;
+    my (undef, $productsTempFile) = File::Temp::tempfile('productTableXXXX', OPEN => 0, TMPDIR => 1, SUFFIX => '.csv');
+    File::Copy::copy($productsFile, $productsTempFile);
 
-    eval { $shelf->importProducts($productsFile); };
+    chmod oct(0000), $productsTempFile;
+
+    eval { $shelf->importProducts($productsTempFile); };
     $e = Exception::Class->caught();
-    isa_ok($e, 'WebGUI::Error::InvalidFile', 'importProducts: error handling for file that cannot be read');
+    isa_ok($e, 'WebGUI::Error::InvalidFile', 'importProducts: error handling for file that cannot be read') || skip 'invalid error thrown', 2;
     is($e->error, 'File is not readable', 'importProducts: error handling for file that that cannot be read');
     cmp_deeply(
         $e,
         methods(
-            brokenFile => $productsFile,
+            brokenFile => $productsTempFile,
         ),
         'importProducts: error handling for file that that cannot be read',
     );
-
-    chmod $originalChmod, $productsFile;
-
+    unlink $productsTempFile;
 }
 
 my $failure=0;
