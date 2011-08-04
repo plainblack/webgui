@@ -343,13 +343,13 @@ sub getCrumbTrail {
 
 #-------------------------------------------------------------------
 
-=head2 getEditForm (  )
+=head2 getEditTemplate (  )
 
-Returns a templated form for adding or editing Stories.
+Templated form from the containing Archive
 
 =cut
 
-sub getEditForm {
+sub getEditTemplate {
     my $self    = shift;
     my $session = $self->session;
     my $i18n    = WebGUI::International->new($session, 'Asset_Story');
@@ -360,7 +360,7 @@ sub getEditForm {
     my $title   = $self->getTitle;
     my $var     = {
         formHeader     => WebGUI::Form::formHeader($session, {action => $url})
-                        . WebGUI::Form::hidden($session, { name => 'func',    value => 'editSave' })
+                        . WebGUI::Form::hidden($session, { name => 'func',    value => ($isNew ? 'addSave' : 'editSave') })
                         . WebGUI::Form::hidden($session, { name => 'proceed', value => 'showConfirmation' })
                         ,
         formFooter     => WebGUI::Form::formFooter($session),
@@ -491,13 +491,16 @@ sub getEditForm {
                           }),
     };
     if ($isNew) {
-        $var->{formHeader} .= WebGUI::Form::hidden($session, { name => 'assetId', value => 'new' })
-                           .  WebGUI::Form::hidden($session, { name => 'class',   value => $form->process('class', 'className') });
+        $var->{formHeader} .= WebGUI::Form::hidden($session, { name => 'assetId',   value => 'new' })
+                           .  WebGUI::Form::hidden($session, { name => 'className', value => $form->process('className', 'className') });
     }
     else {
         $var->{formHeader} .= WebGUI::Form::hidden($session, { name => 'url',     value => $url});
     }
-    return $self->processTemplate($var, $archive->editStoryTemplateId);
+    my $template = WebGUI::Asset->newById($session, $archive->editStoryTemplateId);
+    $template->style($archive->getStyleTemplateId);
+    $template->setParam(@{ $var });
+    return $template;
 
 }
 
