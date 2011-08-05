@@ -645,8 +645,6 @@ sub www_edit {
             name        => "title",
             value       => ( $form->get("title") || $self->title ),
         });
-    
-    $self->getGallery;
 
     $var->{ form_synopsis }
         = WebGUI::Form::HTMLArea( $session, {
