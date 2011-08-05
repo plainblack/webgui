@@ -487,21 +487,6 @@ sub www_delete {
 
 #-------------------------------------------------------------------
 
-=head2 www_edit 
-
-Overrides the master class to render the edit form in the parent wiki's style.
-
-=cut
-
-sub www_edit {
-	my $self = shift;
-	return $self->session->privilege->insufficient unless $self->canEdit;
-	return $self->session->privilege->locked unless $self->canEditIfLocked;
-	return $self->getWiki->processStyle($self->getEditForm);
-}
-
-#-------------------------------------------------------------------
-
 =head2 www_getHistory 
 
 Returns the version history of this wiki page.  The output is templated.
