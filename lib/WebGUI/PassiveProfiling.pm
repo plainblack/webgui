@@ -122,26 +122,17 @@ sub summarizeAOI {
 		where f.fieldId = d.fieldId
 			and d.assetId = ".$session->db->quote($data->{assetId});
 
-        my $sth = $session->db->read($sql);
-        while (my $field = $sth->hashRef) {
-		my $aoi = $session->db->quickHashRef("select * from passiveProfileAOI
-						where userId=".$session->db->quote($data->{userId})."
-						and fieldId=".$session->db->quote($field->{fieldId})." and
-						value=".$session->db->quote($field->{value}));
-		if(not exists $aoi->{userId}) {
-			# Add record to DB
-			$session->db->write("insert into passiveProfileAOI (userId, fieldId, value)
-						values (".$session->db->quote($data->{userId}).",".
-							$session->db->quote($field->{fieldId}).",".
-							$session->db->quote($field->{value}).")");
-		}
-		my $count = $aoi->{count};
-		$count++;
-		$session->db->write("update passiveProfileAOI set count=".$session->db->quote($count)."
-					where userId=".$session->db->quote($data->{userId})."
-                                        and fieldId=".$session->db->quote($field->{fieldId})." and
-                                        value=".$session->db->quote($field->{value}));
-	}
+    my $sth = $session->db->read($sql);
+    while (my $field = $sth->hashRef) {
+        $session->db->write(
+            "INSERT IGNORE INTO passiveProfileAOI (userId, fieldId, value, count) VALUES (?, ?, ?, ?)",
+            [$data->{userId}, $field->{fieldId}, $field->{value}, 0],
+        );
+        $session->db->write(
+            "UPDATE passiveProfileAOI SET count=count+1 WHERE userId=? AND fieldId=? AND value=?",
+            [$data->{userId}, $field->{fieldId}, $field->{value}],
+        );
+    }
 	$sth->finish;
 }
 
