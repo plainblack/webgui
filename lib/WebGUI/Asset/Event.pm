@@ -1884,14 +1884,14 @@ sub www_deleteFile {
 
 ####################################################################
 
-=head2 www_edit
+=head2 getEditTemplate
 
-Edit the event.
+Override the base class to handle the custom edit template.
 
 =cut
 
 # Author's note: This sub is ugly and should be reformatted according to PBP
-sub www_edit {
+sub getEditTemplate {
     my $self        = shift;
     my $session     = $self->session;
     my $form        = $self->session->form;
@@ -1911,13 +1911,17 @@ sub www_edit {
                 value   => "new",
             })
             . WebGUI::Form::hidden($self->session, {
-                name    => "class",
-                value   => $self->session->form->process("class","className"),
+                name    => "className",
+                value   => $self->session->form->process("className","className"),
             })
             . WebGUI::Form::hidden( $self->session, {
                 name    => 'ownerUserId',
                 value   => $self->session->user->userId,
             } )
+            . WebGUI::Form::hidden($self->session, {
+                name    => "func",
+                value   => "addSave"
+            })
             ;
     }
     else {
@@ -1933,15 +1937,15 @@ sub www_edit {
                 name    => 'ownerUserId',
                 value   => $self->session->user->userId,
             } )
+            . WebGUI::Form::hidden($self->session, {
+                name    => "func",
+                value   => "editSave"
+            })
             ;
     }
 
-    $var->{"formHeader"}
-        .= WebGUI::Form::hidden($self->session, {
-            name    => "func",
-            value   => "editSave"
-        })
-        . WebGUI::Form::hidden($self->session, {
+    $var->{"formHeader"} .=
+        WebGUI::Form::hidden($self->session, {
             name    => "recurId",
             value   => $self->recurId,
         });
@@ -2411,32 +2415,19 @@ ENDJS
 
 
     ### Load the template
-    my $parent        = $self->getParent;
+    my $parent = $self->getParent;
     my $template;
     if ($parent) {
-        $template
-            = WebGUI::Asset::Template->newById($session,$parent->templateIdEventEdit);
+        $template = WebGUI::Asset::Template->newById($session,$parent->templateIdEventEdit);
+        $template->style($parent->styleTemplateId);
     }
     else {
-        $template
-            = WebGUI::Asset::Template->newById($session,"CalendarEventEdit00001");
+        $template = WebGUI::Asset::Template->newById($session,"CalendarEventEdit00001");
     }
 
-
-
-    ### Show the processed template
-    $session->response->sendHeader;
-    my $style = $self->getParent->processStyle($self->getSeparator);
-    my ($head, $foot) = split($self->getSeparator,$style);
-    $self->session->output->print($head, 1);
-    $self->session->output->print($self->processTemplate($var, undef, $template));
-    $self->session->output->print($foot, 1);
-    return "chunked";
+    $template->setParam(%{ $var });
+    return $template
 }
-
-
-
-
 
 ####################################################################
 
