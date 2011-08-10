@@ -2326,7 +2326,8 @@ sub processEditForm {
 
 
         # process the form element
-        $data{$property} = $form->process( $property, $fieldType, $fieldHash->{defaultValue}, $fieldHash );
+        my $defaultValue = $overrides->{defaultValue} // $self->$property;
+        $data{$property} = $form->process( $property, $fieldType, $defaultValue, $fieldHash );
     } ## end foreach my $property ( $self...)
 
     $data{keywords} = $form->process("keywords");
