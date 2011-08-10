@@ -2419,7 +2419,7 @@ ENDJS
     my $template;
     if ($parent) {
         $template = WebGUI::Asset::Template->newById($session,$parent->templateIdEventEdit);
-        $template->style($parent->styleTemplateId);
+        $template->style($parent->getStyleTemplateId);
     }
     else {
         $template = WebGUI::Asset::Template->newById($session,"CalendarEventEdit00001");
