@@ -29,6 +29,7 @@ use WebGUI::User;
 use WebGUI::Operation::Shared;
 use WebGUI::Operation::Profile;
 use WebGUI::Workflow::Instance;
+use WebGUI::Shop::AddressBook;
 use WebGUI::Inbox;
 use WebGUI::Friends;
 
@@ -315,6 +316,35 @@ sub createAccountSave {
 	}
 	$u->karma($self->session->setting->get("karmaPerLogin"),"Login","Just for logging in.") if ($self->session->setting->get("useKarma"));
 	$u->updateProfileFields($profile) if ($profile);
+    #Update the shop address
+    my $address          = {};
+    my $address_mappings = WebGUI::Shop::AddressBook->getProfileAddressMappings;
+    foreach my $fieldId (keys %$profile) {
+        #set the shop address fields
+        my $address_key          = $address_mappings->{$fieldId};
+        $address->{$address_key} = $profile->{$fieldId} if ($address_key);
+    }
+
+    #Update or create and update the shop address
+    if ( keys %$address ) {
+        $address->{'isProfile'        } = 1;
+
+        #Get home address only mappings to avoid creating addresses with just firstName, lastName, email
+        my %home_address_map = %{$address_mappings};
+        foreach my $exclude ( qw{ firstName lastName email } ) {
+            delete $home_address_map{$exclude};
+        }
+        #Add the profile address for the user if there are homeAddress fields
+        if( grep { $address->{$_} } values %home_address_map ) {
+            #Create the address book for the user
+            my $addressBook    = WebGUI::Shop::AddressBook->newByUserId($self->session,$userId);
+            $address->{label} = "Profile Address";
+            my $new_address = $addressBook->addAddress($address);
+            #Set this as the default address if one doesn't already exist
+            $addressBook->update( { defaultAddressId => $new_address->getId } );
+        }
+    }
+
     $self->saveParams($userId,$self->authMethod,$properties);
 
 	if ($self->getSetting("sendWelcomeMessage")){

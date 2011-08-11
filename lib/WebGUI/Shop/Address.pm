@@ -153,6 +153,19 @@ sub getId {
     return $self->get("addressId");
 }
 
+#-------------------------------------------------------------------
+
+=head2 isProfile ()
+
+Returns 1 if the address is linked to the user's profile.
+
+=cut
+
+sub isProfile {
+    my $self = shift;
+    return ($self->get("isProfile") eq 1);
+}
+
 
 #-------------------------------------------------------------------
 
@@ -191,7 +204,6 @@ sub new {
     $properties{ $id } = $address;
     return $self;
 }
-
 
 #-------------------------------------------------------------------
 
@@ -259,16 +271,20 @@ The organization or company that this user is a part of.
 
 The address book that this address belongs to.
 
+=head4 isProfile
+
+Whether or not this address is linked to the user profile.  Defaults to 0
+
 =cut
 
 sub update {
     my ($self, $newProperties) = @_;
     my $id = id $self;
-    foreach my $field (qw(addressBookId email organization address1 address2 address3 state code city label firstName lastName country phoneNumber)) {
+
+    foreach my $field (qw(addressBookId email organization address1 address2 address3 state code city label firstName lastName country phoneNumber isProfile)) {
         $properties{$id}{$field} = (exists $newProperties->{$field}) ? $newProperties->{$field} : $properties{$id}{$field};
     }
     $self->addressBook->session->db->setRow("address","addressId",$properties{$id});
 }
-
 
 1;

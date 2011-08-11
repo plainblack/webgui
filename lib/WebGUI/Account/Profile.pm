@@ -432,16 +432,67 @@ sub www_editSave {
 
     unless(scalar(@{$retHash->{errors}})) {
         my $profile  = $retHash->{profile};
+
         my $privacy  = {};
         $session->user->update($profile);
+
+        my $address          = {};
+        my $address_mappings = WebGUI::Shop::AddressBook->getProfileAddressMappings;
         foreach my $fieldName (keys %{$profile}) {
+            #set the shop address fields
+            my $address_key          = $address_mappings->{$fieldName};
+            $address->{$address_key} = $profile->{ $fieldName } if ($address_key);
+
+            #set the privacy settings
             my $privacySetting     = $session->form->get("privacy_".$fieldName);
             next unless $privacySetting;
             $privacy->{$fieldName} = $privacySetting;
         }
+
         $session->user->setProfileFieldPrivacySetting($privacy);
+
+        #Update or create and update the shop address
+        if ( keys %$address ) {
+            $address->{'isProfile'        } = 1;
+
+            #Get the address book for the user (one is created if it does not exist)
+            my $addressBook     = WebGUI::Shop::AddressBook->newByUserId($session,$self->uid);
+            my $profileAddress = eval { $addressBook->getProfileAddress() };
+
+            my $e;
+            if($e = WebGUI::Error->caught('WebGUI::Error::ObjectNotFound')) {
+                #Get home address only mappings to avoid creating addresses with just firstName, lastName, email
+                my %home_address_map = %{$address_mappings};
+                foreach my $exclude ( qw{ firstName lastName email } ) {
+                    delete $home_address_map{$exclude};
+                }
+                #Add the profile address for the user if there are homeAddress fields
+                if( grep { $address->{$_} } values %home_address_map ) {
+                    $address->{label} = "Profile Address";
+                    my $new_address = $addressBook->addAddress($address);
+                    #Set this as the default address if one doesn't already exist
+                    my $defaultAddress = eval{ $addressBook->getDefaultAddress };
+                    if(WebGUI::Error->caught('WebGUI::Error::ObjectNotFound')) {
+                        $addressBook->update( {
+                            defaultAddressId => $new_address->getId
+                        } );
+                    }
+                }
+            }
+            elsif ($e = WebGUI::Error->caught) {
+                #Bad stuff happened - log an error but don't fail since this isn't a vital function
+                $session->log->error(
+                    q{Could not update Shop Profile Address for user }
+                        .$self->username.q{ : }.$e->error
+                );
+            }
+            else {
+                #Update the profile address for the user
+                $profileAddress->update($address);
+            }
+        }
     }
-    
+
     #Store the category the error occurred in the object for reference
     $self->store->{selected} = $retHash->{errorCategory};
 

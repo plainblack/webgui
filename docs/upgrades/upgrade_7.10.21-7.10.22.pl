@@ -33,6 +33,9 @@ my $session = start(); # this line required
 # upgrade functions go here
 addAuthorizePaymentDriver($session);
 
+createAddressField($session);
+addLinkedProfileAddress($session);
+
 finish($session); # this line required
 
 
@@ -52,6 +55,67 @@ sub addAuthorizePaymentDriver {
     print "\tAdd the Authorize.net payment driver... " unless $quiet;
     # and here's our code
     $session->config->addToArray('paymentDrivers', 'WebGUI::Shop::PayDriver::CreditCard::AuthorizeNet');
+    print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+sub addLinkedProfileAddress {
+    my $session = shift;
+    print "\tAdding linked profile addresses for existing users... " unless $quiet;
+
+    my $users = $session->db->buildArrayRef( q{
+        select userId from users where userId not in ('1','3')
+    } );
+
+    foreach my $userId (@$users) {
+        #check to see if there is user profile information available
+        my $u = WebGUI::User->new($session,$userId);
+        #skip if user does not have any homeAddress fields filled in
+        next unless (
+            $u->profileField("homeAddress")
+            || $u->profileField("homeCity")
+            || $u->profileField("homeState")
+            || $u->profileField("homeZip")
+            || $u->profileField("homeCountry")
+            || $u->profileField("homePhone")
+        );
+
+        #Get the address book for the user (one is created if it does not exist)
+        my $addressBook = WebGUI::Shop::AddressBook->newByUserId($session,$userId);
+        
+        #Add the profile address for the user
+        $addressBook->addAddress({
+            label       => "Profile Address",
+            firstName   => $u->profileField("firstName"),
+            lastName    => $u->profileField("lastName"),
+            address1    => $u->profileField("homeAddress"),
+            city        => $u->profileField("homeCity"),
+            state       => $u->profileField("homeState"),
+            country     => $u->profileField("homeCountry"),
+            code        => $u->profileField("homeZip"),
+            phoneNumber => $u->profileField("homePhone"),
+            email       => $u->profileField("email"),
+            isProfile   => 1,
+        });
+    }
+
+    print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+sub createAddressField {
+    my $session = shift;
+
+    #skip if field exists
+    my $columns  = $session->db->buildArrayRef("show columns from address where Field='isProfile'");
+    return if(scalar(@$columns));
+
+    print "\tAdding profile link to Address... " unless $quiet;
+
+    $session->db->write( q{
+        alter table address add isProfile tinyint default 0
+    } );
+
     print "DONE!\n" unless $quiet;
 }
 

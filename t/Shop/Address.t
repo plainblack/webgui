@@ -141,6 +141,7 @@ cmp_deeply(
         organization => undef,
         addressId   => ignore(), #checked elsewhere
         addressBookId  => $book->getId,
+        isProfile   => 0,
     },
     'get the whole thing and check a new, blank object'
 );
