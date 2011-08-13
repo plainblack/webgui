@@ -40,7 +40,25 @@ The following methods are specifically available from this class. Check the supe
 
 =cut
 
+#-------------------------------------------------------------------
 
+=head2 definition ( session, [ additionalTerms ] )
+
+Add another field so we can provide extras to the text area vs the selectBox
+
+=cut
+
+sub definition {
+       my $class = shift;
+       my $session = shift;
+       my $definition = shift || [];
+       push(@{$definition}, {
+               textExtras=>{
+                       defaultValue=>undef
+                       },
+    });
+       return $definition;
+}
 
 #-------------------------------------------------------------------
 
@@ -127,7 +145,8 @@ sub toHtml {
 		.WebGUI::Form::Text->new($self->session,
 			size=>$self->session->setting->get("textBoxSize")-5,
 			name=>$self->get("name")."_new",
-			id=>$self->get('id')."_new"
+			id=>$self->get('id')."_new",
+                        extras=>$self->get('textExtras')||$self->get('extras'),
 			)->toHtml;
 }
 
