@@ -4,6 +4,7 @@
  - fixed #12208: replacements don't work
  - fixed #12213: Unable to view cart when an asset is deleted.
  - added: Better integration between User Profile fields, the Shop address book and the EMS.
+ - fixed #12218: Failed INSERT in Passive Profiling causes leak
 
 7.10.21
  - added #9668 extension template variable to attachment loops for the following assets:
