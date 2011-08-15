@@ -1,6 +1,10 @@
 This is a running list of template changes made during upgrades.  If you have copied the default
 templates, you will need to apply these changes manually to your copies.
 
+7.10.22
+  * Thingy CSS file - root/import/thingy-templates/thingy.css
+    Add CSS to make sure that overflows are visible, to handle style that hide overflow by default.
+
 7.10.18
   * Collaboration System Default Notification Template /default_forum_notification
     Replace table with divs to make inline replying easier.
