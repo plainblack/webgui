@@ -3,6 +3,7 @@
  - fixed #12202: JsonTable refers to unexistent YUI file
  - fixed #12208: replacements don't work
  - fixed #12213: Unable to view cart when an asset is deleted.
+ - fixed #12218: Failed INSERT in Passive Profiling causes leak
 
 7.9.33
  - fixed #12188: Thingy broken after upgrade to 7.9.32-stable
