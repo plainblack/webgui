@@ -43,6 +43,7 @@ addProcessorDropdownToSnippet( $session );
 addRichEditToCarousel($session);
 alterAssetIndexTable($session);
 reindexAllThingys($session);
+use WebGUI::Asset::MapPoint;
 WebGUI::AssetAspect::Installable::upgrade("WebGUI::Asset::MapPoint",$session);
 addRenderThingDataMacro($session);
 addAssetPropertyMacro($session);
@@ -327,6 +328,7 @@ sub createThingyDBColumns {
 sub addAssetManagerSortPreferences {
     my $cn   = 'assetManagerSortColumn';
     my $on   = 'assetManagerSortDirection';
+    use WebGUI::ProfileField;
     unless (WebGUI::ProfileField->new($session, $cn)) {
         print 'Adding Asset Manager Sort Column profile field...'
             unless $quiet;
@@ -378,7 +380,6 @@ sub addTicketLimitToBadgeGroup {
     print "\tAdd ticket limit to badge groups... " unless $quiet;
     # Make sure it hasn't been done already...
     my $columns = $session->db->buildHashRef('describe EMSBadgeGroup');
-    use List::MoreUtils qw(any);
     if(! grep { /ticketsPerBadge/ } keys %{$columns}) {
         $session->db->write(q{
             ALTER TABLE EMSBadgeGroup ADD COLUMN `ticketsPerBadge` INTEGER
@@ -399,6 +400,7 @@ sub addWaitForConfirmationWorkflow {
     my $c       = $session->config;
     my $exists  = $c->get('workflowActivities/WebGUI::User');
     my $class   = 'WebGUI::Workflow::Activity::WaitForUserConfirmation';
+    use $class;
     unless (grep { $_ eq $class } @$exists) {
         print "Adding WaitForUserConfirmation workflow..." unless $quiet;
         $c->addToArray('workflowActivities/WebGUI::User' => $class);
@@ -436,6 +438,8 @@ sub addLinkedProfileAddress {
         select userId from users where userId not in ('1','3')
     } );
 
+    use WebGUI::User;
+    use WebGUI::Shop::AddressBook;
     foreach my $userId (@$users) {
         #check to see if there is user profile information available
         my $u = WebGUI::User->new($session,$userId);
