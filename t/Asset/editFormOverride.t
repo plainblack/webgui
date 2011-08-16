@@ -17,6 +17,7 @@ my $asset = WebGUI::Asset->getTempspace($session)->addChild(
         className => 'WebGUI::Asset::Wobject::Layout',
     }
 );
+WebGUI::Test->addToCleanup($asset);
 
 sub capture {
     my $save;
