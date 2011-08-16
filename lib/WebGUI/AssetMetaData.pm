@@ -275,7 +275,7 @@ sub www_editMetaDataField {
 		-label=>$i18n->get(486),
 		-hoverHelp=>$i18n->get('Data Type description'),
 		-value=>$fieldInfo->{fieldType} || "text",
-		-types=> [ qw /text integer yesNo selectBox radioList checkList dateTime/ ]
+		-types=> [ qw /text integer yesNo selectBox radioList checkList/ ]
 	);
 	$f->textarea(
 		-name=>"possibleValues",
