@@ -400,7 +400,6 @@ sub addWaitForConfirmationWorkflow {
     my $c       = $session->config;
     my $exists  = $c->get('workflowActivities/WebGUI::User');
     my $class   = 'WebGUI::Workflow::Activity::WaitForUserConfirmation';
-    use $class;
     unless (grep { $_ eq $class } @$exists) {
         print "Adding WaitForUserConfirmation workflow..." unless $quiet;
         $c->addToArray('workflowActivities/WebGUI::User' => $class);
