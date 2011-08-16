@@ -1,4 +1,5 @@
 7.9.34
+ - rfe   #12223: Add dateTime type to content profiling (metadata)
  - fixed #12206: Bad Subscription Groups in Duplicated Threads
  - fixed #12202: JsonTable refers to unexistent YUI file
  - fixed #12208: replacements don't work
