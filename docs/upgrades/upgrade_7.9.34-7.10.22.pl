@@ -23,7 +23,6 @@ use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::Asset;
 
-
 my $toVersion = "0.0.0"; # make this match what version you're going to
 my $quiet; # this line required
 
@@ -121,6 +120,7 @@ sub installForkCleanup {
     my $class = 'WebGUI::Workflow::Activity::RemoveOldForks';
     $session->config->addToArray('workflowActivities/None', $class);
     my $wf = WebGUI::Workflow->new($session, 'pbworkflow000000000001');
+    use List::Util qw/first/;
     my $a  = first { ref $_ eq $class } @{ $wf->getActivities };
     unless ($a) {
         $a = $wf->addActivity($class);
@@ -284,6 +284,7 @@ EOSQL
 sub reindexAllThingys {
     my $session = shift;
     print "\tReindex all Thingys... " unless $quiet;
+    use WebGUI::Asset::Wobject::Thingy;
     my $get_thingy = WebGUI::Asset::Wobject::Thingy->getIsa($session);
     THINGY: while (1) {
         my $thingy = eval { $get_thingy->() };
