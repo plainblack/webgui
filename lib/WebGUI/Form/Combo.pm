@@ -146,7 +146,7 @@ sub toHtml {
 			size=>$self->session->setting->get("textBoxSize")-5,
 			name=>$self->get("name")."_new",
 			id=>$self->get('id')."_new",
-                        extras=>$self->get('textExtras')||$self->get('extras'),
+                        extras=>$self->get('textExtras'),
 			)->toHtml;
 }
 
