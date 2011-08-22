@@ -1,4 +1,5 @@
 7.10.23
+ - fixed #12225: Stock asset, multiple instances on a page
 
 7.10.22
  - rfe   #12223: Add date type to content profiling (metadata)
