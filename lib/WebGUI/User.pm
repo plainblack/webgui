@@ -954,21 +954,17 @@ sub isInGroup {
 	### Check stow before we check the cache.  Stow is in memory and much faster
 	my $stow          = $session->stow->get("isInGroup", { noclone => 1 }) || {};
 	return $stow->{$uid}->{$gid} if (exists $stow->{$uid}->{$gid});
-	
+
 	### Don't bother checking File Cache if we already have a stow for this group.
 	### We can find what we need there and save ourselves a bunch of time
-	my $cache        = undef;
-	my $groupMembers = undef;
-	unless ($stow->{$uid}->{$gid}) {
-		$cache         = WebGUI::Cache->new($session,["groupMembers",$gid]);
-		$groupMembers  = $cache->get || {};
-		#If we have this user's membership cached, return what we have stored
-		if (exists $groupMembers->{$uid}) {
-			return $groupMembers->{$uid}->{isMember} if (!$self->isVisitor);
-			return $groupMembers->{$uid}->{$session->getId}->{isMember} #Include the session check for visitors
-		}
-	}
-	
+    my $cache         = WebGUI::Cache->new($session,["groupMembers",$gid]);
+    my $groupMembers  = $cache->get || {};
+    #If we have this user's membership cached, return what we have stored
+    if (exists $groupMembers->{$uid}) {
+        return $groupMembers->{$uid}->{isMember} if (!$self->isVisitor);
+        return $groupMembers->{$uid}->{$session->getId}->{isMember} if exists $groupMembers->{$uid}->{$session->getId}; #Include the session check for visitors
+    }
+
  	### Instantiate the group
     my $group = WebGUI::Group->new($session,$gid);
 	if ( !$group ) {
@@ -978,7 +974,7 @@ sub isInGroup {
 
 	#Check the group for membership
 	my $isInGroup = $group->hasUser($self);
-	
+
 	#Write what we found to file cache
 	$group->cacheGroupings( $self, $isInGroup, $cache, $groupMembers );
 	return $isInGroup;
