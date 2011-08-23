@@ -192,7 +192,7 @@ my $ldapProps = WebGUI::Test->getSmokeLDAPProps();
 $session->db->setRow('ldapLink', 'ldapLinkId', $ldapProps, $ldapProps->{ldapLinkId});
 my $ldap = WebGUI::LDAPLink->new($session, $ldapProps->{ldapLinkId});
 is($ldap->getValue("ldapLinkId"),$ldapProps->{ldapLinkId},'ldap link created properly');
-addToCleanup($ldap);
+WebGUI::Test->addToCleanup($ldap);
 
 my @shawshank;
 
@@ -687,7 +687,8 @@ cmp_bag(
     ok $localSession->user->isInGroup($localScratchGroup->getId), 'Local Visitor is in the scratch group';
 
     $remoteSession->stow->delete('isInGroup');
-    ok !$remoteSession->user->isInGroup($localScratchGroup->getId), 'Remove Visitor is not in the scratch group, even though a different Visitor passed';
+    $localScratchGroup->clearCaches;
+    ok !$remoteSession->user->isInGroup($localScratchGroup->getId), 'Remote Visitor is not in the scratch group, even though a different Visitor passed';
 
 }
 
@@ -765,7 +766,8 @@ foreach my $ipTest (@ipTests) {
     ok $localSession->user->isInGroup($localIpGroup->getId), 'Local Visitor is in the group';
 
     $remoteSession->stow->delete('isInGroup');
-    ok !$remoteSession->user->isInGroup($localIpGroup->getId), 'Remove Visitor is not in the group, even though a different Visitor passed';
+    $localIpGroup->clearCaches;
+    ok !$remoteSession->user->isInGroup($localIpGroup->getId), 'Remote Visitor is not in the group, even though a different Visitor passed';
 
 }
 
@@ -840,7 +842,7 @@ ok(! WebGUI::Group->vitalGroup('27'), '... 27 is not vital');
 # Normal group
 my $happyDude   = WebGUI::User->create( $session );
 $happyDude->username(" Happy Dude ");
-addToCleanup( $happyDude );
+WebGUI::Test->addToCleanup( $happyDude );
 
 $gA->addUsers([ $happyDude->getId ]);
 $gB->addUsers([ $happyDude->getId ]);
