@@ -640,15 +640,17 @@ WebGUI::Test->addToCleanup(@sessionBank);
 
 #isInGroup test
 foreach my $scratchTest (@scratchTests) {
-	is($scratchTest->{user}->isInGroup($gS->getId), $scratchTest->{expect}, $scratchTest->{comment});
+    is($scratchTest->{user}->isInGroup($gS->getId), $scratchTest->{expect}, $scratchTest->{comment});
 }
 
 WebGUI::Cache->new($session, $gS->getId)->delete();  ##Delete cached key for testing
 $session->stow->delete("isInGroup");
 
 #hasScratchUser test
-foreach my $scratchTest (@scratchTests) {
-	is($gS->hasScratchUser($scratchTest->{user}->getId), $scratchTest->{expect}, $scratchTest->{comment}." - hasScratchUser");
+foreach my $idx (0..$#scratchTests) {
+    my $scratchTest = $scratchTests[$idx];
+    my $sessionId   = $sessionBank[$idx]->getId;
+	is($gS->hasScratchUser($scratchTest->{user}->getId, $sessionId), $scratchTest->{expect}, $scratchTest->{comment}." - hasScratchUser");
 }
 
 
@@ -666,7 +668,7 @@ cmp_bag(
 
 {  ##Add scope to force cleanup
 
-    note "Checking for user Visitor session leak";
+    note "Checking for user Visitor session leak with scratch";
 
     my $remoteSession = WebGUI::Test->newSession;
     $remoteSession->user({userId => 1});
@@ -681,13 +683,12 @@ cmp_bag(
     my $localSession = WebGUI::Test->newSession;
     WebGUI::Test->addToCleanup($localScratchGroup, $remoteSession, $localSession);
     $localSession->user({userId => 1});
-    $remoteSession->scratch->set('local','ok');
+    $localSession->scratch->set('local','ok');
     $localScratchGroup->clearCaches;
 
     ok $localSession->user->isInGroup($localScratchGroup->getId), 'Local Visitor is in the scratch group';
 
     $remoteSession->stow->delete('isInGroup');
-    $localScratchGroup->clearCaches;
     ok !$remoteSession->user->isInGroup($localScratchGroup->getId), 'Remote Visitor is not in the scratch group, even though a different Visitor passed';
 
 }
@@ -710,8 +711,9 @@ foreach my $idx (0..$#ipTests) {
 	##Name this user for convenience
 	$tcps[$idx]->username("tcp$idx");
 
-	##Assign this user to this test to be fetched later
-	$ipTests[$idx]->{user} = $tcps[$idx];
+    ##Assign this user and session to this test to be fetched later
+    $ipTests[$idx]->{user}    = $tcps[$idx];
+    $ipTests[$idx]->{session} = $sessionBank[$idx];
 }
 WebGUI::Test->addToCleanup(@tcps);
 WebGUI::Test->addToCleanup(@sessionBank);
@@ -734,7 +736,7 @@ cmp_bag(
 );
 
 is_deeply(
-	[ (map { $gI->hasIpUser($_->{user}->getId) }  @ipTests) ],
+	[ (map { $gI->hasIpUser($_->{user}->getId, $_->{session}->getId) }  @ipTests) ],
 	[ (map { $_->{expect} } @ipTests) ],
 	'hasIpUsers for group with IP filter'
 );
@@ -745,7 +747,7 @@ foreach my $ipTest (@ipTests) {
 
 {  ##Add scope to force cleanup
 
-    note "Checking for user Visitor session leak";
+    note "Checking for user Visitor session leak via IP address";
 
     $ENV{REMOTE_ADDR} = '191.168.1.1';
     my $remoteSession = WebGUI::Test->newSession;

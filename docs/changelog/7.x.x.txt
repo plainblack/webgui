@@ -1,6 +1,7 @@
 7.10.23
  - fixed #12225: Stock asset, multiple instances on a page
  - fixed #12229: Indexed thingy data has gateway url prepended to it
+ - fixed #12195: Visitor group by scratch membership shared among all Visitors (Dale Trexel)
 
 7.10.22
  - rfe   #12223: Add date type to content profiling (metadata)
