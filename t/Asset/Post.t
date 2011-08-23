@@ -175,9 +175,6 @@ $storage->addFileFromFilesystem(WebGUI::Test->getTestCollateralPath('lamp.jpg'))
 $storage->addFileFromFilesystem(WebGUI::Test->getTestCollateralPath('littleTextFile'));
 my $attachment_loop = $post1->getTemplateVars()->{attachment_loop};
 
-use Data::Dumper;
-diag Dumper($attachment_loop);
-
 my @extensions = map { [ $_->{filename}, $_->{extension} ] } @{ $attachment_loop };
 
 cmp_bag(
