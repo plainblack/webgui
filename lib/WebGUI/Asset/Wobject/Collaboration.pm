@@ -1681,7 +1681,7 @@ sub update {
     my $instance_data = {
         workflowId => 'xR-_GRRbjBojgLsFx3dEMA',
         className  => 'WebGUI::Asset',
-        methodName => 'newByDynamicClass',
+        methodName => 'newPending',
         parameters => $self->getId,
     };
     my $instance = WebGUI::Workflow::Instance->create($self->session, $instance_data);
