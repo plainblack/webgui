@@ -31,6 +31,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+fixBadTemplateAttachments($session);
 
 finish($session); # this line required
 
@@ -43,6 +44,23 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+#----------------------------------------------------------------------------
+sub fixBadTemplateAttachments {
+    my $session = shift;
+    print "\tRemove template attachements in search templates that refer to an old, deleted CSS snippet... " unless $quiet;
+    # and here's our code
+    use WebGUI::Asset::Template;
+    my $get_template = WebGUI::Asset::Template->getIsa($session);
+    TEMPLATE: while (1) {
+        my $template = eval {$get_template->()};
+        next TEMPLATE if Exception::Class->caught;
+        last TEMPLATE unless $template;
+        next TEMPLATE unless $template->get('namespace') eq 'Search';
+        $template->removeAttachments(['^/(webgui.css);']);
+    }
+    print "DONE!\n" unless $quiet;
+}
 
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
