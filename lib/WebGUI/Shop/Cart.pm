@@ -758,15 +758,16 @@ sub updateFromForm {
             $item->update({shippingAddressId => $itemAddressId});
         }
     }
-    if ($self->hasMixedItems) {
-         my $i18n = WebGUI::International->new($self->session, "Shop");
-        $error{id $self} = $i18n->get('mixed items warning');
-    }
-
     my @cartItemIds = $form->process('remove_item', 'checkList');
     foreach my $cartItemId (@cartItemIds) {
         my $item = eval { $self->getItem($cartItemId); };
         $item->remove if ! Exception::Class->caught();
+    }
+
+    ##Remove the items BEFORE we check to see if there are duplicates.
+    if ($self->hasMixedItems) {
+         my $i18n = WebGUI::International->new($self->session, "Shop");
+        $error{id $self} = $i18n->get('mixed items warning');
     }
 
     ##Visitor cannot have an address book, or set a payment gateway, so skip the rest of this.
