@@ -5,6 +5,7 @@
  - fixed #12227: Corrected AssetReport such that OrderBy works correctly.
  - fixed #12238: Old template attachement in search template slows down sites
  - fixed #12239: Still get cart error message after removing extra recurring items from the cart
+ - fixed #12240: Empty Extend Calendar Recurrance version tags
 
 7.10.22
  - rfe   #12223: Add date type to content profiling (metadata)
