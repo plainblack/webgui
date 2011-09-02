@@ -190,7 +190,7 @@
 # List the authentication plug-ins you wish to be available on
 # this site.
 
-"authMethods" : [ "LDAP", "WebGUI" ],
+"authMethods" : [ "LDAP", "WebGUI", "Twitter" ],
 
 # List the merchant gateways you have installed and wish to be
 # available on this site.
@@ -856,6 +856,7 @@
     "r"                : "r_printable", 
     "Spacer"           : "Spacer", 
     "SpectreCheck"     : "SpectreCheck",
+    "TwitterLogin"     : "TwitterLogin", 
     "Thumbnail"        : "Thumbnail", 
     "User"             : "User", 
     "UsersOnline"      : "UsersOnline", 
