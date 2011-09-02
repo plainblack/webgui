@@ -107,6 +107,7 @@ checkModule("Template",                     2.20,      2 );
 checkModule("XML::FeedPP",                  0.40         );
 checkModule("XML::FeedPP::MediaRSS",        0.02         );
 checkModule("JSON",                         2.12         );
+checkModule("JSON::PP",                     0.00         );
 checkModule("Config::JSON",                 "1.3.1"      );
 checkModule("Text::CSV_XS",                 "0.64"       );
 checkModule("Net::CIDR::Lite",              0.20         );
