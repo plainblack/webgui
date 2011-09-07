@@ -2927,9 +2927,28 @@ sub www_add {
 		url=>scalar($self->session->form->param("url")),
 		);
 	$properties{isHidden} = 1 unless $self->session->config->get("assets/".$class."/isContainer");
+    $class->extra_www_add_properties($self->session, $self, \%properties );
 	my $newAsset = WebGUI::Asset->newByPropertyHashRef($self->session,\%properties);
 	$newAsset->{_parent} = $self;
 	return $newAsset->www_edit();
+}
+
+#-------------------------------------------------------------------
+
+=head2 extra_www_add_properties ( $session, $parentAsset, \%properties )
+
+Called from C<www_add> by the parent asset on the class of the new asset being constructed.
+The asset class has the chance to modify or augment C<$properties> before the new asset
+is presented for edit.
+This base version does nothing.  It should be overridden as needed.
+
+=cut
+
+sub extra_www_add_properties {
+    my $self = shift;
+    my $session = shift;
+    my $parentAsset = shift;
+    my $properties = shift;
 }
 
 #-------------------------------------------------------------------
