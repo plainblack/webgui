@@ -2921,8 +2921,6 @@ sub www_add {
 		encryptPage => $self->get("encryptPage"),
 		styleTemplateId => $self->get("styleTemplateId"),
 		printableStyleTemplateId => $self->get("printableStyleTemplateId"),
-		mobileStyleTemplateId => $self->get("mobileStyleTemplateId"),
-		mobileTemplateId => $self->get("mobileTemplateId"),
 		isHidden => $self->get("isHidden"),
 		className=>$class,
 		assetId=>"new",
