@@ -514,24 +514,5 @@ sub www_view {
     return $self->SUPER::www_view;
 }
 
-#-------------------------------------------------------------------
-
-=head2 extra_www_add_properties ()
-
-Inherit C<mobileStyleTemplateId> and C<mobileTemplateId> from the parent asset if it is an instance of
-L<WebGUI::Asset::Wobject::Layout>.
-
-=cut
-
-sub extra_www_add_properties {
-    my $self = shift;
-    my $session = shift;
-    my $parentAsset = shift;
-    my $properties = shift;
-    return unless $parentAsset->isa('WebGUI::Asset::Wobject::Layout');
-    $properties->{ mobileStyleTemplateId } = $parentAsset->get("mobileStyleTemplateId");
-    $properties->{ mobileTemplateId } = $parentAsset->get("mobileTemplateId");
-}
-
 1;
 
