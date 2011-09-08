@@ -8,6 +8,8 @@
  - fixed #12240: Empty Extend Calendar Recurrance version tags
  - fixed #12241: Account Shop
  - fixed #12246: Layout inherits mobileStyleTemplateId and mobileTemplateId from parent Layouts
+ - fixed #12246: added extra_www_add_properties as properties fix-up hook in child for www_add
+ - fixed #12231: Thingy reindex fails on upgrade
 
 7.10.22
  - rfe   #12223: Add date type to content profiling (metadata)

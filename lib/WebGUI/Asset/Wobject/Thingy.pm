@@ -1061,7 +1061,7 @@ sub getFieldValue {
     # TODO: The otherThing field type is probably also handled by getFormPlugin, so the elsif below can probably be
     # safely removed. However, this requires more testing than I can provide right now, so for now this stays the
     # way it was.
-    elsif ($field->{fieldType} =~ m/^otherthing/x) {
+    elsif ($fieldType =~ m/^otherthing/x) {
         my $otherThingId = $field->{fieldType};
         $otherThingId =~ s/^otherThing_//x;
         my $tableName = 'Thingy_'.$otherThingId;
