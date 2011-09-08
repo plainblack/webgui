@@ -56,7 +56,12 @@ my ($mech, $redirect, $response, $url);
 
 # Get the site's base URL
 my $baseUrl         = 'http://' . $session->config->get('sitename')->[0];
+# $baseUrl            .= ':8000';  # no easy way to automatically find this
 $baseUrl            .= $session->config->get('gateway');
+
+my $httpAuthUrl = 'http://' . $USERNAME . ':' . $IDENTIFIER . '@' . $session->config->get('sitename')->[0];
+# $httpAuthUrl    .= ':8000'; # no easy way to automatically find this
+$httpAuthUrl    .= $session->config->get('gateway');
 
 # Make an asset we can login on
 my $asset
@@ -84,7 +89,7 @@ if ( !$mech->success ) {
     plan skip_all => "Cannot load URL '$baseUrl'. Will not test.";
 }
 
-plan tests => 40;        # Increment this number for each test you create
+plan tests => 42;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # no form: Test logging in on a normal page sends the user back to the same page
@@ -276,3 +281,10 @@ $mech->submit_form_ok(
 );
 $mech->base_is( $assetUrl, "We don't get redirected" );
 
+#----------------------------------------------------------------------------
+# HTTP basic auth
+$mech       = Test::WWW::Mechanize->new;
+$mech->get( $httpAuthUrl );
+$mech->content_contains( "Hello, $USERNAME", "We are greeted by name" );
+$mech->get( $httpAuthUrl . $asset->get('url') );
+$mech->content_contains( "ARTICLE", "We are shown the article" );
