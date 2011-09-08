@@ -2891,20 +2891,51 @@ sub view {
 
 =head2 www_add ( )
 
-Adds a new Asset based upon the class of the current form. Returns the Asset calling method www_edit();  The
-new Asset will inherit security and style properties from the current asset, the parent.
+Create a new, unsaved asset with a parent of this asset from C<class>, C<url>, and optional C<prototype> parameters and present the
+edit screen for it.
+Calls C<get_add_instance> to configure the new asset; the default implementation inherits security and 
+style properties from the current asset, the parent.
 
 =cut
 
 sub www_add {
 	my $self = shift;
-	my %prototypeProperties;
     my $class = $self->loadModule($self->session, $self->session->form->process("class","className"));
+	my $prototype = $self->session->form->process('prototype');
+    my $url = scalar($self->session->form->param("url"));
+
     return undef unless (defined $class);
 	return $self->session->privilege->insufficient() unless ($class->canAdd($self->session));
-	if ($self->session->form->process('prototype')) {
-		my $prototype = WebGUI::Asset->new($self->session, $self->session->form->process("prototype"),$class);
-		foreach my $definition (@{$prototype->definition($self->session)}) { # cycle through rather than copying properties to avoid grabbing stuff we shouldn't grab
+
+    my $newAsset = $class->get_add_instance( $self->session, $self, $url, $prototype );
+
+	$newAsset->{_parent} = $self;
+	return $newAsset->www_edit();
+}
+
+#-------------------------------------------------------------------
+
+=head2 get_add_instance ( $session, $parentAsset, $url, $prototype )
+
+Class method.
+Called from C<www_add> by the parent asset on the class of the new asset being constructed.
+Configures the new asset with defaults, including inheriting security and style properties from the current asset.
+C<$prototype> is the optional assetId of an asset to initialize the new asset from.
+
+=cut
+
+sub get_add_instance {
+    my $class = shift;
+    my $session = shift;
+    my $parentAsset = shift;
+    my $url = shift;
+    my $prototype = shift;
+
+	my %prototypeProperties;
+
+	if ($prototype) {
+		my $prototype = WebGUI::Asset->new($session, $prototype, $class);
+		foreach my $definition (@{$prototype->definition($session)}) { # cycle through rather than copying properties to avoid grabbing stuff we shouldn't grab
 			foreach my $property (keys %{$definition->{properties}}) {
 				next if (isIn($property,qw(title menuTitle url isPrototype isPackage)));
 				next if ($definition->{properties}{$property}{noFormPost});
@@ -2912,24 +2943,25 @@ sub www_add {
 			}
 		}
 	}
-	my %properties = (
-		%prototypeProperties,
-		parentId => $self->getId,
-		groupIdView => $self->get("groupIdView"),
-		groupIdEdit => $self->get("groupIdEdit"),
-		ownerUserId => $self->get("ownerUserId"),
-		encryptPage => $self->get("encryptPage"),
-		styleTemplateId => $self->get("styleTemplateId"),
-		printableStyleTemplateId => $self->get("printableStyleTemplateId"),
-		isHidden => $self->get("isHidden"),
-		className=>$class,
-		assetId=>"new",
-		url=>scalar($self->session->form->param("url")),
-		);
-	$properties{isHidden} = 1 unless $self->session->config->get("assets/".$class."/isContainer");
-	my $newAsset = WebGUI::Asset->newByPropertyHashRef($self->session,\%properties);
-	$newAsset->{_parent} = $self;
-	return $newAsset->www_edit();
+
+    my %properties = (
+        %prototypeProperties,
+        parentId                 => $parentAsset->getId,
+        groupIdView              => $parentAsset->get("groupIdView"),
+        groupIdEdit              => $parentAsset->get("groupIdEdit"),
+        ownerUserId              => $parentAsset->get("ownerUserId"),
+        encryptPage              => $parentAsset->get("encryptPage"),
+        styleTemplateId          => $parentAsset->get("styleTemplateId"),
+        printableStyleTemplateId => $parentAsset->get("printableStyleTemplateId"),
+        isHidden                 => $parentAsset->get("isHidden"),
+        className                => $class,
+        assetId                  => "new",
+        url                      => $url,
+    );
+    $properties{isHidden} = 1 unless $session->config->get("assets/".$class."/isContainer");
+
+    return WebGUI::Asset->newByPropertyHashRef($session, \%properties);
+
 }
 
 #-------------------------------------------------------------------
