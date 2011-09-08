@@ -14,6 +14,8 @@ use Kwargs;
 use URI;
 
 my $session = WebGUI::Test->session;
+WebGUI::Test->originalConfig('templateParsers');
+$session->config->addToArray('templateParsers', 'WebGUI::Asset::Template::TemplateToolkit');
 
 my $act = WebGUI::Workflow::Activity->newByPropertyHashRef(
     $session, {
