@@ -11,6 +11,7 @@
  - fixed #12246: added extra_www_add_properties as properties fix-up hook in child for www_add
  - fixed #12231: Thingy reindex fails on upgrade
  - fixed #12245: Encrypt Login and Display Message on Login conflict
+ - fixed #12211: Recurring Item error message in Cart
 
 7.10.22
  - rfe   #12223: Add date type to content profiling (metadata)

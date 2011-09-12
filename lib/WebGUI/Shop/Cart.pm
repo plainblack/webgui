@@ -1024,6 +1024,10 @@ sub www_view {
         return $session->style->userStyle($template->process(\%var));
     }
 
+    if ($self->hasMixedItems) {
+        $error{id $self} = $i18n->get('mixed items warning');
+    }
+
     my %var = (
         %{$self->get},
         formHeader              => WebGUI::Form::formHeader($session, { extras => q|id="wgCartId"|, })
@@ -1046,7 +1050,6 @@ sub www_view {
         userIsVisitor           => $session->user->isVisitor,
         shippableItemsInCart    => $self->requiresShipping,
     );
-
 
     # get the shipping address    
     my $address = eval { $self->getShippingAddress };
