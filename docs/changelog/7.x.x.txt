@@ -1,4 +1,5 @@
 7.10.24
+ - fixed #12256: Calendar Search doesn't show admin controls
 
 7.10.23
  - fixed #12225: Stock asset, multiple instances on a page
