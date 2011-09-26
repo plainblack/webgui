@@ -18,6 +18,8 @@ my $session = WebGUI::Test->session;
 $session->user({userId => 3});
 
 WebGUI::Test->addToCleanup(SQL => 'delete from passiveLog');
+WebGUI::Test->addToCleanup(SQL => 'delete from deltaLog');
+WebGUI::Test->addToCleanup(SQL => 'delete from bucketLog');
 WebGUI::Test->addToCleanup(SQL => 'delete from analyticRule');
 
 my $workflow = WebGUI::Workflow->new($session, 'PassiveAnalytics000001');
