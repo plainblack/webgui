@@ -93,6 +93,20 @@ sub getConfiguredTitle {
 
 #-------------------------------------------------------------------
 
+=head2 getEditForm
+
+Extend the base class so that the user is returned to the viewAll screen after adding/editing
+a ribbon.
+
+=cut
+
+override getEditForm => sub {
+    my $form = super();
+    $form->addField('hidden', name => 'proceed', value => 'viewAll',);
+}; 
+
+#-------------------------------------------------------------------
+
 =head2 getMaxAllowedInCart
 
 Return 1;
@@ -238,40 +252,6 @@ sub www_delete {
     return $self->getParent->www_buildBadge(undef,'ribbons');
 }
 
-
-#-------------------------------------------------------------------
-
-=head2 www_edit ()
-
-Displays the edit form.
-
-=cut
-
-sub www_edit {
-	my ($self) = @_;
-	return $self->session->privilege->insufficient() unless $self->canEdit;
-	return $self->session->privilege->locked() unless $self->canEditIfLocked;
-	$self->session->style->setRawHeadTags(q|
-		<style type="text/css">
-		.forwardButton {
-			background-color: green;
-			color: white;
-			font-weight: bold;
-			padding: 3px;
-		}
-		.backwardButton {
-			background-color: red;
-			color: white;
-			font-weight: bold;
-			padding: 3px;
-		}
-		</style>
-						   |);	
-	my $i18n = WebGUI::International->new($self->session, "Asset_EventManagementSystem");
-	my $form = $self->getEditForm;
-	$form->addField( "hidden", name=>'proceed', value=>'viewAll', );
-	return $self->processStyle('<h1>'.$i18n->get('ems ribbon').'</h1>'.$form->toHtml);
-}
 
 #-------------------------------------------------------------------
 

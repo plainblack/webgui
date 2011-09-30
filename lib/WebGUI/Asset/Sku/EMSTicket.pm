@@ -275,6 +275,7 @@ override getEditForm => sub {
             defaultValue    => $date->toDatabase,
             value           => $self->startDate,
     );
+    $form->addField('hidden', name => 'proceed', value => 'viewAll',);
 	return $form;
 };
 
@@ -544,40 +545,6 @@ sub www_delete {
 	return $self->getParent->www_buildBadge(undef,'tickets');
 }
 
-
-#-------------------------------------------------------------------
-
-=head2 www_edit ()
-
-Displays the edit form.
-
-=cut
-
-sub www_edit {
-	my ($self) = @_;
-	return $self->session->privilege->insufficient() unless $self->canEdit;
-	return $self->session->privilege->locked() unless $self->canEditIfLocked;
-	$self->session->style->setRawHeadTags(q|
-		<style type="text/css">
-		.forwardButton {
-			background-color: green;
-			color: white;
-			font-weight: bold;
-			padding: 3px;
-		}
-		.backwardButton {
-			background-color: red;
-			color: white;
-			font-weight: bold;
-			padding: 3px;
-		}
-		</style>
-						   |);	
-	my $i18n = WebGUI::International->new($self->session, "Asset_EventManagementSystem");
-	my $form = $self->getEditForm;
-	$form->addField( "hidden", name=>'proceed', value=>'viewAll');
-	return $self->processStyle('<h1>'.$i18n->get('ems ticket').'</h1>'.$form->toHtml);
-}
 
 #-------------------------------------------------------------------
 
