@@ -176,6 +176,21 @@ sub getConfiguredTitle {
     return $self->getTitle." (".$name.")";
 }
 
+#-------------------------------------------------------------------
+
+=head2 getEditForm ()
+
+Extended to support event metadata.
+
+=cut
+
+override getEditForm => sub {
+	my $self = shift;
+	my $form = super();
+    $form->addField('hidden', name => 'proceed', value => 'viewParent',);
+	return $form;
+};
+
 
 #-------------------------------------------------------------------
 
