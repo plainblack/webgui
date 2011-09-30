@@ -23,6 +23,12 @@ use Test::Deep;
 use Scope::Guard;
 
 #----------------------------------------------------------------------------
+# Tests
+
+#plan tests => 9;        # Increment this number for each test you create
+plan skip_all => 'Test server for LDAP down';        # Increment this number for each test you create
+
+#----------------------------------------------------------------------------
 # Init
 my $session         = WebGUI::Test->session;
 
@@ -42,11 +48,6 @@ $ldapGroup->set( "ldapGroup", "cn=Convicts,o=shawshank" );
 $ldapGroup->set( "ldapGroupProperty", "member" );
 $ldapGroup->set( "ldapRecursiveProperty", "uid" );
 addToCleanup($ldapGroup);
-
-#----------------------------------------------------------------------------
-# Tests
-
-plan tests => 9;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # Test Login of existing user

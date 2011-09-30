@@ -1061,7 +1061,7 @@ sub getFieldValue {
     # TODO: The otherThing field type is probably also handled by getFormPlugin, so the elsif below can probably be
     # safely removed. However, this requires more testing than I can provide right now, so for now this stays the
     # way it was.
-    elsif ($field->{fieldType} =~ m/^otherthing/x) {
+    elsif ($fieldType =~ m/^otherthing/x) {
         my $otherThingId = $field->{fieldType};
         $otherThingId =~ s/^otherThing_//x;
         my $tableName = 'Thingy_'.$otherThingId;
@@ -1611,11 +1611,11 @@ sub indexThing {
     return unless $thing;
     my $index = WebGUI::Search::Index->new($self);
     $index->addRecord(
-        url         => $self->getUrl($self->getThingUrl($thing)),
         groupIdView => $thing->{groupIdView},
         title       => $thing->{label},
         subId       => $thing->{thingId},
         keywords    => join(' ', @{$thing}{qw/label editScreenTitle editInstructions searchScreenTitle searchDescription/}),
+        url         => $self->session->url->append($self->get('url'), $self->getThingUrl($thing)),
     );
     ##Easy update of all thingData fields for this thing.  This is in lieu of deleting all records
     ##And rebuilding them all.
@@ -1687,7 +1687,7 @@ sub indexThingData {
              || $self->getTitle;
     $index->addRecord(
         assetId     => $self->getId,
-        url         => $self->getUrl('func=viewThingData;thingId='. $thing->{thingId} . ';thingDataId='. $thingData->{thingDataId}),
+        url         => $session->url->append($self->get('url'), 'func=viewThingData;thingId='. $thing->{thingId} . ';thingDataId='. $thingData->{thingDataId}),
         groupIdView => $thing->{groupIdView},
         title       => $title,
         subId       => $thing->{thingId} . '-' . $thingData->{thingDataId},

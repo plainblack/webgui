@@ -7,6 +7,18 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+7.10.24
+--------------------------------------------------------------------
+    * WebGUI now depends on Business::OnlinePayment::AuthorizeNet.  This version
+      should install automatically via the testEnvironment.pl script, or the
+      perl-standard CPAN module.
+
+7.10.23
+--------------------------------------------------------------------
+    * The default_search2 template had a bad template attachment pointing to 
+      an old WebGUI CSS Snippet called /webgui.css.  Any attachment with that
+      URL will be removed from ALL templates in the Search namespace.
+
 7.10.21
 --------------------------------------------------------------------
     * WebGUI now depends on Kwargs.

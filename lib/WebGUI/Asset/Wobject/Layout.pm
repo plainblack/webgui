@@ -514,5 +514,35 @@ sub www_view {
     return $self->SUPER::www_view;
 }
 
+#-------------------------------------------------------------------
+
+=head2 get_add_instance ()
+
+Subclass the standard C<get_add_instance> to inherit 
+C<mobileStyleTemplateId> and C<mobileTemplateId> from the parent asset if it is an instance of
+L<WebGUI::Asset::Wobject::Layout>.
+
+=cut
+
+sub get_add_instance {
+    my $class = shift;
+    my $session = shift;
+    my $parentAsset = shift;
+    my $url = shift;
+    my $prototype = shift;
+
+    my $instance = $class->SUPER::get_add_instance( $session, $parentAsset, $url, $prototype, @_ );
+
+    if( $parentAsset->isa('WebGUI::Asset::Wobject::Layout') ) {
+        $instance->update({  
+            mobileStyleTemplateId => $parentAsset->get("mobileStyleTemplateId"),
+            mobileTemplateId      => $parentAsset->get("mobileTemplateId"),
+        });
+    }
+
+    return $instance;
+
+}
+
 1;
 

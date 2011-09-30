@@ -87,7 +87,7 @@ sub body {
         return keys %{ $self->{body} } if wantarray;
         return { %{ $self->{body} } };
     }
-	if ($self->{body}->{$value}) {
+	if (defined $self->{body}->{$value}) {
         if (wantarray && ref $self->{body}->{$value} eq "ARRAY") {
             return @{$self->{body}->{$value}};
         }

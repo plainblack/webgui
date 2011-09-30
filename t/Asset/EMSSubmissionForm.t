@@ -432,10 +432,10 @@ my $expected = {
                                },
           'description' => undef,
           '_isValid' => 1,
-          'deleteCreatedItems' => undef,
+          'deleteCreatedItems' => 0,
           'canSubmitGroupId' => '2',
           'assetId' => 'new',
-          'url' => undef,
+          'url' => '',
           'daysBeforeCleanup' => '7',
           'title' => 'Untitled',
         } ;
