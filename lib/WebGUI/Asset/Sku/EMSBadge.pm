@@ -180,7 +180,7 @@ sub getConfiguredTitle {
 
 =head2 getEditForm ()
 
-Extended to support event metadata.
+Extended to make sure that the next screen viewed after saving is the viewAll screen from the parent EMS.
 
 =cut
 
