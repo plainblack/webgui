@@ -1020,6 +1020,7 @@ WebGUI.Admin.prototype.showHelperMenu
         context : [ elem, 'tl', 'bl' ],
         effect: { effect: YAHOO.widget.ContainerEffect.FADE, duration:0.25 }
     } );
+    this.helperMenu = helperMenu;
     this.helperMenu.render( document.body );
     this.helperMenu.show();
     this.helperMenu.focus();
@@ -1505,7 +1506,7 @@ WebGUI.Admin.AssetTable.prototype.addMenuOpenHandler
 = function ( elem, assetId, helpers ) {
     var self = this;
     YAHOO.util.Event.addListener( elem, "click", function(){
-        self.showHelperMenu( elem, assetId, helpers );
+        self.admin.showHelperMenu( elem, assetId, helpers );
     } );
 };
 
@@ -2215,14 +2216,14 @@ WebGUI.Admin.Tree.prototype.onDataReturnInitializeTable
     elItem.className    = "clickable";
     var self = this;
     var crumbMenu = function () {
-        self.showHelperMenu( elItem, currentAssetId, currentHelpers );
+        self.admin.showHelperMenu( elItem, currentAssetId, currentHelpers );
     };
     YAHOO.util.Event.addListener( elItem, "click", crumbMenu, this, true );
     elItem.appendChild( document.createTextNode( oResponse.meta.currentAsset.title ) );
     elCrumb.appendChild( elItem );
 
     // TODO: Update current asset
-    window.admin.navigate( oResponse.meta.currentAsset.assetId );
+    window.admin.navigate( currentAssetId );
 
     // TODO Hide loading screen
 };
