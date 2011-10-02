@@ -2209,7 +2209,7 @@ WebGUI.Admin.Tree.prototype.onDataReturnInitializeTable
     elCrumb.appendChild( elItem );
 
     // TODO: Update current asset
-    window.admin.navigate( oResponse.meta.currentAsset );
+    window.admin.navigate( oResponse.meta.currentAsset.assetId );
 
     // TODO Hide loading screen
 };
