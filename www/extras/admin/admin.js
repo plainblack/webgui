@@ -1412,25 +1412,25 @@ WebGUI.Admin.AssetTable
             },
             { 
                 key: 'title', 
-                label: window.admin.i18n.get('Asset', '99'), 
+                label: admin.i18n.get('Asset', '99'), 
                 formatter: bind( this, this.formatTitle ),
                 sortable: true 
             },
             { 
                 key: 'type', 
-                label: window.admin.i18n.get('Asset','type'), 
-                sortable: true, 
+                label: admin.i18n.get('Asset','type'), 
+                sortable: false, 
                 formatter: bind( this, this.formatType )
             },
             { 
                 key: 'revisionDate', 
-                label: window.admin.i18n.get('Asset','revision date' ), 
+                label: admin.i18n.get('Asset','revision date' ), 
                 formatter: bind( this, this.formatRevisionDate ), 
                 sortable: true 
             },
             { 
                 key: 'assetSize', 
-                label: window.admin.i18n.get('Asset','size' ), 
+                label: admin.i18n.get('Asset','size' ), 
                 formatter: bind( this, this.formatAssetSize ),
                 sortable: true 
             },
@@ -2511,7 +2511,7 @@ WebGUI.Admin.Search.prototype.addFilter
 
     var type        = menuitem.value;
     filter.type     = type;
-    li.className    = "filter_" + filter.type;
+    li.mlassName    = "filter_" + filter.type;
 
     var ul = this.searchFiltersContainer;
     ul.appendChild( li );
