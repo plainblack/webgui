@@ -31,10 +31,6 @@ WebGUI.Admin = function(cfg){
     }
 
     // TODO: This should be i18n
-    this.localeMonths   = [
-        'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August',
-        'September', 'October', 'November', 'December'
-    ];
 
     // Custom events
     this.afterNavigate = new YAHOO.util.CustomEvent( "afterNavigate", this );
@@ -124,6 +120,20 @@ WebGUI.Admin = function(cfg){
     // Private methods
     // Initialize these things AFTER the i18n is fetched
     var _init = function () {
+        self.localeMonths   = [
+            self.i18n.get('DateTime', 'january'),
+            self.i18n.get('DateTime', 'february'),
+            self.i18n.get('DateTime', 'march'),
+            self.i18n.get('DateTime', 'april'),
+            self.i18n.get('DateTime', 'may'),
+            self.i18n.get('DateTime', 'june'),
+            self.i18n.get('DateTime', 'july'),
+            self.i18n.get('DateTime', 'august'),
+            self.i18n.get('DateTime', 'september'),
+            self.i18n.get('DateTime', 'october'),
+            self.i18n.get('DateTime', 'november'),
+            self.i18n.get('DateTime', 'december')
+        ];
         self.afterNavigate.subscribe( self.requestUpdateCurrentVersionTag, self );
         self.requestUpdateCurrentVersionTag();
 
@@ -148,10 +158,13 @@ WebGUI.Admin = function(cfg){
     // Get I18N
     this.i18n = new WebGUI.i18n( {
         namespaces : {
-            'WebGUI' : [ '< prev', 'next >', 'locked by' ],
-            'Asset'  : [ 'rank', '99', 'type', 'revision date', 'size', 'locked', 'More', 'unlocked', 'edit',
-                         'update', 'delete', '43', 'cut', 'Copy', 'duplicate', 'create shortcut'
-                       ]
+            'WebGUI'   : [ '< prev', 'next >', 'locked by' ],
+            'Asset'    : [ 'rank', '99', 'type', 'revision date', 'size', 'locked', 'More', 'unlocked', 'edit',
+                           'update', 'delete', '43', 'cut', 'Copy', 'duplicate', 'create shortcut'
+                         ],
+            'DateTime' : [ 'january', 'february', 'march', 'april', 'may', 'june',
+                           'july', 'august', 'september', 'october', 'november', 'december'
+                         ]
         },
         onpreload : {
             fn : _init
