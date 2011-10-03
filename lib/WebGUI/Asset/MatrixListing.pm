@@ -209,9 +209,9 @@ sub getEditForm {
     my $i18n        = WebGUI::International->new($session, 'Asset_MatrixListing');
     my $func        = $session->form->process("func");
 
-    my $form = WebGUI::FormBuilder->new($session);
-    
-    if ($func eq "add" || ( $func eq "editSave" && $session->form->process("assetId") eq "new")) {
+    my $form = WebGUI::FormBuilder->new($session, action => $self->getParent->getUrl, );
+
+    if ($func eq "add" || ( $func eq "addSave" && $session->form->process("assetId") eq "new")) {
         $form->addField( "hidden", 
             name           => 'assetId',
             value          => 'new',
@@ -220,11 +220,17 @@ sub getEditForm {
             name           => 'className',
             value          => 'WebGUI::Asset::MatrixListing',
         );
-    }
-    $form->addField( "hidden", 
-        name           =>'func',
-        value          =>'editSave',
+        $form->addField( "hidden", 
+            name           =>'func',
+            value          =>'addSave',
         );
+    }
+    else {
+        $form->addField( "hidden", 
+            name           =>'func',
+            value          =>'editSave',
+        );
+    }
     $form->addField( "text", 
         name           =>'title',
         defaultValue   =>'Untitled',
@@ -349,7 +355,6 @@ sub getEditTemplate {
     my $template    = eval { WebGUI::Asset->newById($self->session, $matrix->get('editListingTemplateId')); };
     # TODO: Change to FormBuilder
     $var->{form}    = $self->getEditForm->toHtml;
-    $self->session->log->warn($var->{form});
     $template->setParam(%{ $var });
     $template->style($matrix->getStyleTemplateId);
     return $template;
