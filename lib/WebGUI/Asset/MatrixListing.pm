@@ -217,7 +217,7 @@ sub getEditForm {
             value          => 'new',
         );
         $form->addField( "hidden", 
-            name           => 'class',
+            name           => 'className',
             value          => 'WebGUI::Asset::MatrixListing',
         );
     }
@@ -324,14 +324,35 @@ sub getEditForm {
     }
 
     my $buttons = $form->addField( "ButtonGroup", name => "saveButtons", rowClass => "saveButtons" );
-    $buttons->addButton( "Submit", name => "send" );
-    $buttons->addButton( "Button", 
+    $buttons->addButton( "Submit", { name => "send", });
+    $buttons->addButton( "Button", {
         name => "cancel", 
         value => $i18n->get('cancel', 'WebGUI'),
         extras => q{onclick="history.go(-1);" class="backwardButton"},
-    );
+    } );
 
     return $form;
+}
+
+#-------------------------------------------------------------------
+
+=head2 getEditTemplate ( )
+
+Override the base method to get the template from the parent Matrix asset.
+
+=cut
+
+sub getEditTemplate {
+    my $self = shift;
+    my $var         = $self->get;
+    my $matrix      = $self->getParent;
+    my $template    = eval { WebGUI::Asset->newById($self->session, $matrix->get('editListingTemplateId')); };
+    # TODO: Change to FormBuilder
+    $var->{form}    = $self->getEditForm->toHtml;
+    $self->session->log->warn($var->{form});
+    $template->setParam(%{ $var });
+    $template->style($matrix->getStyleTemplateId);
+    return $template;
 }
 
 #-------------------------------------------------------------------
@@ -809,33 +830,6 @@ sub www_deleteStickied {
     $self->getParent->www_deleteStickied();
 
     return undef;
-}
-
-#-------------------------------------------------------------------
-
-=head2 www_edit ( )
-
-Web facing method which is the default edit page
-
-=cut
-
-sub www_edit {
-    my $self = shift;
-    my $i18n = WebGUI::International->new($self->session, "Asset_MatrixListing");
-
-    if($self->session->form->process('func') eq 'add'){
-        return $self->session->privilege->noAccess() unless $self->getParent->canAddMatrixListing();
-    }else{
-        return $self->session->privilege->insufficient() unless $self->canEdit;
-        return $self->session->privilege->locked() unless $self->canEditIfLocked;
-    }
-
-    my $var         = $self->get;
-    my $matrix      = $self->getParent;
-    # TODO: Change to FormBuilder
-    $var->{form}    = $self->getEditForm->toHtml;
-        
-    return $matrix->processStyle($self->processTemplate($var,$matrix->get("editListingTemplateId")));
 }
 
 #-------------------------------------------------------------------
