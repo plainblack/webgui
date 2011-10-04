@@ -240,6 +240,122 @@ sub getEditFormUploadControl {
 
 #----------------------------------------------------------------------------
 
+=head2 getEditTemplate ( )
+
+Override the method in the base class to get the parent's templates and data.
+
+=cut
+
+sub getEditTemplate {
+    my $self    = shift;
+    my $session = $self->session;
+    my $form    = $session->form;
+
+    my $i18n = WebGUI::International->new($session, 'WebGUI');
+
+    # Prepare the template variables
+    # Cannot get all template vars since they require a storage location, doesn't work for
+    # creating new assets.
+    #my $var     = $self->getTemplateVars;
+    my $var     = {
+        url_addArchive      => $self->getParent->getUrl('func=addArchive'),
+        url_album           => $self->getParent->getUrl('func=album'),
+    };
+
+    # Process errors if any
+    if ( $session->stow->get( 'editFormErrors' ) ) {
+        for my $error ( @{ $session->stow->get( 'editFormErrors' ) } ) {
+            push @{ $var->{ errors } }, {
+                error       => $error,
+            };
+        }
+    }
+
+    if ( $form->get('func') eq "add" ) {
+        $var->{ isNewPhoto }    = 1;
+    }
+
+    # Generate the form
+    if ( $var->{ isNewPhoto } ) {
+        $var->{ form_start }
+            = WebGUI::Form::formHeader( $session, {
+                action      => $self->getParent->getUrl('func=addSave;assetId=new;class='.__PACKAGE__),
+                extras      => 'name="photoAdd"',
+            })
+            . WebGUI::Form::hidden( $session, {
+                name        => 'ownerUserId',
+                value       => $session->user->userId,
+            })
+            ;
+    }
+    else {
+        $var->{ form_start }
+            = WebGUI::Form::formHeader( $session, {
+                action      => $self->getUrl('func=editSave'),
+                extras      => 'name="photoEdit"',
+            })
+            . WebGUI::Form::hidden( $session, {
+                name        => 'ownerUserId',
+                value       => $self->ownerUserId,
+            })
+            ;
+    }
+    $var->{ form_start }
+        .= WebGUI::Form::hidden( $session, {
+            name        => "proceed",
+            value       => $form->get('proceed') || "showConfirmation",
+        });
+
+    $var->{ form_end } = WebGUI::Form::formFooter( $session );
+
+    $var->{ form_submit }
+        = WebGUI::Form::submit( $session, {
+            name        => "submit",
+            value       => $i18n->get('save'),
+        });
+
+    $var->{ form_title  }
+        = WebGUI::Form::Text( $session, {
+            name        => "title",
+            value       => ( $form->get("title") || $self->title ),
+        });
+
+    $var->{ form_synopsis }
+        = WebGUI::Form::HTMLArea( $session, {
+            name        => "synopsis",
+            value       => ( $form->get("synopsis") || $self->synopsis ),
+            richEditId  => $self->getGallery->richEditIdFile,
+        });
+
+    $var->{ form_photo } = $self->getEditFormUploadControl;
+
+    $var->{ form_keywords }
+        = WebGUI::Form::Text( $session, {
+            name        => "keywords",
+            value       => ( $form->get("keywords") || $self->keywords ),
+        });
+
+    $var->{ form_location }
+        = WebGUI::Form::Text( $session, {
+            name        => "location",
+            value       => ( $form->get("location") || $self->location ),
+        });
+
+    $var->{ form_friendsOnly }
+        = WebGUI::Form::yesNo( $session, {
+            name            => "friendsOnly",
+            value           => ( $form->get("friendsOnly") || $self->friendsOnly ),
+            defaultValue    => undef,
+        });
+
+    my $gallery  = $self->getGallery;
+    my $template = eval { WebGUI::Asset->newById($session, $gallery->getTemplateIdEditFile) };
+    $template->setParams(@{ $var });
+    $template->style($gallery->getStyleTemplateId);
+}
+
+#----------------------------------------------------------------------------
+
 =head2 getExifData ( )
 
 Gets a hash reference of Exif data about this Photo.
@@ -557,127 +673,6 @@ sub www_download {
     else {
         return $storage->getFileContentsAsScalar( $self->filename );
     }
-}
-
-#----------------------------------------------------------------------------
-
-=head2 www_edit ( )
-
-Web facing method which is the default edit page
-
-This page is only available to those who can edit this Photo.
-
-=cut
-
-sub www_edit {
-    my $self    = shift;
-    my $session = $self->session;
-    my $form    = $session->form;
-
-    return $session->privilege->insufficient  unless $self->canEdit;
-    return $session->privilege->locked        unless $self->canEditIfLocked;
-
-    my $i18n = WebGUI::International->new($session, 'WebGUI');
-
-    # Prepare the template variables
-    # Cannot get all template vars since they require a storage location, doesn't work for
-    # creating new assets.
-    #my $var     = $self->getTemplateVars; 
-    my $var     = {
-        url_addArchive      => $self->getParent->getUrl('func=addArchive'),
-        url_album           => $self->getParent->getUrl('func=album'),
-    };
-    
-    # Process errors if any
-    if ( $session->stow->get( 'editFormErrors' ) ) {
-        for my $error ( @{ $session->stow->get( 'editFormErrors' ) } ) {
-            push @{ $var->{ errors } }, {
-                error       => $error,
-            };
-        }
-    }
-
-    if ( $form->get('func') eq "add" ) {
-        $var->{ isNewPhoto }    = 1;
-    }
-    
-    # Generate the form
-    if ($form->get("func") eq "add") {
-        $var->{ form_start  } 
-            = WebGUI::Form::formHeader( $session, {
-                action      => $self->getParent->getUrl('func=editSave;assetId=new;class='.__PACKAGE__),
-                extras      => 'name="photoAdd"',
-            })
-            . WebGUI::Form::hidden( $session, {
-                name        => 'ownerUserId',
-                value       => $session->user->userId,
-            })
-            ;
-    }
-    else {
-        $var->{ form_start  } 
-            = WebGUI::Form::formHeader( $session, {
-                action      => $self->getUrl('func=editSave'),
-                extras      => 'name="photoEdit"',
-            })
-            . WebGUI::Form::hidden( $session, {
-                name        => 'ownerUserId',
-                value       => $self->ownerUserId,
-            })
-            ;
-    }
-    $var->{ form_start } 
-        .= WebGUI::Form::hidden( $session, {
-            name        => "proceed",
-            value       => $form->get('proceed') || "showConfirmation",
-        });
-
-    $var->{ form_end } = WebGUI::Form::formFooter( $session );
-    
-    $var->{ form_submit }
-        = WebGUI::Form::submit( $session, {
-            name        => "submit",
-            value       => $i18n->get('save'),
-        });
-
-    $var->{ form_title  }
-        = WebGUI::Form::Text( $session, {
-            name        => "title",
-            value       => ( $form->get("title") || $self->title ),
-        });
-
-    $var->{ form_synopsis }
-        = WebGUI::Form::HTMLArea( $session, {
-            name        => "synopsis",
-            value       => ( $form->get("synopsis") || $self->synopsis ),
-            richEditId  => $self->getGallery->richEditIdFile,
-        });
-
-    $var->{ form_photo } = $self->getEditFormUploadControl;
-    
-    $var->{ form_keywords }
-        = WebGUI::Form::Text( $session, {
-            name        => "keywords",
-            value       => ( $form->get("keywords") || $self->keywords ),
-        });
-
-    $var->{ form_location }
-        = WebGUI::Form::Text( $session, {
-            name        => "location",
-            value       => ( $form->get("location") || $self->location ),
-        });
-
-    $var->{ form_friendsOnly }
-        = WebGUI::Form::yesNo( $session, {
-            name            => "friendsOnly",
-            value           => ( $form->get("friendsOnly") || $self->friendsOnly ),
-            defaultValue    => undef,
-        });
-
-
-    return $self->processStyle(
-        $self->processTemplate( $var, $self->getGallery->getTemplateIdEditFile )
-    );
 }
 
 #----------------------------------------------------------------------------
