@@ -1,5 +1,6 @@
 7.10.24
  - fixed #12256: Calendar Search doesn't show admin controls
+ - fixed #12268: Point of sale form missing from cart screen.
 
 7.10.23
  - fixed #12225: Stock asset, multiple instances on a page
