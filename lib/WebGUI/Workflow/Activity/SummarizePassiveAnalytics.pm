@@ -126,6 +126,7 @@ sub execute {
             $recordLast->finish;
             $fetchLast->finish;
             $sth->finish;
+            $instance->setScratch('counter', $counter);
             return $self->WAITING(1);
         }
         last LOG_CHUNK if $counter >= $total_rows;
