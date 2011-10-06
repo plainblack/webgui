@@ -59,7 +59,7 @@ Return a statement handle at the desired offset.
 
 sub get_statement {
     my ($session, $counter) = @_;
-    my $passive = q{select SQL_CALC_FOUND_ROWS * from passiveLog where userId <> '1' order by userId, sessionId, timeStamp limit ?, 500000};
+    my $passive = q{select SQL_CALC_FOUND_ROWS * from passiveLog where userId <> '1' limit ?, 500000};
     my $sth = $session->db->read($passive, [$counter+0]);
     return $sth;
 }
@@ -93,68 +93,51 @@ sub execute {
     my $lastUrl;
     my $counter = $instance->getScratch('counter');
     my $sth = get_statement($session, $counter);
-    if ($counter) {
-        $lastUserId    = $instance->getScratch('lastUserId');
-        $lastSessionId = $instance->getScratch('lastSessionId');
-        $lastTimeStamp = $instance->getScratch('lastTimeStamp');
-        $lastAssetId   = $instance->getScratch('lastAssetId');
-        $lastUrl       = $instance->getScratch('lastUrl');
-    }
-    else {
-        my $logLine    = $sth->hashRef();
-        $lastUserId    = $logLine->{userId};
-        $lastSessionId = $logLine->{sessionId};
-        $lastTimeStamp = $logLine->{timeStamp};
-        $lastAssetId   = $logLine->{assetId};
-        $lastUrl       = $logLine->{url};
-        $session->db->write('delete from deltaLog'); ##Only if we're starting out
+    if (! $counter) {  #Clean up from last time, just in case
+        $session->db->write('delete from deltaLog');
+        $session->db->write('delete from PA_lastLog');
     }
 
     my $total_rows = $session->db->quickScalar('select found_rows()');
 
-    my $deltaLog = $session->db->prepare('insert into deltaLog (userId, assetId, delta, timeStamp, url) VALUES (?,?,?,?,?)');
+    my $deltaLog   = $session->db->prepare('insert into deltaLog (userId, assetId, timeStamp, url, delta) VALUES (?,?,?,?,?)');
+    my $recordLast = $session->db->prepare('REPLACE INTO PA_lastLog (userId, sessionId, timeStamp, url) VALUES (?,?,?,?)');
+    my $fetchLast  = $session->db->prepare('select * from PA_lastLog where sessionId=? and userId=?');
 
     my $expired = 0;
     LOG_CHUNK: while (1) {
         LOG_ENTRY: while (my $logLine = $sth->hashRef()) {
             $counter++;
-            my $delta = $logLine->{timeStamp} - $lastTimeStamp;
-            if (  $logLine->{userId}    eq $lastUserId 
-               && $logLine->{sessionId} eq $lastSessionId
-               && $delta < $deltaInterval ) {
-                    $deltaLog->execute([$lastUserId, $lastAssetId, $delta, $lastTimeStamp, $lastUrl]);
+            $fetchLast->execute([@{$logLine}{qw/sessionId userId/}]);
+            my $lastLine = $fetchLast->hashRef();
+            $recordLast->execute([ (@{ $logLine }{qw/userId sessionId timeStamp url/}) ]);
+            if ($lastLine->{timeStamp}) {
+                my $delta = $logLine->{timeStamp} - $lastLine->{timeStamp};
+                $deltaLog->execute([ (@{ $lastLine }{qw/userId assetId timeStamp url/}), $delta]);
             }
-            $lastUserId    = $logLine->{userId};
-            $lastSessionId = $logLine->{sessionId};
-            $lastTimeStamp = $logLine->{timeStamp};
-            $lastAssetId   = $logLine->{assetId};
-            $lastUrl       = $logLine->{url};
             if (time() > $endTime) {
-                $instance->setScratch('lastUserId',    $lastUserId);
-                $instance->setScratch('lastSessionId', $lastSessionId);
-                $instance->setScratch('lastTimeStamp', $lastTimeStamp);
-                $instance->setScratch('lastAssetId',   $lastAssetId);
-                $instance->setScratch('lastUrl',       $lastUrl);
-                $instance->setScratch('counter',       $counter);
                 $expired = 1;
                 last LOG_ENTRY;
             }
         }
  
-        $sth->finish;
         if ($expired) {
+            $deltaLog->finish;
+            $recordLast->finish;
+            $fetchLast->finish;
+            $sth->finish;
             return $self->WAITING(1);
         }
         last LOG_CHUNK if $counter >= $total_rows;
         $sth = get_statement($session, $counter);
     }
 
-    $instance->deleteScratch('lastUserId');
-    $instance->deleteScratch('lastSessionId');
-    $instance->deleteScratch('lastTimeStamp');
-    $instance->deleteScratch('lastAssetId');
-    $instance->deleteScratch('lastUrl');
     $instance->deleteScratch('counter');
+    $deltaLog->finish;
+    $recordLast->finish;
+    $fetchLast->finish;
+    $sth->finish;
+    $session->db->write('delete from PA_lastLog');
     return $self->COMPLETE;
 }
 

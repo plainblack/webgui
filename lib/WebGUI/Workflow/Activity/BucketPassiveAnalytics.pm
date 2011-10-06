@@ -61,7 +61,7 @@ Return a statement handle at the desired offset.
 
 sub get_statement {
     my ($session, $logIndex) = @_;
-    my $deltaSql = q{select SQL_CALC_FOUND_ROWS userId, assetId, url, delta, from_unixtime(timeStamp) as stamp from deltaLog order by timestamp limit ?, 500000};
+    my $deltaSql = q{select SQL_CALC_FOUND_ROWS userId, assetId, url, delta, from_unixtime(timeStamp) as stamp from deltaLog limit ?, 500000};
     my $sth = $session->db->read($deltaSql, [$logIndex+0]);
     return $sth;
 }

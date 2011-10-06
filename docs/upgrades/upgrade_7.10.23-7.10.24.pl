@@ -31,9 +31,29 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+addPALastLogTable($session);
 
 finish($session); # this line required
 
+
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub addPALastLogTable {
+    my $session = shift;
+    print "\tAdd a table to keep track of additional Passive Analytics data... " unless $quiet;
+    # and here's our code
+    $session->db->write(<<EOSQL);
+CREATE TABLE `PA_lastLog` (
+`userId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+`assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+`sessionId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+`timeStamp` bigint(20) DEFAULT NULL,
+`url` char(255) NOT NULL,
+PRIMARY KEY (userId, sessionId)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8
+EOSQL
+    print "DONE!\n" unless $quiet;
+}
 
 #----------------------------------------------------------------------------
 # Describe what our function does

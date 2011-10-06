@@ -5,14 +5,13 @@ use lib "$FindBin::Bin/../../lib";
 #use DB;
 
 use WebGUI::Test;
-use WebGUI::Asset;
 use WebGUI::PassiveAnalytics::Rule;
-use WebGUI::Workflow::Activity::BucketPassiveAnalytics;
-use WebGUI::Text;
 
 use Test::More;
+use Test::Deep;
+use Data::Dumper;
 
-plan tests => 1; # increment this value for each test you create
+plan tests => 2; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 $session->user({userId => 3});
@@ -21,6 +20,7 @@ WebGUI::Test->addToCleanup(SQL => 'delete from passiveLog');
 WebGUI::Test->addToCleanup(SQL => 'delete from deltaLog');
 WebGUI::Test->addToCleanup(SQL => 'delete from bucketLog');
 WebGUI::Test->addToCleanup(SQL => 'delete from analyticRule');
+WebGUI::Test->addToCleanup(SQL => 'delete from PA_lastLog');
 
 my $workflow = WebGUI::Workflow->new($session, 'PassiveAnalytics000001');
 my $activities = $workflow->getActivities();
@@ -67,7 +67,8 @@ while (my $spec = shift @url2) {
 }
 
 my @urls = map {$_->[1]} @ruleSets;
-loadLogData($session, @urls);
+#loadLogData($session, @urls);
+repeatableLogData($session, 'passiveAnalyticsLog');
 
 ##Build rulesets
 
@@ -80,7 +81,28 @@ PAUSE: while (my $retval = $instance->run()) {
 }
 #DB::disable_profile();
 
-ok(1, 'One test');
+cmp_ok $counter, '<', 16, 'Successful completion of PA';
+
+my $get_line = $session->db->read('select userId, Bucket, duration from bucketLog');
+
+my @database_dump = ();
+ROW: while ( 1 ) {
+    my @datum = $get_line->array();
+    last ROW unless @datum;
+    push @database_dump, [ @datum ];
+}
+
+cmp_bag(
+    [ @database_dump ],
+    [
+        ['user1', 'one', 10],
+        ['user1', 'two', 15],
+        ['user2', 'zero', 2],
+        ['user2', 'uno', 3],
+        ['user2', 'Other', 5],
+    ],
+    'PA analysis completed, and calculated correctly'
+) or diag Dumper(\@database_dump);
 
 sub loadLogData {
     my ($session, @urls) = @_;
@@ -98,6 +120,26 @@ sub loadLogData {
         $insert->execute([2, 25, $startTime, $url]);
         $startTime += int(rand(10))+1;
     }
+}
+
+sub repeatableLogData {
+    my ($session, $dataLogName) = @_;
+    $session->db->write('delete from passiveLog');
+    my $insert = $session->db->prepare(
+        q!insert into passiveLog (userId, sessionId, timeStamp, url, assetId) VALUES (?,?,?,?,'assetId')!
+    );
+    my $data_name = WebGUI::Test::collateral('passiveAnalyticsLog');
+    open my $log_data, '<', $data_name or
+        die "Unable to open $data_name for reading: $!";
+    local $_;
+    while (<$log_data>) {
+        next if /^\s*#/;
+        s/#\.*$//;
+        chomp;
+        my @data = split;
+        $insert->execute([@data]);
+    }
+    $insert->finish;
 }
 
 #vim:ft=perl
