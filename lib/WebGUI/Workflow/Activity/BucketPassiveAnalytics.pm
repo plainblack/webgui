@@ -137,7 +137,7 @@ sub execute {
         }
 
         if ($expired) {
-            $instance->setScratch('logIndex', $logIndex);
+            $instance->setScratch('lastPassiveLogIndex', $logIndex);
             return $self->WAITING(1);
         }
         last DELTA_CHUNK if $logIndex >= $total_rows;
