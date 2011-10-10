@@ -24,7 +24,7 @@ Package WebGUI::AssetHelper::EditBranch
 
 =head1 DESCRIPTION
 
-Displays the revisions for this asset.
+Make revisioned edits to the current asset and descendant assets.
 
 =head1 METHODS
 
