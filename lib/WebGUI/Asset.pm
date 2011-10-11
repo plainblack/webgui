@@ -1341,6 +1341,10 @@ sub getHelpers {
             label       => $i18n->get('delete'),
             confirm     => $i18n->get('43'),
         },
+        upload_files => {
+            className   => 'WebGUI::AssetHelper::UploadFiles',
+            label       => $i18n->get('upload files'),
+        },
     };
 
     # Merge additional helpers for this class from config
