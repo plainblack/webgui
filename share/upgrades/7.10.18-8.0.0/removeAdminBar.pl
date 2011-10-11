@@ -43,6 +43,6 @@ done;
 start_step "Removing Admin Bar module";
 
 my $webgui_root = realpath( File::Spec->catdir( WebGUI::Paths->configBase, (File::Spec->updir) x 1) );
-unlink File::Spec->catfile($webgui_root, 'lib', 'WebGUI', 'Macro', 'AdminBar');
+unlink File::Spec->catfile($webgui_root, 'lib', 'WebGUI', 'Macro', 'AdminBar.pm');
 
 done;

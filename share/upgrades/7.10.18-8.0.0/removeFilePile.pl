@@ -12,6 +12,6 @@ done;
 start_step "Removing FilePile asset module";
 
 my $webgui_root = realpath( File::Spec->catdir( WebGUI::Paths->configBase, (File::Spec->updir) x 1 ) );
-unlink File::Spec->catfile($webgui_root, 'lib', 'WebGUI', 'Asset', 'FilePile');
+unlink File::Spec->catfile($webgui_root, 'lib', 'WebGUI', 'Asset', 'FilePile.pm');
 
 done;
