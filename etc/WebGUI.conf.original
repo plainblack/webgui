@@ -607,9 +607,6 @@
    "WebGUI::Asset::Wobject::StockData" : {
       "category" : "intranet"
    },
-   "WebGUI::Asset::FilePile" : {
-      "category" : "basic"
-   },
    "WebGUI::Asset::Wobject::Collaboration" : {
       "category" : "community"
    },
