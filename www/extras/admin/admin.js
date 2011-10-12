@@ -158,7 +158,7 @@ WebGUI.Admin = function(cfg){
     // Get I18N
     this.i18n = new WebGUI.i18n( {
         namespaces : {
-            'WebGUI'   : [ '< prev', 'next >', 'locked by' ],
+            'WebGUI'   : [ '< prev', 'next >', 'locked by', '364', 'Loading...' ],
             'Asset'    : [ 'rank', '99', 'type', 'revision date', 'size', 'locked', 'More', 'unlocked', 'edit',
                            'update', 'delete', '43', 'cut', 'Copy', 'duplicate', 'create shortcut'
                          ],
@@ -956,7 +956,7 @@ WebGUI.Admin.prototype.openTab
 
     // Prepare the tab
     var newTab = new YAHOO.widget.Tab({
-        label : "Loading...",
+        label : window.admin.i18n.get('WebGUI','Loading...'),
         content : ''
     });
     newTab.get('contentEl').appendChild( iframe );
@@ -2431,7 +2431,7 @@ WebGUI.Admin.Search
     newForm.style.display = "block";
 
     var newTab = new YAHOO.widget.Tab({
-        label : "Search",
+        label : window.admin.i18n.get('WebGUI','364'),
         content : ''
     });
     this.tab = newTab;
@@ -2648,7 +2648,7 @@ WebGUI.Admin.Search.prototype.addFilter
         filter.button   = new YAHOO.widget.Button( {
             name        : "className",
             type        : "menu",
-            label       : "Choose...",
+            label       : window.admin.i18n.get('WebGUI','Choose...'),
             container   : li,
             menu        : filter.menu
         } );

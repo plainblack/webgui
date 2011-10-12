@@ -4770,6 +4770,12 @@ Users may override this setting in their profile.
         context     => 'Add, as in to append or add more',
     },
 
+    'Choose...' => {
+        message     => 'Choose...',
+        lastUpdate  => 0,
+        context     => 'Choose, as in to select from a set of options',
+    },
+
 };
 
 1;
