@@ -13,6 +13,7 @@ use WebGUI::Workflow;
 use WebGUI::Workflow::Instance;
 use WebGUI::User;
 use WebGUI::Text;
+use WebGUI::ProgressBar;
 
 =head1 NAME
 
@@ -84,15 +85,26 @@ The name of the file to create inside the storage object.
 
 sub exportSomething {
     my ($session, $sth, $filename) = @_;
+    my $pb   = WebGUI::ProgressBar->new($session);
+    my $i18n = WebGUI::International->new($session, 'Asset_Thingy');
+    $pb->start($i18n->get('export label'), $session->url->extras('adminConsole/passiveAnalytics.png'));
+    $pb->update($i18n->get('Creating column headers'));
     my $storage = WebGUI::Storage->createTemp($session);
     my @columns = $sth->getColumnNames;
     my $csvData = WebGUI::Text::joinCSV( @columns ). "\n";
+    $pb->update($i18n->get('Writing data'));
+    my $rowCounter=0;
     while (my $row = $sth->hashRef()) {
         my @row = @{ $row }{@columns};
         $csvData .= WebGUI::Text::joinCSV(@row) . "\n";
+        if (! ++$rowCounter % 25) {
+            $pb->update($i18n->get('Writing data'));
+        }
     }
     $storage->addFileFromScalar($filename, $csvData);
     $session->http->setRedirect($storage->getUrl($filename));
+    $pb->update(sprintf q|<a href="%s">%s</a>|, $session->url->page('op=passiveAnalytics;func=editRuleflow'), sprintf($i18n->get('Return to %s'), $i18n->get('Passive Analytics','PassiveAnalytics')));
+    return $pb->finish($storage->getUrl($filename));
 }
 
 #-------------------------------------------------------------------
