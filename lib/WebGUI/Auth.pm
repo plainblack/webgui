@@ -590,7 +590,7 @@ sub displayLogin {
     $vars->{title} = $i18n->get(66);
     my $action;
     if ($self->session->setting->get("encryptLogin")) {
-        my $uri = URI->new($session->url->page(undef,1));
+        my $uri = URI->new($self->session->url->page(undef,1));
         $uri->scheme('https');
         $uri->host_port($uri->host);
         $action = $uri->as_string;
@@ -928,7 +928,7 @@ sub login {
 		my $currentUrl = URI->new($self->session->url->page(undef,1));
         $currentUrl->scheme('http');
         $currentUrl->port($self->session->config->get('webServerPort') || 80);
-		$self->session->http->setRedirect($currentUrl->canonical->as-string);
+		$self->session->http->setRedirect($currentUrl->canonical->as_string);
 	}
 
     # Get open version tag. This is needed if we want
