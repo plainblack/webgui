@@ -32,6 +32,7 @@ my $session = start(); # this line required
 
 # upgrade functions go here
 addPALastLogTable($session);
+addForkRedirect($session);
 
 finish($session); # this line required
 
@@ -51,6 +52,18 @@ CREATE TABLE IF NOT EXISTS `PA_lastLog` (
 `url` char(255) NOT NULL,
 PRIMARY KEY (userId, sessionId)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8
+EOSQL
+    print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub addForkRedirect {
+    my $session = shift;
+    print "\tAdd a column to Fork to keep track of late generated redirect URLs... " unless $quiet;
+    # and here's our code
+    $session->db->write(<<EOSQL);
+ALTER TABLE Fork add column redirect CHAR(255);
 EOSQL
     print "DONE!\n" unless $quiet;
 }

@@ -278,6 +278,7 @@ sub finish {
         $props{latch}  = 0;
     }
     $props{endTime} = time();
+    $props{redirect} = $self->{redirect};
     $self->set( \%props );
 }
 
@@ -510,6 +511,20 @@ sub setGroup {
     my ( $self, $groupId ) = @_;
     $groupId = eval { $groupId->getId } || $groupId;
     $self->set( { groupId => $groupId } );
+}
+
+#-----------------------------------------------------------------
+
+=head2 setRedirect($url)
+
+Allows a redirect to be set for the process after the initial fork.  This happens
+in the case when a file is to be downloaded after the fork finishes.
+
+=cut
+
+sub setRedirect {
+    my ( $self, $url ) = @_;
+    $self->{redirect} = $url;
 }
 
 #-----------------------------------------------------------------

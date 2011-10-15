@@ -26,7 +26,7 @@
                         args.first();
                     }
                     if (data.finished) {
-                        args.finish();
+                        args.finish(data);
                     }
                     else {
                         setTimeout(fetch, args.interval || 1000);
