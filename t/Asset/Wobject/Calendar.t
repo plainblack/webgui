@@ -57,8 +57,6 @@ use Data::Dumper;
 use WebGUI::Asset::Wobject::Calendar;
 use WebGUI::Asset::Event;
 
-plan tests => 15 + scalar @icalWrapTests;
-
 my $session = WebGUI::Test->session;
 
 # Do our work in the import node
@@ -571,6 +569,9 @@ cmp_deeply(
     '... correct set of events in list view'
 );
 
+ok(exists $listVars->{events}->[0]->{new_year} && $listVars->{events}->[0]->{new_year}, 'first event has new_year set');
+ok(exists $listVars->{events}->[0]->{new_month} && $listVars->{events}->[0]->{new_month}, 'first event has new_month set');
+ok(exists $listVars->{events}->[0]->{new_day} && $listVars->{events}->[0]->{new_day}, 'first event has new_day set');
 
 ######################################################################
 #
@@ -606,3 +607,5 @@ cmp_deeply(
     [],
     'but getFeeds still returns a data structure.'
 );
+
+done_testing;

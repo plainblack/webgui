@@ -1133,7 +1133,7 @@ sub viewList {
         );
 
     ### Build the event vars
-    my $dtLast = $dtStart; # The DateTime of the last event
+    my $dtLast = WebGUI::DateTime->new(0); # The DateTime of the last event
     EVENT: for my $event (@events) {
         next EVENT unless $event && $event->canView();
         my ( %eventVar, %eventDate )
@@ -1142,12 +1142,15 @@ sub viewList {
         # Add the change flags
         my $dt  = $event->getDateTimeStart;
         if ( $dt->year > $dtLast->year ) {
-            $eventVar{ new_year } = 1;
-        }
-        if ( $dt->month > $dtLast->month ) {
+            $eventVar{ new_year }  = 1;
             $eventVar{ new_month } = 1;
+            $eventVar{ new_day }   = 1;
         }
-        if ( $dt->day > $dtLast->day ) {
+        elsif ( $dt->month > $dtLast->month ) {
+            $eventVar{ new_month } = 1;
+            $eventVar{ new_day }   = 1;
+        }
+        elsif ( $dt->day > $dtLast->day ) {
             $eventVar{ new_day } = 1;
         }
 
