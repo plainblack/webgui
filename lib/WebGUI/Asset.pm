@@ -1604,8 +1604,8 @@ sub getPrototypeList {
     my $userUiLevel = $session->user->get('uiLevel');
     my @assets;
     ID: foreach my $id (@prototypeIds) {
-        my $asset = WebGUI::Asset->newById($session, $id);
-        next ID unless defined $asset;
+        my $asset = eval { WebGUI::Asset->newById($session, $id); };
+        next ID if Exception::Class->caught();
         next ID unless $asset->get('isPrototype');
         next ID unless ($asset->get('status') eq 'approved' || $asset->get('tagId') eq $session->scratch->get("versionTag"));
         push @assets, $asset;
