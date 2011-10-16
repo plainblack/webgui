@@ -72,8 +72,6 @@ if ( !$mech->success ) {
     plan skip_all => "Cannot load URL '$baseUrl'. Will not test.";
 }
 
-plan tests => 11;        # Increment this number for each test you create
-
 #----------------------------------------------------------------------------
 # Visitor user cannot add albums 
 $mech       = Test::WWW::Mechanize->new;
@@ -110,6 +108,10 @@ $mech->content_contains(
 # Creates the album with the appropriate properties
 my $album   = WebGUI::Asset->newById( $session, $gallery->getAlbumIds->[0] );
 cmp_deeply( $properties, subhashof( $album->get ), "Properties from edit form are set correctly" );
+
+SKIP: {
+
+skip 'rotation, deletion, reordering no longer a part of the edit form', 5;
 
 #----------------------------------------------------------------------------
 # Photos can be rotated using the respective form buttons
@@ -169,6 +171,12 @@ foreach my $file ( @{$storage->getFiles('showAll') } ) {
 
 # Compare dimensions
 cmp_deeply( \@oldDims, \@newerDims, "Check if all files were rotated by 90° CCW" );
+
+}
+
+}
+
+done_testing;
 
 #----------------------------------------------------------------------------
 # getMechLogin( baseUrl, WebGUI::User, "identifier" )
