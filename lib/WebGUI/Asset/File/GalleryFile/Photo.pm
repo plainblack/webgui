@@ -279,7 +279,7 @@ sub getEditTemplate {
     if ( $var->{ isNewPhoto } ) {
         $var->{ form_start }
             = WebGUI::Form::formHeader( $session, {
-                action      => $self->getParent->getUrl('func=addSave;assetId=new;class='.__PACKAGE__),
+                action      => $self->getParent->getUrl('func=addSave;assetId=new;className='.__PACKAGE__),
                 extras      => 'name="photoAdd"',
             })
             . WebGUI::Form::hidden( $session, {
