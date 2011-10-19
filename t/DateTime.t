@@ -107,6 +107,6 @@ sub addUser {
 	##so the test will not fail in the summer
 	$user->profileField("timeZone","America/Hermosillo");
 	$user->username("Time Zone");
-    addToCleanup($user);
+    WebGUI::Test->addToCleanup($user);
 	return $user;
 }

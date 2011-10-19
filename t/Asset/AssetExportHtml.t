@@ -183,7 +183,7 @@ is(-d $accessibleDirectory, 1, "exportCheckPath creating subdirectory actually c
 
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Asset Export Test"});
-addToCleanup($versionTag);
+WebGUI::Test->addToCleanup($versionTag);
 
 my $importNode = WebGUI::Asset->getImportNode($session);
 

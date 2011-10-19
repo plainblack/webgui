@@ -34,7 +34,7 @@ my $node            = WebGUI::Asset->getImportNode( $session );
 
 # Create version tag and make sure it gets cleaned up
 my $versionTag = WebGUI::VersionTag->getWorking($session);
-addToCleanup($versionTag);
+WebGUI::Test->addToCleanup($versionTag);
 
 # Override some settings to make things easier to test
 # userFunctionStyleId 

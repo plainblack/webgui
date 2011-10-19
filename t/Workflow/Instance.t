@@ -67,7 +67,7 @@ my $wf = WebGUI::Workflow->create(
     }
 );
 isa_ok($wf, 'WebGUI::Workflow', 'workflow created for test');
-addToCleanup($wf);
+WebGUI::Test->addToCleanup($wf);
 
 # create an instance of $wfId
 my $properties = {
@@ -179,7 +179,7 @@ my $wf2 = WebGUI::Workflow->create(
         type => 'None',
     }
 );
-addToCleanup($wf2);
+WebGUI::Test->addToCleanup($wf2);
 
 my $wf2Instance = WebGUI::Workflow::Instance->create($session, {workflowId => $wf2->getId});
 cmp_deeply($wf2Instance->get('parameters'), {}, 'get returns {} for parameters when there are no parameters stored');

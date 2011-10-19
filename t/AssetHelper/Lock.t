@@ -33,7 +33,7 @@ my $home = WebGUI::Test->asset;
 
 my $editor = WebGUI::User->create($session);
 $editor->addToGroups([4]);
-addToCleanup($editor);
+WebGUI::Test->addToCleanup($editor);
 
 $session->user({userId => 3});
 my $newPage = $home->addChild({

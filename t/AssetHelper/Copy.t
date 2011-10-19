@@ -54,7 +54,7 @@ my $root = WebGUI::Asset->getRoot($session);
         'AssetHelper/Copy forks a process'
     );
 
-    addToCleanup( 'WebGUI::Fork' => $output->{forkId} );
+    WebGUI::Test->addToCleanup( 'WebGUI::Fork' => $output->{forkId} );
 }
 
 ok(WebGUI::Test->waitForAllForks(10), "Forks finished");
@@ -62,6 +62,6 @@ ok(WebGUI::Test->waitForAllForks(10), "Forks finished");
 $session->cache->clear;
 my $clippies = $root->getLineage(["descendants"], {statesToInclude => [qw{clipboard clipboard-limbo}], returnObjects => 1,});
 is @{ $clippies }, 1, '... only copied 1 asset to the clipboard, no children';
-addToCleanup(@{ $clippies });
+WebGUI::Test->addToCleanup(@{ $clippies });
 
 #vim:ft=perl

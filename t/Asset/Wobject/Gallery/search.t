@@ -33,7 +33,7 @@ my $versionTag      = WebGUI::VersionTag->getWorking($session);
 
 $versionTag->set( { name=>"Gallery Search Test" } );
 my %tag = ( tagId => $versionTag->getId, status => "pending" );
-addToCleanup( $versionTag );
+WebGUI::Test->addToCleanup( $versionTag );
 
 # Create gallery and a single album
 my $gallery

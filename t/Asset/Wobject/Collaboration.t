@@ -32,7 +32,7 @@ my $node = WebGUI::Test->asset;
 
 # grab a named version tag
 my $versionTag = WebGUI::VersionTag->getWorking($session);
-addToCleanup($versionTag);
+WebGUI::Test->addToCleanup($versionTag);
 $versionTag->set({name => 'Collaboration => groupToEditPost test'});
 my %tag = ( tagId => $versionTag->getId, status => "pending" );
 
@@ -74,7 +74,7 @@ my $props = {
 my $thread = $collab->addChild($props, @addChildCoda);
 $thread->setSkipNotification;
 $tag1->commit;
-addToCleanup($tag1);
+WebGUI::Test->addToCleanup($tag1);
 
 # Test for a sane object type
 isa_ok($thread, 'WebGUI::Asset::Post::Thread');
@@ -89,7 +89,7 @@ $props = {
 my $thread2 = $collab->addChild($props, @addChildCoda);
 $thread2->setSkipNotification;
 $tag2->commit;
-addToCleanup($tag2);
+WebGUI::Test->addToCleanup($tag2);
 
 my $rssitems = $collab->getRssFeedItems();
 is(scalar @{ $rssitems }, 2, 'rssitems set to number of posts added');

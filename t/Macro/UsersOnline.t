@@ -178,7 +178,7 @@ sub setupUsers {
         my $newSession = WebGUI::Session->open(WebGUI::Test::file);
         $newSession->user({user => $_});
     }
-    addToCleanup(@users);
+    WebGUI::Test->addToCleanup(@users);
     return @users;
 }
 
@@ -232,6 +232,6 @@ sub setupJSONtemplate {
     }
 EOTMPL
     my $template = WebGUI::Asset->getImportNode($session)->addChild({className=>'WebGUI::Asset::Template', parser => 'WebGUI::Asset::Template::HTMLTemplate', namespace => 'Macro/UsersOnline', template=>$templateBody});
-    addToCleanup($template);
+    WebGUI::Test->addToCleanup($template);
     return $template;
 }

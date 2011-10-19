@@ -384,7 +384,7 @@ $siteWideTag->rollback();
     # create admin session
     $admin_session = WebGUI::Test->newSession;
     WebGUI::Test->addToCleanup($admin_session);
-    addToCleanup($admin_session);
+    WebGUI::Test->addToCleanup($admin_session);
     $admin_session->user({'userId' => 3});
 
     setUserVersionTagMode($admin_session->user(), q{autoCommit});
@@ -436,10 +436,10 @@ my $redSession  = WebGUI::Test->newSession();
 
 my $andy = WebGUI::User->create($andySession);
 my $red  = WebGUI::User->create($redSession);
-addToCleanup($andy, $red);
+WebGUI::Test->addToCleanup($andy, $red);
 
 my $andyTag = WebGUI::VersionTag->getWorking($andySession);
-addToCleanup($andyTag);
+WebGUI::Test->addToCleanup($andyTag);
 my $redTag  = WebGUI::VersionTag->new($redSession, $andyTag->getId);
 $redTag->setWorking();
 is($andyTag->getId, $redTag->getId, 'users share the same version tag');
@@ -459,7 +459,7 @@ $andyTag2->clearWorking;
     my $andyTagCheck = WebGUI::VersionTag->getWorking($andySession, 'nocreate');
     is($andyTagCheck, undef, 'clearWorking: user andy does not have tag');
     my $redSession2  = $redSession->duplicate;
-    addToCleanup($redSession2);
+    WebGUI::Test->addToCleanup($redSession2);
     my $redTagCheck  = WebGUI::VersionTag->getWorking($redSession2, 'nocreate');
     is($redTagCheck, undef, 'red does not either');
 }

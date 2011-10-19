@@ -31,7 +31,7 @@ my $session = WebGUI::Test->session;
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Adding assets for RootTitle tests"});
 my %tag = ( tagId => $versionTag->getId, status => "pending" );
-addToCleanup($versionTag);
+WebGUI::Test->addToCleanup($versionTag);
 
 my $root = WebGUI::Asset->getRoot($session);
 my %properties_A = (

@@ -155,7 +155,7 @@ $driver = WebGUI::Shop::ShipDriver::UPS->new($session, {
     enabled  => 1,
     shipType => 'PARCEL',
 });
-addToCleanup($driver);
+WebGUI::Test->addToCleanup($driver);
 
 eval { $driver->calculate() };
 $e = Exception::Class->caught();
@@ -218,7 +218,7 @@ cmp_deeply(
 );
 
 my $cart = WebGUI::Shop::Cart->newBySession($session);
-addToCleanup($cart);
+WebGUI::Test->addToCleanup($cart);
 my $addressBook = $cart->getAddressBook;
 my $workAddress = $addressBook->addAddress({
     label => 'work',

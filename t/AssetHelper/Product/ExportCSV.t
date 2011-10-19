@@ -85,7 +85,7 @@ my $helper  = WebGUI::AssetHelper::Product::ExportCSV->new(
 );
 my $exportProducts  = \&WebGUI::AssetHelper::Product::ExportCSV::exportProducts;
 my $process = Test::MockObject::Extends->new( WebGUI::Fork->create( $session ) );
-addToCleanup( sub { $process->delete } );
+WebGUI::Test->addToCleanup( sub { $process->delete } );
 
 $exportProducts->($process, {});
 # Determine the storage location from the URL

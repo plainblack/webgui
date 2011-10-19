@@ -57,14 +57,14 @@ my $sth = $session->db->prepare('INSERT INTO myUserTable VALUES(?)');
 foreach my $mob (@mob) {
 	$sth->execute([ $mob->userId ]);
 }
-addToCleanup(@mob);
+WebGUI::Test->addToCleanup(@mob);
 
 ##Create the 3 groups
 
 $ms_users = WebGUI::Group->new($session, "new");
 $ms_distributors = WebGUI::Group->new($session, "new");
 $ms_int_distributors = WebGUI::Group->new($session, "new");
-addToCleanup($ms_users, $ms_distributors, $ms_int_distributors);
+WebGUI::Test->addToCleanup($ms_users, $ms_distributors, $ms_int_distributors);
 
 $ms_users->name('MS Users');
 $ms_distributors->name('MS Distributors');
@@ -86,7 +86,7 @@ $ms_distributors->addGroups([$ms_int_distributors->getId]);
 
 $disti = WebGUI::User->new($session, 'new');
 $int_disti = WebGUI::User->new($session, 'new');
-addToCleanup($disti, $int_disti);
+WebGUI::Test->addToCleanup($disti, $int_disti);
 
 $ms_distributors->addUsers([$disti->userId]);
 $ms_int_distributors->addUsers([$int_disti->userId]);

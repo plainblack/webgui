@@ -29,7 +29,7 @@ my $ldapProps   = WebGUI::Test->getSmokeLDAPProps();
 
 $session->db->setRow("ldapLink","ldapLinkId",$ldapProps, $ldapProps->{ldapLinkId});
 my $ldapLink        = WebGUI::LDAPLink->new( $session, $ldapProps->{ldapLinkId} );
-addToCleanup($ldapLink);
+WebGUI::Test->addToCleanup($ldapLink);
 my $ldap            = $ldapLink->bind;
 $session->setting->set('ldapConnection', $ldapProps->{ldapLinkId} );
 
@@ -39,7 +39,7 @@ $ldapGroup->set( "ldapLinkId", $ldapProps->{ldapLinkId} );
 $ldapGroup->set( "ldapGroup", "cn=Convicts,o=shawshank" );
 $ldapGroup->set( "ldapGroupProperty", "member" );
 $ldapGroup->set( "ldapRecursiveProperty", "uid" );
-addToCleanup($ldapGroup);
+WebGUI::Test->addToCleanup($ldapGroup);
 
 #----------------------------------------------------------------------------
 # Tests

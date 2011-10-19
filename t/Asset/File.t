@@ -109,7 +109,7 @@ cmp_deeply(
 #----------------------------------------------------------------------------
 # Add another new revision, changing the privs
 my $newRev  = $asset->addRevision( { ownerUserId => '3', groupIdView => '3' }, time + 5 );
-addToCleanup( $newRev );
+WebGUI::Test->addToCleanup( $newRev );
 $privs   = JSON->new->decode( $newRev->getStorageLocation->getFileContentsAsScalar('.wgaccess') );
 cmp_deeply(
     $privs,
@@ -123,7 +123,7 @@ cmp_deeply(
 
 # Add a new revision, changing the privs
 my $newRev  = $asset->addRevision( { groupIdView => '7' }, time + 8 );
-addToCleanup( $newRev );
+WebGUI::Test->addToCleanup( $newRev );
 is( $newRev->getStorageLocation->getFileContentsAsScalar('.wgaccess'), undef, "wgaccess doesn't exist" );
 
 #----------------------------------------------------------------------------
@@ -144,7 +144,7 @@ $asset->update({
     filename => $filename,
 });
 
-addToCleanup( $asset );
+WebGUI::Test->addToCleanup( $asset );
 $asset->trash;
 my $storage = $asset->getStorageLocation;
 my $dir = $storage->getPathClassDir();

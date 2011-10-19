@@ -24,12 +24,12 @@ my $node = WebGUI::Asset->getImportNode($session);
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Wiki Test"});
 my %tag = ( tagId => $versionTag->getId, status => "pending" );
-addToCleanup($versionTag);
+WebGUI::Test->addToCleanup($versionTag);
 
 my $assetEdit    = WebGUI::Group->new($session, "new");
 my $wikiAdmin    = WebGUI::Group->new($session, "new");
 my $wikiEditPage = WebGUI::Group->new($session, "new");
-addToCleanup($assetEdit, $wikiAdmin, $wikiEditPage);
+WebGUI::Test->addToCleanup($assetEdit, $wikiAdmin, $wikiEditPage);
 
 my $assetEditor       = WebGUI::User->create($session);
 $assetEdit->addUsers([$assetEditor->userId]);
@@ -39,7 +39,7 @@ my $wikiPageEditor    = WebGUI::User->create($session);
 $wikiEditPage->addUsers([$wikiPageEditor->userId]);
 my $wikiOwner         = WebGUI::User->create($session);
 my $wikiPageOwner     = WebGUI::User->create($session);
-addToCleanup($assetEditor, $wikiAdministrator, $wikiPageEditor, $wikiOwner, $wikiPageOwner);
+WebGUI::Test->addToCleanup($assetEditor, $wikiAdministrator, $wikiPageEditor, $wikiOwner, $wikiPageOwner);
 
 $session->user({user => $wikiOwner});
 my $wiki = $node->addChild({
@@ -57,7 +57,7 @@ my $wikipage = $wiki->addChild({
 }, undef, undef, {skipAutoCommitWorkflows => 1, skipNotification => 1});
 is $wikipage->get('ownerUserId'), $wikiPageOwner->userId, 'wiki page owned by correct user';
 
-addToCleanup($wikipage);
+WebGUI::Test->addToCleanup($wikipage);
 
 # Test for sane object types
 isa_ok($wiki, 'WebGUI::Asset::Wobject::WikiMaster');

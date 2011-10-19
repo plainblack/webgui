@@ -75,7 +75,7 @@ my $workflow  = WebGUI::Workflow->create($session,
         mode       => 'realtime',
     },
 );
-addToCleanup($workflow);
+WebGUI::Test->addToCleanup($workflow);
 
 my $threshold = $workflow->addActivity('WebGUI::Workflow::Activity::NotifyAboutLowStock');
 $threshold->set('className'    , 'WebGUI::Activity::NotifyAboutLowStock');
@@ -166,7 +166,7 @@ my $movieVarId = $movie_posters->setCollateral('variantsJSON', 'variantId', 'new
     },
 );
 my $otherTag     = WebGUI::VersionTag->getWorking($session);
-addToCleanup($otherTag);
+WebGUI::Test->addToCleanup($otherTag);
 $otherTag->commit;
 
 $threshold->set('warningLimit' , 10);

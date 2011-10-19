@@ -32,7 +32,7 @@ my $versionTag      = WebGUI::VersionTag->getWorking($session);
 # Name version tag and make sure it gets cleaned up
 $versionTag->set({name=>"Orientation adjustment test"});
 my %tag = ( tagId => $versionTag->getId, status => "pending" );
-addToCleanup($versionTag);
+WebGUI::Test->addToCleanup($versionTag);
 
 # Create gallery and a single album
 my $gallery

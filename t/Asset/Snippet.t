@@ -23,7 +23,7 @@ my $node = WebGUI::Asset->getImportNode($session);
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Snippet Test"});
 my %tag = ( tagId => $versionTag->getId, status => "pending" );
-addToCleanup($versionTag);
+WebGUI::Test->addToCleanup($versionTag);
 my $snippet = $node->addChild({className=>'WebGUI::Asset::Snippet', %tag});
 
 # Make sure TemplateToolkit is in the config file
@@ -103,7 +103,7 @@ $tag{tagId} = $tag2->getId;
 my $snippet2 = $node->addChild({className => 'WebGUI::Asset::Snippet', %tag});
 $snippet2->update({mimeType => 'text/javascript'});
 $tag2->commit;
-addToCleanup($tag2);
+WebGUI::Test->addToCleanup($tag2);
 
 $snippet2->snippet('uncompressable');
 is $snippet2->snippetPacked, 'uncompressable', 'packed snippet content was set';

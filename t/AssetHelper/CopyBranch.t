@@ -56,7 +56,7 @@ my $grand   = $child->addChild({
     %tag,
 });
 $tag->commit;
-addToCleanup( $tag );
+WebGUI::Test->addToCleanup( $tag );
 
 { 
     my $helper = WebGUI::AssetHelper::CopyBranch->new( id => 'copy_branch', session => $session, asset => $top );
@@ -88,6 +88,6 @@ $mech->get_ok( '/?op=assetHelper;helperId=copy_branch;method=copy;with=descendan
 WebGUI::Test->waitForAllForks;
 my $clippies = $root->getLineage(["descendants"], {statesToInclude => [qw{clipboard clipboard-limbo}], returnObjects => 1,});
 is @{ $clippies }, 3, '... copied 3 asset to the clipboard';
-addToCleanup( @$clippies );
+WebGUI::Test->addToCleanup( @$clippies );
 
 #vim:ft=perl

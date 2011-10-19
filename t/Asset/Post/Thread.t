@@ -25,7 +25,7 @@ my $node = WebGUI::Asset->getImportNode($session);
 # Grab a named version tag
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Collab setup"});
-addToCleanup($versionTag);
+WebGUI::Test->addToCleanup($versionTag);
 
 # Need to create a Collaboration system in which the post lives.
 my @addArgs = ( undef, undef, { skipNotification => 1 } );
@@ -78,7 +78,7 @@ note 'getCSLinkUrl';
 my @newThreads;
 my $threadCount = 15;
 my $versionTag2 = WebGUI::VersionTag->getWorking($session);
-addToCleanup( $versionTag2 );
+WebGUI::Test->addToCleanup( $versionTag2 );
 $props->{tagId} = $versionTag2->getId;
 while ($threadCount--) {
     push @newThreads, $collab->addChild($props, @addArgs);

@@ -144,7 +144,7 @@ foreach my $testSet (@testSets) {
 $WebGUIdbLink->set({allowMacroAccess=>$originalMacroAccessValue});
 
 my $newLinkId = $WebGUIdbLink->copy;
-addToCleanup(WebGUI::DatabaseLink->new($session, $newLinkId));
+WebGUI::Test->addToCleanup(WebGUI::DatabaseLink->new($session, $newLinkId));
 my $output = WebGUI::Macro::SQL::process(
     $session,
     q{show columns from testTable like 'zero'},

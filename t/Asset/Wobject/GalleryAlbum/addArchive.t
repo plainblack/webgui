@@ -25,7 +25,7 @@ my $node            = WebGUI::Asset->getImportNode($session);
 my $versionTag      = WebGUI::VersionTag->getWorking($session);
 my %tag = ( tagId => $versionTag->getId, status => "pending" );
 $versionTag->set({name=>"Add Archive to Album Test"});
-addToCleanup($versionTag);
+WebGUI::Test->addToCleanup($versionTag);
 
 my $gallery
     = $node->addChild({

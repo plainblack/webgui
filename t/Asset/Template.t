@@ -23,7 +23,7 @@ use JSON qw{ from_json };
 
 my $session = WebGUI::Test->session;
 my $tag = WebGUI::VersionTag->getWorking($session);
-addToCleanup( $tag );
+WebGUI::Test->addToCleanup( $tag );
 my %tag = ( tagId => $tag->getId, status => "pending" );
 my $default = $session->config->get('defaultTemplateParser');
 my $ht      = 'WebGUI::Asset::Template::HTMLTemplate';

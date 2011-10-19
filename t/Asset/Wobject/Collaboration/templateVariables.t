@@ -110,7 +110,7 @@ foreach my $index (1 .. 5) {
     $newThreads[$index]->setSkipNotification;
 }
 $vt2->commit;
-addToCleanup($vt2);
+WebGUI::Test->addToCleanup($vt2);
 
 $session->user({userId => 3});
 $templateVars = $collab->getViewTemplateVars();

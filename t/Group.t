@@ -832,7 +832,7 @@ ok(! WebGUI::Group->vitalGroup('27'), '... 27 is not vital');
 # Normal group
 my $happyDude   = WebGUI::User->create( $session );
 $happyDude->username(" Happy Dude ");
-addToCleanup( $happyDude );
+WebGUI::Test->addToCleanup( $happyDude );
 
 $gA->addUsers([ $happyDude->getId ]);
 $gB->addUsers([ $happyDude->getId ]);

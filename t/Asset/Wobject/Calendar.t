@@ -310,7 +310,7 @@ my $coincidentHigh = $windowCal->addChild({
 # Everything above the window should be included in the set of events returned.
 
 $tag2->commit;
-addToCleanup($tag2);
+WebGUI::Test->addToCleanup($tag2);
 
 is(scalar @{ $windowCal->getLineage(['children'])}, 17, 'added events to the window calendar');
 
@@ -556,7 +556,7 @@ my $prevDay = $listCal->addChild({
 
 my $tag6 = WebGUI::VersionTag->getWorking($session);
 $tag6->commit;
-addToCleanup($tag6);
+WebGUI::Test->addToCleanup($tag6);
 
 my $listVars = $listCal->viewList({ start => $bday });
 

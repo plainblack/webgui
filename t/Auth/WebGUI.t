@@ -28,7 +28,7 @@ use WebGUI::Auth::WebGUI;
 my $session         = WebGUI::Test->session;
 
 my $user            = WebGUI::User->create( $session );
-addToCleanup( $user );
+WebGUI::Test->addToCleanup( $user );
 
 #----------------------------------------------------------------------------
 # Test instance

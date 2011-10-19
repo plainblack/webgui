@@ -134,7 +134,7 @@ is($todayFolder->get('styleTemplateId'), $archive->get('styleTemplateId'),  '...
         className => 'WebGUI::Asset::Wobject::StoryArchive',
         title     => 'Extension Tester',
     });
-    addToCleanup($arch2);
+    WebGUI::Test->addToCleanup($arch2);
 
     is $arch2->get('url'),
         $home->get('url').'/extension-tester.ext',

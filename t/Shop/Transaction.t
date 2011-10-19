@@ -68,7 +68,7 @@ my $transaction = WebGUI::Shop::Transaction->new($session,{
     paymentDriverLabel  => 'kkk',
     taxes               => 7,
     });
-addToCleanup($transaction);
+WebGUI::Test->addToCleanup($transaction);
 
 # objects work
 isa_ok($transaction, "WebGUI::Shop::Transaction");
@@ -243,13 +243,13 @@ my $shopGroup  = WebGUI::Group->new($session, 'new');
 my $shopAdmin  = WebGUI::User->create($session);
 $shopUser->username('shopAdmin');
 $shopGroup->addUsers([$shopAdmin->getId]);
-addToCleanup($shopUser, $shopAdmin, $shopGroup);
+WebGUI::Test->addToCleanup($shopUser, $shopAdmin, $shopGroup);
 $session->setting->set('shopSaleNotificationGroupId', $shopGroup->getId);
 $session->user({userId => $shopUser->getId});
 
 my $trans = WebGUI::Shop::Transaction->new($session, {});
 ok($trans->can('sendNotifications'), 'sendNotifications: valid method for transactions');
-addToCleanup($trans);
+WebGUI::Test->addToCleanup($trans);
 
 ##Disable sending email
 my $sendmock = Test::MockObject->new( {} );
