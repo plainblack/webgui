@@ -174,8 +174,6 @@ cmp_deeply( \@oldDims, \@newerDims, "Check if all files were rotated by 90° CCW
 
 }
 
-}
-
 done_testing;
 
 #----------------------------------------------------------------------------
