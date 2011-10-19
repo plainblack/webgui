@@ -763,7 +763,7 @@ my @unticks = qw( assetId vendorId seatsAvailable price eventNumber location rel
 for my $val ( @unticks ) {
     $mech->untick( 'fieldsToImport', $val );
 }
-$mech->click_ok( "submit", "import files" );
+$mech->click_ok( "send", "import files" );
 
 # Events exist
 my $events = $ems->getLineage( ['children'], {
@@ -777,7 +777,7 @@ cmp_deeply(
             { 
                 title => "One",
                 description => "Oneness",
-                startDate => WebGUI::DateTime->new( $session, mysql => '2010-01-01 00:00:00', time_zone => DateTime::TimeZone::Local->TimeZone() )->toMysql,
+                startDate => WebGUI::DateTime->new( $session, mysql => '2010-01-01 00:00:00', time_zone => $session->user->get('timeZone'), )->toMysql,
                 duration => 2,
             }
         ),
@@ -785,7 +785,7 @@ cmp_deeply(
             {
                 title => 'Two',
                 description => 'Twoness',
-                startDate => WebGUI::DateTime->new( $session, mysql => '2010-02-02 00:00:00', time_zone => DateTime::TimeZone::Local->TimeZone() )->toMysql,
+                startDate => WebGUI::DateTime->new( $session, mysql => '2010-02-02 00:00:00', time_zone => $session->user->get('timeZone') )->toMysql,
                 duration => 3,
             }
         ),
