@@ -4,6 +4,7 @@
  - fixed #12201: AssetReport - no selects.
  - fixed #12269: Login / Loginbox with encryptlogin
  - fixed #12271: Calendar List View does not always show labels
+ - fixed Passive Analytics, UI, Progress Bar, server load.
 
 7.10.23
  - fixed #12225: Stock asset, multiple instances on a page

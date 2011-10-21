@@ -113,7 +113,9 @@ sub execute {
             $recordLast->execute([ (@{ $logLine }{qw/userId sessionId timeStamp url/}) ]);
             if ($lastLine->{timeStamp}) {
                 my $delta = $logLine->{timeStamp} - $lastLine->{timeStamp};
-                $deltaLog->execute([ (@{ $lastLine }{qw/userId assetId timeStamp url/}), $delta]);
+                if ($delta <= $deltaInterval) {
+                    $deltaLog->execute([ (@{ $lastLine }{qw/userId assetId timeStamp url/}), $delta]);
+                }
             }
             if (time() > $endTime) {
                 $expired = 1;

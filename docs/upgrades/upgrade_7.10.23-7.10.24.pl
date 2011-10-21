@@ -33,6 +33,7 @@ my $session = start(); # this line required
 # upgrade functions go here
 addPALastLogTable($session);
 addForkRedirect($session);
+extendBucketName($session);
 
 finish($session); # this line required
 
@@ -64,6 +65,18 @@ sub addForkRedirect {
     # and here's our code
     $session->db->write(<<EOSQL);
 ALTER TABLE Fork add column redirect CHAR(255);
+EOSQL
+    print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub extendBucketName {
+    my $session = shift;
+    print "\tExtend the size of the bucket name in the bucketLog table for Passive Analytics... " unless $quiet;
+    # and here's our code
+    $session->db->write(<<EOSQL);
+ALTER TABLE bucketLog CHANGE COLUMN Bucket Bucket CHAR(255)
 EOSQL
     print "DONE!\n" unless $quiet;
 }
