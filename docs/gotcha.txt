@@ -11,7 +11,13 @@ save you many hours of grief.
 --------------------------------------------------------------------
  * WebGUI 8 is not API compatible with WebGUI 7. If you have custom
    code, chances are you'll need to update it to make it work with
-   WebGUI 8.
+   WebGUI 8.  Please read docs/migration.txt for information about
+   changes to the WebGUI API.
+
+ * Many scripts in the sbin directory have been replaced by the webgui.pl
+   master script.
+   
+   * upgrade.pl -> webgui.pl upgrade
 
  * The rotation, deletion and reordering of Photos in a Gallery Album
    has been removed because the way it was implemented in WebGUI 7
