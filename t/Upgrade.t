@@ -162,7 +162,7 @@ END_PM
     isa_ok $package, 'WebGUI::Asset::Template';
     my $vtId = $package->get('tagId');
     my $vt = WebGUI::VersionTag->new($session, $vtId);
-    addToCleanup($vt);
+    WebGUI::Test->addToCleanup($vt);
     is $vt->get('name'), 'Upgrade to 8.3.0 - test-template', 'package import names version tag correctly';
 }
 

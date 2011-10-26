@@ -26,6 +26,7 @@ use WebGUI::Test::Mechanize;
 my $session = WebGUI::Test->session;
 $session->user({ userId => 3 });
 
+my $tag = WebGUI::VersionTag->getWorking($session);
 my $page = WebGUI::Test->asset( className => 'WebGUI::Asset::Wobject::Dashboard' );
 my $asset = WebGUI::Test->asset(
     className       => 'WebGUI::Asset::Wobject::Article',
@@ -36,7 +37,11 @@ my $shortcut = $page->addChild( {
     shortcutToAssetId => $asset->getId,
     prefFieldsToShow => 'alias',
 } );
-
+WebGUI::Test->addToCleanup($tag);
+$tag->commit;
+foreach my $object ($page, $asset, $shortcut) {
+    $object = $object->cloneFromDb;
+}
 #----------------------------------------------------------------------------
 # Tests
 

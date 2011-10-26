@@ -144,26 +144,27 @@ sub isDynamicCompatible {
 
 #-------------------------------------------------------------------
 
-=head2 toHtml ( )
+=head2 new ( )
 
-Returns a select list containing the content filter options. This is for use with WebGUI::HTML::filter().
+Extend the base "new" to set options.
 
 =cut
 
-sub toHtml {
-	my $self = shift;
+sub new {
+    my $class = shift;
+    my $self  = $class->SUPER::new(@_);
 	my $i18n = WebGUI::International->new($self->session);
-        my %filter;
-        tie %filter, 'Tie::IxHash';
-        %filter = (
-                'none'=>$i18n->get(420),
-                'macros'=>$i18n->get(891),
-                'javascript'=>$i18n->get(526),
-                'most'=>$i18n->get(421),
-                'all'=>$i18n->get(419)
-                );
+    my %filter;
+    tie %filter, 'Tie::IxHash';
+    %filter = (
+        'none'       => $i18n->get(420),
+        'macros'     => $i18n->get(891),
+        'javascript' => $i18n->get(526),
+        'most'       => $i18n->get(421),
+        'all'        => $i18n->get(419),
+    );
 	$self->set("options", \%filter);
-	return $self->SUPER::toHtml();
+    return $self;
 }
 
 1;

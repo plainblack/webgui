@@ -607,9 +607,6 @@
    "WebGUI::Asset::Wobject::StockData" : {
       "category" : "intranet"
    },
-   "WebGUI::Asset::FilePile" : {
-      "category" : "basic"
-   },
    "WebGUI::Asset::Wobject::Collaboration" : {
       "category" : "community"
    },
@@ -850,6 +847,7 @@
     "FetchMimeType"    : "FetchMimeType", 
     "FilePump"         : "FilePump", 
     "FileUrl"          : "FileUrl", 
+    "FormField"        : "FormField",
     "GroupAdd"         : "GroupAdd", 
     "GroupDelete"      : "GroupDelete", 
     "GroupText"        : "GroupText", 

@@ -466,14 +466,14 @@ sub addEditSaveButtons {
         rowClass => 'saveButtons',
     );
 
-    # Approved status
-    $buttonGroup->addButton( 'checkbox', {
-        name        => 'approved',
-        id          => 'approveCheckbox',
-        value       => 'approved',
-        label       => $i18n->get('560', 'WebGUI'),
-        checked     => ( $session->setting->get( 'versionTagMode' ) eq 'autoCommit' ? 1 : 0 ),
-    } );
+#    # Approved status
+#    $buttonGroup->addButton( 'checkbox', {
+#        name        => 'approved',
+#        id          => 'approveCheckbox',
+#        value       => 'approved',
+#        label       => $i18n->get('560', 'WebGUI'),
+#        checked     => ( $session->setting->get( 'versionTagMode' ) eq 'autoCommit' ? 1 : 0 ),
+#    } );
 
     $buttonGroup->addButton( "submit", {
         name        => "save",
@@ -1341,6 +1341,10 @@ sub getHelpers {
             label       => $i18n->get('delete'),
             confirm     => $i18n->get('43'),
         },
+        upload_files => {
+            className   => 'WebGUI::AssetHelper::UploadFiles',
+            label       => $i18n->get('upload files'),
+        },
     };
 
     # Merge additional helpers for this class from config
@@ -1600,8 +1604,8 @@ sub getPrototypeList {
     my $userUiLevel = $session->user->get('uiLevel');
     my @assets;
     ID: foreach my $id (@prototypeIds) {
-        my $asset = WebGUI::Asset->newById($session, $id);
-        next ID unless defined $asset;
+        my $asset = eval { WebGUI::Asset->newById($session, $id); };
+        next ID if Exception::Class->caught();
         next ID unless $asset->get('isPrototype');
         next ID unless ($asset->get('status') eq 'approved' || $asset->get('tagId') eq $session->scratch->get("versionTag"));
         push @assets, $asset;
@@ -2391,6 +2395,7 @@ sub processTemplate {
             %{$self->get},
             'title'     => $self->getTitle,
             'menuTitle' => $self->getMenuTitle,
+            'keywords'  => $self->get('keywords'),
             %{$var},
         );
         return $template->process(\%vars);
@@ -2772,40 +2777,12 @@ sub www_addSave {
         return $self->session->style->userStyle($i18n->get("over max assets")) if ($self->session->config->get("maximumAssets") <= $count);
     }
 
-    # Determine what version tag we should use
-    my $autoCommitId  = $self->getAutoCommitWorkflowId();
-
-    my ($workingTag, $oldWorking);
-    if ( $autoCommitId ) {
-        $workingTag
-            = WebGUI::VersionTag->create( $session, { 
-                groupToUse  => '12',            # Turn Admin On (for lack of something better)
-                workflowId  => $autoCommitId,
-            } ); 
-    }
-    else {
-        my $parentAsset;
-        if ( not defined( $parentAsset = $self->getParent ) ) {
-            $parentAsset = WebGUI::Asset->newPending( $session, $self->parentId );
-        }
-        if ( $parentAsset->hasBeenCommitted ) {
-            $workingTag = WebGUI::VersionTag->getWorking( $session );
-        }
-        else {
-            $oldWorking = WebGUI::VersionTag->getWorking($session, 'noCreate');
-            $workingTag = WebGUI::VersionTag->new( $session, $parentAsset->tagId );
-            $workingTag->setWorking();
-        }
-    }
-
     # Add the new asset
     my $object;
     my $className   = $form->process('className','className') || $form->process('class','className');
     $object = $self->addChild({
         className   => $className,
         revisedBy   => $session->user->userId,
-        tagId       => $workingTag->getId,
-        status      => "pending",
     });
     if ( !defined $object ) {
         my $url = $session->url->page;
@@ -2814,11 +2791,6 @@ sub www_addSave {
     }
     $object->{_parent} = $self;
     $object->url(undef);
-
-    # More version tag stuff
-    $object->setVersionLock;
-    $object->setAutoCommitTag($workingTag) if (defined $autoCommitId);
-    $oldWorking->setWorking if $oldWorking;
 
     # Process properties from form post
     my $errors = $object->processEditForm;
@@ -2920,43 +2892,8 @@ sub www_editSave {
     return $session->privilege->locked() unless $self->canEditIfLocked;
     return $session->privilege->insufficient() unless $self->canEdit;
 
-    # Determine what version tag we should use
-    my $autoCommitId  = $self->getAutoCommitWorkflowId();
-
-    my ($workingTag, $oldWorking);
-    if ( $autoCommitId ) {
-        $workingTag
-            = WebGUI::VersionTag->create( $session, { 
-                groupToUse  => '12',            # Turn Admin On (for lack of something better)
-                workflowId  => $autoCommitId,
-            } ); 
-    }
-    else {
-        my $parentAsset;
-        if ( not defined( $parentAsset = $self->getParent ) ) {
-            $parentAsset = WebGUI::Asset->newPending( $session, $self->parentId );
-        }
-        if ( $parentAsset->hasBeenCommitted ) {
-            $workingTag = WebGUI::VersionTag->getWorking( $session );
-        }
-        else {
-            $oldWorking = WebGUI::VersionTag->getWorking($session, 'noCreate');
-            $workingTag = WebGUI::VersionTag->new( $session, $parentAsset->tagId );
-            $workingTag->setWorking();
-        }
-    }
-
     # Add the new revision
-    my $object = $self->addRevision({
-        revisedBy   => $session->user->userId,
-        tagId       => $workingTag->getId,
-        status      => "pending",
-    });
-
-    # More version tag stuff
-    $object->setVersionLock;
-    $object->setAutoCommitTag($workingTag) if (defined $autoCommitId);
-    $oldWorking->setWorking if $oldWorking;
+    my $object = $self->addRevision();
 
     # Process properties from form post
     my $errors = $object->processEditForm;

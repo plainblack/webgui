@@ -33,7 +33,6 @@ $user{"2"}->addToGroups( ['2'] ); # Registered user
 
 my $versionTag      = WebGUI::VersionTag->getWorking( $session );
 $versionTag->set( { name => "Collaboration Test" } );
-my %tag = ( tagId => $versionTag->getId, status => "pending" );
 WebGUI::Test->addToCleanup($versionTag);
 
 my @addArgs = ( undef, undef, { skipAutoCommitWorkflows => 1, skipNotification => 1 } );
@@ -49,14 +48,12 @@ my $collab
         canStartThreadGroupId   => 3,   # Admin
         allowReplies            => 1,
         editTimeout             => 60 * 60 * 24, # 24 hours
-        %tag,
     }, @addArgs );
 
 my $thread
     = $collab->addChild({
         className           => 'WebGUI::Asset::Post::Thread',
         ownerUserId         => $user{"2"}->userId,  
-        %tag,
     }, @addArgs );
 $thread->setSkipNotification;
 
@@ -64,7 +61,6 @@ my $post
     = $thread->addChild({
         className           => 'WebGUI::Asset::Post',
         ownerUserId         => $user{"2"}->userId,
-        %tag,
     }, @addArgs );
 $post->setSkipNotification;
 

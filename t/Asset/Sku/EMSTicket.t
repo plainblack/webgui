@@ -25,6 +25,7 @@ use WebGUI::Session;
 #----------------------------------------------------------------------------
 # Init
 my $session = WebGUI::Test->session;
+my $tag = WebGUI::VersionTag->getWorking($session);
 my $ems = WebGUI::Test->asset( className => 'WebGUI::Asset::Wobject::EventManagementSystem' );
 my $badge = $ems->addChild({
     className       => 'WebGUI::Asset::Sku::EMSBadge',
@@ -32,6 +33,8 @@ my $badge = $ems->addChild({
 my $ticket = $ems->addChild({
     className       => 'WebGUI::Asset::Sku::EMSTicket',
 });
+$tag->commit;
+WebGUI::Test->addToCleanup($tag);
 
 #----------------------------------------------------------------------------
 # Tests

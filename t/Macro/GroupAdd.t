@@ -145,13 +145,13 @@ sub setupTest {
 	$groups[1] = WebGUI::Group->new($session, "new");
 	$groups[1]->name('Regular Old Group');
 	$groups[1]->autoAdd(0);
-    addToCleanup(@groups);
+    WebGUI::Test->addToCleanup(@groups);
 
 	##Three users.  One in each group and one with no group membership
 	my @users = map { WebGUI::User->new($session, "new") } 0..2;
 	$users[0]->addToGroups([$groups[0]->getId]);
 	$users[1]->addToGroups([$groups[1]->getId]);
-    addToCleanup(@users);
+    WebGUI::Test->addToCleanup(@users);
 
 	my $properties = {
 		title     => 'GroupAdd test template',

@@ -20,6 +20,8 @@ use Test::Deep;
 use Data::Dumper;
 use WebGUI::Session;
 
+my $addArgs = { skipNotifications => 1, skipAutoCommitWorkflows => 1, };
+
 #----------------------------------------------------------------------------
 # Tests
 plan tests => 23;        # Increment this number for each test you create
@@ -27,6 +29,7 @@ plan tests => 23;        # Increment this number for each test you create
 #----------------------------------------------------------------------------
 # Init
 my $session         = WebGUI::Test->session;
+my $tag = WebGUI::VersionTag->getWorking($session);
 my $collab          = WebGUI::Test->asset->addChild({
     className        => 'WebGUI::Asset::Wobject::Collaboration',
     threadsPerPage   => 20,
@@ -39,18 +42,23 @@ my @threads = (
         title           => "X - Foo",
         isSticky        => 0,
         ownerUserId     => 1,
-    }, undef, 1,),
+    }, undef, 1, $addArgs ),
     $collab->addChild( {
         className       => 'WebGUI::Asset::Post::Thread',
         title           => "X - Bar",
         isSticky        => 0,
         ownerUserId     => 3,
-    }, undef, 2,),
+    }, undef, 2, $addArgs ),
 );
 
 for my $t ( @threads ) {
     $t->setSkipNotification;
-    $t->commit;
+}
+
+$tag->commit;
+
+foreach my $asset ($collab, @threads) {
+    $asset = $asset->cloneFromDb;
 }
 
 my $templateVars;
@@ -104,13 +112,11 @@ foreach my $index (1 .. 5) {
         title           => "X - Bar",
         isSticky        => 0,
         ownerUserId     => 3,
-        tagId           => $vt2->getId,
-        status          => "pending",
-    }, undef, 2+$index);
+    }, undef, 2+$index, $addArgs );
     $newThreads[$index]->setSkipNotification;
 }
 $vt2->commit;
-addToCleanup($vt2);
+WebGUI::Test->addToCleanup($vt2);
 
 $session->user({userId => 3});
 $templateVars = $collab->getViewTemplateVars();

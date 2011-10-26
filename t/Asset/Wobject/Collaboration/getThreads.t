@@ -19,9 +19,12 @@ use Test::Deep;
 use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
 
+my $addArgs = { skipNotifications => 1, skipAutoCommitWorkflows => 1, };
+
 #----------------------------------------------------------------------------
 # Init
 my $session         = WebGUI::Test->session;
+my $tag = WebGUI::VersionTag->getWorking($session);
 my $collab          = WebGUI::Test->asset->addChild({
     className       => 'WebGUI::Asset::Wobject::Collaboration',
     threadsPerPage  => 20,
@@ -33,28 +36,34 @@ my @threads = (
         title           => "X - Foo",
         isSticky        => 0,
         threadRating    => 4,
-    }, undef, 1, ),
+    }, undef, 1, $addArgs ),
     $collab->addChild( {
         className       => 'WebGUI::Asset::Post::Thread',
         title           => "W - Bar",
         isSticky        => 0,
         threadRating    => 2,
-    }, undef, 2, ),
+    }, undef, 2, $addArgs ),
     $collab->addChild( {
         className       => 'WebGUI::Asset::Post::Thread',
         title           => "Z - Baz",
         isSticky        => 1,
         threadRating    => 6,
-    }, undef, 3, ),
+    }, undef, 3, $addArgs ),
     $collab->addChild( {
         className       => 'WebGUI::Asset::Post::Thread',
         title           => "Y - Shank",
         isSticky        => 1,
         threadRating    => 5,
-    }, undef, 4, ),
+    }, undef, 4, $addArgs ),
 );
 
+
 $_->setSkipNotification for @threads; # 100+ messages later...
+$tag->commit;
+
+foreach my $asset ($collab, @threads) {
+    $asset = $asset->cloneFromDb;
+}
 
 #----------------------------------------------------------------------------
 # Tests

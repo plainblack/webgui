@@ -26,13 +26,12 @@ my $node = WebGUI::Asset->getImportNode($session);
 # Grab a named version tag
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Collab setup"});
-my %tag = ( tagId => $versionTag->getId, status => "pending" );
+my $addArgs = { skipAutoCommitWorkflows => 1, skipNotification => 1 };
 
 my $collab = $node->addChild(
     {
         className => 'WebGUI::Asset::Wobject::Collaboration',
         title     => 'Test Collaboration',
-        %tag,
     },
 );
 
@@ -42,8 +41,8 @@ my $first_thread = $collab->addChild(
     {
         className   => 'WebGUI::Asset::Post::Thread',
         title       => 'Test Thread',
-        %tag,
     },
+    undef, undef, $addArgs,
 );
 $first_thread->setSkipNotification;
 
@@ -52,8 +51,8 @@ my $t1p1 = $first_thread->addChild(
     {
         className   => 'WebGUI::Asset::Post',
         title       => 'Test Post',
-        %tag,
     },
+    undef, undef, $addArgs,
 );
 $t1p1->setSkipNotification;
 

@@ -29,7 +29,6 @@ use WebGUI::Test::Mechanize;
 #----------------------------------------------------------------------------
 # Init
 my $session         = WebGUI::Test->session;
-my $node            = WebGUI::Test->asset;
 
 # Override some settings to make things easier to test
 # userFunctionStyleId 
@@ -55,6 +54,8 @@ my ($redirect, $response, $url);
 my $baseUrl         = 'http://localhost/';
 
 # Make an asset we can login on
+my $tag = WebGUI::VersionTag->getWorking($session);
+my $node            = WebGUI::Test->asset;
 my $asset
     = $node->addChild({
         className       => 'WebGUI::Asset::Wobject::Article',
@@ -65,6 +66,9 @@ my $asset
         styleTemplateId => 'PBtmpl0000000000000132', 
     });
 my $assetUrl    = $baseUrl . $asset->get('url');
+$tag->commit;
+my $node  = $node->cloneFromDb;
+my $asset = $asset->cloneFromDb;
 
 #----------------------------------------------------------------------------
 # Tests

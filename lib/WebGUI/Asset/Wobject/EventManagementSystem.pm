@@ -868,15 +868,75 @@ sub www_addTicketsToBadge {
 	my $self = shift;
 	my $session = $self->session;
     return $session->privilege->insufficient() unless $self->canView;
-    my $form = $session->form;
+    my ( $form, $db ) = $session->quick(qw{ form db });
+	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
+
+	# get badge's badge groups
+	my $badgeId = $form->get('badgeId');
+	my %badgeGroups = (); # Hash of badgeGroupId => ticketsPerBadge
+	if (defined $badgeId) {
+		my $assetId = $db->quickScalar("select badgeAssetId from EMSRegistrant where badgeId=?",[$badgeId]);
+		my $badge = WebGUI::Asset->new($session, $assetId, 'WebGUI::Asset::Sku::EMSBadge');
+                if ( defined $badge ) {
+                    my @badgeGroups = split("\n",$badge->get('relatedBadgeGroups'));
+                    %badgeGroups = $db->buildHash( 
+                        "SELECT badgeGroupId, ticketsPerBadge FROM EMSBadgeGroup WHERE badgeGroupId IN (" . $db->quoteAndJoin(\@badgeGroups) . ")",
+                    );
+                }
+	}
+        	
+	# get a list of tickets already associated with the badge
+	my @existingTickets = $db->buildArray("select ticketAssetId from EMSRegistrantTicket where badgeId=?",[$badgeId]);
+
+        # Determine the ticket limits per badge group
+        my %fullBadgeGroups = ();
+        for my $ticketId ( @existingTickets ) {
+            my $ticket  = WebGUI::Asset->new( $session, $ticketId, 'WebGUI::Asset::Sku::EMSTicket' );
+            next unless $ticket;
+            # Every ticket takes one spot from every related badge group
+            # So a badge can never have more than the limit defined in any related badge group
+            # Badge groups that start at 0 are not limited
+            for my $badgeGroupId ( split "\n", $ticket->get('relatedBadgeGroups') ) {
+                if ( $badgeGroups{ $badgeGroupId } ) {
+                    $badgeGroups{ $badgeGroupId }--;
+                    # If we're reduced to 0 now, keep track
+                    if ( $badgeGroups{ $badgeGroupId } == 0 ) {
+                        $fullBadgeGroups{ $badgeGroupId } = 1;
+                    }
+                }
+            }
+        }
+
+        # Add the tickets
 	my @ids = $form->param('assetId');
-	foreach my $id (@ids) {
+    my @errors = (); # Error messages
+	TICKET: foreach my $id (@ids) {
 		my $ticket = WebGUI::Asset->newById($session, $id);
 		if (defined $ticket) {
-			$ticket->addToCart({badgeId=>$form->get('badgeId')});
+                    # Make sure we're allowed to add this ticket
+                    my @ticketBadgeGroups = ( split "\n", $ticket->get('relatedBadgeGroups') );
+                    for my $badgeGroupId ( @ticketBadgeGroups ) {
+                        if ( $fullBadgeGroups{ $badgeGroupId } ) {
+                            push @errors, sprintf( $i18n->get('error badge group ticket limit'), $ticket->getTitle );
+                            next TICKET;
+                        }
+                    }
+                    
+                    # Reduce our numbers
+                    for my $badgeGroupId ( @ticketBadgeGroups ) {
+                        if ( $badgeGroups{ $badgeGroupId } ) {
+                            $badgeGroups{ $badgeGroupId }--;
+                            # If we're reduced to 0 now, keep track
+                            if ( $badgeGroups{ $badgeGroupId } == 0 ) {
+                                $fullBadgeGroups{ $badgeGroupId } = 1;
+                            }
+                        }
+                    }
+
+			$ticket->addToCart({badgeId=>$badgeId});
 		}		
 	}
-	return $self->www_getRegistrantAsJson();
+	return $self->www_getRegistrantAsJson( { errors => \@errors } );
 }
 
 #-------------------------------------------------------------------
@@ -1007,6 +1067,12 @@ sub www_editBadgeGroup {
 		label		=> $i18n->get('badge group name'),
 		hoverHelp	=> $i18n->get('badge group name help'),
 		);
+    $f->addField( "integer", 
+        name        => 'ticketsPerBadge',
+        value       => $badgeGroup->{ticketsPerBadge} || 0,
+        label       => $i18n->get('badge group ticketsPerBadge'),
+        hoverHelp   => $i18n->get('badge group ticketsPerBadge help'),
+    );
 	$f->addField( "submit", name => "send" );
 	return $self->processStyle('<h1>'.$i18n->get('badge groups').'</h1>'.$f->toHtml);
 }
@@ -1029,6 +1095,7 @@ sub www_editBadgeGroupSave {
 		badgeGroupId	=> $id,
 		emsAssetId		=> $self->getId,
 		name			=> $form->get('name'),
+                ticketsPerBadge         => $form->get('ticketsPerBadge','Integer'),
 		});
 	return $self->www_manageBadgeGroups;
 }
@@ -1260,7 +1327,7 @@ sub www_exportEvents {
 	# set http header
     $session->response->header( 'Content-Disposition' => qq{attachment; filename="}.$self->getTitle().'.csv"' );
     $session->response->content_type('application/excel');
-	
+
 	# add file header
 	my @header = ();
 	foreach my $field (@{$fields}) {
@@ -1293,7 +1360,7 @@ sub www_exportEvents {
 			last;
 		}
 	}
-	
+
 	# finished
 	return "chunked";
 }
@@ -1333,13 +1400,13 @@ sub www_getAllSubmissions {
     $rules->{'orderByClause'     } = $session->db->quote_identifier( $orderByColumn ) . ' ' . $orderByDirection if $orderByColumn;
 
     my $sql  = "";
-    
+
     $sql = $self->getLineageSql(['descendants'], $rules);
 
     my $startIndex        = $form->get( 'startIndex' ) || 1;
     my $rowsPerPage         = $form->get( 'rowsPerPage' ) || 25;
     my $currentPage         = int ( $startIndex / $rowsPerPage ) + 1;
-    
+
     my $p = WebGUI::Paginator->new( $session, '', $rowsPerPage, 'pn', $currentPage );
     $p->setDataByQuery($sql);
 
@@ -1349,10 +1416,10 @@ sub www_getAllSubmissions {
     $tableInfo->{'sort'           } = $orderByColumn;
     $tableInfo->{'dir'            } = $orderByDirection;
     $tableInfo->{'records'        } = [];
-    
+
     for my $record ( @{ $p->getPageData } ) {
         my $asset = WebGUI::Asset->newById( $session, $record->{assetId} );
-        
+
         my $lastReplyBy = $asset->get("lastReplyBy");
         if ($lastReplyBy) {
            $lastReplyBy = WebGUI::User->new($session,$lastReplyBy)->username;
@@ -1377,7 +1444,7 @@ sub www_getAllSubmissions {
 
         push @{ $tableInfo->{ records } }, \%fields;
     }
-    
+
     $session->response->content_type( 'application/json' );
     return JSON->new->encode( $tableInfo );
 }
@@ -1458,7 +1525,7 @@ Retrieves the properties of a specific badge and the items attached to it. Expec
 =cut
 
 sub www_getRegistrantAsJson {
-	my ($self) = @_;
+	my ($self, $opt) = @_;
 	my $session = $self->session;
 	my $db = $session->db;
     return $session->privilege->insufficient() unless $self->canView;
@@ -1476,6 +1543,11 @@ sub www_getRegistrantAsJson {
 	$badgeInfo->{sku} = $badge->sku;
 	$badgeInfo->{assetId} = $badge->getId;
 	$badgeInfo->{hasPurchased} = ($badgeInfo->{purchaseComplete}) ? 1 : 0;
+
+    # Add errors, if any
+    if ( $opt->{errors} && @{ $opt->{errors} } ) {
+        $badgeInfo->{errors} = $opt->{errors};
+    }
 	
 	# get existing tickets
 	my $existingTickets = $db->read("select ticketAssetId from EMSRegistrantTicket where badgeId=? and purchaseComplete=1",[$badgeId]);
@@ -1554,7 +1626,7 @@ sub www_getRegistrantAsJson {
 				price			=> $sku->getPrice+0 * $item->get('quantity'),
 				});
 		}
-		
+
 		# it's a ribbon
 		elsif ($sku->isa('WebGUI::Asset::Sku::EMSRibbon')) {
 			push(@ribbons, {
@@ -1576,7 +1648,7 @@ sub www_getRegistrantAsJson {
 	$badgeInfo->{tokens} = \@tokens;
 	$badgeInfo->{tickets} = \@tickets;
 	$badgeInfo->{ribbons} = \@ribbons;
-	
+
 	# build json datasource
     return JSON->new->encode($badgeInfo);
 }
@@ -1597,10 +1669,10 @@ sub www_getRegistrantsAsJson {
     my $startIndex      = $form->get('startIndex') || 0;
     my $numberOfResults = $form->get('results')    || 25;
 	my $keywords        = $form->get('keywords');
-	
+
 	my $sql = "select SQL_CALC_FOUND_ROWS * from EMSRegistrant where purchaseComplete=1 and emsAssetId=?";
 	my @params = ($self->getId);
-	
+
 	# user or staff
 	unless ($self->isRegistrationStaff) {
 		$sql .= " and userId=?";
@@ -1639,7 +1711,7 @@ sub www_getRegistrantsAsJson {
     $results{'startIndex'}   = $startIndex;
     $results{'sort'}         = undef;
     $results{'dir'}          = "asc";
-	
+
 	# build json datasource
     $session->response->content_type('application/json');
     return JSON->new->encode(\%results);
@@ -1813,14 +1885,14 @@ sub www_getTicketsAsJson {
     my %results = ();
 	my @ids     = ();
 	my $keywords = $form->get('keywords');
-	
+
 	# looking for specific events
 	if ($keywords =~ m{^[\d+,*\s*]+$}) {
 		@ids = $db->buildArray("select distinct(EMSTicket.assetId) from EMSTicket left join asset using (assetId) where
 			asset.parentId=? and EMSTicket.eventNumber in (".$keywords.") and asset.state='published' 
             order by EMSTicket.eventNumber",[$self->getId]);
 	}
-	
+
 	# looking for keywords
 	elsif ($keywords ne "") {
 		@ids = @{WebGUI::Search->new($session)->search({
@@ -1829,30 +1901,53 @@ sub www_getTicketsAsJson {
 			classes		=> ['WebGUI::Asset::Sku::EMSTicket'],
 			})->getAssetIds};
 	}
-	
+
 	# just get all tickets
 	else {
 		@ids = $db->buildArray("select assetId from asset left join EMSTicket using (assetId) where parentId=? and
 className='WebGUI::Asset::Sku::EMSTicket' and state='published' and revisionDate=(select max(revisionDate) from EMSTicket where assetId=asset.assetId) order by $sortKey $sortDir", [$self->getId]);
 	}
-	
+
 	# get badge's badge groups
 	my $badgeId = $form->get('badgeId');
-	my @badgeGroups = ();
+	my %badgeGroups = (); # Hash of badgeGroupId => ticketsPerBadge
 	if (defined $badgeId) {
 		my $assetId = $db->quickScalar("select badgeAssetId from EMSRegistrant where badgeId=?",[$badgeId]);
-		my $badge = WebGUI::Asset->newById($session, $assetId);
-		@badgeGroups = split("\n",$badge->relatedBadgeGroups) if (defined $badge);
+		my $badge = eval { WebGUI::Asset->newById ($session, $assetId, 'WebGUI::Asset::Sku::EMSBadge'); };
+        if ( defined $badge ) {
+            my @badgeGroups = split("\n",$badge->get('relatedBadgeGroups'));
+            %badgeGroups = $db->buildHash( 
+                "SELECT badgeGroupId, ticketsPerBadge FROM EMSBadgeGroup WHERE badgeGroupId IN (" . $db->quoteAndJoin(\@badgeGroups) . ")",
+            );
+        }
 	}
-	
+        	
 	# get a list of tickets already associated with the badge
 	my @existingTickets = $db->buildArray("select ticketAssetId from EMSRegistrantTicket where badgeId=?",[$badgeId]);
+
+        # Determine the ticket limits per badge group
+        my %fullBadgeGroups = ();
+        for my $ticketId ( @existingTickets ) {
+            my $ticket  = WebGUI::Asset->new( $session, $ticketId, 'WebGUI::Asset::Sku::EMSTicket' );
+            next unless $ticket;
+            # Every ticket takes one spot from every related badge group
+            # So a badge can never have more than the limit defined in any related badge group
+            for my $badgeGroupId ( split "\n", $ticket->get('relatedBadgeGroups') ) {
+                if ( $badgeGroups{ $badgeGroupId } ) {
+                    $badgeGroups{ $badgeGroupId }--;
+                    # If we're reduced to 0 now, keep track
+                    if ( $badgeGroups{ $badgeGroupId } == 0 ) {
+                        $fullBadgeGroups{ $badgeGroupId } = 1;
+                    }
+                }
+            }
+        }
 
 	# get assets
 	my $counter = 0;
 	my $totalTickets = scalar(@ids);
 	my @records = ();
-	foreach my $id (@ids) {
+	TICKETID: foreach my $id (@ids) {
 
 		# skip tickets we already have
 		if ($id ~~ @existingTickets) {
@@ -1860,35 +1955,28 @@ className='WebGUI::Asset::Sku::EMSTicket' and state='published' and revisionDate
 			next;
 		}
 
-		my $ticket = WebGUI::Asset->newById($session, $id);
-		
-		# skip borked tickets
-		unless (defined $ticket) {
-			$session->log->warn("EMSTicket $id couldn't be instanciated by EMS ".$self->getId.".");
+		my $ticket = eval { WebGUI::Asset->newById($session, $id); };
+        if (my $e = Exception::Class->caught()) {
+			$session->log->warn("EMSTicket $id couldn't be instanciated by EMS ".$self->getId.'. '.$e->full_message. ".");
 			$totalTickets--;
-			next;
-		}
-		
-		# skip tickets we can't view
-		unless ($ticket->canView) {
-			$totalTickets--;
-			next;
-		}
-		
+			next TICKETID;
+        }
+
+        next TICKETID if !$ticket;
+
 		# skip tickets not in our badge's badge groups
-		if ($badgeId ne "" && scalar(@badgeGroups) > 0 && $ticket->relatedBadgeGroups ne '') { # skip check if it has no badge groups
-			my @groups = split("\n",$ticket->relatedBadgeGroups);
+		if ($badgeId ne "" && keys %badgeGroups > 0 && $ticket->get('relatedBadgeGroups') ne '') { # skip check if it has no badge groups
+			my @badgeGroupIds = split("\n",$ticket->get('relatedBadgeGroups'));
 			my $found = 0;
-			BADGE: {
-				foreach my $a (@badgeGroups) {
-					foreach my $b (@groups) {
-						if ($a eq $b) {
-							$found = 1;
-							last BADGE;
-						}
-					}
-				}
-			}
+
+                        for my $badgeGroupId ( @badgeGroupIds ) {
+                            # Hash lookup is faster than array lookup
+                            if ( exists $badgeGroups{ $badgeGroupId } ) {
+                                $found = 1;
+                                last;
+                            }
+                        }
+
 			unless ($found) {
 				$totalTickets--;
 				next;
@@ -1898,7 +1986,7 @@ className='WebGUI::Asset::Sku::EMSTicket' and state='published' and revisionDate
         # gotta get to the page we're working with
         $counter++;
         next unless ($counter >= $startIndex+1);
-		
+
 		# publish the data for this ticket
         my $description = $ticket->description;
         my $data = $ticket->eventMetaData;
@@ -1913,23 +2001,33 @@ className='WebGUI::Asset::Sku::EMSTicket' and state='published' and revisionDate
 		my $date = WebGUI::DateTime->new($session, mysql => $ticket->startDate)
                 ->set_time_zone($self->timezone)
                 ->webguiDate("%W %z %Z");
-		push(@records, {
-			title 				=> $ticket->getTitle,
-			description			=> $description,
-			price				=> $ticket->getPrice+0,
-			quantityAvailable	=> $ticket->getQuantityAvailable,
-			url					=> $ticket->getUrl,
-			editUrl				=> $ticket->getUrl('func=edit'),
-			deleteUrl			=> $ticket->getUrl('func=delete'),
-			assetId				=> $ticket->getId,
-			eventNumber			=> $ticket->eventNumber,
-			location			=> $ticket->location,
-			startDate			=> $date,
-			duration			=> $ticket->duration,
-			});
+
+        my $properties = {
+            title 				=> $ticket->getTitle,
+            description			=> $description,
+            price				=> $ticket->getPrice+0,
+            quantityAvailable	=> $ticket->getQuantityAvailable,
+            url					=> $ticket->getUrl,
+            editUrl				=> $ticket->getUrl('func=edit'),
+            deleteUrl			=> $ticket->getUrl('func=delete'),
+            assetId				=> $ticket->getId,
+            eventNumber			=> $ticket->eventNumber,
+            location			=> $ticket->location,
+            startDate			=> $date,
+            duration			=> $ticket->duration,
+        };
+
+        # Determine if we're able to add this ticket due to Badge Group limits
+        for my $badgeGroupId ( split /\n/, $ticket->get('relatedBadgeGroups') ) {
+            if ( $fullBadgeGroups{ $badgeGroupId } ) {
+                $properties->{ limitReached } = 1;
+            }
+        }
+
+		push(@records, $properties);
 		last unless (scalar(@records) < $numberOfResults);
 	}
-	
+
 	# humor
 	my $find = pack('u',$keywords);
 	chomp $find;
@@ -1937,7 +2035,7 @@ className='WebGUI::Asset::Sku::EMSTicket' and state='published' and revisionDate
 		push(@records, {title=>unpack('u',q|022=M('-O<G)Y+"!$879E+@``|)});
 		$totalTickets++;
 	}
-	
+
 	# build json
 	$results{records} 			= \@records;
     $results{totalRecords} 		= $totalTickets;
@@ -2001,7 +2099,7 @@ sub www_importEvents {
 	return $self->session->privilege->insufficient unless $self->canEdit;
 	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
 	my $form = $self->session->form;
-	
+
 	# header, with optional errors as unordered list
 	my $page_header = $i18n->get('import form header');
 	if (@$errors_aref) {
@@ -2075,7 +2173,7 @@ $|=1;
 	my $form = $session->form;
 	my $ignoreFirst = $form->get("ignore_first_line");
 	my $validate = WebGUI::FormValidator->new($session);
-	
+
 	# find fields to import
     $out->print("Finding fields to import...\n",1);
 	my @import = $form->get("fieldsToImport");
@@ -2089,12 +2187,12 @@ $|=1;
 		}
 		$i++;
 	}
-	
+
 	# get csv data
 	$out->print("Reading file...\n",1);
 	my $storage		= WebGUI::Storage->createTemp($session);
     my $filename	= $storage->addFileFromFormPost("file_file");
-	
+
 	# do import
 	my $first = 1;
 	if (open my $file, "<", $storage->getPath($filename)) {
@@ -2168,7 +2266,7 @@ $|=1;
 	else {
 		$out->print($i18n->get("no import took place")."\n",1);
 	}
-	
+
 	# clean up
 	$out->print("The import took ".Time::HiRes::tv_interval($start)." seconds to run.\n",1);
 	$storage->delete;
@@ -2278,10 +2376,10 @@ Displays an admin interface for managing a registrant.
 sub www_manageRegistrant {
 	my $self = shift;
 	my $session = $self->session;
-	
+
 	# check privs
 	return $session->privilege->insufficient unless ($self->isRegistrationStaff);
-	
+
 	# setup 
 	my $badgeId = $self->session->form->get('badgeId');
 	my $db = $session->db;
@@ -2292,7 +2390,7 @@ sub www_manageRegistrant {
 	unless ($registrant->{badgeId} ne "") {
 		return $self->www_lookupRegistrant;
 	}
-	
+
 	# build form
 	my $f = WebGUI::FormBuilder->new($session, action=>$self->getUrl, extras=>'class="manageRegistrant"');
 	$f->addField( "submit", name => "send" );
@@ -2366,7 +2464,7 @@ sub www_manageRegistrant {
 		defaultValue	=> $registrant->{notes}
 		);
 	$f->addField( "submit", name => "send" );
-	
+
 	# build html
 	my $output = q|
 	<div id="doc3">
@@ -2382,7 +2480,7 @@ sub www_manageRegistrant {
 				</div>
 				<div class="yui-u">
 		|;
-			
+
 	if ($registrant->{hasCheckedIn}) {
 		$output .= q|<a style="font-size: 200%; margin: 10px; line-height: 200%; padding: 10px; background-color: #ffdddd; color: #800000; text-decoration: none;" href="|.$self->getUrl('func=toggleRegistrantCheckedIn;badgeId='.$badgeId).q|">|.$i18n->get('checked in').q|</a>|;
 	}
@@ -2405,7 +2503,7 @@ sub www_manageRegistrant {
 	$output .= q|
 		&bull; <a href="|.$self->getUrl('func=buildBadge;badgeId='.$badgeId).q|">|.$i18n->get('add more items').q|</a>
 		</p><br />|;
-	
+
 	# ticket management
 	my $existingTickets = $db->read("select ticketAssetId, transactionItemId from EMSRegistrantTicket where badgeId=? and purchaseComplete=1",[$badgeId]);
 	while (my ($id, $itemId) = $existingTickets->array) {
@@ -2496,6 +2594,13 @@ sub www_printBadge {
 	my $registrant = $self->getRegistrant($form->get('badgeId'));
 	my $badge = WebGUI::Asset::Sku::EMSBadge->newById($session, $registrant->{badgeAssetId});
 	$registrant->{badgeTitle} = $badge->getTitle;
+
+    # Add badge metadata
+    my $meta    = $badge->getMetaDataAsTemplateVariables;
+    for my $key ( keys %{$meta} ) {
+        $registrant->{ "badgeMeta_" . $key } = $meta->{ $key };
+    }
+
 	return $self->processTemplate($registrant,$self->printBadgeTemplateId);
 }
 
@@ -2589,7 +2694,12 @@ sub www_printTicket {
 	$registrant->{ticketDuration} = $ticket->duration;
 	$registrant->{ticketLocation} = $ticket->location;
 	$registrant->{ticketEventNumber} = $ticket->eventNumber;
-	return $self->processTemplate($registrant,$self->printTicketTemplateId);
+    # Add ticket metadata
+    my $meta    = $ticket->getEventMetaData;
+    for my $key ( keys %{$meta} ) {
+        $registrant->{ "ticketMeta_" . $key } = $meta->{ $key };
+    }
+    return $self->processTemplate($registrant,$self->printTicketTemplateId);
 }
 
 

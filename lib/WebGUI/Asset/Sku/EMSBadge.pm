@@ -18,63 +18,63 @@ use strict;
 use Moose;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Sku';
-define assetName           => ['ems badge', 'Asset_EMSBadge'];
+define assetName           => ['ems badge', 'Asset_EventManagementSystem'];
 define icon                => 'EMSBadge.gif';
 define tableName           => 'EMSBadge';
 property price => (
             tab             => "shop",
             fieldType       => "float",
             default         => 0.00,
-            label           => ["price", 'Asset_EMSBadge'],
-            hoverHelp       => ["price help", 'Asset_EMSBadge'],
+            label           => ["price", 'Asset_EventManagementSystem'],
+            hoverHelp       => ["price help", 'Asset_EventManagementSystem'],
          );
 property earlyBirdPrice => (
             tab             => "shop",
             fieldType       => "float",
             default         => 0.00,
-            label           => ["early bird price", 'Asset_EMSBadge'],
-            hoverHelp       => ["early bird price help", 'Asset_EMSBadge'],
+            label           => ["early bird price", 'Asset_EventManagementSystem'],
+            hoverHelp       => ["early bird price help", 'Asset_EventManagementSystem'],
          );
 property earlyBirdPriceEndDate => (
             tab             => "shop",
             fieldType       => "date",
             default         => undef,
-            label           => ["early bird price end date", 'Asset_EMSBadge'],
-            hoverHelp       => ["early bird price end date help", 'Asset_EMSBadge'],
+            label           => ["early bird price end date", 'Asset_EventManagementSystem'],
+            hoverHelp       => ["early bird price end date help", 'Asset_EventManagementSystem'],
          );
 property preRegistrationPrice => (
             tab             => "shop",
             fieldType       => "float",
             default         => 0.00,
-            label           => ["pre registration price", 'Asset_EMSBadge'],
-            hoverHelp       => ["pre registration price help", 'Asset_EMSBadge'],
+            label           => ["pre registration price", 'Asset_EventManagementSystem'],
+            hoverHelp       => ["pre registration price help", 'Asset_EventManagementSystem'],
          );
 property preRegistrationPriceEndDate => (
             tab             => "shop",
             fieldType       => "date",
             default         => undef,
-            label           => ["pre registration price end date", 'Asset_EMSBadge'],
-            hoverHelp       => ["pre registration price end date help", 'Asset_EMSBadge'],
+            label           => ["pre registration price end date", 'Asset_EventManagementSystem'],
+            hoverHelp       => ["pre registration price end date help", 'Asset_EventManagementSystem'],
          );
 property seatsAvailable => (
             tab             => "shop",
             fieldType       => "integer",
             default         => 100,
-            label           => ["seats available", 'Asset_EMSBadge'],
-            hoverHelp       => ["seats available help", 'Asset_EMSBadge'],
+            label           => ["seats available", 'Asset_EventManagementSystem'],
+            hoverHelp       => ["seats available help", 'Asset_EventManagementSystem'],
          );
 property relatedBadgeGroups => (
             tab             => "properties",
             fieldType       => "checkList",
             customDrawMethod=> 'drawRelatedBadgeGroupsField',
-            label           => ["related badge groups", 'Asset_EMSBadge'],
-            hoverHelp       => ["related badge groups badge help", 'Asset_EMSBadge'],
+            label           => ["related badge groups", 'Asset_EventManagementSystem'],
+            hoverHelp       => ["related badge groups badge help", 'Asset_EventManagementSystem'],
          );
 property templateId => (
             tab             => "display",
             fieldType       => "template",
-            label           => ["view badge template", 'Asset_EMSBadge'],
-            hoverHelp       => ["view badge template help", 'Asset_EMSBadge'],
+            label           => ["view badge template", 'Asset_EventManagementSystem'],
+            hoverHelp       => ["view badge template help", 'Asset_EventManagementSystem'],
             default         => 'PBEmsBadgeTemplate0000',
             namespace       => 'EMSBadge',
          );
@@ -175,6 +175,21 @@ sub getConfiguredTitle {
 	my $name = $self->session->db->quickScalar("select name from EMSRegistrant where badgeId=?",[$self->getOptions->{badgeId}]);
     return $self->getTitle." (".$name.")";
 }
+
+#-------------------------------------------------------------------
+
+=head2 getEditForm ()
+
+Extended to make sure that the next screen viewed after saving is the viewAll screen from the parent EMS.
+
+=cut
+
+override getEditForm => sub {
+	my $self = shift;
+	my $form = super();
+    $form->addField('hidden', name => 'proceed', value => 'viewParent',);
+	return $form;
+};
 
 
 #-------------------------------------------------------------------
@@ -490,39 +505,6 @@ sub www_addToCart {
 	# add it to the cart
 	$self->addToCart(\%badgeInfo);
 	return $self->getParent->www_buildBadge($self->getOptions->{badgeId});
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 www_edit ()
-
-Displays the edit form.
-
-=cut
-
-sub www_edit {
-	my ($self) = @_;
-	return $self->session->privilege->insufficient() unless $self->canEdit;
-	return $self->session->privilege->locked() unless $self->canEditIfLocked;
-	$self->session->style->setRawHeadTags(q|
-		<style type="text/css">
-		.forwardButton {
-			background-color: green;
-			color: white;
-			font-weight: bold;
-			padding: 3px;
-		}
-		.backwardButton {
-			background-color: red;
-			color: white;
-			font-weight: bold;
-			padding: 3px;
-		}
-		</style>
-						   |);	
-	my $i18n = WebGUI::International->new($self->session, "Asset_EventManagementSystem");
-	return $self->processStyle('<h1>'.$i18n->get('ems badge').'</h1>'.$self->getEditForm->toHtml);
 }
 
 __PACKAGE__->meta->make_immutable;

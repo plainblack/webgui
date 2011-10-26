@@ -115,7 +115,7 @@ my $options = {
               };
 
 $driver2 = WebGUI::Shop::ShipDriver::USPS->new($session, $options);
-addToCleanup($driver2);
+WebGUI::Test->addToCleanup($driver2);
 
 isa_ok($driver2, 'WebGUI::Shop::ShipDriver::USPS');
 isa_ok($driver2, 'WebGUI::Shop::ShipDriver');
@@ -153,7 +153,7 @@ my $driver = WebGUI::Shop::ShipDriver::USPS->new($session, {
     enabled  => 1,
     shipType => 'PARCEL',
 });
-addToCleanup($driver);
+WebGUI::Test->addToCleanup($driver);
 
 my $e;
 eval { $driver->calculate() };
@@ -183,7 +183,7 @@ cmp_deeply(
 );
 
 $cart = WebGUI::Shop::Cart->newBySession($session);
-addToCleanup($cart);
+WebGUI::Test->addToCleanup($cart);
 my $addressBook = $cart->getAddressBook;
 my $workAddress = $addressBook->addAddress({
     label => 'work',

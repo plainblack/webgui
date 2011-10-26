@@ -32,21 +32,19 @@ use JSON;
 # Init
 my $session         = WebGUI::Test->session;
 
-
-#----------------------------------------------------------------------------
-# Tests
-
-plan tests => 67;        # Increment this number for each test you create
-
 #----------------------------------------------------------------------------
 # put your tests here
-my $node = WebGUI::Asset->getRoot($session);
+
+my $tag = WebGUI::VersionTag->getWorking($session);
+WebGUI::Test->addToCleanup($tag);
 
 my $product = WebGUI::Test->asset(
     className => "WebGUI::Asset::Sku::Product",
     title     => "Rock Hammer",
     groupIdEdit => 3,
 );
+$tag->commit;
+$product = $product->cloneFromDb;
 
 is($product->getThumbnailUrl(), '', 'Product with no image1 property returns the empty string');
 
@@ -61,12 +59,17 @@ WebGUI::Test->addToCleanup($image);
 $image->addFileFromFilesystem(WebGUI::Test->getTestCollateralPath('lamp.jpg'));
 $image->generateThumbnail('lamp.jpg');
 
+my $imageTag = WebGUI::VersionTag->getWorking($session);
+
 my $imagedProduct = WebGUI::Test->asset(
     className          => "WebGUI::Asset::Sku::Product",
     title              => "Bible",
     image1             => $image->getId,
     isShippingRequired => 1,
 );
+
+$imageTag->commit;
+$imagedProduct = $imagedProduct->cloneFromDb;
 
 ok($imagedProduct->getThumbnailUrl(), 'getThumbnailUrl is not empty');
 is($imagedProduct->getThumbnailUrl(), $image->getThumbnailUrl('lamp.jpg'), 'getThumbnailUrl returns the right path to the URL');
@@ -151,6 +154,7 @@ my $jsonTemplate = WebGUI::Test->asset(
 
 my @storages = map { WebGUI::Storage->create($session) } 0..2;
 
+my $viewTag = WebGUI::VersionTag->getWorking($session);
 my $viewProduct = WebGUI::Test->asset(
     className  => 'WebGUI::Asset::Sku::Product',
     title      => 'View Product for template variable tests',
@@ -159,6 +163,9 @@ my $viewProduct = WebGUI::Test->asset(
     warranty   => $storages[1]->getId,
     manual     => $storages[2]->getId,
 );
+$viewTag->commit;
+WebGUI::Test->addToCleanup($viewTag);
+$viewProduct = $viewProduct->cloneFromDb;
 
 $viewProduct->prepareView();
 my $json = $viewProduct->view();
@@ -195,6 +202,7 @@ $product = $product->cloneFromDb;
 cmp_deeply(
     $product->getAllCollateral( 'accessoryJSON' ),
     [ { accessoryAssetId => $imagedProduct->getId } ],
+    'accessory updated'
 );
 
 $mech->submit_form_ok({
@@ -208,6 +216,7 @@ $product = $product->cloneFromDb;
 cmp_deeply(
     $product->getAllCollateral( 'accessoryJSON' ),
     [ { accessoryAssetId => $imagedProduct->getId }, { accessoryAssetId => $viewProduct->getId } ],
+    'accessory edited'
 );
 
 #----------------------------------------------------------------------------
@@ -228,6 +237,7 @@ $product = $product->cloneFromDb;
 cmp_deeply(
     $product->getAllCollateral( 'relatedJSON' ),
     [ { relatedAssetId => $imagedProduct->getId } ],
+    'added related asset'
 );
 
 $mech->submit_form_ok({
@@ -241,6 +251,7 @@ $product = $product->cloneFromDb;
 cmp_deeply(
     $product->getAllCollateral( 'relatedJSON' ),
     [ { relatedAssetId => $imagedProduct->getId }, { relatedAssetId => $viewProduct->getId } ],
+    'added another related asset'
 );
 
 #----------------------------------------------------------------------------
@@ -261,6 +272,7 @@ $product = $product->cloneFromDb;
 cmp_deeply(
     $product->getAllCollateral( 'benefitJSON' ),
     [ { benefit => 'One new benefit', benefitId => ignore() } ],
+    'added a benefit'
 );
 
 $mech->submit_form_ok({
@@ -277,6 +289,7 @@ cmp_deeply(
         { benefit => 'One new benefit', benefitId => ignore() }, 
         { benefit => 'Two new benefit', benefitId => ignore() },
     ],
+    'second benefit successfully added'
 );
 
 my $benefit = $product->getAllCollateral( 'benefitJSON' )->[0];
@@ -294,6 +307,7 @@ cmp_deeply(
         { benefit => 'One edited benefit', benefitId => ignore() }, 
         { benefit => 'Two new benefit', benefitId => ignore() },
     ],
+    'benefit edited'
 );
 
 
@@ -315,6 +329,7 @@ $product = $product->cloneFromDb;
 cmp_deeply(
     $product->getAllCollateral( 'featureJSON' ),
     [ { feature => 'One new feature', featureId => ignore() } ],
+    'added a feature'
 );
 
 $mech->submit_form_ok({
@@ -331,6 +346,7 @@ cmp_deeply(
         { feature => 'One new feature', featureId => ignore() }, 
         { feature => 'Two new feature', featureId => ignore() },
     ],
+    'added another feature'
 );
 
 my $feature = $product->getAllCollateral( 'featureJSON' )->[0];
@@ -348,6 +364,7 @@ cmp_deeply(
         { feature => 'One edited feature', featureId => ignore() }, 
         { feature => 'Two new feature', featureId => ignore() },
     ],
+    'edited a feature'
 );
 
 
@@ -373,6 +390,7 @@ cmp_deeply(
     [
         { name => "One", value => "1", units => "Oneitude", specificationId => ignore(), },
     ],
+    'specification added'
 );
 
 $mech->submit_form_ok({
@@ -391,6 +409,7 @@ cmp_deeply(
         { name => "One", value => "1", units => "Oneitude", specificationId => ignore(), },
         { name => "Cold", value => "2", units => "Colditude", specificationId => ignore(), },
     ],
+    'another specification added'
 );
 
 my $spec = $product->getAllCollateral( 'specificationJSON' )->[0];
@@ -410,6 +429,7 @@ cmp_deeply(
         { name => "Oneitude", value => "3", units => "Ones", specificationId => $spec->{specificationId}, },
         { name => "Cold", value => "2", units => "Colditude", specificationId => ignore(), },
     ],
+    'specification edited'
 );
 
 
@@ -439,6 +459,7 @@ cmp_deeply(
     [
         { %variantFlexo, variantId => ignore() },
     ],
+    'added a variant'
 );
 
 my %variantBender = (
@@ -462,6 +483,7 @@ cmp_deeply(
         { %variantFlexo, variantId => ignore() },
         { %variantBender, variantId => ignore() },
     ],
+    'added another variant'
 );
 
 my $variant = $product->getAllCollateral( 'variantsJSON' )->[1];
@@ -481,5 +503,7 @@ cmp_deeply(
         { %variantFlexo, variantId => ignore() },
         { %variantBender, variantId => ignore() },
     ],
+    'variant edited'
 );
 
+done_testing;

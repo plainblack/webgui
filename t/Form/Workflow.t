@@ -50,8 +50,6 @@ my $html = join "\n",
     $plugin->toHtml;
 	$footer;
 
-diag $html;
-
 my @forms = HTML::Form->parse($html, 'http://www.webgui.org');
 
 ##Test Form Generation

@@ -98,6 +98,6 @@ sub setupTest {
 	$users[1]->addToGroups([$cm->getId]);
 	##User 2 is a member of a content manager sub-group
 	$users[2]->addToGroups([$editGroup->getId]);
-    addToCleanup($editGroup, @users);
+    WebGUI::Test->addToCleanup($editGroup, @users);
 	return ($asset, $editGroup, @users);
 }

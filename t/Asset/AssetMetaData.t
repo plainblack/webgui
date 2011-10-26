@@ -28,7 +28,6 @@ my $session = WebGUI::Test->session;
 $session->user({userId => 3});
 my $root = WebGUI::Test->asset;
 my $versionTag = WebGUI::VersionTag->getWorking($session);
-my %tag = ( tagId => $versionTag->getId, status => "pending" );
 $versionTag->set({name=>"Asset Package test"});
 WebGUI::Test->addToCleanup($versionTag);
 
@@ -44,7 +43,6 @@ my $folder = $root->addChild({
     menuTitle => 'folderMenuTitle',
     className => 'WebGUI::Asset::Wobject::Folder',
     isPackage => 1,
-    %tag,
 });
 
 my $snippet = $folder->addChild({
@@ -53,7 +51,6 @@ my $snippet = $folder->addChild({
     menuTitle => 'snippetMenuTitle',
     className => 'WebGUI::Asset::Snippet',
     snippet   => 'A snippet of text',
-    %tag,
 });
 
 $versionTag->commit;

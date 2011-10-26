@@ -26,16 +26,13 @@ my $node            = WebGUI::Asset->getImportNode($session);
 my $versionTag      = WebGUI::VersionTag->getWorking($session);
 WebGUI::Test->addToCleanup($versionTag);
 $versionTag->set({name=>"Photo Test"});
-my %tag = ( tagId => $versionTag->getId, status => "pending" );
 my $gallery
     = $node->addChild({
         className           => "WebGUI::Asset::Wobject::Gallery",
-        %tag,
     });
 my $album
     = $gallery->addChild({
         className           => "WebGUI::Asset::Wobject::GalleryAlbum",
-        %tag,
     },
     undef, undef,
     { skipAutoCommitWorkflows => 1 },
@@ -43,7 +40,6 @@ my $album
 my $photo
     = $album->addChild({
         className               => "WebGUI::Asset::File::GalleryFile::Photo",
-        %tag,
     },
     undef, undef,
     { skipAutoCommitWorkflows => 1 },

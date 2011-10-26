@@ -31,15 +31,13 @@ my $versionTag      = WebGUI::VersionTag->getWorking($session);
 
 # Name version tag and make sure it gets cleaned up
 $versionTag->set({name=>"Orientation adjustment test"});
-my %tag = ( tagId => $versionTag->getId, status => "pending" );
-addToCleanup($versionTag);
+WebGUI::Test->addToCleanup($versionTag);
 
 # Create gallery and a single album
 my $gallery
     = $node->addChild({
         className           => "WebGUI::Asset::Wobject::Gallery",
         imageResolutions    => "1024",        
-        %tag,
     },
     undef,
     undef,
@@ -49,7 +47,6 @@ my $gallery
 my $album
     = $gallery->addChild({
         className           => "WebGUI::Asset::Wobject::GalleryAlbum",
-        %tag,
     },
     undef,
     undef,
@@ -61,7 +58,6 @@ my $album
 my $photo
     = $album->addChild({
         className           => "WebGUI::Asset::File::GalleryFile::Photo",
-        %tag,
     },
     undef,
     undef,

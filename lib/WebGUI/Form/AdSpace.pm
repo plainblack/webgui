@@ -17,6 +17,7 @@ package WebGUI::Form::AdSpace;
 use strict;
 use base 'WebGUI::Form::SelectBox';
 use WebGUI::International;
+use WebGUI::AdSpace;
 
 =head1 NAME
 
@@ -137,34 +138,19 @@ sub isDynamicCompatible {
 
 #-------------------------------------------------------------------
 
-=head2 toHtml ( )
+=head2 new ( )
 
-Returns a group pull-down field. A group pull down provides a select list that provides name value pairs for all the groups in the WebGUI system.  
-
-=cut
-
-sub toHtml {
-	my $self = shift;
-	my $options = { map { $_->getId => $_->get('name') } ( @{ WebGUI::AdSpace->getAdSpaces($self->session) } ) };
-	$self->set('defaultValue', ( keys %{$options} )[0] );
-	$self->set('options', $options );
-	return $self->SUPER::toHtml();
-}
-
-#-------------------------------------------------------------------
-
-=head2 toHtmlAsHidden ( )
-
-Creates a series of hidden fields representing the data in the list.
+Extend the base "new" to set options and the default value.
 
 =cut
 
-sub toHtmlAsHidden {
-        my $self = shift;
+sub new {
+    my $class = shift;
+    my $self  = $class->SUPER::new(@_);
 	my $options = { map { $_->getId => $_->get('name') } ( @{ WebGUI::AdSpace->getAdSpaces($self->session) } ) };
 	$self->set('defaultValue', ( keys %{$options} )[0] );
 	$self->set('options', $options );
-        return $self->SUPER::toHtmlAsHidden();
+    return $self;
 }
 
 #-------------------------------------------------------------------

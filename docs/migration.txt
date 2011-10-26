@@ -281,15 +281,6 @@ processPropertiesFromFormPost
 -----------------------------
 Absurdly long and non-descriptive name, changed to processEditForm
 
-Versioning
-----------
-New revisions are not created in a "pending" state automatically. VersionTags
-are not created by calling addRevision(). If you want a revision to be part of
-a version tag, you must set 
-    status => "pending", 
-    tagId => $tag->getId,
-explicitly.
-
 Admin Controls
 --------------------
 The admin controls are now added to the asset with javascript. This javascript
@@ -307,7 +298,14 @@ www_add is now its own page, it is no longer handled by www_edit. www_addSave
 is also its own page, it is no longer handled by www_addSave.
 
 If you had previously overrode www_edit to provide a template, you must move
-that code into an overridden getEditTemplate.
+that code into an overridden getEditTemplate.  See WebGUI::Asset::Event,
+WebGUI::Asset::Post, WebGUI::Asset::Wobject::GalleryAlbum for examples.
+
+Lineage
+--------------------
+Assets created for use during www_add do NOT have a lineage.  Calling
+getLineage on them will return assets from below the root asset, and not
+the child.  See WebGUI::Asset::Wobject::GalleryAlbum::getFileIds.
 
 WebGUI::Shop::Vendor
 ====================

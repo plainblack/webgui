@@ -306,7 +306,7 @@ my $session = WebGUI::Test->session;
     is $revAsset->revisedBy, $session->user->userId, 'revisedBy is current session user';
     my $count = $session->db->quickScalar('SELECT COUNT(*) from assetData where assetId=?',[$testId2]);
     is $count, 2, 'two records in the database';
-    addToCleanup($tag);
+    WebGUI::Test->addToCleanup($tag);
 
     $session->db->write("delete from asset where assetId like 'wg8TestAsset00000%'");
     $session->db->write("delete from assetData where assetId like 'wg8TestAsset00000%'");

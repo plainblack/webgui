@@ -27,30 +27,25 @@ my $node = WebGUI::Asset->getImportNode($session);
 
 
 my $tag2 = WebGUI::VersionTag->getWorking($session);
-my %tag = ( tagId => $tag2->getId, status => "pending" );
 
 my $default = WebGUI::Asset->getDefault($session);
 my $importArticle = $node->addChild({
     className     => 'WebGUI::Asset::Wobject::Article',
     description   => 'rockhound',
-    %tag,
 });
 my $defaultArticle = $default->addChild({
     className     => 'WebGUI::Asset::Wobject::Article',
     description   => 'rockhound',
-    %tag,
 });
 my $template = $node->addChild({
     className  => 'WebGUI::Asset::Template',
     parser    => 'WebGUI::Asset::Template::HTMLTemplate',
     template   => qq{[<tmpl_loop result_set>"<tmpl_var assetId>"<tmpl_unless __LAST__>,</tmpl_unless></tmpl_loop>]},
-    %tag,
 });
 my $search = $default->addChild({
     className  => 'WebGUI::Asset::Wobject::Search',
     searchRoot => $default->getId,
     templateId => $template->getId,
-    %tag,
 });
 $tag2->commit;
 

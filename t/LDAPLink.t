@@ -39,7 +39,7 @@ plan tests => 9;        # Increment this number for each test you create
 
 {
     my $ldap = WebGUI::LDAPLink->new($session, "new");
-    addToCleanup($ldap);
+    WebGUI::Test->addToCleanup($ldap);
     isa_ok($ldap, 'WebGUI::LDAPLink');
     is $ldap->{_ldapLinkId}, "new", '... created with correct linkId';
 }
@@ -54,7 +54,7 @@ plan tests => 9;        # Increment this number for each test you create
     my $ldapProps = WebGUI::Test->getSmokeLDAPProps();
     $session->db->setRow('ldapLink', 'ldapLinkId', $ldapProps, $ldapProps->{ldapLinkId});
     my $ldap = WebGUI::LDAPLink->new($session, $ldapProps->{ldapLinkId});
-    addToCleanup($ldap);
+    WebGUI::Test->addToCleanup($ldap);
     cmp_deeply $ldap->get(), superhashof($ldapProps), 'all db properties retrieved';
     my $connection = $ldap->bind();
     isa_ok $connection, 'Net::LDAP', 'returned by bind';
@@ -73,7 +73,7 @@ plan tests => 9;        # Increment this number for each test you create
     $ldapProps->{identifier} = 'hadley';
     $session->db->setRow('ldapLink', 'ldapLinkId', $ldapProps, $ldapProps->{ldapLinkId});
     my $ldap = WebGUI::LDAPLink->new($session, $ldapProps->{ldapLinkId});
-    addToCleanup($ldap);
+    WebGUI::Test->addToCleanup($ldap);
     my $connection = $ldap->bind();
     isa_ok $connection, 'Net::LDAP', 'returned by bind';
     is $ldap->{_error}, 104, 'auth error due to bad identifier';

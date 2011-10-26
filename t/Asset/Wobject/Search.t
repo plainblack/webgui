@@ -27,9 +27,10 @@ my $node = WebGUI::Asset->getDefault($session);
 
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Search Test"});
-my %tag = ( tagId => $versionTag->getId, status => "pending" );
 WebGUI::Test->addToCleanup($versionTag);
-my $search = $node->addChild({className=>'WebGUI::Asset::Wobject::Search', %tag});
+my $search = $node->addChild({className=>'WebGUI::Asset::Wobject::Search'});
+$versionTag->commit;
+$search = $search->cloneFromDb;
 
 # Test for a sane object type
 isa_ok($search, 'WebGUI::Asset::Wobject::Search');
@@ -89,14 +90,12 @@ $search->update({
 
 {
     my $versionTag2 = WebGUI::VersionTag->getWorking($session);
-    $tag{tagId} = $versionTag2->getId;
     $versionTag2->set({name=>"Collab setup"});
-    my @addArgs = ( undef, undef, { skipNotification => 1 } );
+    my @addArgs = ( undef, undef, { skipNotification => 1, skipAutoCommitWorkflows => 1, } );
     my $collab = $node->addChild({
             className      => 'WebGUI::Asset::Wobject::Collaboration',
             editTimeout    => '1',
             threadsPerPage => 3,
-            %tag,
         },
         @addArgs);
     # finally, add the post to the collaboration system
@@ -104,7 +103,6 @@ $search->update({
         className   => 'WebGUI::Asset::Post::Thread',
         content     => 'verbosity shale anything',
         ownerUserId => 1,
-        %tag,
     };
 
     my $thread = $collab->addChild($props, @addArgs);
@@ -132,12 +130,10 @@ $search->update({
     # Test useContainers when the user cannot view the container
     my $versionTag3 = WebGUI::VersionTag->getWorking($session);
     $versionTag3->set({name=>"Folder setup"});
-    $tag{tagId} = $versionTag3->getId;
     my @addArgs = ( undef, undef, { skipAutoCommitWorkflows => 1, skipNotification => 1 } );
     my $folder = $node->addChild({
             className      => 'WebGUI::Asset::Wobject::Folder',
             groupIdView     => '3', # Admins
-            %tag,
         },
         @addArgs);
     # add an article anyone can see
@@ -145,8 +141,6 @@ $search->update({
         className   => 'WebGUI::Asset::Wobject::Article',
         synopsis => 'juxtaposition coolwhip cheezewhiz',
         groupIdView => '7', # Everyone
-        tagId   => $versionTag3->getId,
-        status  => 'pending',
     };
 
     my $snippet = $folder->addChild($props, @addArgs);
@@ -161,7 +155,6 @@ $search->update({
     $search->prepareView;
     $search->view;
     $search->update({useContainers => 0});
-    note( explain $templateVars );
     is $templateVars->{result_set}->[0]->{url}, $snippet->get('url'), 'search returns regular URL for article';
     $search->update({useContainers => 1});
     $search->view;

@@ -30,6 +30,8 @@ my $wgBday = WebGUI::Test->webguiBirthday;
 
 my $creationDateSth = $session->db->prepare('update asset set creationDate=? where assetId=?');
 
+my $tag = WebGUI::VersionTag->getWorking($session);
+
 my $archive1 = $home->addChild({
     className => 'WebGUI::Asset::Wobject::StoryArchive',
     title     => '2001 Stories',
@@ -57,6 +59,8 @@ my $weekFolder = $archive2->getFolder($weekAgo);
 my $weekStory  = $weekFolder->addChild({className => 'WebGUI::Asset::Story',});
 $creationDateSth->execute([$weekAgo, $weekFolder->getId]);
 $creationDateSth->execute([$weekAgo, $weekStory->getId]);
+$tag->commit;
+WebGUI::Test->addToCleanup($tag);
 
 my $workflow  = WebGUI::Workflow->create($session,
     {

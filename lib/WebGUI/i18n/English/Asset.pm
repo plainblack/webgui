@@ -1501,7 +1501,13 @@ Couldn't open %-s because %-s <br />
     'Allowed Classes hoverHelp' => {
         message     => 'Which assets use this metadata?',
         lastUpdated => 1295986062,
-    }
+    },
+
+    'upload files' => {
+        message => q|Upload Files|,
+        context => q|Name of the asset helper.|,
+        lastUpdated => 1107387247,
+    },
 };
 
 1;

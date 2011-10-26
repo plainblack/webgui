@@ -24,7 +24,7 @@ my $session = WebGUI::Test->session;
 
 # put your tests here
 
-plan tests => 30;
+plan tests => 32;
 
 my $timeZoneUser = addUser($session);
 
@@ -96,17 +96,21 @@ is( $nowDt->webguiToStrftime('%y-%m-%d'), '%Y-%m-%d', 'webgui to strftime conver
 
 $timeZoneUser->update({ 'dateFormat' => '%y-%M-%D' });
 $timeZoneUser->update({ 'timeFormat' => '%H:%n %p' });
-is( $nowDt->webguiToStrftime, '%Y-%_varmonth_-%e %l:%M %P', 'default datetime string' );
+is( $nowDt->webguiToStrftime, '%Y-%{month}-%{day} %l:%M %P', 'default datetime string' );
 
+my $single_digit = WebGUI::DateTime->new($session, '2011-07-04 15:00:00');
+is $single_digit->webguiDate("%z"), '2011-7-4', 'single digit month and day check';
+is $single_digit->webguiDate("%z"), $session->datetime->epochToHuman($single_digit->epoch, '%z'), 'webguiDate, an exact match to session->datetime';
 
 sub addUser {
 	my $session = shift;
+
 	my $user = WebGUI::User->new($session, "new");
 
 	##From my research, this particular time zone does NOT follow daylight savings,
 	##so the test will not fail in the summer
 	$user->profileField("timeZone","America/Hermosillo");
 	$user->username("Time Zone");
-    addToCleanup($user);
+    WebGUI::Test->addToCleanup($user);
 	return $user;
 }

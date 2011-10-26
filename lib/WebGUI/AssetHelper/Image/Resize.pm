@@ -146,8 +146,7 @@ sub www_resizeSave {
     return $session->privilege->insufficient() unless $asset->canEdit;
     return $session->privilege->locked()       unless $asset->canEditIfLocked;
     my $tag = WebGUI::VersionTag->getWorking($session);
-    $asset = $asset->addRevision( { tagId => $tag->getId, status => "pending" } );
-    $asset->setVersionLock;
+    $asset = $asset->addRevision();
     delete $asset->{_storageLocation};
     $asset->getStorageLocation->resize(
         $asset->filename,

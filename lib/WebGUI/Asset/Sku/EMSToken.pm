@@ -18,15 +18,15 @@ use strict;
 use Moose;
 use WebGUI::Definition::Asset;
 extends 'WebGUI::Asset::Sku';
-define assetName           => ['ems token', 'Asset_EMSToken'];
+define assetName           => ['ems token', 'Asset_EventManagementSystem'];
 define icon                => 'EMSToken.gif';
 define tableName           => 'EMSToken';
 property price => (
             tab             => "shop",
             fieldType       => "float",
             default         => 0.00,
-            label           => ["price", 'Asset_EMSToken'],
-            hoverHelp       => ["price help", 'Asset_EMSToken'],
+            label           => ["price", 'Asset_EventManagementSystem'],
+            hoverHelp       => ["price help", 'Asset_EventManagementSystem'],
          );
 
 
@@ -83,6 +83,22 @@ sub getConfiguredTitle {
 	my $name = $self->session->db->quickScalar("select name from EMSRegistrant where badgeId=?",[$self->getOptions->{badgeId}]);
     return $self->getTitle." (".$name.")";
 }
+
+#-------------------------------------------------------------------
+
+=head2 getEditForm ()
+
+Extended to make sure that the next screen viewed after saving is the viewAll screen from the parent EMS.
+
+=cut
+
+override getEditForm => sub {
+	my $self = shift;
+	my $form = super();
+    $form->addField('hidden', name => 'proceed', value => 'viewAll',);
+	return $form;
+};
+
 
 #-------------------------------------------------------------------
 
@@ -233,40 +249,6 @@ sub www_delete {
     return $self->getParent->www_buildBadge(undef,'tokens');
 }
 
-
-#-------------------------------------------------------------------
-
-=head2 www_edit ()
-
-Displays the edit form.
-
-=cut
-
-sub www_edit {
-	my ($self) = @_;
-	return $self->session->privilege->insufficient() unless $self->canEdit;
-	return $self->session->privilege->locked() unless $self->canEditIfLocked;
-	$self->session->style->setRawHeadTags(q|
-		<style type="text/css">
-		.forwardButton {
-			background-color: green;
-			color: white;
-			font-weight: bold;
-			padding: 3px;
-		}
-		.backwardButton {
-			background-color: red;
-			color: white;
-			font-weight: bold;
-			padding: 3px;
-		}
-		</style>
-						   |);	
-	my $i18n = WebGUI::International->new($self->session, "Asset_EventManagementSystem");
-	my $form = $self->getEditForm;
-	$form->addField( "hidden", name=>'proceed', value=>'viewAll');
-	return $self->processStyle('<h1>'.$i18n->get('ems token').'</h1>'.$form->toHtml);
-}
 
 #-------------------------------------------------------------------
 

@@ -456,8 +456,8 @@ ipAddress etc?|,
 
     'default value description' => {
         message => q|Enter the default value (if any) for the field. If you have defined the possible values for
-this field using a hash, then the default value has to be a key in that hash, and not a value. For Yes/No fields, enter "yes" to select "Yes" and "no" to select "No".|,
-        lastUpdated => 1223372150,
+this field using a hash, then the default value has to be a key in that hash, and not a value. For Yes/No fields, enter "yes" to select "Yes" and "no" to select "No". For Date and Date/Time fields, enter an epoch date, or a date in YYYY-MM-DD HH:MM:SS, the ISO 9601 format with optional time|,
+        lastUpdated => 1309814047,
     },
 
     'default value subtext' => {
@@ -1160,6 +1160,12 @@ below/after the form element.|,
         message => q|Is this a unique field?  In simple terms, values in unique fields can't have any duplicates in other rows.|,
         lastUpdated => 1308006162,
         context => q|Hoverhelp for edit field screen|,
+    },
+
+    'callerAssetId' => {
+        message => q|When passed into the www_viewThingData, provides the assetId of the caller asset.  Used by RenderThingMacro.  See POD.|,
+        lastUpdated => 0,
+        context => q|Template variable help for www_viewThingData|,
     },
 
 };

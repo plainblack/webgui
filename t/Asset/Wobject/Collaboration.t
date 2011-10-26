@@ -32,12 +32,11 @@ my $node = WebGUI::Test->asset;
 
 # grab a named version tag
 my $versionTag = WebGUI::VersionTag->getWorking($session);
-addToCleanup($versionTag);
+WebGUI::Test->addToCleanup($versionTag);
 $versionTag->set({name => 'Collaboration => groupToEditPost test'});
-my %tag = ( tagId => $versionTag->getId, status => "pending" );
 
 # place the collab system under a layout to ensure we're using the inherited groupIdEdit value
-my $layout  = $node->addChild({className => 'WebGUI::Asset::Wobject::Layout', %tag});
+my $layout  = $node->addChild({className => 'WebGUI::Asset::Wobject::Layout', });
 
 # set the layout as the current asset for the same reason
 $session->asset($layout);
@@ -46,7 +45,6 @@ $session->asset($layout);
 my $collab  = $layout->addChild({
     className => 'WebGUI::Asset::Wobject::Collaboration',
     url       => 'collab',
-    %tag,
 });
 
 $versionTag->commit;
@@ -68,13 +66,11 @@ my $tag1 = WebGUI::VersionTag->getWorking($session);
 my $props = {
     className   => 'WebGUI::Asset::Post::Thread',
     content     => 'hello, world!',
-    status      => "pending",
-    tagId       => $tag1->getId,
 };
 my $thread = $collab->addChild($props, @addChildCoda);
 $thread->setSkipNotification;
 $tag1->commit;
-addToCleanup($tag1);
+WebGUI::Test->addToCleanup($tag1);
 
 # Test for a sane object type
 isa_ok($thread, 'WebGUI::Asset::Post::Thread');
@@ -83,13 +79,11 @@ my $tag2 = WebGUI::VersionTag->getWorking($session);
 $props = {
     className   => 'WebGUI::Asset::Post::Thread',
     content     => 'jello, world!',
-    status      => "pending",
-    tagId       => $tag2->getId,
 };
 my $thread2 = $collab->addChild($props, @addChildCoda);
 $thread2->setSkipNotification;
 $tag2->commit;
-addToCleanup($tag2);
+WebGUI::Test->addToCleanup($tag2);
 
 my $rssitems = $collab->getRssFeedItems();
 is(scalar @{ $rssitems }, 2, 'rssitems set to number of posts added');

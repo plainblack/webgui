@@ -25,12 +25,11 @@ my $node = WebGUI::Test->asset;
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Wiki Test"});
 WebGUI::Test->addToCleanup($versionTag);
-my %tag = ( tagId => $versionTag->getId, status => "pending" );
 my $wiki = $node->addChild({className=>'WebGUI::Asset::Wobject::WikiMaster', title => 'Wiki Test', url => 'wikitest',});
 my @autoCommitCoda = (undef, undef, {skipAutoCommitWorkflows => 1, skipNotification => 1});
 my $wikipage = $wiki->addChild(
     {className=>'WebGUI::Asset::WikiPage',
-     title    =>'wikipage', %tag},
+     title    =>'wikipage', },
     @autoCommitCoda,
 );
 

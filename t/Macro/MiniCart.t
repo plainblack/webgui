@@ -33,7 +33,7 @@ my $donation = WebGUI::Asset->getRoot($session)->addChild({
 });
 
 my $template = setupJSONtemplate($session);
-addToCleanup($cart, $donation, $template);
+WebGUI::Test->addToCleanup($cart, $donation, $template);
 
 my $json;
 my $templateVars;

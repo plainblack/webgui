@@ -40,8 +40,6 @@ my $calendar = $node->addChild({
     groupIdView         => '7',     # Everyone
     groupIdEdit         => '3',     # Admins
     groupIdEventEdit    => '2',     # Registered Users
-    tagId               => $versionTags[-1]->getId,
-    status              => "pending",
 });
 
 $versionTags[-1]->commit;
@@ -64,8 +62,6 @@ WebGUI::Test->addToCleanup($versionTags[-1]);
 $event  = $calendar->addChild({
     className       => 'WebGUI::Asset::Event',
     ownerUserId     => 3,
-    tagId           => $versionTags[-1]->getId,
-    status          => "pending",
 }, @addArgs);
 
 $maker->prepare( {

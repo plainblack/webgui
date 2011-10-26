@@ -72,18 +72,15 @@ sub copy {
     my $tree  = WebGUI::ProgressTree->new($session, [ $asset->getId ] );
     $process->update(sub { $tree->json });
     my $newAsset = $asset->duplicate({ state => "clipboard" });
-
-    # If we aren't committing, add to a tag
-    if ( !$args->{commit} ) {
-        $newAsset->update({
-            status      => "pending",
-            tagId       => WebGUI::VersionTag->getWorking( $session )->getId,
-        });
-    }
     $newAsset->update({ title => $newAsset->getTitle . ' (copy)'});
 
     $tree->success($asset->getId);
     $process->update(sub { $tree->json });
+
+    my $tag = WebGUI::VersionTag->getWorking($session);
+    if ($tag->canAutoCommit) {
+        $tag->commit;
+    }
 }
 
 1;

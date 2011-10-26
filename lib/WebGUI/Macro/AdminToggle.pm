@@ -22,7 +22,7 @@ Package WebGUI::Macro::AdminToggle
 
 Macro for displaying a url to the user for turning Admin mode on and off.
 
-=head2 process ( [turnOn,turnOff,template ] )
+=head2 process ( [turnOn,template ] )
 
 process takes three optional parameters for customizing the content and layout
 of the account link.
@@ -30,11 +30,6 @@ of the account link.
 =head3 turnOn
 
 The text displayed to the user if Admin mode is turned off and they are in the
-Turn On Admin group.  If this is blank an internationalized default is used.
-
-=head3 turnOff
-
-The text displayed to the user if Admin mode is turned on and they are in the
 Turn On Admin group.  If this is blank an internationalized default is used.
 
 =head3 template

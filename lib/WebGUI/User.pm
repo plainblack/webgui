@@ -711,8 +711,9 @@ sub getGroupIdsRecursive {
     my $self        = shift;
     my $groupingIds = $self->getGroups( "withoutExpired" );
     my %groupIds    = map { $_ => 1 } @{ $groupingIds };
-    while ( my $groupingId = shift @{ $groupingIds } ) {
+    GROUPINGID: while ( my $groupingId = shift @{ $groupingIds } ) {
         my $group   = WebGUI::Group->new( $self->session, $groupingId );
+        next GROUPINGID unless $group;
         for my $groupGroupingId ( @{ $group->getGroupsFor } ) { 
             if ( !$groupIds{ $groupGroupingId } ) {
                 push @{ $groupingIds }, $groupGroupingId;

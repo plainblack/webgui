@@ -22,6 +22,7 @@ my $session         = WebGUI::Test->session;
 my $node            = WebGUI::Test->asset;
 
 # Create gallery and a single album
+my $tag = WebGUI::VersionTag->getWorking($session);
 my $gallery
     = $node->addChild({
         className           => "WebGUI::Asset::Wobject::Gallery",
@@ -38,16 +39,13 @@ for (my $i = 0; $i < 5; $i++)
     $photo[$i]
         = $album->addChild({
             className           => "WebGUI::Asset::File::GalleryFile::Photo",
-        });
+        }, undef, undef, { skipNotifications => 1, skipAutoCommitWorkflows => 1, });
 }
 
-#----------------------------------------------------------------------------
-# Tests
-plan tests => 15;
-
-#----------------------------------------------------------------------------
-# Test module compiles okay
-use_ok("WebGUI::Asset::Wobject::GalleryAlbum");
+$tag->commit;
+foreach my $asset ($gallery, $album, @photo) {
+    $asset = $asset->cloneFromDb;
+}
 
 #----------------------------------------------------------------------------
 # Test getPreviousFileId
@@ -74,5 +72,7 @@ is( $album->getNextFileId(undef), undef, 'Return undef if undef specified');
 is( $album->getNextFileId(''), undef, 'Return undef if empty string specified');
 is( $album->getNextFileId('123456'), undef, 'Return undef if non-existing id specified');
 is( $album->getNextFileId($album->getId), undef, 'Return undef if non-child id specified');
+
+done_testing;
 
 #vim:ft=perl

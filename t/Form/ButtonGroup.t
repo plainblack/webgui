@@ -27,12 +27,11 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 6;        # Increment this number for each test you create
-
 #----------------------------------------------------------------------------
 # put your tests here
 
-use_ok( 'WebGUI::Form::ButtonGroup' );
+use WebGUI::Form::ButtonGroup;
+use WebGUI::FormBuilder;
 
 #----------------------------------------------------------------------------
 # buttons as params
@@ -67,6 +66,10 @@ cmp_deeply(
 my $html = $bg->toHtml;
 like( $html, qr/onetwothree/, 'buttons rendered without extras between or around' );
 
+$bg->addButton("TestButton", { name => "four" } );
+like( $bg->toHtml, qr/onetwothreefour/, 'calling addButton twice does not nuke your buttons' );
+
+done_testing();
 
 #----------------------------------------------------------------------------
 # Test collateral

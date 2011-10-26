@@ -22,9 +22,8 @@ my $session = WebGUI::Test->session;
 my $node = WebGUI::Asset->getImportNode($session);
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Snippet Test"});
-my %tag = ( tagId => $versionTag->getId, status => "pending" );
-addToCleanup($versionTag);
-my $snippet = $node->addChild({className=>'WebGUI::Asset::Snippet', %tag});
+WebGUI::Test->addToCleanup($versionTag);
+my $snippet = $node->addChild({className=>'WebGUI::Asset::Snippet', });
 
 # Make sure TemplateToolkit is in the config file
 WebGUI::Test->originalConfig( 'templateParsers' );
@@ -77,7 +76,7 @@ $session->config->addToHash('macros', 'SQL', 'SQL');
 
 is($snippet->view(), 'WebGUI', 'Interpolating macros in works with template in the correct order');
 
-my $empty = $node->addChild( { className => 'WebGUI::Asset::Snippet', %tag } );
+my $empty = $node->addChild( { className => 'WebGUI::Asset::Snippet', } );
 is($empty->www_view, 'empty', 'www_view: snippet with no content returns "empty"');
 
 #----------------------------------------------------------------------
@@ -99,11 +98,10 @@ is $snippet->view(1), 'Cache test: 3', 'receive uncached content since view was 
 #Check packing
 
 my $tag2 = WebGUI::VersionTag->getWorking($session);
-$tag{tagId} = $tag2->getId;
-my $snippet2 = $node->addChild({className => 'WebGUI::Asset::Snippet', %tag});
+my $snippet2 = $node->addChild({className => 'WebGUI::Asset::Snippet', });
 $snippet2->update({mimeType => 'text/javascript'});
 $tag2->commit;
-addToCleanup($tag2);
+WebGUI::Test->addToCleanup($tag2);
 
 $snippet2->snippet('uncompressable');
 is $snippet2->snippetPacked, 'uncompressable', 'packed snippet content was set';

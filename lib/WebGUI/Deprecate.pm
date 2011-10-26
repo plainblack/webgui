@@ -15,6 +15,29 @@ WebGUI::Deprecate - Warn about subroutine deprecations
 
 Deprecate a subroutine, spitting out a warning whenever it is used.
 
+=head2 derp ($message)
+
+derp is short for DEprecation caRP.  Similar to carp, derp will emit the message
+on STDERR.  If the message does not end with a newline, it will append a strack trace
+to the message.  Each message is only printed once.
+
+=head3 $message
+
+The message to print.
+
+=head2 deprecate ($old_method, $new_method)
+
+This subroutine allows you to replace an old method with a new method and to emit a warning
+to the user (developer) that they should be using something else.
+
+=head3 $old_method
+
+The old, deprecated method.
+
+=head3 $new_method
+
+The new, shiny method that should be called in its place.
+
 =cut
 
 use strict;

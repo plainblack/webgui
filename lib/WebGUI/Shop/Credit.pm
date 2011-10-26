@@ -136,7 +136,7 @@ Returns the amount of credit that is owed to this user.
 
 sub getSum {
     my $self = shift;
-    my $credit = $self->session->db->quickScalar("select sum(amount) from shopCredit where userId=?",[$self->userId]);
+    my $credit = $self->session->db->quickScalar("select sum(amount) from shopCredit where userId=?",[$self->userId]) || 0;
     return sprintf("%.2f", $credit);
 }
 

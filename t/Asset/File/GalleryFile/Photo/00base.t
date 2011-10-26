@@ -26,12 +26,10 @@ my $versionTag = WebGUI::VersionTag->getWorking($session);
 WebGUI::Test->addToCleanup($versionTag);
 
 $versionTag->set({name=>"Photo Test"});
-my %tag = ( tagId => $versionTag->getId, status => "pending" );
 
 my $gallery
     = $node->addChild({
         className           => "WebGUI::Asset::Wobject::Gallery",
-        %tag,
     },
     undef,
     undef,
@@ -41,7 +39,6 @@ my $gallery
 my $album
     = $gallery->addChild({
         className           => "WebGUI::Asset::Wobject::GalleryAlbum",
-        %tag,
     },
     undef,
     undef,
@@ -64,7 +61,6 @@ use_ok("WebGUI::Asset::File::GalleryFile::Photo");
 $photo
     = $album->addChild({
         className           => "WebGUI::Asset::File::GalleryFile::Photo",
-        %tag,
     },
     undef,
     undef,

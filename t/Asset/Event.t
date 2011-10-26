@@ -29,8 +29,6 @@ WebGUI::Test->addToCleanup($versionTag);
 my $defaultAsset = WebGUI::Asset->getDefault($session);
 my $cal = $defaultAsset->addChild({
     className=>'WebGUI::Asset::Wobject::Calendar',
-    tagId   => $versionTag->getId,
-    status  => "pending",
 });
 $versionTag->commit;
 
@@ -49,8 +47,6 @@ my $properties = {
     endTime   => '03:00:00',
     timeZone  => 'America/Chicago',
     location  => 'Madison, Wisconsin',
-    tagId       => $versionTag->getId,
-    status      => "pending",
 };
 
 my $event = $cal->addChild($properties, $properties->{id});

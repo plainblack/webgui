@@ -25,16 +25,14 @@ my $node = WebGUI::Asset->getImportNode($session);
 # Grab a named version tag
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Collab setup"});
-addToCleanup($versionTag);
+WebGUI::Test->addToCleanup($versionTag);
 
 # Need to create a Collaboration system in which the post lives.
-my @addArgs = ( undef, undef, { skipNotification => 1 } );
+my @addArgs = ( undef, undef, { skipNotification => 1, skipAutoCommitWorkflows => 1 } );
 my $collab = $node->addChild({
         className      => 'WebGUI::Asset::Wobject::Collaboration',
         editTimeout    => '1',
         threadsPerPage => 3,
-        status          => "pending",
-        tagId           => $versionTag->getId,
     },
     @addArgs);
 
@@ -44,8 +42,6 @@ my $props = {
     className   => 'WebGUI::Asset::Post::Thread',
     content     => 'hello, world!',
     ownerUserId => 1,
-    status      => "pending",
-    tagId       => $versionTag->getId,
 };
 
 my $thread = $collab->addChild($props, @addArgs);
@@ -78,13 +74,16 @@ note 'getCSLinkUrl';
 my @newThreads;
 my $threadCount = 15;
 my $versionTag2 = WebGUI::VersionTag->getWorking($session);
-addToCleanup( $versionTag2 );
-$props->{tagId} = $versionTag2->getId;
+WebGUI::Test->addToCleanup( $versionTag2 );
 while ($threadCount--) {
     push @newThreads, $collab->addChild($props, @addArgs);
 }
 $_->setSkipNotification for @newThreads;
 $versionTag2->commit;
+
+foreach my $asset (@newThreads) {
+    $asset = $asset->cloneFromDb;
+}
 
 my $csUrl = $collab->get('url');
 like $newThreads[-1]->getCSLinkUrl, qr/^$csUrl/, 'getCsLinkUrl returns URL of the parent CS with no gateway';

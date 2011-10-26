@@ -159,24 +159,22 @@ $tag2->rollback;
 ($tag, $tagAgain1, $tag2, $tagAgain2) = ();
 
 my $tag3 = WebGUI::VersionTag->create($session, {});
-my %tag = ( tagId => $tag3->getId, status => "pending" );
 $tag3->setWorking;
-my $asset1 = WebGUI::Test->asset->addChild({ className => 'WebGUI::Asset::Snippet', %tag });
-my $asset2 = WebGUI::Test->asset->addChild({ className => 'WebGUI::Asset::Snippet', %tag });
+my $asset1 = WebGUI::Test->asset->addChild({ className => 'WebGUI::Asset::Snippet', });
+my $asset2 = WebGUI::Test->asset->addChild({ className => 'WebGUI::Asset::Snippet', });
 is($tag3->getAssetCount, 2, 'tag with two assets');
 is($tag3->getRevisionCount, 2, 'tag with two revisions');
-$asset1 = $asset1->addRevision({ title => 'revised once', %tag }, time+10);
-$asset1 = $asset1->addRevision({ title => 'revised twice', %tag }, time+20);
-$asset2 = $asset2->addRevision({ title => 'other revised once', %tag }, time+30);
+$asset1 = $asset1->addRevision({ title => 'revised once', }, time+10);
+$asset1 = $asset1->addRevision({ title => 'revised twice', }, time+20);
+$asset2 = $asset2->addRevision({ title => 'other revised once', }, time+30);
 is($tag3->getRevisionCount, 5, 'tag with five revisions');
 
 my $tag4 = WebGUI::VersionTag->create($session, {});
-$tag{tagId} = $tag4->getId;
 $tag4->setWorking;
-my $asset3 = WebGUI::Test->asset->addChild({ className => 'WebGUI::Asset::Snippet', %tag });
+my $asset3 = WebGUI::Test->asset->addChild({ className => 'WebGUI::Asset::Snippet', });
 is($tag4->getAssetCount, 1, 'other tag with one asset');
 is($tag4->getRevisionCount, 1, 'other tag with one revision');
-$asset3->addRevision({ title => 'again revised once', %tag }, time+40);
+$asset3->addRevision({ title => 'again revised once', }, time+40);
 is($tag4->getRevisionCount, 2, 'other tag still with one asset');
 is($tag4->getRevisionCount, 2, 'other tag with two revisions');
 is($tag3->getAssetCount, 2, 'original tag still with two assets');
@@ -187,9 +185,8 @@ $tag4->rollback;
 
 #Test commitAsUser
 my $tag5   = WebGUI::VersionTag->create($session, {});
-$tag{tagId} = $tag5->getId;
 $tag5->setWorking;
-my $asset5 = WebGUI::Test->asset->addChild({ className => 'WebGUI::Asset::Snippet', %tag });
+my $asset5 = WebGUI::Test->asset->addChild({ className => 'WebGUI::Asset::Snippet', });
 is($tag5->get("createdBy"),1,'tag created by visitor');
 $tag5->commitAsUser(3);
 $tag5      = WebGUI::VersionTag->new($session, $tag5->getId); #Get the tag again - properties have changed
@@ -199,9 +196,8 @@ $tag5->rollback;
 
 #Test commitAsUser with options
 my $tag6   = WebGUI::VersionTag->create($session, {});
-$tag{tagId} = $tag6->getId;
 $tag6->setWorking;
-my $asset6 = WebGUI::Test->asset->addChild({ className => 'WebGUI::Asset::Snippet', %tag });
+my $asset6 = WebGUI::Test->asset->addChild({ className => 'WebGUI::Asset::Snippet', });
 $tag6->commitAsUser(3, { commitNow => "yes" });
 $tag6      = WebGUI::VersionTag->new($session, $tag6->getId); #Get the tag again - properties have changed
 is($tag6->get("committedBy"),3,'tag committed by admin again');
@@ -324,9 +320,8 @@ $siteWideTag->rollback();
 
     setUserVersionTagMode($user, q{singlePerUser});
     my $tag = WebGUI::VersionTag->create($session, {});
-    $tag{ tagId } = $tag->getId;
     $tag->setWorking;
-    my $asset = WebGUI::Test->asset->addChild({ className => 'WebGUI::Asset::Snippet', %tag });
+    my $asset = WebGUI::Test->asset->addChild({ className => 'WebGUI::Asset::Snippet', });
     is($tag->getAssetCount, 1, qq{$test_prefix [singlePerUser] tag with 1 asset});
 
     # create admin session
@@ -376,15 +371,14 @@ $siteWideTag->rollback();
 
     setUserVersionTagMode($user, q{siteWide});
     $tag = WebGUI::VersionTag->create($session, {});
-    $tag{tagId} = $tag->getId;
     $tag->setWorking;
-    $asset = WebGUI::Test->asset->addChild({ className => 'WebGUI::Asset::Snippet', %tag });
+    $asset = WebGUI::Test->asset->addChild({ className => 'WebGUI::Asset::Snippet', });
     is($tag->getAssetCount, 1, qq{$test_prefix [siteWide] tag with 1 asset});
 
     # create admin session
     $admin_session = WebGUI::Test->newSession;
     WebGUI::Test->addToCleanup($admin_session);
-    addToCleanup($admin_session);
+    WebGUI::Test->addToCleanup($admin_session);
     $admin_session->user({'userId' => 3});
 
     setUserVersionTagMode($admin_session->user(), q{autoCommit});
@@ -436,10 +430,10 @@ my $redSession  = WebGUI::Test->newSession();
 
 my $andy = WebGUI::User->create($andySession);
 my $red  = WebGUI::User->create($redSession);
-addToCleanup($andy, $red);
+WebGUI::Test->addToCleanup($andy, $red);
 
 my $andyTag = WebGUI::VersionTag->getWorking($andySession);
-addToCleanup($andyTag);
+WebGUI::Test->addToCleanup($andyTag);
 my $redTag  = WebGUI::VersionTag->new($redSession, $andyTag->getId);
 $redTag->setWorking();
 is($andyTag->getId, $redTag->getId, 'users share the same version tag');
@@ -459,7 +453,7 @@ $andyTag2->clearWorking;
     my $andyTagCheck = WebGUI::VersionTag->getWorking($andySession, 'nocreate');
     is($andyTagCheck, undef, 'clearWorking: user andy does not have tag');
     my $redSession2  = $redSession->duplicate;
-    addToCleanup($redSession2);
+    WebGUI::Test->addToCleanup($redSession2);
     my $redTagCheck  = WebGUI::VersionTag->getWorking($redSession2, 'nocreate');
     is($redTagCheck, undef, 'red does not either');
 }

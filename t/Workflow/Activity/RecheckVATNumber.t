@@ -46,7 +46,7 @@ plan tests => 9;        # Increment this number for each test you create
     my $number = 'NL34567890';
     my $user   = WebGUI::User->new( $session, 'new' );
     my $userId = $user->userId;
-    addToCleanup( $user );
+    WebGUI::Test->addToCleanup( $user );
     
     # --- valid number ----------------
     $return = 'VALID';
@@ -94,7 +94,7 @@ sub createInstance {
     } );
     my $activity = $workflow->addActivity( 'WebGUI::Workflow::Activity::RecheckVATNumber' );
 
-    addToCleanup( $workflow );
+    WebGUI::Test->addToCleanup( $workflow );
 
     my $instance = WebGUI::Workflow::Instance->create( $session, {
         workflowId                  => $workflow->getId,

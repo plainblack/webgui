@@ -40,8 +40,6 @@ my $topFolder = $root->addChild({
     menuTitle   => 'topFolderMenuTitle',
     groupIdEdit => 3,
     className   => 'WebGUI::Asset::Wobject::Folder',
-    tagId   => $versionTag->getId,
-    status  => "pending",
 });
 
 my $folder = $topFolder->addChild({
@@ -50,8 +48,6 @@ my $folder = $topFolder->addChild({
     menuTitle   => 'folderMenuTitle',
     groupIdEdit => 3,
     className   => 'WebGUI::Asset::Wobject::Folder',
-    tagId   => $versionTag->getId,
-    status  => "pending",
 });
 
 my $folder2 = $topFolder->addChild({
@@ -59,8 +55,6 @@ my $folder2 = $topFolder->addChild({
     title => 'folder2',
     menuTitle => 'folder2MenuTitle',
     className => 'WebGUI::Asset::Wobject::Folder',
-    tagId   => $versionTag->getId,
-    status  => "pending",
 });
 
 my $editor = WebGUI::User->new($session, 'new');
@@ -77,8 +71,6 @@ foreach my $snipNum (0..6) {
             title       => "Snippet $snipNum",
             menuTitle   => $snipNum,
             url         => 'snippet'.$snipNum,
-            tagId   => $versionTag->getId,
-            status  => "pending",
         });
 }
 
@@ -88,8 +80,6 @@ my $snippet2 = $folder2->addChild( {
             ownerUserId => $editor->userId, #For coverage on addChild properties
             title       => "Snippet2 0",
             menuTitle   => 0,
-            tagId   => $versionTag->getId,
-            status  => "pending",
 });
 
 $versionTag->commit;
@@ -681,8 +671,6 @@ WebGUI::Test->interceptLogging( sub {
                 ownerUserId => 3, #For coverage on addChild properties
                 title       => "Deep Snippet $_",
                 menuTitle   => "Deep Snip $_",
-                tagId       => $vTag2->getId,
-                status      => "pending",
         });
     }
 

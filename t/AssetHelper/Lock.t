@@ -33,15 +33,17 @@ my $home = WebGUI::Test->asset;
 
 my $editor = WebGUI::User->create($session);
 $editor->addToGroups([4]);
-addToCleanup($editor);
+WebGUI::Test->addToCleanup($editor);
 
 $session->user({userId => 3});
+my $tag = WebGUI::VersionTag->getWorking($session);
 my $newPage = $home->addChild({
     className   => 'WebGUI::Asset::Wobject::Layout',
     title       => 'Test page',
     groupIdEdit => '4',
     ownerUserId => '3',
 }, undef, WebGUI::Test->webguiBirthday, { skipAutoCommitWorkflows => 1, });
+$tag->commit;
 
 $newPage = WebGUI::Asset->newById($session, $newPage->assetId);
 

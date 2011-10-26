@@ -31,6 +31,8 @@ $user{"2"}          = WebGUI::User->new( $session, "new" );
 $user{"2"}->addToGroups( ['2'] ); # Registered user
 WebGUI::Test->addToCleanup($user{'2'});
 
+my $tag = WebGUI::VersionTag->getWorking($session);
+
 my $collab
     = $node->addChild({
         className               => "WebGUI::Asset::Wobject::Collaboration",
@@ -40,6 +42,9 @@ my $collab
         postGroupId             => 2,   # Registered Users
         canStartThreadGroupId   => 3,   # Admin
     },);
+
+$tag->commit;
+$collab = $collab->cloneFromDb;
 
 #----------------------------------------------------------------------------
 # Tests

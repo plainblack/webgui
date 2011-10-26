@@ -209,7 +209,7 @@ my $dbLinkParams = {
                    };
 
 $dbLink = WebGUI::DatabaseLink->create($session, $dbLinkParams);
-addToCleanup($dbLink);
+WebGUI::Test->addToCleanup($dbLink);
 $dbLinkParams->{databaseLinkId} = ignore();
 
 cmp_deeply(

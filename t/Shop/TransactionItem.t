@@ -91,6 +91,7 @@ my $foreignHammer = $rockHammer->setCollateral('variantsJSON', 'variantId', 'new
 
 
 $versionTag->commit;
+$rockHammer = $rockHammer->cloneFromDb;
 $cart->update({gatewayId => 'gzUxkEZJxREF9JpylOg2zw',}); ##Cash checkout
 my $transaction = WebGUI::Shop::Transaction->new($session, {
     cart          => $cart,

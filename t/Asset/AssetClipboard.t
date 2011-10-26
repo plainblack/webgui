@@ -28,7 +28,6 @@ my $session = WebGUI::Test->session;
 $session->user({userId => 3});
 my $root = WebGUI::Asset->getRoot($session);
 my $versionTag = WebGUI::VersionTag->getWorking($session);
-my %tag = ( tagId => $versionTag->getId, status => "pending" );
 $versionTag->set({name=>"Asset Clipboard test"});
 WebGUI::Test->addToCleanup($versionTag);
 
@@ -38,7 +37,6 @@ my $snippet = $root->addChild({
     menuTitle => 'snippetMenuTitle',
     className => 'WebGUI::Asset::Snippet',
     snippet   => 'A snippet of text',
-    %tag,
 }, undef, time()-3);
 
 my $snippetAssetId      = $snippet->getId;
@@ -49,28 +47,24 @@ my $topFolder = $root->addChild({
     menuTitle   => 'topFolderMenuTitle',
     groupIdEdit => 3,
     className   => 'WebGUI::Asset::Wobject::Folder',
-    %tag,
 });
 my $folder1a = $topFolder->addChild({
     url   => 'folder_1a',
     title => 'folder1a',
     groupIdEdit => 3,
     className   => 'WebGUI::Asset::Wobject::Folder',
-    %tag,
 });
 my $folder1b = $topFolder->addChild({
     url   => 'folder_1b',
     title => 'folder1b',
     groupIdEdit => 3,
     className   => 'WebGUI::Asset::Wobject::Folder',
-    %tag,
 });
 my $folder1a2 = $folder1a->addChild({
     url   => 'folder_1a2',
     title => 'folder1a2',
     groupIdEdit => 3,
     className   => 'WebGUI::Asset::Wobject::Folder',
-    %tag,
 });
 
 
@@ -147,15 +141,11 @@ my $tempspace = WebGUI::Test->asset;
 my $page = $tempspace->addChild({
     className   => 'WebGUI::Asset::Wobject::Layout',
     title       => 'Parent asset',
-    tagId       => $versionTag2->getId,
-    status      => "pending",
 });
 
 my $shortcut = $tempspace->addChild({
     className           => 'WebGUI::Asset::Shortcut',
     shortcutToAssetId   => $page->getId,
-    tagId               => $versionTag2->getId,
-    status              => "pending",
 });
 
 $versionTag2->commit;
@@ -187,6 +177,8 @@ $process->mock( "session" => sub { return $session } );
 
 
 # Try with a Collaboration and some Threads
+my $tag = WebGUI::VersionTag->getWorking( $session );
+WebGUI::Test->addToCleanup($tag);
 my $collab = WebGUI::Test->asset(
     className => 'WebGUI::Asset::Wobject::Collaboration',
     groupIdEdit => "3",
@@ -194,7 +186,10 @@ my $collab = WebGUI::Test->asset(
 my $thread = $collab->addChild({
     className => 'WebGUI::Asset::Post::Thread',
     groupIdEdit => "3",
-}, undef, undef, { skipNotification => 1 });
+}, undef, undef, { skipAutoCommitWorkflows => 1, skipNotification => 1, },
+);
+$tag->commit;
+$thread = $thread->cloneFromDb;  ##so that the cached parent asset with the wrong status does not update the db.
 $thread->cut;
 WebGUI::Asset::pasteInFork( $process, { assetId => $collab->getId, list => [ $thread->getId ] } );
 $thread = $thread->cloneFromDb;

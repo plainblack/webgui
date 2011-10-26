@@ -39,24 +39,24 @@ my $output;
 my $node = WebGUI::Asset->getImportNode($session);
 my $root = WebGUI::Asset->getRoot( $session );
 my $tag = WebGUI::VersionTag->getWorking( $session );
-my %tag = ( tagId => $tag->getId, status => "pending" );
 my $top = $node->addChild({
     className       => 'WebGUI::Asset::Wobject::Layout',
     title           => 'Top',
-    %tag,
 } );
 my $child   = $top->addChild({
     className       => 'WebGUI::Asset::Wobject::Layout',
     title           => 'Child',
-    %tag,
 });
 my $grand   = $child->addChild({
     className       => 'WebGUI::Asset::Snippet',
     title           => 'Grand',
-    %tag,
 });
 $tag->commit;
-addToCleanup( $tag );
+WebGUI::Test->addToCleanup( $tag );
+
+foreach my $asset ($top, $child, $grand) {
+    $asset = $asset->cloneFromDb;
+}
 
 { 
     my $helper = WebGUI::AssetHelper::CopyBranch->new( id => 'copy_branch', session => $session, asset => $top );
@@ -76,7 +76,7 @@ addToCleanup( $tag );
 
 my $mech    = WebGUI::Test::Mechanize->new( config => WebGUI::Test->file );
 $mech->get_ok( '/?op=assetHelper;helperId=copy_branch;method=copy;with=children;assetId=' . $top->getId );
-WebGUI::Test->waitForAllForks;
+WebGUI::Test->waitForAllForks(10);
 
 my $clippies = $root->getLineage(["descendants"], {statesToInclude => [qw{clipboard clipboard-limbo}], returnObjects => 1,});
 is @{ $clippies }, 2, '... copied 2 asset to the clipboard';
@@ -85,9 +85,9 @@ for my $asset ( @$clippies ) {
 }
 
 $mech->get_ok( '/?op=assetHelper;helperId=copy_branch;method=copy;with=descendants;assetId=' . $top->getId );
-WebGUI::Test->waitForAllForks;
+WebGUI::Test->waitForAllForks(10);
 my $clippies = $root->getLineage(["descendants"], {statesToInclude => [qw{clipboard clipboard-limbo}], returnObjects => 1,});
 is @{ $clippies }, 3, '... copied 3 asset to the clipboard';
-addToCleanup( @$clippies );
+WebGUI::Test->addToCleanup( @$clippies );
 
 #vim:ft=perl

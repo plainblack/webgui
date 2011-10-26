@@ -22,7 +22,10 @@ use Data::Dumper;
 my $session = WebGUI::Test->session;
 
 # put your tests here
+my $tag = WebGUI::VersionTag->getWorking($session);
 my $home = WebGUI::Test->asset;
+$tag->commit;
+$home = $home->cloneFromDb;
 
 isa_ok($home, "WebGUI::Asset");
 my $keyword = WebGUI::Keyword->new($session);

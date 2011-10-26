@@ -18,7 +18,7 @@ use WebGUI::Test;
 use WebGUI::Test::MockAsset;
 use WebGUI::Test::Mechanize;
 use WebGUI::Session;
-use Test::More tests => 27; # increment this value for each test you create
+use Test::More; # increment this value for each test you create
 use Test::Deep;
 use Data::Dumper;
 
@@ -45,9 +45,12 @@ foreach my $name (@names) {
 }
 WebGUI::Test->addToCleanup(@users);
 
+my $tag = WebGUI::VersionTag->getWorking($session);
 my $board = WebGUI::Test->asset(
     className       => 'WebGUI::Asset::Wobject::InOutBoard',
 );
+$tag->commit;
+$board = $board->cloneFromDb;
 
 $board->prepareView();
 
@@ -176,10 +179,13 @@ is ($count, 0, '... cleans up statusLog table');
 
 #----------------------------------------------------------------------------
 # selectDelegates
+my $tag2 = WebGUI::VersionTag->getWorking($session);
 $board = WebGUI::Test->asset(
     className       => 'WebGUI::Asset::Wobject::InOutBoard',
     inOutGroup => '7', # everyone
 );
+$tag2->commit;
+$board = $board->cloneFromDb;
 
 my $mech = WebGUI::Test::Mechanize->new( config => WebGUI::Test->file );
 $mech->get_ok( '/' );
@@ -238,3 +244,5 @@ $mech->submit_form_ok( {
 # Report was ok!
 $mech->content_lacks( "No sleep till Brooklyn!" );
 $mech->content_contains( "Sleeping till Brooklyn!" );
+
+done_testing;

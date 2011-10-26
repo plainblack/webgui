@@ -245,20 +245,20 @@ sub isDynamicCompatible {
 
 #-------------------------------------------------------------------
 
-=head2 toHtml ( )
+=head2 new ( )
 
-Renders a country picker control.
+Extend the base "new" to set options.
 
 =cut
 
-sub toHtml {
-	my $self = shift;
-
+sub new {
+    my $class = shift;
+    my $self  = $class->SUPER::new(@_);
 	my %countries;
 	tie %countries, 'Tie::IxHash';
 	%countries = map {$_ => $_} getCountries();
-	$self->set("options", \%countries);
-	return $self->SUPER::toHtml();
+    $self->set('options', \%countries);
+    return $self;
 }
 
 1;

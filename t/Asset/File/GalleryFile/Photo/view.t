@@ -15,6 +15,7 @@ use strict;
 use WebGUI::Test;
 use WebGUI::HTML;
 use WebGUI::Session;
+use WebGUI::VersionTag;
 use Test::More; 
 use Test::Deep;
 use WebGUI::Asset::File::GalleryFile::Photo;
@@ -23,6 +24,8 @@ use WebGUI::Asset::File::GalleryFile::Photo;
 # Init
 my $session         = WebGUI::Test->session;
 my $user            = WebGUI::User->new( $session, 3 );
+
+my $tag = WebGUI::VersionTag->getWorking($session);
 
 my $gallery
     = WebGUI::Test->asset(
@@ -55,6 +58,12 @@ my $nextPhoto
     });
 
 $photo->setFile( WebGUI::Test->getTestCollateralPath('page_title.jpg') );
+
+$tag->commit;
+WebGUI::Test->addToCleanup($tag);
+foreach my $asset ($gallery, $album, $previousPhoto, $photo, $nextPhoto) {
+    $asset = $asset->cloneFromDb;
+}
 
 #----------------------------------------------------------------------------
 # Tests

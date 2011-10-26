@@ -32,6 +32,7 @@ $session->user({ userId => 3 });
 my $output;
 my $node = WebGUI::Asset->getImportNode($session);
 my $root = WebGUI::Asset->getRoot( $session );
+my $tag = WebGUI::VersionTag->getWorking($session);
 my $top = $node->addChild({
     className       => 'WebGUI::Asset::Wobject::Layout',
     title           => 'Top',
@@ -52,6 +53,7 @@ my $grand   = $child->addChild({
     groupIdView     => '7',
 });
 WebGUI::Test->addToCleanup( $top );
+$tag->commit;
 
 my $dir     = File::Temp->newdir;
 WebGUI::Test->originalConfig( "exportPath" );

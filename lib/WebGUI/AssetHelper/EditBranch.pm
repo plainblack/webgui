@@ -24,7 +24,7 @@ Package WebGUI::AssetHelper::EditBranch
 
 =head1 DESCRIPTION
 
-Displays the revisions for this asset.
+Make revisioned edits to the current asset and descendant assets.
 
 =head1 METHODS
 
@@ -405,7 +405,7 @@ sub www_editBranchSave {
                     my $revision;
                     if (scalar %$newData > 0) {
                         $revision = $descendant->addRevision(
-                            { %$newData, tagId => $tag->getId, status => "pending" },
+                            { %$newData, },
                             undef,
                             {skipAutoCommitWorkflows => 1, skipNotification => 1},
                         );

@@ -39,6 +39,7 @@ plan tests => 39;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # put your tests here
+my $tag = WebGUI::VersionTag->getWorking($session);
 my $sku = WebGUI::Test->asset(
         className => "WebGUI::Asset::Sku::Subscription",
         title     => "Test Subscription",
@@ -47,6 +48,8 @@ my $sku = WebGUI::Test->asset(
         subscriptionGroup     => $group->getId,
         duration              => 'Monthly',
         );
+$tag->commit;
+$sku = $sku->cloneFromDb;
 isa_ok($sku, "WebGUI::Asset::Sku::Subscription");
 
 is($sku->getPrice, 50.00, "Price should be 50.00");

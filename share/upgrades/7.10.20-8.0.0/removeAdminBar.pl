@@ -4,6 +4,9 @@ start_step "Editing templates to remove AdminBar macro calls";
 
 use WebGUI::Macro;
 use WebGUI::Asset::Template;
+use File::Spec;
+use Cwd qw(realpath);
+use WebGUI::Paths;
 
 my $removeAdminBar = sub {
     my $macro = shift;
@@ -31,8 +34,15 @@ ASSET: while (1) {
 
 done;
 
-start_step "Removing Admin Bar";
+start_step "Removing Admin Bar from config file";
 
 session->config->delete( 'macros/AdminBar' );
+
+done;
+
+start_step "Removing Admin Bar module";
+
+my $webgui_root = realpath( File::Spec->catdir( WebGUI::Paths->configBase, (File::Spec->updir) x 1) );
+unlink File::Spec->catfile($webgui_root, 'lib', 'WebGUI', 'Macro', 'AdminBar.pm');
 
 done;

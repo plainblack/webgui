@@ -425,8 +425,12 @@ Gets an array reference of asset IDs for all the files in this album.
 sub getFileIds {
     my $self        = shift;
 
-    if ( !$self->session->stow->get( 'fileIds-' . $self->getId ) ) {
-        my $gallery     = $self->getParent;
+    ##Assets created by www_add do not have a lineage.
+    return [] unless $self->lineage;
+    my $session = $self->session;
+    $self->getParent;
+
+    if ( !$session->stow->get( 'fileIds-' . $self->getId ) ) {
         
         # Deal with "pending" files.
         my %pendingRules;
@@ -437,7 +441,7 @@ sub getFileIds {
             $pendingRules{ statusToInclude } = [ 'pending', 'approved' ];
             $pendingRules{ whereClause } = q{
                 ( 
-                    status = "approved" || ownerUserId = "} . $self->session->user->userId . q{"
+                    status = "approved" || ownerUserId = } . $session->db->quote($session->user->userId) . q{
                 )
             };
         }
@@ -810,16 +814,18 @@ approval workflow.
 
 =cut
 
-sub processEditForm {
+override processEditForm => sub {
     my $self        = shift;
     my $form        = $self->session->form;
     my $errors      = $self->next::method || [];
+
+    $self->processFileSynopsis;
 
     # Return if error
     return $errors  if @$errors;
 
     ### Passes all checks
-}
+};
 
 #----------------------------------------------------------------------------
 
@@ -1382,17 +1388,13 @@ sub _moveFileAjaxRequest {
 
 #----------------------------------------------------------------------------
 
-=head2 www_edit ( )
+=head2 getEditTemplate ( )
 
 Show the form to add / edit a GalleryAlbum asset.
 
-Due to the advanced requirements of this form, we will ALWAYS post back to 
-this page. This page will decide whether or not to make C<www_editSave> 
-handle things.
-
 =cut
 
-sub www_edit {
+sub getEditTemplate {
     my $self        = shift;
     my $session     = $self->session;
     my $form        = $self->session->form;
@@ -1401,100 +1403,13 @@ sub www_edit {
 
     return $session->privilege->insufficient unless $self->canEdit;
 
-    # Handle the button that was pressed
-    # Save button
-    if ( $form->get("save") ) {
-        $self->processFileSynopsis;
-        return $self->www_editSave;
-    }
-    # Cancel button
-    elsif ( $form->get("cancel") ) {
-        return $self->www_view;
-    }
-    # Promote the file
-    elsif ( grep { $_ =~ /^promote-(.{22})$/ } $form->param ) {
-        my $assetId     = ( grep { $_ =~ /^promote-(.{22})$/ } $form->param )[0];
-        $assetId        =~ s/^promote-//;
-        my $asset       = WebGUI::Asset->newById( $session, $assetId );
-        if ( $asset ) {
-            $asset->promote;
-        }
-        else {
-            $session->log->error("Couldn't promote asset '$assetId' because we couldn't instantiate it.");
-        }
-    }
-    # Demote the file
-    elsif ( grep { $_ =~ /^demote-(.{22})$/ } $form->param ) {
-        my $assetId     = ( grep { $_ =~ /^demote-(.{22})$/ } $form->param )[0];
-        $assetId        =~ s/^demote-//;
-        my $asset       = WebGUI::Asset->newById( $session, $assetId );
-        if ( $asset ) {
-            $asset->demote;
-        }
-        else {
-            $session->log->error("Couldn't demote asset '$assetId' because we couldn't instantiate it.");
-        }
-    }
-    # Rotate to the left
-    elsif ( grep { $_ =~ /^rotateLeft-(.{22})$/ } $form->param ) {
-        my $assetId     = ( grep { $_ =~ /^rotateLeft-(.{22})$/ } $form->param )[0];
-        $assetId        =~ s/^rotateLeft-//;              
-        my $asset       = eval { WebGUI::Asset->newById( $session, $assetId ); };
-        
-        if ( ! Exception::Class->caught() ) {
-            # Add revision and create a new version tag by doing so
-            my $tag = WebGUI::VersionTag->create( $session, { workflowId => $asset->getAutoCommitWorkflowId } );
-            my $newRevision = $asset->addRevision({ tagId => $tag->getId, status => "pending" });
-            $newRevision->setVersionLock;
-            # Rotate photo (i.e. all attached image files) by 90° CCW
-            $newRevision->rotate(-90);           
-            # Auto-commit version tag 
-            $newRevision->requestAutoCommit;
-       }
-        else {
-            $session->log->error("Couldn't rotate asset '$assetId' because we couldn't instantiate it.");
-        }        
-    }
-    # Rotate to the right
-    elsif ( grep { $_ =~ /^rotateRight-(.{22})$/ } $form->param ) {
-        my $assetId     = ( grep { $_ =~ /^rotateRight-(.{22})$/ } $form->param )[0];
-        $assetId        =~ s/^rotateRight-//;                
-        my $asset       = WebGUI::Asset->newById( $session, $assetId );
-
-        if ( Exception::Class->caught() ) {
-            # Add revision and create a new version tag by doing so
-            my $tag = WebGUI::VersionTag->create( $session, { workflowId => $asset->getAutoCommitWorkflowId } );
-            my $newRevision = $asset->addRevision({ tagId => $tag->getId, status => "pending" });
-            $newRevision->setVersionLock;
-            # Rotate photo (i.e. all attached image files) by 90° CW
-            $newRevision->rotate(90);           
-            # Auto-commit version tag 
-            $newRevision->requestAutoCommit;
-        }
-        else {
-            $session->log->error("Couldn't rotate asset '$assetId' because we couldn't instantiate it.");
-        }        
-    }
-    # Delete the file
-    elsif ( grep { $_ =~ /^delete-(.{22})$/ } $form->param ) {
-        my $assetId     = ( grep { $_ =~ /^delete-(.{22})$/ } $form->param )[0];
-        $assetId        =~ s/^delete-//;
-        my $asset       = WebGUI::Asset->newById( $session, $assetId );
-        if ( $asset ) {
-            $asset->purge;
-        }
-        else {
-            $session->log->error( "Couldn't delete asset '$assetId' because we couldn't instanciate it.");
-        }
-    }
-
     # Generate the form
     if ($form->get("func") eq "add") {
         # Add page is exempt from our button handling code since it calls the Gallery www_editSave
         $var->{ isNewAlbum  } = 1;
         $var->{ form_start  } 
             = WebGUI::Form::formHeader( $session, {
-                action      => $self->getParent->getUrl('func=editSave;assetId=new;class='.__PACKAGE__),
+                action      => $self->getParent->getUrl('func=addSave;assetId=new;className='.__PACKAGE__),
                 extras      => 'name="galleryAlbumAdd"',
             })
             . WebGUI::Form::hidden( $session, {
@@ -1503,17 +1418,11 @@ sub www_edit {
             });
 
         # Put in the buttons that may ignore button handling code
-        $var->{ form_cancel }
-            = WebGUI::Form::button( $session, {
-                name        => "cancel",
-                value       => $i18n->get("cancel"),
-                extras      => 'onclick="history.go(-1)"',
-            });
     }
     else {
         $var->{ form_start  } 
             = WebGUI::Form::formHeader( $session, {
-                action      => $self->getUrl('func=edit'),
+                action      => $self->getUrl('func=editSave'),
                 extras      => 'name="galleryAlbumEdit"',
             })
             . WebGUI::Form::hidden( $session, {
@@ -1521,13 +1430,6 @@ sub www_edit {
                 value       => $self->ownerUserId,
             });
         
-        # Put in the buttons that may ignore button handling code
-        $var->{ form_cancel }
-            = WebGUI::Form::submit( $session, {
-                name        => "cancel",
-                value       => $i18n->get("cancel"),
-                extras      => 'onclick="history.go(-1)"',
-            });
     }
     $var->{ form_start } 
         .= WebGUI::Form::hidden( $session, {
@@ -1535,6 +1437,13 @@ sub www_edit {
             value       => "showConfirmation",
         })
         ;
+
+    $var->{ form_cancel }
+        = WebGUI::Form::submit( $session, {
+            name        => "cancel",
+            value       => $i18n->get("cancel"),
+            extras      => 'onclick="history.go(-1)"',
+        });
 
     $var->{ form_end    }
         = WebGUI::Form::formFooter( $session );
@@ -1576,45 +1485,6 @@ sub www_edit {
                 id          => "assetIdThumbnail_$file->{ assetId }",
             } );
 
-        my $promoteLabel    = $i18n->get( 'Move Up', 'Icon' );
-        $file->{ form_promote }
-            = WebGUI::Form::submit( $session, {
-                name        => "promote-$file->{assetId}",
-                value       => $i18n->get( 'Move Up', 'Icon' ),
-                class       => "promote",
-            });
-
-        my $demoteLabel     = $i18n->get( 'Move Down', 'Icon' );
-        $file->{ form_demote }
-            = WebGUI::Form::submit( $session, {
-                name        => "demote-$file->{assetId}",
-                value       => $i18n->get( 'Move Down', 'Icon' ),
-                class       => "demote",
-            });
-
-        my $deleteConfirm   = $i18n->get( 'template delete message', 'Asset_Photo' );
-        $file->{ form_delete }
-            = WebGUI::Form::submit( $session, {
-                name        => "delete-$file->{assetId}",
-                value       => $i18n->get( 'Delete', 'Icon' ),
-                class       => "delete",
-                extras      => "onclick=\"return confirm('$deleteConfirm')\"",
-            });
-            
-        $file->{ form_rotateLeft }
-            = WebGUI::Form::submit( $session, {
-                name        => "rotateLeft-$file->{assetId}",
-                value       => $i18n->get( 'rotate left' ),
-                class       => "rotateLeft",
-            });
-               
-        $file->{ form_rotateRight } 
-            = WebGUI::Form::submit( $session, {
-                name        => "rotateRight-$file->{assetId}",
-                value       => $i18n->get( 'rotate right' ),
-                class       => "rotateRight",
-            });
-
         $file->{ form_synopsis }
             = WebGUI::Form::HTMLArea( $session, {
                 name        => "fileSynopsis_$file->{assetId}",
@@ -1625,9 +1495,11 @@ sub www_edit {
             });
     }
 
-    return $self->processStyle( 
-        $self->processTemplate( $var, $self->getParent->templateIdEditAlbum )
-    );
+    my $gallery = $self->getParent;
+    my $template = WebGUI::Asset->newById($session, $gallery->templateIdEditAlbum);
+    $template->style($gallery->getStyleTemplateId);
+    $template->setParam( %{ $var } );
+    return $template;
 }
 
 #----------------------------------------------------------------------------

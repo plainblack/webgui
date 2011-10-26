@@ -32,6 +32,8 @@ my $inbox = WebGUI::Inbox->new($session);
 
 my $import = WebGUI::Test->asset;
 
+my $tag = WebGUI::VersionTag->getWorking($session);
+
 my $posters = $import->addChild({
     className => 'WebGUI::Asset::Sku::Product',
     url       => 'cell_posters',
@@ -68,6 +70,9 @@ my $marilynVarId = $posters->setCollateral('variantsJSON', 'variantId', 'new',
     },
 );
 
+$tag->commit;
+WebGUI::Test->addToCleanup($tag);
+
 my $workflow  = WebGUI::Workflow->create($session,
     {
         enabled    => 1,
@@ -75,7 +80,7 @@ my $workflow  = WebGUI::Workflow->create($session,
         mode       => 'realtime',
     },
 );
-addToCleanup($workflow);
+WebGUI::Test->addToCleanup($workflow);
 
 my $threshold = $workflow->addActivity('WebGUI::Workflow::Activity::NotifyAboutLowStock');
 $threshold->set('className'    , 'WebGUI::Activity::NotifyAboutLowStock');
@@ -150,6 +155,7 @@ WebGUI::Test->addToCleanup(sub {
     $session->db->write("delete from Product    where assetId=?",[$otherPosters->getId]);
     $session->db->write("delete from assetIndex where assetId=?",[$otherPosters->getId]);
 });
+my $otherTag     = WebGUI::VersionTag->getWorking($session);
 my $movie_posters = $import->addChild({
     className => 'WebGUI::Asset::Sku::Product',
     url       => 'movie_posters',
@@ -165,8 +171,7 @@ my $movieVarId = $movie_posters->setCollateral('variantsJSON', 'variantId', 'new
         quantity  => 5,
     },
 );
-my $otherTag     = WebGUI::VersionTag->getWorking($session);
-addToCleanup($otherTag);
+WebGUI::Test->addToCleanup($otherTag);
 $otherTag->commit;
 
 $threshold->set('warningLimit' , 10);

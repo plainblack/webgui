@@ -75,7 +75,7 @@ sub processed_ok {
             template  => $template,
         }
     );
-    addToCleanup($tmpl);
+    WebGUI::Test->addToCleanup($tmpl);
     is( $tmpl->process( {
                 his => { yes => 'yes', stop => 'stop' },
                 my  => { yes => 'no',  stop => 'go' }

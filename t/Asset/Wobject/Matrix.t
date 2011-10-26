@@ -15,7 +15,7 @@ use File::Spec;
 
 use WebGUI::Test;
 use WebGUI::Session;
-use Test::More tests => 30; # increment this value for each test you create
+use Test::More; # increment this value for each test you create
 use Test::Deep;
 use JSON;
 use WebGUI::Asset::Wobject::Matrix;
@@ -26,10 +26,11 @@ my $session = WebGUI::Test->session;
 my $node = WebGUI::Asset->getImportNode($session);
 
 my $versionTag = WebGUI::VersionTag->getWorking($session);
-my %tag = ( tagId => $versionTag->getId, status => "pending" );
 $versionTag->set({name=>"Matrix Test"});
 WebGUI::Test->addToCleanup($versionTag);
-my $matrix = $node->addChild({className=>'WebGUI::Asset::Wobject::Matrix',%tag});
+my $matrix = $node->addChild({className=>'WebGUI::Asset::Wobject::Matrix'});
+$versionTag->commit;
+$matrix = $matrix->cloneFromDb;
 
 # Test for a sane object type
 isa_ok($matrix, 'WebGUI::Asset::Wobject::Matrix');
@@ -103,7 +104,10 @@ is($newAttribute->{attributeId},undef,"The new attribute was successfully delete
 
 # add a listing
 
+my $listing_tag = WebGUI::VersionTag->getWorking($session);
 my $matrixListing = $matrix->addChild({className=>'WebGUI::Asset::MatrixListing'}, undef, undef, { skipNotification => 1});
+$listing_tag->commit;
+$matrixListing = $matrixListing->cloneFromDb;
 
 WebGUI::Test->addToCleanup($matrixListing);
 
@@ -441,3 +445,5 @@ cmp_deeply(
     },
     'statistics calculated for the category with 10 ratings'
 );
+
+done_testing;

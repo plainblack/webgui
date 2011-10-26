@@ -53,7 +53,7 @@ my $helper  = WebGUI::AssetHelper::Product::ImportCSV->new(
 );
 my $importProducts  = \&WebGUI::AssetHelper::Product::ImportCSV::importProducts;
 my $process = Test::MockObject::Extends->new( WebGUI::Fork->create( $session ) );
-addToCleanup( sub { $process->delete } );
+WebGUI::Test->addToCleanup( sub { $process->delete } );
 
 eval { $importProducts->( $process, { assetId => $helper->asset->getId } ); };
 my $e = Exception::Class->caught();
@@ -83,7 +83,7 @@ SKIP: {
 
     chmod oct(0000), $productsTempFile;
 
-    eval { $shelf->importProducts($productsTempFile); };
+    eval { $importProducts->($process, { assetId => $helper->asset->getId, filePath => $productsTempFile } ); };
     $e = Exception::Class->caught();
     isa_ok($e, 'WebGUI::Error::InvalidFile', 'importProducts: error handling for file that cannot be read') || skip 'invalid error thrown', 2;
     is($e->error, 'File is not readable', 'importProducts: error handling for file that that cannot be read');

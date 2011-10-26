@@ -1379,7 +1379,7 @@ around groupIdView => sub {
     my $oldValue = $self->$orig;
     my $return = $self->$orig(@_);
     # Update the subscription group so if they can't see the collab, they don't get e-mailed
-    if ( $newValue && $newValue != $oldValue ) {
+    if ( $newValue && $newValue ne $oldValue ) {
         my $instance_data = {
             workflowId => 'xR-_GRRbjBojgLsFx3dEMA',
             className  => 'WebGUI::Asset',

@@ -141,14 +141,15 @@ sub isDynamicCompatible {
 
 #-------------------------------------------------------------------
 
-=head2 toHtml ( )
+=head2 new ( )
 
-Renders a template picker control.
+Extend the base "new" to set options.
 
 =cut
 
-sub toHtml {
-    my $self = shift;
+sub new {
+    my $class = shift;
+    my $self  = $class->SUPER::new(@_);
     my $workflowList = WebGUI::Workflow->getList($self->session, $self->get("type"));
     
     if ( $self->get("none") ) {
@@ -157,7 +158,7 @@ sub toHtml {
     }
 
     $self->set("options", $workflowList);
-    return $self->SUPER::toHtml();
+    return $self;
 }
 
 #-------------------------------------------------------------------

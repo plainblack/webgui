@@ -32,14 +32,12 @@ my $node            = WebGUI::Asset->getImportNode($session);
 my $versionTag      = WebGUI::VersionTag->getWorking($session);
 
 $versionTag->set( { name=>"Gallery Search Test" } );
-my %tag = ( tagId => $versionTag->getId, status => "pending" );
-addToCleanup( $versionTag );
+WebGUI::Test->addToCleanup( $versionTag );
 
 # Create gallery and a single album
 my $gallery
     = $node->addChild({
         className           => "WebGUI::Asset::Wobject::Gallery",
-        %tag,
     });
 
 my $album
@@ -48,7 +46,6 @@ my $album
         title           => "album",
         synopsis        => "synopsis2",
         keywords        => "group2",        
-        %tag,
     });
 my $albumId = $album->getId;    
 
@@ -60,7 +57,6 @@ my $photo1
         synopsis        => "synopsis1",
         keywords        => "group1",
         location        => "Heidelberg",
-        %tag,
     });
 my $id1 = $photo1->getId;    
     
@@ -71,7 +67,6 @@ my $photo2
         synopsis        => "synopsis2",
         keywords        => "group1",
         location        => "Mannheim",
-        %tag,
     });
 my $id2 = $photo2->getId;    
 
@@ -82,7 +77,6 @@ my $photo3
         synopsis        => "synopsis1",
         keywords        => "group2",
         location        => "Mannheim",
-        %tag,
     });
 my $id3 = $photo3->getId;
     

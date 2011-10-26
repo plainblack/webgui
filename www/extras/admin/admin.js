@@ -31,10 +31,6 @@ WebGUI.Admin = function(cfg){
     }
 
     // TODO: This should be i18n
-    this.localeMonths   = [
-        'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August',
-        'September', 'October', 'November', 'December'
-    ];
 
     // Custom events
     this.afterNavigate = new YAHOO.util.CustomEvent( "afterNavigate", this );
@@ -124,6 +120,20 @@ WebGUI.Admin = function(cfg){
     // Private methods
     // Initialize these things AFTER the i18n is fetched
     var _init = function () {
+        self.localeMonths   = [
+            self.i18n.get('DateTime', 'january'),
+            self.i18n.get('DateTime', 'february'),
+            self.i18n.get('DateTime', 'march'),
+            self.i18n.get('DateTime', 'april'),
+            self.i18n.get('DateTime', 'may'),
+            self.i18n.get('DateTime', 'june'),
+            self.i18n.get('DateTime', 'july'),
+            self.i18n.get('DateTime', 'august'),
+            self.i18n.get('DateTime', 'september'),
+            self.i18n.get('DateTime', 'october'),
+            self.i18n.get('DateTime', 'november'),
+            self.i18n.get('DateTime', 'december')
+        ];
         self.afterNavigate.subscribe( self.requestUpdateCurrentVersionTag, self );
         self.requestUpdateCurrentVersionTag();
 
@@ -148,10 +158,13 @@ WebGUI.Admin = function(cfg){
     // Get I18N
     this.i18n = new WebGUI.i18n( {
         namespaces : {
-            'WebGUI' : [ '< prev', 'next >', 'locked by' ],
-            'Asset'  : [ 'rank', '99', 'type', 'revision date', 'size', 'locked', 'More', 'unlocked', 'edit',
-                         'update', 'delete', '43', 'cut', 'Copy', 'duplicate', 'create shortcut'
-                       ]
+            'WebGUI'   : [ '< prev', 'next >', 'locked by', '364', 'Loading...' ],
+            'Asset'    : [ 'rank', '99', 'type', 'revision date', 'size', 'locked', 'More', 'unlocked', 'edit',
+                           'update', 'delete', '43', 'cut', 'Copy', 'duplicate', 'create shortcut'
+                         ],
+            'DateTime' : [ 'january', 'february', 'march', 'april', 'may', 'june',
+                           'july', 'august', 'september', 'october', 'november', 'december'
+                         ]
         },
         onpreload : {
             fn : _init
@@ -943,7 +956,7 @@ WebGUI.Admin.prototype.openTab
 
     // Prepare the tab
     var newTab = new YAHOO.widget.Tab({
-        label : "Loading...",
+        label : window.admin.i18n.get('WebGUI','Loading...'),
         content : ''
     });
     newTab.get('contentEl').appendChild( iframe );
@@ -1399,25 +1412,25 @@ WebGUI.Admin.AssetTable
             },
             { 
                 key: 'title', 
-                label: window.admin.i18n.get('Asset', '99'), 
+                label: admin.i18n.get('Asset', '99'), 
                 formatter: bind( this, this.formatTitle ),
                 sortable: true 
             },
             { 
                 key: 'type', 
-                label: window.admin.i18n.get('Asset','type'), 
-                sortable: true, 
+                label: admin.i18n.get('Asset','type'), 
+                sortable: false, 
                 formatter: bind( this, this.formatType )
             },
             { 
                 key: 'revisionDate', 
-                label: window.admin.i18n.get('Asset','revision date' ), 
+                label: admin.i18n.get('Asset','revision date' ), 
                 formatter: bind( this, this.formatRevisionDate ), 
                 sortable: true 
             },
             { 
                 key: 'assetSize', 
-                label: window.admin.i18n.get('Asset','size' ), 
+                label: admin.i18n.get('Asset','size' ), 
                 formatter: bind( this, this.formatAssetSize ),
                 sortable: true 
             },
@@ -1494,7 +1507,7 @@ WebGUI.Admin.AssetTable.prototype.addMenuOpenHandler
 = function ( elem, assetId, helpers ) {
     var self = this;
     YAHOO.util.Event.addListener( elem, "click", function(){
-        self.showHelperMenu( elem, assetId, helpers );
+        self.admin.showHelperMenu( elem, assetId, helpers );
     } );
 };
 
@@ -2205,14 +2218,14 @@ WebGUI.Admin.Tree.prototype.onDataReturnInitializeTable
     elItem.className    = "clickable";
     var self = this;
     var crumbMenu = function () {
-        self.showHelperMenu( elItem, currentAssetId, currentHelpers );
+        self.admin.showHelperMenu( elItem, currentAssetId, currentHelpers );
     };
     YAHOO.util.Event.addListener( elItem, "click", crumbMenu, this, true );
     elItem.appendChild( document.createTextNode( oResponse.meta.currentAsset.title ) );
     elCrumb.appendChild( elItem );
 
     // TODO: Update current asset
-    window.admin.navigate( oResponse.meta.currentAsset.assetId );
+    window.admin.navigate( currentAssetId );
 
     // TODO Hide loading screen
 };
@@ -2420,7 +2433,7 @@ WebGUI.Admin.Search
     newForm.style.display = "block";
 
     var newTab = new YAHOO.widget.Tab({
-        label : "Search",
+        label : window.admin.i18n.get('WebGUI','364'),
         content : ''
     });
     this.tab = newTab;
@@ -2500,7 +2513,7 @@ WebGUI.Admin.Search.prototype.addFilter
 
     var type        = menuitem.value;
     filter.type     = type;
-    li.className    = "filter_" + filter.type;
+    li.mlassName    = "filter_" + filter.type;
 
     var ul = this.searchFiltersContainer;
     ul.appendChild( li );
@@ -2637,7 +2650,7 @@ WebGUI.Admin.Search.prototype.addFilter
         filter.button   = new YAHOO.widget.Button( {
             name        : "className",
             type        : "menu",
-            label       : "Choose...",
+            label       : window.admin.i18n.get('WebGUI','Choose...'),
             container   : li,
             menu        : filter.menu
         } );

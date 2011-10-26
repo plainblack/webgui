@@ -33,7 +33,10 @@ $templateMock->mock_id($templateId);
 my $templateVars;
 $templateMock->mock('process', sub { $templateVars = $_[1]; } );
 
+my $tag = WebGUI::VersionTag->getWorking($session);
 my $thingy = $node->addChild({className=>'WebGUI::Asset::Wobject::Thingy'});
+$tag->commit;
+$thingy = $thingy->cloneFromDb;
 
 # Test for a sane object type
 isa_ok($thingy, 'WebGUI::Asset::Wobject::Thingy');
@@ -522,9 +525,12 @@ cmp_deeply( $field, superhashof( \%fieldInfo ), 'field info saved' );
 #----------------------------------------------------------------------------
 # www_importForm
 
+my $tag2 = WebGUI::VersionTag->getWorking($session);
 my $thingy = WebGUI::Test->asset(
     className => 'WebGUI::Asset::Wobject::Thingy',
 );
+$tag2->commit;
+$thingy = $thingy->cloneFromDb;
 my $thingId = $thingy->addThing();
 my @fieldIds = (
     $thingy->addField({

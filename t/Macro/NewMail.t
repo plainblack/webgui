@@ -25,7 +25,7 @@ plan tests => $numTests;
 
 my $inboxUser = WebGUI::User->create($session);
 $session->user({userId => $inboxUser->getId});
-addToCleanup($inboxUser);
+WebGUI::Test->addToCleanup($inboxUser);
 
 my $inbox = WebGUI::Inbox->new($session);
 
