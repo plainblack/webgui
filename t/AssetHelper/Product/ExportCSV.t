@@ -36,6 +36,7 @@ my $session         = WebGUI::Test->session;
 
 my $root  = WebGUI::Test->asset;
 my $class = 'WebGUI::Asset::Wobject::Shelf';
+my $tag = WebGUI::VersionTag->getWorking($session);
 my $shelf = $root->addChild({className => $class});
 
 my $soda = [
@@ -78,6 +79,8 @@ $shelf->addChild({
         title           => 'Shirts',
         sku             => 't-shirt',
     });
+
+$tag->commit;
 my $helper  = WebGUI::AssetHelper::Product::ExportCSV->new( 
     id => 'exportProducts',
     session => $session,

@@ -73,13 +73,6 @@ sub duplicate {
     $process->update(sub { $tree->json });
     my $newAsset = $asset->duplicate;
 
-    # If we aren't committing, add to a tag
-    if ( !$args->{commit} ) {
-        $newAsset->update({
-            status      => "pending",
-            tagId       => WebGUI::VersionTag->getWorking( $session )->getId,
-        });
-    }
     $newAsset->update({ title => $newAsset->getTitle . ' (Duplicate)'});
 
     $tree->success($asset->getId);

@@ -53,8 +53,6 @@ my $properties = {
 	title => 'File Asset Test',
 	className => 'WebGUI::Asset::File',
 	url => 'file-asset-test',
-        tagId => $versionTag->getId,
-        status => "pending",
 };
 my $defaultAsset = WebGUI::Asset->getDefault($session);
 my $asset = $defaultAsset->addChild($properties, $properties->{id});

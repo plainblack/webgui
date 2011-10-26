@@ -606,7 +606,7 @@ sub sendRequestToMaster {
     };
     return 1 unless $@;
     undef $pipe;
-    $self->session->log->error('Problems talking to master daemon process.  Please restart the web server.');
+    $self->session->log->error("Problems talking to master daemon process: $@.  Please restart the web server.");
     return 0;
 }
 

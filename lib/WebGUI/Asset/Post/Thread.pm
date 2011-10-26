@@ -45,7 +45,7 @@ property lastPostId => (
 property lastPostDate => (
                 noFormPost  => 1,
                 fieldType   => "dateTime",
-                default     => undef,
+                default     => 0,
          );
 property karma => (
                 noFormPost  => 1,

@@ -29,7 +29,10 @@ WebGUI::Test->addToCleanup($user);
 my $import_node = WebGUI::Test->asset;
 
 # Create a Survey
+my $tag = WebGUI::VersionTag->getWorking($session);
 $survey = $import_node->addChild( { className => 'WebGUI::Asset::Wobject::Survey', } );
+$tag->commit;
+$survey = $survey->cloneFromDb;
 isa_ok($survey, 'WebGUI::Asset::Wobject::Survey');
 
 my $sJSON = $survey->getSurveyJSON;

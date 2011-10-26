@@ -344,7 +344,7 @@ sub disqualifyAsLastPost {
             $thread->update({ lastPostId => $secondary_post->getId, lastPostDate => $secondary_post->get('creationDate'), });
         }
         else {
-            $thread->update({ lastPostId => '', lastPostDate => '', });
+            $thread->update({ lastPostId => '', lastPostDate => 0 });
         }
     }
     my $cs = $thread->getParent;
@@ -359,7 +359,7 @@ sub disqualifyAsLastPost {
             $cs->update({ lastPostId => $secondary_post->getId, lastPostDate => $secondary_post->get('creationDate'), });
         }
         else {
-            $cs->update({ lastPostId => '', lastPostDate => '', });
+            $cs->update({ lastPostId => '', lastPostDate => 0 });
         }
     }
 }

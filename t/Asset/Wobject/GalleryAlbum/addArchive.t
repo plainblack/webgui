@@ -23,7 +23,6 @@ use Test::Deep;
 my $session         = WebGUI::Test->session;
 my $node            = WebGUI::Asset->getImportNode($session);
 my $versionTag      = WebGUI::VersionTag->getWorking($session);
-my %tag = ( tagId => $versionTag->getId, status => "pending" );
 $versionTag->set({name=>"Add Archive to Album Test"});
 WebGUI::Test->addToCleanup($versionTag);
 
@@ -35,14 +34,12 @@ my $gallery
         groupIdView         => 7,   # Everyone
         groupIdEdit         => 3,   # Admins
         ownerUserId         => 3,   # Admin
-        %tag,
     });
 
 my $album
     = $gallery->addChild({
         className           => "WebGUI::Asset::Wobject::GalleryAlbum",
         ownerUserId         => "3", # Admin
-        %tag,
     });
 
 $versionTag->commit;
@@ -63,8 +60,6 @@ my $properties  = {
     keywords        => "something",
     location        => "somewhere",
     friendsOnly     => "1",
-    tagId           => $versionTag->getId,
-    status          => "pending",
 };
 
 $album->addArchive( WebGUI::Test->getTestCollateralPath('elephant_images.zip'), $properties );
@@ -128,7 +123,6 @@ $versionTag->rollback;
 # it's machine dependent.
 
 $versionTag = WebGUI::VersionTag->getWorking($session);
-$properties->{tagId} = $versionTag->getId;
 # Add photos sorted by file order (default)
 $album->addArchive( WebGUI::Test->getTestCollateralPath('gallery_archive_sorting_test.zip'), $properties, 'fileOrder' );
 # Get all children
@@ -143,7 +137,6 @@ cmp_deeply(
 $versionTag->rollback;
 
 $versionTag = WebGUI::VersionTag->getWorking($session);
-$properties->{tagId} = $versionTag->getId;
 # Add photos sorted by date
 $album->addArchive( WebGUI::Test->getTestCollateralPath('gallery_archive_sorting_test.zip'), $properties, 'date' );
 # Get all children
@@ -158,7 +151,6 @@ cmp_deeply(
 $versionTag->rollback;
 
 $versionTag = WebGUI::VersionTag->getWorking($session);
-$properties->{tagId} = $versionTag->getId;
 # Add photos sorted by name
 $album->addArchive( WebGUI::Test->getTestCollateralPath('gallery_archive_sorting_test.zip'), $properties, 'name' );
 # Get all children

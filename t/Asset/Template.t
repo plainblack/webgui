@@ -24,7 +24,6 @@ use JSON qw{ from_json };
 my $session = WebGUI::Test->session;
 my $tag = WebGUI::VersionTag->getWorking($session);
 WebGUI::Test->addToCleanup( $tag );
-my %tag = ( tagId => $tag->getId, status => "pending" );
 my $default = $session->config->get('defaultTemplateParser');
 my $ht      = 'WebGUI::Asset::Template::HTMLTemplate';
 
@@ -43,12 +42,12 @@ ok($output =~ m/true/, "processRaw() - conditionals");
 ok($output =~ m/\s(?:XY){5}\s/, "processRaw() - loops");
 
 my $importNode = WebGUI::Test->asset;
-my $template = $importNode->addChild({className=>"WebGUI::Asset::Template", title=>"test", url=>"testingtemplates", template=>$tmplText, namespace=>'WebGUI Test Template', %tag});
+my $template = $importNode->addChild({className=>"WebGUI::Asset::Template", title=>"test", url=>"testingtemplates", template=>$tmplText, namespace=>'WebGUI Test Template', });
 
 my $template = $importNode->addChild({className=>"WebGUI::Asset::Template"});
 is($template->get('parser'), $default, "default parser is $default");
 
-$template = $importNode->addChild({className=>"WebGUI::Asset::Template", title=>"test", url=>"testingtemplates", template=>$tmplText, namespace=>'WebGUI Test Template',parser=>$ht, %tag});
+$template = $importNode->addChild({className=>"WebGUI::Asset::Template", title=>"test", url=>"testingtemplates", template=>$tmplText, namespace=>'WebGUI Test Template',parser=>$ht, });
 isa_ok($template, 'WebGUI::Asset::Template', "creating a template");
 
 
@@ -68,7 +67,6 @@ my $style   = $importNode->addChild({
     namespace   => 'style',
     template    => '<IGOTSTYLE><tmpl_var body.content></IGOTSTYLE>',
     parser      => 'WebGUI::Asset::Template::HTMLTemplate',
-    %tag,
 });
 $template->style( $style->getId );
 $output = $template->process({});
@@ -82,7 +80,6 @@ $template = WebGUI::Test->asset(
     template    => '<tmpl_var NAME_header>',
     namespace   => 'WebGUI Test Template',
     parser      => $ht,
-    %tag,
 );
 my $form = WebGUI::FormBuilder->new( $session );
 $template->addForm( NAME => $form );
@@ -162,7 +159,6 @@ my $template3 = $importNode->addChild({
     title     => 'headBlock test',
     template  => "this is a template",
     parser    => $ht,
-    %tag,
 }, undef, time()-5);
 
 my @atts = (
@@ -195,7 +191,7 @@ cmp_bag(
     'attachments are duplicated'
 ) or diag( Dumper \@atts3dup );
 
-my $template3rev = $template3->addRevision({%tag});
+my $template3rev = $template3->addRevision({});
 my $att4 = $template3rev->getAttachments('headScript');
 is($att4->[0]->{url}, 'foo', 'rev has foo');
 is($att4->[1]->{url}, 'bar', 'rev has bar');
@@ -254,7 +250,6 @@ my $trashTemplate = $importNode->addChild({
     title     => 'Trash template',
     template  => q|Trash Trash Trash Trash|,
     parser    => $ht,
-    %tag
 });
 
 $trashTemplate->trash;
@@ -280,7 +275,6 @@ my $brokenTemplate = $importNode->addChild({
     title     => 'Broken template',
     template  => q|<tmpl_if unclosedIf>If clause with no ending tag|,
     parser    => $ht,
-    %tag
 });
 
 WebGUI::Test->interceptLogging( sub {
@@ -302,7 +296,6 @@ my $userStyleTemplate = $importNode->addChild({
     template  => "user function style",
     namespace => 'WebGUI Test Template',
     parser    => $ht,
-    %tag
 });
 
 my $someOtherTemplate = $importNode->addChild({
@@ -312,7 +305,6 @@ my $someOtherTemplate = $importNode->addChild({
     template  => "some other template",
     namespace => 'WebGUI Test Template',
     parser    => $ht,
-    %tag
 });
 
 $session->setting->set('userFunctionStyleId', $userStyleTemplate->getId);

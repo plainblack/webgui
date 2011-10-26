@@ -48,9 +48,11 @@ cmp_deeply(
 $session->setting->set( versionTagMode => 'autoCommit' );
 $session->setting->set( skipCommitComments => '1' );
 $session->user({userId => 3});
+my $tag = WebGUI::VersionTag->getWorking($session);
 my $safe_page = WebGUI::Test->asset;
 my $helper = WebGUI::AssetHelper::CreateShortcut->new( id => 'shortcut', session => $session, asset => $safe_page );
 $output = $helper->process;
+$tag->commit;
 cmp_deeply(
     $output, 
     {

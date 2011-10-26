@@ -123,7 +123,6 @@ sub addSubmission {
     $newParams->{submissionId} = $self->ems->getNextSubmissionId;
     my $newAsset = $self->addChild($newParams);
     WebGUI::VersionTag->autoCommitWorkingIfEnabled($self->session, { override => 1, allowComments => 0 });
-    $self = $self->cloneFromDb;
     return $newAsset;
 }
 

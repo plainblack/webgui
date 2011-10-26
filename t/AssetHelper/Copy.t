@@ -22,8 +22,6 @@ use WebGUI::Asset;
 use WebGUI::AssetHelper::Copy;
 use WebGUI::Test::Mechanize;
 
-$SIG{HUP} = sub { use Carp; confess "hup"; };
-
 #----------------------------------------------------------------------------
 # Init
 my $session         = WebGUI::Test->session;
@@ -56,6 +54,7 @@ my $root = WebGUI::Asset->getRoot($session);
 
     WebGUI::Test->addToCleanup( 'WebGUI::Fork' => $output->{forkId} );
 }
+
 
 ok(WebGUI::Test->waitForAllForks(10), "Forks finished");
 

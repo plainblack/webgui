@@ -15,6 +15,7 @@ use strict;
 use WebGUI::Test;
 use WebGUI::Session;
 use Test::More; 
+use WebGUI::VersionTag;
 
 #----------------------------------------------------------------------------
 # Init
@@ -22,6 +23,7 @@ my $session    = WebGUI::Test->session;
 my $node       = WebGUI::Asset->getImportNode($session);
 
 # Create gallery and a single album
+my $tag = WebGUI::VersionTag->getWorking($session);
 my $gallery
     = WebGUI::Test->asset(
         className           => "WebGUI::Asset::Wobject::Gallery",
@@ -41,15 +43,15 @@ for (my $i = 0; $i < 5; $i++)
             className           => "WebGUI::Asset::File::GalleryFile::Photo",
         });
 }
+$tag->commit;
+WebGUI::Test->addToCleanup($tag);
+
+foreach my $asset ($gallery, $album, @photo) {
+    $asset = $asset->cloneFromDb;
+}
 
 #----------------------------------------------------------------------------
 # Tests
-plan tests => 11;
-
-#----------------------------------------------------------------------------
-# Test module compiles okay
-# plan tests => 1
-use_ok("WebGUI::Asset::File::GalleryFile::Photo");
 
 #----------------------------------------------------------------------------
 # Test getFirstFile method
@@ -81,3 +83,4 @@ is( $photo[2]->getNextFile->getId, $photo[3]->getId, 'Photo next of photo no. 3 
 is( $photo[3]->getNextFile->getId, $photo[4]->getId, 'Photo next of photo no. 4 is photo no. 5' );
 is( $photo[4]->getNextFile, undef, 'Photo next of photo no. 5 is undef' );
 
+done_testing;

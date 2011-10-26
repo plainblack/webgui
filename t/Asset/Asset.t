@@ -141,26 +141,6 @@ $canViewMaker->prepare(
     },
 );
 
-#### TestAsset class to test definition / update relationship
-BEGIN { $INC{ 'WebGUI/Asset/TestAsset.pm' } = __FILE__ }
-package WebGUI::Asset::TestAsset;
-
-our @ISA = ( 'WebGUI::Asset' );
-sub definition {
-    my ( $class, $session, $definition ) = @_;
-
-    # Alter assetData fields for testing purposes. Do not do 
-    # this in normal circumstances. Ever.
-    $definition = $class->SUPER::definition( $session, $definition );
-
-    # Make synopsis serialized
-    $definition->[0]->{properties}->{synopsis}->{serialize} = 1;
-
-    return $definition;
-}
-
-package main;
-
 note "loadModule";
 {
     my $className = eval { WebGUI::Asset->loadModule('Moose::Asset'); };
@@ -613,8 +593,10 @@ my $node = WebGUI::Asset->getRoot($session);
 my $product1 = $node->addChild({ className => 'WebGUI::Asset::Sku::Product'}, undef, undef, { skipAutoCommitWorkflows => 1});
 my $product2 = $node->addChild({ className => 'WebGUI::Asset::Sku::Product'}, undef, undef, { skipAutoCommitWorkflows => 1});
 my $product3 = $node->addChild({ className => 'WebGUI::Asset::Sku::Product'}, undef, undef, { skipAutoCommitWorkflows => 1});
-WebGUI::Test->addToCleanup($product1, $product2, $product3);
-my $product4 = $node->addChild({ className => 'WebGUI::Asset::Sku::Product', status => "pending"}, undef, undef, { skipAutoCommitWorkflows => 1});
+my $ptag = WebGUI::VersionTag->getWorking($session);
+$ptag->commit;
+WebGUI::Test->addToCleanup($product1, $product2, $product3, $ptag);
+my $product4 = $node->addChild({ className => 'WebGUI::Asset::Sku::Product'}, undef, undef, { skipAutoCommitWorkflows => 1});
 WebGUI::Test->addToCleanup($product4);
 
 my $getAProduct = WebGUI::Asset::Sku::Product->getIsa($session);
@@ -738,8 +720,6 @@ my $cloneTag = WebGUI::VersionTag->getWorking($session);
 my $assetToCommit = $defaultAsset->addChild({ 
     className => 'WebGUI::Asset::Snippet', 
     title => 'Snippet to commit and clone from db', 
-    status  => "pending",
-    tagId   => $cloneTag->getId,
 });
 WebGUI::Test->addToCleanup($cloneTag);
 $cloneTag->commit;

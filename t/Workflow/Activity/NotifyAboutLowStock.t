@@ -32,6 +32,8 @@ my $inbox = WebGUI::Inbox->new($session);
 
 my $import = WebGUI::Test->asset;
 
+my $tag = WebGUI::VersionTag->getWorking($session);
+
 my $posters = $import->addChild({
     className => 'WebGUI::Asset::Sku::Product',
     url       => 'cell_posters',
@@ -67,6 +69,9 @@ my $marilynVarId = $posters->setCollateral('variantsJSON', 'variantId', 'new',
         quantity  => 10,
     },
 );
+
+$tag->commit;
+WebGUI::Test->addToCleanup($tag);
 
 my $workflow  = WebGUI::Workflow->create($session,
     {
@@ -150,6 +155,7 @@ WebGUI::Test->addToCleanup(sub {
     $session->db->write("delete from Product    where assetId=?",[$otherPosters->getId]);
     $session->db->write("delete from assetIndex where assetId=?",[$otherPosters->getId]);
 });
+my $otherTag     = WebGUI::VersionTag->getWorking($session);
 my $movie_posters = $import->addChild({
     className => 'WebGUI::Asset::Sku::Product',
     url       => 'movie_posters',
@@ -165,7 +171,6 @@ my $movieVarId = $movie_posters->setCollateral('variantsJSON', 'variantId', 'new
         quantity  => 5,
     },
 );
-my $otherTag     = WebGUI::VersionTag->getWorking($session);
 WebGUI::Test->addToCleanup($otherTag);
 $otherTag->commit;
 

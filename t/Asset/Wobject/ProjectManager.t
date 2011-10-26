@@ -26,10 +26,13 @@ use WebGUI::Session;
 # Init
 my $session         = WebGUI::Test->session;
 
+my $tag = WebGUI::VersionTag->getWorking($session);
 my $pm  = WebGUI::Test->asset(
     className   => 'WebGUI::Asset::Wobject::ProjectManager',
     groupToAdd => 3,
 );
+$tag->commit;
+$pm = $pm->cloneFromDb;
 
 #----------------------------------------------------------------------------
 # Tests

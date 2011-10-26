@@ -26,7 +26,6 @@ my $session         = WebGUI::Test->session;
 my $node            = WebGUI::Asset->getImportNode($session);
 my $versionTag      = WebGUI::VersionTag->getWorking($session);
 WebGUI::Test->addToCleanup($versionTag);
-my %tag = ( tagId => $versionTag->getId, status => "pending" );
 $versionTag->set({name=>"Album Test"});
 my $gallery
     = $node->addChild({
@@ -36,13 +35,11 @@ my $gallery
         groupIdView         => 2,   # Registered Users
         groupIdEdit         => 3,   # Admins
         ownerUserId         => 3,   # Admin
-        %tag,
     });
 my $album
     = $gallery->addChild({
         className           => "WebGUI::Asset::Wobject::GalleryAlbum",
         ownerUserId         => "3", # Admin
-        %tag,
     });
 my @photos;
 for my $i ( 0 .. 5 ) {
@@ -50,7 +47,6 @@ for my $i ( 0 .. 5 ) {
         = $album->addChild({
             className           => "WebGUI::Asset::File::GalleryFile::Photo",
             filename            => "$i.jpg",
-            %tag,
         });
 }
 

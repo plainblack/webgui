@@ -98,11 +98,14 @@ property seatsAvailable => (
 property startDate => (
     noFormPost   => 1,
     fieldType    => "dateTime",
-    default      => '',
+    builder      => '_default_startDate',
     label        => [ "add/edit event start date", 'Asset_EMSSubmission' ],
     hoverHelp    => [ "add/edit event start date help", 'Asset_EMSSubmission' ],
     autoGenerate => 0,
 );
+sub _default_startDate {
+    return WebGUI::DateTime->new()->toMysql;
+}
 property duration => (
     tab       => "properties",
     fieldType => "float",

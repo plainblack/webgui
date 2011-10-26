@@ -23,7 +23,6 @@ my $session = WebGUI::Test->session;
 my $node = WebGUI::Asset->getImportNode($session);
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Wiki Test"});
-my %tag = ( tagId => $versionTag->getId, status => "pending" );
 WebGUI::Test->addToCleanup($versionTag);
 
 my $assetEdit    = WebGUI::Group->new($session, "new");
@@ -48,7 +47,6 @@ my $wiki = $node->addChild({
     groupToAdminister => $wikiAdmin->getId,
     groupToEditPages  => $wikiEditPage->getId,
     ownerUserId       => $wikiOwner->getId,
-    %tag,
 }, undef, undef, {skipAutoCommitWorkflows => 1, skipNotification => 1});
 $versionTag->commit;
 my $wikipage = $wiki->addChild({

@@ -281,15 +281,6 @@ processPropertiesFromFormPost
 -----------------------------
 Absurdly long and non-descriptive name, changed to processEditForm
 
-Versioning
-----------
-New revisions are not created in a "pending" state automatically. VersionTags
-are not created by calling addRevision(). If you want a revision to be part of
-a version tag, you must set 
-    status => "pending", 
-    tagId => $tag->getId,
-explicitly.
-
 Admin Controls
 --------------------
 The admin controls are now added to the asset with javascript. This javascript

@@ -45,21 +45,6 @@ my $node = WebGUI::Test->asset;
 # Create a version tag to work in
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"EventManagementSystem Test"});
-my %tag = ( tagId   => $versionTag->getId, status => "pending" );
-
-#----------------------------------------------------------------------------
-# Tests
-
-plan tests => 70;        # Increment this number for each test you create
-
-#----------------------------------------------------------------------------
-
-# check base module and all related
-use_ok('WebGUI::Asset::Wobject::EventManagementSystem');
-use_ok('WebGUI::Asset::Sku::EMSBadge');
-use_ok('WebGUI::Asset::Sku::EMSTicket');
-use_ok('WebGUI::Asset::Sku::EMSRibbon');
-use_ok('WebGUI::Asset::Sku::EMSToken');
 
 # Add an EMS asset
 my $ems = $node->addChild({
@@ -70,10 +55,10 @@ my $ems = $node->addChild({
     workflowIdCommit         => 'pbworkflow000000000003', # Commit Content Immediately
     registrationStaffGroupId => $registrars->getId,
     groupIdView              => $attendees->getId,
-    %tag
 });
 $versionTag->commit;
 WebGUI::Test->addToCleanup($versionTag);
+$ems = $ems->cloneFromDb;
 
 # Test for a sane object type
 isa_ok($ems, 'WebGUI::Asset::Wobject::EventManagementSystem');
@@ -634,10 +619,13 @@ cmp_deeply( JSON::from_json($data), {
 
 #----------------------------------------------------------------------------
 # www_editBadgeGroup
+my $ems_tag = WebGUI::VersionTag->getWorking($session);
 $ems = WebGUI::Test->asset(
     className   => 'WebGUI::Asset::Wobject::EventManagementSystem',
     groupIdEdit => '3',
 );
+$ems_tag->commit;
+$ems = $ems->cloneFromDb;
 
 my $mech = WebGUI::Test::Mechanize->new( config => WebGUI::Test->file );
 $mech->get_ok('/');
@@ -801,10 +789,13 @@ $mech->get_ok('/');
 $mech->session->user({ userId => 3 });
 
 # Need a badge
+my $badger_tag = WebGUI::VersionTag->getWorking($session);
 my $badger = $ems->addChild({
         className => 'WebGUI::Asset::Sku::EMSBadge',
         title => 'Badgers',
     });
+$badger_tag->commit;
+$badger = $badger->cloneFromDb;
 # Add cart and complete checkout
 my $regBadgeId 
     = $session->db->setRow( 'EMSRegistrant', 'badgeId', {
@@ -838,3 +829,4 @@ cmp_deeply(
     "Registrant info saved correctly",
 );
 
+done_testing;

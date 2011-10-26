@@ -40,8 +40,6 @@ my $folder = $root->addChild({
     menuTitle => 'folderMenuTitle',
     className => 'WebGUI::Asset::Wobject::Folder',
     isPackage => 1,
-    tagId   => $versionTag->getId,
-    status  => "pending",
 }, undef, $time);
 
 my $targetFolder = $root->addChild({
@@ -49,8 +47,6 @@ my $targetFolder = $root->addChild({
     title => 'Target Folder',
     menuTitle => 'Target folderMenuTitle',
     className => 'WebGUI::Asset::Wobject::Folder',
-    tagId   => $versionTag->getId,
-    status  => "pending",
 });
 
 my $subSnippet = $folder->addChild({
@@ -59,8 +55,6 @@ my $subSnippet = $folder->addChild({
     menuTitle => 'snippetMenuTitle',
     className => 'WebGUI::Asset::Snippet',
     snippet   => 'A snippet of text',
-    tagId   => $versionTag->getId,
-    status  => "pending",
 }, undef, $time);
 
 my $snippet = $root->addChild({
@@ -69,8 +63,6 @@ my $snippet = $root->addChild({
     className => 'WebGUI::Asset::Snippet',
     snippet   => 'Always upgrade to the latest version',
     isPackage => 1,
-    tagId   => $versionTag->getId,
-    status  => "pending",
 }, undef, $time);
 
 my $packageAssetId = $folder->getId;
@@ -90,8 +82,6 @@ isa_ok($storage, 'WebGUI::Storage', 'exportPackage returns a WebGUI::Storage obj
 my $vt2 = WebGUI::VersionTag->getWorking($session);
 my $snippetRev = $snippet->addRevision({ 
     snippet => 'Only upgrade existing data if revisionDate is newer',
-    tagId   => $vt2->getId,
-    status  => "pending",
 });
 is($snippetRev->get('snippet'), 'Only upgrade existing data if revisionDate is newer', 'importPackage, overwriteLatest: precondition check, content');
 cmp_ok( $snippetRev->get('revisionDate'), '>', $snippet->get('revisionDate'), '... precondition check, revisionDate');
@@ -117,7 +107,7 @@ isa_ok($deployedFolderChildren->[0] , 'WebGUI::Asset::Snippet', 'deployed child 
 ##Unset isPackage in this versionTag for the next tests
 my $newVersionTag = WebGUI::VersionTag->getWorking($session);
 WebGUI::Test->addToCleanup($newVersionTag);
-$folder->addRevision({isPackage => 0, tagId => $newVersionTag->getId, status => "pending", });
+$folder->addRevision({isPackage => 0, });
 $newVersionTag->commit;
 
 my $newFolder = WebGUI::Asset->newById($session, $folder->getId);
@@ -148,8 +138,6 @@ WebGUI::Test->addToCleanup($lastTag);
             className => 'WebGUI::Asset::Snippet',
             snippet   => 'This is a test asset',
             isPackage => 1,
-            tagId   => $flagTag->getId,
-            status  => "pending",
         }
     );
     my $storage = $snippet->exportPackage;

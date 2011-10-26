@@ -20,6 +20,8 @@ use Data::Dumper;
 my $session = WebGUI::Test->session;
 my $temp    = WebGUI::Test->asset;
 
+my $tag = WebGUI::VersionTag->getWorking($session);
+
 my $calendar = $temp->addChild(
     {   className => 'WebGUI::Asset::Wobject::Calendar' }
 );
@@ -74,6 +76,9 @@ $clipped_event->setRecurrence(
         dayNumber => $eventStartDate->day,
     }
 );
+
+$tag->commit;
+WebGUI::Test->addToCleanup($tag);
 
 my $workflow = WebGUI::Workflow->create(
     $session, {

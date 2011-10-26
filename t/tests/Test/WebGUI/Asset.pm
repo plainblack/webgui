@@ -110,8 +110,6 @@ sub getAnchoredAsset {
     my @parents = $test->getMyParents;
     my $asset   = $parents[-1]->addChild({
         className => $test->class,
-        status  => "pending",
-        tagId   => $tag->getId,
         $test->constructorExtras($session),
     }, undef, (time-10), {skipNotification => 1});
     # warn "XXX getAnchoredAsset:  created new asset of Id: " . $asset->getId . ' of type: ' . ref $asset;
@@ -146,8 +144,6 @@ sub getMyParents {
             {   
                 className => $parent_class, 
                 $test->constructorExtras($session), 
-                status  => 'pending',
-                tagId   => $tag->getId,
             }, 
             undef, 
             (time-10), 

@@ -28,6 +28,7 @@ use WebGUI::Session;
 my $session         = WebGUI::Test->session;
 
 # Create a DataForm
+my $tag = WebGUI::VersionTag->getWorking($session);
 my $df  = WebGUI::Test->asset
         ->addChild( {
             className           => "WebGUI::Asset::Wobject::DataForm",
@@ -40,6 +41,9 @@ my $dform = WebGUI::Test->asset->addChild({
     mailData            => 0,
 }, undef, time-5);
 $dform->createField('gotCaptcha', { type => 'Captcha', name => 'humanCheck', });
+$tag->commit;
+$df = $df->cloneFromDb;
+$dform = $dform->cloneFromDb;
 
 #----------------------------------------------------------------------------
 # Tests

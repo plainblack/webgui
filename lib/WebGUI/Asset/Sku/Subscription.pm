@@ -620,13 +620,13 @@ sub www_createSubscriptionCodeBatch {
         name       => 'name',
         label      => $i18n->get('batch name'),
         hoverHelp  => $i18n->get('batch name description'),
-        value      => $session->form->process('name'),
+        value      => $session->form->process('name') || '',
         );
 	$f->addField( "textarea",
 		name	    => 'description',
 		label	    => $i18n->get('batch description'),
 		hoverHelp	=> $i18n->get('batch description description'),
-		value	    => $session->form->process("description"),
+		value	    => $session->form->process("description") || '',
 		);
 	$f->addField( "submit", name => "send" );
 

@@ -121,7 +121,6 @@ my $endDt       = $startDt->clone->add(days => 2);
 my $windowEnd   = $endDt->clone->subtract(seconds => 1);
 
 my $tag2 = WebGUI::VersionTag->getWorking($session);
-my %tag = ( tagId => $tag2->getId, status => "pending" );
 
 my $inside = $windowCal->addChild({
     className   => 'WebGUI::Asset::Event',
@@ -129,7 +128,6 @@ my $inside = $windowCal->addChild({
     startDate   => $bday->toDatabaseDate,
     endDate     => $bday->toDatabaseDate,
     timeZone    => $tz,
-    %tag,
 },);
 
 my $insidewt = $windowCal->addChild({
@@ -140,7 +138,6 @@ my $insidewt = $windowCal->addChild({
     startTime   => $bday->toDatabaseTime,
     endTime     => $bday->clone->add(hours => 1)->toDatabaseTime,
     timeZone    => $tz,
-    %tag,
 },);
 
 my $outsideHigh = $windowCal->addChild({
@@ -149,7 +146,6 @@ my $outsideHigh = $windowCal->addChild({
     startDate   => $endDt->clone->add(days => 2)->toDatabaseDate,
     endDate     => $endDt->clone->add(days => 3)->toDatabaseDate,
     timeZone    => $tz,
-    %tag,
 },);
 
 my $outsideLow = $windowCal->addChild({
@@ -158,7 +154,6 @@ my $outsideLow = $windowCal->addChild({
     startDate   => $startDt->clone->subtract(days => 3)->toDatabaseDate,
     endDate     => $startDt->clone->subtract(days => 2)->toDatabaseDate,
     timeZone    => $tz,
-    %tag,
 },);
 
 my $straddle = $windowCal->addChild({
@@ -167,7 +162,6 @@ my $straddle = $windowCal->addChild({
     startDate   => $startDt->clone->subtract(days => 1)->toDatabaseDate,
     endDate     => $endDt->clone->add(days => 1)->toDatabaseDate,
     timeZone    => $tz,
-    %tag,
 },);
 
 my $straddlewt = $windowCal->addChild({
@@ -178,7 +172,6 @@ my $straddlewt = $windowCal->addChild({
     startTime   => $startDt->clone->subtract(hours => 12)->toDatabaseTime,
     endTime     => $endDt->clone->add(hours => 12)->toDatabaseTime,
     timeZone    => $tz,
-    %tag,
 },);
 
 my $straddleLowwt = $windowCal->addChild({
@@ -189,7 +182,6 @@ my $straddleLowwt = $windowCal->addChild({
     startTime   => $startDt->clone->subtract(hours => 12)->toDatabaseTime,
     endTime     => $startDt->clone->add(hours => 12)->toDatabaseTime,
     timeZone    => $tz,
-    %tag,
 },);
 
 my $straddleHighwt = $windowCal->addChild({
@@ -200,7 +192,6 @@ my $straddleHighwt = $windowCal->addChild({
     startTime   => $endDt->clone->subtract(hours => 12)->toDatabaseTime,
     endTime     => $endDt->clone->add(hours => 12)->toDatabaseTime,
     timeZone    => $tz,
-    %tag,
 },);
 
 my $justBeforewt = $windowCal->addChild({
@@ -211,7 +202,6 @@ my $justBeforewt = $windowCal->addChild({
     startTime   => $startDt->clone->subtract(hours => 1)->toDatabaseTime,
     endTime     => $startDt->toDatabaseTime,
     timeZone    => $tz,
-    %tag,
 },);
 
 my $justAfterwt = $windowCal->addChild({
@@ -222,7 +212,6 @@ my $justAfterwt = $windowCal->addChild({
     startTime   => $endDt->toDatabaseTime,
     endTime     => $endDt->clone->add(hours => 1)->toDatabaseTime,
     timeZone    => $tz,
-    %tag,
 }, );
 
 my $justBefore = $windowCal->addChild({
@@ -231,7 +220,6 @@ my $justBefore = $windowCal->addChild({
     startDate   => $startDt->clone->add(days => -1)->toDatabaseDate,
     endDate     => $startDt->clone->add(days => -1)->toDatabaseDate,
     timeZone    => $tz,
-    %tag,
 },);
 
 my $justAfter = $windowCal->addChild({
@@ -240,7 +228,6 @@ my $justAfter = $windowCal->addChild({
     startDate   => $endDt->clone->add(days => 1)->toDatabaseDate,
     endDate     => $endDt->clone->add(days => 1)->toDatabaseDate,
     timeZone    => $tz,
-    %tag,
 },);
 
 my $starting = $windowCal->addChild({
@@ -249,7 +236,6 @@ my $starting = $windowCal->addChild({
     startDate   => $startDt->toDatabaseDate,
     endDate     => $startDt->toDatabaseDate,
     timeZone    => $tz,
-    %tag,
 }, );
 
 my $ending = $windowCal->addChild({
@@ -258,7 +244,6 @@ my $ending = $windowCal->addChild({
     startDate   => $endDt->clone->add(days => -1)->toDatabaseDate,
     endDate     => $endDt->clone->add(days => -1)->toDatabaseDate,
     timeZone    => $tz,
-    %tag,
 },);
 
 my $coincident = $windowCal->addChild({
@@ -267,7 +252,6 @@ my $coincident = $windowCal->addChild({
     startDate   => $startDt->toDatabaseDate,
     endDate     => $endDt->toDatabaseDate,
     timeZone    => $tz,
-    %tag,
 },);
 
 my $coincidentLow = $windowCal->addChild({
@@ -276,7 +260,6 @@ my $coincidentLow = $windowCal->addChild({
     startDate   => $startDt->toDatabaseDate,
     endDate     => $endDt->clone->add(days => 1)->toDatabaseDate,
     timeZone    => $tz,
-    %tag,
 },);
 
 my $coincidentHigh = $windowCal->addChild({
@@ -285,7 +268,6 @@ my $coincidentHigh = $windowCal->addChild({
     startDate   => $startDt->clone->add( days => -1, )->toDatabaseDate,
     endDate     => $endDt->toDatabaseDate,
     timeZone    => $tz,
-    %tag,
 },);
 
 #    no suffix = all day event

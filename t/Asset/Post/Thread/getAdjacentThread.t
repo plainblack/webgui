@@ -136,8 +136,6 @@ push @threads, $collab->addChild( {
         title           => "Abababa",
         isSticky        => 0,
         threadRating    => 1_000_000,
-        tagId           => $versionTags[-1]->getId,
-        status          => "pending",
     }, undef, 6, @addChildArgs
 );
 $sort = sub { $b->get('revisionDate') <=> $a->get('revisionDate') };

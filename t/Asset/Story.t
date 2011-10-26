@@ -54,6 +54,7 @@ $canEditMaker->prepare({
 
 
 my $defaultNode = WebGUI::Test->asset;
+my $tag = WebGUI::VersionTag->getWorking($session);
 my $archive     = $defaultNode->addChild({
     className   => 'WebGUI::Asset::Wobject::StoryArchive',
     title       => 'Test Archive',
@@ -70,6 +71,9 @@ my $topic       = $defaultNode->addChild({
     keywords  => 'tango,yankee',
 });
 
+$tag->commit;
+$archive = $archive->cloneFromDb;
+$topic   = $topic->cloneFromDb;
 my $storage1 = WebGUI::Storage->create($session);
 my $storage2 = WebGUI::Storage->create($session);
 WebGUI::Test->addToCleanup($storage1, $storage2);

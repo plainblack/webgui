@@ -28,7 +28,6 @@ my $session = WebGUI::Test->session;
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Collab setup"});
 WebGUI::Test->addToCleanup($versionTag);
-my %tag = ( tagId => $versionTag->getId, status => "pending" );
 
 # Need to create a Collaboration system in which the post lives.
 my @addArgs = ( undef, undef, { skipAutoCommitWorkflows => 1, skipNotification => 1 } );
@@ -37,18 +36,16 @@ my $notification_template = WebGUI::Test->asset(
     className => 'WebGUI::Asset::Template',
     template  => "<body>!!!url:<tmpl_var url>!!!content:<tmpl_var content>!!!</body>",
     parser    => 'WebGUI::Asset::Template::HTMLTemplate',
-    %tag,
 );
 
 my $collab = WebGUI::Test->asset(
     className => 'WebGUI::Asset::Wobject::Collaboration',
     notificationTemplateId => $notification_template->getId,
-    %tag,
 );
 
 # finally, add posts and threads to the collaboration system
 
-my $first_thread = $collab->addChild( { className   => 'WebGUI::Asset::Post::Thread', %tag },);
+my $first_thread = $collab->addChild( { className   => 'WebGUI::Asset::Post::Thread', }, @addArgs);
 $first_thread->setSkipNotification;
 
 ##Thread 1, Post 1 => t1p1
@@ -62,8 +59,8 @@ my $t1p1 = $first_thread->addChild(
         title       => $title,
         url         => lc $title,
         content     => $content,
-        %tag,
     },
+    @addArgs
 );
 $t1p1->setSkipNotification;
 

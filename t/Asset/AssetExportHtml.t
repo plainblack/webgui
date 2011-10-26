@@ -191,22 +191,16 @@ my $parent = $importNode->addChild({
     className => 'WebGUI::Asset::Wobject::Layout',
     styleTemplateId => 'PBtmpl0000000000000132',
     url => 'parent',
-    tagId   => $versionTag->getId,
-    status  => "pending",
 });
 my $firstChild = $parent->addChild({
     className => 'WebGUI::Asset::Wobject::Layout',
     styleTemplateId => 'PBtmpl0000000000000132',
     url => 'first_child',
-    tagId   => $versionTag->getId,
-    status  => "pending",
 });
 my $grandChild = $firstChild->addChild({
     className => 'WebGUI::Asset::Wobject::Article',
     styleTemplateId => 'PBtmpl0000000000000132',
     url => 'first_child/grand_child',
-    tagId   => $versionTag->getId,
-    status  => "pending",
 });
 $versionTag->commit;
 
@@ -337,8 +331,6 @@ my $asset = $importNode->addChild($properties, $properties->{id});
 $asset->update({
         storageId => $storage->getId,
         filename => $filename,
-        tagId   => $versionTag->getId,
-        status  => "pending",
 });
 
 my $fileAsPath = $asset->exportGetUrlAsPath('index.html');
@@ -358,8 +350,6 @@ $properties = {
     title       => 'Export Test',
     className   => 'WebGUI::Asset::File',
     url         => 'export-test.foobar',
-    tagId   => $versionTag->getId,
-    status  => "pending",
 };
 $asset = $importNode->addChild($properties, $properties->{id});
 $asset->update({

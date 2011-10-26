@@ -48,8 +48,6 @@ sub process {
     my $import = WebGUI::Asset->getImportNode( $session );
     my $tag = WebGUI::VersionTag->getWorking( $session );
     my $child = $import->addChild({
-        tagId       => $tag->getId,
-        status      => 'pending',
         className   => 'WebGUI::Asset::Shortcut',
         shortcutToAssetId => $asset->getId,
         title       => $asset->getTitle,

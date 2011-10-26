@@ -39,8 +39,6 @@ my $thingy = $node->addChild({
     className   => 'WebGUI::Asset::Wobject::Thingy',
     groupIdView => 7,
     url         => 'some_thing',
-    tagId       => $versionTag->getId,
-    status      => "pending",
 });
 is $session->db->quickScalar('select count(*) from assetIndex where assetId=?',[$thingy->getId]), 0, 'no records yet';
 $versionTag->commit;
@@ -268,7 +266,7 @@ is @{ $search->getAssetIds }, 3, 'setup for indexContent, start with 3 records..
 
 my $updateTag = WebGUI::VersionTag->getWorking($session);
 WebGUI::Test->addToCleanup($updateTag);
-$thingy = $thingy->addRevision({ url => 'wild_thing', tagId => $updateTag->getId, status => "pending" });
+$thingy = $thingy->addRevision({ url => 'wild_thing',});
 $updateTag->commit;
 $thingy = $thingy->cloneFromDb;
 

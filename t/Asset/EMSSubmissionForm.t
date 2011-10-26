@@ -86,7 +86,9 @@ my $ems = $node->addChild({
     groupIdView              => $attendees->getId,
     submittedLocationsList   => join( "\n", my @submissionLocations = qw'loc1 loc2' ),
 });
-WebGUI::Test->addToCleanup($ems);
+my $ems_tag = WebGUI::VersionTag->getWorking($session);
+$ems_tag->commit;
+WebGUI::Test->addToCleanup($ems, $ems_tag);
 # I scooped this out ot WG::Asset::Wobject::EventManagementSystem
 # its not pretty, but there is no other way to add a meta field
 my $mf1Id = $ems->setCollateral("EMSEventMetaField", "fieldId",{
@@ -197,7 +199,7 @@ my $submission = {
     title => 'my favorite thing to talk about',
     description => 'the description',
     startDate => '1255150800',
-        };
+};
 $session->request->setup_body($submission);
 my $sub1 = $frmA->addSubmission;
 WebGUI::Test->addToCleanup( $sub1 );
@@ -215,7 +217,7 @@ $submission = {
     title => 'why i like to be important',
     description => 'the description',
     mfRequiredUrl => 'http://google.com',
-        };
+};
 $session->request->setup_body($submission);
 my $sub2 = $frmB->addSubmission;
 WebGUI::Test->addToCleanup( $sub2 );
@@ -326,6 +328,8 @@ is($sub1->get('submissionStatus'),'approved','set status to approved');
 
 $sub2->update({ submissionStatus => 'denied' });
 is($sub2->get('submissionStatus'),'denied','set status to denied');
+diag $sub1->submissionStatus;
+diag $sub1->ticketId;
 
 SKIP: { skip "workflow activities not coded yet", 10 if 0;
 
@@ -341,13 +345,18 @@ is($approveSubmissions->run, 'complete', 'approval complete');
 is($approveSubmissions->run, 'done', 'approval done');
 
 $sub1 = $sub1->cloneFromDb;
+diag $sub1->submissionStatus;
+diag $sub1->ticketId;
+diag $sub1->getRevisionCount;
 is( $sub1->get('submissionStatus'),'created','approval successfull');
 
-my $ticket = WebGUI::Asset->newById($session, $sub1->get('ticketId'));
-WebGUI::Test->addToCleanup( $ticket ) if $ticket ;
+my $ticket = eval { WebGUI::Asset->newById($session, $sub1->get('ticketId')); };
+my $e = Exception::Class->caught();
 SKIP: {
-skip 'no ticket created', 1 unless isa_ok( $ticket, 'WebGUI::Asset::Sku::EMSTicket', 'approval created a ticket');
-is( $ticket->get('title'), $sub1->get('title'), 'Ticket title matches submission title' );
+    skip 'no ticket created', 2 if $e;
+    isa_ok( $ticket, 'WebGUI::Asset::Sku::EMSTicket', 'approval created a ticket');
+    WebGUI::Test->addToCleanup( $ticket ) if $ticket ;
+    is( $ticket->get('title'), $sub1->get('title'), 'Ticket title matches submission title' );
 }
  
 my $newDate = time - ( 60 * 60 * 24 * ( $sub2->getParent->get('daysBeforeCleanup') + 1 ) ),

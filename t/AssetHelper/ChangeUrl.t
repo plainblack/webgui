@@ -29,11 +29,14 @@ $SIG{HUP} = sub { use Carp; confess "hup"; };
 # Init
 my $session         = WebGUI::Test->session;
 
+my $tag = WebGUI::VersionTag->getWorking($session);
 my $asset           = WebGUI::Test->asset->addChild( {
     className       => 'WebGUI::Asset::Snippet',
     url             => 'example',
     groupIdEdit     => 3,       # Admins
 } );
+$tag->commit;
+$asset = $asset->cloneFromDb;
 
 #----------------------------------------------------------------------------
 # Check permissions

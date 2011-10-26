@@ -157,8 +157,7 @@ sub www_cropSave {
     return $session->privilege->locked()       unless $asset->canEditIfLocked;
 
     my $tag = WebGUI::VersionTag->getWorking( $session );
-    $asset = $asset->addRevision({ tagId => $tag->getId, status => "pending" });
-    $asset->setVersionLock;
+    $asset = $asset->addRevision();
     delete $asset->{_storageLocation};
     $asset->getStorageLocation->crop(
         $asset->filename,
@@ -171,7 +170,7 @@ sub www_cropSave {
     WebGUI::VersionTag->autoCommitWorkingIfEnabled($session, { allowComments => 0 });
 
     # We're in admin mode, close the dialog
-    my $helper = { message => 'Image croped', };
+    my $helper = { message => 'Image cropped', };
     my $text = '<script type="text/javascript">';
 
     if ( ref $helper eq 'HASH' ) {

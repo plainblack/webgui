@@ -82,6 +82,31 @@ sub addRevision {
     my $now         = shift || time();
     my $options     = shift;
 
+    my $autoCommitId     = $self->getAutoCommitWorkflowId() unless ($options->{skipAutoCommitWorkflows});
+
+    my ($workingTag, $oldWorking);
+    if ( $autoCommitId ) {
+        $workingTag  
+            = WebGUI::VersionTag->create( $self->session, { 
+                groupToUse  => '12',            # Turn Admin On (for lack of something better)
+                workflowId  => $autoCommitId,
+            } ); 
+    }
+    else {
+        my $parentAsset;
+        if ( not defined( $parentAsset = $self->getParent ) ) {
+            $parentAsset = WebGUI::Asset->newPending( $self->session, $self->get('parentId') );
+        }
+        if ( $parentAsset->hasBeenCommitted ) {
+            $workingTag = WebGUI::VersionTag->getWorking( $self->session );
+        }
+        else {
+            $oldWorking = WebGUI::VersionTag->getWorking($self->session, 'noCreate');
+            $workingTag = WebGUI::VersionTag->new( $self->session, $parentAsset->get('tagId') );
+            $workingTag->setWorking();
+        }
+    }
+
     #Create a dummy revision to be updated with real data later
     $session->db->beginTransaction;
 
@@ -109,7 +134,7 @@ sub addRevision {
     $session->db->commit;
 
 	# current values, and the user set properties
-	my %mergedProperties = (%{$self->get}, %{$properties}, );
+    my %mergedProperties = (%{$self->get}, %{$properties}, tagId => $workingTag->getId, status => 'pending',  );
 
     # Set some defaults
     $mergedProperties{ revisedBy } = $properties->{ revisedBy } || $session->user->userId;
@@ -121,7 +146,10 @@ sub addRevision {
     my $newVersion = WebGUI::Asset->newById($session, $self->getId, $now);
     $newVersion->setSkipNotification if ($options->{skipNotification});
     $newVersion->updateHistory("created revision");
+    $newVersion->setVersionLock;
     $newVersion->update(\%mergedProperties);
+    $newVersion->setAutoCommitTag($workingTag) if (defined $autoCommitId);
+    $oldWorking->setWorking if $oldWorking;
 
     return $newVersion;
 }
