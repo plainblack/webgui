@@ -1516,12 +1516,16 @@ Extend the base method to handle cleaning up storage locations.
 
 override purge => sub {
     my $self = shift;
-    my $sth = $self->session->db->read("select storageId from Post where assetId=".$self->session->db->quote($self->getId));
-    while (my ($storageId) = $sth->array) {
-    my $storage = WebGUI::Storage->get($self->session, $storageId);
-        $storage->delete if defined $storage;
+    my $purged = super();
+    if ($purged) {
+        my $sth = $self->session->db->read("select storageId from Post where assetId=?",[$self->getId]);
+        while (my ($storageId) = $sth->array) {
+            my $storage = WebGUI::Storage->get($self->session, $storageId);
+            $storage->delete if defined $storage;
+        }
+        $sth->finish;
+        $self->disqualifyAsLastPost;
     }
-    $sth->finish;
     return super();
 };
 

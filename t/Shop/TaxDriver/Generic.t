@@ -36,9 +36,6 @@ $session->user({userId => 3});
 
 my $addExceptions = getAddExceptions($session);
 
-my $tests = 80 + 2*scalar(@{$addExceptions});
-plan tests => $tests;
-
 WebGUI::Test->addToCleanup(SQL => 'delete from tax_generic_rates');
 
 #----------------------------------------------------------------------------
@@ -144,6 +141,30 @@ my $dupId = $taxer->add($taxData);
 
 $taxIterator = $taxer->getItems;
 is($taxIterator->rows, 3, 'add permits adding duplicate information.');
+
+my $spaceId = $taxer->add({
+    country => 'USA, United States , United States Of America ,U.S.A',
+    state   => 'Wisconsin, WI',
+    city    => 'MADCITY, madcity, Madison , WebGUIVille',
+    code    => '77575, 54703 ,  97424',
+    taxRate => '7.77',
+});
+
+my $no_spaces = $taxer->getItem($spaceId);
+cmp_deeply (
+    $no_spaces,
+    {
+        country => 'USA,United States,United States Of America,U.S.A',
+        state   => 'Wisconsin,WI',
+        city    => 'MADCITY,madcity,Madison,WebGUIVille',
+        taxRate => '7.77',
+        taxId   => $spaceId,
+        code    => '77575,54703,97424',
+    },
+    'Spaces removed from content when adding'
+);
+
+$taxer->delete({taxId => $spaceId});
 
 ##Madison zip codes:
 ##53701-53709
@@ -680,4 +701,6 @@ sub getAddExceptions {
         },
     ];
 }
+
+done_testing;
 #vim:ft=perl

@@ -38,6 +38,18 @@ The following methods are specifically available from this class. Check the supe
 
 #-------------------------------------------------------------------
 
+=head2 areOptionsSettable ( )
+
+Returns 0.
+
+=cut
+
+sub areOptionsSettable {
+    return 0;
+}
+
+#-------------------------------------------------------------------
+
 =head2 definition ( [ additionalTerms ] )
 
 See the super class for additional details.
@@ -92,24 +104,24 @@ sub isDynamicCompatible {
 
 #-------------------------------------------------------------------
 
-=head2 toHtml ( )
+=head2 new ( )
 
-Renders a database connection picker control.
+Extend the base "new" to set options.
 
 =cut
 
-sub toHtml {
-	my $self = shift;
-	my $mimeTypes;
-	foreach ('text/html','text/css','text/javascript','text/plain','text/xml','application/xml') {
-	    $mimeTypes->{$_}=$_;
-	} 
+sub new {
+    my $class = shift;
+    my $self  = $class->SUPER::new(@_);
+    my $mimeTypes;
+    foreach ('text/html','text/css','text/javascript','text/plain','text/xml','application/xml') {
+        $mimeTypes->{$_}=$_;
+    } 
+    ##Handle the combo box
     my $value            = $self->getOriginalValue();
     $mimeTypes->{$value} = $value;
-	$self->set("options", $mimeTypes);
-	return $self->SUPER::toHtml();
+    $self->set("options", $mimeTypes);
+    return $self;
 }
 
-
 1;
-

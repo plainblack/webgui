@@ -110,24 +110,8 @@ sub new {
     my $defaultValue = $self->get('defaultValue');
     $defaultValue =~ tr/ /_/;
     $self->set('defaultValue', $defaultValue);
+	$self->set("options", $self->session->datetime->getTimeZones());
     return $self;
 }
 
-#-------------------------------------------------------------------
-
-=head2 toHtml ( )
-
-Renders a database connection picker control.
-
-=cut
-
-sub toHtml {
-	my $self = shift;
-	$self->set("options", $self->session->datetime->getTimeZones());
-	return $self->SUPER::toHtml();
-}
-
-
-
 1;
-

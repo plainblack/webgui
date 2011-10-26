@@ -126,27 +126,25 @@ sub isDynamicCompatible {
 
 #-------------------------------------------------------------------
 
-=head2 toHtml ( )
+=head2 new ( )
 
-Renders a fieldType selector.
+Extend the base "new" to set options.
 
 =cut
 
-sub toHtml {
-	my $self = shift;
-	my %options;
-	tie %options, "Tie::IxHash";
+sub new {
+    my $class = shift;
+    my $self  = $class->SUPER::new(@_);
+    my %options;
+    tie %options, "Tie::IxHash";
     %options = (
         MatrixCompare => WebGUI::Pluggable::instanciate('WebGUI::Form::MatrixCompare', 'getName',[$self->session]),
-        SelectBox => WebGUI::Pluggable::instanciate('WebGUI::Form::SelectBox', 'getName',[$self->session]),
-        Combo => WebGUI::Pluggable::instanciate('WebGUI::Form::Combo', 'getName',[$self->session]),
+        SelectBox     => WebGUI::Pluggable::instanciate('WebGUI::Form::SelectBox', 'getName',[$self->session]),
+        Combo         => WebGUI::Pluggable::instanciate('WebGUI::Form::Combo', 'getName',[$self->session]),
     );
     $self->set('options', \%options);
     $self->set('defaultValue','MatrixCompare');
-	return $self->SUPER::toHtml();
+    return $self;
 }
 
-
-
 1;
-

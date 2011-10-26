@@ -456,8 +456,8 @@ ipAddress etc?|,
 
     'default value description' => {
         message => q|Enter the default value (if any) for the field. If you have defined the possible values for
-this field using a hash, then the default value has to be a key in that hash, and not a value. For Yes/No fields, enter "yes" to select "Yes" and "no" to select "No".|,
-        lastUpdated => 1223372150,
+this field using a hash, then the default value has to be a key in that hash, and not a value. For Yes/No fields, enter "yes" to select "Yes" and "no" to select "No". For Date and Date/Time fields, enter an epoch date, or a date in YYYY-MM-DD HH:MM:SS, the ISO 9601 format with optional time|,
+        lastUpdated => 1309814047,
     },
 
     'default value subtext' => {

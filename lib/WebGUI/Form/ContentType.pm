@@ -118,29 +118,33 @@ sub isDynamicCompatible {
 
 #-------------------------------------------------------------------
 
-=head2 toHtml ( )
+=head2 new ( )
 
-Renders a select list form control.
+Extend the base "new" to set options.
 
 =cut
 
-sub toHtml {
-	my $self = shift;
-	my %types;
-	my $i18n = WebGUI::International->new($self->session);
-	foreach my $type (@{ $self->get('types') }) {
-                if ($type eq "text") {
-                        $types{text} = $i18n->get(1010);
-                } elsif ($type eq "mixed") {
-                        $types{mixed} = $i18n->get(1008);
-                } elsif ($type eq "code") {
-                        $types{code} = $i18n->get(1011);
-                } elsif ($type eq "html") {
-                        $types{html} = $i18n->get(1009);
-                }
+sub new {
+    my $class = shift;
+    my $self  = $class->SUPER::new(@_);
+    my %types;
+    my $i18n = WebGUI::International->new($self->session);
+    foreach my $type (@{ $self->get('types') }) {
+        if ($type eq "text") {
+            $types{text} = $i18n->get(1010);
         }
-	$self->set("options", \%types);
-	return $self->SUPER::toHtml();
+        elsif ($type eq "mixed") {
+            $types{mixed} = $i18n->get(1008);
+        }
+        elsif ($type eq "code") {
+            $types{code} = $i18n->get(1011);
+        }
+        elsif ($type eq "html") {
+            $types{html} = $i18n->get(1009);
+        }
+    }
+    $self->set("options", \%types);
+    return $self;
 }
 
 1;

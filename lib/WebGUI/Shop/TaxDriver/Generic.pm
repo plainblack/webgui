@@ -86,6 +86,10 @@ sub add {
         unless exists($params->{taxRate}) and defined $params->{taxRate};
 
     $params->{taxId} = 'new';
+    ##Remove spaces around commas, which will break tax lookups
+    foreach my $param (qw/country city state code/) {
+        $params->{$param} =~ s/\s*,\s*/,/g;
+    }
     my $id = $self->session->db->setRow('tax_generic_rates', 'taxId', $params);
     return $id;
 }
@@ -209,6 +213,24 @@ sub getAllItems {
     my $self = shift;
     my $taxes = $self->session->db->buildArrayRefOfHashRefs('select country,state,city,code,taxRate from tax_generic_rates order by country, state');
     return $taxes;
+}
+
+#-------------------------------------------------------------------
+
+=head2 getItem ( $taxId )
+
+Returns all data for one tax item as a hash reference.
+
+=head3 $taxId
+
+The identifier for the row of tax data to return.
+
+=cut
+
+sub getItem {
+    my $self = shift;
+    my $result = $self->session->db->quickHashRef('select * from tax_generic_rates where taxId=?',[shift]);
+    return $result;
 }
 
 #-------------------------------------------------------------------

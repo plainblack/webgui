@@ -22,20 +22,23 @@ use Getopt::Long;
 use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::Asset;
-use WebGUI::Asset::Wobject::Calendar;
-use Exception::Class;
 
 
-my $toVersion = '7.10.19';
+my $toVersion = '7.10.20';
 my $quiet; # this line required
-
 
 my $session = start(); # this line required
 
+addFormFieldMacroToConfig();
+
 # upgrade functions go here
-addTicketLimitToBadgeGroup( $session );
-fixBrokenCalendarFeedUrls ( $session );
-removeUndergroundUserStyleTemplate ( $session );
+fixSpacesInTaxInfo ( $session );
+
+sub addFormFieldMacroToConfig {
+    print "\tAdd FormField macro to config... " unless $quiet;
+    $session->config->addToHash( 'macros', FormField => 'FormField' );
+    print "DONE!\n" unless $quiet;
+}    
 
 finish($session); # this line required
 
@@ -49,55 +52,22 @@ finish($session); # this line required
 #    print "DONE!\n" unless $quiet;
 #}
 
-
+#----------------------------------------------------------------------------
 # Fix calendar feed urls that had adminId attached to them until they blew up
-sub fixBrokenCalendarFeedUrls {
+sub fixSpacesInTaxInfo {
     my $session = shift;
-    print "\tChecking all calendar feed URLs for adminId brokenness... " unless $quiet;
-    my $getCalendar = WebGUI::Asset::Wobject::Calendar->getIsa($session);
-    CALENDAR: while (1) {
-        my $calendar = eval { $getCalendar->(); };
-        next CALENDAR if Exception::Class->caught;
-        last CALENDAR unless $calendar;
-        FEED: foreach my $feed (@{ $calendar->getFeeds }) {
-            $feed->{url} =~ s/adminId=[^;]{22};?//g;
-            $feed->{url} =~ s/\?$//;
-            $calendar->setFeed($feed->{feedId}, $feed);
-        }
+    print "\tRemoving spaces around commas in generic tax rate information... " unless $quiet;
+    use WebGUI::Shop::TaxDriver::Generic;
+    my $taxer = WebGUI::Shop::TaxDriver::Generic->new($session);
+    my $taxIterator = $taxer->getItems;
+    while (my $taxInfo = $taxIterator->hashRef) {
+        my $taxId = $taxInfo->{taxId};
+        $taxer->add($taxInfo);  ##Automatically removes spaces now.
+        $taxer->delete({taxId => $taxId});
     }
     print "DONE!\n" unless $quiet;
 }
 
-#----------------------------------------------------------------------------
-# Add a ticket limit to badges in a badge group
-sub removeUndergroundUserStyleTemplate {
-    my $session = shift;
-    print "\tRemove Underground User Style template... " unless $quiet;
-    if ($session->setting->get('userFunctionStyleId') eq 'zfDnOJgeiybz9vnmoEXRXA') {
-        $session->setting->set('userFunctionStyleId', 'Qk24uXao2yowR6zxbVJ0xA');
-    }
-    my $underground_user = WebGUI::Asset->newByDynamicClass($session, 'zfDnOJgeiybz9vnmoEXRXA');
-    if ($underground_user) {
-        $underground_user->purge;
-    }
-    print "DONE!\n" unless $quiet;
-}
-
-#----------------------------------------------------------------------------
-# Add a ticket limit to badges in a badge group
-sub addTicketLimitToBadgeGroup {
-    my $session = shift;
-    print "\tAdd ticket limit to badge groups... " unless $quiet;
-    # Make sure it hasn't been done already...
-    my $columns = $session->db->buildHashRef('describe EMSBadgeGroup');
-    use List::MoreUtils qw(any);
-    if(!any { $_ eq 'ticketsPerBadge' } keys %{$columns}) {
-        $session->db->write(q{
-            ALTER TABLE EMSBadgeGroup ADD COLUMN `ticketsPerBadge` INTEGER
-        });
-    }
-    print "DONE!\n" unless $quiet;
-}
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
 

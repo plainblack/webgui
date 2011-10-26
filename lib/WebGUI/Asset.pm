@@ -2395,6 +2395,7 @@ sub processTemplate {
             %{$self->get},
             'title'     => $self->getTitle,
             'menuTitle' => $self->getMenuTitle,
+            'keywords'  => $self->get('keywords'),
             %{$var},
         );
         return $template->process(\%vars);
