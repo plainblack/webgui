@@ -999,15 +999,15 @@ WebGUI.Admin.prototype.showHelperMenu
         // destroy the old helper menu!
         this.helperMenu.destroy();
     }
-    var helperMenu = new YAHOO.widget.Menu( document.createElement('div'), {
+    this.helperMenu = new YAHOO.widget.Menu( "HelperMenu", {
         position : "dynamic",
         clicktohide : true,
         constraintoviewport : true,
-        items : this.getHelperMenuItems( assetId, helpers ),
+        itemData : this.getHelperMenuItems( assetId, helpers ),
         context : [ elem, 'tl', 'bl' ],
         effect: { effect: YAHOO.widget.ContainerEffect.FADE, duration:0.25 }
     } );
-    this.helperMenu.render( document.body );
+    this.helperMenu.render( elem.parentElement );
     this.helperMenu.show();
     this.helperMenu.focus();
 };
@@ -1428,6 +1428,7 @@ WebGUI.Admin.AssetTable
             }
         ];
 };
+YAHOO.lang.extend( WebGUI.Admin.AssetTable, WebGUI.Admin );
 
 /**
  * init ( )
@@ -1615,7 +1616,6 @@ WebGUI.Admin.AssetTable.prototype.onDataReturnInitializeTable
 
     this.dataTable.onDataReturnInitializeTable.call( this.dataTable, sRequest, oResponse, oPayload );
 
-    // YAHOO.util.Event.addListener( this.selectAllCheck, "onClick", this.toggleAllRows, this, true );
     YAHOO.util.Event.addListener( this.selectAllCheck, "change", function() { this.toggleAllRows(); }, this, true );
 };
 
@@ -2212,7 +2212,7 @@ WebGUI.Admin.Tree.prototype.onDataReturnInitializeTable
     elCrumb.appendChild( elItem );
 
     // TODO: Update current asset
-    window.admin.navigate( oResponse.meta.currentAsset );
+    window.admin.navigate( oResponse.meta.currentAsset.assetId );
 
     // TODO Hide loading screen
 };
