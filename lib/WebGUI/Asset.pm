@@ -466,14 +466,14 @@ sub addEditSaveButtons {
         rowClass => 'saveButtons',
     );
 
-    # Approved status
-    $buttonGroup->addButton( 'checkbox', {
-        name        => 'approved',
-        id          => 'approveCheckbox',
-        value       => 'approved',
-        label       => $i18n->get('560', 'WebGUI'),
-        checked     => ( $session->setting->get( 'versionTagMode' ) eq 'autoCommit' ? 1 : 0 ),
-    } );
+#    # Approved status
+#    $buttonGroup->addButton( 'checkbox', {
+#        name        => 'approved',
+#        id          => 'approveCheckbox',
+#        value       => 'approved',
+#        label       => $i18n->get('560', 'WebGUI'),
+#        checked     => ( $session->setting->get( 'versionTagMode' ) eq 'autoCommit' ? 1 : 0 ),
+#    } );
 
     $buttonGroup->addButton( "submit", {
         name        => "save",
