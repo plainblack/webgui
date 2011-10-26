@@ -73,7 +73,7 @@ if (!($^O =~ /^Win/i) && $> != 0 && !$override) {
 print "Starting up..." unless ($quiet);
 my $session = WebGUI::Session->open($configFile);
 $session->user({userId=>3});
-open(FILE,"<".$usersFile);
+open(FILE,"<".$usersFile) || die("Could not open $usersFile for reading: $!");
 print "OK\n" unless ($quiet);
 
 my $lineNumber = 0;
@@ -81,6 +81,7 @@ my @field;
 my @profileFields = $session->db->buildArray("select fieldName from userProfileField");
 while(my $line = <FILE>) {
     $lineNumber++;
+
     chomp $line;
     next
         if $line eq '';
@@ -179,7 +180,25 @@ while(my $line = <FILE>) {
         }
         if ($user{groups}) {
             my @groups = split(/,/,$user{groups});
-            $u->addToGroups(\@groups,$user{expireOffset});
+            # Groups that have : in them have unique expiration dates
+            $u->addToGroups([grep { !/:/ } @groups],$user{expireOffset});
+            for my $groupDef ( grep { /:/ } @groups ) {
+                my ( $groupId, $expireDate ) = split /:/, $groupDef, 2;
+
+                # Calculate expiration offset
+                my $dtparse = DateTime::Format::Strptime->new(
+                    pattern     => '%F %T',
+                    on_error    => 'croak',
+                );
+
+                eval { 
+                    my $expireOffset = $dtparse->parse_datetime( $expireDate )->epoch - time;
+                    $u->addToGroups( [$groupId], $expireOffset );
+                };
+                if ( $@ ) {
+                    print "Could not add user $user{username} to group $groupId: $@";
+                }
+            }
         }
     }
 }
@@ -344,6 +363,12 @@ to B<seconds>.
 Specify a comma separated list of WebGUI Group Ids that each loaded
 user will be set to. It can be overridden in the import file for
 specific users.
+
+You can specify a unique expiration date for a group by adding it
+after the group ID, seperated by a colon. The date/time should be in
+"YYYY-MM-DD HH:NN:SS" format.
+
+ groupId:2000-01-01 01:00:00,groupId2:2001-01-02 02:00:00
 
 =item B<--ldapUrl uri>
 

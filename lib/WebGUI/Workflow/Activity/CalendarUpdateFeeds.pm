@@ -120,22 +120,23 @@ sub execute {
             # and send the appropriate cookie with the request.
             my $sitename    = $session->config->get("sitename")->[0];
             FEED: foreach my $feed (@{ $calendar->getFeeds }) {
-                if ($feed->{url} =~ m{http://[^/]*$sitename}) {
-                    $feed->{url} .= ( $feed->{url} =~ /[?]/ ? ";" : "?" ) . "adminId=".$session->getId;
+                my $url = $feed->{url};
+                if ($url =~ m{http://[^/]*$sitename}) {
+                    $url .= ( $url =~ /[?]/ ? ";" : "?" ) . "adminId=".$session->getId;
                     $session->db->write("REPLACE INTO userSessionScratch (sessionId,name,value) VALUES (?,?,?)",
                         [$session->getId,$calendar->getId,"SPECTRE"]);
                 }
 
                 # Get the feed
-                $session->log->info( "Trying Calendar feed ".$feed->{url}." for $calendarTitle" );
-                my $response    = $ua->get($feed->{url});
+                $session->log->info( "Trying Calendar feed ".$url." for $calendarTitle" );
+                my $response    = $ua->get($url);
 
                 if (!$response->is_success) {
                     # Update the result and last updated fields
                     $feed->{lastResult}  = $response->message || $response->content;
                     $feed->{lastUpdated} = $dt;
                     $calendar->setFeed($feed->{feedId}, $feed);
-                    $session->log->info( "Calendar feed ".$feed->{url}." for $calendarTitle failed" );
+                    $session->log->warn( "Calendar feed ".$url." for $calendarTitle failed" );
                     next FEED;
                 }
 
@@ -146,7 +147,8 @@ sub execute {
                     $feed->{lastResult}  = "Error parsing iCal feed";
                     $feed->{lastUpdated} = $dt;
                     $calendar->setFeed($feed->{feedId}, $feed);
-                    #next FEED;
+                    $session->log->warn( "Calendar feed ".$url." for $calendarTitle could not be parsed" );
+                    next FEED;
                 }
                 my $feedData = $feedList->{$feed->{feedId}} = {
                     added   => 0,

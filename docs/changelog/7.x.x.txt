@@ -1,3 +1,12 @@
+7.10.19
+ - fixed #12169: extras uploads symlink export
+ - Added ability to pass caller assetId to RenderThingMacro
+ - Allow specific expirations for groups in userImport.pl
+ - fixed #12164: Calendar feeds with tons of ;adminId=XXXXXX added
+ - fixed #12167: Calendar Next/Prev Month/Year confusion
+ - fixed #12172: Underground User Style template shows up in Style wizard during site creation
+ - fixed #12157: www_editThingSave
+
 7.10.18
  - fixed #12138: Version tag gets create by entering and direct leaving
  - Added the WebGUI::Event API

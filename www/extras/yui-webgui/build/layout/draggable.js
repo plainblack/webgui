@@ -8,17 +8,17 @@ var draggableObjectList=new Array();
 //Internal Config (Do not Edit)
 
 //browser check
-var dom=document.getElementById&&!document.all
+//var dom=document.getElementById&&!document.all
 var docElement = document.documentElement;
 var pageURL = "";
-var topelement=dom? "HTML" : "BODY"
+//var topelement=dom? "HTML" : "BODY"
 var pageHeight=0;
 var pageWidth=0;
 var scrollJump=50;
 var blankCount=1;
 
 var Dom = YAHOO.util.Dom;
-var Event = YAHOO.util.Event;
+//var Event = YAHOO.util.Event;
 var DDM = YAHOO.util.DragDropMgr;
 
 
@@ -26,6 +26,8 @@ var DDM = YAHOO.util.DragDropMgr;
 //goes up the parent tree until class is found. If not found, returns null
 function dragable_getObjectByClass(target,clazz) {
     var classMatch = new RegExp("\\b" + clazz + "\\b");
+    var dom=document.getElementById&&!document.all;
+    var topelement=dom? "HTML" : "BODY";
     while (target.tagName!=topelement && target.className.search(classMatch) == -1){
         target=dom? target.parentNode : target.parentElement
     }
@@ -153,7 +155,7 @@ YAHOO.extend(YAHOO.webgui.DDList, YAHOO.util.DDProxy, {
 
     onDrag: function(e) {
         // Keep track of the direction of the drag for use during onDragOver
-        var y = Event.getPageY(e);
+        var y = YAHOO.util.Event.getPageY(e);
         if (y < this.lastY) {
             this.goingUp = true;
         } else if (y > this.lastY) {
