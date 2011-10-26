@@ -1332,7 +1332,8 @@ WebGUI.Admin.AssetTable
     this.cfg    = cfg;
 
     var selectAllCheck = document.createElement( 'input' );
-    this.selectAllCheck = selectAllCheck;
+    YAHOO.util.Dom.generateId(selectAllCheck,"selectAllCheck");
+    this.selectAllCheck = selectAllCheck.id;
     selectAllCheck.type = "checkbox";
     // Add the event handler in onDataTableInitializeRows because innerHTML won't
     // save event handlers
@@ -1614,7 +1615,8 @@ WebGUI.Admin.AssetTable.prototype.onDataReturnInitializeTable
 
     this.dataTable.onDataReturnInitializeTable.call( this.dataTable, sRequest, oResponse, oPayload );
 
-    YAHOO.util.Event.addListener( this.selectAllCheck, "click", this.toggleAllRows, this, true );
+    // YAHOO.util.Event.addListener( this.selectAllCheck, "onClick", this.toggleAllRows, this, true );
+    YAHOO.util.Event.addListener( this.selectAllCheck, "change", function() { this.toggleAllRows(); }, this, true );
 };
 
 /**
@@ -1624,7 +1626,8 @@ WebGUI.Admin.AssetTable.prototype.onDataReturnInitializeTable
  */
 WebGUI.Admin.AssetTable.prototype.toggleAllRows
 = function ( ) {
-    var state   = this.selectAllCheck.checked ? true : false;
+    var selectAllCheck = YAHOO.util.Dom.get(this.selectAllCheck);
+    var state   = selectAllCheck.checked ? true : false;
     var row = this.dataTable.getFirstTrEl();
     while ( row ) {
         if ( state ) { 
