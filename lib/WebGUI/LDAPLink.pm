@@ -35,8 +35,8 @@ This package contains utility methods for WebGUI's ldap link system.
  %ldapLink = WebGUI::LDAPLink->new($self->session,$ldapLinkId)->get;
  
  $ldapLink = WebGUI::LDAPLink->new($self->session,$ldapLinkId);
- $connection = $ldapLink->authenticate();
- $ldapLink->disconnect;
+ $connection = $ldapLink->connectToLDAP();
+ $ldapLink->unbind;
 
 =head1 METHODS
 
