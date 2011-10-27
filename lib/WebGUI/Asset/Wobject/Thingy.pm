@@ -635,6 +635,10 @@ sub editThingDataSave {
             if ($self->field_isa($fieldType, 'WebGUI::Form::File')) {
                 $field->{ defaultValue } = $thingData{ "field_" . $field->{ fieldId } };
             }
+            elsif ($fieldType eq 'Date' or $fieldType eq 'DateTime') {  ##Must be in epoch format to be stored in the db.
+                my $wdt = WebGUI::DateTime->new($session, $field->{defaultValue})->cloneToUserTimeZone;
+                $field->{defaultValue} = $wdt->epoch;
+            }
             $fieldValue = $thingData->{$fieldName} || $session->form->process($fieldName,$fieldType,$field->{defaultValue},$field);
         }
         if ($field->{status} eq "required" && ($fieldValue =~ /^\s$/x || $fieldValue eq "" || !(defined $fieldValue))) {
@@ -1042,12 +1046,12 @@ sub getFieldValue {
 
     my $fieldType = lc $field->{fieldType};
     if ($fieldType eq "date"){
-        my $dt = WebGUI::DateTime->new($session, $value);
-        $processedValue = $dt->webguiDate($dateFormat);
+        my $wdt = WebGUI::DateTime->new($session, $value);
+        $processedValue = $wdt->cloneToUserTimeZone->webguiDate($dateFormat);
     }
     elsif ($fieldType eq "datetime"){
-        my $dt = WebGUI::DateTime->new($session, $value);
-        $processedValue = $dt->webguiDate($dateTimeFormat);
+        my $wdt = WebGUI::DateTime->new($session, $value);
+        $processedValue = $wdt->cloneToUserTimeZone->webguiDate($dateTimeFormat);
     }
     # TODO: The otherThing field type is probably also handled by getFormPlugin, so the elsif below can probably be
     # safely removed. However, this requires more testing than I can provide right now, so for now this stays the
@@ -3069,7 +3073,6 @@ sub www_exportThing {
 
     ### Loop through the returned structure and put it through Text::CSV
     # Column heads
-    $self->session->log->warn("field labels: ". join ' ', @fieldLabels);
     my $csv_filename = 'export_'.$thingProperties->{label}.'.csv';
     open my $CSV, '>', $tempStorage->getPath($csv_filename);
     print $CSV WebGUI::Text::joinCSV( @fieldLabels );

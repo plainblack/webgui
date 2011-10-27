@@ -176,6 +176,7 @@ checkModule('Starman',						'0.2010',	2);
 checkModule('App::Cmd',                     '0.311'      );
 checkModule('Devel::StackTrace',            '1.27'       );
 checkModule('Devel::StackTrace::WithLexicals',  '0.03'   );
+checkModule('Kwargs',                                    );
 checkModule('Data::ICal',                   '0.16'       );
 checkModule('common::sense',                '3.2'        );
 checkModule('Geo::Coder::Googlev3',         '0.07'       );

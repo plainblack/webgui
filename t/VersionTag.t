@@ -42,7 +42,7 @@ sub setSiteVersionTagMode {
 sub setUserVersionTagMode {
     my ($user, $newMode) = @_;
 
-    $user->profileField(q{versionTagMode}, $newMode);
+    $user->update(versionTagMode => $newMode);
 
     return;
 } #setUserVersionTagMode
@@ -158,10 +158,16 @@ ok(!defined $tagAgain2, 'nonexistent tag cannot be instantiated');
 $tag2->rollback;
 ($tag, $tagAgain1, $tag2, $tagAgain2) = ();
 
+my $master_tag = WebGUI::VersionTag->getWorking($session);
+my $node = WebGUI::Test->asset;
+$master_tag->commit;
+$node = $node->cloneFromDb;
+WebGUI::Test->addToCleanup($master_tag);
+
 my $tag3 = WebGUI::VersionTag->create($session, {});
 $tag3->setWorking;
-my $asset1 = WebGUI::Test->asset->addChild({ className => 'WebGUI::Asset::Snippet', });
-my $asset2 = WebGUI::Test->asset->addChild({ className => 'WebGUI::Asset::Snippet', });
+my $asset1 = $node->addChild({ className => 'WebGUI::Asset::Snippet', });
+my $asset2 = $node->addChild({ className => 'WebGUI::Asset::Snippet', });
 is($tag3->getAssetCount, 2, 'tag with two assets');
 is($tag3->getRevisionCount, 2, 'tag with two revisions');
 $asset1 = $asset1->addRevision({ title => 'revised once', }, time+10);
@@ -171,7 +177,7 @@ is($tag3->getRevisionCount, 5, 'tag with five revisions');
 
 my $tag4 = WebGUI::VersionTag->create($session, {});
 $tag4->setWorking;
-my $asset3 = WebGUI::Test->asset->addChild({ className => 'WebGUI::Asset::Snippet', });
+my $asset3 = $node->addChild({ className => 'WebGUI::Asset::Snippet', });
 is($tag4->getAssetCount, 1, 'other tag with one asset');
 is($tag4->getRevisionCount, 1, 'other tag with one revision');
 $asset3->addRevision({ title => 'again revised once', }, time+40);
@@ -186,7 +192,7 @@ $tag4->rollback;
 #Test commitAsUser
 my $tag5   = WebGUI::VersionTag->create($session, {});
 $tag5->setWorking;
-my $asset5 = WebGUI::Test->asset->addChild({ className => 'WebGUI::Asset::Snippet', });
+my $asset5 = $node->addChild({ className => 'WebGUI::Asset::Snippet', });
 is($tag5->get("createdBy"),1,'tag created by visitor');
 $tag5->commitAsUser(3);
 $tag5      = WebGUI::VersionTag->new($session, $tag5->getId); #Get the tag again - properties have changed
@@ -197,7 +203,7 @@ $tag5->rollback;
 #Test commitAsUser with options
 my $tag6   = WebGUI::VersionTag->create($session, {});
 $tag6->setWorking;
-my $asset6 = WebGUI::Test->asset->addChild({ className => 'WebGUI::Asset::Snippet', });
+my $asset6 = $node->addChild({ className => 'WebGUI::Asset::Snippet', });
 $tag6->commitAsUser(3, { commitNow => "yes" });
 $tag6      = WebGUI::VersionTag->new($session, $tag6->getId); #Get the tag again - properties have changed
 is($tag6->get("committedBy"),3,'tag committed by admin again');
@@ -253,7 +259,7 @@ ok($siteWideTag->getId() ne $userTagId, 'versionTagMode siteWide: siteWide tag h
 
 $siteWideTag->clearWorking();
 
-my $asset4 = WebGUI::Test->asset->addChild({ className => 'WebGUI::Asset::Snippet' });
+my $asset4 = $node->addChild({ className => 'WebGUI::Asset::Snippet' });
 
 ok(defined ($siteWideTag = getWorking(1)), 'versionTagMode siteWide: reclaim version tag after clearWorking and addding new asset');
 
@@ -321,7 +327,7 @@ $siteWideTag->rollback();
     setUserVersionTagMode($user, q{singlePerUser});
     my $tag = WebGUI::VersionTag->create($session, {});
     $tag->setWorking;
-    my $asset = WebGUI::Test->asset->addChild({ className => 'WebGUI::Asset::Snippet', });
+    my $asset = $node->addChild({ className => 'WebGUI::Asset::Snippet', });
     is($tag->getAssetCount, 1, qq{$test_prefix [singlePerUser] tag with 1 asset});
 
     # create admin session
@@ -372,7 +378,7 @@ $siteWideTag->rollback();
     setUserVersionTagMode($user, q{siteWide});
     $tag = WebGUI::VersionTag->create($session, {});
     $tag->setWorking;
-    $asset = WebGUI::Test->asset->addChild({ className => 'WebGUI::Asset::Snippet', });
+    $asset = $node->addChild({ className => 'WebGUI::Asset::Snippet', });
     is($tag->getAssetCount, 1, qq{$test_prefix [siteWide] tag with 1 asset});
 
     # create admin session

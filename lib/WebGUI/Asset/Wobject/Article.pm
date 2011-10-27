@@ -340,6 +340,7 @@ sub view {
 			}
 			push(@{$var{attachment_loop}}, {
 				filename => $file,
+				extension => WebGUI::Storage->getFileExtension($file),
 				isImage => $storage->isImage($file),
 				url=> $storage->getUrl($file),
 				thumbnailUrl => $storage->getThumbnailUrl($file),

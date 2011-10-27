@@ -1126,10 +1126,12 @@ sub getEditForm {
 
     ###
     # Properties
+    my $overrides = $session->config->get("assets/".$self->className) || {};
     foreach my $property ( $self->getProperties ) {
         my $fieldHash = $self->getFieldData( $property );
         next if $fieldHash->{noFormPost};
 
+        $fieldHash = $self->setupFormField($property, $fieldHash, $overrides);
         # Create tabs to have labels added later
         if ( !$f->getTab( $fieldHash->{tab} ) ) {
             $f->addTab( name => $fieldHash->{tab}, label => $fieldHash->{tab} );
@@ -1167,22 +1169,37 @@ sub getEditForm {
     return $f;
 } ## end sub getEditForm
 
+=head2 setupFormField ( $fieldName, $fieldHash, $overrides )
+
+Applies overrides from the WebGUI config file to a set of field data.  The overridden
+and updated field data is returned.
+
+=head3 $fieldName
+
+The name of the field.
+
+=head3 $fieldHash
+
+A hash reference of field data for $fieldName.
+
+=head3 $overrides
+
+A hash reference of overrides from the config file.  This is passed in instead of 
+looking it up each time as a speed optimization.
+
+=cut
+
 sub setupFormField {
-    my ( $self, $tabform, $fieldName, $extraFields, $overrides ) = @_;
-    my %params = %{ $extraFields->{$fieldName} };
-    my $tab    = delete $params{tab};
+    my ( $self, $fieldName, $fieldHash, $overrides ) = @_;
 
-    if ( exists $overrides->{fields}{$fieldName} ) {
-        my %overrideParams = %{ $overrides->{fields}{$fieldName} };
-        my $overrideTab    = delete $overrideParams{tab};
-        $tab = $overrideTab if defined $overrideTab;
-        foreach my $key ( keys %overrideParams ) {
-            $params{"-$key"} = $overrideParams{$key};
-        }
+    return $fieldHash unless exists $overrides->{fields}->{$fieldName};
+    my %overrideParams = %{ $overrides->{fields}->{$fieldName} };
+    foreach my $key ( keys %overrideParams ) {
+        (my $canon = $key) =~ s/^-//;
+        $fieldHash->{$canon} = $overrideParams{$key};
     }
+    return $fieldHash;
 
-    $tab ||= 'properties';
-    return $tabform->getTab($tab)->addField( delete $params{fieldType}, %params);
 } ## end sub setupFormField
 
 #-------------------------------------------------------------------

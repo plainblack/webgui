@@ -945,6 +945,7 @@
         "WebGUI::Workflow::Activity::NotifyAboutUser",
         "WebGUI::Workflow::Activity::ActivateUser",
         "WebGUI::Workflow::Activity::DeactivateUser",
+        "WebGUI::Workflow::Activity::WaitForUserConfirmation",
         "WebGUI::Workflow::Activity::DeleteUser"
     ],
     "WebGUI::VersionTag" : [

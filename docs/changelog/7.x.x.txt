@@ -1,3 +1,13 @@
+7.10.21
+ - added #9668 extension template variable to attachment loops for the following assets:
+      Article,Post,Event,File,Form::Attachments,Folder
+ - added WaitForUserConfirmation workflow activity
+ - added new setting - Enable Users after Anonymous Registration?
+ - added the optional WebGUI::Content::PDFGenerator, not enabled by default
+   (see the module's documentation).
+ - fixed #12204: Default forum notification template produces invalid HTML
+ - fixed #12202: JsonTable refers to unexistent YUI file
+
 7.10.20
  - fixed: Do not call group methods on an undefined value.
  - fixed #12178: random deletion of columns may happen when a schema is saved (Amir Plivatsky)
@@ -13,6 +23,7 @@
  - fixed #12135: Geo::Coder::Googlev3 needs common sense
  - fixed #12183: Posts do not disqualify themselves when purged
  - fixed #12189: installClass ignores preload.custom
+ - fixed #12197: Default date Thingy disables date
 
 7.10.19
  - fixed #12169: extras uploads symlink export
@@ -4223,4 +4234,5 @@
    an IP other than 127.0.0.1.
  - Made the Include macro more secure.
  - Added Len's patch to fix some caching problems.
+
 

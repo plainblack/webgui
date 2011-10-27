@@ -4776,6 +4776,18 @@ Users may override this setting in their profile.
         context     => 'Choose, as in to select from a set of options',
     },
 
+    'Enable Users after Anonymous Registration?' => {
+        message => 'Enable Users after Anonymous Registration?',
+        lastUpdated => 1311618346,
+    },
+
+    'enableUsersAfterAnonymousRegistration help' => {
+        message => 'If this is off, '
+            . 'users must be manually activated by a workflow or an admin.',
+        lastUpdated => 1311618419,
+
+    },
+
 };
 
 1;

@@ -19,6 +19,14 @@ Package WebGUI::Test::MockAsset
 =head1 DESCRIPTION
 
 Creates fake WebGUI::Asset objects and sets them up to be returned by WebGUI::Asset's normal constructors.
+Most of the time, you'll be mocking templates to read which variables are sent to their
+templates.  Here's how to do that:
+
+    my $mockAsset = WebGUI::Test::MockAsset->new('WebGUI::Asset::Template');
+    $mockAsset->mock_id($template_id_to_mock);
+    my $templateVars;
+    $templateMock->mock('process', sub { $templateVars = $_[1]; } );
+    $templateMock->set_true('prepare', sub {  } );
 
 =head1 METHODS
 

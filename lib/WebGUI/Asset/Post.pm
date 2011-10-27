@@ -1092,6 +1092,7 @@ sub getTemplateVars {
 				url       => $fileUrl,
 				icon      => $storage->getFileIconUrl($filename),
 				filename  => $filename,
+				extension => WebGUI::Storage->getFileExtension($filename),
 				thumbnail => $isImage ? $storage->getThumbnailUrl($filename) : '',
 				isImage   => $isImage,
 				});
