@@ -1226,7 +1226,7 @@ sub www_view {
         $addressBook->appendAddressFormVars(\%var, 'shipping_', $shippingAddressData);
         $addressBook->appendAddressFormVars(\%var, 'billing_',  $billingAddressData);
 
-        my $has_billing_addr - $self->get('billingAddressId') ? 1 : 0;
+        my $has_billing_addr = $self->get('billingAddressId') ? 1 : 0;
 
         $var{sameShippingAsBilling} = WebGUI::Form::yesNo($session, {
             name => 'sameShippingAsBilling',
