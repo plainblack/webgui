@@ -2637,7 +2637,7 @@ sub www_printBadge {
 
 	$registrant->{token_loop} = [];
     foreach my $tokenId (@tokens) {
-        my $token = WebGUI::Asset::Sku::EMSRibbon->new($session, $tokenId);
+        my $token = WebGUI::Asset::Sku::EMSToken->new($session, $tokenId);
         push (@{$registrant->{token_loop}}, $token->get);
     }
 
