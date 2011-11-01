@@ -173,7 +173,7 @@ $andy = $session->user;
 
 #Test that the address was saved to the profile
 cmp_bag (
-    [ map { $andy->profileField($_) } keys %profile_info ],
+    [ map { $andy->get($_) } keys %profile_info ],
     [ values %profile_info ],
     'Profile fields were updated'
 );

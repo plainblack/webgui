@@ -21,7 +21,7 @@ has method => (
 
 has uid => (
     is       => 'rw',
-    default  => 'view',
+    default  => '',
 );
 
 has bare => (

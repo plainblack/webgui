@@ -7,6 +7,7 @@ use WebGUI::International;
 use WebGUI::Pluggable;
 use WebGUI::ProfileCategory;
 use WebGUI::ProfileField;
+use WebGUI::Shop::AddressBook;
 use base qw/WebGUI::Account/;
 
 =head1 NAME
@@ -462,9 +463,7 @@ sub www_editSave {
             if($e = WebGUI::Error->caught('WebGUI::Error::ObjectNotFound')) {
                 #Get home address only mappings to avoid creating addresses with just firstName, lastName, email
                 my %home_address_map = %{$address_mappings};
-                foreach my $exclude ( qw{ firstName lastName email } ) {
-                    delete $home_address_map{$exclude};
-                }
+                delete $home_address_map{qw/firstName lastName email/};
                 #Add the profile address for the user if there are homeAddress fields
                 if( grep { $address->{$_} } values %home_address_map ) {
                     $address->{label} = "Profile Address";
