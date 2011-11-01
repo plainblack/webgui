@@ -866,7 +866,7 @@ subtest 'canAdd tolerates being called as an object method', sub {
 
     # Make a test user who's just in Turn Admin On
     my $u = WebGUI::User->create($session);
-    WebGUI::Test->addToCleanup($u);
+    WebGUI::Test->addToCleanup($u, $snip);
     $u->addToGroups(['12']);
     $session->user({ user => $u });
 

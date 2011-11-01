@@ -643,7 +643,7 @@ sub editThingDataSave {
         }
         if ($field->{status} eq "required" && ($fieldValue =~ /^\s$/x || $fieldValue eq "" || !(defined $fieldValue))) {
             push (@errors,{
-                "error_message"=>$field->{label}." ".$i18n->get('is required error').".",
+		"error_message"=>$field->{label}." ".$i18n->get('is required error').".", "field_name"=>$fieldName,
                 });
         }
         if ($field->{status} eq "hidden") {
@@ -659,7 +659,7 @@ sub editThingDataSave {
 
              unless ( $self->isUniqueEntry($thingId,$fieldName,$fieldValue,$thingDataId)) {
                push (@errors,{
-                "error_message"=>$field->{label}. $i18n->get('needs to be unique error'),
+                "error_message"=>$field->{label}. $i18n->get('needs to be unique error'),"field_name"=>$fieldName,
                 });
              }
 	}

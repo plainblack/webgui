@@ -1475,8 +1475,8 @@ sub update {
     delete $properties->{privacyFields};
 
     # $self->{_user} contains all fields in `users` table
-    my @userFields  = ();
-    my @userValues  = ();
+    my @userFields = ();
+    my @userValues = ();
     for my $key ( keys %{$self->{_user}} ) {
         if ( exists $properties->{$key} ) {
             # Delete the value because it's not a profile field
@@ -1487,15 +1487,16 @@ sub update {
         }
     }
     # No matter what we update properties
-    my $userFields  = join ", ", @userFields;
+    my $userFields = join ", ", @userFields;
     $db->write(
         "UPDATE users SET $userFields WHERE userId=?",
         [@userValues, $self->{_userId}]
     );
 
     # Everything else must be a profile field
-    my @profileFields   = ();
-    my @profileValues   = ();
+    my @profileFields = ();
+    my @profileValues = ();
+
     for my $key ( keys %{$properties} ) {
         if (!exists $self->{_profile}{$key} && !WebGUI::ProfileField->exists($session,$key)) {
             $self->session->log->warn("No such profile field: $key");
@@ -1506,7 +1507,7 @@ sub update {
         $self->{_profile}->{$key} = $properties->{ $key };
     }
     if ( @profileFields ) {
-        my $profileFields  = join ", ", @profileFields;
+        my $profileFields = join ", ", @profileFields;
         $db->write(
             "UPDATE userProfileData SET $profileFields WHERE userId=?",
             [@profileValues, $self->{_userId}]

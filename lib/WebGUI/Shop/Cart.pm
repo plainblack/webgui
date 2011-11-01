@@ -766,8 +766,11 @@ sub requiresShipping {
     my $self    = shift;
 
     # Look for recurring items in the cart
-    foreach my $item (@{ $self->getItems }) {
-        return 1 if $item->getSku->isShippingRequired;
+    ITEM: foreach my $item (@{ $self->getItems }) {
+        my $sku = $item->getSku;
+        next ITEM unless $sku;
+        return 1 if $sku->isShippingRequired;
+
     }
 
     # No recurring items in cart so return false
@@ -1113,6 +1116,13 @@ sub www_view {
         $self->update({shippingAddressId=>''});
     }
 
+    #get the billing address
+    my $billingAddress = eval { $self->getBillingAddress };
+    if (my $e = WebGUI::Error->caught("WebGUI::Error::ObjectNotFound") && $self->get('billingAddressId')) {
+        # choose another address cuz we've got a problem
+        $self->update({billingAddressId=>''});
+    }
+
     # generate template variables for the items in the cart
     my @items   = ();
     tie my %addressOptions,        'Tie::IxHash';
@@ -1274,9 +1284,11 @@ sub www_view {
         $addressBook->appendAddressFormVars(\%var, 'shipping_', $shippingAddressData);
         $addressBook->appendAddressFormVars(\%var, 'billing_',  $billingAddressData);
 
+        my $has_billing_addr = $self->get('billingAddressId') ? 1 : 0;
+
         $var{sameShippingAsBilling} = WebGUI::Form::yesNo($session, {
             name => 'sameShippingAsBilling',
-            value => $self->billingAddressId && $self->billingAddressId eq $self->shippingAddressId,
+            value => (($has_billing_addr && $self->billingAddressId eq $self->shippingAddressId) || !$has_billing_addr),
         });
     }
 

@@ -1,3 +1,13 @@
+7.10.22
+ - rfe   #12223: Add dateTime type to content profiling (metadata)
+ - rfe #12207: Thingy. Field_name info returned by www_editThingDataSaveViaAjax
+ - fixed #12206: Bad Subscription Groups in Duplicated Threads
+ - fixed #12208: replacements don't work
+ - fixed #12213: Unable to view cart when an asset is deleted.
+ - added: Better integration between User Profile fields, the Shop address book and the EMS.
+ - fixed #12218: Failed INSERT in Passive Profiling causes leak
+ - fixed #12173: CrystalX theme Thingy drop down problem
+
 7.10.21
  - added #9668 extension template variable to attachment loops for the following assets:
       Article,Post,Event,File,Form::Attachments,Folder

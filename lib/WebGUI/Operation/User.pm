@@ -790,7 +790,7 @@ sub www_editUser {
 		size=>15,
 		value=>\@groupsToDelete
 		);
-	return '<h1>' . $i18n->get(168) . '</h1>' . $f->toHtml;
+	return '<h1>' . $i18n->get(168) . '</h1>' . $error . $f->toHtml;
 }
 
 #-------------------------------------------------------------------
@@ -818,7 +818,7 @@ sub www_editUserSave {
 
 	return $session->privilege->adminOnly() unless ($isAdmin || $isSecondary) && $session->form->validToken;
 
-	# Check to see if 
+    # Check to see if
 	# 1) the userId associated with the posted username matches the posted userId (we're editing an account)
 	# or that the userId is new and the username selected is unique (creating new account)
 	# or that the username passed in isn't assigned a userId (changing a username)
@@ -829,11 +829,11 @@ sub www_editUserSave {
 	my $postedUsername = $session->form->process("username");
 	$postedUsername = WebGUI::HTML::filter($postedUsername, "all");
 
-	if (($existingUserId eq $postedUserId || ($postedUserId eq "new" && !$existingUserId) || $existingUserId eq '')
+    if (($existingUserId eq $postedUserId || ($postedUserId eq "new" && !$existingUserId) || $existingUserId eq '')
              && $postedUsername ne '') 
              {
-		# Create a user object with the id passed in.  If the Id is 'new', the new method will return a new user,
-		# otherwise return the existing users properties
+        # Create a user object with the id passed in.  If the Id is 'new', the new method will return a new user,
+        # otherwise return the existing users properties
 	   	my $u = WebGUI::User->new($session,$postedUserId);
 	   	$actualUserId = $u->userId;
 	   	
@@ -851,10 +851,59 @@ sub www_editUserSave {
         }
        		
         # Loop through all profile fields, and update them with new values.
-		foreach my $field (@{WebGUI::ProfileField->getFields($session)}) {
+        my $address          = {};
+        my $address_mappings = WebGUI::Shop::AddressBook->getProfileAddressMappings;
+        foreach my $field (@{WebGUI::ProfileField->getFields($session)}) {
 			next if $field->getId =~ /contentPositions/;
-			$u->profileField($field->getId,$field->formProcess($u));
+            my $field_value = $field->formProcess($u);
+			$u->update({ $field->getId => $field_value} );
+
+            #set the shop address fields
+            my $address_key          = $address_mappings->{$field->getId};
+            $address->{$address_key} = $field_value if ($address_key);
 		}
+
+        #Update or create and update the shop address
+        if ( keys %$address ) {
+            $address->{'isProfile'        } = 1;
+
+            #Get the address book for the user (one is created if it does not exist)
+            my $addressBook     = WebGUI::Shop::AddressBook->newByUserId($session, $actualUserId,);
+            my $profileAddress = eval { $addressBook->getProfileAddress() };
+
+            my $e;
+            if($e = WebGUI::Error->caught('WebGUI::Error::ObjectNotFound')) {
+                #Get home address only mappings to avoid creating addresses with just firstName, lastName, email
+                my %home_address_map = %{$address_mappings};
+                delete $home_address_map{qw/firstName lastName email/};
+                #Add the profile address for the user if there are homeAddress fields
+                if( grep { $address->{$_} } values %home_address_map ) {
+                    $address->{label} = "Profile Address";
+                    my $new_address = $addressBook->addAddress($address);
+                    #Set this as the default address if one doesn't already exist
+                    my $defaultAddress = eval{ $addressBook->getDefaultAddress };
+                    if(WebGUI::Error->caught('WebGUI::Error::ObjectNotFound')) {
+                        $addressBook->update( {
+                            defaultAddressId => $new_address->getId
+                        } );
+                    }
+                    else {
+                        $session->log->warn("The default address exists, and it should not.");
+                    }
+                }
+            }
+            elsif ($e = WebGUI::Error->caught) {
+                #Bad stuff happened - log an error but don't fail since this isn't a vital function
+                $session->log->error(
+                    q{Could not update Shop Profile Address for user }
+                        .$u->username.q{ : }.$e->error
+                );
+            }
+            else {
+                #Update the profile address for the user
+                $profileAddress->update($address);
+            }
+        }
 		
 		# Update group assignements
 		my @groups = $session->form->group("groupsToAdd");

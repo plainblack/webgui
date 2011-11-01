@@ -15,6 +15,9 @@
 
 use strict;
 use Test::More;
+use Test::Deep;
+use Exception::Class;
+
 use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Auth;
 use WebGUI::Session;
@@ -30,7 +33,7 @@ my ($request, $oldRequest, $output);
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 4;        # Increment this number for each test you create
+plan tests => 11;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # Test createAccountSave and returnUrl together
@@ -59,9 +62,21 @@ WebGUI::Test->addToCleanup(sub {
             "SELECT userId FROM users WHERE username=?",
             [ $username ]
         );
-        
+
+        my $addressBookId = $session->db->quickScalar(
+            "select addressBookId from addressBook where userId=?",
+            [ $userId ]
+        );
+
+        if($addressBookId) {
+            $session->db->write(
+                "delete from address where addressBookId=?",
+                [$addressBookId]
+            );
+        }
+
         my @tableList
-            = qw{authentication users userProfileData groupings inbox userLoginLog};
+            = qw{authentication users userProfileData groupings inbox userLoginLog addressBook};
 
         for my $table ( @tableList ) {
             $session->db->write(
@@ -79,6 +94,8 @@ is(
 
 is $createAccountSession->user->profileField('language'), $language, 'languageOverride is taken in to account in createAccountSave';
 $createAccountSession->scratch->delete('language');  ##Remove language override
+
+
 
 #----------------------------------------------------------------------------
 # Test login and returnUrl together
@@ -102,6 +119,104 @@ is $output, undef, 'login returns undef when showMessageOnLogin is false';
 
 # Session Cleanup
 $session->{_request} = $oldRequest;
+
+#----------------------------------------------------------------------------
+# Test createAccountSave
+$username    = $session->id->generate;
+push @cleanupUsernames, $username;
+
+#Test updates to existing addresses
+tie my %profile_info, "Tie::IxHash", (
+    firstName       => "Andy",
+    lastName        => "Dufresne",
+    homeAddress     => "123 Shank Ave.",
+    homeCity        => "Shawshank",
+    homeState       => "PA",
+    homeZip         => "11223",
+    homeCountry     => "US",
+    homePhone       => "111-111-1111",
+    email           => 'andy@shawshank.com'
+);
+
+$auth->createAccountSave( $username, { }, "PASSWORD", \%profile_info );
+
+#Reset andy to the session users since stuff has changed
+my $andy = $session->user;
+
+#Test that the address was saved to the profile
+cmp_bag(
+    [ map { $andy->profileField($_) } keys %profile_info ],
+    [ values %profile_info ],
+    'Profile fields were saved'
+);
+
+#Test that the addressBook was created
+my $bookId = $session->db->quickScalar(
+    q{ select addressBookId from addressBook where userId=? },
+    [$andy->getId]
+);
+
+ok( ($bookId ne ""), "Address Book was created");
+
+my $book   = WebGUI::Shop::AddressBook->new($session,$bookId);
+
+my @addresses = @{ $book->getAddresses() };
+
+is(scalar(@addresses), 1 , "One address was created in the address book");
+
+my $address = $addresses[0];
+
+tie my %address_info, "Tie::IxHash", (
+    firstName       => $address->get("firstName"),
+    lastName        => $address->get("lastName"),
+    homeAddress     => $address->get("address1"),
+    homeCity        => $address->get("city"),
+    homeState       => $address->get("state"),
+    homeZip         => $address->get("code"),
+    homeCountry     => $address->get("country"),
+    homePhone       => $address->get("phoneNumber"),
+    email           => $address->get("email")
+);
+
+#Test that the address was saved properly to shop
+cmp_bag(
+    [ values %profile_info ],
+    [ values %address_info ],
+    'Shop address was has the right information'
+);
+
+#Test that the address is returned as the profile address
+my $profileAddress = $book->getProfileAddress;
+is($profileAddress->getId, $address->getId, "Profile linked properly to address");
+
+#Test that the address is the default address
+my $defaultAddress = $book->getDefaultAddress;
+is(
+    $defaultAddress->getId,
+    $address->getId,
+    "Profile address properly set to default address when created"
+);
+
+$username    = $session->id->generate;
+push @cleanupUsernames, $username;
+
+#Test updates to existing addresses
+%profile_info = (
+    firstName       => "Andy",
+    lastName        => "Dufresne",
+    email           => 'andy@shawshank.com'
+);
+
+$auth->createAccountSave( $username, { }, "PASSWORD", \%profile_info );
+
+#Test that the addressBook was not created
+my $bookCount = $session->db->quickScalar(
+    q{ select count(addressBookId) from addressBook where userId=? },
+    [$session->user->getId]
+);
+
+is( $bookCount, 0, "Address Book was not created for user without address fields");
+
 sub installPigLatin {
     use File::Copy;
 	mkdir File::Spec->catdir(WebGUI::Test->lib, 'WebGUI', 'i18n', 'PigLatin');

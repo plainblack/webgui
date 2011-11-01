@@ -26,6 +26,7 @@ require WebGUI::Asset::Template;
 use WebGUI::Exception::Shop;
 use WebGUI::Form;
 use WebGUI::International;
+use WebGUI::Shop::Admin;
 use WebGUI::Shop::Address;
 use Scalar::Util qw/blessed/;
 
@@ -101,7 +102,7 @@ around BUILDARGS => sub {
         }
         my ($addressBookId)          = $class->_init($session);
         $properties->{addressBookId} = $addressBookId;
-        $properties->{userId}        = $session->user->userId;
+        $properties->{userId}        ||= $session->user->userId;
         return $class->$orig($properties);
     }
     my $session = shift;
@@ -369,6 +370,55 @@ sub getDefaultAddress {
 
 #-------------------------------------------------------------------
 
+=head2 getProfileAddress ()
+
+Returns the profile address for this address book if there is one. Otherwise throws a WebGUI::Error::ObjectNotFound exception.
+
+=cut
+
+sub getProfileAddress {
+    my ($self) = @_;
+    my $id = $self->session->db->quickScalar(q{ select addressId from address where addressBookId=? and isProfile=1 },[$self->getId]);
+    if (!$id) {
+        WebGUI::Error::ObjectNotFound->throw(error=>"No profile address.");
+    }
+    my $address = eval { $self->getAddress($id) };
+    my $e;
+    if ($e = WebGUI::Error->caught('WebGUI::Error::ObjectNotFound')) {
+        $e->rethrow;
+    }
+    elsif ($e = WebGUI::Error->caught) {
+        $e->rethrow;
+    }
+    else {
+        return $address;
+    }
+}
+
+#-------------------------------------------------------------------
+
+=head2 getProfileAddressMappings ( )
+
+Class or object method which returns the profile address field mappings
+
+=cut
+
+sub getProfileAddressMappings {
+    return {
+        homeAddress => 'address1',
+        homeCity    => 'city',
+        homeState   => 'state',
+        homeZip     => 'code',
+        homeCountry => 'country',
+        homePhone   => 'phoneNumber',
+        email       => 'email',
+        firstName   => 'firstName',
+        lastName    => 'lastName'
+    }
+}
+
+#-------------------------------------------------------------------
+
 =head2 getId ()
 
 Returns the unique id for this addressBook.
@@ -458,7 +508,9 @@ sub newByUserId {
     }
     else {
         # nope create one for the user
-        return $class->new($session);
+        my $book = $class->new({session => $session, userId => $userId});
+        $book->write;
+        return $book
     }
 }
 
@@ -481,19 +533,19 @@ sub processAddressForm {
     $prefix  ||= '';
     my $form   = $self->session->form;
     my %addressData = (
-        label           => $form->get($prefix . "label"),
-        firstName       => $form->get($prefix . "firstName"),
-        lastName        => $form->get($prefix . "lastName"),
-        address1        => $form->get($prefix . "address1"),
-        address2        => $form->get($prefix . "address2"),
-        address3        => $form->get($prefix . "address3"),
-        city            => $form->get($prefix . "city"),
-        state           => $form->get($prefix . "state"),
-        code            => $form->get($prefix . "code",        "zipcode"),
-        country         => $form->get($prefix . "country",     "country"),
-        phoneNumber     => $form->get($prefix . "phoneNumber", "phone"),
-        email           => $form->get($prefix . "email",       "email"),
-        organization    => $form->get($prefix . "organization"),
+        label           => $form->get($prefix . "label") || '',
+        firstName       => $form->get($prefix . "firstName") || '',
+        lastName        => $form->get($prefix . "lastName") || '',
+        address1        => $form->get($prefix . "address1") || '',
+        address2        => $form->get($prefix . "address2") || '',
+        address3        => $form->get($prefix . "address3") || '',
+        city            => $form->get($prefix . "city") || '',
+        state           => $form->get($prefix . "state") || '',
+        code            => $form->get($prefix . "code",        "zipcode") || '',
+        country         => $form->get($prefix . "country",     "country") || '',
+        phoneNumber     => $form->get($prefix . "phoneNumber", "phone") || '',
+        email           => $form->get($prefix . "email",       "email") || '',
+        organization    => $form->get($prefix . "organization") || '',
     );
 
     ##Label is optional in the form, but required for the UI and API.
@@ -559,6 +611,80 @@ sub www_ajaxSave {
 
 #-------------------------------------------------------------------
 
+=head2 www_ajaxSearch ( )
+
+Gets a JSON object with addresses returned based on the search
+parameters from the form.
+
+=cut
+
+sub www_ajaxSearch {
+    my $self    = shift;
+    my $session = $self->session;
+    my $form    = $session->form;
+
+    my $name      = $form->get('name');
+    my $fields = {
+        firstName       => (split(" ",$name))[0] || "",
+        lastName        => (split(" ",$name))[1] || "",
+        organization    => $form->get('organization') || "",
+        address1        => $form->get('address1') || "",
+        address2        => $form->get('address2') || "",
+        address3        => $form->get('address3') || "",
+        city            => $form->get('city') || "",
+        state           => $form->get('state') || "",
+        code            => $form->get('zipcode') || "",
+        country         => $form->get('country') || "",
+        email           => $form->get('email') || "",
+        phoneNumber     => $form->get('phone') || "",
+    };
+
+    my $clause = [];
+    my $params = [];
+
+    foreach my $field (keys %$fields) {
+        my $field_value = $fields->{$field};
+        if($field_value) {
+            $field       = $session->db->dbh->quote_identifier($field);
+            $field_value = $field_value."%";
+            push(@$clause,qq{$field like ?});
+            push(@$params,$field_value);
+        }
+    }
+
+    my $admin = WebGUI::Shop::Admin->new($session);
+    unless ($session->user->isAdmin || $admin->canManage || $admin->isCashier) {
+        push(@$clause,qq{users.userId=?});
+        push(@$params,$session->user->getId);
+    }
+
+    my $where  = "";
+    $where = "where ".join(" and ",@$clause) if scalar(@$clause);
+
+    my $query = qq{
+        select
+            address.*,
+            users.username
+        from
+            address
+            join addressBook on address.addressBookId = addressBook.addressBookId
+            join users on addressBook.userId = users.userId
+        $where
+        limit 3
+    };
+
+    my $sth = $session->db->read($query,$params);
+    my $var = [];
+    while (my $hash = $sth->hashRef) {
+        push(@$var,$hash);
+    }
+
+    $session->http->setMimeType('text/plain');
+    return JSON->new->encode($var);
+}
+
+#-------------------------------------------------------------------
+
 =head2 www_deleteAddress ( )
 
 Deletes an address from the book.
@@ -567,7 +693,10 @@ Deletes an address from the book.
 
 sub www_deleteAddress {
     my $self = shift;
-    $self->getAddress($self->session->form->get("addressId"))->delete;
+    my $address = $self->getAddress($self->session->form->get("addressId"));
+    if (defined $address && !$address->isProfile) {
+        $address->delete;
+    }
     return $self->www_view;
 }
 
@@ -726,8 +855,20 @@ sub www_editAddressSave {
         $self->addAddress(\%addressData);
     }
     else {
-        $self->getAddress($form->get('addressId'))->update(\%addressData);
+        my $addressId = $form->get('addressId');
+        my $address   = $self->getAddress($addressId);
+        $address->update(\%addressData);
+        if($address->isProfile) {
+            my $u = WebGUI::User->new($self->session, $self->get("userId"));
+            my $address_mappings = $self->getProfileAddressMappings;
+            foreach my $field (keys %$address_mappings) {
+                my $addr_field = $address_mappings->{$field};
+                $u->profileField($field,$address->get($addr_field));
+            }
+        }
     }
+
+    #profile fields updated in WebGUI::Shop::Address->update
     return $self->www_view;
 }
 
@@ -758,12 +899,12 @@ sub www_view {
         return $self->www_editAddress;
     }
     foreach my $address (@availableAddresses) {
+
         push(@addresses, {
             %{$address->get},
             address         => $address->getHtmlFormatted,
             isDefault       => ($self->get('defaultAddressId') eq $address->getId),
-            deleteButton    => 
-                WebGUI::Form::formHeader( $session )
+            deleteButton    => $address->get("isProfile") ? undef : WebGUI::Form::formHeader( $session )
                 . WebGUI::Form::hidden( $session, { name => 'shop',      value => 'address'         } )
                 . WebGUI::Form::hidden( $session, { name => 'method',    value => 'deleteAddress'   } )
                 . WebGUI::Form::hidden( $session, { name => 'addressId', value => $address->getId   } )

@@ -129,6 +129,7 @@ my $defaultPayDrivers = {
     'WebGUI::Shop::PayDriver::Ogone'         => 'Ogone',
     'WebGUI::Shop::PayDriver::PayPal::PayPalStd'       => 'PayPal',
     'WebGUI::Shop::PayDriver::PayPal::ExpressCheckout' => 'PayPal Express Checkout',
+    'WebGUI::Shop::PayDriver::CreditCard::AuthorizeNet' => 'Credit Card (Authorize.net)',
 };
 
 cmp_deeply( $drivers, $defaultPayDrivers, 'getDrivers returns the default PayDrivers');

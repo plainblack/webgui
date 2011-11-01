@@ -27,11 +27,6 @@ use WebGUI::Shop::AddressBook;
 my $session         = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
-# Tests
-
-plan tests => 20;
-
-#----------------------------------------------------------------------------
 # put your tests here
 
 my $storage;
@@ -128,6 +123,7 @@ cmp_deeply(
         addressId    => ignore(), #checked elsewhere
         addressBookId  => $book->getId,
         addressBook  => $book,
+        isProfile   => 0,
     },
     'get the whole thing and check a new, blank object'
 );
@@ -192,3 +188,5 @@ cmp_deeply(
 $address->delete;
 my $check = $session->db->quickScalar('select count(*) from address where addressId=?',[$address->getId]);
 is( $check, 0, 'delete worked');
+
+done_testing;

@@ -2590,15 +2590,52 @@ sub www_printBadge {
 	my $self = shift;
 	my $session = $self->session;
 	return $session->privilege->insufficient unless ($self->isRegistrationStaff);
-	my $form = $session->form;
-	my $registrant = $self->getRegistrant($form->get('badgeId'));
-	my $badge = WebGUI::Asset::Sku::EMSBadge->newById($session, $registrant->{badgeAssetId});
+    my $form = $session->form;
+    my $badgeId    = $form->get('badgeId');
+    my $registrant = $self->getRegistrant($badgeId);
+    my $badge      = WebGUI::Asset::Sku::EMSBadge->newById($session, $registrant->{badgeAssetId});
 	$registrant->{badgeTitle} = $badge->getTitle;
 
     # Add badge metadata
     my $meta    = $badge->getMetaDataAsTemplateVariables;
     for my $key ( keys %{$meta} ) {
         $registrant->{ "badgeMeta_" . $key } = $meta->{ $key };
+    }
+
+    #Add tickets
+    my @tickets = $session->db->buildArray(
+        q{select ticketAssetId from EMSRegistrantTicket where badgeId=?},
+        [$badgeId]
+    );
+
+    $registrant->{ticket_loop} = [];
+    foreach my $ticketId (@tickets) {
+		my $ticket = WebGUI::Asset::Sku::EMSTicket->newById($session, $ticketId);
+        push (@{$registrant->{ticket_loop}}, $ticket->get);
+	}
+
+    #Add ribbons
+    my @ribbons = $session->db->buildArray(
+        q{select ribbonAssetId from EMSRegistrantRibbon where badgeId=?},
+        [$badgeId]
+    );
+
+	$registrant->{ribbon_loop} = [];
+    foreach my $ribbonId (@ribbons) {
+        my $ribbon = WebGUI::Asset::Sku::EMSRibbon->newById($session, $ribbonId);
+        push (@{$registrant->{ribbon_loop}}, $ribbon->get);
+    }
+
+	## Add tokens
+    my @tokens = $session->db->buildArray(
+        q{select tokenAssetId from EMSRegistrantToken where badgeId=?},
+        [$badgeId]
+    );
+
+	$registrant->{token_loop} = [];
+    foreach my $tokenId (@tokens) {
+        my $token = WebGUI::Asset::Sku::EMSToken->newById($session, $tokenId);
+        push (@{$registrant->{token_loop}}, $token->get);
     }
 
 	return $self->processTemplate($registrant,$self->printBadgeTemplateId);
