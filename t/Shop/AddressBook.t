@@ -16,6 +16,7 @@
 use strict;
 use Test::More;
 use Test::Deep;
+use Data::Dumper;
 use Exception::Class;
 
 use WebGUI::Test; # Must use this before any other WebGUI modules
@@ -194,9 +195,6 @@ is($profile_address->getId,$address1->getId,"getProfileAddress returns addresses
 #
 #######################################################################
 
-#Clear the book address cache
-$book->uncache;
-
 my $address_info = {
     label           => 'Profile Label',
     addressId       => $address1->getId,
@@ -232,13 +230,10 @@ cmp_bag(
 my $u = WebGUI::User->new($session,$book->get("userId"));
 
 cmp_bag(
-    [ map { $u->profileField($_) } keys %{ $book->getProfileAddressMappings } ],
+    [ map { $u->get($_) } keys %{ $book->getProfileAddressMappings } ],
     [ map { $address1->get($_) } values %{ $book->getProfileAddressMappings } ],
     'Profile address was updated and matches address fields'
 );
-
-#Test that updates to non profile address does not update the profile
-$book->uncache;
 
 $address_info = {
     label           => 'Non Profile Label',
@@ -275,7 +270,7 @@ cmp_bag(
 );
 
 cmp_bag(
-    [ map { $u->profileField($_) } keys %{ $book->getProfileAddressMappings } ],
+    [ map { $u->get($_) } keys %{ $book->getProfileAddressMappings } ],
     [ map { $address1->get($_) } values %{ $book->getProfileAddressMappings } ],
     'Profile address was not updated when non profile fields were saved'
 );
@@ -285,9 +280,6 @@ cmp_bag(
 # www_deleteAddress
 #
 #######################################################################
-
-#clear the cache
-$book->uncache;
 
 $session->request->setup_body({
     'addressId' => $address2->getId,
@@ -303,9 +295,6 @@ cmp_bag(
     'Address was deleted properly'
 );
 
-
-#clear the cache
-$book->uncache;
 
 $session->request->setup_body({
     'addressId' => $address1->getId,
@@ -327,9 +316,6 @@ cmp_bag(
 # delete
 #
 #######################################################################
-
-#clear the cache
-$book->uncache;
 
 my $addressBookId = $alreadyHaveBook->getId;
 my $firstCount    = $session->db->quickScalar('select count(*) from addressBook where addressBookId=?',[$addressBookId]);
@@ -381,6 +367,7 @@ cmp_bag(
 #Create some data to search for
 my $andySession = WebGUI::Test->newSession;
 my $andy = WebGUI::User->create($andySession);
+$andy->username('andy');
 WebGUI::Test->addToCleanup($andy);
 $andySession->user({ userId => $andy->getId });
 my $andyBook   = WebGUI::Shop::AddressBook->create($andySession);
@@ -421,6 +408,7 @@ my $andyAddr2 = $andyBook->addAddress({
 
 my $redSession = WebGUI::Test->newSession;
 my $red = WebGUI::User->create($redSession);
+$red->username('red');
 WebGUI::Test->addToCleanup($red);
 $redSession->user({userId => $red->getId});
 my $redBook   = WebGUI::Shop::AddressBook->create($redSession);
@@ -439,12 +427,14 @@ my $redAddr = $redBook->addAddress({
     country         => 'US',
     phoneNumber     => '111-111-1111',
     email           => 'red@shawshank.com',
-    organization    => 'Shawshank'
+    organization    => 'Shawshank',
+    isProfile       => 0,
 });
 
 
 my $brooksSession = WebGUI::Test->newSession;
 my $brooks = WebGUI::User->create($brooksSession);
+$brooks->username('brooks');
 WebGUI::Test->addToCleanup($brooks);
 $brooksSession->user({userId => $brooks->getId});
 my $brooksBook   = WebGUI::Shop::AddressBook->create($brooksSession);
@@ -463,7 +453,8 @@ my $brooksAddr = $brooksBook->addAddress({
     country         => 'US',
     phoneNumber     => '111-111-1111',
     email           => 'brooks@shawshank.com',
-    organization    => 'Shawshank'
+    organization    => 'Shawshank',
+    isProfile       => 0,
 });
 
 #Test search as admin
@@ -473,11 +464,20 @@ $session->request->setup_body({
 
 my $results = JSON->new->decode($book->www_ajaxSearch);
 
+my $andyAddr1_get  = $andyAddr1->get;
+my $andyAddr2_get  = $andyAddr2->get;
+my $redAddr_get    = $redAddr->get;
+my $brooksAddr_get = $brooksAddr->get;
+
+foreach my $addr ($andyAddr1_get, $andyAddr2_get, $redAddr_get, $brooksAddr_get) {
+    delete $addr->{addressBook};
+}
+
 cmp_bag(
     $results,
     [
-        { %{$andyAddr1->get}, username => $andy->username },
-        { %{$andyAddr2->get}, username => $andy->username },
+        { %{$andyAddr1_get}, username => $andy->username, },
+        { %{$andyAddr2_get}, username => $andy->username, },
     ],
     'Ajax Address Search matches name correctly for admins'
 );
@@ -501,7 +501,7 @@ $results = JSON->new->decode($book->www_ajaxSearch);
 
 cmp_bag(
     $results,
-    [{ %{$andyAddr1->get}, username => $andy->username }],
+    [{ %{$andyAddr1_get}, username => $andy->username }],
     'Ajax Address Search matches multiple fields correctly'
 );
 
@@ -539,9 +539,9 @@ $results = JSON->new->decode($book->www_ajaxSearch);
 cmp_bag(
     $results,
     [
-        { %{$andyAddr1->get}, username => $andy->username },
-        { %{$redAddr->get}, username => $red->username },
-        { %{$brooksAddr->get}, username => $brooks->username },
+        { %{$andyAddr1_get},  username => $andy->username },
+        { %{$redAddr_get},    username => $red->username },
+        { %{$brooksAddr_get}, username => $brooks->username },
     ],
     'Ajax Address Search returns cross user results for admins'
 );
@@ -556,9 +556,9 @@ $results = JSON->new->decode($andyBook->www_ajaxSearch);
 cmp_bag(
     $results,
     [
-        { %{$andyAddr1->get}, username => $andy->username },
-        { %{$redAddr->get}, username => $red->username },
-        { %{$brooksAddr->get}, username => $brooks->username },
+        { %{$andyAddr1_get}, username => $andy->username },
+        { %{$redAddr_get}, username => $red->username },
+        { %{$brooksAddr_get}, username => $brooks->username },
     ],
     'Ajax Address Search returns cross user results for shop admins'
 );
@@ -573,9 +573,9 @@ $results = JSON->new->decode($redBook->www_ajaxSearch);
 cmp_bag(
     $results,
     [
-        { %{$andyAddr1->get}, username => $andy->username },
-        { %{$redAddr->get}, username => $red->username },
-        { %{$brooksAddr->get}, username => $brooks->username },
+        { %{$andyAddr1_get}, username => $andy->username },
+        { %{$redAddr_get}, username => $red->username },
+        { %{$brooksAddr_get}, username => $brooks->username },
     ],
     'Ajax Address Search returns cross user results for shop cashiers'
 );
@@ -588,7 +588,7 @@ $results = JSON->new->decode($brooksBook->www_ajaxSearch);
 
 cmp_bag(
     $results,
-    [{ %{$brooksAddr->get}, username => $brooks->username }],
+    [{ %{$brooksAddr_get}, username => $brooks->username }],
     'Ajax Address Search returns only current user results for non privileged users'
 );
 

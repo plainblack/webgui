@@ -28,7 +28,6 @@ my $session         = WebGUI::Test->session;
 
 my @cleanupUsernames    = ();   # Will be cleaned up when we're done
 my $auth;   # will be used to create auth instances
-my ($request, $oldRequest, $output);
 
 #----------------------------------------------------------------------------
 # Tests
@@ -54,7 +53,7 @@ WebGUI::Test->addToCleanup(sub {
 });
 
 $createAccountSession->scratch->setLanguageOverride($language);
-$output         = $auth->www_createAccountSave( $username, { }, "PASSWORD" ); 
+my $output         = $auth->www_createAccountSave( $username, { }, "PASSWORD" ); 
 WebGUI::Test->addToCleanup(sub {
     for my $username ( @cleanupUsernames ) {
         # We don't create actual, real users, so we have to cleanup by hand
@@ -92,7 +91,7 @@ is(
     "returnUrl field is used to set redirect after createAccountSave",
 );
 
-is $createAccountSession->user->profileField('language'), $language, 'languageOverride is taken in to account in createAccountSave';
+is $createAccountSession->user->get('language'), $language, 'languageOverride is taken in to account in createAccountSave';
 $createAccountSession->scratch->delete('language');  ##Remove language override
 
 
@@ -109,7 +108,7 @@ $auth           = WebGUI::Auth->new( $loginSession, 3 );
 my $username    = $loginSession->id->generate;
 push @cleanupUsernames, $username;
 $session->setting->set('showMessageOnLogin', 0);
-$output         = $auth->login;
+$output         = $auth->www_login;
 
 is(
     $loginSession->response->location, 'REDIRECT_LOGIN_URL',
@@ -117,11 +116,9 @@ is(
 );
 is $output, undef, 'login returns undef when showMessageOnLogin is false';
 
-# Session Cleanup
-$session->{_request} = $oldRequest;
-
 #----------------------------------------------------------------------------
 # Test createAccountSave
+$auth           = WebGUI::Auth->new( $session );
 $username    = $session->id->generate;
 push @cleanupUsernames, $username;
 
@@ -138,14 +135,14 @@ tie my %profile_info, "Tie::IxHash", (
     email           => 'andy@shawshank.com'
 );
 
-$auth->createAccountSave( $username, { }, "PASSWORD", \%profile_info );
+diag $auth->www_createAccountSave( $username, { }, "PASSWORD", \%profile_info );
 
 #Reset andy to the session users since stuff has changed
 my $andy = $session->user;
 
 #Test that the address was saved to the profile
 cmp_bag(
-    [ map { $andy->profileField($_) } keys %profile_info ],
+    [ map { $andy->get($_) } keys %profile_info ],
     [ values %profile_info ],
     'Profile fields were saved'
 );

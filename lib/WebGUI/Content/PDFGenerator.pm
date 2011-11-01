@@ -138,7 +138,7 @@ sub handler {
     return undef unless $op && $op eq 'generatePdf';
     my $asset = getRequestedAsset($session);
     return $session->privilege->noAccess unless $asset->canView;
-    $session->http->setMimeType('application/pdf');
+    $session->response->content_type('application/pdf');
     return cache($asset);
 }
 

@@ -8,7 +8,28 @@ use DateTime;
 use Readonly;
 use Business::OnlinePayment;
 
+use Moose;
+use WebGUI::Definition::Shop;
+extends 'WebGUI::Shop::PayDriver::CreditCard';
+
 Readonly my $I18N => 'PayDriver_AuthorizeNet';
+
+define pluginName => ['name', $I18N];
+property login => (
+            fieldType => 'text',
+            label     => ['login', $I18N],
+            hoverHelp => ['login help', $I18N],
+         );
+property transaction_key => (
+            fieldType => 'text',
+            label     => ['transaction key', $I18N],
+            hoverHelp => ['transaction key help', $I18N],
+         );
+property testMode => (
+            fieldType => 'YesNo',
+            label     => ['test mode', $I18N],
+            hoverHelp => ['test mode help', $I18N],
+         );
 
 =head1 NAME
 
@@ -86,38 +107,6 @@ sub cancelRecurringPayment {
 
     return $self->gatewayResponse($tx);
 }
-
-#-------------------------------------------------------------------
-sub definition {
-    my ( $class, $session, $definition ) = @_;
-
-    my $i18n = WebGUI::International->new( $session, $I18N );
-
-    tie my %fields, 'Tie::IxHash', (
-        login => {
-            fieldType => 'text',
-            label     => $i18n->get('login'),
-            hoverHelp => $i18n->get('login help'),
-        },
-        transaction_key => {
-            fieldType => 'text',
-            label     => $i18n->get('transaction key'),
-            hoverHelp => $i18n->get('transaction key help'),
-        },
-        testMode => {
-            fieldType => 'YesNo',
-            label     => $i18n->get('test mode'),
-            hoverHelp => $i18n->get('test mode help'),
-        },
-        );
-
-    push @{$definition}, {
-        name       => $i18n->get('name'),
-        properties => \%fields,
-        };
-
-    return $class->SUPER::definition( $session, $definition );
-} ## end sub definition
 
 #-------------------------------------------------------------------
 

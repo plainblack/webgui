@@ -1076,8 +1076,8 @@ sub www_preview {
     my $session = $self->session;
     return $session->privilege->insufficient unless $self->canEdit;
 
-    my $form = $session->form;
-    my $http = $session->http;
+    my $form     = $session->form;
+    my $response = $session->response;
 
     try {
         my $output = $self->processRaw(
@@ -1087,14 +1087,14 @@ sub www_preview {
             $form->get('parser'),
         );
         if ($form->get('plainText')) {
-            $http->setMimeType('text/plain');
+            $response->content_type('text/plain');
         }
         elsif ($output !~ /<html>/) {
             $output = $session->style->userStyle($output);
         }
         return $output;
     } catch {
-        $http->setMimeType('text/plain');
+        $response->content_type('text/plain');
         $_[0];
     }
 }

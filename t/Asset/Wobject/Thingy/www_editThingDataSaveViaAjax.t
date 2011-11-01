@@ -92,10 +92,10 @@ $session->request->setup_body({
 });
 
 $session->user({userId => '3'});
-$session->http->setStatus(200);
+$session->response->status(200);
 my $json = $thingy->www_editThingDataSaveViaAjax();
 is $json, '{}', 'www_editThingDataSaveViaAjax: Empty JSON hash';
-is $session->http->getStatus, 200, '... http status=200';
+is $session->response->status, 200, '... http status=200';
 
 
 $session->request->setup_body({   

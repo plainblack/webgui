@@ -91,6 +91,7 @@ property "addressBookId" => (
 property "isProfile" => (
     noFormPost => 1,
     required   => 0,
+    default    => 0,
 );
 
 has [ qw/addressId addressBook/] => (

@@ -916,7 +916,7 @@ sub www_createAccountSave {
 	    $profile->{'language'} = $self->session->scratch->getLanguageOverride;
 	}
 	$u->karma($self->session->setting->get("karmaPerLogin"),"Login","Just for logging in.") if ($self->session->setting->get("useKarma"));
-	$u->updateProfileFields($profile) if ($profile);
+    $u->update($profile);
     $self->update($properties);
 
     my $address          = {};
@@ -926,6 +926,8 @@ sub www_createAccountSave {
         my $address_key          = $address_mappings->{$fieldId};
         $address->{$address_key} = $profile->{$fieldId} if ($address_key);
     }
+
+	$self->session->user({user=>$u});
 
     #Update or create and update the shop address
     if ( keys %$address ) {
@@ -962,7 +964,6 @@ sub www_createAccountSave {
 		});
 	}
 
-	$self->session->user({user=>$u});
 	$self->_logLogin($userId,"success");
 
 	if ($self->session->setting->get("runOnRegistration")) {

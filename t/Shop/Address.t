@@ -123,7 +123,7 @@ cmp_deeply(
         addressId    => ignore(), #checked elsewhere
         addressBookId  => $book->getId,
         addressBook  => $book,
-        isProfile   => 0,
+        isProfile   => bool(0),
     },
     'get the whole thing and check a new, blank object'
 );

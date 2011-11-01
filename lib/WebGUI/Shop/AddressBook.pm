@@ -625,18 +625,18 @@ sub www_ajaxSearch {
 
     my $name      = $form->get('name');
     my $fields = {
-        firstName       => (split(" ",$name))[0] || "",
-        lastName        => (split(" ",$name))[1] || "",
-        organization    => $form->get('organization') || "",
-        address1        => $form->get('address1') || "",
-        address2        => $form->get('address2') || "",
-        address3        => $form->get('address3') || "",
-        city            => $form->get('city') || "",
-        state           => $form->get('state') || "",
-        code            => $form->get('zipcode') || "",
-        country         => $form->get('country') || "",
-        email           => $form->get('email') || "",
-        phoneNumber     => $form->get('phone') || "",
+        'address.firstName'       => (split(" ",$name))[0] || "",
+        'address.lastName'        => (split(" ",$name))[1] || "",
+        'address.organization'    => $form->get('organization') || "",
+        'address.address1'        => $form->get('address1') || "",
+        'address.address2'        => $form->get('address2') || "",
+        'address.address3'        => $form->get('address3') || "",
+        'address.city'            => $form->get('city') || "",
+        'address.state'           => $form->get('state') || "",
+        'address.code'            => $form->get('zipcode') || "",
+        'address.country'         => $form->get('country') || "",
+        'address.email'           => $form->get('email') || "",
+        'address.phoneNumber'     => $form->get('phone') || "",
     };
 
     my $clause = [];
@@ -645,7 +645,7 @@ sub www_ajaxSearch {
     foreach my $field (keys %$fields) {
         my $field_value = $fields->{$field};
         if($field_value) {
-            $field       = $session->db->dbh->quote_identifier($field);
+            $field       = join('.', map { $session->db->quote_identifier($_) } split(/\./, $field));
             $field_value = $field_value."%";
             push(@$clause,qq{$field like ?});
             push(@$params,$field_value);
@@ -663,8 +663,8 @@ sub www_ajaxSearch {
 
     my $query = qq{
         select
-            address.*,
-            users.username
+            users.username,
+            address.*
         from
             address
             join addressBook on address.addressBookId = addressBook.addressBookId
@@ -679,7 +679,7 @@ sub www_ajaxSearch {
         push(@$var,$hash);
     }
 
-    $session->http->setMimeType('text/plain');
+    $session->response->content_type('text/plain');
     return JSON->new->encode($var);
 }
 
