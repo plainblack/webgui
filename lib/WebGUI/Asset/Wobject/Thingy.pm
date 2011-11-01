@@ -3012,7 +3012,7 @@ sub www_editThingDataSaveViaAjax {
             return JSON->new->encode({message => $i18n->get("has entered max per user message")});
         }
         if($thingDataId eq 'new' && $self->hasEnteredMaxEntries($thingId)){
-            $session->http->setStatus("400", "Bad Request");
+            $session->response->status("400");
             return JSON->new->encode({message => $i18n->get("has entered max total message")});
         }
 
