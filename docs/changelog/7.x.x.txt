@@ -1,5 +1,20 @@
+7.10.23
+ - fixed #12225: Stock asset, multiple instances on a page
+ - fixed #12229: Indexed thingy data has gateway url prepended to it
+ - fixed #12195: Visitor group by scratch membership shared among all Visitors (Dale Trexel)
+ - fixed #12227: Corrected AssetReport such that OrderBy works correctly.
+ - fixed #12238: Old template attachement in search template slows down sites
+ - fixed #12239: Still get cart error message after removing extra recurring items from the cart
+ - fixed #12240: Empty Extend Calendar Recurrance version tags
+ - fixed #12241: Account Shop
+ - fixed #12246: Layout inherits mobileStyleTemplateId and mobileTemplateId from parent Layouts
+ - fixed #12246: added extra_www_add_properties as properties fix-up hook in child for www_add
+ - fixed #12231: Thingy reindex fails on upgrade
+ - fixed #12245: Encrypt Login and Display Message on Login conflict
+ - fixed #12211: Recurring Item error message in Cart
+
 7.10.22
- - rfe   #12223: Add dateTime type to content profiling (metadata)
+ - rfe   #12223: Add date type to content profiling (metadata)
  - rfe #12207: Thingy. Field_name info returned by www_editThingDataSaveViaAjax
  - fixed #12206: Bad Subscription Groups in Duplicated Threads
  - fixed #12208: replacements don't work

@@ -334,7 +334,7 @@ sub getRequestedUrl {
 
 =head2 getSiteURL ( )
 
-Returns a constructed site url. The returned value can be overridden using the setSiteURL function.
+Returns a constructed site url without the gateway. The returned value can be overridden using the setSiteURL function.
 
 =cut
 

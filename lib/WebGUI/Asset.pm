@@ -1427,6 +1427,28 @@ sub getImportNode {
 	return WebGUI::Asset->newById($session, "PBasset000000000000002");
 }
 
+#-------------------------------------------------------------------
+
+=head2 getInheritableProperties ( )
+
+Returns a hash (list) of properties that should be inherited from a parent when creating an asset.
+
+=cut
+
+sub getInheritableProperties {
+	my $self = shift;
+    return (
+		parentId => $self->getId,
+		groupIdView => $self->get("groupIdView"),
+		groupIdEdit => $self->get("groupIdEdit"),
+		ownerUserId => $self->get("ownerUserId"),
+		encryptPage => $self->get("encryptPage"),
+		styleTemplateId => $self->get("styleTemplateId"),
+		printableStyleTemplateId => $self->get("printableStyleTemplateId"),
+		isHidden => $self->get("isHidden"),
+    );
+}
+
 
 
 #-------------------------------------------------------------------
@@ -2749,15 +2771,8 @@ sub www_add {
 	}
 	my %properties = (
 		%prototypeProperties,
-		parentId => $self->getId,
-		groupIdView => $self->get("groupIdView"),
-		groupIdEdit => $self->get("groupIdEdit"),
-		ownerUserId => $self->get("ownerUserId"),
-		encryptPage => $self->get("encryptPage"),
-		styleTemplateId => $self->get("styleTemplateId"),
-		printableStyleTemplateId => $self->get("printableStyleTemplateId"),
-		isHidden => $self->get("isHidden"),
 		className=>$class,
+        $self->getInheritableProperties,
 		assetId=>"new",
 		url=>scalar($self->session->form->param("url")),
 		);

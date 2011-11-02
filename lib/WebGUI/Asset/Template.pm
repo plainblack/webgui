@@ -637,15 +637,15 @@ sub prepare {
 
 	$style->setRawHeadTags($headBlock);
 
+    my %props = ( type => 'text/css', rel => 'stylesheet' );
 	foreach my $sheet ( @{ $self->getAttachments('stylesheet') } ) {
-		my %props = ( type => 'text/css', rel => 'stylesheet' );
 		$style->setLink($sheet->{url}, \%props);
 	}
 
 	my $doScripts = sub {
 		my ($type, $body) = @_;
+        my %props = ( type => 'text/javascript' );
 		foreach my $script ( @{ $self->getAttachments($type) } ) {
-			my %props = ( type => 'text/javascript' );
 			$style->setScript($script->{url}, \%props, $body);
 		}
 	};

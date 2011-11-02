@@ -2,7 +2,7 @@
 #                   WebGUI Legal Information                       #
 ####################################################################
 
-WebGUI is Copyright 2001-2009 Plain Black Corporation. All rights 
+WebGUI is Copyright 2001-2011 Plain Black Corporation. All rights 
 reserved.
 
 WebGUI Content Engine, WebGUI Runtime Environment, and Plain Black 

@@ -75,12 +75,12 @@ is $session->db->quickScalar('select count(*) from assetIndex where assetId=?',[
 
 my $record;
 
-$record = $session->db->quickHashRef('select * from assetIndex where assetId=?',[$thingy->getId]);
+$record = $session->db->quickHashRef('select * from assetIndex where assetId=? AND subId IS NOT NULL',[$thingy->getId]);
 cmp_deeply(
     $record,
     superhashof({
         subId       => 'THING_RECORD',
-        url         => $thingy->getUrl('func=search;thingId=THING_RECORD'),
+        url         => $session->url->append($thingy->get('url'), 'func=search;thingId=THING_RECORD'),
         title       => 'Label',
         groupIdView => 2,
         keywords    => all(
@@ -165,7 +165,7 @@ cmp_deeply(
         score        => ignore(),
         synopsis     => ignore(),
         title        => 'Label', ##From the Thing's label
-        url          => $thingy->getUrl('func=viewThingData;thingId='.$thingId.';thingDataId=THING_DATA'),
+        url          => $session->url->append($thingy->get('url'), 'func=viewThingData;thingId='.$thingId.';thingDataId=THING_DATA'),
     }
     ],
     'Checking indexed data for the thingData'
@@ -214,7 +214,7 @@ cmp_deeply(
         score        => ignore(),
         synopsis     => ignore(),
         title        => '8/16/2001', ##From viewScreenTitle, which is $birthday in user's preferred date format
-        url          => $thingy->getUrl('func=viewThingData;thingId='.$thingId.';thingDataId=THING_DATA'),
+        url          => $session->url->append($thingy->get('url'), 'func=viewThingData;thingId='.$thingId.';thingDataId=THING_DATA'),
     }
     ],
     'Checking indexed data for the thingData'

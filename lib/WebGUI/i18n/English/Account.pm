@@ -99,6 +99,12 @@ our $I18N = {
         lastUpdated => 1230844137,
     },
 
+    'Return to Account' => {
+        message     => q{Return to Account},
+        context     => q{label for templates that want to provide a link back to the main account page},
+        lastUpdated => 1230844137,
+    },
+
 };
 
 1;

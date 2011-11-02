@@ -872,6 +872,7 @@
     "r"                : "r_printable", 
     "Spacer"           : "Spacer", 
     "SpectreCheck"     : "SpectreCheck",
+    "TwitterLogin"     : "TwitterLogin", 
     "Thumbnail"        : "Thumbnail", 
     "TwitterLogin"     : "TwitterLogin",
     "User"             : "User", 
