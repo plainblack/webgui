@@ -266,12 +266,4 @@ $mech->submit_form_ok(
 );
 $mech->base_is( $assetUrl, "We don't get redirected" );
 
-#----------------------------------------------------------------------------
-# HTTP basic auth
-$mech       = Test::WWW::Mechanize->new;
-$mech->get( $httpAuthUrl );
-$mech->content_contains( "Hello, $USERNAME", "We are greeted by name" );
-$mech->get( $httpAuthUrl . $asset->get('url') );
-$mech->content_contains( "ARTICLE", "We are shown the article" );
-
 done_testing;
