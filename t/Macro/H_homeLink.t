@@ -14,15 +14,21 @@ use WebGUI::Test;
 use WebGUI::Session;
 use HTML::TokeParser;
 use Data::Dumper;
+use WebGUI::VersionTag;
 
 use Test::More; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
+my $tag = WebGUI::VersionTag->getWorking($session);
 my ($template) = addTemplate();
-
 my $homeAsset = WebGUI::Test->asset;
+$tag->commit;
+
+my $originalDefault = $session->setting->get('defaultPage');
+WebGUI::Test->addToCleanup(sub { $session->setting->set('defaultPage', $originalDefault); });
 $session->setting->set( 'defaultPage', $homeAsset->getId );
+WebGUI::Test->addToCleanup($tag);
 
 my $i18n = WebGUI::International->new($session,'Macro_H_homeLink');
 
