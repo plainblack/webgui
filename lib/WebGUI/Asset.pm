@@ -1276,9 +1276,13 @@ sub getFieldData {
     my $attr            = $self->meta->find_attribute_by_name( $property );
     my $fieldType       = $attr->fieldType;
     my $fieldOverrides  = $overrides->{ $property } || {};
+    my $noFormPost      = $attr->noFormPost;
+    if (ref $noFormPost eq 'CODE') {
+        $noFormPost = $self->$noFormPost;
+    }
     my $fieldHash       = {
                             fieldType   => $fieldType,
-                            noFormPost  => $attr->noFormPost,
+                            noFormPost  => $noFormPost,
                             tab         => "properties",
                             %{ $self->getFormProperties( $property ) },
                             %{ $overrides },
@@ -1878,6 +1882,7 @@ exception.
 sub loadModule {
     my ($class, $className) = @_;
     if ($className !~ /^WebGUI::Asset(?:::\w+)*$/ ) {
+        warn $className;
         WebGUI::Error::InvalidParam->throw(param => $className, error => "Not a WebGUI::Asset class",);
     }
     (my $module = $className . '.pm') =~ s{::}{/}g;
