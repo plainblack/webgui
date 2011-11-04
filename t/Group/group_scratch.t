@@ -21,7 +21,7 @@ use WebGUI::Group;
 #----------------------------------------------------------------------------
 # Init
 my $session1         = WebGUI::Test->session;
-my $session2         = WebGUI::Session->open(WebGUI::Test::root, WebGUI::Test::file);
+my $session2         = WebGUI::Test->newSession;
 
 #----------------------------------------------------------------------------
 # Tests
