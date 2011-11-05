@@ -212,6 +212,8 @@ $mech->submit_form_ok({
     },
 }, 'add viewProduct and go back' );
 
+WebGUI::Test->addToCleanup(WebGUI::Shop::Cart->newBySession($mech->session));
+
 $product = $product->cloneFromDb;
 cmp_deeply(
     $product->getAllCollateral( 'accessoryJSON' ),
@@ -246,6 +248,7 @@ $mech->submit_form_ok({
         proceed => 0,
     },
 }, 'add viewProduct and go back' );
+WebGUI::Test->addToCleanup(WebGUI::Shop::Cart->newBySession($mech->session));
 
 $product = $product->cloneFromDb;
 cmp_deeply(
@@ -281,6 +284,7 @@ $mech->submit_form_ok({
         proceed => 0,
     },
 }, 'add one more new benefit' );
+WebGUI::Test->addToCleanup(WebGUI::Shop::Cart->newBySession($mech->session));
 
 $product = $product->cloneFromDb;
 cmp_deeply(
@@ -338,6 +342,7 @@ $mech->submit_form_ok({
         proceed => 0,
     },
 }, 'add one more new feature' );
+WebGUI::Test->addToCleanup(WebGUI::Shop::Cart->newBySession($mech->session));
 
 $product = $product->cloneFromDb;
 cmp_deeply(
@@ -401,6 +406,7 @@ $mech->submit_form_ok({
         proceed => 0,
     },
 }, 'add one more new feature' );
+WebGUI::Test->addToCleanup(WebGUI::Shop::Cart->newBySession($mech->session));
 
 $product = $product->cloneFromDb;
 cmp_deeply(
@@ -475,6 +481,7 @@ $mech->submit_form_ok({
         proceed => 0,
     },
 }, 'add one more new variant' );
+WebGUI::Test->addToCleanup(WebGUI::Shop::Cart->newBySession($mech->session));
 
 $product = $product->cloneFromDb;
 cmp_deeply(

@@ -50,6 +50,7 @@ $mech->submit_form_ok({
 });
 
 my $cart = WebGUI::Shop::Cart->newBySession( $mech->session );
+WebGUI::Test->addToCleanup($cart);
 ok( $cart->getItemsByAssetId([ $ribbon->getId ])->[0]->getId, $ribbon->getId );
 
 
