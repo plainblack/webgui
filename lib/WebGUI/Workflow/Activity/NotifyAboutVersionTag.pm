@@ -101,7 +101,7 @@ sub execute {
 	if ($versionTag->getAssetCount) {
 		# if there's only one asset in the tag, we might as well give them a direct link to it
 		my $asset = $versionTag->getAssets->[0];	
-		$urlOfSingleAsset = "\n\n".$self->session->url->getSiteURL().$asset->getUrl("func=view;revision=".$asset->get("revisionDate"));
+		$urlOfSingleAsset = $self->session->url->getSiteURL().$asset->getUrl("func=view;revision=".$asset->get("revisionDate"));
 	}
     my $var = {
         message  => $self->get('message'),

@@ -1126,10 +1126,12 @@ sub getEditForm {
 
     ###
     # Properties
+    my $overrides = $session->config->get("assets/".$self->className) || {};
     foreach my $property ( $self->getProperties ) {
         my $fieldHash = $self->getFieldData( $property );
         next if $fieldHash->{noFormPost};
 
+        $fieldHash = $self->setupFormField($property, $fieldHash, $overrides);
         # Create tabs to have labels added later
         if ( !$f->getTab( $fieldHash->{tab} ) ) {
             $f->addTab( name => $fieldHash->{tab}, label => $fieldHash->{tab} );
@@ -1167,22 +1169,37 @@ sub getEditForm {
     return $f;
 } ## end sub getEditForm
 
+=head2 setupFormField ( $fieldName, $fieldHash, $overrides )
+
+Applies overrides from the WebGUI config file to a set of field data.  The overridden
+and updated field data is returned.
+
+=head3 $fieldName
+
+The name of the field.
+
+=head3 $fieldHash
+
+A hash reference of field data for $fieldName.
+
+=head3 $overrides
+
+A hash reference of overrides from the config file.  This is passed in instead of 
+looking it up each time as a speed optimization.
+
+=cut
+
 sub setupFormField {
-    my ( $self, $tabform, $fieldName, $extraFields, $overrides ) = @_;
-    my %params = %{ $extraFields->{$fieldName} };
-    my $tab    = delete $params{tab};
+    my ( $self, $fieldName, $fieldHash, $overrides ) = @_;
 
-    if ( exists $overrides->{fields}{$fieldName} ) {
-        my %overrideParams = %{ $overrides->{fields}{$fieldName} };
-        my $overrideTab    = delete $overrideParams{tab};
-        $tab = $overrideTab if defined $overrideTab;
-        foreach my $key ( keys %overrideParams ) {
-            $params{"-$key"} = $overrideParams{$key};
-        }
+    return $fieldHash unless exists $overrides->{fields}->{$fieldName};
+    my %overrideParams = %{ $overrides->{fields}->{$fieldName} };
+    foreach my $key ( keys %overrideParams ) {
+        (my $canon = $key) =~ s/^-//;
+        $fieldHash->{$canon} = $overrideParams{$key};
     }
+    return $fieldHash;
 
-    $tab ||= 'properties';
-    return $tabform->getTab($tab)->addField( delete $params{fieldType}, %params);
 } ## end sub setupFormField
 
 #-------------------------------------------------------------------
@@ -1259,9 +1276,13 @@ sub getFieldData {
     my $attr            = $self->meta->find_attribute_by_name( $property );
     my $fieldType       = $attr->fieldType;
     my $fieldOverrides  = $overrides->{ $property } || {};
+    my $noFormPost      = $attr->noFormPost;
+    if (ref $noFormPost eq 'CODE') {
+        $noFormPost = $self->$noFormPost;
+    }
     my $fieldHash       = {
                             fieldType   => $fieldType,
-                            noFormPost  => $attr->noFormPost,
+                            noFormPost  => $noFormPost,
                             tab         => "properties",
                             %{ $self->getFormProperties( $property ) },
                             %{ $overrides },
@@ -1408,6 +1429,28 @@ sub getImportNode {
 	my $class = shift;
 	my $session = shift;
 	return WebGUI::Asset->newById($session, "PBasset000000000000002");
+}
+
+#-------------------------------------------------------------------
+
+=head2 getInheritableProperties ( )
+
+Returns a hash (list) of properties that should be inherited from a parent when creating an asset.
+
+=cut
+
+sub getInheritableProperties {
+	my $self = shift;
+    return (
+		parentId => $self->getId,
+		groupIdView => $self->get("groupIdView"),
+		groupIdEdit => $self->get("groupIdEdit"),
+		ownerUserId => $self->get("ownerUserId"),
+		encryptPage => $self->get("encryptPage"),
+		styleTemplateId => $self->get("styleTemplateId"),
+		printableStyleTemplateId => $self->get("printableStyleTemplateId"),
+		isHidden => $self->get("isHidden"),
+    );
 }
 
 
@@ -1839,6 +1882,7 @@ exception.
 sub loadModule {
     my ($class, $className) = @_;
     if ($className !~ /^WebGUI::Asset(?:::\w+)*$/ ) {
+        warn $className;
         WebGUI::Error::InvalidParam->throw(param => $className, error => "Not a WebGUI::Asset class",);
     }
     (my $module = $className . '.pm') =~ s{::}{/}g;
@@ -2732,15 +2776,8 @@ sub www_add {
 	}
 	my %properties = (
 		%prototypeProperties,
-		parentId => $self->getId,
-		groupIdView => $self->get("groupIdView"),
-		groupIdEdit => $self->get("groupIdEdit"),
-		ownerUserId => $self->get("ownerUserId"),
-		encryptPage => $self->get("encryptPage"),
-		styleTemplateId => $self->get("styleTemplateId"),
-		printableStyleTemplateId => $self->get("printableStyleTemplateId"),
-		isHidden => $self->get("isHidden"),
 		className=>$class,
+        $self->getInheritableProperties,
 		assetId=>"new",
 		url=>scalar($self->session->form->param("url")),
 		);

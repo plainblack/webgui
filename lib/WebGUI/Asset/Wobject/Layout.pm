@@ -393,6 +393,21 @@ sub getContentLastModifiedBy {
 
 #-------------------------------------------------------------------
 
+=head2 getInheritableProperties ( )
+
+Extend the base class to include the mobileTemplateId.
+
+=cut
+
+override getInheritableProperties => sub {
+	my $self = shift;
+    my %properties = super();
+    $properties{mobileTemplateId} = $self->mobileTemplateId;
+    return %properties;
+};
+
+#-------------------------------------------------------------------
+
 =head2 www_view 
 
 Extend the base method to handle caching and ad rotation.
@@ -437,4 +452,3 @@ override www_view => sub {
 
 __PACKAGE__->meta->make_immutable;
 1;
-

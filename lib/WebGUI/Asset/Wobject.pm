@@ -228,6 +228,21 @@ sub getCollateral {
 
 #-------------------------------------------------------------------
 
+=head2 getInheritableProperties ( )
+
+Extend the base class to include the mobileStyleTemplateId.
+
+=cut
+
+override getInheritableProperties => sub {
+	my $self = shift;
+    my %properties = super();
+    $properties{mobileStyleTemplateId} = $self->mobileStyleTemplateId;
+    return %properties;
+};
+
+#-------------------------------------------------------------------
+
 =head2 getStyleTemplateId
 
 This returns the correct style to use, either a regular style or a mobile style,

@@ -300,6 +300,7 @@ sub www_upload {
         title       => $filename,
         url         => "attachments/".$filename,
         filename    => $filename,
+	extension   => WebGUI::Storage->getFileExtension($filename),
         ownerUserId => $owner,
         groupIdEdit => "3",
         groupIdView => "7",

@@ -2307,6 +2307,12 @@ normal templates.|,
         context     => q{Error message when trying to add too many tickets to a badge},
     },
 
+    'clear form' => {
+        message     => q|Clear|,
+        lastUpdated    => 0,
+        context        => q|a button on the add badge to clear the form|,
+    },
+
 };
 
 1;

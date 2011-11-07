@@ -88,6 +88,12 @@ property "addressBookId" => (
     required   => 1,
 );
 
+property "isProfile" => (
+    noFormPost => 1,
+    required   => 0,
+    default    => 0,
+);
+
 has [ qw/addressId addressBook/] => (
     is => 'ro',
     required => 1,
@@ -195,6 +201,10 @@ An email address for this user.
 =head4 organization
 
 The organization or company that this user is a part of.
+
+=head4 isProfile
+
+Whether or not this address is linked to the user profile.  Defaults to 0
 
 =cut
 
@@ -356,6 +366,5 @@ sub write {
     my $book = delete $properties->{addressBook};
     $book->session->db->setRow("address","addressId",$properties);
 }
-
 
 1;

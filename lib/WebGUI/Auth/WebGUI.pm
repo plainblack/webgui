@@ -23,6 +23,7 @@ use WebGUI::User;
 use WebGUI::Form::Captcha;
 use WebGUI::Macro;
 use WebGUI::Deprecate;
+use Scope::Guard qw(guard);
 use Encode ();
 use Tie::IxHash;
 
@@ -679,12 +680,28 @@ sub www_createAccountSave {
     $properties->{ identifier           } = $self->hashPassword($password);
     $properties->{ passwordLastUpdated  } = time();
     $properties->{ passwordTimeout      } = $setting->get("webguiPasswordTimeout");
-    $properties->{ status } = 'Deactivated' if ($setting->get("webguiValidateEmail"));
 
     my $afterCreateMessage = $self->SUPER::createAccountSave($username,$properties,$password,$profile);
 
+    my $sendEmail   = $setting->get('webguiValidateEmail');
+
+    # We need to deactivate the user and log him out if there are additional
+    # things that need to be done before he should be logged in.
+    my $cleanupUser;
+    if ($sendEmail || !$setting->get('enableUsersAfterAnonymousRegistration')) {
+        $cleanupUser = guard {
+            $self->user->status('Deactivated');
+            $session->var->end($session->var->get('sessionId'));
+            $session->var->start(1, $session->getId);
+            my $u = WebGUI::User->new($session, 1);
+            $self->{user} = $u;
+            $self->logout;
+        };
+    }
+
+
     # Send validation e-mail if required
-    if ($setting->get("webguiValidateEmail")) {
+    if ($sendEmail) {
         my $key = $session->id->generate;
         $self->update(emailValidationKey=>$key);
         my $mail = WebGUI::Mail::Send->create($self->session, {
@@ -700,12 +717,6 @@ WebGUI::Asset::Template->newById($self->session,$self->getSetting('accountActiva
         $mail->addText($text);
         $mail->addFooter;
         $mail->queue;
-        $self->user->status("Deactivated");
-        $session->end();
-        $session->start(1, $session->getId);
-        my $u = WebGUI::User->new($session, 1);
-        $self->{user} = $u;
-        $self->logout;
         return $self->www_displayLogin($i18n->get('check email for validation','AuthWebGUI'));
     }
     return $afterCreateMessage;

@@ -97,6 +97,65 @@ WebGUI.Form.buildQueryString = function ( formId, excludes ) {
 };
 
 /***********************************************************************************
+   * @description This method clears all the values of the form.  This is different than reset which will restore default values
+   * @method clearForm
+   * @public
+   * @static
+   * @param {string || object} id or object of the form element to clear values for.
+   * @param {object} object containing array of form elements to exclude. { id:[], name:[], classNames:[], type:[] } 
+   */
+
+WebGUI.Form.clearForm = function ( oElement, excludes ) {
+
+    var _isInArray = function ( value, array) {
+        if(!array || !value) return 0;
+        if(typeof array != 'object') return 0;
+
+        for(var i = 0; i < array.length; i++) {
+            if(array[i] == value) return 1;
+        }
+        return 0;
+    };
+
+    if(typeof oElement != 'object') oElement = document.getElementById(oElement);
+
+    for (i = 0; i < oElement.length; i++) {
+        var oType  = oElement[i].type.toLowerCase();
+        var oClass = oElement[i].className;
+        var oName  = oElement[i].name;
+        var oId    = oElement[i].id;
+
+        if(_isInArray(oClass,excludes.classNames)) continue;
+        if(_isInArray(oId,excludes.id)) continue;
+        if(_isInArray(oName,excludes.name)) continue;
+        if(_isInArray(oType,excludes.type)) continue;
+
+        switch (oType) {
+            case "text":
+            case "password":
+            case "textarea":
+            case "hidden":
+                oElement[i].value = "";
+                break;
+            case "radio":
+            case "checkbox":
+                if (oElement[i].checked) {
+                    oElement[i].checked = false;
+                }
+                break;
+            case "select-one":
+            case "select-multi":
+                oElement[i].selectedIndex = -1;
+                break;
+            default:
+                break;
+        }
+    }
+
+    return;
+};
+
+/***********************************************************************************
    * @description This method gets the proper value of the form element passed in
    * @method getFormValue
    * @public

@@ -1,0 +1,59 @@
+/**
+ * wg-datatable-yui.css
+ * CSS rules for DataTable assets
+ *
+ * Add as attachment to Default DetaTable template (YUI)
+ */
+
+
+/* start content at top of cells */
+.yui-dt-editable {
+ vertical-align: 0;
+}
+.wg-dt-htmlarea>p:first-child {
+ margin-top: 0;
+}
+
+/* padding in all data cells */
+td.yui-dt-editable .yui-dt-liner {
+ padding-left: 10px;
+ padding-right: 10px;
+}
+
+/* examples of further styles */
+
+/* limited textarea/htmlarea cells, show vertical scrollbar if needed */
+/*
+.wg-dt-textarea, .wg-dt-htmlarea {
+ height: 70px;
+ width: 200px;
+ overflow-y: auto;
+}
+*/
+
+
+/* styling a particular DataTable in the page */
+/*
+#dataTablesrvp2vk8QJqY5E0imSRQag .wg-dt-textarea, #dataTablesrvp2vk8QJqY5E0imSRQag .wg-dt-htmlarea {
+ color:red;
+ height:auto;
+ width:150px;
+ overflow:visible;
+}
+*/
+
+/* minimum row height */
+/*
+td.yui-dt-editable .yui-dt-liner {
+ min-height:70px;
+ height:auto !important;
+ height:70px;
+}
+*/
+
+/* styling a particular column */
+/*
+#dataTablesrvp2vk8QJqY5E0imSRQag .yui-dt-col-col1 .yui-dt-liner {
+ color:blue;
+}
+*/

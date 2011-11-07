@@ -20,9 +20,11 @@ use WebGUI::International;
 use WebGUI::Asset::Template;
 use WebGUI::User;
 use WebGUI::Workflow::Instance;
+use WebGUI::Shop::AddressBook;
 use WebGUI::Inbox;
 use WebGUI::Friends;
 use WebGUI::Deprecate;
+use URI;
 
 # Profile field name for the number of times the showMessageOnLogin has been
 # seen.
@@ -910,16 +912,43 @@ sub www_createAccountSave {
 	my $userId = $u->userId;
 	$u->username($username);
 	$u->authMethod($self->authMethod);
-        $self->session->log->info( " override: " . $self->session->scratch->getLanguageOverride );
-        use Data::Dumper;
-        $self->session->log->info( Dumper $profile );
 
 	if (!$profile->{'language'} && $self->session->scratch->getLanguageOverride) {
 	    $profile->{'language'} = $self->session->scratch->getLanguageOverride;
 	}
 	$u->karma($self->session->setting->get("karmaPerLogin"),"Login","Just for logging in.") if ($self->session->setting->get("useKarma"));
-	$u->updateProfileFields($profile) if ($profile);
+    $u->update($profile);
     $self->update($properties);
+
+    my $address          = {};
+    my $address_mappings = WebGUI::Shop::AddressBook->getProfileAddressMappings;
+    foreach my $fieldId (keys %$profile) {
+        #set the shop address fields
+        my $address_key          = $address_mappings->{$fieldId};
+        $address->{$address_key} = $profile->{$fieldId} if ($address_key);
+    }
+
+	$self->session->user({user=>$u});
+
+    #Update or create and update the shop address
+    if ( keys %$address ) {
+        $address->{'isProfile'        } = 1;
+
+        #Get home address only mappings to avoid creating addresses with just firstName, lastName, email
+        my %home_address_map = %{$address_mappings};
+        foreach my $exclude ( qw{ firstName lastName email } ) {
+            delete $home_address_map{$exclude};
+        }
+        #Add the profile address for the user if there are homeAddress fields
+        if( grep { $address->{$_} } values %home_address_map ) {
+            #Create the address book for the user
+            my $addressBook    = WebGUI::Shop::AddressBook->newByUserId($self->session,$userId);
+            $address->{label} = "Profile Address";
+            my $new_address = $addressBook->addAddress($address);
+            #Set this as the default address if one doesn't already exist
+            $addressBook->update( { defaultAddressId => $new_address->getId } );
+        }
+    }
 
 	if ($self->getSetting("sendWelcomeMessage")){
         my $var;
@@ -936,7 +965,6 @@ sub www_createAccountSave {
 		});
 	}
 
-	$self->session->user({user=>$u});
 	$self->_logLogin($userId,"success");
 
 	if ($self->session->setting->get("runOnRegistration")) {
@@ -1182,13 +1210,7 @@ sub www_login {
 	$u->karma($self->session->setting->get("karmaPerLogin"),"Login","Just for logging in.") if ($self->session->setting->get("useKarma"));
 	$self->_logLogin($uid,"success");
 
-	if ($self->session->setting->get('encryptLogin')) {
-		my $currentUrl = $self->session->url->page(undef,1);
-		$currentUrl =~ s/^https:/http:/;
-		$self->session->response->setRedirect($currentUrl);
-	}
-
-        # Run on login
+    # Run on login
 	my $command = $self->session->config->get("runOnLogin");
 	if ($command ne "") {
 		WebGUI::Macro::process($self->session,\$command);
@@ -1196,7 +1218,6 @@ sub www_login {
 		$self->session->log->warn($error) if $error;
 	}
 	
-
     # Set the proper redirect
     if ( $self->session->setting->get( 'showMessageOnLogin' ) 
         && $self->user->get( $LOGIN_MESSAGE_SEEN ) 
@@ -1214,6 +1235,11 @@ sub www_login {
     elsif ( $self->session->setting->get("redirectAfterLoginUrl") ) {
         $self->session->response->setRedirect($self->session->setting->get("redirectAfterLoginUrl"));
         $self->session->scratch->delete("redirectAfterLogin");
+    }
+    elsif ($self->session->setting->get('encryptLogin')) {
+        my $currentUrl = $self->session->url->page(undef,1);
+        $currentUrl =~ s/^https:/http:/;
+        $self->session->response->setRedirect($currentUrl);
     }
 
     # Get open version tag. This is needed if we want
@@ -1281,18 +1307,27 @@ sub www_showMessageOnLogin {
 
     # Add the link to continue
     my $session = $self->session;
-    my $redirectUrl =  $self->session->form->get( 'returnUrl' )
-                    || $self->session->setting->get("redirectAfterLoginUrl")
-                    || $self->session->scratch->get( 'redirectAfterLogin' )
-                    || $self->session->url->getBackToSiteURL
+    my $redirectUrl =  $session->form->get( 'returnUrl' )
+                    || $session->setting->get("redirectAfterLoginUrl")
+                    || $session->scratch->get( 'redirectAfterLogin' )
+                    || $session->url->getBackToSiteURL
                     ;
 
     $output     .= '<p><a href="' . $redirectUrl . '">' . $i18n->get( 'showMessageOnLogin return' ) 
                 .  '</a></p>'
                 ;
 
+    if ($session->setting->get('encryptLogin') && ( ! $redirectUrl =~ /^http/)) {
+        ##A scheme-less URL has been supplied.  We need to make it an absolute one
+        ##with a non-encrypted scheme.  Otherwise the user will stay in SSL mode.
+        ##We assume that the user put the gateway URL into their URL.
+        my $uri = URI->new_abs($redirectUrl, $session->url->getSiteURL);
+        $uri->scheme('http');
+        $redirectUrl = $uri->as_string;
+    }
+
     # No matter what, we won't be redirecting after this
-    $self->session->scratch->delete( 'redirectAfterLogin' );
+    $session->scratch->delete( 'redirectAfterLogin' );
 
     return $output;
 }

@@ -16,6 +16,7 @@ use WebGUI::Test;
 use WebGUI::Session;
 use WebGUI::User;
 use WebGUI::Macro::LastUpdatedBy;
+use WebGUI::VersionTag;
 
 use Test::More; # increment this value for each test you create
 
@@ -51,9 +52,12 @@ my %properties_A = (
                 #              '1234567890123456789012',
 );
 
+my $tag = WebGUI::VersionTag->getWorking($session);
 my $assetA = $root->addChild(\%properties_A, $properties_A{id});
 
 $session->asset($assetA);
+$tag->commit;
+WebGUI::Test->addToCleanup($tag);
 
 $output = WebGUI::Macro::LastUpdatedBy::process($session);
 is($output, 'Andy', 'Default asset last revised by andy');

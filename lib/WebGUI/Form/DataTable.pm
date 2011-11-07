@@ -383,6 +383,7 @@ sub prepare {
         $style->setCss( $url->extras( 'yui/build/button/assets/skins/sam/button.css'));
         $style->setCss( $url->extras( 'yui/build/calendar/assets/skins/sam/calendar.css'));
         $style->setCss( $url->extras('yui/build/container/assets/skins/sam/container.css'));
+        $style->setCss( $url->extras('yui-webgui/build/form/datatable.css'));
         $style->setScript( $url->extras('yui/build/container/container-min.js') );
         $style->setScript( $url->extras('yui/build/button/button-min.js') );
         $style->setScript( $url->extras('yui/build/calendar/calendar-min.js') );

@@ -50,7 +50,8 @@ plan tests => 9;        # Increment this number for each test you create
 #
 ###########################################################################
 
-{
+SKIP: {
+    skip "Test LDAP server is down", 3;
     my $ldapProps = WebGUI::Test->getSmokeLDAPProps();
     $session->db->setRow('ldapLink', 'ldapLinkId', $ldapProps, $ldapProps->{ldapLinkId});
     my $ldap = WebGUI::LDAPLink->new($session, $ldapProps->{ldapLinkId});
@@ -68,7 +69,8 @@ plan tests => 9;        # Increment this number for each test you create
 #
 ###########################################################################
 
-{
+SKIP: {
+    skip "Test LDAP server is down", 4;
     my $ldapProps = WebGUI::Test->getSmokeLDAPProps();
     $ldapProps->{identifier} = 'hadley';
     $session->db->setRow('ldapLink', 'ldapLinkId', $ldapProps, $ldapProps->{ldapLinkId});

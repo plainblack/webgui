@@ -296,6 +296,7 @@ sub view {
 				"icon.small"    => $child->getIcon(1),
 				"icon.big"      => $child->getIcon,
 				type            => $child->getName,
+				extension	=> WebGUI::Storage->getFileExtension( $child->get("filename")),
 				url             => $child->getUrl,
 				canEdit         => $child->canEdit,
 				controls        => $child->getToolbar,

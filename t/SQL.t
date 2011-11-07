@@ -224,6 +224,7 @@ SKIP: {
 
 }
 
+$session->db->dbh->do('DROP TABLE IF EXISTS testTable');
 $session->db->dbh->do('CREATE TABLE testTable (myIndex int(8) NOT NULL default 0, message CHAR(64), myKey varchar(32), PRIMARY KEY(myIndex))');
 
 my @tableData = (

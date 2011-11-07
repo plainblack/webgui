@@ -16,8 +16,9 @@ use lib "$FindBin::Bin/../../lib";
 use Test::MockTime qw/:all/;  ##Must be loaded before all other code
 use WebGUI::Test;
 use WebGUI::Session;
-use Test::More tests => 3; # increment this value for each test you create
+use Test::More;
 use WebGUI::Asset::Wobject::Layout;
+use WebGUI::Asset;
 
 my $session = WebGUI::Test->session;
 
@@ -64,4 +65,36 @@ set_relative_time(-100);
 $snip1 = $snip1->addRevision({ title => 'titular', }, 18);
 is $page->getContentLastModifiedBy, $revised_user1->userId, '... check that a new revision tracks';
 
+# inheriting mobileStyleTemplateId and mobileTemplateId; from ``Mobile template is not being inherited  (#12246)'' 
 
+$session->setting->set('useMobileStyle', 1);
+$session->setting->set('anonymousRegistration', 1);
+
+my $importNode = WebGUI::Asset->getImportNode($session);
+my $template1 = $importNode->addChild({className=>"WebGUI::Asset::Template", namespace => 'style', });
+my $template2 = $importNode->addChild({className=>"WebGUI::Asset::Template", namespace => 'Layout', });
+
+my $mobileStyleTemplateId = $template1->getId;
+my $mobileTemplateId = $template2->getId;
+
+my $mobile_page = $importNode->addChild({
+    className             => "WebGUI::Asset::Wobject::Layout",
+    mobileStyleTemplateId => $mobileStyleTemplateId,
+    mobileTemplateId      => $mobileTemplateId, }
+);
+WebGUI::Test->addToCleanup($template1, $template2);
+
+my $tag = WebGUI::VersionTag->getWorking($session);
+$tag->commit;
+WebGUI::Test->addToCleanup($tag);
+
+my $mech = WebGUI::Test::Mechanize->new( config => WebGUI::Test->config );
+$mech->get_ok('/');
+$mech->session->user({userId => 3});
+$mech->get_ok($mobile_page->getUrl('func=add;userId=3;className=WebGUI::Asset::Wobject::Layout'));
+my ($mobileTemplateInput) = $mech->find_all_inputs(name => 'mobileTemplateId');
+is $mobileTemplateInput->value, $mobileTemplateId, 'child PageLayout inherited parents mobileTemplateId';
+my ($mobileStyleTemplateInput) = $mech->find_all_inputs(name => 'mobileStyleTemplateId');
+is $mobileStyleTemplateInput->value, $mobileStyleTemplateId, 'child PageLayout inherited parents mobileStyleTemplateId';
+
+done_testing;

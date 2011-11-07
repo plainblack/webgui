@@ -365,7 +365,7 @@ user will be set to. It can be overridden in the import file for
 specific users.
 
 You can specify a unique expiration date for a group by adding it
-after the group ID, seperated by a colon. The date/time should be in
+after the group ID, separated by a colon. The date/time should be in
 "YYYY-MM-DD HH:NN:SS" format.
 
  groupId:2000-01-01 01:00:00,groupId2:2001-01-02 02:00:00

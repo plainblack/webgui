@@ -139,9 +139,8 @@ sub getTemplateVars {
         $rules->{'whereClause'} .= qq{$prop $op $value};
     }
 
-    if($rules->{'whereClause'}) {
-        $rules->{'joinClass'}   = $settings->{className};
-    }
+    # Always join to the class, asset and assetData are excluded by getLineageSql
+    $rules->{'joinClass'}   = $settings->{className};
 
     #Build the order by condition
     my $order                 = $settings->{order};

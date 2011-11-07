@@ -218,6 +218,7 @@
     "WebGUI::Shop::PayDriver::ITransact",
     "WebGUI::Shop::PayDriver::PayPal::PayPalStd",
     "WebGUI::Shop::PayDriver::PayPal::ExpressCheckout",
+    "WebGUI::Shop::PayDriver::CreditCard::AuthorizeNet",
     "WebGUI::Shop::PayDriver::Ogone"
     ],
 
@@ -871,6 +872,7 @@
     "r"                : "r_printable", 
     "Spacer"           : "Spacer", 
     "SpectreCheck"     : "SpectreCheck",
+    "TwitterLogin"     : "TwitterLogin", 
     "Thumbnail"        : "Thumbnail", 
     "TwitterLogin"     : "TwitterLogin",
     "User"             : "User", 
@@ -945,6 +947,7 @@
         "WebGUI::Workflow::Activity::NotifyAboutUser",
         "WebGUI::Workflow::Activity::ActivateUser",
         "WebGUI::Workflow::Activity::DeactivateUser",
+        "WebGUI::Workflow::Activity::WaitForUserConfirmation",
         "WebGUI::Workflow::Activity::DeleteUser"
     ],
     "WebGUI::VersionTag" : [

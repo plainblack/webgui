@@ -635,11 +635,15 @@ sub editThingDataSave {
             if ($self->field_isa($fieldType, 'WebGUI::Form::File')) {
                 $field->{ defaultValue } = $thingData{ "field_" . $field->{ fieldId } };
             }
+            elsif ($fieldType eq 'Date' or $fieldType eq 'DateTime') {  ##Must be in epoch format to be stored in the db.
+                my $wdt = WebGUI::DateTime->new($session, $field->{defaultValue})->cloneToUserTimeZone;
+                $field->{defaultValue} = $wdt->epoch;
+            }
             $fieldValue = $thingData->{$fieldName} || $session->form->process($fieldName,$fieldType,$field->{defaultValue},$field);
         }
         if ($field->{status} eq "required" && ($fieldValue =~ /^\s$/x || $fieldValue eq "" || !(defined $fieldValue))) {
             push (@errors,{
-                "error_message"=>$field->{label}." ".$i18n->get('is required error').".",
+		"error_message"=>$field->{label}." ".$i18n->get('is required error').".", "field_name"=>$fieldName,
                 });
         }
         if ($field->{status} eq "hidden") {
@@ -655,7 +659,7 @@ sub editThingDataSave {
 
              unless ( $self->isUniqueEntry($thingId,$fieldName,$fieldValue,$thingDataId)) {
                push (@errors,{
-                "error_message"=>$field->{label}. $i18n->get('needs to be unique error'),
+                "error_message"=>$field->{label}. $i18n->get('needs to be unique error'),"field_name"=>$fieldName,
                 });
              }
 	}
@@ -1042,17 +1046,17 @@ sub getFieldValue {
 
     my $fieldType = lc $field->{fieldType};
     if ($fieldType eq "date"){
-        my $dt = WebGUI::DateTime->new($session, $value);
-        $processedValue = $dt->webguiDate($dateFormat);
+        my $wdt = WebGUI::DateTime->new($session, $value);
+        $processedValue = $wdt->cloneToUserTimeZone->webguiDate($dateFormat);
     }
     elsif ($fieldType eq "datetime"){
-        my $dt = WebGUI::DateTime->new($session, $value);
-        $processedValue = $dt->webguiDate($dateTimeFormat);
+        my $wdt = WebGUI::DateTime->new($session, $value);
+        $processedValue = $wdt->cloneToUserTimeZone->webguiDate($dateTimeFormat);
     }
     # TODO: The otherThing field type is probably also handled by getFormPlugin, so the elsif below can probably be
     # safely removed. However, this requires more testing than I can provide right now, so for now this stays the
     # way it was.
-    elsif ($field->{fieldType} =~ m/^otherthing/x) {
+    elsif ($fieldType =~ m/^otherthing/x) {
         my $otherThingId = $field->{fieldType};
         $otherThingId =~ s/^otherThing_//x;
         my $tableName = 'Thingy_'.$otherThingId;
@@ -1599,11 +1603,11 @@ sub indexThing {
     return unless $thing;
     my $index = WebGUI::Search::Index->new($self);
     $index->addRecord(
-        url         => $self->getUrl($self->getThingUrl($thing)),
         groupIdView => $thing->{groupIdView},
         title       => $thing->{label},
         subId       => $thing->{thingId},
         keywords    => join(' ', @{$thing}{qw/label editScreenTitle editInstructions searchScreenTitle searchDescription/}),
+        url         => $self->session->url->append($self->get('url'), $self->getThingUrl($thing)),
     );
     ##Easy update of all thingData fields for this thing.  This is in lieu of deleting all records
     ##And rebuilding them all.
@@ -1675,7 +1679,7 @@ sub indexThingData {
              || $self->getTitle;
     $index->addRecord(
         assetId     => $self->getId,
-        url         => $self->getUrl('func=viewThingData;thingId='. $thing->{thingId} . ';thingDataId='. $thingData->{thingDataId}),
+        url         => $session->url->append($self->get('url'), 'func=viewThingData;thingId='. $thing->{thingId} . ';thingDataId='. $thingData->{thingDataId}),
         groupIdView => $thing->{groupIdView},
         title       => $title,
         subId       => $thing->{thingId} . '-' . $thingData->{thingDataId},
@@ -3008,7 +3012,7 @@ sub www_editThingDataSaveViaAjax {
             return JSON->new->encode({message => $i18n->get("has entered max per user message")});
         }
         if($thingDataId eq 'new' && $self->hasEnteredMaxEntries($thingId)){
-            $session->http->setStatus("400", "Bad Request");
+            $session->response->status("400");
             return JSON->new->encode({message => $i18n->get("has entered max total message")});
         }
 
@@ -3069,7 +3073,6 @@ sub www_exportThing {
 
     ### Loop through the returned structure and put it through Text::CSV
     # Column heads
-    $self->session->log->warn("field labels: ". join ' ', @fieldLabels);
     my $csv_filename = 'export_'.$thingProperties->{label}.'.csv';
     open my $CSV, '>', $tempStorage->getPath($csv_filename);
     print $CSV WebGUI::Text::joinCSV( @fieldLabels );

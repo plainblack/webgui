@@ -981,20 +981,17 @@ sub isInGroup {
 	### Check stow before we check the cache.  Stow is in memory and much faster
 	my $stow          = $session->stow->get("isInGroup", { noclone => 1 }) || {};
 	return $stow->{$uid}->{$gid} if (exists $stow->{$uid}->{$gid});
-	
+
 	### Don't bother checking File Cache if we already have a stow for this group.
 	### We can find what we need there and save ourselves a bunch of time
-	my $cache        = undef;
-	my $groupMembers = undef;
-	unless ($stow->{$uid}->{$gid}) {
-		$groupMembers  = $session->cache->get("groupMembers".$gid) || {};
-		#If we have this user's membership cached, return what we have stored
-		if (exists $groupMembers->{$uid}) {
-			return $groupMembers->{$uid}->{isMember} if (!$self->isVisitor);
-			return $groupMembers->{$uid}->{$session->getId}->{isMember} #Include the session check for visitors
-		}
-	}
-	
+    my $cache        = undef;
+    my $groupMembers = $session->cache->get("groupMembers".$gid) || {};
+    #If we have this user's membership cached, return what we have stored
+    if (exists $groupMembers->{$uid}) {
+        return $groupMembers->{$uid}->{isMember} if (!$self->isVisitor);
+        return $groupMembers->{$uid}->{$session->getId}->{isMember} if exists $groupMembers->{$uid}->{$session->getId}; #Include the session check for visitors
+    }
+
  	### Instantiate the group
     my $group = WebGUI::Group->new($session,$gid);
 	if ( !$group ) {
@@ -1004,7 +1001,7 @@ sub isInGroup {
 
 	#Check the group for membership
 	my $isInGroup = $group->hasUser($self);
-	
+
 	#Write what we found to file cache
 	$group->cacheGroupings( $self, $isInGroup, $groupMembers );
 	return $isInGroup;
@@ -1475,8 +1472,8 @@ sub update {
     delete $properties->{privacyFields};
 
     # $self->{_user} contains all fields in `users` table
-    my @userFields  = ();
-    my @userValues  = ();
+    my @userFields = ();
+    my @userValues = ();
     for my $key ( keys %{$self->{_user}} ) {
         if ( exists $properties->{$key} ) {
             # Delete the value because it's not a profile field
@@ -1487,15 +1484,16 @@ sub update {
         }
     }
     # No matter what we update properties
-    my $userFields  = join ", ", @userFields;
+    my $userFields = join ", ", @userFields;
     $db->write(
         "UPDATE users SET $userFields WHERE userId=?",
         [@userValues, $self->{_userId}]
     );
 
     # Everything else must be a profile field
-    my @profileFields   = ();
-    my @profileValues   = ();
+    my @profileFields = ();
+    my @profileValues = ();
+
     for my $key ( keys %{$properties} ) {
         if (!exists $self->{_profile}{$key} && !WebGUI::ProfileField->exists($session,$key)) {
             $self->session->log->warn("No such profile field: $key");
@@ -1506,7 +1504,7 @@ sub update {
         $self->{_profile}->{$key} = $properties->{ $key };
     }
     if ( @profileFields ) {
-        my $profileFields  = join ", ", @profileFields;
+        my $profileFields = join ", ", @profileFields;
         $db->write(
             "UPDATE userProfileData SET $profileFields WHERE userId=?",
             [@profileValues, $self->{_userId}]

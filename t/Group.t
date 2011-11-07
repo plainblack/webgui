@@ -70,26 +70,6 @@ my @ipTests = (
 			},
 );
 
-my @ldapTests = (
-            {
-				dn => 'uid=Byron Hadley,o=shawshank',
-				comment => 'bad dn for group',
-				expect  => 0,
-			},
-			{
-				dn => 'uid=Andy Dufresne,o=shawshank',
-				comment => 'good dn for group',
-				expect  => 1,
-			},
-            {
-				dn => 'uid=Bogs Diamond,o=shawshank',
-				comment => 'another good dn for group',
-				expect  => 1,
-			},
-);
-
-
-plan tests => (173 + (scalar(@scratchTests) * 2) + scalar(@ipTests)); # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 $session->cache->remove('myTestKey');
@@ -174,61 +154,6 @@ my $optionGroup = WebGUI::Group->new($session, 'new', undef, 'noAdmin');
 my $getGroupsIn = $optionGroup->getGroupsIn();
 cmp_deeply($getGroupsIn, [], 'new: noAdmin prevents the admin group from being added to this group');
 $optionGroup->delete;
-
-################################################################
-#
-# LDAP specific group properties
-# These tests have to be done on an isolated group that will NEVER
-# have getGroups called on it
-#
-################################################################
-
-my $ldapProps = WebGUI::Test->getSmokeLDAPProps();
-$session->db->setRow('ldapLink', 'ldapLinkId', $ldapProps, $ldapProps->{ldapLinkId});
-my $ldap = WebGUI::LDAPLink->new($session, $ldapProps->{ldapLinkId});
-is($ldap->getValue("ldapLinkId"),$ldapProps->{ldapLinkId},'ldap link created properly');
-WebGUI::Test->addToCleanup($ldap);
-
-my @shawshank;
-
-foreach my $idx (0..$#ldapTests) {
-	$shawshank[$idx] = WebGUI::User->new($session, "new");
-	$shawshank[$idx]->username("shawshank$idx");
-    $shawshank[$idx]->authMethod("LDAP");
-    my $auth     = $shawshank[$idx]->authInstance;
-    $auth->saveParams($shawshank[$idx]->getId,$shawshank[$idx]->authMethod,{
-        connectDN      => $ldapTests[$idx]->{dn},
-        ldapConnection => $ldap->getValue("ldapLinkId"),
-        ldapUrl        => $ldap->getValue("ldapUrl"),
-    });
-}
-
-WebGUI::Test->addToCleanup(@shawshank);
-
-my $lGroup = WebGUI::Group->new($session, 'new');
-
-$lGroup->ldapGroup('cn=Convicts,o=shawshank');
-is($lGroup->ldapGroup(), 'cn=Convicts,o=shawshank', 'ldapGroup set and fetched correctly');
-
-$lGroup->ldapGroupProperty('member');
-is($lGroup->ldapGroupProperty(), 'member', 'ldapGroup set and fetched correctly');
-
-$lGroup->ldapLinkId($ldapProps->{ldapLinkId});
-is($lGroup->ldapLinkId(),$ldapProps->{ldapLinkId}, 'ldapLinkId set and fetched correctly');
-
-is_deeply(
-	[ (map { $lGroup->hasLDAPUser($_->getId) }  @shawshank) ],
-	[0, 1, 1],
-	'shawshank user 2, and 3 found in lGroup users from LDAP'
-);
-
-$lGroup->ldapRecursiveProperty('LDAP recursive property');
-is($lGroup->ldapRecursiveProperty(), 'LDAP recursive property', 'ldapRecursiveProperty set and fetched correctly');
-
-$lGroup->ldapRecursiveFilter('LDAP recursive filter');
-is($lGroup->ldapRecursiveFilter(), 'LDAP recursive filter', 'ldapRecursiveFilter set and fetched correctly');
-
-$lGroup->delete;
 
 my $gid = $g->getId;
 is (length($gid), 22, "GroupId is proper length");
@@ -633,14 +558,16 @@ WebGUI::Test->addToCleanup(@sessionBank);
 
 #isInGroup test
 foreach my $scratchTest (@scratchTests) {
-	is($scratchTest->{user}->isInGroup($gS->getId), $scratchTest->{expect}, $scratchTest->{comment});
+    is($scratchTest->{user}->isInGroup($gS->getId), $scratchTest->{expect}, $scratchTest->{comment});
 }
 
 $session->cache->remove("isInGroup");
 
 #hasScratchUser test
-foreach my $scratchTest (@scratchTests) {
-	is($gS->hasScratchUser($scratchTest->{user}->getId), $scratchTest->{expect}, $scratchTest->{comment}." - hasScratchUser");
+foreach my $idx (0..$#scratchTests) {
+    my $scratchTest = $scratchTests[$idx];
+    my $sessionId   = $sessionBank[$idx]->getId;
+	is($gS->hasScratchUser($scratchTest->{user}->getId, $sessionId), $scratchTest->{expect}, $scratchTest->{comment}." - hasScratchUser");
 }
 
 
@@ -658,7 +585,7 @@ cmp_bag(
 
 {  ##Add scope to force cleanup
 
-    note "Checking for user Visitor session leak";
+    note "Checking for user Visitor session leak with scratch";
 
     my $remoteSession = WebGUI::Test->newSession;
     $remoteSession->user({userId => 1});
@@ -673,13 +600,13 @@ cmp_bag(
     my $localSession = WebGUI::Test->newSession;
     WebGUI::Test->addToCleanup($localScratchGroup, $remoteSession, $localSession);
     $localSession->user({userId => 1});
-    $remoteSession->scratch->set('local','ok');
+    $localSession->scratch->set('local','ok');
     $localScratchGroup->clearCaches;
 
     ok $localSession->user->isInGroup($localScratchGroup->getId), 'Local Visitor is in the scratch group';
 
     $remoteSession->stow->delete('isInGroup');
-    ok !$remoteSession->user->isInGroup($localScratchGroup->getId), 'Remove Visitor is not in the scratch group, even though a different Visitor passed';
+    ok !$remoteSession->user->isInGroup($localScratchGroup->getId), 'Remote Visitor is not in the scratch group, even though a different Visitor passed';
 
 }
 
@@ -702,8 +629,9 @@ foreach my $idx (0..$#ipTests) {
 	##Name this user for convenience
 	$tcps[$idx]->username("tcp$idx");
 
-	##Assign this user to this test to be fetched later
-	$ipTests[$idx]->{user} = $tcps[$idx];
+    ##Assign this user and session to this test to be fetched later
+    $ipTests[$idx]->{user}    = $tcps[$idx];
+    $ipTests[$idx]->{session} = $sessionBank[$idx];
 }
 WebGUI::Test->addToCleanup(@tcps);
 
@@ -725,7 +653,7 @@ cmp_bag(
 );
 
 is_deeply(
-	[ (map { $gI->hasIpUser($_->{user}->getId) }  @ipTests) ],
+	[ (map { $gI->hasIpUser($_->{user}->getId, $_->{session}->getId) }  @ipTests) ],
 	[ (map { $_->{expect} } @ipTests) ],
 	'hasIpUsers for group with IP filter'
 );
@@ -736,7 +664,7 @@ foreach my $ipTest (@ipTests) {
 
 {  ##Add scope to force cleanup
 
-    note "Checking for user Visitor session leak";
+    note "Checking for user Visitor session leak via IP address";
 
     my $remoteSession = WebGUI::Test->newSession;
     $remoteSession->request->env->{REMOTE_ADDR} = '191.168.1.1';
@@ -757,7 +685,8 @@ foreach my $ipTest (@ipTests) {
     ok $localSession->user->isInGroup($localIpGroup->getId), 'Local Visitor is in the group';
 
     $remoteSession->stow->delete('isInGroup');
-    ok !$remoteSession->user->isInGroup($localIpGroup->getId), 'Remove Visitor is not in the group, even though a different Visitor passed';
+    $localIpGroup->clearCaches;
+    ok !$remoteSession->user->isInGroup($localIpGroup->getId), 'Remote Visitor is not in the group, even though a different Visitor passed';
 
 }
 
@@ -858,5 +787,6 @@ ok(
     "registered users: don't get the users in both groups",
 );
 
+done_testing;
 
 #vim:ft=perl

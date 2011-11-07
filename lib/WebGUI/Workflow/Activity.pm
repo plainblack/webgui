@@ -76,6 +76,29 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 
+=head2 changeWorkflow ( $workflowId, $instance, $skipDelete )
+
+Kicks a new workflow in a new instance with the same object the current
+instance has, deleting the old instance unless you say otherwise.
+
+=cut
+
+sub changeWorkflow {
+    my ($self, $workflowId, $instance, $skipDelete) = @_;
+    WebGUI::Workflow::Instance->create(
+        $self->session, {
+            workflowId  => $workflowId,
+            methodName  => $instance->get('methodName'),
+            className   => $instance->get('className'),
+            parameters  => $instance->get('parameters'),
+            priority    => $instance->get('priority'),
+        }
+    )->start(1);
+    $instance->delete() unless $skipDelete;
+}
+
+#-------------------------------------------------------------------
+
 =head2 cleanup ( )
 
 Override this activity to add a cleanup routine to be run if an instance

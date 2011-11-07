@@ -114,6 +114,7 @@ sub getDrivers {
     my $self      = shift;
     my %drivers = ();
     CLASS: foreach my $class (@{$self->session->config->get('paymentDrivers')}) {
+        $self->session->log->warn($class);
         my $driverName   = eval { WebGUI::Pluggable::instanciate($class, 'getName', [ $self->session ])};
         if ($@) {
             $self->session->log->warn("Error loading $class: $@");

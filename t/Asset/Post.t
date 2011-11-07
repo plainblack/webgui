@@ -162,6 +162,8 @@ $storage->addFileFromFilesystem(WebGUI::Test->getTestCollateralPath('lamp.jpg'))
 $storage->addFileFromFilesystem(WebGUI::Test->getTestCollateralPath('littleTextFile'));
 my $attachment_loop = $post1->getTemplateVars()->{attachment_loop};
 
+my @extensions = map { [ $_->{filename}, $_->{extension} ] } @{ $attachment_loop };
+
 cmp_bag(
     $attachment_loop,
     [
@@ -170,6 +172,7 @@ cmp_bag(
             url       => $storage->getUrl('gooey.jpg'),
             icon      => $session->url->extras('fileIcons/jpg.gif'),
             thumbnail => $storage->getThumbnailUrl('gooey.jpg'),
+            extension => 'jpg',
             isImage   => bool(1),
         },
         {
@@ -177,6 +180,7 @@ cmp_bag(
             url       => $storage->getUrl('lamp.jpg'),
             icon      => $session->url->extras('fileIcons/jpg.gif'),
             thumbnail => $storage->getThumbnailUrl('lamp.jpg'),
+            extension => 'jpg',
             isImage   => bool(1),
         },
         {
@@ -184,6 +188,7 @@ cmp_bag(
             url       => $storage->getUrl('littleTextFile'),
             icon      => $session->url->extras('fileIcons/unknown.gif'),
             thumbnail => '',
+            extension => undef,
             isImage   => bool(0),
         },
     ],

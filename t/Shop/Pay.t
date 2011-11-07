@@ -17,6 +17,7 @@ use strict;
 use Test::More;
 use Test::Deep;
 use Test::Exception;
+use Data::Dumper;
 use JSON;
 use HTML::Form;
 
@@ -129,9 +130,11 @@ my $defaultPayDrivers = {
     'WebGUI::Shop::PayDriver::Ogone'         => 'Ogone',
     'WebGUI::Shop::PayDriver::PayPal::PayPalStd'       => 'PayPal',
     'WebGUI::Shop::PayDriver::PayPal::ExpressCheckout' => 'PayPal Express Checkout',
+    'WebGUI::Shop::PayDriver::CreditCard::AuthorizeNet' => 'Credit Card (Authorize.net)',
 };
 
-cmp_deeply( $drivers, $defaultPayDrivers, 'getDrivers returns the default PayDrivers');
+cmp_deeply( $drivers, $defaultPayDrivers, 'getDrivers returns the default PayDrivers')
+    or diag Dumper $drivers;
 
 #######################################################################
 #

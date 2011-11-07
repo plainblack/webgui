@@ -16,6 +16,7 @@
 use strict;
 use Test::More;
 use Test::Deep;
+use Test::Exception;
 use Scalar::Util qw/refaddr/;
 use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
@@ -29,11 +30,6 @@ use JSON 'from_json';
 # Init
 my $session         = WebGUI::Test->session;
 my $i18n = WebGUI::International->new($session, "Shop");
-
-#----------------------------------------------------------------------------
-# Tests
-
-plan tests => 35;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -219,3 +215,11 @@ is($cart->delete, undef, "Can destroy cart.");
 
 $product->purge;
 
+my $requiresShipping_ok = lives_ok { $cart->requiresShipping; } 'requiresShipping does not die if the asset in the cart has been deleted';
+
+SKIP: {
+    skip 1, 'requiresShipping died, so skipping' unless $requiresShipping_ok;
+    ok !$cart->requiresShipping, 'Shipping no longer required on a cart with missing assets';
+}
+
+done_testing;

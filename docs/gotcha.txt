@@ -31,6 +31,16 @@ save you many hours of grief.
        Account Macro template
        Admin Toggle Macro template
 
+7.10.23
+--------------------------------------------------------------------
+    * The default_search2 template had a bad template attachment pointing to 
+      an old WebGUI CSS Snippet called /webgui.css.  Any attachment with that
+      URL will be removed from ALL templates in the Search namespace.
+
+7.10.21
+--------------------------------------------------------------------
+    * WebGUI now depends on Kwargs.
+
 7.10.17
 --------------------------------------------------------------------
     * Due to a formatting problem with form variables in the PayPal driver, WebGUI

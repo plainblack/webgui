@@ -622,6 +622,7 @@ sub view {
 	$var{fileUrl} = $self->getFileUrl;
 	$var{fileIcon} = $self->getFileIconUrl;
 	$var{fileSize} = Number::Format::format_bytes($self->get("assetSize"));
+	$var{extension} = WebGUI::Storage->getFileExtension( $self->get("filename"));
     my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
 	if (!$self->session->isAdminOn && $self->get("cacheTimeout") > 10) {
 		$self->session->cache->set($self->getViewCacheKey, $out, $self->get("cacheTimeout"));

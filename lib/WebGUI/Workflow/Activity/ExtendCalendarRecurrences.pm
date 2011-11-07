@@ -194,7 +194,13 @@ sub processRecurrence {
         $event->generateRecurrence($d);
     }
 
-    $versionTag->commit;
+    ##If nothing needed to happen, then don't keep the tag around.
+    if ($versionTag->getAssetCount > 0) {
+        $versionTag->commit;
+    }
+    else {
+        $versionTag->rollback;
+    }
     return $time_limit ? 1 : 0;
 } ## end sub processRecurrence
 
