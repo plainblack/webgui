@@ -1020,7 +1020,7 @@ WebGUI.Admin.prototype.showHelperMenu
         context : [ elem, 'tl', 'bl' ],
         effect: { effect: YAHOO.widget.ContainerEffect.FADE, duration:0.25 }
     } );
-    this.helperMenu.render( elem.parentElement );
+    this.helperMenu.render( elem.parentNode );
     this.helperMenu.show();
     this.helperMenu.focus();
 };
