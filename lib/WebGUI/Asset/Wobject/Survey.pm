@@ -2456,6 +2456,51 @@ sub export {
 
 #-------------------------------------------------------------------
 
+=head2 exportAssetData ()
+
+Extend the base method to include custom question types added to this Survey.
+
+=cut
+
+sub exportAssetData {
+    my $self = shift;
+    my $asset_data = $self->SUPER::exportAssetData();
+    my $questions  = $self->surveyJSON->questions();
+    my %question_types = ();
+    my $get_question = $self->session->db->prepare('select answers from Survey_questionTypes where questionType=?');
+    foreach my $question (@{ $questions }) {
+        my $type = $question->{questionType};
+        next if $question_types{$type};
+        $get_question->execute([$type]);
+        my ($answers) = $get_question->array();
+        $question_types{$type} = $answers;
+    }
+    #my $question_types = $self->db->buildArrayRefOfHashRefs('select * from Survey_questionTypes');
+    $get_question->finish;
+    $asset_data->{question_types} = \%question_types;
+    return $asset_data;
+}
+
+#-------------------------------------------------------------------
+
+=head2 importAssetCollateralData ($data)
+
+Extend the base method to include custom question types added to this Survey.
+
+=cut
+
+sub importAssetCollateralData {
+    my $self = shift;
+    my $data = shift;
+    $self->SUPER::importAssetCollateralData($data);
+    my $custom_types = $data->{question_types};
+    while (my ($question, $answer) = each %{ $custom_types }) {
+        $self->session->db->write("INSERT INTO Survey_questionTypes VALUES(?,?) ON DUPLICATE KEY UPDATE answers = ?",[$question,$answer,$answer]);
+    }
+}
+
+#-------------------------------------------------------------------
+
 =head2 www_exportSimpleResults ()
 
 Exports transposed results as CSV (or tabbed depending on the C<format> form param)
