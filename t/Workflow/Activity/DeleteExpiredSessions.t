@@ -46,7 +46,7 @@ $retVal = $instance1->run();
 is($retVal, 'complete', 'cleanup: activity complete');
 $retVal = $instance1->run();
 is($retVal, 'done', 'cleanup: activity is done');
-$instance1->delete;
+$instance1->delete('skipNotify');
 
 my $origSessionTimeout = $session->setting->get('sessionTimeout');
 
@@ -80,6 +80,7 @@ my $instance2 = WebGUI::Workflow::Instance->create($session,
         skipSpectreNotification => 1,
     }
 );
+WebGUI::Test->addToCleanup($instance2);
 
 my $counter = 0;
 PAUSE: while ($retVal = $instance2->run()) {
