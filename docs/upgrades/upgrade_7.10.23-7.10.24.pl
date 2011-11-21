@@ -34,6 +34,7 @@ my $session = start(); # this line required
 addPALastLogTable($session);
 addForkRedirect($session);
 extendBucketName($session);
+fixSurveyQuestionTypes($session);
 
 finish($session); # this line required
 
@@ -77,6 +78,19 @@ sub extendBucketName {
     # and here's our code
     $session->db->write(<<EOSQL);
 ALTER TABLE bucketLog CHANGE COLUMN Bucket Bucket CHAR(255)
+EOSQL
+    print "DONE!\n" unless $quiet;
+}
+
+
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub fixSurveyQuestionTypes {
+    my $session = shift;
+    print "\tFix bad custom Question Types in the Survey... " unless $quiet;
+    # and here's our code
+    $session->db->write(<<EOSQL);
+update Survey_questionTypes set answers="{}" where answers like 'HASH%';
 EOSQL
     print "DONE!\n" unless $quiet;
 }
