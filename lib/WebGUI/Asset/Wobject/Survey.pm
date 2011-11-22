@@ -2466,10 +2466,12 @@ sub exportAssetData {
     my $self = shift;
     my $asset_data = $self->SUPER::exportAssetData();
     my $questions  = $self->surveyJSON->questions();
-    my %question_types = ();
-    my $get_question = $self->session->db->prepare('select answers from Survey_questionTypes where questionType=?');
+    my $multiple_choice = $self->surveyJSON->multipleChoiceTypes();
+    my %question_types  = ();
+    my $get_question    = $self->session->db->prepare('select answers from Survey_questionTypes where questionType=?');
     foreach my $question (@{ $questions }) {
         my $type = $question->{questionType};
+        next unless $multiple_choice->{$type};
         next if $question_types{$type};
         $get_question->execute([$type]);
         my ($answers) = $get_question->array();
