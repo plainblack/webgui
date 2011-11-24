@@ -134,7 +134,7 @@ sub toHtml {
 		$output .= '>'.$options->{$key}.'</option>';
 	}
 	$output .= '</select>'."\n";
-    $output .= WebGUI::Form::Hidden($session, { name => $self->privateName('isIn'), value => 1, });
+    $output .= WebGUI::Form::Hidden->new($session, { name => $self->privateName('isIn'), value => 1, })->toHtml;
 	return $output;
 }
 
