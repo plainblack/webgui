@@ -171,21 +171,27 @@ sub getEditTemplate {
 	my $i18n = WebGUI::International->new($session, "Asset_WikiPage");
 	my $wiki = $self->getWiki;
 	my $url = ($self->getId eq "new") ? $wiki->getUrl : $self->getUrl;
+    use WebGUI::Form::HTMLArea;
+    use WebGUI::Form::Submit;
+    use WebGUI::Form::YesNo;
+    use WebGUI::Form::Hidden;
+    use WebGUI::Form::Keywords;
+    use WebGUI::Form::Attachments;
 	my $var = {
 		title=> $i18n->get("editing")." ".(defined($self->title)? $self->title : $i18n->get("assetName")),
 		formHeader => WebGUI::Form::formHeader($session, { action => $url}) 
-			.WebGUI::Form::hidden($session, { name => 'func', value => ( $self->getId eq 'new' ? 'addSave' : 'editSave' ) }) 
-			.WebGUI::Form::hidden($session, { name=>"proceed", value=>"showConfirmation" }),
-	 	formTitle => WebGUI::Form::text($session, { name => 'title', maxlength => 255, size => 40, 
-                value => $self->title, defaultValue=>$form->get("title","text") }),
-		formContent => WebGUI::Form::HTMLArea($session, { name => 'content', richEditId => $wiki->richEditor, value => $self->content }) ,
-		formSubmit => WebGUI::Form::submit($session, { value => 'Save' }),
-		formProtect => WebGUI::Form::yesNo($session, { name => "isProtected", value=>$self->isProtected}),
-                formFeatured => WebGUI::Form::yesNo( $session, { name => 'isFeatured', value=>$self->isFeatured}),
-        formKeywords => WebGUI::Form::keywords($session, {
+			.WebGUI::Form::Hidden->new($session, { name => 'func', value => ( $self->getId eq 'new' ? 'addSave' : 'editSave' ) })->toHtml 
+			.WebGUI::Form::Hidden->new($session, { name=>"proceed", value=>"showConfirmation" })->toHtml,
+	 	formTitle => WebGUI::Form::Text->new($session, { name => 'title', maxlength => 255, size => 40, 
+                value => $self->title, defaultValue=>$form->get("title","text") })->toHtml,
+		formContent => WebGUI::Form::HTMLArea->new($session, { name => 'content', richEditId => $wiki->richEditor, value => $self->content })->toHtml ,
+		formSubmit => WebGUI::Form::Submit->new($session, { value => 'Save' })->toHtml,
+		formProtect => WebGUI::Form::YesNo->new($session, { name => "isProtected", value=>$self->isProtected})->toHtml,
+                formFeatured => WebGUI::Form::YesNo->new( $session, { name => 'isFeatured', value=>$self->isFeatured})->toHtml,
+        formKeywords => WebGUI::Form::Keywords->new($session, {
             name    => "keywords",
             value   => WebGUI::Keyword->new($session)->getKeywordsForAsset({asset=>$self}),
-            }),
+            })->toHtml,
 		allowsAttachments => $wiki->allowAttachments,
 		formFooter => WebGUI::Form::formFooter($session),
 		isNew => ($self->getId eq "new"),
@@ -203,17 +209,17 @@ sub getEditTemplate {
     $session->log->warn("title form element". $var->{formTitle});
     my $children = [];
 	if ($self->getId eq "new") {
-		$var->{formHeader} .= WebGUI::Form::hidden($session, { name=>"assetId", value=>"new" }) 
-			.WebGUI::Form::hidden($session, { name=>"className", value=>$form->process("className","className") });
+		$var->{formHeader} .= WebGUI::Form::Hidden->new($session, { name=>"assetId", value=>"new" })->toHtml 
+			.WebGUI::Form::Hidden->new($session, { name=>"className", value=>$form->process("className","className") })->toHtml;
 	} else {
         $children = $self->getLineage(["children"]);
     }
-    $var->{formAttachment} = WebGUI::Form::Attachments($session, { 
+    $var->{formAttachment} = WebGUI::Form::Attachments->new($session, { 
         value           => $children,
         maxAttachments  => $wiki->allowAttachments,
         maxImageSize    => $wiki->maxImageSize,
         thumbnailSize   => $wiki->thumbnailSize,
-        });
+        })->toHtml;
     my $template    = WebGUI::Asset->newById( $session, $wiki->pageEditTemplateId );
     $template->style( $wiki->getStyleTemplateId );
     $template->setParam( %$var );
