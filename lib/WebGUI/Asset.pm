@@ -504,6 +504,28 @@ sub addEditSaveButtons {
     return $form->addFieldAt( $buttonGroup, 0 );
 }
 
+#----------------------------------------------------------------------------
+
+=head2 addEditSaveTabs ( form )
+
+Add the tabs to the form for editing or saving the asset's properties.
+This is broken out so that additional tabs with i18n'ed labels can be
+added by subclasses or by Roles.
+
+=cut
+
+sub addEditSaveTabs {
+    my ( $self, $form ) = @_;
+    my $session = $self->session;
+    my $i18n = WebGUI::International->new($session, "Asset");
+    # Not using loop to maintain correct order
+    $form->addTab( name => "properties", label => $i18n->get("properties") );
+    $form->addTab( name => "display", label => $i18n->get(105) );
+    $form->addTab( name => "security", label => $i18n->get(107) );
+    $form->addTab( name => "meta", label => $i18n->get("Metadata") );
+    return $form;
+}
+
 #-------------------------------------------------------------------
 
 =head2 addMissing ( url )
@@ -1085,11 +1107,7 @@ sub getEditForm {
 
     ### 
     # Create the main tabset
-    # Not using loop to maintain correct order
-    $f->addTab( name => "properties", label => $i18n->get("properties") );
-    $f->addTab( name => "display", label => $i18n->get(105) );
-    $f->addTab( name => "security", label => $i18n->get(107) );
-    $f->addTab( name => "meta", label => $i18n->get("Metadata") );
+    $self->addEditSaveTabs($f);
 
     ###
     # Asset ID and class name

@@ -121,7 +121,23 @@ These methods are available from this class:
 
 =cut
 
-#-------------------------------------------------------------------
+#----------------------------------------------------------------------------
+
+=head2 addEditSaveTabs ( form )
+
+Add the tab for the RSS feed configuration data.
+
+=cut
+
+override addEditSaveTabs => sub {
+    my ( $self, $form ) = @_;
+    $form = super();
+    my $i18n = WebGUI::International->new($self->session, 'Role_RssFeed');
+    $form->addTab( name => "rss", label => $i18n->get("RSS tab") );
+    return $form;
+};
+
+ #-------------------------------------------------------------------
 
 =head2 dispatch ( )
 
