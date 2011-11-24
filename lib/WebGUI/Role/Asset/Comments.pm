@@ -219,12 +219,16 @@ sub getFormattedComments {
 		$out .= q{<b>}.$comment->{alias}.q{:</b> "}.WebGUI::HTML::format($comment->{comment},'text').q{"</div>};
 	}
 	if ($self->canComment) {
+        use WebGUI::Form::Hidden;
+        use WebGUI::Form::Textarea;
+        use WebGUI::Form::CommentRating;
+        use WebGUI::Form::Submit;
 		$out .= '<div class="assetAspectCommentForm">';
 		$out .= WebGUI::Form::formHeader($session, {action=>$self->getUrl});
-		$out .= WebGUI::Form::hidden($session, {name=>"func",value=>"addComment"});
-		$out .= WebGUI::Form::textarea($session, {name=>"comment"});
-		$out .= WebGUI::Form::commentRating($session, {name=>"rating"});
-		$out .= WebGUI::Form::submit($session);
+		$out .= WebGUI::Form::Hidden->new($session, {name=>"func",value=>"addComment"})->toHtml;
+		$out .= WebGUI::Form::Textarea->new($session, {name=>"comment"})->toHtml;
+		$out .= WebGUI::Form::CommentRating->new($session, {name=>"rating"})->toHtml;
+		$out .= WebGUI::Form::Submit->new($session)->toHtml;
 		$out .= WebGUI::Form::formFooter($session);
 		$out .= '</div>';
 	}

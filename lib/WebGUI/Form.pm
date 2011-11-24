@@ -144,7 +144,8 @@ sub formHeader {
     my $enctype     = (exists $params->{enctype} && $params->{enctype} ne "") ? $params->{enctype} : "multipart/form-data";
 
     # Fix a query string in the action URL
-    my $hidden = csrfToken($session);
+    use WebGUI::Form::CsrfToken;
+    my $hidden = WebGUI::Form::CsrfToken->new($session)->toHtml;
     if ($action =~ /\?/) {
         ($action, my $query) = split /\?/, $action, 2;
         my @params = split /[&;]/, $query;
