@@ -51,6 +51,12 @@ property isFeatured => (
             noFormPost => 1,
          );
 
+override _default_title => sub {
+    my $self = shift;
+    my $title = $self->session->form->get('title') || super();
+    return $title;
+};
+
 with 'WebGUI::Role::Asset::AlwaysHidden';
 with 'WebGUI::Role::Asset::Subscribable';
 with 'WebGUI::Role::Asset::Comments';
@@ -193,6 +199,8 @@ sub getEditTemplate {
 		protectQuestionLabel => $i18n->get("protectQuestionLabel"),
 		isProtected => $self->isProtected
 		};
+    $session->log->warn("title form variable". $form->get('title', 'text'));
+    $session->log->warn("title form element". $var->{formTitle});
     my $children = [];
 	if ($self->getId eq "new") {
 		$var->{formHeader} .= WebGUI::Form::hidden($session, { name=>"assetId", value=>"new" }) 

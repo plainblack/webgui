@@ -33,8 +33,14 @@ property  title => (
             label           => ['99','Asset'],
             hoverHelp       => ['99 description','Asset'],
             fieldType       => 'text',
-            default         => 'Untitled',
+            builder         => '_default_title',
+            lazy            => 1,
           );
+
+sub _default_title {
+    return 'Untitled';
+}
+
 around title => sub {
     my $orig = shift;
     my $self = shift;
