@@ -529,23 +529,23 @@ cmp_deeply(
     'importTaxData: error handling for file that does not exist in the filesystem',
 );
 
-cmp_deeply(
+cmp_bag(
     $taxer->getTaxRates($taxingAddress),
     [0, 5, 0.5],
     'getTaxRates: return correct data for a state with tax data'
-);
+) or diag Dumper $taxer->getTaxRates($taxingAddress);
 
-cmp_deeply(
+cmp_bag(
     $taxer->getTaxRates($taxFreeAddress),
     [0,0],
     'getTaxRates: return correct data for a state with no tax data'
-);
+) or diag Dumper $taxer->getTaxRates($taxFreeAddress);
 
-cmp_deeply(
+cmp_bag(
     $taxer->getTaxRates($alternateAddress),
     [0.0, 8.25], #Hits USA and Los Angeles, California using the alternate spelling of the state
     'getTaxRates: return correct data for a state when the address has alternations'
-);
+) or diag Dumper $taxer->getTaxRates($alternateAddress);
 
 my $capitalized = $taxer->add({
     country => 'USA',
@@ -553,11 +553,11 @@ my $capitalized = $taxer->add({
     taxRate => '50',
 });
 
-cmp_deeply(
+cmp_bag(
     $taxer->getTaxRates($taxingAddress),
     [0, 5, 0.5],
     '... multiple entries with different capitalization, first matches'
-);
+) or diag Dumper $taxer->getTaxRates($taxingAddress);
 
 $taxer->delete({ taxId => $capitalized });
 
