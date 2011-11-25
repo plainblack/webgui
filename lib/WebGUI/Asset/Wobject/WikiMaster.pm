@@ -350,8 +350,8 @@ sub appendSearchBoxVars {
 	$var->{'searchFormHeader'} = join '',
 	    (WebGUI::Form::formHeader($self->session, { action => $self->getUrl, method => 'GET', }),
 	     WebGUI::Form::Hidden->new($self->session, { name => 'func', value => 'search' })->toHtml);
-	$var->{'searchQuery'} = WebGUI::Form::Text($self->session, { name => 'query', value => $queryText })->toHtml;
-	$var->{'searchSubmit'} = WebGUI::Form::Submit($self->session, { value => $submitText }->toHtml);
+	$var->{'searchQuery'} = WebGUI::Form::Text->new($self->session, { name => 'query', value => $queryText })->toHtml;
+	$var->{'searchSubmit'} = WebGUI::Form::Submit->new($self->session, { value => $submitText })->toHtml;
 	$var->{'searchFormFooter'} = WebGUI::Form::formFooter($self->session);
 	$var->{'canAddPages'} = $self->canEditPages();
 	return $self;
