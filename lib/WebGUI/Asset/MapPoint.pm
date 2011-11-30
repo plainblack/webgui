@@ -266,23 +266,23 @@ sub getTemplateVarsEditForm {
 
     $var->{ form_header } 
         = WebGUI::Form::formHeader( $session )
-        . WebGUI::Form::hidden( $session, { 
+        . WebGUI::Form::Hidden->new( $session, { 
             name    => 'func', 
             value   => 'ajaxEditPointSave',
-        } )
-        . WebGUI::Form::hidden( $session, {
+        } )->toHtml
+        . WebGUI::Form::Hidden->new( $session, {
             name    => 'assetId',
             value   => $self->getId,
             defaultValue => 'new',
-        } )
-        . WebGUI::Form::hidden( $session, {
+        } )->toHtml
+        . WebGUI::Form::Hidden->new( $session, {
             name    => 'latitude',
             value   => $self->latitude,
-        } )
-        . WebGUI::Form::hidden( $session, {
+        } )->toHtml
+        . WebGUI::Form::Hidden->new( $session, {
             name    => 'longitude',
             value   => $self->longitude,
-        } )
+        } )->toHtml
         ;
     $var->{ form_footer } = WebGUI::Form::formFooter( $session );
 
@@ -302,34 +302,34 @@ sub getTemplateVarsEditForm {
     
     # Stuff from Asset
     $var->{ "form_title" }
-        = WebGUI::Form::text( $session, {
+        = WebGUI::Form::Text->new( $session, {
             name        => "title",
             value       => $self->title,
-        } );
+        } )->toHtml;
     $var->{ "form_synopsis" }
-        = WebGUI::Form::textarea( $session, {
+        = WebGUI::Form::Textarea->new( $session, {
             name        => "synopsis",
             value       => $self->synopsis,
             resizable   => 0,
-        } );
+        } )->toHtml;
 
     #Only allow people who can edit the parent to change isHidden
     if($var->{'can_edit_map'}) {
         my $isHidden = (defined $self->get("isHidden")) ? $self->get("isHidden") : 1;
         $var->{ "form_isHidden" }
-            = WebGUI::Form::yesNo( $session, {
+            = WebGUI::Form::YesNo->toHtml( $session, {
                 name        => "isHidden",
                 value       => $isHidden,
-            } );
+            } )->toHtml;
     }
     
     my $isGeocoded = ( $self->getId ) ? $self->get("isGeocoded") : 1;
     $var->{"form_isGeocoded"}
-        = WebGUI::Form::checkbox( $session, {
+        = WebGUI::Form::Checkbox->new( $session, {
             name        => "isGeocoded",
             value       => 1,
             checked     => $isGeocoded
-        } );
+        } )->toHtml;
     # Fix storageIdPhoto because scripts do not get executed in ajax requests
     $var->{ "form_storageIdPhoto" }
 	= '<input type="file" name="storageIdPhoto" />';
