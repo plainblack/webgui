@@ -2,8 +2,8 @@ This is the PSGI branch of WebGUI8
 
 To try this out:
 
- 0) Start from WebGUI 7.10.4 or the example .conf and create.sql that comes with WebGUI 8
- 1) Run testEnvironment.pl to install Plack
+ 0) Start from WebGUI 7.10.23 or the example .conf and create.sql that comes with WebGUI 8.
+ 1) Run testEnvironment.pl to install all new requirements.
  2) Get a new wgd from http://haarg.org/wgd
  3) Copy etc/WebGUI.conf.original to www.whatever.com.conf; edit it and set dbuser, dbpass, 
     dsn, and uploadsPath (eg to /data/domains/www.example.com/public/uploads/)
