@@ -17,21 +17,15 @@
 use strict;
 use Test::More;
 use WebGUI::Test; # Must use this before any other WebGUI modules
+use WebGUI::Test::Mechanize; # Must use this before any other WebGUI modules
 use WebGUI::Session;
 use Test::Deep;
-plan skip_all => 'set WEBGUI_LIVE to enable this test' unless $ENV{WEBGUI_LIVE};
 
 #----------------------------------------------------------------------------
 # Init
 my $session         = WebGUI::Test->session;
 my $node            = WebGUI::Asset->getImportNode( $session );
 my @versionTags     = ( WebGUI::VersionTag->getWorking( $session ) );
-
-# Override some settings to make things easier to test
-# userFunctionStyleId 
-$session->setting->set( 'userFunctionStyleId', 'PBtmpl0000000000000132' );
-# specialState
-$session->setting->set( 'specialState', '' );
 
 # Create a user for testing purposes
 my $user        = WebGUI::User->new( $session, "new" );
@@ -42,11 +36,6 @@ my $auth        = WebGUI::Operation::Auth::getInstance( $session, $user->authMet
 $auth->saveParams( $user->userId, $user->authMethod, {
     'identifier'    => Digest::MD5::md5_base64( $identifier ), 
 });
-
-my ($mech, $redirect, $response);
-
-# Get the site's base URL
-my $baseUrl         = 'http://' . $session->config->get('sitename')->[0];
 
 my $i18n        = WebGUI::International->new( $session, 'Asset_GalleryAlbum' );
 
@@ -66,23 +55,19 @@ WebGUI::Test->addToCleanup(@versionTags);
 if ( !eval { require Test::WWW::Mechanize; 1; } ) {
     plan skip_all => 'Cannot load Test::WWW::Mechanize. Will not test.';
 }
-$mech    = Test::WWW::Mechanize->new;
-$mech->get( $baseUrl );
-if ( !$mech->success ) {
-    plan skip_all => "Cannot load URL '$baseUrl'. Will not test.";
-}
+my $mech    = WebGUI::Test::Mechanize->new( config => WebGUI::Test->file );
+$mech->get_ok( '/' );
 
 #----------------------------------------------------------------------------
 # Visitor user cannot add albums 
-$mech       = Test::WWW::Mechanize->new;
-$mech->get( $baseUrl . $gallery->getUrl('func=add;class=WebGUI::Asset::Wobject::GalleryAlbum') );
-
-# Should contain the Log In form
+$mech->get( $gallery->getUrl('func=add;className=WebGUI::Asset::Wobject::GalleryAlbum') );
+ok $mech->res->is_error, 'HTTP error returned from server';
 $mech->content_contains( "Permission Denied" );
 
 #----------------------------------------------------------------------------
 # Registered User can add albums
-$mech       = getMechLogin( $baseUrl, $user, $identifier );
+$mech->session->user({ user => $user });
+WebGUI::Test->addToCleanup($mech->session);
 
 # Complete the GalleryAlbum edit form
 my $properties  = {
@@ -90,10 +75,13 @@ my $properties  = {
     description     => 'This is a new Gallery Album',
 };
 
-$mech->get_ok( $baseUrl . $gallery->getUrl('func=add;class=WebGUI::Asset::Wobject::GalleryAlbum') );
+$mech->get_ok( $gallery->getUrl('func=add;className=WebGUI::Asset::Wobject::GalleryAlbum') );
 $mech->submit_form_ok( {
     with_fields     => $properties,
 }, 'Sent GalleryAlbum edit form' );
+
+my $added_tag = WebGUI::VersionTag->getWorking($mech->session);
+WebGUI::Test->addToCleanup($added_tag);
 
 # Shows the confirmation page
 $mech->content_contains( 
@@ -101,7 +89,7 @@ $mech->content_contains(
     'Shows message about what next',
 );
 $mech->content_contains( 
-    q{func=add;class=WebGUI::Asset::File::GalleryFile::Photo},
+    q{func=add;className=WebGUI::Asset::File::GalleryFile::Photo},
     'Shows link to add a Photo',
 );
 
@@ -121,11 +109,14 @@ my $album = $gallery->getFirstChild;
 
 # Add single photo to this album. No need to commit since auto-commit was
 # enabled for the Gallery asset.
+my $tag = WebGUI::VersionTag->getWorking($session);
 my $photo
     = $album->addChild({
         className           => "WebGUI::Asset::File::GalleryFile::Photo",
     });
 my $photoId = $photo->getId;
+$tag->commit;
+WebGUI::Test->addToCleanup($tag);
 
 # Attach image file to photo asset (setFile also makes download versions)
 $photo->setFile( WebGUI::Test->getTestCollateralPath("rotation_test.png") );
@@ -138,7 +129,7 @@ foreach my $file ( @{$storage->getFiles('showAll') } ) {
 }
 
 # Rotate photo (i.e. all attached images) by 90° CW
-$mech->get_ok( $baseUrl . $album->getUrl('func=edit'), 'Request GalleryAlbum edit screen' );
+$mech->get_ok( $album->getUrl('func=edit'), 'Request GalleryAlbum edit screen' );
 # Select the proper form
 $mech->form_name( 'galleryAlbumEdit' );
 # Try to click the "rotate right" button
@@ -175,25 +166,3 @@ cmp_deeply( \@oldDims, \@newerDims, "Check if all files were rotated by 90° CCW
 }
 
 done_testing;
-
-#----------------------------------------------------------------------------
-# getMechLogin( baseUrl, WebGUI::User, "identifier" )
-# Returns a Test::WWW::Mechanize session after logging in the given user using
-# the given identifier (password)
-# baseUrl is a fully-qualified URL to the site to login to
-sub getMechLogin {
-    my $baseUrl     = shift;
-    my $user        = shift;
-    my $identifier  = shift;
-    
-    my $mech    = Test::WWW::Mechanize->new;
-    $mech->get( $baseUrl . '?op=auth;method=displayLogin' );
-    $mech->submit_form( 
-        with_fields => {
-            username        => $user->username,
-            identifier      => $identifier,
-        },
-    ); 
-
-    return $mech;
-}
