@@ -19,17 +19,11 @@ use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Asset;
 use WebGUI::VersionTag;
 use WebGUI::Session;
-plan skip_all => 'set WEBGUI_LIVE to enable this test' unless $ENV{WEBGUI_LIVE};
+use WebGUI::Test::Mechanize;
 
 #----------------------------------------------------------------------------
 # Init
 my $session         = WebGUI::Test->session;
-
-# Override some settings to make things easier to test
-# userFunctionStyleId 
-$session->setting->set( 'userFunctionStyleId', 'PBtmpl0000000000000132' );
-# specialState
-$session->setting->set( 'specialState', '' );
 
 # Create a user for testing purposes
 my $user        = WebGUI::User->new( $session, "new" );
@@ -38,7 +32,7 @@ $user->username( 'dufresne' );
 my $identifier  = 'ritahayworth';
 my $auth        = WebGUI::Operation::Auth::getInstance( $session, $user->authMethod, $user->userId );
 $auth->saveParams( $user->userId, $user->authMethod, {
-    'identifier'    => Digest::MD5::md5_base64( $identifier ), 
+    'identifier'    => Digest::MD5::md5_base64( $identifier ),
 });
 
 my ($mech, $redirect, $response);
@@ -52,40 +46,39 @@ my $redirectUrl     = time . "shawshank";
 my $testContent     = "Perhaps if you've gone this far, you'd be willing to go further.";
 my $snippetUrl      = time . "zejuatenejo";
 my $redirectToUrl   = $snippetUrl . "?name=value";
-my $redirectToAsset 
+my $redirectToAsset
     = WebGUI::Test->asset(
-        className       => 'WebGUI::Asset::Snippet', 
+        className       => 'WebGUI::Asset::Snippet',
         url             => $snippetUrl,
         snippet         => $testContent,
     );
+my $tag1 = WebGUI::VersionTag->getWorking($session);
+WebGUI::Test->addToCleanup($tag1);
+$tag1->commit;
+$redirectToAsset = $redirectToAsset->cloneFromDb;
 
 my $count = time;   # A known count for url uniqueness
 
 #----------------------------------------------------------------------------
 # Tests
 
-if ( !eval { require Test::WWW::Mechanize; 1; } ) {
-    plan skip_all => 'Cannot load Test::WWW::Mechanize. Will not test.';
-}
-$mech    = Test::WWW::Mechanize->new;
-$mech->get( $baseUrl );
-if ( !$mech->success ) {
-    plan skip_all => "Cannot load URL '$baseUrl'. Will not test.";
-}
-
-plan tests => 12;        # Increment this number for each test you create
-
 #----------------------------------------------------------------------------
 # Test operation with a public Redirect
-$redirect       
+$redirect
     = WebGUI::Test->asset(
         className       => 'WebGUI::Asset::Redirect',
         redirectUrl     => $redirectToUrl,
-        url             => $redirectUrl . $count++,
+        url             => $redirectUrl . ++$count,
     );
+my $tag2 = WebGUI::VersionTag->getWorking($session);
+WebGUI::Test->addToCleanup($tag2);
+$tag2->commit;
+$redirect = $redirect->cloneFromDb;
 
-$mech   = Test::WWW::Mechanize->new;
-$mech->get_ok( $baseUrl . $redirectUrl . $count, "We get the redirect" );
+$mech   = WebGUI::Test::Mechanize->new( config => WebGUI::Test->file );
+$mech->get_ok('/', 'initialize mech object with session');
+$mech->get_ok($snippetUrl, 'snippet can be fetched');
+$mech->get_ok( $redirectUrl . $count, "We get the redirect" );
 $mech->content_contains( $testContent, "We made it to the snippet" );
 
 $response = $mech->res->previous;
@@ -102,13 +95,18 @@ $redirect
     = WebGUI::Test->asset(
         className       => 'WebGUI::Asset::Redirect',
         redirectUrl     => $redirectToUrl,
-        url             => $redirectUrl . $count++,
+        url             => $redirectUrl . ++$count,
         groupIdView     => 2,
         groupIdEdit     => 3,
     );
 
-$mech       = Test::WWW::Mechanize->new;
-$mech->get( $baseUrl . $redirectUrl . $count ); 
+my $tag = WebGUI::VersionTag->getWorking($session);
+$tag->commit;
+WebGUI::Test->addToCleanup($tag);
+$redirect = $redirect->cloneFromDb;
+
+$mech       = WebGUI::Test::Mechanize->new( config => WebGUI::Test->file );
+$mech->get( $baseUrl . $redirectUrl . $count );
 $mech->submit_form_ok( {
     with_fields     => {
         username        => $user->username,
@@ -127,21 +125,26 @@ is(
 
 
 #----------------------------------------------------------------------------
-# Test operation with a private Redirect through a login with translate 
+# Test operation with a private Redirect through a login with translate
 # query params
 $redirect
     = WebGUI::Test->asset(
         className           => 'WebGUI::Asset::Redirect',
         redirectUrl         => $redirectToUrl,
-        url                 => $redirectUrl . $count++,
+        url                 => $redirectUrl . ++$count,
         groupIdView         => 2,
         groupIdEdit         => 3,
         forwardQueryParams  => 1,
     );
 
+my $tag = WebGUI::VersionTag->getWorking($session);
+$tag->commit;
+WebGUI::Test->addToCleanup($tag);
+$redirect = $redirect->cloneFromDb;
+
 my $extraParams = 'extra=hi';
-$mech       = Test::WWW::Mechanize->new;
-$mech->get( $baseUrl . $redirectUrl . $count . '?' . $extraParams ); 
+$mech       = WebGUI::Test::Mechanize->new( config => WebGUI::Test->file );
+$mech->get( $baseUrl . $redirectUrl . $count . '?' . $extraParams );
 $mech->submit_form_ok( {
     with_fields     => {
         username        => $user->username,
@@ -160,5 +163,7 @@ TODO: {
         "We were redirected to the right URL with forwarded query params",
     );
 };
+
+done_testing;
 
 #vim:ft=perl
