@@ -1402,6 +1402,11 @@ sub getEditTemplate {
     my $i18n        = WebGUI::International->new($session, 'Asset_GalleryAlbum');
 
     return $session->privilege->insufficient unless $self->canEdit;
+    use WebGUI::Form::Text;
+    use WebGUI::Form::Radio;
+    use WebGUI::Form::HTMLArea;
+    use WebGUI::Form::Submit;
+    use WebGUI::Form::YesNo;
 
     # Generate the form
     if ($form->get("func") eq "add") {
@@ -1412,10 +1417,10 @@ sub getEditTemplate {
                 action      => $self->getParent->getUrl('func=addSave;assetId=new;className='.__PACKAGE__),
                 extras      => 'name="galleryAlbumAdd"',
             })
-            . WebGUI::Form::hidden( $session, {
+            . WebGUI::Form::Hidden->new( $session, {
                 name        => "ownerUserId",
                 value       => $session->user->userId,
-            });
+            })->toHtml;
 
         # Put in the buttons that may ignore button handling code
     }
@@ -1425,74 +1430,74 @@ sub getEditTemplate {
                 action      => $self->getUrl('func=editSave'),
                 extras      => 'name="galleryAlbumEdit"',
             })
-            . WebGUI::Form::hidden( $session, {
+            . WebGUI::Form::Hidden->new( $session, {
                 name        => "ownerUserId",
                 value       => $self->ownerUserId,
-            });
+            })->toHtml;
         
     }
     $var->{ form_start } 
-        .= WebGUI::Form::hidden( $session, {
+        .= WebGUI::Form::Hidden->new( $session, {
             name        => "proceed",
             value       => "showConfirmation",
-        })
+        })->toHtml
         ;
 
     $var->{ form_cancel }
-        = WebGUI::Form::submit( $session, {
+        = WebGUI::Form::Submit->new( $session, {
             name        => "cancel",
             value       => $i18n->get("cancel"),
             extras      => 'onclick="history.go(-1)"',
-        });
+        })->toHtml;
 
     $var->{ form_end    }
         = WebGUI::Form::formFooter( $session );
 
     $var->{ form_submit }
-        = WebGUI::Form::submit( $session, {
+        = WebGUI::Form::Submit->new( $session, {
             name        => "save",
             value       => $i18n->get("save"),
-        });
+        })->toHtml;
     
     $var->{ form_title  }
-        = WebGUI::Form::text( $session, {
+        = WebGUI::Form::Text->new( $session, {
             name        => "title",
             value       => $form->get("title") || $self->title,
-        });
+        })->toHtml;
 
     $var->{ form_description }
-        = WebGUI::Form::HTMLArea( $session, {
+        = WebGUI::Form::HTMLArea->new( $session, {
             name        => "description",
             value       => $form->get("description") || $self->description,
             richEditId  => $self->getParent->richEditIdAlbum,
-        });
+        })->toHtml;
 
     $var->{ form_othersCanAdd }
-        = WebGUI::Form::yesNo( $session, {
+        = WebGUI::Form::YesNo->new( $session, {
             name        => "othersCanAdd",
             value       => $form->get( "othersCanAdd" ) || $self->othersCanAdd,
-        } );
+        } )->toHtml;
 
     # Generate the file loop
     my $assetIdThumbnail    = $form->get("assetIdThumbnail") || $self->assetIdThumbnail;
     $self->appendTemplateVarsFileLoop( $var, $self->getFileIds );
     for my $file ( @{ $var->{file_loop} } ) {
         $file->{ form_assetIdThumbnail }
-            = WebGUI::Form::radio( $session, {
+            = WebGUI::Form::Radio->new( $session, {
                 name        => "assetIdThumbnail",
                 value       => $file->{ assetId },
                 checked     => ( $assetIdThumbnail eq $file->{ assetId } ),
                 id          => "assetIdThumbnail_$file->{ assetId }",
-            } );
+            } )->toHtml;
 
         $file->{ form_synopsis }
-            = WebGUI::Form::HTMLArea( $session, {
+            = WebGUI::Form::HTMLArea->new( $session, {
                 name        => "fileSynopsis_$file->{assetId}",
                 value       => $form->get( "fileSynopsis_$file->{assetId}" ) || $file->{ synopsis },
                 richEditId  => $self->getParent->richEditIdFile,
                 height      => 150,
                 width       => 300,
-            });
+            })->toHtml;
     }
 
     my $gallery = $self->getParent;
