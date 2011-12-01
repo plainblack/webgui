@@ -756,9 +756,9 @@ sent.
 sub getInboxNotificationAddresses {
     my $self   = shift;
     my $emails = '';
-    if ( $self->profileField('receiveInboxEmailNotifications')
-      && $self->profileField('email')) {
-        $emails = $self->profileField('email');
+    if ( $self->get('receiveInboxEmailNotifications')
+      && $self->get('email')) {
+        $emails = $self->get('email');
     }
     return $emails;
 }
