@@ -146,12 +146,13 @@ sub formHeader {
     # Fix a query string in the action URL
     use WebGUI::Form::CsrfToken;
     my $hidden = WebGUI::Form::CsrfToken->new($session)->toHtml;
+    use WebGUI::Form::Hidden;
     if ($action =~ /\?/) {
         ($action, my $query) = split /\?/, $action, 2;
         my @params = split /[&;]/, $query;
         foreach my $param ( @params ) {
             my ($name, $value) = split /=/, $param;
-            $hidden .= hidden( $session, { name => $name, value => $value } );
+            $hidden .= WebGUI::Form::Hidden->new( $session, { name => $name, value => $value } )->toHtml;
         }
     }
 

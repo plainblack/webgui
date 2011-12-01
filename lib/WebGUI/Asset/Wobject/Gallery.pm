@@ -357,6 +357,10 @@ sub appendTemplateVarsSearchForm {
     my $form        = $self->session->form;
     my $i18n        = WebGUI::International->new($session, 'Asset_Gallery');
 
+    use WebGUI::Form::Text;
+    use WebGUI::Form::Submit;
+    use WebGUI::Form::DateTime;
+    use WebGUI::Form::RadioList;
     $var->{ searchForm_start    } 
         = WebGUI::Form::formHeader( $session, {
             action      => $self->getUrl('func=search'),
@@ -367,34 +371,34 @@ sub appendTemplateVarsSearchForm {
         = WebGUI::Form::formFooter( $session );
 
     $var->{ searchForm_basicSearch }
-        = WebGUI::Form::text( $session, {
+        = WebGUI::Form::Text->new( $session, {
             name        => "basicSearch",
             value       => scalar $form->get("basicSearch"),
-        });
+        })->toHtml;
 
     $var->{ searchForm_title    }
-        = WebGUI::Form::text( $session, {
+        = WebGUI::Form::Text->new( $session, {
             name        => "title",
             value       => scalar $form->get("title"),
-        });
+        })->toHtml;
 
     $var->{ searchForm_description }
-        = WebGUI::Form::text( $session, {
+        = WebGUI::Form::Text->new( $session, {
             name        => "description",
             value       => scalar $form->get("description"),
-        });
+        })->toHtml;
 
     $var->{ searchForm_keywords }
-        = WebGUI::Form::text( $session, {
+        = WebGUI::Form::Text->new( $session, {
             name        => "keywords",
             value       => scalar $form->get("keywords"),
-        });
+        })->toHtml;
         
     $var->{ searchForm_location }
-        = WebGUI::Form::text( $session, {
+        = WebGUI::Form::Text->new( $session, {
             name        => "location",
             value       => scalar $form->get("location"),
-        });
+        })->toHtml;
         
     # Search classes
     tie my %searchClassOptions, 'Tie::IxHash', (
@@ -403,31 +407,31 @@ sub appendTemplateVarsSearchForm {
         ''                                          => $i18n->get("search class any"),
     );
     $var->{ searchForm_className }
-        = WebGUI::Form::radioList( $session, {
+        = WebGUI::Form::RadioList->new( $session, {
             name        => "className",
             value       => ( $form->get("className") || '' ),
             options     => \%searchClassOptions,
-        });
+        })->toHtml;
 
     # Search creationDate
     my $oneYearAgo      = WebGUI::DateTime->new( $session, time )->add( years => -1 )->epoch;
     $var->{ searchForm_creationDate_after }
-        = WebGUI::Form::dateTime( $session, {
+        = WebGUI::Form::DateTime->new( $session, {
             name        => "creationDate_after",
             value       => scalar $form->get("creationDate_after",  "dateTime", $oneYearAgo),
-        });
+        })->toHtml;
     $var->{ searchForm_creationDate_before }
-        = WebGUI::Form::dateTime( $session, {
+        = WebGUI::Form::DateTime->new( $session, {
             name        => "creationDate_before",
             value       => scalar $form->get("creationDate_before", "dateTime", time()),
-        });
+        })->toHtml;
 
     # Buttons
     $var->{ searchForm_submit }
-        = WebGUI::Form::submit( $session, {
+        = WebGUI::Form::Submit->new( $session, {
             name        => "submit",
             value       => $i18n->get("search submit"),
-        });
+        })->toHtml;
 
     return $var;
 }
