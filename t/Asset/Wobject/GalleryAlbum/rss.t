@@ -14,11 +14,12 @@ use strict;
 ## The goal of this test is to test the rss view of GalleryAlbums
 
 use WebGUI::Test;
+use WebGUI::Test::Mechanize;
 use WebGUI::Session;
 use Test::More; 
 use Test::Deep;
 use XML::Simple;
-plan skip_all => 'set WEBGUI_LIVE to enable this test' unless $ENV{WEBGUI_LIVE};
+#plan skip_all => 'set WEBGUI_LIVE to enable this test' unless $ENV{WEBGUI_LIVE};
 
 #----------------------------------------------------------------------------
 # Init
@@ -83,16 +84,11 @@ if ( !eval { require Test::WWW::Mechanize; 1; } ) {
     plan skip_all => 'Cannot load Test::WWW::Mechanize. Will not test.';
 }
 $mech    = Test::WWW::Mechanize->new;
-$mech->get( $baseUrl );
-if ( !$mech->success ) {
-    plan skip_all => "Cannot load URL '$baseUrl'. Will not test.";
-}
-
-plan tests => 1;
 
 #----------------------------------------------------------------------------
 # Test www_viewRss
-$mech   = Test::WWW::Mechanize->new;
+$mech   = WebGUI::Test::Mechanize->new( config => WebGUI::Test->file );
+$mech->get_ok('/', 'initialize mech object with session');
 my $url = $session->url->getSiteURL . $session->url->makeAbsolute( $album->getUrl('func=viewRss') ); 
 $mech->get( $url );
 cmp_deeply(
@@ -117,3 +113,5 @@ cmp_deeply(
     },
     "RSS Datastructure is complete and correct",
 );
+
+done_testing;
