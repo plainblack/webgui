@@ -12,6 +12,7 @@ my @fields = qw( ableToBeFriend alias allowPrivateMessages avatar cellPhone date
     toolbar uiLevel versionTagMode );
 
 # Create the new columns
+report "Creating new columns in the user table";
 for my $fieldName ( @fields ) {
     my $field       = WebGUI::ProfileField->new( session, $fieldName );
     my $fieldClass  = $field->getFormControlClass;
@@ -21,6 +22,7 @@ for my $fieldName ( @fields ) {
 }
 
 # Update the table
+report "Copying data for all users, this could take a while";
 my @pairs   = map { q{`users`.`} . $_ . q{`=`userProfileData`.`} . $_ . q{`} } @fields;
 session->db->write(
     q{ UPDATE `users`,`userProfileData` SET } . join( ", ", @pairs ) .
@@ -28,6 +30,7 @@ session->db->write(
 );
 
 # Drop the old tables
+report "Removing old columns";
 for my $fieldName ( @fields ) {
     session->db->write( qq{ ALTER TABLE userProfileData DROP COLUMN `$fieldName` } );
 }
