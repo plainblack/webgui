@@ -19,7 +19,6 @@ use WebGUI::Session;
 use Test::More; 
 use Test::Deep;
 use XML::Simple;
-#plan skip_all => 'set WEBGUI_LIVE to enable this test' unless $ENV{WEBGUI_LIVE};
 
 #----------------------------------------------------------------------------
 # Init
@@ -68,22 +67,10 @@ for my $i ( 0 .. 5 ) {
 
 $versionTag->commit;
 
-# Override some settings to make things easier to test
-# userFunctionStyleId 
-$session->setting->set( 'userFunctionStyleId', 'PBtmpl0000000000000132' );
-# specialState
-$session->setting->set( 'specialState', '' );
-
-my ( $mech );
-my $baseUrl         = $session->url->getSiteURL;
-
 #----------------------------------------------------------------------------
 # Tests
 
-if ( !eval { require Test::WWW::Mechanize; 1; } ) {
-    plan skip_all => 'Cannot load Test::WWW::Mechanize. Will not test.';
-}
-$mech    = Test::WWW::Mechanize->new;
+my $mech    = Test::WWW::Mechanize->new;
 
 #----------------------------------------------------------------------------
 # Test www_viewRss
