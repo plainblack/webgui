@@ -810,8 +810,8 @@ sub www_createAccount {
     
     $vars->{'create.form.header'}
         = WebGUI::Form::formHeader($self->session)
-        . WebGUI::Form::hidden($self->session,{"name"=>"op","value"=>"auth"})
-        . WebGUI::Form::hidden($self->session,{"name"=>"method","value"=>$method})
+        . WebGUI::Form::Hidden->new($self->session,{"name"=>"op","value"=>"auth"})->toHtml
+        . WebGUI::Form::Hidden->new($self->session,{"name"=>"method","value"=>$method})->toHtml
         ;
     
     # User Defined Options
@@ -1172,14 +1172,18 @@ sub www_displayLogin {
         $action = $self->session->url->page(undef,1);
         $action =~ s/http:/https:/;
     }
+    use WebGUI::Form::Password;
+    use WebGUI::Form::Hidden;
+    use WebGUI::Form::Text;
+    use WebGUI::Form::Submit;
     $vars->{'login.form.header'} = WebGUI::Form::formHeader($self->session,{action=>$action});
-    $vars->{'login.form.hidden'} = WebGUI::Form::hidden($self->session,{"name"=>"op","value"=>"auth"});
-    $vars->{'login.form.hidden'} .= WebGUI::Form::hidden($self->session,{"name"=>"method","value"=>$method});
-    $vars->{'login.form.username'} = WebGUI::Form::text($self->session,{"name"=>"username"});
+    $vars->{'login.form.hidden'} = WebGUI::Form::Hidden->new($self->session,{"name"=>"op","value"=>"auth"})->toHtml;
+    $vars->{'login.form.hidden'} .= WebGUI::Form::Hidden->new($self->session,{"name"=>"method","value"=>$method})->toHtml;
+    $vars->{'login.form.username'} = WebGUI::Form::Text->new($self->session,{"name"=>"username"})->toHtml;
     $vars->{'login.form.username.label'} = $i18n->get(50);
-    $vars->{'login.form.password'} = WebGUI::Form::password($self->session,{"name"=>"identifier"});
+    $vars->{'login.form.password'} = WebGUI::Form::Password->new($self->session,{"name"=>"identifier"})->toHtml;
     $vars->{'login.form.password.label'} = $i18n->get(51);
-    $vars->{'login.form.submit'} = WebGUI::Form::submit($self->session,{"value"=>$i18n->get(52)});
+    $vars->{'login.form.submit'} = WebGUI::Form::Submit->new($self->session,{"value"=>$i18n->get(52)})->toHtml;
     $vars->{'login.form.footer'} = WebGUI::Form::formFooter($self->session,);
     $vars->{'anonymousRegistration.isAllowed'} = ($self->session->setting->get("anonymousRegistration"));
     $vars->{'createAccount.url'} = $self->session->url->page('op=auth;method=createAccount');
