@@ -47,7 +47,7 @@ around title => sub {
     if (@_ > 0) {
         my $title = shift;
         $title    = WebGUI::HTML::filter($title, 'all');
-        $title    = $self->meta->find_attribute_by_name('title')->default if $title eq '';
+        $title    = $self->_default_title if $title eq '';
         unshift @_, $title;
     }
     $self->$orig(@_);
