@@ -506,7 +506,7 @@ sub canEdit {
     if ( $form->get('func') eq "add" && $form->get( 'className' )->isa( "WebGUI::Asset::Wobject::GalleryAlbum" ) ) {
         return $self->canAddFile( $userId );
     }
-    elsif ( $form->get('func') eq "editSave" && $form->get('assetId') eq "new" && $form->get( 'class' )->isa( 'WebGUI::Asset::Wobject::GalleryAlbum' ) ) {
+    elsif ( $form->get('func') eq "addSave" && $form->get('assetId') eq "new" && $form->get( 'className' )->isa( 'WebGUI::Asset::Wobject::GalleryAlbum' ) ) {
         return $self->canAddFile( $userId );
     }
     else {
