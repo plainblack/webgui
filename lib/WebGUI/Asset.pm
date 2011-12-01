@@ -409,6 +409,7 @@ use WebGUI::Search::Index;
 use WebGUI::TabForm;
 use WebGUI::PassiveAnalytics::Logging;
 use WebGUI::Form::ButtonGroup;
+use WebGUI::PassiveProfiling;
 
 =head1 NAME
 
