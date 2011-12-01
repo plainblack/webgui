@@ -2812,6 +2812,9 @@ sub www_add {
 
     my $template   = eval { $newAsset->getEditTemplate };
     return $@ if $@;
+    if (! blessed $template ) {
+        return $template;
+    }
     if ( $template->getForm("form") ) {
         $template->getForm("form")->action( $self->getUrl );
         $template->getForm("form")->addField( "Hidden", name => "func", value => "addSave" );
