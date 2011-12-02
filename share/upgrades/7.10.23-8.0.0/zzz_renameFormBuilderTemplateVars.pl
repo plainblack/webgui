@@ -51,7 +51,6 @@ for my $ns ( keys %namespaces ) {
             $template =~ s/$match/sprintf( $replace, $1, $2, $3, $4, $5, $6, $7, $8, $9 )/es; # No, I do not feel good about this
         }
 
-        session->log->error( $template );
         $asset->addRevision( {
             template    => $template,
             tagId       => version_tag->getId,
