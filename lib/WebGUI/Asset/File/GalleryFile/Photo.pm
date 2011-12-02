@@ -350,8 +350,9 @@ sub getEditTemplate {
 
     my $gallery  = $self->getGallery;
     my $template = eval { WebGUI::Asset->newById($session, $gallery->getTemplateIdEditFile) };
-    $template->setParams(@{ $var });
+    $template->setParam(%{ $var });
     $template->style($gallery->getStyleTemplateId);
+    return $template;
 }
 
 #----------------------------------------------------------------------------
