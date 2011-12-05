@@ -370,7 +370,7 @@ sub view {
 					push(@found, $child->getId);
                     ##Filter based on visibility
                     next CHILD unless $child->canView;
-                    next CHILD if isIn($asset, @hidden);
+                    next CHILD if $asset ~~ @hidden;
                     ##Detect child types
                     my $is_shortcut = $child->isa('WebGUI::Asset::Shortcut');
                     my $is_dashlet  = $child->can('getOverrideFormDefinition');
