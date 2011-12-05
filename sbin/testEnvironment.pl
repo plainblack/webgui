@@ -164,7 +164,7 @@ checkModule("Cache::FastMmap",              "1.35"       );
 checkModule("Test::Log::Dispatch",          "0"          );
 checkModule("CHI",                          "0.34"       );
 checkModule('IO::Socket::SSL',                           );
-checkModule('Package::Stash',                            );
+checkModule('Package::Stash',               "0.33"       );
 checkModule('HTTP::Exception',                           );
 checkModule('Net::Twitter',                 "3.13006"    );
 checkModule('PerlIO::eol',                  "0.14"       );
