@@ -260,9 +260,9 @@ if (my $exception = Exception::Class->caught() ) {
 
 Removed Methods
 ---------------
-assetDbProperties - Simply instantiate the asset if you want it's properties.
+assetDbProperties - Simply instanciate the asset if you want it's properties.
 
-assetExists - Simply instantiate the asset if you want to know if it exists.
+assetExists - Simply instanciate the asset if you want to know if it exists.
 
 getValue - Use get() or the individual property accessors instead.
 
