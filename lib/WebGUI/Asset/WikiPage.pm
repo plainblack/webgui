@@ -205,8 +205,6 @@ sub getEditTemplate {
 		protectQuestionLabel => $i18n->get("protectQuestionLabel"),
 		isProtected => $self->isProtected
 		};
-    $session->log->warn("title form variable". $form->get('title', 'text'));
-    $session->log->warn("title form element". $var->{formTitle});
     my $children = [];
 	if ($self->getId eq "new") {
 		$var->{formHeader} .= WebGUI::Form::Hidden->new($session, { name=>"assetId", value=>"new" })->toHtml 
