@@ -18,7 +18,6 @@ package WebGUI::Session::Log;
 use strict;
 use WebGUI::Paths;
 use WebGUI::Exception;
-use Sub::Uplevel;
 use Scalar::Util qw(weaken blessed);
 
 =head1 NAME
@@ -148,7 +147,8 @@ sub fatal {
     my $self = shift;
     my $message = shift;
     my $error_obj = shift;
-    Sub::Uplevel::uplevel( 1, $self->getLogger, { level => 'fatal', message => $message});
+    local $Log::Log4perl::caller_depth = $Log::Log4perl::caller_depth + 1;
+    $self->getLogger->( { level => 'fatal', message => $message} );
     if( blessed $error_obj and $error_obj->can('rethrow') ) {
         # Exception::Class objects have valuable stack traces built in to them; rethrow the existing error to preserve that if possible
         $error_obj->rethrow;
