@@ -5,7 +5,7 @@ use Cwd qw(realpath);
 
 start_step "Removing FilePile asset from config file";
 
-session->config->delete( 'assets/FilePile' );
+session->config->deleteFromHash( 'assets', 'WebGUI::Asset::FilePile' );
 
 done;
 
