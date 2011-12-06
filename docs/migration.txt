@@ -247,6 +247,13 @@ of type SomeClass, populated with information from the database.
 WebGUI::Asset::SomeClass->new($propertyHashRef) will return you an object of type SomeClass populated
 with the properties you have passed in.  Missing properties will have default set from the definition.
 
+Asset & Moose
+-------------
+The update method for Asset's now comes from WebGUI::Definition::Role::Object.  Since the Asset base
+class does not have an update method, you cannot use Moose's "override" method modifier to add
+behavior to it.  You must use "around" instead.  Note, in most cases, you should never need
+to do this, because it is much more modular to use modifiers on individual asset properties.
+
 Exceptions
 ----------
 All Asset instanciators, new, newById, newByUrl, newPending, newByPropertyHashRef throw exceptions instead
