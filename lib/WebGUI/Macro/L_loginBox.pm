@@ -99,31 +99,35 @@ sub process {
                 $action = $session->url->page(undef,1);
                 $action =~ s/http:/https:/;
         }
+    use WebGUI::Form::Hidden;
+    use WebGUI::Form::Text;
+    use WebGUI::Form::Password;
+    use WebGUI::Form::Submit;
 	$var{'form.header'} = WebGUI::Form::formHeader($session,{action=>$action})
-		.WebGUI::Form::hidden($session,{
+		.WebGUI::Form::Hidden->new($session,{
 			name=>"op",
 			value=>"auth"
-			})
-		.WebGUI::Form::hidden($session,{
+			})-toHtml
+		.WebGUI::Form::Hidden->new($session,{
 			name=>"method",
 			value=>"login"
-			});
+			})->toHtml;
 	$var{'username.label'} = $i18n->get(50, 'WebGUI');
-	$var{'username.form'} = WebGUI::Form::text($session,{
+	$var{'username.form'} = WebGUI::Form::Text->new($session,{
 		name=>"username",
 		size=>$boxSize,
 		extras=>'class="loginBoxField"'
-		});
+		})->toHtml;
         $var{'password.label'} = $i18n->get(51, 'WebGUI');
-        $var{'password.form'} = WebGUI::Form::password($session,{
+        $var{'password.form'} = WebGUI::Form::Password->new($session,{
 		name=>"identifier",
 		size=>$boxSize,
 		extras=>'class="loginBoxField"'
-		});
-        $var{'form.login'} = WebGUI::Form::submit($session,{
+		})->toHtml;
+        $var{'form.login'} = WebGUI::Form::Submit->new($session,{
 		value=>$i18n->get(52, 'WebGUI'),
 		extras=>'class="loginBoxButton"'
-		});
+		})->toHtml;
         $var{'account.create.url'} = $session->url->page('op=auth;method=createAccount');
 	$var{'account.create.label'} = $i18n->get(407, 'WebGUI');
 	$var{'form.footer'} = WebGUI::Form::formFooter($session,);
