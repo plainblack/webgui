@@ -102,7 +102,7 @@ Manually build the edit form due to javascript elements.
 override getEditForm => sub {
     my $self = shift;
     my $fb   = super();
-    my $i18n = WebGUI::International->new($self->session, "Navigation");
+    my $i18n = WebGUI::International->new($self->session, "Asset_Navigation");
     my ( $descendantsChecked, $ancestorsChecked, $selfChecked, $pedigreeChecked, $siblingsChecked );
     my @assetsToInclude = split( "\n", $self->assetsToInclude );
     my $afterScript;
