@@ -107,7 +107,7 @@ sub process {
 		.WebGUI::Form::Hidden->new($session,{
 			name=>"op",
 			value=>"auth"
-			})-toHtml
+			})->toHtml
 		.WebGUI::Form::Hidden->new($session,{
 			name=>"method",
 			value=>"login"
