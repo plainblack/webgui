@@ -2,7 +2,7 @@ use WebGUI::Upgrade::Script;
 
 start_step "Removing URL Handlers from WebGUI Configuration files";
 
-session->config->delete( 'urlHandlers' );
+config->delete( 'urlHandlers' );
 
 done;
 

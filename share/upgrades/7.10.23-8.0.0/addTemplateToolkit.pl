@@ -5,7 +5,7 @@ start_step "Adding Template Toolkit template parser";
 
 my $class = 'WebGUI::Asset::Template::TemplateToolkit';
 unless ( grep { $_ eq $class } @{ session->config->get('templateParsers') } ) {
-    session->config->addToArray( 'templateParsers' => $class );
+    config->addToArray( 'templateParsers' => $class );
 }
 
 done;
