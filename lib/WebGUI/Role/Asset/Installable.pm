@@ -2,6 +2,7 @@ package WebGUI::Role::Asset::Installable;
 
 use strict;
 
+use Moose::Role;
 use WebGUI::Asset;
 use WebGUI::Form::DynamicField;
 
