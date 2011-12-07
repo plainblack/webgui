@@ -88,11 +88,12 @@ instead of the default of 12.
 
 =cut
 
-sub canAdd {
+around canAdd => sub {
+    my $orig  = shift;
     my $class = shift;
     my $session = shift;
-    return $class->next::method($session, undef, '7');
-}
+    return $class->$orig($session, undef, '7');
+};
 
 #-------------------------------------------------------------------
 
@@ -355,11 +356,11 @@ Extends the master class to handle preparing the main view template for the page
 
 =cut
 
-sub prepareView {
+override prepareView => sub {
 	my $self = shift;
-	$self->next::method;
+	super();
 	$self->preparePageTemplate;
-}
+};
 
 
 #-------------------------------------------------------------------
@@ -370,10 +371,10 @@ Extends the master method to handle properties and attachments.
 
 =cut
 
-sub processEditForm {
+override processEditForm => sub {
     my $self    = shift;
     my $session = $self->session;
-    $self->next::method(@_);
+    super();
     my $actionTaken = ($session->form->process("assetId") eq "new") ? "Created" : "Edited";
     my $wiki = $self->getWiki;
     my $properties = {
@@ -425,7 +426,7 @@ sub processEditForm {
             }
         }
     }
-}
+};
 
 #-------------------------------------------------------------------
 
