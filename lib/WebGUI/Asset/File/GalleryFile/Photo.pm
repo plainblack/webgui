@@ -480,12 +480,12 @@ additonal details.
 
 =cut
 
-sub indexContent {
+override indexContent => sub {
 	my $self = shift;
-	my $indexer = $self->SUPER::indexContent;
+	my $indexer = super();
 	$indexer->addKeywords($self->get("location"));
 	return $indexer;
-}
+};
 
 #----------------------------------------------------------------------------
 

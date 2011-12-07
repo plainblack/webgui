@@ -63,11 +63,12 @@ The session variable.
 
 =cut
 
-sub canAdd {
+around canAdd => sub {
+    my $orig  = shift;
 	my $class = shift;
 	my $session = shift;
-	$class->SUPER::canAdd($session, undef, '3');
-}
+	return $class->$orig($session, undef, '3');
+};
 
 
 #----------------------------------------------------------------------------

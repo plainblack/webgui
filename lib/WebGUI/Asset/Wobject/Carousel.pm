@@ -179,9 +179,9 @@ See WebGUI::Asset::prepareView() for details.
 
 =cut
 
-sub prepareView {
+override prepareView => sub {
     my $self = shift;
-    $self->SUPER::prepareView();
+    super();
     my $template = WebGUI::Asset::Template->newById($self->session, $self->templateId);
     if (!$template) {
         WebGUI::Error::ObjectNotFound::Template->throw(
@@ -192,7 +192,7 @@ sub prepareView {
     }
     $template->prepare;
     $self->{_viewTemplate} = $template;
-}
+};
 
 #-------------------------------------------------------------------
 

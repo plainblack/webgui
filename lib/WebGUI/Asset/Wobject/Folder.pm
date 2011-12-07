@@ -127,9 +127,9 @@ Overridden to check the updated dates of children as well
 
 =cut
 
-sub getContentLastModifiedBy {
+override getContentLastModifiedBy => sub {
     my $self      = shift;
-    my $mtime     = $self->SUPER::getContentLastModified;
+    my $mtime     = super();
     my $userId    = $self->get('revisedBy');
     my $childIter = $self->getLineageIterator(["children"]);
     while ( 1 ) {
@@ -147,7 +147,7 @@ sub getContentLastModifiedBy {
         }
     }
     return $userId;
-}
+};
 
 #-------------------------------------------------------------------
 
@@ -157,9 +157,9 @@ Returns the TabForm object that will be used in generating the edit page for thi
 
 =cut
 
-sub getEditForm {
+override getEditForm => sub {
 	my $self = shift;
-	my $tabform = $self->SUPER::getEditForm();
+	my $tabform = super();
 	my $i18n = WebGUI::International->new($self->session,"Asset_Folder");
 	if ($self->get("assetId") eq "new") {
                	$tabform->getTab("properties")->whatNext(
@@ -171,7 +171,7 @@ sub getEditForm {
 			);
 	}
 	return $tabform;
-}
+};
 
 #----------------------------------------------------------------------------
 
@@ -202,9 +202,9 @@ See WebGUI::Asset::prepareView() for details.
 
 =cut
 
-sub prepareView {
+override prepareView => sub {
     my $self = shift;
-    $self->SUPER::prepareView();
+    super();
     my $template = WebGUI::Asset::Template->newById($self->session, $self->templateId);
     if (!$template) {
         WebGUI::Error::ObjectNotFound::Template->throw(
@@ -215,7 +215,7 @@ sub prepareView {
     }
     $template->prepare($self->getMetaDataAsTemplateVariables);
     $self->{_viewTemplate} = $template;
-}
+};
 
 
 #-------------------------------------------------------------------

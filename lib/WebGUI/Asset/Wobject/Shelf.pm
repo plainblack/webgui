@@ -66,10 +66,9 @@ See WebGUI::Asset::prepareView() for details.
 
 =cut
 
-sub prepareView {
+override prepareView => sub {
     my $self = shift;
-    $self->SUPER::prepareView();
-warn "Shelf: going to do prepareView on template with id: " . $self->templateId . " and we are: " . $self->getId;
+    super();
     my $template = WebGUI::Asset::Template->newById($self->session, $self->templateId); # boom XXX
     if (!$template) {
         WebGUI::Error::ObjectNotFound::Template->throw(
@@ -80,7 +79,7 @@ warn "Shelf: going to do prepareView on template with id: " . $self->templateId 
     }
     $template->prepare($self->getMetaDataAsTemplateVariables);
     $self->{_viewTemplate} = $template;
-}
+};
 
 
 #-------------------------------------------------------------------

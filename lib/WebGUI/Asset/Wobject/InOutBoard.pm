@@ -132,9 +132,9 @@ See WebGUI::Asset::prepareView() for details.
 
 =cut
 
-sub prepareView {
+override prepareView => sub {
     my $self = shift;
-    $self->SUPER::prepareView();
+    super();
     my $template = WebGUI::Asset::Template->newById($self->session, $self->inOutTemplateId);
     if (!$template) {
         WebGUI::Error::ObjectNotFound::Template->throw(
@@ -145,7 +145,7 @@ sub prepareView {
     }
     $template->prepare($self->getMetaDataAsTemplateVariables);
     $self->{_viewTemplate} = $template;
-}
+};
 
 
 #-------------------------------------------------------------------
@@ -535,7 +535,6 @@ where users.userId<>'1' and
  $departmentSQLclause
 group by InOutBoard_statusLog.dateStamp
 order by department, lastName, firstName, InOutBoard_statusLog.dateStamp";
-	  $self->session->log->warn("QUERY: $sql\n");
 	  $p->setDataByQuery($sql);
 	  my $rowdata = $p->getPageData();
 	  my @rows;

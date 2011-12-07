@@ -73,9 +73,9 @@ use WebGUI::Asset::Wobject::ProjectManager;
 
 =cut
 
-sub prepareView {
+override prepareView => sub {
 	my $self = shift;
-	$self->SUPER::prepareView();
+	super();
 	my $template;
     $template = WebGUI::Asset::Template->newById($self->session, $self->userViewTemplateId);
     if (!$template) {
@@ -87,7 +87,7 @@ sub prepareView {
     }
 	$template->prepare($self->getMetaDataAsTemplateVariables);
 	$self->{_viewTemplate} = $template;
-}
+};
 
 #-------------------------------------------------------------------
 

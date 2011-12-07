@@ -318,9 +318,9 @@ See WebGUI::Asset::prepareView() for details.
 
 =cut
 
-sub prepareView {
+override prepareView => sub {
     my $self = shift;
-    $self->SUPER::prepareView();
+    super();
     my $templateId = $self->templateId;
     if ($self->session->form->process("overrideTemplateId") ne "") {
         $templateId = $self->session->form->process("overrideTemplateId");
@@ -337,7 +337,7 @@ sub prepareView {
     $self->{_viewTemplate} = $template;
     
     return undef;
-}
+};
 
 #-------------------------------------------------------------------
 

@@ -429,9 +429,9 @@ Extended to support event meta fields.
 
 =cut
 
-sub processEditForm {
+override processEditForm => sub {
 	my $self = shift;
-	$self->SUPER::processEditForm(@_);
+	super();
 	my $form = $self->session->form;
 	my %metadata = ();
 	foreach my $field (@{$self->getParent->getEventMetaFields}) {
@@ -442,7 +442,7 @@ sub processEditForm {
     my $startDate = $form->process('startDate', "dateTime", $date, 
         { defaultValue => $date, timeZone => $self->getParent->timezone});
 	$self->update({eventMetaData => JSON->new->encode(\%metadata), startDate => $startDate});
-}
+};
 
 #-------------------------------------------------------------------
 

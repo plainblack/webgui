@@ -168,9 +168,9 @@ Prepare the view. Add stuff to HEAD.
 
 =cut
 
-sub prepareView {
+override prepareView => sub {
     my $self = shift;
-    $self->SUPER::prepareView(@_);
+    super();
     my $session = $self->session;
 
     # For now, prepare the form control.
@@ -199,7 +199,7 @@ sub prepareView {
     $self->{_template} = $template;
 
     return;
-} ## end sub prepareView
+}; ## end sub prepareView
 
 #----------------------------------------------------------------------------
 

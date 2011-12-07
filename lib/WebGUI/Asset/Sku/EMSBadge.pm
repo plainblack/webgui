@@ -214,10 +214,10 @@ it is purchased. C<item> is the WebGUI::Shop::TransactionItem for this item
 
 =cut
 
-sub getPostPurchaseActions {
+override getPostPurchaseActions => sub {
     my ( $self, $item ) = @_;
     my $session  = $self->session;
-    my $opts     = $self->SUPER::getPostPurchaseActions();
+    my $opts     = super();
     if($self->getParent->isRegistrationStaff) {
         my $i18n     = WebGUI::International->new( $session, "Asset_EventManagementSystem" );
         my $badgeId = $item->get('options')->{badgeId};
@@ -225,7 +225,7 @@ sub getPostPurchaseActions {
         $opts->{ $i18n->get('print') } = $self->getParent->getUrl( "func=printBadge;badgeId=$badgeId" );
     }
     return $opts;
-}
+};
 
 #-------------------------------------------------------------------
 
@@ -370,13 +370,13 @@ See WebGUI::Asset, prepareView for details.
 
 =cut
 
-sub prepareView {
+override prepareView => sub {
 	my $self = shift;
-    $self->SUPER::prepareView();
+    super();
     my $templateId = $self->templateId;
     my $template = WebGUI::Asset::Template->newById($self->session, $templateId);
     $self->{_viewTemplate} = $template;
-}
+};
 
 #-------------------------------------------------------------------
 

@@ -326,7 +326,7 @@ Override to add attachments to package data
 
 override exportAssetData => sub {
     my ( $self ) = @_;
-    my $data    = $self->SUPER::exportAssetData;
+    my $data    = super();
     if ( $self->get('storageIdExample') ) {
         push @{$data->{storage}}, $self->get('storageIdExample');
     }

@@ -773,11 +773,13 @@ Extend the master method to delete all keyword entries.
 
 =cut
 
-sub purge {
+##Using around due to the plugin
+around purge => sub {
+    my $orig = shift;
 	my $self = shift;
     $self->session->db->write('delete from WikiMasterKeywords where assetId=?',[$self->getId]);
-    return $self->SUPER::purge;
-}
+    return $self->$orig(@_);
+};
 
 #-------------------------------------------------------------------
 

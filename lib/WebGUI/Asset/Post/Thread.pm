@@ -253,10 +253,10 @@ Extends the base method to handle creating a new subscription group.
 
 =cut
 
-sub duplicate {
+override duplicate => sub {
     my $self       = shift;
     my $session    = $self->session;
-    my $copy       = $self->SUPER::duplicate(@_);
+    my $copy       = super();
     my $key        = 'subscriptionGroupId';
     my $oldGroupId = $self->get($key);
 
@@ -270,7 +270,7 @@ sub duplicate {
         }
     }
     return $copy;
-}
+};
 
 #-------------------------------------------------------------------
 
@@ -414,16 +414,16 @@ Extend the base method from Post to remove the pagination query fragment
 
 =cut
 
-sub getThreadLinkUrl {
+override getThreadLinkUrl => sub {
 	my $self = shift;
-    my $url = $self->SUPER::getThreadLinkUrl();
+    my $url = super();
     $url =~ s/\?pn=\d+//;
     if ($url =~ m{;revision=\d+}) {
         $url =~ s/;revision/?revision/;
     }
 
     return $url;
-}
+};
 
 
 #-------------------------------------------------------------------
@@ -740,13 +740,13 @@ See WebGUI::Asset::prepareView() for details.
 
 =cut
 
-sub prepareView {
+override prepareView => sub {
 	my $self = shift;
-	$self->SUPER::prepareView();
+	super();
 	my $template = WebGUI::Asset::Template->newById($self->session, $self->getParent->threadTemplateId);
 	$template->prepare($self->getMetaDataAsTemplateVariables);
 	$self->{_viewTemplate} = $template;
-}
+};
 
 
 #-------------------------------------------------------------------

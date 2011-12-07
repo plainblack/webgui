@@ -211,9 +211,9 @@ Overriden to include any topics in which this story would appear.
 
 =cut
 
-sub exportGetRelatedAssetIds {
+override exportGetRelatedAssetIds => sub {
     my $self = shift;
-    my $rel  = $self->SUPER::exportGetRelatedAssetIds(@_);
+    my $rel  = super();
     push @$rel, @{
         WebGUI::Keyword->new($self->session)->getMatchingAssets({
             keywords => WebGUI::Keyword::string2list($self->get('keywords')),
@@ -221,7 +221,7 @@ sub exportGetRelatedAssetIds {
         })
     };
     return $rel;
-}
+};
 
 #-------------------------------------------------------------------
 

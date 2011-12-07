@@ -416,11 +416,12 @@ The session variable.
 
 =cut
 
-sub canAdd {
+around canAdd => sub {
+    my $orig  = shift;
 	my $class = shift;
 	my $session = shift;
-	$class->SUPER::canAdd($session, undef, '7');
-}
+	$class->$orig($session, undef, '7');
+};
 
 
 ####################################################################
@@ -455,9 +456,9 @@ Extend the super class to duplicate the storage location.
 
 =cut
 
-sub duplicate {
+override duplicate => sub {
 	my $self = shift;
-	my $newAsset = $self->SUPER::duplicate(@_);
+	my $newAsset = super();
 	my $newStorage = $self->getStorageLocation->copy;
 	$newAsset->update({storageId=>$newStorage->getId});
     my $links = $self->getRelatedLinks();
@@ -469,7 +470,7 @@ sub duplicate {
     }
     $newAsset->setRelatedLinks($links);
 	return $newAsset;
-}
+};
 
 #-------------------------------------------------------------------
 
@@ -1674,7 +1675,7 @@ override purge => sub {
     my $id      = $self->getId;
     my $session = $self->session;
     my @storageIds = $session->db->buildArray("select storageId from Event where assetId=?",[$id]);
-    my $success    = $self->SUPER::purge;
+    my $success    = super();
     return 0 unless $success;
     foreach my $storageId (@storageIds) {
         my $storage = WebGUI::Storage->get($session, $storageId);

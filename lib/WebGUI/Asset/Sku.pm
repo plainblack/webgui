@@ -598,13 +598,13 @@ Extent the base class to clean out any items using this Sku in all Carts.
 
 =cut
 
-sub purge {
+override purge => sub {
 	my $self = shift;
     my $assetId = $self->getId;
-    my $success = $self->SUPER::purge;
+    my $success = super();
     return $success unless $success;
     $self->session->db->write('delete from cartItem where assetId=?',[$assetId]);
-}
+};
 
 #-------------------------------------------------------------------
 

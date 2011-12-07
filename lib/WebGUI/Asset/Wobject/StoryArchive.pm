@@ -443,9 +443,10 @@ See WebGUI::Asset::prepareView() for details.
 
 =cut
 
-sub prepareView {
+around prepareView => sub {
+    my $orig = shift;
     my $self = shift;
-    $self->SUPER::prepareView();
+    $self->$orig(@_);
     my $template = WebGUI::Asset::Template->newById($self->session, $self->templateId);
     if (!$template) {
         WebGUI::Error::ObjectNotFound::Template->throw(
@@ -456,7 +457,7 @@ sub prepareView {
     }
     $template->prepare;
     $self->{_viewTemplate} = $template;
-}
+};
 
 
 #-------------------------------------------------------------------

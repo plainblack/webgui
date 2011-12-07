@@ -840,15 +840,15 @@ on the Asset that is shortcutted.
 
 =cut
 
-sub prepareView {
+override prepareView => sub {
 	my $self = shift;
-	$self->SUPER::prepareView();
+	super();
 	my $template = WebGUI::Asset::Template->newById($self->session, $self->get("templateId"));
 	$template->prepare($self->getMetaDataAsTemplateVariables);
 	$self->{_viewTemplate} = $template;
 	my $shortcut = $self->getShortcut;
 	$shortcut->prepareView if defined $shortcut;
-}
+};
 
 
 #-------------------------------------------------------------------

@@ -812,9 +812,9 @@ parameters.
 
 =cut
 
-sub prepareView {
+override prepareView => sub {
     my $self = shift;
-    $self->SUPER::prepareView();
+    super();
 
     my $view = ucfirst lc $self->session->form->param("type")
             || ucfirst $self->defaultView 
@@ -838,7 +838,7 @@ sub prepareView {
     $template->prepare($self->getMetaDataAsTemplateVariables);
 
     $self->{_viewTemplate} = $template;
-}
+};
 
 #----------------------------------------------------------------------------
 

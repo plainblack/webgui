@@ -137,9 +137,9 @@ and to put children in their places.
 
 =cut
 
-sub prepareView {
+override prepareView => sub {
     my $self = shift;
-    $self->SUPER::prepareView;
+    super();
     my $session = $self->session;
     my $templateId;
 
@@ -263,7 +263,7 @@ sub prepareView {
 
     $self->{_viewVars} = \%vars;
     $self->{_viewPlaceholder} = \%placeHolder;
-}
+};
 
 #-------------------------------------------------------------------
 
@@ -369,9 +369,9 @@ Extend the base class to include the userid of the person that made last modific
 
 =cut
 
-sub getContentLastModifiedBy {
+override getContentLastModifiedBy => sub {
     my $self      = shift;
-    my $mtime     = $self->SUPER::getContentLastModified;
+    my $mtime     = super();
     my $userId    = $self->get('revisedBy');
     my $childIter = $self->getLineageIterator(["children"],{excludeClasses=>['WebGUI::Asset::Wobject::Layout']});
     while ( 1 ) {
@@ -389,7 +389,7 @@ sub getContentLastModifiedBy {
         }
     }
     return $userId;
-}
+};
 
 #-------------------------------------------------------------------
 

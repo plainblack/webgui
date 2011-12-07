@@ -372,17 +372,17 @@ Extend the base method to handle duplicate storage locations and groups.
 
 =cut
 
-sub duplicate {
+override duplicate => sub {
 	my $self    = shift;
     my $session = $self->session;
-    my $copy    = $self->SUPER::duplicate(@_);
+    my $copy    = super(@_);
     if ($self->get('storageId')) {
         my $storage        = $self->getStorageLocation;
         my $copied_storage = $storage->copy;
         $copy->update({storageId => $copied_storage->getId});
     }
     return $copy;
-}
+};
 
 #-------------------------------------------------------------------
 

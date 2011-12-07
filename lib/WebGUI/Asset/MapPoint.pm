@@ -350,9 +350,9 @@ Indexing the content of attachments and user defined fields. See WebGUI::Asset::
 
 =cut
 
-sub indexContent {
+override indexContent => sub {
     my $self = shift;
-    my $indexer = $self->SUPER::indexContent;
+    my $indexer = super();
     $indexer->addKeywords($self->get("website"));
     $indexer->addKeywords($self->get("address1"));
     $indexer->addKeywords($self->get("address2"));
@@ -369,7 +369,7 @@ sub indexContent {
     $indexer->addKeywords($self->get("userDefined4"));
     $indexer->addKeywords($self->get("userDefined5"));
     return $indexer;
-}
+};
 
 #-------------------------------------------------------------------
 

@@ -142,15 +142,15 @@ locations
 
 =cut
 
-sub commit {
+override commit => sub {
     my ( $self, @args ) = @_;
 
     for my $rev ( grep { $_->get("revisionDate") < $self->get("revisionDate") } @{$self->getRevisions} ) {
         $rev->getStorageLocation->trash;
     }
 
-    return $self->SUPER::commit( @args );
-}
+    return super();
+};
 
 #-------------------------------------------------------------------
 
@@ -474,11 +474,11 @@ Override trash restore to restore storage location
 
 =cut
 
-sub restore {
-    my ( $self, @args ) = @_;
+override restore => sub {
+    my ( $self ) = @_;
     $self->setPrivileges;
-    return $self->SUPER::restore( @args );
-}
+    return super();
+};
 
 #----------------------------------------------------------------------------
 
@@ -573,14 +573,14 @@ Override to put the attached file in the trash too
 
 =cut
 
-sub trash {
-    my ( $self, @args ) = @_;
-    my $return = $self->SUPER::trash( @args );
+override trash => sub {
+    my ( $self ) = @_;
+    my $return = super();
 
     $self->getStorageLocation->trash;
 
     return $return;
-}
+};
 
 #----------------------------------------------------------------------------
 
