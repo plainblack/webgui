@@ -77,15 +77,16 @@ sub process {
         $var{'logout.label'} = $i18n->get(49);
         
         # A hidden field with the current URL
+    use WebGUI::Form::Hidden;
         my $returnUrl   = $session->url->page;
         if ( !$session->form->get("op") eq "auth" ) {
             $returnUrl  .= '?' . $session->request->env->{ "QUERY_STRING" };
         }
         $var{'form.returnUrl'} 
-            = WebGUI::Form::hidden( $session, {
+            = WebGUI::Form::Hidden->new( $session, {
                 name        => 'returnUrl',
                 value       => $session->url->page($session->request->env->{"QUERY_STRING"}),
-            });
+            })->toHtml;
             
         # Fix box size
         my $boxSize = $param[0];
@@ -99,7 +100,6 @@ sub process {
                 $action = $session->url->page(undef,1);
                 $action =~ s/http:/https:/;
         }
-    use WebGUI::Form::Hidden;
     use WebGUI::Form::Text;
     use WebGUI::Form::Password;
     use WebGUI::Form::Submit;
