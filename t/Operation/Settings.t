@@ -67,9 +67,6 @@ cmp_deeply(
     "Settings are set",
 );
 
-diag $mech->content;
-diag explain $testSettings;
-
 done_testing;
 
 #vim:ft=perl
