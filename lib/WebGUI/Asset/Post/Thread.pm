@@ -1456,10 +1456,11 @@ sub www_view {
     return $self->session->privilege->noAccess() unless $self->canView;
     my $check = $self->checkView;
     return $check if (defined $check);
-    $self->session->response->setCacheControl($self->visitorCacheTimeout) if ($self->session->user->isVisitor);
+    my $cs = $self->getParent;
+    $self->session->response->setCacheControl($cs->visitorCacheTimeout) if ($self->session->user->isVisitor);
     $self->session->response->sendHeader;    
     $self->prepareView;
-    my $style = $self->getParent->processStyle($self->getSeparator);
+    my $style = $cs->processStyle($self->getSeparator);
     my ($head, $foot) = split($self->getSeparator,$style);
     $self->session->output->print($head,1);
     $self->session->output->print($self->view($currentPost));
