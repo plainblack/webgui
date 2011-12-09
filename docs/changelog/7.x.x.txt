@@ -7,7 +7,7 @@
  - fixed Passive Analytics, UI, Progress Bar, server load.
  - fixed #12303: Survey custom multiple choice question types
  - fixed #12304: Surven packages do not include custom question types
-
+ - fixed #12309: Some child assets ignore visitor cache timeouts
 
 7.10.23
  - fixed #12225: Stock asset, multiple instances on a page
