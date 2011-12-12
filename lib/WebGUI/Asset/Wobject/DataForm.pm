@@ -290,7 +290,7 @@ sub _getFormFields {
     my $entry         = $self->entry;
     my @orderedFields = map { $self->getFieldConfig($_) } @{ $self->getFieldOrder };
     my $func       = $session->form->process('func');
-    my $ignoreForm = $func eq 'editSave' || $func eq 'editFieldSave';
+    my $ignoreForm = $func eq 'addSave'|| $func eq 'editSave' || $func eq 'editFieldSave';
     my @forms      = ();
     for my $field (@orderedFields) {
         my $value;

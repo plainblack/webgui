@@ -269,9 +269,9 @@ override canEdit => sub {
     my $userId = shift || $self->session->user->userId;
 
     my $form   = $self->session->form;
-    if ( $form->get('func')    eq "editSave"
+    if ( $form->get('func')    eq "addSave"
       && $form->get('assetId') eq "new"
-      && $form->get( 'class' )->isa( 'WebGUI::Asset::MatrixListing' ) ) {
+      && $form->get( 'className','className' )->isa( 'WebGUI::Asset::MatrixListing' ) ) {
         return $self->canAddMatrixListing();
     }
     return super();

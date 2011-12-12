@@ -113,7 +113,7 @@ sub canEdit {
 	my $form      = $self->session->form;
     my $addNew    = $form->process("func"              ) eq "add";
     my $editSave  = $form->process("assetId"           ) eq "new"
-                 && $form->process("func"              ) eq "editSave"
+                 && $form->process("func"              ) eq "addSave"
                  && $form->process("className","className" ) eq "WebGUI::Asset::WikiPage";
     return $wiki->canAdminister
         || ( $wiki->canEditPages && ( $addNew || $editSave || !$self->isProtected) );
