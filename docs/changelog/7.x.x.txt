@@ -1,4 +1,5 @@
 7.10.24
+ - fixed #12308: error message used scalar as reference
  - fixed #12256: Calendar Search doesn't show admin controls
  - fixed #12268: Point of sale form missing from cart screen.
  - fixed #12201: AssetReport - no selects.
