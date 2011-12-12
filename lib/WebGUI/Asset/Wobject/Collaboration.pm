@@ -737,8 +737,8 @@ around canEdit => sub {
                 $self->session->form->process("func") eq "add" || 
                 (
                     $self->session->form->process("assetId") eq "new" && 
-                    $self->session->form->process("func") eq "editSave" && 
-                    $self->session->form->process("class") eq "WebGUI::Asset::Post::Thread"
+                    $self->session->form->process("func") eq "addSave" && 
+                    $self->session->form->process("className") eq "WebGUI::Asset::Post::Thread"
                 )
             ) && 
             $self->canStartThread( $userId )
