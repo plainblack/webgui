@@ -445,8 +445,8 @@ around canEdit => sub {
     return 1 if (
         $self->canAddEvent( $userId ) 
         && $form->process("assetId")    eq "new"
-        && $form->process("func")       eq "editSave"
-        && $form->process("class")      eq "WebGUI::Asset::Event"
+        && $form->process("func")       eq "addSave"
+        && $form->process("className")  eq "WebGUI::Asset::Event"
     );
 
     # Who can edit the Calendar can do everything
