@@ -175,7 +175,7 @@ while(my $line = <FILE>) {
         $auth->saveParams($u->userId,"WebGUI",{changePassword=>$user{changePassword}});
         foreach my $field (keys %user) {
             if ($field ~~ @profileFields) {
-                $u->profileField($field,$user{$field});
+                $u->update({$field => $user{$field}});
             }
         }
         if ($user{groups}) {
