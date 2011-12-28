@@ -158,7 +158,7 @@ sub _form_with_confirmation {
     $confirm   =~ s/([\\\'])/\\$1/g;
     use WebGUI::Form;
     my $output = WebGUI::Form::formHeader($session, { action => $session->url->append($pageURL,$url_params), });
-    $output   .= '<span class="toolbarIcon" style="vertical-align:middle;"><a href="#" onclick="var ack = confirm('.$confirm.'); if (ack) {this.form.submit();} return false;">';
+    $output   .= q|<span class="toolbarIcon" style="vertical-align:middle;"><a href="#" onclick="var ack = confirm('|.$confirm.q|'); if (ack) {this.form.submit();} return false;">|;
     $output   .= '<img src="'.$self->getBaseURL().$icon_name.'" style="vertical-align:middle;border: 0px;" alt="'.$tag.'" title="'.$tag.'" /></a></span>';
     $output   .= WebGUI::Form::formFooter();
     return $output;
