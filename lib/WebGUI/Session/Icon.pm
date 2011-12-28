@@ -81,6 +81,22 @@ sub getBaseURL {
 
 Returns a basic icon with i18n title and alt text.
 
+=head3 $i18n_tag
+
+The name of an i18n tag to show for the TITLE and ALT properties in the image tag.
+
+=head3 $icon_name
+
+The name of an icon, such as delete, edit, manage, moveLeft, etc.  See /data/WebGUI/www/extras/toolbar/bullet for a full list.
+
+=head3 $url_params
+
+Parameters to append to the URL.
+
+=head3 $pageURL
+
+The URL of a page to call.  If empty, defaults to the current page which is fine for most operations.
+
 =cut
 
 sub _basic {
@@ -95,6 +111,56 @@ sub _basic {
                    . $self->session->url->gateway($pageURL,$url_params)
                    . '">';
     $output        .= '<img src="'.$self->getBaseURL().$icon_name.'" style="vertical-align:middle;border: 0px;" alt="'.$tag.'" title="'.$tag.'" /></a></span>';
+    return $output;
+}
+
+#-------------------------------------------------------------------
+
+=head2 _form_with_confirmation ( )
+
+Generates a form containing an icon.  When the icon is clicked, it pops up a confirmation window, and submits
+the form if the confirmation is accepted.
+
+=head3 $i18n_tag
+
+The name of an i18n tag to show for the TITLE and ALT properties in the image tag.
+
+=head3 $icon_name
+
+The name of an icon, such as delete, edit, manage, moveLeft, etc.  See /data/WebGUI/www/extras/toolbar/bullet for a full list.
+
+=head3 $url_params
+
+Parameters to append to the URL.
+
+=head3 $pageURL
+
+The URL of a page to call.  If empty, defaults to the current page which is fine for most operations.
+
+=head3 $confirm
+
+Text to show to the user in the pop-up confirmation for the action.
+
+=cut
+
+sub _form_with_confirmation {
+    my $self       = shift;
+    my $session    = $self->session;
+    my $i18n_tag   = shift;
+    my $icon_name  = shift;
+    my $url_params = shift;
+    my $pageURL    = shift || $session->url->getRequestedUrl;
+    my $confirm    = shift;
+
+	my $i18n   = WebGUI::International->new($session,'Icon');
+    my $tag    = $i18n->get($i18n_tag);
+    ##Escape JS characters
+    $confirm   =~ s/([\\\'])/\\$1/g;
+    use WebGUI::Form;
+    my $output = WebGUI::Form::formHeader($session, { action => $session->url->append($pageURL,$url_params), });
+    $output   .= '<span class="toolbarIcon" style="vertical-align:middle;"><a href="#" onclick="var ack = confirm('.$confirm.'); if (ack) {this.form.submit();} return false;">';
+    $output   .= '<img src="'.$self->getBaseURL().$icon_name.'" style="vertical-align:middle;border: 0px;" alt="'.$tag.'" title="'.$tag.'" /></a></span>';
+    $output   .= WebGUI::Form::formFooter();
     return $output;
 }
 
@@ -177,6 +243,32 @@ sub delete {
         my $output = '<span class="toolbarIcon" style="vertical-align:middle;"><a href="'.$self->session->url->gateway($pageURL,$urlParams).'" '.$confirmText.'>';
 	$output .= '<img src="'.$self->getBaseURL().'delete.gif" style="vertical-align:middle;border: 0px;" alt="'.$i18n->get('Delete').'" title="'.$i18n->get('Delete').'" /></a></span>';
 	return $output;
+}
+
+#-------------------------------------------------------------------
+
+=head2 delete_with_form ( urlParameters [, pageURL, confirmText ] )
+
+Generates a button that represents a delete operation inside of a form for CSRF purposes.
+
+=head3 urlParameters
+
+Any URL parameters that need to be tacked on to the current URL to accomplish whatever function this button represents.
+
+=head3 pageURL
+
+The URL to any page. Defaults to the current page.  If a URL is passed, the gateway URL from the site's config
+file will be prepended to it.
+
+=head3 confirmText 
+
+If defined, a confirm box will popup to ask the user if they want to delete.
+
+=cut
+
+sub delete_with_form {
+    my $self = shift;
+    return $self->_form_with_confirmation('Delete', 'delete.gif', @_);
 }
 
 #-------------------------------------------------------------------
