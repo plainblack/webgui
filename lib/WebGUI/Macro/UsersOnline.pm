@@ -3,7 +3,7 @@ package WebGUI::Macro::UsersOnline;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black LLC.
+  WebGUI is Copyright 2001-2012 Plain Black LLC.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using

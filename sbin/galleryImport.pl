@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 
 # -------------------------------------------------------------------
-#  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+#  WebGUI is Copyright 2001-2012 Plain Black Corporation.
 # -------------------------------------------------------------------
 #  Please read the legal notices (docs/legal.txt) and the license
 #  (docs/license.txt) that came with this distribution before using
@@ -472,7 +472,7 @@ URL parameter of the Gallery, and not the fully qualified URL.
 
 =head1 AUTHOR
 
-Copyright 2001-2009 Plain Black Corporation.
+Copyright 2001-2012 Plain Black Corporation.
 
 =cut
 
