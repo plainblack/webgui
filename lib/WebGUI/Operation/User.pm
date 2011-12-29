@@ -1064,7 +1064,6 @@ sub www_listUsers {
         }
 	}
 
-	my %status;
 	my $i18n = WebGUI::International->new($session);
 	my $output = getUserSearchForm($session,"listUsers");
 	my ($userCount) = $session->db->quickArray("select count(*) from users");
@@ -1073,8 +1072,7 @@ sub www_listUsers {
     }
     
 	return _submenu($session,{workarea => $output}) unless ($session->form->process("doit") || $userCount<250 || $session->form->process("pn") > 1);
-	tie %status, 'Tie::IxHash';
-	%status = (
+	my %status = (
 		Active		=> $i18n->get(817),
 		Deactivated	=> $i18n->get(818),
 		Selfdestructed	=> $i18n->get(819)
