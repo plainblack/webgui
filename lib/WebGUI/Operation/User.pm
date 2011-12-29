@@ -211,11 +211,9 @@ sub doUserSearch {
 	my $returnPaginator = shift;
 	my $userFilter = shift;
 	push(@{$userFilter},0);
-	my $selectedStatus;
+	my $selectedStatus = '';
 	if ($session->scratch->get("userSearchStatus")) {
-		$selectedStatus = "status='".$session->scratch->get("userSearchStatus")."'";
-	} else {
-		$selectedStatus = "status like '%'";
+		$selectedStatus = "status='".$session->scratch->get("userSearchStatus")."' and ";
 	}
 	my $keyword = $session->scratch->get("userSearchKeyword");
 	if ($session->scratch->get("userSearchModifier") eq "startsWith") {
@@ -227,7 +225,7 @@ sub doUserSearch {
 	}
 	my $sql = "select users.userId, users.username, users.status, users.dateCreated, users.lastUpdated,
                 users.email from users 
-                where $selectedStatus  and (users.username like ? or alias like ? or email like ? 
+                where $selectedStatus (users.username like ? or alias like ? or email like ? 
                     or firstName like ? or lastName like ? or CONCAT(firstName, ' ', lastName) LIKE ? ) 
                 and users.userId not in (".$session->db->quoteAndJoin($userFilter).")  order by users.username";
 	if ($returnPaginator) {
