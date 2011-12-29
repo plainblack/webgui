@@ -418,3 +418,7 @@ NEW: $session->request->ifModifiedSince;
 WebGUI::Workflow::Activity
 ==========================
 getEditForm now returns a WebGUI::FormBuilder object
+
+Show Performance Indicators
+==========================
+This setting is removed, as the Plack debug console shows this for us.
