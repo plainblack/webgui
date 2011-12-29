@@ -372,14 +372,6 @@ sub definition {
 		});
 	push(@fields, {
 		tab=>"misc",
-		fieldType=>"yesNo",
-		name=>"showPerformanceIndicators",
-		label=>$i18n->get('show performance indicators'),
-		hoverHelp=>$i18n->get('show performance indicators description'),
-		defaultValue=>$setting->get("showPerformanceIndicators")
-		});
-	push(@fields, {
-		tab=>"misc",
 		fieldType=>"selectBox",
 		name=>"hostToUse",
 		defaultValue=>[$setting->get("hostToUse")],
