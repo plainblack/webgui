@@ -1090,6 +1090,29 @@ sub www_listUsers {
                 <td class="tableHeader">'.$i18n->get( "time recorded" ).'</td>
 		</tr>';
 	my $p = doUserSearch($session,"listUsers",1);
+    my $user_loginlog = $session->db->prepare(
+        q{
+            select   status, timeStamp, lastPageViewed, sessionId
+            from     userLoginLog
+            where    userId = ?
+            order by timeStamp desc
+            limit    1
+        },
+    );
+    my $last_page_view = $session->db->prepare(
+        q{
+            select lastPageView
+            from   userSession
+            where  sessionId = ?
+        },
+    );
+    my $total_time = $session->db->prepare(
+        q{
+            select sum(lastPageViewed - timeStamp) 
+            from   userLoginLog 
+            where  userId = ?
+        },
+    );
 	foreach my $data (@{$p->getPageData}) {
         $output .= '<tr class="tableData">';
         $output .= '<td>'.$status{$data->{status}}.'</td>';
@@ -1099,26 +1122,11 @@ sub www_listUsers {
         $output .= '<td class="tableData">'.$session->datetime->epochToHuman($data->{dateCreated},"%z").'</td>';
         $output .= '<td class="tableData">'.$session->datetime->epochToHuman($data->{lastUpdated},"%z").'</td>';
 
-        my ( $status, $lastLogin, $lastView, $lastSession ) 
-            = $session->db->quickArray(
-            q{
-                select   status, timeStamp, lastPageViewed, sessionId
-                from     userLoginLog
-                where    userId = ?
-                order by timeStamp desc
-                limit    1
-            },
-            [ $data->{userId} ]
-        );
+        $user_loginlog->execute([$data->{userId}]);
+        my ( $status, $lastLogin, $lastView, $lastSession ) = $user_loginlog->fetchrow_array;
 
-        my $trueLastView = $session->db->quickScalar(
-            q{
-                select lastPageView
-                from   userSession
-                where  sessionId = ?
-            },
-            [ $lastSession ]
-        );
+        $last_page_view->execute([$lastSession]);
+        my ($trueLastView) = $last_page_view->fetchrow_array();
 
         # format last page view, preferring session recorded view time
         $lastView   = $trueLastView || $lastView;
@@ -1126,14 +1134,8 @@ sub www_listUsers {
 
         $lastLogin &&= $session->datetime->epochToHuman($lastLogin);
 
-        my $totalTime = $session->db->quickScalar(
-            q{
-                select sum(lastPageViewed - timeStamp) 
-                from   userLoginLog 
-                where  userId = ?
-            }, 
-            [$data->{userId}]
-        );
+        $total_time->execute([$data->{userId}]);
+        my ($totalTime) = $total_time->fetchrow_array();
 
         if ($totalTime) {
             my ($interval, $units) 
@@ -1151,6 +1153,9 @@ sub www_listUsers {
     $output .= '</table>';
     $p->setAlphabeticalKey('username');
     $output .= $p->getBarTraditional;
+    $user_loginlog->finish;
+    $last_page_view->finish;
+    $total_time->finish;
 	my $submenu = _submenu(
                     $session,
                     { workarea => $output, }
