@@ -25,10 +25,6 @@ is created.
 
 =cut
 
-#
-#
-#
-
 =head2 stream
 
 =cut
@@ -38,10 +34,6 @@ sub stream {
     $self->streamer(shift);
     $self->streaming(1);
 }
-
-#
-#
-#
 
 =head2 stream_write
 
@@ -55,10 +47,6 @@ sub stream_write {
     }
     $self->writer->write(@_);
 }
-
-#
-#
-#
 
 =head2 sendHeader ( )
 
@@ -127,10 +115,6 @@ sub _sendMinimalHeader {
 	return undef;
 }
 
-#
-#
-#
-
 =head2 setCookie ( name, value [ , timeToLive, domain ] )
 
 Sends a cookie to the browser.
@@ -170,10 +154,6 @@ sub setCookie {
     };
 }   
 
-#
-#
-#
-
 =head2 setRedirect ( url, [ type ] )
 
 Sets the necessary information in the HTTP header to redirect to another URL.
@@ -201,10 +181,6 @@ sub setRedirect {
     $self->session->style->setMeta({"http-equiv"=>"refresh",content=>"0; URL=".$url});
 }  
 
-#
-#
-#
-
 =head2 getLastModified ( )
 
 Returns the stored epoch date when the page as last modified.
@@ -215,10 +191,6 @@ sub getLastModified {
     my $self = shift;
     return $self->{_http}{lastModified};
 }
-
-#
-#
-#
 
 =head2 setLastModified ( epoch )
 
@@ -234,10 +206,6 @@ sub setLastModified {
     $self->{_http}{lastModified} = $epoch;
 }  
 
-#
-#
-#
-
 =head2 getNoHeader ( )
 
 Returns whether or not a HTTP header will be printed.
@@ -248,10 +216,6 @@ sub getNoHeader {
     my $self = shift;
     return $self->{_http}{noHeader};
 }
-
-#
-#
-#
 
 =head2 setNoHeader ( boolean )
 
@@ -269,10 +233,6 @@ sub setNoHeader {
     $self->{_http}{noHeader} = shift;
 }
 
-#
-#
-#
-
 =head2 isRedirect ( )
 
 Returns a boolean value indicating whether the current page will redirect to some other location.
@@ -285,10 +245,6 @@ sub isRedirect {
     return $status == 302 || $status == 301;
 }  
 
-#
-#
-#
-
 =head2 getStreamedFile ( ) {
 
 Returns the location of a file to be streamed thru mod_perl, if one has been set.
@@ -300,14 +256,11 @@ sub getStreamedFile {
     return $self->{_http}{streamlocation} || undef;
 }  
 
-#
-#
-#
-
 =head2 setStreamedFile ( ) {
 
-Set a file to be streamed through mod_perl.
-Rrequires that C<enableStreamingUploads> be set in the config file and then
+Set a file to be streamed.
+
+Requires that C<enableStreamingUploads> be set in the config file and then
 some middleware or reverse-proxy in front of L<WebGUI> to catch the X-Sendfile
 headers and replace that with the file to be sent.
 
@@ -340,10 +293,6 @@ sub setStreamedFile {
 
 }
 
-#
-#
-#
-
 =head2 sendFile ( ) {
 
 Either redirect (C<setRedirect()>) or trigger a stream (C<setStreamedFile()>) depending on how L<WebGUI> is configured.
@@ -367,10 +316,6 @@ sub sendFile {
     1;
 }
 
-#
-#
-#
-
 =head2 setCacheControl  ( timeout )
 
 Sets the cache control headers.
@@ -386,10 +331,6 @@ sub setCacheControl {
     my $timeout = shift;
     $self->{_http}{cacheControl} = $timeout;
 }
-
-#
-#
-#
 
 =head2 getCacheControl  ( )
 
@@ -407,10 +348,6 @@ sub getCacheControl {
 Subclasses Plack::Response C<finalize()>, doing L<WebGUI> specific finalization chores.
 
 =cut
-
-#
-#
-#
 
 sub finalize {
 
@@ -435,6 +372,5 @@ sub finalize {
     $self->next::method(@_);
 
 }
-
 
 1;
