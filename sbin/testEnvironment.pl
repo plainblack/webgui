@@ -184,6 +184,7 @@ checkModule('Data::ICal',                   '0.16'       );
 checkModule('common::sense',                '3.2'        );
 checkModule('Geo::Coder::Googlev3',         '0.07'       );
 checkModule('IO::File::WithPath',                        );
+checkModule('Plack::Middleware::SizeLimit',              );
 
 failAndExit("Required modules are missing, running no more checks.") if $missingModule;
 

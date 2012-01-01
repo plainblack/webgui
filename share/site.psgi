@@ -8,6 +8,13 @@ builder {
     my $config = $wg->config;
     my $streaming_uploads = $config->get('enableStreamingUploads'); # have to restart for changes to this to take effect
 
+    if (! $^O eq 'darwin') {
+        enable 'Plack::Middleware::SizeLimit' => (
+            max_unshared_size => 200_000,
+            max_process_size  => 500_000,
+            check_every_n_requests => 3,
+        );
+    }
     enable 'Log4perl', category => $config->getFilename, conf => WebGUI::Paths->logConfig;
     enable 'SimpleContentFilter', filter => sub {
         if ( utf8::is_utf8($_) ) {

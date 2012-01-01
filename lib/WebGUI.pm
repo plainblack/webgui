@@ -66,6 +66,9 @@ sub call {
     my $self = shift;
     my $env = shift;
 
+    ##Enable size limiting
+    $env->{'psgix.harakiri'} = 1;
+
     my $session = $env->{'webgui.session'}
         or die 'Missing WebGUI Session - check WebGUI::Middleware::Session';
 
