@@ -175,7 +175,6 @@ checkModule('HTTP::BrowserDetect',          '1.19'       );
 checkModule('Search::QueryParser',                       );
 checkModule('Monkey::Patch',                '0.03'       );
 checkModule('UUID::Tiny',                	'1.03'       );
-checkModule('Starman',						'0.2010',	2);
 checkModule('App::Cmd',                     '0.311'      );
 checkModule('Devel::StackTrace',            '1.27'       );
 checkModule('Devel::StackTrace::WithLexicals',  '0.03'   );
