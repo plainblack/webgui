@@ -76,6 +76,7 @@ checkModule("Test::Exception",              0.27,      2 );
 checkModule("Test::Differences",            0.5,       2 );
 checkModule("Test::Class",                  0.31,      2 );
 checkModule("Test::MockTime",               0.09,      2 );
+checkModule("Test::WWW::Mechanize::PSGI",   0.35,      2 );
 checkModule("Pod::Coverage",                0.19,      2 );
 checkModule("Text::Balanced",               2.00,      2 );
 checkModule("Capture::Tiny",                0.08,      2 );
