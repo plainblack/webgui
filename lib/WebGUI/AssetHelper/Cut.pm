@@ -1,7 +1,6 @@
 package WebGUI::AssetHelper::Cut;
 
 use strict;
-use Class::C3;
 use base qw/WebGUI::AssetHelper/;
 use Scalar::Util qw( blessed );
 use Monkey::Patch;

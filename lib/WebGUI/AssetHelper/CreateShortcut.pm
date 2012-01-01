@@ -1,7 +1,6 @@
 package WebGUI::AssetHelper::CreateShortcut;
 
 use strict;
-use Class::C3;
 use base qw/WebGUI::AssetHelper/;
 
 =head1 LEGAL

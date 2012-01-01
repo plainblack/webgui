@@ -1,7 +1,6 @@
 package WebGUI::AssetHelper::Lock;
 
 use strict;
-use Class::C3;
 use WebGUI::International;
 use base qw/WebGUI::AssetHelper/;
 

@@ -1,7 +1,6 @@
 package WebGUI::AssetHelper::ExportHtml;
 
 use strict;
-use Class::C3;
 use base qw/WebGUI::AssetHelper/;
 use WebGUI::User;
 use WebGUI::HTML;

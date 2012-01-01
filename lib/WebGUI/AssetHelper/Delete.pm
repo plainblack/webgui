@@ -1,7 +1,6 @@
 package WebGUI::AssetHelper::Delete;
 
 use strict;
-use Class::C3;
 use base qw/WebGUI::AssetHelper/;
 use Scalar::Util qw( blessed );
 

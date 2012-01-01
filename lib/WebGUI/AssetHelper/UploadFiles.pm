@@ -1,7 +1,6 @@
 package WebGUI::AssetHelper::UploadFiles;
 
 use strict;
-use Class::C3;
 use base qw/WebGUI::AssetHelper/;
 use WebGUI::Form::File;
 use WebGUI::TabForm;

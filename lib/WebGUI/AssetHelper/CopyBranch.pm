@@ -1,7 +1,6 @@
 package WebGUI::AssetHelper::CopyBranch;
 
 use strict;
-use Class::C3;
 use base qw/WebGUI::AssetHelper::Copy/;
 use Scalar::Util qw{ blessed };
 use WebGUI::VersionTag;
