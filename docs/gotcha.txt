@@ -31,6 +31,11 @@ save you many hours of grief.
        Account Macro template
        Admin Toggle Macro template
 
+ * The new Admin Console required changes to layout templates.  Old templates
+   will continue to work, but show two sets of editing and drag controls.
+
+ * WebGUI 8 does not support HTTP Basic Authentication any longer.
+
 7.10.23
 --------------------------------------------------------------------
     * The default_search2 template had a bad template attachment pointing to 
