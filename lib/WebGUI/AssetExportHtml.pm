@@ -157,6 +157,10 @@ This scratch variable is used by the Widget Macro.
 
 Takes a hashref of arguments, containing the following keys:
 
+=head3 depth
+
+How many levels deep to export.
+
 =head3 quiet
 
 Boolean. To be or not to be quiet with our output. Defaults to false.
