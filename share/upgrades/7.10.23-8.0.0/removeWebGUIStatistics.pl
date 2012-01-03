@@ -18,8 +18,7 @@ my $task = WebGUI::Workflow::Cron->new(session, 'send_webgui_statistics');
 $task && $task->delete;
 
 report "Deleting files";
-my $webgui_root = realpath( File::Spec->catdir( WebGUI::Paths->configBase, (File::Spec->updir) x 1 ) );
-unlink File::Spec->catfile($webgui_root, 'lib', 'WebGUI', 'Operation', 'Statistics.pm');
-unlink File::Spec->catfile($webgui_root, 'lib', 'WebGUI', 'Workflow', 'Activity', 'SendWebguiStats.pm');
+rm_lib 'WebGUI::Operation::Statistics';
+rm_lib 'WebGUI::Workflow::Activity::SendWebguiStats';
 
 done;
