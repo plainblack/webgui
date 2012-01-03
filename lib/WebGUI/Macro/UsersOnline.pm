@@ -170,7 +170,6 @@ sub _visitors {
 	# SQL conditional clause for filtering server IP
 	my $ip_clause;
 
-	# Check whether instance of Apache2::ServerRec is available
 	if(my $hostname = $session->request->uri->host) {
 
 		# Look up server IP addresses
