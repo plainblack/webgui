@@ -18,6 +18,7 @@ package WebGUI::Asset::EMSSubmissionForm;
 use strict;
 use Moose;
 use WebGUI::Definition::Asset;
+use WebGUI::Asset::EMSSubmission;
 extends 'WebGUI::Asset';
 
 define assetName  => ['assetName','Asset_EMSSubmissionForm'];
