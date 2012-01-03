@@ -278,13 +278,6 @@
       "url" : "^PageUrl(\"\",func=manageClipboard);",
       "title" : "^International(948,WebGUI);"
    },
-   "statistics" : {
-      "icon" : "statistics.gif",
-      "uiLevel" : 1,
-      "url" : "^PageUrl(\"\",op=viewStatistics);",
-      "title" : "^International(437,WebGUI);",
-      "groupSetting" : "groupIdAdminStatistics"
-   },
    "users" : {
       "icon" : "users.gif",
       "uiLevel" : 5,
