@@ -85,22 +85,22 @@ property price => (
     tab       => "shop",
     fieldType => "float",
     default   => 0.00,
-    label     => [ "price", 'Asset_EMSSubmission' ],
-    hoverHelp => [ "price help", 'Asset_EMSSubmission' ],
+    label     => [ "price", 'Asset_EventManagementSystem' ],
+    hoverHelp => [ "price help", 'Asset_EventManagementSystem' ],
 );
 property seatsAvailable => (
     tab       => "shop",
     fieldType => "integer",
     default   => 25,
-    label     => [ "seats available", 'Asset_EMSSubmission' ],
-    hoverHelp => [ "seats available help", 'Asset_EMSSubmission' ],
+    label     => [ "seats available", 'Asset_EventManagementSystem' ],
+    hoverHelp => [ "seats available help", 'Asset_EventManagementSystem' ],
 );
 property startDate => (
     noFormPost   => 1,
     fieldType    => "dateTime",
     builder      => '_default_startDate',
-    label        => [ "add/edit event start date", 'Asset_EMSSubmission' ],
-    hoverHelp    => [ "add/edit event start date help", 'Asset_EMSSubmission' ],
+    label        => [ "add/edit event start date", 'Asset_EventManagementSystem' ],
+    hoverHelp    => [ "add/edit event start date help", 'Asset_EventManagementSystem' ],
     autoGenerate => 0,
 );
 sub _default_startDate {
@@ -110,30 +110,30 @@ property duration => (
     tab       => "properties",
     fieldType => "float",
     default   => 1.0,
-    subtext   => [ 'hours', 'Asset_EMSSubmission' ],
-    label     => [ "duration", 'Asset_EMSSubmission' ],
-    hoverHelp => [ "duration help", 'Asset_EMSSubmission' ],
+    subtext   => [ 'hours', 'Asset_EventManagementSystem' ],
+    label     => [ "duration", 'Asset_EventManagementSystem' ],
+    hoverHelp => [ "duration help", 'Asset_EventManagementSystem' ],
 );
 property location => (
     fieldType        => "combo",
     tab              => "properties",
     customDrawMethod => 'drawLocationField',
-    label            => [ "location", 'Asset_EMSSubmission' ],
-    hoverHelp        => [ "location help", 'Asset_EMSSubmission' ],
+    label            => [ "location", 'Asset_EventManagementSystem' ],
+    hoverHelp        => [ "location help", 'Asset_EventManagementSystem' ],
 );
 property relatedBadgeGroups => (
     tab              => "properties",
     fieldType        => "checkList",
     customDrawMethod => 'drawRelatedBadgeGroupsField',
-    label            => [ "related badge groups", 'Asset_EMSSubmission' ],
-    hoverHelp        => [ "related badge groups ticket help", 'Asset_EMSSubmission' ],
+    label            => [ "related badge groups", 'Asset_EventManagementSystem' ],
+    hoverHelp        => [ "related badge groups ticket help", 'Asset_EventManagementSystem' ],
 );
 property relatedRibbons => (
     tab              => "properties",
     fieldType        => "checkList",
     customDrawMethod => 'drawRelatedRibbonsField',
-    label            => [ "related ribbons", 'Asset_EMSSubmission' ],
-    hoverHelp        => [ "related ribbons help", 'Asset_EMSSubmission' ],
+    label            => [ "related ribbons", 'Asset_EventManagementSystem' ],
+    hoverHelp        => [ "related ribbons help", 'Asset_EventManagementSystem' ],
 );
 property eventMetaData => (
     noFormPost => 1,
