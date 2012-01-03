@@ -18,6 +18,7 @@ package WebGUI::Asset::Wobject::EventManagementSystem;
 use strict;
 use Moose;
 use WebGUI::Definition::Asset;
+use WebGUI::Asset::EMSSubmissionForm;
 extends 'WebGUI::Asset::Wobject';
 define assetName => ['assetName', 'Asset_EventManagementSystem'];
 define icon      => 'ems.gif';
