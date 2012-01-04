@@ -1,4 +1,5 @@
 8.0.0
+ - #12310 - fixed rendering and submit button on user edit/add form
  - Replaced the existing caching mechanism with memcached, which results in a 400% improvement to cache speed. See migration.txt for API changes and gotcha.txt for prereq changes.
  - Added "hot sessions" so sessions interact with the database less.
  - Added Facebook Auth and FacebookLogin macro.

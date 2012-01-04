@@ -654,7 +654,8 @@ sub www_editUser {
 	my $username = ($u->isVisitor && $uid ne "1") ? '' : $u->username;
 	my $i18n = WebGUI::International->new($session, "WebGUI");
     my $f = WebGUI::FormBuilder->new( $session, 
-        action => $session->url->page,
+       # action => $session->url->page,
+        action => '?op=editUserSave',
         extras => 'autocomplete="off"',
     );
     $f->addField( 'csrfToken', name => 'csrfToken' );
@@ -788,7 +789,9 @@ sub www_editUser {
 		size=>15,
 		value=>\@groupsToDelete
 		);
-	return '<h1>' . $i18n->get(168) . '</h1>' . $error . $f->toHtml;
+       $f->addField('submit', name => 'save' );
+	return WebGUI::AdminConsole->new($session,'settings')->render(
+         '<h1>' . $i18n->get(168) . '</h1>' . $error . $f->toHtml );
 }
 
 #-------------------------------------------------------------------
