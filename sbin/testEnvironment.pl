@@ -127,7 +127,6 @@ checkModule("URI::Escape",                  "3.29"       );
 checkModule("POSIX"                                      );
 checkModule("List::Util"                                 );
 checkModule("Color::Calc"                                );
-checkModule("Text::Aspell",                 0.01,2       );
 checkModule("Weather::Com::Finder",         "0.5.3"      );
 checkModule("HTML::TagCloud",               "0.34"       );
 checkModule("Image::ExifTool",              "7.67"       );
