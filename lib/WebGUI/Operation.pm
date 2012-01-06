@@ -256,10 +256,6 @@ sub getOperations {
 		'moveColorDown' => 'Graphics',
 		'moveColorUp' => 'Graphics',
 		'removeColorFromPalette' => 'Graphics',
-
-		'spellCheck' => 'SpellCheck',
-		'suggestWords' => 'SpellCheck',
-		'addWordToDictionary' => 'SpellCheck',
 	};
 }
 

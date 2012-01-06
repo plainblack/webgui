@@ -966,23 +966,6 @@
     "WebGUI::Image::Graph::XYGraph::Line"
     ],
 
-# Here you can define the dictionaries that are available through the tinyMCE spellchecker. You should set
-# id to the name the dictionary is known by ASpell (eg. en or en_US or nl), use the name parameter to set 
-# the name the dictionary is displayed with in tinyMCE. To set the default dictionary please set the 'default'
-# parameter.
-
-#"availableDictionaries" : [
-#    {
-#        "id"      : "en_US",
-#        "name"    : "English",
-#        "default" : "1"
-#    },
-#    {
-#        "id"      : "nl",
-#        "name"    : "Dutch"
-#    }
-#],
-
 # Optional script to run upon successful login.  The script can contain macros
 # ex: /data/WebGUI/sbin/doLogin.pl --configFile=dev.localhost.localdomain.conf --loginPage=^PageUrl();
 
