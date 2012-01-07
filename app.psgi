@@ -16,9 +16,6 @@
 use strict;
 use Plack::Builder;
 
-use FindBin;
-use lib "$FindBin::Bin/lib";
-
 use WebGUI::Paths -inc;
 use WebGUI::Config;
 use WebGUI::Fork;
