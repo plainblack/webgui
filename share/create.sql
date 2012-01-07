@@ -16,12 +16,13 @@ SET UNIQUE_CHECKS                   = 0;
 SET FOREIGN_KEY_CHECKS              = 0;
 SET SQL_MODE                        = 'NO_AUTO_VALUE_ON_ZERO';
 SET SQL_NOTES                       = 0;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `AdSku` (
-  `assetId` char(22) binary NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
-  `purchaseTemplate` char(22) binary NOT NULL,
-  `manageTemplate` char(22) binary NOT NULL,
-  `adSpace` char(22) binary NOT NULL,
+  `purchaseTemplate` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `manageTemplate` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `adSpace` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `priority` int(11) DEFAULT '1',
   `pricePerClick` float DEFAULT '0',
   `pricePerImpression` float DEFAULT '0',
@@ -29,75 +30,80 @@ CREATE TABLE `AdSku` (
   `impressionDiscounts` char(22) DEFAULT NULL,
   `karma` int(11) DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `Article` (
   `linkTitle` char(255) DEFAULT NULL,
   `linkURL` text,
-  `assetId` char(22) binary NOT NULL,
-  `templateId` char(22) binary NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `templateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
   `cacheTimeout` int(11) NOT NULL DEFAULT '3600',
-  `storageId` char(22) binary DEFAULT NULL,
+  `storageId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `AssetReport` (
-  `assetId` char(22) binary NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
   `settings` mediumtext,
-  `templateId` char(22) binary DEFAULT NULL,
+  `templateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `paginateAfter` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `Calendar` (
-  `assetId` char(22) binary NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
   `defaultDate` enum('current','first','last') DEFAULT 'current',
   `defaultView` enum('month','week','day','list') DEFAULT 'month',
   `visitorCacheTimeout` int(11) unsigned DEFAULT NULL,
-  `templateIdMonth` char(22) binary DEFAULT 'CalendarMonth000000001',
-  `templateIdWeek` char(22) binary DEFAULT 'CalendarWeek0000000001',
-  `templateIdDay` char(22) binary DEFAULT 'CalendarDay00000000001',
-  `templateIdEvent` char(22) binary DEFAULT 'CalendarEvent000000001',
-  `templateIdEventEdit` char(22) binary DEFAULT 'CalendarEventEdit00001',
-  `templateIdSearch` char(22) binary DEFAULT 'CalendarSearch00000001',
-  `templateIdPrintMonth` char(22) binary DEFAULT 'CalendarPrintMonth0001',
-  `templateIdPrintWeek` char(22) binary DEFAULT 'CalendarPrintWeek00001',
-  `templateIdPrintDay` char(22) binary DEFAULT 'CalendarPrintDay000001',
-  `templateIdPrintEvent` char(22) binary DEFAULT 'CalendarPrintEvent0001',
-  `groupIdEventEdit` char(22) binary DEFAULT '3',
-  `groupIdSubscribed` char(22) binary DEFAULT NULL,
+  `templateIdMonth` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT 'CalendarMonth000000001',
+  `templateIdWeek` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT 'CalendarWeek0000000001',
+  `templateIdDay` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT 'CalendarDay00000000001',
+  `templateIdEvent` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT 'CalendarEvent000000001',
+  `templateIdEventEdit` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT 'CalendarEventEdit00001',
+  `templateIdSearch` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT 'CalendarSearch00000001',
+  `templateIdPrintMonth` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT 'CalendarPrintMonth0001',
+  `templateIdPrintWeek` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT 'CalendarPrintWeek00001',
+  `templateIdPrintDay` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT 'CalendarPrintDay000001',
+  `templateIdPrintEvent` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT 'CalendarPrintEvent0001',
+  `groupIdEventEdit` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT '3',
+  `groupIdSubscribed` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `subscriberNotifyOffset` int(11) DEFAULT NULL,
   `sortEventsBy` enum('time','sequencenumber') DEFAULT 'time',
   `listViewPageInterval` bigint(20) DEFAULT NULL,
-  `templateIdList` char(22) binary DEFAULT NULL,
-  `templateIdPrintList` char(22) binary DEFAULT NULL,
+  `templateIdList` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `templateIdPrintList` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `icalInterval` bigint(20) DEFAULT NULL,
-  `workflowIdCommit` char(22) binary DEFAULT NULL,
+  `workflowIdCommit` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `icalFeeds` longtext,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `Carousel` (
-  `assetId` char(22) binary NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
   `items` mediumtext,
-  `templateId` char(22) binary DEFAULT NULL,
+  `templateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `slideWidth` int(11) DEFAULT NULL,
   `slideHeight` int(11) DEFAULT NULL,
   `autoPlay` int(11) DEFAULT NULL,
   `autoPlayInterval` int(11) DEFAULT NULL,
-  `richEditor` char(22) binary DEFAULT NULL,
+  `richEditor` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `Collaboration` (
-  `assetId` char(22) binary NOT NULL,
-  `postGroupId` char(22) binary NOT NULL DEFAULT '2',
-  `canStartThreadGroupId` char(22) binary NOT NULL DEFAULT '2',
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `postGroupId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '2',
+  `canStartThreadGroupId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '2',
   `karmaPerPost` int(11) NOT NULL DEFAULT '0',
-  `collaborationTemplateId` char(22) binary NOT NULL,
-  `threadTemplateId` char(22) binary NOT NULL,
-  `postFormTemplateId` char(22) binary NOT NULL,
-  `searchTemplateId` char(22) binary NOT NULL,
-  `notificationTemplateId` char(22) binary NOT NULL,
+  `collaborationTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `threadTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `postFormTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `searchTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `notificationTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `sortBy` char(35) NOT NULL DEFAULT 'assetData.revisionDate',
   `sortOrder` char(4) NOT NULL DEFAULT 'desc',
   `usePreview` int(11) NOT NULL DEFAULT '1',
@@ -110,21 +116,21 @@ CREATE TABLE `Collaboration` (
   `views` int(11) NOT NULL DEFAULT '0',
   `replies` int(11) NOT NULL DEFAULT '0',
   `rating` int(11) NOT NULL DEFAULT '0',
-  `lastPostId` char(22) binary DEFAULT NULL,
+  `lastPostId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `lastPostDate` bigint(20) DEFAULT NULL,
   `archiveAfter` int(11) NOT NULL DEFAULT '31536000',
   `postsPerPage` int(11) NOT NULL DEFAULT '10',
   `threadsPerPage` int(11) NOT NULL DEFAULT '30',
-  `subscriptionGroupId` char(22) binary DEFAULT NULL,
+  `subscriptionGroupId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `allowReplies` int(11) NOT NULL DEFAULT '0',
   `displayLastReply` int(11) NOT NULL DEFAULT '0',
-  `richEditor` char(22) binary NOT NULL DEFAULT 'PBrichedit000000000002',
+  `richEditor` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'PBrichedit000000000002',
   `karmaRatingMultiplier` int(11) NOT NULL DEFAULT '0',
   `karmaSpentToRate` int(11) NOT NULL DEFAULT '0',
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
   `avatarsEnabled` int(11) NOT NULL DEFAULT '0',
-  `approvalWorkflow` char(22) binary NOT NULL DEFAULT 'pbworkflow000000000003',
-  `threadApprovalWorkflow` char(22) binary NOT NULL DEFAULT 'pbworkflow000000000003',
+  `approvalWorkflow` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'pbworkflow000000000003',
+  `threadApprovalWorkflow` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'pbworkflow000000000003',
   `defaultKarmaScale` int(11) NOT NULL DEFAULT '1',
   `mailServer` char(255) DEFAULT NULL,
   `mailAccount` char(255) DEFAULT NULL,
@@ -133,7 +139,7 @@ CREATE TABLE `Collaboration` (
   `mailPrefix` char(255) DEFAULT NULL,
   `getMail` int(11) NOT NULL DEFAULT '0',
   `getMailInterval` char(64) DEFAULT NULL,
-  `getMailCronId` char(22) binary DEFAULT NULL,
+  `getMailCronId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `visitorCacheTimeout` int(11) NOT NULL DEFAULT '3600',
   `autoSubscribeToThread` int(11) NOT NULL DEFAULT '1',
   `requireSubscriptionForEmailPosting` int(11) NOT NULL DEFAULT '1',
@@ -141,101 +147,110 @@ CREATE TABLE `Collaboration` (
   `maxImageSize` int(11) NOT NULL DEFAULT '0',
   `enablePostMetaData` int(11) NOT NULL DEFAULT '0',
   `useCaptcha` int(11) NOT NULL DEFAULT '0',
-  `groupToEditPost` char(22) binary NOT NULL,
+  `groupToEditPost` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `archiveEnabled` int(1) DEFAULT '1',
-  `postReceivedTemplateId` char(22) binary DEFAULT 'default_post_received1',
-  `replyRichEditor` char(22) binary DEFAULT 'PBrichedit000000000002',
-  `replyFilterCode` char(30) binary DEFAULT 'javascript',
+  `postReceivedTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT 'default_post_received1',
+  `replyRichEditor` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT 'PBrichedit000000000002',
+  `replyFilterCode` char(30) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT 'javascript',
   `unsubscribeTemplateId` char(22) NOT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `Dashboard` (
-  `assetId` char(22) binary NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
-  `adminsGroupId` char(22) binary NOT NULL DEFAULT '4',
-  `usersGroupId` char(22) binary NOT NULL DEFAULT '2',
-  `templateId` char(22) binary NOT NULL DEFAULT 'DashboardViewTmpl00001',
+  `adminsGroupId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '4',
+  `usersGroupId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '2',
+  `templateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'DashboardViewTmpl00001',
   `isInitialized` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `assetsToHide` text,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `Dashboard_dashlets` (
-  `dashboardAssetId` char(22) binary NOT NULL DEFAULT '',
-  `dashletAssetId` char(22) binary NOT NULL DEFAULT '',
+  `dashboardAssetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '',
+  `dashletAssetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '',
   `isStatic` tinyint(1) DEFAULT NULL,
   `isRequired` tinyint(1) DEFAULT NULL,
   PRIMARY KEY (`dashboardAssetId`,`dashletAssetId`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `Dashboard_userPrefs` (
-  `dashboardAssetId` char(22) binary NOT NULL DEFAULT '',
-  `dashletAssetId` char(22) binary NOT NULL DEFAULT '',
-  `userId` char(22) binary NOT NULL DEFAULT '',
+  `dashboardAssetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '',
+  `dashletAssetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '',
+  `userId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '',
   `isMinimized` tinyint(1) DEFAULT NULL,
   `properties` longtext,
   PRIMARY KEY (`dashboardAssetId`,`dashletAssetId`,`userId`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `DataForm` (
   `acknowledgement` text,
   `mailData` int(11) NOT NULL DEFAULT '1',
-  `emailTemplateId` char(22) binary NOT NULL,
-  `acknowlegementTemplateId` char(22) binary NOT NULL,
-  `listTemplateId` char(22) binary NOT NULL,
-  `assetId` char(22) binary NOT NULL,
-  `templateId` char(22) binary NOT NULL,
+  `emailTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `acknowlegementTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `listTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `templateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `defaultView` int(11) NOT NULL DEFAULT '0',
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
-  `groupToViewEntries` char(22) binary NOT NULL DEFAULT '7',
+  `groupToViewEntries` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '7',
   `mailAttachments` int(11) DEFAULT '0',
   `useCaptcha` int(1) DEFAULT '0',
   `storeData` int(1) DEFAULT '1',
   `fieldConfiguration` longtext,
   `tabConfiguration` longtext,
-  `workflowIdAddEntry` char(22) binary DEFAULT NULL,
-  `htmlAreaRichEditor` char(22) binary DEFAULT '**Use_Default_Editor**',
+  `workflowIdAddEntry` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `htmlAreaRichEditor` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT '**Use_Default_Editor**',
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `DataForm_entry` (
-  `DataForm_entryId` char(22) binary NOT NULL,
-  `userId` char(22) binary NOT NULL,
+  `DataForm_entryId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `userId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `username` char(255) DEFAULT NULL,
   `ipAddress` char(255) DEFAULT NULL,
-  `assetId` char(22) binary NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `entryData` longtext,
   `submissionDate` datetime DEFAULT NULL,
   PRIMARY KEY (`DataForm_entryId`),
   KEY `assetId` (`assetId`),
   KEY `assetId_submissionDate` (`assetId`,`submissionDate`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `DataTable` (
-  `assetId` char(22) binary NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
   `data` longtext,
-  `templateId` char(22) binary DEFAULT NULL,
+  `templateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `EMSBadge` (
-  `assetId` char(22) binary NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
   `price` float NOT NULL DEFAULT '0',
   `seatsAvailable` int(11) NOT NULL DEFAULT '100',
   `relatedBadgeGroups` mediumtext,
-  `templateId` char(22) binary NOT NULL,
+  `templateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `earlyBirdPrice` float NOT NULL DEFAULT '0',
   `earlyBirdPriceEndDate` bigint(20) DEFAULT NULL,
   `preRegistrationPrice` float NOT NULL DEFAULT '0',
   `preRegistrationPriceEndDate` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `EMSBadgeGroup` (
-  `badgeGroupId` char(22) binary NOT NULL,
-  `emsAssetId` char(22) binary NOT NULL,
+  `badgeGroupId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `emsAssetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `name` char(100) DEFAULT NULL,
   `ticketsPerBadge` int(11) DEFAULT NULL,
   PRIMARY KEY (`badgeGroupId`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `EMSEventMetaField` (
-  `fieldId` char(22) binary NOT NULL,
-  `assetId` char(22) binary DEFAULT NULL,
+  `fieldId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `label` char(100) DEFAULT NULL,
   `dataType` char(20) DEFAULT NULL,
   `visible` tinyint(4) DEFAULT '0',
@@ -245,13 +260,14 @@ CREATE TABLE `EMSEventMetaField` (
   `sequenceNumber` int(5) DEFAULT NULL,
   `helpText` mediumtext,
   PRIMARY KEY (`fieldId`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `EMSRegistrant` (
-  `badgeId` char(22) binary NOT NULL,
-  `userId` char(22) binary DEFAULT NULL,
+  `badgeId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `userId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `badgeNumber` int(11) NOT NULL AUTO_INCREMENT,
-  `badgeAssetId` char(22) binary NOT NULL,
-  `emsAssetId` char(22) binary NOT NULL,
+  `badgeAssetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `emsAssetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `name` char(35) NOT NULL,
   `address1` char(35) DEFAULT NULL,
   `address2` char(35) DEFAULT NULL,
@@ -266,48 +282,53 @@ CREATE TABLE `EMSRegistrant` (
   `notes` mediumtext,
   `purchaseComplete` tinyint(1) DEFAULT NULL,
   `hasCheckedIn` tinyint(1) DEFAULT NULL,
-  `transactionItemId` char(22) binary DEFAULT NULL,
+  `transactionItemId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   PRIMARY KEY (`badgeId`),
   UNIQUE KEY `badgeNumber` (`badgeNumber`),
   KEY `badgeAssetId_purchaseComplete` (`badgeAssetId`,`purchaseComplete`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `EMSRegistrantRibbon` (
-  `badgeId` char(22) binary NOT NULL,
-  `ribbonAssetId` char(22) binary NOT NULL,
-  `transactionItemId` char(22) binary DEFAULT NULL,
+  `badgeId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `ribbonAssetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `transactionItemId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   PRIMARY KEY (`badgeId`,`ribbonAssetId`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `EMSRegistrantTicket` (
-  `badgeId` char(22) binary NOT NULL,
-  `ticketAssetId` char(22) binary NOT NULL,
+  `badgeId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `ticketAssetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `purchaseComplete` tinyint(1) DEFAULT NULL,
-  `transactionItemId` char(22) binary DEFAULT NULL,
+  `transactionItemId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   PRIMARY KEY (`badgeId`,`ticketAssetId`),
   KEY `ticketAssetId_purchaseComplete` (`ticketAssetId`,`purchaseComplete`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `EMSRegistrantToken` (
-  `badgeId` char(22) binary NOT NULL,
-  `tokenAssetId` char(22) binary NOT NULL,
+  `badgeId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `tokenAssetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `quantity` int(11) DEFAULT NULL,
   `transactionItemIds` text,
   PRIMARY KEY (`badgeId`,`tokenAssetId`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `EMSRibbon` (
-  `assetId` char(22) binary NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
   `percentageDiscount` float NOT NULL DEFAULT '10',
   `price` float NOT NULL DEFAULT '0',
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `EMSSubmission` (
-  `assetId` char(22) binary NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
   `submissionId` int(11) NOT NULL,
   `submissionStatus` char(30) DEFAULT NULL,
-  `ticketId` char(22) binary DEFAULT NULL,
+  `ticketId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `description` mediumtext,
   `sku` char(35) DEFAULT NULL,
-  `vendorId` char(22) binary DEFAULT NULL,
+  `vendorId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `displayTitle` tinyint(1) DEFAULT NULL,
   `shipsSeparately` tinyint(1) DEFAULT NULL,
   `price` float DEFAULT NULL,
@@ -320,20 +341,22 @@ CREATE TABLE `EMSSubmission` (
   `relatedRibbons` mediumtext,
   `eventMetaData` mediumtext,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `EMSSubmissionForm` (
-  `assetId` char(22) binary NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
-  `canSubmitGroupId` char(22) binary DEFAULT NULL,
+  `canSubmitGroupId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `daysBeforeCleanup` int(11) DEFAULT NULL,
   `deleteCreatedItems` int(1) DEFAULT NULL,
   `formDescription` text,
   `submissionDeadline` date DEFAULT NULL,
   `pastDeadlineMessage` text,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `EMSTicket` (
-  `assetId` char(22) binary NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
   `price` float NOT NULL DEFAULT '0',
   `seatsAvailable` int(11) NOT NULL DEFAULT '100',
@@ -345,17 +368,19 @@ CREATE TABLE `EMSTicket` (
   `relatedRibbons` mediumtext,
   `eventMetaData` mediumtext,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `EMSToken` (
-  `assetId` char(22) binary NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
   `price` float NOT NULL DEFAULT '0',
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `Event` (
-  `assetId` char(22) binary NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
-  `feedId` char(22) binary DEFAULT NULL,
+  `feedId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `feedUid` char(255) DEFAULT NULL,
   `startDate` date DEFAULT NULL,
   `endDate` date DEFAULT NULL,
@@ -364,86 +389,93 @@ CREATE TABLE `Event` (
   `userDefined3` text,
   `userDefined4` text,
   `userDefined5` text,
-  `recurId` char(22) binary DEFAULT NULL,
+  `recurId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `description` longtext,
   `startTime` time DEFAULT NULL,
   `endTime` time DEFAULT NULL,
   `relatedLinks` longtext,
   `location` char(255) DEFAULT NULL,
-  `storageId` char(22) binary NOT NULL,
+  `storageId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `timeZone` char(255) DEFAULT 'America/Chicago',
   `sequenceNumber` bigint(20) DEFAULT NULL,
   `iCalSequenceNumber` int(11) DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `EventManagementSystem` (
-  `assetId` char(22) binary NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
   `timezone` char(30) NOT NULL DEFAULT 'America/Chicago',
-  `templateId` char(22) binary NOT NULL DEFAULT '2rC4ErZ3c77OJzJm7O5s3w',
-  `badgeBuilderTemplateId` char(22) binary NOT NULL DEFAULT 'BMybD3cEnmXVk2wQ_qEsRQ',
-  `lookupRegistrantTemplateId` char(22) binary NOT NULL DEFAULT 'OOyMH33plAy6oCj_QWrxtg',
-  `printBadgeTemplateId` char(22) binary NOT NULL DEFAULT 'PsFn7dJt4wMwBa8hiE3hOA',
-  `printTicketTemplateId` char(22) binary NOT NULL DEFAULT 'yBwydfooiLvhEFawJb0VTQ',
+  `templateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '2rC4ErZ3c77OJzJm7O5s3w',
+  `badgeBuilderTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'BMybD3cEnmXVk2wQ_qEsRQ',
+  `lookupRegistrantTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'OOyMH33plAy6oCj_QWrxtg',
+  `printBadgeTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'PsFn7dJt4wMwBa8hiE3hOA',
+  `printTicketTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'yBwydfooiLvhEFawJb0VTQ',
   `printRemainingTicketsTemplateId` char(22) NOT NULL DEFAULT 'hreA_bgxiTX-EzWCSZCZJw',
   `badgeInstructions` mediumtext,
   `ribbonInstructions` mediumtext,
   `ticketInstructions` mediumtext,
   `tokenInstructions` mediumtext,
-  `registrationStaffGroupId` char(22) binary NOT NULL,
-  `scheduleTemplateId` char(22) binary DEFAULT NULL,
+  `registrationStaffGroupId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `scheduleTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `scheduleColumnsPerPage` int(11) DEFAULT NULL,
-  `eventSubmissionTemplateId` char(22) binary DEFAULT NULL,
-  `eventSubmissionQueueTemplateId` char(22) binary DEFAULT NULL,
-  `eventSubmissionMainTemplateId` char(22) binary DEFAULT NULL,
+  `eventSubmissionTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `eventSubmissionQueueTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `eventSubmissionMainTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `eventSubmissionGroups` mediumtext,
   `submittedLocationsList` mediumtext,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `Event_recur` (
-  `recurId` char(22) binary NOT NULL,
+  `recurId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `recurType` char(16) DEFAULT NULL,
   `pattern` char(255) DEFAULT NULL,
   `startDate` date DEFAULT NULL,
   `endDate` char(10) DEFAULT NULL,
   PRIMARY KEY (`recurId`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `Event_relatedlink` (
-  `eventlinkId` char(22) binary NOT NULL,
-  `assetId` char(22) binary NOT NULL,
+  `eventlinkId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `linkURL` tinytext,
   `linktext` char(80) DEFAULT NULL,
-  `groupIdView` char(22) binary NOT NULL,
+  `groupIdView` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `sequenceNumber` bigint(20) DEFAULT NULL
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `FileAsset` (
-  `assetId` char(22) binary NOT NULL,
-  `storageId` char(22) binary NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `storageId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `filename` char(255) NOT NULL,
-  `templateId` char(22) binary NOT NULL,
+  `templateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
   `cacheTimeout` int(11) NOT NULL DEFAULT '3600',
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `FlatDiscount` (
-  `assetId` char(22) binary NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
-  `templateId` char(22) binary NOT NULL DEFAULT '63ix2-hU0FchXGIWkG3tow',
+  `templateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '63ix2-hU0FchXGIWkG3tow',
   `mustSpend` float NOT NULL DEFAULT '0',
   `percentageDiscount` int(3) NOT NULL DEFAULT '0',
   `priceDiscount` float NOT NULL DEFAULT '0',
   `thankYouMessage` mediumtext,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `Folder` (
-  `assetId` char(22) binary NOT NULL,
-  `templateId` char(22) binary NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `templateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
   `visitorCacheTimeout` int(11) NOT NULL DEFAULT '3600',
   `sortAlphabetically` int(11) NOT NULL DEFAULT '0',
   `sortOrder` enum('ASC','DESC') DEFAULT 'ASC',
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `Fork` (
   `id` char(22) NOT NULL DEFAULT '',
   `userId` char(22) DEFAULT NULL,
@@ -455,50 +487,52 @@ CREATE TABLE `Fork` (
   `finished` tinyint(1) DEFAULT '0',
   `latch` tinyint(1) DEFAULT '0',
   PRIMARY KEY (`id`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `Gallery` (
-  `assetId` char(22) binary NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
-  `groupIdAddComment` char(22) binary DEFAULT NULL,
-  `groupIdAddFile` char(22) binary DEFAULT NULL,
+  `groupIdAddComment` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `groupIdAddFile` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `imageResolutions` text,
   `imageViewSize` int(11) DEFAULT NULL,
   `imageThumbnailSize` int(11) DEFAULT NULL,
   `maxSpacePerUser` char(20) DEFAULT NULL,
-  `richEditIdComment` char(22) binary DEFAULT NULL,
-  `templateIdAddArchive` char(22) binary DEFAULT NULL,
-  `templateIdDeleteAlbum` char(22) binary DEFAULT NULL,
-  `templateIdDeleteFile` char(22) binary DEFAULT NULL,
-  `templateIdEditAlbum` char(22) binary DEFAULT NULL,
-  `templateIdEditFile` char(22) binary DEFAULT NULL,
-  `templateIdListAlbums` char(22) binary DEFAULT NULL,
-  `templateIdListAlbumsRss` char(22) binary DEFAULT NULL,
-  `templateIdListFilesForUser` char(22) binary DEFAULT NULL,
-  `templateIdListFilesForUserRss` char(22) binary DEFAULT NULL,
-  `templateIdMakeShortcut` char(22) binary DEFAULT NULL,
-  `templateIdSearch` char(22) binary DEFAULT NULL,
-  `templateIdViewSlideshow` char(22) binary DEFAULT NULL,
-  `templateIdViewThumbnails` char(22) binary DEFAULT NULL,
-  `templateIdViewAlbum` char(22) binary DEFAULT NULL,
-  `templateIdViewAlbumRss` char(22) binary DEFAULT NULL,
-  `templateIdViewFile` char(22) binary DEFAULT NULL,
-  `viewAlbumAssetId` char(22) binary DEFAULT NULL,
+  `richEditIdComment` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `templateIdAddArchive` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `templateIdDeleteAlbum` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `templateIdDeleteFile` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `templateIdEditAlbum` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `templateIdEditFile` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `templateIdListAlbums` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `templateIdListAlbumsRss` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `templateIdListFilesForUser` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `templateIdListFilesForUserRss` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `templateIdMakeShortcut` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `templateIdSearch` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `templateIdViewSlideshow` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `templateIdViewThumbnails` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `templateIdViewAlbum` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `templateIdViewAlbumRss` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `templateIdViewFile` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `viewAlbumAssetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `viewDefault` enum('album','list') DEFAULT NULL,
   `viewListOrderBy` char(40) DEFAULT NULL,
   `viewListOrderDirection` enum('ASC','DESC') DEFAULT NULL,
-  `workflowIdCommit` char(22) binary DEFAULT NULL,
-  `templateIdEditComment` char(22) binary DEFAULT NULL,
-  `richEditIdAlbum` char(22) binary DEFAULT NULL,
-  `richEditIdFile` char(22) binary DEFAULT NULL,
+  `workflowIdCommit` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `templateIdEditComment` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `richEditIdAlbum` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `richEditIdFile` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `defaultFilesPerPage` int(11) DEFAULT NULL,
   `imageDensity` int(11) DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `GalleryAlbum` (
-  `assetId` char(22) binary NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
   `allowComments` int(11) DEFAULT NULL,
-  `assetIdThumbnail` char(22) binary DEFAULT NULL,
+  `assetIdThumbnail` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `userDefined1` text,
   `userDefined2` text,
   `userDefined3` text,
@@ -506,9 +540,10 @@ CREATE TABLE `GalleryAlbum` (
   `userDefined5` text,
   `othersCanAdd` int(11) DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `GalleryFile` (
-  `assetId` char(22) binary NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
   `userDefined1` longtext,
   `userDefined2` longtext,
@@ -519,17 +554,19 @@ CREATE TABLE `GalleryFile` (
   `friendsOnly` int(1) DEFAULT '0',
   `rating` int(1) DEFAULT '0',
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `GalleryFile_comment` (
-  `assetId` char(22) binary NOT NULL,
-  `commentId` char(22) binary NOT NULL,
-  `userId` char(22) binary DEFAULT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `commentId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `userId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `visitorIp` char(255) DEFAULT NULL,
   `creationDate` datetime DEFAULT NULL,
   `bodyText` longtext,
   PRIMARY KEY (`assetId`,`commentId`),
   KEY `commentId` (`commentId`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `HttpProxy` (
   `proxiedUrl` text,
   `timeout` int(11) DEFAULT NULL,
@@ -543,83 +580,91 @@ CREATE TABLE `HttpProxy` (
   `rewriteUrls` int(11) DEFAULT NULL,
   `searchFor` char(255) DEFAULT NULL,
   `stopAt` char(255) DEFAULT NULL,
-  `cookieJarStorageId` char(22) binary NOT NULL,
-  `assetId` char(22) binary NOT NULL,
-  `templateId` char(22) binary NOT NULL,
+  `cookieJarStorageId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `templateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
   `cacheTimeout` int(11) NOT NULL DEFAULT '0',
   `useAmpersand` int(11) NOT NULL DEFAULT '0',
   `urlPatternFilter` mediumtext,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `ImageAsset` (
-  `assetId` char(22) binary NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `thumbnailSize` int(11) NOT NULL DEFAULT '50',
   `parameters` text,
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
   `annotations` mediumtext,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `InOutBoard` (
-  `assetId` char(22) binary NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
   `statusList` text,
-  `reportViewerGroup` char(22) binary NOT NULL DEFAULT '3',
-  `inOutGroup` char(22) binary NOT NULL DEFAULT '2',
-  `inOutTemplateId` char(22) binary NOT NULL DEFAULT 'IOB0000000000000000001',
-  `reportTemplateId` char(22) binary NOT NULL DEFAULT 'IOB0000000000000000002',
+  `reportViewerGroup` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '3',
+  `inOutGroup` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '2',
+  `inOutTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'IOB0000000000000000001',
+  `reportTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'IOB0000000000000000002',
   `paginateAfter` int(11) NOT NULL DEFAULT '50',
   `reportPaginateAfter` int(11) NOT NULL DEFAULT '50',
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `InOutBoard_delegates` (
-  `userId` char(22) binary NOT NULL,
-  `delegateUserId` char(22) binary NOT NULL,
-  `assetId` char(22) binary NOT NULL
-) TYPE=MyISAM;
+  `userId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `delegateUserId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `InOutBoard_status` (
-  `assetId` char(22) binary NOT NULL,
-  `userId` char(22) binary NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `userId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `status` char(255) DEFAULT NULL,
   `dateStamp` int(11) NOT NULL,
   `message` text
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `InOutBoard_statusLog` (
-  `assetId` char(22) binary NOT NULL,
-  `userId` char(22) binary NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `userId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `status` char(255) DEFAULT NULL,
   `dateStamp` int(11) NOT NULL,
   `message` text,
-  `createdBy` char(22) binary DEFAULT NULL
-) TYPE=MyISAM;
+  `createdBy` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `Layout` (
-  `assetId` char(22) binary NOT NULL,
-  `templateId` char(22) binary NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `templateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `contentPositions` text,
   `assetsToHide` text,
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
   `assetOrder` char(20) DEFAULT 'asc',
-  `mobileTemplateId` char(22) binary DEFAULT 'PBtmpl0000000000000054',
+  `mobileTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT 'PBtmpl0000000000000054',
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `Map` (
-  `assetId` char(22) binary NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
-  `groupIdAddPoint` char(22) binary DEFAULT NULL,
+  `groupIdAddPoint` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `mapApiKey` text,
   `mapHeight` char(12) DEFAULT NULL,
   `mapWidth` char(12) DEFAULT NULL,
   `startLatitude` float DEFAULT NULL,
   `startLongitude` float DEFAULT NULL,
   `startZoom` tinyint(3) unsigned DEFAULT NULL,
-  `templateIdEditPoint` char(22) binary DEFAULT NULL,
-  `templateIdView` char(22) binary DEFAULT NULL,
-  `templateIdViewPoint` char(22) binary DEFAULT NULL,
-  `workflowIdPoint` char(22) binary DEFAULT NULL,
+  `templateIdEditPoint` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `templateIdView` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `templateIdViewPoint` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `workflowIdPoint` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `MapPoint` (
-  `assetId` char(22) binary NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
   `latitude` double DEFAULT NULL,
   `longitude` double DEFAULT NULL,
@@ -633,7 +678,7 @@ CREATE TABLE `MapPoint` (
   `phone` char(255) DEFAULT NULL,
   `fax` char(255) DEFAULT NULL,
   `email` char(255) DEFAULT NULL,
-  `storageIdPhoto` char(22) binary DEFAULT NULL,
+  `storageIdPhoto` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `userDefined1` char(255) DEFAULT NULL,
   `userDefined2` char(255) DEFAULT NULL,
   `userDefined3` char(255) DEFAULT NULL,
@@ -641,41 +686,43 @@ CREATE TABLE `MapPoint` (
   `userDefined5` char(255) DEFAULT NULL,
   `isGeocoded` tinyint(1) DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `Matrix` (
-  `detailTemplateId` char(22) binary DEFAULT NULL,
-  `compareTemplateId` char(22) binary DEFAULT NULL,
-  `searchTemplateId` char(22) binary DEFAULT NULL,
+  `detailTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `compareTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `searchTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `categories` text,
-  `assetId` char(22) binary NOT NULL,
-  `templateId` char(22) binary NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `templateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
   `maxComparisons` int(11) NOT NULL DEFAULT '10',
   `maxComparisonsPrivileged` int(11) NOT NULL DEFAULT '10',
-  `defaultSort` char(22) binary NOT NULL DEFAULT 'score',
-  `compareColorNo` char(22) binary DEFAULT '#ffaaaa',
-  `compareColorLimited` char(22) binary NOT NULL DEFAULT '#ffffaa',
-  `compareColorCostsExtra` char(22) binary NOT NULL DEFAULT '#ffffaa',
-  `compareColorFreeAddOn` char(22) binary NOT NULL DEFAULT '#ffffaa',
-  `compareColorYes` char(22) binary NOT NULL DEFAULT '#aaffaa',
-  `submissionApprovalWorkflowId` char(22) binary NOT NULL,
+  `defaultSort` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'score',
+  `compareColorNo` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT '#ffaaaa',
+  `compareColorLimited` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '#ffffaa',
+  `compareColorCostsExtra` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '#ffffaa',
+  `compareColorFreeAddOn` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '#ffffaa',
+  `compareColorYes` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '#aaffaa',
+  `submissionApprovalWorkflowId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `ratingsDuration` int(11) NOT NULL DEFAULT '7776000',
-  `editListingTemplateId` char(22) binary DEFAULT NULL,
-  `groupToAdd` char(22) binary DEFAULT '2',
-  `screenshotsConfigTemplateId` char(22) binary DEFAULT NULL,
-  `screenshotsTemplateId` char(22) binary DEFAULT NULL,
+  `editListingTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `groupToAdd` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT '2',
+  `screenshotsConfigTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `screenshotsTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `statisticsCacheTimeout` int(11) NOT NULL DEFAULT '3600',
   `maxScreenshotWidth` int(11) DEFAULT NULL,
   `maxScreenshotHeight` int(11) DEFAULT NULL,
   `listingsCacheTimeout` int(11) NOT NULL DEFAULT '3600',
-  `maxComparisonsGroup` char(22) binary DEFAULT NULL,
+  `maxComparisonsGroup` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `maxComparisonsGroupInt` int(11) DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `MatrixListing` (
-  `assetId` char(22) binary NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
-  `screenshots` char(22) binary DEFAULT NULL,
+  `screenshots` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `description` text,
   `version` char(255) DEFAULT NULL,
   `views` int(11) DEFAULT NULL,
@@ -685,67 +732,74 @@ CREATE TABLE `MatrixListing` (
   `comparesLastIp` char(255) DEFAULT NULL,
   `clicksLastIp` char(255) DEFAULT NULL,
   `lastUpdated` int(11) DEFAULT NULL,
-  `maintainer` char(22) binary DEFAULT NULL,
+  `maintainer` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `manufacturerName` char(255) DEFAULT NULL,
   `manufacturerURL` char(255) DEFAULT NULL,
   `productURL` char(255) DEFAULT NULL,
   `score` int(11) DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `MatrixListing_attribute` (
-  `matrixId` char(22) binary NOT NULL,
-  `matrixListingId` char(22) binary NOT NULL,
-  `attributeId` char(22) binary NOT NULL,
+  `matrixId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `matrixListingId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `attributeId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `value` char(255) DEFAULT NULL,
   PRIMARY KEY (`attributeId`,`matrixListingId`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `MatrixListing_rating` (
   `timeStamp` int(11) NOT NULL DEFAULT '0',
   `category` char(255) DEFAULT NULL,
   `rating` int(11) NOT NULL DEFAULT '1',
-  `listingId` char(22) binary NOT NULL,
+  `listingId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `ipAddress` char(15) DEFAULT NULL,
-  `assetId` char(22) binary NOT NULL,
-  `userId` char(22) binary DEFAULT NULL
-) TYPE=MyISAM;
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `userId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `MatrixListing_ratingSummary` (
-  `listingId` char(22) binary NOT NULL,
+  `listingId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `category` char(255) NOT NULL,
   `meanValue` decimal(3,2) DEFAULT NULL,
   `medianValue` int(11) DEFAULT NULL,
   `countValue` int(11) DEFAULT NULL,
-  `assetId` char(22) binary NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   PRIMARY KEY (`listingId`,`category`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `Matrix_attribute` (
-  `attributeId` char(22) binary NOT NULL,
+  `attributeId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `category` char(255) NOT NULL,
   `name` char(255) DEFAULT NULL,
   `description` text,
   `fieldType` char(255) NOT NULL DEFAULT 'MatrixCompare',
   `defaultValue` char(255) DEFAULT NULL,
-  `assetId` char(22) binary NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `options` text,
   PRIMARY KEY (`attributeId`),
   KEY `categoryIndex` (`category`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `MessageBoard` (
-  `assetId` char(22) binary NOT NULL,
-  `templateId` char(22) binary NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `templateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
   `visitorCacheTimeout` int(11) NOT NULL DEFAULT '3600',
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `MultiSearch` (
-  `assetId` char(22) binary NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
-  `templateId` char(22) binary NOT NULL DEFAULT 'MultiSearchTmpl0000001',
+  `templateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'MultiSearchTmpl0000001',
   `predefinedSearches` text,
   `cacheTimeout` int(11) NOT NULL DEFAULT '3600',
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `Navigation` (
-  `assetId` char(22) binary NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `assetsToInclude` text,
   `startType` char(35) DEFAULT NULL,
   `startPoint` char(255) DEFAULT NULL,
@@ -753,110 +807,119 @@ CREATE TABLE `Navigation` (
   `showSystemPages` int(11) NOT NULL DEFAULT '0',
   `showHiddenPages` int(11) NOT NULL DEFAULT '0',
   `showUnprivilegedPages` int(11) NOT NULL DEFAULT '0',
-  `templateId` char(22) binary NOT NULL,
+  `templateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `ancestorEndPoint` int(11) NOT NULL DEFAULT '55',
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
   `mimeType` char(50) DEFAULT 'text/html',
   `reversePageLoop` tinyint(1) DEFAULT '0',
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `Newsletter` (
-  `assetId` char(22) binary NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
-  `newsletterTemplateId` char(22) binary NOT NULL DEFAULT 'newsletter000000000001',
-  `mySubscriptionsTemplateId` char(22) binary NOT NULL DEFAULT 'newslettersubscrip0001',
+  `newsletterTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'newsletter000000000001',
+  `mySubscriptionsTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'newslettersubscrip0001',
   `newsletterHeader` mediumtext,
   `newsletterFooter` mediumtext,
   `newsletterCategories` text,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `Newsletter_subscriptions` (
-  `assetId` char(22) binary NOT NULL,
-  `userId` char(22) binary NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `userId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `subscriptions` text,
   `lastTimeSent` bigint(20) NOT NULL DEFAULT '0',
   PRIMARY KEY (`assetId`,`userId`),
   KEY `lastTimeSent_assetId_userId` (`lastTimeSent`,`assetId`,`userId`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `PM_project` (
-  `projectId` char(22) binary NOT NULL,
-  `assetId` char(22) binary DEFAULT NULL,
+  `projectId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `name` char(255) NOT NULL,
   `description` text,
   `startDate` bigint(20) DEFAULT NULL,
   `endDate` bigint(20) DEFAULT NULL,
-  `projectManager` char(22) binary DEFAULT NULL,
+  `projectManager` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `durationUnits` enum('hours','days') DEFAULT 'hours',
   `hoursPerDay` float DEFAULT NULL,
   `targetBudget` float(15,2) DEFAULT '0.00',
   `percentComplete` float NOT NULL DEFAULT '0',
-  `parentId` char(22) binary DEFAULT NULL,
+  `parentId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `creationDate` bigint(20) NOT NULL,
-  `createdBy` char(22) binary NOT NULL,
-  `lastUpdatedBy` char(22) binary NOT NULL,
+  `createdBy` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `lastUpdatedBy` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `lastUpdateDate` bigint(20) NOT NULL,
-  `projectObserver` char(22) binary DEFAULT '7',
+  `projectObserver` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT '7',
   PRIMARY KEY (`projectId`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `PM_task` (
-  `taskId` char(22) binary NOT NULL,
-  `projectId` char(22) binary NOT NULL,
+  `taskId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `projectId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `taskName` char(255) NOT NULL,
   `duration` float DEFAULT NULL,
   `startDate` bigint(20) DEFAULT NULL,
   `endDate` bigint(20) DEFAULT NULL,
   `dependants` char(50) DEFAULT NULL,
-  `parentId` char(22) binary DEFAULT NULL,
+  `parentId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `percentComplete` float DEFAULT NULL,
   `sequenceNumber` int(11) NOT NULL DEFAULT '1',
   `creationDate` bigint(20) NOT NULL,
-  `createdBy` char(22) binary NOT NULL,
-  `lastUpdatedBy` char(22) binary NOT NULL,
+  `createdBy` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `lastUpdatedBy` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `lastUpdateDate` bigint(20) NOT NULL,
   `lagTime` bigint(20) DEFAULT '0',
   `taskType` enum('timed','progressive','milestone') NOT NULL DEFAULT 'timed',
   PRIMARY KEY (`taskId`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `PM_taskResource` (
-  `taskResourceId` char(22) binary NOT NULL,
-  `taskId` char(22) binary NOT NULL,
+  `taskResourceId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `taskId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `sequenceNumber` int(11) NOT NULL,
   `resourceKind` enum('user','group') NOT NULL,
-  `resourceId` char(22) binary NOT NULL,
+  `resourceId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   PRIMARY KEY (`taskResourceId`),
   UNIQUE KEY `taskId` (`taskId`,`resourceKind`,`resourceId`),
   UNIQUE KEY `taskId_2` (`taskId`,`sequenceNumber`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `PM_wobject` (
-  `assetId` char(22) binary NOT NULL,
-  `projectDashboardTemplateId` char(22) binary NOT NULL DEFAULT 'ProjectManagerTMPL0001',
-  `projectDisplayTemplateId` char(22) binary NOT NULL DEFAULT 'ProjectManagerTMPL0002',
-  `ganttChartTemplateId` char(22) binary NOT NULL DEFAULT 'ProjectManagerTMPL0003',
-  `editTaskTemplateId` char(22) binary NOT NULL DEFAULT 'ProjectManagerTMPL0004',
-  `groupToAdd` char(22) binary NOT NULL DEFAULT '3',
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `projectDashboardTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'ProjectManagerTMPL0001',
+  `projectDisplayTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'ProjectManagerTMPL0002',
+  `ganttChartTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'ProjectManagerTMPL0003',
+  `editTaskTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'ProjectManagerTMPL0004',
+  `groupToAdd` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '3',
   `revisionDate` bigint(20) NOT NULL,
-  `resourcePopupTemplateId` char(22) binary NOT NULL DEFAULT 'ProjectManagerTMPL0005',
-  `resourceListTemplateId` char(22) binary NOT NULL DEFAULT 'ProjectManagerTMPL0006',
+  `resourcePopupTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'ProjectManagerTMPL0005',
+  `resourceListTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'ProjectManagerTMPL0006',
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `Photo` (
-  `assetId` char(22) binary NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
   `exifData` longtext,
   `location` char(255) DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `Photo_rating` (
-  `assetId` char(22) binary NOT NULL,
-  `userId` char(22) binary DEFAULT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `userId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `visitorIp` char(255) DEFAULT NULL,
   `rating` int(11) DEFAULT NULL,
   KEY `assetId` (`assetId`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `Poll` (
   `active` int(11) NOT NULL DEFAULT '1',
   `graphWidth` int(11) NOT NULL DEFAULT '150',
-  `voteGroup` char(22) binary DEFAULT NULL,
+  `voteGroup` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `question` char(255) DEFAULT NULL,
   `a1` char(255) DEFAULT NULL,
   `a2` char(255) DEFAULT NULL,
@@ -880,22 +943,24 @@ CREATE TABLE `Poll` (
   `a20` char(255) DEFAULT NULL,
   `karmaPerVote` int(11) NOT NULL DEFAULT '0',
   `randomizeAnswers` int(11) NOT NULL DEFAULT '0',
-  `assetId` char(22) binary NOT NULL,
-  `templateId` char(22) binary NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `templateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
   `graphConfiguration` blob,
   `generateGraph` tinyint(1) DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `Poll_answer` (
   `answer` char(3) DEFAULT NULL,
-  `userId` char(22) binary NOT NULL,
+  `userId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `ipAddress` char(50) DEFAULT NULL,
-  `assetId` char(22) binary NOT NULL
-) TYPE=MyISAM;
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `Post` (
-  `assetId` char(22) binary NOT NULL,
-  `threadId` char(22) binary NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `threadId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `username` char(30) DEFAULT NULL,
   `content` mediumtext,
   `views` int(11) NOT NULL DEFAULT '0',
@@ -905,22 +970,24 @@ CREATE TABLE `Post` (
   `userDefined3` text,
   `userDefined4` text,
   `userDefined5` text,
-  `storageId` char(22) binary NOT NULL,
+  `storageId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `rating` int(11) NOT NULL DEFAULT '0',
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
   `originalEmail` mediumtext,
   PRIMARY KEY (`assetId`,`revisionDate`),
   KEY `threadId_rating` (`threadId`,`rating`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `Post_rating` (
-  `assetId` char(22) binary NOT NULL,
-  `userId` char(22) binary NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `userId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `ipAddress` char(15) NOT NULL,
   `dateOfRating` bigint(20) DEFAULT NULL,
   `rating` int(11) NOT NULL DEFAULT '0',
   KEY `assetId_userId` (`assetId`,`userId`),
   KEY `assetId_ipAddress` (`assetId`,`ipAddress`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `Product` (
   `image1` char(255) DEFAULT NULL,
   `image2` char(255) DEFAULT NULL,
@@ -928,8 +995,8 @@ CREATE TABLE `Product` (
   `brochure` char(255) DEFAULT NULL,
   `manual` char(255) DEFAULT NULL,
   `warranty` char(255) DEFAULT NULL,
-  `assetId` char(22) binary NOT NULL,
-  `templateId` char(22) binary NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `templateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
   `cacheTimeout` int(11) NOT NULL DEFAULT '3600',
   `thankYouMessage` mediumtext,
@@ -941,9 +1008,10 @@ CREATE TABLE `Product` (
   `variantsJSON` longtext,
   `isShippingRequired` int(11) DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `RichEdit` (
-  `assetId` char(22) binary NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `askAboutRichEdit` int(11) NOT NULL DEFAULT '0',
   `preformatted` int(11) NOT NULL DEFAULT '0',
   `editorWidth` int(11) NOT NULL DEFAULT '0',
@@ -967,32 +1035,33 @@ CREATE TABLE `RichEdit` (
   `inlinePopups` int(11) NOT NULL DEFAULT '0',
   `allowMedia` int(11) DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `SQLReport` (
   `dbQuery1` text,
   `paginateAfter` int(11) NOT NULL DEFAULT '50',
   `preprocessMacros1` int(11) DEFAULT '0',
   `debugMode` int(11) NOT NULL DEFAULT '0',
-  `databaseLinkId1` char(22) binary NOT NULL,
+  `databaseLinkId1` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `placeholderParams1` text,
   `preprocessMacros2` int(11) DEFAULT '0',
   `dbQuery2` text,
   `placeholderParams2` text,
-  `databaseLinkId2` char(22) binary NOT NULL,
+  `databaseLinkId2` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `preprocessMacros3` int(11) DEFAULT '0',
   `dbQuery3` text,
   `placeholderParams3` text,
-  `databaseLinkId3` char(22) binary NOT NULL,
+  `databaseLinkId3` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `preprocessMacros4` int(11) DEFAULT '0',
   `dbQuery4` text,
   `placeholderParams4` text,
-  `databaseLinkId4` char(22) binary NOT NULL,
+  `databaseLinkId4` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `preprocessMacros5` int(11) DEFAULT '0',
   `dbQuery5` text,
   `placeholderParams5` text,
-  `databaseLinkId5` char(22) binary NOT NULL,
-  `assetId` char(22) binary NOT NULL,
-  `templateId` char(22) binary NOT NULL,
+  `databaseLinkId5` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `templateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
   `cacheTimeout` int(11) NOT NULL DEFAULT '0',
   `prequeryStatements1` text,
@@ -1002,55 +1071,60 @@ CREATE TABLE `SQLReport` (
   `prequeryStatements5` text,
   `downloadType` char(255) DEFAULT NULL,
   `downloadFilename` char(255) DEFAULT NULL,
-  `downloadTemplateId` char(22) binary DEFAULT NULL,
+  `downloadTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `downloadMimeType` char(255) DEFAULT NULL,
-  `downloadUserGroup` char(22) binary DEFAULT NULL,
+  `downloadUserGroup` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `Shelf` (
-  `assetId` char(22) binary NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
-  `templateId` char(22) binary NOT NULL DEFAULT 'nFen0xjkZn8WkpM93C9ceQ',
+  `templateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'nFen0xjkZn8WkpM93C9ceQ',
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `Shortcut` (
   `overrideTitle` int(11) NOT NULL DEFAULT '0',
   `overrideDescription` int(11) NOT NULL DEFAULT '0',
   `overrideTemplate` int(11) NOT NULL DEFAULT '0',
   `overrideDisplayTitle` int(11) NOT NULL DEFAULT '0',
-  `overrideTemplateId` char(22) binary NOT NULL,
+  `overrideTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `shortcutByCriteria` int(11) NOT NULL DEFAULT '0',
   `resolveMultiples` char(30) DEFAULT 'mostRecent',
   `shortcutCriteria` text NOT NULL,
-  `assetId` char(22) binary NOT NULL,
-  `templateId` char(22) binary NOT NULL,
-  `shortcutToAssetId` char(22) binary NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `templateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `shortcutToAssetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `disableContentLock` int(11) NOT NULL DEFAULT '0',
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
   `prefFieldsToShow` text,
   `prefFieldsToImport` text,
   `showReloadIcon` tinyint(3) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `Shortcut_overrides` (
-  `assetId` char(22) binary NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `fieldName` char(255) NOT NULL,
   `newValue` text,
   PRIMARY KEY (`assetId`,`fieldName`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `StockData` (
-  `assetId` char(22) binary NOT NULL,
-  `templateId` char(22) binary NOT NULL DEFAULT 'StockListTMPL000000001',
-  `displayTemplateId` char(22) binary NOT NULL DEFAULT 'StockListTMPL000000002',
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `templateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'StockListTMPL000000001',
+  `displayTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'StockListTMPL000000002',
   `defaultStocks` text,
   `source` char(50) DEFAULT 'usa',
   `failover` int(11) DEFAULT '1',
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
   `cacheTimeout` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `Story` (
-  `assetId` char(22) binary NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
   `headline` char(255) DEFAULT NULL,
   `subtitle` char(255) DEFAULT NULL,
@@ -1060,103 +1134,111 @@ CREATE TABLE `Story` (
   `story` mediumtext,
   `photo` longtext,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `StoryArchive` (
-  `assetId` char(22) binary NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
   `storiesPerPage` int(11) DEFAULT NULL,
-  `groupToPost` char(22) binary DEFAULT NULL,
-  `templateId` char(22) binary DEFAULT NULL,
-  `storyTemplateId` char(22) binary DEFAULT NULL,
-  `editStoryTemplateId` char(22) binary DEFAULT NULL,
-  `keywordListTemplateId` char(22) binary DEFAULT NULL,
+  `groupToPost` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `templateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `storyTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `editStoryTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `keywordListTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `archiveAfter` int(11) DEFAULT NULL,
-  `richEditorId` char(22) binary DEFAULT NULL,
-  `approvalWorkflowId` char(22) binary DEFAULT 'pbworkflow000000000003',
+  `richEditorId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `approvalWorkflowId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT 'pbworkflow000000000003',
   `photoWidth` int(11) DEFAULT NULL,
   `storySortOrder` char(22) DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `StoryTopic` (
-  `assetId` char(22) binary NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
   `storiesPer` int(11) DEFAULT NULL,
   `storiesShort` int(11) DEFAULT NULL,
-  `templateId` char(22) binary DEFAULT NULL,
-  `storyTemplateId` char(22) binary DEFAULT NULL,
+  `templateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `storyTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `storySortOrder` char(22) DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `Subscription` (
-  `assetId` char(22) binary NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
-  `templateId` char(22) binary NOT NULL,
+  `templateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `thankYouMessage` mediumtext,
   `price` float NOT NULL DEFAULT '0',
-  `subscriptionGroup` char(22) binary NOT NULL DEFAULT '2',
+  `subscriptionGroup` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '2',
   `duration` char(12) NOT NULL DEFAULT 'Monthly',
   `executeOnSubscription` char(255) DEFAULT NULL,
   `karma` int(6) DEFAULT '0',
   `recurringSubscription` tinyint(1) NOT NULL DEFAULT '1',
-  `redeemSubscriptionCodeTemplateId` char(22) binary NOT NULL,
+  `redeemSubscriptionCodeTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `Subscription_code` (
   `code` char(64) NOT NULL,
-  `batchId` char(22) binary NOT NULL,
+  `batchId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `status` char(10) NOT NULL DEFAULT 'Unused',
   `dateUsed` bigint(20) DEFAULT NULL,
-  `usedBy` char(22) binary DEFAULT NULL,
+  `usedBy` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   PRIMARY KEY (`code`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `Subscription_codeBatch` (
-  `batchId` char(22) binary NOT NULL,
+  `batchId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `name` char(255) DEFAULT NULL,
   `description` mediumtext,
-  `subscriptionId` char(22) binary NOT NULL,
+  `subscriptionId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `expirationDate` bigint(20) NOT NULL,
   `dateCreated` bigint(20) NOT NULL,
   PRIMARY KEY (`batchId`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `Survey` (
-  `groupToTakeSurvey` char(22) binary NOT NULL DEFAULT '2',
-  `groupToEditSurvey` char(22) binary NOT NULL DEFAULT '3',
-  `groupToViewReports` char(22) binary NOT NULL DEFAULT '3',
-  `overviewTemplateId` char(22) binary NOT NULL,
+  `groupToTakeSurvey` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '2',
+  `groupToEditSurvey` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '3',
+  `groupToViewReports` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '3',
+  `overviewTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `maxResponsesPerUser` int(11) NOT NULL DEFAULT '1',
-  `gradebookTemplateId` char(22) binary NOT NULL,
-  `assetId` char(22) binary NOT NULL,
-  `templateId` char(22) binary NOT NULL,
+  `gradebookTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `templateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
-  `surveyEditTemplateId` char(22) binary DEFAULT NULL,
-  `answerEditTemplateId` char(22) binary DEFAULT NULL,
-  `questionEditTemplateId` char(22) binary DEFAULT NULL,
-  `sectionEditTemplateId` char(22) binary DEFAULT NULL,
-  `surveyTakeTemplateId` char(22) binary DEFAULT NULL,
-  `surveyQuestionsId` char(22) binary DEFAULT NULL,
+  `surveyEditTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `answerEditTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `questionEditTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `sectionEditTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `surveyTakeTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `surveyQuestionsId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `exitURL` text,
   `surveyJSON` longtext,
   `timeLimit` mediumint(8) unsigned NOT NULL,
   `showProgress` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `showTimeLimit` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  `doAfterTimeLimit` char(22) binary DEFAULT NULL,
-  `onSurveyEndWorkflowId` char(22) binary DEFAULT NULL,
+  `doAfterTimeLimit` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `onSurveyEndWorkflowId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `quizModeSummary` tinyint(3) DEFAULT NULL,
-  `surveySummaryTemplateId` char(22) binary DEFAULT NULL,
+  `surveySummaryTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `allowBackBtn` tinyint(3) DEFAULT NULL,
-  `feedbackTemplateId` char(22) binary DEFAULT NULL,
-  `testResultsTemplateId` char(22) binary DEFAULT NULL,
+  `feedbackTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `testResultsTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `Survey_questionTypes` (
   `questionType` char(56) NOT NULL,
   `answers` text NOT NULL,
   PRIMARY KEY (`questionType`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `Survey_response` (
-  `assetId` char(22) binary NOT NULL,
-  `Survey_responseId` char(22) binary NOT NULL,
-  `userId` char(22) binary DEFAULT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `Survey_responseId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `userId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `username` char(255) DEFAULT NULL,
   `ipAddress` char(15) DEFAULT NULL,
   `startDate` bigint(20) NOT NULL DEFAULT '0',
@@ -1166,10 +1248,11 @@ CREATE TABLE `Survey_response` (
   `responseJSON` longtext,
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
   PRIMARY KEY (`Survey_responseId`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `Survey_tempReport` (
-  `assetId` char(22) binary NOT NULL,
-  `Survey_responseId` char(22) binary NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `Survey_responseId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `order` smallint(5) unsigned NOT NULL,
   `sectionNumber` smallint(5) unsigned NOT NULL,
   `sectionName` text,
@@ -1182,12 +1265,13 @@ CREATE TABLE `Survey_tempReport` (
   `entryDate` bigint(20) unsigned NOT NULL COMMENT 'UTC Unix Time',
   `isCorrect` tinyint(3) unsigned DEFAULT NULL,
   `value` int(11) DEFAULT NULL,
-  `fileStoreageId` char(22) binary DEFAULT NULL,
+  `fileStoreageId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   PRIMARY KEY (`assetId`,`Survey_responseId`,`order`),
   KEY `assetId` (`assetId`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `Survey_test` (
-  `testId` char(22) binary NOT NULL,
+  `testId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `sequenceNumber` int(11) NOT NULL DEFAULT '1',
   `dateCreated` datetime DEFAULT NULL,
   `lastUpdated` datetime DEFAULT NULL,
@@ -1196,94 +1280,104 @@ CREATE TABLE `Survey_test` (
   `test` mediumtext NOT NULL,
   PRIMARY KEY (`testId`),
   KEY `assetId` (`assetId`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `SyndicatedContent` (
   `rssUrl` text,
   `maxHeadlines` int(11) NOT NULL DEFAULT '0',
-  `assetId` char(22) binary NOT NULL,
-  `templateId` char(22) binary NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `templateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
   `hasTerms` char(255) NOT NULL,
   `cacheTimeout` int(11) NOT NULL DEFAULT '3600',
   `processMacroInRssUrl` int(11) DEFAULT '0',
   `sortItems` char(255) DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `TT_projectList` (
-  `projectId` char(22) binary NOT NULL,
-  `assetId` char(22) binary DEFAULT NULL,
+  `projectId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `projectName` char(255) NOT NULL,
   `creationDate` bigint(20) NOT NULL,
-  `createdBy` char(22) binary NOT NULL,
-  `lastUpdatedBy` char(22) binary NOT NULL,
+  `createdBy` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `lastUpdatedBy` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `lastUpdateDate` bigint(20) NOT NULL,
   PRIMARY KEY (`projectId`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `TT_projectResourceList` (
-  `projectId` char(22) binary NOT NULL,
-  `resourceId` char(22) binary NOT NULL,
+  `projectId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `resourceId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   PRIMARY KEY (`projectId`,`resourceId`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `TT_projectTasks` (
-  `taskId` char(22) binary NOT NULL,
-  `projectId` char(22) binary NOT NULL,
+  `taskId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `projectId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `taskName` char(255) NOT NULL,
   PRIMARY KEY (`taskId`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `TT_report` (
-  `reportId` char(22) binary NOT NULL,
-  `assetId` char(22) binary NOT NULL,
+  `reportId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `startDate` char(10) NOT NULL,
   `endDate` char(10) NOT NULL,
   `reportComplete` int(11) NOT NULL DEFAULT '0',
-  `resourceId` char(22) binary NOT NULL,
+  `resourceId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `creationDate` bigint(20) NOT NULL,
-  `createdBy` char(22) binary NOT NULL,
-  `lastUpdatedBy` char(22) binary NOT NULL,
+  `createdBy` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `lastUpdatedBy` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `lastUpdateDate` bigint(20) NOT NULL
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `TT_timeEntry` (
-  `entryId` char(22) binary NOT NULL,
-  `projectId` char(22) binary NOT NULL,
-  `taskId` char(22) binary NOT NULL,
+  `entryId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `projectId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `taskId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `taskDate` char(10) NOT NULL,
   `hours` float DEFAULT '0',
   `comments` text,
-  `reportId` char(22) binary NOT NULL,
+  `reportId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   PRIMARY KEY (`entryId`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `TT_wobject` (
-  `assetId` char(22) binary NOT NULL,
-  `userViewTemplateId` char(22) binary NOT NULL DEFAULT 'TimeTrackingTMPL000001',
-  `managerViewTemplateId` char(22) binary NOT NULL DEFAULT 'TimeTrackingTMPL000002',
-  `timeRowTemplateId` char(22) binary NOT NULL DEFAULT 'TimeTrackingTMPL000003',
-  `pmAssetId` char(22) binary DEFAULT NULL,
-  `groupToManage` char(22) binary NOT NULL DEFAULT '3',
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `userViewTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'TimeTrackingTMPL000001',
+  `managerViewTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'TimeTrackingTMPL000002',
+  `timeRowTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'TimeTrackingTMPL000003',
+  `pmAssetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `groupToManage` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '3',
   `revisionDate` bigint(20) NOT NULL,
   `pmIntegration` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `Thingy` (
-  `assetId` char(22) binary NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
-  `templateId` char(22) binary NOT NULL,
-  `defaultThingId` char(22) binary DEFAULT NULL,
+  `templateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `defaultThingId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `ThingyRecord` (
-  `assetId` char(22) binary NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
-  `templateIdView` char(22) binary DEFAULT NULL,
-  `thingId` char(22) binary DEFAULT NULL,
+  `templateIdView` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `thingId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `thingFields` longtext,
   `thankYouText` longtext,
   `price` float DEFAULT NULL,
   `duration` bigint(20) DEFAULT NULL,
   `fieldPrice` longtext,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `ThingyRecord_record` (
-  `recordId` char(22) binary NOT NULL,
+  `recordId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `sequenceNumber` int(11) NOT NULL DEFAULT '1',
   `dateCreated` datetime DEFAULT NULL,
   `lastUpdated` datetime DEFAULT NULL,
@@ -1295,16 +1389,17 @@ CREATE TABLE `ThingyRecord_record` (
   `isHidden` tinyint(1) NOT NULL DEFAULT '0',
   `sentExpiresNotice` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`recordId`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `Thingy_fields` (
-  `assetId` char(22) binary NOT NULL,
-  `thingId` char(22) binary NOT NULL,
-  `fieldId` char(22) binary NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `thingId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `fieldId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `sequenceNumber` int(11) NOT NULL,
   `dateCreated` bigint(20) NOT NULL,
-  `createdBy` char(22) binary NOT NULL,
+  `createdBy` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `dateUpdated` bigint(20) NOT NULL,
-  `updatedBy` char(22) binary NOT NULL,
+  `updatedBy` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `label` char(255) NOT NULL,
   `fieldType` char(255) NOT NULL,
   `defaultValue` longtext,
@@ -1319,69 +1414,73 @@ CREATE TABLE `Thingy_fields` (
   `viewScreenTitle` int(11) DEFAULT NULL,
   `displayInSearch` int(11) DEFAULT NULL,
   `searchIn` int(11) DEFAULT NULL,
-  `fieldInOtherThingId` char(22) binary DEFAULT NULL,
+  `fieldInOtherThingId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `size` int(11) DEFAULT NULL,
   `pretext` char(255) DEFAULT NULL,
   `isUnique` int(1) DEFAULT '0',
   PRIMARY KEY (`fieldId`,`thingId`,`assetId`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `Thingy_things` (
-  `assetId` char(22) binary NOT NULL,
-  `thingId` char(22) binary NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `thingId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `label` char(255) NOT NULL,
   `editScreenTitle` char(255) NOT NULL,
   `editInstructions` text,
-  `groupIdAdd` char(22) binary NOT NULL,
-  `groupIdEdit` char(22) binary NOT NULL,
+  `groupIdAdd` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `groupIdEdit` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `saveButtonLabel` char(255) NOT NULL,
   `afterSave` char(255) NOT NULL,
-  `editTemplateId` char(22) binary NOT NULL,
-  `onAddWorkflowId` char(22) binary DEFAULT NULL,
-  `onEditWorkflowId` char(22) binary DEFAULT NULL,
-  `onDeleteWorkflowId` char(22) binary DEFAULT NULL,
-  `groupIdView` char(22) binary NOT NULL,
-  `viewTemplateId` char(22) binary NOT NULL,
+  `editTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `onAddWorkflowId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `onEditWorkflowId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `onDeleteWorkflowId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `groupIdView` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `viewTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `defaultView` char(255) NOT NULL,
   `searchScreenTitle` char(255) NOT NULL,
   `searchDescription` text,
-  `groupIdSearch` char(22) binary NOT NULL,
-  `groupIdImport` char(22) binary NOT NULL,
-  `groupIdExport` char(22) binary NOT NULL,
-  `searchTemplateId` char(22) binary NOT NULL,
+  `groupIdSearch` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `groupIdImport` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `groupIdExport` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `searchTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `thingsPerPage` int(11) NOT NULL DEFAULT '25',
-  `sortBy` char(22) binary DEFAULT NULL,
+  `sortBy` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `display` int(11) DEFAULT NULL,
   `exportMetaData` int(11) DEFAULT NULL,
   `maxEntriesPerUser` int(11) DEFAULT NULL,
   `maxEntriesTotal` int(11) DEFAULT NULL,
   PRIMARY KEY (`thingId`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `Thread` (
-  `assetId` char(22) binary NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `replies` int(11) NOT NULL DEFAULT '0',
-  `lastPostId` char(22) binary NOT NULL,
+  `lastPostId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `lastPostDate` bigint(20) DEFAULT NULL,
   `isLocked` int(11) NOT NULL DEFAULT '0',
   `isSticky` int(11) NOT NULL DEFAULT '0',
-  `subscriptionGroupId` char(22) binary NOT NULL,
+  `subscriptionGroupId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
   `karma` int(11) NOT NULL DEFAULT '0',
   `karmaScale` int(11) NOT NULL DEFAULT '1',
   `karmaRank` float(11,6) DEFAULT NULL,
   `threadRating` int(11) DEFAULT '0',
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `Thread_read` (
-  `threadId` char(22) binary NOT NULL,
-  `userId` char(22) binary NOT NULL,
+  `threadId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `userId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   KEY `threadId_userId` (`threadId`,`userId`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `UserList` (
-  `assetId` char(22) binary NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
-  `templateId` char(22) binary DEFAULT NULL,
-  `showGroupId` char(22) binary DEFAULT NULL,
-  `hideGroupId` char(22) binary DEFAULT NULL,
+  `templateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `showGroupId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `hideGroupId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `usersPerPage` int(11) DEFAULT NULL,
   `alphabet` text,
   `alphabetSearchField` char(128) DEFAULT NULL,
@@ -1391,92 +1490,100 @@ CREATE TABLE `UserList` (
   `overridePublicEmail` int(11) DEFAULT NULL,
   `overridePublicProfile` int(11) DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `WeatherData` (
-  `assetId` char(22) binary NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `revisionDate` bigint(20) unsigned NOT NULL DEFAULT '0',
-  `templateId` char(22) binary NOT NULL DEFAULT 'WeatherDataTmpl0000001',
+  `templateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'WeatherDataTmpl0000001',
   `locations` text,
   `partnerId` char(100) DEFAULT NULL,
   `licenseKey` char(100) DEFAULT NULL,
   `cacheTimeout` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `WikiMaster` (
-  `assetId` char(22) binary NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
-  `groupToEditPages` char(22) binary NOT NULL DEFAULT '2',
-  `groupToAdminister` char(22) binary NOT NULL DEFAULT '3',
-  `richEditor` char(22) binary NOT NULL DEFAULT 'PBrichedit000000000002',
-  `frontPageTemplateId` char(22) binary NOT NULL DEFAULT 'WikiFrontTmpl000000001',
-  `pageTemplateId` char(22) binary NOT NULL DEFAULT 'WikiPageTmpl0000000001',
-  `pageEditTemplateId` char(22) binary NOT NULL DEFAULT 'WikiPageEditTmpl000001',
-  `recentChangesTemplateId` char(22) binary NOT NULL DEFAULT 'WikiRCTmpl000000000001',
-  `mostPopularTemplateId` char(22) binary NOT NULL DEFAULT 'WikiMPTmpl000000000001',
-  `pageHistoryTemplateId` char(22) binary NOT NULL DEFAULT 'WikiPHTmpl000000000001',
-  `searchTemplateId` char(22) binary NOT NULL DEFAULT 'WikiSearchTmpl00000001',
+  `groupToEditPages` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '2',
+  `groupToAdminister` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '3',
+  `richEditor` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'PBrichedit000000000002',
+  `frontPageTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'WikiFrontTmpl000000001',
+  `pageTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'WikiPageTmpl0000000001',
+  `pageEditTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'WikiPageEditTmpl000001',
+  `recentChangesTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'WikiRCTmpl000000000001',
+  `mostPopularTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'WikiMPTmpl000000000001',
+  `pageHistoryTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'WikiPHTmpl000000000001',
+  `searchTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'WikiSearchTmpl00000001',
   `recentChangesCount` int(11) NOT NULL DEFAULT '50',
   `recentChangesCountFront` int(11) NOT NULL DEFAULT '10',
   `mostPopularCount` int(11) NOT NULL DEFAULT '50',
   `mostPopularCountFront` int(11) NOT NULL DEFAULT '10',
   `thumbnailSize` int(11) NOT NULL DEFAULT '0',
   `maxImageSize` int(11) NOT NULL DEFAULT '0',
-  `approvalWorkflow` char(22) binary NOT NULL DEFAULT 'pbworkflow000000000003',
+  `approvalWorkflow` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'pbworkflow000000000003',
   `useContentFilter` int(11) DEFAULT '0',
   `filterCode` char(30) DEFAULT 'javascript',
-  `byKeywordTemplateId` char(22) binary NOT NULL DEFAULT 'WikiKeyword00000000001',
+  `byKeywordTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'WikiKeyword00000000001',
   `allowAttachments` int(11) NOT NULL DEFAULT '0',
   `topLevelKeywords` longtext,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `WikiMasterKeywords` (
-  `assetId` char(22) binary NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `keyword` char(64) NOT NULL,
   `subKeyword` char(64) NOT NULL DEFAULT '',
   PRIMARY KEY (`assetId`,`keyword`,`subKeyword`),
   KEY `assetId` (`assetId`),
   KEY `keyword` (`keyword`),
   KEY `subKeyword` (`subKeyword`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `WikiPage` (
-  `assetId` char(22) binary NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
   `content` mediumtext,
   `views` bigint(20) NOT NULL DEFAULT '0',
   `isProtected` int(11) NOT NULL DEFAULT '0',
   `actionTaken` char(35) NOT NULL,
-  `actionTakenBy` char(22) binary NOT NULL,
+  `actionTakenBy` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `isFeatured` int(1) DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `Workflow` (
-  `workflowId` char(22) binary NOT NULL,
+  `workflowId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `title` char(255) NOT NULL DEFAULT 'Untitled',
   `description` text,
   `enabled` int(11) NOT NULL DEFAULT '0',
   `type` char(255) NOT NULL DEFAULT 'None',
   `mode` char(20) NOT NULL DEFAULT 'parallel',
   PRIMARY KEY (`workflowId`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `WorkflowActivity` (
-  `activityId` char(22) binary NOT NULL,
-  `workflowId` char(22) binary NOT NULL,
+  `activityId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `workflowId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `title` char(255) NOT NULL DEFAULT 'Untitled',
   `description` text,
   `sequenceNumber` int(11) NOT NULL DEFAULT '1',
   `className` char(255) DEFAULT NULL,
   PRIMARY KEY (`activityId`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `WorkflowActivityData` (
-  `activityId` char(22) binary NOT NULL,
+  `activityId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `name` char(255) NOT NULL,
   `value` text,
   PRIMARY KEY (`activityId`,`name`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `WorkflowInstance` (
-  `instanceId` char(22) binary NOT NULL,
-  `workflowId` char(22) binary NOT NULL,
-  `currentActivityId` char(22) binary NOT NULL,
+  `instanceId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `workflowId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `currentActivityId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `priority` int(11) NOT NULL DEFAULT '2',
   `className` char(255) DEFAULT NULL,
   `methodName` char(255) DEFAULT NULL,
@@ -1486,15 +1593,17 @@ CREATE TABLE `WorkflowInstance` (
   `lastStatus` char(15) DEFAULT NULL,
   `noSession` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`instanceId`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `WorkflowInstanceScratch` (
-  `instanceId` char(22) binary NOT NULL,
+  `instanceId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `name` char(255) NOT NULL,
   `value` text,
   PRIMARY KEY (`instanceId`,`name`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `WorkflowSchedule` (
-  `taskId` char(22) binary NOT NULL,
+  `taskId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `title` char(255) NOT NULL DEFAULT 'Untitled',
   `enabled` int(11) NOT NULL DEFAULT '0',
   `runOnce` int(11) NOT NULL DEFAULT '0',
@@ -1503,22 +1612,24 @@ CREATE TABLE `WorkflowSchedule` (
   `dayOfMonth` char(255) NOT NULL DEFAULT '*',
   `monthOfYear` char(255) NOT NULL DEFAULT '*',
   `dayOfWeek` char(255) NOT NULL DEFAULT '*',
-  `workflowId` char(22) binary NOT NULL,
+  `workflowId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `className` char(255) DEFAULT NULL,
   `methodName` char(255) DEFAULT NULL,
   `priority` int(11) NOT NULL DEFAULT '2',
   `parameters` longtext,
   PRIMARY KEY (`taskId`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `ZipArchiveAsset` (
-  `assetId` char(22) binary NOT NULL,
-  `templateId` char(22) binary NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `templateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `showPage` char(255) NOT NULL DEFAULT 'index.html',
   `revisionDate` bigint(20) NOT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `adSkuPurchase` (
-  `adSkuPurchaseId` char(22) binary NOT NULL,
+  `adSkuPurchaseId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `sequenceNumber` int(11) NOT NULL DEFAULT '1',
   `dateCreated` datetime DEFAULT NULL,
   `lastUpdated` datetime DEFAULT NULL,
@@ -1526,14 +1637,15 @@ CREATE TABLE `adSkuPurchase` (
   `clicksPurchased` bigint(20) DEFAULT NULL,
   `dateOfPurchase` bigint(20) DEFAULT NULL,
   `impressionsPurchased` bigint(20) DEFAULT NULL,
-  `transactionItemId` char(22) binary DEFAULT NULL,
-  `userId` char(22) binary DEFAULT NULL,
-  `adId` char(22) binary DEFAULT NULL,
-  `storedImage` char(22) binary DEFAULT NULL,
+  `transactionItemId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `userId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `adId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `storedImage` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   PRIMARY KEY (`adSkuPurchaseId`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `adSpace` (
-  `adSpaceId` char(22) binary NOT NULL,
+  `adSpaceId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `name` char(35) NOT NULL,
   `title` char(255) NOT NULL,
   `description` text,
@@ -1543,10 +1655,11 @@ CREATE TABLE `adSpace` (
   `height` int(11) NOT NULL DEFAULT '60',
   PRIMARY KEY (`adSpaceId`),
   UNIQUE KEY `name` (`name`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `address` (
-  `addressId` char(22) binary NOT NULL,
-  `addressBookId` char(22) binary NOT NULL,
+  `addressId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `addressBookId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `label` char(35) DEFAULT NULL,
   `firstName` char(35) DEFAULT NULL,
   `lastName` char(35) DEFAULT NULL,
@@ -1563,21 +1676,23 @@ CREATE TABLE `address` (
   `isProfile` tinyint(4) DEFAULT '0',
   PRIMARY KEY (`addressId`),
   KEY `addressBookId_addressId` (`addressBookId`,`addressId`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `addressBook` (
-  `addressBookId` char(22) binary NOT NULL,
-  `userId` char(22) binary DEFAULT NULL,
-  `defaultAddressId` char(22) binary DEFAULT NULL,
+  `addressBookId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `userId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `defaultAddressId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   PRIMARY KEY (`addressBookId`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `advertisement` (
-  `adId` char(22) binary NOT NULL,
-  `adSpaceId` char(22) binary NOT NULL,
-  `ownerUserId` char(22) binary NOT NULL,
+  `adId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `adSpaceId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `ownerUserId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `isActive` int(11) NOT NULL DEFAULT '0',
   `title` char(255) NOT NULL,
   `type` char(15) NOT NULL DEFAULT 'text',
-  `storageId` char(22) binary DEFAULT NULL,
+  `storageId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `adText` char(255) DEFAULT NULL,
   `url` text,
   `richMedia` text,
@@ -1593,27 +1708,29 @@ CREATE TABLE `advertisement` (
   `renderedAd` text,
   PRIMARY KEY (`adId`),
   KEY `adSpaceId_isActive` (`adSpaceId`,`isActive`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `analyticRule` (
-  `ruleId` char(22) binary NOT NULL,
+  `ruleId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `sequenceNumber` int(11) NOT NULL DEFAULT '1',
   `dateCreated` datetime DEFAULT NULL,
   `lastUpdated` datetime DEFAULT NULL,
   `bucketName` char(255) DEFAULT NULL,
   `regexp` char(255) NOT NULL DEFAULT '.+',
   PRIMARY KEY (`ruleId`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `asset` (
-  `assetId` char(22) binary NOT NULL,
-  `parentId` char(22) binary NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `parentId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `lineage` char(255) NOT NULL,
   `state` char(35) NOT NULL,
   `className` char(255) NOT NULL,
   `creationDate` bigint(20) NOT NULL DEFAULT '997995720',
-  `createdBy` char(22) binary NOT NULL DEFAULT '3',
-  `stateChanged` char(22) binary NOT NULL DEFAULT '997995720',
-  `stateChangedBy` char(22) binary NOT NULL DEFAULT '3',
-  `isLockedBy` char(22) binary DEFAULT NULL,
+  `createdBy` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '3',
+  `stateChanged` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '997995720',
+  `stateChangedBy` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '3',
+  `isLockedBy` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `isSystem` int(11) NOT NULL DEFAULT '0',
   `lastExportedAs` char(255) DEFAULT NULL,
   PRIMARY KEY (`assetId`),
@@ -1623,46 +1740,50 @@ CREATE TABLE `asset` (
   KEY `isPrototype_className_assetId` (`className`,`assetId`),
   KEY `className_assetId_state` (`className`,`assetId`,`state`),
   KEY `state_lineage` (`state`,`lineage`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `assetAspectComments` (
-  `assetId` char(22) binary NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
   `comments` longtext,
   `averageCommentRating` int(11) DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `assetAspectRssFeed` (
-  `assetId` char(22) binary NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
   `itemsPerFeed` int(11) DEFAULT '25',
   `feedCopyright` text,
   `feedTitle` text,
   `feedDescription` mediumtext,
-  `feedImage` char(22) binary DEFAULT NULL,
+  `feedImage` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `feedImageLink` text,
   `feedImageDescription` mediumtext,
   `feedHeaderLinks` char(32) DEFAULT 'rss\natom',
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `assetAspect_Subscribable` (
-  `assetId` char(22) binary NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
-  `subscriptionGroupId` char(22) binary DEFAULT NULL,
-  `subscriptionTemplateId` char(22) binary DEFAULT NULL,
+  `subscriptionGroupId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `subscriptionTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `assetData` (
-  `assetId` char(22) binary NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
-  `revisedBy` char(22) binary NOT NULL,
-  `tagId` char(22) binary NOT NULL,
+  `revisedBy` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `tagId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `status` char(35) NOT NULL DEFAULT 'pending',
   `title` char(255) NOT NULL DEFAULT 'untitled',
   `menuTitle` char(255) NOT NULL DEFAULT 'untitled',
   `url` char(255) NOT NULL,
-  `ownerUserId` char(22) binary NOT NULL,
-  `groupIdView` char(22) binary NOT NULL,
-  `groupIdEdit` char(22) binary NOT NULL,
+  `ownerUserId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `groupIdView` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `groupIdEdit` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `synopsis` text,
   `newWindow` int(11) NOT NULL DEFAULT '0',
   `isHidden` int(11) NOT NULL DEFAULT '0',
@@ -1683,71 +1804,78 @@ CREATE TABLE `assetData` (
   KEY `url` (`url`),
   KEY `assetId_status_tagId_revisionDate` (`assetId`,`status`,`tagId`,`revisionDate`),
   KEY `assetId_status` (`assetId`,`status`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `assetHistory` (
-  `assetId` char(22) binary NOT NULL,
-  `userId` char(22) binary NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `userId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `dateStamp` bigint(20) NOT NULL DEFAULT '0',
   `actionTaken` char(255) NOT NULL,
   `url` char(255) DEFAULT NULL
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `assetIndex` (
-  `assetId` char(22) binary NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `title` char(255) DEFAULT NULL,
   `synopsis` text,
   `url` char(255) NOT NULL DEFAULT '',
   `creationDate` bigint(20) DEFAULT NULL,
   `revisionDate` bigint(20) DEFAULT NULL,
-  `ownerUserId` char(22) binary DEFAULT NULL,
-  `groupIdView` char(22) binary DEFAULT NULL,
-  `groupIdEdit` char(22) binary DEFAULT NULL,
+  `ownerUserId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `groupIdView` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `groupIdEdit` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `className` char(255) DEFAULT NULL,
   `isPublic` int(11) NOT NULL DEFAULT '1',
   `keywords` mediumtext,
   `lineage` char(255) DEFAULT NULL,
-  `subId` char(255) binary DEFAULT NULL,
+  `subId` char(255) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   PRIMARY KEY (`assetId`,`url`),
   FULLTEXT KEY `keywords` (`keywords`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `assetKeyword` (
   `keyword` char(64) NOT NULL,
-  `assetId` char(22) binary NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   PRIMARY KEY (`keyword`,`assetId`),
   KEY `keyword` (`keyword`),
   KEY `assetId` (`assetId`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `assetVersionTag` (
-  `tagId` char(22) binary NOT NULL,
+  `tagId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `name` char(255) NOT NULL,
   `isCommitted` int(11) NOT NULL DEFAULT '0',
   `creationDate` bigint(20) NOT NULL DEFAULT '0',
-  `createdBy` char(22) binary NOT NULL,
+  `createdBy` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `commitDate` bigint(20) NOT NULL DEFAULT '0',
-  `committedBy` char(22) binary NOT NULL,
+  `committedBy` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `isLocked` int(11) NOT NULL DEFAULT '0',
-  `lockedBy` char(22) binary NOT NULL,
-  `groupToUse` char(22) binary NOT NULL,
-  `workflowId` char(22) binary NOT NULL,
-  `workflowInstanceId` char(22) binary DEFAULT NULL,
+  `lockedBy` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `groupToUse` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `workflowId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `workflowInstanceId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `comments` text,
   `startTime` datetime DEFAULT NULL,
   `endTime` datetime DEFAULT NULL,
   `isSiteWide` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`tagId`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `authentication` (
-  `userId` char(22) binary NOT NULL,
+  `userId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `authMethod` char(30) NOT NULL,
   `fieldName` char(128) NOT NULL,
   `fieldData` text,
   PRIMARY KEY (`userId`,`authMethod`,`fieldName`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `bucketLog` (
-  `userId` char(22) binary NOT NULL,
-  `Bucket` char(22) binary NOT NULL,
+  `userId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `Bucket` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `duration` int(11) DEFAULT NULL,
   `timeStamp` datetime DEFAULT NULL
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `cache` (
   `namespace` char(128) NOT NULL,
   `cachekey` char(128) NOT NULL,
@@ -1756,33 +1884,36 @@ CREATE TABLE `cache` (
   `content` mediumblob,
   PRIMARY KEY (`namespace`,`cachekey`),
   KEY `namespace_cachekey_size` (`namespace`,`cachekey`,`expires`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `cart` (
-  `cartId` char(22) binary NOT NULL,
-  `sessionId` char(22) binary NOT NULL,
-  `shippingAddressId` char(22) binary DEFAULT NULL,
-  `shipperId` char(22) binary DEFAULT NULL,
-  `posUserId` char(22) binary DEFAULT NULL,
+  `cartId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `sessionId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `shippingAddressId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `shipperId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `posUserId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `creationDate` int(20) DEFAULT NULL,
   `billingAddressId` char(22) DEFAULT NULL,
   `gatewayId` char(22) DEFAULT NULL,
   PRIMARY KEY (`cartId`),
   KEY `sessionId` (`sessionId`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `cartItem` (
-  `itemId` char(22) binary NOT NULL,
-  `cartId` char(22) binary NOT NULL,
-  `assetId` char(22) binary NOT NULL,
+  `itemId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `cartId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `dateAdded` datetime NOT NULL,
   `options` longtext,
   `configuredTitle` char(255) DEFAULT NULL,
-  `shippingAddressId` char(22) binary DEFAULT NULL,
+  `shippingAddressId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `quantity` int(11) NOT NULL DEFAULT '1',
   PRIMARY KEY (`itemId`),
   KEY `cartId_assetId_dateAdded` (`cartId`,`assetId`,`dateAdded`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `databaseLink` (
-  `databaseLinkId` char(22) binary NOT NULL,
+  `databaseLinkId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `title` char(255) DEFAULT NULL,
   `DSN` char(255) DEFAULT NULL,
   `username` char(255) DEFAULT NULL,
@@ -1791,24 +1922,27 @@ CREATE TABLE `databaseLink` (
   `allowMacroAccess` int(11) NOT NULL DEFAULT '0',
   `additionalParameters` char(255) NOT NULL,
   PRIMARY KEY (`databaseLinkId`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `deltaLog` (
-  `userId` char(22) binary NOT NULL,
-  `assetId` char(22) binary NOT NULL,
+  `userId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `delta` int(11) DEFAULT NULL,
   `timeStamp` bigint(20) DEFAULT NULL,
   `url` char(255) NOT NULL
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `donation` (
-  `assetId` char(22) binary NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
   `defaultPrice` float NOT NULL DEFAULT '100',
   `thankYouMessage` mediumtext,
-  `templateId` char(22) binary NOT NULL,
+  `templateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `filePumpBundle` (
-  `bundleId` char(22) binary NOT NULL,
+  `bundleId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `sequenceNumber` int(11) NOT NULL DEFAULT '1',
   `dateCreated` datetime DEFAULT NULL,
   `lastUpdated` datetime DEFAULT NULL,
@@ -1819,32 +1953,36 @@ CREATE TABLE `filePumpBundle` (
   `cssFiles` longtext NOT NULL,
   `otherFiles` longtext NOT NULL,
   PRIMARY KEY (`bundleId`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `friendInvitations` (
-  `inviteId` char(22) binary NOT NULL,
-  `inviterId` char(22) binary NOT NULL,
-  `friendId` char(22) binary NOT NULL,
+  `inviteId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `inviterId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `friendId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `dateSent` datetime NOT NULL,
   `comments` char(255) NOT NULL,
-  `messageId` char(22) binary NOT NULL,
+  `messageId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   PRIMARY KEY (`inviteId`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `groupGroupings` (
-  `groupId` char(22) binary NOT NULL,
-  `inGroup` char(22) binary NOT NULL,
+  `groupId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `inGroup` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   PRIMARY KEY (`groupId`,`inGroup`),
   KEY `inGroup` (`inGroup`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `groupings` (
-  `groupId` char(22) binary NOT NULL,
-  `userId` char(22) binary NOT NULL,
+  `groupId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `userId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `expireDate` bigint(20) NOT NULL DEFAULT '2114402400',
   `groupAdmin` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`groupId`,`userId`),
   KEY `userId` (`userId`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `groups` (
-  `groupId` char(22) binary NOT NULL,
+  `groupId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `groupName` char(100) DEFAULT NULL,
   `description` char(255) DEFAULT NULL,
   `expireOffset` int(11) NOT NULL DEFAULT '314496000',
@@ -1859,7 +1997,7 @@ CREATE TABLE `groups` (
   `scratchFilter` text,
   `autoAdd` int(11) NOT NULL DEFAULT '0',
   `autoDelete` int(11) NOT NULL DEFAULT '0',
-  `databaseLinkId` char(22) binary NOT NULL,
+  `databaseLinkId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `groupCacheTimeout` int(11) NOT NULL DEFAULT '3600',
   `dbQuery` text,
   `isEditable` int(11) NOT NULL DEFAULT '1',
@@ -1867,78 +2005,87 @@ CREATE TABLE `groups` (
   `ldapGroup` char(255) DEFAULT NULL,
   `ldapGroupProperty` char(255) DEFAULT NULL,
   `ldapRecursiveProperty` char(255) DEFAULT NULL,
-  `ldapLinkId` char(22) binary DEFAULT NULL,
+  `ldapLinkId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `ldapRecursiveFilter` mediumtext,
   `isAdHocMailGroup` tinyint(4) NOT NULL DEFAULT '0',
   PRIMARY KEY (`groupId`),
   KEY `groupName` (`groupName`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `imageColor` (
-  `colorId` char(22) binary NOT NULL,
+  `colorId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `name` char(255) NOT NULL DEFAULT 'untitled',
   `fillTriplet` char(7) NOT NULL DEFAULT '#000000',
   `fillAlpha` char(2) NOT NULL DEFAULT '00',
   `strokeTriplet` char(7) NOT NULL DEFAULT '#000000',
   `strokeAlpha` char(2) NOT NULL DEFAULT '00',
   PRIMARY KEY (`colorId`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `imageFont` (
-  `fontId` char(22) binary NOT NULL,
+  `fontId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `name` char(255) DEFAULT NULL,
-  `storageId` char(22) binary DEFAULT NULL,
+  `storageId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `filename` char(255) DEFAULT NULL,
   PRIMARY KEY (`fontId`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `imagePalette` (
-  `paletteId` char(22) binary NOT NULL,
+  `paletteId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `name` char(255) NOT NULL DEFAULT 'untitled',
   PRIMARY KEY (`paletteId`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `imagePaletteColors` (
-  `paletteId` char(22) binary NOT NULL,
-  `colorId` char(22) binary NOT NULL,
+  `paletteId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `colorId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `paletteOrder` int(11) NOT NULL,
   PRIMARY KEY (`paletteId`,`paletteOrder`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `inbox` (
-  `messageId` char(22) binary NOT NULL,
+  `messageId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `status` char(15) NOT NULL DEFAULT 'pending',
   `dateStamp` bigint(20) NOT NULL,
   `completedOn` bigint(20) DEFAULT NULL,
-  `completedBy` char(22) binary DEFAULT NULL,
-  `userId` char(22) binary DEFAULT NULL,
-  `groupId` char(22) binary DEFAULT NULL,
+  `completedBy` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `userId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `groupId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `subject` char(255) NOT NULL DEFAULT 'No Subject',
   `message` mediumtext,
-  `sentBy` char(22) binary NOT NULL DEFAULT '3',
+  `sentBy` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '3',
   PRIMARY KEY (`messageId`),
   KEY `completedOn_dateStamp` (`completedOn`,`dateStamp`),
   KEY `pb_userId` (`userId`),
   KEY `pb_groupId` (`groupId`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `inbox_messageState` (
-  `messageId` char(22) binary NOT NULL,
-  `userId` char(22) binary NOT NULL,
+  `messageId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `userId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `isRead` tinyint(4) NOT NULL DEFAULT '0',
   `repliedTo` tinyint(4) NOT NULL DEFAULT '0',
   `deleted` tinyint(4) NOT NULL DEFAULT '0',
   PRIMARY KEY (`messageId`,`userId`),
   KEY `userId_deleted_isRead` (`userId`,`deleted`,`isRead`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `incrementer` (
   `incrementerId` char(50) NOT NULL,
   `nextValue` int(11) NOT NULL DEFAULT '1',
   PRIMARY KEY (`incrementerId`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `karmaLog` (
-  `userId` char(22) binary NOT NULL,
+  `userId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `amount` int(11) NOT NULL DEFAULT '1',
   `source` char(255) DEFAULT NULL,
   `description` text,
   `dateModified` bigint(20) NOT NULL DEFAULT '0'
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `ldapLink` (
-  `ldapLinkId` char(22) binary NOT NULL,
+  `ldapLinkId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `ldapLinkName` char(255) NOT NULL,
   `ldapUrl` char(255) NOT NULL,
   `connectDn` char(255) NOT NULL,
@@ -1949,26 +2096,29 @@ CREATE TABLE `ldapLink` (
   `ldapPasswordName` char(255) DEFAULT NULL,
   `ldapSendWelcomeMessage` char(2) DEFAULT NULL,
   `ldapWelcomeMessage` text,
-  `ldapAccountTemplate` char(22) binary NOT NULL,
-  `ldapCreateAccountTemplate` char(22) binary NOT NULL,
-  `ldapLoginTemplate` char(22) binary NOT NULL,
+  `ldapAccountTemplate` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `ldapCreateAccountTemplate` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `ldapLoginTemplate` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `ldapGlobalRecursiveFilter` mediumtext,
   `ldapDeactivateAccountTemplate` char(22) NOT NULL,
   PRIMARY KEY (`ldapLinkId`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `mailQueue` (
-  `messageId` char(22) binary NOT NULL,
+  `messageId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `message` mediumtext,
-  `toGroup` char(22) binary DEFAULT NULL,
+  `toGroup` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `isInbox` tinyint(4) DEFAULT '0',
   PRIMARY KEY (`messageId`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `metaData_classes` (
   `className` char(255) DEFAULT NULL,
   `fieldId` char(22) DEFAULT NULL
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `metaData_properties` (
-  `fieldId` char(22) binary NOT NULL,
+  `fieldId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `fieldName` char(100) NOT NULL,
   `description` mediumtext NOT NULL,
   `fieldType` char(30) DEFAULT NULL,
@@ -1976,97 +2126,110 @@ CREATE TABLE `metaData_properties` (
   `defaultValue` char(255) DEFAULT NULL,
   PRIMARY KEY (`fieldId`),
   UNIQUE KEY `field_unique` (`fieldName`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `metaData_values` (
-  `fieldId` char(22) binary NOT NULL,
+  `fieldId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `value` char(255) DEFAULT NULL,
-  `assetId` char(22) binary NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
   PRIMARY KEY (`fieldId`,`assetId`,`revisionDate`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `passiveAnalyticsStatus` (
   `startDate` datetime DEFAULT NULL,
   `endDate` datetime DEFAULT NULL,
   `running` int(2) DEFAULT '0',
   `userId` char(255) NOT NULL
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `passiveLog` (
-  `userId` char(22) binary NOT NULL,
-  `assetId` char(22) binary NOT NULL,
-  `sessionId` char(22) binary NOT NULL,
+  `userId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `sessionId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `timeStamp` bigint(20) DEFAULT NULL,
   `url` char(255) NOT NULL
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `passiveProfileAOI` (
-  `userId` char(22) binary NOT NULL,
-  `fieldId` char(22) binary NOT NULL,
+  `userId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `fieldId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `value` char(100) NOT NULL,
   `count` int(11) DEFAULT NULL,
   PRIMARY KEY (`userId`,`fieldId`,`value`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `passiveProfileLog` (
-  `passiveProfileLogId` char(22) binary NOT NULL,
-  `userId` char(22) binary NOT NULL,
-  `sessionId` char(22) binary NOT NULL,
-  `assetId` char(22) binary NOT NULL,
+  `passiveProfileLogId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `userId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `sessionId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `dateOfEntry` bigint(20) NOT NULL DEFAULT '0',
   PRIMARY KEY (`passiveProfileLogId`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `paymentGateway` (
-  `paymentGatewayId` char(22) binary NOT NULL,
+  `paymentGatewayId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `className` char(255) DEFAULT NULL,
   `options` longtext,
   PRIMARY KEY (`paymentGatewayId`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `redirect` (
-  `assetId` char(22) binary NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `redirectUrl` text,
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
   `redirectType` int(11) NOT NULL DEFAULT '302',
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `replacements` (
-  `replacementId` char(22) binary NOT NULL,
+  `replacementId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `searchFor` char(255) DEFAULT NULL,
   `replaceWith` text,
   PRIMARY KEY (`replacementId`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `search` (
-  `assetId` char(22) binary NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
   `classLimiter` text,
-  `searchRoot` char(22) binary NOT NULL DEFAULT 'PBasset000000000000001',
-  `templateId` char(22) binary NOT NULL DEFAULT 'PBtmpl0000000000000200',
+  `searchRoot` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'PBasset000000000000001',
+  `templateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'PBtmpl0000000000000200',
   `useContainers` int(11) NOT NULL DEFAULT '0',
   `paginateAfter` int(11) NOT NULL DEFAULT '25',
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `settings` (
   `name` char(255) NOT NULL,
   `value` text,
   PRIMARY KEY (`name`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `shipper` (
-  `shipperId` char(22) binary NOT NULL,
+  `shipperId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `className` char(255) DEFAULT NULL,
   `options` longtext,
   PRIMARY KEY (`shipperId`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `shopCredit` (
-  `creditId` char(22) binary NOT NULL,
-  `userId` char(22) binary NOT NULL,
+  `creditId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `userId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `amount` float NOT NULL DEFAULT '0',
   `comment` text,
   `dateOfAdjustment` datetime DEFAULT NULL,
   PRIMARY KEY (`creditId`),
   KEY `userId` (`userId`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `sku` (
-  `assetId` char(22) binary NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
   `description` mediumtext,
   `sku` char(35) NOT NULL,
-  `vendorId` char(22) binary NOT NULL DEFAULT 'defaultvendor000000000',
+  `vendorId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'defaultvendor000000000',
   `displayTitle` tinyint(1) NOT NULL DEFAULT '1',
   `overrideTaxRate` tinyint(1) NOT NULL DEFAULT '0',
   `taxRateOverride` float NOT NULL DEFAULT '0',
@@ -2075,9 +2238,10 @@ CREATE TABLE `sku` (
   PRIMARY KEY (`assetId`,`revisionDate`),
   KEY `sku` (`sku`),
   KEY `vendorId` (`vendorId`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `snippet` (
-  `assetId` char(22) binary NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `snippet` mediumtext,
   `mimeType` char(50) NOT NULL DEFAULT 'text/html',
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
@@ -2086,36 +2250,40 @@ CREATE TABLE `snippet` (
   `usePacked` int(1) DEFAULT NULL,
   `templateParser` char(255) DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `taxDriver` (
   `className` char(255) NOT NULL,
   `options` longtext,
   PRIMARY KEY (`className`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `tax_eu_vatNumbers` (
-  `userId` char(22) binary NOT NULL,
+  `userId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `countryCode` char(3) NOT NULL,
   `vatNumber` char(20) NOT NULL,
   `viesValidated` tinyint(1) DEFAULT NULL,
   `viesErrorCode` int(3) DEFAULT NULL,
   `approved` tinyint(1) DEFAULT NULL,
   PRIMARY KEY (`userId`,`vatNumber`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `tax_generic_rates` (
-  `taxId` char(22) binary NOT NULL,
+  `taxId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `country` char(100) NOT NULL,
   `state` char(100) DEFAULT NULL,
   `city` char(100) DEFAULT NULL,
   `code` char(100) DEFAULT NULL,
   `taxRate` float NOT NULL DEFAULT '0',
   PRIMARY KEY (`taxId`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `template` (
   `template` mediumtext,
   `namespace` char(35) NOT NULL DEFAULT 'Page',
   `isEditable` int(11) NOT NULL DEFAULT '1',
   `showInForms` int(11) NOT NULL DEFAULT '1',
-  `assetId` char(22) binary NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
   `parser` char(255) NOT NULL DEFAULT 'WebGUI::Asset::Template::HTMLTemplate',
   `isDefault` int(1) DEFAULT '0',
@@ -2125,20 +2293,21 @@ CREATE TABLE `template` (
   `attachmentsJson` longtext,
   PRIMARY KEY (`assetId`,`revisionDate`),
   KEY `namespace_showInForms` (`namespace`,`showInForms`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `transaction` (
-  `transactionId` char(22) binary NOT NULL,
-  `originatingTransactionId` char(22) binary DEFAULT NULL,
+  `transactionId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `originatingTransactionId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `isSuccessful` tinyint(1) NOT NULL DEFAULT '0',
   `orderNumber` int(11) NOT NULL AUTO_INCREMENT,
   `transactionCode` char(100) DEFAULT NULL,
   `statusCode` char(35) DEFAULT NULL,
   `statusMessage` char(255) DEFAULT NULL,
-  `userId` char(22) binary NOT NULL,
+  `userId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `username` char(35) NOT NULL,
   `amount` float DEFAULT NULL,
   `shopCreditDeduction` float DEFAULT NULL,
-  `shippingAddressId` char(22) binary DEFAULT NULL,
+  `shippingAddressId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `shippingAddressName` char(35) DEFAULT NULL,
   `shippingAddress1` char(35) DEFAULT NULL,
   `shippingAddress2` char(35) DEFAULT NULL,
@@ -2148,10 +2317,10 @@ CREATE TABLE `transaction` (
   `shippingCountry` char(35) DEFAULT NULL,
   `shippingCode` char(35) DEFAULT NULL,
   `shippingPhoneNumber` char(35) DEFAULT NULL,
-  `shippingDriverId` char(22) binary DEFAULT NULL,
+  `shippingDriverId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `shippingDriverLabel` char(35) DEFAULT NULL,
   `shippingPrice` float DEFAULT NULL,
-  `paymentAddressId` char(22) binary DEFAULT NULL,
+  `paymentAddressId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `paymentAddressName` char(35) DEFAULT NULL,
   `paymentAddress1` char(35) DEFAULT NULL,
   `paymentAddress2` char(35) DEFAULT NULL,
@@ -2161,25 +2330,26 @@ CREATE TABLE `transaction` (
   `paymentCountry` char(35) DEFAULT NULL,
   `paymentCode` char(35) DEFAULT NULL,
   `paymentPhoneNumber` char(35) DEFAULT NULL,
-  `paymentDriverId` char(22) binary DEFAULT NULL,
+  `paymentDriverId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `paymentDriverLabel` char(35) DEFAULT NULL,
   `taxes` float DEFAULT NULL,
   `dateOfPurchase` datetime DEFAULT NULL,
   `isRecurring` tinyint(1) DEFAULT NULL,
   `notes` mediumtext,
-  `cashierUserId` char(22) binary DEFAULT NULL,
+  `cashierUserId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `shippingOrganization` char(35) DEFAULT NULL,
   `paymentOrganization` char(35) DEFAULT NULL,
   PRIMARY KEY (`transactionId`),
   UNIQUE KEY `orderNumber` (`orderNumber`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `transactionItem` (
-  `itemId` char(22) binary NOT NULL,
-  `transactionId` char(22) binary NOT NULL,
-  `assetId` char(22) binary DEFAULT NULL,
+  `itemId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `transactionId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `configuredTitle` char(255) DEFAULT NULL,
   `options` longtext,
-  `shippingAddressId` char(22) binary DEFAULT NULL,
+  `shippingAddressId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `shippingName` char(35) DEFAULT NULL,
   `shippingAddress1` char(35) DEFAULT NULL,
   `shippingAddress2` char(35) DEFAULT NULL,
@@ -2194,7 +2364,7 @@ CREATE TABLE `transactionItem` (
   `lastUpdated` datetime DEFAULT NULL,
   `quantity` int(11) NOT NULL DEFAULT '1',
   `price` float DEFAULT NULL,
-  `vendorId` char(22) binary NOT NULL DEFAULT 'defaultvendor000000000',
+  `vendorId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'defaultvendor000000000',
   `vendorPayoutStatus` char(10) DEFAULT 'NotPaid',
   `vendorPayoutAmount` decimal(8,2) DEFAULT '0.00',
   `taxRate` decimal(6,3) DEFAULT NULL,
@@ -2203,30 +2373,33 @@ CREATE TABLE `transactionItem` (
   PRIMARY KEY (`itemId`),
   KEY `transactionId` (`transactionId`),
   KEY `vendorId` (`vendorId`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `userInvitations` (
-  `inviteId` char(22) binary NOT NULL,
-  `userId` char(22) binary NOT NULL,
+  `inviteId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `userId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `dateSent` date DEFAULT NULL,
   `email` char(255) NOT NULL,
-  `newUserId` char(22) binary DEFAULT NULL,
+  `newUserId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `dateCreated` date DEFAULT NULL,
   PRIMARY KEY (`inviteId`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `userLoginLog` (
-  `userId` char(22) binary NOT NULL,
+  `userId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `status` char(30) DEFAULT NULL,
   `timeStamp` int(11) DEFAULT NULL,
   `ipAddress` char(128) DEFAULT NULL,
   `userAgent` text,
-  `sessionId` char(22) binary DEFAULT NULL,
+  `sessionId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `lastPageViewed` int(11) DEFAULT NULL,
   KEY `sessionId` (`sessionId`),
   KEY `userId` (`userId`),
   KEY `timeStamp` (`timeStamp`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `userProfileCategory` (
-  `profileCategoryId` char(22) binary NOT NULL,
+  `profileCategoryId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `label` char(255) NOT NULL DEFAULT 'Undefined',
   `shortLabel` char(255) DEFAULT NULL,
   `sequenceNumber` int(11) NOT NULL DEFAULT '1',
@@ -2234,9 +2407,10 @@ CREATE TABLE `userProfileCategory` (
   `editable` int(11) NOT NULL DEFAULT '1',
   `protected` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`profileCategoryId`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `userProfileData` (
-  `userId` char(22) binary NOT NULL,
+  `userId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `email` char(255) DEFAULT NULL,
   `firstName` char(255) DEFAULT NULL,
   `middleName` char(255) DEFAULT NULL,
@@ -2276,8 +2450,8 @@ CREATE TABLE `userProfileData` (
   `signature` longtext,
   `publicProfile` longtext,
   `toolbar` char(255) DEFAULT NULL,
-  `photo` char(22) binary DEFAULT NULL,
-  `avatar` char(22) binary DEFAULT NULL,
+  `photo` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `avatar` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `department` char(255) DEFAULT NULL,
   `allowPrivateMessages` longtext,
   `ableToBeFriend` tinyint(4) DEFAULT NULL,
@@ -2291,7 +2465,8 @@ CREATE TABLE `userProfileData` (
   `assetManagerSortDirection` char(255) DEFAULT NULL,
   PRIMARY KEY (`userId`),
   KEY `email` (`email`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `userProfileField` (
   `fieldName` char(128) NOT NULL,
   `label` char(255) NOT NULL DEFAULT 'Undefined',
@@ -2301,7 +2476,7 @@ CREATE TABLE `userProfileField` (
   `possibleValues` text,
   `dataDefault` text,
   `sequenceNumber` int(11) NOT NULL DEFAULT '1',
-  `profileCategoryId` char(22) binary NOT NULL,
+  `profileCategoryId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `protected` int(11) NOT NULL DEFAULT '0',
   `editable` int(11) NOT NULL DEFAULT '1',
   `forceImageOnly` int(11) DEFAULT '1',
@@ -2310,50 +2485,55 @@ CREATE TABLE `userProfileField` (
   `extras` text,
   `defaultPrivacySetting` char(128) DEFAULT NULL,
   PRIMARY KEY (`fieldName`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `userSession` (
-  `sessionId` char(22) binary NOT NULL,
+  `sessionId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `expires` int(11) DEFAULT NULL,
   `lastPageView` int(11) DEFAULT NULL,
   `adminOn` int(11) NOT NULL DEFAULT '0',
   `lastIP` char(50) DEFAULT NULL,
-  `userId` char(22) binary NOT NULL,
+  `userId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   PRIMARY KEY (`sessionId`),
   KEY `expires` (`expires`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `userSessionScratch` (
-  `sessionId` char(22) binary NOT NULL,
+  `sessionId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `name` char(255) NOT NULL,
   `value` text,
   PRIMARY KEY (`sessionId`,`name`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `users` (
-  `userId` char(22) binary NOT NULL,
+  `userId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `username` char(100) DEFAULT NULL,
   `authMethod` char(30) NOT NULL DEFAULT 'WebGUI',
   `dateCreated` int(11) NOT NULL DEFAULT '1019867418',
   `lastUpdated` int(11) NOT NULL DEFAULT '1019867418',
   `karma` int(11) NOT NULL DEFAULT '0',
   `status` char(35) NOT NULL DEFAULT 'Active',
-  `referringAffiliate` char(22) binary NOT NULL,
-  `friendsGroup` char(22) binary NOT NULL,
+  `referringAffiliate` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `friendsGroup` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   PRIMARY KEY (`userId`),
   UNIQUE KEY `username_unique` (`username`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `vendor` (
-  `vendorId` char(22) binary NOT NULL,
+  `vendorId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `dateCreated` datetime DEFAULT NULL,
   `name` char(255) DEFAULT NULL,
-  `userId` char(22) binary NOT NULL DEFAULT '3',
+  `userId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '3',
   `preferredPaymentType` char(255) DEFAULT NULL,
   `paymentInformation` text,
-  `paymentAddressId` char(22) binary DEFAULT NULL,
+  `paymentAddressId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `url` text,
   PRIMARY KEY (`vendorId`),
   KEY `userId` (`userId`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `vendorPayoutLog` (
-  `payoutId` char(22) binary NOT NULL,
+  `payoutId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `isSuccessful` tinyint(1) NOT NULL,
   `errorCode` char(10) DEFAULT NULL,
   `errorMessage` char(255) DEFAULT NULL,
@@ -2363,28 +2543,31 @@ CREATE TABLE `vendorPayoutLog` (
   `correlationId` char(13) NOT NULL,
   `paymentInformation` char(255) NOT NULL,
   PRIMARY KEY (`payoutId`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `vendorPayoutLog_items` (
-  `payoutId` char(22) binary NOT NULL,
-  `transactionItemId` char(22) binary NOT NULL,
+  `payoutId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `transactionItemId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `amount` decimal(7,2) NOT NULL,
   PRIMARY KEY (`payoutId`,`transactionItemId`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `webguiVersion` (
   `webguiVersion` char(10) DEFAULT NULL,
   `versionType` char(30) DEFAULT NULL,
   `dateApplied` int(11) DEFAULT NULL
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `wobject` (
   `displayTitle` int(11) NOT NULL DEFAULT '1',
   `description` mediumtext,
-  `assetId` char(22) binary NOT NULL,
-  `styleTemplateId` char(22) binary NOT NULL,
-  `printableStyleTemplateId` char(22) binary NOT NULL,
+  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `styleTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `printableStyleTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
-  `mobileStyleTemplateId` char(22) binary DEFAULT 'PBtmpl0000000000000060',
+  `mobileStyleTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT 'PBtmpl0000000000000060',
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 ALTER TABLE `Article` DISABLE KEYS;
 INSERT INTO `Article` VALUES (NULL,NULL,'bX5rYxb6tZ9docY6sUhBlw','PBtmpl0000000000000002',1278013772,3600,'AHrUFHib-cqwIz1x7RI9sA'),(NULL,NULL,'ix1p0AbwKAz8QWB-T-HHfg','PBtmpl0000000000000002',1271359087,3600,'VF2bqXTRUBoYb_u7dmH70w'),(NULL,NULL,'iCYOjohB9SKvAPr6bXElKA','PBtmpl0000000000000103',1271445525,3600,'TEXVtOhmF_RHM11-_xJLyw'),(NULL,NULL,'4Yfz9hqBqM8OYMGuQK8oLw','PBtmpl0000000000000002',1271352537,3600,'TngTkH6qB76os2nf2S9bDA'),(NULL,NULL,'Wl8WZ43g2rK5AYr9o4zY7w','PBtmpl0000000000000103',1271445539,3600,'HUItbZl7TpOPC06NlO62QA'),(NULL,NULL,'LBuiKzg2mWwmOPS9AgV3bg','PBtmpl0000000000000002',1271348789,3600,'6zKDCX1Jpqbi4banD1EFNQ'),(NULL,NULL,'jTNggl7AoVSUc_ZzrvuCmw','PBtmpl0000000000000002',1271348789,3600,'t_CTIcSnLSuqOumw7LwxFA'),(NULL,NULL,'k2Qj03FrAOXYra8kDJYYXw','PBtmpl0000000000000002',1271357513,3600,'g8L2HOTFkZv5mYtYBarDCQ'),(NULL,NULL,'ksSfkZdsr0uC62NwIk6hFQ','PBtmpl0000000000000002',1271356973,3600,'iiraeaTpGWVrs4uzfvaU2A'),(NULL,NULL,'nWxS5jnA3o3DgPEwBeR7yQ','PBtmpl0000000000000002',1271357239,3600,'MALauel3oVVPZNrm53m3Uw'),(NULL,NULL,'OhdaFLE7sXOzo_SIP2ZUgA','PBtmpl0000000000000002',1271445348,3600,'3g2hbILhcxQA_7UOep0B3Q'),(NULL,NULL,'IWFxZDyGhQ3-SLZhELa3qw','PBtmpl0000000000000002',1277737686,3600,'0MZ-Ua1Gcv25yT-3JxXX8A'),(NULL,NULL,'l0guT3vTR3B8cL6vtP-g3A','PBtmpl0000000000000002',1285124369,3600,'sH36uWhF3AHO8sKBy4ZBIw'),(NULL,NULL,'NK8bqlwVRILJknqeCDPBHg','PBtmpl0000000000000002',1285796040,3600,'RcOVW6oW5IqpdPJskCPscA'),(NULL,NULL,'diZvW4bSgZWwyyGP3qXi1g','PBtmpl0000000000000002',1285610019,3600,'JkzwMnShoIjz0EfwqoXPJA'),(NULL,NULL,'j_1qEqM6iLfQLiR6VKy0aA','PBtmpl0000000000000002',1299872071,3600,'_o7GMxFGJ5flJrIozstBFA');
 ALTER TABLE `Article` ENABLE KEYS;
