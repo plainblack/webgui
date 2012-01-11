@@ -8,10 +8,10 @@ To try this out:
  3) Copy etc/WebGUI.conf.original to www.whatever.com.conf; edit it and set dbuser, dbpass, 
     dsn, and uploadsPath (eg to /data/domains/www.example.com/public/uploads/)
  4) Set WEBGUI_CONFIG to point at your new config file
- 4) $ wgd reset --upgrade
- 5) $ cd /data/WebGUI (or whereever you unpacked it)
- 6) $ rsync -r -a (or cp -a) /data/WebGUI/www/extras /data/domains/www.example.com/public/
- 7) $ export PERL5LIB='/data/WebGUI/lib'
+ 5) $ export PERL5LIB='/data/WebGUI/lib'
+ 6) $ wgd reset --upgrade
+ 7) $ cd /data/WebGUI (or whereever you unpacked it)
+ 8) $ rsync -r -a (or cp -a) /data/WebGUI/www/extras /data/domains/www.example.com/public/
 
 To start it:
 
