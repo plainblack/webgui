@@ -11,6 +11,7 @@
  - fixed #12309: Some child assets ignore visitor cache timeouts
  - fixed possible values and default values on EMS submission.
  - fixed #12312: Shop account plugin has unrendered macro
+ - fixed #12315: Remove yui tests from git repo.
 
 7.10.23
  - fixed #12225: Stock asset, multiple instances on a page
