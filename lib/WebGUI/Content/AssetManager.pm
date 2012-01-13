@@ -308,7 +308,7 @@ sub www_ajaxGetManagerPage {
 
     for my $assetId ( @{ $p->getPageData } ) {
         my $asset       = WebGUI::Asset->newByDynamicClass( $session, $assetId );
-        
+
         unless( $asset ) {
               $session->log->error('www_ajaxGetManagerPage: assetId="'.$assetId.'" failed in newByDynamicClass');
               next;
