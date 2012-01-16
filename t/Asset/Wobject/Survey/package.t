@@ -40,14 +40,16 @@ $sJSON->update([0,0,1], { text => 'two',});
 $sJSON->update([0,0,2], { text => 'more than two',});
 $sJSON->update([0,1], { variable => 'name', questionType => 'Text' });
 
-$survey->persistSurveyJSON;
-
 $survey->addType('toes', [0,0]);
+
+$survey->persistSurveyJSON;  ##This does not update the SurveyJSON object cacched in the Survey object
+$survey=$survey->cloneFromDb;
 
 my $asset_data = $survey->exportAssetData();
 
 ok exists $asset_data->{question_types}, 'question_types entry exists in asset data to package';
-ok exists $asset_data->{question_types}->{toes}, 'the toes type in a question type';
+ok exists $asset_data->{question_types}->{toes}, 'the toes type in a question type' or
+    explain $asset_data;
 ok !exists $asset_data->{question_types}->{name}, 'name question not in question types';
 
 $asset_data->{question_types}->{fingers} = clone $asset_data->{question_types}->{toes};
