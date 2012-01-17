@@ -284,15 +284,22 @@ names are:
 =over
 
 =item B<username>
+
 =item B<password>
+
 =item B<authMethod>
+
 =item B<status>
+
 =item B<ldapUrl>
+
 =item B<connectDN>
+
 =item B<groups>
+
 =item B<expireOffset>
-=item Any valid User Profile field name available in WebGUI's database,
-      e.g. B<firstName>, B<lastName>, B<mail>, etc.
+
+=item Any valid User Profile field name available in WebGUI's database, e.g. B<firstName>, B<lastName>, B<mail>, etc.
 
 =back
 

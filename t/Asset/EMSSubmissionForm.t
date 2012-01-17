@@ -428,7 +428,7 @@ my $expected = {
                                },
           'description' => undef,
           '_isValid' => 1,
-          'deleteCreatedItems' => '0',
+          'deleteCreatedItems' => 0,
           'canSubmitGroupId' => '2',
           'assetId' => 'new',
           'url' => '',

@@ -14,8 +14,6 @@ use WebGUI::Test;
 use WebGUI::Session;
 use WebGUI::Asset::Template;
 use Exception::Class;
-
-use Test::More tests => 62; # increment this value for each test you create
 use Test::Deep;
 use Data::Dumper;
 use Test::Exception;
@@ -344,4 +342,16 @@ throws_ok
     'Parser not in config dies';
 isa_ok $class->getParser( $session, 'WebGUI::Asset::Template::HTMLTemplateExpr'), 'WebGUI::Asset::Template::HTMLTemplateExpr', 'parser in config is created';
 
+{
+use Test::MockObject::Extends;
+my $mockparser = Test::MockObject->new->mock( process => sub { $@ = "failed" } );
+my $mockTemplate = Test::MockObject::Extends->new( $class )
+        ->mock( get => sub { return '' } )
+        ->mock( session => sub { return $session } )
+        ->mock( getParser => sub { return $mockparser } )
+     ;
+is $mockTemplate->process, 'failed', 'handle non-reference exceeption';
+}
+
 done_testing;
+

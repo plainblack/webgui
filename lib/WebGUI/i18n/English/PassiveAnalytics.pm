@@ -201,6 +201,12 @@ home\?func=match<br />
 		context => q|Error message|,
 	},
 
+	'error creating workflow' => {
+		message => q|Error creating the workflow instance.|,
+		lastUpdated => 0,
+		context => q|Error message|,
+	},
+
 };
 
 1;

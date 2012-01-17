@@ -731,9 +731,10 @@ sub process {
     my $output;
     eval { $output = $parser->process($template, $self->param); };
     if (my $e = Exception::Class->caught) {
-        $session->log->error(sprintf "Error processing template: %s, %s, %s", $self->getUrl, $self->getId, $e->error);
+    	my $message = ref $e ? $e->error : $e;
+        $session->log->error(sprintf "Error processing template: %s, %s, %s", $self->getUrl, $self->getId, $message);
         my $i18n = WebGUI::International->new($session, 'Asset_Template');
-        $output = sprintf $i18n->get('template error').$e->error, $self->getUrl, $self->getId;
+        $output = sprintf $i18n->get('template error').$message, $self->getUrl, $self->getId;
     }
 
     # Process the style template

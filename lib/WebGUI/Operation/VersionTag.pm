@@ -154,7 +154,7 @@ sub rollbackInFork {
     my $session = $process->session;
     my $tag = WebGUI::VersionTag->new( $session, $tagId );
     my %status = (
-        finished => 0,
+        current => 0,
         total    => $process->session->db->quickScalar( 'SELECT count(*) FROM assetData WHERE tagId = ?', [$tagId] ),
         message  => '',
     );
@@ -168,7 +168,7 @@ sub rollbackInFork {
             my $purgeRevision = shift;
             my $self          = shift;
             $self->$purgeRevision(@_);
-            $status{finished}++;
+            $status{current}++;
             $update->();
         }
     );
