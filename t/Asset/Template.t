@@ -14,6 +14,7 @@ use WebGUI::Test;
 use WebGUI::Session;
 use WebGUI::Asset::Template;
 use Exception::Class;
+use Test::More;
 use Test::Deep;
 use Data::Dumper;
 use Test::Exception;
