@@ -14,6 +14,12 @@ use WebGUI::Command -command;
 use strict;
 use warnings;
 
+=head2 opt_spec
+
+Return a set of options to WebGUI::Command so that it knows how to process command line options.
+
+=cut
+
 sub opt_spec {
     return (
         [ 'configFile=s', 'The WebGUI config file to use.  This parameter is required.'],
@@ -25,6 +31,12 @@ sub opt_spec {
         [ 'newStatus:s', q{Change users status in the IOB to status status. If left unspecified, it will default to Out.}],
     );
 }
+
+=head2 validate_args
+
+Check for mandatory command line options
+
+=cut
 
 sub validate_args {
     my ($self, $opt, $args) = @_;

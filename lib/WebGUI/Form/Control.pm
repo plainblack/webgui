@@ -336,6 +336,14 @@ sub getDatabaseFieldType {
     return "CHAR(255)";
 }
 
+#-------------------------------------------------------------------
+
+=head2 getLabel ( )
+
+Gets the label for this form control, including any configured hover help.
+
+=cut 
+
 sub getLabel {
     my ( $self ) = @_;
 
