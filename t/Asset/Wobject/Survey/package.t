@@ -27,7 +27,7 @@ my $import_node = WebGUI::Asset->getImportNode($session);
 my $survey = $import_node->addChild( { className => 'WebGUI::Asset::Wobject::Survey', } );
 WebGUI::Test->addToCleanup($survey);
 
-my $sJSON = $survey->surveyJSON;
+my $sJSON = $survey->getSurveyJSON;
 
 # Load bare-bones survey, containing a single section (S0)
 $sJSON->update([0], { variable => 'S0' });
@@ -57,7 +57,7 @@ $asset_data->{question_types}->{fingers} = clone $asset_data->{question_types}->
 $survey->importAssetCollateralData($asset_data);
 
 $survey = $survey->cloneFromDb;
-my $multipleChoiceTypes = $survey->surveyJSON->multipleChoiceTypes;
+my $multipleChoiceTypes = $survey->getSurveyJSON->multipleChoiceTypes;
 
 ok exists $multipleChoiceTypes->{fingers}, 'fingers type imported as package collateral data';
 ok exists $multipleChoiceTypes->{toes}, 'still have toes, too';

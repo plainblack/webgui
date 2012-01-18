@@ -2439,8 +2439,8 @@ Extend the base method to include custom question types added to this Survey.
 sub exportAssetData {
     my $self = shift;
     my $asset_data = $self->SUPER::exportAssetData();
-    my $questions  = $self->surveyJSON->questions();
-    my $multiple_choice = $self->surveyJSON->multipleChoiceTypes();
+    my $questions  = $self->getSurveyJSON->questions();
+    my $multiple_choice = $self->getSurveyJSON->multipleChoiceTypes();
     my %question_types  = ();
     my $get_question    = $self->session->db->prepare('select answers from Survey_questionTypes where questionType=?');
     foreach my $question (@{ $questions }) {
