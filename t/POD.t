@@ -21,10 +21,10 @@ my $threshold = $ENV{POD_COVERAGE} == 2 ? 0.9999
               : 0;
 
 my @modules = ();
-find(\&countModules, WebGUI::Test->lib );
+my $lib_path = WebGUI::Test->lib;
+find(\&countModules, $lib_path );
 my $moduleCount = scalar(@modules);
 plan tests => $moduleCount;
-use Data::Dumper;
 foreach my $package (sort @modules) {
 	my $pc = Pod::Coverage->new(
         package       => $package,
@@ -49,8 +49,8 @@ sub countModules {
 	return unless $filename =~ m/\.pm$/;
 	return if $filename =~ m/WebGUI\/i18n/;
 	return if $filename =~ m/WebGUI\/Help/;
-	my $package = $filename;
-	$package =~ s/^.*(WebGUI.*)\.pm$/$1/;
+    my $package = File::Spec->abs2rel($filename, $lib_path);
 	$package =~ s/\//::/g;
+    $package =~ s/\.pm$//;
 	push(@modules,$package);
 }
