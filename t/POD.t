@@ -28,11 +28,11 @@ plan tests => $moduleCount;
 foreach my $package (sort @modules) {
 	my $pc = Pod::Coverage->new(
         package       => $package,
-        also_private  => [ qr/definition/ ],
+        also_private  => [ qr/^definition$/, qr/^run$/],
         nonwhitespace => ($ENV{POD_COVERAGE} == 3 ? 1 : 0),
     );
     my $coverage   = $pc->coverage > $threshold;
-    my $goodReason = $pc->why_unrated() eq 'no public symbols defined';
+    my $goodReason = $pc->why_unrated() eq'no public symbols defined';
     SKIP: {
         skip "No subroutines found by Devel::Symdump for $package", 1 if $goodReason;
         ok($coverage, sprintf "%s has %d%% POD coverage", $package, $pc->coverage*100);
