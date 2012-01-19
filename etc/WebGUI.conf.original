@@ -500,7 +500,7 @@
    }
 },
 
-# Specify a the list of assets you want to appear in your
+# Specify the list of assets you want to appear in your
 # "New Content" menu categories. See "assetCategories" for details
 # about categories. Each listing has a key of class name, and then
 # has several properties, which are:
