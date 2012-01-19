@@ -225,7 +225,7 @@ if ($shortcuts) {
             my $linked_asset = eval { WebGUI::Asset->newPending($session, $shortcut->get('shortcutToAssetId')); };
             if ( $@ || Exception::Class->caught() || ! $linked_asset ) {
                 printf "\r%-68s", "-- Broken shortcut: ".$shortcut->getId.' pointing to '.$shortcut->get('shortcutToAssetId');
-                if ($fix || $delete) {
+                if ($delete) {
                     my $success = $shortcut->purge;
                     if ($success) {
                         print "Purged shortcut";
@@ -240,6 +240,44 @@ if ($shortcuts) {
         progress( $shortcuts, $count++ ) unless $no_progress;
     }
     progress( $shortcuts, $count ) unless $no_progress;
+}
+
+print "\n";
+
+my $file_assets = $session->db->quickScalar(q!select count(*) from asset where className like 'WebGUI::Asset::File%'!);
+if ($file_assets) {
+    print "Checking for broken File Assets\n";
+    my $get_asset = WebGUI::Asset::File->getIsa($session, 0, {returnAll => 1});
+    $count = 0;
+    FILE_ASSET: while (1) {
+        my $file_asset = eval { $get_asset->() };
+        if ( $@ || Exception::Class->caught() ) {
+            ##Do nothing, since it would have been caught above
+            printf "\r%-68s", "No asset to check";
+        }
+        elsif (!$file_asset) {
+            last FILE_ASSET
+        }
+        else {
+            my $storage = $file_asset->getStorageLocation;
+            my $file = $storage->getPath($file_asset->get('filename'));
+            if (! -e $file) {
+                printf "\r%-s", "-- Broken file asset: ".$file_asset->getId." file does not exist: $file";
+                if ($delete) {
+                    my $success = $file_asset->purge;
+                    if ($success) {
+                        print "Purged File Asset";
+                    }
+                    else {
+                        print "Could not purge File Asset";
+                    }
+                }
+                print "\n";
+            }
+        }
+        progress( $file_assets, $count++ ) unless $no_progress;
+    }
+    progress( $file_assets, $count ) unless $no_progress;
 }
 
 finish($session);
@@ -298,7 +336,20 @@ findBrokenAssets.pl -- Find and fix broken assets
 =head1 DESCRIPTION
 
 This utility will find any broken assets that cannot be instantiated and are 
-causing undesired operation of your website.
+causing undesired operation of your website.  It also checks for these kinds of
+semi-working assets and reports them:
+
+=over 4
+
+=item *
+
+Shortcuts pointing to assets that don't exist.
+
+=item *
+
+File assets that have lost their files in the uploads area.
+
+=back
 
 It can also automatically delete them or fix them so you can restore missing data.
 
@@ -320,7 +371,7 @@ Delete any corrupted assets.
 
 =item B<--fix>
 
-Try to fix any corrupted assets.
+Try to fix any corrupted assets.  The broken Shortcuts and File Assets cannot be fixed.
 
 =item B<--help>
 
