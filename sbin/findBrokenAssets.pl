@@ -74,6 +74,7 @@ my $sth   = $session->db->read($sql);
 ##Guarantee that we get the most recent revisionDate
 my $max_revision  = $session->db->prepare('select max(revisionDate) from assetData where assetId=?');
 
+print "Checking all assets\n";
 my $count = 1;
 my %classTables;            # Cache definition lookups
 while ( my %row = $sth->hash ) {
@@ -204,6 +205,42 @@ while ( my %row = $sth->hash ) {
 } ## end while ( my %row = $sth->hash)
 $sth->finish;
 $max_revision->finish;
+print "\n";
+
+my $shortcuts = $session->db->quickScalar(q!select count(*) from asset where className='WebGUI::Asset::Shortcut'!);
+if ($shortcuts) {
+    print "Checking for broken shortcuts\n";
+    my $get_shortcut = WebGUI::Asset::Shortcut->getIsa($session, 0, {returnAll => 1});
+    $count = 0;
+    SHORTCUT: while (1) {
+        my $shortcut = eval { $get_shortcut->() };
+        if ( $@ || Exception::Class->caught() ) {
+            ##Do nothing, since it would have been caught above
+            printf "\r%-68s", "No shortcut to check";
+        }
+        elsif (!$shortcut) {
+            last SHORTCUT
+        }
+        else {
+            my $linked_asset = eval { WebGUI::Asset->newPending($session, $shortcut->get('shortcutToAssetId')); };
+            if ( $@ || Exception::Class->caught() || ! $linked_asset ) {
+                printf "\r%-68s", "-- Broken shortcut: ".$shortcut->getId.' pointing to '.$shortcut->get('shortcutToAssetId');
+                if ($fix || $delete) {
+                    my $success = $shortcut->purge;
+                    if ($success) {
+                        print "Purged shortcut";
+                    }
+                    else {
+                        print "Could not purge shortcut";
+                    }
+                }
+                print "\n";
+            }
+        }
+        progress( $shortcuts, $count++ ) unless $no_progress;
+    }
+    progress( $shortcuts, $count ) unless $no_progress;
+}
 
 finish($session);
 print "\n";
