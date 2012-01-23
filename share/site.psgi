@@ -24,7 +24,6 @@ builder {
 
     # Reproduce URL handler functionality with middleware
     enable '+WebGUI::Middleware::Snoop';
-    enable 'Status', path => qr{^/uploads/dictionaries}, status => 401;
 
     # For PassThru, use Plack::Builder::mount
 
