@@ -14,6 +14,7 @@ use strict;
 use WebGUI::Form;
 use WebGUI::International;
 use WebGUI::Asset::Template;
+use URI;
 
 =head1 NAME
 
@@ -97,8 +98,10 @@ sub process {
 
 	my $action;
         if ($session->setting->get("encryptLogin")) {
-                $action = $session->url->page(undef,1);
-                $action =~ s/http:/https:/;
+                my $uri = URI->new($session->url->page(undef,1));
+                $uri->scheme('https');
+                $uri->host_port($uri->host);
+                $action = $uri->canonical->as_string;
         }
     use WebGUI::Form::Text;
     use WebGUI::Form::Password;

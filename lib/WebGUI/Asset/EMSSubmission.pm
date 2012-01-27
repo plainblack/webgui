@@ -391,6 +391,8 @@ sub www_editSubmission {
 		$fields->{$fieldId}{fieldType} = $metaField->{dataType};
 		$fields->{$fieldId}{name} = $fieldId;
 		$fields->{$fieldId}{value} = $self->get($fieldId) if $self;
+        $fields->{$fieldId}{options} = $metaField->{possibleValues};
+        $fields->{$fieldId}{defaultValue} = $metaField->{defaultValues};
 	    }
         }
 

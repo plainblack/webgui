@@ -259,7 +259,6 @@ override getEditForm => sub {
             'save' => $i18n->get('save'),
             'preview' => $i18n->get('preview'),
             'print' => $i18n->get('print'),
-            'spellchecker' => $i18n->get('Server Side Spell Checker'),
             'code' => $i18n->get('code'),
             'fullscreen' => $i18n->get('fullscreen'),
             'help' => $i18n->get('help'),
@@ -308,9 +307,6 @@ override getEditForm => sub {
                     name=>"toolbarRow3",
                     checked=>$checked3
                     }).'</td><td>';
-            if ($key eq 'spellchecker' && !($self->session->config->get('availableDictionaries'))) {
-                    $buttonGrid .= $i18n->get('no dictionaries');
-            }
             $buttonGrid .= '</td>
     </tr>
                     ';
@@ -377,13 +373,6 @@ sub getConfig {
         wg_userIsVisitor                  => $self->session->user->isVisitor ? JSON::true() : JSON::false(),
     );
     foreach my $button (@toolbarButtons) {
-        if ( $button eq "spellchecker" && $self->session->config->get('availableDictionaries') ) {
-            push( @plugins, "-wgspellchecker" );
-            $config{spellchecker_rpc_url} = $self->session->url->gateway( '', "op=spellCheck" );
-            $config{spellchecker_languages} = join( ',',
-                map { ( $_->{default} ? '+' : '' ) . $_->{name} . '=' . $_->{id} }
-                    @{ $self->session->config->get('availableDictionaries') } );
-        }
         push( @plugins, "table" )      if ( $button eq "tablecontrols" );
         push( @plugins, "save" )       if ( $button eq "save" );
         push( @plugins, "advhr" )      if ( $button eq "advhr" );
@@ -475,9 +464,6 @@ sub getLoadPlugins {
     my ( $self ) = @_;
     my %loadPlugins;
     for my $button ( $self->getAllButtons ) {
-        if ( $button eq 'spellchecker' ) {
-            $loadPlugins{wgspellchecker} = $self->session->url->extras("tinymce-webgui/plugins/wgspellchecker/editor_plugin.js");
-        }
         if ( $button eq 'wginsertimage' ) {
             $loadPlugins{wginsertimage} = $self->session->url->extras("tinymce-webgui/plugins/wginsertimage/editor_plugin.js");
         }

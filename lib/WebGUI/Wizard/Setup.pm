@@ -22,7 +22,6 @@ sub _get_steps {
     return [qw(
         adminAccount
         companyInformation
-        siteStats
         defaultStyle
     )];
 }
@@ -291,58 +290,6 @@ sub www_companyInformationSave {
     $session->setting->set( 'companyName',  $form->text("companyName") )   if ( $form->get("companyName") );
     $session->setting->set( 'companyURL',   $form->url("companyURL") )     if ( $form->get("companyURL") );
     $session->setting->set( 'companyEmail', $form->email("companyEmail") ) if ( $form->get("companyEmail") );
-    return;
-}
-
-#----------------------------------------------------------------------------
-
-=head2 www_siteStats ( ) 
-
-Opt-in to the global WebGUI statistics
-
-=cut
-
-sub www_siteStats {
-    my ( $self ) = @_;
-    my $session = $self->session;
-    my $form    = $session->form;
-    $session->response->setCacheControl("none");
-    my $i18n = WebGUI::International->new( $session, "WebGUI" );
-
-    my $enableForm  = $self->getForm;
-    $enableForm->addField( "hidden", name => "enableStats", value => 1 );
-    $enableForm->addField( "submit", name => 'send', value => $i18n->get( 'enable', 'Activity_SendWebguiStats' ) );
-
-    my $disableForm = $self->getForm;
-    $disableForm->addField( "hidden", name => "enableStats", value => 0 );
-    $disableForm->addField( "submit", name => 'send', value => $i18n->get( 'disable', 'Activity_SendWebguiStats' ) );
-
-    my $output = '<h1>' . $i18n->get( 'topicName', 'Activity_SendWebguiStats' ) . '</h1>';
-    $output .= ' <p>' . $i18n->get( 'why to send', 'Activity_SendWebguiStats' ) . '</p>
-         <p>' . $i18n->get( 'would you participate', 'Activity_SendWebguiStats' ) . '</p>
-        <div style="float: left">' . $enableForm->toHtml . '</div><div style="float: left">'
-        . $disableForm->toHtml
-        . '</div>'
-        . '<div style="clear: both;">&nbsp;</div>'
-        ;
-
-    return $output;
-}
-
-#----------------------------------------------------------------------------
-
-=head2 www_siteStatsSave ( ) 
-
-Opt-in to the global WebGUI statistics
-
-=cut
-
-sub www_siteStatsSave {
-    my ( $self ) = @_;
-    my $session = $self->session;
-    my $form    = $session->form;
-    use WebGUI::Operation::Statistics;
-    WebGUI::Operation::Statistics::www_enableSendWebguiStats($session) if ( $form->get("enableStats") );
     return;
 }
 

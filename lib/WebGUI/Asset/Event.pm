@@ -399,6 +399,14 @@ sub dateSet {
 
 #-------------------------------------------------------------------
 
+=head2 duration ( )
+
+Returns a DateTime::Duration object that represents the difference in time between the end
+and start times of the event.
+
+=cut
+
+
 sub duration {
     my $self  = shift;
     return $self->getDateTimeEnd - $self->getDateTimeStart;

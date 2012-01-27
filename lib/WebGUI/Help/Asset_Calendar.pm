@@ -241,15 +241,15 @@ our $HELP = {
         ],
         variables   => [
             {
-                name        => 'newYear',
+                name        => 'new_year',
                 description => 'helpvar newYear',
             },
             {
-                name        => 'newMonth',
+                name        => 'new_month',
                 description => 'helpvar newMonth',
             },
             {
-                name        => 'newDay',
+                name        => 'new_day',
                 description => 'helpvar newDay',
             },
             {

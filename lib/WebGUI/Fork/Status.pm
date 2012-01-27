@@ -67,7 +67,7 @@ See the synopsis for what kind of response this generates.
 sub handler {
     my $process = shift;
     my $status  = $process->getStatus;
-    my ( $finished, $startTime, $endTime, $error ) = $process->get( 'finished', 'startTime', 'endTime', 'error' );
+    my ( $finished, $startTime, $endTime, $error, $redirect ) = $process->get( qw/finished startTime endTime error redirect/ );
 
     $endTime = time() unless $finished;
 
@@ -76,7 +76,8 @@ sub handler {
         elapsed  => ( $endTime - $startTime ),
         finished => ( $finished ? \1 : \0 ),
     );
-    $status{error} = $error if $finished;
+    $status{error}    = $error    if $finished;
+    $status{redirect} = $redirect if $finished;
     $process->session->response->content_type('text/plain');
     JSON::encode_json( \%status );
 } ## end sub handler

@@ -265,6 +265,7 @@ sub toHtml {
     $style->setRawHeadTags(qq|<script type="text/javascript">var classValues = $jsonStr; </script>|);
     my $jsonData            = $self->get("value") || q|{ "isNew" : "true" }|;
     $style->setRawHeadTags(qq|<script type="text/javascript">var dataValues  = $jsonData; var first_row_error_msg = '$first_row_error_msg';</script>|);
+    $self->headTags();
 
     #Decode JSON data for filling in some of the fields
     my $jsonDataHash = JSON->new->decode($jsonData);

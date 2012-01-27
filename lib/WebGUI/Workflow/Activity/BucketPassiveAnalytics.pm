@@ -51,6 +51,20 @@ sub definition {
 	return $class->SUPER::definition($session,$definition);
 }
 
+#-------------------------------------------------------------------
+
+=head2 get_statement( session, counter )
+
+Return a statement handle at the desired offset.
+
+=cut
+
+sub get_statement {
+    my ($session, $logIndex) = @_;
+    my $deltaSql = q{select SQL_CALC_FOUND_ROWS userId, assetId, url, delta, from_unixtime(timeStamp) as stamp from deltaLog limit ?, 500000};
+    my $sth = $session->db->read($deltaSql, [$logIndex+0]);
+    return $sth;
+}
 
 #-------------------------------------------------------------------
 
@@ -85,47 +99,49 @@ sub execute {
     my %bucketCache = ();
 
     ##Configure all the SQL
-    my $deltaSql  = <<"EOSQL1";
-select userId, assetId, url, delta, from_unixtime(timeStamp) as stamp
-    from deltaLog order by timestamp limit $logIndex, 1234567890
-EOSQL1
-    my $deltaSth  = $session->db->read($deltaSql);
-    my $bucketSth = $session->db->prepare('insert into bucketLog (userId, Bucket, duration, timeStamp) VALUES (?,?,?,?)');
+    my $deltaSth   = get_statement($session, $logIndex);
+    my $total_rows = $session->db->quickScalar('select found_rows()');
+
+    my $bucketSth  = $session->db->prepare('insert into bucketLog (userId, Bucket, duration, timeStamp) VALUES (?,?,?,?)');
 
     ##Walk through the log file entries, one by one.  Run each entry against
     ##all the rules until 1 matches.  If it doesn't match any rule, then bin it
     ##into the "Other" bucket.
-    DELTA_ENTRY: while (my $entry = $deltaSth->hashRef()) {
-        ++$logIndex;
-        my $bucketFound = 0;
-        my $url = $entry->{url};
-        if (exists $bucketCache{$url}) {
-           $bucketSth->execute([$entry->{userId}, $bucketCache{$url}, $entry->{delta}, $entry->{stamp}]);
-        }
-        else {
-            RULE: foreach my $rule (@rules) {
-               next RULE unless $url =~ $rule->[1]; 
-               
-               # Into the bucket she goes..
-               $bucketCache{$url} = $rule->[0];
-               $bucketSth->execute([$entry->{userId}, $rule->[0], $entry->{delta}, $entry->{stamp}]);
-               $bucketFound = 1;
-               last RULE;
+    DELTA_CHUNK: while (1) {
+        DELTA_ENTRY: while (my $entry = $deltaSth->hashRef()) {
+            ++$logIndex;
+            my $bucketFound = 0;
+            my $url = $entry->{url};
+            if (exists $bucketCache{$url}) {
+               $bucketSth->execute([$entry->{userId}, $bucketCache{$url}, $entry->{delta}, $entry->{stamp}]);
             }
-            if (!$bucketFound) {
-               $bucketCache{$url} = 'Other';
-               $bucketSth->execute([$entry->{userId}, 'Other', $entry->{delta}, $entry->{stamp}]);
-            }
-        }
-        if (time() > $endTime) {
-            $expired = 1;
-            last DELTA_ENTRY;
-        }
-    }
+            else {
+                RULE: foreach my $rule (@rules) {
+                   next RULE unless $url =~ $rule->[1];
 
-    if ($expired) {
-        $instance->setScratch('logIndex', $logIndex);
-        return $self->WAITING(1);
+                   # Into the bucket she goes..
+                   $bucketCache{$url} = $rule->[0];
+                   $bucketSth->execute([$entry->{userId}, $rule->[0], $entry->{delta}, $entry->{stamp}]);
+                   $bucketFound = 1;
+                   last RULE;
+                }
+                if (!$bucketFound) {
+                   $bucketCache{$url} = 'Other';
+                   $bucketSth->execute([$entry->{userId}, 'Other', $entry->{delta}, $entry->{stamp}]);
+                }
+            }
+            if (time() > $endTime) {
+                $expired = 1;
+                last DELTA_ENTRY;
+            }
+        }
+
+        if ($expired) {
+            $instance->setScratch('lastPassiveLogIndex', $logIndex);
+            return $self->WAITING(1);
+        }
+        last DELTA_CHUNK if $logIndex >= $total_rows;
+        $deltaSth = get_statement($session, $logIndex);
     }
     my $message = 'Passive analytics is done.';
     if ($session->setting->get('passiveAnalyticsDeleteDelta')) {

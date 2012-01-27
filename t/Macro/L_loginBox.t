@@ -33,7 +33,7 @@ $env->{'QUERY_STRING'}    = 'func=search';
 
 my $i18n = WebGUI::International->new($session,'Macro_L_loginBox');
 
-plan tests => 30;
+plan tests => 31;
 
 my $output = WebGUI::Macro::L_loginBox::process($session,'','',$template->getId);
 my %vars = simpleTextParser($output);
@@ -149,6 +149,12 @@ $session->setting->set("encryptLogin", 1);
 $output = WebGUI::Macro::L_loginBox::process($session,'','',$template->getId);
 %vars = simpleTextParser($output);
 like($vars{'form.header'}, qr{https://}, 'form.header action set to use SSL by encryptLogin');
+
+WebGUI::Test->originalConfig('webServerPort');
+$session->config->set('webServerPort', 8081);
+$output = WebGUI::Macro::L_loginBox::process($session,'','',$template->getId);
+%vars = simpleTextParser($output);
+unlike($vars{'form.header'}, qr{:8081}, '... when setting, remove the port');
 
 ##Finally, a test that the default Template exists
 

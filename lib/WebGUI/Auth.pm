@@ -1169,8 +1169,10 @@ sub www_displayLogin {
     $vars->{title} = $i18n->get(66);
     my $action;
     if ($self->session->setting->get("encryptLogin")) {
-        $action = $self->session->url->page(undef,1);
-        $action =~ s/http:/https:/;
+        my $uri = URI->new($self->session->url->page(undef,1));
+        $uri->scheme('https');
+        $uri->host_port($uri->host);
+        $action = $uri->as_string;
     }
     use WebGUI::Form::Password;
     use WebGUI::Form::Hidden;
@@ -1241,9 +1243,10 @@ sub www_login {
         $self->session->scratch->delete("redirectAfterLogin");
     }
     elsif ($self->session->setting->get('encryptLogin')) {
-        my $currentUrl = $self->session->url->page(undef,1);
-        $currentUrl =~ s/^https:/http:/;
-        $self->session->response->setRedirect($currentUrl);
+		my $currentUrl = URI->new($self->session->url->page(undef,1));
+        $currentUrl->scheme('http');
+        $currentUrl->port($self->session->config->get('webServerPort') || 80);
+		$self->session->response->setRedirect($currentUrl->canonical->as_string);
     }
 
     # Get open version tag. This is needed if we want

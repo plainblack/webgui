@@ -14,11 +14,20 @@
 
 WebGUI::Upgrade::File::txt - Upgrade class for text documents
 
+Displays the text document to the user, and then after a keypress, continues on to the
+next upgarde file.
+
 =cut
 
 package WebGUI::Upgrade::File::txt;
 use Moose;
 with 'WebGUI::Upgrade::File';
+
+=head2 once
+
+Override the default so that the text is only displayed once.
+
+=cut
 
 sub once { 1 }
 

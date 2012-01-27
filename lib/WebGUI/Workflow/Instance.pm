@@ -53,6 +53,7 @@ is singleton and an instance of it already exists.
 A reference to the current session.
 
 =head3 properties
+
 The settable properties of the workflow instance. See the set() method for details.
 
 A key/value for C<workflowId> is required in the properties for this method.

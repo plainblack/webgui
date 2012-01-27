@@ -169,7 +169,7 @@ sub addType {
     my $questionType = shift;
     my $address = shift;
     my $question = $self->question($address);
-    my $ansString = $question->{answers} ? to_json $question->{answers} : {};
+    my $ansString = $question->{answers} ? to_json $question->{answers} : '{}';
     $self->session->db->write("INSERT INTO Survey_questionTypes VALUES(?,?) ON DUPLICATE KEY UPDATE answers = ?",[$questionType,$ansString,$ansString]);
     $question->{questionType} = $questionType;
 }

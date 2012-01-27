@@ -36,6 +36,14 @@ save you many hours of grief.
 
  * WebGUI 8 does not support HTTP Basic Authentication any longer.
 
+ * Support for server-side spell checking in the Rich Editor TinyMCE has been removed.
+
+7.10.24
+--------------------------------------------------------------------
+    * WebGUI now depends on Business::OnlinePayment::AuthorizeNet.  This version
+      should install automatically via the testEnvironment.pl script, or the
+      perl-standard CPAN module.
+
 7.10.23
 --------------------------------------------------------------------
     * The default_search2 template had a bad template attachment pointing to 

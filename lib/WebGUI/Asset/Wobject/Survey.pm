@@ -1372,7 +1372,7 @@ sub view {
     my $responseDetails = $self->getResponseDetails || {};
 
     # Add lastResponse template vars
-    for my $tv qw(endDate complete restart timeout timeoutRestart) {
+    for my $tv (qw(endDate complete restart timeout timeoutRestart)) {
         $var->{"lastResponse\u$tv"} = $responseDetails->{$tv};
     }
     $var->{lastResponseFeedback} = $responseDetails->{templateText};
@@ -2158,7 +2158,7 @@ sub takenCount {
     my $sql = 'select count(*) from Survey_response where';
     $sql .= ' assetId = ' . $self->session->db->quote($self->getId);
     $sql .= ' and isComplete = ' . $self->session->db->quote($isComplete);
-    for my $o qw(userId ipAddress) {
+    for my $o (qw(userId ipAddress)) {
         if (my $o_value = $opts{$o}) {
             $sql .= " and $o = " . $self->session->db->quote($o_value);
         }
@@ -2426,6 +2426,53 @@ sub export {
     $self->session->response->header( 'Content-Disposition' => qq{attachment; filename="}.$filename.'"');
     $self->session->response->content_type("text/$format");
     return $content;
+}
+
+#-------------------------------------------------------------------
+
+=head2 exportAssetData ()
+
+Extend the base method to include custom question types added to this Survey.
+
+=cut
+
+sub exportAssetData {
+    my $self = shift;
+    my $asset_data = $self->SUPER::exportAssetData();
+    my $questions  = $self->getSurveyJSON->questions();
+    my $multiple_choice = $self->getSurveyJSON->multipleChoiceTypes();
+    my %question_types  = ();
+    my $get_question    = $self->session->db->prepare('select answers from Survey_questionTypes where questionType=?');
+    foreach my $question (@{ $questions }) {
+        my $type = $question->{questionType};
+        next unless $multiple_choice->{$type};
+        next if $question_types{$type};
+        $get_question->execute([$type]);
+        my ($answers) = $get_question->array();
+        $question_types{$type} = $answers;
+    }
+    #my $question_types = $self->db->buildArrayRefOfHashRefs('select * from Survey_questionTypes');
+    $get_question->finish;
+    $asset_data->{question_types} = \%question_types;
+    return $asset_data;
+}
+
+#-------------------------------------------------------------------
+
+=head2 importAssetCollateralData ($data)
+
+Extend the base method to include custom question types added to this Survey.
+
+=cut
+
+sub importAssetCollateralData {
+    my $self = shift;
+    my $data = shift;
+    $self->SUPER::importAssetCollateralData($data);
+    my $custom_types = $data->{question_types};
+    while (my ($question, $answer) = each %{ $custom_types }) {
+        $self->session->db->write("INSERT INTO Survey_questionTypes VALUES(?,?) ON DUPLICATE KEY UPDATE answers = ?",[$question,$answer,$answer]);
+    }
 }
 
 #-------------------------------------------------------------------

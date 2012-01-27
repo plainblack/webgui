@@ -40,7 +40,7 @@ sub www_genesis {
 
 #-------------------------------------------------------------------
 
-=head2 theWg ( )
+=head2 www_theWg ( )
 
 The core WebGUI function.  All WebGUI Assets, Operations and functions require this
 to work, even superseding the session variable.

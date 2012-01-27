@@ -98,7 +98,7 @@ my $template = <<'TEMPLATE';
             url    : params.statusUrl,
             draw   : function (data) {
                 var status = YAHOO.lang.JSON.parse(data.status);
-                bar.update(status.finished, status.total);
+                bar.update(status.current, status.total);
                 document.getElementById('message').innerHTML = status.message;
                 document.getElementById('elapsed').innerHTML = data.elapsed;
             },
@@ -106,8 +106,8 @@ my $template = <<'TEMPLATE';
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('ui').style.display = 'block';
             },
-            finish : function() {
-                YAHOO.WebGUI.Fork.redirect(params);
+            finish : function(data) {
+                YAHOO.WebGUI.Fork.redirect(data.redirect || params.redirect);
             },
             error  : function (msg) {
                 alert(msg);

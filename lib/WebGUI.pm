@@ -134,6 +134,17 @@ sub call {
     }
 }
 
+=head2 handle ($session)
+
+Process the list of content handlers from the config file and then evaluate any Template objects which
+may have been returned.
+
+=head3 $session
+
+A WebGUI::Session object.
+
+=cut
+
 sub handle {
     my ( $self, $session ) = @_;
 
