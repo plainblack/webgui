@@ -1,4 +1,5 @@
 7.10.25
+- fixed #12321: Error while deleting a group.
 
 7.10.24
  - fixed #12318: asset error causes asset manager to fail
