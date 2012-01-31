@@ -1627,7 +1627,7 @@ sub resetGroupFields {
     ASSET: foreach my $assetClass ($db->buildArray('SELECT DISTINCT className FROM asset')) {
         my $definition = eval { WebGUI::Pluggable::instanciate($assetClass, 'definition', [$session]); };
         if ($@) {
-            $session->log->error("Unable to load className: " . $className . " when looking for asset definitions: " . $@);
+            $session->log->error("Unable to load className: " . $assetClass . " when looking for asset definitions: " . $@);
             next ASSET;
         }
         SUBDEF: foreach my $subdef (@{ $definition }) {
