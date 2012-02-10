@@ -22,7 +22,7 @@ use WebGUI::Test::Mechanize;
 
 use Test::More; # increment this value for each test you create
 use Test::Deep;
-plan tests => 25;
+plan tests => 26;
 
 my $session = WebGUI::Test->session;
 $session->user({userId => 3});
@@ -172,7 +172,7 @@ cmp_deeply(
 $folder->deleteMetaDataField($byName->{'color'});
 $foMetaData = $folder->getMetaDataFields;
 $byName = buildNameIndex($foMetaData);
-cmp_bag( [keys %{ $byName}], ['sport', 'searchEngine'], 'color meta data field removed');
+cmp_bag( [keys %{ $byName}], ['sport', 'searchEngine' ], 'color meta data field removed');
 
 ####################################################
 #
@@ -235,6 +235,32 @@ cmp_deeply(
         'searchEngine'      => undef,
     },
     'getMetaDataAsTemplateVariables returns proper values for folder'
+);
+
+####################################################
+#
+# meta data value field size is 1024 characters
+#
+####################################################
+
+$folder->addMetaDataField('new', 'bigText', '', 'Text Field', 'text');
+
+# set it; need to update $foMetaData and $byName.
+$foMetaData = $folder->getMetaDataFields;
+$byName = buildNameIndex($foMetaData);
+my $value1024 = 'balderdashagain' x 64;  # 16 chars * 64 is 1024 chars
+$folder->updateMetaData( $byName->{'bigText'}, $value1024 );
+
+# check that they're equal
+cmp_deeply(
+    $folder->getMetaDataAsTemplateVariables,
+    {
+        'book'              => '1984',
+        'sport'             => 'underwaterHockey',
+        'searchEngine'      => undef,
+        'bigText'           => $value1024,
+    },
+    'meta data value can hold 1024 characters'
 );
 
 {
