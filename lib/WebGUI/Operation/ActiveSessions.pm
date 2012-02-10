@@ -1,7 +1,7 @@
 package WebGUI::Operation::ActiveSessions;
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -53,7 +53,7 @@ $session->form->process("sid").  Afterwards, it calls www_viewActiveSessions.
 
 sub www_killSession {
 	my $session = shift;
-	return www_viewActiveSessions($session) if $session->form->process("sid") eq $session->var->get("sessionId");
+	return www_viewActiveSessions($session) if $session->form->process("sid") eq $session->getId;
 	return $session->privilege->adminOnly unless canView($session);
 	$session->db->write("delete from userSession where sessionId=?",[$session->form->process("sid")]);
 	$session->db->write("delete from userSessionScratch where sessionId=?", [$session->form->process("sid")]);

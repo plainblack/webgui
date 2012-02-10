@@ -3,7 +3,7 @@ package WebGUI::Exception;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -15,55 +15,6 @@ package WebGUI::Exception;
 =cut
 
 use strict;
-use Exception::Class (
-
-    'WebGUI::Error' => {
-        description     => "A general error occured.",
-        },
-    'WebGUI::Error::OverrideMe' => {
-        isa             => 'WebGUI::Error',
-        description     => 'This method should be overridden by subclasses.',
-        },
-    'WebGUI::Error::MethodNotFound' => {
-        isa             => 'WebGUI::Error',
-        description     => q|Called a method that doesn't exist.|,
-        fields          => 'method'
-        },
-    'WebGUI::Error::InvalidObject' => {
-        isa             => 'WebGUI::Error::InvalidParam',
-        description     => "Expected to get a reference to an object type that wasn't gotten.",
-        fields          => ["expected","got"],
-        },
-    'WebGUI::Error::InvalidParam' => {
-        isa             => 'WebGUI::Error',
-        description     => "Expected to get a param we didn't get.",
-        fields          => ["param"],
-        },
-    'WebGUI::Error::ObjectNotFound' => {
-        isa             => 'WebGUI::Error',
-        description     => "The object you were trying to retrieve does not exist.",
-        fields          => ["id"],
-        },
-    'WebGUI::Error::ObjectNotFound::Template' => {
-        isa             => 'WebGUI::Error',
-        description     => "The template an asset was trying to retrieve does not exist.",
-        fields          => [qw/templateId assetId/],
-        },
-    'WebGUI::Error::InvalidFile' => {
-        isa             => 'WebGUI::Error',
-        description     => "The file you have provided has errors.",
-        fields          => [qw{ brokenFile brokenLine }],
-        },
-    'WebGUI::Error::Template' => {
-        isa             => 'WebGUI::Error',
-        description     => "A template has errors that prevent it from being processed.",
-        },
-    'WebGUI::Error::NotInConfig' => {
-        isa             => 'WebGUI::Error',
-        description     => 'A module was requested that does not exist in the configuration file.',
-        fields          => [qw{ module configKey }],
-        },
-);
 
 sub WebGUI::Error::full_message {
     my $self = shift;
@@ -104,10 +55,33 @@ A base class for all exception handling. It creates a few base exception objects
 
 B<NOTE>: Though the package name is WebGUI::Exception, the handler objects that are created are WebGUI::Error.
 
+=head1 DESCRIPTION
+
+To the new policies for API methods are: if there's an error message to the user, there's one to the log. 
+Only trap exceptions in C<www_> methods and always report them.
+
+API methods now have a policy of throwing errors from this class to be caught by C<eval { }>
+or C<catch { }> in the calling code.
+Code using the API (such as in C<www_> methods, upgrade scripts, and so forth) should 
+use C<Exception::Class> to identify it, then either handle it gracefully or else 
+propogate it.
+
+    eval {
+        my $expected_result = WebGUI::Somewhere->something(@args);
+    };
+    if( my $e = Exception::Class->caught('WebGUI::Error::InvalidParam') ) {
+        # clean up or retry but otherwise don't do anything and the error will just vanish
+    } elsif( my $e = Exception::Class->caught() {
+        $e->rethrow;  # rethrow all unexpected errors
+    }
+
 =head1 EXCEPTION TYPES
 
 These exception classes are defined in this class:
 
+=cut
+
+#-------------------------------------------------------------------
 
 =head2 WebGUI::Error
 
@@ -137,6 +111,30 @@ A read only exception method that returns the line number where the exception wa
 
 A read only exception method that returns the package name where the exception was thrown.
 
+=cut
+
+#-------------------------------------------------------------------
+
+=head2 WebGUI::Error::OverrideMe
+
+An interface was not overriden as expected.
+
+=cut
+
+#-------------------------------------------------------------------
+
+=head2 WebGUI::Error::MethodNotFound
+
+Tried calling a method that doesn't exist.
+
+=head3 method
+
+The method called.
+
+=cut
+
+#-------------------------------------------------------------------
+
 =head2 WebGUI::Error::InvalidObject
 
 Used when looking to make sure objects are passed in that you expect. ISA WebGUI::Error::InvalidParam.
@@ -149,6 +147,10 @@ The type of object expected ("HASH", "ARRAY", "WebGUI::User", etc).
 
 The object type we got.
 
+=cut
+
+#-------------------------------------------------------------------
+
 =head2 WebGUI::Error::InvalidParam
 
 Used when an invalid parameter is passed into a subroutine.
@@ -156,6 +158,10 @@ Used when an invalid parameter is passed into a subroutine.
 =head3 param
 
 Used to return the bad parameter, if present.
+
+=cut
+
+#-------------------------------------------------------------------
 
 =head2 WebGUI::Error::ObjectNotFound
 
@@ -165,20 +171,164 @@ Used when an object is trying to be retrieved, but does not exist. ISA WebGUI::E
 
 The id of the object to be retrieved.
 
-=head2 WebGUI::Error::MethodNotFound
+=cut
 
-Tried calling a method that doesn't exist.
+#-------------------------------------------------------------------
 
-=head3 method
+=head2 WebGUI::Error::ObjectNotFound::Template
 
-The method called.
+Used when a template is trying to be retrieved, but does not exist. ISA WebGUI::Error::ObjectNotFound.
 
-=head2 WebGUI::Error::OverrideMe
+=head3 templateId | id | assetId
 
-An interface was not overriden as expected.
+The id of the object to be retrieved.
 
 =cut
 
+#-------------------------------------------------------------------
+
+=head2 WebGUI::Error::InvalidFile
+
+Used when accessing a file and there are formatting or data problems found in the file. ISA WebGUI::Error.
+
+=head3 brokenFile
+
+The filename.
+
+=head3 brokenLine
+
+The line the error was found on.
+
+=cut
+
+#-------------------------------------------------------------------
+
+=head2 WebGUI::Error::Template
+
+Used when a template has parsing errors. ISA WebGUI::Error.
+
+=cut
+
+#-------------------------------------------------------------------
+
+=head2 WebGUI::Error::Connection
+
+Used when connecting to an external resource and it fails for some reason. ISA WebGUI::Error.
+
+=head3 resource
+
+The name or configuration or URL of the resource trying to be accessed.
+
+=cut
+
+use Exception::Class (
+
+    'WebGUI::Error' => {
+        description     => "A general error occured.",
+     },
+
+
+    'WebGUI::Error::OverrideMe' => {
+        isa             => 'WebGUI::Error',
+        description     => 'This method should be overridden by subclasses.',
+     },
+
+
+    'WebGUI::Error::MethodNotFound' => {
+        isa             => 'WebGUI::Error',
+        description     => q|Called a method that doesn't exist.|,
+        fields          => 'method'
+    },
+
+
+    'WebGUI::Error::InvalidObject' => {
+        isa             => 'WebGUI::Error::InvalidParam',
+        description     => "Expected to get a reference to an object type that wasn't gotten.",
+        fields          => ["expected","got"],
+    },
+
+
+    'WebGUI::Error::InvalidParam' => {
+        isa             => 'WebGUI::Error',
+        description     => "Expected to get a param we didn't get.",
+        fields          => ["param"],
+    },
+
+
+    'WebGUI::Error::Compile' => {
+        isa             => 'WebGUI::Error',
+        description     => "Unable to compile the requested class",
+        fields          => ["class", "cause"],
+    },
+
+
+    'WebGUI::Error::ObjectNotFound' => {
+        isa             => 'WebGUI::Error',
+        description     => "The object you were trying to retrieve does not exist.",
+        fields          => ["id"],
+    },
+
+
+    'WebGUI::Error::ObjectNotFound::Template' => {
+        isa             => 'WebGUI::Error',
+        description     => "The template an asset was trying to retrieve does not exist.",
+        fields          => [qw/templateId assetId/],
+    },
+
+
+    'WebGUI::Error::InvalidFile' => {
+        isa             => 'WebGUI::Error',
+        description     => "The file you have provided has errors.",
+        fields          => [qw{ brokenFile brokenLine }],
+    },
+
+
+    'WebGUI::Error::Template' => {
+        isa             => 'WebGUI::Error',
+        description     => "A template has errors that prevent it from being processed.",
+    },
+
+
+   'WebGUI::Error::Connection' => {
+        isa             => 'WebGUI::Error',
+        description     => "Couldn't establish a connection.",
+        fields          => [qw{ resource }],
+    },
+
+    'WebGUI::Error::Fatal' => {
+        isa             => 'WebGUI::Error',
+        description     => "Fatal error that should be shown to all site visitors.",
+    },
+
+    'WebGUI::Error::Database' => {
+        isa             => 'WebGUI::Error',
+        description     => 'A database error',
+    },
+
+    'WebGUI::Error::NotInConfig' => {
+        isa             => 'WebGUI::Error',
+        description     => 'A module was requested that does not exist in the configuration file.',
+        fields          => [qw{ module configKey }],
+    },
+
+    'WebGUI::Error::RunTime' => {
+        isa             => 'WebGUI::Error',
+        description     => 'Perl runtime error.',
+    },
+);
+
+{
+    package WebGUI::Error;
+    use overload '~~' => sub {
+        return $_[0]->isa($_[1]);
+    },
+    'eq' => sub {
+        return $_[0]->error eq $_[1];
+    },
+    'ne' => sub {
+        return $_[0]->error ne $_[1];
+    };
+}
 
 1;
 

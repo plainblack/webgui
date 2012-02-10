@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -8,9 +8,7 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../lib";
 
 ##The goal of this test is to test the creation of Snippet Assets.
 
@@ -24,8 +22,8 @@ my $session = WebGUI::Test->session;
 my $node = WebGUI::Asset->getImportNode($session);
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Snippet Test"});
-addToCleanup($versionTag);
-my $snippet = $node->addChild({className=>'WebGUI::Asset::Snippet'});
+WebGUI::Test->addToCleanup($versionTag);
+my $snippet = $node->addChild({className=>'WebGUI::Asset::Snippet', });
 
 # Make sure TemplateToolkit is in the config file
 WebGUI::Test->originalConfig( 'templateParsers' );
@@ -45,15 +43,6 @@ $snippet->update($properties);
 
 foreach my $property (keys %{$properties}) {
 	is ($snippet->get($property), $properties->{$property}, "updated $property is ".$properties->{$property});
-}
-
-# Test the getToolbar method
-for (1..2) {
-	my $toolbarState = $snippet->getToolbarState;
-	my $toolbar = $snippet->getToolbar;
-	is($toolbar, undef, 'getToolbar method returns undef when _toolbarState is set') if $toolbarState;
-	isnt($toolbar, undef, 'getToolbar method returns something other than undef when _toolbarState is not set') unless $toolbarState;
-	$snippet->toggleToolbar;
 }
 
 # Rudimentry test of the view method
@@ -83,7 +72,6 @@ $snippet->update({
     snippet => q|^SQL(select value from settings where name="[% title %]");|
 });
 
-WebGUI::Test->originalConfig('macros');
 $session->config->addToHash('macros', 'SQL', 'SQL');
 
 is($snippet->view(), 'WebGUI', 'Interpolating macros in works with template in the correct order');
@@ -109,11 +97,17 @@ is $snippet->view(1), 'Cache test: 3', 'receive uncached content since view was 
 #----------------------------------------------------------------------
 #Check packing
 
-my $snippet2 = $node->addChild({className => 'WebGUI::Asset::Snippet'});
 my $tag2 = WebGUI::VersionTag->getWorking($session);
+my $snippet2 = $node->addChild({className => 'WebGUI::Asset::Snippet', });
 $snippet2->update({mimeType => 'text/javascript'});
 $tag2->commit;
-addToCleanup($tag2);
+WebGUI::Test->addToCleanup($tag2);
+
+$snippet2->snippet('uncompressable');
+is $snippet2->snippetPacked, 'uncompressable', 'packed snippet content was set';
+
+$snippet2->snippet("two\n\nwords");
+is $snippet2->snippetPacked, "two words", '... and packed';
 
 open my $JSFILE, WebGUI::Test->getTestCollateralPath('jquery.js')
     or die "Unable to open jquery test collateral file: $!";
@@ -124,6 +118,7 @@ my $jquery;
 };
 close $JSFILE;
 
+$snippet2 = $snippet2->cloneFromDb;
 is $snippet2->get('snippetPacked'), undef, 'no packed content';
 lives_ok { $snippet2->update({snippet => $jquery}); } 'did not die during packing jquery';
 ok $snippet2->get('snippetPacked'), 'snippet content was packed';

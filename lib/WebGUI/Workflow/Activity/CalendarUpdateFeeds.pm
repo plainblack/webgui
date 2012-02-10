@@ -4,7 +4,7 @@ package WebGUI::Workflow::Activity::CalendarUpdateFeeds;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -345,7 +345,7 @@ sub execute {
         # If this event already exists, update
         if ($assetId) {
             $session->log->info( "Updating existing asset $assetId" );
-            my $event   = WebGUI::Asset->newByDynamicClass($session,$assetId);
+            my $event   = eval { WebGUI::Asset->newById($session,$assetId); };
 
             if ($event) {
                 $event->update($properties);
@@ -354,7 +354,7 @@ sub execute {
         }
         else {
             $session->log->info( "Creating new Event!" );
-            my $calendar = WebGUI::Asset->newByDynamicClass($session,$feed->{assetId});
+            my $calendar = WebGUI::Asset->newById($session,$feed->{assetId});
             my $event   = $calendar->addChild($properties, undef, undef, { skipAutoCommitWorkflows => 1});
             $feed->{added}++;
             if ($recur) {
@@ -376,7 +376,7 @@ sub execute {
     }
     for my $feedId (keys %$feedList) {
         my $feed = $feedList->{$feedId};
-        my $calendar = WebGUI::Asset->newByDynamicClass($session, $feed->{assetId});
+        my $calendar = WebGUI::Asset->newById($session, $feed->{assetId});
         my $feedData = $calendar->getFeed($feedId);
         $feedData->{lastResult}  = "Success! $feed->{added} added, $feed->{updated} updated, $feed->{errored} parsing errors";
         $feedData->{lastUpdated} = $dt;

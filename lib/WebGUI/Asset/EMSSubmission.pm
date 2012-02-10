@@ -3,7 +3,7 @@ package WebGUI::Asset::EMSSubmission;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -14,11 +14,142 @@ package WebGUI::Asset::EMSSubmission;
 
 =cut
 
-use Class::C3;
 use strict;
+use Moose;
+use WebGUI::Definition::Asset;
+use WebGUI::Asset;
+use WebGUI::International;
+use WebGUI::Form::Combo;
+use WebGUI::Form::SelectBox;
+use WebGUI::Form::CheckList;
+
+extends 'WebGUI::Asset';
+define tableName => 'EMSSubmission';
+define assetNae  => ['assetName', 'Asset_EMSSubmission'];
+define icon      => 'EMSSubmission.gif';
+
+property submissionId => (
+    noFormPost => 1,
+    fieldType  => "hidden",
+    default    => undef,
+);
+property submissionStatus => (
+    fieldType        => "selectList",
+    default          => 'pending',
+    customDrawMethod => 'drawStatusField',
+    label            => [ "submission status", 'Asset_EMSSubmission' ],
+    hoverHelp        => [ "submission status help", 'Asset_EMSSubmission' ]
+);
+property description => (
+    tab       => "properties",
+    fieldType => "HTMLArea",
+    default   => undef,
+    label     => [ "description", 'Asset_Sku' ],
+    hoverHelp => [ "description help", 'Asset_Sku' ]
+);
+property sku => (
+    tab       => "shop",
+    fieldType => "text",
+    builder   => '_builder_sku',
+    lazy      => 1,
+    label     => [ "sku", 'Asset_Sku' ],
+    hoverHelp => [ "sku help", 'Asset_Sku' ]
+);
+sub _builder_sku {
+    my $self = shift;
+    return $self->session->id->generate;
+}
+property displayTitle => (
+    tab       => "display",
+    fieldType => "yesNo",
+    default   => 1,
+    label     => [ "display title", 'Asset_Sku' ],
+    hoverHelp => [ "display title help", 'Asset_Sku' ]
+);
+property vendorId => (
+    tab       => "shop",
+    fieldType => "vendor",
+    default   => 'defaultvendor000000000',
+    label     => [ "vendor", 'Asset_Sku' ],
+    hoverHelp => [ "vendor help", 'Asset_Sku' ]
+);
+property shipsSeparately => (
+    tab       => 'shop',
+    fieldType => 'yesNo',
+    default   => 0,
+    label     => [ 'shipsSeparately', 'Asset_Sku' ],
+    hoverHelp => [ 'shipsSeparately help', 'Asset_Sku' ],
+);
+
+property price => (
+    tab       => "shop",
+    fieldType => "float",
+    default   => 0.00,
+    label     => [ "price", 'Asset_EMSSubmission' ],
+    hoverHelp => [ "price help", 'Asset_EMSSubmission' ],
+);
+property seatsAvailable => (
+    tab       => "shop",
+    fieldType => "integer",
+    default   => 25,
+    label     => [ "seats available", 'Asset_EMSSubmission' ],
+    hoverHelp => [ "seats available help", 'Asset_EMSSubmission' ],
+);
+property startDate => (
+    noFormPost   => 1,
+    fieldType    => "dateTime",
+    builder      => '_default_startDate',
+    label        => [ "add/edit event start date", 'Asset_EMSSubmission' ],
+    hoverHelp    => [ "add/edit event start date help", 'Asset_EMSSubmission' ],
+    autoGenerate => 0,
+);
+sub _default_startDate {
+    return WebGUI::DateTime->new()->toMysql;
+}
+property duration => (
+    tab       => "properties",
+    fieldType => "float",
+    default   => 1.0,
+    subtext   => [ 'hours', 'Asset_EMSSubmission' ],
+    label     => [ "duration", 'Asset_EMSSubmission' ],
+    hoverHelp => [ "duration help", 'Asset_EMSSubmission' ],
+);
+property location => (
+    fieldType        => "combo",
+    tab              => "properties",
+    customDrawMethod => 'drawLocationField',
+    label            => [ "location", 'Asset_EMSSubmission' ],
+    hoverHelp        => [ "location help", 'Asset_EMSSubmission' ],
+);
+property relatedBadgeGroups => (
+    tab              => "properties",
+    fieldType        => "checkList",
+    customDrawMethod => 'drawRelatedBadgeGroupsField',
+    label            => [ "related badge groups", 'Asset_EMSSubmission' ],
+    hoverHelp        => [ "related badge groups ticket help", 'Asset_EMSSubmission' ],
+);
+property relatedRibbons => (
+    tab              => "properties",
+    fieldType        => "checkList",
+    customDrawMethod => 'drawRelatedRibbonsField',
+    label            => [ "related ribbons", 'Asset_EMSSubmission' ],
+    hoverHelp        => [ "related ribbons help", 'Asset_EMSSubmission' ],
+);
+property eventMetaData => (
+    noFormPost => 1,
+    fieldType  => "hidden",
+    default    => '{}',
+);
+property ticketId => (
+    noFormPost => 1,
+    fieldType  => "hidden",
+    default    => '',
+);
+
+with 'WebGUI::Role::Asset::Comments';
+
 use Tie::IxHash;
-use base qw(WebGUI::AssetAspect::Comments WebGUI::Asset);
-use WebGUI::Utility;
+use base qw(WebGUI::Asset);
 use WebGUI::Inbox;
 
 =head1 NAME
@@ -58,172 +189,14 @@ send email when a comment is added
 
 =cut
 
-sub addComment {
+around addComment => sub {
+    my $orig = shift;
     my $self = shift;
     $self->update({lastReplyBy => $self->session->user->userId});
-    $self->next::method(@_);
+    $self->$orig(@_);
     $self->sendEmailUpdate;
-}
+};
 
-
-#-------------------------------------------------------------------
-
-=head2 addRevision
-
-This method exists for demonstration purposes only.  The superclass
-handles revisions to NewAsset Assets.
-
-=cut
-
-#sub addRevision {
-#    my $self    = shift;
-#    my $newSelf = $self->next::method(@_);
-#    return $newSelf;
-#}
-
-#-------------------------------------------------------------------
-
-=head2 definition ( session, definition )
-
-defines asset properties for New Asset instances.  You absolutely need 
-this method in your new Assets. 
-
-=head3 session
-
-=head3 definition
-
-A hash reference passed in from a subclass definition.
-
-=cut
-
-sub definition {
-    my $class      = shift;
-    my $session    = shift;
-    my $definition = shift;
-    my $i18n       = WebGUI::International->new( $session, "Asset_EMSSubmission" );
-    my $EMS_i18n = WebGUI::International->new($session, "Asset_EventManagementSystem");
-    my $SKU_i18n = WebGUI::International->new($session, "Asset_Sku");
-    tie my %properties, 'Tie::IxHash', (
-		submissionId => {
-			    noFormPost      => 1,
-			    fieldType       => "hidden",
-			    defaultValue => undef,
-		},
-		submissionStatus => {
-			    fieldType    =>"selectList",
-			    defaultValue => 'pending',
-			customDrawMethod=> 'drawStatusField',
-                        label                   => $i18n->get("submission status"),
-                        hoverHelp               => $i18n->get("submission status help")
-		},
-                description => {
-                        tab                             => "properties",
-                        fieldType               => "HTMLArea",
-                        defaultValue    => undef,
-                        label                   => $SKU_i18n->get("description"),
-                        hoverHelp               => $SKU_i18n->get("description help")
-                        },
-                sku => {
-                        tab                             => "shop",
-                        fieldType               => "text",
-                        defaultValue    => $session->id->generate,
-                        label                   => $SKU_i18n->get("sku"),
-                        hoverHelp               => $SKU_i18n->get("sku help")
-                        },
-                displayTitle => {
-                        tab                             => "display",
-                        fieldType               => "yesNo",
-                        defaultValue    => 1,
-                        label                   => $SKU_i18n->get("display title"),
-                        hoverHelp               => $SKU_i18n->get("display title help")
-                        },
-                vendorId => {
-                        tab                             => "shop",
-                        fieldType               => "vendor",
-                        defaultValue    => 'defaultvendor000000000',
-                        label                   => $SKU_i18n->get("vendor"),
-                        hoverHelp               => $SKU_i18n->get("vendor help")
-                        },
-		shipsSeparately => {
-		    tab             => 'shop',
-		    fieldType       => 'yesNo',
-		    defaultValue    => 0,
-		    label           => $SKU_i18n->get('shipsSeparately'),
-		    hoverHelp       => $SKU_i18n->get('shipsSeparately help'),
-		},
-
-		price => {
-				tab             => "shop",
-				fieldType       => "float",
-				defaultValue    => 0.00,
-				label           => $EMS_i18n->get("price"),
-				hoverHelp       => $EMS_i18n->get("price help"),
-		},
-		seatsAvailable => {
-				tab             => "shop",
-				fieldType       => "integer",
-				defaultValue    => 25,
-				label           => $EMS_i18n->get("seats available"),
-				hoverHelp       => $EMS_i18n->get("seats available help"),
-		},
-		startDate => {
-			    noFormPost      => 1,
-			    fieldType       => "dateTime",
-			    defaultValue    => '',
-			    label           => $EMS_i18n->get("add/edit event start date"),
-			    hoverHelp       => $EMS_i18n->get("add/edit event start date help"),
-			    autoGenerate    => 0,
-		},
-		duration => {
-				tab             => "properties",
-				fieldType       => "float",
-				defaultValue    => 1.0,
-				subtext         => $EMS_i18n->get('hours'),
-				label           => $EMS_i18n->get("duration"),
-				hoverHelp       => $EMS_i18n->get("duration help"),
-		},
-		location => {
-				fieldType       => "combo",
-				tab             => "properties",
-				customDrawMethod=> 'drawLocationField',
-				label           => $EMS_i18n->get("location"),
-				hoverHelp       => $EMS_i18n->get("location help"),
-		},
-		relatedBadgeGroups => {
-				tab             => "properties",
-				fieldType       => "checkList",
-				customDrawMethod=> 'drawRelatedBadgeGroupsField',
-				label           => $EMS_i18n->get("related badge groups"),
-				hoverHelp       => $EMS_i18n->get("related badge groups ticket help"),
-		},
-		relatedRibbons => {
-				tab             => "properties",
-				fieldType       => "checkList",
-				customDrawMethod=> 'drawRelatedRibbonsField',
-				label           => $EMS_i18n->get("related ribbons"),
-				hoverHelp       => $EMS_i18n->get("related ribbons help"),
-		},
-		eventMetaData => {
-				noFormPost              => 1,
-				fieldType               => "hidden",
-				defaultValue    => '{}',
-		},
-                ticketId => {
-				noFormPost              => 1,
-				fieldType               => "hidden",
-				defaultValue    => '',
-                },
-    );
-    push @{$definition}, {
-        assetName         => $i18n->get('assetName'),
-        icon              => 'EMSSubmission.gif',
-        autoGenerateForms => 1,
-        tableName         => 'EMSSubmission',
-        className         => 'WebGUI::Asset::EMSSubmission',
-        properties        => \%properties,
-        };
-    return $class->next::method( $session, $definition );
-} ## end sub definition
 
 #-------------------------------------------------------------------
 
@@ -238,17 +211,17 @@ sub drawLocationField {
 	my $ems = $self->ems;
 	my $options = { map { $_ => $_ } ( @{ $ems->getSubmissionLocations || [ $ems->getLocations ] } ) } ;
 	if( $ems->isRegistrationStaff ) {
-	    return WebGUI::Form::combo($self->session, {
+	    return WebGUI::Form::Combo->new($self->session, {
 		    name    => 'location',
 		    value   => $self->get('location'),
 		    options => $options,
-		});
+		})->toHtml;
 	} else {
-	    return WebGUI::Form::selectBox($self->session, {
+	    return WebGUI::Form::SelectBox->new($self->session, {
 		    name    => 'location',
 		    value   => $self->get('location'),
 		    options => $options,
-		});
+		})->toHtml;
 	}
 }
 
@@ -262,12 +235,12 @@ Draws the field for the relatedBadgeGroups property.
 
 sub drawRelatedBadgeGroupsField {
         my ($self, $params) = @_;
-        return WebGUI::Form::checkList($self->session, {
+        return WebGUI::Form::CheckList->new($self->session, {
                 name            => $params->{name},
                 value           => $self->get($params->{name}),
                 vertical        => 1,
                 options         => $self->getParent->getParent->getBadgeGroups,
-                });
+                })->toHtml;
 }
 
 #-------------------------------------------------------------------
@@ -284,12 +257,12 @@ sub drawRelatedRibbonsField {
         foreach my $ribbon (@{$self->getParent->getParent->getRibbons}) {
                 $ribbons{$ribbon->getId} = $ribbon->getTitle;
         }
-        return WebGUI::Form::checkList($self->session, {
+        return WebGUI::Form::CheckList->new($self->session, {
                 name            => $params->{name},
                 value           => $self->get($params->{name}),
                 vertical        => 1,
                 options         => \%ribbons,
-                });
+                })->toHtml;
 }
 
 #-------------------------------------------------------------------
@@ -305,29 +278,13 @@ sub drawStatusField {
         for my $key ( qw/pending created failed/ ) {
             delete $options->{$key} unless $currentStatus eq $key;
         }
-        return WebGUI::Form::SelectBox($self->session, {
+        return WebGUI::Form::SelectBox->new($self->session, {
                 name    => 'submissionStatus',
                 value   => $currentStatus,
                 options => $options,
-                });
+                })->toHtml;
 }
 
-
-#-------------------------------------------------------------------
-
-=head2 duplicate
-
-This method exists for demonstration purposes only.  The superclass
-handles duplicating NewAsset Assets.  This method will be called 
-whenever a copy action is executed
-
-=cut
-
-#sub duplicate {
-#    my $self     = shift;
-#    my $newAsset = $self->next::method(@_);
-#    return $newAsset;
-#}
 
 #-------------------------------------------------------------------
 
@@ -396,33 +353,33 @@ sub www_editSubmission {
         my $assetId = $self ? $self->getId : $params->{assetId} || $session->form->get('assetId') || 'new';
 
         if( $assetId ne 'new' ) {
-            $self ||= WebGUI::Asset->newByDynamicClass($session,$assetId);
-            if (!defined $self) {
-                $session->errorHandler->error(__PACKAGE__ . " - failed to instanciate asset with assetId $assetId");
+            $self ||= eval { WebGUI::Asset->newById($session,$assetId); };
+            if (Exception::Class->caught()) {
+                $session->log->error(__PACKAGE__ . " - failed to instanciate asset with assetId $assetId");
             }
         }
         my $asset = $self || $parent;
 	my $url = $asset->getUrl('func=editSubmissionSave');
-        my $newform = WebGUI::HTMLForm->new($session,action => $url);
-        $newform->hidden(name => 'assetId', value => $assetId);
+        my $newform = WebGUI::FormBuilder->new($session,action => $url);
+        $newform->addField( "hidden", name => 'assetId', value => $assetId);
 	my $formDescription = $parent->getFormDescription;
-	my @defs = reverse @{__PACKAGE__->definition($session)};
         my @fieldNames = qw/title submissionStatus startDate duration seatsAvailable location description/;
         my $fields;
-        for my $def ( @defs ) {
-	    my $properties = $def->{properties};
-	    for my $fieldName ( keys %$properties ) {
-		if( defined $formDescription->{$fieldName} ) {
-		      $fields->{$fieldName} = { %{$properties->{$fieldName}} }; # a simple first level copy
-		      if( $fieldName eq 'description' ) {
-		          $fields->{description}{height} = 200;
-		          $fields->{description}{width} = 350;
-		      }
-		      $fields->{$fieldName}{fieldId} = $fieldName;
-		      $fields->{$fieldName}{name} = $fieldName;
-		      $fields->{$fieldName}{value} = $self->get($fieldName) if $self;
-		}
-	    }
+        my $class   = 'WebGUI::Asset::EMSSubmission';
+        foreach my $fieldName (@fieldNames) {
+            my $attr            = $class->meta->find_attribute_by_name( $fieldName );
+            $fields->{$fieldName} = {
+                                fieldId     => $fieldName,
+                                name        => $fieldName,
+                                fieldType   => $attr->fieldType,
+                                noFormPost  => $attr->noFormPost,
+                                %{ $class->getFormProperties( $session, $fieldName ) },
+                    };
+              if( $fieldName eq 'description' ) {
+                  $fields->{description}{height} = 200;
+                  $fields->{description}{width} = 350;
+              }
+              $fields->{$fieldName}{value} = $self->get($fieldName) if $self;
         }
         # add the meta field
         for my $metaField ( @{$parent->getParent->getEventMetaFields} ) {
@@ -434,6 +391,8 @@ sub www_editSubmission {
 		$fields->{$fieldId}{fieldType} = $metaField->{dataType};
 		$fields->{$fieldId}{name} = $fieldId;
 		$fields->{$fieldId}{value} = $self->get($fieldId) if $self;
+        $fields->{$fieldId}{options} = $metaField->{possibleValues};
+        $fields->{$fieldId}{defaultValue} = $metaField->{defaultValues};
 	    }
         }
 
@@ -447,11 +406,11 @@ sub www_editSubmission {
 		    my $drawMethod = __PACKAGE__ . '::' . $field->{customDrawMethod};
 		    if ($asset->can( $drawMethod )) {
 			$field->{value} = $asset->$drawMethod($field);
-			delete $field->{name}; # don't want readOnly to generate a hidden field
+			$field->{addHidden} = 0;
 			$field->{fieldType} = "readOnly";
 		    }
  
-	        $newform->dynamicField(%$field);
+	        $newform->addField( $field->{fieldType}, %$field);
 	    } else {
 	        my $value;
 	        # TODO see that the data gets formatted
@@ -461,14 +420,14 @@ sub www_editSubmission {
                 } else {
                     $value = $field->{value} || '[ ]';
                 }
-		$newform->readOnly(
+		$newform->addField( "readOnly", 
 		         label => $field->{label},
 			 value => $value,
 			 fieldId => $field->{fieldId},
 	            );
 	    }
 	}
-        $newform->submit;
+        $newform->addField( "submit", name => "send" );
 	my $title = $asset->get('title');
         my $content = 
                $asset->processTemplate({
@@ -476,18 +435,19 @@ sub www_editSubmission {
                       isDynamic => $session->form->get('asJson') || 0,
                       backUrl => $parent->getUrl,
                       pageTitle => $title,
-                      pageForm => $newform->print,
+                      pageForm => $newform->toHtml,
 		      commentForm => $self ? $self->getFormattedComments : '',
 		      commentFlag => $self ? 1 : 0 ,
+                      %{ $newform->toTemplateVars },
                   },$parent->getParent->get('eventSubmissionTemplateId'));
 	   WebGUI::Macro::process( $session, \$content );
     if( $params->{asHashRef} ) {
 	return { text => $content, title => $title, };
     } elsif( $session->form->get('asJson') ) {
-        $session->http->setMimeType( 'application/json' );
+        $session->response->content_type( 'application/json' );
 	return JSON->new->encode( { text => $content, title => $title, id => $assetId ne 'new' ? $assetId : 'new' . rand } );
     } else {
-        $session->http->setMimeType( 'text/html' );
+        $session->response->content_type( 'text/html' );
         return $asset->processStyle( $content );
     }
 }
@@ -505,7 +465,9 @@ sub www_editSubmissionSave {
         my $formParams = $self->processForm;
         if( $formParams->{_isValid} ) {
             delete $formParams->{_isValid};
-            $self->addRevision($formParams);
+            my $tag = WebGUI::VersionTag->getWorking( $session );
+            my $newRevision = $self->addRevision({%$formParams,tagId => $tag->getId, status => "pending",});
+            $newRevision->setVersionLock;
 	    WebGUI::VersionTag->autoCommitWorkingIfEnabled($session, { override => 1, allowComments => 0 });
 	    $self = $self->cloneFromDb;
             $self->sendEmailUpdate;
@@ -524,52 +486,6 @@ calles ems->view
 =cut
 
 sub www_view { $_[0]->ems->www_viewSubmissionQueue }
-
-#-------------------------------------------------------------------
-
-=head2 getEditForm ( )
-
-Extends the base class to add Tax information for the Sku, in a new tab.
-
-=cut
-
-sub getEditForm {
-    my $self    = shift;
-    my $session = $self->session;
-
-    my $tabform = $self->SUPER::getEditForm;
-
-    # TODO once comments can be submitted using AJAX this will work...
-       # be sure to uncomment the tab in the next function also...
-    #my $comments        = $tabform->getTab( 'comments' );
-
-#    $comments->div({name => 'comments',
-#      contentCallback => sub { $self->getFormattedComments },
-#    });
-
-    return $tabform;
-}
-
-#-------------------------------------------------------------------
-
-=head2 getEditTabs ( )
-
-defines 2 new tabs.
-the shop tab is created here to mimic the function of the sku-created 
-shop tab.  this class holds data like Sku assets so that they can be assigned
-in the future when the sku asset is created from this data.
-
-=cut
-
-sub getEditTabs {
-        my $self = shift;
-        my $i18n = WebGUI::International->new($self->session,"Asset_EMSSubmission");
-        my $sku_i18n = WebGUI::International->new($self->session,"Asset_Sku");
-        return ($self->SUPER::getEditTabs(), ['shop', $sku_i18n->get('shop'), 9],
-            # The comment tab is not available because comments are not AJAX yet...
-          # ['comments', $i18n->get('comments'), 9]
-          );
-}
 
 #-------------------------------------------------------------------
 
@@ -592,11 +508,11 @@ Making private. See WebGUI::Asset::indexContent() for additonal details.
 
 =cut
 
-sub indexContent {
+override indexContent => sub {
     my $self    = shift;
-    my $indexer = $self->next::method;
+    my $indexer = super();
     $indexer->setIsPublic(0);
-}
+};
 
 #-------------------------------------------------------------------
 
@@ -609,10 +525,6 @@ See WebGUI::Asset::prepareView() for details.
 sub prepareView {
     my $self = shift;
     $self->ems->prepareView;
-    #$self->next::method();
-    #my $template = WebGUI::Asset::Template->new( $self->session, $self->get("templateId") );
-    #$template->prepare($self->getMetaDataAsTemplateVariables);
-    #$self->{_viewTemplate} = $template;
 }
 
 #----------------------------------------------------------------
@@ -659,50 +571,6 @@ sub processForm {
     return $params;
 }
 
-#-------------------------------------------------------------------
-
-=head2 processPropertiesFromFormPost ( )
-
-Used to process properties from the form posted.  Do custom things with
-noFormPost fields here, or do whatever you want.  This method is called
-when /yourAssetUrl?func=editSave is requested/posted.
-
-=cut
-
-sub processPropertiesFromFormPost {
-    my $self = shift;
-    $self->next::method;
-}
-
-#-------------------------------------------------------------------
-
-=head2 purge ( )
-
-This method is called when data is purged by the system.
-removes collateral data associated with a NewAsset when the system
-purges it's data.  This method is unnecessary, but if you have 
-auxiliary, ancillary, or "collateral" data or files related to your 
-asset instances, you will need to purge them here.
-
-=cut
-
-#sub purge {
-#    my $self = shift;
-#    return $self->next::method;
-#}
-
-#-------------------------------------------------------------------
-
-=head2 purgeRevision ( )
-
-This method is called when data is purged by the system.
-
-=cut
-
-#sub purgeRevision {
-#    my $self = shift;
-#    return $self->next::method;
-#}
 
 #-------------------------------------------------------------------
 
@@ -719,25 +587,6 @@ sub view {
     #my $var  = $self->get;    # $var is a hash reference.
     #$var->{controls} = $self->getToolbar;
     #return $self->processTemplate( $var, undef, $self->{_viewTemplate} );
-}
-
-#-------------------------------------------------------------------
-
-=head2 www_edit ( )
-
-Web facing method which is the default edit page.  Unless the method needs
-special handling or formatting, it does not need to be included in
-the module.
-
-=cut
-
-sub www_edit {
-    my $self    = shift;
-    my $session = $self->session;
-    return $session->privilege->insufficient() unless $self->canEdit;
-    return $session->privilege->locked()       unless $self->canEditIfLocked;
-    my $i18n = WebGUI::International->new( $session, 'Asset_EMSSubmission' );
-    return $self->getAdminConsole->render( $self->getEditForm->print, $i18n->get('edit asset') );
 }
 
 1;

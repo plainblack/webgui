@@ -3,7 +3,7 @@ package WebGUI::Content::Prefetch;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -46,8 +46,8 @@ The content handler for this package.
 
 sub handler {
     my ($session) = @_;
-    if ($session->env->get("HTTP_X_MOZ") eq "prefetch") { # browser prefetch is a bad thing
-        $session->http->setStatus("403","We don't allow prefetch, because it increases bandwidth, hurts stats, and can break web sites.");
+    if ($session->request->env->{"HTTP_X_MOZ"} eq "prefetch") { # browser prefetch is a bad thing
+        $session->response->status(403);
     }
     return undef;
 }

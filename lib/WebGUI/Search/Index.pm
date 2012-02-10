@@ -3,7 +3,7 @@ package WebGUI::Search::Index;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -102,6 +102,7 @@ sub addRecord {
     my %defaults = $self->session->db->quickHash('select * from assetIndex where assetId=? and url=?', [$asset->get('assetId'), $asset->get('url')]);
     $fields{keywords} = $self->_filterKeywords($fields{keywords});
     %fields           = (%defaults, %fields);
+    $fields{assetId}  = $asset->getId;
     $fields{lineage}  = $defaults{lineage};
     my $add = $self->session->db->prepare("replace into assetIndex (assetId, url, title, creationDate, revisionDate, 
         ownerUserId, groupIdView, groupIdEdit, lineage, className, synopsis, keywords, subId) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )");
@@ -167,19 +168,6 @@ sub delete {
 	my $self = shift;
 	my $delete = $self->session->db->prepare("delete from assetIndex where assetId=?");
 	$delete->execute([$self->getId]);
-}
-
-#-------------------------------------------------------------------
-
-=head2 DESTROY ( ) 
-
-Deconstructor.
-
-=cut
-
-sub DESTROY {
-	my $self = shift;
-	undef $self;
 }
 
 #-------------------------------------------------------------------

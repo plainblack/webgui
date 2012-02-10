@@ -1,6 +1,6 @@
 # vim:syntax=perl
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -12,13 +12,10 @@
 #  These tests are for the shiny rewritten export functionality. it tries
 #  really hard to test every permutation of the code.
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../lib";
 use Test::More;
 use Monkey::Patch qw(patch_class);
 use WebGUI::Test; # Must use this before any other WebGUI modules
-use WebGUI::PseudoRequest;
 
 use WebGUI::Session;
 use WebGUI::Asset;
@@ -45,7 +42,7 @@ my @events;
 
 my $testRan = 1;
 
-plan tests => 124;        # Increment this number for each test you create
+plan tests => 125;        # Increment this number for each test you create
 
 sub export_ok {
     my ($asset, $message) = @_;
@@ -186,7 +183,7 @@ is(-d $accessibleDirectory, 1, "exportCheckPath creating subdirectory actually c
 
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Asset Export Test"});
-addToCleanup($versionTag);
+WebGUI::Test->addToCleanup($versionTag);
 
 my $importNode = WebGUI::Asset->getImportNode($session);
 
@@ -206,6 +203,10 @@ my $grandChild = $firstChild->addChild({
     url => 'first_child/grand_child',
 });
 $versionTag->commit;
+
+foreach my $asset ($parent, $firstChild, $grandChild) {
+    $asset = $asset->cloneFromDb;
+}
 
 
 my $isExportable;
@@ -308,7 +309,7 @@ is($gcAsPath->absolute($exportPath)->stringify, $litmus->absolute($exportPath)->
 
 # now let's get tricky and test different file extensions
 my $storage = WebGUI::Storage->create($session);
-WebGUI::Test->addToCleanup($storage);
+WebGUI::Test->addToCleanup('WebGUI::Storage' => $storage->getId);
 my $filename = 'somePerlFile_pl.txt';
 $storage->addFileFromScalar($filename, $filename);
 $session->user({userId=>3});
@@ -324,7 +325,7 @@ my $properties = {
 
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Asset Export Test"});
-addToCleanup($versionTag);
+WebGUI::Test->addToCleanup($versionTag);
 
 my $asset = $importNode->addChild($properties, $properties->{id});
 $asset->update({
@@ -388,7 +389,7 @@ is($fileAsPath->absolute($exportPath)->stringify, $litmus->absolute($exportPath)
 # we need to be tricky here and call code in wG proper which calls www_ methods
 # even though we don't have access to modperl. the following hack lets us do
 # that.
-#$session->http->setNoHeader(1);
+#$session->response->setNoHeader(1);
 
 $session->user( { userId => 1 } );
 my $content;
@@ -398,7 +399,10 @@ $config->set('exportPath', $guidPath->absolute->stringify);
 export_ok $parent, 'exportWriteFile works when creating exportPath';
 
 # now make sure that it contains the correct content
-eval { $content = WebGUI::Test->getPage($parent, 'exportHtml_view', { user => WebGUI::User->new($session, 1) } ) };
+$content = WebGUI::Test->getPage2(
+    $parent->get('url').'?func=exportHtml_view', 
+    { user => WebGUI::User->new($session, 1) },
+);
 is(scalar $parent->exportGetUrlAsPath->slurp, $content, "exportWriteFile puts the correct contents in exported parent");
 
 
@@ -411,7 +415,7 @@ my $unwritablePath = Path::Class::Dir->new($config->get('uploadsPath'), 'temp', 
 chmod 0000, $guidPath->stringify;
 $config->set('exportPath', $unwritablePath->absolute->stringify);
 
-$session->http->setNoHeader(1);
+$session->response->setNoHeader(1);
 SKIP: {
     skip 'Root will cause this test to fail since it does not obey file permissions', 2
         if $< == 0;
@@ -442,30 +446,34 @@ $config->set('exportPath', $guidPath->absolute->stringify);
 chmod 0755, $guidPath->stringify;
 $unwritablePath->remove;
 
-$session->http->setNoHeader(1);
+$session->response->setNoHeader(1);
+eval { $firstChild->exportWriteFile() };
+is($@, '', "exportWriteFile works for first_child");
+
+# ensure that the file was actually written
 export_ok $firstChild, 'exportWriteFile works for first_child';
 
 # verify it has the correct contents
-eval { $content = WebGUI::Test->getPage($firstChild, 'exportHtml_view') };
+eval { $content = WebGUI::Test->getPage2( $firstChild->get('url').'?func=exportHtml_view', ) };
 is(scalar $firstChild->exportGetUrlAsPath->absolute->slurp, $content, "exportWriteFile puts the correct contents in exported first_child");
 
 # and one more level. remove the export path to ensure directory creation keeps
 # working.
 $guidPath->rmtree;
 
-$session->http->setNoHeader(1);
+$session->response->setNoHeader(1);
 $session->user( { userId => 1 } );
 export_ok $grandChild, 'exportWriteFile works for grandchild';
 
 # finally, check its contents
 $session->style->sent(0);
-eval { $content = WebGUI::Test->getPage($grandChild, 'exportHtml_view') };
+eval { $content = WebGUI::Test->getPage2( $grandChild->get('url').'?func=exportHtml_view', ) };
 is(scalar $grandChild->exportGetUrlAsPath->absolute->slurp, $content, "exportWriteFile puts correct content in exported grandchild");
 
 # test different extensions
 $guidPath->rmtree;
-$asset = WebGUI::Asset->new($session, 'ExportTest000000000001');
-$session->http->setNoHeader(1);
+$asset = WebGUI::Asset->newById($session, 'ExportTest000000000001');
+$session->response->setNoHeader(1);
 
 export_ok $asset, 'exportWriteFile for perl file works';
 
@@ -481,7 +489,7 @@ $guidPath->rmtree;
 # isn't allowed to see. this means that we'll need to temporarily change the
 # permissions on something.
 $parent->update( { groupIdView => 3 } ); # admins
-$session->http->setNoHeader(1);
+$session->response->setNoHeader(1);
 @events = trap {
     eval { $parent->exportWriteFile() };
     $e = Exception::Class->caught();
@@ -635,9 +643,7 @@ is(readlink $symlinkedRoot->stringify, $parentPath, 'exportSymlinkRoot sets up l
 unlink $symlinkedRoot->stringify;
 
 subtest exportRelated => sub {
-    my $old = WebGUI::VersionTag->getWorking($session, 'noCreate');
-    my $tag = WebGUI::VersionTag->create($session);
-    $tag->setWorking();
+    my $parent  = WebGUI::Test->asset;
     my $topic = $parent->addChild({
         className => 'WebGUI::Asset::Wobject::StoryTopic',
         keywords  => 'relatedAssetTesting'
@@ -649,20 +655,9 @@ subtest exportRelated => sub {
         className => 'WebGUI::Asset::Story',
         keywords  => 'relatedAssetTesting',
     });
-    $tag->commit();
-    my $cleanup = guard { $tag->rollback; if ($old) { $old->setWorking(); } };
-
-    # This will include some folders, because of the way Archive works
-    my $expected = $archive->getLineage(['self', 'descendants']);
-    push @$expected, $topic->getId;
-
-    # getContainer should be included; since parent is a Layout, the
-    # upward-recursion will stop there.
-    push @$expected, $topic->getContainer->getId;
-
-    cmp_bag(
+    cmp_deeply(
         $archive->exportGetAssetIds({ depth => 99, exportRelated => 1}),
-        $expected,
+        superbagof(map { $_->getId } ($topic, $archive, $story)),
         'exporting archive includes topic with exportRelated'
     );
     is(0, scalar grep { $_ eq $topic->getId }
@@ -675,9 +670,9 @@ subtest exportRelated => sub {
 # exportGetDescendants()
 
 # clear these out now so that they don't interfere with the lineage tests
-$asset = WebGUI::Asset->new($session, 'ExportTest000000000001');
+$asset = WebGUI::Asset->newById($session, 'ExportTest000000000001');
 $asset->purge;
-$asset = WebGUI::Asset->new($session, 'ExportTest000000000002');
+$asset = WebGUI::Asset->newById($session, 'ExportTest000000000002');
 $asset->purge;
 
 $session->user( { userId => 1 } );
@@ -805,11 +800,11 @@ is($@, '', "exportAsHtml on parent does not throw an error"); ##Note, string com
     [ qw/ parent                                   index.html /],
 );
 
-my $numberCreatedAll = scalar @createdFiles;
-like($message, qr/Exported $numberCreatedAll pages/, "exportAsHtml on parent returns correct message");
-
 # turn them into Path::Class::File objects
 @shouldExist = map { Path::Class::File->new($exportPath, @{$_})->absolute->stringify } @createdFiles;
+
+my $numberCreatedAll = scalar @createdFiles;
+like($message, qr/Exported $numberCreatedAll pages/, "exportAsHtml on parent returns correct message");
 
 # ensure that the files that should exist do exist
 my @doExist;
@@ -960,7 +955,7 @@ SKIP: {
 
 # user can't view asset
 $parent->update( { groupIdView => 3 } );
-$session->http->setNoHeader(1);
+$session->response->setNoHeader(1);
 
 chmod 0755, $tempDirectory;
 eval { ($message) = $parent->exportAsHtml( { userId => 1, depth => 99 } ) };

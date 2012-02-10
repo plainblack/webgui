@@ -1,6 +1,6 @@
 # vim:syntax=perl
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -13,9 +13,7 @@
 #
 #
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../../../lib";
 use Test::More;
 use Test::Deep;
 use WebGUI::Test;    # Must use this before any other WebGUI modules
@@ -25,11 +23,9 @@ use WebGUI::Session;
 # Init
 my $session = WebGUI::Test->session;
 
-my $df = WebGUI::Asset->getImportNode($session)->addChild( { 
+my $df = WebGUI::Test->asset->addChild( { 
     className => 'WebGUI::Asset::Wobject::DataForm', 
 } );
-
-addToCleanup( WebGUI::VersionTag->getWorking( $session ) );
 
 # Add fields to the dataform
 $df->createField( "name",    { type => "text", } );
@@ -145,7 +141,7 @@ while ( $entryIdx >= 0 ) {
         'record.entryId'        => $entries[$entryIdx]->getId,
         'record.userId'         => $session->user->userId,
         'record.username'       => $session->user->username,
-        'record.ipAddress'      => undef,
+        'record.ipAddress'      => $session->request->address,
         'record.delete.icon'    => ignore(),
         'record.delete.url'     => ignore(),
         'record.edit.icon'      => ignore(),

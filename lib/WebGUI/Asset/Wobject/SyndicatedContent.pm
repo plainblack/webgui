@@ -1,7 +1,7 @@
 package WebGUI::Asset::Wobject::SyndicatedContent;
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -12,13 +12,89 @@ package WebGUI::Asset::Wobject::SyndicatedContent;
 
 use strict;
 use HTML::Entities;
-use Tie::IxHash;
-use WebGUI::Cache;
 use WebGUI::Exception;
 use WebGUI::HTML;
 use WebGUI::International;
-use Class::C3;
-use base qw(WebGUI::AssetAspect::RssFeed WebGUI::Asset::Wobject);
+use LWP::UserAgent;
+
+use Moose;
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset::Wobject';
+
+define assetName => ['assetName','Asset_SyndicatedContent'];
+define icon      => 'syndicatedContent.gif';
+define tableName => 'SyndicatedContent';
+property cacheTimeout => (
+                tab          => "display",
+                fieldType    => "interval",
+                default      => 3600,
+                uiLevel      => 8,
+                label        => ["cache timeout", 'Asset_SyndicatedContent'],
+                hoverHelp    => ["cache timeout help", 'Asset_SyndicatedContent'],
+         );
+property templateId  => (
+                tab          => "display",
+                fieldType    => 'template',
+                default      => 'PBtmpl0000000000000065',
+                namespace    => 'SyndicatedContent',
+                label        => [72, 'Asset_SyndicatedContent'],
+                hoverHelp    => ['72 description', 'Asset_SyndicatedContent'],
+         );
+property rssUrl => (
+                tab          => "properties",
+                default      => undef,
+                fieldType    => 'textarea',
+                label        => [1, 'Asset_SyndicatedContent'],
+                hoverHelp    => ['1 description', 'Asset_SyndicatedContent'],
+         );
+property processMacroInRssUrl => (
+                tab          => "properties",
+                default      => 0,
+                fieldType    => 'yesNo',
+                label        => ['process macros in rss url', 'Asset_SyndicatedContent'],
+                hoverHelp    => ['process macros in rss url description', 'Asset_SyndicatedContent'],
+         );
+property maxHeadlines => (
+                tab          => "display",
+                fieldType    => 'integer',
+                default      => 10,
+                label        => [3, 'Asset_SyndicatedContent'],
+                hoverHelp    => ['3 description', 'Asset_SyndicatedContent'],
+         );
+property hasTerms => (
+                tab          => "properties",
+                fieldType    => 'text',
+                default      => '',
+                label        => ['hasTermsLabel', 'Asset_SyndicatedContent'],
+                hoverHelp    => ['hasTermsLabel description', 'Asset_SyndicatedContent'],
+                maxlength    => 255,
+         );
+property sortItems => (
+                tab             => 'properties',
+                fieldType       => 'selectBox',
+                default         => 'none',
+                label           => ['sortItemsLabel', 'Asset_SyndicatedContent'],
+                hoverHelp       => ['sortItemsLabel description', 'Asset_SyndicatedContent'],
+                options         => \&_sortItems_options,
+         );
+sub _sortItems_options {
+    my $session = shift->session;
+	my $i18n    = WebGUI::International->new($session,'Asset_SyndicatedContent');
+    tie my %o, 'Tie::IxHash', (
+        none        => $i18n->get('no order'),
+        feed        => $i18n->get('feed order'),
+        pubDate_asc => $i18n->get('publication date ascending'),
+        pubDate_des => $i18n->get('publication date descending'),
+    );
+    return \%o;
+}
+has '+uiLevel' => (
+    default => 6,
+);
+
+
+
+with 'WebGUI::Role::Asset::RssFeed';
 use WebGUI::Macro;
 use XML::FeedPP;
 use XML::FeedPP::MediaRSS;
@@ -44,100 +120,6 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 
-=head2 definition ( definition )
-
-Defines the properties of this asset.
-
-=head3 definition
-
-A hash reference passed in from a subclass definition.
-
-=cut
-
-sub definition {
-	my $class = shift;
-	my $session = shift;
-        my $definition = shift;
-	my %properties;
-	tie %properties, 'Tie::IxHash';
-	my $i18n = WebGUI::International->new($session,'Asset_SyndicatedContent');
-	%properties = (
-			cacheTimeout => {
-				tab => "display",
-				fieldType => "interval",
-				defaultValue => 3600,
-				uiLevel => 8,
-				label => $i18n->get("cache timeout"),
-				hoverHelp => $i18n->get("cache timeout help")
-				},
-			templateId =>{
-				tab=>"display",
-				fieldType=>'template',
-				defaultValue=>'PBtmpl0000000000000065',
-				namespace=>'SyndicatedContent',
-               	 		label=>$i18n->get(72),
-                		hoverHelp=>$i18n->get('72 description')
-				},
-			rssUrl=>{
-				tab=>"properties",
-				defaultValue=>undef,
-				fieldType=>'textarea',
-				label=>$i18n->get(1),
-                		hoverHelp=>$i18n->get('1 description')
-				},
-			processMacroInRssUrl=>{
-				tab=>"properties",
-				defaultValue=>0,
-				fieldType=>'yesNo',
-				label=>$i18n->get('process macros in rss url'),
-				hoverHelp=>$i18n->get('process macros in rss url description'),
-				},
-            maxHeadlines=>{
-				tab=>"display",
-				fieldType=>'integer',
-				defaultValue=>10,
-				label=>$i18n->get(3),
-                		hoverHelp=>$i18n->get('3 description')
-				},
-			hasTerms=>{
-				tab=>"properties",
-				fieldType=>'text',
-				defaultValue=>'',
-				label=>$i18n->get('hasTermsLabel'),
-                		hoverHelp=>$i18n->get('hasTermsLabel description'),
-                		maxlength=>255
-				},
-            sortItems => {
-                tab             => 'properties',
-                fieldType       => 'selectBox',
-                options         => do {
-                    tie my %o, 'Tie::IxHash', (
-                        none        => $i18n->get('no order'),
-                        feed        => $i18n->get('feed order'),
-                        pubDate_asc => $i18n->get('publication date ascending'),
-                        pubDate_des =>
-                            $i18n->get('publication date descending'),
-                    ); \%o;
-                },
-                defaultValue    => 'none',
-                label           => $i18n->get('sortItemsLabel'),
-                hoverHelp       => $i18n->get('sortItemsLabel description'),
-            },
-		);
-        push(@{$definition}, {
-		assetName=>$i18n->get('assetName'),
-		uiLevel=>6,
-		autoGenerateForms=>1,
-		icon=>'syndicatedContent.gif',
-                tableName=>'SyndicatedContent',
-                className=>'WebGUI::Asset::Wobject::SyndicatedContent',
-                properties=>\%properties
-		});
-        return $class->next::method($session, $definition);
-}
-
-#-------------------------------------------------------------------
-
 =head2 generateFeed ()
 
 Combines all feeds into a single XML::FeedPP object.
@@ -145,29 +127,41 @@ Combines all feeds into a single XML::FeedPP object.
 =cut
 
 sub generateFeed {
-	my $self  = shift;
-    my $limit = shift || $self->get('maxHeadlines');
-	my $log   = $self->session->log;
-	my $sort  = $self->get('sortItems');
+	my $self    = shift;
+    my $limit   = shift || $self->maxHeadlines;
+    my $session = $self->session;
+	my $log     = $session->log;
+	my $cache   = $session->cache;
+	my $sort    = $self->sortItems;
 
 	my @opt   = (use_ixhash => 1) if $sort eq 'feed';
 	my $feed  = XML::FeedPP::Atom->new(@opt);
 
 	# build one feed out of many
     my $newlyCached = 0;
-	foreach my $url (split(/\s+/, $self->get('rssUrl'))) {
+	foreach my $url (split(/\s+/, $self->rssUrl)) {
 		$log->info("Processing FEED: ".$url);
 		$url =~ s/^feed:/http:/;
-		if ($self->get('processMacroInRssUrl')) {
+		if ($self->processMacroInRssUrl) {
 			WebGUI::Macro::process($self->session, \$url);
 		}
-		my $cache = WebGUI::Cache->new($self->session, $url, "RSS");
-		my $value = $cache->get;
-        #warn "got this: $value\n";
-		unless ($value) {
-            $value = $cache->setByHTTP($url, $self->get("cacheTimeout"));
-            $newlyCached = 1;
-        }
+
+            my $value = $cache->compute( $url, sub { 
+                my $ua = LWP::UserAgent->new(
+                    env_proxy       => 1,
+                    agent           => "WebGUI/" . $WebGUI::VERSION,
+                    timeout         => 30,
+                );
+
+                my $r = $ua->get( $url );
+                if ( $r->is_error ) {
+                    $session->log->warn( "Could not get syndicated content from '$url': " . $r->status_line );
+                }
+                else {
+                    $newlyCached = 1;
+                    return $r->decoded_content;
+                }
+            }, $self->cacheTimeout );
 
         eval {
             my $singleFeed = XML::FeedPP->new($value, utf8_flag => 1, -type => 'string', xml_deref => 1, @opt);
@@ -175,13 +169,13 @@ sub generateFeed {
             $feed->merge_item($singleFeed);
         };
         if ($@) {
-            $log->error("Syndicated Content asset (".$self->getId.") has a bad feed URL (".$url."). Failed with ".$@);
+            $log->warn("Syndicated Content asset (".$self->getId.") has a bad feed URL (".$url."). Failed with ".$@);
         }
 	}
 
 	# build a new feed that matches the term the user is interested in
-	if ($self->get('hasTerms') ne '') {
-		my @terms = split /,\s*/, $self->get('hasTerms'); # get the list of terms
+	if ($self->hasTerms ne '') {
+		my @terms = split /,\s*/, $self->hasTerms; # get the list of terms
 		my $termRegex = join("|", map quotemeta($_), @terms); # turn the terms into a regex string
 		my @items =  $feed->match_item(title       => qr/$termRegex/msi);
 		push @items, $feed->match_item(description => qr/$termRegex/msi);
@@ -191,7 +185,7 @@ sub generateFeed {
         }
 	}
 
-    my %seen = {};
+    my %seen = ();
     my @items = $feed->get_item;
     $feed->clear_item;
     ITEM: foreach my $item (@items) {
@@ -221,48 +215,28 @@ sub generateFeed {
 
 #-------------------------------------------------------------------
 
-=head2 getFeed ()
+=head2 getRssFeedItems ()
 
-Override the one in the parent...
+Go through the items, and produce a new RSS feed for them so that the SC is an aggregator
+and producer.
 
 =cut
 
-sub getFeed {
-    my $self = shift;
-    my $feed = shift;
-    foreach my $item ($self->generateFeed( $self->get('itemsPerFeed') )->get_item) {
-        my $set_permalink_false = 0;
-        my $new_item = $feed->add_item( $item );
-        if (!$new_item->guid) {
-            if ($new_item->link) {
-                $new_item->guid( $new_item->link );
-            } else {
-                $new_item->guid( $self->session->id->generate );
-                $set_permalink_false = 1;
-            }
-        }
-        $new_item->guid( $new_item->guid, isPermaLink => 0 ) if $set_permalink_false;
+sub getRssFeedItems {
+    my $self  = shift;
+    my @items = ();
+    foreach my $item ($self->generateFeed( $self->itemsPerFeed )->get_item) {
+        my %feed_item = (
+            title           => $item->title,
+            description     => $item->description,
+            pubDate         => $item->pubDate,
+            category        => $item->category,
+            author          => $item->author,
+            guid            => $item->guid,
+        );
+        push @items, \%feed_item;
     }
-    $feed->title( $self->get('feedTitle') || $self->get('title') );
-    $feed->description( $self->get('feedDescription') || $self->get('synopsis') );
-    $feed->pubDate( $self->getContentLastModified );
-    $feed->copyright( $self->get('feedCopyright') );
-    $feed->link( $self->getUrl );
-    # $feed->language( $lang );
-    if ($self->get('feedImage')) {
-        my $storage = WebGUI::Storage->get($self->session, $self->get('feedImage'));
-        my @files = @{ $storage->getFiles };
-        if (scalar @files) {
-            $feed->image(
-                $storage->getUrl( $files[0] ),
-                $self->get('feedImageDescription') || $self->getTitle,
-                $self->get('feedImageUrl') || $self->getUrl,
-                $self->get('feedImageDescription') || $self->getTitle,
-                ( $storage->getSizeInPixels( $files[0] ) ) # expands to width and height
-            );
-        }
-    }
-    return $feed;
+    return \@items;
 }
 
 #-------------------------------------------------------------------
@@ -351,20 +325,21 @@ See WebGUI::Asset::prepareView() for details.
 
 =cut
 
-sub prepareView {
+around prepareView => sub {
+    my $orig = shift;
     my $self = shift;
-    $self->next::method;
-    my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId"));
-    if (!$template) {
+    $self->$orig();
+    my $template = eval { WebGUI::Asset->newById($self->session, $self->templateId); };
+    if (Exception::Class->caught()) {
         WebGUI::Error::ObjectNotFound::Template->throw(
             error      => qq{Template not found},
-            templateId => $self->get("templateId"),
+            templateId => $self->templateId,
             assetId    => $self->getId,
         );
     }
     $template->prepare($self->getMetaDataAsTemplateVariables);
     $self->{_viewTemplate} = $template;
-}
+};
 
 
 #-------------------------------------------------------------------
@@ -375,11 +350,11 @@ See WebGUI::Asset::purgeCache() for details.
 
 =cut
 
-sub purgeCache {
+override purgeCache => sub {
 	my $self = shift;
-	WebGUI::Cache->new($self->session,"view_".$self->getId)->delete;
-	$self->next::method;
-}
+    $self->session->cache->remove("view_".$self->getId);
+	super();
+};
 
 #-------------------------------------------------------------------
 
@@ -394,16 +369,16 @@ sub view {
     my $session = $self->session;
 
 	# try the cached version
-	my $cache = WebGUI::Cache->new($session,"view_".$self->getId);
-	my $out = $cache->get;
-	return $out if ($out ne "" && !$session->var->isAdminOn);
+	my $cache = $session->cache; 
+	my $out = $cache->get("view_".$self->getId);
+	return $out if ($out ne "" && !$session->isAdminOn);
     #return $out if $out;
 
 	# generate from scratch
 	my $feed = $self->generateFeed;
 	$out = $self->processTemplate($self->getTemplateVariables($feed),undef,$self->{_viewTemplate});
-	if (!$session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
-		$cache->set($out,$self->get("cacheTimeout"));
+	if (!$session->isAdminOn && $self->cacheTimeout > 10) {
+		$cache->set("view_".$self->getId, $out, $self->cacheTimeout);
 	}
 	return $out;
 }
@@ -416,63 +391,12 @@ See WebGUI::Asset::Wobject::www_view() for details.
 
 =cut
 
-sub www_view {
-	my $self = shift;
-	$self->session->http->setCacheControl($self->get("cacheTimeout"));
-	$self->next::method(@_);
-}
+override www_view => sub {
+    my $self = shift;
+    $self->session->response->setCacheControl($self->cacheTimeout);
+    super();
+};
 
-#-------------------------------------------------------------------
-
-=head2 www_viewRSS090 ( )
-
-Deprecated. Use www_viewRss() instead.
-
-=cut
-
-sub www_viewRSS090 {
-	my $self = shift;
-	return $self->www_viewRss;
-}
-
-#-------------------------------------------------------------------
-
-=head2 www_viewRSS091 ( )
-
-Deprecated. Use www_viewRss() instead.
-
-=cut
-
-sub www_viewRSS091 {
-	my $self = shift;
-	return $self->www_viewRss;
-}
-
-#-------------------------------------------------------------------
-
-=head2 www_viewRSS10 ( )
-
-Deprecated. Use www_viewRdf() instead.
-
-=cut
-
-sub www_viewRSS10 {
-	my $self = shift;
-	return $self->www_viewRdf;
-}
-
-#-------------------------------------------------------------------
-
-=head2 www_viewRSS20 ( )
-
-Deprecated. Use www_viewRss() instead.
-
-=cut
-
-sub www_viewRSS20 {
-	my $self = shift;
-	return $self->www_viewRss;
-}
-
+__PACKAGE__->meta->make_immutable;
 1;
 

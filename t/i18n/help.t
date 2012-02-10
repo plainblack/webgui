@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -8,15 +8,13 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use FindBin;
 use strict;
 use warnings;
-use lib "$FindBin::Bin/../lib"; ##t/lib
 
 use WebGUI::Test;
 use WebGUI::Operation::Help;
 use WebGUI::International;
-use WebGUI::Session;
+use WebGUI::Pluggable;
 use Data::Dumper;
 
 #The goal of this test is to verify all the i18n labels in
@@ -28,14 +26,14 @@ my $numTests = 0;
 
 my $session = WebGUI::Test->session;
 
-my @helpFileSet = WebGUI::Operation::Help::_getHelpFilesList($session);
+my @helpFileSet = WebGUI::Pluggable::findAndLoad('WebGUI::Help');
 
 my %helpTable;
 
-foreach my $helpSet (@helpFileSet) {
-	my $helpName = $helpSet->[1];
-	my $help = WebGUI::Operation::Help::_load($session, $helpName);
-	$helpTable{ $helpName } = $help;
+foreach my $helpFile (@helpFileSet) {
+    my ($namespace) = $helpFile =~ m{WebGUI::Help::(.+$)};
+    my $help = WebGUI::Operation::Help::_load($session, $namespace);
+    $helpTable{ $namespace } = $help;
 }
 
 ##Scan #1, find all labels in the help system.  body, title, @fields

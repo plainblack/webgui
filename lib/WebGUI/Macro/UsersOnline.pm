@@ -3,7 +3,7 @@ package WebGUI::Macro::UsersOnline;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black LLC.
+  WebGUI is Copyright 2001-2012 Plain Black LLC.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -19,9 +19,8 @@ package WebGUI::Macro::UsersOnline;
 =cut
 
 use strict;
-use Apache2::ServerRec;
 use Net::DNS;
-use WebGUI::Asset::Template;
+use WebGUI::Asset;
 use WebGUI::International;
 use WebGUI::Session::DateTime;
 use WebGUI::SQL;
@@ -86,7 +85,7 @@ sub process {
 	# Obtain internationalization instance
 	my $i18n = WebGUI::International->new($session, "Macro_UsersOnline");
 	# Get preferred time format of current user
-	my $time_format = $session->user->profileField("timeFormat");
+	my $time_format = $session->user->get("timeFormat");
 
 	# Calculate epoch time for comparison to last activity
 	my $dt = $session->datetime;
@@ -118,7 +117,15 @@ sub process {
 	$var{'lastActivity_label'} = $i18n->get("Last Activity");
 	
 	# Process Template
-	return WebGUI::Asset::Template->new($session,$templateId)->process(\%var);
+    my $template = eval { WebGUI::Asset->newById($session,$templateId); };
+    if (Exception::Class->caught) {
+        #Rethrow with the correct error
+        WebGUI::Error::ObjectNotFound::Template->throw(
+            error      => qq{Template not found},
+            templateId => $templateId,
+        );
+    }
+	return $template->process(\%var);
 }
 
 #-------------------------------------------------------------------
@@ -158,15 +165,12 @@ sub _visitors {
 	my $db = $session->db();
 	my $dt = $session->datetime;
 	# Get preferred time format of current user
-	my $time_format = $session->user->profileField("timeFormat");
+	my $time_format = $session->user->get("timeFormat");
 
 	# SQL conditional clause for filtering server IP
 	my $ip_clause;
 
-	# Check whether instance of Apache2::ServerRec is available
-	if($session->server) {
-		# Query hostname of server
-		my $hostname = $session->server->server_hostname();
+	if(my $hostname = $session->request->uri->host) {
 
 		# Look up server IP addresses
 		my $res = Net::DNS::Resolver->new();
@@ -244,7 +248,7 @@ sub _members {
 	my $db = $session->db();
 	my $dt = $session->datetime;
 	# Get preferred time format of current user
-	my $time_format = $session->user->profileField("timeFormat");
+	my $time_format = $session->user->get("timeFormat");
 
 	# Determine the number of registered users that are online. The Admin 
 	# account is excluded from the list.
@@ -264,10 +268,10 @@ sub _members {
 		my $user = WebGUI::User->new($session, $row{'userId'});
 	    
 		# Only show users with the "showOnline" flag set to true
-		if ($user->profileField("showOnline")) {
+		if ($user->get("showOnline")) {
 	    	# Find URL of avatar if available
 			my $avatar_url;
-			my $avatar = $user->profileField("avatar");
+			my $avatar = $user->get("avatar");
 			if ($avatar) {
 		    		my $storage = WebGUI::Storage->get($session, $avatar);
 		    		my @files = @{ $storage->getFiles() };
@@ -279,10 +283,10 @@ sub _members {
 			# Add item to member template loop
 			push(@{$var->{'member_loop'}}, {
 		    		username => $user->username(),
-		    		firstName => $user->profileField("firstName"),
-		    		middleName => $user->profileField("middleName"),
-		    		lastName => $user->profileField("lastName"),
-		    		alias => $user->profileField("alias"),
+		    		firstName => $user->get("firstName"),
+		    		middleName => $user->get("middleName"),
+		    		lastName => $user->get("lastName"),
+		    		alias => $user->get("alias"),
 		    		avatar => $avatar_url,
 		    		uid => $row{'userId'},
 		    		sessionId => $row{'sessionId'},

@@ -3,7 +3,7 @@ package WebGUI::Asset;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -48,6 +48,7 @@ Converts all the properties of this asset into a hash reference and then returns
 sub exportAssetData {
 	my $self = shift;
 	my %data = %{$self->get};
+    delete $data{'session'};
 	my %hash = ( properties => \%data, storage=>[] );
 	return \%hash;
 }
@@ -86,7 +87,7 @@ sub exportPackage {
 
 #-------------------------------------------------------------------
 
-=head2 getPackageList ( )
+=head2 WebGUI::Asset::getPackageList ( session )
 
 Returns an array of all assets that the user can view and edit that are packages.  The array
 is sorted by the title of the assets.
@@ -94,13 +95,15 @@ is sorted by the title of the assets.
 =cut
 
 sub getPackageList {
-    my $self = shift;
-    my $session = $self->session;
+    my $session = shift;
+    if ( $session->isa( 'WebGUI::Asset' ) ) {
+        $session    = $session->session;
+    }
     my $db = $session->db;
     my @packageIds = $db->buildArray("select distinct assetId from assetData where isPackage=1");
     my @assets;
     ID: foreach my $id (@packageIds) {
-        my $asset = WebGUI::Asset->newByDynamicClass($session, $id);
+        my $asset = WebGUI::Asset->newById($session, $id);
         next ID unless defined $asset;
         next ID unless $asset->get('isPackage');
         next ID unless ($asset->get('status') eq 'approved' || $asset->get('tagId') eq $session->scratch->get("versionTag"));
@@ -148,18 +151,17 @@ Set the isDefault flag on the incoming asset.  Really only works on templates.
 
 sub importAssetData {
     my $self        = shift;
+    my $session     = $self->session;
     my $data        = shift;
     my $options     = shift || {};
-    my $error       = $self->session->errorHandler;
+    my $log       = $session->log;
     my $id          = $data->{properties}{assetId};
     my $class       = $data->{properties}{className};
     my $version     = $options->{overwriteLatest} ? time : $data->{properties}{revisionDate};
 
     # Load the class
-    WebGUI::Asset->loadModule( $self->session, $class );
+    WebGUI::Asset->loadModule( $class );
 
-    my $asset;
-    my $revisionExists = WebGUI::Asset->assetExists($self->session, $id, $class, $version);
     my %properties = %{ $data->{properties} };
     if ($options->{inheritPermissions}) {
         delete $properties{ownerUserId};
@@ -172,35 +174,43 @@ sub importAssetData {
     if ($options->{setDefaultTemplate}) {
         $properties{isDefault} = 1;
     }
-    if ($revisionExists) { # update an existing revision
-        $asset = WebGUI::Asset->new($self->session, $id, $class, $version);
 
+    if ($options->{clearPackageFlag}) {
+        $properties{isPackage} = 0;
+    }
+    if ($options->{setDefaultTemplate}) {
+        $properties{isDefault} = 1;
+    }
+
+    my $asset = eval { $class->new($session, $id, $version); };
+
+    if (! Exception::Class->caught()) { # update an existing revision
         ##If the existing asset is not committed, do not allow the new package data to 
         ##change the version control status.
         if (  $asset->get('status') eq 'pending'
            && $properties{'status'} ne 'pending' ) {
            delete $properties{status};
         }
-        $error->info("Updating an existing revision of asset $id");	
+        $log->info("Updating an existing revision of asset $id");	
         $asset->update(\%properties);
         ##Pending assets are assigned a new version tag
         if ($properties{status} eq 'pending') {
-            $self->session->db->write(
+            $session->db->write(
                 'update assetData set tagId=? where assetId=? and revisionDate=?',
-                [WebGUI::VersionTag->getWorking($self->session)->getId, $properties{assetId}, $properties{revisionDate},]
+                [WebGUI::VersionTag->getWorking($session)->getId, $properties{assetId}, $properties{revisionDate},]
             );
         }
     }
     else {
         eval {
-            $asset = WebGUI::Asset->newPending($self->session, $id, $class);
+            $asset = WebGUI::Asset->newPending($session, $id);
         };
-        if (defined $asset) {   # create a new revision of an existing asset
-            $error->info("Creating a new revision of asset $id");
+        if (! Exception::Class->caught()) {   # create a new revision of an existing asset
+            $log->info("Creating a new revision of asset $id");
             $asset = $asset->addRevision(\%properties, $version, {skipAutoCommitWorkflows => 1});
         }
         else {  # add an entirely new asset
-            $error->info("Adding $id that didn't previously exist.");
+            $log->info("Adding $id that didn't previously exist.");
             $asset = $self->addChild(\%properties, $id, $version, {skipAutoCommitWorkflows => 1});
         }
     }
@@ -253,12 +263,12 @@ sub importPackage {
     return undef
         if $storage->getErrorCount;
     my $package         = undef;            # The asset package
-    my $error           = $self->session->errorHandler;
+    my $log           = $self->session->log;
 
     # The debug output for long requests would be too long, and we'd have to
     # keep it all in memory.
-    $error->preventDebugOutput();
-    $error->info("Importing package.");
+    $log->preventDebugOutput();
+    $log->info("Importing package.");
 
     # Your parent is on this stack somewhere because we're going through these
     # assets depth-first.  This way we only have to keep one branch in-memory
@@ -268,18 +278,23 @@ sub importPackage {
 
     foreach my $file (sort(@{$decompressed->getFiles})) {
         next unless ($decompressed->getFileExtension($file) eq "json");
-        $error->info("Found data file $file");
+        $log->info("Found data file $file");
         my $data = eval {
             $json->decode($decompressed->getFileContentsAsScalar($file))
         };
         if ($@ || $data->{properties}{assetId} eq "" || $data->{properties}{className} eq "" || $data->{properties}{revisionDate} eq "") {
-            $error->error("package corruption: ".$@) if ($@);
+            $log->error("package corruption: ".$@) if ($@);
             return "corrupt";
         }
-        $error->info("Data file $file is valid and represents asset ".$data->{properties}{assetId});
+        $log->info("Data file $file is valid and represents asset ".$data->{properties}{assetId});
         foreach my $storageId (@{$data->{storage}}) {
             my $assetStorage = WebGUI::Storage->get($self->session, $storageId);
             $decompressed->untar($storageId.".storage", $assetStorage);
+        }
+
+        if ( $options->{tagId} ) {
+            $data->{properties}{tagId}  = $options->{tagId};
+            $data->{properties}{status} = "pending";
         }
 
         my $parentId = $data->{properties}->{parentId};
@@ -315,15 +330,16 @@ current asset.
 =cut
 
 sub www_deployPackage {
-	my $self = shift;
+	my $self    = shift;
+    my $session = $self->session;
 	# Must have edit rights to the asset deploying the package.  Also, must be a Content Manager.
 	# This protects against non content managers deploying packages using a post or similar trickery.
-	return $self->session->privilege->insufficient() unless ($self->canEdit && $self->session->user->isInGroup(4));
-	my $packageMasterAssetId = $self->session->form->param("assetId");
+	return $session->privilege->insufficient() unless ($self->canEdit && $session->user->isInGroup(4));
+	my $packageMasterAssetId = $session->form->param("assetId");
 	if (defined $packageMasterAssetId) {
-		my $packageMasterAsset = WebGUI::Asset->newByDynamicClass($self->session, $packageMasterAssetId);
-		unless ($packageMasterAsset->getValue('isPackage')) { #only deploy packages
-		 	$self->session->errorHandler->security('deploy an asset as a package which was not set as a package.');
+		my $packageMasterAsset = WebGUI::Asset->newById($session, $packageMasterAssetId);
+		unless ($packageMasterAsset->get('isPackage')) { #only deploy packages
+		 	$session->log->security('deploy an asset as a package which was not set as a package.');
 		 	return undef;
 		}
 		my $masterLineage = $packageMasterAsset->get("lineage");
@@ -333,16 +349,16 @@ sub www_deployPackage {
 			$deployedTreeMaster->update({isPackage=>0, styleTemplateId=>$self->get("styleTemplateId")});
 		}
 	}
-    if (WebGUI::VersionTag->autoCommitWorkingIfEnabled($self->session, {
+    if (WebGUI::VersionTag->autoCommitWorkingIfEnabled($session, {
         allowComments   => 1,
         returnUrl       => $self->getUrl,
     }) eq 'redirect') {
         return undef;
     };
-	if ($self->session->form->param("proceed") eq "manageAssets") {
-		$self->session->http->setRedirect($self->getManagerUrl);
+	if ($session->form->param("proceed") eq "manageAssets") {
+		$session->response->setRedirect($self->getManagerUrl);
 	} else {
-		$self->session->http->setRedirect($self->getUrl());
+		$session->response->setRedirect($self->getUrl());
 	}
 	return undef;
 }
@@ -360,7 +376,7 @@ sub www_exportPackage {
     return $self->session->privilege->insufficient() unless ($self->canEdit);
     my $storage = $self->exportPackage;
     my $filename = $storage->getFiles->[0];
-    $self->session->http->setRedirect($storage->getUrl($storage->getFiles->[0]));
+    $self->session->response->setRedirect($storage->getUrl($storage->getFiles->[0]));
     return "redirect";
 }
 

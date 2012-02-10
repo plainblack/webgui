@@ -3,7 +3,7 @@ package WebGUI::Asset;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -15,7 +15,7 @@ package WebGUI::Asset;
 =cut
 
 use strict;
-use WebGUI::Paginator;
+require WebGUI::Paginator;
 use WebGUI::VersionTag;
 use WebGUI::Search::Index;
 
@@ -51,9 +51,6 @@ These methods are available from this class:
 Creates a new revision of an existing asset. Returns the new revision of
 the asset.
 
-Programmers should almost never call this method directly, but 
-rather use the update() method instead.
-
 When using this method, take care that an asset doesn't try to add two
 revisions of the same asset within the same second. It will cause things to 
 fail. This is not a bug
@@ -71,12 +68,6 @@ created. Defaults to time().
 
 A hash reference of options that change the behavior of this method.
 
-=head4 skipAutoCommitWorkflows
-
-If this is set to 1 then assets that would normally autocommit their 
-workflow (like CS Posts) will instead add themselves to the normal working 
-version tag.
-
 =head4 skipNotification
 
 If this is set to 1 then assets that normally send notifications will (like CS
@@ -85,10 +76,11 @@ Posts) will know not to send them under certain conditions.
 =cut
 
 sub addRevision {
-    my $self             = shift;
-    my $properties       = shift || {};
-    my $now              = shift     || time();
-    my $options          = shift;
+    my $self        = shift;
+    my $session     = $self->session;
+    my $properties  = shift || {};
+    my $now         = shift || time();
+    my $options     = shift;
 
     my $autoCommitId     = $self->getAutoCommitWorkflowId() unless ($options->{skipAutoCommitWorkflows});
 
@@ -114,41 +106,13 @@ sub addRevision {
             $workingTag->setWorking();
         }
     }
-    
+
     #Create a dummy revision to be updated with real data later
-    $self->session->db->beginTransaction;
-	
-    my $sql = "insert into assetData"
-            . " (assetId, revisionDate, revisedBy, tagId, status, url, ownerUserId, groupIdEdit, groupIdView)"
-            . " values (?, ?, ?, ?, 'pending', ?, '3','3','7')"
-            ;
-                  
-    $self->session->db->write($sql,[
-        $self->getId, 
-        $now, 
-        $self->session->user->userId, 
-        $workingTag->getId, 
-        $self->getId,
-    ]);
-    
-	my %defaults = ();
-    foreach my $definition (@{$self->definition($self->session)}) {
-		
-		# get the default values of each property
-		foreach my $property (keys %{$definition->{properties}}) {
-			$defaults{$property} = $definition->{properties}{$property}{defaultValue};
-            if (ref($defaults{$property}) eq 'ARRAY' && !$definition->{properties}{$property}{serialize}) {
-                $defaults{$property} = $defaults{$property}->[0];
-            }
-		}
-		
-		# prime the tables
-        unless ($definition->{tableName} eq "assetData") {
-            $self->session->db->write(
-                "insert into ".$definition->{tableName}." (assetId,revisionDate) values (?,?)", 
-                [$self->getId, $now]
-            );
-        }
+    $session->db->beginTransaction;
+
+	# prime the tables
+    foreach my $table ($self->meta->get_tables) {
+        $session->db->write( "insert into ".$table." (assetId,revisionDate) values (?,?)", [$self->getId, $now]);
     }
 
     # Copy metadata values
@@ -167,26 +131,28 @@ sub addRevision {
         $db->write($mdset, [ $row->{fieldId}, $row->{value}, $id, $now ]);
     }
 
-    $self->session->db->commit;
-	
-	# merge the defaults, current values, and the user set properties
-	my %mergedProperties = (%defaults, %{$self->get}, %{$properties}, (status => 'pending'));
-    
+    $session->db->commit;
+
+	# current values, and the user set properties
+    my %mergedProperties = (%{$self->get}, %{$properties}, tagId => $workingTag->getId, status => 'pending',  );
+
+    # Set some defaults
+    $mergedProperties{ revisedBy } = $properties->{ revisedBy } || $session->user->userId;
+
     # Force the packed head block to be regenerated
     delete $mergedProperties{extraHeadTagsPacked};
 
     #Instantiate new revision and fill with real data
-    my $newVersion = WebGUI::Asset->new($self->session,$self->getId, $self->get("className"), $now);
+    my $newVersion = WebGUI::Asset->newById($session, $self->getId, $now);
     $newVersion->setSkipNotification if ($options->{skipNotification});
     $newVersion->updateHistory("created revision");
     $newVersion->setVersionLock;
     $newVersion->update(\%mergedProperties);
     $newVersion->setAutoCommitTag($workingTag) if (defined $autoCommitId);
     $oldWorking->setWorking if $oldWorking;
-    
+
     return $newVersion;
 }
-
 
 #-------------------------------------------------------------------
 
@@ -292,6 +258,23 @@ sub getRevisionCount {
 
 #-------------------------------------------------------------------
 
+=head2 getRevisionDates ( [ status ] )
+
+Return an arrayref of all the revision dates for this asset, sorted in 
+descending order (most recent first).
+
+=cut
+
+sub getRevisionDates {
+    my $self = shift;
+    return $self->session->db->buildArrayRef(
+        "select revisionDate from assetData where assetId=? order by revisionDate desc", 
+        [$self->getId],
+    );
+}
+
+#-------------------------------------------------------------------
+
 =head2 getRevisions ( [ status ] )
 
 Returns an array reference of the revision objects of this asset, sorted by revision date in descending
@@ -311,9 +294,9 @@ sub getRevisions {
 		$statusClause = " and status=".$self->session->db->quote($status);
 	}
 	my @revisions = ();
-	my $rs = $self->session->db->read("select revisionDate from assetData where assetId=".$self->session->db->quote($self->getId).$statusClause. " order by revisionDate desc");
+	my $rs = $self->session->db->read("select revisionDate from assetData where assetId=? order by revisionDate desc", [$self->getId]);
 	while (my ($version) = $rs->array) {
-		push(@revisions, WebGUI::Asset->new($self->session, $self->getId, $self->get("className"), $version));
+		push(@revisions, WebGUI::Asset->newById($self->session, $self->getId, $version));
 	}
 	return \@revisions;
 }
@@ -386,22 +369,24 @@ Deletes a revision of an asset. If it's the last revision, it purges the asset a
 sub purgeRevision {
 	my $self = shift;
 	if ($self->getRevisionCount > 1) {
-		$self->session->db->beginTransaction;
-        	foreach my $definition (@{$self->definition($self->session)}) {
-			$self->session->db->write("delete from ".$self->session->db->dbh->quote_identifier($definition->{tableName})." where assetId=? and revisionDate=?",[$self->getId, $self->get("revisionDate")]);
-        	}
-		my ($count) = $self->session->db->quickArray("select count(*) from assetData where assetId=? and status='pending'",[$self->getId]);
+        my $db = $self->session->db;
+		$db->beginTransaction;
+       	foreach my $table ($self->meta->get_tables) {
+			$db->write("delete from ".$table." where assetId=? and revisionDate=?",[$self->getId, $self->get("revisionDate")]);
+       	}
+		my $count = $db->quickScalar("select count(*) from assetData where assetId=? and status='pending'",[$self->getId]);
 		if ($count < 1) {
-			$self->session->db->write("update asset set isLockedBy=null where assetId=?",[$self->getId]);
+			$db->write("update asset set isLockedBy=null where assetId=?",[$self->getId]);
 		}
-		$self->session->db->write(
+		$db->write(
 			'delete from metaData_values where assetId=?  and revisionDate=?',
 			[ $self->getId, $self->get('revisionDate') ]
 		);
-        	$self->session->db->commit;
+        $db->commit;
 		$self->purgeCache;
 		$self->updateHistory("purged revision ".$self->get("revisionDate"));
-	} else {
+	} 
+    else {
 		$self->purge;
 	}
 }
@@ -424,7 +409,7 @@ sub moveAssetToVersionTag {
     #
     my $moveToTagId = $moveToTag;
     if ( ref($moveToTag) eq "WebGUI::VersionTag" ) {
-        $moveToTagId = $moveToTag->get('tagId');
+        $moveToTagId = $moveToTag->tagId;
     }
     else {
         $moveToTag = WebGUI::VersionTag->new( $self->session, $moveToTagId );
@@ -435,7 +420,7 @@ sub moveAssetToVersionTag {
     $self->setVersionTag($moveToTagId);
 
     my $versionTag = $self->session->db->quickScalar("SELECT tagId FROM assetData WHERE assetId=? AND revisionDate=?",[$self->getId,$self->get('revisionDate')]);
-    
+
     # If no revisions remain, delete the version tag
     if ( $tag->getRevisionCount <= 0 ) {
         $tag->rollback;
@@ -453,15 +438,15 @@ Requests an autocommit tag be commited. See also getAutoCommitWorkflowId() and s
 sub requestAutoCommit {
     my $self = shift;
 
-    my $parentAsset;
-    if ( not defined( $parentAsset = $self->getParent ) ) {
-        $parentAsset = WebGUI::Asset->newPending( $self->session, $self->get('parentId') );
+    my $parentAsset = eval { $self->getParent; };
+    if ( Exception::Class->caught() ) {
+        $parentAsset = WebGUI::Asset->newPending( $self->session, $self->parentId );
     }
     unless ( $parentAsset->hasBeenCommitted ) {
-        my $tagId = $parentAsset->get('tagId');
+        my $tagId = $parentAsset->tagId;
 
         if ($tagId) {
-            if ( $tagId ne $self->get('tagId') ) {
+            if ( $tagId ne $self->tagId ) {
                 $self->moveAssetToVersionTag($tagId);
                 return;
             }
@@ -505,7 +490,7 @@ Sets a flag so that developers know whether to send notifications out on certain
 sub setSkipNotification {
 	my $self = shift;
 	$self->session->db->write("update assetData set skipNotification=1 where assetId=? and revisionDate=?", [$self->getId, $self->get("revisionDate")]);
-    $self->{_properties}->{skipNotification} = 1;
+    $self->skipNotification(1);
 }
 
 #-------------------------------------------------------------------
@@ -517,9 +502,10 @@ Sets the versioning lock to "on" so that this piece of content may not be edited
 =cut
 
 sub setVersionLock {
-    my $self = shift;
-    $self->session->db->write("update asset set isLockedBy=? where assetId=?", [$self->session->user->userId, $self->getId]);
-    $self->{_properties}{isLockedBy} = $self->session->user->userId;
+    my $self    = shift;
+    my $session = $self->session;
+    $session->db->write("update asset set isLockedBy=? where assetId=?", [$session->user->userId, $self->getId]);
+    $self->isLockedBy($session->user->userId);
     $self->updateHistory("locked");
     $self->purgeCache;
 }
@@ -537,12 +523,12 @@ A new version tag id.
 =cut
 
 sub setVersionTag {
-	my $self = shift;
+    my $self  = shift;
     my $tagId = shift;
-    $self->session->db->write("update assetData set tagId=? where assetId=? and tagId = ?", [$tagId, $self->getId,$self->get('tagId')]);
-        $self->{_properties}{tagId} = $tagId;
-	$self->updateHistory("changed version tag to $tagId");
-	$self->purgeCache;
+    $self->session->db->write("update assetData set tagId=? where assetId=? and tagId = ?", [$tagId, $self->getId,$self->tagId]);
+    $self->tagId($tagId);
+    $self->updateHistory("changed version tag to $tagId");
+    $self->purgeCache;
 }
 
 
@@ -572,7 +558,7 @@ Sets the versioning lock to "off" so that this piece of content may be edited on
 sub unsetVersionLock {
     my $self = shift;
     $self->session->db->write("update asset set isLockedBy=NULL where assetId=?",[$self->getId]);
-    $self->{_properties}{isLockedBy} = undef;
+    $self->isLockedBy(undef);
     $self->updateHistory("unlocked");
     $self->purgeCache;
 }
@@ -615,7 +601,9 @@ This is the same as doing an www_editSave without changing anything. It's here s
 sub www_lock {
 	my $self = shift;
 	if (!$self->isLocked && $self->canEdit) {
-		$self = $self->addRevision;
+                my $tag = WebGUI::VersionTag->getWorking( $self->session );
+		$self = $self->addRevision({ tagId => $tag->getId, status => "pending" });
+                $self->setVersionLock;
 	}
 	if ($self->session->form->process("proceed") eq "manageAssets") {
                 $self->session->asset($self->getParent);
@@ -664,24 +652,28 @@ sub www_manageRevisions {
 #-------------------------------------------------------------------
 
 sub www_purgeRevision {
-	my $self = shift;
-	my $session = $self->session;
-	return $session->privilege->insufficient() unless $self->canEdit;
-	my $revisionDate = $session->form->process("revisionDate");
-	return undef unless $revisionDate;
-	my $asset = WebGUI::Asset->new($session,$self->getId,$self->get("className"),$revisionDate);
-	return undef if ($asset->get('revisionDate') != $revisionDate);
-	my $parent = $asset->getParent;
-	$asset->purgeRevision;
-	if ($session->form->process("proceed") eq "manageRevisionsInTag") {
-		my $working = (defined $self) ? $self : $parent;
-		$session->http->setRedirect($working->getUrl("op=manageRevisionsInTag"));
-		return undef;
-	}
-	unless (defined $self) {
-		return $parent->www_view;
-	}
-	return $self->www_manageRevisions;
+    my $self    = shift;
+    my $session = $self->session;
+    return $session->privilege->insufficient() unless $self->canEdit;
+    my $revisionDate = $session->form->process("revisionDate");
+    return undef unless $revisionDate;
+    my $asset = eval { WebGUI::Asset->newById($session, $self->getId, $revisionDate); };
+    if (my $e = Exception::Class->caught()) {
+        $session->log->warn($@);
+        return undef;
+    }
+    return undef if ($asset->revisionDate != $revisionDate);
+    my $parent = $asset->getParent;
+    $asset->purgeRevision;
+    if ($session->form->process("proceed") eq "manageRevisionsInTag") {
+        my $working = (defined $self) ? $self : $parent;
+        $session->response->setRedirect($working->getUrl("op=manageRevisionsInTag"));
+        return undef;
+    }
+    unless (defined $self) {
+        return $parent->www_view;
+    }
+    return $self->www_manageRevisions;
 }
 
 1;

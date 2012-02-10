@@ -1,7 +1,7 @@
 package WebGUI::Asset::Wobject::Gallery;
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -11,17 +11,325 @@ package WebGUI::Asset::Wobject::Gallery;
 #-------------------------------------------------------------------
 
 use strict;
-use Class::C3;
-use base qw(WebGUI::AssetAspect::RssFeed WebGUI::Asset::Wobject);
+use Tie::IxHash;
+use Moose;
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset::Wobject';
+define assetName           => ['assetName', 'Asset_Gallery'];
+define icon                => 'photoGallery.gif';
+define tableName           => 'Gallery';
+property groupIdAddComment => (
+            tab             => "security",
+            fieldType       => "group",
+            default         => 2, # Registered Users
+            label           => ["groupIdAddComment label", 'Asset_Gallery'],
+            hoverHelp       => ["groupIdAddComment description", 'Asset_Gallery'],
+         );
+property groupIdAddFile => (
+            tab             => "security",
+            fieldType       => "group",
+            default         => 2, # Registered Users
+            label           => ["groupIdAddFile label", 'Asset_Gallery'],
+            hoverHelp       => ["groupIdAddFile description", 'Asset_Gallery'],
+         );
+property imageResolutions => (
+            tab             => "properties",
+            fieldType       => "checkList",
+            builder         => '_imageResolutions_builder',
+            lazy            => 1,
+            options         => \&_imageResolutions_options,
+            label           => ["imageResolutions label", 'Asset_Gallery'],
+            hoverHelp       => ["imageResolutions description", 'Asset_Gallery'],
+         );
+sub _imageResolutions_builder {
+    return join("\n", '800', '1024', '1200', '1600', '2880');
+}
+sub _imageResolutions_options {
+    tie my %imageResolutionOptions, 'Tie::IxHash', map { $_ => $_ } qw(600 800 1024 1260 1440 1600 2880);
+    return \%imageResolutionOptions;
+}
+property imageViewSize => (
+            tab             => "properties",
+            fieldType       => "integer",
+            default         => 700,
+            label           => ["imageViewSize label", 'Asset_Gallery'],
+            hoverHelp       => ["imageViewSize description", 'Asset_Gallery'],
+         );
+property imageThumbnailSize => (
+            tab             => "properties",
+            fieldType       => "integer",
+            default         => 300,
+            label           => ["imageThumbnailSize label", 'Asset_Gallery'],
+            hoverHelp       => ["imageThumbnailSize description", 'Asset_Gallery'],
+         );
+property imageDensity => (
+            tab             => "properties",
+            fieldType       => "selectBox",
+            options         => \&_imageDensity_options,
+            default         => 72,
+            label           => [ "imageDensity label" , 'Asset_Gallery'],
+            hoverHelp       => [ "imageDensity description" , 'Asset_Gallery'],
+         );
+sub _imageDensity_options {
+    my $session = shift->session;
+    my $i18n    = WebGUI::International->new($session, 'Asset_Gallery');
+
+    tie my %imageDensityOptions, 'Tie::IxHash', (
+        72              => $i18n->get( "imageDensity option web" ),
+        300             => $i18n->get( "imageDensity option print" ),
+    );
+    return \%imageDensityOptions;
+}
+property maxSpacePerUser => (
+            tab             => "properties",
+            fieldType       => "integer",
+            default         => 0,
+            label           => ["maxSpacePerUser label", 'Asset_Gallery'],
+            hoverHelp       => ["maxSpacePerUser description", 'Asset_Gallery'],
+         );
+property richEditIdAlbum => (
+            tab             => "properties",
+            fieldType       => "selectRichEditor",
+            default         => "PBrichedit000000000001", # Content Managers editor
+            label           => ["richEditIdAlbum label", 'Asset_Gallery'],
+            hoverHelp       => ["richEditIdAlbum description", 'Asset_Gallery'],
+         );
+property richEditIdFile => (
+            tab             => "properties",
+            fieldType       => "selectRichEditor",
+            default         => "PBrichedit000000000002", # Forum Rich editor
+            label           => ["richEditIdFile label", 'Asset_Gallery'],
+            hoverHelp       => ["richEditIdFile description", 'Asset_Gallery'],
+         );
+property richEditIdComment => (
+            tab             => "properties",
+            fieldType       => "selectRichEditor",
+            default         => "PBrichedit000000000002", # Forum Rich Editor
+            label           => ["richEditIdFileComment label", 'Asset_Gallery'],
+            hoverHelp       => ["richEditIdFileComment description", 'Asset_Gallery'],
+         );
+property templateIdAddArchive => (
+            tab             => "display",
+            fieldType       => "template",
+            default         => "0X4Q3tBWUb_thsVbsYz9xQ",
+            namespace       => "GalleryAlbum/AddArchive",
+            label           => ["templateIdAddArchive label", 'Asset_Gallery'],
+            hoverHelp       => ["templateIdAddArchive description", 'Asset_Gallery'],
+         );
+property templateIdDeleteAlbum => (
+            tab             => "display",
+            fieldType       => "template",
+            default         => "UTNFeV7B_aSCRmmaFCq4Vw",
+            namespace       => "GalleryAlbum/Delete",
+            label           => ["templateIdDeleteAlbum label", 'Asset_Gallery'],
+            hoverHelp       => ["templateIdDeleteAlbum description", 'Asset_Gallery'],
+         );
+property templateIdDeleteFile => (
+            tab             => "display",
+            fieldType       => "template",
+            default         => "zcX-wIUct0S_np14xxOA-A",
+            namespace       => "GalleryFile/Delete",
+            label           => ["templateIdDeleteFile label", 'Asset_Gallery'],
+            hoverHelp       => ["templateIdDeleteFile description", 'Asset_Gallery'],
+         );
+property templateIdEditAlbum => (
+            tab             => "display",
+            fieldType       => "template",
+            default         => "6X-7Twabn5KKO_AbgK3PEw",
+            namespace       => "GalleryAlbum/Edit",
+            label           => ["templateIdEditAlbum label", 'Asset_Gallery'],
+            hoverHelp       => ["templateIdEditAlbum description", 'Asset_Gallery'],
+         );
+property templateIdEditComment => (
+            tab             => "display",
+            fieldType       => "template",
+            default         => "OxJWQgnGsgyGohP2L3zJPQ",
+            namespace       => "GalleryFile/EditComment",
+            label           => ["templateIdEditComment label", 'Asset_Gallery'],
+            hoverHelp       => ["templateIdEditComment description", 'Asset_Gallery'],
+         );
+property templateIdEditFile => (
+            tab             => "display",
+            fieldType       => "template",
+            default         => "7JCTAiu1U_bT9ldr655Blw",
+            namespace       => "GalleryFile/Edit",
+            label           => ["templateIdEditFile label", 'Asset_Gallery'],
+            hoverHelp       => ["templateIdEditFile description", 'Asset_Gallery'],
+         );
+property templateIdListAlbums => (
+            tab             => "display",
+            fieldType       => "template",
+            default         => "azCqD0IjdQSlM3ar29k5Sg",
+            namespace       => "Gallery/ListAlbums",
+            label           => ["templateIdListAlbums label", 'Asset_Gallery'],
+            hoverHelp       => ["templateIdListAlbums description", 'Asset_Gallery'],
+         );
+property templateIdListAlbumsRss => (
+            tab             => "display",
+            fieldType       => "template",
+            default         => "ilu5BrM-VGaOsec9Lm7M6Q",
+            namespace       => "Gallery/ListAlbumsRss",
+            label           => ["templateIdListAlbumsRss label", 'Asset_Gallery'],
+            hoverHelp       => ["templateIdListAlbumsRss description", 'Asset_Gallery'],
+         );
+property templateIdListFilesForUser => (
+            tab             => "display",
+            fieldType       => "template",
+            default         => "OkphOEdaSGTXnFGhK4GT5A",
+            namespace       => "Gallery/ListFilesForUser",
+            label           => ["templateIdListFilesForUser label", 'Asset_Gallery'],
+            hoverHelp       => ["templateIdListFilesForUser description", 'Asset_Gallery'],
+         );
+property templateIdListFilesForUserRss => (
+            tab             => "display",
+            fieldType       => "template",
+            default         => "-ANLpoTEP-n4POAdRxCzRw",
+            namespace       => "Gallery/ListFilesForUserRss",
+            label           => ["templateIdListFilesForUserRss label", 'Asset_Gallery'],
+            hoverHelp       => ["templateIdListFilesForUserRss description", 'Asset_Gallery'],
+         );
+property templateIdMakeShortcut => (
+            tab             => "display",
+            fieldType       => "template",
+            default         => "m3IbBavqzuKDd2PGGhKPlA",
+            namespace       => "GalleryFile/MakeShortcut",
+            label           => ["templateIdMakeShortcut label", 'Asset_Gallery'],
+            hoverHelp       => ["templateIdMakeShortcut description", 'Asset_Gallery'],
+         );
+property templateIdSearch => (
+            tab             => "display",
+            fieldType       => "template",
+            default         => "jME5BEDYVDlBZ8jIQA9-jQ",
+            namespace       => "Gallery/Search",
+            label           => ["templateIdSearch label", 'Asset_Gallery'],
+            hoverHelp       => ["templateIdSearch description", 'Asset_Gallery'],
+         );
+property templateIdViewSlideshow => (
+            tab             => "display",
+            fieldType       => "template",
+            default         => "KAMdiUdJykjN02CPHpyZOw",
+            namespace       => "GalleryAlbum/ViewSlideshow",
+            label           => ["templateIdViewSlideshow label", 'Asset_Gallery'],
+            hoverHelp       => ["templateIdViewSlideshow description", 'Asset_Gallery'],
+         );
+property templateIdViewThumbnails => (
+            tab             => "display",
+            fieldType       => "template",
+            default         => "q5O62aH4pjUXsrQR3Pq4lw",
+            namespace       => "GalleryAlbum/ViewThumbnails",
+            label           => ["templateIdViewThumbnails label", 'Asset_Gallery'],
+            hoverHelp       => ["templateIdViewThumbnails description", 'Asset_Gallery'],
+         );
+property templateIdViewAlbum => (
+            tab             => "display",
+            fieldType       => "template",
+            default         => "05FpjceLYhq4csF1Kww1KQ",
+            namespace       => "GalleryAlbum/View",
+            label           => ["templateIdViewAlbum label", 'Asset_Gallery'],
+            hoverHelp       => ["templateIdViewAlbum description", 'Asset_Gallery'],
+         );
+property templateIdViewAlbumRss => (
+            tab             => "display",
+            fieldType       => "template",
+            default         => "mM3bjP_iG9sv5nQb4S17tQ",
+            namespace       => "GalleryAlbum/ViewRss",
+            label           => ["templateIdViewAlbumRss label", 'Asset_Gallery'],
+            hoverHelp       => ["templateIdViewAlbumRss description", 'Asset_Gallery'],
+         );
+property templateIdViewFile => (
+            tab             => "display",
+            fieldType       => "template",
+            default         => "TEId5V-jEvUULsZA0wuRuA",
+            namespace       => "GalleryFile/View",
+            label           => ["templateIdViewFile label", 'Asset_Gallery'],
+            hoverHelp       => ["templateIdViewFile description", 'Asset_Gallery'],
+         );
+property viewDefault => (
+            tab             => "display",
+            fieldType       => "selectBox",
+            default         => "list",
+            options         => \&_viewDefault_options,
+            label           => ["viewDefault label", 'Asset_Gallery'],
+            hoverHelp       => ["viewDefault description", 'Asset_Gallery'],
+         );
+sub _viewDefault_options {
+    my $session = shift->session;
+    my $i18n    = WebGUI::International->new($session, 'Asset_Gallery');
+    tie my %viewDefaultOptions, 'Tie::IxHash', (
+        list        => $i18n->get("viewDefault option list"),
+        album       => $i18n->get("viewDefault option album"),
+    );
+    return \%viewDefaultOptions;
+}
+property viewAlbumAssetId => (
+            tab             => "display",
+            fieldType       => "asset",
+            class           => "WebGUI::Asset::Wobject::GalleryAlbum",
+            label           => ["viewAlbumAssetId label", 'Asset_Gallery'],
+            hoverHelp       => ["viewAlbumAssetId description", 'Asset_Gallery'],
+         );
+property viewListOrderBy => (
+            tab             => "display",
+            fieldType       => "selectBox",
+            default         => "lineage", # "Sequence Number"
+            options         => \&_viewListOrderBy_options,
+            label           => ["viewListOrderBy label", 'Asset_Gallery'],
+            hoverHelp       => ["viewListOrderBy description", 'Asset_Gallery'],
+         );
+sub _viewListOrderBy_options {
+    my $session = shift->session;
+    my $i18n    = WebGUI::International->new($session, 'Asset_Gallery');
+
+    tie my %viewListOrderByOptions, 'Tie::IxHash', (
+        creationDate    => $i18n->get("viewListOrderBy option creationDate"),
+        lineage         => $i18n->get("viewListOrderBy option lineage"),
+        revisionDate    => $i18n->get("viewListOrderBy option revisionDate"),
+        title           => $i18n->get("viewListOrderBy option title"),
+    );
+    return \%viewListOrderByOptions;
+    
+}
+property viewListOrderDirection => (
+            tab             => "display",
+            fieldType       => "selectBox",
+            default         => "ASC",
+            options         => \&_viewListOrderDirection_options,
+            label           => ["viewListOrderDirection label", 'Asset_Gallery'],
+            hoverHelp       => ["viewListOrderDirection description", 'Asset_Gallery'],
+         );
+sub _viewListOrderDirection_options {
+    my $session = shift->session;
+    my $i18n    = WebGUI::International->new($session, 'Asset_Gallery');
+    tie my %viewListOrderDirectionOptions, 'Tie::IxHash', (
+        ASC             => $i18n->get("viewListOrderDirection option asc"),
+        DESC            => $i18n->get("viewListOrderDirection option desc"),
+    );
+    return \%viewListOrderDirectionOptions;
+}
+property workflowIdCommit => (
+            tab             => "security",
+            fieldType       => "workflow",
+            default         => "pbworkflow000000000003", # Commit without approval
+            type            => 'WebGUI::VersionTag',
+            label           => ["workflowIdCommit label", 'Asset_Gallery'],
+            hoverHelp       => ["workflowIdCommit description", 'Asset_Gallery'],
+         );
+property defaultFilesPerPage => (
+            tab             => 'display',
+            fieldType       => 'integer',
+            default         => 24,
+            label           => [ 'defaultFilesPerPage label' , 'Asset_Gallery'],
+            hoverHelp       => [ 'defaultFilesPerPage description' , 'Asset_Gallery'],
+         );
+with 'WebGUI::Role::Asset::RssFeed';
+
 
 use JSON;
-use Tie::IxHash;
-use WebGUI::HTML;
 use WebGUI::International;
 use WebGUI::Search;
-use WebGUI::Utility;
 use XML::Simple;
-
+use WebGUI::HTML;
+use WebGUI::Asset::Wobject::GalleryAlbum;
 
 =head1 NAME
 
@@ -32,321 +340,6 @@ use XML::Simple;
 =head1 DIAGNOSTICS
 
 =head1 METHODS
-
-=cut
-
-#-------------------------------------------------------------------
-
-=head2 definition ( )
-
-=cut
-
-sub definition {
-    my $class       = shift;
-    my $session     = shift;
-    my $definition  = shift;
-    my $i18n        = WebGUI::International->new($session, 'Asset_Gallery');
-
-    tie my %imageResolutionOptions, 'Tie::IxHash', (
-        '640'       => '640',
-        '800'       => '800',
-        '1024'      => '1024',
-        '1260'      => '1260',
-        '1440'      => '1440',
-        '1600'      => '1600',
-        '2880'      => '2880',
-    );
-    
-    tie my %viewDefaultOptions, 'Tie::IxHash', (
-        list        => $i18n->get("viewDefault option list"),
-        album       => $i18n->get("viewDefault option album"),
-    );
-   
-    tie my %viewListOrderByOptions, 'Tie::IxHash', (
-        creationDate    => $i18n->get("viewListOrderBy option creationDate"),
-        lineage         => $i18n->get("viewListOrderBy option lineage"),
-        revisionDate    => $i18n->get("viewListOrderBy option revisionDate"),
-        title           => $i18n->get("viewListOrderBy option title"),
-    );
-    
-    tie my %viewListOrderDirectionOptions, 'Tie::IxHash', (
-        ASC             => $i18n->get("viewListOrderDirection option asc"),
-        DESC            => $i18n->get("viewListOrderDirection option desc"),
-    );
-
-    tie my %imageDensityOptions, 'Tie::IxHash', (
-        72              => $i18n->get( "imageDensity option web" ),
-        300             => $i18n->get( "imageDensity option print" ),
-    );
-
-    tie my %properties, 'Tie::IxHash', (
-        groupIdAddComment => {
-            tab             => "security",
-            fieldType       => "group",
-            defaultValue    => 2, # Registered Users
-            label           => $i18n->get("groupIdAddComment label"),
-            hoverHelp       => $i18n->get("groupIdAddComment description"),
-        },
-        groupIdAddFile => {
-            tab             => "security",
-            fieldType       => "group",
-            defaultValue    => 2, # Registered Users
-            label           => $i18n->get("groupIdAddFile label"),
-            hoverHelp       => $i18n->get("groupIdAddFile description"),
-        },
-        imageResolutions => {
-            tab             => "properties",
-            fieldType       => "checkList",
-            defaultValue    => join("\n", '800', '1024', '1200', '1600', '2880'),
-            options         => \%imageResolutionOptions,
-            label           => $i18n->get("imageResolutions label"),
-            hoverHelp       => $i18n->get("imageResolutions description"),
-        },
-        imageViewSize => {
-            tab             => "properties",
-            fieldType       => "integer",
-            defaultValue    => 700,
-            label           => $i18n->get("imageViewSize label"),
-            hoverHelp       => $i18n->get("imageViewSize description"),
-        },
-        imageThumbnailSize => {
-            tab             => "properties",
-            fieldType       => "integer",
-            defaultValue    => 300,
-            label           => $i18n->get("imageThumbnailSize label"),
-            hoverHelp       => $i18n->get("imageThumbnailSize description"),
-        },
-        imageDensity        => {
-            tab             => "properties",
-            fieldType       => "selectBox",
-            options         => \%imageDensityOptions,
-            defaultValue    => 72,
-            label           => $i18n->get( "imageDensity label" ),
-            hoverHelp       => $i18n->get( "imageDensity description" ),
-        },
-        maxSpacePerUser => {
-            tab             => "properties",
-            fieldType       => "integer",
-            defaultValue    => 0,
-            label           => $i18n->get("maxSpacePerUser label"),
-            hoverHelp       => $i18n->get("maxSpacePerUser description"),
-        },
-        richEditIdAlbum => {
-            tab             => "properties",
-            fieldType       => "selectRichEditor",
-            defaultValue    => "PBrichedit000000000001", # Content Managers editor
-            label           => $i18n->get("richEditIdAlbum label"),
-            hoverHelp       => $i18n->get("richEditIdAlbum description"),
-        },
-        richEditIdFile => {
-            tab             => "properties",
-            fieldType       => "selectRichEditor",
-            defaultValue    => "PBrichedit000000000002", # Forum Rich editor
-            label           => $i18n->get("richEditIdFile label"),
-            hoverHelp       => $i18n->get("richEditIdFile description"),
-        },
-        richEditIdComment => {
-            tab             => "properties",
-            fieldType       => "selectRichEditor",
-            defaultValue    => "PBrichedit000000000002", # Forum Rich Editor
-            label           => $i18n->get("richEditIdFileComment label"),
-            hoverHelp       => $i18n->get("richEditIdFileComment description"),
-        },
-        templateIdAddArchive => {
-            tab             => "display",
-            fieldType       => "template",
-            defaultValue    => "0X4Q3tBWUb_thsVbsYz9xQ",
-            namespace       => "GalleryAlbum/AddArchive",
-            label           => $i18n->get("templateIdAddArchive label"),
-            hoverHelp       => $i18n->get("templateIdAddArchive description"),
-        },
-        templateIdDeleteAlbum => {
-            tab             => "display",
-            fieldType       => "template",
-            defaultValue    => "UTNFeV7B_aSCRmmaFCq4Vw",
-            namespace       => "GalleryAlbum/Delete",
-            label           => $i18n->get("templateIdDeleteAlbum label"),
-            hoverHelp       => $i18n->get("templateIdDeleteAlbum description"),
-        },
-        templateIdDeleteFile => {
-            tab             => "display",
-            fieldType       => "template",
-            defaultValue    => "zcX-wIUct0S_np14xxOA-A",
-            namespace       => "GalleryFile/Delete",
-            label           => $i18n->get("templateIdDeleteFile label"),
-            hoverHelp       => $i18n->get("templateIdDeleteFile description"),
-        },
-        templateIdEditAlbum => {
-            tab             => "display",
-            fieldType       => "template",
-            defaultValue    => "6X-7Twabn5KKO_AbgK3PEw",
-            namespace       => "GalleryAlbum/Edit",
-            label           => $i18n->get("templateIdEditAlbum label"),
-            hoverHelp       => $i18n->get("templateIdEditAlbum description"),
-        },
-        templateIdEditComment => {
-            tab             => "display",
-            fieldType       => "template",
-            defaultValue    => "OxJWQgnGsgyGohP2L3zJPQ",
-            namespace       => "GalleryFile/EditComment",
-            label           => $i18n->get("templateIdEditComment label"),
-            hoverHelp       => $i18n->get("templateIdEditComment description"),
-        },
-        templateIdEditFile => {
-            tab             => "display",
-            fieldType       => "template",
-            defaultValue    => "7JCTAiu1U_bT9ldr655Blw",
-            namespace       => "GalleryFile/Edit",
-            label           => $i18n->get("templateIdEditFile label"),
-            hoverHelp       => $i18n->get("templateIdEditFile description"),
-        },
-        templateIdListAlbums => {
-            tab             => "display",
-            fieldType       => "template",
-            defaultValue    => "azCqD0IjdQSlM3ar29k5Sg",
-            namespace       => "Gallery/ListAlbums",
-            label           => $i18n->get("templateIdListAlbums label"),
-            hoverHelp       => $i18n->get("templateIdListAlbums description"),
-        },
-        templateIdListAlbumsRss => {
-            tab             => "display",
-            fieldType       => "template",
-            defaultValue    => "ilu5BrM-VGaOsec9Lm7M6Q",
-            namespace       => "Gallery/ListAlbumsRss",
-            label           => $i18n->get("templateIdListAlbumsRss label"),
-            hoverHelp       => $i18n->get("templateIdListAlbumsRss description"),
-        },
-        templateIdListFilesForUser => {
-            tab             => "display",
-            fieldType       => "template",
-            defaultValue    => "OkphOEdaSGTXnFGhK4GT5A",
-            namespace       => "Gallery/ListFilesForUser",
-            label           => $i18n->get("templateIdListFilesForUser label"),
-            hoverHelp       => $i18n->get("templateIdListFilesForUser description"),
-        },
-        templateIdListFilesForUserRss => {
-            tab             => "display",
-            fieldType       => "template",
-            defaultValue    => "-ANLpoTEP-n4POAdRxCzRw",
-            namespace       => "Gallery/ListFilesForUserRss",
-            label           => $i18n->get("templateIdListFilesForUserRss label"),
-            hoverHelp       => $i18n->get("templateIdListFilesForUserRss description"),
-        },
-        templateIdMakeShortcut => {
-            tab             => "display",
-            fieldType       => "template",
-            defaultValue    => "m3IbBavqzuKDd2PGGhKPlA",
-            namespace       => "GalleryFile/MakeShortcut",
-            label           => $i18n->get("templateIdMakeShortcut label"),
-            hoverHelp       => $i18n->get("templateIdMakeShortcut description"),
-        },
-        templateIdSearch => {
-            tab             => "display",
-            fieldType       => "template",
-            defaultValue    => "jME5BEDYVDlBZ8jIQA9-jQ",
-            namespace       => "Gallery/Search",
-            label           => $i18n->get("templateIdSearch label"),
-            hoverHelp       => $i18n->get("templateIdSearch description"),
-        },
-        templateIdViewSlideshow => {
-            tab             => "display",
-            fieldType       => "template",
-            defaultValue    => "KAMdiUdJykjN02CPHpyZOw",
-            namespace       => "GalleryAlbum/ViewSlideshow",
-            label           => $i18n->get("templateIdViewSlideshow label"),
-            hoverHelp       => $i18n->get("templateIdViewSlideshow description"),
-        },
-        templateIdViewThumbnails => {
-            tab             => "display",
-            fieldType       => "template",
-            defaultValue    => "q5O62aH4pjUXsrQR3Pq4lw",
-            namespace       => "GalleryAlbum/ViewThumbnails",
-            label           => $i18n->get("templateIdViewThumbnails label"),
-            hoverHelp       => $i18n->get("templateIdViewThumbnails description"),
-        },
-        templateIdViewAlbum => {
-            tab             => "display",
-            fieldType       => "template",
-            defaultValue    => "05FpjceLYhq4csF1Kww1KQ",
-            namespace       => "GalleryAlbum/View",
-            label           => $i18n->get("templateIdViewAlbum label"),
-            hoverHelp       => $i18n->get("templateIdViewAlbum description"),
-        },
-        templateIdViewAlbumRss => {
-            tab             => "display",
-            fieldType       => "template",
-            defaultValue    => "mM3bjP_iG9sv5nQb4S17tQ",
-            namespace       => "GalleryAlbum/ViewRss",
-            label           => $i18n->get("templateIdViewAlbumRss label"),
-            hoverHelp       => $i18n->get("templateIdViewAlbumRss description"),
-        },
-        templateIdViewFile  => {
-            tab             => "display",
-            fieldType       => "template",
-            defaultValue    => "TEId5V-jEvUULsZA0wuRuA",
-            namespace       => "GalleryFile/View",
-            label           => $i18n->get("templateIdViewFile label"),
-            hoverHelp       => $i18n->get("templateIdViewFile description"),
-        },
-        viewDefault     => {
-            tab             => "display",
-            fieldType       => "selectBox",
-            defaultValue    => "list",
-            options         => \%viewDefaultOptions,
-            label           => $i18n->get("viewDefault label"),
-            hoverHelp       => $i18n->get("viewDefault description"),
-        },
-        viewAlbumAssetId => {
-            tab             => "display",
-            fieldType       => "asset",
-            class           => "WebGUI::Asset::Wobject::GalleryAlbum",
-            label           => $i18n->get("viewAlbumAssetId label"),
-            hoverHelp       => $i18n->get("viewAlbumAssetId description"),
-        },
-        viewListOrderBy => {
-            tab             => "display",
-            fieldType       => "selectBox",
-            defaultValue    => "lineage", # "Sequence Number"
-            options         => \%viewListOrderByOptions,
-            label           => $i18n->get("viewListOrderBy label"),
-            hoverHelp       => $i18n->get("viewListOrderBy description"),
-        },
-        viewListOrderDirection => {
-            tab             => "display",
-            fieldType       => "selectBox",
-            defaultValue    => "ASC",
-            options         => \%viewListOrderDirectionOptions,
-            label           => $i18n->get("viewListOrderDirection label"),
-            hoverHelp       => $i18n->get("viewListOrderDirection description"),
-        },
-        workflowIdCommit => {
-            tab             => "security",
-            fieldType       => "workflow",
-            defaultValue    => "pbworkflow000000000003", # Commit without approval
-            type            => 'WebGUI::VersionTag',
-            label           => $i18n->get("workflowIdCommit label"),
-            hoverHelp       => $i18n->get("workflowIdCommit description"),
-        },
-        defaultFilesPerPage => {
-            tab             => 'display',
-            fieldType       => 'integer',
-            defaultValue    => 24,
-            label           => $i18n->get( 'defaultFilesPerPage label' ),
-            hoverHelp       => $i18n->get( 'defaultFilesPerPage description' ),
-        },
-    );
-
-    push @{$definition}, {
-        assetName           => $i18n->get('assetName'),
-        icon                => 'photoGallery.gif',
-        autoGenerateForms   => 1,
-        tableName           => 'Gallery',
-        className           => __PACKAGE__,
-        properties          => \%properties,
-    };
-
-    return $class->next::method($session, $definition);
-}
 
 #----------------------------------------------------------------------------
 
@@ -364,6 +357,10 @@ sub appendTemplateVarsSearchForm {
     my $form        = $self->session->form;
     my $i18n        = WebGUI::International->new($session, 'Asset_Gallery');
 
+    use WebGUI::Form::Text;
+    use WebGUI::Form::Submit;
+    use WebGUI::Form::DateTime;
+    use WebGUI::Form::RadioList;
     $var->{ searchForm_start    } 
         = WebGUI::Form::formHeader( $session, {
             action      => $self->getUrl('func=search'),
@@ -374,34 +371,34 @@ sub appendTemplateVarsSearchForm {
         = WebGUI::Form::formFooter( $session );
 
     $var->{ searchForm_basicSearch }
-        = WebGUI::Form::text( $session, {
+        = WebGUI::Form::Text->new( $session, {
             name        => "basicSearch",
-            value       => $form->get("basicSearch"),
-        });
+            value       => scalar $form->get("basicSearch"),
+        })->toHtml;
 
     $var->{ searchForm_title    }
-        = WebGUI::Form::text( $session, {
+        = WebGUI::Form::Text->new( $session, {
             name        => "title",
-            value       => $form->get("title"),
-        });
+            value       => scalar $form->get("title"),
+        })->toHtml;
 
     $var->{ searchForm_description }
-        = WebGUI::Form::text( $session, {
+        = WebGUI::Form::Text->new( $session, {
             name        => "description",
-            value       => $form->get("description"),
-        });
+            value       => scalar $form->get("description"),
+        })->toHtml;
 
     $var->{ searchForm_keywords }
-        = WebGUI::Form::text( $session, {
+        = WebGUI::Form::Text->new( $session, {
             name        => "keywords",
-            value       => $form->get("keywords"),
-        });
+            value       => scalar $form->get("keywords"),
+        })->toHtml;
         
     $var->{ searchForm_location }
-        = WebGUI::Form::text( $session, {
+        = WebGUI::Form::Text->new( $session, {
             name        => "location",
-            value       => $form->get("location"),
-        });
+            value       => scalar $form->get("location"),
+        })->toHtml;
         
     # Search classes
     tie my %searchClassOptions, 'Tie::IxHash', (
@@ -410,31 +407,31 @@ sub appendTemplateVarsSearchForm {
         ''                                          => $i18n->get("search class any"),
     );
     $var->{ searchForm_className }
-        = WebGUI::Form::radioList( $session, {
+        = WebGUI::Form::RadioList->new( $session, {
             name        => "className",
             value       => ( $form->get("className") || '' ),
             options     => \%searchClassOptions,
-        });
+        })->toHtml;
 
     # Search creationDate
     my $oneYearAgo      = WebGUI::DateTime->new( $session, time )->add( years => -1 )->epoch;
     $var->{ searchForm_creationDate_after }
-        = WebGUI::Form::dateTime( $session, {
+        = WebGUI::Form::DateTime->new( $session, {
             name        => "creationDate_after",
-            value       => $form->get("creationDate_after",  "dateTime", $oneYearAgo),
-        });
+            value       => scalar $form->get("creationDate_after",  "dateTime", $oneYearAgo),
+        })->toHtml;
     $var->{ searchForm_creationDate_before }
-        = WebGUI::Form::dateTime( $session, {
+        = WebGUI::Form::DateTime->new( $session, {
             name        => "creationDate_before",
-            value       => $form->get("creationDate_before", "dateTime", time()),
-        });
+            value       => scalar $form->get("creationDate_before", "dateTime", time()),
+        })->toHtml;
 
     # Buttons
     $var->{ searchForm_submit }
-        = WebGUI::Form::submit( $session, {
+        = WebGUI::Form::Submit->new( $session, {
             name        => "submit",
             value       => $i18n->get("search submit"),
-        });
+        })->toHtml;
 
     return $var;
 }
@@ -459,7 +456,7 @@ sub canAddFile {
                     : $self->session->user
                     ;
 
-    return $user->isInGroup( $self->get("groupIdAddFile") );
+    return $user->isInGroup( $self->groupIdAddFile );
 }
 
 #----------------------------------------------------------------------------
@@ -483,7 +480,7 @@ sub canComment {
                     : $self->session->user
                     ;
 
-    return $user->isInGroup( $self->get("groupIdAddComment") );
+    return $user->isInGroup( $self->groupIdAddComment );
 }
 
 #----------------------------------------------------------------------------
@@ -506,10 +503,10 @@ sub canEdit {
 
     my $form        = $self->session->form;
 
-    if ( $form->get('func') eq "add" && $form->get( 'class' )->isa( "WebGUI::Asset::Wobject::GalleryAlbum" ) ) {
+    if ( $form->get('func') eq "add" && $form->get( 'className' )->isa( "WebGUI::Asset::Wobject::GalleryAlbum" ) ) {
         return $self->canAddFile( $userId );
     }
-    elsif ( $form->get('func') eq "editSave" && $form->get('assetId') eq "new" && $form->get( 'class' )->isa( 'WebGUI::Asset::Wobject::GalleryAlbum' ) ) {
+    elsif ( $form->get('func') eq "addSave" && $form->get('assetId') eq "new" && $form->get( 'className' )->isa( 'WebGUI::Asset::Wobject::GalleryAlbum' ) ) {
         return $self->canAddFile( $userId );
     }
     else {
@@ -517,8 +514,8 @@ sub canEdit {
                         ? WebGUI::User->new( $self->session, $userId )
                         : $self->session->user
                         ;
-        
-        return $user->isInGroup( $self->get("groupIdEdit") );
+
+        return $user->isInGroup( $self->groupIdEdit );
     }
 }
 
@@ -542,7 +539,7 @@ sub canView {
                     : $self->session->user
                     ;
 
-    return $user->isInGroup( $self->get("groupIdView") );
+    return $user->isInGroup( $self->groupIdView );
 }
 
 #----------------------------------------------------------------------------
@@ -561,11 +558,11 @@ is a hash reference with the following keys.
 sub getAlbumIds {
     my $self        = shift;
     my $options     = shift;
-    
+
     my $orderBy     = $options->{ orderBy }
                     ? $options->{ orderBy }
-                    : $self->get( 'viewListOrderBy' )
-                    ? join( " ", $self->get( 'viewListOrderBy' ), $self->get( 'viewListOrderDirection' ) )
+                    : $self->viewListOrderBy
+                    ? join( " ", $self->viewListOrderBy, $self->viewListOrderDirection )
                     : "lineage ASC"
                     ;
 
@@ -582,7 +579,7 @@ sub getAlbumIds {
             )
         };
     }
-    
+
     my $assets 
         = $self->getLineage(['descendants'], {
             includeOnlyClasses  => ['WebGUI::Asset::Wobject::GalleryAlbum'],
@@ -609,7 +606,7 @@ For more C<options>, see L</getAlbumIds>.
 sub getAlbumPaginator {
     my $self        = shift;
     my $options     = shift;
-    
+
     my $perpage     = $options->{ perpage }      || 20;
     delete $options->{ perpage };
 
@@ -670,7 +667,7 @@ assets in this gallery.
 
 sub getImageResolutions {
     my $self        = shift;
-    return [ split /\n/, $self->get("imageResolutions") ];
+    return [ split /\n/, $self->imageResolutions ];
 }
 
 #----------------------------------------------------------------------------
@@ -741,9 +738,9 @@ sub getRssFeedItems {
 
     my $p
         = $self->getAlbumPaginator( { 
-            perpage     => $self->get('itemsPerFeed'),
+            perpage     => $self->itemsPerFeed,
         } );
-    
+
     my $var     = [];
     my $siteUrl = $self->session->url->getSiteURL();
     for my $assetId ( @{ $p->getPageData } ) {
@@ -757,7 +754,7 @@ sub getRssFeedItems {
             'author'        => WebGUI::User->new($self->session, $asset->{_properties}->{ 'ownerUserId' })->username
         };
     }
-    
+
     return $var;
 }
 
@@ -779,7 +776,7 @@ sub getSearchPaginator {
     my $rules       = shift;
     my $session     = $self->session;
 
-    $rules->{ lineage       } = [ $self->get("lineage") ];
+    $rules->{ lineage       } = [ $self->lineage ];
 
     my $search      = WebGUI::Search->new( $self->session );
     $search->search( $rules );
@@ -801,7 +798,7 @@ classes of files inside of a Gallery.
 
 sub getTemplateIdEditFile {
     my $self        = shift;
-    return $self->get("templateIdEditFile");
+    return $self->templateIdEditFile;
 }
 
 #----------------------------------------------------------------------------
@@ -815,12 +812,12 @@ Gets a hash reference of vars common to all templates.
 sub getTemplateVars {
     my $self        = shift;
     my $var         = $self->get;
-    
+
     # Add the search form variables
     $self->appendTemplateVarsSearchForm( $var );
 
     $var->{ url                         } = $self->getUrl;
-    $var->{ url_addAlbum                } = $self->getUrl('func=add;class=WebGUI::Asset::Wobject::GalleryAlbum');
+    $var->{ url_addAlbum                } = $self->getUrl('func=add;className=WebGUI::Asset::Wobject::GalleryAlbum');
     $var->{ url_listAlbums              } = $self->getUrl('func=listAlbums');
     $var->{ url_listAlbumsRss           } = $self->getUrl('func=listAlbumsRss');
     $var->{ url_listFilesForCurrentUser } = $self->getUrl('func=listFilesForUser');
@@ -919,14 +916,14 @@ sub hasSpaceAvailable {
     my $self        = shift;
     my $spaceWanted = shift;
     my $userId      = shift || $self->session->user->userId;
-    
+
     # If we don't care, just return
-    return 1 if ( $self->get( "maxSpacePerUser" ) == 0 );
+    return 1 if ( $self->maxSpacePerUser == 0 );
 
     my $db          = $self->session->db;
 
     # Compile the amount of disk space used
-    my $maxSpace    = $self->get( "maxSpacePerUser" ) * ( 1_024 ** 2 ); # maxSpacePerUser is in MB
+    my $maxSpace    = $self->maxSpacePerUser * ( 1_024 ** 2 ); # maxSpacePerUser is in MB
     my $spaceUsed   = 0;
     my $fileIter
         = $self->getLineageIterator( [ 'descendants' ], { 
@@ -958,14 +955,13 @@ See WebGUI::Asset::prepareView() for details.
 
 =cut
 
-sub prepareView {
-    my $self = shift;
-    $self->next::method();
+around prepareView => sub {
+    my ( $orig, $self, @args ) = @_;
+    $self->$orig( @args );
 
-    if ( $self->get("viewDefault") eq "album" && $self->get("viewAlbumAssetId") && $self->get("viewAlbumAssetId")
-ne 'PBasset000000000000001') {
+    if ( $self->viewDefault eq "album" && $self->viewAlbumAssetId && $self->viewAlbumAssetId ne 'PBasset000000000000001') {
         my $asset
-            = WebGUI::Asset->newByDynamicClass( $self->session, $self->get("viewAlbumAssetId") );
+            = WebGUI::Asset->newById( $self->session, $self->viewAlbumAssetId );
         if ($asset) {
             $asset->prepareView;
             $self->{_viewAsset} = $asset;
@@ -977,7 +973,7 @@ ne 'PBasset000000000000001') {
     else {
         $self->prepareViewListAlbums;
     }
-}
+};
 
 #----------------------------------------------------------------------------
 
@@ -990,11 +986,11 @@ Prepare the template for listing multiple albums.
 sub prepareViewListAlbums {
     my $self        = shift;
     my $template 
-        = WebGUI::Asset::Template->new($self->session, $self->get("templateIdListAlbums"));
+        = WebGUI::Asset::Template->newById($self->session, $self->templateIdListAlbums);
     if (!$template) {
         WebGUI::Error::ObjectNotFound::Template->throw(
             error      => qq{Template not found},
-            templateId => $self->get("templateIdListAlbums"),
+            templateId => $self->templateIdListAlbums,
             assetId    => $self->getId,
         );
     }
@@ -1015,7 +1011,7 @@ sub view {
     my $session = $self->session;	
     my $var     = $self->get;
 
-    if ( $self->get("viewDefault") eq "album" && $self->{_viewAsset}) {
+    if ( $self->viewDefault eq "album" && $self->{_viewAsset}) {
         return $self->{_viewAsset}->view;
     }
     else {
@@ -1048,7 +1044,7 @@ sub view_listAlbums {
         my $asset       = WebGUI::Asset::Wobject::GalleryAlbum->newPending( $session, $assetId );
         push @{ $var->{albums} }, $asset->getTemplateVars;
     }
-    
+
     return $self->processTemplate( $var, undef, $self->{_viewTemplate} );
 }
 
@@ -1067,16 +1063,16 @@ instead of having to block things from being added.
 
 =cut
 
-sub www_add {
+override www_add => sub {
     my $self        = shift;
-    
+
     unless ( $self->hasBeenCommitted ) {
         my $i18n    = WebGUI::International->new($self->session, 'Asset_Gallery');
         return $self->processStyle($i18n->get("error add uncommitted"));
     }
 
-    return $self->next::method( @_ );
-}
+    return super();
+};
 
 #----------------------------------------------------------------------------
 
@@ -1127,10 +1123,10 @@ A 1 or a 0 depending on whether you want other people to be able to add images t
 sub www_addAlbumService {
     my $self        = shift;
     my $session     = $self->session;
-    
+
     return $session->privilege->insufficient unless ($self->canAddFile);
     my $form = $session->form;
-    
+
     my $album = $self->addChild({
         className       => "WebGUI::Asset::Wobject::GalleryAlbum",
         title           => $form->get('title','text'),
@@ -1139,7 +1135,7 @@ sub www_addAlbumService {
         othersCanAdd    => $form->get('othersCanAdd','yesNo'),
         ownerUserId     => $session->user->userId,
     });
-    
+
     $album->requestAutoCommit;
 
     my $siteUrl = $session->url->getSiteURL;
@@ -1150,15 +1146,15 @@ sub www_addAlbumService {
         canAddFiles     => $album->canAddFile,
         title           => $album->getTitle,
         url             => $siteUrl.$album->getUrl,
-        dateCreated     => $date->epochToHuman($album->get('creationDate'), '%y-%m-%d %j:%n:%s'),
-        lastUpdated     => $date->epochToHuman($album->get('revisionDate'), '%y-%m-%d %j:%n:%s'),
+        dateCreated     => $date->epochToHuman($album->creationDate, '%y-%m-%d %j:%n:%s'),
+        lastUpdated     => $date->epochToHuman($album->revisionDate, '%y-%m-%d %j:%n:%s'),
     };
     if ($as eq "xml") {
-        $session->http->setMimeType('text/xml');
+        $session->response->content_type('text/xml');
         return XML::Simple::XMLout($document, NoAttr => 1);
     }
 
-    $session->http->setMimeType('application/json');
+    $session->response->content_type('application/json');
     return JSON->new->pretty->encode($document);
 }
 
@@ -1172,7 +1168,7 @@ Show a paginated list of the albums in this gallery.
 
 sub www_listAlbums {
     my $self        = shift;
-    
+
     # Perform the prepareView ourselves
     $self->prepareViewListAlbums;
 
@@ -1195,7 +1191,7 @@ sub www_listAlbumsRss {
     my $var         = $self->getTemplateVars;
 
     for my $assetId ( @{ $self->getAlbumIds } ) {
-        my $asset       = WebGUI::Asset->new( $session, $assetId, 'WebGUI::Asset::Wobject::GalleryAlbum');
+        my $asset       = WebGUI::Asset->newById( $session, $assetId);
         my $assetVar    = $asset->getTemplateVars;
 
         # Fix URLs
@@ -1215,8 +1211,8 @@ sub www_listAlbumsRss {
         push @{ $var->{albums} }, $assetVar;
     }
 
-    $self->session->http->setMimeType('text/xml');
-    return $self->processTemplate( $var, $self->get("templateIdListAlbumsRss") );
+    $self->session->response->content_type('text/xml');
+    return $self->processTemplate( $var, $self->templateIdListAlbumsRss );
 }
 
 #----------------------------------------------------------------------------
@@ -1304,9 +1300,9 @@ Defaults to 1. This represents the page number. It will return up to 100 albums 
 sub www_listAlbumsService {
     my $self        = shift;
     my $session     = $self->session;
-    
+
     return $session->privilege->insufficient unless ($self->canView);
-    
+
     my $siteUrl = $session->url->getSiteURL;
     my @assets;
     my $date = $session->datetime;
@@ -1323,14 +1319,14 @@ sub www_listAlbumsService {
         if ($count > $pageNumber * 100 - 1) { # skip high page numbers
             last;
         }        
-        my $asset       = WebGUI::Asset->new( $session, $assetId, 'WebGUI::Asset::Wobject::GalleryAlbum' );
+        my $asset       = WebGUI::Asset->newById( $session, $assetId);
         if (defined $asset) {
             if ($asset->canView) {
                 push @assets, {
                     title           => $asset->getTitle,
                     url             => $siteUrl.$asset->getUrl,
-                    dateCreated     => $date->epochToHuman($asset->get('creationDate'), '%y-%m-%d %j:%n:%s'),
-                    lastUpdated     => $date->epochToHuman($asset->get('revisionDate'), '%y-%m-%d %j:%n:%s'),
+                    dateCreated     => $date->epochToHuman($asset->creationDate, '%y-%m-%d %j:%n:%s'),
+                    lastUpdated     => $date->epochToHuman($asset->revisionDate, '%y-%m-%d %j:%n:%s'),
                     thumbnailUrl    => $siteUrl.$asset->getThumbnailUrl,
                     canAddFiles     => $asset->canAddFile,
                 };
@@ -1344,19 +1340,19 @@ sub www_listAlbumsService {
         gallery     => {
             canAddAlbums    => $self->canAddFile,
             title           => $self->getTitle,
-            menuTitle       => $self->get('menuTitle'),
-            synopsis        => $self->get('synopsis'),
+            menuTitle       => $self->menuTitle,
+            synopsis        => $self->synopsis,
             url             => $siteUrl.$self->getUrl,
-            dateCreated     => $date->epochToHuman($self->get('creationDate'), '%y-%m-%d %j:%n:%s'),
-            lastUpdated     => $date->epochToHuman($self->get('revisionDate'), '%y-%m-%d %j:%n:%s'),
+            dateCreated     => $date->epochToHuman($self->creationDate, '%y-%m-%d %j:%n:%s'),
+            lastUpdated     => $date->epochToHuman($self->revisionDate, '%y-%m-%d %j:%n:%s'),
         },
         albums      => \@assets
     };
     if ($as eq "xml") {
-        $session->http->setMimeType('text/xml');
+        $session->response->content_type('text/xml');
         return XML::Simple::XMLout($document, NoAttr => 1);
     }
-    $session->http->setMimeType('application/json');
+    $session->response->content_type('application/json');
     return JSON->new->pretty->encode($document);
 }
 
@@ -1458,7 +1454,6 @@ sub search {
         if ( $form->get("className") ) {
             $classes = [ $form->get('className') ];
         }
-        
         # Build a URL for the pagination
         my $url     
             = $self->getUrl( 
@@ -1521,7 +1516,7 @@ sub www_search {
         # Add search results
         $paginator->appendTemplateVars( $var );        
         for my $result ( @{ $paginator->getPageData } ) {
-            my $asset   = WebGUI::Asset->newByDynamicClass( $session, $result->{assetId} );
+            my $asset   = WebGUI::Asset->newById( $session, $result->{assetId} );
             push @{ $var->{search_results} }, {
                 %{ $asset->getTemplateVars },
                 isAlbum     => $asset->isa( 'WebGUI::Asset::Wobject::GalleryAlbum' ),
@@ -1530,7 +1525,7 @@ sub www_search {
     }
 
     return $self->processStyle(
-        $self->processTemplate( $var, $self->get("templateIdSearch") )
+        $self->processTemplate( $var, $self->templateIdSearch )
     );
 }
 
@@ -1557,7 +1552,7 @@ sub www_listFilesForUser {
     # Get all the albums
     my $albumIds    = $self->getUserAlbumIds( $userId );
     for my $albumId ( @$albumIds ) {
-        my $asset       = WebGUI::Asset->newByDynamicClass( $session, $albumId );
+        my $asset       = WebGUI::Asset->newById( $session, $albumId );
         push @{ $var->{user_albums} }, $asset->getTemplateVars;
     }
 
@@ -1570,12 +1565,12 @@ sub www_listFilesForUser {
     $p->appendTemplateVars( $var );
 
     for my $fileId ( @{ $p->getPageData } ) {
-        my $asset       = WebGUI::Asset->newByDynamicClass( $session, $fileId );
+        my $asset       = WebGUI::Asset->newById( $session, $fileId );
         push @{ $var->{user_files} }, $asset->getTemplateVars;
     }
 
     return $self->processStyle(
-        $self->processTemplate( $var, $self->get("templateIdListFilesForUser") )
+        $self->processTemplate( $var, $self->templateIdListFilesForUser )
     );
 }
 
@@ -1599,7 +1594,7 @@ sub www_listFilesForUserRss {
     # Get all the albums
     my $albumIds    = $self->getUserAlbumIds( $userId );
     for my $albumId ( @$albumIds ) {
-        my $asset       = WebGUI::Asset->newByDynamicClass( $session, $albumId );
+        my $asset       = WebGUI::Asset->newById( $session, $albumId );
         my $assetVar    = $asset->getTemplateVars;
 
         for my $key ( qw( url ) ) {
@@ -1612,7 +1607,7 @@ sub www_listFilesForUserRss {
     # Get all the files
     my $fileIds     = $self->getUserFileIds( $userId );
     for my $fileId ( @$fileIds ) {
-        my $asset       = WebGUI::Asset->newByDynamicClass( $session, $fileId );
+        my $asset       = WebGUI::Asset->newById( $session, $fileId );
         my $assetVar    = $asset->getTemplateVars;
 
         for my $key ( qw( url ) ) {
@@ -1622,8 +1617,9 @@ sub www_listFilesForUserRss {
         push @{ $var->{user_files} }, $assetVar;
     }
 
-    $self->session->http->setMimeType('text/xml');
-    return $self->processTemplate( $var, $self->get("templateIdListFilesForUserRss") );
+    $self->session->response->content_type('text/xml');
+    return $self->processTemplate( $var, $self->templateIdListFilesForUserRss );
 }
 
+__PACKAGE__->meta->make_immutable;
 1;

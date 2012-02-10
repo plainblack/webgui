@@ -3,7 +3,7 @@ package WebGUI::Form::DynamicField;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -18,7 +18,6 @@ use strict;
 use base 'WebGUI::Form::Control';
 use WebGUI::International;
 use WebGUI::Pluggable;
-use WebGUI::Utility;
 
 =head1 NAME
 
@@ -113,12 +112,12 @@ sub new {
 	delete $raw{fieldType};
         # Return the appropriate field object.
 	if ($fieldType eq "") {
-		$session->errorHandler->warn("Something is trying to create a dynamic field called ".$raw{name}.", but didn't pass in a field type.");
+		$session->log->warn("Something is trying to create a dynamic field called ".$raw{name}.", but didn't pass in a field type.");
 		$fieldType = "Text";
 	}
 	##No infinite loops, please
 	elsif ($fieldType eq 'DynamicField') {
-		$session->errorHandler->warn("Something is trying to create a DynamicField via DynamicField.");
+		$session->log->warn("Something is trying to create a DynamicField via DynamicField.");
 		$fieldType = "Text";
 	}
     return WebGUI::Pluggable::instanciate("WebGUI::Form::".$fieldType, "new", [$session, \%raw]);

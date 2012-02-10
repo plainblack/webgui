@@ -3,7 +3,7 @@ package WebGUI::Form::SelectSlider;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -18,6 +18,7 @@ use strict;
 use base 'WebGUI::Form::Slider';
 use WebGUI::Form::SelectBox;
 use WebGUI::International;
+use Tie::IxHash;
 
 =head1 NAME
 

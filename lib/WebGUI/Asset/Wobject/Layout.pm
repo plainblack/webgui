@@ -3,7 +3,7 @@ package WebGUI::Asset::Wobject::Layout;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -16,11 +16,71 @@ package WebGUI::Asset::Wobject::Layout;
 
 use strict;
 use WebGUI::AdSpace;
-use WebGUI::Asset::Wobject;
-use WebGUI::Utility;
-use WebGUI::Cache;
+use Tie::IxHash;
+use Moose;
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset::Wobject';
 
-our @ISA = qw(WebGUI::Asset::Wobject);
+define assetName => ["assetName", 'Asset_Layout'];
+define icon      => 'layout.gif';
+define tableName => 'Layout';
+
+property templateId => (
+             tab          => "display",
+             fieldType    => "template",
+             namespace    => "Layout",
+             default      => 'PBtmpl0000000000000054',
+             label        => ['layout template title', 'Asset_Layout'],
+             hoverHelp    => ['template description', 'Asset_Layout'],
+         );
+property mobileTemplateId => (
+             tab          => "display",
+             fieldType    => 'template',
+             namespace    => 'Layout',
+             default      => 'PBtmpl0000000000000054',
+             label        => ['mobileTemplateId label', 'Asset_Layout'],
+             hoverHelp    => ['mobileTemplateId description', 'Asset_Layout'],
+         );
+property contentPositions => (
+             noFormPost   => 1,
+             default      => undef,
+             fieldType    => "hidden",
+         );
+property assetsToHide => (
+             tab          => "properties",
+             default      => undef,
+             fieldType    => "checkList",
+             label          => ['assets to hide', 'Asset_Layout'],
+             hoverHelp      => ['assets to hide description', 'Asset_Layout'],
+             vertical  => 1,
+             uiLevel   => 9,
+             options        => sub {
+                my ( $self ) = @_;
+                my @assetsToHide = split("\n",$self->assetsToHide);
+                my $children = $self->getLineage(["children"],{"returnObjects"=>1, excludeClasses=>["WebGUI::Asset::Wobject::Layout"]});
+                my %childIds;
+                foreach my $child (@{$children}) {
+                    $childIds{$child->getId} = $child->getTitle;    
+                }
+                return \%childIds;
+             },
+         );
+property assetOrder => (
+             tab          => "display",
+             default      => 'asc',
+             fieldType    => 'selectBox',
+             label        => ['asset order label', 'Asset_Layout'],
+             hoverHelp    => ['asset order hoverHelp', 'Asset_Layout'],
+             options      => sub {
+                 my ( $self ) = @_;
+                 my $i18n = WebGUI::International->new( $self->session, 'Asset_Layout' );
+                 tie my %assetOrder, "Tie::IxHash", (
+                    "asc"  => $i18n->get("asset order asc"),
+                    "desc" => $i18n->get("asset order desc"),
+                );
+                return \%assetOrder;
+             },
+         );
 
 =head1 NAME
 
@@ -45,173 +105,28 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 
-=head2 definition ( definition )
-
-Defines the properties of this asset.
-
-=head3 definition
-
-A hash reference passed in from a subclass definition.
-
-=cut
-
-sub definition {
-    my $class = shift;
-    my $session = shift;
-    my $definition = shift;
-    my $i18n = WebGUI::International->new($session,"Asset_Layout");
-    
-    push(@{$definition}, {
-        assetName=>$i18n->get("assetName"),
-        icon=>'layout.gif',
-        tableName=>'Layout',
-        className=>'WebGUI::Asset::Wobject::Layout',
-        properties=>{
-            templateId => {
-                label        => $i18n->get('layout template title'),
-                hoverHelp    => $i18n->get('template description'),
-                fieldType    =>"template",
-                namespace    => "Layout",
-                defaultValue =>'PBtmpl0000000000000054',
-            },
-            mobileTemplateId => {
-                fieldType    => ( $session->style->useMobileStyle ? 'template' : 'hidden' ),
-                label        => $i18n->get('mobileTemplateId label'),
-                hoverHelp    => $i18n->get('mobileTemplateId description'),
-                namespace    => 'Layout',
-                defaultValue => 'PBtmpl0000000000000054',
-            },
-            contentPositions => {
-                noFormPost   =>1,
-                defaultValue =>undef,
-                fieldType    =>"hidden"
-            },
-            assetsToHide => {
-                defaultValue =>undef,
-                fieldType    =>"checkList"
-            },
-            assetOrder => {
-                defaultValue => 'asc',
-                fieldType    => 'selectBox',
-                label        => $i18n->get('asset order label'),
-                hoverHelp    => $i18n->get('asset order hoverHelp'),
-            }
-        }
-    });
-    return $class->SUPER::definition($session, $definition);
-}
-
-
-#-------------------------------------------------------------------
-
 =head2 getEditForm ( )
 
 Extends the base method to  handle the optional mobileTemplateId and assetsToHide.
 
 =cut
 
-sub getEditForm {
+override getEditForm => sub {
     my $self = shift;
-    my $tabform = $self->SUPER::getEditForm();
+    my $f = super();
     my $i18n = WebGUI::International->new($self->session,"Asset_Layout");
 
     my ($templateId);
-    if (($self->get("assetId") eq "new") && ($self->getParent->get('className') eq 'WebGUI::Asset::Wobject::Layout')) {
-        $templateId = $self->getParent->getValue('templateId');
-    } else {
-        $templateId = $self->getValue('templateId');
+    if (($self->assetId eq "new") && ($self->getParent->isa('WebGUI::Asset::Wobject::Layout'))) {
+        $f->getTab('display')->getField('templateId')->set( value => $self->getParent->templateId );
     }
 
-    tie my %extraFields, "Tie::IxHash";
-    %extraFields = (
-      templateId => {
-          fieldType => 'template',
-          tab       => 'display',
-          value     => $templateId,
-          label     => $i18n->get('layout template title'),
-          hoverHelp => $i18n->get('template description'),
-          namespace => "Layout",
-      });
-
-    if ( $self->session->setting->get('useMobileStyle') ) {
-      $extraFields{mobileTemplateId} = {
-        fieldType   => 'template',
-        tab         => 'display',
-        name        => 'mobileTemplateId',
-        value       => $self->getValue('mobileTemplateId'),
-        label       => $i18n->get('mobileTemplateId label'),
-        hoverHelp   => $i18n->get('mobileTemplateId description'),
-        namespace   => 'Layout',
-      };
-    }
-    else {
-        $extraFields{mobileTemplateId} = {
-            fieldType   => 'hidden',
-            tab         => 'display',
-            name        => 'mobileTemplateId',
-            value       => $self->getValue('mobileTemplateId'),
-        };
+    if ( !$self->session->setting->get('useMobileStyle') ) {
+        $f->getTab('display')->deleteField( 'mobileTemplateId' );
     }
 
-	tie my %assetOrder, "Tie::IxHash";
-	%assetOrder = (
-		"asc"  => $i18n->get("asset order asc"),
-		"desc" => $i18n->get("asset order desc"),
-	);
-    $extraFields{assetOrder} = {
-        tab         => 'display',
-        fieldType   => 'selectBox',
-        name        => 'assetOrder',
-        label       => $i18n->get('asset order label'),
-        hoverHelp   => $i18n->get('asset order hoverHelp'),
-        value       => $self->getValue('assetOrder'),
-        options     => \%assetOrder,
-    };
-
-    if ($self->get("assetId") eq "new") {
-        $extraFields{whatNext} = {
-            fieldType   => 'whatNext',
-            value       => "view",
-            options     => {
-                view       => $i18n->get(823),
-                viewParent => $i18n->get(847)
-            },
-        };
-    }
-    else {
-        my @assetsToHide = split("\n",$self->getValue("assetsToHide"));
-        my $childIter = $self->getLineageIterator(["children"],{excludeClasses=>["WebGUI::Asset::Wobject::Layout"]});
-        my %childIds;
-        while ( 1 ) {
-            my $child;
-            eval { $child = $childIter->() };
-            if ( my $x = WebGUI::Error->caught('WebGUI::Error::ObjectNotFound') ) {
-                $self->session->log->error($x->full_message);
-                next;
-            }
-            last unless $child;
-            $childIds{$child->getId} = $child->getTitle;    
-        }
-        $extraFields{assetsToHide} = {
-            fieldType => 'checkList',
-            tab       => 'display',
-            name      => "assetsToHide",
-            value     => \@assetsToHide,
-            options   => \%childIds,
-            label     => $i18n->get('assets to hide'),
-            hoverHelp => $i18n->get('assets to hide description'),
-            vertical  => 1,
-            uiLevel   => 9,
-        };
-    }
-
-    my $overrides = $self->session->config->get("assets/".$self->get("className"));
-    foreach my $fieldName (keys %extraFields) {
-        $self->setupFormField($tabform, $fieldName, \%extraFields, $overrides);
-    }
-
-    return $tabform;
-}
+    return $f;
+};
 
 #-------------------------------------------------------------------
 
@@ -222,20 +137,20 @@ and to put children in their places.
 
 =cut
 
-sub prepareView {
+override prepareView => sub {
     my $self = shift;
-    $self->SUPER::prepareView;
+    super();
     my $session = $self->session;
     my $templateId;
 
     if ($session->style->useMobileStyle) {
-        $templateId = $self->get('mobileTemplateId');
+        $templateId = $self->mobileTemplateId;
     }
     else {
-        $templateId = $self->get('templateId');
+        $templateId = $self->templateId;
     }
 
-    my $template = WebGUI::Asset->new($session,$templateId,"WebGUI::Asset::Template");
+    my $template = WebGUI::Asset->newById($session, $templateId);
     if (!$template) {
         WebGUI::Error::ObjectNotFound::Template->throw(
             error      => qq{Template not found},
@@ -246,7 +161,7 @@ sub prepareView {
     $template->prepare( $self->getMetaDataAsTemplateVariables );
     $self->{_viewTemplate} = $template;
 
-    my $templateContent = $template->get("template");
+    my $templateContent = $template->template;
     my $numPositions = 1;
     while ($templateContent =~ /position(\d+)_loop/g) {
         $numPositions = $1
@@ -254,12 +169,12 @@ sub prepareView {
     }
 
     my %vars;
-    $vars{showAdmin} = ($session->var->isAdminOn && $self->canEdit && $self->canEditIfLocked);
+    $vars{showAdmin} = ($session->isAdminOn && $self->canEdit && $self->canEditIfLocked);
 
     my $splitter = $self->{_viewSplitter} = $self->getSeparator;
 
     my %hidden = map { $_ => 1 }
-        split "\n", $self->get("assetsToHide");
+        split "\n", $self->assetsToHide;
 
     my %placeHolder;
     my @children;
@@ -282,7 +197,7 @@ sub prepareView {
         $placeHolder{$assetId} = $child;
         push @children, {
             id             => $assetId,
-            isUncommitted  => $child->get('status') eq 'pending',
+            isUncommitted  => $child->status eq 'pending',
             content        => $splitter . $assetId . '~~',
         };
         if ($vars{showAdmin}) {
@@ -290,7 +205,7 @@ sub prepareView {
         };
     }
 
-    my @positions = split /\./, $self->get("contentPositions");
+    my @positions = split /\./, $self->contentPositions;
     # cut positions off at the number we found in the template
     $#positions = $numPositions - 1
         if $numPositions < scalar @positions;
@@ -313,22 +228,24 @@ sub prepareView {
     }
     # deal with unplaced children
     # Add children to the top or bottom of the first content position based on assetOrder setting
-    if($self->getValue("assetOrder") eq "asc") {
+    if($self->assetOrder eq "asc") {
         push @{ $vars{"position1_loop"} }, @children;
     }
     else {
         unshift @{ $vars{"position1_loop"} }, reverse @children;
     }
 
+    # NOTE: This is the old way of doing the Layout drag/drop. The new way is injected by the WebGUI Admin
+    # Interface if certain elements are present in the template
     if ($vars{showAdmin}) {
         # under normal circumstances we don't put HTML stuff in our code, but this will make it much easier
         # for end users to work with our templates
-        $session->style->setScript($session->url->extras("yui/build/yahoo-dom-event/yahoo-dom-event.js"),{ type=>"text/javascript" });
-        $session->style->setScript($session->url->extras("yui/build/animation/animation-min.js"),{ type=>"text/javascript" });
-        $session->style->setScript($session->url->extras("yui/build/dragdrop/dragdrop.js"),{ type=>"text/javascript" });
-        $session->style->setScript($session->url->extras("yui-webgui/build/layout/draggable.js"),{ type=>"text/javascript" });
+        $session->style->setScript($session->url->extras("yui/build/yahoo-dom-event/yahoo-dom-event.js"));
+        $session->style->setScript($session->url->extras("yui/build/animation/animation-min.js"));
+        $session->style->setScript($session->url->extras("yui/build/dragdrop/dragdrop.js"));
+        $session->style->setScript($session->url->extras("yui-webgui/build/layout/draggable.js"));
 
-        $session->style->setLink($session->url->extras("draggable.css"),{ type=>"text/css", rel=>"stylesheet", media=>"all" });
+        $session->style->setCss($session->url->extras("draggable.css"));
         $session->style->setRawHeadTags('
             <style type="text/css">
             .dragging, .empty {
@@ -346,7 +263,7 @@ sub prepareView {
 
     $self->{_viewVars} = \%vars;
     $self->{_viewPlaceholder} = \%placeHolder;
-}
+};
 
 #-------------------------------------------------------------------
 
@@ -361,7 +278,7 @@ Show performance indicators for the Layout and all children if enabled.
 sub view {
     my $self = shift;
     my $session = $self->session;
-    my $showPerformance = $session->errorHandler->canShowPerformanceIndicators;
+    my $perfLog = $session->log->performanceLogger;
     my @parts = split $self->{_viewSplitter},
     $self->processTemplate($self->{_viewVars}, undef, $self->{_viewTemplate});
     my $output = "";
@@ -376,9 +293,10 @@ sub view {
         my ($assetId, $outputPart) = split '~~', $part, 2;
         my $asset = $self->{_viewPlaceholder}{$assetId};
         if (defined $asset) {
-            my $t = [Time::HiRes::gettimeofday()] if ($showPerformance);
+            my $t = $perfLog ? [Time::HiRes::gettimeofday()] : undef;
             my $assetOutput = $asset->view;
-            $assetOutput .= "Asset:".Time::HiRes::tv_interval($t) if ($showPerformance);
+            $perfLog->({ asset => $asset, 'time' => Time::HiRes::tv_interval($t), type => 'Layout' })
+                if $perfLog;
             if ($self->{_viewPrintOverride}) {
                 $session->output->print($assetOutput);
             } else {
@@ -406,9 +324,11 @@ a new asset revision.
 sub www_setContentPositions {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);
-    $self->addRevision({
+    my $tag = WebGUI::VersionTag->getWorking( $self->session );
+    my $newSelf = $self->addRevision({
         contentPositions=>$self->session->form->process("map")
         });
+    $newSelf->setVersionLock;
     WebGUI::VersionTag->autoCommitWorkingIfEnabled($self->session);
     return "Map set: ".$self->session->form->process("map");
 }
@@ -422,10 +342,10 @@ of the page, by lineage.
 
 =cut
 
-sub getContentLastModified {
+override getContentLastModified => sub {
     # Buggo: this is a little too conservative.  Children that are hidden maybe shouldn't count.  Hm.
     my $self = shift;
-    my $mtime = $self->SUPER::getContentLastModified;
+    my $mtime = super();
     my $childIter = $self->getLineageIterator(["children"],{excludeClasses=>['WebGUI::Asset::Wobject::Layout']});
     while ( 1 ) {
         my $child;
@@ -439,7 +359,7 @@ sub getContentLastModified {
         $mtime = $child_mtime if ($child_mtime > $mtime);
     }
     return $mtime;
-}
+};
 
 #-------------------------------------------------------------------
 
@@ -449,9 +369,9 @@ Extend the base class to include the userid of the person that made last modific
 
 =cut
 
-sub getContentLastModifiedBy {
+override getContentLastModifiedBy => sub {
     my $self      = shift;
-    my $mtime     = $self->SUPER::getContentLastModified;
+    my $mtime     = super();
     my $userId    = $self->get('revisedBy');
     my $childIter = $self->getLineageIterator(["children"],{excludeClasses=>['WebGUI::Asset::Wobject::Layout']});
     while ( 1 ) {
@@ -469,7 +389,22 @@ sub getContentLastModifiedBy {
         }
     }
     return $userId;
-}
+};
+
+#-------------------------------------------------------------------
+
+=head2 getInheritableProperties ( )
+
+Extend the base class to include the mobileTemplateId.
+
+=cut
+
+override getInheritableProperties => sub {
+	my $self = shift;
+    my %properties = super();
+    $properties{mobileTemplateId} = $self->mobileTemplateId;
+    return %properties;
+};
 
 #-------------------------------------------------------------------
 
@@ -479,23 +414,24 @@ Extend the base method to handle caching and ad rotation.
 
 =cut
 
-sub www_view {
+override www_view => sub {
     my $self = shift;
     my $session = $self->session;
     # slashdot / burst protection hack
-    if ($session->var->get("userId") eq "1"
+    if ($session->user->isVisitor
         && $session->form->param() == 0
         && !$session->scratch->get('isExporting')
     ) {
         my $check = $self->checkView;
         return $check if (defined $check);
-        my $cache = $self->getCache;
-        my $out   = $cache->get if defined $cache;
+        my $cacheKey = $self->getWwwCacheKey('view');
+        my $cache = $session->cache;
+        my $out = $cache->get($cacheKey);
         unless ($out) {
             $self->prepareView;
             $session->stow->set("cacheFixOverride", 1);
             $out = $self->processStyle($self->view, { noHeadTags => 1 });
-            $cache->set($out, 60);
+            $cache->set($cacheKey, $out, 60);
             $session->stow->delete("cacheFixOverride");
         }
         # keep those ads rotating even though the output is cached
@@ -505,44 +441,14 @@ sub www_view {
             my $ad = $adSpace->displayImpression if (defined $adSpace);
             $out =~ s/\Q$code/$ad/ges;
         }
-        $session->http->setLastModified($self->getContentLastModified);
-        $session->http->sendHeader;
+        $session->response->setLastModified($self->getContentLastModified);
+        $session->response->sendHeader;
         $session->output->print($out, 1);
         return "chunked";
     }
     $self->{_viewPrintOverride} = 1; # we do this to make it output each asset as it goes, rather than waiting until the end
-    return $self->SUPER::www_view;
-}
+    return super();
+};
 
-#-------------------------------------------------------------------
-
-=head2 get_add_instance ()
-
-Subclass the standard C<get_add_instance> to inherit 
-C<mobileStyleTemplateId> and C<mobileTemplateId> from the parent asset if it is an instance of
-L<WebGUI::Asset::Wobject::Layout>.
-
-=cut
-
-sub get_add_instance {
-    my $class = shift;
-    my $session = shift;
-    my $parentAsset = shift;
-    my $url = shift;
-    my $prototype = shift;
-
-    my $instance = $class->SUPER::get_add_instance( $session, $parentAsset, $url, $prototype, @_ );
-
-    if( $parentAsset->isa('WebGUI::Asset::Wobject::Layout') ) {
-        $instance->update({  
-            mobileStyleTemplateId => $parentAsset->get("mobileStyleTemplateId"),
-            mobileTemplateId      => $parentAsset->get("mobileTemplateId"),
-        });
-    }
-
-    return $instance;
-
-}
-
+__PACKAGE__->meta->make_immutable;
 1;
-

@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -8,28 +8,28 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
 use WebGUI::Session;
 use WebGUI::Asset::Template;
 use Exception::Class;
-use Test::More tests => 58; # increment this value for each test you create
+use Test::More;
 use Test::Deep;
 use Data::Dumper;
 use Test::Exception;
 use JSON qw{ from_json };
 
 my $session = WebGUI::Test->session;
+my $tag = WebGUI::VersionTag->getWorking($session);
+WebGUI::Test->addToCleanup( $tag );
 my $default = $session->config->get('defaultTemplateParser');
 my $ht      = 'WebGUI::Asset::Template::HTMLTemplate';
 
 my $list = WebGUI::Asset::Template->getList($session);
 cmp_deeply($list, {}, 'getList with no classname returns an empty hashref');
 
-my $tmplText = " <tmpl_var variable> <tmpl_if conditional>true</tmpl_if> <tmpl_loop loop>XY</tmpl_loop> ";
+my $tmplText = " <tmpl_var variable> <tmpl_if conditional>true</tmpl_if> <tmpl_loop loop>XY</tmpl_loop> <tmpl_var setParam_var> ";
 my %var = (
 	variable=>"AAAAA",
 	conditional=>1,
@@ -40,34 +40,77 @@ ok($output =~ m/\bAAAAA\b/, "processRaw() - variables");
 ok($output =~ m/true/, "processRaw() - conditionals");
 ok($output =~ m/\s(?:XY){5}\s/, "processRaw() - loops");
 
-my $importNode = WebGUI::Asset::Template->getImportNode($session);
+my $importNode = WebGUI::Test->asset;
+my $template = $importNode->addChild({className=>"WebGUI::Asset::Template", title=>"test", url=>"testingtemplates", template=>$tmplText, namespace=>'WebGUI Test Template', });
 
 my $template = $importNode->addChild({className=>"WebGUI::Asset::Template"});
 is($template->get('parser'), $default, "default parser is $default");
 
-$template = $importNode->addChild({className=>"WebGUI::Asset::Template", title=>"test", url=>"testingtemplates", template=>$tmplText, namespace=>'WebGUI Test Template',parser=>$ht});
+$template = $importNode->addChild({className=>"WebGUI::Asset::Template", title=>"test", url=>"testingtemplates", template=>$tmplText, namespace=>'WebGUI Test Template',parser=>$ht, });
 isa_ok($template, 'WebGUI::Asset::Template', "creating a template");
 
 
 $var{variable} = "BBBBB";
+$template->setParam( setParam_var => 'HUEG SUCCESS' );
 $output = $template->process(\%var);
 ok($output =~ m/\bBBBBB\b/, "process() - variables");
 ok($output =~ m/true/, "process() - conditionals");
 ok($output =~ m/\b(?:XY){5}\b/, "process() - loops");
+ok($output =~ m/\bHUEG SUCCESS\b/, "process() merges with setParam" );
+$template->deleteParam( 'setParam_var' );
 
+# Test with a style template
+my $style   = $importNode->addChild({
+    className   => 'WebGUI::Asset::Template',
+    title       => 'test style',
+    namespace   => 'style',
+    template    => '<IGOTSTYLE><tmpl_var body.content></IGOTSTYLE>',
+    parser      => 'WebGUI::Asset::Template::HTMLTemplate',
+});
+$template->style( $style->getId );
+$output = $template->process({});
+ok( $output =~ m{^<IGOTSTYLE>.+</IGOTSTYLE>$}, 'style template is added' );
+$template->style( undef );
+
+#-----------------------------------------------------------------------------
+# Forms in templates
+$template = WebGUI::Test->asset(
+    className   => 'WebGUI::Asset::Template',
+    template    => '<tmpl_var NAME_header>',
+    namespace   => 'WebGUI Test Template',
+    parser      => $ht,
+);
+my $form = WebGUI::FormBuilder->new( $session );
+$template->addForm( NAME => $form );
+$output = $template->process;
+is( $output, $form->getHeader, 'form variables added to template' );
+
+# Params passed into process() override everything
+$output = $template->process({ NAME_header => 'NOT_SO_FAST' });
+is( $output, 'NOT_SO_FAST', "params passed into process() override all others" );
+$template->forms( {} );
+$template->param( {} );
+
+#------------------------------------------------------------------------------
+# JSON output
 # See if template listens the Accept header
-my $request = $session->request;
-my $in      = $request->headers_in;
-my $out     = $request->headers_out;
-$in->{Accept} = 'application/json';
+$session->request->header('Accept' => 'application/json');
 
 my $json = $template->process(\%var);
 my $andNowItsAPerlHashRef = eval { from_json( $json ) };
 ok( !$@, 'Accept = json, JSON is returned' );
 cmp_deeply( \%var, $andNowItsAPerlHashRef, 'Accept = json, The correct JSON is returned' );
 
+# Try Accept application/json again, but with a setParam
+$template->setParam( herp_status => 'derp' );
+$json = $template->process(\%var);
+$andNowItsAPerlHashRef = eval { from_json( $json ) };
+ok( !$@, 'Accept = json, JSON is returned with setParam' );
+# Also test getParam
+cmp_deeply( { %var, herp_status => $template->getParam('herp_status') }, $andNowItsAPerlHashRef, 'Accept = json, The correct JSON is returned with setParam' );
+
 # Done, so remove the json Accept header.
-delete $session->request->headers_in->{Accept};
+$session->request->headers->remove_header('Accept');
 
 # Testing the stuff-your-variables-into-the-body-with-delimiters header
 my $oldUser = $session->user;
@@ -75,7 +118,7 @@ my $oldUser = $session->user;
 # log in as admin so we pass canEdit
 $session->user({ userId => 3 });
 my $hname = 'X-Webgui-Template-Variables';
-$in->{$hname} = $template->getId;
+$session->request->headers->header($hname => $template->getId);
 
 # processRaw sets some session variables (including username), so we need to
 # re-do it.
@@ -88,9 +131,8 @@ $template->process(\%var);
 
 my $output = WebGUI::Asset::Template->getVariableJson($session);
 
-delete $in->{$hname};
-my $start = delete $out->{"$hname-Start"};
-my $end   = delete $out->{"$hname-End"};
+my $start = $session->response->headers->header("$hname-Start");
+my $end   = $session->response->headers->header("$hname-End");
 my ($json) = $output =~ /\Q$start\E(.*)\Q$end\E/;
 $andNowItsAPerlHashRef = eval { from_json( $json ) };
 cmp_deeply( $andNowItsAPerlHashRef, \%var, "$hname: json returned correctly" )
@@ -114,13 +156,9 @@ is($templateCopy->get('isDefault'), 0, 'isDefault set to 0 on copy');
 my $template3 = $importNode->addChild({
     className => "WebGUI::Asset::Template",
     title     => 'headBlock test',
-    headBlock => "tag1 tag2 tag3",
     template  => "this is a template",
     parser    => $ht,
 }, undef, time()-5);
-
-ok(!$template3->get('headBlock'),    'headBlock is empty');
-is($template3->get('extraHeadTags'), 'tag1 tag2 tag3', 'extraHeadTags contains headBlock info');
 
 my @atts = (
     {type => 'headScript', url => 'foo'},
@@ -152,7 +190,7 @@ cmp_bag(
     'attachments are duplicated'
 ) or diag( Dumper \@atts3dup );
 
-my $template3rev = $template3->addRevision();
+my $template3rev = $template3->addRevision({});
 my $att4 = $template3rev->getAttachments('headScript');
 is($att4->[0]->{url}, 'foo', 'rev has foo');
 is($att4->[1]->{url}, 'bar', 'rev has bar');
@@ -205,7 +243,6 @@ $template3rev->purgeRevision();
 ## Check how templates in the trash and clipboard are handled.
 
 $session->asset($importNode);
-$session->var->switchAdminOff;
 
 my $trashTemplate = $importNode->addChild({
     className => "WebGUI::Asset::Template",
@@ -220,7 +257,7 @@ is($trashTemplate->process, '', 'process: returns nothing when the template is i
 $trashTemplate->cut;
 is($trashTemplate->process, '', '... returns nothing when the template is in the trash, and admin mode is off');
 
-$session->var->switchAdminOn;
+$session->user({ userId => 3 });
 
 $trashTemplate->trash;
 is($trashTemplate->process, 'Template in trash', '... returns message when the template is in the trash, and admin mode is on');
@@ -228,7 +265,7 @@ is($trashTemplate->process, 'Template in trash', '... returns message when the t
 $trashTemplate->cut;
 is($trashTemplate->process, 'Template in clipboard', '... returns message when the template is in the trash, and admin mode is on');
 
-$session->var->switchAdminOff;
+$session->user({ userId => 1 });
 
 # Check error logging for bad templates
 
@@ -239,19 +276,17 @@ my $brokenTemplate = $importNode->addChild({
     parser    => $ht,
 });
 
-WebGUI::Test->interceptLogging;
-my $brokenOutput = $brokenTemplate->process({});
-my $logError = $WebGUI::Test::logger_error;
-my $brokenUrl = $brokenTemplate->getUrl;
-my $brokenId  = $brokenTemplate->getId;
-like($brokenOutput, qr/^There is a syntax error in this template/, 'process: returned error output contains boilerplate');
-like($brokenOutput, qr/$brokenUrl/, '... and the template url');
-like($brokenOutput, qr/$brokenId/, '... and the template id');
-like($logError, qr/$brokenUrl/, 'process: logged error has the url');
-like($logError, qr/$brokenId/, '... and the template id');
-WebGUI::Test->restoreLogging;
-
-WebGUI::Test->addToCleanup(WebGUI::VersionTag->getWorking($session));
+WebGUI::Test->interceptLogging( sub {
+    my $log_data = shift;
+    my $brokenOutput = $brokenTemplate->process({});
+    my $brokenUrl = $brokenTemplate->getUrl;
+    my $brokenId  = $brokenTemplate->getId;
+    like($brokenOutput, qr/^There is a syntax error in this template/, 'process: returned error output contains boilerplate');
+    like($brokenOutput, qr/$brokenUrl/, '... and the template url');
+    like($brokenOutput, qr/$brokenId/, '... and the template id');
+    like($log_data->{error}, qr/$brokenUrl/, 'process: logged error has the url');
+    like($log_data->{error}, qr/$brokenId/, '... and the template id');
+});
 
 my $userStyleTemplate = $importNode->addChild({
     className => "WebGUI::Asset::Template",
@@ -272,9 +307,6 @@ my $someOtherTemplate = $importNode->addChild({
 });
 
 $session->setting->set('userFunctionStyleId', $userStyleTemplate->getId);
-
-my $purgeCutTag = WebGUI::VersionTag->getWorking($session);
-WebGUI::Test->addToCleanup($purgeCutTag);
 
 is($session->setting->get('userFunctionStyleId'), $userStyleTemplate->getId, 'Setup for cut tests.');
 
@@ -310,4 +342,17 @@ throws_ok
     'WebGUI::Error::NotInConfig',
     'Parser not in config dies';
 isa_ok $class->getParser( $session, 'WebGUI::Asset::Template::HTMLTemplateExpr'), 'WebGUI::Asset::Template::HTMLTemplateExpr', 'parser in config is created';
+
+{
+use Test::MockObject::Extends;
+my $mockparser = Test::MockObject->new->mock( process => sub { $@ = "failed" } );
+my $mockTemplate = Test::MockObject::Extends->new( $class )
+        ->mock( get => sub { return '' } )
+        ->mock( session => sub { return $session } )
+        ->mock( getParser => sub { return $mockparser } )
+     ;
+is $mockTemplate->process, 'failed', 'handle non-reference exceeption';
+}
+
+done_testing;
 

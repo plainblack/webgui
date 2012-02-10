@@ -4,7 +4,7 @@ package WebGUI::Workflow::Activity::ProcessEMSApprovals;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2008 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -76,44 +76,44 @@ sub execute {
     # keep track of how much time it's taking
     my $start   = time;
     my $limit   = 2_500;
-    my $timeLimit = 60;
+    my $timeLimit = $self->getTTL;
 
     my $list = $root->getLineage( ['descendants'], {
-                 includeOnlyClasses => ['WebGUI::Asset::EMSSubmissionForm'],
-                 returnObjects      => 1,
-             } );
-    
+        includeOnlyClasses => ['WebGUI::Asset::EMSSubmissionForm'],
+        returnObjects      => 1,
+    } );
+
     for my $emsForm ( @$list ) {
-       my $whereClause = q{ submissionStatus='approved' };
-       my $res = $emsForm->getLineage(['children'],{  returnObjects => 1,
-	     joinClass => 'WebGUI::Asset::EMSSubmission',
-	     includeOnlyClasses => ['WebGUI::Asset::EMSSubmission'],
-	     whereClause => $whereClause,
-             returnObjects      => 1,
-	 } );
-        for my $submission ( @$res ) {
-	    my $properties = { className => 'WebGUI::Asset::Sku::EMSTicket' };
+        my $res = $emsForm->getLineage(['children'], {
+            returnObjects      => 1,
+            joinClass          => 'WebGUI::Asset::EMSSubmission',
+            includeOnlyClasses => ['WebGUI::Asset::EMSSubmission'],
+            whereClause        => ,q{ submissionStatus='approved' },
+            returnObjects      => 1,
+         } );
+         for my $submission ( @$res ) {
+	        my $properties = { className => 'WebGUI::Asset::Sku::EMSTicket' };
             for my $name ( qw{title description seatsAvailable price vendorId
                                synopsis location duration startDate sku relatedRibbons
                                 relatedBadgeGroups eventMetaData shipsSeparately} ) {
-		    $properties->{$name} = $submission->get($name);
+                $properties->{$name} = $submission->get($name);
             }
             $properties->{eventNumber} = $self->session->db->quickScalar(
-                    "select max(eventNumber)+1
-                       from EMSTicket left join asset using (assetId)
-			 where parentId=?",[$emsForm->ems->getId]) || 0;
+                "select max(eventNumber)+1 from EMSTicket left join asset using (assetId)
+                where parentId=?",[$emsForm->ems->getId]) || 0;
             my $newAsset = $emsForm->ems->addChild( $properties );
             if( $newAsset ) {
-                     # TODO this should be addRevision
-		$submission->update({ ticketId => $newAsset->getId, submissionStatus => 'created' });
-		WebGUI::VersionTag->autoCommitWorkingIfEnabled($session, { override => 1, allowComments => 0 });
-	    } else {
+                # TODO this should be addRevision
+                $submission->update({ ticketId => $newAsset->getId, submissionStatus => 'created' });
+                WebGUI::VersionTag->autoCommitWorkingIfEnabled($session, { override => 1, allowComments => 0 });
+	        }
+            else {
                 $submission->addComment($@) if $@;
-		$submission->update({ submissionStatus => 'failed' });
-	    }
-	    $limit--;
-	    last if ! $limit or time > $start + $timeLimit;
-	}
+                $submission->update({ submissionStatus => 'failed' });
+            }
+            $limit--;
+            last if ! $limit or time > $start + $timeLimit;
+        }
     }
     return $self->WAITING(1) if ! $limit or time > $start + $timeLimit;
     return $self->COMPLETE;

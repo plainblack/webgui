@@ -1,6 +1,6 @@
 # vim:syntax=perl
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -9,46 +9,96 @@
 # http://www.plainblack.com                     info@plainblack.com
 #------------------------------------------------------------------
 
-# This tests the operation of Authentication
-# 
-#
+# Test the User operation
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../lib";
-use Test::More;
-use Test::Deep;
-use Exception::Class;
-
 use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
+use WebGUI::Test::Mechanize;
 use WebGUI::User;
 use WebGUI::Operation::User;
+use Test::More;
+use Test::Deep;
 
 #----------------------------------------------------------------------------
 # Init
 my $session         = WebGUI::Test->session;
 $session->user({ userId => 3 });
 
+#----------------------------------------------------------------------------
+# Tests
+
+#----------------------------------------------------------------------------
+# Create a new user
+my $mech = WebGUI::Test::Mechanize->new( config => WebGUI::Test->file );
+$mech->get_ok( '/' );
+$mech->session->user({userId => 3});
+
+$mech->get_ok( '?op=editUser;uid=new' );
+my %fields = (
+            username    => 'AndrewDufresne',
+            email       => 'andy@shawshank.doj.gov',
+            alias       => 'Randall Stevens',
+            status      => 'Active',
+        );
+$mech->submit_form_ok({
+        fields => {
+            %fields,
+            'authWebGUI.identifier' => 'zihuatanejo',
+            groupsToAdd => '12',
+        },
+    },
+    "Add a new user",
+);
+
+ok( my $user = WebGUI::User->newByUsername( $session, 'AndrewDufresne' ), "user exists" );
+WebGUI::Test->addToCleanup( $user );
+is( $user->get('email'), $fields{email}, 'checking email' );
+is( $user->get('alias'), $fields{alias}, '... alias' );
+is( $user->status, $fields{status}, '... status' );
+ok( $user->isInGroup( 12 ), '... added to group 12' );
+my $auth = WebGUI::Auth::WebGUI->new( $session, $user );
+is( $auth->get('identifier'), $auth->hashPassword('zihuatanejo'), "password was set correctly" );
+
+# Edit an existing user
+$mech->get_ok( '?op=editUser;uid=' . $user->getId );
+%fields = (
+    username    => "EllisRedding",
+    email       => 'red@shawshank.doj.gov',
+    alias       => 'Red',
+    status      => 'Active',
+);
+$mech->submit_form_ok({
+        fields  => {
+            %fields,
+            'authWebGUI.identifier' => 'rehabilitated',
+            groupsToDelete => '12',
+        },
+    },
+    "Edit an existing user",
+);
+
+ok( my $user = WebGUI::User->newByUsername( $mech->session, 'EllisRedding' ), "user exists" );
+is( $user->get('email'), $fields{email}, '... checking email' );
+is( $user->get('alias'), $fields{alias}, '... checking alias' );
+is( $user->status, $fields{status}, '... checking status' );
+ok( not ($user->isInGroup( 12 )), '.. checking group deletion' );
+$auth = WebGUI::Auth::WebGUI->new( $session, $user );
+is( $auth->get('identifier'), $auth->hashPassword('rehabilitated'), "password was set correctly" );
+
+#######################################################################
+#
+# Address testing in the profile
+#
+#######################################################################
+
 my $andy = WebGUI::User->new($session, "new");
 WebGUI::Test->addToCleanup($andy);
 $andy->username("andydufresne");
 
-#----------------------------------------------------------------------------
-# Tests
+$mech->get_ok( '?op=editUser;uid=' . $andy->getId );
 
-plan tests => 10;        # Increment this number for each test you create
-
-#----------------------------------------------------------------------------
-
-
-#######################################################################
-#
-# www_editUserSave
-#
-#######################################################################
-
-tie my %profile_info, "Tie::IxHash", (
+my %profile_info = (
     firstName       => "Andy",
     lastName        => "Dufresne",
     homeAddress     => "123 Shank Ave.",
@@ -59,22 +109,19 @@ tie my %profile_info, "Tie::IxHash", (
     homePhone       => "111-111-1111",
     email           => 'andy@shawshank.com'
 );  
-
-$session->request->setup_body({
-    uid             => $andy->getId,
-    username        => $andy->username,
-    webguiCsrfToken => $session->scratch->get('webguiCsrfToken'),
-    %profile_info
-});
-$session->request->method('POST');
-
-WebGUI::Operation::User::www_editUserSave($session);
+$mech->submit_form_ok({
+        fields  => {
+            %profile_info,
+        },
+    },
+    "Edit an existing user for address testing",
+);
 
 $andy = WebGUI::User->new($session,$andy->getId);
 
 #Test that the address was saved to the profile
 cmp_bag(
-    [ map { $andy->profileField($_) } keys %profile_info ],
+    [ map { $andy->get($_) } keys %profile_info ],
     [ values %profile_info ],
     'Profile fields were saved'
 );
@@ -94,6 +141,7 @@ my @addresses = @{ $book->getAddresses() };
 is(scalar(@addresses), 1 , "One address was created in the address book");
 
 my $address = $addresses[0];
+ok ($address->get('isProfile'), '... and it is a profile address');
 
 tie my %address_info, "Tie::IxHash", (
     firstName       => $address->get("firstName"),
@@ -111,7 +159,7 @@ tie my %address_info, "Tie::IxHash", (
 cmp_bag(
     [ values %profile_info ],
     [ values %address_info ],
-    'Shop address was has the right information'
+    'Shop address has the right information'
 );
 
 #Test that the address is returned as the profile address
@@ -139,21 +187,21 @@ is(
     homePhone       => "222-222-2222",
     email           => 'andy@freeman.com'
 );
+$mech->get_ok( '?op=editUser;uid=' . $andy->getId );
+$mech->submit_form_ok({
+        fields  => {
+            %profile_info,
+        },
+    },
+    "Update existing address info",
+);
 
-$session->request->setup_body({
-    uid             => $andy->getId,
-    username        => $andy->username,
-    webguiCsrfToken => $session->scratch->get('webguiCsrfToken'),
-    %profile_info
-});
-$session->request->method('POST');
-WebGUI::Operation::User::www_editUserSave($session);
 
 $andy = WebGUI::User->new($session,$andy->getId);
 
 #Test that the address was saved to the profile
 cmp_bag (
-    [ map { $andy->profileField($_) } keys %profile_info ],
+    [ map { $andy->get($_) } keys %profile_info ],
     [ values %profile_info ],
     'Profile fields were updated'
 );
@@ -190,5 +238,7 @@ my $address = $addresses[0];
 cmp_bag(
     [ values %profile_info ],
     [ values %address_info ],
-    'Shop address was has the right information'
+    'Shop address has the right information'
 );
+
+done_testing;

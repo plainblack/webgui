@@ -1,6 +1,6 @@
 # vim:syntax=perl
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -13,9 +13,7 @@
 # 
 #
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../lib";
 use Test::More;
 use Test::MockObject::Extends;
 use Test::Deep;
@@ -73,7 +71,7 @@ sub www_edit { return "you'll never see me!" }
 package main;
 
 my $td
-    = WebGUI::Asset->getImportNode( $session )->addChild( {
+    = WebGUI::Test->asset->addChild( {
         title           => "one",
         className       => 'WebGUI::Asset::TestDispatch',
         url             => 'testdispatch',
@@ -82,18 +80,11 @@ my $td
 my $utf8_url = "Viel-spa\x{00DF}";
 utf8::upgrade $utf8_url;
 my $utf8
-    = WebGUI::Asset->getImportNode( $session )->addChild( {
+    = WebGUI::Test->asset->addChild( {
         title           => "utf8",
         className       => 'WebGUI::Asset::TestDispatch',
         url             => $utf8_url,
     } );
-
-WebGUI::Test->addToCleanup( WebGUI::VersionTag->getWorking( $session ) );
-
-#----------------------------------------------------------------------------
-# Tests
-
-plan tests => 25;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # test getUrlPermutation( url ) method
@@ -166,12 +157,11 @@ is $output, "bar", "special /foo handler";
 
 # Add an asset that clobbers the TestDispatch's /foo
 my $clobberingTime
-    = WebGUI::Asset->getImportNode( $session )->addChild( {
+    = WebGUI::Test->asset->addChild( {
         title       => "two",
         className   => 'WebGUI::Asset::TestDispatch',
         url         => $td->get('url') . '/foo',
     } );
-WebGUI::Test->addToCleanup($clobberingTime);
 
 is(
     WebGUI::Content::Asset::dispatch( $session, "testdispatch/foo" ),
@@ -184,7 +174,7 @@ $clobberingTime->purge;
 
 # Add an asset that declines everything instead
 my $declined
-    = WebGUI::Asset->getImportNode( $session )->addChild( {
+    = WebGUI::Test->asset->addChild( {
         title       => "three",
         className   => 'WebGUI::Asset::TestDecline',
         url         => $td->get('url') . '/foo',
@@ -213,6 +203,30 @@ $output  = WebGUI::Content::Asset::dispatch( $session );
 is $output, 'www_view one', 'an empty URL returns the default asset';
 $session->setting->set('defaultPage', $originalDefaultPage);
 
+#----------------------------------------------------------------------------
+# 304 Content Not Modified response
+
+my $newAsset = WebGUI::Test->asset->addChild( {
+    className       => 'WebGUI::Asset::Wobject::Article',
+} );
+
+my $http_request = HTTP::Request::Common::GET('http://'.$session->config->get('sitename')->[0]);
+$http_request->header('If-Modified-Since' => $session->datetime->epochToHttp(time + 20)); # 20 seconds into the future!
+my $notModifiedSession  = WebGUI::Test->newSession( undef, $http_request);
+WebGUI::Test->addToCleanup( $notModifiedSession );
+
+my $output = WebGUI::Content::Asset::handler( $notModifiedSession );
+is( $output, "chunked", "304 returns chunked" );
+is( $notModifiedSession->response->status, "304", "http status code set" );
+ok( !$notModifiedSession->closed, "session is not closed" );
+
+$notModifiedSession  = WebGUI::Test->newSession( undef, $http_request);
+WebGUI::Test->addToCleanup( $notModifiedSession );
+$notModifiedSession->user({ userId => 3});
+my $output = WebGUI::Content::Asset::handler( $notModifiedSession );
+isnt( $notModifiedSession->response->status, "304", "logged in user doesn't get 304" );
+ok( !$notModifiedSession->closed, "session is not closed" );
+
 # Test that requesting a URL that doesn't exist, but one of the permutations does exist, returns undef
 
 $session->request->setup_body({ });
@@ -223,15 +237,16 @@ is $output, undef, 'getting a URL which does not exist returns undef';
 is $session->asset, undef, '... session asset is not set';
 
 use WebGUI::Asset::RssAspectDummy;
-my $dummy = WebGUI::Asset->getImportNode($session)->addChild({
+my $dummy = WebGUI::Test->asset->addChild({
     className   => 'WebGUI::Asset::RssAspectDummy',
     url         => '/home/shawshank',
     title       => 'Dummy Title',
     synopsis    => 'Dummy Synopsis',
     description => 'Dummy Description',
 });
-WebGUI::Test->addToCleanup($dummy);
 $output  = WebGUI::Content::Asset::dispatch( $session, '/home/shawshank/no-child-here' );
 is $output, undef, 'RSS Aspect propagates the fragment';
+
+done_testing;
 
 #vim:ft=perl

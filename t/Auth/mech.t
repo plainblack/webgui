@@ -1,6 +1,6 @@
 # vim:syntax=perl
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -18,21 +18,17 @@
 #   unauthorized page
 # returnUrl: tests use returnUrl= to try to return to the right place
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../lib";
 use Test::More;
 use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Asset;
 use WebGUI::VersionTag;
 use WebGUI::Session;
-plan skip_all => 'set WEBGUI_LIVE to enable this test' unless $ENV{WEBGUI_LIVE};
+use WebGUI::Test::Mechanize;
 
 #----------------------------------------------------------------------------
 # Init
 my $session         = WebGUI::Test->session;
-my $node            = WebGUI::Asset->getImportNode( $session );
-my @versionTags     = ( WebGUI::VersionTag->getWorking( $session ) );
 
 # Override some settings to make things easier to test
 # userFunctionStyleId 
@@ -48,22 +44,22 @@ WebGUI::Test->addToCleanup($user);
 $user->username( $USERNAME );
 $user->addToGroups( ['3'] );
 my $auth        = WebGUI::Operation::Auth::getInstance( $session, $user->authMethod, $user->userId );
-$auth->saveParams( $user->userId, $user->authMethod, {
-    'identifier'    => Digest::MD5::md5_base64( $IDENTIFIER ), 
-});
+$auth->update( 
+    'identifier'    => $auth->hashPassword($IDENTIFIER)
+);
 
-my ($mech, $redirect, $response, $url);
+my ($redirect, $response, $url);
 
 # Get the site's base URL
-my $baseUrl         = 'http://' . $session->config->get('sitename')->[0];
-# $baseUrl            .= ':8000';  # no easy way to automatically find this
-$baseUrl            .= $session->config->get('gateway');
+my $baseUrl         = 'http://localhost/';
 
 my $httpAuthUrl = 'http://' . $USERNAME . ':' . $IDENTIFIER . '@' . $session->config->get('sitename')->[0];
 # $httpAuthUrl    .= ':8000'; # no easy way to automatically find this
 $httpAuthUrl    .= $session->config->get('gateway');
 
 # Make an asset we can login on
+my $tag = WebGUI::VersionTag->getWorking($session);
+my $node            = WebGUI::Test->asset;
 my $asset
     = $node->addChild({
         className       => 'WebGUI::Asset::Wobject::Article',
@@ -73,27 +69,18 @@ my $asset
         groupIdEdit     => 3,   # Admins
         styleTemplateId => 'PBtmpl0000000000000132', 
     });
-$versionTags[-1]->commit;
 my $assetUrl    = $baseUrl . $asset->get('url');
-WebGUI::Test->addToCleanup(@versionTags);
+$tag->commit;
+my $node  = $node->cloneFromDb;
+my $asset = $asset->cloneFromDb;
 
 #----------------------------------------------------------------------------
 # Tests
 
-if ( !eval { require Test::WWW::Mechanize; 1; } ) {
-    plan skip_all => 'Cannot load Test::WWW::Mechanize. Will not test.';
-}
-$mech    = Test::WWW::Mechanize->new;
-$mech->get( $baseUrl );
-if ( !$mech->success ) {
-    plan skip_all => "Cannot load URL '$baseUrl'. Will not test.";
-}
-
-plan tests => 42;        # Increment this number for each test you create
+my $mech    = WebGUI::Test::Mechanize->new( config => WebGUI::Test->config );
 
 #----------------------------------------------------------------------------
 # no form: Test logging in on a normal page sends the user back to the same page
-$mech       = Test::WWW::Mechanize->new;
 $mech->get( $assetUrl );
 $mech->base_is( $assetUrl, "We got the page we were expecting" );
 $url    = $assetUrl . '?op=auth;method=login;username=' . $USERNAME . ';identifier=' . $IDENTIFIER; 
@@ -105,7 +92,7 @@ $mech->content_contains( "ARTICLE", "We are shown the article" );
 #----------------------------------------------------------------------------
 # no form: Test logging in on a normal page sends user back to same page AFTER at least one
 # failed attempt
-$mech       = Test::WWW::Mechanize->new;
+$mech = WebGUI::Test::Mechanize->new( config => WebGUI::Test->config );
 $mech->get( $assetUrl );
 $mech->base_is( $assetUrl, "We got the page we were expecting" );
 $url    = $assetUrl . '?op=auth;method=login;username=' . $USERNAME . ';identifier=nowai';
@@ -124,15 +111,13 @@ $mech->content_contains( "ARTICLE", "We are shown the article" );
 
 #----------------------------------------------------------------------------
 # displayLogin: Test logging in on a normal page sends the user back to the same page
-$mech       = Test::WWW::Mechanize->new;
+$mech = WebGUI::Test::Mechanize->new( config => WebGUI::Test->config );
 $mech->get( $assetUrl ); 
 $mech->base_is( $assetUrl, "We got the page we were expecting" );
 $mech->get_ok( $assetUrl . "?op=auth;method=displayLogin" );
 $mech->submit_form_ok( 
     {
         with_fields => {
-            op              => 'auth',
-            method          => 'login',
             username        => $USERNAME,
             identifier      => $IDENTIFIER,
         },
@@ -144,7 +129,7 @@ $mech->base_is( $assetUrl, "We were redirected to the same page after login" );
 #----------------------------------------------------------------------------
 # displayLogin: Test logging in on a normal page sends user back to same page AFTER at least one
 # failed attempt
-$mech       = Test::WWW::Mechanize->new;
+$mech = WebGUI::Test::Mechanize->new( config => WebGUI::Test->config );
 $mech->get( $assetUrl );
 $mech->base_is( $assetUrl, "We got the page we were expecting" );
 $mech->get_ok( $assetUrl . "?op=auth;method=displayLogin" );
@@ -167,7 +152,7 @@ $mech->base_is( $assetUrl, "We were redirected to the same page after login and 
 
 #----------------------------------------------------------------------------
 # displayLogin: Test logging in on an operation other than ?op=auth
-$mech       = Test::WWW::Mechanize->new;
+$mech = WebGUI::Test::Mechanize->new( config => WebGUI::Test->config );
 $mech->get( $assetUrl . '?op=listUsers' );
 $mech->base_is( $assetUrl . '?op=listUsers', "We got the page we were expecting" );
 $mech->get_ok( $assetUrl . "?op=auth;method=displayLogin" );
@@ -185,7 +170,7 @@ $mech->base_is( $assetUrl, "We weren't redirected");
 #----------------------------------------------------------------------------
 # displayLogin: Test logging in on an operation other than ?op=auth after at least one 
 # failed attempt
-$mech       = Test::WWW::Mechanize->new;
+$mech = WebGUI::Test::Mechanize->new( config => WebGUI::Test->config );
 $mech->get( $assetUrl . '?op=listUsers' );
 $mech->base_is( $assetUrl . '?op=listUsers', "We got the page we were expecting" );
 $mech->get_ok( $assetUrl . "?op=auth;method=displayLogin" );
@@ -209,7 +194,7 @@ $mech->base_is( $assetUrl, "We weren't redirected" );
 
 #----------------------------------------------------------------------------
 # displayLogin: Test logging in after directly going to ?op=auth;method=init
-$mech       = Test::WWW::Mechanize->new;
+$mech = WebGUI::Test::Mechanize->new( config => WebGUI::Test->config );
 $mech->get_ok( $assetUrl . '?op=auth;method=init' );
 $mech->base_is( $assetUrl . '?op=auth;method=init', "We got the page we were expecting" );
 $mech->get_ok( $assetUrl . "?op=auth;method=displayLogin" );
@@ -228,7 +213,7 @@ $mech->base_is( $assetUrl, "We were redirected to the right page" );
 #----------------------------------------------------------------------------
 # displayLogin: Test logging in after directly going to ?op=auth;method=init and failing
 # at least once.
-$mech       = Test::WWW::Mechanize->new;
+$mech = WebGUI::Test::Mechanize->new( config => WebGUI::Test->config );
 $mech->get_ok( $assetUrl . '?op=auth;method=init' );
 $mech->base_is( $assetUrl . '?op=auth;method=init', "We got the page we were expecting" );
 $mech->get_ok( $assetUrl . "?op=auth;method=displayLogin" );
@@ -251,7 +236,7 @@ $mech->base_is( $assetUrl, "We were redirected to the right place" );
 
 #----------------------------------------------------------------------------
 # returnUrl: Test logging in on a normal page sends the user back to the same page
-$mech       = Test::WWW::Mechanize->new;
+$mech = WebGUI::Test::Mechanize->new( config => WebGUI::Test->config );
 $mech->get( $assetUrl );
 $mech->base_is( $assetUrl, "We got the page we were expecting" );
 $url    = $assetUrl 
@@ -264,7 +249,7 @@ $mech->base_is( $baseUrl . 'root/import', "We were redirected properly" );
 #----------------------------------------------------------------------------
 # returnUrl: Test logging in on a normal page sends user back to same page AFTER at least one
 # failed attempt
-$mech       = Test::WWW::Mechanize->new;
+$mech = WebGUI::Test::Mechanize->new( config => WebGUI::Test->config );
 $mech->get( $assetUrl );
 $mech->base_is( $assetUrl, "We got the page we were expecting" );
 $url    = $assetUrl 
@@ -281,10 +266,4 @@ $mech->submit_form_ok(
 );
 $mech->base_is( $assetUrl, "We don't get redirected" );
 
-#----------------------------------------------------------------------------
-# HTTP basic auth
-$mech       = Test::WWW::Mechanize->new;
-$mech->get( $httpAuthUrl );
-$mech->content_contains( "Hello, $USERNAME", "We are greeted by name" );
-$mech->get( $httpAuthUrl . $asset->get('url') );
-$mech->content_contains( "ARTICLE", "We are shown the article" );
+done_testing;

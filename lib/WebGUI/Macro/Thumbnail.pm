@@ -1,7 +1,7 @@
 package WebGUI::Macro::Thumbnail;
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -32,13 +32,15 @@ Image Asset can be found with that URL, then undef will be returned.
 
 #-------------------------------------------------------------------
 sub process {
-	my $session = shift;
-        my $url = shift;
-	if (my $image = WebGUI::Asset::File::Image->newByUrl($session,$url)) {
-	        return $image->getThumbnailUrl;
-        } else {
-                return undef;
-        }
+    my $session = shift;
+    my $url     = shift;
+    my $image   = eval { WebGUI::Asset::File::Image->newByUrl($session,$url) };
+    if (Exception::Class->caught()) {
+        return undef;
+    }
+    else {
+        return $image->getThumbnailUrl;
+    }
 }
 
 

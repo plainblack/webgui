@@ -3,7 +3,7 @@ package WebGUI::Asset::Sku::ThingyRecord;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -16,8 +16,71 @@ package WebGUI::Asset::Sku::ThingyRecord;
 
 use strict;
 use Tie::IxHash;
-use base 'WebGUI::Asset::Sku';
-use WebGUI::Utility;
+use Moose;
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset::Sku';
+define assetName         => ['assetName', 'Asset_ThingyRecord'];
+define icon              => 'thingyRecord.gif';
+define tableName         => 'ThingyRecord';
+property templateIdView => (
+            tab       => "display",
+            fieldType => "template",
+            namespace => "ThingyRecord/View",
+            label     => ['templateIdView label', 'Asset_ThingyRecord'],
+            hoverHelp => ['templateIdView description', 'Asset_ThingyRecord'],
+         );
+property thingId => (
+            tab       => "properties",
+            fieldType => "selectBox",
+            options   => \&_thingId_options,
+            label     => ['thingId label', 'Asset_ThingyRecord'],
+            hoverHelp => ['thingId description', 'Asset_ThingyRecord'],
+         );
+sub _thingId_options {
+    my $self = shift;
+    return $self->getThingOptions($self->session);
+}
+property thingFields => (
+            tab       => "properties",
+            fieldType => "selectList",
+            options   => {},                                      # populated by ajax call
+            label     => ['thingFields label', 'Asset_ThingyRecord'],
+            hoverHelp => ['thingFields description', 'Asset_ThingyRecord'],
+         );
+property thankYouText => (
+            tab          => "properties",
+            fieldType    => "HTMLArea",
+            builder      => '_thankYouMessage_default',
+            lazy         => 1,
+            label        => [ "thank you message", 'Asset_Product' , 'Asset_ThingyRecord'],
+            hoverHelp    => [ "thank you message help", 'Asset_Product' , 'Asset_ThingyRecord'],
+         );
+sub _thankYouMessage_default {
+    my $session = shift->session;
+	my $i18n = WebGUI::International->new($session, "Asset_Product");
+    return $i18n->get( 'default thank you message', 'Asset_Product' ) . " ^ViewCart;";
+}
+property price => (
+            tab       => "properties",
+            fieldType => "float",
+            label     => [ '10', "Asset_Product" , 'Asset_ThingyRecord'],      #Price
+            hoverHelp => [ 'price', 'Asset_Product' , 'Asset_ThingyRecord'],
+         );
+property fieldPrice => (
+            tab         => "properties",
+            fieldType   => "textarea",
+            customDrawMethod => 'drawEditFieldPrice',
+            label       => [ 'fieldPrice label' , 'Asset_ThingyRecord'],
+            hoverHelp   => [ 'fieldPrice description', 'Asset_ThingyRecord'],
+         );
+property duration => (
+            tab          => "properties",
+            fieldType    => "interval",
+            default      => 60 * 60 * 24 * 7,                      # One week
+            label        => ['duration label', 'Asset_ThingyRecord'],
+            hoverHelp    => ['duration description', 'Asset_ThingyRecord'],
+         );
+
 use HTML::Entities qw( encode_entities );
 
 # Collateral data class... very long name. Zoffix eat your heart out.
@@ -42,84 +105,6 @@ These methods are available from this class:
 
 =cut
 
-#-------------------------------------------------------------------
-
-=head2 definition ( session, definition )
-
-=head3 session
-
-=head3 definition
-
-A hash reference passed in from a subclass definition.
-
-=cut
-
-sub definition {
-    my $class      = shift;
-    my $session    = shift;
-    my $definition = shift;
-    my $i18n       = WebGUI::International->new( $session, "Asset_ThingyRecord" );
-    tie my %properties, 'Tie::IxHash', (
-        templateIdView => {
-            tab       => "display",
-            fieldType => "template",
-            namespace => "ThingyRecord/View",
-            label     => $i18n->get('templateIdView label'),
-            hoverHelp => $i18n->get('templateIdView description'),
-        },
-        thingId => {
-            tab       => "properties",
-            fieldType => "selectBox",
-            options   => $class->getThingOptions($session),
-            label     => $i18n->get('thingId label'),
-            hoverHelp => $i18n->get('thingId description'),
-        },
-        thingFields => {
-            tab       => "properties",
-            fieldType => "selectList",
-            options   => {},                                      # populated by ajax call
-            label     => $i18n->get('thingFields label'),
-            hoverHelp => $i18n->get('thingFields description'),
-        },
-        thankYouText => {
-            tab          => "properties",
-            fieldType    => "HTMLArea",
-            defaultValue => $i18n->get( 'default thank you message', 'Asset_Product' ) . " ^ViewCart;",
-            label        => $i18n->get( "thank you message", 'Asset_Product' ),
-            hoverHelp    => $i18n->get( "thank you message help", 'Asset_Product' ),
-        },
-        price => {
-            tab       => "properties",
-            fieldType => "float",
-            label     => $i18n->get( '10', "Asset_Product" ),      #Price
-            hoverHelp => $i18n->get( 'price', 'Asset_Product' ),
-        },
-        fieldPrice => {
-            tab         => "properties",
-            fieldType   => "textarea",
-            customDrawMethod => 'drawEditFieldPrice',
-            label       => $i18n->get( 'fieldPrice label' ),
-            hoverHelp   => $i18n->get( 'fieldPrice description'),
-        },
-        duration => {
-            tab          => "properties",
-            fieldType    => "interval",
-            defaultValue => 60 * 60 * 24 * 7,                      # One week
-            label        => $i18n->get('duration label'),
-            hoverHelp    => $i18n->get('duration description'),
-        },
-    );
-    push @{$definition}, {
-        assetName         => $i18n->get('assetName'),
-        icon              => 'thingyRecord.gif',
-        autoGenerateForms => 1,
-        tableName         => 'ThingyRecord',
-        className         => __PACKAGE__,
-        properties        => \%properties,
-        };
-    return $class->SUPER::definition( $session, $definition );
-} ## end sub definition
-
 #----------------------------------------------------------------------------
 
 =head2 appendVarsEditRecord ( var, recordId )
@@ -133,19 +118,19 @@ sub appendVarsEditRecord {
     my ( $self, $var, $recordId ) = @_;
     my $session     = $self->session;
     my $thingy      = $self->getThingy;
-    my $fieldPrice  = JSON->new->decode( $self->get('fieldPrice') || '{}' );
+    my $fieldPrice  = JSON->new->decode( $self->fieldPrice || '{}' );
     my $record      = {};
     if ($recordId) {
 
         # Get an existing record
-        $record = $self->getThingRecord( $self->get('thingId'), $recordId );
+        $record = $self->getThingRecord( $self->thingId, $recordId );
         if ( !%$record ) {    # Record is hidden
             $record = JSON->new->decode( $RECORD_CLASS->new( $session, $recordId )->get('fields') );
         }
     }
 
-    my $fields = $self->getThingFields( $self->get('thingId') );
-    my @allowed = split "\n", $self->get('thingFields');
+    my $fields = $self->getThingFields( $self->thingId );
+    my @allowed = split "\n", $self->thingFields;
     for my $field ( @{$fields} ) {
         next unless grep { $_ eq $field->{fieldId} } @allowed;
         
@@ -205,7 +190,7 @@ Draw the field to edit field prices. Add appropriate javascript.
 sub drawEditFieldPrice {
     my ( $self ) = @_;
 
-    my $fieldHtml   = sprintf <<'ENDHTML', encode_entities( $self->get('fieldPrice') );
+    my $fieldHtml   = sprintf <<'ENDHTML', encode_entities( $self->fieldPrice );
 <div id="fieldPrice"></div><input type="hidden" name="fieldPrice" value="%s" id="fieldPrice_formId"/>
 ENDHTML
 
@@ -220,31 +205,19 @@ Add the javascript needed for the edit form
 
 =cut
 
-sub getEditForm {
+override getEditForm => sub {
     my ($self) = @_;
-    $self->session->style->setScript(
-        $self->session->url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'),
-        { type => "text/javascript" },
-    );
-    $self->session->style->setScript(
-        $self->session->url->extras('yui/build/connection/connection-min.js'),
-        { type => "text/javascript" },
-    );
-    $self->session->style->setScript(
-        $self->session->url->extras('yui/build/json/json-min.js'),
-        { type => "text/javascript" },
-    );
-    $self->session->style->setScript(
-        $self->session->url->extras('yui-webgui/build/thingyRecord/thingyRecord.js'),
-        { type => "text/javascript" },
-    );
+    $self->session->style->setScript( $self->session->url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'));
+    $self->session->style->setScript( $self->session->url->extras('yui/build/connection/connection-min.js'));
+    $self->session->style->setScript( $self->session->url->extras('yui/build/json/json-min.js'));
+    $self->session->style->setScript( $self->session->url->extras('yui-webgui/build/thingyRecord/thingyRecord.js'));
     $self->session->style->setRawHeadTags(<<EOSCRIPT);
 <script type="text/javascript">
 YAHOO.util.Event.onDOMReady( function () { var thingForm = YAHOO.util.Dom.get('thingId_formId'); WebGUI.ThingyRecord.getThingFields(thingForm.options[thingForm.selectedIndex].value,'thingFields_formId')} );
 </script>
 EOSCRIPT
-    return $self->SUPER::getEditForm;
-} ## end sub getEditForm
+    return super();
+}; ## end sub getEditForm
 
 #----------------------------------------------------------------------------
 
@@ -268,10 +241,10 @@ it is purchased. C<item> is the WebGUI::Shop::TransactionItem for this item
 
 =cut
 
-sub getPostPurchaseActions {
+override getPostPurchaseActions => sub {
     my ( $self, $item ) = @_;
     my $session  = $self->session;
-    my $opts     = $self->SUPER::getPostPurchaseActions();
+    my $opts     = super();
     my $i18n     = WebGUI::International->new( $session, "Asset_ThingyRecord" );
     my $recordId = $item->get('options')->{recordId};
 
@@ -280,7 +253,7 @@ sub getPostPurchaseActions {
         = $self->getUrl( 'func=editRecord;recordid=' . $recordId );
 
     return $opts;
-}
+};
 
 #----------------------------------------------------------------------------
 
@@ -292,8 +265,8 @@ Get the price
 
 sub getPrice {
     my ($self) = @_;
-    my $price       = $self->get('price');
-    my $fieldPrice  = JSON->new->decode( $self->get('fieldPrice') || '{}' );
+    my $price       = $self->price;
+    my $fieldPrice  = JSON->new->decode( $self->fieldPrice || '{}' );
     my $option      = $self->getOptions;
     my $record      = $RECORD_CLASS->new( $self->session, $option->{recordId} );
     my $fields      = JSON->new->decode( $record->get('fields') );
@@ -367,7 +340,7 @@ sub getThingOptions {
 
         tie my %things, 'Tie::IxHash', (
             $session->db->buildHash( "SELECT thingId, label FROM Thingy_things WHERE assetId=?", [ $thingy->getId ] ) );
-        $options{ $thingy->get('title') } = \%things;
+        $options{ $thingy->title } = \%things;
     }
 
     return \%options;
@@ -383,7 +356,7 @@ Get a row of data from a thing. Returns a hashref
 
 sub getThingRecord {
     my ( $self, $thingId, $recordId ) = @_;
-    my $table = $self->session->db->dbh->quote_identifier( "Thingy_" . $thingId );
+    my $table = $self->session->db->quote_identifier( "Thingy_" . $thingId );
     return $self->session->db->quickHashRef( "SELECT * FROM " . $table . " WHERE thingDataId=?", [$recordId] );
 }
 
@@ -399,9 +372,9 @@ sub getThingy {
     my ($self) = @_;
     my $thingyId = $self->session->db->quickScalar(
         "SELECT assetId FROM Thingy_things WHERE thingId=?",
-        [ $self->get('thingId') ],
+        [ $self->thingId ],
     );
-    return WebGUI::Asset->newByDynamicClass( $self->session, $thingyId );
+    return WebGUI::Asset->newById( $self->session, $thingyId );
 }
 
 #-------------------------------------------------------------------
@@ -423,7 +396,7 @@ sub onCompletePurchase {
 
         # Update record
         $record->update( {
-                expires         => $now + $self->get('duration'),
+                expires         => $now + $self->duration,
                 transactionId   => $item->transaction->getId,
                 isHidden        => 0,
             }
@@ -431,26 +404,26 @@ sub onCompletePurchase {
 
         # Add to thingy data
         my $data = JSON->new->decode( $record->get('fields') );
-        $self->updateThingRecord( $self->get('thingId'), $record->getId, $data );
+        $self->updateThingRecord( $self->thingId, $record->getId, $data );
     }
     elsif ( $option->{action} eq "renew" ) {
 
         # Renew a currently active record
         if ( $record->get('expires') > $now ) {
-            $record->update( { expires => $record->get('expires') + $self->get('duration'), } );
+            $record->update( { expires => $record->get('expires') + $self->duration, } );
         }
 
         # Renew an expired but not deleted record
         else {
             $record->update( {
-                    expires  => $now + $self->get('duration'),
+                    expires  => $now + $self->duration,
                     isHidden => 0,
                 }
             );
 
             # Add to thingy data
             my $data = JSON->new->decode( $record->get('fields') );
-            $self->updateThingRecord( $self->get('thingId'), $record->getId, $data );
+            $self->updateThingRecord( $self->thingId, $record->getId, $data );
         }
     } ## end elsif ( $option->{action}...)
 } ## end sub onCompletePurchase
@@ -484,13 +457,13 @@ See WebGUI::Asset::prepareView() for details.
 
 =cut
 
-sub prepareView {
+override prepareView => sub {
     my $self = shift;
-    $self->SUPER::prepareView();
-    my $template = WebGUI::Asset::Template->new( $self->session, $self->get("templateIdView") );
+    super();
+    my $template = WebGUI::Asset::Template->newById( $self->session, $self->templateIdView );
     $template->prepare( $self->getMetaDataAsTemplateVariables );
     $self->{_viewTemplate} = $template;
-}
+};
 
 #-------------------------------------------------------------------
 
@@ -503,9 +476,9 @@ Process the edit record form and return the record
 sub processEditRecordForm {
     my ($self) = @_;
     my $var         = {};
-    my $fieldPrice  = JSON->new->decode( $self->get('fieldPrice') );
+    my $fieldPrice  = JSON->new->decode( $self->fieldPrice );
 
-    my $fields = $self->getThingFields( $self->get('thingId') );
+    my $fields = $self->getThingFields( $self->thingId );
     for my $field ( @{$fields} ) {
         my $fieldName = 'field_' . $field->{fieldId};
         my $fieldType = $field->{fieldType};
@@ -531,7 +504,7 @@ Remove all collateral associated with the ThingyRecord sku
 
 =cut
 
-sub purge {
+override purge => sub {
     my $self = shift;
 
     my $options = { constraints => [ { 'assetId = ?' => $self->getId } ] };
@@ -543,8 +516,8 @@ sub purge {
 
     # XXX: Should we also remove the records from the Thingy?
 
-    return $self->SUPER::purge;
-}
+    return super();
+};
 
 #-------------------------------------------------------------------
 
@@ -583,7 +556,7 @@ sub view {
     $var->{isNew} = 1;
     $var->{message}
         = $options->{addedToCart}
-        ? $self->get('thankYouText')
+        ? $self->thankYouText
         : $options->{message};
     if ( $options->{addedToCart} ) {
         $var->{addedToCart} = 1;
@@ -680,7 +653,7 @@ sub www_editRecord {
         );
     }
 
-    return $self->processStyle( $self->processTemplate( $var, $self->get('templateIdView') ) );
+    return $self->processStyle( $self->processTemplate( $var, $self->templateIdView ) );
 } ## end sub www_editRecord
 
 #----------------------------------------------------------------------------
@@ -709,10 +682,10 @@ sub www_editRecordSave {
     );
 
     if ($hide) {
-        $self->deleteThingRecord( $self->get('thingId'), $recordId );
+        $self->deleteThingRecord( $self->thingId, $recordId );
     }
     else {
-        $self->updateThingRecord( $self->get('thingId'), $recordId, $recordData );
+        $self->updateThingRecord( $self->thingId, $recordId, $recordData );
     }
 
     return $self->www_editRecord( { message => $i18n->get('saved') } );
@@ -744,6 +717,7 @@ sub www_renew {
     return $self->www_editRecord( { message => $i18n->get('renewal added to cart') . ' ^ViewCart;' } );
 } ## end sub www_renew
 
+__PACKAGE__->meta->make_immutable;
 1;
 
 #vim:ft=perl

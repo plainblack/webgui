@@ -1,7 +1,7 @@
 package WebGUI::Operation::Spectre;
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -13,9 +13,9 @@ package WebGUI::Operation::Spectre;
 use strict;
 use JSON;
 use POE::Component::IKC::ClientLite;
-use WebGUI::Utility;
 use WebGUI::Workflow::Cron;
 use WebGUI::Workflow::Instance;
+use Net::CIDR::Lite;
 
 =head1 NAME
 
@@ -52,20 +52,20 @@ Checks to ensure the requestor is who we think it is, and then returns a JSON st
 
 sub www_spectreGetSiteData {
     my $session = shift;
-	$session->http->setMimeType("application/json");
-	$session->http->setCacheControl("none");
+	$session->response->content_type("application/json");
+	$session->response->setCacheControl("none");
 	my %siteData = ();
     my $subnets = $session->config->get("spectreSubnets");
     if (!defined $subnets) {
         $subnets = [];
     }
-	if (!isInSubnet($session->env->getIp, $subnets)) {
-		$session->errorHandler->security("Tried to make a Spectre workflow data load request, but we're only allowed to accept requests from "
+	if (!Net::CIDR::Lite->new(@$subnets)->find($session->request->address)) {
+		$session->log->security("Tried to make a Spectre workflow data load request, but we're only allowed to accept requests from "
 			.join(",",@{$subnets}).".");
 	} 
   	else {
 		my $sitename = $session->config->get("sitename")->[0];
-		my $gateway = $session->config->get("gateway");
+		my $gateway  = $session->request->base->path;
 		my $cookieName = $session->config->getCookieName;
 		my @instances = ();
 		foreach my $instance (@{WebGUI::Workflow::Instance->getAllInstances($session)}) {
@@ -117,7 +117,7 @@ sub www_spectreStatus {
     my $ac = WebGUI::AdminConsole->new($session, 'spectre');
     my $i18n = WebGUI::International->new($session, 'Spectre');
 
-    $session->http->setCacheControl("none");
+    $session->response->setCacheControl("none");
 
     my $remote = create_ikc_client(
 		port=>$session->config->get("spectrePort"),
@@ -173,17 +173,17 @@ spectreSubnet, instead of checking the IP address of the spectre process.
 
 sub www_spectreTest {
 	my $session = shift;
-	$session->http->setMimeType("text/plain");
-	$session->http->setCacheControl("none");
+	$session->response->content_type("text/plain");
+	$session->response->setCacheControl("none");
 
     my $subnets = $session->config->get("spectreSubnets");
     if (!defined $subnets) {
         $subnets = [];
     }
 
-    my $sessionIp = $session->env->getIp;
-	unless (isInSubnet($sessionIp, $subnets)) {
-		$session->errorHandler->security(
+    my $sessionIp = $session->request->address;
+	unless (Net::CIDR::Lite->new(@$subnets)->find($sessionIp)) {
+		$session->log->security(
             sprintf "Tried to make a Spectre workflow runner request from %s, but we're only allowed to accept requests from %s",
                 $sessionIp, join(",",@{$subnets})
         );

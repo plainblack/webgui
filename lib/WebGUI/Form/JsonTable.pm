@@ -3,7 +3,7 @@ package WebGUI::Form::JsonTable;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -137,26 +137,11 @@ Send JS required for this plugin.
 sub headTags {
     my $self = shift;
     my ( $url, $style ) = $self->session->quick(qw( url style ));
-    $style->setScript(
-        $url->extras('yui/build/connection/connection-min.js'),
-        { type => 'text/javascript' },
-    );
-    $style->setScript(
-        $url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'),
-        { type => 'text/javascript' },
-    );
-    $style->setScript(
-        $url->extras('yui/build/json/json-min.js'),
-        { type => 'text/javascript' },
-    );
-    $style->setScript(
-        $url->extras('yui-webgui/build/i18n/i18n.js'),
-        { type => 'text/javascript' },
-    );
-    $style->setScript(
-        $url->extras('yui-webgui/build/form/jsontable.js'),
-        { type => 'text/javascript' },
-    );
+    $style->setScript( $url->extras('yui/build/connection/connection-min.js') );
+    $style->setScript( $url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'));
+    $style->setScript( $url->extras('yui/build/json/json-min.js'));
+    $style->setScript( $url->extras('yui-webgui/build/i18n/i18n.js') );
+    $style->setScript( $url->extras('yui-webgui/build/form/jsontable.js'));
 }
 
 #-------------------------------------------------------------------
@@ -178,7 +163,8 @@ sub toHtml {
     # Table headers
     $output     .= '<table id="' . $self->get( 'id' ) . '"><thead><tr>';
     for my $field ( @{ $self->get('fields') } ) {
-        $output .= '<th>' . $field->{label} . '</th>';
+        my $label = ref $field->{label} eq 'ARRAY' ? $i18n->get(@{$field->{label}}) : $field->{label};
+        $output .= '<th>' . $label . '</th>';
     }
     $output .= '<th>&nbsp;</th>'; # Extra column for buttons
 
@@ -205,6 +191,10 @@ sub toHtml {
             for my $i ( 0 .. $opts-1 ) {
                 my $optValue    = $field->{options}[$i*2];
                 my $optLabel    = $field->{options}[$i*2+1];
+                # If the label is an arrayref, get the i18n value
+                if ( ref $optLabel eq 'ARRAY' ) {
+                    $optLabel = $i18n->get(@{$optLabel});
+                }
                 $fieldHtml  .= '<option value="' . $optValue . '">' . $optLabel . '</option>';
             }
             $fieldHtml  .= '</select>';

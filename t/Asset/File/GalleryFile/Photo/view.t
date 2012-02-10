@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -10,13 +10,12 @@
 
 # The goal of this test is to test the view and getTemplateVars methods
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../../../../lib";
 
 use WebGUI::Test;
 use WebGUI::HTML;
 use WebGUI::Session;
+use WebGUI::VersionTag;
 use Test::More; 
 use Test::Deep;
 use WebGUI::Asset::File::GalleryFile::Photo;
@@ -25,64 +24,46 @@ use WebGUI::Asset::File::GalleryFile::Photo;
 # Init
 my $session         = WebGUI::Test->session;
 my $user            = WebGUI::User->new( $session, 3 );
-my $node            = WebGUI::Asset->getImportNode($session);
-my $versionTag      = WebGUI::VersionTag->getWorking($session);
 
-$versionTag->set({name=>"Photo Test"});
-addToCleanup($versionTag);
+my $tag = WebGUI::VersionTag->getWorking($session);
 
 my $gallery
-    = $node->addChild({
+    = WebGUI::Test->asset(
         className           => "WebGUI::Asset::Wobject::Gallery",
         groupIdAddComment   => 7,   # Everyone
         groupIdAddFile      => 2,   # Registered Users
-    });
+    );
 
 my $album
     = $gallery->addChild({
         className           => "WebGUI::Asset::Wobject::GalleryAlbum",
-    },
-    undef,
-    undef,
-    {
-        skipAutoCommitWorkflows => 1,
     });
 
 my $previousPhoto
     = $album->addChild({
         className           => "WebGUI::Asset::File::GalleryFile::Photo",
         ownerUserId         => $user->getId,
-    },
-    undef,
-    undef,
-    {
-        skipAutoCommitWorkflows => 1,
     });
 
 my $photo
     = $album->addChild({
         className           => "WebGUI::Asset::File::GalleryFile::Photo",
         ownerUserId         => $user->getId,
-    },
-    undef,
-    undef,
-    {
-        skipAutoCommitWorkflows => 1,
     });
 
 my $nextPhoto
     = $album->addChild({
         className           => "WebGUI::Asset::File::GalleryFile::Photo",
         ownerUserId         => $user->getId,
-    },
-    undef,
-    undef,
-    {
-        skipAutoCommitWorkflows => 1,
     });
 
-$versionTag->commit;
 $photo->setFile( WebGUI::Test->getTestCollateralPath('page_title.jpg') );
+
+$tag->commit;
+WebGUI::Test->addToCleanup($tag);
+foreach my $asset ($gallery, $album, $previousPhoto, $photo, $nextPhoto) {
+    $asset = $asset->cloneFromDb;
+}
 
 #----------------------------------------------------------------------------
 # Tests
@@ -118,7 +99,7 @@ my $testTemplateVars    = {
     thumbnailUrl        => $photo->getThumbnailUrl,
     numberOfComments    => scalar @{ $photo->getCommentIds },
     exifLoop            => ignore(), # Tested elsewhere
-    isPending           => ( $photo->get("status") eq "pending" ),
+    isPending           => ( $photo->status eq "pending" ),
     firstFile_url       => $previousPhoto->getUrl,
     firstFile_thumbnailUrl 
         => $previousPhoto->getThumbnailUrl,

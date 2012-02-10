@@ -1,6 +1,6 @@
 # vim:syntax=perl
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -173,7 +173,7 @@ $andy = $session->user;
 
 #Test that the address was saved to the profile
 cmp_bag (
-    [ map { $andy->profileField($_) } keys %profile_info ],
+    [ map { $andy->get($_) } keys %profile_info ],
     [ values %profile_info ],
     'Profile fields were updated'
 );

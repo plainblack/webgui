@@ -3,7 +3,7 @@ package WebGUI::Keyword;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -15,7 +15,13 @@ package WebGUI::Keyword;
 =cut
 
 use strict;
-use Class::InsideOut qw(public register id);
+use Moose;
+
+has session => (
+    is              => 'ro',
+    required        => 1,
+);
+
 use HTML::TagCloud;
 use WebGUI::Paginator;
 
@@ -40,6 +46,17 @@ These methods are available from this class:
 
 =cut
 
+around BUILDARGS => sub {
+    my $orig       = shift;
+    my $className  = shift;
+
+    ##Original arguments start here.
+    my $protoSession = $_[0];
+    if (blessed $protoSession && $protoSession->isa('WebGUI::Session')) {
+        return $className->$orig(session => $protoSession);
+    }
+    return $className->$orig(@_);
+};
 
 #-------------------------------------------------------------------
 
@@ -48,9 +65,6 @@ These methods are available from this class:
 Returns a reference to the current session.
 
 =cut
-
-public session => my %session;
-
 
 #-------------------------------------------------------------------
 
@@ -128,7 +142,10 @@ sub findKeywords {
         $parentAsset = $options->{asset};
     }
     if ($options->{assetId}) {
-        $parentAsset = WebGUI::Asset->new($self->session, $options->{assetId});
+        $parentAsset = eval { WebGUI::Asset->newById($self->session, $options->{assetId}); };
+        if (Exception::Class->caught()) {
+            $self->session->log->error("Keywords: error instanciating parentAsset by assetId ". $options->{assetId}.": $@");
+        }
     }
     if ($parentAsset) {
         $sql .= ' INNER JOIN asset USING (assetId)';
@@ -492,15 +509,6 @@ Constructor.
 A reference to the current session.
 
 =cut
-
-sub new {
-    my $class = shift;
-    my $session = shift;
-    my $self = bless \do {my $s}, $class;
-    register($self);
-    $session{id $self} = $session;
-    return $self;
-}
 
 #-------------------------------------------------------------------
 

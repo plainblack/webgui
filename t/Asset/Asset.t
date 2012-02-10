@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -8,9 +8,7 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
 use WebGUI::Test::Maker::Permission;
@@ -33,8 +31,6 @@ use Storable qw/dclone/;
 
 my $session = WebGUI::Test->session;
 
-my @fixIdTests    = getFixIdTests($session);
-my @fixTitleTests = getFixTitleTests($session);
 my @getTitleTests = getTitleTests($session);
 
 my $rootAsset = WebGUI::Asset->getRoot($session);
@@ -63,14 +59,14 @@ $testGroups{'canEdit asset'}     = WebGUI::Group->new($session, 'new');
 $testUsers{'canEdit group user'} = WebGUI::User->new($session, 'new');
 $testUsers{'canEdit group user'}->addToGroups([$testGroups{'canEdit asset'}->getId]);
 $testUsers{'canEdit group user'}->username('Edit Group User');
-addToCleanup($testGroups{'canEdit asset'});
+WebGUI::Test->addToCleanup($testGroups{'canEdit asset'});
 
 ##A group and user for groupIdEdit
 $testGroups{'canAdd asset'}     = WebGUI::Group->new($session, 'new');
 $testUsers{'canAdd group user'} = WebGUI::User->new($session, 'new');
 $testUsers{'canAdd group user'}->addToGroups([$testGroups{'canAdd asset'}->getId]);
 $testUsers{'canEdit group user'}->username('Can Add Group User');
-addToCleanup($testGroups{'canAdd asset'}, values %testUsers);
+WebGUI::Test->addToCleanup($testGroups{'canAdd asset'}, values %testUsers);
 
 my $canAddMaker = WebGUI::Test::Maker::Permission->new();
 $canAddMaker->prepare({
@@ -102,12 +98,8 @@ $properties = {
     groupIdView => 7,
 };
 
-my $versionTag2 = WebGUI::VersionTag->getWorking($session);
-addToCleanup($versionTag2);
-
 my $canEditAsset = $rootAsset->addChild($properties, $properties->{id});
-
-$versionTag2->commit;
+WebGUI::Test->addToCleanup( $canEditAsset );
 $properties = {};  ##Clear out the hash so that it doesn't leak later by accident.
 
 my $canEditMaker = WebGUI::Test::Maker::Permission->new();
@@ -118,8 +110,6 @@ $canEditMaker->prepare({
     'fail'   => [1, $testUsers{'regular user'},                                   ],
 });
 
-my $versionTag3 = WebGUI::VersionTag->getWorking($session);
-addToCleanup($versionTag3);
 $properties = {
 	#            '1234567890123456789012'
 	id          => 'canViewAsset0000000010',
@@ -133,8 +123,7 @@ $properties = {
 
 
 my $canViewAsset = $rootAsset->addChild($properties, $properties->{id});
-
-$versionTag3->commit;
+WebGUI::Test->addToCleanup( $canViewAsset );
 $properties = {};  ##Clear out the hash so that it doesn't leak later by accident.
 
 my $canViewMaker = WebGUI::Test::Maker::Permission->new();
@@ -152,46 +141,31 @@ $canViewMaker->prepare(
     },
 );
 
-#### TestAsset class to test definition / update relationship
-BEGIN { $INC{ 'WebGUI/Asset/TestAsset.pm' } = __FILE__ }
-package WebGUI::Asset::TestAsset;
-
-our @ISA = ( 'WebGUI::Asset' );
-sub definition {
-    my ( $class, $session, $definition ) = @_;
-
-    # Alter assetData fields for testing purposes. Do not do 
-    # this in normal circumstances. Ever.
-    $definition = $class->SUPER::definition( $session, $definition );
-
-    # Make synopsis serialized
-    $definition->[0]->{properties}->{synopsis}->{serialize} = 1;
-
-    return $definition;
+note "loadModule";
+{
+    my $className = eval { WebGUI::Asset->loadModule('Moose::Asset'); };
+    my $e = Exception::Class->caught;
+    isa_ok($e, 'WebGUI::Error::InvalidParam', 'loadModule must get a WebGUI::Asset class');
+    cmp_deeply(
+        $e,
+        methods(
+            error => 'Not a WebGUI::Asset class',
+            param => 'Moose::Asset',
+        ),
+        '... checking error message',
+    );
 }
-
-package main;
-
-plan tests => 138
-            + scalar(@fixIdTests)
-            + scalar(@fixTitleTests)
-            + 2*scalar(@getTitleTests) #same tests used for getTitle and getMenuTitle
-            + $canAddMaker->plan
-            + $canAddMaker2->plan
-            + $canEditMaker->plan
-            + $canViewMaker->plan
-            ;
 
 # Test the default constructor
 my $defaultAsset = WebGUI::Asset->getDefault($session);
-is(ref $defaultAsset, 'WebGUI::Asset::Wobject::Layout','default constructor');
+isa_ok($defaultAsset, 'WebGUI::Asset::Wobject::Layout');
 
 # Test the new constructor
 my $assetId = "PBnav00000000000000001"; # one of the default nav assets
 
 # - explicit class
-my $asset = WebGUI::Asset->new($session, $assetId, 'WebGUI::Asset::Wobject::Navigation');
-is (ref $asset, 'WebGUI::Asset::Wobject::Navigation','new constructor explicit - ref check');
+my $asset = WebGUI::Asset->newById($session, $assetId);
+isa_ok ($asset, 'WebGUI::Asset::Wobject::Navigation');
 is ($asset->getId, $assetId, 'new constructor explicit - returns correct asset');
 
 # - new by hashref properties
@@ -200,60 +174,97 @@ $asset = WebGUI::Asset->newByPropertyHashRef($session, {
                                                           className=>"WebGUI::Asset::Wobject::Navigation",
 		                                                  assetId=>$assetId
 													    });
-is (ref $asset, 'WebGUI::Asset::Wobject::Navigation', 'new constructor newByHashref - ref check');
+isa_ok ($asset, 'WebGUI::Asset::Wobject::Navigation');
 is ($asset->getId, $assetId, 'new constructor newByHashref - returns correct asset');
 
 # - implicit class
 $asset = undef;
 $asset = WebGUI::Asset::Wobject::Navigation->new($session, $assetId);
-is (ref $asset, 'WebGUI::Asset::Wobject::Navigation', 'new constructor implicit - ref check');
+isa_ok ($asset, 'WebGUI::Asset::Wobject::Navigation');
 is ($asset->getId, $assetId, 'new constructor implicit - returns correct asset');
 
 # - die gracefully
-my $deadAsset = 1;
-
 # -- no asset id
-$deadAsset = WebGUI::Asset->new($session, '', 'WebGUI::Asset::Wobject::Navigation');
-is ($deadAsset, undef,'new constructor with no assetId returns undef');
+note "new, constructor fails";
+{
+    my $deadAsset = eval { WebGUI::Asset->new($session, ''); };
+    my $e = Exception::Class->caught;
+    isa_ok($e, 'WebGUI::Error::InvalidParam', 'new must get an assetId');
+    cmp_deeply(
+        $e,
+        methods(
+            error => 'Asset constructor new() requires an assetId.',
+        ),
+        '... checking error message',
+    );
+}
 
 # -- no class
 my $primevalAsset = WebGUI::Asset->new($session, $assetId);
 isa_ok ($primevalAsset, 'WebGUI::Asset');
 
-# Test the newByDynamicClass Constructor
+# Test the newById Constructor
 $asset = undef;
 
-$asset = WebGUI::Asset->newByDynamicClass($session, $assetId);
-is (ref $asset, 'WebGUI::Asset::Wobject::Navigation', 'newByDynamicClass constructor - ref check');
-is ($asset->getId, $assetId, 'newByDynamicClass constructor - returns correct asset');
+note "new";
+use WebGUI::Asset::Wobject::Navigation;
+$asset = WebGUI::Asset::Wobject::Navigation->new($session, $assetId);
+isa_ok ($asset, 'WebGUI::Asset::Wobject::Navigation');
+is ($asset->getId, $assetId, 'new constructor - returns correct asset when invoked with correct class');
 
-# - die gracefully
-$deadAsset = 1;
+note "getClassById";
+{
+    my $deadAsset = eval { WebGUI::Asset->getClassById($session, 'RoysNonExistantAssetId'); };
+    my $e = Exception::Class->caught;
+    isa_ok($e, 'WebGUI::Error::InvalidParam', 'getClassById must have a valid assetId');
+    cmp_deeply(
+        $e,
+        methods(
+            error => "Couldn't lookup className",
+            param => 'RoysNonExistantAssetId',
+        ),
+        '... checking error message',
+    );
+}
 
-# -- invalid asset id
-$deadAsset = WebGUI::Asset->newByDynamicClass($session, 'RoysNonExistantAssetId');
-is ($deadAsset, undef,'newByDynamicClass constructor with invalid assetId returns undef');
+note "newById";
+{
+    my $deadAsset = eval { WebGUI::Asset->newById($session); };
+    my $e = Exception::Class->caught;
+    isa_ok($e, 'WebGUI::Error::InvalidParam', "newById won't work without an assetId");
+    cmp_deeply(
+        $e,
+        methods(
+            error => "newById must get an assetId",
+        ),
+        '... checking error message',
+    );
+}
 
-# -- no assetId
-is(
-    WebGUI::Asset->newByDynamicClass( $session ),
-    undef,
-    "newByDynamicClass constructor returns 'undef' with no assetId",
-);
+note "newByUrl";
+{
+    my $deadAsset = eval { WebGUI::Asset->newByUrl($session, '/workFromHomeScam'); };
+    my $e = Exception::Class->caught;
+    isa_ok($e, 'WebGUI::Error::ObjectNotFound');
+    cmp_deeply(
+        $e,
+        methods(
+            error => "The URL was requested, but does not exist in your asset tree.",
+            id    => 'workfromhomescam',
+        ),
+        '... checking error message',
+    );
+    my $root = eval { WebGUI::Asset->newByUrl($session, '/root'); };
+    isa_ok($root, 'WebGUI::Asset');
+    $root = eval { WebGUI::Asset->newByUrl($session, '/ROOT'); };
+    isa_ok($root, 'WebGUI::Asset');
+    $root = eval { WebGUI::Asset->newByUrl($session, '/root/'); };
+    isa_ok($root, 'WebGUI::Asset');
+}
 
 # -- no session
-is(
-    WebGUI::Asset->newByDynamicClass( ),
-    undef,
-    "newByDynamicClass constructor returns 'undef' with no valid WebGUI::Session",
-);
-is(
-    WebGUI::Asset->newByDynamicClass( "nothing" ),
-    undef,
-    "newByDynamicClass constructor returns 'undef' with no valid WebGUI::Session",
-);
-
 # Root Asset
+my $rootAsset = WebGUI::Asset->getRoot($session);
 isa_ok($rootAsset, 'WebGUI::Asset');
 is($rootAsset->getId, 'PBasset000000000000001', 'Root Asset ID check');
 
@@ -280,39 +291,6 @@ is($tempNode->getParent->getId, $rootAsset->getId, 'Tempspace parent is Root Ass
 
 ################################################################
 #
-# update
-#
-################################################################
-
-# Create a new TestAsset instance
-my $ta  = $importNode->addChild( { 
-                className       => 'WebGUI::Asset::TestAsset',
-} );
-isa_ok( $ta, 'WebGUI::Asset::TestAsset', 'addChild returns correct object' );
-
-ok(
-    eval { $ta->update({ synopsis => [ "one", "two" ] }); 1; },
-    'update() succeeds with ref on serialized property',
-);
-cmp_deeply(
-    $ta->get('synopsis'),
-    [ "one", "two" ],
-    "serialized property returns deserialized ref",
-);
-
-ok(
-    eval { $ta->update({ synopsis => '[ "two", "three" ]', }); 1; },
-    'update() succeeds with serialized string on serialized property',
-);
-cmp_deeply(
-    $ta->get('synopsis'),
-    [ "two", "three" ],
-    "serialized property returns deserialized ref",
-);
-$ta->purge;
-
-################################################################
-#
 # urlExists
 #
 ################################################################
@@ -332,22 +310,23 @@ ok(  WebGUI::Asset->urlExists($session, $importUrl,     {assetId => 'notAnWebGUI
 
 ################################################################
 #
-# addEditLabel
+# getName
 #
 ################################################################
 
 my $i18n = WebGUI::International->new($session, 'Asset_Wobject');
+is($importNode->getName,    $i18n->get('assetName', 'Asset_Folder'),  'getName: Returns the internationalized name of the Asset, core Asset');
+
+################################################################
+#
+# addEditLabel
+#
+################################################################
+
 is($importNode->addEditLabel, $i18n->get('edit').' '.$importNode->getName, 'addEditLabel, default mode is edit mode');
 
-my $origRequest = $session->{_request};
-my $newRequest = Test::MockObject->new();
-my $func;
-$newRequest->set_bound('body', \$func);
-$newRequest->set_bound('param', \$func);
-$session->{_request} = $newRequest;
-$func = 'add';
+$session->request->setup_param({ func => 'add' });
 is($importNode->addEditLabel, $i18n->get('add').' '.$importNode->getName, 'addEditLabel, use add mode');
-$session->{_request} = $origRequest;
 
 ################################################################
 #
@@ -355,11 +334,7 @@ $session->{_request} = $origRequest;
 #
 ################################################################
 
-my $versionTag = WebGUI::VersionTag->getWorking($session);
-addToCleanup($versionTag);
-$versionTag->set({name=>"Asset tests"});
-
-$properties = {
+my $properties = {
 	#            '1234567890123456789012'
 	id        => 'fixUrlAsset00000000012',
 	title     => 'fixUrl Asset Test',
@@ -368,18 +343,21 @@ $properties = {
 };
 
 my $fixUrlAsset = $defaultAsset->addChild($properties, $properties->{id});
+WebGUI::Test->addToCleanup( $fixUrlAsset );
 
 #                    '1234567890123456789012'
 $properties->{id}  = 'fixUrlAsset00000000013';
 $properties->{url} = 'fixUrlFolderURL9';
 
 my $fixUrlAsset2 = $defaultAsset->addChild($properties, $properties->{id});
+WebGUI::Test->addToCleanup( $fixUrlAsset2 );
 
 #                    '1234567890123456789012'
 $properties->{id}  = 'fixUrlAsset00000000014';
 $properties->{url} = 'fixUrlFolderURL00';
 
 my $fixUrlAsset3 = $defaultAsset->addChild($properties, $properties->{id});
+WebGUI::Test->addToCleanup( $fixUrlAsset3 );
 
 #                    '1234567890123456789012'
 $properties->{id}  = 'fixUrlAsset00000000015';
@@ -387,6 +365,7 @@ $properties->{url} = 'fixUrlFolderURL100';
 
 my $fixUrlAsset4 = $defaultAsset->addChild($properties, $properties->{id});
 is($fixUrlAsset4->get('url'), 'fixurlfolderurl100', 'asset setup correctly for 100->101 test');
+WebGUI::Test->addToCleanup( $fixUrlAsset4 );
 
 delete $properties->{url};
 #                          '1234567890123456789012'
@@ -394,6 +373,7 @@ $properties->{id}        = 'fixUrlAsset00000000016';
 $properties->{menuTitle} = 'fix url folder url autogenerated';
 
 my $fixUrlAsset5 = $defaultAsset->addChild($properties, $properties->{id});
+WebGUI::Test->addToCleanup( $fixUrlAsset5 );
 
 my $properties2 = {
 	#            '1234567890123456789012'
@@ -404,8 +384,7 @@ my $properties2 = {
 };
 
 my $fixTitleAsset = $defaultAsset->addChild($properties2, $properties2->{id});
-##Commit this asset right away
-$fixTitleAsset->commit;
+WebGUI::Test->addToCleanup( $fixTitleAsset );
 
 $properties2 = {
 	#            '1234567890123456789012'
@@ -416,19 +395,13 @@ $properties2 = {
 };
 
 my $getTitleAsset = $defaultAsset->addChild($properties2, $properties2->{id});
-$getTitleAsset->commit;
-
-$versionTag->commit;
+WebGUI::Test->addToCleanup( $getTitleAsset );
 
 $session->setting->set('urlExtension', undef);
 
 is($importNode->fixUrl('1234'.'_'x235 . 'abcdefghij'), '1234'.'_'x235 . 'abcdefghij', 'fixUrl leaves long URLs under 250 characters alone');
 is($importNode->fixUrl('1234'.'_'x250 . 'abcdefghij'), '1234'.'_'x216, 'fixUrl truncates long URLs over 250 characters to 220 characters');
 is $importNode->fixUrl('---'), '-', '... 3 dashes are collapsed down to a single dash';
-
-WebGUI::Test->originalConfig('extrasURL');
-WebGUI::Test->originalConfig('uploadsURL');
-WebGUI::Test->originalConfig('assets');
 
 $session->config->set('extrasURL',    '/extras');
 $session->config->set('uploadsURL',   '/uploads');
@@ -471,37 +444,6 @@ is($importNode->fixUrl('fixurl'), 'fixurl.html', 'Automatic adding of extensions
 is($importNode->fixUrl('fixurl.css'), 'fixurl.css', 'extensions aren\'t automatically added if there is already and extension');
 $session->setting->set('urlExtension', undef);
 
-################################################################
-#
-# fixId
-#
-################################################################
-
-my $ownerUserId = $importNode->getValue('ownerUserId');
-
-foreach my $test (@fixIdTests) {
-    my $fixedId    = $importNode->fixId($test->{id}, 'ownerUserId');
-    my $expectedId = $test->{pass} ? $test->{id} : $ownerUserId;
-    is($fixedId, $expectedId, $test->{comment});
-}
-
-################################################################
-#
-# fixTitle
-#
-################################################################
-
-my $importNodeTitle = $importNode->getTitle();
-
-foreach my $test (@fixTitleTests) {
-    my $fixedTitle    = $importNode->fixTitle($test->{title}, 'ownerUserId');
-    my $expectedTitle = defined $test->{fixed} ? $test->{fixed} : $importNodeTitle;
-    is($fixedTitle, $expectedTitle, $test->{comment});
-}
-
-$fixTitleAsset->update({'title' => 0});
-
-is($fixTitleAsset->fixTitle(''), 'Untitled', q{fixTitle: title is false, fixTitle returns 'Untitled'});
 
 ################################################################
 #
@@ -546,54 +488,20 @@ TODO: {
 
 ################################################################
 #
-# canAdd
-#
-################################################################
-
-$session->config->set('assets/WebGUI::Asset/addGroup', $testGroups{'canAdd asset'}->getId );
-
-$canAddMaker->run;
-
-#Without proper group setup, Turn On Admin is excluded from adding assets via assetAddPrivilege
-
-$canAddMaker2->run;
-
-################################################################
-#
-# canEdit
-#
-################################################################
-
-$canEditMaker->run;
-
-################################################################
-#
-# canView
-#
-################################################################
-
-$canViewMaker->run;
-
-################################################################
-#
 # addMissing
 #
 ################################################################
 
 $session->user({ userId => 3 });
-$session->var->switchAdminOff;
-is($canEditAsset->addMissing('/nowhereMan'), undef, q{addMissing doesn't return anything unless use is in Admin Mode});
-
-$session->var->switchAdminOn;
-my $addMissing = $canEditAsset->addMissing('/nowhereMan');
-ok($addMissing, 'addMissing returns some output when in Admin Mode');
+my $addMissing = $rootAsset->addMissing('/nowhereMan');
+ok($addMissing, 'addMissing returns some output when in Turn Admin On group');
 
 {
 
     my $parser = HTML::TokeParser->new(\$addMissing);
     my $link = $parser->get_tag('a');
     my $url = $link->[1]{'href'} || '-';
-    like($url, qr{func=add;class=WebGUI::Asset::Wobject::Layout;url=/nowhereMan$}, 'addMissing: Link will add a new page asset with correct URL');
+    like($url, qr{func=add;className=WebGUI::Asset::Wobject::Layout;url=/nowhereMan$}, 'addMissing: Link will add a new page asset with correct URL');
 
 }
 
@@ -608,100 +516,25 @@ is($fixTitleAsset->getContainer->getId, $defaultAsset->getId, 'getContainer: A s
 
 ################################################################
 #
-# getName
-#
-################################################################
-
-is($fixTitleAsset->getName, $i18n->get('assetName', 'Asset_Snippet'), 'getName: Returns the internationalized name of the Asset, Snippet');
-is($importNode->getName,    $i18n->get('assetName', 'Asset_Folder'),  'getName: Returns the internationalized name of the Asset, Folder');
-is($canEditAsset->getName,  $i18n->get('asset', 'Asset'),             'getName: Returns the internationalized name of the Asset, core Asset');
-
-################################################################
-#
-# getToolbarState
-# toggleToolbar
-#
-################################################################
-
-is($getTitleAsset->getToolbarState, undef, 'getToolbarState: default toolbar state is undef');
-$getTitleAsset->toggleToolbar();
-is($getTitleAsset->getToolbarState, 1, 'getToolbarState: toggleToolbarState toggled the state to 1');
-$getTitleAsset->toggleToolbar();
-is($getTitleAsset->getToolbarState, 0, 'getToolbarState: toggleToolbarState toggled the state to 0');
-
-################################################################
-#
 # getUiLevel
 #
 ################################################################
 
-is($canEditAsset->getUiLevel,  1, 'getUiLevel: WebGUI::Asset uses the default uiLevel of 1');
+#is($canEditAsset->getUiLevel,  1, 'getUiLevel: WebGUI::Asset uses the default uiLevel of 1');
 is($fixTitleAsset->getUiLevel, 5, 'getUiLevel: Snippet has an uiLevel of 5');
 
 my $origAssetUiLevel = $session->config->get('assetUiLevel');
 $session->config->set('assets/WebGUI::Asset/uiLevel', 8);
 $session->config->set('assets/WebGUI::Asset::Snippet/uiLevel', 8);
 
-is($canEditAsset->getUiLevel,  8, 'getUiLevel: WebGUI::Asset has a configured uiLevel of 8');
+#is($canEditAsset->getUiLevel,  8, 'getUiLevel: WebGUI::Asset has a configured uiLevel of 8');
 is($fixTitleAsset->getUiLevel, 8, 'getUiLevel: Snippet has a configured uiLevel of 8');
 
-
-################################################################
-#
-# assetExists
-#
-################################################################
-
-{
-
-    my $id    = $canViewAsset->getId;
-    my $class = 'WebGUI::Asset';
-    my $date  = $canViewAsset->get('revisionDate');
-
-    ok ( WebGUI::Asset->assetExists($session, $id, $class, $date), 'assetExists with proper class, id and revisionDate');
-    ok (!WebGUI::Asset->assetExists($session, $id, 'WebGUI::Asset::Snippet', $date), 'assetExists with wrong class does not exist');
-    my $id2 = $id;
-    ++$id2;
-    ok (!WebGUI::Asset->assetExists($session, $id2, $class, $date), 'assetExists with wrong id does not exist');
-    ok (!WebGUI::Asset->assetExists($session, $id,  $class, $date+1), 'assetExists with wrong revisionDate does not exist');
-
-}
-
-################################################################
-#
-# getEditTabs
-#
-################################################################
-
-my @tabs = $canViewAsset->getEditTabs;
-is(scalar(@tabs), 4, 'getEditTabs: 4 tabs by default');
-
-################################################################
-#
-# getEditForm
-#
-################################################################
 
 $session->style->sent(0); ##Prevent extra output from being generated by session->style
                           ##At some point, a test will need to tie STDOUT and make sure
                           ##that the output is correct.
-isa_ok($canViewAsset->getEditForm, 'WebGUI::TabForm', 'getEditForm: Returns a tabForm');
-
-TODO: {
-    local $TODO = 'More getEditForm tests';
-    ok(0, 'Validate form output');
-}
-
-################################################################
-#
-# newByDynamicClass
-#
-################################################################
-
-my $newFixTitleAsset = WebGUI::Asset->newByDynamicClass($session, $fixTitleAsset->getId);
-isnt($newFixTitleAsset, undef, 'newByDynamicClass did not fail');
-isa_ok($newFixTitleAsset, 'WebGUI::Asset', 'newByDynamicClass: able to look up an existing asset by id');
-cmp_deeply($newFixTitleAsset->{_properties}, $fixTitleAsset->{_properties}, 'newByDynamicClass created a duplicate asset');
+#isa_ok($canViewAsset->getEditForm, 'WebGUI::TabForm', 'getEditForm: Returns a tabForm');
 
 ################################################################
 #
@@ -733,15 +566,17 @@ is($rootAsset->get('isExportable'), 1, 'isExportable exists, defaults to 1');
 # getSeparator
 #
 ################################################################
-is($rootAsset->getSeparator,      '~~~PBasset000000000000001~~~', 'getSeparator, known assetId');
-is($rootAsset->getSeparator('!'), '!!!PBasset000000000000001!!!', 'getSeparator, given pad character');
-isnt($rootAsset->getSeparator, $mediaFolder->getSeparator, 'getSeparator: unique string');
+note "getSeparator";
+is($rootAsset->getSeparator,      '~~~PBasset000000000000001~~~', '... known assetId');
+is($rootAsset->getSeparator('!'), '!!!PBasset000000000000001!!!', '... given pad character');
+isnt($rootAsset->getSeparator, $mediaFolder->getSeparator, '... unique string');
 
 ################################################################
 #
 # get
 #
 ################################################################
+note "get";
 my $assetProps = $rootAsset->get();
 my $funkyTitle = q{Miss Annie's Whoopie Emporium and Sasparilla Shop};
 $assetProps->{title} = $funkyTitle;
@@ -753,18 +588,19 @@ isnt( $rootAsset->get('title'), $funkyTitle, 'get returns a safe copy of the Ass
 # getIsa
 #
 ################################################################
+note "getIsa";
 my $node = WebGUI::Asset->getRoot($session);
 my $product1 = $node->addChild({ className => 'WebGUI::Asset::Sku::Product'}, undef, undef, { skipAutoCommitWorkflows => 1});
 my $product2 = $node->addChild({ className => 'WebGUI::Asset::Sku::Product'}, undef, undef, { skipAutoCommitWorkflows => 1});
 my $product3 = $node->addChild({ className => 'WebGUI::Asset::Sku::Product'}, undef, undef, { skipAutoCommitWorkflows => 1});
-my $pTag = WebGUI::VersionTag->getWorking($session);
-$pTag->commit;
-addToCleanup($pTag);
+my $ptag = WebGUI::VersionTag->getWorking($session);
+$ptag->commit;
+WebGUI::Test->addToCleanup($product1, $product2, $product3, $ptag);
 my $product4 = $node->addChild({ className => 'WebGUI::Asset::Sku::Product'}, undef, undef, { skipAutoCommitWorkflows => 1});
-addToCleanup($product4);
+WebGUI::Test->addToCleanup($product4);
 
 my $getAProduct = WebGUI::Asset::Sku::Product->getIsa($session);
-isa_ok($getAProduct, 'CODE', 'getIsa returns a sub ref');
+isa_ok($getAProduct, 'CODE');
 my $counter = 0;
 my $productIds = [];
 while( my $product = $getAProduct->()) {
@@ -801,10 +637,7 @@ $product4->purge;
 # inheritUrlFromParent
 #
 ################################################################
-
-my $versionTag4 = WebGUI::VersionTag->getWorking($session);
-addToCleanup($versionTag4);
-$versionTag4->set( { name => 'inheritUrlFromParent tests' } );
+note "inheritUrlFromParent";
 
 $properties = {
     #              '1234567890123456789012'
@@ -815,6 +648,7 @@ $properties = {
 };
 
 my $iufpAsset = $defaultAsset->addChild($properties, $properties->{id});
+WebGUI::Test->addToCleanup( $iufpAsset );
 $iufpAsset->commit;
 
 $properties2 = {
@@ -826,9 +660,11 @@ $properties2 = {
 };
 
 my $iufpAsset2 = $iufpAsset->addChild($properties2, $properties2->{id});
+WebGUI::Test->addToCleanup( $iufpAsset2 );
 $iufpAsset2->update( { inheritUrlFromParent => 1 } );
+is $iufpAsset2->inheritUrlFromParent, 1, 'inheritUrlFromParent set';
 $iufpAsset2->commit;
-is($iufpAsset2->get('url'), 'inheriturlfromparent01/inheriturlfromparent02', 'inheritUrlFromParent works');
+is($iufpAsset2->url, 'inheriturlfromparent01/inheriturlfromparent02', 'inheritUrlFromParent works');
 
 my $properties2a = {
     #                       '1234567890123456789012'
@@ -840,13 +676,14 @@ my $properties2a = {
 };
 
 my $iufpAsset2a = $iufpAsset->addChild($properties2a, $properties2a->{id});
+WebGUI::Test->addToCleanup( $iufpAsset2a );
 $iufpAsset2a->commit;
-is($iufpAsset2a->get('url'), 'inheriturlfromparent01/inheriturlfromparent2a', '... works when created with the property');
+is($iufpAsset2a->url, 'inheriturlfromparent01/inheriturlfromparent2a', '... works when created with the property');
 
 # works for setting, now try disabling. Should not change the URL.
 $iufpAsset2->update( { inheritUrlFromParent => 0 } );
 $iufpAsset2->commit;
-is($iufpAsset2->get('url'), 'inheriturlfromparent01/inheriturlfromparent02', '... setting inheritUrlFromParent to 0 works');
+is($iufpAsset2->url, 'inheriturlfromparent01/inheriturlfromparent02', '... setting inheritUrlFromParent to 0 works');
 
 # also make sure that it is actually disabled
 is($iufpAsset2->get('inheritUrlFromParent'), 0, "... disabling inheritUrlFromParent actually works");
@@ -861,95 +698,17 @@ my $properties3 = {
     url         => 'inheriturlfromparent03',
 };
 my $iufpAsset3 = $iufpAsset2->addChild($properties3, $properties3->{id});
+WebGUI::Test->addToCleanup( $iufpAsset3 );
 $iufpAsset3->commit;
 $iufpAsset2->update( { inheritUrlFromParent => 1 } );
 $iufpAsset2->commit;
 $iufpAsset3->update( { inheritUrlFromParent => 1 } );
 $iufpAsset3->commit;
-is($iufpAsset3->get('url'), 'inheriturlfromparent01/inheriturlfromparent02/inheriturlfromparent03', '... recurses properly');
+is($iufpAsset3->url, 'inheriturlfromparent01/inheriturlfromparent02/inheriturlfromparent03', '... recurses properly');
 
 $iufpAsset2->update({url => 'iufp2'});
-is($iufpAsset2->get('url'), 'inheriturlfromparent01/iufp2', '... update works propertly when iUFP is not passed');
+is($iufpAsset2->url, 'inheriturlfromparent01/iufp2', '... update works propertly when iUFP is not passed');
 
-
-################################################################
-#
-# addRevision to uncommitted child of uncommitted parent
-#
-################################################################
-
-my $versionTag5 = WebGUI::VersionTag->getWorking($session);
-$versionTag5->set( { name => 'move revision of uncommitted child to uncommitted parent tests vt1' } );
-
-$properties = {
-
-    #              '1234567890123456789012'
-    id        => 'moveVersionToParent_01',
-    title     => 'moveVersionToParent_01',
-    className => 'WebGUI::Asset::Wobject::Layout',
-    url       => 'moveVersionToParent_01',
-};
-
-my $parentAsset = $defaultAsset->addChild( $properties, $properties->{id}, undef, { skipAutoCommitWorkflows => 1 } );
-my $parentVersionTag = WebGUI::VersionTag->new( $session, $parentAsset->get('tagId') );
-is( $parentVersionTag->get('isCommitted'), 0, 'built non-committed parent asset' );
-
-my $versionTag6 = WebGUI::VersionTag->create( $session, {} );
-$versionTag6->set( { name => 'move revision of uncommitted child to uncommitted parent tests vt2' } );
-$versionTag6->setWorking;
-
-$properties2 = {
-
-    #              '1234567890123456789012'
-    id        => 'moveVersionToParent_03',
-    title     => 'moveVersionToParent_03',
-    className => 'WebGUI::Asset::Wobject::Layout',
-    url       => 'moveVersionToParent_03',
-};
-
-my $childAsset = $parentAsset->addChild(
-    $properties2, $properties2->{id},
-    time(),
-    { skipAutoCommitWorkflows => 1 }
-);
-my $testAsset      = WebGUI::Asset->newPending( $session, $childAsset->get('parentId') );
-my $testVersionTag = WebGUI::VersionTag->new( $session,   $testAsset->get('tagId') );
-
-my $childVersionTag;
-$childVersionTag = WebGUI::VersionTag->new( $session, $childAsset->get('tagId') );
-is( $childVersionTag->get('isCommitted'), 0, 'built non-committed child asset' );
-
-is( $testAsset->get('tagId'),
-    $childAsset->get('tagId'),
-    'uncommitted parent asset and uncommitted child asset have same version tag at addChild'
-);
-
-$properties2 = {
-
-    #              '1234567890123456789012'
-    id        => 'moveVersionToParent_03',
-    title     => 'moveVersionToParent_03a',
-    className => 'WebGUI::Asset::Wobject::Layout',
-    url       => 'moveVersionToParent_03a',
-};
-sleep 2;
-$childAsset->addRevision( $properties2, time(), { skipAutoCommitWorkflows => 1 } );
-
-is( $parentVersionTag->get('isCommitted'), 0, 'confimr non-committed parent asset after revision' );
-is( $childVersionTag->get('isCommitted'),  0, 'confirm non-committed child asset after revision' );
-
-is( $testAsset->get('tagId'),
-    $childAsset->get('tagId'),
-    'uncommitted parent asset and uncommitted child asset have same version tag after addRevision'
-);
-
-eval { $testVersionTag->commit; };
-
-$session->log->warn('parent asset is now committed');
-is( $testVersionTag->get('isCommitted'), 1, 'parent asset is now committed' );
-
-$childVersionTag = WebGUI::VersionTag->new( $session, $childAsset->get('tagId') );
-is( $childVersionTag->get('isCommitted'), 1, 'child asset is now committed' );
 
 ################################################################
 #
@@ -957,9 +716,12 @@ is( $childVersionTag->get('isCommitted'), 1, 'child asset is now committed' );
 #
 ################################################################
 
-my $assetToCommit = $defaultAsset->addChild({ className => 'WebGUI::Asset::Snippet', title => 'Snippet to commit and clone from db', });
 my $cloneTag = WebGUI::VersionTag->getWorking($session);
-addToCleanup($cloneTag);
+my $assetToCommit = $defaultAsset->addChild({ 
+    className => 'WebGUI::Asset::Snippet', 
+    title => 'Snippet to commit and clone from db', 
+});
+WebGUI::Test->addToCleanup($cloneTag);
 $cloneTag->commit;
 is($assetToCommit->get('status'), 'pending', 'cloneFromDb: local asset is still pending');
 $assetToCommit = $assetToCommit->cloneFromDb;
@@ -978,10 +740,7 @@ my $trashedAsset = $defaultAsset->addChild({
 my $clippedAsset = $defaultAsset->addChild({
     className => 'WebGUI::Asset::Snippet', title     => 'Clippy',
 });
-
-my $checkTag = WebGUI::VersionTag->getWorking($session);
-$checkTag->commit;
-addToCleanup($checkTag);
+WebGUI::Test->addToCleanup( $trashedAsset, $clippedAsset );
 $trashedAsset = $trashedAsset->cloneFromDb;
 $clippedAsset = $clippedAsset->cloneFromDb;
 $trashedAsset->trash;
@@ -989,27 +748,27 @@ $clippedAsset->cut;
 is $trashedAsset->get('state'), 'trash',     'checkView setup: trashed an asset';
 is $clippedAsset->get('state'), 'clipboard', '... clipped an asset';
 
-$session->var->switchAdminOff;
-$session->http->setRedirectLocation('');
-$session->http->setStatus(200, 'OK');
+$session->user({ userId => 1 });
+$session->response->location('');
+$session->response->status(200, 'OK');
 
 $trashedAsset->checkView();
-is $session->http->getStatus, 410, '... status set to 410 for trashed asset';
-is $session->http->getRedirectLocation, '', '... no redirect set';
+is $session->response->status, 410, '... status set to 410 for trashed asset';
+is $session->response->location, '', '... no redirect set';
 
-$session->http->setStatus(200, 'OK');
+$session->response->status(200, 'OK');
 $clippedAsset->checkView();
-is $session->http->getStatus, 410, '... status set to 410 for cut asset';
-is $session->http->getRedirectLocation, '', '... no redirect set';
+is $session->response->status, 410, '... status set to 410 for cut asset';
+is $session->response->location, '', '... no redirect set';
 
-$session->var->switchAdminOn;
-$session->http->setStatus(200, 'OK');
-is $trashedAsset->checkView(), 'chunked', '... returns "chunked" when admin is on for trashed asset';
-is $session->http->getRedirectLocation, $trashedAsset->getUrl('func=manageTrash'), '... trashed asset sets redirect to manageTrash';
+$session->user({ userId => 3 });
+$session->response->status(200, 'OK');
+is $trashedAsset->checkView(), 'chunked', '... returns "chunked" when admin for trashed asset';
+is $session->response->location, $trashedAsset->getUrl('func=manageTrash'), '... trashed asset sets redirect to manageTrash';
 
-$session->http->setRedirectLocation('');
-is $clippedAsset->checkView(), 'chunked', 'checkView: returns "chunked" when admin is on for cut asset';
-is $session->http->getRedirectLocation, $clippedAsset->getUrl('func=manageClipboard'), '... cut asset sets redirect to manageClipboard';
+$session->response->location('');
+is $clippedAsset->checkView(), 'chunked', 'checkView: returns "chunked" when admin for cut asset';
+is $session->response->location, $clippedAsset->getUrl('func=manageClipboard'), '... cut asset sets redirect to manageClipboard';
 
 ################################################################
 #
@@ -1021,7 +780,7 @@ use HTML::Packer;
 my $asset   = WebGUI::Asset->getImportNode( $session )->addChild({
     className       => 'WebGUI::Asset::Snippet',
 });
-addToCleanup( $asset );
+WebGUI::Test->addToCleanup( $asset );
 my $unpacked = qq{<title>
                                                                              
                                                                              
@@ -1065,118 +824,6 @@ ok !$asset->get('extraHeadTagsPacked'), 'extraHeadTagsPacked cleared';
 }
 
 ##Return an array of hashrefs.  Each hashref describes a test
-##for the fixId method.
-
-sub getFixIdTests {
-    my $session = shift;
-    return (
-    {
-        id      => '0',
-        pass    => 1,
-        comment => 'digit zero',
-    },
-    {
-        id      => '1',
-        pass    => 1,
-        comment => 'digit one',
-    },
-    {
-        id      => '123',
-        pass    => 1,
-        comment => '3 digit integer',
-    },
-    {
-        id      => '12345678901'x2,
-        pass    => 1,
-        comment => '22 digit integer',
-    },
-    {
-        id      => '12345678901'x4,
-        pass    => 0,
-        comment => '44 digit integer',
-    },
-    {
-        id      => '',
-        pass    => 0,
-        comment => 'null string is rejected',
-    },
-    {
-        id      => 'a',
-        pass    => 0,
-        comment => 'single lower case character rejected',
-    },
-    {
-	  #            '1234567890123456789012'
-        id      => 'abc123ZYX098deadbeef()',
-        pass    => 0,
-        comment => 'illegal characters in length 22 string rejected',
-    },
-    {
-        id      => $session->id->generate,
-        pass    => 1,
-        comment => 'valid id accepted',
-    },
-    );
-}
-
-##Return an array of hashrefs.  Each hashref describes a test
-##for the fixTitle method.  If "fixed" != undef, it should
-##contain what the fixTitle method will return.
-
-sub getFixTitleTests {
-    my $session = shift;
-    return ({
-        title   => undef,
-        fixed   => undef,
-        comment => "undef returns the Asset's title",
-    },
-    {
-        title   => '',
-        fixed   => undef,
-        comment => "null string returns the Asset's title",
-    },
-    {
-        title   => 'untitled',
-        fixed   => undef,
-        comment => "'untitled' returns the Asset's title",
-    },
-    {
-        title   => 'UnTiTlEd',
-        fixed   => undef,
-        comment => "'untitled' in any case returns the Asset's title",
-    },
-    {
-        title   => 'Username: ^@;',
-        fixed   => 'Username: &#94;@;',
-        comment => "Macros are negated",
-    },
-    {
-        title   => '<b>A bold title</b>',
-        fixed   => 'A bold title',
-        comment => "Markup is stripped out",
-    },
-    {
-        title   => 'Javascript: <script>Evil code goes in here</script>',
-        fixed   => 'Javascript: ',
-        comment => "javascript removed",
-    },
-    {
-        title   => 'This is a good Title',
-        fixed   => 'This is a good Title',
-        comment => "Good titles are passed",
-    },
-    {
-        title   => '<b></b>',
-        fixed   => '',
-        comment => "If there is no title left after processing, then it is set to untitled.",
-    },
-    {
-        title   => q|Quotes '"|,
-        fixed   => q|Quotes '"|,
-        comment => "Quotes are not processed.",
-    },
-    );
-}
 
 ##Return an array of hashrefs.  Each hashref describes a test
 ##for the getTitle and getMenuTitle tests.  If "assetName"  != 0, they
@@ -1235,3 +882,5 @@ subtest 'canAdd tolerates being called as an object method', sub {
     ok !$class->canAdd($session), 'Cannot add when called as a class method';
     ok !$snip->canAdd($session), '...or an object method';
 };
+
+done_testing;

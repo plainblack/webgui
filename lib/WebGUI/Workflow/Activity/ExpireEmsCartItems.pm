@@ -4,7 +4,7 @@ package WebGUI::Workflow::Activity::ExpireEmsCartItems;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -79,7 +79,7 @@ sub execute {
     my $object = shift;
     my $instance = shift;
 	my $start = time();
-	my $log = $self->session->errorHandler;
+	my $log = $self->session->log;
 	$log->info('Searching for EMS items that have been in the cart too long.');
     my $ttl = $self->getTTL;
 	my $items = $self->session->db->read("select itemId, cartId, assetId from cartItem where

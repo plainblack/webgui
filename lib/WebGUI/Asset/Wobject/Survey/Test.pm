@@ -1,9 +1,49 @@
 package WebGUI::Asset::Wobject::Survey::Test;
 
 use strict;
-use base qw/WebGUI::Crud/;
+use Test::Deep::NoTest qw/eq_deeply/;
+use Moose;
+use WebGUI::Definition::Crud;
+extends qw/WebGUI::Crud/;
+define tableName   => 'Survey_test';
+define tableKey    => 'testId';
+define sequenceKey => 'assetId';
+has testId => (
+    required => 1,
+    is       => 'ro',
+);
+property assetId => (
+        label        => 'assetId', 
+        fieldType    => 'hidden',
+        default      => undef,
+         );
+property name => (
+        fieldType    => 'text',
+        label        => [ 'test name', 'Asset_Survey' ],
+        hoverHelp    => [ 'test name help', 'Asset_Survey' ],
+        default      => '',
+         );
+property test => (
+        fieldType    => 'codearea',
+        label        => [ 'test spec', 'Asset_Survey' ],
+        hoverHelp    => [ 'test spec help', 'Asset_Survey' ],
+        syntax       => 'js',
+        default      => <<END_SPEC,
+[
+{
+    "name": "My Test",
+    "test": {
+        "variable1": "yes",
+        "next": "section2",
+         }
+},
+]
+END_SPEC
+         );
+
+
+
 use WebGUI::International;
-use Test::Deep::NoTest;
 use JSON::PP;
 use Data::Dumper;
 use Params::Validate qw(:all);
@@ -25,76 +65,6 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 
-=head2 crud_definition ( )
-
-WebGUI::Crud definition for this class.
-
-=head3 tableName
-
-Survey_test
-
-=head3 tableKey
-
-testId
-
-=head3 sequenceKey
-
-assetId, e.g. each Survey instance has its own sequence of tests.
-
-=head3 properties
-
-=head4 assetId
-
-Identifies the Survey instance.
-
-=head4 name
-
-A name for the test
-
-=head4 test
-
-The test spec
-
-=cut
-
-sub crud_definition {
-    my ( $class, $session ) = @_;
-    my $definition = $class->SUPER::crud_definition($session);
-    $definition->{tableName}   = 'Survey_test';
-    $definition->{tableKey}    = 'testId';
-    $definition->{sequenceKey} = 'assetId';
-    my $properties = $definition->{properties};
-    my $i18n       = WebGUI::International->new($session);
-    $properties->{assetId} = {
-        fieldType    => 'hidden',
-        defaultValue => undef,
-    };
-    $properties->{name} = {
-        fieldType    => 'text',
-        label        => $i18n->get( 'test name', 'Asset_Survey' ),
-        hoverHelp    => $i18n->get( 'test name help', 'Asset_Survey' ),
-        defaultValue => '',
-    };
-    $properties->{test} = {
-        fieldType    => 'codearea',
-        label        => $i18n->get( 'test spec', 'Asset_Survey' ),
-        hoverHelp    => $i18n->get( 'test spec help', 'Asset_Survey' ),
-        syntax       => 'js',
-        defaultValue => <<END_SPEC,
-[
-{
-    "name": "My Test",
-    "test": {
-        "variable1": "yes",
-        "next": "section2",
-    },
-},
-]
-END_SPEC
-    };
-    return $definition;
-}
-
 =head2 run
 
 Run this test. Returns TAP in a hashref.
@@ -110,7 +80,7 @@ sub run {
         return { tap => 'Bail Out! enableSurveyExpressionEngine config option disabled' };
     }
     
-    my $spec = $self->get('test') 
+    my $spec = $self->test 
         or return { tap => "Bail Out! Test spec undefined" };
     
     # Use JSON::PP rather than JSON::XS so that we can use things like allow_barekey
@@ -126,8 +96,8 @@ sub run {
         return { tap => "Bail Out! Invalid test spec: $error" };
     }
     
-    my $assetId = $self->get('assetId');
-    my $survey = WebGUI::Asset::Wobject::Survey->new($session, $assetId);
+    my $assetId = $self->assetId;
+    my $survey = WebGUI::Asset::Wobject::Survey->newById($session, $assetId);
     if (!$survey || !$survey->isa('WebGUI::Asset::Wobject::Survey') ) {
         return { tap => "Bail Out! Unable to instantiate Survey using assetId: $assetId" };
     }

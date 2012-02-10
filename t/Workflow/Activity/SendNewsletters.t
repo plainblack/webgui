@@ -1,6 +1,6 @@
 # vim:syntax=perl
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -9,9 +9,7 @@
 # http://www.plainblack.com                     info@plainblack.com
 #------------------------------------------------------------------
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../../lib";
 use Test::More;
 use Test::Deep;
 use Data::Dumper;
@@ -19,6 +17,7 @@ use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
 use Test::MockObject;
 use Test::MockObject::Extends;
+use WebGUI::Test::MockAsset;
 
 #----------------------------------------------------------------------------
 # Init
@@ -40,15 +39,13 @@ $sendmock->fake_module('WebGUI::Mail::Send',
 );
 
 ##Create Assets;
-my $home = WebGUI::Asset->getDefault($session);
-my $versionTag = WebGUI::VersionTag->getWorking($session);
+my $home = WebGUI::Test->asset;
 
                  #1234567890123456789012#
 my $templateId = 'NEWSLETTER_TEMPLATE___';
 
-my $templateMock = Test::MockObject->new({});
-$templateMock->set_isa('WebGUI::Asset::Template');
-$templateMock->set_always('getId', $templateId);
+my $templateMock = WebGUI::Test::MockAsset->new('WebGUI::Asset::Template');
+$templateMock->mock_id($templateId);
 my $templateVars;
 $templateMock->mock('process', sub { $templateVars = $_[1]; } );
 
@@ -67,10 +64,9 @@ my $thread = $cs->addChild({
     title     => 'Test Thread',
     content   => 'This is the content',
     synopsis  => 'This is the synopsis',
-}, undef, undef, {skipAutoCommitWorkflows => 1,});
-
-$versionTag->commit;
-WebGUI::Test->addToCleanup($versionTag);
+},);
+$thread->setSkipNotification;
+$thread->commit;
 
 ##Setup metadata
 $session->setting->set('metaDataEnabled', 1);
@@ -97,7 +93,6 @@ $activity->set_always('getTTL', 60);
 $activity->set_always('COMPLETE', 'complete');
 
 {
-    WebGUI::Test->mockAssetId($templateId, $templateMock);
     $activity->execute();
     cmp_deeply(
         $templateVars,
@@ -116,7 +111,6 @@ $activity->set_always('COMPLETE', 'complete');
             ],
         }
     );
-    WebGUI::Test->unmockAssetId($templateId);
 }
 
 foreach my $metadataId (keys %{ $cs->getMetaDataFields }) {

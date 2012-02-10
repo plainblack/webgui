@@ -1,7 +1,7 @@
 package WebGUI::Operation::User;
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -11,7 +11,6 @@ package WebGUI::Operation::User;
 #-------------------------------------------------------------------
 
 use strict qw(vars subs);
-use Tie::CPHash;
 use Tie::IxHash;
 use WebGUI::AdminConsole;
 use WebGUI::Group;
@@ -22,11 +21,10 @@ use WebGUI::International;
 use WebGUI::Operation::Auth;
 use WebGUI::Paginator;
 use WebGUI::SQL;
-use WebGUI::TabForm;
 use WebGUI::User;
-use WebGUI::Utility;
 use JSON;
 use XML::Simple;
+use Net::CIDR::Lite;
 
 =head1 NAME
 
@@ -142,7 +140,7 @@ sub canUseService {
     my ( $session ) = @_;
     my $subnets = $session->config->get('serviceSubnets');
     return 1 if !$subnets || !@{$subnets};
-    return 1 if WebGUI::Utility::isInSubnet( $session->env->getIp, $subnets );
+    return 1 if Net::CIDR::Lite->new(@$subnets)->find($session->request->address);
     return 0; # Don't go away mad, just go away
 }
 
@@ -213,11 +211,9 @@ sub doUserSearch {
 	my $returnPaginator = shift;
 	my $userFilter = shift;
 	push(@{$userFilter},0);
-	my $selectedStatus;
+	my $selectedStatus = '';
 	if ($session->scratch->get("userSearchStatus")) {
-		$selectedStatus = "status='".$session->scratch->get("userSearchStatus")."'";
-	} else {
-		$selectedStatus = "status like '%'";
+		$selectedStatus = "status='".$session->scratch->get("userSearchStatus")."' and ";
 	}
 	my $keyword = $session->scratch->get("userSearchKeyword");
 	if ($session->scratch->get("userSearchModifier") eq "startsWith") {
@@ -228,17 +224,16 @@ sub doUserSearch {
 		$keyword = "%".$keyword;
 	}
 	my $sql = "select users.userId, users.username, users.status, users.dateCreated, users.lastUpdated,
-                userProfileData.email from users 
-                left join userProfileData on users.userId=userProfileData.userId 
-                where $selectedStatus  and (users.username like ? or alias like ? or email like ? 
-                    or firstName like ? or lastName like ?) 
+                users.email from users 
+                where $selectedStatus (users.username like ? or alias like ? or email like ? 
+                    or firstName like ? or lastName like ? or CONCAT(firstName, ' ', lastName) LIKE ? ) 
                 and users.userId not in (".$session->db->quoteAndJoin($userFilter).")  order by users.username";
 	if ($returnPaginator) {
         	my $p = WebGUI::Paginator->new($session,$session->url->page("op=".$op));
-		$p->setDataByQuery($sql, undef, undef, [$keyword, $keyword, $keyword, $keyword, $keyword]);
+		$p->setDataByQuery($sql, undef, undef, [$keyword, $keyword, $keyword, $keyword, $keyword, $keyword]);
 		return $p;
 	} else {
-		my $sth = $session->dbSlave->read($sql, [$keyword, $keyword, $keyword, $keyword, $keyword]);
+		my $sth = $session->dbSlave->read($sql, [$keyword, $keyword, $keyword, $keyword, $keyword, $keyword]);
 		return $sth;
 	}
 }
@@ -350,12 +345,12 @@ sub www_ajaxCreateUser {
         $mimeType       = "application/xml";
     }
 
-    $session->http->setMimeType( $mimeType ); 
+    $session->response->content_type( $mimeType ); 
 
     # Verify access
     if ( !canAdd($session) || !canUseService($session) ) {
         # We need an automatic way to send a request for an http basic auth
-        $session->http->setStatus(401,'Unauthorized');
+        $session->response->status(401);
         return createServiceResponse( $outputFormat, {
             error       => "WebGUI::Error::Unauthorized",
             message     => "",
@@ -469,12 +464,12 @@ sub www_ajaxDeleteUser {
         $mimeType       = "application/xml";
     }
 
-    $session->http->setMimeType( $mimeType ); 
+    $session->response->content_type( $mimeType ); 
 
     # Verify access
     if ( !canEdit($session) || !canUseService($session) ) {
         # We need an automatic way to send a request for an http basic auth
-        $session->http->setStatus(401,'Unauthorized');
+        $session->response->status(401);
         return createServiceResponse( $outputFormat, {
             error       => "WebGUI::Error::Unauthorized",
             message     => "",
@@ -491,7 +486,7 @@ sub www_ajaxDeleteUser {
         } );
     }
     elsif ( $userId eq "1" || $userId eq "3" ) {
-        $session->http->setStatus(403,"Forbidden");
+        $session->response->status(403);
         return createServiceResponse( $outputFormat, {
             error       => 'WebGUI::Error::InvalidParam',
             param       => 'userId',
@@ -536,12 +531,12 @@ sub www_ajaxUpdateUser {
         $mimeType       = "application/xml";
     }
 
-    $session->http->setMimeType( $mimeType ); 
+    $session->response->content_type( $mimeType ); 
 
     # Verify access
     if ( !canEdit($session) || !canUseService($session) ) {
         # We need an automatic way to send a request for an http basic auth
-        $session->http->setStatus(401,'Unauthorized');
+        $session->response->status(401);
         return createServiceResponse( $outputFormat, {
             error       => "WebGUI::Error::Unauthorized",
             message     => "",
@@ -614,7 +609,7 @@ sub www_becomeUser {
 	my $session = shift;
 	return $session->privilege->adminOnly() unless canEdit($session) && $session->form->validToken;
 	return undef unless WebGUI::User->validUserId($session, $session->form->process("uid"));
-	$session->var->end($session->var->get("sessionId"));
+	$session->end();
 	$session->user({userId=>$session->form->process("uid")});
 	return "";
 }
@@ -655,100 +650,122 @@ sub www_editUser {
 	return $session->privilege->adminOnly() unless canAdd($session);
 	my $error = shift;
 	my $uid = shift || $session->form->process("uid");
-	my $i18n = WebGUI::International->new($session, "WebGUI");
-	my %tabs;
-	tie %tabs, 'Tie::IxHash';
-    %tabs = (
-        "account"=> { label=>$i18n->get("account")},
-        "profile"=> { label=>$i18n->get("profile")},
-        "groups"=> { label=>$i18n->get('89')},
-    );
-	my $tabform = WebGUI::TabForm->new($session,\%tabs);
-	$tabform->formHeader({extras=>'autocomplete="off"'});	
 	my $u = WebGUI::User->new($session,($uid eq 'new') ? '' : $uid); #Setting uid to '' when uid is 'new' so visitor defaults prefill field for new user
 	my $username = ($u->isVisitor && $uid ne "1") ? '' : $u->username;
-    $tabform->hidden({name=>"op",value=>"editUserSave"});
-    $tabform->hidden({name=>"uid",value=>$uid});
-    $tabform->getTab("account")->raw('<tr><td width="170">&nbsp;</td><td>&nbsp;</td></tr>');
-    $tabform->getTab("account")->readOnly(value=>$uid,label=>$i18n->get(378));
-    $tabform->getTab("account")->readOnly(value=>$u->karma,label=>$i18n->get(537)) if ($session->setting->get("useKarma"));
-    $tabform->getTab("account")->readOnly(value=>$session->datetime->epochToHuman($u->dateCreated,"%z"),label=>$i18n->get(453));
-    $tabform->getTab("account")->readOnly(value=>$session->datetime->epochToHuman($u->lastUpdated,"%z"),label=>$i18n->get(454));
-    $tabform->getTab("account")->text(
-        -name=>"username",
-        -label=>$i18n->get(50),
-        -value=>$username,
-        -extras=>'autocomplete="off"',
+	my $i18n = WebGUI::International->new($session, "WebGUI");
+    my $f = WebGUI::FormBuilder->new( $session, 
+        action => $session->url->page,
+        extras => 'autocomplete="off"',
     );
-	my %status;
-	tie %status, 'Tie::IxHash';
-	%status = (
-		Active		=>$i18n->get(817),
-		Deactivated	=>$i18n->get(818),
-		Selfdestructed	=>$i18n->get(819)
-		);
+    $f->addField( 'csrfToken', name => 'csrfToken' );
+    $f->addField( "hidden",
+        name => 'op',
+        value => 'editUserSave',
+    );
+    $f->addField( "hidden", 
+        name => "uid", 
+        value => $uid,
+    );
+    my $account = $f->addTab( name => "account", label => $i18n->get('account') );
+    my $profile = $f->addTab( name => "profile", label => $i18n->get('profile') );
+    my $groups = $f->addTab( name => "groups", label => $i18n->get('89') );
+
+    # Normal user fields
+    $account->addField( "readOnly", 
+        name => "uid", 
+        value => $uid, 
+        label => $i18n->get(378),
+    );
+    $account->addField( "readOnly", 
+        name => "karma", 
+        value => $u->karma,
+        label => $i18n->get(537)
+    ) if ($session->setting->get("useKarma"));
+    $account->addField( "readOnly",
+        name => "dateCreated",
+        value=>$session->datetime->epochToHuman($u->dateCreated,"%z"),
+        label=>$i18n->get(453)
+    );
+    $account->addField( "readOnly",
+        name => "lastUpdated",
+        value=>$session->datetime->epochToHuman($u->lastUpdated,"%z"),
+        label=>$i18n->get(454)
+    );
+    $account->addField( "text",
+        name=>"username",
+        label=>$i18n->get(50),
+        value=>$username,
+        extras=>'autocomplete="off"',
+    );
+
 	if ($u->userId eq $session->user->userId) {
-		$tabform->getTab("account")->hidden(
-			-name => "status",
-			-value => $u->status
+		$account->addField( "hidden",
+			name => "status",
+			value => $u->status
 			);
 	}
     else {
-		$tabform->getTab("account")->selectBox(
-			-name => "status",
-			-options => \%status,
-			-label => $i18n->get(816),
-			-value => $u->status
+        tie my %status, 'Tie::IxHash', (
+            Active		=>$i18n->get(817),
+            Deactivated	=>$i18n->get(818),
+            Selfdestructed	=>$i18n->get(819)
+        );
+		$account->addField( "selectBox",
+			name => "status",
+			options => \%status,
+			label => $i18n->get(816),
+			value => $u->status
 			);
 	}
+
+    # Auth configurations
 	my $options;
 	foreach (@{$session->config->get("authMethods")}) {
 		$options->{$_} = $_;
 	}
-	$tabform->getTab("account")->selectBox(
-	        -name=>"authMethod",
-		-options=>$options,
-		-label=>$i18n->get(164),
-		-value=>$u->authMethod,
+	$account->addField( "selectBox",
+	        name=>"authMethod",
+		options=>$options,
+		label=>$i18n->get(164),
+		value=>$u->authMethod,
     );
-	foreach (@{$session->config->get("authMethods")}) {
-		my $authInstance = WebGUI::Operation::Auth::getInstance($session,$_,$u->userId);
+	foreach my $auth (@{$session->config->get("authMethods")}) {
+		my $authInstance = WebGUI::Operation::Auth::getInstance($session,$auth,$u->userId);
         my $editUserForm = $authInstance->editUserForm;
         next unless $editUserForm;
-		$tabform->getTab("account")->fieldSetStart($_);
-		$tabform->getTab("account")->raw($editUserForm);
-		$tabform->getTab("account")->fieldSetEnd;
+        $account->addFieldset( $editUserForm, name => $auth, label => $auth );
 	}
+
+    # Profile fields
 	foreach my $category (@{WebGUI::ProfileCategory->getCategories($session)}) {
-		$tabform->getTab("profile")->fieldSetStart($category->getLabel);
+		my $fieldset = $profile->addFieldset( name => $category->getLabel, label => $category->getLabel );
 		foreach my $field (@{$category->getFields}) {
 			next if $field->getId =~ /contentPositions/;
 			my $label = $field->getLabel . ($field->isRequired ? "*" : '');
 			if ($u->isVisitor) {
-				$tabform->getTab("profile")->raw($field->formField({label=>$label},1,undef,undef,undef,undef,'useFormDefault'));
+				$fieldset->addField($field->formField({label=>$label},1,undef,undef,undef,1,'useFormDefault'));
 			}
             else {
-				$tabform->getTab("profile")->raw($field->formField({label=>$label},1,$u));
+				$fieldset->addField($field->formField({label=>$label},1,$u,undef,undef,1));
 			}
 		}
-		$tabform->getTab("profile")->fieldSetEnd($category->getLabel);
 	}
+
+    # Groups
 	my @groupsToAdd = $session->form->group("groupsToAdd");
 	my @exclude = $session->db->buildArray("select groupId from groupings where userId=?",[$u->userId]);
-	@exclude = (@exclude,"1","2","7");
+	push @exclude,"1","2","7"; # Special groups cannot be left/joined
     my $secondaryAdmin = $session->user->isInGroup('11');
-    my @extraExclude = ();
     if ($secondaryAdmin && !$session->user->isAdmin) {
-        @extraExclude = $session->db->buildArray('select groupId from groups where groupId not in (select groupId from groupings where userId=?)',[$session->user->userId]);
+        push @exclude, $session->db->buildArray('select groupId from groups where groupId not in (select groupId from groupings where userId=?)',[$session->user->userId]);
     }
-    push @extraExclude, @exclude;
-	$tabform->getTab("groups")->group(
-		-name=>"groupsToAdd",
-		-label=>$i18n->get("groups to add"),
-		-excludeGroups=>\@extraExclude,
-		-size=>15,
-		-multiple=>1,
-		-value=>\@groupsToAdd
+	$groups->addField( "group",
+		name=>"groupsToAdd",
+		label=>$i18n->get("groups to add"),
+		excludeGroups=>\@exclude,
+		size=>15,
+		multiple=>1,
+		value=>\@groupsToAdd
 		);
 	my @include; 
 	foreach my $group (@exclude) {
@@ -762,22 +779,16 @@ sub www_editUser {
 	}
 	push (@include, "0");
 	my @groupsToDelete = $session->form->group("groupsToDelete");
-	$tabform->getTab("groups")->selectList(
-		-name=>"groupsToDelete",
-		-options=>$session->db->buildHashRef("select groupId, groupName from groups 
+	$groups->addField( "selectList",
+		name=>"groupsToDelete",
+		options=>$session->db->buildHashRef("select groupId, groupName from groups 
 			where groupId in (".$session->db->quoteAndJoin(\@include).") and showInForms=1 order by groupName"),
-		-label=>$i18n->get("groups to delete"),
-		-multiple=>1,
-		-size=>15,
-		-value=>\@groupsToDelete
+		label=>$i18n->get("groups to delete"),
+		multiple=>1,
+		size=>15,
+		value=>\@groupsToDelete
 		);
-	my $submenu = _submenu(
-                        $session,
-                        { workarea => $error.$tabform->print,
-                          title    => 168,
-                          userId   => $uid, }
-                  );
-	return $submenu;;
+	return '<h1>' . $i18n->get(168) . '</h1>' . $error . $f->toHtml;
 }
 
 #-------------------------------------------------------------------
@@ -843,7 +854,7 @@ sub www_editUserSave {
         foreach my $field (@{WebGUI::ProfileField->getFields($session)}) {
 			next if $field->getId =~ /contentPositions/;
             my $field_value = $field->formProcess($u);
-			$u->profileField($field->getId,$field_value);
+			$u->update({ $field->getId => $field_value} );
 
             #set the shop address fields
             my $address_key          = $address_mappings->{$field->getId};
@@ -855,16 +866,14 @@ sub www_editUserSave {
             $address->{'isProfile'        } = 1;
 
             #Get the address book for the user (one is created if it does not exist)
-            my $addressBook     = WebGUI::Shop::AddressBook->newByUserId($session,$actualUserId);
+            my $addressBook     = WebGUI::Shop::AddressBook->newByUserId($session, $actualUserId,);
             my $profileAddress = eval { $addressBook->getProfileAddress() };
 
             my $e;
             if($e = WebGUI::Error->caught('WebGUI::Error::ObjectNotFound')) {
                 #Get home address only mappings to avoid creating addresses with just firstName, lastName, email
                 my %home_address_map = %{$address_mappings};
-                foreach my $exclude ( qw{ firstName lastName email } ) {
-                    delete $home_address_map{$exclude};
-                }
+                delete $home_address_map{qw/firstName lastName email/};
                 #Add the profile address for the user if there are homeAddress fields
                 if( grep { $address->{$_} } values %home_address_map ) {
                     $address->{label} = "Profile Address";
@@ -875,6 +884,9 @@ sub www_editUserSave {
                         $addressBook->update( {
                             defaultAddressId => $new_address->getId
                         } );
+                    }
+                    else {
+                        $session->log->warn("The default address exists, and it should not.");
                     }
                 }
             }
@@ -1010,7 +1022,7 @@ A reference to the current session.
 
 sub www_formUsers {
 	my $session = shift;
-	$session->http->setCacheControl("none");
+	$session->response->setCacheControl("none");
 	return $session->privilege->insufficient() unless $session->user->isInGroup(12);
 	$session->style->useEmptyStyle("1");
     my $output = getUserSearchForm($session,"formUsers",{formId=>$session->form->process("formId")},1);
@@ -1050,7 +1062,6 @@ sub www_listUsers {
         }
 	}
 
-	my %status;
 	my $i18n = WebGUI::International->new($session);
 	my $output = getUserSearchForm($session,"listUsers");
 	my ($userCount) = $session->db->quickArray("select count(*) from users");
@@ -1059,8 +1070,7 @@ sub www_listUsers {
     }
     
 	return _submenu($session,{workarea => $output}) unless ($session->form->process("doit") || $userCount<250 || $session->form->process("pn") > 1);
-	tie %status, 'Tie::IxHash';
-	%status = (
+	my %status = (
 		Active		=> $i18n->get(817),
 		Deactivated	=> $i18n->get(818),
 		Selfdestructed	=> $i18n->get(819)
@@ -1078,6 +1088,29 @@ sub www_listUsers {
                 <td class="tableHeader">'.$i18n->get( "time recorded" ).'</td>
 		</tr>';
 	my $p = doUserSearch($session,"listUsers",1);
+    my $user_loginlog = $session->db->prepare(
+        q{
+            select   status, timeStamp, lastPageViewed, sessionId
+            from     userLoginLog
+            where    userId = ?
+            order by timeStamp desc
+            limit    1
+        },
+    );
+    my $last_page_view = $session->db->prepare(
+        q{
+            select lastPageView
+            from   userSession
+            where  sessionId = ?
+        },
+    );
+    my $total_time = $session->db->prepare(
+        q{
+            select sum(lastPageViewed - timeStamp) 
+            from   userLoginLog 
+            where  userId = ?
+        },
+    );
 	foreach my $data (@{$p->getPageData}) {
         $output .= '<tr class="tableData">';
         $output .= '<td>'.$status{$data->{status}}.'</td>';
@@ -1087,26 +1120,11 @@ sub www_listUsers {
         $output .= '<td class="tableData">'.$session->datetime->epochToHuman($data->{dateCreated},"%z").'</td>';
         $output .= '<td class="tableData">'.$session->datetime->epochToHuman($data->{lastUpdated},"%z").'</td>';
 
-        my ( $status, $lastLogin, $lastView, $lastSession ) 
-            = $session->db->quickArray(
-            q{
-                select   status, timeStamp, lastPageViewed, sessionId
-                from     userLoginLog
-                where    userId = ?
-                order by timeStamp desc
-                limit    1
-            },
-            [ $data->{userId} ]
-        );
+        $user_loginlog->execute([$data->{userId}]);
+        my ( $status, $lastLogin, $lastView, $lastSession ) = $user_loginlog->fetchrow_array;
 
-        my $trueLastView = $session->db->quickScalar(
-            q{
-                select lastPageView
-                from   userSession
-                where  sessionId = ?
-            },
-            [ $lastSession ]
-        );
+        $last_page_view->execute([$lastSession]);
+        my ($trueLastView) = $last_page_view->fetchrow_array();
 
         # format last page view, preferring session recorded view time
         $lastView   = $trueLastView || $lastView;
@@ -1114,14 +1132,8 @@ sub www_listUsers {
 
         $lastLogin &&= $session->datetime->epochToHuman($lastLogin);
 
-        my $totalTime = $session->db->quickScalar(
-            q{
-                select sum(lastPageViewed - timeStamp) 
-                from   userLoginLog 
-                where  userId = ?
-            }, 
-            [$data->{userId}]
-        );
+        $total_time->execute([$data->{userId}]);
+        my ($totalTime) = $total_time->fetchrow_array();
 
         if ($totalTime) {
             my ($interval, $units) 
@@ -1139,6 +1151,9 @@ sub www_listUsers {
     $output .= '</table>';
     $p->setAlphabeticalKey('username');
     $output .= $p->getBarTraditional;
+    $user_loginlog->finish;
+    $last_page_view->finish;
+    $total_time->finish;
 	my $submenu = _submenu(
                     $session,
                     { workarea => $output, }

@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -11,9 +11,7 @@
 ## Test that trashing a post works, and checking side effects like updating
 ## lastPost information in the Thread, and CS.
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../../lib";
 use WebGUI::Test;
 use WebGUI::Session;
 use Test::More tests => 13; # increment this value for each test you create
@@ -31,9 +29,9 @@ my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Collab setup"});
 
 # Need to create a Collaboration system in which the post lives.
-my @addArgs = ( undef, undef, { skipAutoCommitWorkflows => 1, skipNotification => 1 } );
+my $addArgs = { skipAutoCommitWorkflows => 1, skipNotification => 1 };
 
-my $collab = $node->addChild({className => 'WebGUI::Asset::Wobject::Collaboration'}, @addArgs);
+my $collab = $node->addChild({className => 'WebGUI::Asset::Wobject::Collaboration', }, );
 
 # finally, add posts and threads to the collaboration system
 
@@ -41,14 +39,14 @@ my $first_thread = $collab->addChild(
     { className   => 'WebGUI::Asset::Post::Thread', },
     undef, 
     WebGUI::Test->webguiBirthday, 
-    { skipAutoCommitWorkflows => 1, skipNotification => 1 }
+    $addArgs,
 );
 
 my $second_thread = $collab->addChild(
     { className   => 'WebGUI::Asset::Post::Thread', },
     undef, 
     WebGUI::Test->webguiBirthday, 
-    { skipAutoCommitWorkflows => 1, skipNotification => 1 }
+    $addArgs,
 );
 
 ##Thread 1, Post 1 => t1p1
@@ -56,14 +54,14 @@ my $t1p1 = $first_thread->addChild(
     { className   => 'WebGUI::Asset::Post', },
     undef, 
     WebGUI::Test->webguiBirthday, 
-    { skipAutoCommitWorkflows => 1, skipNotification => 1 }
+    $addArgs,
 );
 
 my $t1p2 = $first_thread->addChild(
     { className   => 'WebGUI::Asset::Post', },
     undef, 
     WebGUI::Test->webguiBirthday + 1, 
-    { skipAutoCommitWorkflows => 1, skipNotification => 1 }
+    $addArgs,
 );
 
 my $past = time()-15;
@@ -72,15 +70,18 @@ my $t2p1 = $second_thread->addChild(
     { className   => 'WebGUI::Asset::Post', },
     undef, 
     $past, 
-    { skipAutoCommitWorkflows => 1, skipNotification => 1 }
+    $addArgs,
 );
 
 my $t2p2 = $second_thread->addChild(
     { className   => 'WebGUI::Asset::Post', },
-    undef, 
-    undef, 
-    { skipAutoCommitWorkflows => 1, skipNotification => 1 }
+    undef, undef,
+    $addArgs,
 );
+
+foreach my $asset ($t1p1, $t1p2, $t2p1, $t2p2, $first_thread, $second_thread, ) {
+    $asset->setSkipNotification;
+}
 
 $versionTag->commit();
 WebGUI::Test->addToCleanup($versionTag);

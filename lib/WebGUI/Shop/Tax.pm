@@ -3,7 +3,7 @@ package WebGUI::Shop::Tax;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -16,7 +16,7 @@ package WebGUI::Shop::Tax;
 
 use strict;
 
-use Class::InsideOut qw{ :std };
+use Moose;
 use WebGUI::Exception::Shop;
 use WebGUI::Shop::Admin;
 use WebGUI::Pluggable;
@@ -44,7 +44,23 @@ These subroutines are available from this package:
 
 =cut
 
-readonly session => my %session;
+has session => (
+    is              => 'ro',
+    required        => 1,
+);
+
+around BUILDARGS => sub {
+    my $orig       = shift;
+    my $className  = shift;
+
+    ##Original arguments start here.
+    my $protoSession = $_[0];
+    if (blessed $protoSession && $protoSession->isa('WebGUI::Session')) {
+        return $className->$orig(session => $protoSession);
+    }
+    return $className->$orig(@_);
+};
+
 
 ##-------------------------------------------------------------------
 #sub appendSkuForm {
@@ -86,24 +102,15 @@ sub calculate {
         unless ref($cart) eq 'WebGUI::Shop::Cart';
     my $book = $cart->getAddressBook;
 
-    # Fetch the default shipping address for each item in the cart that hasn't set its own.
-    my $shippingAddress = $book->getAddress( $cart->get('shippingAddressId') ) if $cart->get('shippingAddressId');
-
     my $driver  = $self->getDriver;
     my $tax     = 0;
 
     foreach my $item (@{ $cart->getItems }) {
         my $sku         = $item->getSku;
-        my $quantity    = $item->get('quantity');
+        my $quantity    = $item->quantity;
         my $unitPrice   = $sku->getPrice;
 
-        # Check if this cart item overrides the shipping address. If it doesn't, use the default shipping address.
-        my $itemAddress = $shippingAddress;
-        if (defined $item->get('shippingAddressId')) {
-            $itemAddress = $book->getAddress($item->get('shippingAddressId'));
-        }
-
-        my $taxRate = $driver->getTaxRate( $sku, $itemAddress );            
+        my $taxRate = $driver->getTaxRate( $sku, $item->getShippingAddress );
 
         # Calc the monetary tax for the given quantity of this item and add it to the total.
         $tax += $unitPrice * $quantity * $taxRate / 100;
@@ -127,8 +134,11 @@ A WebGUI::Session object. Required in class context, optional in instance contex
 
 sub getDriver {
     my $self    = shift;
-    my $session = shift || $self->session;
-    
+    my $session = shift;
+    if (!$session && blessed $self) {
+        $session = $self->session;
+    }
+
     WebGUI::Error::InvalidObject->throw( expected => "WebGUI::Session", got => (ref $session), error => "Need a session." )
         unless $session && $session->isa( 'WebGUI::Session' );
 
@@ -142,28 +152,6 @@ sub getDriver {
     }
 
     return $driver;
-}
-
-#-------------------------------------------------------------------
-
-=head2 new ( $session )
-
-Constructor for the WebGUI::Shop::Tax.  Returns a WebGUI::Shop::Tax object.
-
-=cut
-
-sub new {
-    my $class   = shift;
-    my $session = shift;
-    
-    WebGUI::Error::InvalidObject->throw( expected => "WebGUI::Session", got => (ref $session), error => "Need a session." )
-        unless $session && $session->isa( 'WebGUI::Session' );
-
-    my $self    = {};
-    bless $self, $class;
-    register $self;
-    $session{ id $self } = $session;
-    return $self;
 }
 
 
@@ -256,10 +244,15 @@ sub www_manage {
 #    }
 
     my $taxDriver   = $self->getDriver;
+    my $editForm    = $taxDriver->getEditForm;
+    my $editFormHtml = '';
+    if ( blessed $editForm and $editForm->isa( 'WebGUI::FormBuilder' ) ) {
+        $editFormHtml = $editForm->toHtml;
+    }
     my $output      = 
         $pluginSwitcher
         . '<fieldset><legend>Plugin configuration</legend>' 
-            . $taxDriver->getConfigurationScreen
+            . $editFormHtml
         . '</fieldset>'
         ;
 

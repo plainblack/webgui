@@ -3,7 +3,7 @@ package WebGUI::Asset::Template::Parser;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -37,9 +37,9 @@ sub addSessionVars {
 	# These are the only session template variables used in the core as 
 	# of 6.8.5.  Further use of session template vars is deprecated.
 	$vars->{"session.user.username"} = $self->session->user->username;
-	$vars->{"session.user.firstDayOfWeek"} = $self->session->user->profileField("firstDayOfWeek");
+	$vars->{"session.user.firstDayOfWeek"} = $self->session->user->get("firstDayOfWeek");
 	$vars->{"session.config.extrasurl"} = $self->session->url->extras();
-	$vars->{"session.var.adminOn"} = $self->session->var->isAdminOn;
+	$vars->{"session.var.adminOn"} = $self->session->isAdminOn;
 	$vars->{"session.setting.companyName"} = $self->session->setting->get("companyName");
 	$vars->{"session.setting.anonymousRegistration"} = $self->session->setting->get("anonymousRegistration");
 	my $forms = $self->session->form->paramsHashRef();

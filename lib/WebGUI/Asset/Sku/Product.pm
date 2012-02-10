@@ -1,7 +1,7 @@
 package WebGUI::Asset::Sku::Product;
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -11,16 +11,150 @@ package WebGUI::Asset::Sku::Product;
 #-------------------------------------------------------------------
 
 use strict;
-use Tie::CPHash;
 use Tie::IxHash;
-use WebGUI::Cache;
-use WebGUI::HTMLForm;
+use WebGUI::FormBuilder;
 use WebGUI::Storage;
 use WebGUI::SQL;
-use WebGUI::Utility;
 use JSON;
 
-use base 'WebGUI::Asset::Sku';
+use Moose;
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset::Sku';
+
+define assetName  => ['assetName', 'Asset_Product'];
+define icon       => 'product.gif';
+define tableName  => 'Product';
+
+property cacheTimeout => (
+            tab          => "display",
+            fieldType    => "interval",
+            default      => 3600,
+            uiLevel      => 8,
+            label        => ["cache timeout"],
+            hoverHelp    => ["cache timeout help"],
+        );
+property templateId => (
+            fieldType    => "template",
+            tab          => "display",
+            namespace    => "Product",
+            label        => ['62', 'Asset_Product'],
+            hoverHelp    => ['62 description', 'Asset_Product'],
+            default      => 'PBtmpl0000000000000056'
+        );
+property thankYouMessage => (
+            tab             => "properties",
+            default         => '_default_thankYouMessage',
+            fieldType       => "HTMLArea",
+            label           => ["thank you message", 'Asset_Product'],
+            hoverHelp       => ["thank you message help", 'Asset_Product'],
+            lazy            => 1,
+        );
+sub _default_thankYouMessage {
+    my $self = shift;
+    my $i18n = WebGUI::International->new($self->session, 'Asset_Product');
+    return $i18n->get("default thank you message");
+}
+property image1 => (
+            tab            => "properties",
+            fieldType      => "image",
+            default        => undef,
+            maxAttachments => 1,
+            label          => ['7', 'Asset_Product'],
+            deleteFileUrl  => \&_product_delete_file_url,
+            persist        =>  1,
+        );
+sub _product_delete_file_url {
+    my ($self, $property) = @_;
+    return $self->session->url->page(sprintf "func=deleteFileConfirm;file=%s;filename=", $property->name);
+}
+property image2 => (
+            tab            => "properties",
+            fieldType      => "image",
+            maxAttachments => 1,
+            label          => ['8', 'Asset_Product'],
+            deleteFileUrl  => \&_product_delete_file_url,
+            default        => undef,
+            persist        => 1,
+        );
+property image3 => (
+            tab            => "properties",
+            fieldType      => "image",
+            maxAttachments => 1,
+            label          => ['9', 'Asset_Product'],
+            deleteFileUrl  => \&_product_delete_file_url,
+            default        => undef,
+            persist        => 1,
+        );
+property brochure => (
+            tab            => "properties",
+            fieldType      => "file",
+            maxAttachments => 1,
+            label          => ['13', 'Asset_Product'],
+            deleteFileUrl  => \&_product_delete_file_url,
+            default        => undef,
+            persist        => 1,
+        );
+property manual => (
+            tab            => "properties",
+            fieldType      => "file",
+            maxAttachments => 1,
+            label          => ['14', 'Asset_Product'],
+            deleteFileUrl  => \&_product_delete_file_url,
+            default        => undef,
+            persist        => 1,
+        );
+property isShippingRequired => (
+            tab          => "shop",
+            fieldType    => "yesNo",
+            label        => ['isShippingRequired', 'Asset_Product'],
+            hoverHelp    => ['isShippingRequired help', 'Asset_Product'],
+            default      => 0,
+        );
+property warranty => (
+            tab            => "properties",
+            fieldType      => "file",
+            maxAttachments => 1,
+            label          => ['15', 'Asset_Product'],
+            deleteFileUrl  => \&_product_delete_file_url,
+            default        => undef,
+            persist        => 1,
+        );
+property variantsJSON => (
+            ##Collateral data is stored as JSON in here
+            noFormPost   => 1,
+            default      => '[]',
+            fieldType    => "textarea",
+        );
+property accessoryJSON => (
+            ##Collateral data is stored as JSON in here
+            noFormPost   => 1,
+            default      => '[]',
+            fieldType    => "textarea",
+        );
+property relatedJSON => (
+            ##Collateral data is stored as JSON in here
+            noFormPost   => 1,
+            default      => '[]',
+            fieldType    => "textarea",
+        );
+property specificationJSON => (
+            ##Collateral data is stored as JSON in here
+            noFormPost   => 1,
+            default      => '[]',
+            fieldType    => "textarea",
+        );
+property featureJSON => (
+            ##Collateral data is stored as JSON in here
+            noFormPost   => 1,
+            default      => '[]',
+            fieldType    => "textarea",
+        );
+property benefitJSON => (
+            ##Collateral data is stored as JSON in here
+            noFormPost   => 1,
+            default      => '[]',
+            fieldType    => "textarea",
+        );
 
 #-------------------------------------------------------------------
 sub _duplicateFile {
@@ -42,9 +176,9 @@ Override the default method in order to deal with attachments.
 
 =cut
 
-sub addRevision {
+override addRevision => sub {
     my $self = shift;
-    my $newSelf = $self->SUPER::addRevision(@_);
+    my $newSelf = super();
     if ($newSelf->getRevisionCount > 1) {
         foreach my $field (qw(image1 image2 image3 brochure manual warranty)) {
             if ($self->get($field)) {
@@ -54,155 +188,7 @@ sub addRevision {
         }
     }
     return $newSelf;
-}
-
-#-------------------------------------------------------------------
-sub definition {
-    my $class = shift;
-    my $session = shift;
-    my $definition = shift;
-    my $i18n = WebGUI::International->new($session,"Asset_Product");
-    my %properties;
-    tie %properties, 'Tie::IxHash';
-    %properties = (
-        cacheTimeout => {
-            tab => "display",
-            fieldType => "interval",
-            defaultValue => 3600,
-            uiLevel => 8,
-            label => $i18n->get("cache timeout"),
-            hoverHelp => $i18n->get("cache timeout help")
-        },
-        templateId =>{
-            fieldType=>"template",
-            tab => "display",
-                  namespace=>"Product",
-            label=>$i18n->get(62),
-            hoverHelp=>$i18n->get('62 description'),
-            defaultValue=>'PBtmpl0000000000000056'
-        },
-        thankYouMessage => {
-            tab             => "properties",
-            defaultValue    => $i18n->get("default thank you message"),
-            fieldType       => "HTMLArea",
-            label           => $i18n->get("thank you message"),
-            hoverHelp       => $i18n->get("thank you message help"),
-        },
-        image1=>{
-            tab => "properties",
-            fieldType=>"image",
-            defaultValue=>undef,
-            maxAttachments=>1,
-            label=>$i18n->get(7),
-            deleteFileUrl=>$session->url->page("func=deleteFileConfirm;file=image1;filename="),
-            persist => 1,
-        },
-        image2=>{
-            tab => "properties",
-            fieldType=>"image",
-            maxAttachments=>1,
-            label=>$i18n->get(8),
-            deleteFileUrl=>$session->url->page("func=deleteFileConfirm;file=image2;filename="),
-            defaultValue=>undef,
-            persist => 1,
-        },
-        image3=>{
-            tab => "properties",
-            fieldType=>"image",
-            maxAttachments=>1,
-            label=>$i18n->get(9),
-            deleteFileUrl=>$session->url->page("func=deleteFileConfirm;file=image3;filename="),
-            defaultValue=>undef,
-            persist => 1,
-        },
-        brochure=>{
-            tab => "properties",
-            fieldType=>"file",
-            maxAttachments=>1,
-            label=>$i18n->get(13),
-            deleteFileUrl=>$session->url->page("func=deleteFileConfirm;file=brochure;filename="),
-            defaultValue=>undef,
-            persist => 1,
-        },
-        manual=>{
-            tab => "properties",
-            fieldType=>"file",
-            maxAttachments=>1,
-            label=>$i18n->get(14),
-            deleteFileUrl=>$session->url->page("func=deleteFileConfirm;file=manual;filename="),
-            defaultValue=>undef,
-            persist => 1,
-        },
-        isShippingRequired => {
-            tab          => "shop",
-            fieldType    => "yesNo",
-            label        => $i18n->get('isShippingRequired'),
-            hoverHelp    => $i18n->get('isShippingRequired help'),
-            defaultValue => 0,
-        },
-        warranty=>{
-            tab => "properties",
-            fieldType=>"file",
-            maxAttachments=>1,
-            label=>$i18n->get(15),
-            deleteFileUrl=>$session->url->page("func=deleteFileConfirm;file=warranty;filename="),
-            defaultValue=>undef,
-            persist => 1,
-        },
-        variantsJSON => {
-            ##Collateral data is stored as JSON in here
-            autoGenerate => 0,
-            defaultValue => '[]',
-            fieldType    => "textarea",
-            noFormPost   => 1,
-        },
-        accessoryJSON => {
-            ##Collateral data is stored as JSON in here
-            autoGenerate => 0,
-            defaultValue => '[]',
-            fieldType    => "textarea",
-            noFormPost   => 1,
-        },
-        relatedJSON => {
-            ##Collateral data is stored as JSON in here
-            autoGenerate => 0,
-            defaultValue => '[]',
-            fieldType    => "textarea",
-            noFormPost   => 1,
-        },
-        specificationJSON => {
-            ##Collateral data is stored as JSON in here
-            autoGenerate => 0,
-            defaultValue => '[]',
-            fieldType    => "textarea",
-            noFormPost   => 1,
-        },
-        featureJSON => {
-            ##Collateral data is stored as JSON in here
-            autoGenerate => 0,
-            defaultValue => '[]',
-            fieldType    => "textarea",
-            noFormPost   => 1,
-        },
-        benefitJSON => {
-            ##Collateral data is stored as JSON in here
-            autoGenerate => 0,
-            defaultValue => '[]',
-            fieldType    => "textarea",
-            noFormPost   => 1,
-        },
-    );
-    push(@{$definition}, {
-        assetName=>$i18n->get('assetName'),
-        autoGenerateForms=>1,
-        icon=>'product.gif',
-        tableName=>'Product',
-        className=>'WebGUI::Asset::Sku::Product',
-        properties=>\%properties
-        }
-    );
-    return $class->SUPER::definition($session, $definition);
-}
+};
 
 #-------------------------------------------------------------------
 
@@ -245,9 +231,9 @@ Override the duplicate method so uploaded files and images also get copied.
 
 =cut
 
-sub duplicate {
+override duplicate => sub {
     my $self = shift;
-    my $newAsset = $self->SUPER::duplicate(@_);
+    my $newAsset = super;
 
     foreach my $file ('image1', 'image2', 'image3', 'manual', 'brochure', 'warranty') {
         $self->_duplicateFile($newAsset, $file);
@@ -255,7 +241,7 @@ sub duplicate {
 
     return $newAsset;
 
-}
+};
 
 
 #-------------------------------------------------------------------
@@ -471,6 +457,30 @@ sub getFileUrl {
     return $store->getUrl($self->getFilename($store));
 }
 
+#----------------------------------------------------------------------------
+
+=head2 getHelpers ( )
+
+Add the importCSV and exportCSV helpers
+
+=cut
+
+override getHelpers => sub {
+    my ( $self ) = @_;
+    my $helpers = super();
+
+    $helpers->{import_products} = {
+        className   => 'WebGUI::AssetHelper::Product::ImportCSV',
+        label       => 'Import Products',
+    };
+    $helpers->{export_products} = {
+        className   => 'WebGUI::AssetHelper::Product::ExportCSV',
+        label       => 'Export Products',
+    };
+
+    return $helpers;
+};
+
 #-------------------------------------------------------------------
 
 =head2 getMaxAllowedInCart ( )
@@ -570,20 +580,6 @@ sub getWeight {
 
 #-------------------------------------------------------------------
 
-=head2 isShippingRequired
-
-Overriding the method from Sku so that the user can configure it.
-
-=cut
-
-sub isShippingRequired {
-    my $self = shift;
-    return $self->get('isShippingRequired');
-}
-
-
-#-------------------------------------------------------------------
-
 =head2 moveCollateralDown ( tableName, keyName, keyValue )
 
 Moves a collateral data item down one position.  If called on the last element of the
@@ -672,10 +668,10 @@ The WebGUI::Shop::CartItem that will be refunded.
 
 =cut
 
-sub onRefund {
+override onRefund => sub {
     my $self   = shift;
     my $item   = shift;
-    $self->SUPER::onRefund($item);
+    super();
     my $amount = $item->get('quantity');
     ##Update myself, as options
     $self->getOptions->{quantity} += $amount;
@@ -684,7 +680,7 @@ sub onRefund {
     my $collateral = $self->getCollateral('variantsJSON', 'variantId', $vid);
     $collateral->{quantity} += $amount;
     $self->setCollateral('variantsJSON', 'variantId', $vid, $collateral);
-}
+};
 
 
 #-------------------------------------------------------------------
@@ -755,13 +751,13 @@ See WebGUI::Asset::prepareView() for details.
 
 =cut
 
-sub prepareView {
+override prepareView => sub {
     my $self = shift;
-    $self->SUPER::prepareView();
-    my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId"));
+    super();
+    my $template = WebGUI::Asset::Template->newById($self->session, $self->get("templateId"));
     $template->prepare($self->getMetaDataAsTemplateVariables);
     $self->{_viewTemplate} = $template;
-}
+};
 
 
 #-------------------------------------------------------------------
@@ -772,7 +768,7 @@ Extend the base class to handle all file collateral.
 
 =cut
 
-sub purge {
+override purge => sub {
     my $self = shift;
     my $sth = $self->session->db->read("select image1, image2, image3, brochure, manual, warranty from Product where assetId=?", [$self->getId]);
     while (my @array = $sth->array) {
@@ -782,8 +778,8 @@ sub purge {
         }
     }
     $sth->finish;
-    $self->SUPER::purge();
-}
+    super();
+};
 
 #-------------------------------------------------------------------
 
@@ -793,11 +789,11 @@ Extends the base class to handle cleaning up the cache for this asset.
 
 =cut
 
-sub purgeCache {
+override purgeCache => sub {
     my $self = shift;
-    WebGUI::Cache->new($self->session,"view_".$self->getId)->delete;
-    $self->SUPER::purgeCache;
-}
+    $self->session->cache->remove("view_".$self->getId);
+    super();
+};
 
 #-------------------------------------------------------------------
 
@@ -807,7 +803,7 @@ Extend the base method to handle deleting file collateral.
 
 =cut
 
-sub purgeRevision {
+override purgeRevision => sub {
     my $self = shift;
     WebGUI::Storage->get($self->session, $self->get("image1"))->delete   if ($self->get("image1"));
     WebGUI::Storage->get($self->session, $self->get("image2"))->delete   if ($self->get("image2"));
@@ -815,8 +811,8 @@ sub purgeRevision {
     WebGUI::Storage->get($self->session, $self->get("brochure"))->delete if ($self->get("brochure"));
     WebGUI::Storage->get($self->session, $self->get("manual"))->delete   if ($self->get("manual"));
     WebGUI::Storage->get($self->session, $self->get("warranty"))->delete if ($self->get("warranty"));
-    return $self->SUPER::purgeRevision;
-}
+    return super();
+};
 
 #-----------------------------------------------------------------
 
@@ -907,10 +903,10 @@ the user to select them.
 sub www_addAccessory {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);
-    my $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
-    $f->hidden(
-        -name => "func",
-        -value => "addAccessorySave",
+    my $f = WebGUI::FormBuilder->new($self->session,action=>$self->getUrl);
+    $f->addField( "hidden", 
+        name => "func",
+        value => "addAccessorySave",
     );
     ##Accessories are other Products.  Give the user a list of Accessories that
     ##are not already used, nor itself.
@@ -934,20 +930,20 @@ sub www_addAccessory {
     );
 
     my $i18n = WebGUI::International->new($self->session,"Asset_Product");
-    $f->selectBox(
-        -name => "accessoryAccessId",
-        -options => $accessory,
-        -label => $i18n->get(17),
-        -hoverHelp => $i18n->get('17 description'),
+    $f->addField( "selectBox",
+        name => "accessoryAccessId",
+        options => $accessory,
+        label => $i18n->get(17),
+        hoverHelp => $i18n->get('17 description'),
     );
-    $f->yesNo(
-        -name => "proceed",
-        -label => $i18n->get(18),
-        -hoverHelp => $i18n->get('18 description'),
+    $f->addField( "yesNo",
+        name => "proceed",
+        label => $i18n->get(18),
+        hoverHelp => $i18n->get('18 description'),
     );
-    $f->submit;
+    $f->addField( "submit", name => "send" );
 
-    return $self->getAdminConsole->render($f->print, "product accessory add/edit");
+    return $f->toHtml;
 }
 
 #-------------------------------------------------------------------
@@ -987,10 +983,10 @@ Provides a form for the user to pick Products related to this one.
 sub www_addRelated {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);
-    my $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
-    $f->hidden(
-        -name => 'func',
-        -value => 'addRelatedSave',
+    my $f = WebGUI::FormBuilder->new($self->session,action=>$self->getUrl);
+    $f->addField( "hidden",
+        name => 'func',
+        value => 'addRelatedSave',
     );
     ##Relateds are other Products.  Give the user a list of Related products that
     ##are not already used, nor itself.
@@ -1016,19 +1012,19 @@ sub www_addRelated {
 
 
     my $i18n = WebGUI::International->new($self->session,'Asset_Product');
-    $f->selectBox(
-        -name => 'relatedAssetId',
-        -options => $related,
-        -label => $i18n->get(20),
-        -hoverHelp => $i18n->get('20 description'),
+    $f->addField( "selectBox",
+        name => 'relatedAssetId',
+        options => $related,
+        label => $i18n->get(20),
+        hoverHelp => $i18n->get('20 description'),
     );
-    $f->yesNo(
-        -name => 'proceed',
-        -label => $i18n->get(21),
-        -hoverHelp => $i18n->get('21 description'),
+    $f->addField( "yesNo",
+        name => 'proceed',
+        label => $i18n->get(21),
+        hoverHelp => $i18n->get('21 description'),
     );
-    $f->submit;
-    return $self->getAdminConsole->render($f->print,'product related add/edit');
+    $f->addField( "submit", name => "send" );
+    return $f->toHtml;
 }
 
 #-------------------------------------------------------------------
@@ -1134,7 +1130,7 @@ sub www_deleteFileConfirm {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);
     my $column = $self->session->form->process("file");
-    return $self->www_edit  unless (isIn($column, qw(image1 image2 image3 manual warranty brochure)));
+    return $self->www_edit  unless $column ~~ [qw(image1 image2 image3 manual warranty brochure)];
     my $store = $self->get($column);
     my $file = WebGUI::Storage->get($self->session,$store);
     $file->delete if defined $file;
@@ -1202,28 +1198,28 @@ sub www_editBenefit {
     return $self->session->privilege->insufficient() unless ($self->canEdit);
     my $data = $self->getCollateral('benefitJSON', 'benefitId', $bid);
     my $i18n = WebGUI::International->new($self->session,'Asset_Product');
-    my $f    = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
-    $f->hidden(
-        -name => 'bid',
-        -value => $bid,
+    my $f    = WebGUI::FormBuilder->new($self->session,action=>$self->getUrl);
+    $f->addField( "hidden",
+        name => 'bid',
+        value => $bid,
     );
-    $f->hidden(
-        -name => 'func',
-        -value => 'editBenefitSave',
+    $f->addField( "hidden",
+        name => 'func',
+        value => 'editBenefitSave',
     );
-    $f->text(
-        -name => 'benefit',
-        -label => $i18n->get(51),
-        -hoverHelp => $i18n->get('51 description'),
-        -value => $data->{benefit},
+    $f->addField( "text",
+        name => 'benefit',
+        label => $i18n->get(51),
+        hoverHelp => $i18n->get('51 description'),
+        value => $data->{benefit},
     );
-    $f->yesNo(
-        -name => 'proceed',
-        -label => $i18n->get(52),
-        -hoverHelp => $i18n->get('52 description'),
+    $f->addField( "yesNo",
+        name => 'proceed',
+        label => $i18n->get(52),
+        hoverHelp => $i18n->get('52 description'),
     );
-    $f->submit;
-    return $self->getAdminConsole->render($f->print, 'product benefit add/edit');
+    $f->addField( "submit", name => "send" );
+    return $f->toHtml;
 }
 
 #-------------------------------------------------------------------
@@ -1265,28 +1261,28 @@ sub www_editFeature {
     return $self->session->privilege->insufficient() unless ($self->canEdit);
     my $data = $self->getCollateral('featureJSON', 'featureId', $fid);
     my $i18n = WebGUI::International->new($self->session,'Asset_Product');
-    my $f    = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
-    $f->hidden(
-        -name  => 'fid',
-        -value => $fid,
+    my $f    = WebGUI::FormBuilder->new($self->session,action=>$self->getUrl);
+    $f->addField( "hidden",
+        name  => 'fid',
+        value => $fid,
     );
-    $f->hidden(
-        -name  => 'func',
-        -value => 'editFeatureSave',
+    $f->addField( "hidden",
+        name  => 'func',
+        value => 'editFeatureSave',
     );
-    $f->text(
-        -name      => 'feature',
-        -label     => $i18n->get(23),
-        -hoverHelp => $i18n->get('23 description'),
-        -value     => $data->{feature},
+    $f->addField( "text",
+        name      => 'feature',
+        label     => $i18n->get(23),
+        hoverHelp => $i18n->get('23 description'),
+        value     => $data->{feature},
     );
-    $f->yesNo(
-        -name      => 'proceed',
-        -label     => $i18n->get(24),
-        -hoverHelp => $i18n->get('24 description'),
+    $f->addField( "yesNo",
+        name      => 'proceed',
+        label     => $i18n->get(24),
+        hoverHelp => $i18n->get('24 description'),
     );
-    $f->submit;
-    return $self->getAdminConsole->render($f->print, 'product feature add/edit');
+    $f->addField( "submit", name => "send" );
+    return $f->toHtml;
 }
 
 #-------------------------------------------------------------------
@@ -1329,41 +1325,41 @@ sub www_editSpecification {
 
     my $i18n = WebGUI::International->new($self->session,'Asset_Product');
     my $data = $self->getCollateral('specificationJSON', 'specificationId', $sid);
-    my $f    = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
+    my $f    = WebGUI::FormBuilder->new($self->session,action=>$self->getUrl);
 
-    $f->hidden(
-        -name => 'sid',
-        -value => $sid,
+    $f->addField( "hidden",
+        name => 'sid',
+        value => $sid,
     );
-    $f->hidden(
-        -name => 'func',
-        -value => 'editSpecificationSave',
+    $f->addField( "hidden",
+        name => 'func',
+        value => 'editSpecificationSave',
     );
-    $f->text(
-        -name => 'name',
-        -label => $i18n->get(26),
-        -hoverHelp => $i18n->get('26 description'),
-        -value => $data->{name},
+    $f->addField( "text",
+        name => 'name',
+        label => $i18n->get(26),
+        hoverHelp => $i18n->get('26 description'),
+        value => $data->{name},
     );
-    $f->text(
-        -name => 'value',
-        -label => $i18n->get(27),
-        -hoverHelp => $i18n->get('27 description'),
-        -value => $data->{value},
+    $f->addField( "text",
+        name => 'value',
+        label => $i18n->get(27),
+        hoverHelp => $i18n->get('27 description'),
+        value => $data->{value},
     );
-    $f->text(
-        -name => 'units',
-        -label => $i18n->get(29),
-        -hoverHelp => $i18n->get('29 description'),
-        -value => $data->{units},
+    $f->addField( "text",
+        name => 'units',
+        label => $i18n->get(29),
+        hoverHelp => $i18n->get('29 description'),
+        value => $data->{units},
     );
-    $f->yesNo(
-        -name => 'proceed',
-        -label => $i18n->get(28),
-        -hoverHelp => $i18n->get('28 description'),
+    $f->addField( "yesNo",
+        name => 'proceed',
+        label => $i18n->get(28),
+        hoverHelp => $i18n->get('28 description'),
     );
-    $f->submit;
-    return $self->getAdminConsole->render($f->print, 'product specification add/edit');
+    $f->addField( "submit", name => "send" );
+    return $f->toHtml;
 }
 
 #-------------------------------------------------------------------
@@ -1408,53 +1404,53 @@ sub www_editVariant {
     return $self->session->privilege->insufficient() unless ($self->canEdit);
     my $i18n = WebGUI::International->new($self->session,'Asset_Product');
     my $data = $self->getCollateral("variantsJSON", 'variantId', $vid);
-    my $f    = WebGUI::HTMLForm->new($self->session, -action=>$self->getUrl);
-    $f->hidden(
-        -name => 'func',
-        -value => 'editVariantSave',
+    my $f    = WebGUI::FormBuilder->new($self->session, action=>$self->getUrl);
+    $f->addField( "hidden",
+        name => 'func',
+        value => 'editVariantSave',
     );
-    $f->hidden(
-        -name => 'vid',
-        -value => $vid,
+    $f->addField( "hidden",
+        name => 'vid',
+        value => $vid,
     );
-    $f->text(
-        -name      => 'varSku',
-        -label     => $i18n->get('variant sku'),
-        -hoverHelp => $i18n->get('variant sku description'),
-        -value     => $data->{varSku},
+    $f->addField( "text",
+        name      => 'varSku',
+        label     => $i18n->get('variant sku'),
+        hoverHelp => $i18n->get('variant sku description'),
+        value     => $data->{varSku},
     );
-    $f->text(
-        -name      => 'shortdesc',
-        -maxlength => 30,
-        -label     => $i18n->get('shortdesc'),
-        -hoverHelp => $i18n->get('shortdesc description'),
-        -value     => $data->{shortdesc},
+    $f->addField( "text",
+        name      => 'shortdesc',
+        maxlength => 30,
+        label     => $i18n->get('shortdesc'),
+        hoverHelp => $i18n->get('shortdesc description'),
+        value     => $data->{shortdesc},
     );
-    $f->float(
-        -name      => 'price',
-        -label     => $i18n->get(10),
-        -hoverHelp => $i18n->get('10 description'),
-        -value     => $data->{price},
+    $f->addField( "float",
+        name      => 'price',
+        label     => $i18n->get(10),
+        hoverHelp => $i18n->get('10 description'),
+        value     => $data->{price},
     );
-    $f->float(
-        -name      => 'weight',
-        -label     => $i18n->get('weight'),
-        -hoverHelp => $i18n->get('weight description'),
-        -value     => $data->{weight},
+    $f->addField( "float",
+        name      => 'weight',
+        label     => $i18n->get('weight'),
+        hoverHelp => $i18n->get('weight description'),
+        value     => $data->{weight},
     );
-    $f->integer(
-        -name      => 'quantity',
-        -label     => $i18n->get('quantity'),
-        -hoverHelp => $i18n->get('quantity description'),
-        -value     => $data->{quantity},
+    $f->addField( "integer",
+        name      => 'quantity',
+        label     => $i18n->get('quantity'),
+        hoverHelp => $i18n->get('quantity description'),
+        value     => $data->{quantity},
     );
-    $f->yesNo(
-        -name      => "proceed",
-        -label     => $i18n->get('add another variant'),
-        -hoverHelp => $i18n->get('add another variant description'),
+    $f->addField( "yesNo",
+        name      => "proceed",
+        label     => $i18n->get('add another variant'),
+        hoverHelp => $i18n->get('add another variant description'),
     );
-    $f->submit;
-    return $self->getAdminConsole->render($f->print, 'add variant');
+    $f->addField( "submit", name => "send" );
+    return $f->toHtml;
 }
 
 #-------------------------------------------------------------------
@@ -1680,13 +1676,13 @@ sub view {
     my $self = shift;
     my $error = shift;
     my $session = $self->session;
-    if (!$session->var->isAdminOn && $self->get("cacheTimeout") > 10){
-        my $cache = $self->getCache;
-        my $out   = $cache->get if defined $cache;
-		return $out if $out;
+    my $cache = $session->cache;
+    my $cacheKey = $self->getWwwCacheKey( 'view' );
+    if (!$session->isAdminOn && $self->get("cacheTimeout") > 10){
+        my $out = $cache->get( $cacheKey );
+        return $out if $out;
     }
-    my (%data, $segment, %var, @featureloop, @benefitloop, @specificationloop, @accessoryloop, @relatedloop);
-    tie %data, 'Tie::CPHash';
+    my ($segment, %var, @featureloop, @benefitloop, @specificationloop, @accessoryloop, @relatedloop);
     my $brochure = $self->get("brochure");
     my $manual   = $self->get("manual");
     my $warranty = $self->get("warranty");
@@ -1805,7 +1801,7 @@ sub view {
             accessory_title    => $i18n->get('Lost'),
             accessory_controls => $segment,
         };
-        my $accessory = WebGUI::Asset->newByDynamicClass($session, $collateral->{accessoryAssetId});
+        my $accessory = WebGUI::Asset->newById($session, $collateral->{accessoryAssetId});
         if ( $accessory ) {
             $accessory_vars->{ accessory_URL }   = $accessory->getUrl;
             $accessory_vars->{ accessory_title } = $accessory->getTitle;
@@ -1826,7 +1822,7 @@ sub view {
             relatedproduct_title    => $i18n->get('Lost'),
             relatedproduct_controls => $segment,
         };
-        my $related = WebGUI::Asset->newByDynamicClass($session, $collateral->{relatedAssetId});
+        my $related = WebGUI::Asset->newById($session, $collateral->{relatedAssetId});
         if ($related) {
             $related_vars->{ relatedproduct_URL }   = $related->getUrl;
             $related_vars->{ relatedproduct_title } = $related->getTitle;
@@ -1892,8 +1888,8 @@ sub view {
     $var{continueShoppingUrl} = $self->getUrl;
 
     my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
-    if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10 && $self->{_hasAddedToCart} != 1){
-        WebGUI::Cache->new($self->session,"view_".$self->getId)->set($out,$self->get("cacheTimeout"));
+    if (!$self->session->isAdminOn && $self->cacheTimeout > 10 && $self->{_hasAddedToCart} != 1){
+        $cache->set( $cacheKey, $out, $self->cacheTimeout );
     }
     return $out;
 }
@@ -1906,11 +1902,12 @@ Extend the base method to handle caching.
 
 =cut
 
-sub www_view {
+override www_view => sub {
     my $self = shift;
-    $self->session->http->setCacheControl($self->get("cacheTimeout"));
-    $self->SUPER::www_view(@_);
-}
+    $self->session->response->setCacheControl($self->cacheTimeout);
+    super();
+};
 
+__PACKAGE__->meta->make_immutable;
 1;
 

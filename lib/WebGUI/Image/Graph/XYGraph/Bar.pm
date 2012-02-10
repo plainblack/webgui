@@ -4,7 +4,6 @@ use strict;
 use WebGUI::Image::Graph::XYGraph;
 use List::Util;
 use POSIX;
-use WebGUI::Utility;
 
 our @ISA = qw(WebGUI::Image::Graph::XYGraph);
 
@@ -48,28 +47,23 @@ more information.
 
 sub configurationForm {
 	my $self = shift;
+    my $tab  = shift;
 
 	my $i18n = WebGUI::International->new($self->session, 'Image_Graph_XYGraph_Bar');
 
-	my $configForms = $self->SUPER::configurationForm;
-my	$f = WebGUI::HTMLForm->new($self->session);
-	$f->trClass('Graph_XYGraph_Bar');
-	$f->float(
+	$self->SUPER::configurationForm($tab);
+	$tab->addField('float',
 		name	=> 'xyGraph_bar_barSpacing',
 		value	=> $self->getBarSpacing,
 		label	=> $i18n->get('bar spacing'),
 		hoverHelp => $i18n->get('bar spacing description'),
 	);
-	$f->float(
+	$tab->addField('float',
 		name	=> 'xyGraph_bar_groupSpacing',
 		value	=> $self->getGroupSpacing,
 		label	=> $i18n->get('group spacing'),
 		hoverHelp => $i18n->get('group spacing description'),
 	);
-
-	$configForms->{'graph_xygraph_bar'} = $f->printRowsOnly;
-
-	return $configForms;
 }
 
 #-------------------------------------------------------------------
@@ -251,7 +245,7 @@ sub getAnchorSpacing {
 
 	my $numberOfGroups = List::Util::max(map {scalar @$_} @{$self->getDataset});
 
-	my $spacing = round(($self->getChartWidth - ($numberOfGroups-1) * $self->getGroupSpacing) / $numberOfGroups + $self->getGroupSpacing);
+	my $spacing = sprintf('%.0f', ($self->getChartWidth - ($numberOfGroups-1) * $self->getGroupSpacing) / $numberOfGroups + $self->getGroupSpacing);
 
 	return {
 		x	=> $spacing,
@@ -320,7 +314,7 @@ sub getFirstAnchorLocation {
 	my $self = shift;
 
 	return {
-		x	=> round($self->getChartOffset->{x} + ($self->getAnchorSpacing->{x} - $self->getGroupSpacing) / 2),
+		x	=> sprintf('%.0f', $self->getChartOffset->{x} + ($self->getAnchorSpacing->{x} - $self->getGroupSpacing) / 2),
 		y	=> $self->getChartOffset->{y} + $self->getChartHeight
 	}
 }

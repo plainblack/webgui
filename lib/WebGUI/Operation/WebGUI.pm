@@ -1,7 +1,7 @@
 package WebGUI::Operation::WebGUI;
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -40,7 +40,7 @@ sub www_genesis {
 
 #-------------------------------------------------------------------
 
-=head2 theWg ( )
+=head2 www_theWg ( )
 
 The core WebGUI function.  All WebGUI Assets, Operations and functions require this
 to work, even superseding the session variable.

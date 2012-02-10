@@ -2,69 +2,103 @@
 #              Quick And Dirty Install Instructions              #
 ##################################################################
 
-The following is a rough overview of how to install WebGUI. For
-more detailed instructions read the WebGUI installation 
-documentation.
-   
-  http://wiki.webgui.org/installation-options
+The following is a rough overview of how to install WebGUI *8*. 
 
-QnD INSTALL INSTRUCTIONS:
+http://wiki.webgui.org/installation-options has instructions for
+WebGUI 7.
 
-1. Install Perl 5.8 or higher.
+== INSTALL ==
 
-2. Install Apache 2.0 with mod_perl 2.0 and set up your config. Add the
-following directives to mod_perl (See WebGUI Done Right for more detail.)
+* Install a recent Perl (5.12.1 or better) if you don't have one already
 
-LoadModule apreq_module modules/mod_apreq2.so
-LoadModule perl_module modules/mod_perl.so
-PerlSetVar WebguiRoot /data/WebGUI
-PerlCleanupHandler Apache2::SizeLimit
-PerlRequire /data/WebGUI/sbin/preload.perl
+* Install a recent MySQL and set up a user account
 
-<VirtualHost *:80>
-        ServerName www.example.com 
-        ServerAlias example.com
-        DocumentRoot /data/domains/example.com/www/public
-        SetHandler perl-script
-        PerlInitHandler WebGUI
-        PerlSetVar WebguiConfig www.example.com.conf
-</VirtualHost>
+* Install ImageMagick (http://www.imagemagick.org/, compile and install the 
+  source or binary package)
 
-3. Install MySQL 5.0.10 or higher.
+* Get WebGUI from GitHub and check out the WebGUI8 branch:
 
-4. Install Image Magick 6.0 or higher.
+  $ git clone https://github.com/plainblack/webgui.git
+  $ git checkout WebGUI8 --track
 
-5. Extract WebGUI into your webroot.
+* Setup your configuration files
 
-6. Start MySQL.
+  Copy WebGUI.conf.original to something named after the site's URL and 
+  ending in .conf, such as www.example.com.conf, and edit it, making sure
+  to insert your site's URL and the database connection information 
+  (dbuser, dbpass, dsn).
 
-7. Run the following Database commands. (You should modify the
-   commands to match your database, username, and password.)
+  Set uploadsPath in the .conf file to eg 
+  /data/domains/www.example.com/public/uploads/.
 
-   mysql -e "create database WebGUI"
-   mysql -e "grant all privileges on WebGUI.* to webgui@localhost identified by 'password'"
-   mysql -e "flush privileges"
-   mysql -uwebgui -ppassword WebGUI < docs/create.sql
+  Edit "etc/spectre.conf" to define port and worker settings for spectre.
 
-8. Edit "etc/WebGUI.conf" to match your DB settings and log directory.
+  Set WEBGUI_CONFIG to point at your new configuration file:
 
-9. Edit "etc/spectre.conf" to define port and worker settings for spectre
+  $ export WEBGUI_CONFIG='/data/WebGUI/etc/www.example.com.conf'
 
-10. Run the following command from your WebGUI/sbin directory to install
-   the required perl modules and determine whether you've configured 
-   your system correctly.
+* Automatically install new Perl module dependencies:
 
-   perl testEnvironment.pl
+  $ sbin/testEnvironment.pl as root to install Perl modules
 
-   If it returns all "OK" then you're done. 
+* Create a MySQL user account for the domain WebGUI is to host
+  and share/create.sql into that database
 
-11. Start Apache.
+  $ mysql --password --user=root -e "create database www_example_com"
+  $ mysql --password --user=root -e "grant all privileges on www_example_com.* 
+        to webgui@localhost identified by 'XXXXpasswordhereXXXX'"
+  $ mysql --password --user=webgui < share/create.sql 
 
-12. Start Spectre.
+* wgd reset --uploads
+
+* Continue with the UPGRADE instructions below
+
+
+== UPGRADE ==
+
+* Run sbin/testEnvironment.pl.  WebGUI 8 adds new dependencies.
+
+* Update wgd:
+
+  WebGUI has a new upgrades system for wgd to support.  The old system silently
+  ignores the new upgrade scripts.
+
+  Get wgd from http://haarg.org/wgd, put in /data/wre/prereqs/bin/ (if you're
+  using the WRE), /usr/local/bin, or ~/bin.
+
+  Do chmod ugo+x wgd to make it executable.
+
+* Run Upgrades:
+
+  $ wgd reset --upgrade
+
+  This is needed even for new WebGUI 8 installs.  The create.sql and 
+  WebGUI.conf.original are both from 7.10.x.
+
+* Copy new "extras" (images, CSS, JavaScript) over:
+
+  $ rsync -r -a (or cp -a) /data/WebGUI/www/extras \
+        /data/domains/www.example.com/public/
+
+* Add WebGUI's libraries to Perl's library path:
+
+  $ export PERL5LIB='/data/WebGUI/lib:/data/WebGUI/t/lib'
+
+  Previously, this would break Apache if it were set; now it's required for the
+  stuff plackup loads to find the rest of WebGUI.
+
+* Launch WebGUI 8:
+
+  $ plackup app.psgi
+
+  ... then connect your browser to the URL it advertises.
+
+   You'll be guided through a few quick questions to setup an admin account.
+   (Or, if you aren't but wanted to be, run wgd reset --starter to enable it.)
+ 
+* Start Spectre:
 
 	cd /data/WebGUI/sbin
 	perl spectre.pl --daemon
 
-13. Browse to your site. You'll be guided through a few quick questions
-   to setup an admin account.
 

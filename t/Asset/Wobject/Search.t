@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -8,13 +8,12 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../../lib";
 
 ##The goal of this test is to test the creation of Search Wobjects.
 
 use WebGUI::Test;
+use WebGUI::Test::MockAsset;
 use WebGUI::Session;
 use Test::More tests => 13; # increment this value for each test you create
 use Test::Deep;
@@ -28,8 +27,10 @@ my $node = WebGUI::Asset->getDefault($session);
 
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Search Test"});
-addToCleanup($versionTag);
+WebGUI::Test->addToCleanup($versionTag);
 my $search = $node->addChild({className=>'WebGUI::Asset::Wobject::Search'});
+$versionTag->commit;
+$search = $search->cloneFromDb;
 
 # Test for a sane object type
 isa_ok($search, 'WebGUI::Asset::Wobject::Search');
@@ -49,9 +50,8 @@ foreach my $newSetting (keys %{$newSearchSettings}) {
                  #1234567890123456789012#
 my $templateId = '_FAUX_SEARCH_TEMPLATE_';
 
-my $templateMock = Test::MockObject->new({});
-$templateMock->set_isa('WebGUI::Asset::Template');
-$templateMock->set_always('getId', $templateId);
+my $templateMock = WebGUI::Test::MockAsset->new('WebGUI::Asset::Template');
+$templateMock->mock_id($templateId);
 $templateMock->set_true('prepare');
 my $templateVars;
 $templateMock->mock('process', sub { $templateVars = $_[1]; } );
@@ -68,7 +68,6 @@ $search->update({
         doit     => 1,
         keywords => 'building + applications',
     });
-    WebGUI::Test->mockAssetId($templateId, $templateMock);
     $search->prepareView;
     eval { $search->view; };
     ok(! $@, 'view did now error out on standalone regexp wildcard')
@@ -85,7 +84,6 @@ $search->update({
     eval { $search->view; };
     ok(! $@, 'view did now error out on prefix regexp wildcard')
         or diag $@;
-    WebGUI::Test->unmockAssetId($templateId);
     $session->request->setup_body({});
 
 }
@@ -93,7 +91,7 @@ $search->update({
 {
     my $versionTag2 = WebGUI::VersionTag->getWorking($session);
     $versionTag2->set({name=>"Collab setup"});
-    my @addArgs = ( undef, undef, { skipAutoCommitWorkflows => 1, skipNotification => 1 } );
+    my @addArgs = ( undef, undef, { skipNotification => 1, skipAutoCommitWorkflows => 1, } );
     my $collab = $node->addChild({
             className      => 'WebGUI::Asset::Wobject::Collaboration',
             editTimeout    => '1',
@@ -108,14 +106,14 @@ $search->update({
     };
 
     my $thread = $collab->addChild($props, @addArgs);
+    $thread->setSkipNotification;
     $versionTag2->commit();
-    addToCleanup($versionTag2);
+    WebGUI::Test->addToCleanup($versionTag2);
 
     $session->request->setup_body({
         doit     => 1,
         keywords => 'shale',
     });
-    WebGUI::Test->mockAssetId($templateId, $templateMock);
     $search->prepareView;
     $search->view;
     $search->update({useContainers => 0});
@@ -124,7 +122,6 @@ $search->update({
     $search->view;
     like $templateVars->{result_set}->[0]->{url}, qr{\?pn=\d}, 'search returns paginated URL for a Thread when useContainers=1';
 
-    WebGUI::Test->unmockAssetId($templateId);
     $session->request->setup_body({});
     $search->update({useContainers => 0});
 }
@@ -148,13 +145,13 @@ $search->update({
 
     my $snippet = $folder->addChild($props, @addArgs);
     $versionTag3->commit();
-    addToCleanup($versionTag3);
+    WebGUI::Test->addToCleanup($versionTag3);
 
     $session->request->setup_body({
         doit     => 1,
         keywords => 'juxtaposition',
     });
-    WebGUI::Test->mockAssetId($templateId, $templateMock);
+    WebGUI::Test::MockAsset->mock_id($templateId, $templateMock);
     $search->prepareView;
     $search->view;
     $search->update({useContainers => 0});
@@ -163,7 +160,7 @@ $search->update({
     $search->view;
     is $templateVars->{result_set}->[0]->{url}, $snippet->get('url'), 'search returns regular URL for article because user cannot see container';
 
-    WebGUI::Test->unmockAssetId($templateId);
+    WebGUI::Test::MockAsset->unmock_id($templateId);
     $session->request->setup_body({});
     $search->update({useContainers => 0});
 }

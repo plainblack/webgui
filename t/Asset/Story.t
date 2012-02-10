@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -12,7 +12,6 @@ use Test::MockTime qw/:all/;
 
 use FindBin;
 use strict;
-use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
 use WebGUI::Test::Maker::Permission;
@@ -20,6 +19,7 @@ use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::User;
 use WebGUI::Group;
+use WebGUI::Asset::Story;
 
 use Test::More; # increment this value for each test you create
 use Test::Deep;
@@ -53,7 +53,8 @@ $canEditMaker->prepare({
 });
 
 
-my $defaultNode = WebGUI::Asset->getDefault($session);
+my $defaultNode = WebGUI::Test->asset;
+my $tag = WebGUI::VersionTag->getWorking($session);
 my $archive     = $defaultNode->addChild({
     className   => 'WebGUI::Asset::Wobject::StoryArchive',
     title       => 'Test Archive',
@@ -69,13 +70,10 @@ my $topic       = $defaultNode->addChild({
     assetId   => 'TestStoryTopicAsset123',
     keywords  => 'tango,yankee',
 });
-my $archiveTag  = WebGUI::VersionTag->getWorking($session);
-$archiveTag->commit;
-WebGUI::Test->addToCleanup($archiveTag);
-foreach my $asset ($archive, $topic) {
-    $asset = $asset->cloneFromDb;
-}
 
+$tag->commit;
+$archive = $archive->cloneFromDb;
+$topic   = $topic->cloneFromDb;
 my $storage1 = WebGUI::Storage->create($session);
 my $storage2 = WebGUI::Storage->create($session);
 WebGUI::Test->addToCleanup($storage1, $storage2);
@@ -86,18 +84,11 @@ WebGUI::Test->addToCleanup($storage1, $storage2);
 #
 ############################################################
 
-my $tests = 50;
+my $tests = 48;
 plan tests => 1
             + $tests
             + $canEditMaker->plan
             ;
-
-my $class  = 'WebGUI::Asset::Story';
-my $loaded = use_ok($class);
-
-SKIP: {
-
-skip "Unable to load module $class", $tests unless $loaded;
 
 ############################################################
 #
@@ -131,20 +122,12 @@ $story = $archive->addChild({
 });
 
 isa_ok($story, 'WebGUI::Asset::Story', 'Created a Story asset');
-is($story->get('photo'),   '[]', 'by default, photos is an empty JSON array');
-is($story->get('isHidden'), 1, 'by default, stories are hidden');
+is($story->photo,   '[]', 'by default, photos is an empty JSON array');
+is($story->isHidden, 1, 'by default, stories are hidden');
 $story->update({isHidden => 0});
-is($story->get('isHidden'), 1, 'stories cannot be set to not be hidden');
-is($story->get('state'),    'published', 'Story is published');
-$story->requestAutoCommit;
-
-{
-    ##Version control does not alter the current object's status, fetch an updated copy from the
-    ##db.
-    my $storyDB = WebGUI::Asset->newByUrl($session, $story->getUrl);
-    is($storyDB->get('status'),   'approved',  'Story is approved');
-}
-
+is($story->isHidden, 1, 'stories cannot be set to not be hidden');
+is($story->state,    'published', 'Story is published');
+$story->commit;
 
 ############################################################
 #
@@ -191,7 +174,7 @@ $story->setPhotoData([
     },
 ]);
 
-is($story->get('photo'), q|[{"caption":"Shawshank Prison","byLine":"Andrew Dufresne"}]|, 'setPhotoData: set JSON in the photo property');
+is($story->photo, q|[{"caption":"Shawshank Prison","byLine":"Andrew Dufresne"}]|, 'setPhotoData: set JSON in the photo property');
 
 $photoData = $story->getPhotoData();
 $photoData->[0]->{caption}="My cell";
@@ -292,8 +275,8 @@ cmp_deeply(
         'link'      => all(re('^'.$session->url->getSiteURL),re('story-1$')),
         guid        => re('story-1$'),
         author      => 'JT Smith',
-        date        => $story->get('lastModified'),
-        pubDate     => $session->datetime->epochToMail($story->get('creationDate')),
+        date        => $story->lastModified,
+        pubDate     => $session->datetime->epochToMail($story->creationDate),
     },
     'getRssData: returns correct data'
 );
@@ -312,7 +295,7 @@ $story->update({
     highlights => "one\ntwo\nthree",
     keywords   => "foxtrot,tango,whiskey",
 });
-is($story->get('highlights'), "one\ntwo\nthree", 'highlights set correctly for template var check');
+is($story->highlights, "one\ntwo\nthree", 'highlights set correctly for template var check');
 
 $storage1->addFileFromFilesystem(WebGUI::Test->getTestCollateralPath('gooey.jpg'));
 $storage2->addFileFromFilesystem(WebGUI::Test->getTestCollateralPath('lamp.jpg'));
@@ -363,14 +346,14 @@ is($viewVariables->{headline}, 'WebGUI, Web Done Right', '... headline is okay')
 cmp_bag(
     $viewVariables->{keyword_loop},
     [
-        { keyword => "foxtrot", url => '/home/test-archive?func=view;keyword=foxtrot', },
-        { keyword => "tango",   url => '/home/test-archive?func=view;keyword=tango', },
-        { keyword => "whiskey", url => '/home/test-archive?func=view;keyword=whiskey', },
+        { keyword => "foxtrot", url => re('test-archive\?func=view;keyword=foxtrot$'), },
+        { keyword => "tango",   url => re('test-archive\?func=view;keyword=tango$'), },
+        { keyword => "whiskey", url => re('test-archive\?func=view;keyword=whiskey$'), },
     ],
     'viewTemplateVariables: keywords_loop is okay'
-);
+) or diag( Dumper $viewVariables->{keyword_loop} );
 
-is ($viewVariables->{updatedTimeEpoch}, $story->get('revisionDate'), 'viewTemplateVariables: updatedTimeEpoch');
+is ($viewVariables->{updatedTimeEpoch}, $story->revisionDate, 'viewTemplateVariables: updatedTimeEpoch');
 
 my $rockstarVar = {
     imageUrl     => 'http://www.plainblack.com/rockstar.jpg',
@@ -541,5 +524,4 @@ my $revision_storageId = $revision->getPhotoData->[0]->{storageId};
 
 ok($revision_storageId && ($revision_storageId ne $rev_storage->getId), 'storageId in the revision is different from the original');
 
-}
 #vim:ft=perl

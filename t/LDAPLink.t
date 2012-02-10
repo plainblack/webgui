@@ -1,6 +1,6 @@
 # vim:syntax=perl
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -13,9 +13,7 @@
 # 
 #
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/lib";
 use Test::More;
 use Test::Deep;
 use Data::Dumper;
@@ -41,7 +39,7 @@ plan tests => 9;        # Increment this number for each test you create
 
 {
     my $ldap = WebGUI::LDAPLink->new($session, "new");
-    addToCleanup($ldap);
+    WebGUI::Test->addToCleanup($ldap);
     isa_ok($ldap, 'WebGUI::LDAPLink');
     is $ldap->{_ldapLinkId}, "new", '... created with correct linkId';
 }
@@ -57,7 +55,7 @@ SKIP: {
     my $ldapProps = WebGUI::Test->getSmokeLDAPProps();
     $session->db->setRow('ldapLink', 'ldapLinkId', $ldapProps, $ldapProps->{ldapLinkId});
     my $ldap = WebGUI::LDAPLink->new($session, $ldapProps->{ldapLinkId});
-    addToCleanup($ldap);
+    WebGUI::Test->addToCleanup($ldap);
     cmp_deeply $ldap->get(), superhashof($ldapProps), 'all db properties retrieved';
     my $connection = $ldap->bind();
     isa_ok $connection, 'Net::LDAP', 'returned by bind';
@@ -77,7 +75,7 @@ SKIP: {
     $ldapProps->{identifier} = 'hadley';
     $session->db->setRow('ldapLink', 'ldapLinkId', $ldapProps, $ldapProps->{ldapLinkId});
     my $ldap = WebGUI::LDAPLink->new($session, $ldapProps->{ldapLinkId});
-    addToCleanup($ldap);
+    WebGUI::Test->addToCleanup($ldap);
     my $connection = $ldap->bind();
     isa_ok $connection, 'Net::LDAP', 'returned by bind';
     is $ldap->{_error}, 104, 'auth error due to bad identifier';

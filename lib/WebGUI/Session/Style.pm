@@ -3,7 +3,7 @@ package WebGUI::Session::Style;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -16,13 +16,13 @@ package WebGUI::Session::Style;
 
 
 use strict;
-use Tie::CPHash;
 use Scalar::Util qw( weaken );
 use WebGUI::International;
 use WebGUI::Macro;
-use WebGUI::Asset::Template;
-eval { require WebGUI; import WebGUI; };
+require WebGUI::Asset;
+BEGIN { eval { require WebGUI; WebGUI->import } }
 use HTML::Entities ();
+use Scalar::Util qw(weaken);
 
 =head1 NAME
 
@@ -54,19 +54,6 @@ This package contains utility methods for WebGUI's style system.
 These methods are available from this class:
 
 =cut
-
-#-------------------------------------------------------------------
-
-=head2 DESTROY ( )
-
-Deconstructor.
-
-=cut
-
-sub DESTROY {
-        my $self = shift;
-        undef $self;
-}
 
 #-------------------------------------------------------------------
 
@@ -123,25 +110,6 @@ sub makePrintable {
 
 #-------------------------------------------------------------------
 
-=head2 mobileBrowser ( ) 
-
-Returns true if the user's browser matches any of the mobile browsers set in the config file.
-
-=cut
-
-sub mobileBrowser {
-	my $self    = shift;
-    my $session = $self->session;
-    my $ua      = $session->env->get('HTTP_USER_AGENT');
-    for my $mobileUA (@{ $session->config->get('mobileUserAgents') }) {
-        if ($ua =~ m/$mobileUA/) {
-            return 1;
-        }
-    }
-}
-
-#-------------------------------------------------------------------
-
 =head2 useMobileStyle
 
 Returns a true value if we are on a mobile display.
@@ -162,7 +130,7 @@ sub useMobileStyle {
     if (! $session->setting->get('useMobileStyle')) {
         return $self->{_useMobileStyle} = 0;
     }
-    if ($self->mobileBrowser) {
+    if ($session->request->browser->mobile) {
         return $self->{_useMobileStyle} = 1;
     }
     return $self->{_useMobileStyle} = 0;
@@ -198,9 +166,9 @@ A reference to the current session.
 sub new {
 	my $class = shift;
 	my $session = shift;
-	my $self = bless {_session=>$session}, $class;
-        weaken( $self->{_session} );
-        return $self;
+    my $self = bless { _session => $session}, $class;
+    weaken $self->{_session};
+    return $self;
 }
 
 #-------------------------------------------------------------------
@@ -274,23 +242,34 @@ if ($self->session->user->isRegistered || $self->session->setting->get("preventP
 <meta http-equiv="Cache-Control" content="no-cache, must-revalidate, max-age=0, private" />
 <meta http-equiv="Expires" content="0" />
 ';
-	$self->session->http->setCacheControl("none");
+	$self->session->response->setCacheControl("none");
 } else {
 	$var{'head.tags'} .= '<meta http-equiv="Cache-Control" content="must-revalidate" />'
 }
 
+
+    # Give the API jocks something to use
+    if ( $session->asset ) {
+        $var{'head.tags'} .= sprintf <<'ADMINJS', $session->asset->getId
+            <script type="text/javascript">
+            if ( typeof window.WG == "undefined" ) { window.WG = {} }
+            WG.currentAssetId   = '%s';
+            </script>
+ADMINJS
+    }
+
     # Removing the newlines will probably annoy people. 
     # Perhaps turn it off under debug mode?
-    $var{'head.tags'} =~ s/\n//g;
+    #$var{'head.tags'} =~ s/\n//g;
 
 	# head.tags = head_attachments . body_attachments
 	# keeping head.tags for backwards compatibility
 	$var{'head_attachments'} = $var{'head.tags'};
 	$var{'head.tags'}       .= ($var{'body_attachments'} = '<!--morebody-->');
 
-	my $style = WebGUI::Asset::Template->new($self->session,$templateId);
+	my $style = eval { WebGUI::Asset->newById($self->session, $templateId); };
 	my $output;
-	if (defined $style) {
+	if (! Exception::Class->caught()) {
 		my $meta = {};
         	if ($self->session->setting->get("metaDataEnabled")) {
                 	$meta = $style->getMetaDataFields();
@@ -345,6 +324,27 @@ sub sent {
 		return $boolean;
 	}
 	return $self->session->stow->get("styleHeadSent");
+}
+
+#-------------------------------------------------------------------
+
+=head2 setCss ( url )
+
+Sets a <link> tag into the <head> of this rendered page for this page
+view. This is a shortcut for setLink with the parameters set for the
+standard CSS defaults
+
+=head3 url
+
+The URL to the stylesheet you are linking.  Only one link can be set per url.  If a link to this URL exists,
+the old link will remain and this method will return undef.
+
+=cut
+
+sub setCss {
+	my $self = shift;
+	my $url = shift;
+    return $self->setLink($url, { type=>'text/css', rel=>"stylesheet" });
 }
 
 #-------------------------------------------------------------------
@@ -493,6 +493,7 @@ The URL to your script.
 =head3 params
 
 A hash reference containing the additional parameters to include in the script tag, such as "type" and "language".
+Defaults to { type => 'text/javascript' } if omitted.
 
 =head3 inBody
 
@@ -504,7 +505,10 @@ body_attachments variable instead of to head_attachments.
 sub setScript {
 	my $self = shift;
 	my $url = shift;
-	my $params = shift;
+	my $params = shift || { type => 'text/javascript', };
+    if (! exists $params->{type}) {
+        $params->{type} = 'text/javascript';
+    }
 	my $inBody = shift;
 	return undef if ($self->{_javascript}{$url});
 	my $tag = '<script src="'.$url.'"';
@@ -555,7 +559,7 @@ The content to be wrappered.
 sub userStyle {
 	my $self = shift;
         my $output = shift;
-	$self->session->http->setCacheControl("none");
+	$self->session->response->setCacheControl("none");
         if (defined $output) {
                 return $self->process($output,$self->session->setting->get("userFunctionStyleId"));
         } else {

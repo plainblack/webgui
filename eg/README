@@ -1,0 +1,24 @@
+# Some ways to achieve the same thing from the command line:
+#  plackup -MWebGUI -e 'WebGUI->new'
+#  plackup -MWebGUI -e 'WebGUI->new("dev.localhost.localdomain.conf")'
+#  plackup -MWebGUI -e 'WebGUI->new(root => "/data/WebGUI", site => "dev.localhost.localdomain.conf")'
+#
+# Or from a .psgi file:
+#  my $app = WebGUI->new( root => '/data/WebGUI', site => 'dev.localhost.localdomain.conf' )->psgi_app;
+
+
+    
+    # Extras
+    my $extrasURL = $wg->config->get('extrasURL');
+    my $extrasPath = $wg->config->get('extrasPath');
+    enable 'Plack::Middleware::Static',
+        path => sub { s{^$extrasURL/}{} },
+        root => "$extrasPath/";
+    
+    # Uploads
+    my $uploadsURL = $wg->config->get('uploadsURL');
+    my $uploadsPath = $wg->config->get('uploadsPath');
+    enable 'Plack::Middleware::Static',
+        path => sub { s{^$uploadsURL/}{} }, 
+        root => "$uploadsPath/";
+

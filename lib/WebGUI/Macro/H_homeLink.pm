@@ -1,7 +1,7 @@
 package WebGUI::Macro::H_homeLink;
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -57,7 +57,7 @@ sub process {
 		if ($templateUrl) {
          		return WebGUI::Asset::Template->newByUrl($session,$templateUrl)->process(\%var);
 		} else {
-         		return WebGUI::Asset::Template->new($session,"PBtmpl0000000000000042")->process(\%var);
+         		return WebGUI::Asset::Template->newById($session,"PBtmpl0000000000000042")->process(\%var);
 		}
 	}
 	return $home->getUrl;

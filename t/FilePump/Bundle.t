@@ -1,6 +1,6 @@
 # vim:syntax=perl
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -13,9 +13,7 @@
 # 
 #
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../lib";
 use Test::More;
 use Test::Deep;
 use Test::Exception;
@@ -25,7 +23,7 @@ use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
 
 my $startTime = time();
-my $wgBday = 997966800;
+my $wgBday = WebGUI::Test->webguiBirthday;
 
 #----------------------------------------------------------------------------
 # Init
@@ -34,16 +32,17 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 64;
+plan tests => 65;
 
 #----------------------------------------------------------------------------
 # put your tests here
 
 use WebGUI::FilePump::Bundle;
 
-my $bundle = WebGUI::FilePump::Bundle->create($session);
+my $bundle = WebGUI::FilePump::Bundle->new($session);
 isa_ok($bundle, 'WebGUI::FilePump::Bundle');
 isa_ok($bundle, 'WebGUI::Crud');
+can_ok($bundle, qw/update write getJSONCollateralDataIndex/);
 
 is($bundle->get('lastModified'), 0, 'by default, lastModified is 0');
 
@@ -256,7 +255,7 @@ cmp_ok($bundle->get('lastModified'), '>=', $startTime, '... updates lastModified
 #
 ###################################################################
 
-my $root = WebGUI::Asset->getRoot($session);
+my $root = WebGUI::Test->asset;
 
 my $snippet =  $root->addChild({
     className => 'WebGUI::Asset::Snippet',
@@ -276,10 +275,6 @@ my $storage = WebGUI::Storage->create($session);
 WebGUI::Test->addToCleanup($storage);
 $storage->addFileFromScalar('addendum', 'Red was too');
 $storage->addFileFromFilesystem(WebGUI::Test->getTestCollateralPath('ShawshankRedemptionMoviePoster.jpg'));
-
-my $snippetTag = WebGUI::VersionTag->getWorking($session);
-WebGUI::Test->addToCleanup($snippetTag);
-$snippetTag->commit;
 
 my $guts;
 $guts = $bundle->fetchAsset(URI->new('asset://filePumpSnippet'));
@@ -446,7 +441,7 @@ ok(!-e $buildDir->stringify, 'delete deletes the current build directory');
 my @jsFiles = qw/hoverhelp.js inputcheck.js/;
 
 foreach my $jsFile (@jsFiles) {
-    my $bundle = WebGUI::FilePump::Bundle->create($session);
+    my $bundle = WebGUI::FilePump::Bundle->new($session);
     $bundle->addFile('JS', 'file:extras/'.$jsFile);
     lives_ok { $bundle->build } "built file $jsFile";
     $bundle->delete;

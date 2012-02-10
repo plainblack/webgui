@@ -1,6 +1,6 @@
 # vim:syntax=perl
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -11,9 +11,7 @@
 
 # Test the default WebGUI.conf file to make sure it is valid JSON.
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/lib";
 use Test::More;
 use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
@@ -33,7 +31,7 @@ plan tests => 3;        # Increment this number for each test you create
 #----------------------------------------------------------------------------
 # put your tests here
 
-my $defaultConfigFile = Path::Class::File->new(WebGUI::Test->root, qw/etc WebGUI.conf.original/);
+my $defaultConfigFile = Path::Class::File->new(WebGUI::Paths->configBase, 'WebGUI.conf.original');
 
 ok (-e $defaultConfigFile->stringify, 'WebGUI.conf.original exists');
 

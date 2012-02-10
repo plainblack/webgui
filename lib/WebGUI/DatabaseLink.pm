@@ -3,7 +3,7 @@ package WebGUI::DatabaseLink;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -16,10 +16,8 @@ package WebGUI::DatabaseLink;
 
 
 use strict;
-use Tie::CPHash;
 use WebGUI::SQL;
 use WebGUI::International;
-use WebGUI::Utility;
 use DBI;
 
 =head1 NAME
@@ -97,7 +95,7 @@ sub checkPrivileges {
 
     # Check if we found any privileges at all
     if (! scalar @privileges) {
-        $self->session->errorHandler->warn(
+        $self->session->log->warn(
             sprintf( "DatabaseLink: Could not find SQL privileges or no privileges on database '%s' for user '%s' with database link ID '%s' using DSN '%s'",
                 $self->databaseName, $self->get->{username},
                 $self->getId, $self->get->{DSN},
@@ -107,10 +105,10 @@ sub checkPrivileges {
     }
 
 	# Check if all required privs are present.
-	return 1 if (isIn('ALL PRIVILEGES', @privileges));
+	return 1 if ('ALL PRIVILEGES' ~~ @privileges);
 	
 	foreach (@{ $requestedPrivileges }) {
-		return 0 unless (isIn(uc($_), @privileges));
+		return 0 unless (uc($_) ~~ @privileges);
 	}
 
     return 1;
@@ -213,7 +211,6 @@ sub disconnect {
 	if (defined $self->{_dbh}) {
 		$self->{_dbh}->disconnect() unless ($self->getId eq "0");
 	}
-	undef $self;
 }
 
 #-------------------------------------------------------------------
@@ -243,15 +240,15 @@ sub db {
     else {
         my ($scheme, $driver, $attr_string, $attr_hash, $driver_dsn) = DBI->parse_dsn($dsn);
         if ($driver) {
-            my $dbh = WebGUI::SQL->connect($self->session,$dsn,$username,$identifier,$parameters);
+            my $dbh = WebGUI::SQL->connect($dsn,$username,$identifier,$parameters);
             unless (defined $dbh) {
-                $self->session->errorHandler->warn("Cannot connect to DatabaseLink [".$self->getId."]");
+                $self->session->log->warn("Cannot connect to DatabaseLink [".$self->getId."]");
             }
             $self->{_dbh} = $dbh;
             return $self->{_dbh};
         }
 	}
-    $self->session->errorHandler->warn("DatabaseLink [".$self->getId."] The DSN specified is of an improper format.");
+    $self->session->log->warn("DatabaseLink [".$self->getId."] The DSN specified is of an improper format.");
 	return undef;
 }
 
@@ -340,7 +337,7 @@ sub new {
 	my $class          = shift;
 	my $session        = shift;
 	my $databaseLinkId = shift;
-	tie my %databaseLink, 'Tie::CPHash';
+	my %databaseLink;
 	unless ($databaseLinkId eq "") {
 		if ($databaseLinkId eq "0") {
 			%databaseLink = (
@@ -360,7 +357,7 @@ sub new {
 	
 	unless (defined($databaseLink{databaseLinkId}))
 	{
-		$session->errorHandler->warn("Could not find database link '".$databaseLinkId."'");
+		$session->log->warn("Could not find database link '".$databaseLinkId."'");
 		return undef;
 	}
 	
@@ -388,7 +385,7 @@ sub queryIsAllowed {
 
     my ($firstWord) = $query =~ /(\w+)/;
     $firstWord = lc $firstWord;
-    return isIn($firstWord, split(/\s+/, lc $self->{_databaseLink}{allowedKeywords})) ? 1 : 0;
+    return $firstWord ~~ [split(/\s+/, lc $self->{_databaseLink}{allowedKeywords})] ? 1 : 0;
 }
 
 #-------------------------------------------------------------------

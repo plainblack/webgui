@@ -3,7 +3,7 @@ package WebGUI::Asset::RichEdit;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -15,13 +15,163 @@ package WebGUI::Asset::RichEdit;
 =cut
 
 use strict;
-use WebGUI::Asset;
 use WebGUI::Form;
-use WebGUI::Utility;
 use WebGUI::International;
 use JSON;
+use Tie::IxHash;
 
-our @ISA = qw(WebGUI::Asset);
+use Moose;
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset';
+define assetName   => ['assetName', 'Asset_RichEdit'];
+define icon        => 'richEdit.gif';
+define tableName   => 'RichEdit';
+property disableRichEditor => (
+                fieldType       => 'yesNo',
+                default         => 0,
+                label           => ['disable rich edit', 'Asset_RichEdit'],
+                hoverHelp       => ['disable rich edit description', 'Asset_RichEdit'],
+         );
+property askAboutRichEdit => (
+                fieldType       => 'yesNo',
+                default         => 0,
+                label           => ['using rich edit', 'Asset_RichEdit'],
+                hoverHelp       => ['using rich edit description', 'Asset_RichEdit'],
+         );
+property validElements => (
+                fieldType       => 'textarea',
+                default         => 'a[name|href|target|title|onclick],img[class|src|border=0|alt|title|hspace|vspace|width|height|align|onmouseover|onmouseout|name],hr[class|width|size|noshade],font[face|size|color|style],span[class|align|style]',
+                label           => ['elements', 'Asset_RichEdit'],
+                hoverHelp       => ['elements description', 'Asset_RichEdit'],
+                subtext         => ['elements subtext', 'Asset_RichEdit'],
+                uiLevel         => 9,
+         );
+property preformatted => (
+                fieldType       => 'yesNo',
+                default         => 0,
+                label           => ['preformatted', 'Asset_RichEdit'],
+                hoverHelp       => ['preformatted description', 'Asset_RichEdit'],
+                uiLevel         => 9,
+         );
+property editorWidth => (
+                fieldType       => 'integer',
+                default         => 0,
+                label           => ['editor width', 'Asset_RichEdit'],
+                hoverHelp       => ['editor width description', 'Asset_RichEdit'],
+                uiLevel         => 9,
+         );
+property editorHeight => (
+                fieldType       => 'integer',
+                default         => 0,
+                label           => ['editor height', 'Asset_RichEdit'],
+                hoverHelp       => ['editor height description', 'Asset_RichEdit'],
+                uiLevel         => 9,
+         );
+property sourceEditorWidth => (
+                fieldType       => 'integer',
+                default         => 0,
+                label           => ['source editor height', 'Asset_RichEdit'],
+                hoverHelp       => ['source editor height description', 'Asset_RichEdit'],
+         );
+property sourceEditorHeight => (
+                fieldType       => 'integer',
+                default         => 0,
+                label           => ['source editor height', 'Asset_RichEdit'],
+                hoverHelp       => ['source editor height description', 'Asset_RichEdit'],
+         );
+property useBr => (
+                fieldType       => 'yesNo',
+                default         => 0,
+                label           => ['use br', 'Asset_RichEdit'],
+                hoverHelp       => ['use br description', 'Asset_RichEdit'],
+                uiLevel         => 9,
+         );
+property removeLineBreaks => (
+                fieldType       => 'yesNo',
+                default         => 0,
+                label           => ['remove line breaks', 'Asset_RichEdit'],
+                hoverHelp       => ['remove line breaks description', 'Asset_RichEdit'],
+                uiLevel         => 9,
+         );
+property nowrap => (
+                fieldType       => 'yesNo',
+                default         => 0,
+                label           => ['no wrap', 'Asset_RichEdit'],
+                hoverHelp       => ['no wrap description', 'Asset_RichEdit'],
+                uiLevel         => 9,
+         );
+property directionality => (
+                fieldType       => 'selectBox',
+                default         => 'ltr',
+                label           => ['directionality', 'Asset_RichEdit'],
+                hoverHelp       => ['directionality description', 'Asset_RichEdit'],
+                options         => \&_directionality_options,
+         );
+sub _directionality_options {
+    my $session = shift->session;
+	my $i18n    = WebGUI::International->new($session, 'Asset_RichEdit');
+    return {
+        ltr=>$i18n->get('left to right'),
+        rtl=>$i18n->get('right to left'),
+    };
+}
+property toolbarLocation => (
+                fieldType       => 'selectBox',
+                default         => 'bottom',
+                label           => ['toolbar location', 'Asset_RichEdit'],
+                hoverHelp       => ['toolbar location description', 'Asset_RichEdit'],
+                options         => \&_toolbarLocation_options,
+         );
+sub _toolbarLocation_options {
+    my $session = shift->session;
+	my $i18n    = WebGUI::International->new($session, 'Asset_RichEdit');
+    return {
+        top    => $i18n->get('top'),
+        bottom => $i18n->get('bottom'),
+    };
+}
+property cssFile => (
+                fieldType       => 'text',
+                default         => undef,
+                label           => ['css file', 'Asset_RichEdit'],
+                hoverHelp       => ['css file description', 'Asset_RichEdit'],
+         );
+property toolbarRow1 => (
+                fieldType       => 'checkList',
+                default         => undef,
+                label           => '',
+         );
+property toolbarRow2 => (
+                fieldType       => 'checkList',
+                default         => undef,
+                label           => '',
+         );
+property toolbarRow3 => (
+                fieldType       => 'checkList',
+                default         => undef,
+                label           => '',
+         );
+property enableContextMenu => (
+                fieldType       => "yesNo",
+                default         => 0,
+                label           => ['enable context menu', 'Asset_RichEdit'],
+                hoverHelp       => ['enable context menu description', 'Asset_RichEdit'],
+         );
+property inlinePopups => (
+                fieldType       => "yesNo",
+                default         => 0,
+                label           => ['inline popups', 'Asset_RichEdit'],
+                hoverHelp       => ['inline popups description', 'Asset_RichEdit'],
+         );
+property allowMedia => (
+                fieldType       => "yesNo",
+                default         => 0,
+                label           => ['editForm allowMedia label', 'Asset_RichEdit'],
+                hoverHelp       => ['editForm allowMedia description', 'Asset_RichEdit'],
+         );
+has '+uiLevel' => (
+    default => 5,
+);
 
 
 =head1 NAME
@@ -47,404 +197,156 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 
-=head2 definition ( definition )
-
-Defines the properties of this asset.
-
-=head3 definition
-
-A hash reference passed in from a subclass definition.
-
-=cut
-
-sub definition {
-    my $class = shift;
-    my $session = shift;
-    my $definition = shift;
-    my $i18n = WebGUI::International->new($session,'Asset_RichEdit');
-    push(@{$definition}, {
-        assetName   => $i18n->get('assetName'),
-        icon        => 'richEdit.gif',
-        uiLevel     => 5,
-        tableName   => 'RichEdit',
-        className   => 'WebGUI::Asset::RichEdit',
-        properties => {
-            disableRichEditor => {
-                fieldType       => 'yesNo',
-                defaultValue    => 0,
-            },
-            askAboutRichEdit => {
-                fieldType       => 'yesNo',
-                defaultValue    => 0,
-            },
-            validElements => {
-                fieldType       => 'textarea',
-                defaultValue    => 'a[name|href|target|title|onclick],img[class|src|border=0|alt|title|hspace|vspace|width|height|align|onmouseover|onmouseout|name],hr[class|width|size|noshade],font[face|size|color|style],span[class|align|style]',
-            },
-            preformatted => {
-                fieldType       => 'yesNo',
-                defaultValue    => 0,
-            },
-            editorWidth => {
-                fieldType       => 'integer',
-                defaultValue    => 0,
-            },
-            editorHeight => {
-                fieldType       => 'integer',
-                defaultValue    => 0,
-            },
-            sourceEditorWidth => {
-                fieldType       => 'integer',
-                defaultValue    => 0,
-            },
-            sourceEditorHeight => {
-                fieldType       => 'integer',
-                defaultValue    => 0,
-            },
-            useBr => {
-                fieldType       => 'yesNo',
-                defaultValue    => 0,
-            },
-            removeLineBreaks => {
-                fieldType       => 'yesNo',
-                defaultValue    => 0,
-            },
-            nowrap=>{
-                fieldType       => 'yesNo',
-                defaultValue    => 0,
-            },
-            directionality => {
-                fieldType       => 'selectBox',
-                defaultValue    => 'ltr',
-            },
-            toolbarLocation => {
-                fieldType       => 'selectBox',
-                defaultValue    => 'bottom',
-            },
-            cssFile => {
-                fieldType       => 'text',
-                defaultValue    => undef,
-            },
-            toolbarRow1 => {
-                fieldType       => 'checkList',
-                defaultValue    => undef,
-            },
-            toolbarRow2 => {
-                fieldType       => 'checkList',
-                defaultValue    => undef,
-            },
-            toolbarRow3 => {
-                fieldType       => 'checkList',
-                defaultValue    => undef,
-            },
-            enableContextMenu => {
-                fieldType       => "yesNo",
-                defaultValue    => 0,
-            },
-            inlinePopups => {
-                fieldType       => "yesNo",
-                defaultValue    => 0,
-            },
-            allowMedia => {
-                fieldType       => "yesNo",
-                defaultValue    => 0,
-            },
-        },
-    });
-    return $class->SUPER::definition($session, $definition);
-}
-
-
-
-#-------------------------------------------------------------------
-
 =head2 getEditForm ( )
 
-Returns the TabForm object that will be used in generating the edit page for this asset.
+Returns the WebGUI::FormBuilder object that will be used in generating the edit page for this asset.
 
 =cut
 
-sub getEditForm {
-	my $self = shift;
-	my $tabform = $self->SUPER::getEditForm();
-	my $i18n = WebGUI::International->new($self->session,'Asset_RichEdit');
-	my %buttons;
-	tie %buttons, "Tie::IxHash";
-	%buttons = (
-		'search' => $i18n->get('search'),
-		'replace' => $i18n->get('replace'),
-		'cut' => $i18n->get('cut'),
-		'copy' => $i18n->get('Copy'),
-		'paste' => $i18n->get('paste'),
-		'pastetext' => $i18n->get('pastetext'),
-		'pasteword' => $i18n->get('pasteword'),
-		'undo' => $i18n->get('undo'),
-		'redo' => $i18n->get('redo'),
-		'bold' => $i18n->get('bold'),
-		'italic' => $i18n->get('italic'),
-		'underline' => $i18n->get('underline'),
-		'strikethrough' => $i18n->get('strikethrough'),
-		'justifyleft' => $i18n->get('justifyleft'),
-		'justifycenter' => $i18n->get('justifycenter'),
-		'justifyright' => $i18n->get('justifyright'),
-		'justifyfull' => $i18n->get('justifyfull'),
-		'bullist' => $i18n->get('bullist'),
-		'numlist' => $i18n->get('numlist'),
-		'outdent' => $i18n->get('outdent'),
-		'indent' => $i18n->get('indent'),
-		'sub' => $i18n->get('sub'),
-		'sup' => $i18n->get('sup'),
-		'styleselect' => $i18n->get('styleselect'),
-		'formatselect' => $i18n->get('formatselect'),
-		'fontselect' => $i18n->get('fontselect'),
-		'fontsizeselect' => $i18n->get('fontsizeselect'),
-		'forecolor' => $i18n->get('forecolor'),
-		'backcolor' => $i18n->get('backcolor'),
-		'link' => $i18n->get('link'),
-		'wgpagetree' => $i18n->get('pagetree'),
-		'anchor' => $i18n->get('anchor'),
-		'unlink' => $i18n->get('unlink'),
-		'tablecontrols' => $i18n->get('tablecontrols'),
-		'visualaid' => $i18n->get('visualaid'),
-		'hr' => $i18n->get('hr'),
-		'advhr' => $i18n->get('advhr'),
-		'inserttime' => $i18n->get('inserttime'),
-		'insertdate' => $i18n->get('insertdate'),
-		'image' => $i18n->get('image'),
-		'wginsertimage' => $i18n->get('insertImage'),
-		'media' => $i18n->get('media'),
-		'charmap' => $i18n->get('charmap'),
-		'wgmacro' => $i18n->get('collateral'),
-		'emotions' => $i18n->get('emotions'),
-		'help' => $i18n->get('help'),
-		'iespell' => $i18n->get('iespell'),
-		'removeformat' => $i18n->get('removeformat'),
-		'code' => $i18n->get('code'),
-		'cleanup' => $i18n->get('cleanup'),
-		'save' => $i18n->get('save'),
-		'preview' => $i18n->get('preview'),
-		'fullscreen' => $i18n->get('fullscreen'),
-		'print' => $i18n->get('print'),
-		'spellchecker' => $i18n->get('Server Side Spell Checker'),
-#		'advlink' => "Advanced Link",
-#		'spacer' => "Toolbar Spacer", 
-#		'separator' => "Toolbar Separator", 
-#		'rowseparator' => "Toolbar Row Separator",
-#		'advimage' => "Advanced Image",
-		);
-	my $buttonGrid = sprintf qq!<table style="font-size: 11px;">
-		<tr style="font-weight: bold;">
-			<td>%s</td>
-			<td>%s</td>
-			<td>%s</td>
-			<td>%s</td>
-			<td></td>
-		</tr>!,
-		$i18n->get('button'),
-		$i18n->get('row 1'),
-		$i18n->get('row 2'),
-		$i18n->get('row 3');
-	my @toolbarRow1 = split("\n",$self->getValue("toolbarRow1"));
-	my @toolbarRow2 = split("\n",$self->getValue("toolbarRow2"));
-	my @toolbarRow3 = split("\n",$self->getValue("toolbarRow3"));
-	my $evenOddToggle = 0;
-	foreach my $key (keys %buttons) {
-		$evenOddToggle = $evenOddToggle ? 0 : 1;
-		my $checked1 = isIn($key,@toolbarRow1);
-		my $checked2 = isIn($key,@toolbarRow2);
-		my $checked3 = isIn($key,@toolbarRow3);
-		$buttonGrid .= '
-	<tr'.($evenOddToggle ? ' style="background-color: #eeeeee;"' : undef).'>
-		<td>'.$buttons{$key}.'</td>
-		<td>'.WebGUI::Form::checkbox($self->session, {
-			value=>$key,
-			name=>"toolbarRow1",
-			checked=>$checked1
-			}).'</td>
-		<td>'.WebGUI::Form::checkbox($self->session, {
-			value=>$key,
-			name=>"toolbarRow2",
-			checked=>$checked2
-			}).'</td>
-		<td>'.WebGUI::Form::checkbox($self->session, {
-			value=>$key,
-			name=>"toolbarRow3",
-			checked=>$checked3
-			}).'</td><td>';
-		if ($key eq 'spellchecker' && !($self->session->config->get('availableDictionaries'))) {
-			$buttonGrid .= $i18n->get('no dictionaries');
-		}
-		$buttonGrid .= '</td>
-	</tr>
-			';
-	}
-	$buttonGrid .= "</table>";
-	$tabform->getTab("properties")->readOnly(
-		-label=>$i18n->get('toolbar buttons'),
-		-hoverHelp=>$i18n->get('toolbar buttons description'),
-		-value=>$buttonGrid
-		);
-        $tabform->getTab("properties")->yesNo(
-                -value=>$self->getValue("disableRichEditor"),
-		-label=>$i18n->get('disable rich edit'),
-		-hoverHelp=>$i18n->get('disable rich edit description'),
-		-name=>"disableRichEditor"
-                );
-        $tabform->getTab("properties")->yesNo(
-                -value=>$self->getValue("askAboutRichEdit"),
-		-label=>$i18n->get('using rich edit'),
-		-hoverHelp=>$i18n->get('using rich edit description'),
-		-name=>"askAboutRichEdit"
-                );
-        $tabform->getTab("properties")->yesNo(
-                -value=>$self->getValue("preformatted"),
-		-label=>$i18n->get('preformatted'),
-		-hoverHelp=>$i18n->get('preformatted description'),
-		-name=>"preformatted",
-                -uiLevel=>9
-                );
-	$tabform->getTab("security")->textarea(
-		-value=>$self->getValue("validElements"),
-		-name=>"validElements",
-		-label=>$i18n->get('elements'),
-		-hoverHelp=>$i18n->get('elements description'),
-		-subtext=>$i18n->get('elements subtext'),
-		-uiLevel=>9
-		);
-        $tabform->getTab("display")->integer(
-                -value=>$self->getValue("editorHeight"),
-		-label=>$i18n->get('editor height'),
-		-hoverHelp=>$i18n->get('editor height description'),
-		-name=>"editorHeight",
-                -uiLevel=>9
-                );
-        $tabform->getTab("display")->integer(
-                -value=>$self->getValue("editorWidth"),
-		-label=>$i18n->get('editor width'),
-		-hoverHelp=>$i18n->get('editor width description'),
-		-name=>"editorWidth",
-		-uiLevel=>9
-                );
-        $tabform->getTab("display")->integer(
-                -value=>$self->getValue("sourceEditorHeight"),
-		-label=>$i18n->get('source editor height'),
-		-hoverHelp=>$i18n->get('source editor height description'),
-		-name=>"sourceEditorHeight"
-                );
-        $tabform->getTab("display")->integer(
-                -value=>$self->getValue("sourceEditorWidth"),
-		-label=>$i18n->get('source editor width'),
-		-hoverHelp=>$i18n->get('source editor width description'),
-		-name=>"sourceEditorWidth"
-                );
-        $tabform->getTab("properties")->yesNo(
-                -value=>$self->getValue("useBr"),
-		-label=>$i18n->get('use br'),
-		-hoverHelp=>$i18n->get('use br description'),
-		-name=>"useBr",
-                -uiLevel=>9
-                );
-        $tabform->getTab("properties")->yesNo(
-                -value=>$self->getValue("removeLineBreaks"),
-		-label=>$i18n->get('remove line breaks'),
-		-hoverHelp=>$i18n->get('remove line breaks description'),
-		-name=>"removeLineBreaks",
-                -uiLevel=>9
-                );
-        $tabform->getTab("display")->yesNo(
-                -value=>$self->getValue("nowrap"),
-		-label=>$i18n->get('no wrap'),
-		-hoverHelp=>$i18n->get('no wrap description'),
-		-name=>"nowrap",
-                -uiLevel=>9
-                );
-        $tabform->getTab("properties")->selectBox(
-                -value=>[$self->getValue("directionality")],
-		-label=>$i18n->get('directionality'),
-		-hoverHelp=>$i18n->get('directionality description'),
-		-name=>"directionality",
-		-options=>{
-			ltr=>$i18n->get('left to right'),
-			rtl=>$i18n->get('right to left'),
-			}
-                );
-        $tabform->getTab("display")->selectBox(
-                -value=>[$self->getValue("toolbarLocation")],
-		-label=>$i18n->get('toolbar location'),
-		-hoverHelp=>$i18n->get('toolbar location description'),
-		-name=>"toolbarLocation",
-		-options=>{
-			top=>$i18n->get('top'),
-			bottom=>$i18n->get('bottom'),
-			}
-                );
-        $tabform->getTab("properties")->text(
-                -value=>$self->getValue("cssFile"),
-		-label=>$i18n->get('css file'),
-		-hoverHelp=>$i18n->get('css file description'),
-		-name=>"cssFile"
-                );
-        $tabform->getTab("properties")->yesNo(
-                -value=>$self->getValue("enableContextMenu"),
-		-label=>$i18n->get('enable context menu'),
-		-hoverHelp=>$i18n->get('enable context menu description'),
-		-name=>"enableContextMenu"
-                );
-    $tabform->getTab("properties")->yesNo(
-        -value=>$self->getValue("inlinePopups"),
-        -label=>$i18n->get('inline popups'),
-        -hoverHelp=>$i18n->get('inline popups description'),
-        -name=>"inlinePopups"
+override getEditForm => sub {
+    my $self = shift;
+    my $f = super();
+    my $i18n = WebGUI::International->new($self->session,'Asset_RichEdit');
+    my %buttons;
+    tie %buttons, "Tie::IxHash";
+    %buttons = (
+            'formatselect' => $i18n->get('formatselect'),
+            'styleselect' => $i18n->get('styleselect'),
+            'fontselect' => $i18n->get('fontselect'),
+            'fontsizeselect' => $i18n->get('fontsizeselect'),
+            'bold' => $i18n->get('bold'),
+            'italic' => $i18n->get('italic'),
+            'underline' => $i18n->get('underline'),
+            'strikethrough' => $i18n->get('strikethrough'),
+            'sub' => $i18n->get('sub'),
+            'sup' => $i18n->get('sup'),
+            'justifyleft' => $i18n->get('justifyleft'),
+            'justifycenter' => $i18n->get('justifycenter'),
+            'justifyright' => $i18n->get('justifyright'),
+            'numlist' => $i18n->get('numlist'),
+            'outdent' => $i18n->get('outdent'),
+            'indent' => $i18n->get('indent'),
+            'forecolor' => $i18n->get('forecolor'),
+            'backcolor' => $i18n->get('backcolor'),
+            'link' => $i18n->get('link'),
+            'unlink' => $i18n->get('unlink'),
+            'wgpagetree' => $i18n->get('pagetree'),
+            'image' => $i18n->get('image'),
+            'wginsertimage' => $i18n->get('insertImage'),
+            'media' => $i18n->get('media'),
+            'emotions' => $i18n->get('emotions'),
+            'wgmacro' => $i18n->get('collateral'),
+            'hr' => $i18n->get('hr'),
+            'advhr' => $i18n->get('advhr'),
+            'inserttime' => $i18n->get('inserttime'),
+            'insertdate' => $i18n->get('insertdate'),
+            'anchor' => $i18n->get('anchor'),
+            'tablecontrols' => $i18n->get('tablecontrols'),
+            'visualaid' => $i18n->get('visualaid'),
+            'charmap' => $i18n->get('charmap'),
+            'search' => $i18n->get('search'),
+            'replace' => $i18n->get('replace'),
+            'cut' => $i18n->get('cut'),
+            'copy' => $i18n->get('Copy'),
+            'paste' => $i18n->get('paste'),
+            'undo' => $i18n->get('undo'),
+            'redo' => $i18n->get('redo'),
+            'pastetext' => $i18n->get('pastetext'),
+            'pasteword' => $i18n->get('pasteword'),
+            'removeformat' => $i18n->get('removeformat'),
+            'cleanup' => $i18n->get('cleanup'),
+            'iespell' => $i18n->get('iespell'),
+            'save' => $i18n->get('save'),
+            'preview' => $i18n->get('preview'),
+            'print' => $i18n->get('print'),
+            'code' => $i18n->get('code'),
+            'fullscreen' => $i18n->get('fullscreen'),
+            'help' => $i18n->get('help'),
+#            'advlink' => "Advanced Link",
+#            'spacer' => "Toolbar Spacer", 
+#            'separator' => "Toolbar Separator", 
+#            'rowseparator' => "Toolbar Row Separator",
+#            'advimage' => "Advanced Image",
+            );
+    my $buttonGrid = sprintf qq!<table style="font-size: 11px;">
+            <tr style="font-weight: bold;">
+                    <td>%s</td>
+                    <td>%s</td>
+                    <td>%s</td>
+                    <td>%s</td>
+                    <td></td>
+            </tr>!,
+            $i18n->get('button'),
+            $i18n->get('row 1'),
+            $i18n->get('row 2'),
+            $i18n->get('row 3');
+    my @toolbarRow1 = split("\n",$self->toolbarRow1);
+    my @toolbarRow2 = split("\n",$self->toolbarRow2);
+    my @toolbarRow3 = split("\n",$self->toolbarRow3);
+    my $evenOddToggle = 0;
+    foreach my $key (keys %buttons) {
+            $evenOddToggle = $evenOddToggle ? 0 : 1;
+            my $checked1 = $key ~~ @toolbarRow1;
+            my $checked2 = $key ~~ @toolbarRow2;
+            my $checked3 = $key ~~ @toolbarRow3;
+            $buttonGrid .= '
+    <tr'.($evenOddToggle ? ' style="background-color: #eeeeee;"' : undef).'>
+            <td>'.$buttons{$key}.'</td>
+            <td>'.WebGUI::Form::checkbox($self->session, {
+                    value=>$key,
+                    name=>"toolbarRow1",
+                    checked=>$checked1
+                    }).'</td>
+            <td>'.WebGUI::Form::checkbox($self->session, {
+                    value=>$key,
+                    name=>"toolbarRow2",
+                    checked=>$checked2
+                    }).'</td>
+            <td>'.WebGUI::Form::checkbox($self->session, {
+                    value=>$key,
+                    name=>"toolbarRow3",
+                    checked=>$checked3
+                    }).'</td><td>';
+            $buttonGrid .= '</td>
+    </tr>
+                    ';
+    }
+    $buttonGrid .= "</table>";
+    my $tab = $f->addTab(name => "buttons", label => $i18n->get("buttons") );
+    $tab->addField( "ReadOnly",
+        label       => $i18n->get('toolbar buttons'),
+        hoverHelp   => $i18n->get('toolbar buttons description'),
+        value       => $buttonGrid,
     );
-    $tabform->getTab("properties")->yesNo(
-        value       => $self->getValue("allowMedia"),
-        label       => $i18n->get('editForm allowMedia label'),
-        hoverHelp   => $i18n->get('editForm allowMedia description'),
-        name        => "allowMedia",
-    );
-	return $tabform;
-}
 
-#----------------------------------------------------------------------------
+    return $f;
+};
 
-=head2 getAllButtons ( )
-
-Get a list of all the buttons in this MCE
-
-=cut
-
+# Get a list of all the buttons in this MCE
 sub getAllButtons {
     my ( $self ) = @_;
-    my @toolbarRows = map{[split "\n", $self->getValue("toolbarRow$_")]} (1..3);
+    my @toolbarRows = map{[split "\n", $self->get("toolbarRow$_")]} (1..3);
     my @toolbarButtons = map{ @{$_} } @toolbarRows;
     return @toolbarButtons;
 }
 
-#----------------------------------------------------------------------------
-
-=head2 getConfig ( )
-
-Get a hashref of configuration to create this MCE. You must run the code
-from getLoadPlugins before you can successfully initialize an MCE. You 
-must also specify the "elements" key so TinyMCE knows what textarea to 
-replace.
-
-=cut
-
+# Get a hashref of configuration to create this MCE. You must run the code
+# from getLoadPlugins before you can successfully initialize an MCE. You 
+# must also specify the "elements" key so TinyMCE knows what textarea to 
+# replace.
 sub getConfig {
     my ($self) = @_;
     my $i18n = WebGUI::International->new($self->session, 'Asset_RichEdit');
     my @plugins;
     push @plugins, "safari";
-    push @plugins, "paste";
     push @plugins, "contextmenu"
-        if $self->getValue("enableContextMenu");
+        if $self->get("enableContextMenu");
     push @plugins, "inlinepopups"
-        if $self->getValue("inlinePopups");
+        if $self->get("inlinePopups");
     push @plugins, "media"
-        if $self->getValue( 'allowMedia' );
+        if $self->get( 'allowMedia' );
 
-    my @toolbarRows = map{[split "\n", $self->getValue("toolbarRow$_")]} (1..3);
+    my @toolbarRows = map{[split "\n", $self->get("toolbarRow$_")]} (1..3);
     my @toolbarButtons = map{ @{$_} } @toolbarRows;
     my %config = (
         mode                    => 'exact',
@@ -458,27 +360,19 @@ sub getConfig {
         ( map { "theme_advanced_buttons" . ( $_ + 1 ) => ( join ',', @{ $toolbarRows[$_] } ) } ( 0 .. $#toolbarRows ) ),
 
         ask               => JSON::false(),
-        preformatted      => $self->getValue("preformatted") ? JSON::true() : JSON::false(),
-        force_br_newlines => $self->getValue("useBr") ? JSON::true() : JSON::false(),
-        force_p_newlines  => $self->getValue("useBr") ? JSON::false() : JSON::true(),
-        $self->getValue("useBr") ? ( forced_root_block => JSON::false() ) : (),
-        remove_linebreaks => $self->getValue("removeLineBreaks") ? JSON::true() : JSON::false(),
-        nowrap            => $self->getValue("nowrap")           ? JSON::true() : JSON::false(),
-        directionality    => $self->getValue("directionality"),
-        theme_advanced_toolbar_location   => $self->getValue("toolbarLocation"),
+        preformatted      => $self->get("preformatted") ? JSON::true() : JSON::false(),
+        force_br_newlines => $self->get("useBr") ? JSON::true() : JSON::false(),
+        force_p_newlines  => $self->get("useBr") ? JSON::false() : JSON::true(),
+        $self->get("useBr") ? ( forced_root_block => JSON::false() ) : (),
+        remove_linebreaks => $self->get("removeLineBreaks") ? JSON::true() : JSON::false(),
+        nowrap            => $self->get("nowrap")           ? JSON::true() : JSON::false(),
+        directionality    => $self->get("directionality"),
+        theme_advanced_toolbar_location   => $self->get("toolbarLocation"),
         theme_advanced_statusbar_location => "bottom",
-        valid_elements                    => $self->getValue("validElements"),
+        valid_elements                    => $self->get("validElements"),
         wg_userIsVisitor                  => $self->session->user->isVisitor ? JSON::true() : JSON::false(),
-        paste_postprocess                 => 'tinyMCE_WebGUI_paste_postprocess',
     );
     foreach my $button (@toolbarButtons) {
-        if ( $button eq "spellchecker" && $self->session->config->get('availableDictionaries') ) {
-            push( @plugins, "-wgspellchecker" );
-            $config{spellchecker_rpc_url} = $self->session->url->gateway( '', "op=spellCheck" );
-            $config{spellchecker_languages} = join( ',',
-                map { ( $_->{default} ? '+' : '' ) . $_->{name} . '=' . $_->{id} }
-                    @{ $self->session->config->get('availableDictionaries') } );
-        }
         push( @plugins, "table" )      if ( $button eq "tablecontrols" );
         push( @plugins, "save" )       if ( $button eq "save" );
         push( @plugins, "advhr" )      if ( $button eq "advhr" );
@@ -520,10 +414,10 @@ sub getConfig {
             push @plugins, "-wgmacro";
         }
         if ( $button eq "code" ) {
-            $config{theme_advanced_source_editor_width} = $self->getValue("sourceEditorWidth")
-                if ( $self->getValue("sourceEditorWidth") > 0 );
-            $config{theme_advanced_source_editor_height} = $self->getValue("sourceEditorHeight")
-                if ( $self->getValue("sourceEditorHeight") > 0 );
+            $config{theme_advanced_source_editor_width} = $self->get("sourceEditorWidth")
+                if ( $self->get("sourceEditorWidth") > 0 );
+            $config{theme_advanced_source_editor_height} = $self->get("sourceEditorHeight")
+                if ( $self->get("sourceEditorHeight") > 0 );
         }
     } ## end foreach my $button (@toolbarButtons)
     my $language = $i18n->getLanguage( '', "languageAbbreviation" );
@@ -531,10 +425,10 @@ sub getConfig {
         $language = $i18n->getLanguage( "English", "languageAbbreviation" );
     }
     $config{language}    = $language;
-    $config{content_css} = $self->getValue("cssFile")
+    $config{content_css} = $self->get("cssFile")
         || $self->session->url->extras('tinymce-webgui/defaultcontent.css');
-    $config{width}  = $self->getValue("editorWidth")  if ( $self->getValue("editorWidth") > 0 );
-    $config{height} = $self->getValue("editorHeight") if ( $self->getValue("editorHeight") > 0 );
+    $config{width}  = $self->get("editorWidth")  if ( $self->get("editorWidth") > 0 );
+    $config{height} = $self->get("editorHeight") if ( $self->get("editorHeight") > 0 );
     $config{plugins} = join( ",", @plugins );
 
     return \%config;
@@ -558,28 +452,18 @@ my $sql = "select asset.assetId, assetData.revisionDate from RichEdit left join 
 	my %richEditors;
 	tie %richEditors, 'Tie::IxHash';
 	while (my ($id, $version) = $sth->array) {
-		$richEditors{$id} = WebGUI::Asset::RichEdit->new($session, $id, undef, $version)->getTitle;
+		$richEditors{$id} = WebGUI::Asset::RichEdit->newById($session, $id, $version)->getTitle;
 	}
 	$sth->finish;
 	return \%richEditors;
 }
 
-#-------------------------------------------------------------------
-
-=head2 getLoadPlugins ( )
-
-Get the JS code to load the plugins for this MCE. Needs to be called once
-on the page this MCE will be on
-
-=cut
-
+# Get the JS code to load the plugins for this MCE. Needs to be called once
+# on the page this MCE will be on
 sub getLoadPlugins {
     my ( $self ) = @_;
     my %loadPlugins;
     for my $button ( $self->getAllButtons ) {
-        if ( $button eq 'spellchecker' ) {
-            $loadPlugins{wgspellchecker} = $self->session->url->extras("tinymce-webgui/plugins/wgspellchecker/editor_plugin.js");
-        }
         if ( $button eq 'wginsertimage' ) {
             $loadPlugins{wginsertimage} = $self->session->url->extras("tinymce-webgui/plugins/wginsertimage/editor_plugin.js");
         }
@@ -600,22 +484,6 @@ sub getLoadPlugins {
 
 #-------------------------------------------------------------------
 
-=head2 getToolbar ( )
-
-Returns a toolbar with a set of icons that hyperlink to functions that delete, edit, promote, demote, cut, and copy.
-
-=cut
-
-sub getToolbar {
-	my $self = shift;
-	return undef if ($self->getToolbarState);
-	return $self->SUPER::getToolbar();
-}
-
-
-
-#-------------------------------------------------------------------
-
 =head2 getRichEditor ( $nameId )
 
 Return the javascript needed to make the Rich Editor.
@@ -629,18 +497,22 @@ for a HTML tag.
 
 sub getRichEditor {
 	my $self = shift;
-	return '' if ($self->getValue('disableRichEditor'));
+	return '' if ($self->disableRichEditor);
 	my $nameId = shift;
 	my $i18n = WebGUI::International->new($self->session, 'Asset_RichEdit');
-    my $ask = $self->getValue("askAboutRichEdit");
+    my $ask = $self->askAboutRichEdit;
 #    if ($ask) {
 #        $config{oninit} = 'turnOffTinyMCE_'.$nameId;
 #    }
-    $self->richedit_headTags;
+    $self->session->style->setScript($self->session->url->extras('yui/build/yahoo/yahoo-min.js'),{type=>"text/javascript"});
+    $self->session->style->setScript($self->session->url->extras('yui/build/event/event-min.js'),{type=>"text/javascript"});
+    $self->session->style->setScript($self->session->url->extras('tinymce/jscripts/tiny_mce/tiny_mce_src.js'),{type=>"text/javascript"});
+    $self->session->style->setScript($self->session->url->extras("tinymce-webgui/callbacks.js"),{type=>"text/javascript"});
     my $out = '';
     if ($ask) {
         $out = q|<a style="display: block;" href="javascript:toggleEditor('|.$nameId.q|')">|.$i18n->get('Toggle editor').q|</a>|;
     }
+    $self->richedit_headTags;
     $out .= qq|<script type="text/javascript">\n|;
     if ($ask) {
         $out .= <<"EOHTML1";
@@ -684,10 +556,10 @@ sub richedit_headTags {
 	my $self = shift;
     my $style = $self->session->style;
     my $url   = $self->session->url;
-    $style->setScript($url->extras('yui/build/yahoo/yahoo-min.js'),{type=>"text/javascript"});
-    $style->setScript($url->extras('yui/build/event/event-min.js'),{type=>"text/javascript"});
-    $style->setScript($url->extras('tinymce/jscripts/tiny_mce/tiny_mce_src.js'),{type=>"text/javascript"});
-    $style->setScript($url->extras("tinymce-webgui/callbacks.js"),{type=>"text/javascript"});
+    $style->setScript($url->extras('yui/build/yahoo/yahoo-min.js'));
+    $style->setScript($url->extras('yui/build/event/event-min.js'));
+    $style->setScript($url->extras('tinymce/jscripts/tiny_mce/tiny_mce_src.js'));
+    $style->setScript($url->extras("tinymce-webgui/callbacks.js"));
 }
 
 #-------------------------------------------------------------------
@@ -698,30 +570,14 @@ Making private. See WebGUI::Asset::indexContent() for additonal details.
 
 =cut
 
-sub indexContent {
+around indexContent => sub {
+	my $orig = shift;
 	my $self = shift;
-	my $indexer = $self->SUPER::indexContent;
+	my $indexer = $self->$orig(@_);
 	$indexer->setIsPublic(0);
-}
+};
 
 
-#-------------------------------------------------------------------
-
-=head2 www_edit ( )
-
-Override the method from Asset.pm to change the title of the screen.
-
-=cut
-
-sub www_edit {
-    my $self = shift;
-    return $self->session->privilege->insufficient() unless $self->canEdit;
-    return $self->session->privilege->locked() unless $self->canEditIfLocked;
-	my $i18n = WebGUI::International->new($self->session,"Asset_RichEdit");
-    return $self->getAdminConsole->render($self->getEditForm->print,$i18n->get("rich edit edit config"));
-}
-
-
-
+__PACKAGE__->meta->make_immutable;
 1;
 

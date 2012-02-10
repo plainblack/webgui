@@ -1,6 +1,6 @@
 # vim:syntax=perl
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -13,9 +13,7 @@
 # 
 #
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../lib";
 use Test::More;
 use Test::Deep;
 use WebGUI::Test; # Must use this before any other WebGUI modules
@@ -27,15 +25,12 @@ my $session         = WebGUI::Test->session;
 my ( $db ) = $session->quick(qw{ db });
 
 # Create an article to index
-my $article         = WebGUI::Asset->getImportNode( $session )->addChild( {
+my $article         = WebGUI::Test->asset->addChild( {
     className       => 'WebGUI::Asset::Wobject::Article',
     keywords        => 'keyword1,keyword2',
     title           => 'title',
     menuTitle       => 'menuTitle',
 } );
-WebGUI::Test->addToCleanup(
-    WebGUI::VersionTag->getWorking( $session ),
-);
 
 #----------------------------------------------------------------------------
 # Tests

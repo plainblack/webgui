@@ -3,7 +3,7 @@ package WebGUI::Form::DataTable;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -371,8 +371,7 @@ sub prepare {
     # Source in the scripts
     my $style = $self->session->style;
     my $url   = $self->session->url;
-    $style->setLink( $url->extras('yui/build/datatable/assets/skins/sam/datatable.css'),
-        { rel => "stylesheet", type => "text/css" } );
+    $style->setCss( $url->extras('yui/build/datatable/assets/skins/sam/datatable.css'));
     $style->setScript( $url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js') );
     $style->setScript( $url->extras('yui/build/element/element-min.js') );
     $style->setScript( $url->extras('yui/build/dragdrop/dragdrop-min.js') );
@@ -381,19 +380,10 @@ sub prepare {
 
     # Prepare the editors
     if ( $self->get('showEdit') ) {
-        $style->setLink(
-            $url->extras( 'yui/build/button/assets/skins/sam/button.css', { rel => "stylesheet", type => "text/css" } )
-        );
-        $style->setLink(
-            $url->extras(
-                'yui/build/calendar/assets/skins/sam/calendar.css',
-                { rel => "stylesheet", type => "text/css" }
-            )
-        );
-        $style->setLink( $url->extras('yui/build/container/assets/skins/sam/container.css'),
-            { rel => "stylesheet", type => "text/css" } );
-        $style->setLink( $url->extras( 'yui-webgui/build/form/datatable.css'),
-            { rel => "stylesheet", type => "text/css" } );
+        $style->setCss( $url->extras( 'yui/build/button/assets/skins/sam/button.css'));
+        $style->setCss( $url->extras( 'yui/build/calendar/assets/skins/sam/calendar.css'));
+        $style->setCss( $url->extras('yui/build/container/assets/skins/sam/container.css'));
+        $style->setCss( $url->extras('yui-webgui/build/form/datatable.css'));
         $style->setScript( $url->extras('yui/build/container/container-min.js') );
         $style->setScript( $url->extras('yui/build/button/button-min.js') );
         $style->setScript( $url->extras('yui/build/calendar/calendar-min.js') );

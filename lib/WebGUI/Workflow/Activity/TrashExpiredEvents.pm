@@ -4,7 +4,7 @@ package WebGUI::Workflow::Activity::TrashExpiredEvents;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -81,8 +81,8 @@ sub execute {
     my $date = WebGUI::DateTime->new($session, time() - $self->get("trashAfter") );
     my $sth  = $session->db->read( "select Event.assetId, revisionDate from Event join assetData using (assetId, revisionDate) where endDate < ? and revisionDate = (select max(revisionDate) from assetData where assetData.assetId=Event.assetId);", [ $date->toDatabaseDate ]);
     EVENT: while ( my ($id) = $sth->array ) {
-        my $asset = WebGUI::Asset::Event->new( $session, $id );
-        if ( defined $asset ) {
+        my $asset = eval { WebGUI::Asset->newById($session, $id); };
+        if (! Exception::Class->caught()) {
             $asset->trash;
         }
         last EVENT if time() > $finishTime;

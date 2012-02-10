@@ -3,7 +3,7 @@ package WebGUI::Asset::Wobject::Carousel;
 $VERSION = "1.0.0";
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2008 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -14,107 +14,54 @@ $VERSION = "1.0.0";
 
 use strict;
 use JSON;
-use Tie::IxHash;
 use WebGUI::International;
-use WebGUI::Utility;
-use base 'WebGUI::Asset::Wobject';
-
-#-------------------------------------------------------------------
-
-=head2 definition ( )
-
-defines wobject properties for New Wobject instances.  You absolutely need 
-this method in your new Wobjects.  If you choose to "autoGenerateForms", the
-getEditForm method is unnecessary/redundant/useless.  
-
-=cut
-
-sub definition {
-	my $class = shift;
-	my $session = shift;
-	my $definition = shift;
-	my $i18n = WebGUI::International->new($session, 'Asset_Carousel');
-	my %properties;
-	tie %properties, 'Tie::IxHash';
-	%properties = (
-		templateId =>{
-			fieldType       =>"template",  
-			defaultValue    =>'CarouselTmpl0000000001',
-			tab             =>"display",
-			noFormPost      =>0,  
-			namespace       =>"Carousel", 
-			hoverHelp       =>$i18n->get('carousel template description'),
-			label           =>$i18n->get('carousel template label'),
-		},
-		slideWidth =>{
-			fieldType       => "integer",  
-			defaultValue    => 0,
-			tab             => "display",
-			hoverHelp       => $i18n->get('carousel slideWidth description'),
-			label           => $i18n->get('carousel slideWidth label'),
-		},
-		slideHeight =>{
-			fieldType       => "integer",  
-			defaultValue    => 0,
-			tab             => "display",
-			hoverHelp       => $i18n->get('carousel slideHeight description'),
-			label           => $i18n->get('carousel slideHeight label'),
-		},
-		richEditor =>{
-			fieldType    => "selectRichEditor",
-			defaultValue => "PBrichedit000000000001",
-			tab          => 'display',
-			label        => $i18n->get('rich editor', 'Asset_Collaboration'),
-			hoverHelp    => $i18n->get('rich editor description'),
-        },
-        items =>{
-            noFormPost      =>1,
-            fieldType       =>'text',
-            autoGenerate    =>0,
-        },
-        autoPlay    => {
-            fieldType       => 'yesNo',
-            defaultValue    => 0,
-            tab             => "properties",
-            hoverHelp       => $i18n->get('carousel autoPlay description'),
-            label           => $i18n->get('carousel autoPlay label'),
-        },
-        autoPlayInterval => {
-            fieldType       => 'Integer',
-            defaultValue    => 4,
-            tab             => 'properties',
-            hoverHelp       => $i18n->get('carousel autoPlayInterval description'),
-            label           => $i18n->get('carousel autoPlayInterval label'),
-        },
-
-	);
-	push(@{$definition}, {
-		assetName=>$i18n->get('assetName'),
-		icon=>'Carousel.png',
-		autoGenerateForms=>1,
-		tableName=>'Carousel',
-		className=>'WebGUI::Asset::Wobject::Carousel',
-		properties=>\%properties
-		});
-        return $class->SUPER::definition($session, $definition);
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 duplicate ( )
-
-duplicates a New Wobject.  This method is unnecessary, but if you have 
-auxiliary, ancillary, or "collateral" data or files related to your 
-wobject instances, you will need to duplicate them here.
-
-=cut
-
-sub duplicate {
-	my $self = shift;
-	my $newAsset = $self->SUPER::duplicate(@_);
-	return $newAsset;
-}
+use Moose;
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset::Wobject';
+define assetName => [ 'assetName', 'Asset_Carousel' ];
+define icon      => 'Carousel.png';
+define tableName => 'Carousel';
+property templateId => (
+    fieldType  => "template",
+    default    => 'CarouselTmpl0000000001',
+    tab        => "display",
+    noFormPost => 0,
+    namespace  => "Carousel",
+    hoverHelp  => [ 'carousel template description', 'Asset_Carousel' ],
+    label      => [ 'carousel template label', 'Asset_Carousel' ],
+);
+property slideWidth => (
+    fieldType => "integer",
+    default   => 0,
+    tab       => "display",
+    hoverHelp => [ 'carousel slideWidth description', 'Asset_Carousel' ],
+    label     => [ 'carousel slideWidth label', 'Asset_Carousel' ],
+);
+property slideHeight => (
+    fieldType       => "integer",
+    default         => 0,
+    tab             => "display",
+    hoverHelp       => ['carousel slideHeight description', 'Asset_Carousel' ],
+    label           => ['carousel slideHeight label', 'Asset_Carousel' ],
+);
+property items => (
+    noFormPost   => 1,
+    fieldType    => 'text',
+);
+property autoPlay    => (
+    fieldType       => 'yesNo',
+    defaultValue    => 0,
+    tab             => "properties",
+    hoverHelp       => ['carousel autoPlay description', 'Asset_Carousel' ],
+    label           => ['carousel autoPlay label', 'Asset_Carousel' ],
+);
+property autoPlayInterval => (
+    fieldType       => 'Integer',
+    defaultValue    => 4,
+    tab             => 'properties',
+    hoverHelp       => ['carousel autoPlayInterval description', 'Asset_Carousel'],
+    label           => ['carousel autoPlayInterval label', 'Asset_Carousel'],
+);
 
 #-------------------------------------------------------------------
 
@@ -125,9 +72,9 @@ This method is optional if you set autoGenerateForms=1 in the definition.
 
 =cut
 
-sub getEditForm {
+override getEditForm => sub {
 	my $self    = shift;
-	my $tabform = $self->SUPER::getEditForm();
+	my $tabform = super();
     my $i18n    = WebGUI::International->new($self->session, "Asset_Carousel");
 
     $self->session->style->setScript($self->session->url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'), {type =>
@@ -147,28 +94,71 @@ sub getEditForm {
     $self->session->style->setScript($self->session->url->extras('wobject/Carousel/carousel.js'), {type =>
     'text/javascript'});
 
-    my $tableRowStart = 
-        '<tr id="items_row">'
-        .'    <td class="formDescription"  valign="top" style="width: 180px;"><label for="item1">'
-              .$i18n->get("items label").'</label><div class="wg-hoverhelp">'.$i18n->get("items description").'</div></td>'
-        .'    <td id="items_td" valign="top" class="tableData">'
-        .'    <input type="hidden" id="items_formId" name="items" />'
-        .'    <input type="button" value="Add item" onclick="window.carouselEditor.addTab()"></input><br />'
-        ."    <br />\n";
+    my $tableRowStart = '    <label for="item1">'
+        . $i18n->get("items label").'</label><div class="wg-hoverhelp">'.$i18n->get("items description").'</div>'
+        . '    <input type="hidden" id="items_formId" name="items" />'
+        . '    <input type="button" value="Add item" onclick="window.carouselEditor.addTab()"></input><br />'
+        . "    <br />\n";
 
-    $tabform->getTab("properties")->raw($tableRowStart);
+    $tabform->getTab("properties")->addField('ReadOnly', value => $tableRowStart);
+
+    if($self->items){
+        my @items = @{JSON->new->decode($self->items)->{items}};
+
+        foreach my $item (@items){
+            my $itemNr = $item->{sequenceNumber};
+            my $itemHTML = "<div id='item_div".$itemNr."' name='item_div_".$itemNr."'>\n"
+                ."<span>\n"
+                .$i18n->get("id label").'<div class="wg-hoverhelp">'.$i18n->get("id description").'</div>: '
+                .'<input type="text" id="itemId'.$itemNr.'" '
+                .'name="itemId_'.$itemNr.'" value="'.$item->{itemId}.'">'
+                ."</span>\n"
+                ."<input type='button' id='deleteItem".$itemNr."' value='Delete this item'
+onClick='javascript:deleteItem(this.id)'></input>\n"
+                .'<textarea id="item'.$itemNr.'" name="item_'.$itemNr.'" '
+                .'class="carouselItemText" rows="#" cols="#" '
+                .'style="width: 500px; height: 80px;">'.$item->{text}."</textarea><br />\n";
+            
+            $itemHTML .= 
+                " <script type='text/javascript'>\n"
+                .'var myEditor'.$itemNr.' '
+                .'= new YAHOO.widget.SimpleEditor("item'.$itemNr.'", '
+                ."{height: '80px', width: '500px', handleSubmit: true});\n"
+                .'myEditor'.$itemNr.".render()\n"
+                ."</script>\n"
+                ."</div>\n";
+            $tabform->getTab("properties")->addField('ReadOnly', value => $itemHTML);
+        }
+    }
+    else{
+        my $itemHTML = "<div id='item_div1' name='item_div_1'>\n"
+                ."<span>\n"
+                .$i18n->get("id label").'<div class="wg-hoverhelp">'.$i18n->get("id description").'</div>: '
+                .' <input type="text" id="itemId1" name="itemId_1" value="carousel_item_1">'
+                ."</span>\n"
+                ."<input type='button' id='deleteItem1' value='Delete this item' onClick='javascript:deleteItem(this.id)'></input>\n"
+                .'<textarea id="item1" name="item_1" class="carouselItemText" rows="#" cols="#" '
+                ."style='width: 500px; height: 80px;'></textarea><br />\n";
+            
+        $itemHTML .= 
+                 "<script type='text/javascript'>\n"
+                ."var myEditor1 = new YAHOO.widget.SimpleEditor('item1', {height: '80px', width: '500px', handleSubmit: true});\n"
+                ."myEditor1.render()\n"
+                ."</script>\n";
+        $tabform->getTab("properties")->addField('ReadOnly', value => $itemHTML);
+    }
     
 
     $self->session->log->warn('richedit:' .$self->get('richEditor'));
     my $richEditId      = $self->get('richEditor') || "PBrichedit000000000001";
-    my $richedit        = WebGUI::Asset->newByDynamicClass( $self->session, $richEditId );
+    my $richedit        = WebGUI::Asset->newById( $self->session, $richEditId );
     my $config          = JSON->new->encode( $richedit->getConfig );
     my $loadMcePlugins  = $richedit->getLoadPlugins;
     my $items           = $self->get('items') ? JSON->new->decode($self->get('items'))->{items} : [];
     $items              = JSON->new->encode( $items );
     my $i18nJson        = JSON->new->encode( { "delete" => $i18n->get("delete") } );
 
-    $tabform->getTab('properties')->raw(<<"ENDHTML");
+    $tabform->getTab('properties')->addField( "ReadOnly", name => 'editor', value => <<"ENDHTML");
     <div id="carouselEditor"></div>
     <script type="text/javascript">
     $loadMcePlugins
@@ -178,14 +168,8 @@ sub getEditForm {
     </script>
 ENDHTML
 
-    my $tableRowEnd = qq|
-            </td>
-        </tr>
-    |;
-    $tabform->getTab("properties")->raw($tableRowEnd);
-    
     return $tabform;
-}
+};
 
 #-------------------------------------------------------------------
 
@@ -195,56 +179,37 @@ See WebGUI::Asset::prepareView() for details.
 
 =cut
 
-sub prepareView {
+override prepareView => sub {
     my $self = shift;
-    $self->SUPER::prepareView();
-    my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId"));
+    super();
+    my $template = WebGUI::Asset::Template->newById($self->session, $self->templateId);
     if (!$template) {
         WebGUI::Error::ObjectNotFound::Template->throw(
             error      => qq{Template not found},
-            templateId => $self->get("templateId"),
+            templateId => $self->templateId,
             assetId    => $self->getId,
         );
     }
     $template->prepare;
     $self->{_viewTemplate} = $template;
-}
+};
 
 #-------------------------------------------------------------------
 
-=head2 processPropertiesFromFormPost ( )
+=head2 processEditForm ( )
 
 Used to process properties from the form posted.
 
 =cut
 
-sub processPropertiesFromFormPost {
+override processEditForm => sub {
     my $self    = shift;
     my $form    = $self->session->form;
-    $self->SUPER::processPropertiesFromFormPost(@_);
-
-    my $items   = JSON->new->decode( $form->get("items") ); 
+    super();
+    my $items = JSON->new->decode( $form->get("items") ); 
     $self->update({ items => JSON->new->encode({ items => $items }) });
     return undef;
-}
-
-#-------------------------------------------------------------------
-
-=head2 purge ( )
-
-removes collateral data associated with a Carousel when the system
-purges it's data.  This method is unnecessary, but if you have 
-auxiliary, ancillary, or "collateral" data or files related to your 
-wobject instances, you will need to purge them here.
-
-=cut
-
-sub purge {
-	my $self = shift;
-	#purge your wobject-specific data here.  This does not include fields 
-	# you create for your Carousel asset/wobject table.
-	return $self->SUPER::purge;
-}
+};
 
 #-------------------------------------------------------------------
 
@@ -263,8 +228,8 @@ sub view {
 	#This automatically creates template variables for all of your wobject's properties.
 	my $var = $self->get;
 
-    if($self->getValue('items')){
-        $var->{item_loop} = JSON->new->decode($self->getValue('items'))->{items};
+    if($self->items){
+        $var->{item_loop} = JSON->new->decode($self->items)->{items};
     }
 	
 	#This is an example of debugging code to help you diagnose problems.
@@ -273,5 +238,6 @@ sub view {
 	return $self->processTemplate($var, undef, $self->{_viewTemplate});
 }
 
+__PACKAGE__->meta->make_immutable;
 1;
 #vim:ft=perl

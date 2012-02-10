@@ -3,7 +3,7 @@ package WebGUI::Content::Shop;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -177,7 +177,7 @@ sub www_pay {
     my $session = shift;
     my $output = undef;
     my $method = "www_".$session->form->get("method");
-    my $pay = WebGUI::Shop::Pay->new($session);
+    my $pay = WebGUI::Shop::Pay->new(session => $session);
     if ($method ne "www_" && $pay->can($method)) {
         $output = $pay->$method();
     }
@@ -199,7 +199,7 @@ sub www_ship {
     my $session = shift;
     my $output = undef;
     my $method = "www_".$session->form->get("method");
-    my $ship = WebGUI::Shop::Ship->new($session);
+    my $ship = WebGUI::Shop::Ship->new(session => $session);
     if ($method ne "www_" && $ship->can($method)) {
         $output = $ship->$method($session);
     }

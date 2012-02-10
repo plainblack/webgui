@@ -3,7 +3,7 @@ package WebGUI::Operation::VersionTag;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -21,6 +21,7 @@ use WebGUI::International;
 use WebGUI::VersionTag;
 use WebGUI::HTMLForm;
 use WebGUI::Paginator;
+use Tie::IxHash;
 use WebGUI::Fork;
 use Monkey::Patch;
 use JSON;
@@ -153,7 +154,7 @@ sub rollbackInFork {
     my $session = $process->session;
     my $tag = WebGUI::VersionTag->new( $session, $tagId );
     my %status = (
-        finished => 0,
+        current => 0,
         total    => $process->session->db->quickScalar( 'SELECT count(*) FROM assetData WHERE tagId = ?', [$tagId] ),
         message  => '',
     );
@@ -167,7 +168,7 @@ sub rollbackInFork {
             my $purgeRevision = shift;
             my $self          = shift;
             $self->$purgeRevision(@_);
-            $status{finished}++;
+            $status{current}++;
             $update->();
         }
     );
@@ -421,7 +422,7 @@ sub www_commitVersionTag {
             $session->url->page("op=commitVersionTag;tagId=".$tag->getId),
         );
     $p->setDataByQuery(q{
-        SELECT assetData.revisionDate, assetData.revisedBy, asset.assetId, asset.className 
+        SELECT assetData.revisionDate, assetData.revisedBy, asset.assetId
         FROM assetData 
         LEFT JOIN asset ON assetData.assetId = asset.assetId
         WHERE assetData.tagId=? },
@@ -431,8 +432,8 @@ sub www_commitVersionTag {
     );
 
     foreach my $row ( @{$p->getPageData} ) {
-        my ( $date, $byUserId, $id, $class) = @{ $row }{ qw( revisionDate revisedBy assetId className ) };
-        my $asset = WebGUI::Asset->new($session, $id, $class, $date);
+        my ( $date, $byUserId, $id, $class) = @{ $row }{ qw( revisionDate revisedBy assetId ) };
+        my $asset = WebGUI::Asset->newById($session, $id, $date);
         my $byUser = WebGUI::User->new( $session, $byUserId );
         $output 
             .= '<tr><td>'
@@ -712,7 +713,7 @@ sub www_manageRevisionsInTag {
         my @assetInfo       = $session->form->get('assetInfo'); 
         for my $assetInfo ( @assetInfo ) {
             ( my $assetId, my $revisionDate ) = split ":", $assetInfo;
-            my $asset = WebGUI::Asset->new( $session, $assetId, undef, $revisionDate );
+            my $asset = WebGUI::Asset->newById( $session, $assetId, $revisionDate );
             $asset->purgeRevision;
         }
 
@@ -740,7 +741,7 @@ sub www_manageRevisionsInTag {
         my @assetInfo       = $session->form->get('assetInfo'); 
         for my $assetInfo ( @assetInfo ) {
             ( my $assetId, my $revisionDate ) = split ":", $assetInfo;
-            my $asset = WebGUI::Asset->new( $session, $assetId, undef, $revisionDate );
+            my $asset = WebGUI::Asset->newById( $session, $assetId, $revisionDate );
             $asset->setVersionTag( $moveToTag->getId );
         }
 
@@ -860,13 +861,13 @@ sub www_manageRevisionsInTag {
         . '</tr> '
         ;
     my $p = WebGUI::Paginator->new($session,$session->url->page("op=manageRevisionsInTag;tagId=".$tag->getId));
-    $p->setDataByQuery("select assetData.revisionDate, assetData.revisedBy, asset.assetId, asset.className from assetData 
+    $p->setDataByQuery("select assetData.revisionDate, assetData.revisedBy, asset.assetId from assetData 
             left join asset on assetData.assetId=asset.assetId
             where assetData.tagId=?",undef, undef, [$tag->getId]);
     foreach my $row (@{$p->getPageData}) {
-            my ($date,$byUserId,$id, $class) = ($row->{revisionDate}, $row->{revisedBy}, $row->{assetId}, $row->{className});
+            my ($date,$byUserId,$id) = ($row->{revisionDate}, $row->{revisedBy}, $row->{assetId});
             my $byUser  = WebGUI::User->new( $session, $byUserId );
-            my $asset = WebGUI::Asset->new($session,$id,$class,$date);
+            my $asset = WebGUI::Asset->newById($session, $id, $date);
             # A checkbox for delete and move actions
             my $checkbox    = WebGUI::Form::checkbox( $session, {
                 name        => 'assetInfo',
@@ -913,7 +914,7 @@ sub www_rollbackVersionTag {
 	my $method = $session->form->process("proceed");
     $method    = $method eq "manageCommittedVersions" ? $method : 'manageVersions';
     my $redir = WebGUI::Asset->getDefault($session)->getUrl("op=$method");
-    $session->http->setRedirect(
+    $session->response->setRedirect(
         $session->url->page(
             $process->contentPairs(
                 'ProgressBar', {

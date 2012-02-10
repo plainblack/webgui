@@ -1,6 +1,6 @@
 # vim:syntax=perl
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -13,9 +13,7 @@
 # 
 #
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../../lib";
 use Test::More;
 use Test::Deep;
 use Test::MockObject::Extends;
@@ -36,8 +34,8 @@ my $session         = WebGUI::Test->session;
 # Test user
 my $taxUser     = WebGUI::User->new( $session, 'new' );
 $taxUser->username( 'Tex Evasion' );
-$session->user({userId => $taxUser->getId});
 WebGUI::Test->addToCleanup($taxUser);
+$session->user({userId => $taxUser->getId});
 
 # Test VAT numbers
 my $testVAT_NL  = 'NL123456789B12';
@@ -233,8 +231,9 @@ plan tests => $tests;
         'addVATNumber returns the correct message when VIES is unavailable',
     );
 
-    my $workflows = WebGUI::Workflow::Instance->getAllInstances( $session );
-    my ($workflow) = grep { $_->get('parameters')->{ vatNumber } eq $noServiceVAT } @{ $workflows };
+    my ($workflow) = grep { $_->get('parameters')->{ vatNumber } eq $noServiceVAT }
+                    grep { ref $_->get('parameters') eq 'HASH' }
+                    @{ WebGUI::Workflow::Instance->getAllInstances( $session ) };
     ok( defined $workflow , 'addVATNumber fires a recheck workflow when VIES is down' );
 
     #----- valid number

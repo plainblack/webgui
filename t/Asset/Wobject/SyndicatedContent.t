@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -8,10 +8,8 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use FindBin;
 use strict;
 use File::Spec;
-use lib "$FindBin::Bin/../../lib";
 
 use Data::Dumper;
 
@@ -24,7 +22,6 @@ use Test::More tests => 30; # increment this value for each test you create
 use Test::Deep;
 use WebGUI::Asset::Wobject::SyndicatedContent;
 use XML::FeedPP;
-use WebGUI::Cache;
 
 my $session = WebGUI::Test->session;
 my %var;
@@ -33,12 +30,9 @@ my %var;
 ##          SETUP           ##
 ##############################
 # Do our work in the import node
-my $node = WebGUI::Asset->getImportNode($session);
+my $node = WebGUI::Test->asset;
 
 # Create a version tag to work in
-my $versionTag = WebGUI::VersionTag->getWorking($session);
-$versionTag->set({name=>"SyndicatedContent Test"});
-addToCleanup($versionTag);
 my $syndicated_content = $node->addChild({className=>'WebGUI::Asset::Wobject::SyndicatedContent'});
 
 ##############################
@@ -215,8 +209,7 @@ sub titles_are {
 $syndicated_content->update({ hasTerms => 'WebGUI', });
 my $testFeedUrl = 'http://www.example.com/feed.rss';
 $syndicated_content->update({ rssUrl => $testFeedUrl, });
-my $cache = WebGUI::Cache->new($session, $testFeedUrl, 'RSS');
-$cache->set(slurp_rss('tbb.rss'), 60);
+$session->cache->set($testFeedUrl, slurp_rss('tbb.rss'), 60);
 
 my $feed = $syndicated_content->generateFeed;
 
@@ -241,7 +234,7 @@ $syndicated_content->update({
     hasTerms     => '',
     maxHeadlines => 50,
 });
-$cache->set(slurp_rss('duplicate-link.rss'), 60);
+$session->cache->set($testFeedUrl, slurp_rss('duplicate-link.rss'), 60);
 
 my $oddFeed1 = $syndicated_content->generateFeed();
 my @oddItems = $oddFeed1->get_item();
@@ -253,7 +246,7 @@ is (@oddItems, 2, 'feed has items even without pubDates or links');
 #
 ####################################################################
 
-$cache->set(slurp_rss('tbb_odd.rss'), 60);
+$session->cache->set($testFeedUrl, slurp_rss('tbb_odd.rss'), 60);
 my @ascending  = (
     'I have arrived in Lisboa!',
     'WebGUI 8 Performance',

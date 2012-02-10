@@ -1,6 +1,6 @@
 # vim:syntax=perl
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -13,12 +13,11 @@
 # 
 #
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../lib";
 use Test::More;
 use Test::Deep;
-#use Test::Exception;
+use Test::Exception;
+use Data::Dumper;
 use JSON;
 use HTML::Form;
 
@@ -29,11 +28,6 @@ use WebGUI::TestException;
 #----------------------------------------------------------------------------
 # Init
 my $session         = WebGUI::Test->session;
-
-#----------------------------------------------------------------------------
-# Tests
-
-plan tests => 18;
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -50,21 +44,13 @@ my $anotherDriver;
 #
 #######################################################################
 
-my $e;
 my $pay;
 
+dies_ok { $pay = WebGUI::Shop::Pay->new(); } 
+    'new takes an exception to not giving it a session variable';
 
-throws_deeply ( sub { $pay = WebGUI::Shop::Pay->new(); }, 
-    'WebGUI::Error::InvalidObject', 
-    {
-        error       => 'Must provide a session variable',
-        got         => '',
-        expected    => 'WebGUI::Session',
-    },
-    'new takes an exception to not giving it a session variable'
-);
-
-$pay = WebGUI::Shop::Pay->new($session);
+lives_ok { $pay = WebGUI::Shop::Pay->new(session => $session); } 'new called with hash arguments';
+lives_ok { $pay = WebGUI::Shop::Pay->new($session); } 'new called only with session';
 isa_ok($pay, 'WebGUI::Shop::Pay', 'new returned the right kind of object');
 
 #######################################################################
@@ -147,7 +133,8 @@ my $defaultPayDrivers = {
     'WebGUI::Shop::PayDriver::CreditCard::AuthorizeNet' => 'Credit Card (Authorize.net)',
 };
 
-cmp_deeply( $drivers, $defaultPayDrivers, 'getDrivers returns the default PayDrivers');
+cmp_deeply( $drivers, $defaultPayDrivers, 'getDrivers returns the default PayDrivers')
+    or diag Dumper $drivers;
 
 #######################################################################
 #
@@ -230,3 +217,4 @@ cmp_bag(
 #
 #######################################################################
 
+done_testing();

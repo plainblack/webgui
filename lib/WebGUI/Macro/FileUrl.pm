@@ -1,7 +1,7 @@
 package WebGUI::Macro::FileUrl;
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -14,6 +14,7 @@ use strict;
 use WebGUI::Asset;
 use WebGUI::Storage;
 use WebGUI::International;
+use WebGUI::Exception;
 
 =head1 NAME
 
@@ -40,26 +41,26 @@ The URL to the Asset.
 =cut
 
 sub process {
-	my $session = shift;
-        my $url = shift;
-	my $asset = WebGUI::Asset->newByUrl($session,$url);
-	my $i18n = WebGUI::International->new($session, 'Macro_FileUrl');
-	if (not defined $asset) {
+    my $session = shift;
+    my $url = shift;
+    my $asset = eval { WebGUI::Asset->newByUrl($session,$url); };
+    my $i18n = WebGUI::International->new($session, 'Macro_FileUrl');
+    if (Exception::Class->caught()) {
         $session->log->warn("Invalid Asset URL for url: " . $url);
-		return $i18n->get('invalid url');
-	}
-	my $storageId = $asset->get('storageId');
-	if (not defined $storageId) {
+        return $i18n->get('invalid url');
+    }
+    my $storageId = $asset->can('storageId') ? $asset->storageId : undef;
+    if (not defined $storageId) {
         $session->log->warn("No Storage Location for assetId: " . $asset->getId . " url: $url");
-		return $i18n->get('no storage');
-	}
-	my $filename = $asset->get('filename');
-	if (not defined $filename) {
+        return $i18n->get('no storage');
+    }
+    my $filename = $asset->can('filename') ? $asset->filename : undef;
+    if (not defined $filename) {
         $session->log->warn("No Filename for assetId: " . $asset->getId . " url: $url");
-		return $i18n->get('no filename');
-	}
-	my $storage = WebGUI::Storage->get($session,$storageId);
-	return $storage->getUrl($filename);
+        return $i18n->get('no filename');
+    }
+    my $storage = WebGUI::Storage->get($session,$storageId);
+    return $storage->getUrl($filename);
 }
 
 

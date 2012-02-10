@@ -4,7 +4,7 @@ package WebGUI::Workflow::Activity::GetCsMail;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -104,7 +104,7 @@ sub addPost {
 		url=>$parent->get("url")."/".$title,
 		content=>$content,
 		ownerUserId=>$user->userId,
-		username=>$user->profileField("alias") || $user->username,
+		username=>$user->get("alias") || $user->username,
         originalEmail=>join("",@{$message->{rawMessage}}),
         });
 	if (scalar(@attachments)) {
@@ -181,10 +181,10 @@ sub execute {
 		unless (defined $user) { #if no user
 			unless ($postGroup eq 1 || $postGroup eq 7) { #reject mail if no registered email, unless post group is Visitors (1) or Everyone (7)
 				if ($message->{from} eq "") {
-					$self->session->errorHandler->error("For some reason the message ".$message->{subject}." (".$message->{messageId}.") has no from address.");
+					$self->session->log->error("For some reason the message ".$message->{subject}." (".$message->{messageId}.") has no from address.");
 				}
 				elsif ($message->{from} eq $cs->get("mailAddress")) {
-					$self->session->errorHandler->error("For some reason the message ".$message->{subject}." (".$message->{messageId}.") has the same from address as the collaboration system's mail address.");
+					$self->session->log->error("For some reason the message ".$message->{subject}." (".$message->{messageId}.") has the same from address as the collaboration system's mail address.");
 				} 
 				else { 
 					my $send = WebGUI::Mail::Send->create($self->session, {
@@ -204,8 +204,8 @@ sub execute {
 		my $post = undef;
 		if ($message->{inReplyTo} && $message->{inReplyTo} =~ m/cs\-([\w_-]{22})\@/) {
 			my $id = $1;
-            my $repliedPost = WebGUI::Asset->newByDynamicClass($self->session, $id);
-            if ($repliedPost
+            my $repliedPost = eval { WebGUI::Asset->newById($self->session, $id); };
+            if (! Exception::Class->caught()
                 && $repliedPost->isa('WebGUI::Asset::Post')
                 && $repliedPost->getThread->getParent->getId eq $cs->getId) {
                 $post = $repliedPost;

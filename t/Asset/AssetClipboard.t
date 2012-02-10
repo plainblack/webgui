@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -8,16 +8,13 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../lib";
 
 ##The goal of this test is to check the creation and purging of
 ##versions.
 
 use WebGUI::Test;
 use WebGUI::Session;
-use WebGUI::Utility;
 use WebGUI::Asset;
 use WebGUI::VersionTag;
 use Test::MockObject;
@@ -25,7 +22,7 @@ use Test::MockObject::Extends;
 use WebGUI::Fork;
 
 use Test::More; # increment this value for each test you create
-plan tests => 30;
+plan tests => 15;
 
 my $session = WebGUI::Test->session;
 $session->user({userId => 3});
@@ -75,10 +72,10 @@ $versionTag->commit;
 
 my $duplicatedSnippet = $snippet->duplicate;
 
-is($duplicatedSnippet->get('title'), 'snippet',        'duplicated snippet has correct title');
-isnt($duplicatedSnippet->getId,      $snippetAssetId,  'duplicated snippet does not have same assetId as original');
+is($duplicatedSnippet->title,   'snippet',        'duplicated snippet has correct title');
+isnt($duplicatedSnippet->getId, $snippetAssetId,  'duplicated snippet does not have same assetId as original');
 is( 
-    $duplicatedSnippet->get("revisionDate"),
+    $duplicatedSnippet->revisionDate,
     $snippetRevisionDate,
     'duplicated snippet has the same revision date',
 );
@@ -87,15 +84,15 @@ is($snippet->getId,                  $snippetAssetId,  'original snippet has cor
 is($snippet->getParent->getId,           $root->getId, 'original snippet is a child of root');
 is($duplicatedSnippet->getParent->getId, $root->getId, 'duplicated snippet is also a child of root');
 
-my $newVersionTag = WebGUI::VersionTag->getWorking($session);
-$newVersionTag->commit;
-WebGUI::Test->addToCleanup($newVersionTag);
+WebGUI::Test->addToCleanup( $duplicatedSnippet );
 
 ####################################################
 #
 # cut
 #
 ####################################################
+
+note "cut";
 
 is( $topFolder->cut, 1, 'cut: returns 1 if successful' );
 is($topFolder->get('state'),              'clipboard', '... state set to trash on the trashed asset object');
@@ -131,43 +128,6 @@ sub is_tree_of_folders {
     return $pass ? pass $message : fail $message;
 }
 
-# test www_copy
-my $tag = WebGUI::VersionTag->create($session);
-$tag->setWorking;
-WebGUI::Test->addToCleanup($tag);
-
-my $tempspace  = WebGUI::Asset->getTempspace($session);
-my $folder     = {className => 'WebGUI::Asset::Wobject::Folder'};
-my $root       = $tempspace->addChild($folder);
-my $child      = $root->addChild($folder);
-my $grandchild = $child->addChild($folder);
-
-sub copied {
-    for my $a (@{$tempspace->getAssetsInClipboard}) {
-        if ($a->getParent->getId eq $tempspace->getId) {
-            return $a;
-        }
-    }
-    return undef;
-}
-
-my $process = Test::MockObject->new->mock(update => sub {});
-my @methods = (
-    # single duplicate doesn't fork, so we can just test the www method to
-    # make sure it gets it right
-    sub { shift->www_copy },
-    sub { shift->duplicateBranch(1, 'clipboard') },
-    sub { shift->duplicateBranch(0, 'clipboard') },
-);
-my @prefixes = qw(single children descendants);
-for my $i (0..2) {
-    my $meth = $methods[$i];
-    $root->$meth();
-    my $clip = copied();
-    is_tree_of_folders($clip, $i+1, @prefixes[$i]);
-    $clip->purge;
-}
-
 ####################################################
 #
 # paste
@@ -177,14 +137,15 @@ for my $i (0..2) {
 my $versionTag2 = WebGUI::VersionTag->getWorking($session);
 WebGUI::Test->addToCleanup($versionTag2);
 
+my $tempspace = WebGUI::Test->asset;
 my $page = $tempspace->addChild({
-    className => 'WebGUI::Asset::Wobject::Layout',
-    title     => 'Parent asset',
+    className   => 'WebGUI::Asset::Wobject::Layout',
+    title       => 'Parent asset',
 });
 
 my $shortcut = $tempspace->addChild({
-    className         => 'WebGUI::Asset::Shortcut',
-    shortcutToAssetId => $page->getId,
+    className           => 'WebGUI::Asset::Shortcut',
+    shortcutToAssetId   => $page->getId,
 });
 
 $versionTag2->commit;
@@ -218,19 +179,17 @@ $process->mock( "session" => sub { return $session } );
 # Try with a Collaboration and some Threads
 my $tag = WebGUI::VersionTag->getWorking( $session );
 WebGUI::Test->addToCleanup($tag);
-my $collab = $tempspace->addChild({
+my $collab = WebGUI::Test->asset(
     className => 'WebGUI::Asset::Wobject::Collaboration',
     groupIdEdit => "3",
-    status => "pending",
-    tagId => $tag->getId,
-}, undef, undef, { skipAutoCommitWorkflows => 1, skipNotification => 1 });
+);
 my $thread = $collab->addChild({
     className => 'WebGUI::Asset::Post::Thread',
     groupIdEdit => "3",
-    status => "pending",
-    tagId => $tag->getId,
-}, undef, undef, { skipAutoCommitWorkflows => 1, skipNotification => 1 });
+}, undef, undef, { skipAutoCommitWorkflows => 1, skipNotification => 1, },
+);
 $tag->commit;
+$thread = $thread->cloneFromDb;  ##so that the cached parent asset with the wrong status does not update the db.
 $thread->cut;
 WebGUI::Asset::pasteInFork( $process, { assetId => $collab->getId, list => [ $thread->getId ] } );
 $thread = $thread->cloneFromDb;

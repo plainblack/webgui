@@ -4,7 +4,7 @@ package WebGUI::ProfileField;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -21,8 +21,8 @@ use WebGUI::Form::DynamicField;
 use WebGUI::Operation::Shared;
 use WebGUI::HTML;
 use WebGUI::User;
-use WebGUI::Utility;
 use WebGUI::Pluggable;
+use Tie::IxHash;
 
 =head1 NAME
 
@@ -66,7 +66,7 @@ Return true iff fieldName is reserved and therefore not usable as a profile fiel
 sub isReservedFieldName {
     my $class = shift;
     my $fieldName = shift;
-    return isIn($fieldName, qw/userId shop specialState func op wg_privacySettings username authMethod dateCreated lastUpdated karma status referringAffiliate friendsGroup/);
+    return $fieldName ~~ [qw/userId shop specialState func op wg_privacySettings username authMethod dateCreated lastUpdated karma status referringAffiliate friendsGroup/];
 }
 
 #-------------------------------------------------------------------
@@ -170,7 +170,7 @@ sub create {
 
     # Add the column to the userProfileData table
     $db->write(
-        "ALTER TABLE userProfileData ADD " . $db->dbh->quote_identifier($id)
+        "ALTER TABLE userProfileData ADD " . $db->quote_identifier($id)
         . $dbDataType
     );
     
@@ -193,7 +193,7 @@ sub delete {
     my $db      = $self->session->db;
     
     # Remove the column from the userProfileData table
-    $db->write("ALTER TABLE userProfileData DROP " . $db->dbh->quote_identifier($self->getId));
+    $db->write("ALTER TABLE userProfileData DROP " . $db->quote_identifier($self->getId));
 
     # Remove the record
     $db->deleteRow("userProfileField","fieldName",$self->getId);
@@ -242,7 +242,7 @@ sub formProperties {
     = WebGUI::Operation::Shared::secureEval($self->session,$self->get("possibleValues"));
     unless (ref $values eq 'HASH') {
         if ($self->get('possibleValues') =~ /\S/) {
-            $self->session->errorHandler->warn("Could not get a hash out of possible values for profile field ".$self->getId);
+            $self->session->log->warn("Could not get a hash out of possible values for profile field ".$self->getId);
         }
         $values = {};
     }
@@ -327,7 +327,7 @@ sub formField {
     }
     else {
         # start with specified (or current) user's data.  previous data needed by some form types as well (file).
-        $properties->{value} = $u->profileField($self->getId);
+        $properties->{value} = $u->get($self->getId);
         #If the fieldId is actually found in the request, try to process the form
         if ($session->form->param($self->getId)) {
             $properties->{value} = $self->formProcess($u);
@@ -371,7 +371,7 @@ sub formProcess {
     my $u          = shift || $self->session->user;
     my $userId     = $u->userId;
     
-    my $properties  = $self->formProperties({value => $u->profileField($self->getId)});
+    my $properties  = $self->formProperties({value => $u->get($self->getId)});
     my $result      = $self->session->form->process(
         $self->getId,
         $self->get("fieldType"),
@@ -613,7 +613,7 @@ sub isDuplicate {
     my $value     = shift;
     my $userId    = shift || $session->user->userId;
 
-    my $sql       = qq{select count(*) from userProfileData where $fieldId = ? and userId <> ?};
+    my $sql       = qq{select count(*) from users join userProfileData using( userId ) where $fieldId = ? and userId <> ?};
     my $duplicate = $session->db->quickScalar($sql,[$value, $userId]);
     return ($duplicate > 0);
 }
@@ -813,8 +813,8 @@ sub rename {
 
     $self->session->db->write(
         "ALTER TABLE userProfileData "
-        . "CHANGE " . $db->dbh->quote_identifier($self->getId) 
-        . $db->dbh->quote_identifier($newName) . " " . $dbDataType
+        . "CHANGE " . $db->quote_identifier($self->getId) 
+        . $db->quote_identifier($newName) . " " . $dbDataType
     );
 
     # Update the record
@@ -924,7 +924,7 @@ sub set {
     }
 
     # If the fieldType has changed, modify the userProfileData column
-    if ($properties->{fieldType} ne $originalFieldType) {
+    if ($properties->{fieldType} ne $originalFieldType && !$self->isProtected) {
         # Create a copy of the new properties so we don't mess them up
         my $fieldClass  = $self->getFormControlClass;
         eval { WebGUI::Pluggable::load($fieldClass) };
@@ -933,7 +933,7 @@ sub set {
 
         my $sql 
         = "ALTER TABLE userProfileData MODIFY COLUMN " 
-        . $db->dbh->quote_identifier($self->getId) . q{ }
+        . $db->quote_identifier($self->getId) . q{ }
         . $dbDataType
         ;
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -10,21 +10,12 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use strict;
-use File::Basename ();
-use File::Spec;
-
-my $webguiRoot;
-BEGIN {
-    $webguiRoot = File::Spec->rel2abs(File::Spec->catdir(File::Basename::dirname(__FILE__), File::Spec->updir));
-    unshift @INC, File::Spec->catdir($webguiRoot, 'lib');
-}
-
 #-----------------------------------------
 # A little utility to generate WebGUI
 # thumbnails. 
 #-----------------------------------------
 
+use strict;
 use File::stat;
 use File::Find ();
 use Getopt::Long;
@@ -32,7 +23,7 @@ use Pod::Usage;
 use Image::Magick;
 
 
-use WebGUI::Utility;
+use WebGUI::Paths -inc;
 
 my $thumbnailSize;
 my $onlyMissingThumbnails;
@@ -80,7 +71,7 @@ sub createThumbnail {
         ($x, $y) = $image->Get('width','height');
         $r = $x>$y ? $x / $thumbnailSize : $y / $thumbnailSize;
         $image->Scale(width=>($x/$r),height=>($y/$r)) if ($r > 0);
-        if (isIn($type, qw(tif tiff bmp))) {
+        if ( $type ~~ [qw(tif tiff bmp)] ) {
                 $image->Write('thumb-'.$fileName.'.png');
         } else {
                 $image->Write($_[1].'/thumb-'.$fileName);
@@ -96,7 +87,7 @@ sub shouldThumbnail {
     return 0 if $fileName =~ m/thumb-/;
 
     ##I am not a graphics file, skip me
-    return 0 if !isIn($fileType, qw(jpg jpeg gif png tif tiff bmp));
+    return 0 if ! $fileType ~~ [qw(jpg jpeg gif png tif tiff bmp)];
 
     ##My thumbnail already exists and I was told not to do it again
     return 0 if ($onlyMissingThumbnails && -e 'thumb-'.$fileName);
@@ -165,6 +156,6 @@ Shows this documentation, then exits.
 
 =head1 AUTHOR
 
-Copyright 2001-2009 Plain Black Corporation.
+Copyright 2001-2012 Plain Black Corporation.
 
 =cut

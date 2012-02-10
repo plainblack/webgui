@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -26,7 +26,7 @@ use Pod::Usage;
 use Cwd ();
 
 
-my ($os, $prereq, $dbi, $dbDrivers, $simpleReport, $help, $noprompt);
+my ($prereq, $dbi, $dbDrivers, $simpleReport, $help, $noprompt);
 
 GetOptions(
     'noprompt' => \$noprompt,
@@ -52,15 +52,16 @@ printResult($webguiRoot);
 ###################################
 
 printTest("Perl Interpreter");
-if ($] >= 5.008009) {
+if ($] >= 5.010) {
 	printResult("OK");
 } else {
-	failAndExit("Please upgrade to 5.8.9 or later! Cannot continue without Perl 5.8.9 or higher.");
+	failAndExit("Please upgrade to 5.10 or later! Cannot continue without Perl 5.10 or higher.");
 }
 
 ##Doing this as a global is not nice, but it works
 my $missingModule = 0;
 
+checkModule("Test::Tester",                 "0"          );
 checkModule("LWP",                          5.833        );
 checkModule("HTML::Form",                   5.800,     2 );
 checkModule("Net::DNS",                     0.66,        );
@@ -75,8 +76,10 @@ checkModule("Test::Exception",              0.27,      2 );
 checkModule("Test::Differences",            0.5,       2 );
 checkModule("Test::Class",                  0.31,      2 );
 checkModule("Test::MockTime",               0.09,      2 );
+checkModule("Test::WWW::Mechanize::PSGI",   0.35,      2 );
 checkModule("Pod::Coverage",                0.19,      2 );
 checkModule("Text::Balanced",               2.00,      2 );
+checkModule("Capture::Tiny",                0.08,      2 );
 checkModule("Digest::MD5",                  2.38         );
 checkModule("DBI",                          1.607        );
 checkModule("DBD::mysql",                   4.010        );
@@ -89,7 +92,6 @@ checkModule("Net::SMTP",                    2.31         );
 checkModule("MIME::Tools",                  5.427        );
 checkModule("Net::POP3",                    2.29         );
 checkModule("Tie::IxHash",                  1.21         );
-checkModule("Tie::CPHash",                  1.04         );
 checkModule("XML::Simple",                  2.18         );
 checkModule("DateTime",                     0.4501       );
 checkModule("Time::HiRes",                  1.9719       );
@@ -107,6 +109,7 @@ checkModule("Template",                     2.20,      2 );
 checkModule("XML::FeedPP",                  0.40         );
 checkModule("XML::FeedPP::MediaRSS",        0.02         );
 checkModule("JSON",                         2.12         );
+checkModule("JSON::Any",                    1.22         );
 checkModule("JSON::PP",                     0.00         );
 checkModule("Config::JSON",                 "1.3.1"      );
 checkModule("Text::CSV_XS",                 "0.64"       );
@@ -115,14 +118,16 @@ checkModule("Finance::Quote",               1.15         );
 checkModule("POE",                          1.005        );
 checkModule("POE::Component::IKC::Server",  0.2001       );
 checkModule("POE::Component::Client::HTTP", 0.88         );
-checkModule("Apache2::Request",             2.08         );
+checkModule("Plack",                        0.9949       );
+checkModule("Plack::Request");
+checkModule("Plack::Response");
+checkModule("Plack::Middleware::Status");
+checkModule("Plack::Middleware::Debug");
 checkModule("URI::Escape",                  "3.29"       );
 checkModule("POSIX"                                      );
 checkModule("List::Util"                                 );
 checkModule("Color::Calc"                                );
-checkModule("Text::Aspell",                 0.01,2       );
 checkModule("Weather::Com::Finder",         "0.5.3"      );
-checkModule("Class::InsideOut",             "1.09"       );
 checkModule("HTML::TagCloud",               "0.34"       );
 checkModule("Image::ExifTool",              "7.67"       );
 checkModule("Archive::Any",                 "0.0932"     );
@@ -144,6 +149,11 @@ checkModule('Digest::SHA',                  '5.47'       );
 checkModule("CSS::Minifier::XS",            "0.03"       );
 checkModule("JavaScript::Minifier::XS",     "0.05"       );
 checkModule("Readonly",                     "1.03"       );
+checkModule("Moose",                        "0.93"       );
+checkModule("MooseX::Storage",              "0.23"       );
+checkModule("MooseX::NonMoose",             '0.07'       );
+checkModule("MooseX::Storage::Format::JSON","0.27"       );
+checkModule("namespace::autoclean",         "0.09"       );
 checkModule("Business::PayPal::API",        "0.62"       );
 checkModule("Business::OnlinePayment",      "3.01"       );
 checkModule("Business::OnlinePayment::AuthorizeNet",      "3.22"       );
@@ -151,17 +161,29 @@ checkModule("Locales",                      "0.10"       );
 checkModule("Test::Harness",                "3.17"       );
 checkModule("DateTime::Event::ICal",        "0.10"       );
 checkModule("Cache::FastMmap",              "1.35"       );
-checkModule("Test::Tester",                 "0"          );
 checkModule("Test::Log::Dispatch",          "0"          );
 checkModule("CHI",                          "0.34"       );
 checkModule('IO::Socket::SSL',                           );
+checkModule('Package::Stash',               "0.33"       );
+checkModule('HTTP::Exception',                           );
 checkModule('Net::Twitter',                 "3.13006"    );
 checkModule('PerlIO::eol',                  "0.14"       );
+checkModule('Number::Format',                            );
+checkModule('Email::Valid',                              );
+checkModule('Facebook::Graph',              '0.0505'     );
+checkModule('HTTP::BrowserDetect',          '1.19'       );
+checkModule('Search::QueryParser',                       );
 checkModule('Monkey::Patch',                '0.03'       );
+checkModule('UUID::Tiny',                	'1.03'       );
+checkModule('App::Cmd',                     '0.311'      );
+checkModule('Devel::StackTrace',            '1.27'       );
+checkModule('Devel::StackTrace::WithLexicals',  '0.03'   );
 checkModule('Kwargs',                                    );
 checkModule('Data::ICal',                   '0.16'       );
 checkModule('common::sense',                '3.2'        );
 checkModule('Geo::Coder::Googlev3',         '0.07'       );
+checkModule('IO::File::WithPath',                        );
+checkModule('Plack::Middleware::SizeLimit',              );
 
 failAndExit("Required modules are missing, running no more checks.") if $missingModule;
 
@@ -187,22 +209,26 @@ if ($version eq $WebGUI::VERSION."-".$WebGUI::STATUS) {
 	printResult("You are using ".$WebGUI::VERSION."-".$WebGUI::STATUS." and ".$version." is available.");
 }
 
+require WebGUI::Paths;
+require File::Spec;
 printTest("Locating WebGUI configs");
-my $configs = WebGUI::Config->readAllConfigs($webguiRoot);
+my @configs = WebGUI::Paths->siteConfigs;
 printResult("OK");
-foreach my $filename (keys %{$configs}) {
+foreach my $filename (@configs) {
+    my $shortName = (File::Spec->splitpath($filename))[2];
 	print "\n";	
 	###################################
 	# Checking Config File
 	###################################
 	printTest("Checking config file");
-	printResult($filename);
+	printResult($shortName);
+    my $config = WebGUI::Config->new($filename);
 
 	###################################
 	# Checking uploads folder
 	###################################
 	printTest("Verifying uploads folder");
-        if (opendir(DIR,$configs->{$filename}->get("uploadsPath"))) {
+        if (opendir(DIR,$config->get("uploadsPath"))) {
 		printResult("OK");
 		closedir(DIR);
 	} else {
@@ -210,7 +236,7 @@ foreach my $filename (keys %{$configs}) {
 	}
 	printTest("Verifying DSN");
 	my $dsnok = 0;
-	if ($configs->{$filename}->get("dsn") !~ /\DBI\:\w+\:\w+/) {
+	if ($config->get("dsn") !~ /\DBI\:\w+\:\w+/) {
 		printResult("DSN is improperly formatted.");
 	} else {
 		printResult("OK");
@@ -223,7 +249,7 @@ foreach my $filename (keys %{$configs}) {
 	if ($dsnok) {
 		printTest("Verifying database connection");
 		my ($dbh, $test);
-		unless (eval {$dbh = DBI->connect($configs->{$filename}->get("dsn"),$configs->{$filename}->get("dbuser"),$configs->{$filename}->get("dbpass"))}) {
+		unless (eval {$dbh = DBI->connect($config->get("dsn"),$config->get("dbuser"),$config->get("dbpass"))}) {
 			printResult("Can't connect with info provided!");
 		} else {
 			printResult("OK");
@@ -403,13 +429,6 @@ sub installModule {
 }
 
 #----------------------------------------
-sub isIn {
-        my $key = shift;
-        $_ eq $key and return 1 for @_;
-        return 0;
-}
-
-#----------------------------------------
 sub isRootRequirementMet {
     if (getOs() eq "Linuxish")	 {
 	return ($< == 0);	
@@ -441,7 +460,7 @@ sub prompt {
         my $answer = <STDIN>;
         chomp $answer;
         $answer = $default if ($answer eq "");
-        $answer = prompt($question,$default,@answers) if (($#answers > 0 && !(isIn($answer,@answers))) || $answer eq "");
+        $answer = prompt($question,$default,@answers) if (($#answers > 0 && !($answer ~~ @answers)) || $answer eq "");
         return $answer;
 }
 
@@ -485,6 +504,6 @@ Shows this documentation, then exits.
 
 =head1 AUTHOR
 
-Copyright 2001-2009 Plain Black Corporation.
+Copyright 2001-2012 Plain Black Corporation.
 
 =cut

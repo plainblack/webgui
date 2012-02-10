@@ -1,6 +1,6 @@
 # vim:syntax=perl
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -31,12 +31,17 @@ use WebGUI::Test;
 use WebGUI::Asset;
 
 my $session = WebGUI::Test->session;
-my $thread  = WebGUI::Asset->getImportNode($session)->addChild(
+my $cs      = WebGUI::Asset->getImportNode($session)->addChild(
+    {
+        className => 'WebGUI::Asset::Wobject::Collaboration',
+    }
+);
+my $thread  = $cs->addChild(
     {
         className => 'WebGUI::Asset::Post::Thread',
     }
 );
-WebGUI::Test->addToCleanup($thread);
+WebGUI::Test->addToCleanup($cs);
 $thread->createSubscriptionGroup();
 my $admin = WebGUI::User->new($session, 3);
 ok !$admin->isInGroup($thread->get('subscriptionGroupId'));

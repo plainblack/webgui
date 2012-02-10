@@ -1,7 +1,7 @@
 package WebGUI::Operation::SSO;
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -43,8 +43,8 @@ sub www_ssoViaSessionId {
 		else {
 			my ($userId) = $session->db->quickArray("select userId from userSession where sessionId=?",[$sessionId]);
 			if (defined $userId && $userId ne "") {
-				$session->var->end;
-				$session->var->start($userId);
+				$session->end;
+				$session->start($userId, $sessionId);
 			}
 		}
 	}

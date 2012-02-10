@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -8,9 +8,7 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../../lib";
 
 ## The goal of this test is to test the link between the asset and its shortcut
 # and that changes to the asset are propagated to the shortcut
@@ -27,7 +25,6 @@ use Data::Dumper;
 #----------------------------------------------------------------------------
 # Init
 my $session         = WebGUI::Test->session;
-my $node            = WebGUI::Asset->getImportNode($session);
 
 my $snippet;
 my $shortcut;
@@ -56,6 +53,7 @@ is(
     "Original assetId is correct"
 );
 
+my $node = WebGUI::Asset->getImportNode( $session );
 cmp_bag(
     $original->exportGetRelatedAssetIds,
     [ $shortcut->getId, $node->getId ],
@@ -116,7 +114,7 @@ eval {
 };
 
 is(
-    $contentLastModified, 0,
+    $contentLastModified, undef,
     "Purged Linked Asset: getContentLastModified returns 0 when linked asset missing",
 );
 
@@ -130,10 +128,10 @@ init();
 $snippet->trash();
 
 $snippet->purge();
-$shortcut   = $shortcut->cloneFromDb();
+$shortcut   = eval { $shortcut->cloneFromDb(); };
 
 ok(
-    !defined $shortcut,
+    Exception::Class->caught(),
     "Purge Linked Asset: Shortcut is purged even though it's in the trash"
 );
 
@@ -143,10 +141,10 @@ init();
 #----------------------------------------------------------------------------
 # Test purging snippet purges shortcut also
 $snippet->purge;
-$shortcut   = $shortcut->cloneFromDb();
+$shortcut   = eval { $shortcut->cloneFromDb(); };
 
 ok( 
-    !defined $shortcut,
+    Exception::Class->caught(),
     "Purge Linked Asset: Shortcut is not defined",
 );
 
@@ -154,18 +152,15 @@ ok(
 # init a new snippet and shortcut; handy to have in a sub because we destroy
 # them in some tests and need to reset them for the next round
 sub init {
-    my $versionTag      = WebGUI::VersionTag->getWorking($session);
-    $versionTag->set({name=>"Shortcut Test"});
-    WebGUI::Test->addToCleanup($versionTag);
     # Make a snippet to shortcut
     $snippet 
-        = $node->addChild({
+        = WebGUI::Test->asset(
             className       => "WebGUI::Asset::Snippet",
-        });
+        );
 
     $shortcut
-        = $node->addChild({
+        = WebGUI::Test->asset(
             className           => "WebGUI::Asset::Shortcut",
             shortcutToAssetId   => $snippet->getId,
-        });
+        );
 }

@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -8,9 +8,7 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
  
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../../lib";
 use HTML::TokeParser;
 
 use WebGUI::Test;
@@ -36,8 +34,7 @@ SKIP: {
     skip "HTML::Template::Expr or plugin not loaded", $num_tests unless $plugin;
 
     $session->config->set('templateParsers', ['WebGUI::Asset::Template::HTMLTemplate', 'WebGUI::Asset::Template::HTMLTemplateExpr',] );
-    my ($versionTag, $template) = setup_assets($session);
-    WebGUI::Test->addToCleanup($versionTag);
+    my $template = setup_assets($session);
     my $templateOutput = $template->process({ "foo.bar" => "baz", "number.value" => 2 });
     my $companyName = $session->config->get('companyName');
     like($templateOutput, qr/NAME=$companyName/, "session variable with underscores");
@@ -47,9 +44,6 @@ SKIP: {
 
 sub setup_assets {
 	my $session = shift;
-	my $importNode = WebGUI::Asset->getImportNode($session);
-	my $versionTag = WebGUI::VersionTag->getWorking($session);
-	$versionTag->set({name=>"HTMLTemplateExpr test"});
 	my $properties = {
 		title => 'HTML Template Expr test',
 		className => 'WebGUI::Asset::Template',
@@ -59,7 +53,6 @@ sub setup_assets {
 		#     '1234567890123456789012'
 		template => q!NAME=<tmpl_var session_setting_companyName>\nFOOBAR=<tmpl_var name="foo_bar">\nEQN=<tmpl_var EXPR="2+number_value">!,
 	};
-	my $template = $importNode->addChild($properties, $properties->{id});
-	$versionTag->commit;
-	return ($versionTag, $template);
+	my $template = WebGUI::Test->asset->addChild($properties, $properties->{id});
+	return $template;
 }

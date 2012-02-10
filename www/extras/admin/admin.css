@@ -1,0 +1,395 @@
+
+* {
+    font: 12pt Helvetica, sans-serif;
+}
+
+html,body { margin: 0; padding: 0; height: 100% }
+
+input.disabled {
+    font-style: italic;
+    color: #555;
+}
+
+.with_avatar {
+    background-position: 0 0;
+    background-repeat: no-repeat;
+    padding-left: 50px;
+    min-height: 50px;
+}
+
+#wrapper {
+    position: relative;
+    margin-left: 165px; /* move out of the adminbar's way */
+    min-width:   400px; /* min width for 1024x browsers */
+    height: 100%;
+}
+
+#tabBar {
+    position: absolute;
+    top: 28px;    /* Below the versionTag and user boxes */
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+}
+
+#tabBar #tab_wrapper {
+    position: absolute;
+    top: 34px; /* Below the tabs. */
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+    overflow: hidden;
+}
+
+#tab_content_wrapper {
+    position: absolute;
+    top: 44px; /* below the location bar */
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+}
+
+#versionTag {
+    float: left;
+    width: 57%;
+    padding: 2px 1%;
+    margin: 2px;
+    border: 1px solid #339;
+    border-radius: 5px;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    line-height: 16px;
+    height: 16px;
+}
+
+#user {
+    float: right;
+    width: 38%;
+    padding: 2px 1%;
+    margin: 2px 2px 2px 0px; /* No margin for side next to version tag box */
+    border: 1px solid #339;
+    border-radius: 5px;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    line-height: 16px;
+    height: 16px;
+}
+
+#locationBar {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    z-index: 9000;
+    height: 34px;
+    padding: 5px 0;
+    background-color: white; /* masks what lies beneath! */
+}
+
+#locationBar .yui-button { 
+    margin: auto 2px;
+}
+
+#locationBar #left {
+    position:   absolute;
+    width:      12%;
+    top:        5px;
+    left:       0;
+}
+
+#locationBar #right {
+    position:   absolute;
+    width:      10%;
+    top:        5px;
+    right:      0;
+}
+
+#locationBar #location {
+    position:   relative;
+    margin:     auto 10% auto 12%;
+    width:      77%;
+    height:     80%;
+    border: 1px solid #333;
+    border-radius: 3px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+}
+
+#locationBar #locationInput { 
+    width: 99%;
+    height: 90%;
+    border: none;
+    font-size: 14px;
+    font-family: Verdana, sans-serif;
+}
+
+#locationBar #locationTitle {
+    display: block;
+    position: absolute;
+    top:   3px;
+    right: 0px;
+    height: 90%;
+    margin-right: 5px;
+    font: 14px Verdana, sans-serif;
+    text-align: right;
+}
+
+.searchForm {
+    margin: 1em 8% 0;
+}
+
+.searchResults table {
+    width:  100%;
+}
+
+.searchKeywords {
+    display: block;
+    width:  90%;
+    height: 1.70em;
+    margin-bottom: 5px;
+}
+
+.searchButton {
+    display: block;
+    float: right;
+    width: 7%;
+}
+
+.searchButton-button {
+    display: block;
+    width: 100%;
+}
+
+.searchFilters {
+    clear: both;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+.searchFilters .deleteIcon {
+    display: block;
+}
+
+.searchFilters li { height: 38px; } /* autocomplete is position: absolute, so pretend some height */
+
+.searchFilters span.name {
+    display: block;
+    float: left;
+    width: 9%;
+    text-align: right;
+    padding-right: 1%;
+    line-height: 24px;
+}
+
+.searchFilterAdd {
+    clear: both;
+}
+
+.filter_title input, .filter_ownerUserId div.autocomplete {
+    display: block;
+    float: left;
+    width: 89%;
+}
+
+.searchFilters .yui-ac-bd li {
+    height: 50px;
+}
+
+.searchForm p {
+    margin: 0;
+    padding: 0;
+}
+
+.autocomplete_value {
+    font-size:  larger;
+    font-weight: bold;
+}
+
+.autocomplete_subtext {
+    font-size: smaller;
+}
+
+#wrapper .yui-content {
+    margin: 0; padding: 0; height: 100%;
+}
+
+#viewTab {
+    height: 100%;
+}
+
+#viewTab * { 
+    margin: 0; padding: 0;
+}
+
+#tab_content_wrapper iframe { 
+    border: none;
+    width: 100%;
+    height: 100%;
+}
+
+.clickable {
+    cursor: pointer;
+    color: blue;
+}
+.clickable:hover {
+    text-decoration: underline;
+}
+
+.with_icon {
+    padding: 0 0 0 20px;
+    background: no-repeat 2px 50%;
+}
+
+img.icon {
+    vertical-align: baseline;
+}
+
+a:link {
+    text-decoration: none;
+}
+
+#helper_asset_name {
+    font-size:          14pt;
+    margin-left:        5px;
+}
+
+#assetHelpers_pane h2 {
+    font-size:          14pt;
+    margin-left:        5px;
+}
+
+#infoMessageContainer {
+    position:       absolute;
+    left:           30%;
+    top:            0px;
+    width:          35%;
+    overflow:       hidden;
+}
+
+#infoMessage {
+    width:          100%;
+    height:         100%;
+    background-color: #ccf;
+}
+
+#infoMessage * {
+    margin: 0;
+    padding: 0;
+}
+
+#clipboardItems a, #versionTagItems a {
+    display: block;
+    padding: 2px;
+}
+
+#adminBar a:link, #adminBar a:visited, #adminBar a:active {
+    text-decoration: none;
+    color: black;
+}
+
+#helper_list, #history_list, #admin_list, .new_content_list {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+#helper_list li, #history_list li, #admin_list a, .new_content_list li {
+    color: black;
+    margin: 0;
+    line-height: 18px;
+    font-size: 10pt;
+    white-space: nowrap;
+}
+
+#helper_list li.clickable:hover, #history_list li.clickable:hover, #admin_list li.clickable:hover, 
+.new_content_list li.clickable:hover, #adminBar a:hover, #adminBar li:hover a {
+    text-decoration: underline;
+    color: blue;
+}
+
+#helper_list li, #history_list li {
+    margin-left: 10px;
+}
+
+dl.accordion-menu dt.a-m-t {
+    color: black;
+    margin: 0;
+    padding: 0 0 0 0.5em;
+    background: #dddddd url(../yui/build/assets/skins/sam/sprite.png) repeat-x;
+    height: 20px;
+    border: 1px solid #ACACAC; 
+}
+
+dl.accordion-menu dl.accordion-menu dt.a-m-t {
+    padding: 0 0 0 1.5em;
+}
+
+dl.accordion-menu dt.a-m-t:hover {
+    background: #dddddd url(../yui/build/assets/skins/sam/sprite.png) repeat-x 0% -1300px;
+}
+
+dl.accordion-menu dt.a-m-t.selected {
+    color: white;
+    background: #ddd url(../yui/build/assets/skins/sam/sprite.png) repeat-x 0% -1400px;
+    border-color: black;
+}
+
+dl#adminBar {
+    position:fixed;
+    _position:absolute;
+    top:0;
+        /*
+    _top:expression(eval((document.documentElement && document.documentElement.scrollTop) ? document.documentElement.scrollTop : document.body.scrollTop)); */
+    left:0;
+    width: 160px;
+}
+
+dl.accordion-menu {
+    margin: 0;
+    padding: 0;
+    background: #eeeeee;
+}
+
+dl.accordion-menu dd.a-m-d {
+    margin: 0;
+    padding: 0;
+    overflow: auto;
+    background-color: #eeeeee;
+    background-image: url(panel_bg.jpg);
+    background-repeat: repeat-x;
+    font-weight: normal;
+    overflow-x: hidden;
+}
+
+#treeTab {
+    height: 100%;
+    overflow: auto;
+    margin-bottom: 30px;
+}
+
+#treeCrumbtrail {
+    margin: 5px;
+}
+
+#treeDataTableContainer {
+    margin-bottom: 50px; /* Same as treeBottom height */
+}
+
+#treeBottom {
+    position: fixed;
+    bottom: 0px;
+    width: 100%;
+    background: white;
+    border-top: 2px outset gray;
+}
+
+#treeButtons {
+    margin : 5px;
+    float: left;
+}
+
+#treePagination {
+    margin: 5px;
+    float: left;
+}

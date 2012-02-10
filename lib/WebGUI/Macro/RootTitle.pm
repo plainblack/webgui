@@ -1,7 +1,7 @@
 package WebGUI::Macro::RootTitle;
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -12,6 +12,7 @@ package WebGUI::Macro::RootTitle;
 
 use strict;
 use WebGUI::Asset;
+use WebGUI::Exception;
 
 =head1 NAME
 
@@ -40,9 +41,13 @@ sub process {
 
 	##Get my root.
 	$lineage = substr($lineage,0,12);
-	my $root = WebGUI::Asset->newByLineage($session,$lineage);
+	my $root = eval { WebGUI::Asset->newByLineage($session,$lineage); };
 
-	return "" unless defined $root;
+    if (Exception::Class->caught()) {
+        $session->log->error('RootTitle macro: '.$@);
+        return "";
+    }
+
 	return $root->get("title");	
 }
 

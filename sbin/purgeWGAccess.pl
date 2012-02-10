@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -11,17 +11,10 @@
 #-------------------------------------------------------------------
 
 use strict;
-use File::Basename ();
-use File::Spec;
-
-my $webguiRoot;
-BEGIN {
-    $webguiRoot = File::Spec->rel2abs(File::Spec->catdir(File::Basename::dirname(__FILE__), File::Spec->updir));
-    unshift @INC, File::Spec->catdir($webguiRoot, 'lib');
-}
-
 use Getopt::Long;
 use Pod::Usage;
+use File::Find ();
+use WebGUI::Paths -inc;
 use WebGUI::Config;
 
 local $| = 1; #disable output buffering
@@ -33,8 +26,7 @@ GetOptions(
 pod2usage( verbose => 2 ) if $help;
 pod2usage() if $configFile eq '';
 
-my $config = WebGUI::Config->new($webguiRoot,$configFile);
-use File::Find;
+my $config = WebGUI::Config->new($configFile);
 
 print "\tRemoving unnecessary .wgaccess files.\n";
 my $uploadsPath = $config->get('uploadsPath');
@@ -89,6 +81,6 @@ Shows this documentation, then exits.
 
 =head1 AUTHOR
 
-Copyright 2001-2009 Plain Black Corporation.
+Copyright 2001-2012 Plain Black Corporation.
 
 =cut

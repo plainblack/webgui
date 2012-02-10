@@ -3,7 +3,7 @@ package WebGUI::Form::Guid;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -76,6 +76,7 @@ sub getValue {
     if ($value =~ m/[A-Za-z0-9\-_]{1,22}/) {
         return $value;
     }
+    $self->session->log->warn("Invalid GUID '$value' passed into form");
     return undef;
 }
 

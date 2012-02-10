@@ -3,7 +3,7 @@ package WebGUI::Session::Url;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -20,7 +20,6 @@ use URI;
 use URI::Escape;
 use Scalar::Util qw( weaken );
 use WebGUI::International;
-use WebGUI::Utility;
 use Encode;
 
 
@@ -97,20 +96,6 @@ sub append {
 
 #-------------------------------------------------------------------
 
-=head2 DESTROY ( )
-
-Deconstructor.
-
-=cut
-
-sub DESTROY {
-        my $self = shift;
-        undef $self;
-}
-
-
-#-------------------------------------------------------------------
-
 =head2 escape ( string )
 
 Encodes a string to make it safe to pass in a URL.
@@ -146,11 +131,11 @@ consecutive slashes in the path part of the URL will be replaced with a single s
 sub extras {
     my $self   = shift;
     my $path   = shift;
-    my $url    = $self->session->config->get("extrasURL");
+    my $url    = $self->make_urlmap_work($self->session->config->get("extrasURL"));
     my $cdnCfg = $self->session->config->get('cdn');
     if ( $cdnCfg and $cdnCfg->{'enabled'} and $cdnCfg->{'extrasCdn'} ) {
         unless ( $path and grep $path =~ m/$_/, @{ $cdnCfg->{'extrasExclude'} } ) {
-            if ($cdnCfg->{'extrasSsl'} && $self->session->env->sslRequest) {
+            if ($cdnCfg->{'extrasSsl'} && $self->session->request->secure) {
                 $url = $cdnCfg->{'extrasSsl'};
             }
             else {
@@ -192,15 +177,31 @@ sub gateway {
 	my $pageUrl = shift;
 	my $pairs = shift;
 	my $skipPreventProxyCache = shift;
-        my $url = $self->session->config->get("gateway").'/'.$pageUrl;
-	$url =~ s/\/+/\//g;
+        my $url = $self->make_urlmap_work($self->session->request->base->path).'/'.$pageUrl;
+        $url =~ tr{/}{/}s;
         if ($self->session->setting->get("preventProxyCache") == 1 and !$skipPreventProxyCache) {
-                $url = $self->append($url,"noCache=".randint(0,1000).':'.time());
+                $url = $self->append($url,"noCache=".int(rand(1001)).':'.time());
         }
 	if ($pairs) {
 		$url = $self->append($url,$pairs);
 	}
+
+   return $url;
+}
+
+# Temporary hack
+sub make_urlmap_work {
+    my $self = shift;
+    my $url = shift;
+    if (! $self->session->request) {
         return $url;
+    }
+    if (URI->new($url, 'http')->host) {
+        return $url;
+    }
+    my $uri = $self->session->request->base;
+    $uri = URI->new($url)->abs($uri->path);
+    return $uri->canonical->path;
 }
 
 #-------------------------------------------------------------------
@@ -256,10 +257,10 @@ Returns the URL of the page this request was refered from (no gateway, no query 
 
 sub getRefererUrl {
 	my $self = shift;
-	my $referer = $self->session->env->get("HTTP_REFERER");
+	my $referer = $self->session->request->referer;
 	return undef unless ($referer);
 	my $url = $referer;
-	my $gateway = $self->session->config->get("gateway");
+	my $gateway = $self->session->request->base->path;
 	$url =~ s{https?://[A-Za-z0-9\.-]+$gateway/*([^?]*)\??.*$}{$1};
 	if ($url eq $referer) { ##s/// failed
 		return undef;
@@ -287,24 +288,24 @@ is not passed in, it will attempt to get one from the L<page> method, or finally
 sub forceSecureConnection {
     my $self = shift;
     my $url = shift;
-    my ($conf, $env, $http) = $self->session->quick(qw(config env http));
+    my ($conf, $response) = $self->session->quick(qw(config response));
    
-    if ($conf->get("sslEnabled") && !$env->sslRequest){
+    if ($conf->get("sslEnabled") && ! $self->session->request->secure){
    
-        $url = $self->session->url->page if(! $url);
-        $url = $env->get('QUERY_STRING') if(! $url);
+        my $query_string = $self->session->request->env->{'QUERY_STRING'};
+        $url = $url || $self->page || $query_string;
 
         my $siteURL = $self->getSiteURL();
 
         if($url !~ /^$siteURL/i){
             $url = $siteURL . $url;
         }
-        if($env->get('QUERY_STRING')){ 
-            $url .= "?". $env->get('QUERY_STRING');
+        if($query_string){ 
+            $url .= "?". $query_string;
         }
         if($url =~ /^http/i) {
             $url =~ s/^https?/https/i;
-            $http->setRedirect($url);
+            $response->setRedirect($url);
             return 1;
         }
     } 
@@ -322,11 +323,8 @@ Returns the URL of the page requested (no gateway, no query params, just the pag
 
 sub getRequestedUrl {
 	my $self = shift;
-	return undef unless ($self->session->request);
 	unless ($self->{_requestedUrl}) {
-		$self->{_requestedUrl} = decode_utf8($self->session->request->uri);
-		my $gateway = $self->session->config->get("gateway");
-		$self->{_requestedUrl} =~ s/^$gateway([^?]*)\??.*$/$1/;
+		$self->{_requestedUrl} = decode_utf8($self->session->request->path_info);
 	}
 	return $self->{_requestedUrl};
 }
@@ -345,14 +343,14 @@ sub getSiteURL {
     unless ($self->{_siteUrl}) {
         my $site = "";
         my $sitenames = $self->session->config->get("sitename");
-        my ($http_host,$currentPort) = split(':', $self->session->env->get("HTTP_HOST"));
-        if ($self->session->setting->get("hostToUse") eq "HTTP_HOST" and isIn($http_host,@{$sitenames})) {
+        my ($http_host,$currentPort) = split(':', $self->session->request->env->{"HTTP_HOST"});
+        if ($self->session->setting->get("hostToUse") eq "HTTP_HOST" and $http_host ~~ $sitenames) {
                 $site = $http_host;
         } else {
                 $site = $sitenames->[0];
         }
         my $proto = "http://";
-        if ($self->session->env->sslRequest) {
+        if ($self->session->request->secure) {
                 $proto = "https://";
         }
 		my $port = "";
@@ -426,9 +424,9 @@ A reference to the current session.
 sub new {
 	my $class = shift;
 	my $session = shift;
-	my $self = bless {_session=>$session}, $class;
-        weaken( $self->{_session} );
-        return $self;
+    my $self = bless { _session => $session }, $class;
+    weaken $self->{_session};
+    return $self;
 }
 
 #-------------------------------------------------------------------
@@ -465,7 +463,7 @@ sub page {
     if ($useFullUrl) {
         $url = $self->getSiteURL();
     }
-    my $path = $self->session->asset ? $self->session->asset->get("url") : URI::Escape::uri_escape_utf8($self->getRequestedUrl, "^A-Za-z0-9\-_.!~*'()/");
+    my $path = $self->session->asset ? $self->session->asset->url : URI::Escape::uri_escape_utf8($self->getRequestedUrl, "^A-Za-z0-9\-_.!~*'()/");
     $url .= $self->gateway($path, $pairs, $skipPreventProxyCache);
     return $url;
 }

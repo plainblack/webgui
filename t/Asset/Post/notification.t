@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -11,9 +11,7 @@
 ## Test that trashing a post works, and checking side effects like updating
 ## lastPost information in the Thread, and CS.
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../../lib";
 use WebGUI::Test;
 use WebGUI::Session;
 use Test::More tests => 12; # increment this value for each test you create
@@ -26,30 +24,29 @@ use Encode;
 
 my $session = WebGUI::Test->session;
 
-# Do our work in the import node
-my $node = WebGUI::Asset->getImportNode($session);
-
 # Grab a named version tag
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Collab setup"});
+WebGUI::Test->addToCleanup($versionTag);
 
 # Need to create a Collaboration system in which the post lives.
 my @addArgs = ( undef, undef, { skipAutoCommitWorkflows => 1, skipNotification => 1 } );
 
-my $notification_template = $node->addChild({
+my $notification_template = WebGUI::Test->asset(
     className => 'WebGUI::Asset::Template',
     template  => "<body>!!!url:<tmpl_var url>!!!content:<tmpl_var content>!!!</body>",
     parser    => 'WebGUI::Asset::Template::HTMLTemplate',
-}, @addArgs);
+);
 
-my $collab = $node->addChild({
+my $collab = WebGUI::Test->asset(
     className => 'WebGUI::Asset::Wobject::Collaboration',
     notificationTemplateId => $notification_template->getId,
-}, @addArgs);
+);
 
 # finally, add posts and threads to the collaboration system
 
 my $first_thread = $collab->addChild( { className   => 'WebGUI::Asset::Post::Thread', }, @addArgs);
+$first_thread->setSkipNotification;
 
 ##Thread 1, Post 1 => t1p1
 my $title = "H\x{00E4}ufige Fragen";
@@ -65,9 +62,9 @@ my $t1p1 = $first_thread->addChild(
     },
     @addArgs
 );
+$t1p1->setSkipNotification;
 
 $versionTag->commit();
-WebGUI::Test->addToCleanup($versionTag);
 
 is $t1p1->get('title'), "H\x{00E4}ufige Fragen", "utf8 in title set correctly";
 is $t1p1->get('url'),   "h\x{00E4}ufige-fragen", "... in url";

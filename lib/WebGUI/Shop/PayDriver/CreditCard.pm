@@ -20,9 +20,25 @@ The following methods are available from this class.
 
 =cut
 
-use base qw/WebGUI::Shop::PayDriver/;
+use Moose;
+use WebGUI::Definition::Shop;
+extends 'WebGUI::Shop::PayDriver';
 
 Readonly my $I18N => 'PayDriver_CreditCard';
+
+define pluginName => 'Credit Card Base Class';
+property useCVV2 => (
+            fieldType   => 'yesNo',
+            label       => ['use cvv2', $I18N],
+            hoverHelp   => ['use cvv2 help', $I18N],
+         );
+property credentialsTemplateId => (
+            fieldType    => 'template',
+            label        => ['credentials template', $I18N],
+            hoverHelp    => ['credentials template help', $I18N],
+            namespace    => 'Shop/Credentials',
+            default      => 'itransact_credentials1',
+         );
 
 #-------------------------------------------------------------------
 sub _monthYear {
@@ -90,35 +106,6 @@ sub appendCredentialVars {
     });
 
     return;
-}
-
-#-------------------------------------------------------------------
-sub definition {
-    my ($class, $session, $definition) = @_;
-
-    my $i18n = WebGUI::International->new($session, $I18N);
-
-    tie my %fields, 'Tie::IxHash', (
-        useCVV2         => {
-            fieldType   => 'yesNo',
-            label       => $i18n->get('use cvv2'),
-            hoverHelp   => $i18n->get('use cvv2 help'),
-        },
-        credentialsTemplateId  => {
-            fieldType    => 'template',
-            label        => $i18n->get('credentials template'),
-            hoverHelp    => $i18n->get('credentials template help'),
-            namespace    => 'Shop/Credentials',
-            defaultValue => 'itransact_credentials1',
-        },
-    );
-
-    push @{ $definition }, {
-        name        => 'Credit Card Base Class',
-        properties  => \%fields,
-    };
-
-    return $class->SUPER::definition($session, $definition);
 }
 
 #-------------------------------------------------------------------

@@ -3,7 +3,7 @@ package WebGUI::Asset::Wobject::Folder;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -15,11 +15,62 @@ package WebGUI::Asset::Wobject::Folder;
 =cut
 
 use strict;
-use WebGUI::Asset::Wobject;
-use WebGUI::Cache;
-use WebGUI::Utility;
+use Moose;
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset::Wobject';
 
-our @ISA = qw(WebGUI::Asset::Wobject);
+define assetName   => ["assetName", 'Asset_Folder'];
+define icon        => 'folder.gif';
+define tableName   => 'Folder';
+
+property visitorCacheTimeout => (
+             tab             => "display",
+             fieldType       => "interval",
+             default         => 3600,
+             uiLevel         => 8,
+             label           => ["visitor cache timeout",      'Asset_Folder'],
+             hoverHelp       => ["visitor cache timeout help", 'Asset_Folder'],
+         );
+         # TODO: This should probably be a proper "sortBy" with multiple possible fields
+property sortAlphabetically => (
+             fieldType       => "yesNo",
+             default         => 0,
+             tab             => 'display',
+             label           => ['sort alphabetically',      'Asset_Folder'],
+             hoverHelp       => ['sort alphabetically help', 'Asset_Folder'],
+         );
+
+property sortOrder => (
+             tab             => 'display',
+             fieldType       => "selectBox",
+             options         => \&_sortOrder_options,
+             default         => "ASC",
+             label           => [ "editForm sortOrder label" ,       'Asset_Folder'],
+             hoverHelp       => [ "editForm sortOrder description" , 'Asset_Folder'],
+         );
+sub _sortOrder_options {
+    my $self = shift;
+    my $i18n = WebGUI::International->new($self->session, 'Asset_Folder');
+    my $optionsSortOrder = {
+        ASC     => $i18n->get( "editForm sortOrder ascending" ),
+        DESC    => $i18n->get( "editForm sortOrder descending" ),
+    };
+    return $optionsSortOrder;
+}
+
+property templateId => (
+             fieldType       => "template",
+             default         => 'PBtmpl0000000000000078',
+             namespace       => 'Folder',
+             tab             => 'display',
+             label           => ['folder template title',       'Asset_Folder'],
+             hoverHelp       => ['folder template description', 'Asset_Folder'],
+         );
+has '+uiLevel' => (
+    default => 5,
+);
+
+use Number::Format ();
 
 =head1 NAME
 
@@ -41,75 +92,6 @@ These methods are available from this class:
 =cut
 
 
-
-#-------------------------------------------------------------------
-
-=head2 definition ( definition )
-
-Defines the properties of this asset.
-
-=head3 definition
-
-A hash reference passed in from a subclass definition.
-
-=cut
-
-sub definition {
-    my $class       = shift;
-	my $session     = shift;
-    my $definition  = shift;
-	my $i18n        = WebGUI::International->new($session,"Asset_Folder");
-
-    my %optionsSortOrder = (
-        ASC     => $i18n->get( "editForm sortOrder ascending" ),
-        DESC    => $i18n->get( "editForm sortOrder descending" ),
-    );
-
-    push @{ $definition }, {
-		assetName   => $i18n->get("assetName"),
-		uiLevel     => 5,
-		icon        => 'folder.gif',
-        tableName   => 'Folder',
-        className   => 'WebGUI::Asset::Wobject::Folder',
-		autoGenerateForms => 1,
-        properties  => {
-			visitorCacheTimeout => {
-				tab             => "display",
-				fieldType       => "interval",
-				defaultValue    => 3600,
-				uiLevel         => 8,
-				label           => $i18n->get("visitor cache timeout"),
-				hoverHelp       => $i18n->get("visitor cache timeout help"),
-            },
-            # TODO: This should probably be a proper "sortBy" with multiple possible fields
-			sortAlphabetically => {
-				fieldType       => "yesNo",
-				defaultValue    => 0,
-				tab             => 'display',
-				label           => $i18n->get('sort alphabetically'),
-                hoverHelp       => $i18n->get('sort alphabetically help'),
-            },
-            sortOrder => {
-                tab             => 'display',
-                fieldType       => "selectBox",
-                options         => \%optionsSortOrder,
-                defaultValue    => "ASC",
-                label           => $i18n->get( "editForm sortOrder label" ),
-                hoverHelp       => $i18n->get( "editForm sortOrder description" ),
-            },
-			templateId => {
-				fieldType       => "template",
-				defaultValue    => 'PBtmpl0000000000000078',
-                namespace       => 'Folder',
-				tab             => 'display',
-				label           => $i18n->get('folder template title'),
-				hoverHelp       => $i18n->get('folder template description'),
-            },
-        },
-    };
-
-    return $class->SUPER::definition($session, $definition);
-}
 
 #-------------------------------------------------------------------
 
@@ -145,9 +127,9 @@ Overridden to check the updated dates of children as well
 
 =cut
 
-sub getContentLastModifiedBy {
+override getContentLastModifiedBy => sub {
     my $self      = shift;
-    my $mtime     = $self->SUPER::getContentLastModified;
+    my $mtime     = super();
     my $userId    = $self->get('revisedBy');
     my $childIter = $self->getLineageIterator(["children"]);
     while ( 1 ) {
@@ -165,7 +147,7 @@ sub getContentLastModifiedBy {
         }
     }
     return $userId;
-}
+};
 
 #-------------------------------------------------------------------
 
@@ -175,9 +157,9 @@ Returns the TabForm object that will be used in generating the edit page for thi
 
 =cut
 
-sub getEditForm {
+override getEditForm => sub {
 	my $self = shift;
-	my $tabform = $self->SUPER::getEditForm();
+	my $tabform = super();
 	my $i18n = WebGUI::International->new($self->session,"Asset_Folder");
 	if ($self->get("assetId") eq "new") {
                	$tabform->getTab("properties")->whatNext(
@@ -189,7 +171,7 @@ sub getEditForm {
 			);
 	}
 	return $tabform;
-}
+};
 
 #----------------------------------------------------------------------------
 
@@ -205,7 +187,7 @@ sub getTemplateVars {
 	my $i18n        = WebGUI::International->new($self->session, 'Asset_Folder');
 
 	$vars->{ 'addFile.label'    } = $i18n->get('add file label');
-	$vars->{ 'addFile.url'      } = $self->getUrl('func=add;class=WebGUI::Asset::FilePile');
+	$vars->{ 'addFile.url'      } = $self->getUrl('func=add;className=WebGUI::Asset::FilePile');
     $vars->{ canEdit            } = $self->canEdit;
     $vars->{ canAddFile         } = $self->canEdit;
     
@@ -220,20 +202,20 @@ See WebGUI::Asset::prepareView() for details.
 
 =cut
 
-sub prepareView {
+override prepareView => sub {
     my $self = shift;
-    $self->SUPER::prepareView();
-    my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId"));
+    super();
+    my $template = WebGUI::Asset::Template->newById($self->session, $self->templateId);
     if (!$template) {
         WebGUI::Error::ObjectNotFound::Template->throw(
             error      => qq{Template not found},
-            templateId => $self->get("templateId"),
+            templateId => $self->templateId,
             assetId    => $self->getId,
         );
     }
     $template->prepare($self->getMetaDataAsTemplateVariables);
     $self->{_viewTemplate} = $template;
-}
+};
 
 
 #-------------------------------------------------------------------
@@ -244,11 +226,11 @@ See WebGUI::Asset::purgeCache() for details.
 
 =cut
 
-sub purgeCache {
+override purgeCache => sub {
 	my $self = shift;
-	WebGUI::Cache->new($self->session,"view_".$self->getId)->delete;
-	$self->SUPER::purgeCache;
-}
+	$self->session->cache->remove("view_".$self->getId);
+	super();
+};
 
 #-------------------------------------------------------------------
 
@@ -263,8 +245,9 @@ sub view {
 	my $self    = shift;
 	
     # Use cached version for visitors
+    my $cache = $self->session->cache;
 	if ($self->session->user->isVisitor) {
-		my $out = WebGUI::Cache->new($self->session,"view_".$self->getId)->get;
+		my $out = $cache->get("view_".$self->getId);
 		return $out if $out;
 	}
 
@@ -272,11 +255,11 @@ sub view {
     # TODO: Getting the children template vars should be a seperate method.
 	
     my %rules   = ( );
-    if ( $self->get( "sortAlphabetically" ) ) {
+    if ( $self->sortAlphabetically ) {
         $rules{ orderByClause   } = "assetData.title " . $self->get( "sortOrder" );
     }
     else {
-        $rules{ orderByClause   } = "asset.lineage " . $self->get( "sortOrder" );
+        $rules{ orderByClause   } = "asset.lineage " . $self->sortOrder;
     }
 
 	my $childIter    = $self->getLineageIterator( ["children"], \%rules);
@@ -293,9 +276,9 @@ sub view {
 			push @{ $vars->{ "subfolder_loop" } }, {
 				id           => $child->getId,
 				url          => $child->getUrl,
-				title        => $child->get("title"),
-				menuTitle    => $child->get("menuTitle"),
-				synopsis     => $child->get("synopsis") || '',
+				title        => $child->title,
+				menuTitle    => $child->menuTitle,
+				synopsis     => $child->synopsis || '',
 				canView      => $child->canView(),
 				"icon.small" => $child->getIcon(1),
 				"icon.big"   => $child->getIcon,
@@ -305,11 +288,11 @@ sub view {
             my $childVars   = {
 				id              => $child->getId,
 				canView         => $child->canView(),
-				title           => $child->get("title"),
-				menuTitle       => $child->get("menuTitle"),
-				synopsis        => $child->get("synopsis") || '',
-				size            => WebGUI::Utility::formatBytes($child->get("assetSize")),
-				"date.epoch"    => $child->get("revisionDate"),
+				title           => $child->title,
+				menuTitle       => $child->menuTitle,
+				synopsis        => $child->synopsis || '',
+				size            => Number::Format::format_bytes($child->assetSize),
+				"date.epoch"    => $child->revisionDate,
 				"icon.small"    => $child->getIcon(1),
 				"icon.big"      => $child->getIcon,
 				type            => $child->getName,
@@ -337,8 +320,7 @@ sub view {
 
     # Update the cache
 	if ($self->session->user->isVisitor) {
-		WebGUI::Cache->new($self->session,"view_".$self->getId)
-            ->set($out,$self->get("visitorCacheTimeout"));
+		$cache->set("view_".$self->getId, $out, $self->visitorCacheTimeout);
 	}
 
     return $out;
@@ -353,12 +335,13 @@ See WebGUI::Asset::Wobject::www_view() for details.
 
 =cut
 
-sub www_view {
+override www_view => sub {
 	my $self = shift;
-	$self->session->http->setCacheControl($self->get("visitorCacheTimeout")) if ($self->session->user->isVisitor);
-	$self->SUPER::www_view(@_);
-}
+	$self->session->response->setCacheControl($self->visitorCacheTimeout) if ($self->session->user->isVisitor);
+	super();
+};
 
 
+__PACKAGE__->meta->make_immutable;
 1;
 

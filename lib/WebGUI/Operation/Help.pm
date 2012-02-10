@@ -1,7 +1,7 @@
 package WebGUI::Operation::Help;
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -11,13 +11,11 @@ package WebGUI::Operation::Help;
 #-------------------------------------------------------------------
 
 use strict qw(vars subs);
-use Tie::IxHash;
 use WebGUI::AdminConsole;
 use WebGUI::International;
 use WebGUI::Asset::Template;
 use WebGUI::Macro;
-use WebGUI::Utility;
-use WebGUI::TabForm;
+use WebGUI::Pluggable;
 
 =head1 NAME
 
@@ -43,7 +41,7 @@ sub _loadHelp {
 	my $helpPackage = shift;
         eval { WebGUI::Pluggable::load( $helpPackage ); };
 	if ($@) {
-		$session->errorHandler->error("Help failed to compile: $helpPackage. ".$@);
+		$session->log->error("Help failed to compile: $helpPackage. ".$@);
 		return {};
 	}
 	if (defined *{"$helpPackage\::HELP"}) {  ##Symbol table lookup
@@ -154,7 +152,7 @@ sub _get {
 		return $help->{$id};
 	}
 	else {
-		$session->errorHandler->warn("Unable to load help for $namespace -> $id");
+		$session->log->warn("Unable to load help for $namespace -> $id");
 		return undef;
 	}
 }
@@ -185,29 +183,6 @@ for a Help namespace.
 sub _linkTOC {
 	my $session = shift;
 	return $session->url->page('op=viewHelpChapter;namespace='.$_[0]);
-}
-
-#-------------------------------------------------------------------
-
-=head2 _getHelpFilesList ( $session )
-
-Utility routine for returning a list of all Help files in the lib/WebGUI/Help folder.
-
-=cut
-
-sub _getHelpFilesList {
-	my $session = shift;
-        my $dir = join '/', $session->config->getWebguiRoot,"lib","WebGUI","Help";
-        opendir (DIR,$dir) or $session->errorHandler->fatal("Can't open Help directory!");
-	my @files;
-	foreach my $file (readdir DIR) {
-		next unless $file =~ /.pm$/;
-		my $modName;
-		($modName = $file) =~ s/\.pm$//;
-		push @files, [ $file, $modName ];
-	}
-        closedir(DIR);
-	return @files;
 }
 
 #-------------------------------------------------------------------
@@ -253,7 +228,7 @@ A scalar ref to the array of data that will be broken into columns.
 sub _columnar {
 	my ($columns, $list) = @_;
 	my @entries = @{ $list };
-	my $fraction = round(@entries/$columns + 0.50);
+	my $fraction = sprintf('%.0f', @entries/$columns + 0.50);
 	my $output = '<tr><td valign="top">';
 	@entries = sort { $a->{name} cmp $b->{name} } @entries;
 	my $i = 0;
@@ -297,7 +272,7 @@ sub www_viewHelp {
 	my $session = shift;
 	return $session->privilege->insufficient() unless canView($session);
 	my $ac = WebGUI::AdminConsole->new($session,"help");
-	$session->style->setLink($session->url->extras("/help.css"), {rel=>"stylesheet", type=>"text/css"});
+	$session->style->setCss($session->url->extras("/help.css"));
 	my $namespace = $session->form->process("namespace","className") || "WebGUI";
     my $i18n = WebGUI::International->new($session, $namespace);
 	my $help = _get($session,$session->form->process("hid"),$namespace);
@@ -315,7 +290,7 @@ sub www_viewHelp {
 	else {
 		$vars{body} = $i18n->get($help->{body}) if $help->{body};  ##Body entry is optional
 	}
-	my $userUiLevel = $session->user->profileField("uiLevel");
+	my $userUiLevel = $session->user->get("uiLevel");
 	my $uiOverride = $session->form->process("uiOverride");
         foreach my $row (@{ $help->{fields} }) {
             push @{ $vars{fields} }, 
@@ -325,7 +300,7 @@ sub www_viewHelp {
                 } if ($uiOverride || ($userUiLevel >= ($row->{uiLevel} || 1)));
         }
 	$vars{variable_loop1} = _getTemplateVars($session, 1,  $help->{variables}, $i18n);
-    my $body = WebGUI::Asset::Template->new($session,"PBtmplHelp000000000001")->process(\%vars);
+    my $body = WebGUI::Asset::Template->newById($session, "PBtmplHelp000000000001")->process(\%vars);
 	my $uiOverrideText = $uiOverride ? $i18n->get('show my fields','WebGUI') : $i18n->get('show all fields','WebGUI');
 
 	$ac->addSubmenuItem(_link($session, $session->form->process("hid"), $namespace).";uiOverride=".!$uiOverride, $uiOverrideText) if $userUiLevel < 9;
@@ -379,20 +354,20 @@ sub www_viewHelpIndex {
 	my $session = shift;
 	return $session->privilege->insufficient() unless canView($session);
 	my $i18n = WebGUI::International->new($session);
-        my @helpIndex;
-	my @files = _getHelpFilesList($session,);
-        foreach my $fileSet (@files) {
-		my $namespace = $fileSet->[1];
-		my $help = _load($session,$namespace);
-		foreach my $key (keys %{$help}) {
+    my @helpIndex;
+    my @modules = WebGUI::Pluggable::findAndLoad('WebGUI::Help');
+    for my $namespace (@modules) {
+        $namespace =~ s/^WebGUI::Help:://;
+        my $help = _load($session,$namespace);
+        foreach my $key (keys %{$help}) {
             next if $help->{$key}{private};
             my $title = $i18n->get($help->{$key}{title},$namespace);
             next unless $title;
-			push @helpIndex, [$namespace, $key, $title];
-		}
+            push @helpIndex, [$namespace, $key, $title];
         }
+    }
 	my $output = '<table width="100%" class="content"><tr><td valign="top">';
-	my $halfway = round(@helpIndex / 2);
+	my $halfway = sprintf('%.0f', @helpIndex / 2);
 	my $i = 0;
         @helpIndex = sort { $a->[2] cmp $b->[2] } @helpIndex;
         foreach my $helpEntry (@helpIndex) {

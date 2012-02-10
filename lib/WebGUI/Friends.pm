@@ -3,7 +3,7 @@ package WebGUI::Friends;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -15,16 +15,25 @@ package WebGUI::Friends;
 =cut
 
 use strict;
-use Class::InsideOut qw(id register public readonly);
+
+use Moose;
+
+has 'session' => (
+    is              => 'ro',
+    required        => 1,
+    weak_ref        => 1,
+);
+
+has 'user' => (
+    is              => 'ro',
+    required        => 1,
+);
+
 use WebGUI::DateTime;
 use WebGUI::HTML;
 use WebGUI::Inbox;
 use WebGUI::International;
 use WebGUI::User;
-use WebGUI::Utility;
-
-readonly session    => my %session;
-readonly user       => my %user;
 
 =head1 NAME
 
@@ -44,6 +53,20 @@ A user relationship management system.
 =head1 METHODS
 
 =cut
+
+around BUILDARGS => sub {
+    my $orig       = shift;
+    my $className  = shift;
+
+    ##Original arguments start here.
+    my $protoSession = $_[0];
+    if (blessed $protoSession && $protoSession->isa('WebGUI::Session')) {
+        my $protoUser = defined $_[1] ? $_[1] : $protoSession->user;
+        return $className->$orig(session => $protoSession, user => $protoUser,);
+    }
+    return $className->$orig(@_);
+};
+
 
 
 #-------------------------------------------------------------------
@@ -225,7 +248,7 @@ The userId to check against this user.
 sub isFriend {
     my $self = shift;
     my $userId = shift;
-    return isIn($userId, @{$self->user->friends->getUsers});    
+    return $userId ~~ $self->user->friends->getUsers;
 }
 
 #-------------------------------------------------------------------
@@ -275,16 +298,6 @@ A reference to a WebGUI::User object that we're going to manage the friends of. 
 attached to the session.
 
 =cut
-
-sub new {
-    my $class       = shift;
-    my $session     = shift;
-    my $user        = shift || $session->user;
-    my $self        = register($class);
-    $session{id $self} = $session;
-    $user{id $self} = $user;
-    return $self;
-}
 
 #-------------------------------------------------------------------
 

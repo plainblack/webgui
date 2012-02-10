@@ -509,7 +509,7 @@ sub run {
 
             # Instantiate the asset to check it is a Survey instance, and to grab its assetId
             if ( $session->id->valid($asset_spec) ) {
-                $asset = WebGUI::Asset->new( $session, $asset_spec );
+                $asset = WebGUI::Asset->newById( $session, $asset_spec );
             }
             if ( !$asset ) {
                 $asset = WebGUI::Asset->newByUrl( $session, $asset_spec );

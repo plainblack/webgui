@@ -3,7 +3,7 @@ package WebGUI::Form::ReadOnly;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -37,6 +37,18 @@ The following methods are specifically available from this class. Check the supe
 =cut
 
 
+sub definition {
+    my $class = shift;
+    my $session = shift;
+    my $definition = shift || [];
+    push(@{$definition}, {
+        # Should we show the hidden field too?
+        addHidden    => {
+            defaultValue    => 1,
+        },
+    });
+    return $class->SUPER::definition( $session, $definition );
+}
 #-------------------------------------------------------------------
 
 =head2 getName ( session )
@@ -73,7 +85,7 @@ Renders the value and a hidden input type if a "name" attribute was specified.
 sub toHtml {
 	my $self = shift;
     my $out = $self->getOriginalValue;
-    if ($self->get('name') ne '') {
+    if ($self->get('addHidden') && $self->get('name') ne '') {
         $out .= $self->toHtmlAsHidden;
     }
     return $out;
@@ -89,7 +101,7 @@ Outputs nothing unless a "name" attribute was specified.
 
 sub toHtmlAsHidden {
     my $self = shift;
-    if ($self->get('name') ne '') {
+    if ($self->get('addHidden') && $self->get('name') ne '') {
         return $self->SUPER::toHtmlAsHidden;
     }
 	return undef;

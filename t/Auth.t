@@ -1,6 +1,6 @@
 # vim:syntax=perl
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -13,9 +13,7 @@
 # 
 #
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/lib";
 use Test::More;
 use Test::Deep;
 use Exception::Class;
@@ -29,9 +27,7 @@ use WebGUI::Session;
 my $session         = WebGUI::Test->session;
 
 my @cleanupUsernames    = ();   # Will be cleaned up when we're done
-my $AUTH_METHOD     = "TEST";   # Used as second argument to WebGUI::Auth->new
 my $auth;   # will be used to create auth instances
-my ($request, $oldRequest, $output);
 
 #----------------------------------------------------------------------------
 # Tests
@@ -41,15 +37,12 @@ plan tests => 11;        # Increment this number for each test you create
 #----------------------------------------------------------------------------
 # Test createAccountSave and returnUrl together
 # Set up request
-$oldRequest  = $session->request;
-$request     = WebGUI::PseudoRequest->new;
-$request->setup_param({
+my $createAccountSession = WebGUI::Test->newSession(0, {
     returnUrl       => 'REDIRECT_URL',
 });
-$session->{_request} = $request;
 
-$auth           = WebGUI::Auth->new( $session, $AUTH_METHOD );
-my $username    = $session->id->generate;
+$auth           = WebGUI::Auth->new( $createAccountSession );
+my $username    = $createAccountSession->id->generate;
 my $language	= "PigLatin";
 push @cleanupUsernames, $username;
 installPigLatin();
@@ -59,8 +52,8 @@ WebGUI::Test->addToCleanup(sub {
 	rmdir File::Spec->catdir(WebGUI::Test->lib, qw/WebGUI i18n PigLatin/);
 });
 
-$session->scratch->setLanguageOverride($language);
-$output         = $auth->createAccountSave( $username, { }, "PASSWORD" ); 
+$createAccountSession->scratch->setLanguageOverride($language);
+my $output         = $auth->www_createAccountSave( $username, { }, "PASSWORD" ); 
 WebGUI::Test->addToCleanup(sub {
     for my $username ( @cleanupUsernames ) {
         # We don't create actual, real users, so we have to cleanup by hand
@@ -94,46 +87,38 @@ WebGUI::Test->addToCleanup(sub {
 });
 
 is(
-    $session->http->getRedirectLocation, 'REDIRECT_URL',
+    $createAccountSession->response->location, 'REDIRECT_URL',
     "returnUrl field is used to set redirect after createAccountSave",
 );
 
-is $session->user->profileField('language'), $language, 'languageOverride is taken in to account in createAccountSave';
-$session->scratch->delete('language');  ##Remove language override
-
-# Session Cleanup
-$session->{_request} = $oldRequest;
+is $createAccountSession->user->get('language'), $language, 'languageOverride is taken in to account in createAccountSave';
+$createAccountSession->scratch->delete('language');  ##Remove language override
 
 
 
 #----------------------------------------------------------------------------
 # Test login and returnUrl together
 # Set up request
-$oldRequest  = $session->request;
-$request     = WebGUI::PseudoRequest->new;
-$request->setup_param({
+
+my $loginSession = WebGUI::Test->newSession(0, {
     returnUrl       => 'REDIRECT_LOGIN_URL',
 });
-$session->{_request} = $request;
 
-$auth           = WebGUI::Auth->new( $session, $AUTH_METHOD, 3 );
-my $username    = $session->id->generate;
+$auth           = WebGUI::Auth->new( $loginSession, 3 );
+my $username    = $loginSession->id->generate;
 push @cleanupUsernames, $username;
 $session->setting->set('showMessageOnLogin', 0);
-$output         = $auth->login; 
+$output         = $auth->www_login;
 
 is(
-    $session->http->getRedirectLocation, 'REDIRECT_LOGIN_URL',
+    $loginSession->response->location, 'REDIRECT_LOGIN_URL',
     "returnUrl field is used to set redirect after login",
 );
 is $output, undef, 'login returns undef when showMessageOnLogin is false';
 
-
-# Session Cleanup
-$session->{_request} = $oldRequest;
-
 #----------------------------------------------------------------------------
 # Test createAccountSave
+$auth           = WebGUI::Auth->new( $session );
 $username    = $session->id->generate;
 push @cleanupUsernames, $username;
 
@@ -150,14 +135,14 @@ tie my %profile_info, "Tie::IxHash", (
     email           => 'andy@shawshank.com'
 );
 
-$auth->createAccountSave( $username, { }, "PASSWORD", \%profile_info );
+diag $auth->www_createAccountSave( $username, { }, "PASSWORD", \%profile_info );
 
 #Reset andy to the session users since stuff has changed
 my $andy = $session->user;
 
 #Test that the address was saved to the profile
 cmp_bag(
-    [ map { $andy->profileField($_) } keys %profile_info ],
+    [ map { $andy->get($_) } keys %profile_info ],
     [ values %profile_info ],
     'Profile fields were saved'
 );
@@ -233,13 +218,12 @@ sub installPigLatin {
     use File::Copy;
 	mkdir File::Spec->catdir(WebGUI::Test->lib, 'WebGUI', 'i18n', 'PigLatin');
 	copy( 
-		WebGUI::Test->getTestCollateralPath('WebGUI.pm'),
+		WebGUI::Test->getTestCollateralPath('International/lib/WebGUI/i18n/PigLatin/WebGUI.pm'),
 		File::Spec->catfile(WebGUI::Test->lib, qw/WebGUI i18n PigLatin WebGUI.pm/)
 	);
 	copy(
-		WebGUI::Test->getTestCollateralPath('PigLatin.pm'),
+		WebGUI::Test->getTestCollateralPath('International/lib/WebGUI/i18n/PigLatin.pm'),
 		File::Spec->catfile(WebGUI::Test->lib, qw/WebGUI i18n PigLatin.pm/)
 	);
 }
-
 

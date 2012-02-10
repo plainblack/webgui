@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -8,17 +8,13 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/lib";
 
 use WebGUI::Test;
 use WebGUI::Session;
-use WebGUI::Utility;
 
 use WebGUI::User;
 use WebGUI::Group;
-use WebGUI::Cache;
 
 use Test::More;
 use Test::Deep;
@@ -76,9 +72,8 @@ my @ipTests = (
 
 
 my $session = WebGUI::Test->session;
-my $testCache = WebGUI::Cache->new($session, 'myTestKey');
-$testCache->flush;
-WebGUI::Test->addToCleanup(sub { $testCache->flush; });
+$session->cache->remove('myTestKey');
+WebGUI::Test->addToCleanup(sub { $session->cache->remove('myTestKey'); });
 
 foreach my $gid ('new', '') {
 	my $g = WebGUI::Group->new($session, $gid);
@@ -416,13 +411,12 @@ is( $session->stow->get('isInGroup'), undef, 'setting dbQuery clears cached isIn
 is( $mob[0]->isInGroup($gY->getId), 1, 'mob[0] is in group Y after setting dbQuery');
 is( $mob[0]->isInGroup($gZ->getId), 1, 'mob[0] isInGroup Z');
 
-ok( isIn($mob[0]->userId, @{ $gY->getAllUsers() }), 'mob[0] in list of group Y users');
-ok( !isIn($mob[0]->userId, @{ $gZ->getUsers() }), 'mob[0] not in list of group Z users');
+ok( $mob[0]->userId ~~ $gY->getAllUsers, 'mob[0] in list of group Y users');
+ok( ! ($mob[0]->userId ~~ $gZ->getUsers), 'mob[0] not in list of group Z users');
 
-ok( isIn($mob[0]->userId, @{ $gZ->getAllUsers() }), 'mob[0] in list of group Z users, recursively');
+ok( $mob[0]->userId ~~ $gZ->getAllUsers, 'mob[0] in list of group Z users, recursively');
 
-WebGUI::Cache->new($session, $gY->getId)->delete();  ##Delete cached key for testing
-$session->stow->delete("isInGroup");
+$gY->clearCaches;
 
 my @mobIds = map { $_->userId } @mob;
 
@@ -435,8 +429,7 @@ cmp_bag(
 $session->db->write('delete from myUserTable where userId=?',[$mob[0]->getId]);
 my $inDb = $session->db->quickScalar("select count(*) from myUserTable where userId=?",[$mob[0]->getId]);
 ok ( !$inDb, 'mob[0] no longer in myUserTable');
-WebGUI::Cache->new($session, ["groupMembers",$gY->getId])->delete;  #Delete cache so we get a good test
-$session->stow->delete("isInGroup");                                #Delete stow so we get a good test
+$session->cache->remove("isInGroup");                                #Delete stow so we get a good test
 
 is_deeply(
 	[ (map { $gY->hasDatabaseUser($_->getId) }  @mob) ],
@@ -541,7 +534,7 @@ my @sessionBank = ();
 
 foreach my $idx (0..$#scratchTests) {
 	##Create a new session
-	$sessionBank[$idx] = WebGUI::Session->open(WebGUI::Test->root, WebGUI::Test->file);
+	$sessionBank[$idx] = WebGUI::Session->open(WebGUI::Test->file);
 
 	##Create a new user and make this session's default user that user
 	$itchies[$idx] = WebGUI::User->new($sessionBank[$idx], "new");
@@ -568,8 +561,7 @@ foreach my $scratchTest (@scratchTests) {
     is($scratchTest->{user}->isInGroup($gS->getId), $scratchTest->{expect}, $scratchTest->{comment});
 }
 
-WebGUI::Cache->new($session, $gS->getId)->delete();  ##Delete cached key for testing
-$session->stow->delete("isInGroup");
+$session->cache->remove("isInGroup");
 
 #hasScratchUser test
 foreach my $idx (0..$#scratchTests) {
@@ -622,12 +614,13 @@ cmp_bag(
 my @tcps =  ();
 
 foreach my $idx (0..$#ipTests) {
-	##Set the ip to be used by the session for this user
 	my $ip = $ipTests[$idx]->{ip};
-	$ENV{REMOTE_ADDR} = $ip;
 
 	##Create a new session
-	$sessionBank[$idx] = WebGUI::Session->open(WebGUI::Test->root, WebGUI::Test->file);
+	$sessionBank[$idx] = WebGUI::Test->newSession;
+
+	##Set the ip to be used by the session for this user
+	$sessionBank[$idx]->request->env->{REMOTE_ADDR} = $ip;
 
 	##Create a new user and make this session's default user that user
 	$tcps[$idx] = WebGUI::User->new($sessionBank[$idx], "new");
@@ -641,7 +634,6 @@ foreach my $idx (0..$#ipTests) {
     $ipTests[$idx]->{session} = $sessionBank[$idx];
 }
 WebGUI::Test->addToCleanup(@tcps);
-WebGUI::Test->addToCleanup(@sessionBank);
 
 my $gI = WebGUI::Group->new($session, "new");
 WebGUI::Test->addToCleanup($gI);
@@ -674,8 +666,8 @@ foreach my $ipTest (@ipTests) {
 
     note "Checking for user Visitor session leak via IP address";
 
-    $ENV{REMOTE_ADDR} = '191.168.1.1';
     my $remoteSession = WebGUI::Test->newSession;
+    $remoteSession->request->env->{REMOTE_ADDR} = '191.168.1.1';
     $remoteSession->user({userId => 1});
 
     my $localIpGroup = WebGUI::Group->new($session, 'new');
@@ -684,8 +676,8 @@ foreach my $ipTest (@ipTests) {
 
     ok !$remoteSession->user->isInGroup($localIpGroup->getId), 'Remote Visitor fails to be in the group';
 
-    $ENV{REMOTE_ADDR} = '192.168.33.1';
     my $localSession = WebGUI::Test->newSession;
+    $localSession->request->env->{REMOTE_ADDR} = '192.168.33.1';
     WebGUI::Test->addToCleanup($localIpGroup, $remoteSession, $localSession);
     $localSession->user({userId => 1});
     $localIpGroup->clearCaches;

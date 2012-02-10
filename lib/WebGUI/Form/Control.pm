@@ -3,7 +3,7 @@ package WebGUI::Form::Control;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -16,6 +16,7 @@ package WebGUI::Form::Control;
 
 use strict;
 use WebGUI::International;
+use Scalar::Util qw( blessed );
 
 =head1 NAME
 
@@ -133,7 +134,7 @@ A text string that will be appended after the field when toHtmlWithWrapper() is 
 
 =head4 labelClass
 
-A stylesheet class assigned to the label with toHtmlWithWrapper() is called. Defaults to "formDescription".
+A stylesheet class assigned to the label with toHtmlWithWrapper() is called.
 
 =head4 fieldClass
 
@@ -155,7 +156,7 @@ sub definition {
 	my $definition = shift || [];
 	push(@{$definition}, {
 		name=>{
-			defaultValue=>undef
+			defaultValue=>''
 			},
 		value=>{
 			defaultValue=>undef
@@ -176,7 +177,7 @@ sub definition {
 			defaultValue=>1
 			},
 		labelClass=>{
-			defaultValue=>"formDescription"
+			defaultValue=>""
 			},
 		fieldClass=>{
 			defaultValue=>"tableData"
@@ -201,45 +202,6 @@ sub definition {
         },
     });
 	return $definition;
-}
-
-#-------------------------------------------------------------------
-
-=head2 displayForm ( )
-
-Depricated, see toHtml().
-
-=cut
-
-sub displayForm {
-	my $self = shift;
-	return $self->toHtml(@_);
-}
-
-#-------------------------------------------------------------------
-
-=head2 displayFormWithWrapper ( )
-
-Depricated, see toHtmlWithWrapper().
-
-=cut
-
-sub displayFormWithWrapper {
-	my $self = shift;
-    return $self->toHtmlWithWrapper(@_);
-}
-
-#-------------------------------------------------------------------
-
-=head2 displayValue ( )
-
-Depricated, see getValueAsHtml().
-
-=cut
-
-sub displayValue {
-	my ($self) = @_;
-	return $self->getValueAsHtml;
 }
 
 #-------------------------------------------------------------------
@@ -341,9 +303,10 @@ sub generateIdParameter {
 
 #-------------------------------------------------------------------
 
-=head2 get ( var )
+=head2 get ( [var] )
 
-Returns a property of this form object.
+Returns a property of this form object. If no property is specified, returns a hashref of all
+properties.
 
 =head3 var
 
@@ -354,7 +317,11 @@ The variable name of the value to return.
 sub get {
 	my $self = shift;
 	my $var = shift;
-	return $self->{_params}{$var};
+        if ( $var ) {
+            return $self->{_params}{$var};
+        }
+
+        return $self->{_params};
 }
 
 #-------------------------------------------------------------------
@@ -369,6 +336,28 @@ sub getDatabaseFieldType {
     return "CHAR(255)";
 }
 
+#-------------------------------------------------------------------
+
+=head2 getLabel ( )
+
+Gets the label for this form control, including any configured hover help.
+
+=cut 
+
+sub getLabel {
+    my ( $self ) = @_;
+
+    return '' if !$self->get('label');
+
+    my $labelClass = " " . $self->get("labelClass");
+    $labelClass = qq| class="formDescription${labelClass}"|;
+
+    my $hoverHelp = $self->get("hoverHelp") || '';
+    $hoverHelp =~ s/^\s+//;
+    $hoverHelp &&= '<div class="wg-hoverhelp">' . $hoverHelp . '</div>';
+
+    return '<label'.$labelClass.' for="'.$self->get("id").'">'.$self->get("label").'</label>' . $hoverHelp;
+}
 
 #-------------------------------------------------------------------
 
@@ -405,6 +394,20 @@ sub getValue {
 
 #-------------------------------------------------------------------
 
+=head2 getValueAsScalar 
+
+Returns the value as a scalar, which means for complex types it's returned as a serialized string of some sort.
+
+=cut
+
+sub getValueAsScalar {
+    my $self = shift;
+    return $self->getValue;
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 getOriginalValue ( )
 
 Returns the either the "value" or "defaultValue" passed in to the object in that order, and doesn't take into account form processing.
@@ -431,6 +434,22 @@ sub getDefaultValue {
 	return $self->get("defaultValue");
 }
 
+#----------------------------------------------------------------------------
+
+=head2 getPackageClassName ( )
+
+Get the class name for this package. Defaults to 'wg-form-typeCamelCase' (so, a
+WebGUI::Form::Button would have a class of 'wg-form-button' and a
+WebGUI::Form::SelectBox would have a class of 'wg-form-selectBox')
+
+=cut
+
+sub getPackageClassName {
+    my ( $self ) = @_;
+    my $package = blessed $self;
+    $package =~ s/WebGUI::Form:://;
+    return 'wg-form-' . lcfirst $package;
+}
 
 #-------------------------------------------------------------------
 
@@ -504,21 +523,6 @@ sub isInRequest {
     my $self = shift;
     return $self->session->form->hasParam($self->get('name'));
 }
-
-#-------------------------------------------------------------------
-
-=head2 isProfileEnabled ( session )
-
-Depricated. See isDynamicCompatible().
-
-=cut
-
-
-sub isProfileEnabled {
-    my $class = shift;
-    return $class->isDynamicCompatible();
-}
-
 
 #-------------------------------------------------------------------
 
@@ -599,7 +603,7 @@ Renders the form field to HTML as a table row complete with labels, subtext, hov
 sub passUiLevelCheck {
 	my $self = shift;
 	my $user = $self->session->user;
-	return $self->get("uiLevel") <= $user->profileField("uiLevel") || $user->isAdmin;
+	return $self->get("uiLevel") <= $user->get("uiLevel") || $user->isAdmin;
 }
 
 
@@ -613,17 +617,13 @@ Common code for preparing wrappers for *WithWrapper
 
 sub prepareWrapper {
 	my $self = shift;
-	my $rowClass = $self->get("rowClass");
-	$rowClass = qq| class="$rowClass" | if($self->get("rowClass"));
-	my $labelClass = $self->get("labelClass");
-	$labelClass = qq| class="$labelClass" | if($self->get("labelClass"));
+	my $rowClass = join " ", $self->get("rowClass"), $self->getPackageClassName;
+	$rowClass = qq| class="$rowClass" |;
 	my $fieldClass = $self->get("fieldClass");
 	$fieldClass = qq| class="$fieldClass" | if($self->get("fieldClass"));
-	my $hoverHelp = $self->get("hoverHelp") || '';
-	$hoverHelp =~ s/^\s+//;
     my $subtext = $self->get("subtext");
 	$subtext = qq| <span class="formSubtext">$subtext</span>| if ($subtext);
-	return ($fieldClass, $rowClass, $labelClass, $hoverHelp, $subtext);
+	return ($fieldClass, $rowClass, $subtext);
 }
 
 
@@ -713,21 +713,38 @@ Renders the form field to HTML as a table row complete with labels, subtext, hov
 =cut
 
 sub toHtmlWithWrapper {
-	my $self = shift;
-	if ($self->passUiLevelCheck) {
-		my $rawField = $self->toHtml(); # has to be called before prepareWrapper for some controls, namely captcha.
-		my ($fieldClass, $rowClass, $labelClass, $hoverHelp, $subtext)  = $self->prepareWrapper;
-        $hoverHelp &&= '<div class="wg-hoverhelp">' . $hoverHelp . '</div>';
-        return '<tr'.$rowClass.' id="'.$self->get("id").'_row">
-				<td'.$labelClass.' valign="top" style="width: 180px;"><label for="'.$self->get("id").'">'.$self->get("label").'</label>' . $hoverHelp . '</td>
-				<td valign="top"'.$fieldClass.'>'.$rawField . $subtext . "</td>
-			</tr>\n";
-	} else {
-		return $self->toHtmlAsHidden;
-	}
+    my $self = shift;
+    if ($self->passUiLevelCheck) {
+        my $rawField = $self->toHtml(); # has to be called before prepareWrapper for some controls, namely captcha.
+        my ($fieldClass, $rowClass, $subtext)  = $self->prepareWrapper;
+        return '<div'.$rowClass.' id="'.$self->get("id").'_row">'
+            . $self->getLabel 
+            . $rawField 
+            . $subtext 
+            . "</div>\n";
+    } else {
+        return $self->toHtmlAsHidden;
+    }
 }
 
+#----------------------------------------------------------------------------
 
+=head2 toTemplateVars ( )
+
+Returns a hashref of template variables of the properties of this control, used
+to re-create it in a template.
+
+=cut
+
+sub toTemplateVars {
+    my ( $self ) = @_;
+    my %var = ( 
+        %{$self->get},
+        label           => $self->getLabel,
+        label_nohover   => $self->get('label'),
+    );
+    return \%var;
+}
 
 1;
 

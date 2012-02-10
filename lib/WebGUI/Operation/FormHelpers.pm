@@ -1,7 +1,7 @@
 package WebGUI::Operation::FormHelpers;
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -11,14 +11,12 @@ package WebGUI::Operation::FormHelpers;
 #-------------------------------------------------------------------
 
 use strict;
-use Tie::IxHash;
 use WebGUI::Asset;
 use WebGUI::Asset::Wobject::Folder;
 use WebGUI::Form::Group;
 use WebGUI::HTMLForm;
 use WebGUI::Pluggable;
 use WebGUI::Storage;
-use WebGUI::Utility;
 
 =head1 NAME
 
@@ -50,7 +48,7 @@ sub www_formHelper {
     return "ERROR" unless (defined $sub && defined $class);
     my $output = eval { WebGUI::Pluggable::run($class, "www_".$sub, [$session]) }; 
     if ($@) {
-        $session->errorHandler->error($@); 
+        $session->log->error($@); 
         return "ERROR";
     }
     return $output;

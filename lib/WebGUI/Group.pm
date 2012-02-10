@@ -3,7 +3,7 @@ package WebGUI::Group;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -15,14 +15,14 @@ package WebGUI::Group;
 =cut
 
 use strict;
-use Tie::CPHash;
 use WebGUI::LDAPLink;
 use WebGUI::Macro;
-use WebGUI::Utility;
 use WebGUI::Pluggable;
+require WebGUI::Asset;
 use WebGUI::International;
+use WebGUI::DatabaseLink;
 use Scalar::Util qw( weaken );
-
+use Net::CIDR::Lite;
 
 =head1 NAME
 
@@ -70,6 +70,49 @@ This package provides an object-oriented way of managing WebGUI groups and group
  $boolean = $self->session->user->isInGroup($groupId);
  $boolean = $group->userIsAdmin($userId,$groupId);
  $epoch = $group->userGroupExpireDate($userId,$date);
+
+=head1 MAGIC NUMBERS
+
+These magic group IDs are used throughout WebGUI:
+
+=over 4
+
+=item 1
+
+The visitors group. Only visitors are in this group, not registered users.
+
+=item 2
+
+The registered users group. Any user that is not a visitor is in this group.
+
+=item 3
+
+The admins group. This is the highest level of authority that can be given in
+the site. Admins can do everything regardless of permissions.
+
+=item 4
+
+Content Managers. This group is allowed to manage the content on the site. They
+must still have permissions to edit the individual asset however.
+
+=item 7
+
+Everyone. All Visitors and Registered Users are in this group.
+
+=item 11
+
+Secondary Admins. By default, this group has limited privileges to edit some
+users and groups.
+
+=item 12
+
+Turn Admin On group. This group is allowed to use the Admin interface.
+
+=item 13
+
+Export Managers. This group is allowed to use the HTML export functions.
+
+=back
 
 =head1 METHODS
 
@@ -128,14 +171,14 @@ not be added to any group.  Groups may not be added to themselves.
 sub addGroups {
 	my $self = shift;
 	my $groups = shift;
-	WebGUI::Cache->new($self->session, $self->getId)->delete;
+	$self->session->cache->remove("group_" . $self->getId); 
 	GROUP: foreach my $gid (@{$groups}) {
 		next if ($gid eq '1');
 		next if ($gid eq $self->getId);
 		my ($isIn) = $self->session->db->quickArray("select count(*) from groupGroupings where groupId=? and inGroup=?", [$gid, $self->getId]);
         next GROUP if $isIn;
 		my $group = WebGUI::Group->new($self->session, $gid);
-		my $recursive = isIn($self->getId, @{$group->getGroupsIn(1)});
+		my $recursive = $self->getId ~~ $group->getGroupsIn(1);
         next GROUP if $recursive;
         $self->session->db->write("REPLACE into groupGroupings (groupId,inGroup) values (?,?)",[$gid, $self->getId]);
 	}
@@ -245,11 +288,10 @@ sub cacheGroupings {
     my $userId       = $user->userId;
     my $sessionId    = $session->getId;
 
-    ### Undocumented - cache and groupMembers can be passed in if it they are already built.
+    ### Undocumented - groupMembers can be passed in if it they are already built.
     #These exist specifically for WebGUI::User::isInGroup to use and should not be used elsewhere
     #unless you know what you are doing
-	my $cache        = shift || WebGUI::Cache->new($session,["groupMembers",$groupId]) || {};
-	my $groupMembers = shift || $cache->get;
+	my $groupMembers = shift || $session->cache->get("groupMembers".$groupId) || {};
 
     #Build cache in a special way for visitors
 	if($userId eq '1') {
@@ -259,9 +301,7 @@ sub cacheGroupings {
         $groupMembers->{$userId} = { isMember => $isInGroup };
     }
 
-    if ($self->groupCacheTimeout()) {
-        $cache->set($groupMembers, $self->groupCacheTimeout);
-    }
+    $session->cache->set("groupMembers". $groupId, $groupMembers, $self->groupCacheTimeout);
 }
 
 #-------------------------------------------------------------------
@@ -277,14 +317,16 @@ sub clearCaches {
     my $session = $self->session;
 	##Clear my cache and the cache of all groups above me.
 	my $groups = $self->getAllGroupsFor();
-	foreach my $groupId ( $self->getId, @{ $groups } ) {
-		WebGUI::Cache->new($session, $groupId)->delete;
-        WebGUI::Cache->new($session, ["groupMembers", $groupId])->delete;
+    my $cache = $self->session->cache;
+	foreach my $group ( $self->getId, @{ $groups } ) {
+		$cache->remove("group_".$group);
+		$cache->remove("groupMembers".$group);
 	}
-	$session->stow->delete("groupObj");
-	$session->stow->delete("isInGroup");
-	$session->stow->delete("gotGroupsInGroup");
-    $session->stow->delete("gotGroupsForUser");
+    my $stow = $self->session->stow;
+	$stow->delete("groupObj");
+	$stow->delete("isInGroup");
+	$stow->delete("gotGroupsInGroup");
+    $stow->delete("gotGroupsForUser");
 }
 
 #-------------------------------------------------------------------
@@ -316,7 +358,6 @@ sub delete {
     $self->session->db->write("delete from groups where groupId=?", [$self->getId]);
     $self->session->db->write("delete from groupings where groupId=?", [$self->getId]);
     $self->session->db->write("delete from groupGroupings where inGroup=? or groupId=?", [$self->getId, $self->getId]);
-    undef $self;
 }
 
 #-------------------------------------------------------------------
@@ -408,21 +449,6 @@ sub description {
         }
         return $self->get("description");
 }
-
-
-#-------------------------------------------------------------------
-
-=head2 DESTROY
-
-Desconstructor
-
-=cut
-
-sub DESTROY {
-        my $self = shift;
-        undef $self;
-}
-
 
 #-------------------------------------------------------------------
 
@@ -607,8 +633,8 @@ sub getAllUsers {
 	my $withoutExpired = shift;
 	my $loopCount = shift;
 	my $expireTime = 0;
-	my $cache = WebGUI::Cache->new($self->session, $self->getId);
-	my $value = $cache->get;
+	my $cache = $self->session->cache;
+	my $value = $cache->get("group_".$self->getId);
 	return $value if defined $value;
 	my @users = ();
 	push @users,
@@ -621,7 +647,7 @@ sub getAllUsers {
 	;
 	++$loopCount;
 	if ($loopCount > 99) {
-		$self->session->errorHandler->fatal("Endless recursive loop detected while determining groups in group.\nRequested groupId: ".$self->getId);
+		$self->session->log->fatal("Endless recursive loop detected while determining groups in group.\nRequested groupId: ".$self->getId);
 	}
 	my $groups = $self->getGroupsIn();
 	foreach my $groupId (@{ $groups }) {
@@ -632,9 +658,7 @@ sub getAllUsers {
 	}
 	my %users = map { $_ => 1 } @users;
 	@users = keys %users;
-    if ($self->groupCacheTimeout()) {
-        $cache->set(\@users, $self->groupCacheTimeout);
-    }
+	$cache->set("group_".$self->getId, \@users, $self->groupCacheTimeout);
 	return \@users;
 }
 
@@ -663,7 +687,7 @@ sub getDatabaseUsers {
 				my $sth = $dbh->unconditionalRead($query);
 				if (defined $sth) {
 					unless ($sth->errorCode < 1) {
-						$self->session->errorHandler->warn("There was a problem with the database query for group ID $gid.");
+						$self->session->log->warn("There was a problem with the database query for group ID $gid.");
 					} else {
 						while(my ($userId)=$sth->array) {
 							push @dbUsers, $userId;
@@ -671,12 +695,12 @@ sub getDatabaseUsers {
 					}
 					$sth->finish;
 				} else {
-					$self->session->errorHandler->error("Couldn't process unconditional read for database group with group id $gid.");
+					$self->session->log->error("Couldn't process unconditional read for database group with group id $gid.");
 				}
 				$dbLink->disconnect;
        	 	        }
 		} else {
-			$self->session->errorHandler->warn("The database link ".$self->get("databaseLinkId")." no longer exists even though group ".$gid." references it.");
+			$self->session->log->warn("The database link ".$self->get("databaseLinkId")." no longer exists even though group ".$gid." references it.");
 		}
         }
 	return \@dbUsers;
@@ -731,7 +755,7 @@ sub getGroupsIn {
         if ($isRecursive) {
                 $loopCount++;
                 if ($loopCount > 99) {
-                        $self->session->errorHandler->fatal("Endless recursive loop detected while determining groups in group.\nRequested groupId: ".$self->getId."\nGroups in that group: ".join(",",@$groups));
+                        $self->session->log->fatal("Endless recursive loop detected while determining groups in group.\nRequested groupId: ".$self->getId."\nGroups in that group: ".join(",",@$groups));
                 }
                 my @groupsOfGroups = @$groups;
                 foreach my $group (@$groups) {
@@ -792,7 +816,7 @@ sub getIpUsers {
 	my @ipUsers = ();
 	while (my ($userId, $lastIP) = $sth->array() ) {
 		if (!exists $localCache{$lastIP}) {
-			$localCache{$lastIP} = isInSubnet($lastIP, \@filters);	
+			$localCache{$lastIP} = Net::CIDR::Lite->new(@filters)->find($lastIP);
 		}
 		push @ipUsers, $userId if $localCache{$lastIP};
 	}
@@ -840,7 +864,7 @@ sub getLDAPUsers {
 	
 	my $ldapLink = WebGUI::LDAPLink->new($self->session,$ldapLinkId);
 	unless ($ldapLink && $ldapLink->bind) {
-	   $self->session->errorHandler->warn("There was a problem connecting to LDAP link $ldapLinkId for group ID $gid.");
+	   $self->session->log->warn("There was a problem connecting to LDAP link $ldapLinkId for group ID $gid.");
 	   return [];
 	}
 	
@@ -862,7 +886,7 @@ sub getLDAPUsers {
 	   if($userId) {
 	      push(@ldapUsers,$userId);
 	   } else {
-	      $self->session->errorHandler->warn("Could not find matching userId for dn/uid $person in WebGUI for group $gid");
+	      $self->session->log->warn("Could not find matching userId for dn/uid $person in WebGUI for group $gid");
 	   }
 	}
 	
@@ -1117,7 +1141,7 @@ sub hasIpUser {
     );
 
 	foreach my $ip (@ips) {
-        return 1 if (isInSubnet($ip,\@filters));
+        return 1 if Net::CIDR::Lite->new(@filters)->find($ip);
     }
     
     return 0;
@@ -1189,7 +1213,7 @@ sub hasLDAPUser {
 
 	my $ldapLink = WebGUI::LDAPLink->new($session,$ldapLinkId);
 	unless ($ldapLink && $ldapLink->bind) {
-	   $self->session->errorHandler->warn("There was a problem connecting to LDAP link $ldapLinkId for group ID $gid.");
+	   $self->session->log->warn("There was a problem connecting to LDAP link $ldapLinkId for group ID $gid.");
 	   return 0;
 	}
 		
@@ -1571,7 +1595,7 @@ sub new {
             $self->{_groupId},
         ]);
         unless ($groupExists) {
-            $session->errorHandler->warn('WebGUI::Group->new called with a non-existant groupId:'
+            $session->log->warn('WebGUI::Group->new called with a non-existant groupId:'
                 .'['.$self->{_groupId}.']');
             return undef;
         }
@@ -1626,13 +1650,15 @@ sub resetGroupFields {
     ##instanciate every version of the asset that used the group.  This should be much quicker
     ASSET: foreach my $assetClass ($db->buildArray('SELECT DISTINCT className FROM asset')) {
         next ASSET unless $db->quickScalar( "SELECT COUNT(*) FROM asset WHERE className=?", [$assetClass] );
-        my $definition = WebGUI::Pluggable::instanciate($assetClass, 'definition', [$session]);
-        SUBDEF: foreach my $subdef (@{ $definition }) {
-            next SUBDEF if exists $tableCache->{$subdef->{tableName}}; 
-            PROP: while (my ($fieldName, $properties) = each %{ $subdef->{properties} }) {
-                next PROP unless $properties->{fieldType} eq 'group';
-                push @{ $tableCache->{$subdef->{tableName}} }, $fieldName;
-            }
+        my $className  = eval { WebGUI::Asset->loadModule($assetClass); };
+        if (my $e = Exception::Class->caught) {
+            warn $e->cause;
+            next ASSET;
+        }
+        PROPERTY: foreach my $property_name ($className->meta->get_all_property_list) {
+            my $property = $className->meta->find_attribute_by_name($property_name);
+            next PROPERTY unless $property->fieldType eq 'group';
+            push @{ $tableCache->{$property->tableName} }, $property->name;
         }
     }
     ##VersionTags
@@ -1640,8 +1666,8 @@ sub resetGroupFields {
     foreach my $tableName (keys %{ $tableCache }) {
         foreach my $fieldName (@{ $tableCache->{$tableName} }) {
             my $sql = sprintf 'UPDATE %s SET %s=3 where %s=?',
-                $db->dbh->quote_identifier($tableName),
-                (($db->dbh->quote_identifier($fieldName)) x 2);
+                $db->quote_identifier($tableName),
+                (($db->quote_identifier($fieldName)) x 2);
             $db->write($sql, [ $gid ]);
         }
     }
@@ -2026,7 +2052,7 @@ sub vitalGroup {
     if (! $groupId && ref $class ) {
         $groupId = $class->getId;
     }
-    return isIn ( $groupId, (1..13), 15,16,17, qw/pbgroup000000000000015 pbgroup000000000000016 pbgroup000000000000017 / );
+    return $groupId ~~ [ map { "$_" } (1..13), 15, 16, 17, qw/pbgroup000000000000015 pbgroup000000000000016 pbgroup000000000000017 /];
 }
 
 1;

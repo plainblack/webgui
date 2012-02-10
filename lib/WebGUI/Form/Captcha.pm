@@ -3,7 +3,7 @@ package WebGUI::Form::Captcha;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -111,7 +111,7 @@ sub getValue {
         my $ua = LWP::UserAgent->new;
         my $res = $ua->post('http://www.google.com/recaptcha/api/verify', {
             privatekey  => $privKey,
-            remoteip    => $self->session->env->getIp,
+            remoteip    => $self->session->request->env->{REMOTE_ADDR},
             challenge   => $challenge,
             response    => $response,
         });
@@ -127,7 +127,7 @@ sub getValue {
     my $challenge   = $self->session->scratch->get("captcha_".$self->get("name"));
     $self->session->scratch->delete("captcha_".$self->get("name"));
     my $passed  = lc $value eq lc $challenge;
-    $self->session->errorHandler->info( 
+    $self->session->log->info( 
         "Checking CAPTCHA '" . $self->get("name") . "': " . ( $passed ? "PASSED!" : "FAILED!" )
         . " Got: '" . $value . "', Wanted: '" . $challenge . "'"
     );
@@ -158,10 +158,9 @@ sub toHtml {
     my $self = shift;
 
     if ($self->session->setting->get('useRecaptcha')) {
-        my $env = $self->session->env;
         my $pubKey = $self->session->setting->get('recaptchaPublicKey');
         my $server = "http://www.google.com/recaptcha/api";
-        if ($env->sslRequest) {
+        if ($self->session->request->secure) {
             $server = "https://www.google.com/recaptcha/api";
         }
         return

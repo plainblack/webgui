@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -8,9 +8,7 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../../lib";
 use WebGUI::Test;
 use WebGUI::Session;
 use WebGUI::User;
@@ -30,15 +28,15 @@ my @addChildCoda = (undef, undef,
 );
 
 # Do our work in the import node
-my $node = WebGUI::Asset->getImportNode($session);
+my $node = WebGUI::Test->asset;
 
 # grab a named version tag
 my $versionTag = WebGUI::VersionTag->getWorking($session);
-addToCleanup($versionTag);
+WebGUI::Test->addToCleanup($versionTag);
 $versionTag->set({name => 'Collaboration => groupToEditPost test'});
 
 # place the collab system under a layout to ensure we're using the inherited groupIdEdit value
-my $layout  = $node->addChild({className => 'WebGUI::Asset::Wobject::Layout'});
+my $layout  = $node->addChild({className => 'WebGUI::Asset::Wobject::Layout', });
 
 # set the layout as the current asset for the same reason
 $session->asset($layout);
@@ -64,27 +62,28 @@ cmp_ok($collab->get('groupToEditPost'), 'eq', $collab->get('groupIdEdit'), 'grou
 is($collab->get('itemsPerFeed'), 25, 'itemsPerFeed is set to the default');
 
 # finally, add the post to the collaboration system
+my $tag1 = WebGUI::VersionTag->getWorking($session);
 my $props = {
     className   => 'WebGUI::Asset::Post::Thread',
     content     => 'hello, world!',
 };
 my $thread = $collab->addChild($props, @addChildCoda);
-my $tag1 = WebGUI::VersionTag->getWorking($session);
+$thread->setSkipNotification;
 $tag1->commit;
-addToCleanup($tag1);
+WebGUI::Test->addToCleanup($tag1);
 
 # Test for a sane object type
 isa_ok($thread, 'WebGUI::Asset::Post::Thread');
 
+my $tag2 = WebGUI::VersionTag->getWorking($session);
 $props = {
     className   => 'WebGUI::Asset::Post::Thread',
     content     => 'jello, world!',
 };
-
 my $thread2 = $collab->addChild($props, @addChildCoda);
-my $tag2 = WebGUI::VersionTag->getWorking($session);
+$thread2->setSkipNotification;
 $tag2->commit;
-addToCleanup($tag2);
+WebGUI::Test->addToCleanup($tag2);
 
 my $rssitems = $collab->getRssFeedItems();
 is(scalar @{ $rssitems }, 2, 'rssitems set to number of posts added');
@@ -96,7 +95,6 @@ is($collab->getAtomFeedUrl, '/collab?func=viewAtom', 'getAtomFeedUrl');
 
 note "Mail Cron job tests";
 my $dupedCollab = $collab->duplicate();
-addToCleanup(WebGUI::VersionTag->new($session, $dupedCollab->get('tagId')));
 ok($dupedCollab->get('getMailCronId'), 'Duplicated CS has a cron job');
 isnt($dupedCollab->get('getMailCronId'), $collab->get('getMailCronId'), '... and it is different from its source asset');
 
@@ -109,10 +107,12 @@ $thread2->archive();
 $collab = $collab->cloneFromDb;
 is $collab->get('threads'), 1, 'CS lost 1 thread due to archiving';
 
-my $thread3 = $collab->addChild($props, @addChildCoda);
-my $tag3 = WebGUI::VersionTag->getWorking($session);
-$tag3->commit;
-addToCleanup($tag3);
+my $thread3 = $collab->addChild({ 
+    className => 'WebGUI::Asset::Post::Thread',
+    content => "Again!",
+}, @addChildCoda);
+$thread->setSkipNotification;
+$thread3->commit;
 $collab = $collab->cloneFromDb;
 is $collab->get('threads'), 2, '... added 1 thread';
 

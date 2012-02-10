@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -8,9 +8,7 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../../lib";
 
 ##The goal of this test is to test permissions handling for the WikiMaster and WikiPage.
 
@@ -25,12 +23,12 @@ my $session = WebGUI::Test->session;
 my $node = WebGUI::Asset->getImportNode($session);
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Wiki Test"});
-addToCleanup($versionTag);
+WebGUI::Test->addToCleanup($versionTag);
 
 my $assetEdit    = WebGUI::Group->new($session, "new");
 my $wikiAdmin    = WebGUI::Group->new($session, "new");
 my $wikiEditPage = WebGUI::Group->new($session, "new");
-addToCleanup($assetEdit, $wikiAdmin, $wikiEditPage);
+WebGUI::Test->addToCleanup($assetEdit, $wikiAdmin, $wikiEditPage);
 
 my $assetEditor       = WebGUI::User->create($session);
 $assetEdit->addUsers([$assetEditor->userId]);
@@ -40,7 +38,7 @@ my $wikiPageEditor    = WebGUI::User->create($session);
 $wikiEditPage->addUsers([$wikiPageEditor->userId]);
 my $wikiOwner         = WebGUI::User->create($session);
 my $wikiPageOwner     = WebGUI::User->create($session);
-addToCleanup($assetEditor, $wikiAdministrator, $wikiPageEditor, $wikiOwner, $wikiPageOwner);
+WebGUI::Test->addToCleanup($assetEditor, $wikiAdministrator, $wikiPageEditor, $wikiOwner, $wikiPageOwner);
 
 $session->user({user => $wikiOwner});
 my $wiki = $node->addChild({
@@ -57,10 +55,7 @@ my $wikipage = $wiki->addChild({
 }, undef, undef, {skipAutoCommitWorkflows => 1, skipNotification => 1});
 is $wikipage->get('ownerUserId'), $wikiPageOwner->userId, 'wiki page owned by correct user';
 
-# Wikis create and autocommit a version tag when a child is added.  Lets get the name so we can roll it back.
-my $secondVersionTag = WebGUI::VersionTag->new($session,$wikipage->get("tagId"));
-$secondVersionTag->commit;
-addToCleanup($secondVersionTag );
+WebGUI::Test->addToCleanup($wikipage);
 
 # Test for sane object types
 isa_ok($wiki, 'WebGUI::Asset::Wobject::WikiMaster');

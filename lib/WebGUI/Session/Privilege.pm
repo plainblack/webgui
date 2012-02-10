@@ -3,7 +3,7 @@ package WebGUI::Session::Privilege;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -18,6 +18,7 @@ use strict;
 use Scalar::Util qw( weaken );
 use WebGUI::International;
 use WebGUI::Operation::Auth;
+use Scalar::Util qw(weaken);
 
 =head1 NAME
 
@@ -59,26 +60,11 @@ Returns a message stating that this functionality can only be used by administra
 sub adminOnly {
 	my $self = shift;
 	my $i18n = WebGUI::International->new($self->session);
-	$self->session->http->setStatus("401", "Admin Only");
+    $self->session->response->status(401);
         my $output = '<h1>'.$i18n->get(35).'</h1>';
 	$output .= $i18n->get(36);
 	return $self->session->style->userStyle($output);
 }
-
-
-#-------------------------------------------------------------------
-
-=head2 DESTROY ( )
-
-Deconstructor.
-
-=cut
-
-sub DESTROY {
-        my $self = shift;
-        undef $self;
-}
-
 
 #-------------------------------------------------------------------
 
@@ -92,7 +78,7 @@ sub insufficient {
 	my $self = shift;
     my $noStyle = shift;
 	my $i18n = WebGUI::International->new($self->session);
-	$self->session->http->setStatus("401", "Insufficient Privileges");
+	$self->session->response->status(401);
 	my $output = '<h1>'.$i18n->get(37).'</h1>';
     if ($noStyle) {
         $self->session->style->useEmptyStyle(1);
@@ -117,7 +103,7 @@ sub locked {
 	my $self = shift;
     my $noStyle = shift;
 	my $i18n = WebGUI::International->new($self->session);
-	$self->session->http->setStatus("401", "Insufficient Privileges");
+	$self->session->response->status(401);
 	my $output = '<h1>'.$i18n->get(37).'</h1>';
     if ($noStyle) {
         $self->session->style->useEmptyStyle(1);
@@ -146,9 +132,9 @@ A reference to the current session.
 sub new {
 	my $class = shift;
 	my $session = shift;
-	my $self = bless {_session=>$session}, $class;
-        weaken( $self->{_session} );
-        return $self;
+    my $self = bless { _session => $session }, $class;
+    weaken $self->{_session};
+    return $self;
 }
 
 
@@ -162,7 +148,7 @@ Returns a message stating that the user does not have the privileges necessary t
 
 sub noAccess {
 	my $self = shift;
-	$self->session->http->setStatus("401", "No Access");
+	$self->session->response->status(401);
    	if ($self->session->user->isVisitor) {
       		return WebGUI::Operation::Auth::www_auth($self->session, "init");
    	} else {
@@ -185,7 +171,7 @@ Returns a message stating that the user they requested information about is no l
 sub notMember {
 	my $self = shift;
 	my $i18n = WebGUI::International->new($self->session);
-	$self->session->http->setStatus("400", "Not A Member");
+	$self->session->response->status(400);
 	my ($output);
 	$output = '<h1>'.$i18n->get(345).'</h1>';
 	$output .= $i18n->get(346);
@@ -217,7 +203,7 @@ Returns a message stating that the user made a request to delete something that 
 sub vitalComponent {
 	my $self = shift;
 	my $i18n = WebGUI::International->new($self->session);
-	$self->session->http->setStatus("403", "Vital Component");
+	$self->session->response->status(403);
 	my ($output);
         $output = '<h1>'.$i18n->get(40).'</h1>';
 	$output .= $i18n->get(41);

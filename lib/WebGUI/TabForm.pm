@@ -3,7 +3,7 @@ package WebGUI::TabForm;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -206,7 +206,7 @@ sub new {
 	}
 	my $i18n = WebGUI::International->new($session);
     my $cancelJS  = 'history.go(-1);';
-    if (my $cancelURL = $session->env->get('HTTP_REFERER')) {
+    if (my $cancelURL = $session->request->referer) {
         $cancelJS = sprintf q{window.location.href='%s';}, $cancelURL;
     }
 	my $cancel = WebGUI::Form::button($session,{
@@ -230,19 +230,19 @@ sub print {
 	my $self = shift;
     my $style = $self->session->style;
     my $url = $self->session->url;
-	$style->setLink($self->{_css},{rel=>"stylesheet", rel=>"stylesheet",type=>"text/css"});
-	$style->setLink($url->extras('/yui/build/fonts/fonts-min.css'),{type=>"text/css", rel=>"stylesheet"});
-	$style->setLink($url->extras('/yui/build/tabview/assets/skins/sam/tabview.css'),{type=>"text/css", rel=>"stylesheet"});
-    $style->setLink($url->extras('/yui/build/container/assets/container.css'),{ type=>'text/css', rel=>"stylesheet" });
-    $style->setLink($url->extras('/hoverhelp.css'),{ type=>'text/css', rel=>"stylesheet" });
-    $style->setScript($url->extras('/yui/build/utilities/utilities.js'),{ type=>'text/javascript' });
-    $style->setScript($url->extras('/yui/build/container/container-min.js'),{ type=>'text/javascript' });
-    $style->setScript($url->extras('/yui/build/tabview/tabview-min.js'),{ type=>'text/javascript' });
-    $style->setScript($url->extras('/hoverhelp.js'),{ type=>'text/javascript' });
+	$style->setCss($self->{_css});
+	$style->setCss($url->extras('/yui/build/fonts/fonts-min.css'));
+	$style->setCss($url->extras('/yui/build/tabview/assets/skins/sam/tabview.css'));
+    $style->setCss($url->extras('/yui/build/container/assets/container.css'));
+    $style->setCss($url->extras('/hoverhelp.css'));
+    $style->setScript($url->extras('/yui/build/utilities/utilities.js'));
+    $style->setScript($url->extras('/yui/build/container/container-min.js'));
+    $style->setScript($url->extras('/yui/build/tabview/tabview-min.js'));
+    $style->setScript($url->extras('/hoverhelp.js'));
 	my $i = 1;
 	my $tabs = '<ul class="yui-nav">';
 	my $form = '<div class="yui-content">';
-	my $userUiLevel = $self->session->user->profileField("uiLevel");
+	my $userUiLevel = $self->session->user->get("uiLevel");
 	my $first = 1;
 	foreach my $key (keys %{$self->{_tab}}) {
 		my $hide = '';

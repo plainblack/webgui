@@ -1,6 +1,6 @@
 # vim:syntax=perl
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -13,9 +13,7 @@
 # 
 #
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../../lib";
 use Test::More;
 use Test::Deep;
 use XML::Simple;
@@ -25,7 +23,7 @@ use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
 use WebGUI::Shop::ShipDriver::USPS;
 
-plan tests => 69;
+plan tests => 66;
 
 #----------------------------------------------------------------------------
 # Init
@@ -51,9 +49,7 @@ my $insuranceTable =  <<EOTABLE;
 30:6.00
 EOTABLE
 
-my $versionTag = WebGUI::VersionTag->getWorking($session);
-
-my $home = WebGUI::Asset->getDefault($session);
+my $home = WebGUI::Test->asset;
 
 my $rockHammer = $home->addChild({
     className          => 'WebGUI::Asset::Sku::Product',
@@ -107,39 +103,9 @@ my $gospels = $bible->setCollateral('variantsJSON', 'variantId', 'new',
     }
 );
 
-$versionTag->commit;
-addToCleanup($versionTag);
-
 #######################################################################
 #
-# definition
-#
-#######################################################################
-
-my $definition;
-my $e; ##Exception variable, used throughout the file
-
-eval { $definition = WebGUI::Shop::ShipDriver::USPS->definition(); };
-$e = Exception::Class->caught();
-isa_ok($e, 'WebGUI::Error::InvalidParam', 'definition takes an exception to not giving it a session variable');
-cmp_deeply(
-    $e,
-    methods(
-        error => 'Must provide a session variable',
-    ),
-    '... checking error message',
-);
-
-
-isa_ok(
-    $definition = WebGUI::Shop::ShipDriver::USPS->definition($session),
-    'ARRAY'
-);
-
-
-#######################################################################
-#
-# create
+# new
 #
 #######################################################################
 
@@ -148,8 +114,8 @@ my $options = {
                 enabled => 1,
               };
 
-$driver2 = WebGUI::Shop::ShipDriver::USPS->create($session, $options);
-addToCleanup($driver2);
+$driver2 = WebGUI::Shop::ShipDriver::USPS->new($session, $options);
+WebGUI::Test->addToCleanup($driver2);
 
 isa_ok($driver2, 'WebGUI::Shop::ShipDriver::USPS');
 isa_ok($driver2, 'WebGUI::Shop::ShipDriver');
@@ -160,7 +126,7 @@ isa_ok($driver2, 'WebGUI::Shop::ShipDriver');
 #
 #######################################################################
 
-is (WebGUI::Shop::ShipDriver::USPS->getName($session), 'U.S. Postal Service', 'getName returns the human readable name of this driver');
+is (WebGUI::Shop::ShipDriver::USPS->getName($session), 'United States Postal Service', 'getName returns the human readable name of this driver');
 
 #######################################################################
 #
@@ -182,13 +148,14 @@ undef $driver2;
 #
 #######################################################################
 
-my $driver = WebGUI::Shop::ShipDriver::USPS->create($session, {
+my $driver = WebGUI::Shop::ShipDriver::USPS->new($session, {
     label    => 'Shipping from Shawshank',
     enabled  => 1,
     shipType => 'PARCEL',
 });
-addToCleanup($driver);
+WebGUI::Test->addToCleanup($driver);
 
+my $e;
 eval { $driver->calculate() };
 $e = Exception::Class->caught();
 isa_ok($e, 'WebGUI::Error::InvalidParam', 'calculate throws an exception when no zipcode has been set');
@@ -216,7 +183,7 @@ cmp_deeply(
 );
 
 $cart = WebGUI::Shop::Cart->newBySession($session);
-addToCleanup($cart);
+WebGUI::Test->addToCleanup($cart);
 my $addressBook = $cart->getAddressBook;
 my $workAddress = $addressBook->addAddress({
     label => 'work',

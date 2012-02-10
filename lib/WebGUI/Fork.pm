@@ -27,6 +27,7 @@ status of.
 
     sub doWork {
         my ($process, $data) = @_;
+        # Update our status
         $process->update("Starting...");
         ...
         $process->update("About half way done...");
@@ -42,10 +43,11 @@ status of.
         );
         # See WebGUI::Operation::Fork
         my $pairs = $process->contentPairs('DoWork');
-        $session->http->setRedirect($self->getUrl($pairs));
+        $session->response->setRedirect($self->getUrl($pairs));
         return 'redirect';
     }
 
+    # Display a page with the status of the fork
     package WebGUI::Operation::Fork::DoWork;
 
     sub handler {
@@ -56,11 +58,24 @@ status of.
         # or better yet, an ajaxy page that polls.
     }
 
+    # For ways of displaying status from a fork, see
+    # WebGUI::Fork::ProgressTree
+    # WebGUI::Fork::ProgressBar
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<WebGUI::Fork::ProgressTree>
+
+=item L<WebGUI::Fork::ProgressBar>
+
+=back
 
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -278,6 +293,7 @@ sub finish {
         $props{latch}  = 0;
     }
     $props{endTime} = time();
+    $props{redirect} = $self->{redirect};
     $self->set( \%props );
 }
 
@@ -514,6 +530,20 @@ sub setGroup {
 
 #-----------------------------------------------------------------
 
+=head2 setRedirect($url)
+
+Allows a redirect to be set for the process after the initial fork.  This happens
+in the case when a file is to be downloaded after the fork finishes.
+
+=cut
+
+sub setRedirect {
+    my ( $self, $url ) = @_;
+    $self->{redirect} = $url;
+}
+
+#-----------------------------------------------------------------
+
 =head2 request ($module, $subname, $data)
 
 Internal method. Generates a hashref suitable for passing to runRequest.
@@ -525,8 +555,7 @@ sub request {
     my $session = $self->session;
     my $config  = $session->config;
     return {
-        webguiRoot => $config->getWebguiRoot,
-        configFile => $config->getFilename,
+        configFile => $config->pathToFile,
         sessionId  => $session->getId,
         module     => $module,
         subname    => $subname,
@@ -559,8 +588,8 @@ Internal class method. Expects a hash of arguments describing what to run.
 
 sub runRequest {
     my ( $class, $args ) = @_;
-    my ( $root, $config, $sid ) = @{$args}{qw(webguiRoot configFile sessionId)};
-    my $session = WebGUI::Session->open( $root, $config, undef, undef, $sid );
+    my ( $config, $sid ) = @{$args}{qw(configFile sessionId)};
+    my $session = WebGUI::Session->open( $config, undef, $sid );
     my $id = $args->{id};
     my $self = $class->new( $session, $id );
     $self->set( { startTime => time } );
@@ -592,7 +621,7 @@ sub sendRequestToMaster {
     };
     return 1 unless $@;
     undef $pipe;
-    $self->session->log->error('Problems talking to master daemon process.  Please restart the web server.');
+    $self->session->log->error("Problems talking to master daemon process: $@.  Please restart the web server.");
     return 0;
 }
 

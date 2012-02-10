@@ -3,7 +3,7 @@ package WebGUI::Session::Form;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -15,8 +15,8 @@ package WebGUI::Session::Form;
 =cut
 
 use strict qw(vars subs);
-use WebGUI::HTML;
 use Encode ();
+use Tie::IxHash;
 use base 'WebGUI::FormValidator';
 
 =head1 NAME
@@ -63,6 +63,7 @@ sub AUTOLOAD {
 	my @args = @_;
 	our $AUTOLOAD;
 	my $method = "SUPER::".(split /::/, $AUTOLOAD)[-1];
+	return if $method eq 'SUPER::DESTROY';
 	return $self->$method(@args);
 }
 
@@ -77,10 +78,7 @@ Returns true if the param is part of the submitted form data, or a URL param.
 sub hasParam {
 	my $self = shift;
     my $param = shift;
-    return undef unless $param;
-    return undef unless $self->session->request;
-    my $hashRef = $self->session->request->param();
-    return exists $hashRef->{$param};
+    return $param && $self->session->request && exists $self->session->request->parameters->{$param};
 }
 
 
@@ -124,15 +122,14 @@ sub param {
     return undef unless $self->session->request;
 	my $field = shift;
 	if ($field) {
-        my @data = $self->session->request->param($field);
+        my @data = $self->session->request->parameters->get_all($field);
         foreach my $value (@data) {
             $value = Encode::decode_utf8($value);
         }
         return wantarray ? @data : $data[0];
 	}
     else {
-        my $paramRef = $self->session->request->param;
-        return keys %{ $paramRef };
+        return $self->session->request->parameters->keys;
 	}
 }
 

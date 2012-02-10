@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -10,9 +10,7 @@
 
 # Test permissions of Photo assets
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../../../../lib";
 
 use WebGUI::Test;
 use WebGUI::Session;
@@ -27,9 +25,6 @@ my $node            = WebGUI::Asset->getImportNode($session);
 my $maker           = WebGUI::Test::Maker::Permission->new;
 
 $session->user({ userId => 3 });
-my $versionTag = WebGUI::VersionTag->getWorking($session);
-$versionTag->set({name=>"Photo Test, add Gallery, Album and 1 Photo"});
-WebGUI::Test->addToCleanup($versionTag);
 
 # Add a new user to the test user's friends list
 my $friend  = WebGUI::User->new($session, "new");
@@ -41,13 +36,13 @@ my $notFriend   = WebGUI::User->new( $session, "new" );
 WebGUI::Test->addToCleanup($notFriend);
 
 my $gallery
-    = $node->addChild({
+    = WebGUI::Test->asset(
         className       => "WebGUI::Asset::Wobject::Gallery",
         groupIdView     => "2",     # Registered Users
         groupIdEdit     => "3",     # Admins
         groupIdComment  => "2",     # Registered Users
         ownerUserId     => $session->user->userId,
-    });
+    );
 
 my $album
     = $gallery->addChild({
@@ -55,36 +50,23 @@ my $album
         groupIdView     => "2",     # Registered Users
         groupIdEdit     => "3",     # Admins
         ownerUserId     => $session->user->userId,
-    },
-    undef,
-    undef,
-    {
-        skipAutoCommitWorkflows => 1,
     });
 
 my $photo
     = $album->addChild({
         className       => "WebGUI::Asset::File::GalleryFile::Photo",
         friendsOnly     => 0,
-    },
-    undef,
-    undef,
-    {
-        skipAutoCommitWorkflows => 1,
     });
 
 my $photo2 = $photo->cloneFromDb;
 my $album2 = $album->cloneFromDb;
 
 $session->stow->delete('assetRevision');
-$versionTag->leaveTag;
 
 $session->user({userId => $notFriend->userId});
 note "If you get stuck here, then there is an infinite loop in getParent/getGallery";
 my $album2a = WebGUI::Asset->new($session, $photo2->getId);
 $session->user({userId => 1});
-
-$versionTag->commit;
 
 #----------------------------------------------------------------------------
 # Tests

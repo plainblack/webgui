@@ -3,7 +3,7 @@ package WebGUI::Workflow::Activity::ExtendCalendarRecurrences;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -165,14 +165,14 @@ exhausted the recurrence, false otherwise.
 sub processRecurrence {
     my ( $self, $recurId, $timeLimit ) = @_;
     my $eventId = $self->findLastEventId($recurId);
-    my $event   = WebGUI::Asset::Event->new( $self->session, $eventId );
+    my $event   = WebGUI::Asset::Event->newById( $self->session, $eventId );
     if (! $event) {
         $self->session->log->warn("Unable to instanciate event with assetId $eventId");
         return 0;
     }
     ##Ignore assets in the trash.  Same with assets in the clipboard since they would not be
     ##put into the clipboard.
-    if ($event->get('state') ne 'published') {
+    if ($event->state ne 'published') {
         return 0;
     }
     my $recur   = $event->getRecurrence;

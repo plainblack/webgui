@@ -1,7 +1,7 @@
 package WebGUI::Macro::RandomAssetProxy;
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -13,6 +13,7 @@ package WebGUI::Macro::RandomAssetProxy;
 use strict;
 use WebGUI::Asset;
 use WebGUI::International;
+use WebGUI::Exception;
 
 =head1 NAME
 
@@ -34,28 +35,28 @@ if no asset exists at that url, or if the asset has no children.
 
 #-------------------------------------------------------------------
 sub process {
-	my $session = shift;
-        my $url = shift;
-	my $i18n = WebGUI::International->new($session,'Macro_RandomAssetProxy');
-	my $asset = WebGUI::Asset->newByUrl($session, $url);
-	if (defined $asset) {
-		my $children = $asset->getLineage(["children"]);
-		#randomize;
-		my $randomAssetId = $children->[int(rand(scalar(@{$children})))];	
-		my $randomAsset = WebGUI::Asset->newByDynamicClass($session,$randomAssetId);
-		if (defined $randomAsset) {
-			if ($randomAsset->canView) {
-				$randomAsset->toggleToolbar;
-				$randomAsset->prepareView;
-				return $randomAsset->view;
-			}
-			return undef;
-		} else {
-			return $i18n->get('childless');
-		}
-	} else {
-		return $i18n->get('invalid url');
-	}
+    my $session = shift;
+    my $url = shift;
+    my $i18n = WebGUI::International->new($session,'Macro_RandomAssetProxy');
+    my $asset = eval { WebGUI::Asset->newByUrl($session, $url); };
+    if (Exception::Class->caught()) {
+        return $i18n->get('invalid url');
+    }
+
+    my $children = $asset->getLineage(["children"]);
+    #randomize;
+    my $randomAssetId = $children->[int(rand(scalar(@{$children})))];    
+    my $randomAsset = eval { WebGUI::Asset->newById($session,$randomAssetId); };
+    if (Exception::Class->caught()) {
+        return $i18n->get('childless');
+    }
+    elsif ($randomAsset->canView) {
+        $randomAsset->prepareView;
+        return $randomAsset->view;
+    }
+    else {
+        return undef;
+    }
 }
 
 

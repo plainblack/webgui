@@ -1,6 +1,6 @@
 # vim:syntax=perl
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -13,11 +13,11 @@
 # 
 #
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../../lib";
 use Test::More;
 use WebGUI::Test; # Must use this before any other WebGUI modules
+use WebGUI::Test::Mechanize;
+use WebGUI::Test::MockAsset;
 use WebGUI::Session;
 use WebGUI::User;
 use WebGUI::Group;
@@ -40,38 +40,25 @@ $registrars->addUsers([$registrar->getId]);
 $attendees->addUsers([$attender->getId]);
 
 # Do our work in the import node
-my $node = WebGUI::Asset->getImportNode($session);
+my $node = WebGUI::Test->asset;
 
 # Create a version tag to work in
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"EventManagementSystem Test"});
-
-#----------------------------------------------------------------------------
-# Tests
-
-plan tests => 41;        # Increment this number for each test you create
-
-#----------------------------------------------------------------------------
-
-# check base module and all related
-use_ok('WebGUI::Asset::Wobject::EventManagementSystem');
-use_ok('WebGUI::Asset::Sku::EMSBadge');
-use_ok('WebGUI::Asset::Sku::EMSTicket');
-use_ok('WebGUI::Asset::Sku::EMSRibbon');
-use_ok('WebGUI::Asset::Sku::EMSToken');
 
 # Add an EMS asset
 my $ems = $node->addChild({
     className                =>'WebGUI::Asset::Wobject::EventManagementSystem', 
     title                    => 'Test EMS', 
     description              => 'This is a test ems', 
-    url                      => '/test-ems',
+    url                      => 'test-ems',
     workflowIdCommit         => 'pbworkflow000000000003', # Commit Content Immediately
     registrationStaffGroupId => $registrars->getId,
-    groupIdView              => $attendees->getId
+    groupIdView              => $attendees->getId,
 });
 $versionTag->commit;
 WebGUI::Test->addToCleanup($versionTag);
+$ems = $ems->cloneFromDb;
 
 # Test for a sane object type
 isa_ok($ems, 'WebGUI::Asset::Wobject::EventManagementSystem');
@@ -181,14 +168,12 @@ my $printRemainingTicketsTemplateId = $ems->get('printRemainingTicketsTemplateId
 is($printRemainingTicketsTemplateId, "hreA_bgxiTX-EzWCSZCZJw", 'Default print remaining tickets template id ok');
 
 #Make sure printRemainingTickets template returns the right data
-my $templateMock = Test::MockObject->new({});
-$templateMock->set_isa('WebGUI::Asset::Template');
-$templateMock->set_always('getId', $printRemainingTicketsTemplateId);
-my $templateVars;
-$templateMock->mock('process', sub { $templateVars = $_[1]; } );
-
 {
-    WebGUI::Test->mockAssetId($printRemainingTicketsTemplateId, $templateMock);
+    my $templateMock = WebGUI::Test::MockAsset->new('WebGUI::Asset::Template');
+    $templateMock->mock_id($printRemainingTicketsTemplateId);
+    my $templateVars;
+    $templateMock->mock('process', sub { $templateVars = $_[1]; } );
+
     $ems->www_printRemainingTickets();
 
     my $ticket1 = {
@@ -345,38 +330,39 @@ $templateMock->mock('process', sub { $templateVars = $_[1]; } );
             'eventSubmissionQueueTemplateId'    => ignore(),
             'eventSubmissionTemplateId'         => ignore(),
             'submittedLocationsList'            => ignore(),
+            'keywords'                          => ignore(),
+            'uiLevel'                           => ignore(),
             'tickets_loop'                      => \@ticketArray,
+            controls                            => ignore(),
             keywords                            => ignore(),
          },
         "www_printRemainingTickets: template variables valid"
     );
-
-    WebGUI::Test->unmockAssetId($printRemainingTicketsTemplateId);
 }
 
 #Make sure permissions work on pages
 my $data;
 $session->user({userId => $crasher->getId});
-$session->http->setStatus(201);
+$session->response->status(201);
 $data = $ems->www_viewSchedule();
-is($session->http->getStatus, 401, 'www_viewSchedule: visitor may not see the schedule');
+is($session->response->status, 401, 'www_viewSchedule: visitor may not see the schedule');
 $data = $ems->www_printRemainingTickets();
-is($session->http->getStatus, 401, 'www_printRemainingTickets: visitor may not print the remaining tickets');
+is($session->response->status, 401, 'www_printRemainingTickets: visitor may not print the remaining tickets');
 
-$session->http->setStatus(201);
+$session->response->status(201);
 $session->user({userId => $attender->getId});
 $data = $ems->www_viewSchedule();
-is($session->http->getStatus, 201, '... attender user can see the schedule');
+is($session->response->status, 201, '... attender user can see the schedule');
 $data = $ems->www_printRemainingTickets();
-is($session->http->getStatus, 401, 'www_printRemainingTickets: attender may not print the remaining tickets');
+is($session->response->status, 401, 'www_printRemainingTickets: attender may not print the remaining tickets');
 
-$session->http->setStatus(201);
+$session->response->status(201);
 $session->user({userId => $registrar->getId});
 $data = $ems->www_printRemainingTickets();
-is($session->http->getStatus, 201, 'www_printRemainingTickets: registration staff may print the remaining tickets');
+is($session->response->status, 201, 'www_printRemainingTickets: registration staff may print the remaining tickets');
 
 
-$session->http->setStatus(201);
+$session->response->status(201);
 $session->user({userId => $crasher->getId});
 my ($json, $records);
 $json    = $ems->www_getScheduleDataJSON();
@@ -632,3 +618,216 @@ cmp_deeply( JSON::from_json($data), {
      'Location page #2 looks good'
 );
 
+#----------------------------------------------------------------------------
+# www_editBadgeGroup
+my $ems_tag = WebGUI::VersionTag->getWorking($session);
+$ems = WebGUI::Test->asset(
+    className   => 'WebGUI::Asset::Wobject::EventManagementSystem',
+    groupIdEdit => '3',
+);
+$ems_tag->commit;
+$ems = $ems->cloneFromDb;
+
+my $mech = WebGUI::Test::Mechanize->new( config => WebGUI::Test->file );
+$mech->get_ok('/');
+$mech->session->user({ userId => 3 });
+
+# Create a new one
+$mech->get_ok( $ems->getUrl( 'func=editBadgeGroup;badgeGroupId=new' ), "Get form to create a new badge group" );
+$mech->submit_form_ok( {
+    fields => {
+        name => 'Inmate Training',
+    },
+}, "create a new badge group" );
+
+my $bgroup = $session->db->quickHashRef(
+    "SELECT * FROM EMSBadgeGroup WHERE name=?",
+    [ "Inmate Training" ],
+);
+ok( $bgroup, "Badge group exists" );
+is( $bgroup->{emsAssetId}, $ems->getId, 'ems asset id set correctly' );
+
+# Edit existing one
+$mech->get_ok( 
+    $ems->getUrl( 'func=editBadgeGroup;badgeGroupId=' . $bgroup->{badgeGroupId} ), 
+    "Get form to edit our badge group",
+);
+$mech->submit_form_ok( {
+    fields  => {
+        name    => 'Inmate Beating',
+    },
+}, "Edit an existing badge group" );
+
+$bgroup = $session->db->quickHashRef(
+    "SELECT * FROM EMSBadgeGroup WHERE badgeGroupId=?",
+    [ $bgroup->{badgeGroupId} ],
+);
+ok( $bgroup, "Badge group exists" );
+is( $bgroup->{emsAssetId}, $ems->getId, 'ems asset id set correctly' );
+is( $bgroup->{name}, "Inmate Beating", 'badge name set correctly' );
+
+#----------------------------------------------------------------------------
+# www_editEventMetaField
+my $mech = WebGUI::Test::Mechanize->new( config => WebGUI::Test->file );
+$mech->get_ok('/');
+$mech->session->user({ userId => 3 });
+
+# Create a new one
+my %metaField = ( 
+    label => 'Security Level',
+    visible => 1,
+    required => 1,
+    dataType => 'Text',
+    helpText => 'What security level is required for this event?',
+);
+
+$mech->get_ok( $ems->getUrl( 'func=editEventMetaField' ), 'Get form to create new meta field' );
+$mech->submit_form_ok( {
+    fields => { %metaField },
+}, 'create a new meta field' );
+
+# Meta field exists
+my $field = $session->db->quickHashRef(
+    "SELECT * FROM EMSEventMetaField WHERE assetId=?",
+    [ $ems->getId ],
+);
+ok( $field, 'meta field exists' );
+cmp_deeply(
+    $field,
+    superhashof( { %metaField, assetId => $ems->getId } ), 
+    'meta field contains correct data',
+);
+
+# Edit existing one
+$metaField{ helpText } = "This is new help text";
+$mech->get_ok( 
+    $ems->getUrl( 'func=editEventMetaField;fieldId=' . $field->{fieldId} ), 
+    'Get form to edit meta field' 
+);
+$mech->submit_form_ok( {
+    fields => { %metaField },
+}, 'create a new meta field' );
+
+# Meta field still exists
+my $field = $session->db->quickHashRef(
+    "SELECT * FROM EMSEventMetaField WHERE assetId=?",
+    [ $ems->getId ],
+);
+ok( $field, 'meta field exists' );
+cmp_deeply(
+    $field,
+    superhashof( { %metaField, assetId => $ems->getId } ), 
+    'meta field contains correct data',
+);
+
+#----------------------------------------------------------------------------
+# getEventFieldsForImport
+use Data::Dumper;
+my $fields = $ems->getEventFieldsForImport;
+cmp_deeply(
+    $fields,
+    array_each( superhashof( {
+        type    => ignore(),
+        name    => ignore(),
+        label   => ignore(),
+    } ) ),
+    'getEventFieldsForImport contains correct items',
+);
+
+#----------------------------------------------------------------------------
+# www_importEvents
+my $mech = WebGUI::Test::Mechanize->new( config => WebGUI::Test->file );
+$mech->get_ok('/');
+$mech->session->user({ userId => 3 });
+
+$mech->get_ok( $ems->getUrl( 'func=importEvents' ), 'get form to import events' );
+$mech->set_fields( 
+    file_file => WebGUI::Test::collateral( "ems_events.csv" ),
+    ignore_first_line => 1,
+);
+# Remove the fields we don't have
+my @unticks = qw( assetId vendorId seatsAvailable price eventNumber location relatedBadgeGroups
+    relatedRibbons
+);
+for my $val ( @unticks ) {
+    $mech->untick( 'fieldsToImport', $val );
+}
+$mech->click_ok( "send", "import files" );
+
+# Events exist
+my $events = $ems->getLineage( ['children'], {
+    includeOnlyClasses => ['WebGUI::Asset::Sku::EMSTicket'],
+    returnObjects => 1,
+} );
+is( scalar @$events, 2, '2 events added' );
+cmp_deeply(
+    [ map { $_->get } sort { $a->title cmp $b->title } @$events ],
+    [ superhashof( 
+            { 
+                title => "One",
+                description => "Oneness",
+                startDate => WebGUI::DateTime->new( $session, mysql => '2010-01-01 00:00:00', time_zone => $session->user->get('timeZone'), )->toMysql,
+                duration => 2,
+            }
+        ),
+        superhashof(
+            {
+                title => 'Two',
+                description => 'Twoness',
+                startDate => WebGUI::DateTime->new( $session, mysql => '2010-02-02 00:00:00', time_zone => $session->user->get('timeZone') )->toMysql,
+                duration => 3,
+            }
+        ),
+    ],
+    'correct asset props are set'
+);
+
+
+#----------------------------------------------------------------------------
+# www_manageRegistrant
+my $mech = WebGUI::Test::Mechanize->new( config => WebGUI::Test->file );
+$mech->get_ok('/');
+$mech->session->user({ userId => 3 });
+
+# Need a badge
+my $badger_tag = WebGUI::VersionTag->getWorking($session);
+my $badger = $ems->addChild({
+        className => 'WebGUI::Asset::Sku::EMSBadge',
+        title => 'Badgers',
+    });
+$badger_tag->commit;
+$badger = $badger->cloneFromDb;
+# Add cart and complete checkout
+my $regBadgeId 
+    = $session->db->setRow( 'EMSRegistrant', 'badgeId', {
+        badgeId => "new",
+        badgeAssetId => $badger->getId,
+        emsAssetId => $ems->getId,
+    } );
+
+$mech->get_ok( $ems->getUrl( 'func=manageRegistrant;badgeId=' . $regBadgeId ) );
+my %reg = (
+    userId      => '3',
+    name        => 'Homer S.',
+    address1    => '742 Evergreen Terr.',
+    city        => 'Springfield',
+    notes       => 'Will need assistance.',
+);
+$mech->submit_form_ok({
+        fields => { %reg },
+    }, 
+    "save our registrant's information" 
+);
+
+my $regInfo = $session->db->getRow( 'EMSRegistrant', 'badgeId', $regBadgeId );
+cmp_deeply( 
+    $regInfo,
+    superhashof( {
+        %reg, 
+        badgeAssetId => $badger->getId,
+        emsAssetId => $ems->getId,
+    } ),
+    "Registrant info saved correctly",
+);
+
+done_testing;

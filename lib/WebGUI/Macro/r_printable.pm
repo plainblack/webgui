@@ -1,7 +1,7 @@
 package WebGUI::Macro::r_printable;
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -13,7 +13,6 @@ package WebGUI::Macro::r_printable;
 use strict;
 use WebGUI::International;
 use WebGUI::Asset::Template;
-use WebGUI::Utility;
 
 =head1 NAME
 
@@ -55,7 +54,7 @@ sub process {
 	my $append = 'op=makePrintable';
 	$temp = $session->url->page($append);
         $temp =~ s/\/\//\//;
-        $temp = $session->url->append($temp,$session->env->get("QUERY_STRING"));
+        $temp = $session->url->append($temp,$session->request->env->{"QUERY_STRING"});
 	if ($param[1] ne "") {
 		$temp = $session->url->append($temp,'styleId='.$param[1]);
 	}
@@ -71,7 +70,7 @@ sub process {
 		if ($param[2]) {
          		$temp =  WebGUI::Asset::Template->newByUrl($session,$param[2])->process(\%var);
 		} else {
-         		$temp =  WebGUI::Asset::Template->new($session,"PBtmpl0000000000000045")->process(\%var);
+         		$temp =  WebGUI::Asset::Template->newById($session,"PBtmpl0000000000000045")->process(\%var);
 		}
 	}
 	return $temp;

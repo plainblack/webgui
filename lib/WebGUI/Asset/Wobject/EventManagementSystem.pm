@@ -4,7 +4,7 @@ package WebGUI::Asset::Wobject::EventManagementSystem;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -16,7 +16,179 @@ package WebGUI::Asset::Wobject::EventManagementSystem;
 =cut
 
 use strict;
-use base 'WebGUI::Asset::Wobject';
+use Moose;
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset::Wobject';
+define assetName => ['assetName', 'Asset_EventManagementSystem'];
+define icon      => 'ems.gif';
+define tableName => 'EventManagementSystem';
+property timezone => (
+            fieldType        => 'TimeZone',
+            default          => 'America/Chicago',
+            tab              => 'properties',
+            label            => ['time zone', 'Asset_EventManagementSystem'],
+            hoverHelp        => ['time zone help', 'Asset_EventManagementSystem'],
+         );
+property templateId => (
+            fieldType        => 'template',
+            default          => '2rC4ErZ3c77OJzJm7O5s3w',
+            tab              => 'display',
+            label            => ['main template', 'Asset_EventManagementSystem'],
+            hoverHelp        => ['main template help', 'Asset_EventManagementSystem'],
+            namespace        => 'EMS',
+         );
+property scheduleTemplateId => (
+            fieldType        => 'template',
+            default          => 'S2_LsvVa95OSqc66ITAoig',
+            tab              => 'display',
+            label            => ['schedule template', 'Asset_EventManagementSystem'],
+            hoverHelp        => ['schedule template help', 'Asset_EventManagementSystem'],
+            namespace        => 'EMS',
+         );
+property scheduleColumnsPerPage => (
+            fieldType        => 'Integer',
+            default          => '5',
+            tab              => 'display',
+            label            => ['schedule number of columns', 'Asset_EventManagementSystem'],
+            hoverHelp        => ['schedule number of columns help', 'Asset_EventManagementSystem'],
+         );
+property badgeBuilderTemplateId => (
+            fieldType        => 'template',
+            default          => 'BMybD3cEnmXVk2wQ_qEsRQ',
+            tab              => 'display',
+            label            => ['badge builder template', 'Asset_EventManagementSystem'],
+            hoverHelp        => ['badge builder template help', 'Asset_EventManagementSystem'],
+            namespace        => 'EMS/BadgeBuilder',
+         );
+property lookupRegistrantTemplateId => (
+            fieldType        => 'template',
+            default          => 'OOyMH33plAy6oCj_QWrxtg',
+            tab              => 'display',
+            label            => ['lookup registrant template', 'Asset_EventManagementSystem'],
+            hoverHelp        => ['lookup registrant template help', 'Asset_EventManagementSystem'],
+            namespace        => 'EMS/LookupRegistrant',
+         );
+property printBadgeTemplateId => (
+            fieldType        => 'template',
+            default          => 'PsFn7dJt4wMwBa8hiE3hOA',
+            tab              => 'display',
+            label            => ['print badge template', 'Asset_EventManagementSystem'],
+            hoverHelp        => ['print badge template help', 'Asset_EventManagementSystem'],
+            namespace        => 'EMS/PrintBadge',
+         );
+property printTicketTemplateId => (
+            fieldType        => 'template',
+            default          => 'yBwydfooiLvhEFawJb0VTQ',
+            tab              => 'display',
+            label            => ['print ticket template', 'Asset_EventManagementSystem'],
+            hoverHelp        => ['print ticket template help', 'Asset_EventManagementSystem'],
+            namespace        => 'EMS/PrintTicket',
+         );
+property eventSubmissionMainTemplateId => (
+            fieldType        => 'template',
+            default          => 'DoVNijm6lMDE0cYrtvEbDQ',
+            tab              => 'display',
+            label            => ['event submission main template', 'Asset_EventManagementSystem'],
+            hoverHelp        => ['event submission main template help', 'Asset_EventManagementSystem'],
+            namespace        => 'EMS/SubmissionMain',
+         );
+property eventSubmissionTemplateId => (
+            fieldType        => 'template',
+            default          => '8tqyQx-LwYUHIWOlKPjJrA',
+            tab              => 'display',
+            label            => ['event submission template', 'Asset_EventManagementSystem'],
+            hoverHelp        => ['event submission template help', 'Asset_EventManagementSystem'],
+            namespace        => 'EMS/Submission',
+         );
+property eventSubmissionQueueTemplateId => (
+            fieldType        => 'template',
+            default          => 'ktSvKU8riGimhcsxXwqvPQ',
+            tab              => 'display',
+            label            => ['event submission queue template', 'Asset_EventManagementSystem'],
+            hoverHelp        => ['event submission queue template help', 'Asset_EventManagementSystem'],
+            namespace        => 'EMS/SubmissionQueue',
+         );
+property printRemainingTicketsTemplateId => (
+            fieldType        => 'template',
+            default          => 'hreA_bgxiTX-EzWCSZCZJw',
+            tab              => 'display',
+            label            => ['print remaining ticket template', 'Asset_EventManagementSystem'],
+            hoverHelp        => ['print remaining ticket template help', 'Asset_EventManagementSystem'],
+            namespace        => 'EMS/PrintRemainingTickets',
+         );
+property badgeInstructions => (
+            fieldType        => 'HTMLArea',
+            builder          => '_badgeInstructions_builder',
+            lazy             => 1,
+            tab              => 'properties',
+            label            => ['badge instructions', 'Asset_EventManagementSystem'],
+            hoverHelp        => ['badge instructions help', 'Asset_EventManagementSystem'],
+         );
+sub _badgeInstructions_builder {
+    my $session = shift->session;
+    my $i18n = WebGUI::International->new($session, 'Asset_EventManagementSystem');
+    return $i18n->get('default badge instructions');
+}
+property ticketInstructions => (
+            fieldType        => 'HTMLArea',
+            builder          => '_ticketInstructions_builder',
+            lazy             => 1,
+            tab              => 'properties',
+            label            => ['ticket instructions', 'Asset_EventManagementSystem'],
+            hoverHelp        => ['ticket instructions help', 'Asset_EventManagementSystem'],
+         );
+sub _ticketInstructions_builder {
+    my $session = shift->session;
+    my $i18n = WebGUI::International->new($session, 'Asset_EventManagementSystem');
+    return $i18n->get('default ticket instructions');
+}
+property ribbonInstructions => (
+            fieldType        => 'HTMLArea',
+            builder          => '_ribbonInstructions_builder',
+            lazy             => 1,
+            tab              => 'properties',
+            label            => ['ribbon instructions', 'Asset_EventManagementSystem'],
+            hoverHelp        => ['ribbon instructions help', 'Asset_EventManagementSystem'],
+         );
+sub _ribbonInstructions_builder {
+    my $session = shift->session;
+    my $i18n = WebGUI::International->new($session, 'Asset_EventManagementSystem');
+    return $i18n->get('default ribbon instructions');
+}
+property tokenInstructions => (
+            fieldType        => 'HTMLArea',
+            builder          => '_tokenInstructions_builder',
+            lazy             => 1,
+            tab              => 'properties',
+            label            => ['token instructions', 'Asset_EventManagementSystem'],
+            hoverHelp        => ['token instructions help', 'Asset_EventManagementSystem'],
+         );
+sub _tokenInstructions_builder {
+    my $session = shift->session;
+    my $i18n = WebGUI::International->new($session, 'Asset_EventManagementSystem');
+    return $i18n->get('default token instructions');
+}
+property registrationStaffGroupId => (
+            fieldType        => 'group',
+            default          => 3,
+            tab              => 'security',
+            label            => ['registration staff group', 'Asset_EventManagementSystem'],
+            hoverHelp        => ['registration staff group help', 'Asset_EventManagementSystem'],
+         );
+property submittedLocationsList => (
+            fieldType        => 'textarea',
+            tab              => 'properties',
+            default          => '',
+            label            => ['submitted location list label', 'Asset_EventManagementSystem'],
+            hoverHelp        => ['submitted location list help', 'Asset_EventManagementSystem'],
+         );
+property eventSubmissionGroups => (
+            fieldType        => 'hidden',
+            default          => '',
+            noFormPost       => 1,
+         );
+
+
 use Digest::MD5;
 use JSON;
 use Text::CSV_XS;
@@ -26,14 +198,11 @@ use WebGUI::Asset::Sku::EMSBadge;
 use WebGUI::Asset::Sku::EMSTicket;
 use WebGUI::Asset::Sku::EMSRibbon;
 use WebGUI::Asset::Sku::EMSToken;
-use WebGUI::Cache;
 use WebGUI::Exception;
 use WebGUI::FormValidator;
-use WebGUI::HTMLForm;
+use WebGUI::FormBuilder;
 use WebGUI::International;
-use WebGUI::Utility;
 use WebGUI::Workflow::Instance;
-use Tie::IxHash;
 use Data::Dumper;
 
 #-------------------------------------------------------------------
@@ -118,168 +287,6 @@ sub canSubmit {
         return 1 if $user->isInGroup($groupId);
     }
     return 0;
-}
-
-#-------------------------------------------------------------------
-sub definition {
-	my $class = shift;
-	my $session = shift;
-	my $definition = shift;
-	my %properties;
-	tie %properties, 'Tie::IxHash';
-	my $i18n = WebGUI::International->new($session,'Asset_EventManagementSystem');
-	%properties = (
-		timezone => {
-			fieldType 		=> 'TimeZone',
-			defaultValue 	=> 'America/Chicago',
-			tab				=> 'properties',
-			label			=> $i18n->get('time zone'),
-			hoverHelp		=> $i18n->get('time zone help'),
-		},
-		templateId => {
-			fieldType 		=> 'template',
-			defaultValue 	        => '2rC4ErZ3c77OJzJm7O5s3w',
-			tab				=> 'display',
-			label			=> $i18n->get('main template'),
-			hoverHelp		=> $i18n->get('main template help'),
-			namespace		=> 'EMS',
-		},
-		scheduleTemplateId => {
-			fieldType 		=> 'template',
-			defaultValue 	        => 'S2_LsvVa95OSqc66ITAoig',
-			tab			=> 'display',
-			label			=> $i18n->get('schedule template'),
-			hoverHelp		=> $i18n->get('schedule template help'),
-			namespace		=> 'EMS/Schedule',
-		},
-		scheduleColumnsPerPage => {
-			fieldType 		=> 'Integer',
-			defaultValue 		=> '5',
-			tab			=> 'display',
-			label			=> $i18n->get('schedule number of columns'),
-			hoverHelp		=> $i18n->get('schedule number of columns help'),
-		},
-		badgeBuilderTemplateId => {
-			fieldType 		=> 'template',
-			defaultValue 	=> 'BMybD3cEnmXVk2wQ_qEsRQ',
-			tab				=> 'display',
-			label			=> $i18n->get('badge builder template'),
-			hoverHelp		=> $i18n->get('badge builder template help'),
-			namespace		=> 'EMS/BadgeBuilder',
-		},
-		lookupRegistrantTemplateId => {
-			fieldType 		=> 'template',
-			defaultValue 	=> 'OOyMH33plAy6oCj_QWrxtg',
-			tab				=> 'display',
-			label			=> $i18n->get('lookup registrant template'),
-			hoverHelp		=> $i18n->get('lookup registrant template help'),
-			namespace		=> 'EMS/LookupRegistrant',
-		},
-		printBadgeTemplateId => {
-			fieldType 		=> 'template',
-			defaultValue 	=> 'PsFn7dJt4wMwBa8hiE3hOA',
-			tab				=> 'display',
-			label			=> $i18n->get('print badge template'),
-			hoverHelp		=> $i18n->get('print badge template help'),
-			namespace		=> 'EMS/PrintBadge',
-		},
-		printTicketTemplateId => {
-			fieldType 		=> 'template',
-			defaultValue 	=> 'yBwydfooiLvhEFawJb0VTQ',
-			tab				=> 'display',
-			label			=> $i18n->get('print ticket template'),
-			hoverHelp		=> $i18n->get('print ticket template help'),
-			namespace		=> 'EMS/PrintTicket',
-		},
-		eventSubmissionMainTemplateId => {
-			fieldType 		=> 'template',
-			defaultValue 		=> 'DoVNijm6lMDE0cYrtvEbDQ',
-			tab			=> 'display',
-			label			=> $i18n->get('event submission main template'),
-			hoverHelp		=> $i18n->get('event submission main template help'),
-			namespace		=> 'EMS/SubmissionMain',
-		},
-		eventSubmissionTemplateId => {
-			fieldType 		=> 'template',
-			defaultValue 		=> '8tqyQx-LwYUHIWOlKPjJrA',
-			tab			=> 'display',
-			label			=> $i18n->get('event submission template'),
-			hoverHelp		=> $i18n->get('event submission template help'),
-			namespace		=> 'EMS/Submission',
-		},
-		eventSubmissionQueueTemplateId => {
-			fieldType 		=> 'template',
-			defaultValue 		=> 'ktSvKU8riGimhcsxXwqvPQ',
-			tab			=> 'display',
-			label			=> $i18n->get('event submission queue template'),
-			hoverHelp		=> $i18n->get('event submission queue template help'),
-			namespace		=> 'EMS/SubmissionQueue',
-		},
-		printRemainingTicketsTemplateId => {
-			fieldType 		=> 'template',
-			defaultValue 	=> 'hreA_bgxiTX-EzWCSZCZJw',
-			tab				=> 'display',
-			label			=> $i18n->get('print remaining ticket template'),
-			hoverHelp		=> $i18n->get('print remaining ticket template help'),
-			namespace		=> 'EMS/PrintRemainingTickets',
-		},
-		badgeInstructions => {
-			fieldType 		=> 'HTMLArea',
-			defaultValue 		=> $i18n->get('default badge instructions'),
-			tab			=> 'properties',
-			label			=> $i18n->get('badge instructions'),
-			hoverHelp		=> $i18n->get('badge instructions help'),
-		},
-		ticketInstructions => {
-			fieldType 		=> 'HTMLArea',
-			defaultValue 	=> $i18n->get('default ticket instructions'),
-			tab				=> 'properties',
-			label			=> $i18n->get('ticket instructions'),
-			hoverHelp		=> $i18n->get('ticket instructions help'),
-		},
-		ribbonInstructions => {
-			fieldType 		=> 'HTMLArea',
-			defaultValue 	=> $i18n->get('default ribbon instructions'),
-			tab				=> 'properties',
-			label			=> $i18n->get('ribbon instructions'),
-			hoverHelp		=> $i18n->get('ribbon instructions help'),
-		},
-		tokenInstructions => {
-			fieldType 		=> 'HTMLArea',
-			defaultValue 	=> $i18n->get('default token instructions'),
-			tab				=> 'properties',
-			label			=> $i18n->get('token instructions'),
-			hoverHelp		=> $i18n->get('token instructions help'),
-		},
-		registrationStaffGroupId => {
-			fieldType 		=> 'group',
-			defaultValue 	=> [3],
-			tab				=> 'security',
-			label			=> $i18n->get('registration staff group'),
-			hoverHelp		=> $i18n->get('registration staff group help'),
-		},
-		submittedLocationsList => {
-			fieldType 		=> 'textarea',
-			tab			=> 'properties',
-			defaultValue 	        => '',
-			label			=> $i18n->get('submitted location list label'),
-			hoverHelp		=> $i18n->get('submitted location list help'),
-		},
-		eventSubmissionGroups => {
-			fieldType 		=> 'hidden',
-			defaultValue 	        => '',
-                        noFormPost              => 1,
-		},
-	);
-	push(@{$definition}, {
-		assetName=>$i18n->get('assetName'),
-		icon=>'ems.gif',
-		autoGenerateForms=>1,
-		tableName=>'EventManagementSystem',
-		className=>'WebGUI::Asset::Wobject::EventManagementSystem',
-		properties=>\%properties
-		});
-	return $class->SUPER::definition($session,$definition);
 }
 
 #------------------------------------------------------------------
@@ -387,20 +394,20 @@ sub getEventFieldsForImport {
 			required	=> 1,
 		});
 	my $count = 0;
-	foreach my $definition (@{WebGUI::Asset::Sku::EMSTicket->definition($self->session)}) {
-		$count++;
-		foreach my $field (keys %{$definition->{properties}}) {
-			next if ($count > 1 && !isIn($field, qw(title description)));
-			next unless ($definition->{properties}{$field}{label} ne "");
-			push(@fields, {
-				name 	 		=> $field,
-				label 	  		=> $definition->{properties}{$field}{label},
-				required		=> ($field eq "eventNumber") ? 1 : 0,
-				type			=>  $definition->{properties}{$field}{fieldType},
-				options 		=> $definition->{properties}{$field}{options},
-				defaultValue	=> $definition->{properties}{$field}{defaultValue},
-				});
-		}
+        my $class = "WebGUI::Asset::Sku::EMSTicket";
+	foreach my $fieldName ( $class->getProperties ) {
+            next if $fieldName ~~ [qw( groupIdEdit groupIdView ownerUserId newWindow menuTitle
+                                    encryptPage isHidden url synopsis extraHeadTags
+                                    usePackedHeadTags isPackage isPrototype isExportable
+                                    inheritUrlFromParent displayTitle shipsSeparately sku )];
+            my $attr = $class->meta->find_attribute_by_name( $fieldName );
+            my $props = {
+                type => $attr->fieldType,
+                name => $fieldName,
+                %{ $class->getFormProperties( $self->session, $fieldName ) },
+            };
+            next unless $props->{label};
+            push @fields, $props;
 	}
 	foreach my $field (@{$self->getEventMetaFields}) {
 		push(@fields, {
@@ -435,10 +442,10 @@ sub getLocations {
     my %h;
     my $tickets = $self->getTickets;
 # this is a really compact 'uniq' operation
-    my @locations = map { $h{$_}++ == 0 ? $_ : () } ( map { $_->get('location') } ( @$tickets ) );
+    my @locations = map { $h{$_}++ == 0 ? $_ : () } ( map { $_->location } ( @$tickets ) );
 # the dates have the time data removed with a pattern substitution
     if( $dateRef ) {
-        push @$dateRef, map { s/\s*\d+:\d+(:\d+)?//; $h{$_}++ == 0 ? $_ : () } ( map { $_->get('startDate') } ( @$tickets ) );
+        push @$dateRef, map { s/\s*\d+:\d+(:\d+)?//; $h{$_}++ == 0 ? $_ : () } ( map { $_->startDate } ( @$tickets ) );
     }
 
     return @locations;
@@ -659,7 +666,7 @@ A WebGUI::User object. Defaults to $session->user.
 sub isRegistrationStaff {
 	my $self = shift;
 	my $user = shift || $self->session->user;
-	$user->isInGroup($self->get('registrationStaffGroupId')) || $self->canEdit;
+	$user->isInGroup($self->registrationStaffGroupId) || $self->canEdit;
 }
 
 #-------------------------------------------------------------------
@@ -670,20 +677,20 @@ See WebGUI::Asset::prepareView() for details.
 
 =cut
 
-sub prepareView {
+override prepareView => sub {
     my $self = shift;
-    $self->SUPER::prepareView();
-    my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId"));
+    super();
+    my $template = WebGUI::Asset::Template->newById($self->session, $self->templateId);
     if (!$template) {
         WebGUI::Error::ObjectNotFound::Template->throw(
             error      => qq{Template not found},
-            templateId => $self->get("templateId"),
+            templateId => $self->templateId,
             assetId    => $self->getId,
         );
     }
     $template->prepare($self->getMetaDataAsTemplateVariables);
     $self->{_viewTemplate} = $template;
-}
+};
 
 #------------------------------------------------------------------
 
@@ -695,7 +702,7 @@ and event meta data.
 
 =cut
 
-sub purge {
+override purge => sub {
     my $self = shift;
     my $db = $self->session->db;
 
@@ -718,8 +725,8 @@ sub purge {
 	$db->write("delete from EMSBadgeGroup where emsAssetId=?",[$self->getId]);
 	$db->write("delete from EMSEventMetaField where assetId=?",[$self->getId]);
 
-    $self->SUPER::purge(@_);
-}
+    super();
+};
 
 #-------------------------------------------------------------------
 
@@ -736,7 +743,7 @@ sub view {
 
 	# set up objects we'll need
 	my %var = (
-		addBadgeUrl			=> $self->getUrl('func=add;class=WebGUI::Asset::Sku::EMSBadge'),
+		addBadgeUrl			=> $self->getUrl('func=add;className=WebGUI::Asset::Sku::EMSBadge'),
 		buildBadgeUrl		=> $self->getUrl('func=buildBadge'),
 		viewScheduleUrl		=> $self->getUrl('func=viewSchedule'),
 		addSubmissionUrl	=> $self->getUrl('func=viewSubmissionQueue'),
@@ -772,7 +779,7 @@ sub www_addRibbonToBadge {
 	my $session = $self->session;
     return $session->privilege->insufficient() unless $self->canView;
     my $form = $session->form;
-	my $ribbon = WebGUI::Asset->new($session, $form->get('assetId'), 'WebGUI::Asset::Sku::EMSRibbon');
+	my $ribbon = WebGUI::Asset->newById($session, $form->get('assetId'));
 	if (defined $ribbon) {
 		$ribbon->addToCart({badgeId=>$form->get('badgeId')});
 	}
@@ -816,9 +823,9 @@ sub www_addSubmission {
                 my $title =  $i18n->get('select form to submit') ;
 		my $asJson = $session->form->get('asJson');
                 if( $asJson ) {
-                    $session->http->setMimeType( 'application/json' );
+                    $session->response->content_type( 'application/json' );
                 } else {
-                    $session->http->setMimeType( 'text/html' );
+                    $session->response->content_type( 'text/html' );
                 }
                 my $content =  '<h1>' . $title .  '</h1><ul>' . $listOfLinks . '</ul>' ;
                 if( $asJson ) {
@@ -828,9 +835,9 @@ sub www_addSubmission {
                 }
             }
     }
-    $form = WebGUI::Asset->newByDynamicClass($session,$formId);
-    if (!defined $form) {
-	$session->errorHandler->error(__PACKAGE__ . " - failed to instanciate asset with assetId $formId");
+    $form = eval { WebGUI::Asset->newById($session, $formId); };
+    if (Exception::Class->caught()) {
+        $session->log->error(__PACKAGE__ . " - failed to instanciate asset with assetId $formId");
     }
     return $form->www_addSubmission;
 }
@@ -902,9 +909,9 @@ sub www_addTicketsToBadge {
 
         # Add the tickets
 	my @ids = $form->param('assetId');
-        my @errors = (); # Error messages
+    my @errors = (); # Error messages
 	TICKET: foreach my $id (@ids) {
-		my $ticket = WebGUI::Asset->new($session, $id, 'WebGUI::Asset::Sku::EMSTicket');
+		my $ticket = WebGUI::Asset->newById($session, $id);
 		if (defined $ticket) {
                     # Make sure we're allowed to add this ticket
                     my @ticketBadgeGroups = ( split "\n", $ticket->get('relatedBadgeGroups') );
@@ -945,7 +952,7 @@ sub www_addTokenToBadge {
 	my $session = $self->session;
     return $session->privilege->insufficient() unless $self->canView;
     my $form = $session->form;
-	my $token = WebGUI::Asset->new($session, $form->get('assetId'), 'WebGUI::Asset::Sku::EMSToken');
+	my $token = WebGUI::Asset->newById($session, $form->get('assetId'));
 	if (defined $token) {
 		my $item = $token->addToCart({badgeId=>$form->get('badgeId')});
 		$item->setQuantity($form->get('quantity'));
@@ -969,7 +976,7 @@ sub www_buildBadge {
 	my $i18n = WebGUI::International->new($session, "Asset_EventManagementSystem");
 	my %var = (
 		%{$self->get},
-		addTicketUrl				=> $self->getUrl('func=add;class=WebGUI::Asset::Sku::EMSTicket'),
+		addTicketUrl				=> $self->getUrl('func=add;className=WebGUI::Asset::Sku::EMSTicket'),
 		importTicketsUrl			=> $self->getUrl('func=importEvents'),
 		exportTicketsUrl			=> $self->getUrl('func=exportEvents'),
 		getTicketsUrl				=> $self->getUrl('func=getTicketsAsJson;badgeId='.$badgeId),
@@ -978,10 +985,10 @@ sub www_buildBadge {
 		hasBadge					=> ($badgeId ne ""),
 		badgeId						=> $badgeId,
 		whichTab					=> $whichTab || "tickets",
-		addRibbonUrl				=> $self->getUrl('func=add;class=WebGUI::Asset::Sku::EMSRibbon'),
+		addRibbonUrl				=> $self->getUrl('func=add;className=WebGUI::Asset::Sku::EMSRibbon'),
 		getRibbonsUrl				=> $self->getUrl('func=getRibbonsAsJson'),
 		getTokensUrl				=> $self->getUrl('func=getTokensAsJson'),
-		addTokenUrl					=> $self->getUrl('func=add;class=WebGUI::Asset::Sku::EMSToken'),
+		addTokenUrl					=> $self->getUrl('func=add;className=WebGUI::Asset::Sku::EMSToken'),
 		lookupBadgeUrl				=> $self->getUrl('func=lookupRegistrant'),
 		url							=> $self->getUrl,
 		viewCartUrl					=> $self->getUrl('shop=cart'),
@@ -1003,7 +1010,7 @@ sub www_buildBadge {
 	$var{otherBadgesInCart} = \@otherBadges;
 
 	# render
-	return $self->processStyle($self->processTemplate(\%var,$self->get('badgeBuilderTemplateId')));
+	return $self->processStyle($self->processTemplate(\%var,$self->badgeBuilderTemplateId));
 }
 
 #-------------------------------------------------------------------
@@ -1048,26 +1055,26 @@ sub www_editBadgeGroup {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless $self->canEdit;
 	my ($form, $db) = $self->session->quick(qw(form db));
-	my $f = WebGUI::HTMLForm->new($self->session, action=>$self->getUrl);
+	my $f = WebGUI::FormBuilder->new($self->session, action=>$self->getUrl);
 	my $badgeGroup = $db->getRow("EMSBadgeGroup","badgeGroupId",$form->get('badgeGroupId'));
 	$badgeGroup->{badgeList} = ($badgeGroup->{badgeList} ne "") ? JSON::from_json($badgeGroup->{badgeList}) : [];
 	my $i18n = WebGUI::International->new($self->session, "Asset_EventManagementSystem");
-	$f->hidden(name=>'func', value=>'editBadgeGroupSave');
-	$f->hidden(name=>'badgeGroupId', value=>$form->get('badgeGroupId'));
-	$f->text(
+	$f->addField( "hidden", name=>'func', value=>'editBadgeGroupSave');
+	$f->addField( "hidden", name=>'badgeGroupId', value=>$form->get('badgeGroupId'));
+	$f->addField( "text",
 		name		=> 'name',	
 		value		=> $badgeGroup->{name},
 		label		=> $i18n->get('badge group name'),
 		hoverHelp	=> $i18n->get('badge group name help'),
 		);
-        $f->integer(
-            name        => 'ticketsPerBadge',
-            value       => $badgeGroup->{ticketsPerBadge} || 0,
-            label       => $i18n->get('badge group ticketsPerBadge'),
-            hoverHelp   => $i18n->get('badge group ticketsPerBadge help'),
-        );
-	$f->submit;
-	return $self->processStyle('<h1>'.$i18n->get('badge groups').'</h1>'.$f->print);
+    $f->addField( "integer", 
+        name        => 'ticketsPerBadge',
+        value       => $badgeGroup->{ticketsPerBadge} || 0,
+        label       => $i18n->get('badge group ticketsPerBadge'),
+        hoverHelp   => $i18n->get('badge group ticketsPerBadge help'),
+    );
+	$f->addField( "submit", name => "send" );
+	return $self->processStyle('<h1>'.$i18n->get('badge groups').'</h1>'.$f->toHtml);
 }
 
 
@@ -1164,7 +1171,7 @@ sub www_editEventMetaField {
 	return $self->session->privilege->insufficient unless ($self->canEdit);
 	my $i18n2 = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
 	my $i18n = WebGUI::International->new($self->session,"WebGUIProfile");
-	my $f = WebGUI::HTMLForm->new($self->session, (
+	my $f = WebGUI::FormBuilder->new($self->session, (
 		action => $self->getUrl("func=editEventMetaFieldSave;fieldId=".$fieldId)
 	));
 	my $data = {};
@@ -1179,10 +1186,10 @@ sub www_editEventMetaField {
 			defaultValues => $self->session->form->process("defaultValues",'textarea'),
 			helpText => $self->session->form->process("helpText",'textarea'),
 		};
-		$f->readOnly(
-			-name => 'error',
-			-label => $i18n2->get('error'),
-			-value => '<span style="color:red;font-weight:bold">'.$error.'</span>',
+		$f->addField( "readOnly",
+			name => 'error',
+			label => $i18n2->get('error'),
+			value => '<span style="color:red;font-weight:bold">'.$error.'</span>',
 		);
 	} elsif ($fieldId ne 'new') {
 		$data = $self->session->db->quickHashRef("select * from EMSEventMetaField where fieldId=?",[$fieldId]);
@@ -1195,53 +1202,53 @@ sub www_editEventMetaField {
 			required => 0,
 		};
 	}
-	$f->text(
-		-name => "label",
-		-label => $i18n2->get('label'),
-		-hoverHelp => $i18n2->get('label help'),
-		-value => $data->{label},
-		-extras=>(($data->{label} eq $i18n2->get('type label here'))?' style="color:#bbbbbb" ':'').' onblur="if(!this.value){this.value=\''.$i18n2->get('type label here').'\';this.style.color=\'#bbbbbb\';}" onfocus="if(this.value == \''.$i18n2->get('type label here').'\'){this.value=\'\';this.style.color=\'\';}"',
+	$f->addField( "text",
+		name => "label",
+		label => $i18n2->get('label'),
+		hoverHelp => $i18n2->get('label help'),
+		value => $data->{label},
+		extras=>(($data->{label} eq $i18n2->get('type label here'))?' style="color:#bbbbbb" ':'').' onblur="if(!this.value){this.value=\''.$i18n2->get('type label here').'\';this.style.color=\'#bbbbbb\';}" onfocus="if(this.value == \''.$i18n2->get('type label here').'\'){this.value=\'\';this.style.color=\'\';}"',
 	);
-	$f->yesNo(
-		-name=>"visible",
-		-label=>$i18n->get('473a'),
-		-hoverHelp=>$i18n->get('473a description'),
-		-value=>$data->{visible},
+	$f->addField( "yesNo",
+		name=>"visible",
+		label=>$i18n->get('473a'),
+		hoverHelp=>$i18n->get('473a description'),
+		value=>$data->{visible},
 		defaultValue=>1,
 	);
-	$f->yesNo(
-		-name=>"required",
-		-label=>$i18n->get(474),
-		-hoverHelp=>$i18n->get('474 description'),
-		-value=>$data->{required}
+	$f->addField( "yesNo",
+		name=>"required",
+		label=>$i18n->get(474),
+		hoverHelp=>$i18n->get('474 description'),
+		value=>$data->{required}
 	);
-    $f->fieldType(
-        -name=>"dataType",        
-        -label=>$i18n->get(486),        
-        -hoverHelp=>$i18n->get('486 description'),
-        -value=>ucfirst $data->{dataType},        
-        -defaultValue=>"Text",
+    $f->addField( "fieldType",
+        name=>"dataType",        
+        label=>$i18n->get(486),        
+        hoverHelp=>$i18n->get('486 description'),
+        value=>ucfirst $data->{dataType},        
+        defaultValue=>"Text",
         );
-	$f->textarea(
-		-name => "possibleValues",
-		-label => $i18n->get(487),
-		-hoverHelp => $i18n->get('487 description'),
-		-value => $data->{possibleValues},
+	$f->addField( "textarea",
+		name => "possibleValues",
+		label => $i18n->get(487),
+		hoverHelp => $i18n->get('487 description'),
+		value => $data->{possibleValues},
 	);
-	$f->textarea(
-		-name => "defaultValues",
-		-label => $i18n->get(488),
-		-hoverHelp => $i18n->get('488 description'),
-		-value => $data->{defaultValues},
+	$f->addField( "textarea",
+		name => "defaultValues",
+		label => $i18n->get(488),
+		hoverHelp => $i18n->get('488 description'),
+		value => $data->{defaultValues},
 	);
-	$f->textarea(
-		-name => "helpText",
-		-label => $i18n2->get('meta field help text'),
-		-hoverHelp => $i18n2->get('meta field help text description'),
-		-value => $data->{helpText},
+	$f->addField( "textarea",
+		name => "helpText",
+		label => $i18n2->get('meta field help text'),
+		hoverHelp => $i18n2->get('meta field help text description'),
+		value => $data->{helpText},
 	);
-	$f->submit;
-	return $self->processStyle($f->print);
+	$f->addField( "submit", name => "send" );
+	return $self->processStyle($f->toHtml);
 }
 
 #-------------------------------------------------------------------
@@ -1318,8 +1325,9 @@ sub www_exportEvents {
 	my $out = $session->output;
 
 	# set http header
-	$self->session->http->setFilename($self->getTitle.".csv", 'application/excel');
-	
+    $session->response->header( 'Content-Disposition' => qq{attachment; filename="}.$self->getTitle().'.csv"' );
+    $session->response->content_type('application/excel');
+
 	# add file header
 	my @header = ();
 	foreach my $field (@{$fields}) {
@@ -1330,7 +1338,7 @@ sub www_exportEvents {
 
 	# process events
 	foreach my $id (@{$self->getTickets({returnIds=>1})}) {
-		my $event = WebGUI::Asset::Sku::EMSTicket->new($session, $id);
+		my $event = WebGUI::Asset::Sku::EMSTicket->newById($session, $id);
 		my @export = ();
 		if (defined $event) {
 			my $metadata = $event->getEventMetaData;
@@ -1352,7 +1360,7 @@ sub www_exportEvents {
 			last;
 		}
 	}
-	
+
 	# finished
 	return "chunked";
 }
@@ -1389,16 +1397,16 @@ sub www_getAllSubmissions {
     $rules->{'joinClass'         } = "WebGUI::Asset::EMSSubmission";
     $rules->{'whereClause'       } = $whereClause;
     $rules->{'includeOnlyClasses'} = ['WebGUI::Asset::EMSSubmission'];
-    $rules->{'orderByClause'     } = $session->db->dbh->quote_identifier( $orderByColumn ) . ' ' . $orderByDirection if $orderByColumn;
+    $rules->{'orderByClause'     } = $session->db->quote_identifier( $orderByColumn ) . ' ' . $orderByDirection if $orderByColumn;
 
     my $sql  = "";
-    
+
     $sql = $self->getLineageSql(['descendants'], $rules);
 
     my $startIndex        = $form->get( 'startIndex' ) || 1;
     my $rowsPerPage         = $form->get( 'rowsPerPage' ) || 25;
     my $currentPage         = int ( $startIndex / $rowsPerPage ) + 1;
-    
+
     my $p = WebGUI::Paginator->new( $session, '', $rowsPerPage, 'pn', $currentPage );
     $p->setDataByQuery($sql);
 
@@ -1408,10 +1416,10 @@ sub www_getAllSubmissions {
     $tableInfo->{'sort'           } = $orderByColumn;
     $tableInfo->{'dir'            } = $orderByDirection;
     $tableInfo->{'records'        } = [];
-    
+
     for my $record ( @{ $p->getPageData } ) {
-        my $asset = WebGUI::Asset->newByDynamicClass( $session, $record->{assetId} );
-        
+        my $asset = WebGUI::Asset->newById( $session, $record->{assetId} );
+
         my $lastReplyBy = $asset->get("lastReplyBy");
         if ($lastReplyBy) {
            $lastReplyBy = WebGUI::User->new($session,$lastReplyBy)->username;
@@ -1436,8 +1444,8 @@ sub www_getAllSubmissions {
 
         push @{ $tableInfo->{ records } }, \%fields;
     }
-    
-    $session->http->setMimeType( 'application/json' );
+
+    $session->response->content_type( 'application/json' );
     return JSON->new->encode( $tableInfo );
 }
 
@@ -1461,7 +1469,7 @@ sub www_getBadgesAsJson {
         next BADGE unless $badge->canView;
 		push(@{$results{records}}, {
 			title 				=> $badge->getTitle,
-			description			=> $badge->get('description'),
+			description			=> $badge->description,
 			price				=> $badge->getPrice+0,
 			quantityAvailable	=> $badge->getQuantityAvailable,
 			url					=> $badge->getUrl,
@@ -1474,7 +1482,7 @@ sub www_getBadgesAsJson {
     $results{'startIndex'} = 0;
     $results{'sort'}       = undef;
     $results{'dir'}        = "asc";
-    $session->http->setMimeType('application/json');
+    $session->response->content_type('application/json');
     return JSON->new->encode(\%results);
 }
 
@@ -1504,7 +1512,7 @@ sub www_getSubmissionById {
        $result->{title} = $submissionId;
        $result->{id} = $submissionId;
    }
-    $self->session->http->setMimeType('application/json');
+    $self->session->response->content_type('application/json');
     return JSON->new->encode($result);
 }
 
@@ -1521,7 +1529,7 @@ sub www_getRegistrantAsJson {
 	my $session = $self->session;
 	my $db = $session->db;
     return $session->privilege->insufficient() unless $self->canView;
-    $session->http->setMimeType('application/json');
+    $session->response->content_type('application/json');
 	my @tickets = ();
 	my @tokens = ();
 	my @ribbons = ();
@@ -1530,56 +1538,56 @@ sub www_getRegistrantAsJson {
 	# get badge info
 	my $badgeInfo = $self->getRegistrant($badgeId);
 	return "{}" unless (exists $badgeInfo->{badgeAssetId});
-	my $badge = WebGUI::Asset::Sku::EMSBadge->new($session, $badgeInfo->{badgeAssetId});
+	my $badge = WebGUI::Asset::Sku::EMSBadge->newById($session, $badgeInfo->{badgeAssetId});
 	$badgeInfo->{title} = $badge->getTitle;
-	$badgeInfo->{sku} = $badge->get('sku');
+	$badgeInfo->{sku} = $badge->sku;
 	$badgeInfo->{assetId} = $badge->getId;
 	$badgeInfo->{hasPurchased} = ($badgeInfo->{purchaseComplete}) ? 1 : 0;
 
-        # Add errors, if any
-        if ( $opt->{errors} && @{ $opt->{errors} } ) {
-            $badgeInfo->{errors} = $opt->{errors};
-        }
+    # Add errors, if any
+    if ( $opt->{errors} && @{ $opt->{errors} } ) {
+        $badgeInfo->{errors} = $opt->{errors};
+    }
 	
 	# get existing tickets
 	my $existingTickets = $db->read("select ticketAssetId from EMSRegistrantTicket where badgeId=? and purchaseComplete=1",[$badgeId]);
 	while (my ($id) = $existingTickets->array) {
-		my $ticket = WebGUI::Asset::Sku::EMSTicket->new($session, $id);
-        my $startTime = WebGUI::DateTime->new($ticket->get('startDate'))->set_time_zone($self->get('timezone'));
+		my $ticket = WebGUI::Asset::Sku::EMSTicket->newById($session, $id);
+        my $startTime = WebGUI::DateTime->new($ticket->startDate)->set_time_zone($self->timezone);
 		push(@tickets, {
 			title			=> $ticket->getTitle,
-			eventNumber		=> $ticket->get('eventNumber'),
+			eventNumber		=> $ticket->eventNumber,
 			hasPurchased 	=> 1,
 			startDate		=> $startTime->toMysqlTime,
-			endDate			=> $ticket->get('endDate'),
-			location		=> $ticket->get('location'),
+			endDate			=> $ticket->endDate,
+			location		=> $ticket->location,
 			assetId			=> $ticket->getId,
-			sku				=> $ticket->get('sku'),
+			sku				=> $ticket->sku,
 			});
 	}
 
 	# get existing ribbons
 	my $existingRibbons = $db->read("select ribbonAssetId from EMSRegistrantRibbon where badgeId=?",[$badgeId]);
 	while (my ($id) = $existingRibbons->array) {
-		my $ribbon = WebGUI::Asset::Sku::EMSRibbon->new($session, $id);
+		my $ribbon = WebGUI::Asset::Sku::EMSRibbon->newById($session, $id);
 		push(@ribbons, {
 			title			=> $ribbon->getTitle,
 			hasPurchased 	=> 1,
 			assetId			=> $ribbon->getId,
-			sku				=> $ribbon->get('sku'),
+			sku				=> $ribbon->sku,
 			});
 	}
 
 	# get existing tokens
 	my $existingTokens = $db->read("select tokenAssetId,quantity from EMSRegistrantToken where badgeId=?",[$badgeId]);
 	while (my ($id, $quantity) = $existingTokens->array) {
-		my $token = WebGUI::Asset::Sku::EMSToken->new($session, $id);
+		my $token = WebGUI::Asset::Sku::EMSToken->newById($session, $id);
 		push(@tokens, {
 			title			=> $token->getTitle,
 			hasPurchased 	=> 1,
 			quantity		=> $quantity,
 			assetId			=> $token->getId,
-			sku				=> $token->get('sku'),
+			sku				=> $token->sku,
 			});
 	}
 
@@ -1592,16 +1600,16 @@ sub www_getRegistrantAsJson {
 		my $sku = $item->getSku;
 		# it's a ticket
 		if ($sku->isa('WebGUI::Asset::Sku::EMSTicket')) {
-            my $startTime = WebGUI::DateTime->new($sku->get('startDate'))->set_time_zone($self->get('timezone'));
+            my $startTime = WebGUI::DateTime->new($sku->startDate)->set_time_zone($self->timezone);
 			push(@tickets, {
 				title			=> $sku->getTitle,
-				eventNumber		=> $sku->get('eventNumber'),
+				eventNumber		=> $sku->eventNumber,
 				itemId 			=> $item->getId,
 				startDate		=> $startTime->toMysqlTime,
-				endDate			=> $sku->get('endDate'),
-				location		=> $sku->get('location'),
+				endDate			=> $sku->endDate,
+				location		=> $sku->location,
 				assetId			=> $sku->getId,
-				sku				=> $sku->get('sku'),
+				sku				=> $sku->sku,
 				hasPurchased 	=> 0,
 				price			=> $sku->getPrice+0,
 				});
@@ -1611,14 +1619,14 @@ sub www_getRegistrantAsJson {
 			push(@tokens, {
 				title			=> $sku->getTitle,
 				itemId 			=> $item->getId,
-				quantity		=> $item->get('quantity'),
+				quantity		=> $item->quantity,
 				assetId			=> $sku->getId,
 				hasPurchased 	=> 0,
-				sku				=> $sku->get('sku'),				
+				sku				=> $sku->sku,				
 				price			=> $sku->getPrice+0 * $item->get('quantity'),
 				});
 		}
-		
+
 		# it's a ribbon
 		elsif ($sku->isa('WebGUI::Asset::Sku::EMSRibbon')) {
 			push(@ribbons, {
@@ -1626,7 +1634,7 @@ sub www_getRegistrantAsJson {
 				itemId 			=> $item->getId,
 				assetId			=> $sku->getId,
 				hasPurchased 	=> 0,
-				sku				=> $sku->get('sku'),				
+				sku				=> $sku->sku,				
 				price			=> $sku->getPrice+0,
 				});
 		}
@@ -1640,7 +1648,7 @@ sub www_getRegistrantAsJson {
 	$badgeInfo->{tokens} = \@tokens;
 	$badgeInfo->{tickets} = \@tickets;
 	$badgeInfo->{ribbons} = \@ribbons;
-	
+
 	# build json datasource
     return JSON->new->encode($badgeInfo);
 }
@@ -1661,10 +1669,10 @@ sub www_getRegistrantsAsJson {
     my $startIndex      = $form->get('startIndex') || 0;
     my $numberOfResults = $form->get('results')    || 25;
 	my $keywords        = $form->get('keywords');
-	
+
 	my $sql = "select SQL_CALC_FOUND_ROWS * from EMSRegistrant where purchaseComplete=1 and emsAssetId=?";
 	my @params = ($self->getId);
-	
+
 	# user or staff
 	unless ($self->isRegistrationStaff) {
 		$sql .= " and userId=?";
@@ -1687,13 +1695,13 @@ sub www_getRegistrantsAsJson {
     $results{'recordsReturned'} = $badges->rows()+0;
     $results{'totalRecords'}    = $db->quickScalar('select found_rows()') + 0; ##Convert to numeric
 	while (my $badgeInfo = $badges->hashRef) {
-		my $badge = WebGUI::Asset::Sku::EMSBadge->new($session, $badgeInfo->{badgeAssetId});
+		my $badge = WebGUI::Asset::Sku::EMSBadge->newById($session, $badgeInfo->{badgeAssetId});
 		unless (defined $badge) {
 			$session->log->error('badge '.$badgeInfo->{badgeAssetId}.' does not exist.');
 			next;
 		}
 		$badgeInfo->{title} = $badge->getTitle;
-		$badgeInfo->{sku} = $badge->get('sku');
+		$badgeInfo->{sku} = $badge->sku;
 		$badgeInfo->{assetId} = $badge->getId;
 		$badgeInfo->{manageUrl} = $self->getUrl('func=manageRegistrant;badgeId='.$badgeInfo->{badgeId});
 		$badgeInfo->{buildBadgeUrl} = $self->getUrl('func=buildBadge;badgeId='.$badgeInfo->{badgeId});
@@ -1703,9 +1711,9 @@ sub www_getRegistrantsAsJson {
     $results{'startIndex'}   = $startIndex;
     $results{'sort'}         = undef;
     $results{'dir'}          = "asc";
-	
+
 	# build json datasource
-    $session->http->setMimeType('application/json');
+    $session->response->content_type('application/json');
     return JSON->new->encode(\%results);
 }
 
@@ -1728,7 +1736,7 @@ sub www_getRibbonsAsJson {
 	foreach my $ribbon (@{$self->getRibbons}) {
 		push(@{$results{records}}, {
 			title 				=> $ribbon->getTitle,
-			description			=> $ribbon->get('description'),
+			description			=> $ribbon->description,
 			price				=> $ribbon->getPrice+0,
 			url					=> $ribbon->getUrl,
 			editUrl				=> $ribbon->getUrl('func=edit'),
@@ -1740,7 +1748,7 @@ sub www_getRibbonsAsJson {
     $results{'startIndex'} = 0;
     $results{'sort'}       = undef;
     $results{'dir'}        = "asc";
-    $session->http->setMimeType('application/json');
+    $session->response->content_type('application/json');
     return JSON->new->encode(\%results);
 }
 
@@ -1765,7 +1773,7 @@ sub www_getScheduleDataJSON {
     });
     return $emptyRecord unless $self->canView;
     # the following two are expected to be configurable...
-    my $locationsPerPage   = $self->get('scheduleColumnsPerPage');
+    my $locationsPerPage   = $self->scheduleColumnsPerPage;
 
     my ($db, $form)        = $session->quick(qw(db form));
     my $locationPageNumber = $form->get('locationPage') || 1;
@@ -1853,7 +1861,7 @@ sub www_getScheduleDataJSON {
     $results{totalDatePages} = scalar(@dateRecords);
     $results{currentDatePage} = $datePageNumber;
     $results{dateRecords} = \@dateRecords;
-    $session->http->setMimeType('application/json');
+    $session->response->content_type('application/json');
     return JSON->new->encode(\%results);
 }
 
@@ -1877,41 +1885,41 @@ sub www_getTicketsAsJson {
     my %results = ();
 	my @ids     = ();
 	my $keywords = $form->get('keywords');
-	
+
 	# looking for specific events
 	if ($keywords =~ m{^[\d+,*\s*]+$}) {
 		@ids = $db->buildArray("select distinct(EMSTicket.assetId) from EMSTicket left join asset using (assetId) where
 			asset.parentId=? and EMSTicket.eventNumber in (".$keywords.") and asset.state='published' 
             order by EMSTicket.eventNumber",[$self->getId]);
 	}
-	
+
 	# looking for keywords
 	elsif ($keywords ne "") {
 		@ids = @{WebGUI::Search->new($session)->search({
 			keywords	=> $keywords,
-			lineage		=> [$self->get('lineage')],
+			lineage		=> [$self->lineage],
 			classes		=> ['WebGUI::Asset::Sku::EMSTicket'],
 			})->getAssetIds};
 	}
-	
+
 	# just get all tickets
 	else {
 		@ids = $db->buildArray("select assetId from asset left join EMSTicket using (assetId) where parentId=? and
 className='WebGUI::Asset::Sku::EMSTicket' and state='published' and revisionDate=(select max(revisionDate) from EMSTicket where assetId=asset.assetId) order by $sortKey $sortDir", [$self->getId]);
 	}
-	
+
 	# get badge's badge groups
 	my $badgeId = $form->get('badgeId');
 	my %badgeGroups = (); # Hash of badgeGroupId => ticketsPerBadge
 	if (defined $badgeId) {
 		my $assetId = $db->quickScalar("select badgeAssetId from EMSRegistrant where badgeId=?",[$badgeId]);
-		my $badge = WebGUI::Asset->new($session, $assetId, 'WebGUI::Asset::Sku::EMSBadge');
-                if ( defined $badge ) {
-                    my @badgeGroups = split("\n",$badge->get('relatedBadgeGroups'));
-                    %badgeGroups = $db->buildHash( 
-                        "SELECT badgeGroupId, ticketsPerBadge FROM EMSBadgeGroup WHERE badgeGroupId IN (" . $db->quoteAndJoin(\@badgeGroups) . ")",
-                    );
-                }
+		my $badge = eval { WebGUI::Asset->newById ($session, $assetId, 'WebGUI::Asset::Sku::EMSBadge'); };
+        if ( defined $badge ) {
+            my @badgeGroups = split("\n",$badge->get('relatedBadgeGroups'));
+            %badgeGroups = $db->buildHash( 
+                "SELECT badgeGroupId, ticketsPerBadge FROM EMSBadgeGroup WHERE badgeGroupId IN (" . $db->quoteAndJoin(\@badgeGroups) . ")",
+            );
+        }
 	}
         	
 	# get a list of tickets already associated with the badge
@@ -1939,29 +1947,23 @@ className='WebGUI::Asset::Sku::EMSTicket' and state='published' and revisionDate
 	my $counter = 0;
 	my $totalTickets = scalar(@ids);
 	my @records = ();
-	foreach my $id (@ids) {
+	TICKETID: foreach my $id (@ids) {
 
 		# skip tickets we already have
-		if (isIn($id, @existingTickets)) {
+		if ($id ~~ @existingTickets) {
 			$totalTickets--;
 			next;
 		}
 
-		my $ticket = WebGUI::Asset->new($session, $id, 'WebGUI::Asset::Sku::EMSTicket');
-		
-		# skip borked tickets
-		unless (defined $ticket) {
-			$session->errorHandler->warn("EMSTicket $id couldn't be instanciated by EMS ".$self->getId.".");
+		my $ticket = eval { WebGUI::Asset->newById($session, $id); };
+        if (my $e = Exception::Class->caught()) {
+			$session->log->warn("EMSTicket $id couldn't be instanciated by EMS ".$self->getId.'. '.$e->full_message. ".");
 			$totalTickets--;
-			next;
-		}
-		
-		# skip tickets we can't view
-		unless ($ticket->canView) {
-			$totalTickets--;
-			next;
-		}
-		
+			next TICKETID;
+        }
+
+        next TICKETID if !$ticket;
+
 		# skip tickets not in our badge's badge groups
 		if ($badgeId ne "" && keys %badgeGroups > 0 && $ticket->get('relatedBadgeGroups') ne '') { # skip check if it has no badge groups
 			my @badgeGroupIds = split("\n",$ticket->get('relatedBadgeGroups'));
@@ -1984,10 +1986,10 @@ className='WebGUI::Asset::Sku::EMSTicket' and state='published' and revisionDate
         # gotta get to the page we're working with
         $counter++;
         next unless ($counter >= $startIndex+1);
-		
+
 		# publish the data for this ticket
-        my $description = $ticket->get('description');
-        my $data = $ticket->get('eventMetaData');
+        my $description = $ticket->description;
+        my $data = $ticket->eventMetaData;
         $data = '{}' if ($data eq "");
         my $meta = JSON->new->decode($data);
         foreach my $field (@{$self->getEventMetaFields}) {
@@ -1996,36 +1998,36 @@ className='WebGUI::Asset::Sku::EMSTicket' and state='published' and revisionDate
                 $description .= '<p><b>'.$label.'</b>: '.$meta->{$label}.'</p>';
             }
         }
-		my $date = WebGUI::DateTime->new($session, mysql => $ticket->get('startDate'))
-                ->set_time_zone($self->get("timezone"))
+		my $date = WebGUI::DateTime->new($session, mysql => $ticket->startDate)
+                ->set_time_zone($self->timezone)
                 ->webguiDate("%W %z %Z");
 
-                my $properties = {
-			title 				=> $ticket->getTitle,
-			description			=> $description,
-			price				=> $ticket->getPrice+0,
-			quantityAvailable	=> $ticket->getQuantityAvailable,
-			url					=> $ticket->getUrl,
-			editUrl				=> $ticket->getUrl('func=edit'),
-			deleteUrl			=> $ticket->getUrl('func=delete'),
-			assetId				=> $ticket->getId,
-			eventNumber			=> $ticket->get('eventNumber'),
-			location			=> $ticket->get('location'),
-			startDate			=> $date,
-			duration			=> $ticket->get('duration'),
-                };
+        my $properties = {
+            title 				=> $ticket->getTitle,
+            description			=> $description,
+            price				=> $ticket->getPrice+0,
+            quantityAvailable	=> $ticket->getQuantityAvailable,
+            url					=> $ticket->getUrl,
+            editUrl				=> $ticket->getUrl('func=edit'),
+            deleteUrl			=> $ticket->getUrl('func=delete'),
+            assetId				=> $ticket->getId,
+            eventNumber			=> $ticket->eventNumber,
+            location			=> $ticket->location,
+            startDate			=> $date,
+            duration			=> $ticket->duration,
+        };
 
-                # Determine if we're able to add this ticket due to Badge Group limits
-                for my $badgeGroupId ( split /\n/, $ticket->get('relatedBadgeGroups') ) {
-                    if ( $fullBadgeGroups{ $badgeGroupId } ) {
-                        $properties->{ limitReached } = 1;
-                    }
-                }
+        # Determine if we're able to add this ticket due to Badge Group limits
+        for my $badgeGroupId ( split /\n/, $ticket->get('relatedBadgeGroups') ) {
+            if ( $fullBadgeGroups{ $badgeGroupId } ) {
+                $properties->{ limitReached } = 1;
+            }
+        }
 
 		push(@records, $properties);
 		last unless (scalar(@records) < $numberOfResults);
 	}
-	
+
 	# humor
 	my $find = pack('u',$keywords);
 	chomp $find;
@@ -2033,7 +2035,7 @@ className='WebGUI::Asset::Sku::EMSTicket' and state='published' and revisionDate
 		push(@records, {title=>unpack('u',q|022=M('-O<G)Y+"!$879E+@``|)});
 		$totalTickets++;
 	}
-	
+
 	# build json
 	$results{records} 			= \@records;
     $results{totalRecords} 		= $totalTickets;
@@ -2041,7 +2043,7 @@ className='WebGUI::Asset::Sku::EMSTicket' and state='published' and revisionDate
     $results{'startIndex'}   	= $startIndex;
     $results{'sort'}       		= undef;
     $results{'dir'}        		= "asc";
-    $session->http->setMimeType('application/json');
+    $session->response->content_type('application/json');
     return JSON->new->encode(\%results);
 }
 
@@ -2066,7 +2068,7 @@ sub www_getTokensAsJson {
         next TOKEN unless $token->canView;
 		push(@{$results{records}}, {
 			title 				=> $token->getTitle,
-			description			=> $token->get('description'),
+			description			=> $token->description,
 			price				=> $token->getPrice+0,
 			url					=> $token->getUrl,
 			editUrl				=> $token->getUrl('func=edit'),
@@ -2078,7 +2080,7 @@ sub www_getTokensAsJson {
     $results{'startIndex'} = 0;
     $results{'sort'}       = undef;
     $results{'dir'}        = "asc";
-    $session->http->setMimeType('application/json');
+    $session->response->content_type('application/json');
     return JSON->new->encode(\%results);
 }
 
@@ -2097,7 +2099,7 @@ sub www_importEvents {
 	return $self->session->privilege->insufficient unless $self->canEdit;
 	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
 	my $form = $self->session->form;
-	
+
 	# header, with optional errors as unordered list
 	my $page_header = $i18n->get('import form header');
 	if (@$errors_aref) {
@@ -2109,18 +2111,18 @@ sub www_importEvents {
 	}
 
 	# create the form
-	my $f = WebGUI::HTMLForm->new( $self->session, action => $self->getUrl("func=importEventsSave"), enctype => 'multipart/form-data' );
+	my $f = WebGUI::FormBuilder->new( $self->session, action => $self->getUrl("func=importEventsSave"), enctype => 'multipart/form-data' );
 
-	$f->file(
-		-label     => $i18n->get('choose a file to import'),
-		-hoverHelp => $i18n->get('import hoverhelp file'),
-		-name      => 'file',
+	$f->addField( "file",
+		label     => $i18n->get('choose a file to import'),
+		hoverHelp => $i18n->get('import hoverhelp file'),
+		name      => 'file',
 	);
-	$f->yesNo(
-		-label   => $i18n->get('ignore first line'),
-		-name    => 'ignore_first_line',
-		-hoverHelp => $i18n->get('import hoverhelp first line'),
-		-defaultValue   => scalar $form->param('ignore_first_line'),
+	$f->addField( "yesNo",
+		label   => $i18n->get('ignore first line'),
+		name    => 'ignore_first_line',
+		hoverHelp => $i18n->get('import hoverhelp first line'),
+		defaultValue   => scalar $form->param('ignore_first_line'),
 	);
 
 	# create the std & meta fields part of the form
@@ -2130,7 +2132,7 @@ sub www_importEvents {
 		$importableFields{$field->{name}} = $field->{label};
 	}
 	my @defaultImportableFields = keys %importableFields;
-	$f->checkList(
+	$f->addField( "checkList",
 		vertical			=> 1,
 		showSelectAllButton	=> 1,
 		label				=> 'Fields',
@@ -2140,9 +2142,9 @@ sub www_importEvents {
 		value				=> scalar $form->get('fieldsToImport'),
 	);
 
-	$f->submit(-value=>$i18n->get('import events'));
+	$f->addField( "submit", name => "send", value=>$i18n->get('import events'));
 
-	return $self->processStyle($page_header.'<p/>'.$f->print);
+	return $self->processStyle($page_header.'<p/>'.$f->toHtml);
 }
 
 
@@ -2162,7 +2164,7 @@ sub www_importEventsSave {
 $|=1;
 
 	# set up
-	$session->http->setMimeType("text/plain");
+	$session->response->content_type("text/plain");
 	my $start = [Time::HiRes::gettimeofday];
 	my $i18n = WebGUI::International->new($session,'Asset_EventManagementSystem');
 	my $csv = Text::CSV_XS->new({ binary => 1 });
@@ -2171,7 +2173,7 @@ $|=1;
 	my $form = $session->form;
 	my $ignoreFirst = $form->get("ignore_first_line");
 	my $validate = WebGUI::FormValidator->new($session);
-	
+
 	# find fields to import
     $out->print("Finding fields to import...\n",1);
 	my @import = $form->get("fieldsToImport");
@@ -2185,12 +2187,12 @@ $|=1;
 		}
 		$i++;
 	}
-	
+
 	# get csv data
 	$out->print("Reading file...\n",1);
 	my $storage		= WebGUI::Storage->createTemp($session);
     my $filename	= $storage->addFileFromFormPost("file_file");
-	
+
 	# do import
 	my $first = 1;
 	if (open my $file, "<", $storage->getPath($filename)) {
@@ -2208,7 +2210,7 @@ $|=1;
         		$out->print("Processing ".join(",", @row)."\n",1);
 				my $event = undef;
 				if (defined $assetIdIndex) {
-					$event = WebGUI::Asset::Sku::EMSTicket->new($session, $row[$assetIdIndex]);
+					$event = WebGUI::Asset::Sku::EMSTicket->newById($session, $row[$assetIdIndex]);
 				}
 				if (defined $event) {
 					$out->print('Updating '.$event->getId."\n",1);
@@ -2221,9 +2223,9 @@ $|=1;
 				my $metadata = $event->getEventMetaData;
 				my $i = 0;
 				foreach my $field (@{$fields}) {
-					next unless isIn($field->{name}, @import);
+					next unless $field->{name} ~~ @import;
             		$out->print("\tAdding field ".$field->{label}."\n",1);
-					my $type = $field->{type};
+					my $type = $field->{type} || "Text";
                     ##Force the use of Form::DateTime and MySQL Format
                     if ($field->{name} eq 'startDate') {
                         $type = 'dateTime';
@@ -2248,7 +2250,7 @@ $|=1;
 				}
                 $out->print("\tUpdating properties\n",1);
                 $properties{menuTitle} = $properties{title};
-                $properties{url} = $self->get("url")."/".$properties{title};
+                $properties{url} = $self->url."/".$properties{title};
 				$event->update(\%properties);
                 $out->print("\tUpdating meta data\n",1);
 				$event->setEventMetaData($metadata);
@@ -2264,7 +2266,7 @@ $|=1;
 	else {
 		$out->print($i18n->get("no import took place")."\n",1);
 	}
-	
+
 	# clean up
 	$out->print("The import took ".Time::HiRes::tv_interval($start)." seconds to run.\n",1);
 	$storage->delete;
@@ -2294,7 +2296,7 @@ sub www_lookupRegistrant {
 		);
 
 	# render the page
-	return $self->processStyle($self->processTemplate(\%var, $self->get('lookupRegistrantTemplateId')));
+	return $self->processStyle($self->processTemplate(\%var, $self->lookupRegistrantTemplateId));
 }
 
 #-------------------------------------------------------------------
@@ -2350,10 +2352,10 @@ sub www_manageEventMetaFields {
 			my %row = %{$row1};
 			$count++;
 			$output .= "<div>".
-			$self->session->icon->delete('func=deleteEventMetaField;fieldId='.$row{fieldId},$self->get('url'),$i18n->get('confirm delete event metadata')).
-			$self->session->icon->edit('func=editEventMetaField;fieldId='.$row{fieldId}, $self->get('url')).
-			$self->session->icon->moveUp('func=moveEventMetaFieldUp;fieldId='.$row{fieldId}, $self->get('url'),($count == 1)?1:0);
-			$output .= $self->session->icon->moveDown('func=moveEventMetaFieldDown;fieldId='.$row{fieldId}, $self->get('url'),($count == $number)?1:0).
+			$self->session->icon->delete('func=deleteEventMetaField;fieldId='.$row{fieldId},$self->url,$i18n->get('confirm delete event metadata')).
+			$self->session->icon->edit('func=editEventMetaField;fieldId='.$row{fieldId}, $self->url).
+			$self->session->icon->moveUp('func=moveEventMetaFieldUp;fieldId='.$row{fieldId}, $self->url,($count == 1)?1:0);
+			$output .= $self->session->icon->moveDown('func=moveEventMetaFieldDown;fieldId='.$row{fieldId}, $self->url,($count == $number)?1:0).
 			" ".$row{label}."</div>";
 		}
 	}
@@ -2374,10 +2376,10 @@ Displays an admin interface for managing a registrant.
 sub www_manageRegistrant {
 	my $self = shift;
 	my $session = $self->session;
-	
+
 	# check privs
 	return $session->privilege->insufficient unless ($self->isRegistrationStaff);
-	
+
 	# setup 
 	my $badgeId = $self->session->form->get('badgeId');
 	my $db = $session->db;
@@ -2388,81 +2390,81 @@ sub www_manageRegistrant {
 	unless ($registrant->{badgeId} ne "") {
 		return $self->www_lookupRegistrant;
 	}
-	
+
 	# build form
-	my $f = WebGUI::HTMLForm->new($session, action=>$self->getUrl, tableExtras=>'class="manageRegistrant"');
-	$f->submit;
-	$f->hidden(name=>"func", value=>"editRegistrantSave");
-	$f->hidden(name=>'badgeId', value=>$badgeId);
-	$f->readOnly(
+	my $f = WebGUI::FormBuilder->new($session, action=>$self->getUrl, extras=>'class="manageRegistrant"');
+	$f->addField( "submit", name => "send" );
+	$f->addField( "hidden",name=>"func", value=>"editRegistrantSave");
+	$f->addField( "hidden",name=>'badgeId', value=>$badgeId);
+	$f->addField( "readOnly",
 		label			=> $i18n->get('badge number'),
 		value			=> $registrant->{badgeNumber},
 	);
-	$f->user(
+	$f->addField( "user",
 		name			=> 'userId',
 		label			=> $i18n->get('user'),
 		defaultValue	=> $registrant->{userId},
 	);
-	$f->text(
+	$f->addField( "text",
 		name			=> 'name',
 		label			=> $i18n->get('name','Shop'),
 		defaultValue	=> $registrant->{name},
 		);
-	$f->text(
+	$f->addField( "text",
 		name			=> 'organization',
 		label			=> $i18n->get('organization'),
 		defaultValue	=> $registrant->{organization},
 		);
-	$f->text(
+	$f->addField( "text",
 		name			=> 'address1',
 		label			=> $i18n->get('address','Shop'),		
 		defaultValue	=> $registrant->{address1},
 		);
-	$f->text(
+	$f->addField( "text",
 		name			=> 'address2',
 		defaultValue	=> $registrant->{address2},
 		);
-	$f->text(
+	$f->addField( "text",
 		name			=> 'address3',
 		defaultValue	=> $registrant->{address3},
 		);
-	$f->text(
+	$f->addField( "text",
 		name			=> 'city',
 		label			=> $i18n->get('city','Shop'),		
 		defaultValue	=> $registrant->{city},
 		);
-	$f->text(
+	$f->addField( "text",
 		name			=> 'state',
 		label			=> $i18n->get('state','Shop'),		
 		defaultValue	=> $registrant->{state},
 		);
-	$f->zipcode(
+	$f->addField( "zipcode",
 		name			=> 'zipcode',
 		label			=> $i18n->get('code','Shop'),		
 		defaultValue	=> $registrant->{zipcode},
 		);
-	$f->country(
+	$f->addField( "country",
 		name			=> 'country',
 		label			=> $i18n->get('country','Shop'),		
 		defaultValue	=> $registrant->{country},
 		);
-	$f->phone(
+	$f->addField( "phone",
 		name			=> 'phoneNumber',
 		label			=> $i18n->get('phone number','Shop'),		
 		defaultValue	=> $registrant->{phoneNumber},
 		);
-	$f->email(
+	$f->addField( "email",
 		name			=> 'email',
 		label			=> $i18n->get('email address'),
 		defaultValue	=> $registrant->{email}
 		);
-	$f->textarea(
+	$f->addField( "textarea",
 		name			=> 'notes',
 		label			=> $i18n->get('notes'),
 		defaultValue	=> $registrant->{notes}
 		);
-	$f->submit;
-	
+	$f->addField( "submit", name => "send" );
+
 	# build html
 	my $output = q|
 	<div id="doc3">
@@ -2474,11 +2476,11 @@ sub www_manageRegistrant {
 		<div id="bd">
 			<div class="yui-gc">
 				<div class="yui-u first">
-				|.$f->print.q|
+				|.$f->toHtml.q|
 				</div>
 				<div class="yui-u">
 		|;
-			
+
 	if ($registrant->{hasCheckedIn}) {
 		$output .= q|<a style="font-size: 200%; margin: 10px; line-height: 200%; padding: 10px; background-color: #ffdddd; color: #800000; text-decoration: none;" href="|.$self->getUrl('func=toggleRegistrantCheckedIn;badgeId='.$badgeId).q|">|.$i18n->get('checked in').q|</a>|;
 	}
@@ -2487,7 +2489,7 @@ sub www_manageRegistrant {
 	}
 
 	# badge management
-	my $badge = WebGUI::Asset::Sku::EMSBadge->new($session, $registrant->{badgeAssetId});
+	my $badge = WebGUI::Asset::Sku::EMSBadge->newById($session, $registrant->{badgeAssetId});
 	$output .= q|<p><b style="font-size: 150%; line-height: 150%;">|.$badge->getTitle.q|</b><br />
 		<a href="|.$self->getUrl('func=printBadge;badgeId='.$badgeId).q|" target="_blank">|.$i18n->get('print').q|</a>
 		&bull; <a href="|.$self->getUrl('func=refundItem;badgeId='.$badgeId.';transactionItemId='.$registrant->{transactionItemId}).q|">|.$i18n->get('refund').q|</a>
@@ -2501,11 +2503,11 @@ sub www_manageRegistrant {
 	$output .= q|
 		&bull; <a href="|.$self->getUrl('func=buildBadge;badgeId='.$badgeId).q|">|.$i18n->get('add more items').q|</a>
 		</p><br />|;
-	
+
 	# ticket management
 	my $existingTickets = $db->read("select ticketAssetId, transactionItemId from EMSRegistrantTicket where badgeId=? and purchaseComplete=1",[$badgeId]);
 	while (my ($id, $itemId) = $existingTickets->array) {
-		my $ticket = WebGUI::Asset::Sku::EMSTicket->new($session, $id);
+		my $ticket = WebGUI::Asset::Sku::EMSTicket->newById($session, $id);
 		$output .= q|<p><b>|.$ticket->getTitle.q|</b><br />
 			<a href="|.$self->getUrl('func=printTicket;badgeId='.$badgeId.';ticketAssetId='.$id).q|" target="_blank">|.$i18n->get('print').q|</a>
 			&bull; <a href="|.$self->getUrl('func=refundItem;badgeId='.$badgeId.';transactionItemId='.$itemId).q|">|.$i18n->get('refund').q|</a>
@@ -2515,7 +2517,7 @@ sub www_manageRegistrant {
 	# ribbon management
 	my $existingRibbons = $db->read("select ribbonAssetId, transactionItemId from EMSRegistrantRibbon where badgeId=?",[$badgeId]);
 	while (my ($id, $itemId) = $existingRibbons->array) {
-		my $ribbon = WebGUI::Asset::Sku::EMSRibbon->new($session, $id);
+		my $ribbon = WebGUI::Asset::Sku::EMSRibbon->newById($session, $id);
 		$output .= q|<p><b>|.$ribbon->getTitle.q|</b><br />
 			<a href="|.$self->getUrl('func=refundItem;badgeId='.$badgeId.';transactionItemId='.$itemId).q|">|.$i18n->get('refund').q|</a>
 			</p><br />|;
@@ -2524,7 +2526,7 @@ sub www_manageRegistrant {
 	# token management
 	my $existingTokens = $db->read("select tokenAssetId,quantity,transactionItemIds from EMSRegistrantToken where badgeId=?",[$badgeId]);
 	while (my ($id, $quantity, $itemIds) = $existingTokens->array) {
-		my $token = WebGUI::Asset::Sku::EMSToken->new($session, $id);
+		my $token = WebGUI::Asset::Sku::EMSToken->newById($session, $id);
 		my @itemIds = split(',', $itemIds);
 		$output .= q|<p><b>|.$token->getTitle.q|</b> (|.$quantity.q|)<br />
 			<a href="|.$self->getUrl('func=refundItem;badgeId='.$badgeId.';transactionItemId='.join(';transactionItemId=', @itemIds)).q|">|.$i18n->get('refund').q|</a>
@@ -2540,12 +2542,7 @@ sub www_manageRegistrant {
 	|;
 
 	# render
-	$session->style->setLink($session->url->extras('/yui/build/reset-fonts-grids/reset-fonts-grids.css'), {rel=>"stylesheet", type=>"text/css"});
-	$session->style->setRawHeadTags(q|
-		<style type="text/css">
-		.manageRegistrant tbody tr td { padding: 2px;}
-		</style>
-		|);
+	$session->style->setCss($session->url->extras('/yui/build/reset-fonts-grids/reset-fonts-grids.css'));
 	return $self->processStyle($output);
 }
 
@@ -2593,10 +2590,10 @@ sub www_printBadge {
 	my $self = shift;
 	my $session = $self->session;
 	return $session->privilege->insufficient unless ($self->isRegistrationStaff);
-	my $form = $session->form;
+    my $form = $session->form;
     my $badgeId    = $form->get('badgeId');
-	my $registrant = $self->getRegistrant($badgeId);
-	my $badge = WebGUI::Asset::Sku::EMSBadge->new($session, $registrant->{badgeAssetId});
+    my $registrant = $self->getRegistrant($badgeId);
+    my $badge      = WebGUI::Asset::Sku::EMSBadge->newById($session, $registrant->{badgeAssetId});
 	$registrant->{badgeTitle} = $badge->getTitle;
 
     # Add badge metadata
@@ -2613,7 +2610,7 @@ sub www_printBadge {
 
     $registrant->{ticket_loop} = [];
     foreach my $ticketId (@tickets) {
-		my $ticket = WebGUI::Asset::Sku::EMSTicket->new($session, $ticketId);
+		my $ticket = WebGUI::Asset::Sku::EMSTicket->newById($session, $ticketId);
         push (@{$registrant->{ticket_loop}}, $ticket->get);
 	}
 
@@ -2625,7 +2622,7 @@ sub www_printBadge {
 
 	$registrant->{ribbon_loop} = [];
     foreach my $ribbonId (@ribbons) {
-        my $ribbon = WebGUI::Asset::Sku::EMSRibbon->new($session, $ribbonId);
+        my $ribbon = WebGUI::Asset::Sku::EMSRibbon->newById($session, $ribbonId);
         push (@{$registrant->{ribbon_loop}}, $ribbon->get);
     }
 
@@ -2637,11 +2634,11 @@ sub www_printBadge {
 
 	$registrant->{token_loop} = [];
     foreach my $tokenId (@tokens) {
-        my $token = WebGUI::Asset::Sku::EMSRibbon->new($session, $tokenId);
+        my $token = WebGUI::Asset::Sku::EMSToken->newById($session, $tokenId);
         push (@{$registrant->{token_loop}}, $token->get);
     }
 
-	return $self->processTemplate($registrant,$self->get('printBadgeTemplateId'));
+	return $self->processTemplate($registrant,$self->printBadgeTemplateId);
 }
 
 #-------------------------------------------------------------------
@@ -2727,21 +2724,19 @@ sub www_printTicket {
 	return $session->privilege->insufficient unless ($self->isRegistrationStaff);
 	my $form = $session->form;
 	my $registrant = $self->getRegistrant($form->get('badgeId'));
-	my $ticket = WebGUI::Asset::Sku::EMSTicket->new($session, $form->get('ticketAssetId'));
+	my $ticket = WebGUI::Asset::Sku::EMSTicket->newById($session, $form->get('ticketAssetId'));
 	$registrant->{ticketTitle} = $ticket->getTitle;
-        my $startTime = WebGUI::DateTime->new($ticket->get('startDate'))->set_time_zone($self->get('timezone'));
+        my $startTime = WebGUI::DateTime->new($ticket->startDate)->set_time_zone($self->timezone);
 	$registrant->{ticketStart} = $startTime->strftime('%F %R');
-	$registrant->{ticketDuration} = $ticket->get('duration');
-	$registrant->{ticketLocation} = $ticket->get('location');
-	$registrant->{ticketEventNumber} = $ticket->get('eventNumber');
-
-        # Add ticket metadata
-        my $meta    = $ticket->getEventMetaData;
-        for my $key ( keys %{$meta} ) {
-            $registrant->{ "ticketMeta_" . $key } = $meta->{ $key };
-        }
-
-	return $self->processTemplate($registrant,$self->get('printTicketTemplateId'));
+	$registrant->{ticketDuration} = $ticket->duration;
+	$registrant->{ticketLocation} = $ticket->location;
+	$registrant->{ticketEventNumber} = $ticket->eventNumber;
+    # Add ticket metadata
+    my $meta    = $ticket->getEventMetaData;
+    for my $key ( keys %{$meta} ) {
+        $registrant->{ "ticketMeta_" . $key } = $meta->{ $key };
+    }
+    return $self->processTemplate($registrant,$self->printTicketTemplateId);
 }
 
 
@@ -2823,7 +2818,7 @@ sub www_viewSchedule {
 	my $self             = shift;
     return $self->session->privilege->insufficient() unless $self->canView;
     my $rowsPerPage      = 25;
-    my $locationsPerPage = $self->get('scheduleColumnsPerPage');
+    my $locationsPerPage = $self->scheduleColumnsPerPage;
 
     my @columnNames = map { "'col" . $_ . "'" } ( 1..$locationsPerPage );
     my $fieldList   = join ',', @columnNames;
@@ -2838,7 +2833,7 @@ sub www_viewSchedule {
                       dataColumns => $dataColumns,
                       fieldList => $fieldList,
                       dataSourceUrl => $self->getUrl('func=getScheduleDataJSON'),
-                  },$self->get('scheduleTemplateId')));
+                  },$self->scheduleTemplateId));
 
 }
 
@@ -2917,5 +2912,6 @@ sub www_viewSubmissionQueue {
                $self->processTemplate( $params, $self->get('eventSubmissionMainTemplateId')));
 }
 
+__PACKAGE__->meta->make_immutable;
 1;
 

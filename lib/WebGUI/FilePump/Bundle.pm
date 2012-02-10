@@ -1,9 +1,66 @@
 package WebGUI::FilePump::Bundle;
 
-use base qw/WebGUI::Crud WebGUI::JSONCollateral/;
+use Moose;
+use WebGUI::Definition::Crud;
+extends 'WebGUI::Crud';
+define tableName  => 'filePumpBundle';
+define tableKey   => 'bundleId';
+has bundleId => (
+    required => 1,
+    is       => 'ro',
+);
+property bundleName => (
+    label        => 'bundleName',
+    fieldType    => 'text',
+    builder      => '_default_bundleName',
+    lazy         => 1,
+);
+sub _default_bundleName {
+    my $session = shift->session;
+    my $i18n = WebGUI::International->new($session, 'FilePump');
+    return $i18n->get('new bundle');
+}
+property lastModified => (
+    label        => 'lastModified',
+    fieldType    => 'integer',
+    default      => 0,
+);
+property lastBuild => (
+    label        => 'lastBuild',
+    fieldType    => 'integer',
+    default => 0,
+);
+property jsFiles => (
+    label        => 'jsFiles',
+    fieldType    => 'textarea',
+    default      => sub { [] },
+    traits       => ['Array', 'WebGUI::Definition::Meta::Property::Serialize',],
+    isa          => 'WebGUI::Type::JSONArray',
+    coerce       => 1,
+);
+property cssFiles => (
+    label        => 'cssFiles',
+    fieldType    => 'textarea',
+    default      => sub { [] },
+    traits       => ['Array', 'WebGUI::Definition::Meta::Property::Serialize',],
+    isa          => 'WebGUI::Type::JSONArray',
+    coerce       => 1,
+);
+property otherFiles => (
+    label        => 'otherFiles',
+    fieldType    => 'textarea',
+    default      => sub { [] },
+    traits       => ['Array', 'WebGUI::Definition::Meta::Property::Serialize',],
+    isa          => 'WebGUI::Type::JSONArray',
+    coerce       => 1,
+);
+with 'WebGUI::Role::Asset::JSONCollateral';
+
 use strict;
+use WebGUI::Asset;
 use WebGUI::International;
-use WebGUI::Utility;
+use WebGUI::Exception;
+use WebGUI::Macro;
 use URI;
 use Path::Class;
 use File::Basename;
@@ -12,6 +69,45 @@ use JavaScript::Minifier::XS;
 use LWP;
 use DateTime::Format::HTTP;
 use Data::Dumper;
+
+#-------------------------------------------------------------------
+
+=head2 properties
+
+=head3 tableName
+
+filePumpBundle
+
+=head3 tableKey
+
+bundleId
+
+=head3 sequenceKey
+
+None.  Bundles have no sequence amongst themselves.
+
+=head3 properties
+
+=head4 bundleName
+
+The name of a bundle
+
+=head4 lastBuild
+
+The date the bundle was last built.  This is used to generate the name of the bundled files
+for this bundle.
+
+=head4 lastModified
+
+The date the bundle was last modified.  With this, and the lastBuild date, you can determine
+which bundles need to be rebuilt.
+
+=head4 jsFiles, cssFiles, otherFiles
+
+JSON blobs with files attached to the bundle. js = javascript, css = Cascading Style Sheets, other
+means anything else.
+
+=cut
 
 #-------------------------------------------------------------------
 
@@ -35,12 +131,12 @@ it will return 0 and an error message.
 
 sub addFile {
     my ($self, $type, $uri) = @_;
-    return 0, 'Illegal type' unless WebGUI::Utility::isIn($type, 'JS', 'CSS', 'OTHER');
+    return 0, 'Illegal type' unless $type ~~ ['JS', 'CSS', 'OTHER'];
     return 0, 'No URI' unless $uri;
     my $collateralType = $type eq 'JS'  ? 'jsFiles'
                        : $type eq 'CSS' ? 'cssFiles'
                        : 'otherFiles';
-    my $files     = $self->get($collateralType);
+    my $files     = $self->$collateralType;
     my $uriExists = $self->getJSONCollateralDataIndex($files, 'uri', $uri) != -1 ? 1 : 0;
     return 0, 'Duplicate URI' if $uriExists;
     
@@ -89,13 +185,13 @@ the method returns 0, along with an error message.
 sub build {
     my ($self) = @_;
     my $newBuild = time();
-    my $originalBuild = $self->get('lastBuild');
+    my $originalBuild = $self->lastBuild;
 
     ##Whole lot of building
     my $error = undef;
 
     ##JavaScript first
-    my $jsFiles    = $self->get('jsFiles');
+    my $jsFiles    = $self->jsFiles;
     my $concatenatedJS = '';
     JSFILE: foreach my $jsFile (@{ $jsFiles }) {
         my $uri     = $jsFile->{uri};
@@ -110,7 +206,7 @@ sub build {
     return (0, $error) if ($error);
 
     ##CSS next
-    my $cssFiles    = $self->get('cssFiles');
+    my $cssFiles    = $self->cssFiles;
     my $concatenatedCSS = '';
     CSSFILE: foreach my $cssFile (@{ $cssFiles }) {
         my $uri     = $cssFile->{uri};
@@ -136,7 +232,7 @@ sub build {
     }
 
     ##Copy files over
-    my $otherFiles = $self->get('otherFiles');
+    my $otherFiles = $self->otherFiles;
     OTHERFILE: foreach my $file (@{ $otherFiles }) {
         my $uri     = $file->{uri};
         my $results = $self->fetch($uri);
@@ -285,84 +381,6 @@ sub _buildFile {
     return 0;
 }
 
-#-------------------------------------------------------------------
-
-=head2 crud_definition
-
-WebGUI::Crud definition for this class.
-
-=head3 tableName
-
-filePumpBundle
-
-=head3 tableKey
-
-bundleId
-
-=head3 sequenceKey
-
-None.  Bundles have no sequence amongst themselves.
-
-=head3 properties
-
-=head4 bundleName
-
-The name of a bundle
-
-=head4 lastBuild
-
-The date the bundle was last built.  This is used to generate the name of the bundled files
-for this bundle.
-
-=head4 lastModified
-
-The date the bundle was last modified.  With this, and the lastBuild date, you can determine
-which bundles need to be rebuilt.
-
-=head4 jsFiles, cssFiles, otherFiles
-
-JSON blobs with files attached to the bundle. js = javascript, css = Cascading Style Sheets, other
-means anything else.
-
-=cut
-
-sub crud_definition {
-    my ($class, $session) = @_;
-    my $definition = $class->SUPER::crud_definition($session);
-    my $i18n = WebGUI::International->new($session, 'FilePump');
-    $definition->{tableName}   = 'filePumpBundle';
-    $definition->{tableKey}    = 'bundleId';
-    $definition->{sequenceKey} = '';
-    my $properties = $definition->{properties};
-    $properties->{bundleName} = {
-        fieldType    => 'text',
-        defaultValue => $i18n->get('new bundle'),
-    };
-    $properties->{lastModified} = {
-        fieldType    => 'integer',
-        defaultValue => 0,
-    };
-    $properties->{lastBuild} = {
-        fieldType    => 'integer',
-        defaultValue => 0,
-    };
-    $properties->{jsFiles} = {
-        fieldType    => 'textarea',
-        defaultValue => [],
-        serialize    => 1,
-    };
-    $properties->{cssFiles} = {
-        fieldType    => 'textarea',
-        defaultValue => [],
-        serialize    => 1,
-    };
-    $properties->{otherFiles} = {
-        fieldType    => 'textarea',
-        defaultValue => [],
-        serialize    => 1,
-    };
-    return $definition;
-}
 
 #-------------------------------------------------------------------
 
@@ -409,7 +427,7 @@ types of files.
 
 sub deleteFiles {
     my ($self, $type) = @_;
-    return 0, 'Illegal type' unless WebGUI::Utility::isIn($type, 'JS', 'CSS', 'OTHER');
+    return 0, 'Illegal type' unless $type ~~ ['JS', 'CSS', 'OTHER'];
     my $collateralType = $type eq 'JS'  ? 'jsFiles'
                        : $type eq 'CSS' ? 'cssFiles'
                        : 'otherFiles';
@@ -437,7 +455,7 @@ The unique collateral GUID to delete from the bundle.
 
 sub deleteFile {
     my ($self, $type, $fileId) = @_;
-    return 0, 'Illegal type' unless WebGUI::Utility::isIn($type, 'JS', 'CSS', 'OTHER');
+    return 0, 'Illegal type' unless $type ~~ ['JS', 'CSS', 'OTHER'];
     return 0, 'No fileId' unless $fileId;
     my $collateralType = $type eq 'JS'  ? 'jsFiles'
                        : $type eq 'CSS' ? 'cssFiles'
@@ -508,18 +526,19 @@ sub fetchAsset {
 
     my $url = $uri->opaque;
     $url =~ s{^/+}{};
-    my $asset = WebGUI::Asset->newByUrl($self->session, $url);
-    return {} unless $asset;
+    my $asset = eval {WebGUI::Asset->newByUrl($self->session, $url);};
+    return {} if Exception::Class->caught();
     ##Check for a snippet, or snippet subclass?
     my $guts = {
-        lastModified => $asset->get('lastModified'),
+        lastModified => $asset->lastModified,
         content      => '',
     };
     if ($asset->isa('WebGUI::Asset::Snippet')) {
-        $guts->{content} = $asset->view(1);
+        $guts->{content} = $asset->snippet;
+        WebGUI::Macro::process($self->session, \( $guts->{content} ) );
     }
     elsif ($asset->isa('WebGUI::Asset::File')) {
-        $guts->{content} = $asset->getStorageLocation->getFileContentsAsScalar($asset->get('filename'));
+        $guts->{content} = $asset->getStorageLocation->getFileContentsAsScalar($asset->filename);
     }
     return $guts;
 }
@@ -637,7 +656,7 @@ Returns a urlized version of the bundle name, safe for URLs and filenames.
 
 sub bundleUrl {
     my ($self) = @_;
-    return $self->session->url->urlize($self->get('bundleName'));
+    return $self->session->url->urlize($self->bundleName);
 }
 
 #-------------------------------------------------------------------
@@ -655,7 +674,7 @@ Another time stamp to use instead of the lastModified timestamp.
 
 sub getPathClassDir {
     my ($self, $lastBuild) = @_;
-    $lastBuild ||= $self->get('lastBuild');
+    $lastBuild ||= $self->lastBuild;
     return Path::Class::Dir->new(
         $self->session->config->get('uploadsPath'),
         'filepump',
@@ -710,7 +729,7 @@ The unique collateral GUID to move in the bundle.
 
 sub moveFileDown {
     my ($self, $type, $fileId) = @_;
-    return 0, 'Illegal type' unless WebGUI::Utility::isIn($type, 'JS', 'CSS', 'OTHER');
+    return 0, 'Illegal type' unless $type ~~ ['JS', 'CSS', 'OTHER'];
     return 0, 'No fileId' unless $fileId;
     my $collateralType = $type eq 'JS'  ? 'jsFiles'
                        : $type eq 'CSS' ? 'cssFiles'
@@ -744,7 +763,7 @@ The unique collateral GUID to move in the bundle.
 
 sub moveFileUp {
     my ($self, $type, $fileId) = @_;
-    return 0, 'Illegal type' unless WebGUI::Utility::isIn($type, 'JS', 'CSS', 'OTHER');
+    return 0, 'Illegal type' unless $type ~~ ['JS', 'CSS', 'OTHER'];
     return 0, 'No fileId' unless $fileId;
     my $collateralType = $type eq 'JS'  ? 'jsFiles'
                        : $type eq 'CSS' ? 'cssFiles'

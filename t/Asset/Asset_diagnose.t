@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -8,22 +8,19 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../lib";
 
 ##The goal of this test is to look for orphaned assetIds across
 ##all assets in the Asset's main table, and the asset and assetData tables.
 
 use WebGUI::Test;
 use WebGUI::Session;
-use WebGUI::Utility;
 use Test::More; # increment this value for each test you create
 use Test::Deep;
 
 my $session = WebGUI::Test->session;
 
-my @assets = grep { !isIn($_, qw/WebGUI::Asset::FilePile/) } (
+my @assets = grep { $_ ne 'WebGUI::Asset::FilePile' } (
     keys %{ $session->config->get('assets') }
 );
 
@@ -43,9 +40,8 @@ SKIP: {
 }
 
 foreach my $asset ( @assets ) {
-    eval "use $asset";
-    my $def = $asset->definition($session);
-    my $tableName = $def->[0]->{tableName};
+    my $className = WebGUI::Asset->loadModule($asset);
+    my $tableName = $className->meta->tableName;
     my $classIds 
         = $session->db->buildArrayRef(
             q{

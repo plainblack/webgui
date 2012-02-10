@@ -3,7 +3,7 @@ package WebGUI::Asset::Sku::EMSBadge;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -15,14 +15,76 @@ package WebGUI::Asset::Sku::EMSBadge;
 =cut
 
 use strict;
-use Tie::IxHash;
-use base 'WebGUI::Asset::Sku';
+use Moose;
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset::Sku';
+define assetName           => ['ems badge', 'Asset_EventManagementSystem'];
+define icon                => 'EMSBadge.gif';
+define tableName           => 'EMSBadge';
+property price => (
+            tab             => "shop",
+            fieldType       => "float",
+            default         => 0.00,
+            label           => ["price", 'Asset_EventManagementSystem'],
+            hoverHelp       => ["price help", 'Asset_EventManagementSystem'],
+         );
+property earlyBirdPrice => (
+            tab             => "shop",
+            fieldType       => "float",
+            default         => 0.00,
+            label           => ["early bird price", 'Asset_EventManagementSystem'],
+            hoverHelp       => ["early bird price help", 'Asset_EventManagementSystem'],
+         );
+property earlyBirdPriceEndDate => (
+            tab             => "shop",
+            fieldType       => "date",
+            default         => undef,
+            label           => ["early bird price end date", 'Asset_EventManagementSystem'],
+            hoverHelp       => ["early bird price end date help", 'Asset_EventManagementSystem'],
+         );
+property preRegistrationPrice => (
+            tab             => "shop",
+            fieldType       => "float",
+            default         => 0.00,
+            label           => ["pre registration price", 'Asset_EventManagementSystem'],
+            hoverHelp       => ["pre registration price help", 'Asset_EventManagementSystem'],
+         );
+property preRegistrationPriceEndDate => (
+            tab             => "shop",
+            fieldType       => "date",
+            default         => undef,
+            label           => ["pre registration price end date", 'Asset_EventManagementSystem'],
+            hoverHelp       => ["pre registration price end date help", 'Asset_EventManagementSystem'],
+         );
+property seatsAvailable => (
+            tab             => "shop",
+            fieldType       => "integer",
+            default         => 100,
+            label           => ["seats available", 'Asset_EventManagementSystem'],
+            hoverHelp       => ["seats available help", 'Asset_EventManagementSystem'],
+         );
+property relatedBadgeGroups => (
+            tab             => "properties",
+            fieldType       => "checkList",
+            customDrawMethod=> 'drawRelatedBadgeGroupsField',
+            label           => ["related badge groups", 'Asset_EventManagementSystem'],
+            hoverHelp       => ["related badge groups badge help", 'Asset_EventManagementSystem'],
+         );
+property templateId => (
+            tab             => "display",
+            fieldType       => "template",
+            label           => ["view badge template", 'Asset_EventManagementSystem'],
+            hoverHelp       => ["view badge template help", 'Asset_EventManagementSystem'],
+            default         => 'PBEmsBadgeTemplate0000',
+            namespace       => 'EMSBadge',
+         );
+
+
+
 use JSON;
-use WebGUI::HTMLForm;
 use WebGUI::International;
 use WebGUI::Shop::Admin;
 use WebGUI::Shop::AddressBook;
-use WebGUI::Utility;
 
 =head1 NAME
 
@@ -50,102 +112,17 @@ Adds this badge as configured for an individual to the cart.
 
 =cut
 
-sub addToCart {
-	my ($self, $badgeInfo) = @_;
+around addToCart => sub {
+    my ($orig, $self, $badgeInfo) = @_;
     if($self->getQuantityAvailable() < 1){ 
         return WebGUI::International->new($self->session, "Asset_EventManagementSystem")->get('no more available');
     }
-	$badgeInfo->{badgeId} = "new";
-	$badgeInfo->{badgeAssetId} = $self->getId;
-	$badgeInfo->{emsAssetId} = $self->getParent->getId;
-	my $badgeId = $self->session->db->setRow("EMSRegistrant","badgeId", $badgeInfo);
-	$self->SUPER::addToCart({badgeId=>$badgeId});
-}
-
-#-------------------------------------------------------------------
-
-=head2 definition
-
-Adds price, seatsAvailable fields.
-
-=cut
-
-sub definition {
-	my $class = shift;
-	my $session = shift;
-	my $definition = shift;
-	my %properties;
-	tie %properties, 'Tie::IxHash';
-	my $i18n = WebGUI::International->new($session, "Asset_EventManagementSystem");
-	%properties = (
-		price => {
-			tab             => "shop",
-			fieldType       => "float",
-			defaultValue    => 0.00,
-			label           => $i18n->get("price"),
-			hoverHelp       => $i18n->get("price help"),
-			},
-		earlyBirdPrice => {
-			tab             => "shop",
-			fieldType       => "float",
-			defaultValue    => 0.00,
-			label           => $i18n->get("early bird price"),
-			hoverHelp       => $i18n->get("early bird price help"),
-			},
-		earlyBirdPriceEndDate => {
-			tab             => "shop",
-			fieldType       => "date",
-			defaultValue    => undef,
-			label           => $i18n->get("early bird price end date"),
-			hoverHelp       => $i18n->get("early bird price end date help"),
-			},
-		preRegistrationPrice => {
-			tab             => "shop",
-			fieldType       => "float",
-			defaultValue    => 0.00,
-			label           => $i18n->get("pre registration price"),
-			hoverHelp       => $i18n->get("pre registration price help"),
-			},
-		preRegistrationPriceEndDate => {
-			tab             => "shop",
-			fieldType       => "date",
-			defaultValue    => undef,
-			label           => $i18n->get("pre registration price end date"),
-			hoverHelp       => $i18n->get("pre registration price end date help"),
-			},
-		seatsAvailable => {
-			tab             => "shop",
-			fieldType       => "integer",
-			defaultValue    => 100,
-			label           => $i18n->get("seats available"),
-			hoverHelp       => $i18n->get("seats available help"),
-			},
-		relatedBadgeGroups => {
-			tab             => "properties",
-			fieldType		=> "checkList",
-			customDrawMethod=> 'drawRelatedBadgeGroupsField',
-			label           => $i18n->get("related badge groups"),
-			hoverHelp       => $i18n->get("related badge groups badge help"),
-			},
-		templateId => {
-			tab             => "display",
-			fieldType		=> "template",
-			label           => $i18n->get("view badge template"),
-			hoverHelp       => $i18n->get("view badge template help"),
-            defaultValue    => 'PBEmsBadgeTemplate0000',
-            namespace       => 'EMSBadge',
-			},
-	    );
-	push(@{$definition}, {
-		assetName           => $i18n->get('ems badge'),
-		icon                => 'EMSBadge.gif',
-		autoGenerateForms   => 1,
-		tableName           => 'EMSBadge',
-		className           => 'WebGUI::Asset::Sku::EMSBadge',
-		properties          => \%properties
-	    });
-	return $class->SUPER::definition($session, $definition);
-}
+    $badgeInfo->{badgeId} = "new";
+    $badgeInfo->{badgeAssetId} = $self->getId;
+    $badgeInfo->{emsAssetId} = $self->getParent->getId;
+    my $badgeId = $self->session->db->setRow("EMSRegistrant","badgeId", $badgeInfo);
+    $self->$orig({badgeId=>$badgeId});
+};
 
 #-------------------------------------------------------------------
 
@@ -200,6 +177,21 @@ sub getConfiguredTitle {
     return $self->getTitle." (".$name.")";
 }
 
+#-------------------------------------------------------------------
+
+=head2 getEditForm ()
+
+Extended to make sure that the next screen viewed after saving is the viewAll screen from the parent EMS.
+
+=cut
+
+override getEditForm => sub {
+	my $self = shift;
+	my $form = super();
+    $form->addField('hidden', name => 'proceed', value => 'viewParent',);
+	return $form;
+};
+
 
 #-------------------------------------------------------------------
 
@@ -222,10 +214,10 @@ it is purchased. C<item> is the WebGUI::Shop::TransactionItem for this item
 
 =cut
 
-sub getPostPurchaseActions {
+override getPostPurchaseActions => sub {
     my ( $self, $item ) = @_;
     my $session  = $self->session;
-    my $opts     = $self->SUPER::getPostPurchaseActions();
+    my $opts     = super();
     if($self->getParent->isRegistrationStaff) {
         my $i18n     = WebGUI::International->new( $session, "Asset_EventManagementSystem" );
         my $badgeId = $item->get('options')->{badgeId};
@@ -233,7 +225,7 @@ sub getPostPurchaseActions {
         $opts->{ $i18n->get('print') } = $self->getParent->getUrl( "func=printBadge;badgeId=$badgeId" );
     }
     return $opts;
-}
+};
 
 #-------------------------------------------------------------------
 
@@ -245,13 +237,13 @@ Returns the price field value.
 
 sub getPrice {
     my $self = shift;
-	if ($self->get('earlyBirdPriceEndDate') < time) {
-		return $self->get('price');
+	if ($self->earlyBirdPriceEndDate < time) {
+		return $self->price;
 	}
-	elsif ($self->get('preRegistrationPriceEndDate') < time) {
-		return $self->get('earlyBirdPrice');
+	elsif ($self->preRegistrationPriceEndDate < time) {
+		return $self->earlyBirdPrice;
 	}
-	return $self->get('preRegistrationPrice');
+	return $self->preRegistrationPrice;
 }
 
 #-------------------------------------------------------------------
@@ -265,7 +257,7 @@ Returns seatsAvailable - the count from the EMSRegistrant table.
 sub getQuantityAvailable {
 	my $self = shift;
 	my $seatsTaken = $self->session->db->quickScalar("select count(*) from EMSRegistrant where badgeAssetId=?",[$self->getId]);
-    return $self->get("seatsAvailable") - $seatsTaken;
+    return $self->seatsAvailable - $seatsTaken;
 }
 
 #-------------------------------------------------------------------
@@ -328,7 +320,11 @@ sub onRefund {
 	# get rid of any items in the cart related to this badge
 	foreach my $cartitem (@{$self->getCart->getItems()}) {
 		my $sku = $cartitem->getSku;
-		if (isIn((ref $sku), qw(WebGUI::Asset::Sku::EMSTicket WebGUI::Asset::Sku::EMSRibbon WebGUI::Asset::Sku::EMSToken))) {
+        if ((ref $sku) ~~ [qw(
+            WebGUI::Asset::Sku::EMSTicket
+            WebGUI::Asset::Sku::EMSRibbon
+            WebGUI::Asset::Sku::EMSToken
+        )]) {
 			if ($sku->getOptions->{badgeId} eq $badgeId) {
 				$cartitem->remove;
 			}
@@ -353,7 +349,11 @@ sub onRemoveFromCart {
 	my $badgeId = $self->getOptions->{badgeId};
 	foreach my $cartitem (@{$item->cart->getItems()}) {
 		my $sku = $cartitem->getSku;
-		if (isIn((ref $sku), qw(WebGUI::Asset::Sku::EMSTicket WebGUI::Asset::Sku::EMSRibbon WebGUI::Asset::Sku::EMSToken))) {
+        if ((ref $sku) ~~ [qw(
+            WebGUI::Asset::Sku::EMSTicket
+            WebGUI::Asset::Sku::EMSRibbon
+            WebGUI::Asset::Sku::EMSToken
+        )]) {
 			if ($sku->getOptions->{badgeId} eq $badgeId) {
 				$cartitem->remove;
 			}
@@ -370,13 +370,13 @@ See WebGUI::Asset, prepareView for details.
 
 =cut
 
-sub prepareView {
+override prepareView => sub {
 	my $self = shift;
-    $self->SUPER::prepareView();
-    my $templateId = $self->get('templateId');
-    my $template = WebGUI::Asset::Template->new($self->session, $templateId);
+    super();
+    my $templateId = $self->templateId;
+    my $template = WebGUI::Asset::Template->newById($self->session, $templateId);
     $self->{_viewTemplate} = $template;
-}
+};
 
 #-------------------------------------------------------------------
 
@@ -386,15 +386,15 @@ Deletes all badges and things attached to the badges. No refunds are given.
 
 =cut
 
-sub purge {
+override purge => sub {
 	my $self = shift;
 	my $db = $self->session->db;
 	$db->write("delete from EMSRegistrantTicket where badgeId=?",[$self->getId]);
 	$db->write("delete from EMSRegistrantToken where badgeId=?",[$self->getId]);
 	$db->write("delete from EMSRegistrantRibbon where badgeId=?",[$self->getId]);
 	$db->write("delete from EMSRegistrant where badgeId=?",[$self->getId]);
-	$self->SUPER::purge;
-}
+	super();
+};
 
 #-------------------------------------------------------------------
 
@@ -490,7 +490,8 @@ sub view {
     }
     $vars{resetButton}  = q{<input type="button" value="}.$i18n->get('clear form'). q{" onclick="WebGUI.Form.clearForm(this.form)" />};
     $vars{title}       = $self->getTitle;
-    $vars{description} = $self->get('description');
+    $vars{description} = $self->description;
+	
     $vars{search_url  } = $self->getUrl("shop=address;method=ajaxSearch");
 
     my $shopAdmin       = WebGUI::Shop::Admin->new($session);
@@ -582,37 +583,5 @@ sub www_addToCart {
 	return $self->getParent->www_buildBadge($self->getOptions->{badgeId});
 }
 
-
-#-------------------------------------------------------------------
-
-=head2 www_edit ()
-
-Displays the edit form.
-
-=cut
-
-sub www_edit {
-	my ($self) = @_;
-	return $self->session->privilege->insufficient() unless $self->canEdit;
-	return $self->session->privilege->locked() unless $self->canEditIfLocked;
-	$self->session->style->setRawHeadTags(q|
-		<style type="text/css">
-		.forwardButton {
-			background-color: green;
-			color: white;
-			font-weight: bold;
-			padding: 3px;
-		}
-		.backwardButton {
-			background-color: red;
-			color: white;
-			font-weight: bold;
-			padding: 3px;
-		}
-		</style>
-						   |);	
-	my $i18n = WebGUI::International->new($self->session, "Asset_EventManagementSystem");
-	return $self->processStyle('<h1>'.$i18n->get('ems badge').'</h1>'.$self->getEditForm->print);
-}
-
+__PACKAGE__->meta->make_immutable;
 1;

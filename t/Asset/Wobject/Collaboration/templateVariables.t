@@ -1,6 +1,6 @@
 # vim:syntax=perl
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -13,14 +13,14 @@
 # 
 #
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../../../lib";
 use WebGUI::Test; # Must use this before any other WebGUI modules
 use Test::More;
 use Test::Deep;
 use Data::Dumper;
 use WebGUI::Session;
+
+my $addArgs = { skipNotifications => 1, skipAutoCommitWorkflows => 1, };
 
 #----------------------------------------------------------------------------
 # Tests
@@ -29,8 +29,8 @@ plan tests => 23;        # Increment this number for each test you create
 #----------------------------------------------------------------------------
 # Init
 my $session         = WebGUI::Test->session;
-my @addChildArgs    = ( {skipAutoCommitWorkflows=>1, skipNotification => 1, } );
-my $collab          = WebGUI::Asset->getImportNode( $session )->addChild({
+my $tag = WebGUI::VersionTag->getWorking($session);
+my $collab          = WebGUI::Test->asset->addChild({
     className        => 'WebGUI::Asset::Wobject::Collaboration',
     threadsPerPage   => 20,
     displayLastReply => 1,
@@ -42,19 +42,24 @@ my @threads = (
         title           => "X - Foo",
         isSticky        => 0,
         ownerUserId     => 1,
-    }, undef, 1, @addChildArgs),
+    }, undef, 1, $addArgs ),
     $collab->addChild( {
         className       => 'WebGUI::Asset::Post::Thread',
         title           => "X - Bar",
         isSticky        => 0,
         ownerUserId     => 3,
-    }, undef, 2, @addChildArgs),
+    }, undef, 2, $addArgs ),
 );
 
-$_->setSkipNotification for @threads; # 100+ messages later...
-my $versionTag = WebGUI::VersionTag->getWorking( $session );
-$versionTag->commit;
-WebGUI::Test->addToCleanup($versionTag);
+for my $t ( @threads ) {
+    $t->setSkipNotification;
+}
+
+$tag->commit;
+
+foreach my $asset ($collab, @threads) {
+    $asset = $asset->cloneFromDb;
+}
 
 my $templateVars;
 my $posts;
@@ -89,7 +94,7 @@ ok( !$posts->[0]->{'user.isVisitor'}, 'first post made by visitor');
 ok(  $posts->[0]->{'hideProfileUrl'}, 'hide profile url, and user is visitor');
 ok( !$posts->[0]->{'lastReply.user.isVisitor'}, 'lastReply not made by visitor');
 ok(  $posts->[0]->{'lastReply.hideProfileUrl'}, 'lastReply hide profile url, since user is visitor');
-is(  $posts->[0]->{'lastReply.url'}, $threads[1]->getUrl.'?pn=1#id'.$threads[1]->getId, 'lastReply url has a query fragment prefixed by "id"');
+is(  $posts->[0]->{'lastReply.url'}, $threads[1]->getUrl.'#id'.$threads[1]->getId, 'lastReply url has a query fragment prefixed by "id"');
 is(  $posts->[0]->{'url'}, $threads[1]->getUrl.'#id'.$threads[1]->getId, 'url has a query fragment prefixed by "id"');
 
 
@@ -100,18 +105,18 @@ is(  $posts->[0]->{'url'}, $threads[1]->getUrl.'#id'.$threads[1]->getId, 'url ha
 ###################################################################
 
 my @newThreads = ();
+my $vt2 = WebGUI::VersionTag->getWorking($session);
 foreach my $index (1 .. 5) {
     $newThreads[$index] =  $collab->addChild( {
         className       => 'WebGUI::Asset::Post::Thread',
         title           => "X - Bar",
         isSticky        => 0,
         ownerUserId     => 3,
-    }, undef, 2+$index, @addChildArgs);
+    }, undef, 2+$index, $addArgs );
     $newThreads[$index]->setSkipNotification;
 }
-my $vt2 = WebGUI::VersionTag->getWorking($session);
 $vt2->commit;
-addToCleanup($versionTag);
+WebGUI::Test->addToCleanup($vt2);
 
 $session->user({userId => 3});
 $templateVars = $collab->getViewTemplateVars();

@@ -3,7 +3,7 @@ package WebGUI::Form::Asset;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -118,8 +118,8 @@ Formats as a link.
 
 sub getValueAsHtml {
     my $self = shift;
-#    my $asset = WebGUI::Asset->newByDynamicClass($self->session,$self->getDefaultValue);
-    my $asset = WebGUI::Asset->newByDynamicClass($self->session,$self->getOriginalValue);
+#    my $asset = WebGUI::Asset->newById($self->session,$self->getDefaultValue);
+    my $asset = WebGUI::Asset->newById($self->session,$self->getOriginalValue);
     if (defined $asset) {
         return '<a href="'.$asset->getUrl.'">'.$asset->getTitle.'</a>';
     }
@@ -149,7 +149,7 @@ Renders an asset selector.
 
 sub toHtml {
 	my $self = shift;
-    my $asset = WebGUI::Asset->newByDynamicClass($self->session, $self->getOriginalValue) || WebGUI::Asset->getRoot($self->session);
+    my $asset = $self->getOriginalValue ? WebGUI::Asset->newById($self->session, $self->getOriginalValue) : WebGUI::Asset->getRoot($self->session); 
 	my $url = $asset->getUrl("op=formHelper;sub=assetTree;class=Asset;formId=".$self->get('id'));
 	$url .= ";classLimiter=".$self->get("class") if ($self->get("class"));
         return WebGUI::Form::Hidden->new($self->session,
@@ -181,7 +181,7 @@ form variable C<classLimiter>.  A crumb trail is provided for navigation.
 
 sub www_assetTree {
 	my $session = shift;
-	$session->http->setCacheControl("none");
+	$session->response->setCacheControl("none");
 	my $base = WebGUI::Asset->newByUrl($session) || WebGUI::Asset->getRoot($session);
 	my @crumb;
 	my $ancestorIter = $base->getLineageIterator(["self","ancestors"]);

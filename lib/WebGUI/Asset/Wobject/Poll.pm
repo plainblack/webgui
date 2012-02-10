@@ -2,7 +2,7 @@ package WebGUI::Asset::Wobject::Poll;
 
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -17,174 +17,195 @@ use WebGUI::Form;
 use WebGUI::International;
 use WebGUI::SQL;
 use WebGUI::User;
-use WebGUI::Utility;
 use WebGUI::Asset::Wobject;
 use WebGUI::Image::Graph;
 use WebGUI::Storage;
 use JSON;
+use Try::Tiny;
 
-our @ISA = qw(WebGUI::Asset::Wobject);
+use Moose;
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset::Wobject';
+define assetName => ['assetName', 'Asset_Poll'];
+define tableName => 'Poll';
+define icon      => 'poll.gif';
+property templateId => (
+                tab          => 'display',
+                fieldType    => "template",
+                default      => 'PBtmpl0000000000000055',
+                label        => [73, 'Asset_Poll'],
+                hoverHelp    => ['73 description', 'Asset_Poll'],
+                namespace    => "Poll",
+         );
+property active => (
+                tab          => 'properties',
+                fieldType    => "yesNo",
+                default      => 1,
+                label        => [3, 'Asset_Poll'],
+                hoverHelp    => ['3 description', 'Asset_Poll'],
+            );
+property karmaPerVote => (
+                fieldType    => 'integer',
+                noFormPost   => \&_karmaPerVote_noFormPost,
+                default      => 0,
+                label        => [20, 'Asset_Poll'],
+                hoverHelp    => ['20 description', 'Asset_Poll'],
+         ); 
+sub _karmaPerVote_noFormPost {
+    my $self = shift;
+    return ! $self->session->setting->get('useKarma');
+}
+property graphWidth => (
+                fieldType    => "integer",
+                default      => 150,
+                label        => [5, 'Asset_Poll'],
+                hoverHelp    => ['5 description', 'Asset_Poll'],
+         ); 
+property voteGroup => (
+                tab          => 'security',
+                fieldType    => "group",
+                default      => 7,
+                label        => [4, 'Asset_Poll'],
+                hoverHelp    => ['4 description', 'Asset_Poll'],
+         ); 
+property question => (
+                tab          => 'properties',
+                fieldType    => "text",
+                default      => undef,
+                label        => [6, 'Asset_Poll'],
+                hoverHelp    => ['6 description', 'Asset_Poll'],
+         ); 
+property randomizeAnswers => (
+                tab          => 'properties',
+                fieldType    => "yesNo",
+                default      => 1,
+                label        => [72, 'Asset_Poll'],
+                hoverHelp    => ['72 description', 'Asset_Poll'],
+         );
+property a1 => (
+    fieldType  => "hidden",
+    default    => undef,
+    noFormPost => 1,
+);
+property a2 => (
+    fieldType  => "hidden",
+    default    => undef,
+    noFormPost => 1,
+);
+property a3 => (
+    fieldType  => "hidden",
+    default    => undef,
+    noFormPost => 1,
+);
+property a4 => (
+    fieldType  => "hidden",
+    default    => undef,
+    noFormPost => 1,
+);
+property a5 => (
+    fieldType  => "hidden",
+    default    => undef,
+    noFormPost => 1,
+);
+property a6 => (
+    fieldType  => "hidden",
+    default    => undef,
+    noFormPost => 1,
+);
+property a7 => (
+    fieldType  => "hidden",
+    default    => undef,
+    noFormPost => 1,
+);
+property a8 => (
+    fieldType  => "hidden",
+    default    => undef,
+    noFormPost => 1,
+);
+property a9 => (
+    fieldType  => "hidden",
+    default    => undef,
+    noFormPost => 1,
+);
+property a10 => (
+    fieldType  => "hidden",
+    default    => undef,
+    noFormPost => 1,
+);
+property a11 => (
+    fieldType  => "hidden",
+    default    => undef,
+    noFormPost => 1,
+);
+property a12 => (
+    fieldType  => "hidden",
+    default    => undef,
+    noFormPost => 1,
+);
+property a13 => (
+    fieldType  => "hidden",
+    default    => undef,
+    noFormPost => 1,
+);
+property a14 => (
+    fieldType  => "hidden",
+    default    => undef,
+    noFormPost => 1,
+);
+property a15 => (
+    fieldType  => "hidden",
+    default    => undef,
+    noFormPost => 1,
+);
+property a16 => (
+    fieldType  => "hidden",
+    default    => undef,
+    noFormPost => 1,
+);
+property a17 => (
+    fieldType  => "hidden",
+    default    => undef,
+    noFormPost => 1,
+);
+property a18 => (
+    fieldType  => "hidden",
+    default    => undef,
+    noFormPost => 1,
+);
+property a19 => (
+    fieldType  => "hidden",
+    default    => undef,
+    noFormPost => 1,
+);
+property a20 => (
+    fieldType  => "hidden",
+    default    => undef,
+    noFormPost => 1,
+);
+property graphConfiguration => (
+    fieldType  => "hidden",
+    default    => undef,
+    noFormPost => 1,
+);
+property generateGraph => (
+                noFormPost   => \&_generateGraph_noFormPost,
+                fieldType    => 'yesNo',
+                default      => 0,
+                label        => ['generate graph', 'Asset_Poll'],
+                hoverHelp    => ['generate graph description', 'Asset_Poll'],
+         );
+sub _generateGraph_noFormPost {
+    my $self = shift;
+    return WebGUI::Image::Graph->getPluginList($self->session) ? 1 : 0;
+}
 
 #-------------------------------------------------------------------
 sub _hasVoted {
 	my $self = shift;
 	my ($hasVoted) = $self->session->db->quickArray("select count(*) from Poll_answer 
 		where assetId=".$self->session->db->quote($self->getId)." and ((userId=".$self->session->db->quote($self->session->user->userId)."
-		and userId<>'1') or (userId=".$self->session->db->quote($self->session->user->userId)." and ipAddress='".$self->session->env->getIp."'))");
+		and userId<>'1') or (userId=".$self->session->db->quote($self->session->user->userId)." and ipAddress='".$self->session->request->address."'))");
 	return $hasVoted;
-}
-
-#-------------------------------------------------------------------
-sub definition {
-	my $class = shift;
-	my $session = shift;
-	my $definition = shift;
-	my $i18n = WebGUI::International->new($session,"Asset_Poll");
-	push(@{$definition}, {
-		assetName=>$i18n->get('assetName'),
-		tableName=>'Poll',
-		icon=>'poll.gif',
-		className=>'WebGUI::Asset::Wobject::Poll',
-		autoGenerateForms=>1,
-		properties=>{
-			templateId =>{
-                tab          => 'display',
-				fieldType    => "template",
-				defaultValue => 'PBtmpl0000000000000055',
-                label        => $i18n->get(73),
-                hoverHelp    => $i18n->get('73 description'),
-                namespace    => "Poll",
-            },
-			active=>{
-                tab          => 'properties',
-				fieldType    => "yesNo",
-				defaultValue => 1,
-                label        => $i18n->get(3),
-                hoverHelp    => $i18n->get('3 description'),
-            },
-			karmaPerVote=>{
-				fieldType=>"integer",
-				defaultValue=>0,
-                autoGenerate=>0,
-				}, 
-			graphWidth=>{
-				fieldType=>"integer",
-				defaultValue=>150,
-                autoGenerate=>0,
-				}, 
-			voteGroup=>{
-                tab          => 'security',
-				fieldType    => "group",
-				defaultValue => 7,
-                label        => $i18n->get(4),
-                hoverHelp    => $i18n->get('4 description'),
-            }, 
-			question=>{
-                tab          => 'properties',
-				fieldType    => "text",
-				defaultValue => undef,
-                label        => $i18n->get(6),
-                hoverHelp    => $i18n->get('6 description'),
-            }, 
-			randomizeAnswers=>{
-                tab          => 'properties',
-				fieldType    => "yesNo",
-				defaultValue => 1,
-                label        => $i18n->get(72),
-                hoverHelp    => $i18n->get('72 description'),
-            },
-			a1=>{
-				fieldType=>"hidden",
-				defaultValue=>undef
-				}, 
-			a2=>{
-                                fieldType=>"hidden",
-                                defaultValue=>undef
-                                }, 
-			a3=>{
-                                fieldType=>"hidden",
-                                defaultValue=>undef
-                                }, 
-			a4=>{
-                                fieldType=>"hidden",
-                                defaultValue=>undef
-                                }, 
-			a5=>{
-                                fieldType=>"hidden",
-                                defaultValue=>undef
-                                }, 
-			a6=>{
-                                fieldType=>"hidden",
-                                defaultValue=>undef
-                                }, 
-			a7=>{
-                                fieldType=>"hidden",
-                                defaultValue=>undef
-                                }, 
-			a8=>{
-                                fieldType=>"hidden",
-                                defaultValue=>undef
-                                }, 
-			a9=>{
-                                fieldType=>"hidden",
-                                defaultValue=>undef
-                                }, 
-			a10=>{
-                                fieldType=>"hidden",
-                                defaultValue=>undef
-                                }, 
-			a11=>{
-                                fieldType=>"hidden",
-                                defaultValue=>undef
-                                }, 
-			a12=>{
-                                fieldType=>"hidden",
-                                defaultValue=>undef
-                                }, 
-			a13=>{
-                                fieldType=>"hidden",
-                                defaultValue=>undef
-                                }, 
-			a14=>{
-                                fieldType=>"hidden",
-                                defaultValue=>undef
-                                }, 
-			a15=>{
-                                fieldType=>"hidden",
-                                defaultValue=>undef
-                                }, 
-			a16=>{
-                                fieldType=>"hidden",
-                                defaultValue=>undef
-                                }, 
-			a17=>{
-                                fieldType=>"hidden",
-                                defaultValue=>undef
-                                }, 
-			a18=>{
-                                fieldType=>"hidden",
-                                defaultValue=>undef
-                                }, 
-			a19=>{
-                                fieldType=>"hidden",
-                                defaultValue=>undef
-                                }, 
-			a20=>{
-                                fieldType=>"hidden",
-                                defaultValue=>undef
-                                },
-			graphConfiguration=>{
-				fieldType=>"hidden",
-				defaultValue=>undef,
-				},
-            generateGraph => {
-                fieldType    => "yesNo",
-                defaultValue => 0,
-                autoGenerate => 0,
-            },
-        }
-    });
-    return $class->SUPER::definition($session, $definition);
 }
 
 #-------------------------------------------------------------------
@@ -195,16 +216,16 @@ Extend the base method to handle copying Poll answer data.
 
 =cut
 
-sub duplicate {
+override duplicate => sub {
 	my $self = shift;
-	my $newAsset = $self->SUPER::duplicate(@_);
+	my $newAsset = super();
 	my $sth = $self->session->db->read("select * from Poll_answer where assetId=?", [$self->getId]);
 	while (my $data = $sth->hashRef) {
 		$newAsset->setVote($data->{answer}, $data->{userId}, $data->{ipAddress});
 	}
 	$sth->finish;
 	return $newAsset;
-}
+};
 
 #----------------------------------------------------------------------------
 
@@ -234,64 +255,45 @@ Extend the base class to handle the answers and graphing plugins.
 ##TODO: Pull out all form elements which can come from the definition sub
 ##and only have hand code in here.
 
-sub getEditForm {
+override getEditForm => sub {
 	my $self = shift;
-	my $tabform = $self->SUPER::getEditForm; 
+	my $fb = super(); 
 	my $i18n = WebGUI::International->new($self->session,"Asset_Poll");
     my ($i, $answers);
     for ($i=1; $i<=20; $i++) {
         if ($self->get('a'.$i) =~ /\C/) {
-            $answers .= $self->getValue("a".$i)."\n";
+            $answers .= $self->get("a".$i)."\n";
         }
     }
-	if ($self->session->setting->get("useKarma")) {
-		$tabform->getTab("properties")->integer(
-			-name=>"karmaPerVote",
-			-label=>$i18n->get(20),
-			-hoverHelp=>$i18n->get('20 description'),
-			-value=>$self->getValue("karmaPerVote")
-			);
-	} else {
-		$tabform->getTab("properties")->hidden(
-			-name=>"karmaPerVote",
-			-value=>$self->getValue("karmaPerVote")
-			);
-	}
-	$tabform->getTab("display")->integer(
-		-name=>"graphWidth",
-		-label=>$i18n->get(5),
-		-hoverHelp=>$i18n->get('5 description'),
-		-value=>$self->getValue("graphWidth")
-		);
-        $tabform->getTab("properties")->textarea(
-		-name=>"answers",
-		-label=>$i18n->get(7),
-		-hoverHelp=>$i18n->get('7 description'),
-		-subtext=>('<span class="formSubtext"><br />'.$i18n->get(8).'</span>'),
-		-value=>$answers
-		);
-	$tabform->getTab("properties")->yesNo(
-		-name=>"resetVotes",
-		-label=>$i18n->get(10),
-		-hoverHelp=>$i18n->get('10 description')
+    $fb->getTab("properties")->addField( "textarea", 
+		name=>"answers",
+		label=>$i18n->get(7),
+		hoverHelp=>$i18n->get('7 description'),
+		subtext=>('<span class="formSubtext"><br />'.$i18n->get(8).'</span>'),
+		value=>$answers
+    );
+	$fb->getTab("properties")->addField( "YesNo", 
+		name=>"resetVotes",
+		label=>$i18n->get(10),
+		hoverHelp=>$i18n->get('10 description')
 		) if $self->session->form->process("func") ne 'add';
 
 
 	if (WebGUI::Image::Graph->getPluginList($self->session)) {
 		my $config = $self->getGraphConfig;
 
-		$tabform->addTab('graph', $i18n->get('Graphing','Image_Graph'));
-		$tabform->getTab('graph')->yesNo(
-			-name		=> 'generateGraph',
-			-label		=> $i18n->get('generate graph'),
-			-hoverHelp	=> $i18n->get('generate graph description'),
-			-value		=> $self->getValue('generateGraph'),
+		my $graphTab = $fb->addTab(name => 'graph', label => $i18n->get('Graphing','Image_Graph'));
+		$graphTab->addField( "yesNo", 
+			name		=> 'generateGraph',
+			label		=> $i18n->get('generate graph'),
+			hoverHelp	=> $i18n->get('generate graph description'),
+			value		=> $self->generateGraph,
 		);
-		$tabform->getTab('graph')->raw(WebGUI::Image::Graph->getGraphingTab($self->session, $config));
+        WebGUI::Image::Graph->getGraphingTab($graphTab, $config)
 	}
 
-	return $tabform;
-}
+	return $fb;
+};
 
 #----------------------------------------------------------------------------
 
@@ -318,11 +320,12 @@ Indexing question and answers. See WebGUI::Asset::indexContent() for additonal d
 
 =cut
 
-sub indexContent {
+around indexContent => sub {
+	my $orig = shift;
 	my $self = shift;
-	my $indexer = $self->SUPER::indexContent;
+	my $indexer = $self->$orig(@_);
 	$indexer->addKeywords($self->get("question")." ".$self->get("answers"));
-}
+};
 
 
 #-------------------------------------------------------------------
@@ -333,10 +336,10 @@ See WebGUI::Asset::prepareView() for details.
 
 =cut
 
-sub prepareView {
+override prepareView => sub {
     my $self = shift;
-    $self->SUPER::prepareView();
-    my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId"));
+    super();
+    my $template = WebGUI::Asset::Template->newById($self->session, $self->get("templateId"));
     if (!$template) {
         WebGUI::Error::ObjectNotFound::Template->throw(
             error      => qq{Template not found},
@@ -346,20 +349,20 @@ sub prepareView {
     }
     $template->prepare($self->getMetaDataAsTemplateVariables);
     $self->{_viewTemplate} = $template;
-}
+};
 
 
 #-------------------------------------------------------------------
 
-=head2 processPropertiesFromFormPost 
+=head2 processEditForm 
 
 Extend the base method to handle the answers and the Graphing plugin.
 
 =cut
 
-sub processPropertiesFromFormPost {
+override processEditForm => sub {
 	my $self = shift;
-	$self->SUPER::processPropertiesFromFormPost;
+	super();
 	my $property = {};
     my $answers = $self->session->form->process("answers");
     $answers =~ s{\r}{}xmsg;
@@ -369,13 +372,20 @@ sub processPropertiesFromFormPost {
     }
 
 	if (WebGUI::Image::Graph->getPluginList($self->session)) {
-		my $graph = WebGUI::Image::Graph->processConfigurationForm($self->session);
-		$self->setGraphConfig( $graph->getConfiguration );
+        my $graph;
+        try {
+		    $graph = WebGUI::Image::Graph->processConfigurationForm($self->session);
+        } catch {
+            $self->session->log->error( "Graph plugin not available or not functional:  Error: ``$_''" );
+        };
+        if( $graph ) {
+		    $self->setGraphConfig( $graph->getConfiguration );
+        }
 	}
 
 	$self->update($property);
 	$self->session->db->write("delete from Poll_answer where assetId=".$self->session->db->quote($self->getId)) if ($self->session->form->process("resetVotes"));
-}
+};
 
 
 #-------------------------------------------------------------------
@@ -386,11 +396,11 @@ Extend the base method to handle Poll answers.
 
 =cut
 
-sub purge {
+override purge => sub {
 	my $self = shift;
 	$self->session->db->write("delete from Poll_answer where assetId=".$self->session->db->quote($self->getId));
-	$self->SUPER::purge();
-}	
+	super();
+};	
 
 #----------------------------------------------------------------------------
 
@@ -495,9 +505,9 @@ sub view {
                 	push(@answers,{
 				"answer.form"=>WebGUI::Form::radio($self->session,{name=>"answer",value=>"a".$i}),
 				"answer.text"=>$self->get('a'.$i),
-				"answer.graphWidth"=>round($self->get("graphWidth")*$tally/$totalResponses),
+				"answer.graphWidth"=>sprintf('%.0f', $self->get("graphWidth")*$tally/$totalResponses),
 				"answer.number"=>$i,
-				"answer.percent"=>round(100*$tally/$totalResponses),
+				"answer.percent"=>sprintf('%0.f', 100*$tally/$totalResponses),
 				"answer.total"=>($tally+0)
                         	});
 			push(@dataset, ($tally+0));
@@ -507,7 +517,7 @@ sub view {
 	@answers = List::Util::shuffle(@answers) if ($self->get("randomizeAnswers"));
 	$var{answer_loop} = \@answers;
 
-	if ($self->getValue('generateGraph')) {
+	if ($self->generateGraph) {
 		my $config = $self->getGraphConfig;
         if ($config) {
             my $graph = WebGUI::Image::Graph->loadByConfiguration($self->session, $config);
@@ -523,7 +533,7 @@ sub view {
             $var{graphUrl} = $storage->getUrl($filename);
             $var{hasImageGraph} = 1;
         } else {
-            $self->session->errorHandler->error('The graph configuration hash of the Poll ('.$self->getUrl.') is corrupt.');
+            $self->session->log->error('The graph configuration hash of the Poll ('.$self->getUrl.') is corrupt.');
         }
 	}
 	
@@ -543,7 +553,7 @@ sub www_vote {
 	my $self = shift;
 	my $u;
         if ($self->session->form->process("answer") ne "" && $self->session->user->isInGroup($self->get("voteGroup")) && !($self->_hasVoted())) {
-        	$self->setVote($self->session->form->process("answer"),$self->session->user->userId,$self->session->env->getIp);
+        	$self->setVote($self->session->form->process("answer"),$self->session->user->userId,$self->session->request->address);
 		if ($self->session->setting->get("useKarma")) {
 			$self->session->user->karma($self->get("karmaPerVote"),"Poll (".$self->getId.")","Voted on this poll.");
 		}
@@ -555,5 +565,6 @@ sub www_vote {
 
 
 
+__PACKAGE__->meta->make_immutable;
 1;
 

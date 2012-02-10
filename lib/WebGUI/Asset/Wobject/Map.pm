@@ -3,7 +3,7 @@ package WebGUI::Asset::Wobject::Map;
 $VERSION = "1.0.0";
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -13,129 +13,112 @@ $VERSION = "1.0.0";
 #-------------------------------------------------------------------
 
 use strict;
-use Tie::IxHash;
 use WebGUI::International;
-use WebGUI::Utility;
 use HTML::Entities qw(encode_entities);
-use base 'WebGUI::Asset::Wobject';
-use Data::Dumper;
-
-# To get an installer for your wobject, add the Installable AssetAspect
-# See WebGUI::AssetAspect::Installable and sbin/installClass.pl for more
-# details
-
-#-------------------------------------------------------------------
-
-=head2 definition ( )
-
-Define asset properties
-
-=cut
-
-sub definition {
-    my $class      = shift;
-    my $session    = shift;
-    my $definition = shift;
-    my $i18n       = WebGUI::International->new( $session, 'Asset_Map' );
-
+use Moose;
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset::Wobject';
+define assetName         => ['assetName', 'Asset_Map'];
+define icon              => 'maps.png';
+define tableName         => 'Map';
+property groupIdAddPoint => (
+            tab         => "security",
+            fieldType   => "group",
+            label       => ["groupIdAddPoint label", 'Asset_Map'],
+            hoverHelp   => ["groupIdAddPoint description", 'Asset_Map'],
+            default     => '2', # Registered users
+         );
+property mapApiKey => (
+            tab         => "properties",
+            fieldType   => "text",
+            label       => ["mapApiKey label", 'Asset_Map'],
+            hoverHelp   => ["mapApiKey description", 'Asset_Map'],
+            builder     => '_mapApiKey_builder',
+            lazy        => 1,
+            subtext     => \&_mapApiKey_subtext,
+         );
+sub _mapApiKey_builder {
+    my $self = shift;
+    return $self->getDefaultApiKey($self->session);
+}
+sub _mapApiKey_subtext {
+    my $self    = shift;
+    my $session = $self->session;
+    my $i18n    = WebGUI::International->new($session, 'Asset_Map');
     my $googleApiKeyUrl = 'http://code.google.com/apis/maps/signup.html';
     my $googleApiKeyLink
         = q{<a href="%s" onclick="window.open('%s'); return false;">%s</a>};
-    
-    tie my %properties, 'Tie::IxHash', (
-        groupIdAddPoint => {
-            tab         => "security",
-            fieldType   => "group",
-            label       => $i18n->get("groupIdAddPoint label"),
-            hoverHelp   => $i18n->get("groupIdAddPoint description"),
-            defaultValue=> '2', # Registered users
-        },
-        mapApiKey       => {
-            tab         => "properties",
-            fieldType   => "text",
-            label       => $i18n->get("mapApiKey label"),
-            hoverHelp   => $i18n->get("mapApiKey description"),
-            defaultValue=> $class->getDefaultApiKey($session),
-            subtext     => sprintf($googleApiKeyLink, ($googleApiKeyUrl)x2, $i18n->get('mapApiKey link') ),
-        },
-        mapHeight       => {
+    return sprintf($googleApiKeyLink, ($googleApiKeyUrl)x2, $i18n->get('mapApiKey link') );
+}
+property mapHeight => (
             tab         => "display",
             fieldType   => "text",
-            label       => $i18n->get("mapHeight label"),
-            hoverHelp   => $i18n->get("mapHeight description"),
-            defaultValue    => '400px',
-        },
-        mapWidth       => {
+            label       => ["mapHeight label", 'Asset_Map'],
+            hoverHelp   => ["mapHeight description", 'Asset_Map'],
+            default     => '400px',
+         );
+property mapWidth => (
             tab         => "display",
             fieldType   => "text",
-            label       => $i18n->get("mapWidth label"),
-            hoverHelp   => $i18n->get("mapWidth description"),
-            defaultValue    => '100%',
-        },
-        startLatitude   => {
+            label       => ["mapWidth label", 'Asset_Map'],
+            hoverHelp   => ["mapWidth description", 'Asset_Map'],
+            default     => '100%',
+         );
+property startLatitude => (
             tab         => "display",
             fieldType   => "float",
-            label       => $i18n->get("startLatitude label"),
-            hoverHelp   => $i18n->get("startLatitude description"),
-            defaultValue    => 43.074719,
-        },
-        startLongitude  => {
+            label       => ["startLatitude label", 'Asset_Map'],
+            hoverHelp   => ["startLatitude description", 'Asset_Map'],
+            default     => 43.074719,
+         );
+property startLongitude => (
             tab         => "display",
             fieldType   => "float",
-            label       => $i18n->get("startLongitude label"),
-            hoverHelp   => $i18n->get("startLongitude description"),
-            defaultValue    => -89.384251,
-        },
-        startZoom       => {
+            label       => ["startLongitude label", 'Asset_Map'],
+            hoverHelp   => ["startLongitude description", 'Asset_Map'],
+            default     => -89.384251,
+         );
+property startZoom => (
             tab         => "display",
             fieldType   => "intSlider",
             minimum     => 1,
             maximum     => 19,
-            label       => $i18n->get("startZoom label"),
-            hoverHelp   => $i18n->get("startZoom description"),
-        },
-        templateIdEditPoint => {
-            tab             => "display",
-            fieldType       => "template",
-            defaultValue    => "oHh0UqAJeY7u2n--WD-BAA",
-            namespace       => "MapPoint/Edit",
-            label           => $i18n->get("templateIdEditPoint label"),
-            hoverHelp       => $i18n->get("templateIdEditPoint description"),
-        },
-        templateIdView  => {
-            tab             => "display",
-            fieldType       => "template",
-            defaultValue    => "9j0_Z1j3Jd0QBbY2akb6qw",
-            namespace       => "Map/View",
-            label           => $i18n->get("templateIdView label"),
-            hoverHelp       => $i18n->get("templateIdView description"),
-        },
-        templateIdViewPoint => {
-            tab             => "display",
-            fieldType       => "template",
-            defaultValue    => "u9vfx33XDk5la1-QC5FK7g",
-            namespace       => "MapPoint/View",
-            label           => $i18n->get("templateIdViewPoint label"),
-            hoverHelp       => $i18n->get("templateIdViewPoint description"),
-        },
-        workflowIdPoint => {
+            label       => ["startZoom label", 'Asset_Map'],
+            hoverHelp   => ["startZoom description", 'Asset_Map'],
+            default     => 1,
+         );
+property templateIdEditPoint => (
+            tab         => "display",
+            fieldType   => "template",
+            namespace   => "MapPoint/Edit",
+            default     => 'oHh0UqAJeY7u2n--WD-BAA',
+            label       => ["templateIdEditPoint label", 'Asset_Map'],
+            hoverHelp   => ["templateIdEditPoint description", 'Asset_Map'],
+         );
+property templateIdView => (
+            tab         => "display",
+            fieldType   => "template",
+            namespace   => "Map/View",
+            default     => '9j0_Z1j3Jd0QBbY2akb6qw',
+            label       => ["templateIdView label", 'Asset_Map'],
+            hoverHelp   => ["templateIdView description", 'Asset_Map'],
+         );
+property templateIdViewPoint => (
+            tab         => "display",
+            fieldType   => "template",
+            namespace   => "MapPoint/View",
+            default     => 'u9vfx33XDk5la1-QC5FK7g',
+            label       => ["templateIdViewPoint label", 'Asset_Map'],
+            hoverHelp   => ["templateIdViewPoint description", 'Asset_Map'],
+         );
+property workflowIdPoint => (
             tab         => "security",
             fieldType   => "workflow",
-            label       => $i18n->get("workflowIdPoint label"),
-            hoverHelp   => $i18n->get("workflowIdPoint description"),
+            label       => ["workflowIdPoint label", 'Asset_Map'],
+            hoverHelp   => ["workflowIdPoint description", 'Asset_Map'],
             type        => 'WebGUI::VersionTag',
-        },
-    );
-    push @{$definition}, {
-        assetName         => $i18n->get('assetName'),
-        icon              => 'maps.png',
-        autoGenerateForms => 1,
-        tableName         => 'Map',
-        className         => 'WebGUI::Asset::Wobject::Map',
-        properties        => \%properties
-        };
-    return $class->SUPER::definition( $session, $definition );
-} ## end sub definition
+            default     => "pbworkflow000000000003",
+         );
 
 #-------------------------------------------------------------------
 
@@ -154,7 +137,7 @@ sub canAddPoint {
                 : $self->session->user
                 ;
 
-    return $user->isInGroup( $self->get("groupIdAddPoint") );
+    return $user->isInGroup( $self->groupIdAddPoint );
 }
 
 #----------------------------------------------------------------------------
@@ -189,7 +172,7 @@ sub canEdit {
                         : $self->session->user
                         ;
         
-        return $user->isInGroup( $self->get("groupIdEdit") );
+        return $user->isInGroup( $self->groupIdEdit );
     }
 }
 
@@ -244,9 +227,9 @@ sub getEditPointTemplate {
     my $self    = shift;
     
     if ( !$self->{_editPointTemplate} ) {
-        my $templateId  = $self->get('templateIdEditPoint');
+        my $templateId  = $self->templateIdEditPoint;
         my $template
-            = WebGUI::Asset::Template->new( $self->session, $templateId );
+            = WebGUI::Asset::Template->newById( $self->session, $templateId );
         $template->prepare;
         $self->{_editPointTemplate} = $template;
     }
@@ -267,9 +250,9 @@ sub getViewPointTemplate {
     my $self    = shift;
     
     if ( !$self->{_viewPointTemplate} ) {
-        my $templateId  = $self->get('templateIdViewPoint');
+        my $templateId  = $self->templateIdViewPoint;
         my $template
-            = WebGUI::Asset::Template->new( $self->session, $templateId );
+            = WebGUI::Asset::Template->newById( $self->session, $templateId );
         $self->{_viewPointTemplate} = $template;
     }
     
@@ -313,23 +296,23 @@ sub loadMapApiTags {
     my $style   = $self->session->style;
     my $url     = $self->session->url;
 
-    $style->setLink($url->extras('yui/build/container/assets/skins/sam/container.css'),{type=>'text/css',rel=>'stylesheet'});
-    $style->setLink($url->extras('yui/build/button/assets/skins/sam/button.css'),{type=>'text/css',rel=>'stylesheet'});
-    $style->setScript("http://www.google.com/jsapi?key=" . $self->get('mapApiKey'),{type=>"text/javascript"});
+    $style->setCss($url->extras('yui/build/container/assets/skins/sam/container.css'));
+    $style->setCss($url->extras('yui/build/button/assets/skins/sam/button.css'));
+    $style->setScript("http://www.google.com/jsapi?key=" . $self->mapApiKey);
     $style->setRawHeadTags(<<'ENDHTML');
 <script type="text/javascript">
     google.load("maps", "2", { "other_params" : "sensor=false" });
 </script>
 ENDHTML
-    $style->setScript('http://gmaps-utility-library.googlecode.com/svn/trunk/markermanager/release/src/markermanager.js', {type=>"text/javascript"});
-    $style->setScript($url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'),{type=>'text/javascript'});
-    $style->setScript($url->extras('yui/build/connection/connection-min.js'),{type=>'text/javascript'});
-    $style->setScript($url->extras('yui/build/dragdrop/dragdrop-min.js'),{type=>'text/javascript'});
-    $style->setScript($url->extras('yui/build/element/element-min.js'),{type=>'text/javascript'});
-    $style->setScript($url->extras('yui/build/button/button-min.js'),{type=>'text/javascript'});
-    $style->setScript($url->extras('yui/build/container/container-min.js'),{type=>'text/javascript'});
-    $style->setScript($url->extras('yui/build/json/json-min.js'),{type=>'text/javascript'});
-    $style->setScript($url->extras('yui-webgui/build/map/map.js'),{type=>'text/javascript'});
+    $style->setScript('http://gmaps-utility-library.googlecode.com/svn/trunk/markermanager/release/src/markermanager.js');
+    $style->setScript($url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'));
+    $style->setScript($url->extras('yui/build/connection/connection-min.js'));
+    $style->setScript($url->extras('yui/build/dragdrop/dragdrop-min.js'));
+    $style->setScript($url->extras('yui/build/element/element-min.js'));
+    $style->setScript($url->extras('yui/build/button/button-min.js'));
+    $style->setScript($url->extras('yui/build/container/container-min.js'));
+    $style->setScript($url->extras('yui/build/json/json-min.js'));
+    $style->setScript($url->extras('yui-webgui/build/map/map.js'));
 
     return;
 }
@@ -342,20 +325,20 @@ See WebGUI::Asset::prepareView() for details.
 
 =cut
 
-sub prepareView {
+override prepareView => sub {
     my $self    = shift;
-    $self->SUPER::prepareView();
-    my $template = WebGUI::Asset::Template->new( $self->session, $self->get("templateIdView") );
+    super();
+    my $template = WebGUI::Asset::Template->newById( $self->session, $self->templateIdView );
     if (!$template) {
         WebGUI::Error::ObjectNotFound::Template->throw(
             error      => qq{Template not found},
-            templateId => $self->get("templateIdView"),
+            templateId => $self->templateIdView,
             assetId    => $self->getId,
         );
     }
     $template->prepare;
     $self->{_viewTemplate} = $template;
-}
+};
 
 #-------------------------------------------------------------------
 
@@ -378,12 +361,12 @@ sub view {
     # Build the map container
     my $mapHtml = sprintf '<div id="map_%s" style="height: %s; width: %s"></div>', 
                     $self->getId,
-                    $self->get('mapHeight'),
-                    $self->get('mapWidth'),
+                    $self->mapHeight,
+                    $self->mapWidth,
                     ;
 
     # The script to load the map into the container
-    $mapHtml    .= sprintf <<'ENDHTML', $self->getId, $self->getUrl, $self->get('startLatitude'), $self->get('startLongitude'), $self->get('startZoom'), $session->url->extras;
+    $mapHtml    .= sprintf <<'ENDHTML', $self->getId, $self->getUrl, $self->startLatitude, $self->startLongitude, $self->startZoom, $session->url->extras;
 <script type="text/javascript">
     google.setOnLoadCallback( function() {
         var mapId           = "%s";
@@ -413,7 +396,7 @@ ENDHTML
 ENDHTML
 
         for my $pointId ( @{$pointIds} ) {
-            my $point   = WebGUI::Asset->newByDynamicClass( $session, $pointId );
+            my $point   = WebGUI::Asset->newById( $session, $pointId );
             next unless $point;
             my $buffer = JSON->new->encode( $point->getMapInfo );
             
@@ -504,8 +487,8 @@ sub www_ajaxDeletePoint {
     my $session = $self->session;
     my $i18n    = WebGUI::International->new( $session, 'Asset_Map' );
     my $assetId = $session->form->get('assetId');
-    my $asset   = WebGUI::Asset->newByDynamicClass( $session, $assetId );
-    $session->http->setMimeType('application/json');
+    my $asset   = WebGUI::Asset->newById( $session, $assetId );
+    $session->response->content_type('application/json');
     return JSON->new->encode({error => $i18n->get('error delete unauthorized')})
         unless $asset && $asset->canEdit;
 
@@ -533,7 +516,7 @@ sub www_ajaxEditPoint {
         } );
     }
     else {
-        $asset  = WebGUI::Asset->newByDynamicClass( $session, $form->get('assetId') );
+        $asset  = WebGUI::Asset->newById( $session, $form->get('assetId') );
     }
     
     my $output  = $self->getEditPointTemplate->process( $asset->getTemplateVarsEditForm );
@@ -558,7 +541,7 @@ sub www_ajaxEditPointSave {
 
     # We're returning as HTML because application/json causes download pop-up
     # and text/plain causes <pre>...</pre> in firefox
-    $session->http->setMimeType("text/html"); 
+    $session->response->content_type("text/html"); 
     $session->log->preventDebugOutput;
 
     my $assetId     = $form->get('assetId');
@@ -572,17 +555,26 @@ sub www_ajaxEditPointSave {
         } );
     }
     else {
-        $asset  = WebGUI::Asset->newByDynamicClass( $session, $assetId );
-        return JSON->new->encode({message => $i18n->get("error edit unauthorized")})
-            unless $asset && $asset->canEdit;
+        eval { $asset  = WebGUI::Asset->newById( $session, $assetId ) };
+        if ( $@ || !$asset || !$asset->canEdit ) {
+            return JSON->new->encode({message => $i18n->get("error edit unauthorized")});
+        }
         $asset  = $asset->addRevision;
     }
-    
+
     my $errors  = $asset->processAjaxEditForm;
 
     # Commit!
     if ( $asset->getAutoCommitWorkflowId ) {
         if ( $self->hasBeenCommitted) {
+            my $tag     = WebGUI::VersionTag->create( $session, {
+                workflowId      => $asset->getAutoCommitWorkflowId,
+            } );
+            $asset->update({
+                tagId       => $tag->getId,
+                status      => "pending",
+            });
+            $asset->setVersionLock;
             $asset->requestAutoCommit;
         }
         else {
@@ -614,7 +606,7 @@ sub www_ajaxSetCenter {
     my $form    = $self->session->form;
     my $i18n    = WebGUI::International->new( $session, 'Asset_Map' );
 
-    $session->http->setMimeType("application/json");
+    $session->response->content_type("application/json");
 
     return JSON->new->encode({message => $i18n->get("error set center unauthorized")})
         unless $self->canEdit;
@@ -642,10 +634,10 @@ sub www_ajaxSetPointLocation {
     my $form    = $self->session->form;
     my $i18n    = WebGUI::International->new( $session, 'Asset_Map' );
 
-    $session->http->setMimeType("application/json");
+    $session->response->content_type("application/json");
     
     my $assetId = $form->get('assetId');
-    my $asset   = WebGUI::Asset->newByDynamicClass( $session, $assetId );
+    my $asset   = WebGUI::Asset->newById( $session, $assetId );
     return JSON->new->encode({message => $i18n->get("error edit unauthorized")})
         unless $asset && $asset->canEdit;
     $asset->update( {
@@ -656,6 +648,7 @@ sub www_ajaxSetPointLocation {
     return JSON->new->encode( {message => $i18n->get("message set point location")} ); 
 }
 
+__PACKAGE__->meta->make_immutable;
 1;
 
 #vim:ft=perl

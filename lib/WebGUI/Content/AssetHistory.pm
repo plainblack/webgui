@@ -3,7 +3,7 @@ package WebGUI::Content::AssetHistory;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -107,7 +107,7 @@ EOSQL
     $results{'startIndex'}   = $startIndex;
     $results{'sort'}         = undef;
     $results{'dir'}          = $sortDir;
-    $session->http->setMimeType('application/json');
+    $session->response->content_type('application/json');
     my $json = JSON::to_json(\%results);
     return $json;
 }
@@ -125,22 +125,20 @@ sub www_view {
     return $session->privilege->insufficient
         unless $session->user->isInGroup(12);
     ##YUI specific datatable CSS
-    my $ac = WebGUI::AdminConsole->new( $session, "assetHistory", {
-               showAdminBar        => 1
-           } );
+    my $ac = WebGUI::AdminConsole->new( $session, "assetHistory" );
     my ($style, $url) = $session->quick(qw(style url));
-    $style->setLink($url->extras('/yui/build/fonts/fonts-min.css'), {rel=>'stylesheet', type=>'text/css'});
-    $style->setLink($url->extras('yui/build/datatable/assets/skins/sam/datatable.css'), {rel=>'stylesheet', type => 'text/CSS'});
-    $style->setLink($url->extras('yui/build/paginator/assets/skins/sam/paginator.css'), {rel=>'stylesheet', type => 'text/CSS'});
-    $style->setScript($url->extras('/yui/build/utilities/utilities.js'), {type=>'text/javascript'});
-    $style->setScript($url->extras('yui/build/json/json-min.js'), {type => 'text/javascript'});
-    $style->setScript($url->extras('yui/build/paginator/paginator-min.js'), {type => 'text/javascript'});
-    $style->setScript($url->extras('yui/build/datasource/datasource-min.js'), {type => 'text/javascript'});
+    $style->setCss($url->extras('/yui/build/fonts/fonts-min.css'));
+    $style->setCss($url->extras('yui/build/datatable/assets/skins/sam/datatable.css'));
+    $style->setCss($url->extras('yui/build/paginator/assets/skins/sam/paginator.css'));
+    $style->setScript($url->extras('/yui/build/utilities/utilities.js'));
+    $style->setScript($url->extras('yui/build/json/json-min.js'));
+    $style->setScript($url->extras('yui/build/paginator/paginator-min.js'));
+    $style->setScript($url->extras('yui/build/datasource/datasource-min.js'));
     ##YUI Datatable
-    $style->setScript($url->extras('yui/build/datatable/datatable-min.js'), {type => 'text/javascript'});
+    $style->setScript($url->extras('yui/build/datatable/datatable-min.js'));
     ##WebGUI YUI AssetHistory
-    $style->setScript( $url->extras( 'yui-webgui/build/i18n/i18n.js' ), {type => 'text/javascript'} );
-    $style->setScript( $url->extras('yui-webgui/build/assetHistory/assetHistory.js'), {type => 'text/javascript'});
+    $style->setScript( $url->extras( 'yui-webgui/build/i18n/i18n.js' ));
+    $style->setScript( $url->extras('yui-webgui/build/assetHistory/assetHistory.js'));
     ##Default CSS
     $style->setRawHeadTags('<style type="text/css"> #paging a { color: #0000de; } #search form { display: inline; } </style>');
     my $i18n=WebGUI::International->new($session);

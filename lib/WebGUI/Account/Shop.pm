@@ -5,7 +5,6 @@ use strict;
 use WebGUI::Exception;
 use WebGUI::International;
 use WebGUI::Pluggable;
-use WebGUI::Utility;
 use WebGUI::Shop::Vendor;
 use JSON qw{ from_json };
 
@@ -52,7 +51,7 @@ sub appendCommonVars {
     my $method  = $session->form->get("do");
     
     $var->{ 'manage_purchases_url'      } = $self->getUrl("module=shop;do=managePurchases");
-    $var->{ 'managesPurchasesIsActive'  } = WebGUI::Utility::isIn($method,("","managePurchases","view","viewTransaction"));
+    $var->{ 'managesPurchasesIsActive'  } = $method ~~ ["","managePurchases","view","viewTransaction"];
 
     $var->{ 'view_sales_url'            } = $self->getUrl( 'module=shop;do=viewSales' );
     $var->{ 'viewSalesIsActive'         } = $method eq 'viewSales';
@@ -90,37 +89,37 @@ sub editSettingsForm {
     my $session  = $self->session;
     my $i18n     = WebGUI::International->new($session,'Account_Shop');
     my $shopi18n = WebGUI::International->new($session,'Shop');
-    my $f        = WebGUI::HTMLForm->new($session);
+    my $f        = WebGUI::FormBuilder->new($session);
 
-    $f->template(
+    $f->addField( "template",
 		name      => "shopStyleTemplateId",
 		value     => $self->getStyleTemplateId,
 		namespace => "style",
 		label     => $i18n->get("shop style template label"),
         hoverHelp => $i18n->get("shop style template hoverHelp")
     );
-    $f->template(
+    $f->addField( "template",
 		name      => "shopLayoutTemplateId",
 		value     => $self->getLayoutTemplateId,
 		namespace => "Account/Layout",
 		label     => $i18n->get("shop layout template label"),
         hoverHelp => $i18n->get("shop layout template hoverHelp")
     );
-    $f->template(
+    $f->addField( "template",
 		name      => "shopMyPurchasesTemplateId",
 		value     => $self->session->setting->get("shopMyPurchasesTemplateId"),
 		namespace => "Shop/MyPurchases",
 		label     => $shopi18n->get("my purchases template"),
         hoverHelp => $shopi18n->get("my purchases template help")
     );
-    $f->template(
+    $f->addField( "template",
 		name      => "shopMyPurchasesDetailTemplateId",
 		value     => $self->session->setting->get("shopMyPurchasesDetailTemplateId"),
 		namespace => "Shop/MyPurchasesDetail",
 		label     => $shopi18n->get("my purchases detail template"),
         hoverHelp => $shopi18n->get("my purchases detail template help")
     );
-    $f->template(
+    $f->addField( "template",
         name        => 'shopMySalesTemplateId',
         value       => $self->session->setting->get('shopMySalesTemplateId'),
         namespace   => 'Shop/MySales',
@@ -128,7 +127,7 @@ sub editSettingsForm {
         hoverHelp   => $i18n->get('my sales template help'),
     );
 
-    return $f->printRowsOnly;
+    return $f;
 }
 
 #-------------------------------------------------------------------
@@ -277,7 +276,11 @@ sub www_viewSales {
             my $data = $row;
 
             # Add asset properties to tmpl_vars.
-            my $asset = WebGUI::Asset->newByDynamicClass( $session, $row->{ assetId } );
+            my $asset = eval { WebGUI::Asset->newById( $session, $row->{ assetId } ); };
+            if (Exception::Class->caught()) {
+                $session->log->error('Unable to instanciate assetId '.$row->{ assetId }.": $@");
+                next;
+            }
             $row = { %{ $row }, %{ $asset->get } } if $asset;
             
             push @products, $row;

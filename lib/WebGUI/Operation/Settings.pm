@@ -1,7 +1,7 @@
 package WebGUI::Operation::Settings;
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -13,9 +13,9 @@ package WebGUI::Operation::Settings;
 use strict qw(vars subs);
 use Tie::IxHash;
 use WebGUI::AdminConsole;
-use WebGUI::TabForm;
 use WebGUI::International;
 use WebGUI::SQL;
+require WebGUI::Asset::RichEdit;
 
 =head1 NAME
 
@@ -248,6 +248,24 @@ sub definition {
 		namespace=>"AdminConsole",
 		defaultValue=>$setting->get("AdminConsoleTemplate")
 		});
+    push @fields, {
+        tab             => 'ui',
+        fieldType       => 'template',
+        name            => 'templateIdAssetEdit',
+        label           => $i18n->get('templateIdAssetEdit label'),
+        hoverHelp       => $i18n->get('templateIdAssetEdit description'),
+        namespace       => 'Asset/Edit',
+        defaultValue    => $setting->get('templateIdAssetEdit') || "yKl2HX76TSuv42vmprFbXQ",
+    };
+    push @fields, {
+        tab             => 'ui',
+        fieldType       => 'template',
+        name            => 'templateIdAdmin',
+        label           => $i18n->get('templateIdAdmin label'),
+        hoverHelp       => $i18n->get('templateIdAdmin description'),
+        namespace       => 'Admin',
+        defaultValue    => $setting->get('templateIdAdmin') || "p8g7xlQaTeKSRRDo-_ejSQ",
+    };
     push(@fields, {
         tab             => "ui",
         fieldType       => "yesNo",
@@ -351,14 +369,6 @@ sub definition {
 		label=>$i18n->get(707),
 		hoverHelp=>$i18n->get('707 description'),
 		defaultValue=>$setting->get("showDebug")
-		});
-	push(@fields, {
-		tab=>"misc",
-		fieldType=>"yesNo",
-		name=>"showPerformanceIndicators",
-		label=>$i18n->get('show performance indicators'),
-		hoverHelp=>$i18n->get('show performance indicators description'),
-		defaultValue=>$setting->get("showPerformanceIndicators")
 		});
 	push(@fields, {
 		tab=>"misc",
@@ -614,6 +624,14 @@ sub www_editSettings {
         $output .= '</ul>';
     }
 
+    # Start the form
+ 	my $tabform = WebGUI::FormBuilder->new($session, action => '?op=saveSettings' );
+        $tabform->addField( 'csrfToken', name => 'csrfToken' );
+	$tabform->addField( "hidden",
+		name        => "op",
+		value       => "saveSettings"
+    );
+
     # Available tabs
     # TODO: Build this from the definition instead.
 	tie my %tabs, 'Tie::IxHash', (
@@ -627,25 +645,19 @@ sub www_editSettings {
         auth        => { label => $i18n->get("authentication") },
         perms       => { label => $i18n->get("permissions") },
     );
-
-    # Start the form
- 	my $tabform = WebGUI::TabForm->new($session,\%tabs);
-	$tabform->hidden({
-		name        => "op",
-		value       => "saveSettings"
-    });
+    for my $tabName ( keys %tabs ) {
+        $tabform->addTab( name => $tabName, %{$tabs{$tabName}} );
+    }
 
 	my $definitions = definition($session, $i18n);
 	foreach my $definition (@{$definitions}) {
-		$tabform->getTab($definition->{tab})->dynamicField(%{$definition});
+		$tabform->getTab($definition->{tab})->addField( $definition->{fieldType}, %$definition );
 	}
 
     # Get fieldsets for avaiable auth methods
-	foreach (@{$session->config->get("authMethods")}) {
-		$tabform->getTab("auth")->fieldSetStart($_);
+	foreach my $authName (@{$session->config->get("authMethods")}) {
 		my $authInstance = WebGUI::Operation::Auth::getInstance($session,$_,1);
-		$tabform->getTab("auth")->raw($authInstance->editUserSettingsForm);
-		$tabform->getTab("auth")->fieldSetEnd;
+                $tabform->getTab( "auth" )->addFieldset( $authInstance->editUserSettingsForm, name => $authName, label => $authName );
 	}
 
      # Get fieldsets for avaiable account methods
@@ -668,20 +680,18 @@ sub www_editSettings {
         }
 
         #If editUserSettingsForm is empty, skip it
-        next if $settingsForm eq "";
+        next unless $settingsForm;
 
         #Set the title of the fieldset
         my $title = $account->{title};
         WebGUI::Macro::process($title);
 
         #Print the settings form for this account pluggin
-		$tabform->getTab("account")->fieldSetStart($title);
-		$tabform->getTab("account")->raw($settingsForm);
-		$tabform->getTab("account")->fieldSetEnd;
+		$tabform->getTab("account")->addFieldset( $settingsForm, name => $account->{identifier}, label => $title );
 	}
 
-	$tabform->submit();
-    $output .= $tabform->print;
+	$tabform->addField( "submit", name => "send" );
+    $output .= $tabform->toHtml;
 
 	my $ac = WebGUI::AdminConsole->new($session,"settings");
 	return $ac->render($output);
@@ -715,6 +725,7 @@ sub www_saveSettings {
 
         my $authErrors          = $authInstance->editUserSettingsFormSave;
         if ($authErrors) {
+            $session->log->warn( "Problem saving settings: " . $authErrors );
             push @errors, @{ $authErrors };
         }
     }
@@ -743,10 +754,9 @@ sub www_saveSettings {
     # Reset login message seen numbers
     if ( $session->form->get( 'showMessageOnLoginReset' ) ) {
         $session->db->write( 
-            "UPDATE userProfileData SET showMessageOnLoginSeen=0"
+            "UPDATE users SET showMessageOnLoginSeen=0"
         );
-        # Delete the user cache
-        WebGUI::Cache->new( $session, [ "user" ] )->deleteChunk( [ "user" ] );
+        $session->cache->clear;
     }
 
     return www_editSettings($session, { errors => \@errors, message => $i18n->get("editSettings done") });

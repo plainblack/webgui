@@ -5,7 +5,7 @@ use strict;
 use WebGUI::Exception;
 use WebGUI::International;
 use WebGUI::Pluggable;
-use WebGUI::Utility;
+use Tie::IxHash;
 use base qw/WebGUI::Account/;
 
 =head1 NAME
@@ -66,12 +66,12 @@ sub canView {
     my $session = $self->session;
     my $uid     = $self->uid;
 
-    return 1 if (($session->user->userId eq $uid || $uid eq "") && $session->user->profileField('ableToBeFriend'));
+    return 1 if (($session->user->userId eq $uid || $uid eq "") && $session->user->get('ableToBeFriend'));
 
     my $user    = WebGUI::User->new($session,$uid);
     return 0 if($user->isVisitor); #This should never happen but let's make sure
-    return 0 unless ($user->profileField('ableToBeFriend'));  #User doesn't have friends enabled
-    return WebGUI::User->new($session,$uid)->profileIsViewable($session->user);  #User's profile isn't viewable by this user
+    return 0 unless ($user->get('ableToBeFriend'));  #User doesn't have friends enabled
+    return $user->profileIsViewable($session->user);  #User's profile isn't viewable by this user
 }
 
 #-------------------------------------------------------------------
@@ -86,37 +86,37 @@ sub editSettingsForm {
     my $self    = shift;
     my $session = $self->session;
     my $i18n    = WebGUI::International->new($session,'Account_Friends');
-    my $f       = WebGUI::HTMLForm->new($session);
+    my $f       = WebGUI::FormBuilder->new($session);
 
-    $f->template(
+    $f->addField( "template",
 		name      => "friendsStyleTemplateId",
 		value     => $self->getStyleTemplateId,
 		namespace => "style",
 		label     => $i18n->get("friends style template label"),
         hoverHelp => $i18n->get("friends style template hoverHelp")
 	);
-	$f->template(
+	$f->addField( "template",
 		name      => "friendsLayoutTemplateId",
 		value     => $self->getLayoutTemplateId,
 		namespace => "Account/Layout",
 		label     => $i18n->get("friends layout template label"),
         hoverHelp => $i18n->get("friends layout template hoverHelp")
 	);
-	$f->template(
+	$f->addField( "template",
         name      => "friendsViewTemplateId",
         value     => $self->getViewTemplateId,
         namespace => "Account/Friends/View",
         label     => $i18n->get("friends view template label"),
         hoverHelp => $i18n->get("friends view template hoverHelp")
 	);
-    $f->template(
+    $f->addField( "template",
         name      => "friendsEditTemplateId",
         value     => $self->getEditTemplateId,
         namespace => "Account/Friends/Edit",
         label     => $i18n->get("friends edit template label"),
         hoverHelp => $i18n->get("friends edit template hoverHelp")
 	);
-    $f->template(
+    $f->addField( "template",
         name      => "friendsSendRequestTemplateId",
         value     => $self->getSendRequestTemplateId,
         namespace => "Account/Friends/SendRequest",
@@ -124,7 +124,7 @@ sub editSettingsForm {
         hoverHelp => $i18n->get("friends send request template hoverHelp")
 	);
 
-    $f->template(
+    $f->addField( "template",
         name      => "friendsErrorTemplateId",
         value     => $self->getErrorTemplateId,
         namespace => "Account/Friends/Error",
@@ -132,7 +132,7 @@ sub editSettingsForm {
         hoverHelp => $i18n->get("friends error template hoverHelp")
 	);
 
-    $f->template(
+    $f->addField( "template",
         name      => "friendsConfirmTemplateId",
         value     => $self->getConfirmTemplateId,
         namespace => "Account/Friends/Confirm",
@@ -140,7 +140,7 @@ sub editSettingsForm {
         hoverHelp => $i18n->get("friends confirm template hoverHelp")
 	);
 
-    $f->template(
+    $f->addField( "template",
         name      => "friendsRemoveConfirmTemplateId",
         value     => $self->getRemoveConfirmTemplateId,
         namespace => "Account/Friends/Confirm",
@@ -148,7 +148,7 @@ sub editSettingsForm {
         hoverHelp => $i18n->get("friends remove confirm template hoverHelp")
 	);
 
-    return $f->printRowsOnly;
+    return $f;
 }
 
 #-------------------------------------------------------------------
@@ -402,33 +402,37 @@ sub www_sendFriendsRequest {
     $var->{'user_full_name'    } = $user->getWholeName;
     $var->{'user_member_since' } = $user->dateCreated;
 
+    $var->{'cancel_url'       }  = $user->getProfileUrl;
+
     my $defaultComment = sprintf(
         $i18n->get('default friend comments'),
         $user->getFirstName,
         $session->user->getFirstName
     );
-    $var->{'form_message_text'}  = WebGUI::Form::textarea($session, {
+
+    my $form = WebGUI::FormBuilder->new( $session,
+        name    => "messageForm",
+        action  => $self->getUrl( "module=friends;do=sendFriendsRequestSave;uid=$uid" ),
+    );
+    $form->addField( "HTMLArea",
+        name        => "message",
+        value       => $defaultComment,
+        width       => 600,
+    );
+
+    # Add an alternative to the rich editor
+    $var->{'form_message_text'}  = WebGUI::Form::Textarea->new($session, {
         name   =>"message",
         value  =>$defaultComment,
         width  =>600,
         height =>200
-    });
+    })->toHtml;
 
-    $var->{'form_message_rich'}  = WebGUI::Form::HTMLArea($session, {
-        name  => "message",
-        value => $defaultComment,
-        width => "600",
-    });
+    $form->addField( "Submit",
+        name        => "submit",
+    );
 
-    $var->{'form_header'      }  = WebGUI::Form::formHeader($session,{
-        action => $self->getUrl("module=friends;do=sendFriendsRequestSave;uid=$uid"),
-        extras => q{name="messageForm"}
-    });
-
-    $var->{'submit_button'    }  = WebGUI::Form::submit($session,{});
-    $var->{'form_footer'      }  = WebGUI::Form::formFooter($session, {});
-
-    $var->{'cancel_url'       }  = $user->getProfileUrl;
+    $form->toTemplateVars( "form_", $var );
 
     return $self->processTemplate($var,$self->getSendRequestTemplateId);
 }
@@ -491,7 +495,7 @@ sub www_view {
     my $displayView           = $uid ne "";
     $var->{'display_message'} = $msg;
 
-    unless ($user->profileField('ableToBeFriend') && $user->profileIsViewable($session->user)) {
+    unless ($user->get('ableToBeFriend') && $user->profileIsViewable($session->user)) {
         my $i18n = WebGUI::International->new($session,"Account_Friends");
         my $errorMsg = "";
         if($var->{'can_edit'}) {

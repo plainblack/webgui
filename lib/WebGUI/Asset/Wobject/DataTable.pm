@@ -3,7 +3,7 @@ package WebGUI::Asset::Wobject::DataTable;
 $VERSION = "1.0.0";
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -13,51 +13,30 @@ $VERSION = "1.0.0";
 #-------------------------------------------------------------------
 
 use strict;
-use Tie::IxHash;
-use WebGUI::International;
-use WebGUI::Utility;
-use WebGUI::Form::DataTable;
-use base 'WebGUI::Asset::Wobject';
-
-#-------------------------------------------------------------------
-
-=head2 definition ( session, definition )
-
-=cut
-
-sub definition {
-    my $class      = shift;
-    my $session    = shift;
-    my $definition = shift;
-    my $i18n       = WebGUI::International->new( $session, 'Asset_DataTable' );
-
-    tie my %properties, 'Tie::IxHash', (
-        data => {
+use Moose;
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset::Wobject';
+define assetName         => ['assetName', 'Asset_DataTable'];
+define icon              => 'DataTable.gif';
+define tableName         => 'DataTable';
+property data => (
+            tab          => "data",
             fieldType    => 'DataTable',
-            defaultValue => undef,
-            autoGenerate => 0,
-        },
-        templateId => {
+            default      => undef,
+            label        => '',
+            dateFormat   => \&getDateFormat,
+         );
+property templateId => (
             tab          => "display",
             fieldType    => "template",
             namespace    => "DataTable",
-            defaultValue => "3rjnBVJRO6ZSkxlFkYh_ug",
-            label        => $i18n->get("editForm templateId label"),
-            hoverHelp    => $i18n->get("editForm templateId description"),
-        },
-        );
+            default      => "3rjnBVJRO6ZSkxlFkYh_ug",
+            label        => ["editForm templateId label", 'Asset_DataTable'],
+            hoverHelp    => ["editForm templateId description", 'Asset_DataTable'],
+         );
 
-    push @{$definition}, {
-        assetName         => $i18n->get('assetName'),
-        icon              => 'DataTable.gif',
-        autoGenerateForms => 1,
-        tableName         => 'DataTable',
-        className         => 'WebGUI::Asset::Wobject::DataTable',
-        properties        => \%properties,
-        };
-
-    return $class->SUPER::definition( $session, $definition );
-} ## end sub definition
+use WebGUI::International;
+use WebGUI::Form::DataTable;
 
 #----------------------------------------------------------------------------
 
@@ -87,7 +66,7 @@ Get the data as a JSON object with the following structure:
 sub getDataJson {
     my $self = shift;
 
-    return $self->get("data");
+    return $self->data;
 }
 
 #----------------------------------------------------------------------------
@@ -162,51 +141,6 @@ sub getDateFormat {
 
 #----------------------------------------------------------------------------
 
-=head2 getEditForm ( )
-
-Add the data table to the edit form.
-
-=cut
-
-# TODO Get the DataSource's edit form
-sub getEditForm {
-    my $self    = shift;
-    my $tabform = $self->SUPER::getEditForm(@_);
-
-    $tabform->getTab("data")->raw(
-        q{<tr><td>}
-      . WebGUI::Form::DataTable->new(
-            $self->session, {
-                name         => "data",
-                value        => $self->get("data"),
-                defaultValue => undef,
-                showEdit     => 1,
-                dateFormat   => $self->getDateFormat,
-            }
-            )->toHtml
-      . q{</td></tr>}
-    );
-
-    return $tabform;
-} ## end sub getEditForm
-
-#----------------------------------------------------------------------------
-
-=head2 getEditTabs ( )
-
-Add a tab for the data table.
-
-=cut
-
-sub getEditTabs {
-    my $self = shift;
-    my $i18n = WebGUI::International->new( $self->session, "Asset_DataTable" );
-
-    return ( $self->SUPER::getEditTabs, [ "data" => $i18n->get("tab label data") ], );
-}
-
-#----------------------------------------------------------------------------
-
 =head2 getTemplateVars ( )
 
 Get the template vars for this asset.
@@ -234,9 +168,9 @@ Prepare the view. Add stuff to HEAD.
 
 =cut
 
-sub prepareView {
+override prepareView => sub {
     my $self = shift;
-    $self->SUPER::prepareView(@_);
+    super();
     my $session = $self->session;
 
     # For now, prepare the form control.
@@ -244,7 +178,7 @@ sub prepareView {
     my $dt = WebGUI::Form::DataTable->new(
         $session, {
             name         => $self->getId,
-            value        => $self->get('data'),
+            value        => $self->data,
             defaultValue => undef,
             dateFormat   => $self->getDateFormat,
         }
@@ -253,11 +187,11 @@ sub prepareView {
     $self->{_datatable} = $dt;
 
     # Prepare the template
-    my $template = WebGUI::Asset::Template->new( $session, $self->get("templateId") );
+    my $template = WebGUI::Asset::Template->newById( $session, $self->templateId );
     if (!$template) {
         WebGUI::Error::ObjectNotFound::Template->throw(
             error      => qq{Template not found},
-            templateId => $self->get("templateId"),
+            templateId => $self->templateId,
             assetId    => $self->getId,
         );
     }
@@ -265,7 +199,7 @@ sub prepareView {
     $self->{_template} = $template;
 
     return;
-} ## end sub prepareView
+}; ## end sub prepareView
 
 #----------------------------------------------------------------------------
 
@@ -297,7 +231,7 @@ Get the data asynchronously.
 sub www_ajaxGetData {
     my $self = shift;
 
-    $self->session->http->setMimeType("application/json");
+    $self->session->response->content_type("application/json");
     return $self->getDataJson;
 }
 
@@ -317,10 +251,11 @@ sub www_ajaxUpdateData {
         $self->update( { data => $data } );
     }
 
-    $data ||= $self->get("data");
+    $data ||= $self->data;
 
-    $self->session->http->setMimeType("application/json");
+    $self->session->response->content_type("application/json");
     return $data;
 }
 
+__PACKAGE__->meta->make_immutable;
 1;

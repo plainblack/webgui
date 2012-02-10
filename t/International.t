@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -8,9 +8,7 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/lib";
 use WebGUI::Test;
 use WebGUI::Session;
 use Test::More; # increment this value for each test you create
@@ -20,17 +18,9 @@ use WebGUI::Content::SetLanguage;
 
 my $session = WebGUI::Test->session;
 
-my $numTests  = 1; ##For conditional load check
-my $langTests = 4; ##For language look-up tests
-$numTests    += 20 + $langTests;
-
-plan tests => $numTests;
+plan tests => 25;
 
 my $loaded = use_ok('WebGUI::International');
-
-SKIP: {
-
-skip 'Module was not loaded, skipping all tests', $numTests-1 unless $loaded;
 
 my $i18n = WebGUI::International->new($session, undef, 'English');
 
@@ -49,12 +39,8 @@ is($i18n->getNamespace(), 'Asset', 'getNamespace: set namespace to Asset');
 is($i18n->get('topicName'), 'Assets', 'get: get English label for topicName in Asset: Assets');
 is($i18n->get('topicName', 'WebGUI'), 'WebGUI', 'get: test manual namespace override');
 
-installPigLatin();
-WebGUI::Test->addToCleanup(sub {
-	unlink File::Spec->catfile(WebGUI::Test->lib, qw/WebGUI i18n PigLatin WebGUI.pm/);
-	unlink File::Spec->catfile(WebGUI::Test->lib, qw/WebGUI i18n PigLatin.pm/);
-	rmdir File::Spec->catdir(WebGUI::Test->lib, qw/WebGUI i18n PigLatin/);
-});
+local @INC = @INC;
+unshift @INC, File::Spec->catdir( WebGUI::Test->getTestCollateralPath, 'International', 'lib' );
 
 #tests for sub new
 my $i18nNew1 = WebGUI::International->new($session);
@@ -70,8 +56,6 @@ my $languages = $i18n->getLanguages();
 
 my $gotPigLatin = exists $languages->{PigLatin};
 
-SKIP: {
-	skip 'No PigLatin language pack for testing', $langTests unless $gotPigLatin;
 	is(
 		$i18n->get('account','WebGUI','English'),
 		$i18n->get('account','WebGUI','PigLatin'),
@@ -98,43 +82,27 @@ SKIP: {
 		'keys with spaces work'
 	);
 
-}
-
 is($i18n->getLanguage('English', 'label'), 'English', 'getLanguage, specific property');
 
 isa_ok($i18n->getLanguage('English'), 'HASH', 'getLanguage, without a specific property returns a hashref');
 
-}
-
-sub installPigLatin {
-	mkdir File::Spec->catdir(WebGUI::Test->lib, 'WebGUI', 'i18n', 'PigLatin');
-	copy( 
-		WebGUI::Test->getTestCollateralPath('WebGUI.pm'),
-		File::Spec->catfile(WebGUI::Test->lib, qw/WebGUI i18n PigLatin WebGUI.pm/)
-	);
-	copy(
-		WebGUI::Test->getTestCollateralPath('PigLatin.pm'),
-		File::Spec->catfile(WebGUI::Test->lib, qw/WebGUI i18n PigLatin.pm/)
-	);
-}
-
 #test for sub new with language overridden by scratch
 my $formvariables = {
-        'op' =>'setLanguage',
-        'language' => 'PigLatin'
+    'op' =>'setLanguage',
+    'language' => 'PigLatin'
 };
 $session->request->setup_body($formvariables);
 WebGUI::Content::SetLanguage::handler($session);
 my $newi18n = WebGUI::International->new($session);
-        is(
-                $newi18n->get('webgui','WebGUI','PigLatin'),
-                'ebGUIWay',
-                'if the piglatin language is in the scratch that messages should be retrieved'
+is(
+    $newi18n->get('webgui','WebGUI','PigLatin'),
+    'ebGUIWay',
+    'if the piglatin language is in the scratch that messages should be retrieved'
 );
-	is(
-		$newi18n->get('104','Asset','PigLatin'),
-                $newi18n->get('104', 'WebGUI', 'English'),
-                'Language check after SetLanguage contentHandler : key from missing file return English key'
+is(
+    $newi18n->get('104','Asset','PigLatin'),
+    $newi18n->get('104', 'WebGUI', 'English'),
+    'Language check after SetLanguage contentHandler : key from missing file return English key'
 );
 
 #vim:ft=perl

@@ -4,8 +4,6 @@
 
 use strict;
 use warnings;
-use FindBin;
-use lib "$FindBin::Bin/../../../lib";
 use Test::More;
 use Test::Deep;
 use Test::MockObject::Extends;
@@ -28,11 +26,9 @@ plan tests => $tests + 1;
 #----------------------------------------------------------------------------
 # put your tests here
 
-my $usedOk = use_ok('WebGUI::Asset::Wobject::Survey::ExpressionEngine');
-
 my $e = "WebGUI::Asset::Wobject::Survey::ExpressionEngine";
+use_ok($e);
 
-WebGUI::Test->originalConfig('enableSurveyExpressionEngine');
 $session->config->set( 'enableSurveyExpressionEngine', 0 );
 is( $e->run( $session, 'jump { 1 } target' ),
     undef, "Nothing happens unless we turn on enableSurveyExpressionEngine in config" );
@@ -192,25 +188,26 @@ my $survey = WebGUI::Asset->getImportNode($session)->addChild(
     {   className                => 'WebGUI::Asset::Wobject::Survey',
     },
 );
-isa_ok($survey, 'WebGUI::Asset::Wobject::Survey');
-WebGUI::Test->addToCleanup($survey);
+$versionTag->commit;
 WebGUI::Test->addToCleanup($versionTag);
+$survey = $survey->cloneFromDb;
+isa_ok($survey, 'WebGUI::Asset::Wobject::Survey');
 my $url = $survey->get('url');
 my $id = $survey->getId;
 
-$survey->surveyJSON->newObject([]); # s0
-$survey->surveyJSON->newObject([0]); # s0q0
-$survey->surveyJSON->newObject([0,0]); # s0q0a0
-$survey->surveyJSON->newObject([0]); # s0q1
-$survey->surveyJSON->newObject([0,1]); # s0q1a0
+$survey->getSurveyJSON->newObject([]); # s0
+$survey->getSurveyJSON->newObject([0]); # s0q0
+$survey->getSurveyJSON->newObject([0,0]); # s0q0a0
+$survey->getSurveyJSON->newObject([0]); # s0q1
+$survey->getSurveyJSON->newObject([0,1]); # s0q1a0
 
-$survey->surveyJSON->section([0])->{variable} = 'ext_s0';
-$survey->surveyJSON->question([0,0])->{variable} = 'ext_s0q0';
-$survey->surveyJSON->question([0,1])->{variable} = 'ext_s0q1';
-$survey->surveyJSON->answer([0,0,0])->{recordedAnswer} = 'ext_s0q0a0';
-$survey->surveyJSON->answer([0,0,0])->{value} = 150; # worth 150 points
-$survey->surveyJSON->answer([0,1,0])->{recordedAnswer} = 'ext_s0q1a0';
-$survey->surveyJSON->answer([0,1,0])->{value} = 50; # worth 50 points
+$survey->getSurveyJSON->section([0])->{variable} = 'ext_s0';
+$survey->getSurveyJSON->question([0,0])->{variable} = 'ext_s0q0';
+$survey->getSurveyJSON->question([0,1])->{variable} = 'ext_s0q1';
+$survey->getSurveyJSON->answer([0,0,0])->{recordedAnswer} = 'ext_s0q0a0';
+$survey->getSurveyJSON->answer([0,0,0])->{value} = 150; # worth 150 points
+$survey->getSurveyJSON->answer([0,1,0])->{recordedAnswer} = 'ext_s0q1a0';
+$survey->getSurveyJSON->answer([0,1,0])->{value} = 50; # worth 50 points
 
 my $responseId = $survey->responseId( { userId => $user->userId } );
 

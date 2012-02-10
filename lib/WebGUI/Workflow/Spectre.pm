@@ -4,7 +4,7 @@ package WebGUI::Workflow::Spectre;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -39,19 +39,6 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 
-=head2 DESTROY ( )
-
-Deconstructor.
-
-=cut
-
-sub DESTROY {
-        my $self = shift;
-        undef $self;
-}
-
-#-------------------------------------------------------------------
-
 =head2 notify ( module, params )
 
 Sends a message to Spectre. Returns true iff the message was successfully
@@ -71,7 +58,7 @@ sub notify {
 	my $self = shift;
 	my $module = shift;
 	my $params = shift;
-	my ($config, $error) = $self->session->quick("config", "errorHandler");
+	my ($config, $log) = $self->session->quick("config", "log");
 	my $remote = create_ikc_client(
                 port=>$config->get("spectrePort"),
                 ip=>$config->get("spectreIp"),
@@ -81,9 +68,9 @@ sub notify {
 	if (defined $remote) {
 		my $result = $remote->post($module, $params);
 		return 1 if defined $result;
-		$error->warn("Couldn't send command to Spectre because ".$POE::Component::IKC::ClientLite::error);
+		$log->warn("Couldn't send command to Spectre because ".$POE::Component::IKC::ClientLite::error);
 	} else {
-		$error->warn("Couldn't connect to Spectre because ".$POE::Component::IKC::ClientLite::error);
+		$log->warn("Couldn't connect to Spectre because ".$POE::Component::IKC::ClientLite::error);
 	}
 	return 0;
 }

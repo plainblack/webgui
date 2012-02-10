@@ -3,7 +3,7 @@ package WebGUI::Content::Maintenance;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -47,13 +47,10 @@ The content handler for this package.
 sub handler {
     my $session = shift;
     if ($session->setting->get("specialState") eq "upgrading") {
-        $session->http->sendHeader;
-        my $output = "";
-        open(my $FILE,"<",$session->config->getWebguiRoot."/docs/maintenance.html");
-        while (<$FILE>) {
-            $output .= $_;
-        }
-        close($FILE);
+        $session->response->sendHeader;
+        open my $fh, '<', $session->config->get('maintenancePage');
+        my $output = do { local $/; <$fh> };
+        close $fh;
         return $output;
     }
     return undef;

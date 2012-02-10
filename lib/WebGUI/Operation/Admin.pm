@@ -1,7 +1,7 @@
 package WebGUI::Operation::Admin;
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -43,7 +43,7 @@ sub www_adminConsole {
 =head2 www_switchOffAdmin ( )
 
 If the current user is in the Turn On Admin Group, then allow them to turn off Admin mode
-via WebGUI::Session::Var::switchAdminOff()
+via WebGUI::Session::switchAdminOff()
 
 
 =cut
@@ -51,8 +51,8 @@ via WebGUI::Session::Var::switchAdminOff()
 sub www_switchOffAdmin {
 	my $session = shift;
 	return "" unless ($session->user->canUseAdminMode);
-	$session->http->setCacheControl("none");
-	$session->var->switchAdminOff();
+	$session->response->setCacheControl("none");
+	$session->switchAdminOff();
 	return "";
 }
 
@@ -67,8 +67,8 @@ If the current user is in the Turn On Admin Group, then allow them to turn on Ad
 sub www_switchOnAdmin {
 	my $session = shift;
 	return "" unless ($session->user->canUseAdminMode);
-	$session->http->setCacheControl("none");
-	$session->var->switchAdminOn();
+	$session->response->setCacheControl("none");
+	$session->switchAdminOn();
 	return "";
 }
 

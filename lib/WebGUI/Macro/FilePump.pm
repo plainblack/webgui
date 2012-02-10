@@ -1,7 +1,7 @@
 package WebGUI::Macro::FilePump;
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -92,11 +92,11 @@ sub process {
     
     my $uploadsDir = Path::Class::Dir->new($session->config->get('uploadsPath'));
     my $extrasDir  = Path::Class::Dir->new($session->config->get('extrasPath'));
-    my $uploadsUrl = Path::Class::Dir->new($session->config->get('uploadsURL'));
-    my $extrasUrl  = Path::Class::Dir->new($session->config->get('extrasURL'));
+    my $uploadsUrl = Path::Class::Dir->new($session->url->make_urlmap_work($session->config->get('uploadsURL')));
+    my $extrasUrl  = Path::Class::Dir->new($session->url->make_urlmap_work($session->config->get('extrasURL')));
 
     ##Normal mode
-    if (! $session->var->isAdminOn) {
+    if (! $session->isAdminOn) {
         # Built files live at /path/to/uploads/filepump/bundle.timestamp/ which is
         # a sub-dir of uploadsDir, so resolve the dir relative to uploads
         my $dir = $bundle->getPathClassDir->relative($uploadsDir);

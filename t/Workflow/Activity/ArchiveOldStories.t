@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -8,9 +8,7 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../../lib";
 
 use WebGUI::Test;
 use WebGUI::Asset;
@@ -27,10 +25,12 @@ plan tests => 6; # increment this value for each test you create
 my $session = WebGUI::Test->session;
 $session->user({userId => 3});
 
-my $home = WebGUI::Asset->getDefault($session);
+my $home = WebGUI::Test->asset;
 my $wgBday = WebGUI::Test->webguiBirthday;
 
 my $creationDateSth = $session->db->prepare('update asset set creationDate=? where assetId=?');
+
+my $tag = WebGUI::VersionTag->getWorking($session);
 
 my $archive1 = $home->addChild({
     className => 'WebGUI::Asset::Wobject::StoryArchive',
@@ -59,13 +59,8 @@ my $weekFolder = $archive2->getFolder($weekAgo);
 my $weekStory  = $weekFolder->addChild({className => 'WebGUI::Asset::Story',});
 $creationDateSth->execute([$weekAgo, $weekFolder->getId]);
 $creationDateSth->execute([$weekAgo, $weekStory->getId]);
-
-my $versionTag = WebGUI::VersionTag->getWorking($session);
-$versionTag->commit;
-WebGUI::Test->addToCleanup($versionTag);
-foreach my $asset ($archive1, $archive2) {
-    $asset = $asset->cloneFromDb;
-}
+$tag->commit;
+WebGUI::Test->addToCleanup($tag);
 
 my $workflow  = WebGUI::Workflow->create($session,
     {
@@ -74,7 +69,7 @@ my $workflow  = WebGUI::Workflow->create($session,
         mode       => 'realtime',
     },
 );
-addToCleanup($workflow);
+WebGUI::Test->addToCleanup($workflow);
 
 my $activity = $workflow->addActivity('WebGUI::Workflow::Activity::ArchiveOldStories');
 
@@ -102,6 +97,7 @@ my $archivedAssets = $home->getLineage(
 
 cmp_bag( $archivedAssets, [ ], 'Nothing archived.');
 
+$archive2 = $archive2->cloneFromDb;
 $archive2->update({ archiveAfter => 5*24*3600, });
 
 my $instance2 = WebGUI::Workflow::Instance->create($session,
@@ -123,5 +119,5 @@ $archivedAssets = $home->getLineage(
     },
 );
 
-cmp_bag( $archivedAssets, [ $weekStory->getId, $weekFolder->getId ], 'Nothing archived.');
+cmp_bag( $archivedAssets, [ $weekStory->getId, $weekFolder->getId ], 'archived two folders');
 $creationDateSth->finish;

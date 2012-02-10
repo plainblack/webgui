@@ -3,7 +3,7 @@ package WebGUI::Asset::Sku::EMSRibbon;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -15,10 +15,28 @@ package WebGUI::Asset::Sku::EMSRibbon;
 =cut
 
 use strict;
-use Tie::IxHash;
-use base 'WebGUI::Asset::Sku';
-use WebGUI::HTMLForm;
-use WebGUI::Utility;
+use Moose;
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset::Sku';
+define assetName           => ['ems ribbon', 'Asset_EventManagementSystem'];
+define icon                => 'EMSRibbon.gif';
+define tableName           => 'EMSRibbon';
+property price => (
+            tab             => "shop",
+            fieldType       => "float",
+            default         => 0.00,
+            label           => ["price", 'Asset_EventManagementSystem'],
+            hoverHelp       => ["price help", 'Asset_EventManagementSystem'],
+         );
+property percentageDiscount => (
+            tab             => "shop",
+            fieldType       => "float",
+            default         => 10.0,
+            label           => ["percentage discount", 'Asset_EventManagementSystem'],
+            hoverHelp       => ["percentage discount help", 'Asset_EventManagementSystem'],
+         );
+
+use WebGUI::FormBuilder;
 
 =head1 NAME
 
@@ -37,50 +55,6 @@ use WebGUI::Asset::Sku::EMSRibbon;
 These methods are available from this class:
 
 =cut
-
-
-#-------------------------------------------------------------------
-
-=head2 definition
-
-Add price field to the definition.
-
-=cut
-
-sub definition {
-	my $class = shift;
-	my $session = shift;
-	my $definition = shift;
-	my %properties;
-	tie %properties, 'Tie::IxHash';
-	my $i18n = WebGUI::International->new($session, "Asset_EventManagementSystem");
-	my $date = WebGUI::DateTime->new($session, time());
-	%properties = (
-		price => {
-			tab             => "shop",
-			fieldType       => "float",
-			defaultValue    => 0.00,
-			label           => $i18n->get("price"),
-			hoverHelp       => $i18n->get("price help"),
-			},
-		percentageDiscount => {
-			tab             => "shop",
-			fieldType       => "float",
-			defaultValue    => 10.0,
-			label           => $i18n->get("percentage discount"),
-			hoverHelp       => $i18n->get("percentage discount help"),
-			},
-	    );
-	push(@{$definition}, {
-		assetName           => $i18n->get('ems ribbon'),
-		icon                => 'EMSRibbon.gif',
-		autoGenerateForms   => 1,
-		tableName           => 'EMSRibbon',
-		className           => 'WebGUI::Asset::Sku::EMSRibbon',
-		properties          => \%properties
-	    });
-	return $class->SUPER::definition($session, $definition);
-}
 
 
 #-------------------------------------------------------------------
@@ -119,6 +93,20 @@ sub getConfiguredTitle {
 
 #-------------------------------------------------------------------
 
+=head2 getEditForm
+
+Extend the base class so that the user is returned to the viewAll screen after adding/editing
+a ribbon.
+
+=cut
+
+override getEditForm => sub {
+    my $form = super();
+    $form->addField('hidden', name => 'proceed', value => 'viewAll',);
+}; 
+
+#-------------------------------------------------------------------
+
 =head2 getMaxAllowedInCart
 
 Return 1;
@@ -139,7 +127,7 @@ Returns the price from the definition.
 
 sub getPrice {
     my $self = shift;
-    return $self->get("price");
+    return $self->price;
 }
 
 #-------------------------------------------------------------------
@@ -191,11 +179,11 @@ Deletes all entries in EMSRegistrationRibbon table for this sku. No refunds are 
 
 =cut
 
-sub purge {
+override purge => sub {
 	my $self = shift;
 	$self->session->db->write("delete from EMSRegistrantRibbon where ribbonAssetId=?",[$self->getId]);
-	$self->SUPER::purge;
-}
+	super();
+};
 
 #-------------------------------------------------------------------
 
@@ -215,15 +203,15 @@ sub view {
 	
 	# render the page;
 	my $output = '<h1>'.$self->getTitle.'</h1>'
-		.'<p>'.$self->get('description').'</p>';
+		.'<p>'.$self->description.'</p>';
 
 	# build the add to cart form
 	if ($form->get('badgeId') ne '') {
-		my $addToCart = WebGUI::HTMLForm->new($self->session, action=>$self->getUrl);
-		$addToCart->hidden(name=>"func", value=>"addToCart");
-		$addToCart->hidden(name=>"badgeId", value=>$form->get('badgeId'));
-		$addToCart->submit(value=>$i18n->get('add to cart','Shop'), label=>$self->getPrice);
-		$output .= $addToCart->print;		
+		my $f = WebGUI::FormBuilder->new($self->session, action=>$self->getUrl);
+		$f->addField( "hidden", name=>"func", value=>"addToCart");
+		$f->addField( "hidden", name=>"badgeId", value=>$form->get('badgeId'));
+		$f->addField( "submit", value=>$i18n->get('add to cart','Shop'), label=>$self->getPrice);
+		$output .= $f->toHtml;
 	}
 		
 	return $output;
@@ -256,47 +244,14 @@ Override to return to appropriate page.
 sub www_delete {
 	my ($self) = @_;
 	return $self->session->privilege->insufficient() unless ($self->canEdit && $self->canEditIfLocked);
-    return $self->session->privilege->vitalComponent() if $self->get('isSystem');
-    return $self->session->privilege->vitalComponent() if (isIn($self->getId,
-$self->session->setting->get("defaultPage"), $self->session->setting->get("notFoundPage")));
+    return $self->session->privilege->vitalComponent() if $self->isSystem;
+    return $self->session->privilege->vitalComponent() if $self->getId ~~ [
+        $self->session->setting->get("defaultPage"), $self->session->setting->get("notFoundPage")
+    ];
     $self->trash;
     return $self->getParent->www_buildBadge(undef,'ribbons');
 }
 
-
-#-------------------------------------------------------------------
-
-=head2 www_edit ()
-
-Displays the edit form.
-
-=cut
-
-sub www_edit {
-	my ($self) = @_;
-	return $self->session->privilege->insufficient() unless $self->canEdit;
-	return $self->session->privilege->locked() unless $self->canEditIfLocked;
-	$self->session->style->setRawHeadTags(q|
-		<style type="text/css">
-		.forwardButton {
-			background-color: green;
-			color: white;
-			font-weight: bold;
-			padding: 3px;
-		}
-		.backwardButton {
-			background-color: red;
-			color: white;
-			font-weight: bold;
-			padding: 3px;
-		}
-		</style>
-						   |);	
-	my $i18n = WebGUI::International->new($self->session, "Asset_EventManagementSystem");
-	my $form = $self->getEditForm;
-	$form->hidden({name=>'proceed', value=>'viewAll'});
-	return $self->processStyle('<h1>'.$i18n->get('ems ribbon').'</h1>'.$form->print);
-}
 
 #-------------------------------------------------------------------
 
@@ -312,4 +267,5 @@ sub www_viewAll {
 }
 
 
+__PACKAGE__->meta->make_immutable;
 1;

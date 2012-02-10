@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -28,11 +28,7 @@ my $session = WebGUI::Test->session;
 $session->user({ userId => 3 });
 
 # Do our work in the import node
-my $node = WebGUI::Asset->getImportNode($session);
-
-# Grab a named version tag
-my $versionTag = WebGUI::VersionTag->getWorking($session);
-$versionTag->set({name=>"Map setup"});
+my $node = WebGUI::Test->asset;
 
 # Create a map
 my $map = $node->addChild({
@@ -41,10 +37,6 @@ my $map = $node->addChild({
     startZoom      => "0",
     workflowIdPoint => "pbworkflow000000000003",
 });
-
-#Commit the map before creating the map point
-$versionTag->commit();
-WebGUI::Test->addToCleanup($versionTag);
 
 # Create a map point
 my $test_point = {

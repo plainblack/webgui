@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -8,15 +8,12 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/lib";
 
 use WebGUI::Test;
 use WebGUI::Session;
-use WebGUI::Utility;
-use WebGUI::Cache;
 #use Exception::Class;
+use List::MoreUtils qw( uniq );
 
 use WebGUI::User;
 use WebGUI::ProfileField;
@@ -28,9 +25,8 @@ use Data::Dumper;
 
 my $session = WebGUI::Test->session;
 
-my $testCache = WebGUI::Cache->new($session, 'myTestKey');
-$testCache->flush;
-WebGUI::Test->addToCleanup(sub { $testCache->flush; });
+$session->cache->remove('myTestKey');
+WebGUI::Test->addToCleanup(sub { $session->cache->remove('myTestKey') });
 
 my $user;
 my $lastUpdate;
@@ -82,7 +78,7 @@ is($user->get('status'), "Selfdestructed", 'status("Selfdestructed") via get');
 
 
 # Deactivation user deletes all sessions and scratches
-my $newSession  = WebGUI::Session->open( WebGUI::Test->root, WebGUI::Test->file );
+my $newSession  = WebGUI::Session->open( WebGUI::Test->file );
 $newSession->user({ user => $user });
 $newSession->scratch->set("hasStapler" => "no");
 
@@ -158,7 +154,7 @@ is(
 );
 
 is(
-    $session->db->quickScalar("SELECT firstName FROM userProfileData WHERE userId=?",[$user->getId]),
+    $session->db->quickScalar("SELECT firstName FROM users WHERE userId=?",[$user->getId]),
     "John",
     "update() updates profile firstName",
 );
@@ -169,7 +165,7 @@ is(
 );
 
 is(
-    $session->db->quickScalar("SELECT lastName FROM userProfileData WHERE userId=?",[$user->getId]),
+    $session->db->quickScalar("SELECT lastName FROM users WHERE userId=?",[$user->getId]),
     "Lumbergh",
     "update() updates profile lastName",
 );
@@ -196,7 +192,7 @@ ok(
 
 $user->update({ lastName => "Lumberg" }),
 is( 
-    $session->db->quickScalar("SELECT lastName FROM userProfileData WHERE userId=?",[$user->getId]),
+    $session->db->quickScalar("SELECT lastName FROM users WHERE userId=?",[$user->getId]),
     "Lumberg",
     "update() updates lastName again",
 );
@@ -218,7 +214,7 @@ my $expectValues  = {
 };
 
 # expects all user properties and all profile fields
-my @expectFields    = ( 
+my @expectFields    = uniq( 
     $session->db->buildArray('DESCRIBE users'),
     $session->db->buildArray('SELECT fieldName FROM userProfileField'),
 );
@@ -253,9 +249,9 @@ my $newProfileField = WebGUI::ProfileField->create($session, 'testField', {dataD
 WebGUI::Test->addToCleanup($newProfileField);
 is($user->profileField('testField'), 'this is a test', 'getting profile fields not cached in the user object returns the profile field default');
 
-ok(!$user->profileField('wg_privacySettings'), '... wg_privacySettings may not be retrieved');
-$user->profileField('wg_privacySettings', '{"email"=>"all"}');
-ok(!$user->profileField('wg_privacySettings'), '... wg_privacySettings may not be set');
+ok(!$user->profileField('privacyFields'), '... privacyFields may not be retrieved');
+$user->profileField('privacyFields', '{"email"=>"all"}');
+ok(!$user->profileField('privacyFields'), '... privacyFields may not be set');
 
 ################################################################
 #
@@ -483,10 +479,8 @@ ok($dude->canUseAdminMode, 'canUseAdminMode: with no subnets set, user canUseAdm
 $dude->deleteFromGroups([12]);
 
 ##Spoof the IP address to test subnet level access control to adminMode
-my $origEnvHash = $session->env->{_env};
-my %newEnv = ( REMOTE_ADDR => '194.168.0.2' );
-$session->env->{_env} = \%newEnv;
-WebGUI::Test->originalConfig('adminModeSubnets');
+my $env = $session->request->env;
+$env->{REMOTE_ADDR} = '194.168.0.2';
 $session->config->set('adminModeSubnets', ['194.168.0.0/24']);
 
 ok(!$dude->isInGroup(12), 'user is not in group 12');
@@ -496,7 +490,7 @@ $dude->addToGroups([12]);
 
 ok($dude->canUseAdminMode, 'canUseAdminMode: with no subnets set, user canUseAdminMode');
 
-$newEnv{REMOTE_ADDR} = '10.0.0.2';
+$env->{REMOTE_ADDR} = '10.0.0.2';
 
 ok(!$dude->canUseAdminMode, 'canUseAdminMode: even with the right group permission, user must be in subnet if subnet is set');
 
@@ -504,11 +498,10 @@ ok(!$dude->canUseAdminMode, 'canUseAdminMode: even with the right group permissi
 $session->config->set('adminModeSubnets', ['10.0.0.0/24', '192.168.0.0/24', ]);
 ok($dude->canUseAdminMode, 'canUseAdminMode: multiple IP settings, first IP range');
 
-$newEnv{REMOTE_ADDR} = '192.168.0.127';
+$env->{REMOTE_ADDR} = '192.168.0.127';
 ok($dude->canUseAdminMode, 'canUseAdminMode: multiple IP settings, second IP range');
 
 ##restore the original session variables
-$session->env->{_env} = $origEnvHash;
 $session->config->delete('adminModeSubnets');
 
 ################################################################
@@ -583,9 +576,12 @@ $profileField->set(\%copiedFieldData);
 is($profileField->get('dataDefault'), "'America/Hillsboro'", 'default timeZone set to America/Hillsboro');
 
 # now let's make sure it has an extras field, and that we can get/set it.
-$profileField->set( { extras => '<!-- hello world -->' } );
+# DID YOU KNOW? you have to set everything otherwise things get messed up!
+$copiedFieldData{ 'extras' } = '<!-- hello world -->';
+$profileField->set( \%copiedFieldData );
 is($profileField->getExtras, '<!-- hello world -->', 'extras field for profileField');
-$profileField->set( { extras => '' } );
+$copiedFieldData{ 'extras' } = '';
+$profileField->set( \%copiedFieldData );
 
 
 my $busterCopy = WebGUI::User->new($session, $buster->userId);
@@ -843,7 +839,6 @@ isa_ok( $newCreateUser, 'WebGUI::User', 'create() returns a WebGUI::User' );
 ################################################################
 $session->setting->set('preventProxyCache', 0);
 
-WebGUI::Test->originalConfig('profileModuleIdentifier');
 my $profileModuleId = $session->config->get('profileModuleIdentifier');
 is(
     $newFish->getProfileUrl('cellblock'),
@@ -949,8 +944,8 @@ is($neighbor->getProfileFieldPrivacySetting('email'), 'none', '...get and set 1 
 $neighbor->setProfileFieldPrivacySetting({email => 'only Tony'});
 is($neighbor->getProfileFieldPrivacySetting('email'), 'none', '...set will not set invalid profile settings');
 
-is($admin->getProfileFieldPrivacySetting('publicEmail'), 'all', '...get on a user with existing settings');
-is($neighbor->getProfileFieldPrivacySetting('wg_privacySettings'), 'none', '...the privacy field always returns "none"');
+is($admin->getProfileFieldPrivacySetting('email'), 'all', '...get on a user with existing settings');
+is($neighbor->getProfileFieldPrivacySetting('privacyFields'), 'none', '...the privacy field always returns "none"');
 
 my $recentProfileField = WebGUI::ProfileField->create($session, 'recentField', {
     fieldName             => 'recentField',

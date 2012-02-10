@@ -3,7 +3,7 @@ package WebGUI::Session::Output;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -16,7 +16,7 @@ package WebGUI::Session::Output;
 
 use strict;
 use WebGUI::Macro;
-use Scalar::Util qw( weaken );
+use Scalar::Util qw(weaken);
 
 =head1 NAME
 
@@ -39,20 +39,6 @@ These methods are available from this package:
 
 #-------------------------------------------------------------------
 
-=head2 DESTROY ( )
-
-Deconstructor.
-
-=cut
-
-sub DESTROY {
-        my $self = shift;
-        undef $self;
-}
-
-
-#-------------------------------------------------------------------
-
 =head2 new ( session )
 
 Constructor. 
@@ -66,9 +52,9 @@ A reference to the current session.
 sub new {
 	my $class = shift;
 	my $session = shift;
-	my $self = bless {_session=>$session}, $class;
-        weaken( $self->{_session} );
-        return $self;
+    my $self = bless { _session => $session }, $class;
+    weaken $self->{_session};
+    return $self;
 }
 
 #-------------------------------------------------------------------
@@ -91,14 +77,22 @@ has been set to a non-text type, macros will automatically be skipped.
 sub print {
     my $self       = shift;
     my $content    = shift;
-    my $skipMacros = shift || !($self->session->http->getMimeType =~ /^text/);
+    my $skipMacros = shift || !($self->session->response->content_type =~ /^text/);
     WebGUI::Macro::process($self->session, \$content) unless $skipMacros;
     my $handle = $self->{_handle};
     if (defined $handle) {
         print $handle $content;
     }
-    elsif ($self->session->request) {
-        $self->session->request->print($content);
+    elsif ($self->session->response) {
+        my $response = $self->session->response;
+        if ($response->streaming) {
+            $response->stream_write($content);
+        } else {
+            # Not streaming, so buffer the response instead
+            # warn "buffering output";
+            $response->body([]) unless $response->body && ref $response->body eq 'ARRAY';
+            push @{$response->body}, $content;
+        }
     }
     else {
         print $content;

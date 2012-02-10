@@ -61,7 +61,7 @@ Return a statement handle at the desired offset.
 
 sub get_statement {
     my ($session, $logIndex) = @_;
-    my $deltaSql = q{select SQL_CALC_FOUND_ROWS userId, assetId, url, delta, from_unixtime(timeStamp) as stamp from deltaLog order by timestamp limit ?, 500000};
+    my $deltaSql = q{select SQL_CALC_FOUND_ROWS userId, assetId, url, delta, from_unixtime(timeStamp) as stamp from deltaLog limit ?, 500000};
     my $sth = $session->db->read($deltaSql, [$logIndex+0]);
     return $sth;
 }
@@ -86,8 +86,8 @@ sub execute {
     my @rules = ();
     my $getARule = WebGUI::PassiveAnalytics::Rule->getAllIterator($session);
     while (my $rule = $getARule->()) {
-        my $regexp = $rule->get('regexp');
-        push @rules, [ $rule->get('bucketName'), qr/$regexp/];
+        my $regexp = $rule->regexp;
+        push @rules, [ $rule->bucketName, qr/$regexp/];
     }
 
     ##Get the index stored from the last invocation of the Activity.  If this is
@@ -137,7 +137,7 @@ sub execute {
         }
 
         if ($expired) {
-            $instance->setScratch('logIndex', $logIndex);
+            $instance->setScratch('lastPassiveLogIndex', $logIndex);
             return $self->WAITING(1);
         }
         last DELTA_CHUNK if $logIndex >= $total_rows;

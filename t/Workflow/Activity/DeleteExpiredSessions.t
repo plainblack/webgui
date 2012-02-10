@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -8,13 +8,10 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../../lib";
 
 use WebGUI::Test;
 use WebGUI::Session;
-use WebGUI::Utility;
 use WebGUI::Workflow::Activity::DeleteExpiredSessions;
 
 use Test::More;
@@ -46,7 +43,7 @@ $retVal = $instance1->run();
 is($retVal, 'complete', 'cleanup: activity complete');
 $retVal = $instance1->run();
 is($retVal, 'done', 'cleanup: activity is done');
-$instance1->delete;
+$instance1->delete('skipNotify');
 
 my $origSessionTimeout = $session->setting->get('sessionTimeout');
 
@@ -56,14 +53,14 @@ my $scratchCount = $session->db->quickScalar('select count(*) from userSessionSc
 my @sessions;
 
 foreach (1..2) {
-    push @sessions, WebGUI::Session->open(WebGUI::Test->root, WebGUI::Test->file);
+    push @sessions, WebGUI::Session->open(WebGUI::Test->file);
 }
 
 ##Force automatic expiration of the sessions
 $session->setting->set('sessionTimeout', -500);
 
 foreach (1..2) {
-    push @sessions, WebGUI::Session->open(WebGUI::Test->root, WebGUI::Test->file);
+    push @sessions, WebGUI::Session->open(WebGUI::Test->file);
 }
 
 $session->setting->set('sessionTimeout', $origSessionTimeout );
@@ -80,6 +77,7 @@ my $instance2 = WebGUI::Workflow::Instance->create($session,
         skipSpectreNotification => 1,
     }
 );
+WebGUI::Test->addToCleanup($instance2);
 
 my $counter = 0;
 PAUSE: while ($retVal = $instance2->run()) {
@@ -96,7 +94,7 @@ is ($newSessionCount, $sessionCount+2, 'two of the sessions were deleted');
 is ($newScratchCount, $scratchCount+2, 'scratch from both sessions cleaned up');
 
 foreach my $testSession (@sessions) {
-    $testSession->var->end;
+    $testSession->end;
     $testSession->close;
 }
 

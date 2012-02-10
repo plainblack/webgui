@@ -3,7 +3,7 @@ package WebGUI::Asset;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -14,11 +14,375 @@ package WebGUI::Asset;
 
 =cut
 
-use Carp qw( croak confess );
 use Scalar::Util qw( blessed weaken );
 use Clone qw(clone);
 use JSON;
 use HTML::Packer;
+
+use Moose;
+use WebGUI::Types;
+use Data::Dumper;
+use WebGUI::FormBuilder;
+
+use WebGUI::Definition::Asset;
+define assetName  => ['asset', 'Asset'];
+define tableName  => 'assetData';
+define icon       => 'assets.gif';
+property  title => (
+            tab             => "properties",
+            label           => ['99','Asset'],
+            hoverHelp       => ['99 description','Asset'],
+            fieldType       => 'text',
+            builder         => '_default_title',
+            lazy            => 1,
+          );
+
+sub _default_title {
+    return 'Untitled';
+}
+
+around title => sub {
+    my $orig = shift;
+    my $self = shift;
+    if (@_ > 0) {
+        my $title = shift;
+        $title    = WebGUI::HTML::filter($title, 'all');
+        $title    = $self->_default_title if $title eq '';
+        unshift @_, $title;
+    }
+    $self->$orig(@_);
+};
+
+property  menuTitle => (
+            tab             => "properties",
+            label           => ['411','Asset'],
+            hoverHelp       => ['411 description','Asset'],
+            uiLevel         => 1,
+            fieldType       => 'text',
+            builder         => '_default_menuTitle',
+            lazy            => 1,
+         );
+sub _default_menuTitle {
+    my $self = shift;
+    return $self->title;
+}
+around menuTitle => sub {
+    my $orig = shift;
+    my $self = shift;
+    if (@_ > 0) {
+        my $title = shift;
+        $title    = WebGUI::HTML::filter($title, 'all');
+        $title    = $self->_default_menuTitle if $title eq '';
+        unshift @_, $title;
+    }
+    $self->$orig(@_);
+};
+
+property  url => (
+            tab             => "properties",
+            label           => ['104','Asset'],
+            hoverHelp       => ['104 description','Asset'],
+            uiLevel         => 3,
+            fieldType       => 'text',
+            lazy            => 1,
+            builder         => '_default_url',
+          );
+sub _default_url {
+    return $_[0]->fixUrl;
+}
+
+around url => sub {
+    my $orig = shift;
+    my $self = shift;
+    if (@_ > 0) {
+        my $url = $_[0];
+        $url    = $self->fixUrl($url);
+        unshift @_, $url;
+    }
+    $self->$orig(@_);
+};
+property  isHidden => (
+            tab             => "display",
+            label           => ['886','Asset'],
+            hoverHelp       => ['886 description','Asset'],
+            uiLevel         => 6,
+            fieldType       => 'yesNo',
+            default         => 0,
+          );
+property  newWindow => (
+            tab             => "display",
+            label           => ['940','Asset'],
+            hoverHelp       => ['940 description','Asset'],
+            uiLevel         => 9,
+            fieldType       => 'yesNo',
+            default         => 0,
+          );
+property  encryptPage => (
+            fieldType       => 'yesNo',
+            noFormPost      => sub { return $_[0]->session->config->get("sslEnabled"); },
+            tab             => "security",
+            label           => ['encrypt page','Asset'],
+            hoverHelp       => ['encrypt page description','Asset'],
+            uiLevel         => 6,
+            default         => 0,
+          );
+property  ownerUserId => (
+            tab             => "security",
+            label           => ['108','Asset'],
+            hoverHelp       => ['108 description','Asset'],
+            uiLevel         => 6,
+            fieldType       => 'user',
+            default         => '3',
+            trigger         => sub { shift->_set_ownerUserId(@_) } ,
+          );
+sub _set_ownerUserId {
+    return;
+}
+property  groupIdView  => (
+            tab             => "security",
+            label           => ['872','Asset'],
+            hoverHelp       => ['872 description','Asset'],
+            uiLevel         => 6,
+            fieldType       => 'group',
+            default         => '7',
+            trigger         => sub { shift->_set_groupIdView(@_) },
+          );
+sub _set_groupIdView {
+    return;
+}
+property  groupIdEdit => (
+            tab             => "security",
+            label           => ['871','Asset'],
+            excludeGroups   => [1,7],
+            hoverHelp       => ['871 description','Asset'],
+            uiLevel         => 6,
+            fieldType       => 'group',
+            default         => '4',
+            trigger         => sub { shift->_set_groupIdEdit(@_) } ,
+          );
+sub _set_groupIdEdit {
+    return;
+}
+property  synopsis => (
+            tab             => "meta",
+            label           => ['412','Asset'],
+            hoverHelp       => ['412 description','Asset'],
+            uiLevel         => 3,
+            fieldType       => 'textarea',
+            default         => undef,
+          );
+property  extraHeadTags => (
+            tab             => "meta",
+            label           => ["extra head tags",'Asset'],
+            hoverHelp       => ['extra head tags description','Asset'],
+            uiLevel         => 5,
+            fieldType       => 'codearea',
+            default         => undef,
+            customDrawMethod=>  'drawExtraHeadTags',
+          ); 
+around extraHeadTags => sub {
+    my $orig = shift;
+    my $self = shift;
+    if (@_ > 0) {
+        my $unpacked = $_[0];
+        my $packed   = $unpacked;  ##Undo magic aliasing since a reference is passed below
+        return if !defined $packed;
+        HTML::Packer::minify( \$packed, {
+            remove_newlines     => 1,
+            do_javascript       => "shrink",
+            do_stylesheet       => "minify",
+            } );
+        $self->extraHeadTagsPacked($packed);
+    }
+    $self->$orig(@_);
+};
+property  extraHeadTagsPacked  => (
+            fieldType       => 'hidden',
+            default         => undef,
+            noFormPost      => 1,
+            init_args       => undef,
+          );
+property  usePackedHeadTags => (
+            tab             => "meta",
+            label           => ['usePackedHeadTags label','Asset'],
+            hoverHelp       => ['usePackedHeadTags description','Asset'],
+            uiLevel         => 7,
+            fieldType       => 'yesNo',
+            default         => 0,
+          );
+property  isPackage => (
+            label           => ["make package",'Asset'],
+            tab             => "meta",
+            hoverHelp       => ['make package description','Asset'],
+            uiLevel         => 7,
+            fieldType       => 'yesNo',
+            default         => 0,
+          );
+property  isPrototype => (
+            tab             => "meta",
+            label           => ["make prototype",'Asset'],
+            hoverHelp       => ['make prototype description','Asset'],
+            uiLevel         => 9,
+            fieldType       => 'yesNo',
+            default         => 0,
+          );
+property  isExportable => (
+            tab             => 'meta',
+            label           => ['make asset exportable','Asset'],
+            hoverHelp       => ['make asset exportable description','Asset'],
+            uiLevel         => 9,
+            fieldType       => 'yesNo',
+            default         => 1,
+          );
+property  inheritUrlFromParent  => (
+            tab             => 'meta',
+            label           => ['does asset inherit URL from parent','Asset'],
+            hoverHelp       => ['does asset inherit URL from parent description','Asset'],
+            uiLevel         => 9,
+            fieldType       => 'yesNo',
+            default         => 0,
+            trigger         => \&_set_inheritUrlFromParent,
+          );
+sub _set_inheritUrlFromParent {
+    my ($self, $new, $old) = @_;
+    if ($new && ($new != $old)) {
+        $self->url($self->url);
+    }
+};
+property  status => (
+            noFormPost      => 1,
+            fieldType       => 'text',
+            default         => 'approved',
+          );
+property  lastModified => (
+            noFormPost      => 1,
+            fieldType       => 'DateTime',
+            default         => sub { return time() },
+          );
+property  assetSize => (
+            noFormPost      => 1,
+            fieldType       => 'integer',
+            default         => 0,
+          );
+property  tagId => (
+            noFormPost      => 1,
+            fieldType       => 'guid',
+            default         => 0,
+          );
+property  skipNotification => (
+             autoGenerate    => 0,
+             noFormPost      => 1,
+             fieldType       => 'yesNo',
+             default         => 0,
+          );
+
+has       session => (
+            is              => 'ro',
+            required        => 1,
+          );
+has       assetId => (
+            is              => 'ro',
+            lazy            => 1,
+            default         => sub { shift->session->id->generate() },
+          );
+has       revisionDate => (
+            is              => 'rw',
+          );
+has       uiLevel => (
+            is              => 'ro',
+            default         => 1,
+            init_arg        => undef,
+          );
+property  revisedBy => (
+            is              => 'rw',
+            noFormPost      => 1,
+            fieldType       => 'guid',
+          );
+has       [qw/parentId     lineage
+              creationDate createdBy
+              state stateChanged stateChangedBy
+              isLockedBy isSystem lastExportedAs/] => (
+            is              => 'rw',
+          );
+has       className  => (
+            is              => 'ro',
+            builder         => '_build_className',
+            lazy            => 1,
+            init_arg        => undef,
+          );
+sub _build_className {
+    my $self = shift;
+    return ref $self;
+}
+has       keywords       => (
+            is              => 'rw',
+            builder         => '_build_assetKeywords',
+            lazy            => 1,
+            traits          => [ 'WebGUI::Definition::Meta::Settable' ],
+);
+sub _build_assetKeywords {
+    my $self = shift;
+    my $session = $self->session;
+    my $keywords = WebGUI::Keyword->new($session);
+    return $keywords->getKeywordsForAsset({asset => $self, });
+}
+
+around BUILDARGS => sub {
+    my $orig       = shift;
+    my $className  = shift;
+
+    ##Original arguments start here.
+    if (ref $_[0] eq 'HASH') {
+        return $className->$orig(@_);
+    }
+    my $session       = shift;
+    my $assetId       = shift;
+    my $revisionDate  = shift;
+
+    unless ($assetId) {
+        WebGUI::Error::InvalidParam->throw(error => "Asset constructor new() requires an assetId.");
+    }
+
+    if ( $revisionDate eq '' ) {
+        $revisionDate   = $className->getCurrentRevisionDate( $session, $assetId );
+        if ($revisionDate eq '') {
+            WebGUI::Error::InvalidParam->throw(error => "Cannot find revision date for assetId", param => $assetId);
+        }
+    }
+    elsif ( $revisionDate =~ /[^0-9]/) {
+        WebGUI::Error::InvalidParam->throw(error => "Invalid revision date given", param => $revisionDate);
+    }
+
+    my $properties = $session->cache->get("asset".$assetId.$revisionDate);
+    unless (exists $properties->{assetId}) { # can we get it from cache?
+        my $sql = "select * from asset";
+        my $where = " where asset.assetId=?";
+        my $placeHolders = [$assetId];
+      
+        # join all the tables
+        foreach my $table ($className->meta->get_tables) {
+            $sql .= ",".$table;
+            $where .= " and (asset.assetId=".$table.".assetId and ".$table.".revisionDate=?)";
+            push @$placeHolders, $revisionDate;
+        }
+
+        # fetch properties
+        $properties = $session->db->quickHashRef($sql.$where, $placeHolders);
+        unless (exists $properties->{assetId}) {
+            $session->log->error("Asset $assetId $className $revisionDate is missing properties. Consult your database tables for corruption. ");
+            return undef;
+        }
+        $session->cache->set("asset".$assetId.$revisionDate, $properties, 60*60*24);
+    }
+
+    if (defined $properties) {
+        $properties->{session} = $session;
+        return $className->$orig($properties);
+    }
+    $session->log->error("Something went wrong trying to instanciate a '$className' with assetId '$assetId', but I don't know what!");
+    return undef;
+};
+
 
 use WebGUI::AssetBranch;
 use WebGUI::AssetClipboard;
@@ -28,22 +392,24 @@ use WebGUI::AssetMetaData;
 use WebGUI::AssetPackage;
 use WebGUI::AssetTrash;
 use WebGUI::AssetVersioning;
+use WebGUI::Exception;
 use strict;
 use Tie::IxHash;
-use WebGUI::AdminConsole;
-use WebGUI::Cache;
+require WebGUI::AdminConsole;
+require WebGUI::Asset::Shortcut;
 use WebGUI::Form;
 use WebGUI::HTML;
-use WebGUI::HTMLForm;
+use WebGUI::FormBuilder;
 use WebGUI::Keyword;
-use WebGUI::ProgressBar;
+require WebGUI::ProgressBar;
 use WebGUI::ProgressTree;
 use Monkey::Patch;
 use WebGUI::Fork;
 use WebGUI::Search::Index;
 use WebGUI::TabForm;
-use WebGUI::Utility;
 use WebGUI::PassiveAnalytics::Logging;
+use WebGUI::Form::ButtonGroup;
+use WebGUI::PassiveProfiling;
 
 =head1 NAME
 
@@ -86,6 +452,87 @@ sub addEditLabel {
     return $addEdit.' '.$self->getName;
 }
 
+#----------------------------------------------------------------------------
+
+=head2 addEditSaveButtons ( form )
+
+Add the save buttons to the given form. Used by www_add and www_edit to modify
+the asset edit form.
+
+=cut
+
+sub addEditSaveButtons {
+    my ( $self, $form ) = @_;
+    my $session = $self->session;
+    my $i18n = WebGUI::International->new($session, "Asset");
+
+    ###
+    # Buttons
+    my $buttonGroup = WebGUI::Form::ButtonGroup->new( $session, 
+        name => "saveButtons",
+        rowClass => 'saveButtons',
+    );
+
+#    # Approved status
+#    $buttonGroup->addButton( 'checkbox', {
+#        name        => 'approved',
+#        id          => 'approveCheckbox',
+#        value       => 'approved',
+#        label       => $i18n->get('560', 'WebGUI'),
+#        checked     => ( $session->setting->get( 'versionTagMode' ) eq 'autoCommit' ? 1 : 0 ),
+#    } );
+
+    $buttonGroup->addButton( "submit", {
+        name        => "save",
+        id          => 'saveButton',
+        value       => $i18n->get('save'),
+    } );
+
+    if ( $session->config->get("enableSaveAndCommit") ) {
+        $buttonGroup->addButton( 'Submit', {
+            name  => "saveAndCommit",
+            id    => 'saveAndCommitButton',
+            value => $i18n->get("save and commit"),
+        } );
+    }
+
+    $buttonGroup->addButton( 'Submit', {
+        name  => "saveAndReturn",
+        id    => 'saveAndReturnButton',
+        value => $i18n->get("apply"),
+    } );
+
+    $buttonGroup->addButton( 'Submit', {
+        name    => 'cancel',
+        id      => 'cancelButton',
+        value   => $i18n->get('cancel','WebGUI'),
+    } );
+
+    return $form->addFieldAt( $buttonGroup, 0 );
+}
+
+#----------------------------------------------------------------------------
+
+=head2 addEditSaveTabs ( form )
+
+Add the tabs to the form for editing or saving the asset's properties.
+This is broken out so that additional tabs with i18n'ed labels can be
+added by subclasses or by Roles.
+
+=cut
+
+sub addEditSaveTabs {
+    my ( $self, $form ) = @_;
+    my $session = $self->session;
+    my $i18n = WebGUI::International->new($session, "Asset");
+    # Not using loop to maintain correct order
+    $form->addTab( name => "properties", label => $i18n->get("properties") );
+    $form->addTab( name => "display", label => $i18n->get(105) );
+    $form->addTab( name => "security", label => $i18n->get(107) );
+    $form->addTab( name => "meta", label => $i18n->get("Metadata") );
+    return $form;
+}
+
 #-------------------------------------------------------------------
 
 =head2 addMissing ( url )
@@ -101,89 +548,15 @@ The missing URL.
 sub addMissing {
 	my $self = shift;
 	my $assetUrl = shift;
-	return undef unless ($self->session->var->isAdminOn);
-	my $ac = $self->getAdminConsole;
+	return undef unless ($self->session->isAdminOn);
 	my $i18n = WebGUI::International->new($self->session, "Asset");
 	my $output = $i18n->get("missing page query");
 	$output .= '<ul>
-			<li><a href="'.$self->getUrl("func=add;class=WebGUI::Asset::Wobject::Layout;url=".$assetUrl).'">'.$i18n->get("add the missing page").'</a></li>
+			<li><a href="'.$self->getUrl("func=add;className=WebGUI::Asset::Wobject::Layout;url=".$assetUrl).'">'.$i18n->get("add the missing page").'</a></li>
 			<li><a href="'.$self->getUrl.'">'.$i18n->get("493","WebGUI").'</a></li>
 			</ul>';
-	return $ac->render($output);
+	return $output;
 }
-
-#-------------------------------------------------------------------
-
-=head2 assetDbProperties ( session, assetId, className, revisionDate )
-
-Class method to return all properties in all tables used by a particular Asset.
-Returns a hash ref with data from the table.
-
-=head3 session
-
-A reference to the current session.
-
-=head3 assetId
-
-The assetId of the asset you're creating an object reference for. Must not be blank.
-
-=head3 className
-
-By default we'll use whatever class it is called by like WebGUI::Asset::File->new(), so WebGUI::Asset::File would be used.
-
-=head3 revisionDate
-
-An epoch date that represents a specific version of an asset.
-
-=cut
-
-sub assetDbProperties {
-	my $class = shift;
-	my $session = shift;
-    my ($assetId, $className, $revisionDate) = @_;
-    my $sql = "select * from asset";
-    my $where = " where asset.assetId=?";
-    my $placeHolders = [$assetId];
-    foreach my $definition (@{$className->definition($session)}) {
-        $sql .= ",".$definition->{tableName};
-        $where .= " and (asset.assetId=".$definition->{tableName}.".assetId and ".$definition->{tableName}.".revisionDate=".$revisionDate.")";
-    }
-    return $session->db->quickHashRef($sql.$where, $placeHolders);
-}
-
-#-------------------------------------------------------------------
-
-=head2 assetExists ( session, assetId, className, revisionDate )
-
-Class method that checks to see if an asset exists in all the proper tables for
-the requested asset class.  Returns true or false.
-
-=head3 session
-
-A reference to the current session.
-
-=head3 assetId
-
-The assetId of the asset you're creating an object reference for. Must not be blank.
-
-=head3 className
-
-By default we'll use whatever class it is called by like WebGUI::Asset::File->new(), so WebGUI::Asset::File would be used.
-
-=head3 revisionDate
-
-An epoch date that represents a specific version of an asset.
-
-=cut
-
-sub assetExists {
-	my $class = shift;
-	my $session = shift;
-    my ($assetId, $className, $revisionDate) = @_;
-    my $dbProperties = $class->assetDbProperties($session, $assetId, $className, $revisionDate);
-    return exists $dbProperties->{assetId};
-}
-
 
 #-------------------------------------------------------------------
 
@@ -290,10 +663,10 @@ sub canView {
         $user =  $self->session->user;
         $userId = $user->userId();
     }
-    if ($userId eq $self->get("ownerUserId")) {
+    if ($userId eq $self->ownerUserId) {
         return 1;
     }
-    elsif ($user->isInGroup($self->get("groupIdView"))) {
+    elsif ($user->isInGroup($self->groupIdView)) {
         return 1;
     }
     return $self->canEdit($userId);
@@ -317,33 +690,34 @@ to SSL.
 sub checkView {
 	my $self = shift;
 	return $self->session->privilege->noAccess() unless $self->canView;
-	my ($conf, $env, $var, $http) = $self->session->quick(qw(config env var http));
-    if ($conf->get("sslEnabled") && $self->get("encryptPage") && ! $env->sslRequest) {
+    my $session = $self->session;
+	my ($conf, $response) = $self->session->quick(qw(config response));
+    if ($conf->get("sslEnabled") && $self->get("encryptPage") && ! $self->session->request->secure) {
         # getUrl already changes url to https if 'encryptPage'
-        $http->setRedirect($self->getUrl);
-        $http->sendHeader;
+        $response->setRedirect($self->getUrl);
+        $response->sendHeader;
         return "chunked";
 	}
-    elsif ($var->isAdminOn && $self->get("state") =~ /^trash/) { # show em trash
+    elsif ($session->isAdminOn && $self->get("state") =~ /^trash/) { # show em trash
         my $queryFrag = "func=manageTrash";
         if ($self->session->form->process('revision')) {
             $queryFrag .= ";revision=".$self->session->form->process('revision');
         }
-		$http->setRedirect($self->getUrl($queryFrag));
-        $http->sendHeader;
+		$response->setRedirect($self->getUrl($queryFrag));
+        $response->sendHeader;
 		return "chunked";
 	} 
-    elsif ($var->isAdminOn && $self->get("state") =~ /^clipboard/) { # show em clipboard
+    elsif ($session->isAdminOn && $self->get("state") =~ /^clipboard/) { # show em clipboard
         my $queryFrag = "func=manageClipboard";
         if ($self->session->form->process('revision')) {
             $queryFrag .= ";revision=".$self->session->form->process('revision');
         }
-		$http->setRedirect($self->getUrl($queryFrag));
-        $http->sendHeader;
+		$response->setRedirect($self->getUrl($queryFrag));
+        $response->sendHeader;
 		return "chunked";
 	} 
     elsif ($self->get("state") ne "published") { # tell em it doesn't exist anymore
-		$http->setStatus("410");
+		$session->response->status(410);
 		my $notFound = WebGUI::Asset->getNotFound($self->session);
 		$self->session->asset($notFound);
 		return $notFound->www_view;
@@ -365,206 +739,23 @@ Returns the new Asset object.
 
 sub cloneFromDb {
 	my $self = shift;
-    return WebGUI::Asset->new($self->session,
+    return WebGUI::Asset->newById($self->session,
         $self->getId,
-        $self->get('className'),
-        $self->get('revisionDate')
+        $self->revisionDate
     );
 }
 
 #-------------------------------------------------------------------
 
-=head2 definition ( session, [ definition ] )
+=head2 extraHeadTags ( value )
 
-Basic definition of an Asset. Properties, default values. Returns an array reference containing tableName,className,properties
+Returns extraHeadTags
 
-=head3 session
+=head3 value
 
-The current session object.
-
-=head3 definition
-
-An array reference containing additional information to include with the default definition.
+If specified, stores it, but also updates extraHeadTagsPacked with the packed version.
 
 =cut
-
-sub definition {
-    my $class = shift;
-    my $session = shift;
-    my $definition = shift || [];
-	my $i18n = WebGUI::International->new($session, "Asset");
-	my %properties;
-	tie %properties, 'Tie::IxHash';
-	%properties = (
-                    title=>{
-					    tab=>"properties",
-					    label=>$i18n->get(99),
-					    hoverHelp=>$i18n->get('99 description'),
-                        fieldType=>'text',
-                        defaultValue=>'Untitled',
-					    filter=>'fixTitle',
-                    },
-                    menuTitle=>{
-					    tab=>"properties",
-					    label=>$i18n->get(411),
-					    hoverHelp=>$i18n->get('411 description'),
-					    uiLevel=>1,
-                        fieldType=>'text',
-					    filter=>'fixTitle',
-                        defaultValue=>'Untitled',
-                    },
-                    url=>{
-					    tab=>"properties",
-					    label=>$i18n->get(104),
-					    hoverHelp=>$i18n->get('104 description'),
-					    uiLevel=>3,
-                        fieldType=>'text',
-                        defaultValue=>'',
-					    filter=>'fixUrl',
-                    },
-				    isHidden=>{
-					    tab=>"display",
-					    label=>$i18n->get(886),
-					    hoverHelp=>$i18n->get('886 description'),
-					    uiLevel=>6,
-					    fieldType=>'yesNo',
-					    defaultValue=>0,
-					},
-				    newWindow=>{
-					    tab=>"display",
-					    label=>$i18n->get(940),
-					    hoverHelp=>$i18n->get('940 description'),
-					    uiLevel=>9,
-					    fieldType=>'yesNo',
-					    defaultValue=>0,
-					},
-				    encryptPage=>{
-					    fieldType       => ($session->config->get("sslEnabled") ? 'yesNo' : 'hidden'),
-					    tab             => "security",
-					    label           => $i18n->get('encrypt page'),
-					    hoverHelp       => $i18n->get('encrypt page description'),
-					    uiLevel         => 6,
-					    defaultValue    => 0,
-					},
-                    ownerUserId=>{
-					    tab=>"security",
-					    label=>$i18n->get(108),
-					    hoverHelp=>$i18n->get('108 description'),
-					    uiLevel=>6,
-                        fieldType=>'user',
-					    filter=>'fixId',
-                        defaultValue=>'3',
-                    },
-                    groupIdView=>{
-					    tab=>"security",
-					    label=>$i18n->get(872),
-					    hoverHelp=>$i18n->get('872 description'),
-					    uiLevel=>6,
-                        fieldType=>'group',
-					    filter=>'fixId',
-                        defaultValue=>'7',
-                    },
-                    groupIdEdit=>{
-					    tab=>"security",
-					    label=>$i18n->get(871),
-					    excludeGroups=>[1,7],
-					    hoverHelp=>$i18n->get('871 description'),
-					    uiLevel=>6,
-                        fieldType=>'group',
-					    filter=>'fixId',
-                        defaultValue=>'4',
-                    },
-                    synopsis=>{
-					    tab=>"meta",
-					    label=>$i18n->get(412),
-					    hoverHelp=>$i18n->get('412 description'),
-					    uiLevel=>3,
-                        fieldType=>'textarea',
-                        defaultValue=>undef,
-                    },
-                    extraHeadTags=>{
-					    tab=>"meta",
-					    label=>$i18n->get("extra head tags"),
-					    hoverHelp=>$i18n->get('extra head tags description'),
-					    uiLevel=>5,
-                        fieldType=>'codearea',
-                        defaultValue=>undef,
-                        customDrawMethod => 'drawExtraHeadTags',
-                        filter  => 'packExtraHeadTags',
-                    },
-                    extraHeadTagsPacked => {
-                        fieldType       => 'hidden',
-                        defaultValue    => undef,
-                        noFormPost      => 1,
-                    },
-                    usePackedHeadTags => {
-                        tab             => "meta",
-                        label           => $i18n->get('usePackedHeadTags label'),
-                        hoverHelp       => $i18n->get('usePackedHeadTags description'),
-                        uiLevel         => 7,
-                        fieldType       => 'yesNo',
-                        defaultValue    => 0,
-                    },
-				    isPackage=>{
-					    label=>$i18n->get("make package"),
-					    tab=>"meta",
-					    hoverHelp=>$i18n->get('make package description'),
-					    uiLevel=>7,
-					    fieldType=>'yesNo',
-					    defaultValue=>0,
-					},
-				    isPrototype=>{
-					    tab=>"meta",
-					    label=>$i18n->get("make prototype"),
-					    hoverHelp=>$i18n->get('make prototype description'),
-					    uiLevel=>9,
-					    fieldType=>'yesNo',
-					    defaultValue=>0,
-					},
-                    isExportable=>{
-                        tab=>'meta',
-                        label=>$i18n->get('make asset exportable'),
-                        hoverHelp=>$i18n->get('make asset exportable description'),
-                        uiLevel=>9,
-                        fieldType=>'yesNo',
-                        defaultValue=>1,
-                    },
-                    inheritUrlFromParent=>{
-                        tab=>'meta',
-                        label=>$i18n->get('does asset inherit URL from parent'),
-                        hoverHelp=>$i18n->get('does asset inherit URL from parent description'),
-                        uiLevel=>9,
-                        fieldType=>'yesNo',
-                        defaultValue=>0,
-                    },
-				    status=>{
-					    noFormPost=>1,
-					    fieldType=>'hidden',
-					    defaultValue=>'pending',
-					},
-				    lastModified=>{
-					    noFormPost=>1,
-					    fieldType=>'hidden',
-					    defaultValue=>time(),
-					},
-				    assetSize=>{
-					    noFormPost=>1,
-					    fieldType=>'hidden',
-					    defaultValue=>0,
-					},
-    );
-    push(@{$definition}, {
-	    assetName=>$i18n->get("asset"),
-        tableName=>'assetData',
-		autoGenerateForms=>1,
-        className=>'WebGUI::Asset',
-		icon=>'assets.gif',
-        properties=>\%properties
-        }
-    );
-    return $definition;
-}
-
 
 #-------------------------------------------------------------------
 
@@ -584,41 +775,51 @@ Any leftover part of the requested URL.
 sub dispatch {
     my ($self, $fragment) = @_;
     return undef if $fragment;
+
     my $session = $self->session;
     my $state = $self->get('state');
+
     ##Only allow interaction with assets in certain states
-    return if $state ne 'published' && $state ne 'archived' && !$session->var->isAdminOn;
-    my $func    = $session->form->param('func') || 'view';
-    my $viewing = $func eq 'view' ? 1 : 0;
-    my $sub     = $self->can('www_'.$func);
-    if (!$sub && $func ne 'view') {
-        $sub     = $self->can('www_view');
-        $viewing = 1;
+    return if $state ne 'published' && $state ne 'archived' && !$session->isAdminOn;
+
+    # needed for tests that call straight here but otherwise redundant with same in WebGUI.pm
+    local $SIG{__DIE__} = sub { WebGUI::Error::RunTime->throw( message => $_[0] ); };
+
+
+    for my $func ( $session->form->param('func'), 'view' ) {
+
+        # if there's no output from the user specified func, try view next
+
+        my $viewing = $func eq 'view' ? 1 : 0;
+        my $sub     = $self->can('www_'.$func);
+
+        if (!$sub && $func ne 'view') {
+            $sub     = $self->can('www_view');
+            $viewing = 1;
+        }
+
+        return undef unless $sub;
+
+        my $output = eval { $self->$sub(); };
+
+        if ( $@ ) {
+            my $e = Exception::Class->caught();
+            # previously, this only handled WebGUI::Error::ObjectNotFound::Template
+            my $errstr = sprintf(
+                "Couldn't call method ``%s'' on asset for url ``%s'':  Error: ``%s''", 
+                "www_$func", $session->url->getRequestedUrl, $e->error,
+            );
+            $errstr .= " templateId: " . $e->templateId if $e->can('templateId') and $e->templateId;
+            $errstr .= " assetId: " . $e->assetId if $e->can('assetId') and $e->assetId;
+            $session->log->error($errstr);
+            $e->rethrow if $session->request->env->{'webgui.debug'};
+        }
+
+        return $output if $output || $viewing;
+
     }
-    return undef unless $sub;
-    my $output = eval { $self->$sub(); };
-    if (my $e = Exception::Class->caught('WebGUI::Error::ObjectNotFound::Template')) {
-                                         #WebGUI::Error::ObjectNotFound::Template
-        $session->log->error(sprintf "%s templateId: %s assetId: %s", $e->error, $e->templateId, $e->assetId);
-    }
-    elsif ($@) {
-        my $message = $@;
-        $session->log->warn("Couldn't call method www_".$func." on asset for url: ".$session->url->getRequestedUrl." Root cause: ".$message);
-    }
-    return $output if $output || $viewing;
-    ##No output, try the view method instead
-    $output = eval { $self->www_view };
-    if (my $e = Exception::Class->caught('WebGUI::Error::ObjectNotFound::Template')) {
-        $session->log->error(sprintf "%s templateId: %s assetId: %s", $e->error, $e->templateId, $e->assetId);
-        return "chunked";
-    }
-    elsif ($@) {
-        warn "logged another warn: $@";
-        my $message = $@;
-        $session->log->warn("Couldn't call method www_view on asset for url: ".$session->url->getRequestedUrl." Root cause: ".$@);
-        return "chunked";
-    }
-    return $output;
+
+    return '';  # not reached
 }
 
 
@@ -640,81 +841,9 @@ sub drawExtraHeadTags {
     });
 }
 
-
 #-------------------------------------------------------------------
 
-=head2 DESTROY ( )
-
-Completely remove an asset from existence.
-
-=cut
-
-sub DESTROY {
-	my $self = shift;
-
-	# Let the parent be garbage collected if no one else is referencing
-	# him.  firstChild and lastChild are weak references, so no need to
-	# worry about them here.
-	delete $self->{_parent};
-
-	$self = undef;
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 fixId ( id, fieldName )
-
-Returns the default Id for a field if we get an invalid Id, otherwise returns the id passed in. An valid id either looks like a GUID or is an integer.
-
-=head3 id
-
-The id to check.
-
-=head3 fieldName
-
-The name of the property we're checking. This is used to retrieve whatever the default is set to in the definition.
-
-=cut
-
-sub fixId {
-	my $self = shift;
-    my $id = shift;
-    my $field = shift;
-    if ($id =~ m/\A \d{1,22} \z/xms || $id =~ m/\A [A-Za-z0-9\-\_]{22} \z/xms) {
-        return $id;
-    }
-	return $self->getValue($field);
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 fixTitle ( string )
-
-Fixes a title by eliminating HTML from it.
-
-=head3 string
-
-Any text string. Most likely will have been the Asset's name or title.  If
-no string is supplied, then it will fetch the default title for the asset,
-or the word Untitled.
-
-=cut
-
-sub fixTitle {
-	my $self = shift;
-    my $string = shift;
-    if (lc($string) eq "untitled" || $string eq "") {
-        $string = $self->getValue("title") || 'Untitled';
-    }
-	return WebGUI::HTML::filter($string, 'all');
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 fixUrl ( url )
+=head2 fixUrl ( [value] )
 
 Returns a URL, removing invalid characters and making it unique by
 adding a digit to the end if necessary.  URLs are not allowed to be
@@ -728,7 +857,7 @@ Assets have a maximum length of 250 characters.  Any URL longer than
 URLs will be passed through $session->url->urlize to make them WebGUI compliant.
 That includes any languages specific constraints set up in the default language pack.
 
-=head3 url
+=head3 value
 
 Any text string. Most likely will have been the Asset's name or title.  If the string is not passed
 in, then a url will be constructed from
@@ -741,22 +870,28 @@ sub fixUrl {
 
 	# build a URL from the parent
 	unless ($url) {
-		$url = $self->getParent->get("url");
+        if (my $parent = $self->getParent) {
+            $url = $parent->url;
+        }
 		$url =~ s/(.*)\..*/$1/;
-		$url .= '/'.$self->getValue("menuTitle");
+		$url .= '/'.$self->menuTitle;
 	}
 
     # if we're inheriting the URL from our parent, set that appropriately
-    if($self->get('inheritUrlFromParent')) {
-       $url = $self->fixUrlFromParent($url); 
+    if ($self->inheritUrlFromParent) {
+        # if we're inheriting the URL from our parent, set that appropriately
+        my @parts = split(m{/}, $url);
+        # don't do anything unless we need to
+        my $inheritUrl = $self->getParent->get('url') . '/' . $parts[-1];
+        $url = $inheritUrl if $url ne $inheritUrl;
     }
 	$url = $self->session->url->urlize($url);
 
 	# fix urls used by uploads and extras
 	# and those beginning with http
 	my @badUrls = (
-        $self->session->config->get("extrasURL"),
-        $self->session->config->get("uploadsURL"),
+        $self->session->url->make_urlmap_work($self->session->config->get("extrasURL")),
+        $self->session->url->make_urlmap_work($self->session->config->get("uploadsURL")),
     );
     foreach my $badUrl (@badUrls) {
         $badUrl =~ s{ / $ }{}x; # Remove trailing slashes from the end of the URL
@@ -805,37 +940,9 @@ sub fixUrl {
             $parts[0] .= "2";
         }
         $url = join(".",@parts);
-        $url = $self->fixUrl($url);
+        @_ = ($self, $url);
+        goto $self->can('fixUrl');
     }
-    return $url;
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 fixUrlFromParent ( url )
-
-URLs will be passed through $session->url->urlize to make them WebGUI compliant.
-That includes any languages specific constraints set up in the default language pack.
-
-=head3 url
-
-Any text string.
-
-=cut
-
-sub fixUrlFromParent {
-	my $self      = shift;
-	my $url       = shift;
-
-    # if we're inheriting the URL from our parent, set that appropriately
-    my @parts = split(m{/}, $url);
-
-    # don't do anything unless we need to
-    if($url ne $self->getParent->get('url') . '/' . $parts[-1]) {
-        $url = $self->getParent->get('url') . '/' . $parts[-1];
-    }
-
     return $url;
 }
 
@@ -885,80 +992,55 @@ sub forkWithStatusPage {
         $args->{plugin}, {
             title   => $i18n->get( $args->{title} ),
             icon    => 'assets',
+            dialog  => $args->{dialog},
+            message => $args->{message},
             proceed => $args->{redirect} || '',
         }
     );
-    $session->http->setRedirect( $self->getUrl($pairs) );
+    $session->response->setRedirect( $self->getUrl($pairs) );
     return 'redirect';
 } ## end sub forkWithStatusPage
 
 #-------------------------------------------------------------------
 
-=head2 get ( [propertyName] )
+=head2 getClassById ( $session, $assetId )
 
-Returns a reference to a list of properties (or specified property) of an Asset.
+Class method that looks up a className for an object in the database, using it's assetId.
 
-If C<propertyName> is omitted, it will return a safe copy of the entire property hash.
+If a class cannot be found for the requested assetId, then it throws a WebGUI::Error::InvalidParam
+exception.
 
-=head3 propertyName
+=head3 $session
 
-Any of the values associated with the properties of an Asset. Default choices are "title", "menutTitle",
-"synopsis", "url", "groupIdEdit", "groupIdView", "ownerUserId",  "keywords", and "assetSize".
+A WebGUI::Session object.
 
-=cut
+=head3 $assetId
 
-sub get {
-	my $self = shift;
-	my $propertyName = shift;
-	if (defined $propertyName) {
-        if ($propertyName eq "keywords") {
-            return WebGUI::Keyword->new($self->session)->getKeywordsForAsset({asset => $self});
-        }
-		return $self->{_properties}{$propertyName};
-	}
-	my %copyOfHashRef = %{$self->{_properties}};
-        my $keywords = WebGUI::Keyword->new($self->session)->getKeywordsForAsset({asset => $self});
-        if( $keywords ne '' ) { $copyOfHashRef{ keywords } = $keywords ; }
-	return \%copyOfHashRef;
-}
-
-
-
-#-------------------------------------------------------------------
-
-=head2 getAdminConsole ( )
-
-Returns a reference to a WebGUI::AdminConsole object.
+The assetId of the object to lookup in the database.
 
 =cut
 
-sub getAdminConsole {
-	my $self = shift;
-	unless (exists $self->{_adminConsole}) {
-		$self->{_adminConsole} = WebGUI::AdminConsole->new($self->session,"assets");
-	}
-	$self->{_adminConsole}->setIcon($self->getIcon);
-	return $self->{_adminConsole};
-}
+sub getClassById {
+	my $class   = shift;
+    my $session = shift;
+    my $assetId = shift;
+    # Cache the className lookup
+    my $assetClass  = $session->stow->get("assetClass");
+    my $className   = $assetClass->{$assetId};
 
+    return $className if $className;
 
-#-------------------------------------------------------------------
+    $className = $session->db->quickScalar(
+            "select className from asset where assetId=?",
+            [$assetId]
+    );
+    $assetClass->{ $assetId } = $className;
+    $session->stow->set("assetClass", $assetClass);
 
-=head2 getCache ( )
+    return $className if $className;
 
-Returns a cache object specific to this asset, and whether or not the request is in SSL mode.
+    WebGUI::Error::InvalidParam->throw(error => "Couldn't lookup className", param => $assetId);
 
-=cut
-
-sub getCache {
-	my $self     = shift;
-    my $session  = $self->session;
-    my $cacheKey = "view_".$self->getId;
-    if ($session->env->sslRequest) {
-        $cacheKey .= '_ssl';
-    }
-    my $cache = WebGUI::Cache->new($session, $cacheKey);
-    return $cache;
 }
 
 
@@ -982,6 +1064,23 @@ sub getContainer {
 
 #-------------------------------------------------------------------
 
+=head2 getContentLastModified
+
+Returns the overall modification time of the object and its content in Unix
+epoch format, for the purpose of the Last-Modified HTTP header.  Override this
+for subclasses that contain content that is not solely lastModified property,
+which gets updated every time update() is called.
+
+=cut
+
+sub getContentLastModified {
+	my $self = shift;
+	return $self->get("lastModified");
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 getDefault ( session )
 
 Constructor. Returns the default object, which is also known by some as the "Home Page". The default object is set in the settings.
@@ -995,7 +1094,7 @@ A reference to the current session.
 sub getDefault {
 	my $class = shift;
 	my $session = shift;
-	return $class->newByDynamicClass($session, $session->setting->get("defaultPage"));
+	return $class->newById($session, $session->setting->get("defaultPage"));
 }
 
 
@@ -1003,284 +1102,172 @@ sub getDefault {
 
 =head2 getEditForm ()
 
-Creates and returns a tabform to edit parameters of an Asset. See L<getEditTabs> for
-adding additional tabs.
+Creates and returns a WebGUI::FormBuilder form to edit parameters of an Asset. 
 
 =cut
 
 sub getEditForm {
-    my $self    = shift;
-    my $session = $self->session;
-	my $i18n = WebGUI::International->new($session, "Asset");
-	my $ago = $i18n->get("ago");
-	my $tabform = WebGUI::TabForm->new($session,undef,undef,$self->getUrl());
-	my $overrides = $session->config->get("assets/".$self->get("className"));
+    my $self      = shift;
+    my $session   = $self->session;
+    my $i18n      = WebGUI::International->new( $session, "Asset" );
+    my $f         = WebGUI::FormBuilder->new( $session );
 
-    # Set the appropriate URL
-    # If we're adding a new asset, don't set anything
-    if ( $session->form->get( "func" ) ne "add" ) {
-        $tabform->formHeader( { action => $self->getUrl, method => "POST" } );
+    ### 
+    # Create the main tabset
+    $self->addEditSaveTabs($f);
+
+    ###
+    # Asset ID and class name
+    my $assetId;
+    my $class;
+    if ( $self->getId eq "new" ) {
+        $assetId = "new";
     }
-
-	if ($session->config->get("enableSaveAndCommit")) {
-		$tabform->submitAppend(WebGUI::Form::submit($session, {
-            name    => "saveAndCommit", 
-            value   => $i18n->get("save and commit"),
-            }));
-	}
-
-    $tabform->submitAppend( 
-        WebGUI::Form::submit ( $session, {
-            name    => "saveAndReturn",
-            value   => $i18n->get( "apply" ),
-        } ) 
+    else {
+        $assetId = $self->getId;
+    }
+    $f->getTab("meta")->addField( "Guid", 
+        name        => "assetId",
+        value       => $assetId,
+        label       => $i18n->get( 'asset id' ),
+        hoverHelp   => $i18n->get('asset id description'),
+        uiLevel     => 9,
+    );
+    $f->getTab("meta")->addField( "ClassName", 
+        name        => "className",
+        value       => $self->className,
+        label       => $i18n->get('class name', 'WebGUI'),
+        uiLevel     => 9,
     );
 
-	$tabform->hidden({
-		name=>"func",
-		value=>"editSave"
-		});
-	my $assetId;
-	my $class;
-	if ($self->getId eq "new") {
-		$assetId = "new";
-		$class = $session->form->process("class","className");
-	}
-	else {
-		# revision history
-		$assetId = $self->getId;
-		$class = $self->get('className');
-		my $ac = $self->getAdminConsole;
-		$ac->addSubmenuItem($self->getUrl("func=manageRevisions"),$i18n->get("revisions").":");
-		my $rs = $session->db->read("select revisionDate from assetData where assetId=? order by revisionDate desc limit 5", [$assetId]);
-		while (my ($version) = $rs->array) {
-			my ($interval, $units) = $session->datetime->secondsToInterval(time() - $version);
-			$ac->addSubmenuItem($self->getUrl("func=edit;revision=".$version), $interval." ".$units." ".$ago);
-		}
-	}
-	if (my $proceed = $session->form->process("proceed")) {
-		$tabform->hidden({
-			name=>"proceed",
-			value=>$proceed,
-        });
-        if (my $returnUrl = $session->form->process('returnUrl')) {
-            $tabform->hidden({
-                name=>"returnUrl",
-                value=>$returnUrl,
-            });
+    ###
+    # Keywords
+    $f->getTab( "meta" )->addField( 'Keywords', 
+        name        => 'keywords',
+        value       => $self->get('keywords'),
+        label       => $i18n->get( 'keywords' ),
+        hoverHelp   => $i18n->get( 'keywords help' ),
+    );
+
+    ###
+    # Properties
+    my $overrides = $session->config->get("assets/".$self->className) || {};
+    foreach my $property ( $self->getProperties ) {
+        my $fieldHash = $self->getFieldData( $property );
+        next if $fieldHash->{noFormPost};
+
+        $fieldHash = $self->setupFormField($property, $fieldHash, $overrides);
+        # Create tabs to have labels added later
+        if ( !$f->getTab( $fieldHash->{tab} ) ) {
+            $f->addTab( name => $fieldHash->{tab}, label => $fieldHash->{tab} );
         }
-	}
-	
-	# create tabs
-	tie my %tabs, 'Tie::IxHash';
-	foreach my $tabspec ($self->getEditTabs) {
-		$tabs{$tabspec->[0]} = {
-			label	=> $tabspec->[1],
-			uiLevel	=> $tabspec->[2],
-			};
-	}
-	foreach my $tab (keys %{$overrides->{tabs}}) {
-		foreach my $key (keys %{$overrides->{tabs}{$tab}}) {
-			$tabs{$tab}{$key} = $overrides->{tabs}{$tab}{$key};
-		}
-	}
-	foreach my $tab (keys %tabs) {
-		$tabform->addTab($tab, $tabs{$tab}{label}, $tabs{$tab}{uiLevel});
-	}
 
-	# process errors
-	my $errors = $session->stow->get('editFormErrors');
-	if ($errors) {
-		$tabform->getTab("properties")->readOnly(
-			-value=>"<p>Some error(s) occurred:<ul><li>".join('</li><li>', @$errors).'</li></ul></p>',
-		);
-	}
-
-	# build the definition to the generate form
-	my @definitions = reverse @{$self->definition($session)};
-	tie my %baseProperties, 'Tie::IxHash';
-	%baseProperties = (
-		assetId	=> {
-			fieldType	=> "guid",
-			label		=> $i18n->get("asset id"),
-			value		=> $assetId,
-			hoverHelp	=> $i18n->get('asset id description'),
-			uiLevel		=> 9,
-			tab			=> "meta",
-		},
-		class	=> {
-			fieldType	=> "className",
-			label		=> $i18n->get("class name",'WebGUI'),
-			value		=> $class,
-			uiLevel		=> 9,
-			tab			=> "meta",
-		},
-		keywords => {
-			label       => $i18n->get('keywords'),
-			hoverHelp   => $i18n->get('keywords help'),
-			value       => $self->get('keywords'),
-			fieldType	=> 'keywords',
-			tab			=> 'meta',
-		}
-	);
-	unshift @definitions, {
-		autoGenerateForms	=> 1,
-		properties			=> \%baseProperties
-		};
-
-	# extend the definition with metadata
-	tie my %extendedProperties, 'Tie::IxHash';
-    if ($session->setting->get("metaDataEnabled")) {
-		my $meta = $self->getMetaDataFields();
-		foreach my $field (keys %$meta) {
-			my $fieldType = $meta->{$field}{fieldType} || "text";
-			my $options = $meta->{$field}{possibleValues};
-			# Add a "Select..." option on top of a select list to prevent from
-			# saving the value on top of the list when no choice is made.
-			if("\l$fieldType" eq "selectBox") {
-				$options = "|" . $i18n->get("Select") . "\n" . $options;
-			}
-			$extendedProperties{"metadata_".$meta->{$field}{fieldId}} = {
-				tab				=> "meta",
-				label        	=> $meta->{$field}{fieldName},
-				uiLevel      	=> 5,
-				value        	=> $meta->{$field}{value},
-				extras       	=> qq/title="$meta->{$field}{description}"/,
-				options      	=> $options,
-				defaultValue 	=> $meta->{$field}{defaultValue},
-				fieldType		=> $fieldType
-			};
-		}
-		# add metadata management
-		if ($session->user->isAdmin) {
-			$extendedProperties{_metadatamanagement} = {
-				tab			=> "meta",
-				fieldType	=> "readOnly",
-				value		=> '<p><a href="'.$self->session->url->page("func=editMetaDataField;fid=new").'">'.$i18n->get('Add new field').'</a></p>',
-				hoverHelp	=> $i18n->get('Add new field description'),
-			};
-		}
+        $f->getTab( $fieldHash->{tab} )->addField( delete $fieldHash->{fieldType}, %{$fieldHash} );
     }
-	push @definitions, {
-		autoGenerateForms	=> 1,
-		properties			=> \%extendedProperties
-		};
-	
-	# generate the form	
-	foreach my $definition (@definitions) {
-		my $properties = $definition->{properties};
-		
-		# depricated...by WebGUI 8 they all must autogen forms
-		next unless ($definition->{autoGenerateForms});
 
-		foreach my $fieldName (keys %{$properties}) {
-			my %fieldHash = %{$properties->{$fieldName}};
-			my %params = (name => $fieldName, value => $self->getValue($fieldName));
-			next if exists $fieldHash{autoGenerate} and not $fieldHash{autoGenerate};
+    ###
+    # Meta data
+    if ( $session->setting->get("metaDataEnabled") ) {
+        my $meta = $self->getMetaDataFields();
+        foreach my $field ( keys %$meta ) {
+            my $fieldType = $meta->{$field}{fieldType} || "text";
+            my $options = $meta->{$field}{possibleValues};
 
-			# apply config file changes
-			foreach my $key (keys %{$overrides->{fields}{$fieldName}}) {
-				$fieldHash{$key} = $overrides->{fields}{$fieldName}{$key};
-			}
-
-			# Kludge.
-			if (isIn($fieldHash{fieldType}, 'selectBox', 'workflow') and ref $params{value} ne 'ARRAY') {
-				$params{value} = [$params{value}];
-			}
-
-			if (exists $fieldHash{visible} and not $fieldHash{visible}) {
-				$params{fieldType} = 'hidden';
-			}
-			else {
-				%params = (%params, %fieldHash);
-				delete $params{tab};
-			}
-
-			# if there isnt a tab specified lets define one
-			my $tab = $fieldHash{tab} || "properties";
-
-            # use a custom draw method
-            my $drawMethod = $properties->{$fieldName}{customDrawMethod};
-            if ($drawMethod) {
-                $params{value} = $self->$drawMethod(\%params);
-                delete $params{name}; # don't want readOnly to generate a hidden field
-                $params{fieldType} = "readOnly";
+            # Add a "Select..." option on top of a select list to prevent from
+            # saving the value on top of the list when no choice is made.
+            if ( "\l$fieldType" eq "selectBox" ) {
+                $options = "|" . $i18n->get("Select") . "\n" . $options;
             }
+            my $fieldName   = "metadata_" . $meta->{$field}{fieldId};
+            my $fieldData   = {
+                label        => $meta->{$field}{fieldName},
+                uiLevel      => 5,
+                value        => $meta->{$field}{value},
+                hoverHelp    => $meta->{$field}{description},
+                options      => $options,
+                defaultValue => $meta->{$field}{defaultValue},
+            };
+            $f->getTab('meta')->addField( $fieldType, %{ $fieldData } );
+        } ## end foreach my $field ( keys %$meta)
+    } ## end if ( $session->setting...)
 
-            #draw the field
-		    $tabform->getTab($tab)->dynamicField(%params);
-		}
-	}
+    return $f;
+} ## end sub getEditForm
 
-	# send back the object
-	return $tabform;
-}
+=head2 setupFormField ( $fieldName, $fieldHash, $overrides )
 
-sub setupFormField {
-  my ($self, $tabform, $fieldName, $extraFields, $overrides) = @_;
-  my %params = %{$extraFields->{$fieldName}};
-  my $tab = delete $params{tab};
+Applies overrides from the WebGUI config file to a set of field data.  The overridden
+and updated field data is returned.
 
-  if (exists $overrides->{fields}{$fieldName}) {
-    my %overrideParams = %{$overrides->{fields}{$fieldName}};
-    my $overrideTab = delete $overrideParams{tab};
-    $tab = $overrideTab if defined $overrideTab;
-    foreach my $key (keys %overrideParams) {
-      (my $canon = $key) =~ s/^-//;
-      $params{$canon} = $overrideParams{$key};
-    }
-  }
+=head3 $fieldName
 
-  $tab ||= 'properties';
-  return $tabform->getTab($tab)->dynamicField(%params);
-}
+The name of the field.
 
-#-------------------------------------------------------------------
+=head3 $fieldHash
 
-=head2 getEditTabs ()
+A hash reference of field data for $fieldName.
 
-Returns a list of arrayrefs, one per extra tab to add to the edit
-form.  The default is no extra tabs.  Override this in a subclass to
-add extra tabs.
+=head3 $overrides
 
-Each array ref will have 3 fields:
-
-=over 4
-
-=item tabName
-
-This is the name of the tab that you will use in the definition subroutine to
-add fields to the new tab.
-
-=item label
-
-This should be an internationalized label that will be displayed on the tab.
-
-=item uiLevel
-
-This is the UI level for the tab.
-
-=back
-
-Please see the example below for adding 1 tab.
-
-    sub getEditTabs {
-        my $self = shift;
-        my $i18n = WebGUI::International->new($self->session,"myNamespace");
-        return ($self->SUPER::getEditTabs, ['myTab', $i18n->get('myTabName'), 9]);
-    }
+A hash reference of overrides from the config file.  This is passed in instead of 
+looking it up each time as a speed optimization.
 
 =cut
 
-sub getEditTabs {
-	my $self = shift;
-	my $i18n = WebGUI::International->new($self->session, "Asset");
-	return (["properties", $i18n->get("properties"), 1],
-		["display", $i18n->get(105), 5],
-		["security", $i18n->get(107), 6],
-		["meta", $i18n->get("Metadata"), 3]);
+sub setupFormField {
+    my ( $self, $fieldName, $fieldHash, $overrides ) = @_;
+
+    return $fieldHash unless exists $overrides->{fields}->{$fieldName};
+    my %overrideParams = %{ $overrides->{fields}->{$fieldName} };
+    foreach my $key ( keys %overrideParams ) {
+        (my $canon = $key) =~ s/^-//;
+        $fieldHash->{$canon} = $overrideParams{$key};
+    }
+    return $fieldHash;
+
+} ## end sub setupFormField
+
+#-------------------------------------------------------------------
+
+=head2 getEditTemplate ( )
+
+Get the template to edit this asset. Used by www_edit and www_add to present
+the form to the user. Uses getEditTemplateId to get the template ID.
+
+=cut
+
+sub getEditTemplate {
+    my ( $self ) = @_;
+    my $f           = eval { $self->getEditForm };
+    if ( $@ ) {
+        $self->session->log->error( 
+            sprintf "Couldn't build asset edit form for URL: '%s' because: %s", $self->url, $@ 
+        );
+        die $@;
+    }
+    $self->addEditSaveButtons( $f );
+    $f->action( $self->getUrl ); # Must be changed for www_add/www_addSave
+
+    my $template    = WebGUI::Asset->newById( $self->session, $self->getEditTemplateId );
+    $template->addForm( form => $f );
+    $template->style( "PBtmpl0000000000000137" );
+
+    return $template;
 }
 
+#-------------------------------------------------------------------------
+
+=head2 getEditTemplateId
+
+Get the edit template ID for this asset. Defaults to the Asset Edit template from
+the settings
+
+=cut
+
+sub getEditTemplateId {
+    my ( $self ) = @_;
+    return $self->session->setting->get('templateIdAssetEdit');
+}
 
 #-------------------------------------------------------------------
 
@@ -1292,12 +1279,131 @@ Returns the extraHeadTags stored in the asset.  Called in $self->session->style-
 
 sub getExtraHeadTags {
 	my $self = shift;
-	return $self->get('usePackedHeadTags') 
-            ? $self->get('extraHeadTagsPacked')
-            : $self->get("extraHeadTags")
+	return $self->usePackedHeadTags
+            ? $self->extraHeadTagsPacked
+            : $self->extraHeadTags
             ;
 }
 
+#----------------------------------------------------------------------------
+
+=head2 getFieldData( property )
+
+Returns the form field data for the given property name. Adds the 
+overrides from the config file.
+
+=cut
+
+sub getFieldData {
+    my ( $self, $property ) = @_;
+    my $session         = $self->session;
+    my $overrides       = $session->config->get( "assets/" . $self->get("className") . '/fields' ) || {};
+    my $attr            = $self->meta->find_attribute_by_name( $property );
+    my $fieldType       = $attr->fieldType;
+    my $fieldOverrides  = $overrides->{ $property } || {};
+    my $noFormPost      = $attr->noFormPost;
+    if (ref $noFormPost eq 'CODE') {
+        $noFormPost = $self->$noFormPost;
+    }
+    my $fieldHash       = {
+                            fieldType   => $fieldType,
+                            noFormPost  => $noFormPost,
+                            tab         => "properties",
+                            %{ $self->getFormProperties( $property ) },
+                            %{ $overrides },
+                            name        => $property,
+                            value       => $self->$property,
+                        };
+
+    # Kludge...
+    if ( $fieldHash->{fieldType} ~~ ['selectBox', 'workflow'] and ref $fieldHash->{value} ne 'ARRAY' ) {
+        $fieldHash->{value} = [ $fieldHash->{value} ];
+    }
+
+    return $fieldHash;
+};
+
+#----------------------------------------------------------------------------
+
+=head2 getHelpers ( )
+
+Get the AssetHelpers for this asset.
+
+=cut
+
+sub getHelpers {
+    my ( $self ) = @_;
+    my $session = $self->session;
+    my ( $conf ) = $session->quick(qw{ config });
+    my $i18n        = WebGUI::International->new( $session, "Asset" );
+
+    my $default = { 
+        change_url => {
+            className   => 'WebGUI::AssetHelper::ChangeUrl',
+            label   => $i18n->get('change url'),
+        },
+        copy => {
+            className   => 'WebGUI::AssetHelper::Copy',
+            label   => $i18n->get('Copy'),
+        },
+        copy_branch => {
+            className   => 'WebGUI::AssetHelper::CopyBranch',
+            label   => $i18n->get('copy branch'),
+        },
+        shortcut => {
+            className   => 'WebGUI::AssetHelper::CreateShortcut',
+            label   => $i18n->get( 'create shortcut' ),
+        },
+        duplicate => {
+            className   => 'WebGUI::AssetHelper::Duplicate',
+            label       => $i18n->get('duplicate'),
+        },
+        cut => {
+            className   => 'WebGUI::AssetHelper::Cut',
+            label   => $i18n->get('cut'),
+        },
+        edit => {
+            url     => $self->getUrl( 'func=edit' ),
+            label   => $i18n->get('edit'),
+        },
+        edit_branch => {
+            className   => 'WebGUI::AssetHelper::EditBranch',
+            label   => $i18n->get( 'edit branch' ),
+        },
+        export_html => {
+            className   => 'WebGUI::AssetHelper::ExportHtml',
+            label   => $i18n->get('export as html'),
+        },
+        view => {
+            url     => $self->getUrl( 'func=view' ),
+            label   => $i18n->get('view'),
+        },
+        lock => {
+            className   => 'WebGUI::AssetHelper::Lock',
+            label   => $i18n->get('lock'),
+        },
+        delete => {
+            className   => 'WebGUI::AssetHelper::Delete',
+            label       => $i18n->get('delete'),
+            confirm     => $i18n->get('43'),
+        },
+        upload_files => {
+            className   => 'WebGUI::AssetHelper::UploadFiles',
+            label       => $i18n->get('upload files'),
+        },
+    };
+
+    # Merge additional helpers for this class from config
+    my $confHelpers = $conf->get('assets/' . $self->className . '/helpers') || {};
+    $default = { %$default, %$confHelpers };
+
+    # Process macros in labels
+    for my $helper ( values %$default ) {
+        WebGUI::Macro::process( \$helper->{label} );
+    }
+
+    return $default;
+}
 
 #-------------------------------------------------------------------
 
@@ -1312,10 +1418,8 @@ If this evaluates to True, then the smaller extras/adminConsole/small/assets.gif
 =cut
 
 sub getIcon {
-	my $self = shift;
-	my $small = shift;
-	my $definition = $self->definition($self->session);
-	my $icon = $definition->[0]{icon} || "assets.gif";
+	my ($self, $small) = @_;
+	my $icon = $self->icon;
 	return $self->session->url->extras('assets/small/'.$icon) if ($small);
 	return $self->session->url->extras('assets/'.$icon);
 }
@@ -1331,7 +1435,7 @@ Returns the assetId of an Asset.
 
 sub getId {
 	my $self = shift;
-	return $self->get("assetId");
+	return $self->assetId;
 }
 
 #-------------------------------------------------------------------
@@ -1349,7 +1453,29 @@ A reference to the current session.
 sub getImportNode {
 	my $class = shift;
 	my $session = shift;
-	return WebGUI::Asset->newByDynamicClass($session, "PBasset000000000000002");
+	return WebGUI::Asset->newById($session, "PBasset000000000000002");
+}
+
+#-------------------------------------------------------------------
+
+=head2 getInheritableProperties ( )
+
+Returns a hash (list) of properties that should be inherited from a parent when creating an asset.
+
+=cut
+
+sub getInheritableProperties {
+	my $self = shift;
+    return (
+		parentId => $self->getId,
+		groupIdView => $self->get("groupIdView"),
+		groupIdEdit => $self->get("groupIdEdit"),
+		ownerUserId => $self->get("ownerUserId"),
+		encryptPage => $self->get("encryptPage"),
+		styleTemplateId => $self->get("styleTemplateId"),
+		printableStyleTemplateId => $self->get("printableStyleTemplateId"),
+		isHidden => $self->get("isHidden"),
+    );
 }
 
 
@@ -1408,8 +1534,7 @@ sub getIsa {
     my $session  = shift;
     my $offset   = shift;
     my $options  = shift;
-    my $def = $class->definition($session);
-    my $tableName = $def->[0]->{tableName};
+    my $tableName = $class->tableName;
     #Strategy, generate the correct set of assetIds
     my $sql = "select assetId from assetData as ad ";
     if ($tableName ne 'assetData') {
@@ -1469,7 +1594,7 @@ A reference to the current session.
 sub getMedia {
 	my $class = shift;
 	my $session = shift;
-	return WebGUI::Asset->newByDynamicClass($session, "PBasset000000000000003");
+	return WebGUI::Asset->newById($session, "PBasset000000000000003");
 }
 
 
@@ -1482,11 +1607,12 @@ Returns the menu title of this asset. If it's not specified or it's "Untitled" t
 =cut
 
 sub getMenuTitle {
-	my $self = shift;
-	if ($self->get("menuTitle") eq "" || lc($self->get("menuTitle")) eq "untitled") {
-		return $self->getName;
-	}
-	return $self->get("menuTitle");
+    my $self = shift;
+    my $menuTitle = $self->menuTitle;
+    if ( $menuTitle eq '' || lc $menuTitle eq 'untitled' ) {
+        return $self->getName;
+    }
+    return $menuTitle;
 }
 
 
@@ -1494,14 +1620,18 @@ sub getMenuTitle {
 
 =head2 getName ( )
 
-Returns the internationalization of the word "Asset".
+Returns the human readable name of the asset.
 
 =cut
 
 sub getName {
 	my $self = shift;
-	my $definition = $self->definition($self->session);
-	return $definition->[0]{assetName};
+    if ( ref $self->assetName eq 'ARRAY' ) {
+        return WebGUI::International->new($self->session, 'Asset')->get(@{ $self->assetName });
+    }
+    else {
+        return $self->assetName;
+    }
 }
 
 
@@ -1520,28 +1650,30 @@ A reference to the current session.
 sub getNotFound {
 	my $class = shift;
 	my $session = shift;
-	return WebGUI::Asset->newByDynamicClass($session, $session->setting->get("notFoundPage"));
+	return WebGUI::Asset->newById($session, $session->setting->get("notFoundPage"));
 }
 
 
 #-------------------------------------------------------------------
 
-=head2 getPrototypeList ( )
+=head2 WebGUI::Asset::getPrototypeList ( session )
 
 Returns an array of all assets that the user can view and edit that are prototypes.
 
 =cut
 
 sub getPrototypeList {
-    my $self    = shift;
-    my $session = $self->session;
+    my $session    = shift;
+    if ( $session->isa( 'WebGUI::Asset' ) ) {
+        $session    = $session->session;
+    }
     my $db      = $session->db;
     my @prototypeIds = $db->buildArray("select distinct assetId from assetData where isPrototype=1");
-    my $userUiLevel = $session->user->profileField('uiLevel');
+    my $userUiLevel = $session->user->get('uiLevel');
     my @assets;
     ID: foreach my $id (@prototypeIds) {
-        my $asset = WebGUI::Asset->newByDynamicClass($session, $id);
-        next ID unless defined $asset;
+        my $asset = eval { WebGUI::Asset->newById($session, $id); };
+        next ID if Exception::Class->caught();
         next ID unless $asset->get('isPrototype');
         next ID unless ($asset->get('status') eq 'approved' || $asset->get('tagId') eq $session->scratch->get("versionTag"));
         push @assets, $asset;
@@ -1565,7 +1697,7 @@ A reference to the current session.
 sub getRoot {
 	my $class = shift;
 	my $session = shift;
-	return WebGUI::Asset->new($session, "PBasset000000000000001");
+	return WebGUI::Asset->newById($session, "PBasset000000000000001");
 }
 
 
@@ -1616,7 +1748,7 @@ A reference to the current session.
 sub getTempspace {
 	my $class = shift;
 	my $session = shift;
-	return WebGUI::Asset->newByDynamicClass($session, "tempspace0000000000000");
+	return WebGUI::Asset->newById($session, "tempspace0000000000000");
 }
 
 
@@ -1630,10 +1762,11 @@ Returns the title of this asset. If it's not specified or it's "Untitled" then t
 
 sub getTitle {
 	my $self = shift;
-	if ($self->get("title") eq "" || lc($self->get("title")) eq "untitled") {
+    my $title = $self->title;
+	if ($title eq "" || lc($title) eq "untitled") {
 		return $self->getName;
 	}
-	return $self->get("title");
+	return $title;
 }
 
 
@@ -1641,128 +1774,15 @@ sub getTitle {
 
 =head2 getToolbar ( )
 
-Returns a toolbar with a set of icons that hyperlink to functions that delete, edit, promote, demote, cut, and copy.
+Returns a toolbar placeholder, which can be filled in using the toolbar.js, located
+in www/extras/admin/toolbar.js
 
 =cut
 
 sub getToolbar {
     my $self = shift;
-    return undef unless $self->canEdit && $self->session->var->isAdminOn;
-    return $self->{_toolbar}
-        if (exists $self->{_toolbar});
-    my $userUiLevel = $self->session->user->profileField("uiLevel");
-    my $uiLevels = $self->session->config->get("assetToolbarUiLevel");
-    my $i18n = WebGUI::International->new($self->session, "Asset");
-    my $toolbar = "";
-    my $commit;
-    if ($self->canEditIfLocked) {
-        $toolbar .= $self->session->icon->delete('func=delete',$self->get("url"),$i18n->get(43))
-            if ($userUiLevel >= $uiLevels->{"delete"});
-        $toolbar .= $self->session->icon->edit('func=edit',$self->get("url"))
-            if ($userUiLevel >= $uiLevels->{"edit"});
-    }
-    else {
-        $toolbar .= $self->session->icon->locked('func=manageRevisions',$self->get("url"))
-            if ($userUiLevel >= $uiLevels->{"revisions"});
-    }
-    $toolbar .= $self->session->icon->cut('func=cut',$self->get("url"))
-        if ($userUiLevel >= $uiLevels->{"cut"});
-
-    if ($userUiLevel >= $uiLevels->{"copy"}) {
-        $toolbar .= $self->session->icon->copy('func=copy',$self->get("url"));
-        # if this asset has children, create a more full-featured menu for copying
-        if ($self->getChildCount) {
-            $toolbar
-                .= '<div class="yuimenu wg-contextmenu">'
-                . '<div class="bd">'
-                . '<ul class="first-of-type">'
-                . '<li class="yuimenuitem"><a class="yuimenuitemlabel" href="'
-                . $self->getUrl("func=copy") . '">' . $i18n->get("this asset only") . '</a></li>'
-                . '<li class="yuimenuitem"><a class="yuimenuitemlabel" href="'
-                . $self->getUrl("func=copy;with=children") . '">' . $i18n->get("with children") . '</a></li>'
-                . '<li class="yuimenuitem"><a class="yuimenuitemlabel" href="'
-                . $self->getUrl("func=copy;with=descendants") . '">' . $i18n->get("with descendants") . '</a></li>'
-                . '</ul></div></div>';
-        }
-    }
-    $toolbar .= $self->session->icon->shortcut('func=createShortcut',$self->get("url"))
-        if ($userUiLevel >= $uiLevels->{"shortcut"} && !$self->isa('WebGUI::Asset::Shortcut'));
-
-    $self->session->style->setLink($self->session->url->extras('assetToolbar/assetToolbar.css'), {rel=>"stylesheet",type=>"text/css"});
-    $self->session->style->setLink($self->session->url->extras('yui/build/menu/assets/skins/sam/menu.css'), {rel=>"stylesheet",type=>"text/css"});
-    $self->session->style->setScript($self->session->url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'), {type=>"text/javascript"});
-    $self->session->style->setScript($self->session->url->extras('yui/build/container/container_core-min.js'), {type=>"text/javascript"});
-    $self->session->style->setScript($self->session->url->extras('yui/build/menu/menu-min.js'), {type=>"text/javascript"});
-    $self->session->style->setScript($self->session->url->extras('assetToolbar/assetToolbar.js'), {type=>"text/javascript"});
-    my $output
-        = '<div class="yui-skin-sam wg-toolbar">'
-        . '<img src="' . $self->getIcon(1) . '" title="' . $self->getName . '" alt="' . $self->getName . '" class="wg-toolbar-icon" />'
-        . '<div class="yuimenu wg-contextmenu">'
-        . '<div class="bd">'
-        . '<ul class="first-of-type">';
-    if ($userUiLevel >= $uiLevels->{"changeUrl"}) {
-        $output
-            .= '<li class="yuimenuitem"><a class="yuimenuitemlabel" href="'
-            . $self->getUrl("func=changeUrl") . '">' . $i18n->get("change url") . '</a></li>';
-    }
-    if ($userUiLevel >= $uiLevels->{"editBranch"}) {
-        $output
-            .= '<li class="yuimenuitem"><a class="yuimenuitemlabel" href="'
-            . $self->getUrl("func=editBranch") . '">' . $i18n->get("edit branch") . '</a></li>';
-    }
-    if ($userUiLevel >= $uiLevels->{"revisions"}) {
-        $output
-            .= '<li class="yuimenuitem"><a class="yuimenuitemlabel" href="'
-            . $self->getUrl("func=manageRevisions") . '">' . $i18n->get("revisions") . '</a></li>';
-    }
-    if ($userUiLevel >= $uiLevels->{"view"}) {
-        $output
-            .= '<li class="yuimenuitem"><a class="yuimenuitemlabel" href="'
-            . $self->getUrl . '">' . $i18n->get("view") . '</a></li>';
-    }
-    if ($userUiLevel >= $uiLevels->{"lock"} && !$self->isLocked) {
-        $output
-            .= '<li class="yuimenuitem"><a class="yuimenuitemlabel" href="'
-            . $self->getUrl('func=lock') . '">' . $i18n->get("lock") . '</a></li>';
-    }
-    if ($userUiLevel >= $uiLevels->{"export"} && $self->session->config->get("exportPath")) {
-        $output
-            .= '<li class="yuimenuitem"><a class="yuimenuitemlabel" href="'
-            . $self->getUrl('func=export') . '">' . $i18n->get('Export','Icon') . '</a></li>';
-    }
-    if ($userUiLevel >= $uiLevels->{"promote"}) {
-        $output
-            .= '<li class="yuimenuitem"><a class="yuimenuitemlabel" href="'
-            . $self->getUrl("func=promote") . '">' . $i18n->get("promote") . '</a></li>';
-    }
-    if ($userUiLevel >= $uiLevels->{"demote"}) {
-        $output
-            .= '<li class="yuimenuitem"><a class="yuimenuitemlabel" href="'
-            . $self->getUrl("func=demote") . '">' . $i18n->get("demote") . '</a></li>';
-    }
-    if ($userUiLevel >= $uiLevels->{"manage"}) {
-        $output
-            .= '<li class="yuimenuitem"><a class="yuimenuitemlabel" href="'
-            . $self->getManagerUrl . '">' . $i18n->get("manage") . '</a></li>';
-    }
-    $output .= '</ul></div></div>' . $toolbar . '</div>';
-    $self->{_toolbar} = $output;
-    return $output;
+    return sprintf '<div class="wg-admin-toolbar yui-skin-sam" id="wg-admin-toolbar-%s"></div>', $self->getId;
 }
-
-#-------------------------------------------------------------------
-
-=head2 getToolbarState ( )
-
-Returns 0 if the state is normal, and 1 if the toolbar state has been toggled. See toggleToolbar() for details.
-
-=cut
-
-sub getToolbarState {
-	my $self = shift;
-	return $self->{_toolbarState};
-}
-
 
 #-------------------------------------------------------------------
 
@@ -1778,7 +1798,7 @@ sub getUiLevel {
 	my $className = $self->get("className");
 	return $uiLevel														# passed in
 		|| $self->session->config->get("assets/".$className."/uiLevel")	# from config
-		|| $self->definition($self->session)->[0]{uiLevel}				# from definition
+		|| $self->uiLevel               				                # from definition
 		|| 1;															# if all else fails
 }
 
@@ -1800,9 +1820,9 @@ Name value pairs to add to the URL in the form of:
 sub getUrl {
 	my $self = shift;
 	my $params = shift;
-	my $url = $self->get("url");
+	my $url = $self->url;
 	$url = $self->session->url->gateway($url,$params);
-	if ($self->get("encryptPage")) {
+	if ($self->encryptPage) {
 		$url = $self->session->url->getSiteURL().$url;
 		$url =~ s/http:/https:/;
 	}
@@ -1811,20 +1831,16 @@ sub getUrl {
 
 #-------------------------------------------------------------------
 
-=head2 getContentLastModified
+=head2 getViewCacheKey ( )
 
-Returns the overall modification time of the object and its content in Unix
-epoch format, for the purpose of the Last-Modified HTTP header.  Override this
-for subclasses that contain content that is not solely lastModified property,
-which gets updated every time update() is called.
+Returns the cache key for content generated by this Asset's view method.
 
 =cut
 
-sub getContentLastModified {
+sub getViewCacheKey {
 	my $self = shift;
-	return $self->get("lastModified");
+    return 'view_'.$self->assetId;
 }
-
 
 #-------------------------------------------------------------------
 
@@ -1841,35 +1857,21 @@ sub getContentLastModifiedBy {
 
 #-------------------------------------------------------------------
 
-=head2 getValue ( key )
+=head2 getWwwCacheKey ( )
 
-Tries to look up C<key> in the asset object's property cache.  If it can't find it in there, then it
-tries to look it up in the definition sub for the asset.
-
-Unlike get, it will not return the whole property hash if you omit the key.
-
-=head3 key
-
-An asset property name, or a propertyDefinition.
+Returns a cache object specific to this asset, and whether or not the request is in SSL mode.
 
 =cut
 
-sub getValue {
-	my $self = shift;
-	my $key = shift;
-	if (defined $key) {
-		my $storedValue = $self->get($key);
-		return $storedValue if (defined $storedValue);
-		unless (exists $self->{_propertyDefinitions}) { # check to see if the definitions have been merged and cached
-			my %properties;
-			foreach my $definition (@{$self->definition($self->session)}) {
-				%properties = (%properties, %{$definition->{properties}});
-			}
-			$self->{_propertyDefinitions} = \%properties;
-		}
-		return $self->{_propertyDefinitions}{$key}{defaultValue};
-	}
-	return undef;
+sub getWwwCacheKey {
+    my $self     = shift;
+    my $session  = $self->session;
+    my $method   = shift;
+    my $cacheKey = join '_', @_, $self->getId;
+    if ($session->request->secure) {
+        $cacheKey .= '_ssl';
+    }
+    return $cacheKey;
 }
 
 
@@ -1890,24 +1892,30 @@ sub indexContent {
 
 #-------------------------------------------------------------------
 
-=head2 loadModule ( $session, $className ) 
+=head2 loadModule ( $className ) 
 
-Loads an asset module if it's not already in memory. This is a class
-method. Returns undef on failure to load, otherwise returns the classname.
-Will only load classes in the WebGUI::Asset namespace.
+Loads an asset module if it's not already in memory. This is a class method. Returns
+undef on failure to load, otherwise returns the classname.  Will only load classes
+in the WebGUI::Asset namespace.
+
+Throws a WebGUI::Invalid::Param error if a non-WebGUI::Asset class is requested to be
+loaded.  If there are compilation problems, it will throw a WebGUI::Error::Compile
+exception.
 
 =cut
 
 sub loadModule {
-    my ($class, $session, $className) = @_;
+    my ($class, $className) = @_;
     if ($className !~ /^WebGUI::Asset(?:::\w+)*$/ ) {
-        return undef;
+        warn $className;
+        WebGUI::Error::InvalidParam->throw(param => $className, error => "Not a WebGUI::Asset class",);
     }
     (my $module = $className . '.pm') =~ s{::}{/}g;
     if (eval { require $module; 1 }) {
         return $className;
     }
-    $session->errorHandler->error("Couldn't compile asset package: ".$className.". Root cause: ".$@);
+
+    WebGUI::Error::Compile->throw(class => $className, error => $@);
     return undef;
 }
 
@@ -1931,9 +1939,43 @@ sub logView {
 
 #-------------------------------------------------------------------
 
-=head2 new ( session, assetId [, className, revisionDate ] )
+=head2 title ( [value] )
 
-Constructor. This does not create an asset.
+Returns the title of the asset.
+
+=head3 value
+
+If specified this value will be used to set the title after it goes through some validation checking.
+
+=cut
+
+#-------------------------------------------------------------------
+
+=head2 menuTitle ( [value] )
+
+Returns the menuTitle of the asset, which is used in navigations.
+
+=head3 value
+
+If specified this value will be used to set the title after it goes through some validation checking.
+
+=cut
+
+#-------------------------------------------------------------------
+
+=head2 new ( propertyHashRef )
+
+Asset Constructor.  This does not create an asset in the database, or look up
+properties in the database, but creates a WebGUI::Asset object.
+
+=head3 propertyHashRef
+
+A hash reference of properties to assign to the object.
+
+=head2 new ( session, assetId [,revisionDate ] )
+
+Instanciator. This does not create an asset in the database, but looks up the object's
+properties in the database and returns an object with the correct WebGUI::Asset subclass.
 
 =head3 session
 
@@ -1943,10 +1985,6 @@ A reference to the current session.
 
 The assetId of the asset you're creating an object reference for. Must not be blank.
 
-=head3 className
-
-By default we'll use whatever class it is called by like WebGUI::Asset::File->new(), so WebGUI::Asset::File would be used.
-
 =head3 revisionDate
 
 An epoch date that represents a specific version of an asset. By default the most recent version will be used.  If
@@ -1954,71 +1992,14 @@ no revision date is available it will return undef.
 
 =cut
 
-sub new {
-    my ( $class, $session, $assetId, $className, $revisionDate ) = @_;
-    weaken( $session );
-
-    unless (defined $assetId) {
-        $session->errorHandler->error("Asset constructor new() requires an assetId.");
-        return undef;
-    }
-
-    if ($class eq 'WebGUI::Asset' && !$className) {
-        ($className) = $session->db->quickArray("select className from asset where assetId=?", [$assetId]);
-        unless ($className) {
-            $session->errorHandler->error("Couldn't instantiate asset: ".$assetId. ": couldn't find class name");
-            return undef;
-        }
-    }
-
-    if ($className) {
-        $class = $class->loadModule($session, $className);        
-        return undef unless (defined $class);
-    }
-    
-    if ( !$revisionDate ) {
-        $revisionDate   = $className
-                        ? $className->getCurrentRevisionDate( $session, $assetId )
-                        : $class->getCurrentRevisionDate( $session, $assetId );
-        return undef unless $revisionDate;
-    }
-    
-    my $cache = WebGUI::Cache->new($session, ["asset",$assetId,$revisionDate]);
-    my $properties = $cache->get;
-    if (exists $properties->{assetId}) {
-        # got properties from cache
-    } 
-    else {
-        $properties = WebGUI::Asset->assetDbProperties($session, $assetId, $class, $revisionDate);
-        unless (exists $properties->{assetId}) {
-            $session->errorHandler->error("Asset $assetId $class $revisionDate is missing properties. Consult your database tables for corruption. ");
-            return undef;
-        }
-        # Deserialize
-        foreach my $definition (@{ $class->definition($session) }) {
-            foreach my $property (keys %{ $definition->{properties} }) {
-                if ($definition->{properties}->{$property}->{serialize} && $properties->{$property} ne '') {
-                    $properties->{$property} = JSON->new->canonical->decode($properties->{$property});
-                }
-            }
-        }
-        $cache->set($properties,60*60*24);
-    }
-    if (defined $properties) {
-        my $object = { _session=>$session, _properties => $properties };
-        bless $object, $class;
-        return $object;
-    }	
-    $session->errorHandler->error("Something went wrong trying to instanciate a '$className' with assetId '$assetId', but I don't know what!");
-    return undef;
-}
-
 #-------------------------------------------------------------------
 
-=head2 newByDynamicClass ( session, assetId [ , revisionDate ] )
+=head2 newById ( session, assetId [ , revisionDate ] )
 
-Instances an existing Asset, by looking up the classname of the asset specified by the assetId, and then calling new.
-Returns undef if it can't find the classname.
+Instances an existing Asset, by looking up the className of the asset specified by the assetId, and then calling new.
+
+If a class cannot be found for the requested assetId, then it throws a
+WebGUI::Error::InvalidParam exception.
 
 =head3 session
 
@@ -2026,49 +2007,29 @@ A reference to the current session.
 
 =head3 assetId
 
-Must be a valid assetId
+Must be a valid assetId.
+
+Throws a WebGUI::Error::InvalidParam exception if the assetId is not passed.
 
 =head3 revisionDate
 
-A specific revision date for the asset to retrieve. If not specified, the most recent one will be used.
+An optional, specific revision date for the asset to retrieve. If not specified, the most recent one will be used.
 
 =cut
 
-sub newByDynamicClass {
-    my $class           = shift;
+sub newById {
+    my $requestedClass  = shift;
     my $session         = shift;
     my $assetId         = shift;
+    if (!$assetId) {
+        WebGUI::Error::InvalidParam->throw(error => 'newById must get an assetId');
+    }
     my $revisionDate    = shift;
- 
-# Some code requires that these situations not die.
-#    confess "newByDynamicClass requires WebGUI::Session" 
-#        unless $session && blessed $session eq 'WebGUI::Session';
-#    confess "newByDynamicClass requires assetId"
-#        unless $assetId;
-# So just return instead
-    return undef unless ( $session && blessed $session eq 'WebGUI::Session' ) 
-        && $assetId;
 
-    # Cache the className lookup
-    my $assetClass  = $session->stow->get("assetClass");
-    my $className   = $assetClass->{$assetId};
+    my $className = WebGUI::Asset->getClassById($session, $assetId);
+    my $class     = WebGUI::Asset->loadModule($className);
 
-    unless ($className) {
-        $className 
-            = $session->db->quickScalar(
-                "select className from asset where assetId=?",
-                [$assetId]
-            );
-        $assetClass->{ $assetId } = $className;
-        $session->stow->set("assetClass", $assetClass);
-    }
-        
-    unless ( $className ) {
-        $session->errorHandler->error("Couldn't find className for asset '$assetId'");
-        return undef;
-    }
-
-    return WebGUI::Asset->new($session,$assetId,$className,$revisionDate);
+    return $class->new($session, $assetId, $revisionDate);
 }
 
 
@@ -2076,7 +2037,10 @@ sub newByDynamicClass {
 
 =head2 newByPropertyHashRef ( session,  properties )
 
-Constructor.  This creates a standalone asset with no parent.  It does not update the database.
+Constructor.  This is a class method.  It creates a standalone asset with no parent, with a
+varying class, determined by the className entry in the properties hash ref.
+
+The object created is not persisted to the database.
 
 =head3 session
 
@@ -2084,19 +2048,20 @@ A reference to the current session.
 
 =head3 properties
 
-A properties hash reference. The className of the properties hash must be valid.
+A hash reference of Asset properties.
 
 =cut
 
 sub newByPropertyHashRef {
-	my $class = shift;
-	my $session = shift;
-	my $properties = shift;
-	return undef unless defined $properties;
-	return undef unless exists $properties->{className};
-    my $className = $class->loadModule($session, $properties->{className});
+    my $class      = shift;
+    my $session    = shift;
+    my $properties = shift || {};
+    $properties->{className} //= $class;
+    $properties->{session}     = $session;
+    my $className = $class->loadModule($properties->{className});
     return undef unless (defined $className);
-	bless {_session=>$session, _properties => $properties}, $className;
+    my $object = $className->new($properties);
+    return $object;
 }
 
 #-------------------------------------------------------------------
@@ -2122,23 +2087,20 @@ A specific revision to instanciate. By default we instanciate the newest publish
 =cut
 
 sub newByUrl {
-	my $class = shift;
-	my $session = shift;
-	my $url = shift || $session->url->getRequestedUrl;
+	my $class        = shift;
+	my $session      = shift;
+	my $url          = shift || $session->url->getRequestedUrl;
 	my $revisionDate = shift;
-	$url = lc($url);
+	$url =  lc($url);
 	$url =~ s/\/$//;
 	$url =~ s/^\///;
-	$url =~ s/\'//;
-	$url =~ s/\"//;
+    $url =~ tr/'"//d;
 	if ($url ne "") {
-		my ($id, $class) = $session->db->quickArray("select asset.assetId, asset.className from assetData join asset using (assetId) where assetData.url = ? limit 1", [ $url ]);
-		if ($id ne "" || $class ne "") {
-			return WebGUI::Asset->new($session,$id, $class, $revisionDate);
-		} else {
-			$session->errorHandler->warn("The URL $url was requested, but does not exist in your asset tree.");
-			return undef;
-		}
+		my ($id) = $session->db->quickArray("select assetId from assetData where url = ? limit 1", [ $url ]);
+        if (!$id) {
+            WebGUI::Error::ObjectNotFound->throw(error => "The URL was requested, but does not exist in your asset tree.", id => $url);
+        }
+        return WebGUI::Asset->newById($session, $id, $revisionDate);
 	}
 	return WebGUI::Asset->getDefault($session);
 }
@@ -2155,24 +2117,25 @@ A reference to the current session.
 
 =head3 assetId
 
-The asset's id
+The asset's id.  If an assetId is not passed, throws a WebGUI::Error::InvalidParam exception.  If
+a revision cannot be found for the requested assetId, then it throws a WebGUI::Error::InvalidParam
+exception.
 
 =cut
 
 sub newPending {
-    my $class = shift;
+    my $class   = shift;
     my $session = shift;
     my $assetId = shift;
-    croak "First parameter to newPending needs to be a WebGUI::Session object"
-        unless $session && $session->isa('WebGUI::Session');
-    croak "Second parameter to newPending needs to be an assetId"
-        unless $assetId;
-    my ($className, $revisionDate) = $session->db->quickArray("SELECT asset.className, assetData.revisionDate FROM asset INNER JOIN assetData ON asset.assetId = assetData.assetId WHERE asset.assetId = ? ORDER BY assetData.revisionDate DESC LIMIT 1", [ $assetId ]);
-    if ($className ne "" || $revisionDate ne "") {
-        return WebGUI::Asset->new($session, $assetId, $className, $revisionDate);
+    if (!$assetId) {
+        WebGUI::Error::InvalidParam->throw(error => 'newPending must get an assetId');
+    }
+    my $revisionDate = $session->db->quickScalar("SELECT revisionDate FROM assetData WHERE assetId = ? ORDER BY revisionDate DESC LIMIT 1", [ $assetId ]);
+    if ($revisionDate ne "") {
+        return WebGUI::Asset->newById($session, $assetId, $revisionDate);
     }
     else {
-        croak "Invalid asset id '$assetId' requested!";
+        WebGUI::Error::InvalidParam->throw(error => "Couldn't lookup revisionDate", param => $assetId);
     }
 }
 
@@ -2228,8 +2191,6 @@ The height of the iframe. Required for making widget-in-widget function properly
 The templateId for this widgetized asset to use. Required for making
 widget-in-widget function properly.
 
-=cut
-
 =head3 styleTemplateId
 
 The style templateId for this widgetized asset to use. Not required for making
@@ -2250,7 +2211,7 @@ sub outputWidgetMarkup {
     my $assetId         = $self->getId;
     my $hexId           = $session->id->toHex($assetId);
     my $conf            = $session->config;
-    my $extras          = $conf->get('extrasURL');
+    my $extras          = $session->url->make_urlmap_work($conf->get('extrasURL'));
 
     # the widgetized version of content that has the widget macro in it is
     # executing in an iframe. this iframe doesn't have a style object.
@@ -2317,32 +2278,6 @@ OUTPUT
 
 #-------------------------------------------------------------------
 
-=head2 packExtraHeadTags ( unpacked )
-
-Pack the extra head tags. Return the unpacked head tags (as per
-filter guidelines).
-
-=cut
-
-sub packExtraHeadTags {
-    my ( $self, $unpacked ) = @_;
-    # If no more unpacked tags, remove the packed tags
-    if ( !$unpacked ) {
-        $self->update({ extraHeadTagsPacked => $unpacked });
-        return;
-    }
-    my $packed  = $unpacked;
-    HTML::Packer::minify( \$packed, {
-        remove_newlines     => 1,
-        do_javascript       => "shrink",
-        do_stylesheet       => "minify",
-    } );
-    $self->update({ extraHeadTagsPacked => $packed });
-    return $unpacked;
-}
-
-#-------------------------------------------------------------------
-
 =head2 prepareView ( )
 
 Executes what is necessary to make the view() method work with content chunking.
@@ -2377,17 +2312,65 @@ asset open in a new window.
 sub prepareWidgetView {
     my $self            = shift;
     my $templateId      = shift;
-    my $template        = WebGUI::Asset::Template->new($self->session, $templateId);
-    my $extras          = $self->session->config->get('extrasURL');
+    my $template        = WebGUI::Asset::Template->newById($self->session, $templateId);
+    my $extras          = $self->session->url->make_urlmap_work($self->session->config->get('extrasURL'));
 
     $template->prepare;
 
     $self->{_viewTemplate} = $template;
 }
 
+#----------------------------------------------------------------------------
+
+=head2 proceed ( [method] )
+
+Redirect from a form submit based on the given method. By default, checks the "proceed"
+form parameter.
+
+Proceed types:
+
+ manageAssets       - Go to the asset manager
+ viewParent         - Go to the parent asset
+ editParent         - Go to the parent asset edit form
+ goBackToPage       - Go to the page specified in the "returnUrl" form param
+ *                  - Go to www_* method
+ <default>          - Go to the www_view method
+
+=cut
+
+sub proceed {
+    my ( $self, $proceed ) = @_;
+    my $session = $self->session;
+
+    $proceed ||= $session->form->process('proceed');
+    if ($proceed eq "manageAssets") {
+        $session->asset($self->getParent);
+        return $session->asset->www_manageAssets;
+    }
+    elsif ($proceed eq "viewParent") {
+        $session->response->setRedirect( $self->getParent->getUrl );
+        return "redirect";
+    }
+    elsif ($proceed eq "editParent") {
+        $session->response->setRedirect( $self->getParent->getUrl('func=edit') );
+        return "redirect";
+    }
+    elsif ($proceed eq "goBackToPage" && $session->form->process('returnUrl')) {
+        $session->response->setRedirect($session->form->process("returnUrl"));
+        return "redirect";
+    }
+    elsif ($proceed ne "") {
+        $session->response->setRedirect( $self->getUrl( 'func=' . $proceed ) );
+        return "redirect";
+    }
+
+    $session->response->setRedirect( $self->getUrl );
+    return "redirect";
+}
+
 #-------------------------------------------------------------------
 
-=head2 processPropertiesFromFormPost ( )
+=head2 processEditForm ( )
 
 Updates current Asset with data from Form. You can feed back errors by returning an
 arrayref containing the error messages. If there is no error you do not have to return
@@ -2395,53 +2378,46 @@ anything.
 
 =cut
 
-sub processPropertiesFromFormPost {
-	my $self = shift;
-	my %data;
-    my $form = $self->session->form;
-	my $overrides = $self->session->config->get("assets/".$self->get("className")."/fields");
+sub processEditForm {
+    my $self = shift;
+    my %data;
+    my $form      = $self->session->form;
+    my $overrides = $self->session->config->get( "assets/" . $self->get("className") . "/fields" );
 
-	foreach my $definition (@{$self->definition($self->session)}) {
-		foreach my $property (keys %{$definition->{properties}}) {
-			my %params = %{$definition->{properties}{$property}};
+    foreach my $property ( $self->getProperties ) {
+        next if $self->meta->find_attribute_by_name( $property )->noFormPost;
 
-			# apply config file changes
-			foreach my $key (keys %{$overrides->{$property}}) {
-				$params{$key} = $overrides->{$property}{$key};
-			}
-			
-			# deal with properties that can't be posted through the form
-			if ($params{noFormPost}) {
-				if ($form->process("assetId") eq "new" && $self->get($property) eq "") {
-					$data{$property} = $params{defaultValue};
-				}
-				next;
-			}
-			
-			# process the form element
-			$params{name} = $property;
-			$params{value} = $self->get($property);
-			$data{$property} = $form->process(
-				$property,
-				$params{fieldType},
-				$params{defaultValue},
-				\%params
-				);
-		}
-	}
+        my $fieldType      = $self->meta->find_attribute_by_name($property)->fieldType;
+        my $fieldOverrides = $overrides->{$property} || {};
+        my $fieldHash      = {
+            tab => "properties",
+            %{ $self->getFormProperties($property) },
+            %{$overrides},
+            name  => $property,
+            value => $self->$property,
+        };
+
+
+        # process the form element
+        my $defaultValue = $overrides->{defaultValue} // $self->$property;
+        $data{$property} = $form->process( $property, $fieldType, $defaultValue, $fieldHash );
+    } ## end foreach my $property ( $self...)
+
     $data{keywords} = $form->process("keywords");
-    if ($self->session->setting->get("metaDataEnabled")) {
+    if ( $self->session->setting->get("metaDataEnabled") ) {
         my $meta = $self->getMetaDataFields;
-	    foreach my $field (keys %{$meta}) {
-            my $value = $form->process("metadata_".$field, $meta->{$field}{fieldType}, $meta->{$field}{defaultValue});
-		   	$self->updateMetaData($field, $value);
-	    }
+        foreach my $field ( keys %{$meta} ) {
+            my $value
+                = $form->process( "metadata_" . $field, $meta->{$field}{fieldType}, $meta->{$field}{defaultValue} );
+            $self->updateMetaData( $field, $value );
+        }
     }
-	$self->session->db->beginTransaction;
-	$self->update(\%data);
-	$self->session->db->commit;
+
+    $self->session->db->beginTransaction;
+    $self->update( \%data );
+    $self->session->db->commit;
     return undef;
-}
+} ## end sub processEditForm
 
 
 #-------------------------------------------------------------------
@@ -2474,16 +2450,18 @@ sub processTemplate {
 
     # Sanity checks
     if (ref $var ne "HASH") {
-        $session->errorHandler->error("First argument to processTemplate() should be a hash reference.");
+        $session->log->error("First argument to processTemplate() should be a hash reference.");
         return "Error: Can't process template for asset ".$self->getId." of type ".$self->get("className");
     }
-    $template = WebGUI::Asset->new($session, $templateId,"WebGUI::Asset::Template") unless (defined $template);
-    if (defined $template) {
+    if (!defined $template) {
+        $template = eval { WebGUI::Asset->newById($session, $templateId) };
+    }
+    if (! Exception::Class->caught() ) {
         $var = { %{ $var }, %{ $self->getMetaDataAsTemplateVariables } };
-        $var->{'controls'}   = $self->getToolbar if $session->var->isAdminOn;
+        $var->{'controls'}   = $self->getToolbar if $session->isAdminOn;
         $var->{'assetIdHex'} = $session->id->toHex($self->getId);
         my %vars = (
-            %{$self->{_properties}},
+            %{$self->get},
             'title'     => $self->getTitle,
             'menuTitle' => $self->getMenuTitle,
             'keywords'  => $self->get('keywords'),
@@ -2492,7 +2470,7 @@ sub processTemplate {
         return $template->process(\%vars);
     }
     else {
-        $session->errorHandler->error("Can't instantiate template $templateId for asset ".$self->getId);
+        $session->log->error("Can't instantiate template $templateId for asset ".$self->getId);
         my $i18n = WebGUI::International->new($self->session, 'Asset');
         return $i18n->get('Error: Cannot instantiate template').' '.$templateId;
     }
@@ -2553,16 +2531,17 @@ sub publish {
 	my $stateList = $self->session->db->quoteAndJoin($statesToPublish);
 	my $where = ($statesToPublish) ? "and state in (".$stateList.")" : "";
 	
-	my $assetIds = $self->session->db->buildArrayRef("select assetId from asset where lineage like ".$self->session->db->quote($self->get("lineage").'%')." $where");
+	my $assetIds = $self->session->db->buildArrayRef("select assetId from asset where lineage like ".$self->session->db->quote($self->lineage.'%')." $where");
         my $idList = $self->session->db->quoteAndJoin($assetIds);
         
 	$self->session->db->write("update asset set state='published', stateChangedBy=".$self->session->db->quote($self->session->user->userId).", stateChanged=".time()." where assetId in (".$idList.")");
-	my $cache = WebGUI::Cache->new($self->session);
         foreach my $id (@{$assetIds}) {
-        	# we do the purge directly cuz it's a lot faster than instantiating all these assets
-                $cache->deleteChunk(["asset",$id]);
+                my $asset = WebGUI::Asset->newPending($self->session, $id);
+                if (defined $asset) {
+                    $asset->purgeCache;
+                }
         }
-	$self->{_properties}{state} = "published";
+	$self->state("published");
 
     # Also publish any shortcuts to this asset that are in the trash
     my $shortcuts 
@@ -2580,7 +2559,7 @@ sub publish {
 
 =head2 purgeCache ( )
 
-Purges all cache entries associated with this asset.
+Purges all cache entries associated with this asset, CHI, Session->stow and object caches
 
 =cut
 
@@ -2590,7 +2569,8 @@ sub purgeCache {
 	$stow->delete('assetLineage');
 	$stow->delete('assetClass');
 	$stow->delete('assetRevision');
-	WebGUI::Cache->new($self->session,["asset",$self->getId,$self->get("revisionDate")])->deleteChunk(["asset",$self->getId]);
+    $self->session->cache->remove("asset".$self->getId.$self->revisionDate);
+    $self->{_parent};
 }
 
 
@@ -2617,12 +2597,6 @@ Returns a reference to the current session.
 
 =cut
 
-sub session {
-	my ($self) = @_;
-	return $self->{_session};
-}
-
-
 #-------------------------------------------------------------------
 
 =head2 setSize ( [extra] )
@@ -2643,9 +2617,9 @@ sub setSize {
 		$sizetest .= $self->get($key);
 	}
     my $size = length($sizetest) + $extra;
-	$self->session->db->write("update assetData set assetSize=".$size." where assetId=".$self->session->db->quote($self->getId)." and revisionDate=".$self->session->db->quote($self->get("revisionDate")));
+	$self->session->db->write("update assetData set assetSize=? where assetId=? and revisionDate=?",[$size, $self->getId, $self->revisionDate]);
 	$self->purgeCache;
-    $self->{_properties}{assetSize} = $size;
+    $self->assetSize($size);
 }
 	
 #-------------------------------------------------------------------
@@ -2672,149 +2646,65 @@ sub setState {
             $self->getId,
         ]
     );
-    @{$self->{_properties}}{qw(state stateChangedBy stateChanged)} = @props;
+    $self->state($state);
+    $self->stateChangedBy($props[1]);
+    $self->stateChanged($props[2]);
     $self->purgeCache;
 }
 
 #-------------------------------------------------------------------
 
-=head2 toggleToolbar ( )
+=head2 write ( )
 
-Toggles a toolbar to a special state so that custom toolbars can be rendered under special circumstances. This is mostly useful for macros that wish to proxy an asset but not display the toolbar.
-
-=cut
-
-sub toggleToolbar {
-	my $self = shift;
-	if ($self->{_toolbarState}) {
-		$self->{_toolbarState} = 0;
-	} else {
-		$self->{_toolbarState} = 1;
-	}
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 update ( properties )
-
-Updates the properties of an existing revision. If you want to create a new revision, please use addRevision().
-
-=head3 properties
-
-Hash reference of properties and values to set.
-
-NOTE: C<keywords> is a special property that uses the WebGUI::Keyword API
-to set the keywords for this asset.
+Stores the current properties of the asset in the database.
 
 =cut
 
-sub update {
+sub write {
 	my $self = shift;
-	my $requestedProperties = shift;
-    my $properties = clone($requestedProperties);
-	$properties->{lastModified} = time();
+    $self->lastModified(time());
 	
-    # if keywords were specified, then let's set them the right way
-    if (exists $properties->{keywords}) {
-        WebGUI::Keyword->new($self->session)->setKeywordsForAsset(
-            {keywords=>$properties->{keywords}, asset=>$self});
+    my $db = $self->session->db;
+    my %data_by_table = ();
+    
+    PROPERTY: foreach my $property_name ($self->meta->get_all_property_list) {
+        my $property  = $self->meta->find_attribute_by_name($property_name);
+        my $tableName = $property->tableName;
+        my $value     = $self->$property_name;
+        if ($property->does('WebGUI::Definition::Meta::Property::Serialize')) {
+            $value    = eval { JSON::to_json($value); } || '';
+        }
+        push @{ $data_by_table{$tableName}->{NAMES}  }, $property_name;
+        push @{ $data_by_table{$tableName}->{VALUES} }, $value;
+    }
+    CLASS: foreach my $tableName (keys %data_by_table) {
+        my $table       = $db->quoteIdentifier($tableName);
+        my @values      = @{ $data_by_table{$tableName}->{VALUES} };
+        my @columnNames = map { $db->quoteIdentifier($_).'=?' } @{ $data_by_table{$tableName}->{NAMES}};
+        push @values, $self->getId, $self->revisionDate;
+        $db->write("update ".$table." set ".join(",",@columnNames)." where assetId=? and revisionDate=?",\@values);
     }
 
-    ##If inheritUrlFromParent was sent, and it is true, then muck with the url
-    ##The URL may have been sent too, so use it or the current Asset's URL.
-    if (exists $properties->{inheritUrlFromParent} and $properties->{inheritUrlFromParent}) {
-        $properties->{'url'} = $self->fixUrlFromParent($properties->{'url'} || $self->get('url'));
-    }
-
-    # check the definition of all properties against what was given to us
-    foreach my $definition (reverse @{$self->definition($self->session)}) {
-		my %setPairs = ();
-
-		# get a list of the fields available in this table so we don't try to insert
-		# something for a field that doesn't exist
-		my %tableFields = ();
-		my $sth = $self->session->db->read('DESCRIBE `'.$definition->{tableName}.'`');
-		while (my ($col) = $sth->array) {
-			$tableFields{$col} = 1;
-		}
-
-        # deal with all the properties in this part of the definition
-		foreach my $property (keys %{$definition->{properties}}) {
-
-#            # skip a property unless it was specified to be set by the properties field or has a default value
-#			next unless (exists $properties->{$property} || exists $definition->{properties}{$property}{defaultValue});
-            # skip a property unless it was specified to be set by the properties field
-			next unless (exists $properties->{$property});
-            my $propertyDefinition = $definition->{properties}{$property};
-            # skip a property if it has the display only flag set
-            next if ($propertyDefinition->{displayOnly});
-
-            # skip properties that aren't yet in the table
-            if (!exists $tableFields{$property}) {
-				$self->session->log->error("update() tried to set field named '".$property."' which doesn't exist in table '".$definition->{tableName}."'");
-                next;
-            }
-
-            # use the update value
-			my $value = $properties->{$property};
-            # use the current value because the update value was undef
-            unless (defined $value) {
-                $value = $self->get($property);
-            }
-
-            # apply filter logic on a property to validate or fix it's value
-            if (exists $propertyDefinition->{filter}) {
-                my $filter = $propertyDefinition->{filter};
-                $value = $self->$filter($value, $property);
-            }
-
-            # if the value is undefined, use the default if possible
-            # unless allowEmpty has been set, do this for empty strings as well
-            if ( ( !defined $value || ( $value eq q{} && ! $propertyDefinition->{allowEmpty} ) )
-                 && exists $propertyDefinition->{defaultValue} ) {
-                $value = $propertyDefinition->{defaultValue};
-                if (ref($value) eq 'ARRAY') {
-                    $value = $value->[0];
-                }
-            }
-
-            # set the property
-            if ($propertyDefinition->{serialize}) {
-                # Only serialize references
-                if ( ref $value ) {
-                    $setPairs{$property} = JSON->new->canonical->encode($value);
-                }
-                # Passing already serialized JSON string
-                elsif ( $value ) {
-                    $setPairs{$property} = $value;
-                    $value = JSON->new->decode( $value ); # for setting in _properties, below
-                }
-            }
-            else {
-                $setPairs{$property} = $value;
-            }
-			$self->{_properties}{$property} = $value;
-		}
-
-        # if there's anything to update, then do so
-		if (scalar(keys %setPairs) > 0) {
-			my @values = values %setPairs;
-            my @columnNames = map { $_.'=?' } keys %setPairs;
-			push(@values, $self->getId, $self->get("revisionDate"));
-			$self->session->db->write("update ".$definition->{tableName}." set ".join(",",@columnNames)." where assetId=? and revisionDate=?",\@values);
-		}
-	}
-
-    # we've changed something so we need to update our size
+    # update the asset's size, which also purges the cache.
     $self->setSize();
+    WebGUI::Keyword->new($self->session)->setKeywordsForAsset({ asset => $self, keywords => $self->keywords });
 
-    # we've changed something so cache is no longer valid
-	$self->purgeCache;
+    $self->purgeCache;
 }
 
 #-------------------------------------------------------------------
 
+=head2 url ( [ value ] ) 
+
+Returns the asset's url without any site specific prefixes. If you want a browser friendly url see the getUrl() method.
+
+=head3 value
+
+The new value to set the URL to.
+
+=cut
+
+#-------------------------------------------------------------------
 
 =head2 urlExists ( session, url [, options] )
 
@@ -2856,18 +2746,15 @@ sub urlExists {
 
 #-------------------------------------------------------------------
 
-=head2 validParent ( )
+=head2 valid_parent_classes ( )
 
-Make sure that the current session asset is a valid parent for the child and return true or false.
-For example, a WikiPage would check for a WikiMaster.  It should be overridden by those children
-that need to perform that kind of check.
-
-This is a class method.
+Returns an arrayref of classes that this asset is allowed to be a child of. If
+a candidate parent passes ->isa for any of these it is a valid parent.
 
 =cut
 
-sub validParent {
-    return 1;
+sub valid_parent_classes {
+    return [qw/WebGUI::Asset/];
 }
 
 #-------------------------------------------------------------------
@@ -2880,7 +2767,7 @@ The default view method for any asset that doesn't define one. Under all normal 
 
 sub view {
 	my $self = shift;
-	if ($self->session->var->isAdminOn) {
+	if ($self->session->isAdminOn) {
 		return $self->getToolbar.' '.$self->getTitle;
 	} else {
 		return "";
@@ -2891,217 +2778,96 @@ sub view {
 
 =head2 www_add ( )
 
-Create a new, unsaved asset with a parent of this asset from C<class>, C<url>, and optional C<prototype> parameters and present the
-edit screen for it.
-Calls C<get_add_instance> to configure the new asset; the default implementation inherits security and 
-style properties from the current asset, the parent.
+Show the form to add a new child asset.
 
 =cut
 
 sub www_add {
-	my $self = shift;
-    my $class = $self->loadModule($self->session, $self->session->form->process("class","className"));
-	my $prototype = $self->session->form->process('prototype');
-    my $url = scalar($self->session->form->param("url"));
-
+    my $self = shift;
+    my $session = $self->session;
+    my ( $style, $url ) = $session->quick(qw( style url ));
+	my %prototypeProperties;
+    my $class = $self->loadModule($self->session->form->process("className","className"));
     return undef unless (defined $class);
 	return $self->session->privilege->insufficient() unless ($class->canAdd($self->session));
-
-    my $newAsset = $class->get_add_instance( $self->session, $self, $url, $prototype );
-
-	$newAsset->{_parent} = $self;
-	return $newAsset->www_edit();
-}
-
-#-------------------------------------------------------------------
-
-=head2 get_add_instance ( $session, $parentAsset, $url, $prototype )
-
-Class method.
-Called from C<www_add> by the parent asset on the class of the new asset being constructed.
-Configures the new asset with defaults, including inheriting security and style properties from the current asset.
-C<$prototype> is the optional assetId of an asset to initialize the new asset from.
-
-=cut
-
-sub get_add_instance {
-    my $class = shift;
-    my $session = shift;
-    my $parentAsset = shift;
-    my $url = shift;
-    my $prototype = shift;
-
-	my %prototypeProperties;
-
-	if ($prototype) {
-		my $prototype = WebGUI::Asset->new($session, $prototype, $class);
-		foreach my $definition (@{$prototype->definition($session)}) { # cycle through rather than copying properties to avoid grabbing stuff we shouldn't grab
-			foreach my $property (keys %{$definition->{properties}}) {
-				next if (isIn($property,qw(title menuTitle url isPrototype isPackage)));
-				next if ($definition->{properties}{$property}{noFormPost});
-				$prototypeProperties{$property} = $prototype->get($property);
-			}
+	if ($self->session->form->process('prototype')) {
+		my $prototype = WebGUI::Asset->newById($self->session, $self->session->form->process("prototype"));
+		foreach my $property ($prototype->getProperties) { # cycle through rather than copying properties to avoid grabbing stuff we shouldn't grab
+            my $definition = $prototype->getProperty($property);
+			next if ( $property ~~ [qw(title menuTitle url isPrototype isPackage)]);
+			next if ($definition->{noFormPost});
+			$prototypeProperties{$property} = $prototype->get($property);
 		}
 	}
+	my %properties = (
+		%prototypeProperties,
+		className=>$class,
+        $self->getInheritableProperties,
+		assetId=>"new",
+		url=>scalar($self->session->form->param("url")),
+		);
+	$properties{isHidden} = 1 unless $self->session->config->get("assets/".$class."/isContainer");
+	my $newAsset = WebGUI::Asset->newByPropertyHashRef($self->session,\%properties);
+	$newAsset->{_parent} = $self;
 
-    my %properties = (
-        %prototypeProperties,
-        parentId                 => $parentAsset->getId,
-        groupIdView              => $parentAsset->get("groupIdView"),
-        groupIdEdit              => $parentAsset->get("groupIdEdit"),
-        ownerUserId              => $parentAsset->get("ownerUserId"),
-        encryptPage              => $parentAsset->get("encryptPage"),
-        styleTemplateId          => $parentAsset->get("styleTemplateId"),
-        printableStyleTemplateId => $parentAsset->get("printableStyleTemplateId"),
-        isHidden                 => $parentAsset->get("isHidden"),
-        className                => $class,
-        assetId                  => "new",
-        url                      => $url,
-    );
-    $properties{isHidden} = 1 unless $session->config->get("assets/".$class."/isContainer");
-
-    return WebGUI::Asset->newByPropertyHashRef($session, \%properties);
-
+    my $template   = eval { $newAsset->getEditTemplate };
+    return $@ if $@;
+    if (! blessed $template ) {
+        return $template;
+    }
+    if ( $template->getForm("form") ) {
+        $template->getForm("form")->action( $self->getUrl );
+        $template->getForm("form")->addField( "Hidden", name => "func", value => "addSave" );
+    }
+    return $template;
 }
 
-#-------------------------------------------------------------------
+#----------------------------------------------------------------------------
 
-=head2 www_ajaxInlineView ( )
+=head2 www_addSave
 
-Returns the view() method of the asset object if the requestor canView.
+Process the add form, creating the new asset.
 
 =cut
 
-sub www_ajaxInlineView {
-	my $self = shift;
-	return $self->session->privilege->noAccess() unless $self->canView;
-	$self->prepareView;
-	return $self->view;
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 www_changeUrl ( )
-
-Allows a user to change a url permanently to something else.
-
-=cut
-
-sub www_changeUrl {
-	my $self = shift;
-	return $self->session->privilege->insufficient() unless $self->canEdit;
-	my $i18n = WebGUI::International->new($self->session, "Asset");
-	my $f = WebGUI::HTMLForm->new($self->session, action=>$self->getUrl);
-	$f->hidden(name=>"func", value=>"changeUrlConfirm");
-	$f->hidden(name=>"proceed", value=>scalar($self->session->form->param("proceed")));
-	$f->text(name=>"url", value=>$self->get('url'), label=>$i18n->get("104"), hoverHelp=>$i18n->get('104 description'));
-	$f->yesNo(name=>"confirm", value=>0, label=>$i18n->get("confirm change"), hoverHelp=>$i18n->get("confirm change url message"), subtext=>'<br />'.$i18n->get("confirm change url message"));
-	$f->submit;
-	return $self->getAdminConsole->render($f->print,$i18n->get("change url"));
-}
-
-#-------------------------------------------------------------------
-
-=head2 www_changeUrlConfirm ( )
-
-This actually does the change url of the www_changeUrl() function.
-
-=cut
-
-sub www_changeUrlConfirm {
-	my $self = shift;
-	return $self->session->privilege->insufficient() unless $self->canEdit;
-	$self->_invokeWorkflowOnExportedFiles($self->session->setting->get('changeUrlWorkflow'), 1);
-
-	if ($self->session->form->process("confirm","yesNo") && $self->session->form->process("url","text")) {
-		$self->update({url=>$self->session->form->process("url","text")});
-	 	my $rs = $self->session->db->read("select revisionDate from assetData where assetId=? and revisionDate<>?",[$self->getId, $self->get("revisionDate")]);
-                while (my ($version) = $rs->array) {
-                	my $old = WebGUI::Asset->new($self->session, $self->getId, $self->get("className"), $version);
-                        $old->purgeRevision if defined $old;
-                }
-	}
-
-	if ($self->session->form->param("proceed") eq "manageAssets") {
-		$self->session->http->setRedirect($self->getManagerUrl);
-	} else {
-		$self->session->http->setRedirect($self->getUrl());
-	}
-
-	return undef;
-}
-
-#-------------------------------------------------------------------
-
-=head2 www_edit ( )
-
-Renders an AdminConsole EditForm, unless canEdit returns False.
-
-=cut
-
-sub www_edit {
-	my $self = shift;
-	return $self->session->privilege->insufficient() unless $self->canEdit;
-	return $self->session->privilege->locked() unless $self->canEditIfLocked;
-	return $self->getAdminConsole->render($self->getEditForm->print, $self->addEditLabel);
-}
-
-#-------------------------------------------------------------------
-
-=head2 www_editSave ( )
-
-Saves and updates history. If canEdit, returns www_manageAssets() if a new Asset is created, otherwise returns www_view().  Will return an insufficient Privilege if canEdit returns False, or if the submitted form does not pass the C<$session->form->validToken> check.
-
-NOTE: Don't try to override or overload this method. It won't work. What you are looking for is processPropertiesFromFormPost().
-
-=cut
-
-sub www_editSave {
+sub www_addSave {
     my $self    = shift;
     my $session = $self->session;
+    my ( $form ) = $session->quick(qw{ form });
 
-    ##If this is a new asset (www_add), the parent may be locked.  We should still be able to add a new asset.
-    my $isNewAsset = $session->form->process("assetId") eq "new" ? 1 : 0;
-    return $session->privilege->locked() if (!$self->canEditIfLocked and !$isNewAsset);
-    return $session->privilege->insufficient() unless $self->canEdit && $session->form->validToken;
+    return $session->privilege->insufficient() unless $self->canEdit;
     if ($self->session->config->get("maximumAssets")) {
         my ($count) = $self->session->db->quickArray("select count(*) from asset");
         my $i18n = WebGUI::International->new($self->session, "Asset");
-        return $self->session->style->userStyle($i18n->get("over max assets")) if ( $self->session->config->get("maximumAssets") <= $count && $isNewAsset );
+        return $self->session->style->userStyle($i18n->get("over max assets")) if ($self->session->config->get("maximumAssets") <= $count);
     }
+
+    # Add the new asset
     my $object;
-    if ($isNewAsset) {
-        my $className = $session->form->process("class","className");
-        return $session->privilege->insufficient() if ($isNewAsset && !$className->canAdd($session));
-        $object = $self->addChild({className=> $className});	
-        return $self->www_view unless defined $object;
-        $object->{_parent} = $self;
-        $object->{_properties}{url} = undef;
-    } 
-    else {
-        if ($self->canEditIfLocked) {
-            $object = $self->addRevision;
-        } 
-        else {
-            return $session->asset($self->getContainer)->www_view;
-        }
+    my $className   = $form->process('className','className') || $form->process('class','className');
+    $object = $self->addChild({
+        className   => $className,
+        revisedBy   => $session->user->userId,
+    });
+    if ( !defined $object ) {
+        my $url = $session->url->page;
+        $session->log->error( "Could not add child $className to $url!" );
+        return $self->www_view;
     }
+    $object->{_parent} = $self;
+    $object->url(undef);
 
     # Process properties from form post
-    my $errors = $object->processPropertiesFromFormPost;
+    my $errors = $object->processEditForm;
     if (ref $errors eq 'ARRAY') {
+        my $url = $session->url->page;
+        $session->log->error( "Cannot add asset $className to $url: '" . join( "', '", @$errors ) . q{'} );
         $session->stow->set('editFormErrors', $errors);
-        if ($session->form->process('assetId') eq 'new') {
-            $object->purge;
-            return $self->www_add();
-        } else {
-            $object->purgeRevision;
-            return $self->www_edit();
-        }
+        $object->purge;
+        return $self->www_add();
     }
 
-    $object->updateHistory("edited");
+    $object->updateHistory("added");
 
     # we handle auto commit assets here in case they didn't handle it themselves
     if ($object->getAutoCommitWorkflowId) {
@@ -3133,61 +2899,108 @@ sub www_editSave {
     }
 
     # Handle "proceed" form parameter
-    my $proceed = $session->form->process('proceed');
-    if ($proceed eq "manageAssets") {
-        $session->asset($object->getParent);
-        return $session->asset->www_manageAssets;
-    }
-    elsif ($proceed eq "viewParent") {
-        $session->asset($object->getParent);
-        return $session->asset->www_view;
-    }
-    elsif ($proceed eq "editParent") {
-        $session->asset($object->getParent);
-        return $session->asset->www_edit;
-    }    
-    elsif ($proceed eq "goBackToPage" && $session->form->process('returnUrl')) {
-        $session->http->setRedirect($session->form->process("returnUrl"));
-        return undef;
-    }
-    elsif ($proceed ne "") {
-        my $method = "www_".$session->form->process("proceed");
-        $session->asset($object);
-        return $session->asset->$method();
-    }
-
-    $session->asset($object->getContainer);
-    return $session->asset->www_view;
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 www_manageAssets ( )
-
-Redirect to the asset manager content handler (for backwards compatibility)
-
-=cut
-
-sub www_manageAssets {
-    my $self = shift;
-    $self->session->http->setRedirect( $self->getManagerUrl );
-    return "redirect";
+    return $object->proceed;
 }
 
 #-------------------------------------------------------------------
 
-=head2 www_searchAssets ( )
+=head2 www_ajaxInlineView ( )
 
-Redirect to the asset manager content handler (for backwards 
-compatibility)
+Returns the view() method of the asset object if the requestor canView.
 
 =cut
 
-sub www_searchAssets {
+sub www_ajaxInlineView {
+	my $self = shift;
+	return $self->session->privilege->noAccess() unless $self->canView;
+	$self->prepareView;
+	return $self->view;
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_edit ( )
+
+Renders an AdminConsole EditForm, unless canEdit returns False.
+
+=cut
+
+sub www_edit {
     my $self = shift;
-    $self->session->http->setRedirect( $self->getSearchUrl );
-    return "redirect";
+    my $session = $self->session;
+    my ( $style, $url ) = $session->quick(qw( style url ));
+    return $self->session->privilege->insufficient() unless $self->canEdit;
+    return $self->session->privilege->locked() unless $self->canEditIfLocked;
+
+    my $template    = $self->getEditTemplate;
+    if ( my $form = $template->getForm('form') ) {
+        $form->addField( "Hidden", name => "func", value => "editSave" );
+    }
+
+    return $template;
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_editSave ( )
+
+Save a new revision of this asset.
+
+=cut
+
+sub www_editSave {
+    my $self    = shift;
+    my $session = $self->session;
+    my ( $form ) = $session->quick(qw{ form });
+
+    ##If this is a new asset (www_add), the parent may be locked.  We should still be able to add a new asset.
+    return $session->privilege->locked() unless $self->canEditIfLocked;
+    return $session->privilege->insufficient() unless $self->canEdit;
+
+    # Add the new revision
+    my $object = $self->addRevision();
+
+    # Process properties from form post
+    my $errors = $object->processEditForm;
+    if (ref $errors eq 'ARRAY') {
+        $session->stow->set('editFormErrors', $errors);
+        $object->purgeRevision;
+        return $self->www_edit();
+    }
+
+    $object->updateHistory("edited");
+
+    # we handle auto commit assets here in case they didn't handle it themselves
+    if ($object->getAutoCommitWorkflowId) {
+        $object->requestAutoCommit;
+        #Since the version tag makes new objects, fetch a fresh one here.
+        $object = $object->cloneFromDb;
+    }
+    # else, try to to auto commit
+    else {
+        my $commitStatus = WebGUI::VersionTag->autoCommitWorkingIfEnabled($session, {
+            override        => scalar $session->form->process('saveAndCommit'),
+            allowComments   => 1,
+            returnUrl       => $self->getUrl,
+        });
+        if ($commitStatus eq 'redirect') {
+            ##Redirect set by tag.  Return nothing to send the user over to the redirect.
+            return 'redirect';
+        }
+        elsif ($commitStatus eq 'commit') {
+            ##Commit was successful.  Update the local object cache so that it will no longer
+            ##register as locked.
+            $object = $object->cloneFromDb;
+        }
+    }
+
+    # Handle "saveAndReturn" button
+    if ( $session->form->process( "saveAndReturn" ) ne "" ) {
+        return $object->www_edit;
+    }
+
+    # Handle "proceed" form parameter
+    return $self->proceed;
 }
 
 #-------------------------------------------------------------------
@@ -3203,7 +3016,7 @@ sub www_view {
     
     # don't allow viewing of the root asset
 	if ($self->getId eq "PBasset000000000000001") {
-		$self->session->http->setRedirect($self->getDefault($self->session)->getUrl);
+		$self->session->response->setRedirect($self->getDefault($self->session)->getUrl);
 		return undef;
 	}
 
@@ -3246,4 +3059,5 @@ sub www_widgetView {
         return $self->outputWidgetMarkup($width, $height, $templateId, $styleTemplateId);
 }
 
+__PACKAGE__->meta->make_immutable;
 1;

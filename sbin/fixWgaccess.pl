@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -10,18 +10,17 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-$|++; # disable output buffering
-our ($webguiRoot, $configFile, $help, $man);
-
-BEGIN {
-    $webguiRoot = "..";
-    unshift (@INC, $webguiRoot."/lib");
-}
-
 use strict;
-use Pod::Usage;
 use Getopt::Long;
+use Pod::Usage;
+use WebGUI::Paths -inc;
 use WebGUI::Session;
+
+my $configFile;
+my $help;
+my $man;
+
+$| = 1; # No buffering
 
 # Get parameters here, including $help
 GetOptions(
@@ -34,7 +33,7 @@ pod2usage( verbose => 1 ) if $help;
 pod2usage( verbose => 2 ) if $man;
 pod2usage( msg => "Must specify a config file!" ) unless $configFile;  
 
-my $session = start( $webguiRoot, $configFile );
+my $session = start( $configFile );
 
 use WebGUI::Asset::File;
 my $iter  = WebGUI::Asset::File->getIsa($session);
@@ -52,9 +51,8 @@ finish($session);
 
 #----------------------------------------------------------------------------
 sub start {
-    my $webguiRoot  = shift;
     my $configFile  = shift;
-    my $session = WebGUI::Session->open($webguiRoot,$configFile);
+    my $session = WebGUI::Session->open($configFile);
     $session->user({userId=>3});
 
     return $session;
@@ -113,7 +111,7 @@ Shows this document
 
 =head1 AUTHOR
 
-Copyright 2001-2009 Plain Black Corporation.
+Copyright 2001-2012 Plain Black Corporation.
 
 =cut
 

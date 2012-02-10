@@ -3,7 +3,7 @@ package WebGUI::Asset::Snippet;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -15,14 +15,101 @@ package WebGUI::Asset::Snippet;
 =cut
 
 use strict;
-use WebGUI::Asset;
+use Moose;
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset';
 use WebGUI::Asset::Template;
 use WebGUI::Macro;
 use HTML::Packer;
 use JavaScript::Packer;
 use CSS::Packer;
 
-our @ISA = qw(WebGUI::Asset);
+define assetName  => ['assetName','Asset_Snippet'];
+define icon       => 'snippet.gif';
+define tableName  => 'snippet';
+
+property snippet => (
+    fieldType       => 'codearea',
+	tab             => "properties",
+	label           => ['assetName','Asset_Snippet'],
+	hoverHelp       => ['snippet description','Asset_Snippet'],
+    default         => undef,
+    trigger         => \&_trigger_snippet,
+);
+sub _trigger_snippet {
+    my $self = shift;
+    my ($new, $old) = @_;
+    if ($new ne $old) {
+        $self->_clear_snippetPacked;
+    }
+}
+property snippetPacked => (
+    fieldType       => "hidden",
+    noFormPost      => 1,
+    lazy            => 1,
+    clearer         => '_clear_snippetPacked',
+    builder         => '_build_snippetPacked',
+);
+
+sub _build_snippetPacked {
+    my $self = shift;
+    my $snippet = $self->snippet;
+    if ( !defined $snippet ) {
+        # do nothing
+    }
+    elsif ( $self->mimeType eq "text/html" ) {
+        HTML::Packer::minify( \$snippet, {
+            do_javascript       => "shrink",
+            do_stylesheet       => "minify",
+        } );
+    }
+    elsif ( $self->mimeType eq "text/css" ) {
+        CSS::Packer::minify( \$snippet, {
+            compress            => 'minify',
+        });
+    }
+    elsif ( $self->mimeType eq 'text/javascript' ) {
+        JavaScript::Packer::minify( \$snippet, {
+            compress            => "shrink",
+        });
+    }
+    $snippet;
+}
+
+property usePacked => (
+    tab             => 'properties',
+    fieldType       => 'yesNo',
+    label           => ['usePacked label','Asset_Snippet'],
+    hoverHelp       => ['usePacked description','Asset_Snippet'],
+    default         => 0,
+);
+property cacheTimeout => (
+	tab             => "display",
+	fieldType       => "interval",
+	default         => 3600,
+	uiLevel         => 8,
+	label           => ["cache timeout",'Asset_Snippet'],
+	hoverHelp       => ["cache timeout help",'Asset_Snippet'],
+);
+property mimeType => (
+	tab             => "properties",
+	hoverHelp       => ['mimeType description','Asset_Snippet'],
+	label           => ['mimeType','Asset_Snippet'],
+   	fieldType       => 'mimeType',
+    default         => 'text/html',
+);
+property templateParser => (
+        fieldType    => 'templateParser',
+        allowNone    => 1,
+        label        => ['parser','Asset_Template'],
+        hoverHelp    => ['parser description','Asset_Template'],
+        tab          => 'properties',
+        defaultValue => '',
+    );
+
+has '+uiLevel' => (
+    default         => 5,
+);
 
 
 =head1 NAME
@@ -31,12 +118,15 @@ Package WebGUI::Asset::Snippet
 
 =head1 DESCRIPTION
 
-Provides a mechanism to publish arbitrary code snippets to WebGUI for reuse in other pages. Can be used for things like HTML segments, javascript, and cascading style sheets. You can also specify the MIME type of the snippet, allowing you to serve XML, CSS and other text files directly from the WebGUI asset system and have browsers recognize them correctly.
+Provides a mechanism to publish arbitrary code snippets to WebGUI for reuse
+in other pages. Can be used for things like HTML segments, javascript, and
+cascading style sheets. You can also specify the MIME type of the snippet,
+allowing you to serve XML, CSS and other text files directly from the WebGUI
+asset system and have browsers recognize them correctly.
 
 =head1 SYNOPSIS
 
 use WebGUI::Asset::Snippet;
-
 
 =head1 METHODS
 
@@ -45,98 +135,6 @@ These methods are available from this class:
 =cut
 
 
-
-#-------------------------------------------------------------------
-
-=head2 definition ( definition )
-
-Defines the properties of this asset.
-
-=head3 definition
-
-A hash reference passed in from a subclass definition.
-
-=cut
-
-sub definition {
-        my $class = shift;
-        my $session = shift;
-        my $definition = shift;
-	my $i18n = WebGUI::International->new($session,"Asset_Snippet");
-	my $t18n = WebGUI::International->new($session,'Asset_Template');
-	my %properties;
-	tie %properties, 'Tie::IxHash';
-	%properties = (
- 			snippet=>{
-                        	fieldType=>'codearea',
-				tab=>"properties",
-				label=>$i18n->get('assetName'),
-				hoverHelp=>$i18n->get('snippet description'),
-                                defaultValue=>undef,
-                filter   => "packSnippet",
-                                },
-            snippetPacked => {
-                fieldType => "hidden",
-                defaultValue => undef,
-                noFormPost   => 1,
-            },
-            usePacked => {
-                tab             => 'properties',
-                fieldType       => 'yesNo',
-                label           => $i18n->get('usePacked label'),
-                hoverHelp       => $i18n->get('usePacked description'),
-                defaultValue    => 0,
-            },
-			cacheTimeout => {
-				tab => "display",
-				fieldType => "interval",
-				defaultValue => 3600,
-				uiLevel => 8,
-				label => $i18n->get("cache timeout"),
-				hoverHelp => $i18n->get("cache timeout help")
-				},
-			templateParser => {
-				fieldType    => 'templateParser',
-				allowNone    => 1,
-				label        => $t18n->get('parser'),
-				hoverHelp    => $t18n->get('parser description'),
-				tab          => 'properties',
-				defaultValue => '',
-			},
-			mimeType=>{
-				tab=>"properties",
-				hoverHelp=>$i18n->get('mimeType description'),
-				label=>$i18n->get('mimeType'),
-                        	fieldType=>'mimeType',
-                                defaultValue=>'text/html'
-                                }
-
-                        );
-        push(@{$definition}, {
-		assetName=>$i18n->get('assetName'),
-		uiLevel => 5,
-		icon=>'snippet.gif',
-		autoGenerateForms=>1,
-                tableName=>'snippet',
-                className=>'WebGUI::Asset::Snippet',
-                properties=>\%properties
-                });
-        return $class->SUPER::definition($session,$definition);
-}
-
-#-------------------------------------------------------------------
-
-=head2 addRevision ( properties, ... )
-
-Force the packed snippet to be regenerated.
-
-=cut
-
-sub addRevision {
-    my ( $self, $properties, @args ) = @_;
-    delete $properties->{ snippetPacked };
-    return $self->SUPER::addRevision( $properties, @args );
-}
 
 #-------------------------------------------------------------------
 
@@ -178,91 +176,19 @@ sub exportGetUrlAsPath {
 
 #-------------------------------------------------------------------
 
-=head2 getCache ( $calledAsWebMethod )
-
-Overrides the base method to handle Snippet specific caching.
-
-=head3 $calledAsWebMethod
-
-If this is true, then change the cache key.
-
-=cut
-
-sub getCache {
-	my $self              = shift;
-	my $calledAsWebMethod = shift;
-    my $session           = $self->session;
-    my $cacheKey = "view_".$calledAsWebMethod.'_'.$self->getId;
-    if ($session->env->sslRequest) {
-        $cacheKey .= '_ssl';
-    }
-    my $cache = WebGUI::Cache->new($session, $cacheKey);
-    return $cache;
-}
-
-#-------------------------------------------------------------------
-
-=head2 getToolbar ( )
-
-Returns a toolbar with a set of icons that hyperlink to functions that delete, edit, promote, demote, cut, and copy.
-
-=cut
-
-sub getToolbar {
-	my $self = shift;
-	return undef if ($self->getToolbarState);
-	return '<p>'.$self->SUPER::getToolbar().'</p>';
-}
-
-#-------------------------------------------------------------------
-
 =head2 indexContent ( )
 
 Indexing the content of the snippet. See WebGUI::Asset::indexContent() for additonal details. 
 
 =cut
 
-sub indexContent {
+around indexContent => sub {
+	my $orig = shift;
 	my $self = shift;
-	my $indexer = $self->SUPER::indexContent;
-	$indexer->addKeywords($self->get("snippet"));
+	my $indexer = $self->$orig(@_);
+	$indexer->addKeywords($self->snippet);
 	$indexer->setIsPublic(0);
-}
-
-#-------------------------------------------------------------------
-
-=head2 packSnippet ( unpacked )
-
-Pack the snippet if possible. We can pack HTML, CSS, and JS snippets.
-
-=cut
-
-sub packSnippet {
-    my ( $self, $unpacked ) = @_;
-    return $unpacked if !$unpacked;
-    my $packed  = $unpacked;
-
-    if ( $self->get('mimeType') eq "text/html" ) {
-        HTML::Packer::minify( \$packed, {
-            do_javascript       => "shrink",
-            do_stylesheet       => "minify",
-        } );
-    }
-    elsif ( $self->get('mimeType') eq "text/css" ) {
-        CSS::Packer::minify( \$packed, {
-            compress            => 'minify',
-        });
-    }
-    elsif ( $self->get('mimeType') eq 'text/javascript' ) {
-        JavaScript::Packer::minify( \$packed, {
-            compress            => "shrink",
-        });
-    }
-
-    $self->update({ snippetPacked => $packed });
-    
-    return $unpacked;
-}
+};
 
 #-------------------------------------------------------------------
 
@@ -272,15 +198,29 @@ Extending purgeCache to handle caching of the rendered snippet
 
 =cut
 
-sub purgeCache {
+override purgeCache => sub {
 	my $self = shift;
+    my $cache = $self->session->cache;
+	eval {
+        $cache->remove("view__".$self->getId);
+        $cache->remove("view_1_".$self->getId);
+        $cache->remove("view__".$self->getId . '_ssl');
+        $cache->remove("view_1_".$self->getId . '_ssl');
+    };
+	super();
+};
 
-	WebGUI::Cache->new($self->session,"view__".$self->getId)->delete;
-	WebGUI::Cache->new($self->session,"view_1_".$self->getId)->delete;	
-	WebGUI::Cache->new($self->session,"view__".$self->getId."_ssl")->delete;
-	WebGUI::Cache->new($self->session,"view_1_".$self->getId."_ssl")->delete;	
-	$self->SUPER::purgeCache();
-}
+#-------------------------------------------------------------------
+
+=head2 snippet ( value )
+
+Returns the snippet's content.
+
+=head3 value
+
+If specified, sets the value, and also packs the content and inserts it into packedSnippet.
+
+=cut
 
 #-------------------------------------------------------------------
 
@@ -301,28 +241,27 @@ sub view {
     my $session    = $self->session;
     my $versionTag = WebGUI::VersionTag->getWorking($session, 1);
     my $noCache =
-        $session->var->isAdminOn
-        || $self->get("cacheTimeout") <= 10
-        || ($versionTag && $versionTag->getId eq $self->get("tagId"));
+        $session->isAdminOn
+        || $self->cacheTimeout <= 10
+        || ($versionTag && $versionTag->getId eq $self->tagId);
+    my $cacheKey = $self->getWwwCacheKey('view', $calledAsWebMethod);
     unless ($noCache) {
-        my $cache = $self->getCache($calledAsWebMethod);
-        my $out   = $cache->get if defined $cache;
+        my $out = $session->cache->get( $cacheKey );
 		return $out if $out;
 	}
 	my $output = $self->get('usePacked')
                 ? $self->get("snippetPacked")
                 : $self->get('snippet')
                 ;
-	$output = $self->getToolbar.$output if ($session->var->isAdminOn && !$calledAsWebMethod);
-	if (my $parser = $self->getValue('templateParser')) {
+	$output = $self->getToolbar.$output if ($session->isAdminOn && !$calledAsWebMethod);
+	if (my $parser = $self->templateParser) {
 		$output = WebGUI::Asset::Template->processRaw(
 			$session, $output, $self->get, $parser
 		);
 	}
 	WebGUI::Macro::process($session,\$output);
     unless ($noCache) {
-        my $cache = $self->getCache($calledAsWebMethod);
-		$cache->set($output,$self->get("cacheTimeout"));
+        $session->cache->set( $cacheKey, $output, $self->cacheTimeout);
 	}
     return $output;
 }
@@ -338,9 +277,9 @@ A web accessible version of the view method.
 sub www_view {
     my $self = shift;
     return $self->session->privilege->insufficient() unless $self->canView;
-    my $mimeType=$self->getValue('mimeType');
-    $self->session->http->setMimeType($mimeType || 'text/html');
-    $self->session->http->setCacheControl($self->get("cacheTimeout"));
+    my $mimeType=$self->mimeType;
+    $self->session->response->content_type($mimeType || 'text/html');
+    $self->session->response->setCacheControl($self->cacheTimeout);
     my $output = $self->view(1);
     if (!defined $output) {
         $output = 'empty';
@@ -348,6 +287,6 @@ sub www_view {
     return $output;
 }
 
-
+__PACKAGE__->meta->make_immutable;
 1;
 

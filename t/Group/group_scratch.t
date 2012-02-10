@@ -1,6 +1,6 @@
 # vim:syntax=perl
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -21,7 +21,7 @@ use WebGUI::Group;
 #----------------------------------------------------------------------------
 # Init
 my $session1         = WebGUI::Test->session;
-my $session2         = WebGUI::Session->open(WebGUI::Test::root, WebGUI::Test::file);
+my $session2         = WebGUI::Test->newSession;
 
 #----------------------------------------------------------------------------
 # Tests

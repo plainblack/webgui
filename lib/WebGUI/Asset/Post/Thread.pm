@@ -1,7 +1,7 @@
 package WebGUI::Asset::Post::Thread;
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -11,17 +11,72 @@ package WebGUI::Asset::Post::Thread;
 #-------------------------------------------------------------------
 
 use strict;
+use Moose;
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset::Post';
+define assetName => ['assetName', 'Asset_Thread'];
+define icon      => 'thread.gif';
+define tableName => 'Thread';
+property subscriptionGroupId => (
+                noFormPost  => 1,
+                fieldType   => "hidden",
+                default     => '',
+         );
+property replies => (
+                noFormPost  => 1,
+                fieldType   => "hidden",
+                default     => 0,
+         );
+property isSticky => (
+                label       => ['sticky', 'Asset_Collaboration'],
+                fieldType   => "yesNo",
+                default     => 0
+         );
+property isLocked => (
+                label       => ['lock', 'Asset_Collaboration'],
+                fieldType   => "yesNo",
+                default     => 0,
+         );
+property lastPostId => (
+                noFormPost  => 1,
+                fieldType   => "hidden",
+                default     => '',
+         );
+property lastPostDate => (
+                noFormPost  => 1,
+                fieldType   => "dateTime",
+                default     => 0,
+         );
+property karma => (
+                noFormPost  => 1,
+                fieldType   => "integer",
+                default     => 0,
+         );
+property karmaRank => (
+                noFormPost  => 1,
+                fieldType   => "float",
+                default     => 0,
+         );
+property karmaScale => (
+                noFormPost  => 1,
+                fieldType   => "integer",
+                default     => 10,
+         );
+property threadRating => (
+                noFormPost  => 1,
+                fieldType   => "hidden",
+                default     => undef,
+         );
+
+
 use WebGUI::Asset::Template;
 use WebGUI::Asset::Post;
-use WebGUI::Cache;
 use WebGUI::Group;
 use WebGUI::International;
 use WebGUI::Paginator;
 use WebGUI::SQL;
-use WebGUI::Utility;
 use POSIX qw/ceil/;
 
-our @ISA = qw(WebGUI::Asset::Post);
 
 #-------------------------------------------------------------------
 
@@ -31,12 +86,12 @@ Extend the base method to handle creating a subscription group for this Thread.
 
 =cut
 
-sub addRevision {
-    my $self = shift;
-    my $newSelf = $self->SUPER::addRevision(@_);
+override addRevision => sub {
+    my $self    = shift;
+    my $newSelf = super();
     $newSelf->createSubscriptionGroup;
     return $newSelf;
-}
+};
 
 #-------------------------------------------------------------------
 
@@ -87,7 +142,7 @@ sub canReply {
     my $self        = shift;
     my $userId      = shift || $self->session->user->userId;
     return !$self->isThreadLocked 
-        && $self->getParent->get("allowReplies") 
+        && $self->getParent->allowReplies 
         && $self->getParent->canPost( $userId )
         ;
 }
@@ -120,13 +175,13 @@ Extends the base method to increment the number of threads in the parent CS.
 
 =cut
 
-sub commit {
-	my $self = shift;
-	$self->SUPER::commit;
-	if ($self->isNew) {
-        	$self->getParent->incrementThreads($self->get("revisionDate"),$self->getId);
-	}
-}
+override commit => sub {
+    my $self = shift;
+    super();
+    if ($self->isNew) {
+        $self->getParent->incrementThreads($self->revisionDate,$self->getId);
+    }
+};
 
 #-------------------------------------------------------------------
 # Override duplicateBranch here so that new posts get their threadId set correctly.
@@ -139,9 +194,9 @@ to update the Thread with the lastPost information.
 
 =cut
 
-sub duplicateBranch {
+override duplicateBranch => sub {
 	my $self = shift;
-	my $newAsset = $self->SUPER::duplicateBranch(@_);
+	my $newAsset = super();
 
 	foreach my $post (@{$newAsset->getPosts}) {
 		$post->rethreadUnder($newAsset);
@@ -149,7 +204,7 @@ sub duplicateBranch {
 	$newAsset->normalizeLastPost;
 
 	return $newAsset;
-}
+};
 
 #-------------------------------------------------------------------
 
@@ -162,7 +217,7 @@ already have one.
 
 sub createSubscriptionGroup {
 	my $self = shift;
-	return undef if ($self->get("subscriptionGroupId"));
+	return undef if ($self->subscriptionGroupId);
 	my $group = WebGUI::Group->new($self->session, "new");
 	$group->name($self->getId);
 	$group->description("The group to store subscriptions for the thread ".$self->getId);
@@ -175,71 +230,6 @@ sub createSubscriptionGroup {
 }
 
 #-------------------------------------------------------------------
-sub definition {
-	my $class = shift;
-	my $session = shift;
-	my $definition = shift;
-	my $i18n = WebGUI::International->new($session,"Asset_Thread");
-        push(@{$definition}, {
-		assetName=>$i18n->get('assetName'),
-		icon=>'thread.gif',
-                tableName=>'Thread',
-                className=>'WebGUI::Asset::Post::Thread',
-                properties=>{
-			subscriptionGroupId => {
-				noFormPost=>1,
-				fieldType=>"hidden",
-				defaultValue=>'',
-				},
-			replies => {
-				noFormPost=>1,
-				fieldType=>"hidden",
-				defaultValue=>0,
-				},
-			isSticky => {
-				fieldType=>"yesNo",
-				defaultValue=>0
-				},
-			isLocked => {
-				fieldType=>"yesNo",
-				defaultValue=>0,
-				},
-			lastPostId => {
-				noFormPost=>1,
-				fieldType=>"hidden",
-				defaultValue=>'',
-				},
-			lastPostDate => {
-				noFormPost=>1,
-				fieldType=>"dateTime",
-				defaultValue=>undef
-				},
-			karma => {
-				noFormPost=>1,
-				fieldType=>"integer",
-				defaultValue=>0
-				},
-			karmaRank => {
-				noFormPost=>1,
-				fieldType=>"float",
-				defaultValue=>0
-				},
-			karmaScale => {
-				noFormPost=>1,
-				fieldType=>"integer",
-				defaultValue=>10
-				},
-			threadRating => {
-				noFormPost=>1,
-				fieldType=>"hidden",
-				defaultValue=>undef
-				},
-			},
-		});
-	return $class->SUPER::definition($session,$definition);
-}
-
-#-------------------------------------------------------------------
 
 =head2 DESTROY 
 
@@ -248,12 +238,11 @@ and next threads, and to delete the parent CS.
 
 =cut
 
-sub DESTROY {
-	my $self = shift;
-	return undef unless defined $self;
-	$self->{_next}->DESTROY if (defined $self->{_next});
-	$self->{_previous}->DESTROY if (defined $self->{_previous});
-	$self->SUPER::DESTROY;
+sub DEMOLISH {
+    my $self = shift;
+    return undef unless defined $self;
+    $self->{_next}->DESTROY if (defined $self->{_next});
+    $self->{_previous}->DESTROY if (defined $self->{_previous});
 }
 
 #-------------------------------------------------------------------
@@ -264,10 +253,10 @@ Extends the base method to handle creating a new subscription group.
 
 =cut
 
-sub duplicate {
+override duplicate => sub {
     my $self       = shift;
     my $session    = $self->session;
-    my $copy       = $self->SUPER::duplicate(@_);
+    my $copy       = super();
     my $key        = 'subscriptionGroupId';
     my $oldGroupId = $self->get($key);
 
@@ -281,7 +270,7 @@ sub duplicate {
         }
     }
     return $copy;
-}
+};
 
 #-------------------------------------------------------------------
 
@@ -302,7 +291,7 @@ sub getAdjacentThread {
     my $sortCompareValue = $self->get($sortByField);
 
     # make sortBy safe to include directly in SQL
-    $sortBy = join('.', map { $session->db->dbh->quote_identifier($_) } split(/\./, $sortBy));
+    $sortBy = join('.', map { $session->db->quote_identifier($_) } split(/\./, $sortBy));
 
     my $versionTag = WebGUI::VersionTag->getWorking($session, 'nocreate');
     my $tagId = $versionTag ? $versionTag->getId : undef;
@@ -332,10 +321,10 @@ sub getAdjacentThread {
         ORDER BY $sortBy $sortOrder, assetData.revisionDate $sortOrder
         LIMIT 1
 END_SQL
-        [$self->get('parentId'), $self->getId, $sortCompareValue, $tagId, $session->user->userId]
+        [$self->parentId, $self->getId, $sortCompareValue, $tagId, $session->user->userId]
     );
     if ($id) {
-        return WebGUI::Asset->new($session, $id, $class, $version);
+        return WebGUI::Asset->newById($session, $id, $version);
     }
     return undef;
 }
@@ -363,7 +352,7 @@ Override the base method to fetch the threadApprovalWorkflow from the parent CS.
 
 sub getAutoCommitWorkflowId {
 	my $self = shift;
-	return $self->getThread->getParent->get("threadApprovalWorkflow");
+	return $self->getThread->getParent->threadApprovalWorkflow;
 }
 
 #-------------------------------------------------------------------
@@ -425,16 +414,16 @@ Extend the base method from Post to remove the pagination query fragment
 
 =cut
 
-sub getThreadLinkUrl {
+override getThreadLinkUrl => sub {
 	my $self = shift;
-    my $url = $self->SUPER::getThreadLinkUrl();
+    my $url = super();
     $url =~ s/\?pn=\d+//;
     if ($url =~ m{;revision=\d+}) {
         $url =~ s/;revision/?revision/;
     }
 
     return $url;
-}
+};
 
 
 #-------------------------------------------------------------------
@@ -447,13 +436,13 @@ Fetches the last post in this thread, otherwise, returns itself.
 
 sub getLastPost {
 	my $self = shift;
-	my $lastPostId = $self->get("lastPostId");
-	my $lastPost;
-	if ($lastPostId) {
-		$lastPost = WebGUI::Asset::Post->new($self->session, $lastPostId);
-	}
-	return $lastPost if (defined $lastPost);
-	return $self;	
+	my $lastPostId = $self->lastPostId;
+    return $self unless $lastPostId;
+    my $lastPost = eval { WebGUI::Asset->newById($self->session, $lastPostId); };
+    if (Exception::Class->caught()) {
+        return $self;
+    }
+	return $lastPost;
 }
 
 #-------------------------------------------------------------------
@@ -648,7 +637,7 @@ Returns a boolean indicating whether this thread is locked from new posts and ot
 
 sub isThreadLocked {
         my ($self) = @_;
-        return $self->get("isLocked");
+        return $self->isLocked;
 }
 
 
@@ -684,7 +673,7 @@ Increments the views counter for this thread.
 
 sub incrementViews {
         my ($self) = @_;
-        $self->update({views=>$self->get("views")+1});
+        $self->update({views=>$self->views+1});
         $self->getParent->incrementViews;
 }
 
@@ -705,20 +694,6 @@ sub isMarkedRead {
 
 #-------------------------------------------------------------------
 
-=head2 isSticky ( )
-
-Returns a boolean indicating whether this thread should be "stuck" a the top of the forum and not be sorted with the rest of the threads.
-
-=cut
-
-sub isSticky {
-        my ($self) = @_;
-        return $self->get("isSticky");
-}
-
-
-#-------------------------------------------------------------------
-
 =head2 isSubscribed ( )
 
 Returns a boolean indicating whether the user is subscribed to this thread.
@@ -727,7 +702,7 @@ Returns a boolean indicating whether the user is subscribed to this thread.
 
 sub isSubscribed {
 	my $self = shift;
-	return $self->session->user->isInGroup($self->get("subscriptionGroupId"));
+	return $self->session->user->isInGroup($self->subscriptionGroupId);
 }
 
 #-------------------------------------------------------------------
@@ -765,13 +740,13 @@ See WebGUI::Asset::prepareView() for details.
 
 =cut
 
-sub prepareView {
+override prepareView => sub {
 	my $self = shift;
-	$self->SUPER::prepareView();
-	my $template = WebGUI::Asset::Template->new($self->session, $self->getParent->get("threadTemplateId"));
+	super();
+	my $template = WebGUI::Asset::Template->newById($self->session, $self->getParent->threadTemplateId);
 	$template->prepare($self->getMetaDataAsTemplateVariables);
 	$self->{_viewTemplate} = $template;
-}
+};
 
 
 #-------------------------------------------------------------------
@@ -782,35 +757,35 @@ Extend the base method from Post to process the karmaScale.
 
 =cut
 
-sub postProcess {
+override postProcess => sub {
 	my $self = shift;
 	if ($self->getParent->canEdit) {
-		my $karmaScale = $self->session->form->process("karmaScale","integer") || $self->getParent->get("defaultKarmaScale");
-		my $karmaRank = $self->get("karma")/$karmaScale;
+		my $karmaScale = $self->session->form->process("karmaScale","integer") || $self->getParent->defaultKarmaScale;
+		my $karmaRank = $self->karma/$karmaScale;
 		$self->update({karmaScale=>$karmaScale, karmaRank=>$karmaRank});
 	}
-	$self->SUPER::postProcess;
-}
+	super();
+};
 
 #-------------------------------------------------------------------
 
-=head2 processPropertiesFromFormPost 
+=head2 processEditForm 
 
 Extend the base method to do captcha processing.
 
 =cut
 
-sub processPropertiesFromFormPost {
+override processEditForm => sub {
     my $self = shift;
 
-    if ($self->isNew && $self->getParent->getValue('useCaptcha')) {
+    if ($self->isNew && $self->getParent->useCaptcha) {
         my $captchaOk = $self->session->form->process("captcha","Captcha");
 
         return [ 'invalid captcha' ] unless $captchaOk;
     }
 
-    return $self->SUPER::processPropertiesFromFormPost;
-}
+    return super();
+};
 
 #-------------------------------------------------------------------
 
@@ -821,15 +796,15 @@ the subscriptionGroup for this thread.
 
 =cut
 
-sub purge {
+override purge => sub {
     my $self = shift;
     $self->session->db->write("delete from Thread_read where threadId=?",[$self->getId]);
-    my $group = WebGUI::Group->new($self->session, $self->get("subscriptionGroupId"));
+    my $group = WebGUI::Group->new($self->session, $self->subscriptionGroupId);
     if ($group) {
         $group->delete;
     }
-    $self->SUPER::purge;
-}
+    super();
+};
 
 #-------------------------------------------------------------------
 
@@ -843,22 +818,22 @@ An integer between 1 and 5 (5 being best) to rate this post with.
 
 =cut
 
-sub rate {
+override rate => sub {
 	my $self = shift;
 	my $rating = shift;
 	return undef unless ($rating == -1 || $rating == 1);
 	return undef if $self->hasRated;
-	$self->SUPER::rate($rating);
+	super();
 
 	##Thread specific karma adjustment for CS
 	if ($self->session->setting->get("useKarma")) {
-		my $poster = WebGUI::User->new($self->session, $self->get("ownerUserId"));
-		$poster->karma($rating*$self->getParent->get("karmaRatingMultiplier"),"collaboration rating","someone rated post ".$self->getId);
+		my $poster = WebGUI::User->new($self->session, $self->ownerUserId);
+		$poster->karma($rating*$self->getParent->karmaRatingMultiplier,"collaboration rating","someone rated post ".$self->getId);
 		my $rater = WebGUI::User->new($self->session->user->userId);
-		$rater->karma(-$self->getParent->get("karmaSpentToRate"),"collaboration rating","spent karma to rate post ".$self->getId);
+		$rater->karma(-$self->getParent->karmaSpentToRate,"collaboration rating","spent karma to rate post ".$self->getId);
 	}
 
-}
+};
 
 
 #-------------------------------------------------------------------
@@ -947,7 +922,7 @@ Subscribes the user to this thread.
 sub subscribe {
 	my $self = shift;
 	$self->createSubscriptionGroup;
-	my $group = WebGUI::Group->new($self->session,$self->get("subscriptionGroupId"));
+	my $group = WebGUI::Group->new($self->session,$self->subscriptionGroupId);
   $group->addUsers([$self->session->user->userId]);
 }
 
@@ -973,12 +948,12 @@ Moves thread to the trash and updates reply counter on thread.
 
 =cut
 
-sub trash {
+override trash => sub {
     my $self = shift;
-    $self->SUPER::trash;
+    super();
     $self->getParent->sumReplies;
-    if ($self->getParent->get("lastPostId") eq $self->getId) {
-        my $parentLineage = $self->getThread->get("lineage");
+    if ($self->getParent->lastPostId eq $self->getId) {
+        my $parentLineage = $self->getThread->lineage;
         my ($id, $date) = $self->session->db->quickArray("select assetId, creationDate from asset where 
             lineage like ? and assetId<>? and asset.state='published' and className like 'WebGUI::Asset::Post%' 
             order by creationDate desc",[$parentLineage.'%', $self->getId]);
@@ -989,7 +964,7 @@ sub trash {
             $self->getParent->setLastPost('','');
         }
     }
-}
+};
 
 
 #-------------------------------------------------------------------
@@ -1061,8 +1036,8 @@ An optional user object to unsubscribe.  If the object isn't passed, then it use
 sub unsubscribe {
     my $self  = shift;
     my $user  = shift || $self->session->user;
-    my $group = WebGUI::Group->new($self->session,$self->get("subscriptionGroupId"));
-    return unless $group;
+    my $group = WebGUI::Group->new($self->session,$self->subscriptionGroupId);
+    return if !$group;
     $group->deleteUsers([$user->userId]);
 }
 
@@ -1100,14 +1075,14 @@ sub updateThreadRating {
         $parent->recalculateRating;
     }
     else {
-        $self->session->errorHandler->error("Couldn't get parent for thread ".$self->getId);
+        $self->session->log->error("Couldn't get parent for thread ".$self->getId);
     }    
 }
 
 
 #-------------------------------------------------------------------
 
-=head2 validParent
+=head2 valid_parent_classes
 
 Make sure that the current session asset is a CS for pasting and adding checks.
 
@@ -1115,10 +1090,8 @@ This is a class method.
 
 =cut
 
-sub validParent {
-    my $class   = shift;
-    my $session = shift;
-    return $session->asset->isa('WebGUI::Asset::Wobject::Collaboration');
+sub valid_parent_classes {
+    return [qw/WebGUI::Asset::Wobject::Collaboration/];
 }
 
 #-------------------------------------------------------------------
@@ -1134,12 +1107,13 @@ sub view {
 	my $currentPost = shift || $self;
     $self->markRead;
     $self->incrementViews unless ($self->session->form->process("func") eq 'rate');
+    my $cache = $self->session->cache;
 	if ($self->session->user->isVisitor && !$self->session->form->process("layout")) {
-        my $out = WebGUI::Cache->new($self->session,"view_".$self->getId)->get;
+        my $out = eval{$cache->get("view_".$self->getId)};
         return $out if $out;
     }
     $self->session->scratch->set("discussionLayout",$self->session->form->process("layout")) if ($self->session->form->process("layout"));
-    my $layout = $self->session->scratch->get("discussionLayout") || $self->session->user->profileField("discussionLayout");
+    my $layout = $self->session->scratch->get("discussionLayout") || $self->session->user->get("discussionLayout");
     my $var = $self->getTemplateVars;
 	$self->getParent->appendTemplateLabels($var);
 	
@@ -1148,7 +1122,7 @@ sub view {
     $var->{'user.isModerator'   }  = $self->getParent->canModerate;
     $var->{'user.canPost'       }  = $self->getParent->canPost;
     $var->{'user.canReply'      }  = $self->canReply;
-    $var->{'repliesAllowed'     }  = $self->getParent->get("allowReplies");
+    $var->{'repliesAllowed'     }  = $self->getParent->allowReplies;
 
     $var->{'layout.nested.url'  }  = $self->getLayoutUrl("nested");
     $var->{'layout.flat.url'    }  = $self->getLayoutUrl("flat");
@@ -1162,7 +1136,7 @@ sub view {
 	$var->{'thumbsUp.icon.url'  }  = $self->session->url->extras('thumbup.gif');
 	$var->{'thumbsDown.icon.url'}  = $self->session->url->extras('thumbdown.gif');
 
-    $var->{'isArchived'         }  = $self->get("status") eq "archived";
+    $var->{'isArchived'         }  = $self->status eq "archived";
     $var->{'archive.url'        }  = $self->getArchiveUrl;
     $var->{'unarchive.url'      }  = $self->getUnarchiveUrl;
     
@@ -1189,10 +1163,10 @@ sub view {
     $var->{'transfer.karma.form'} .= WebGUI::Form::submit($self->session);
     $var->{'transfer.karma.form'} .= WebGUI::Form::formFooter($self->session);
 
-    my $p = WebGUI::Paginator->new($self->session,$self->getUrl,$self->getParent->get("postsPerPage"));
+    my $p = WebGUI::Paginator->new($self->session,$self->getUrl,$self->getParent->postsPerPage);
 	my $sql = "select asset.assetId, asset.className, assetData.revisionDate as revisionDate, assetData.url as url from asset 
 		left join assetData on assetData.assetId=asset.assetId
-		where asset.lineage like ".$self->session->db->quote($self->get("lineage").'%')
+		where asset.lineage like ".$self->session->db->quote($self->lineage.'%')
 		."	and asset.state='published'
         and asset.className like 'WebGUI::Asset::Post%'
 		and assetData.revisionDate=(SELECT max(assetData.revisionDate) from assetData where assetData.assetId=asset.assetId
@@ -1215,7 +1189,7 @@ sub view {
 	$p->setDataByQuery($sql, undef, undef, undef, "url", $currentPageUrl);
 	foreach my $dataSet (@{$p->getPageData()}) {
 		next unless ($dataSet->{className} eq "WebGUI::Asset::Post" || $dataSet->{className} eq "WebGUI::Asset::Post::Thread"); #handle non posts!
-		my $reply = WebGUI::Asset::Post->new($self->session, $dataSet->{assetId}, $dataSet->{className}, $dataSet->{revisionDate});
+		my $reply = WebGUI::Asset::Post->newById($self->session, $dataSet->{assetId}, $dataSet->{revisionDate});
 		$reply->{'_thread'      }  = $self; # caching thread for better performance
 		my %replyVars             = %{$reply->getTemplateVars};
 		$replyVars{isCurrent    } = ($reply->getId eq $currentPost->getId);
@@ -1237,12 +1211,12 @@ sub view {
 
 	$var->{"search.url"               } = $self->getParent->getSearchUrl;
     $var->{"collaboration.url"        } = $self->getThread->getParent->getUrl;
-    $var->{'collaboration.title'      } = $self->getParent->get("title");
-    $var->{'collaboration.description'} = $self->getParent->get("description");
+    $var->{'collaboration.title'      } = $self->getParent->title;
+    $var->{'collaboration.description'} = $self->getParent->description;
     my $out                             = $self->processTemplate($var,undef,$self->{_viewTemplate});
 	
     if ($self->session->user->isVisitor && !$self->session->form->process("layout")) {
-		WebGUI::Cache->new($self->session,"view_".$self->getId)->set($out,$self->getThread->getParent->get("visitorCacheTimeout"));
+		eval{$cache->set("view_".$self->getId, $out, $self->getThread->getParent->visitorCacheTimeout)};
 	}
     return $out;
 }
@@ -1361,8 +1335,8 @@ sub www_transferKarma {
 	# cant have them giving more karma then they have
 	if ($amount > 0 && $amount <= $self->session->user->karma) {
 		$self->session->user->karma(-$amount, "Thread ".$self->getId, "Transferring karma to a thread.");
-		my $newKarma = $self->get("karma")+$amount;
-		my $karmaScale = $self->get("karmaScale") || 1;
+		my $newKarma = $self->karma+$amount;
+		my $karmaScale = $self->karmaScale || 1;
 		$self->update({karma=>$newKarma,karmaRank=>$newKarma/$karmaScale});
 	}
 	return $self->www_view;
@@ -1477,23 +1451,25 @@ Renders self->view based upon current style, subject to timeouts. Returns Privil
 =cut
 
 sub www_view {
-        my $self = shift;
-	my $currentPost = shift;
-	return $self->session->privilege->noAccess() unless $self->canView;
-	my $check = $self->checkView;
-	return $check if (defined $check);
-	$self->session->http->setCacheControl($self->get("visitorCacheTimeout")) if ($self->session->user->isVisitor);
-        $self->session->http->sendHeader;    
-        $self->prepareView;
-        my $style = $self->getParent->processStyle($self->getSeparator);
-        my ($head, $foot) = split($self->getSeparator,$style);
-        $self->session->output->print($head,1);
-        $self->session->output->print($self->view($currentPost));
-        $self->session->output->print($foot,1);
-        return "chunked";
+    my $self = shift;
+    my $currentPost = shift;
+    return $self->session->privilege->noAccess() unless $self->canView;
+    my $check = $self->checkView;
+    return $check if (defined $check);
+    my $cs = $self->getParent;
+    $self->session->response->setCacheControl($cs->visitorCacheTimeout) if ($self->session->user->isVisitor);
+    $self->session->response->sendHeader;    
+    $self->prepareView;
+    my $style = $cs->processStyle($self->getSeparator);
+    my ($head, $foot) = split($self->getSeparator,$style);
+    $self->session->output->print($head,1);
+    $self->session->output->print($self->view($currentPost));
+    $self->session->output->print($foot,1);
+    return "chunked";
 }
 
 
 
+__PACKAGE__->meta->make_immutable;
 1;
 

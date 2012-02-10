@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -11,20 +11,9 @@
 #-------------------------------------------------------------------
 
 use strict;
-use File::Basename ();
-use File::Spec;
-
-my $webguiRoot;
-BEGIN {
-    $webguiRoot = File::Spec->rel2abs(File::Spec->catdir(File::Basename::dirname(__FILE__), File::Spec->updir));
-    unshift @INC, File::Spec->catdir($webguiRoot, 'lib');
-}
-
-use DBI;
-use FileHandle;
 use Getopt::Long;
 use Pod::Usage;
-no strict 'refs';
+use WebGUI::Paths -inc;
 use WebGUI::Session;
 use WebGUI::Asset;
 
@@ -48,7 +37,7 @@ pod2usage( verbose => 2 ) if $help;
 pod2usage() if ($configFile eq '' || !($assetId||$url) );
 
 # Open WebGUI session
-my $session = WebGUI::Session->open($webguiRoot,$configFile);
+my $session = WebGUI::Session->open($configFile);
 $session->user({userId=>$userId}) if (defined $userId);
 $session->scratch->set("personalStyleId", $styleId) if (defined $styleId);
 
@@ -56,23 +45,26 @@ my $asset = undef;
 
 if ($url) {
 	$asset = WebGUI::Asset->newByUrl($session,$url);
-} else {
-	$asset = WebGUI::Asset->newByDynamicClass($session,$assetId);
+}
+else {
+	$asset = WebGUI::Asset->newById($session,$assetId);
 }
 
 if (defined $asset) {
-	my $file = undef;
+	my $file;
 	if ($toFile) {
-		$file = FileHandle->new(">$toFile") or die "Can't open file $toFile for writing. $!";
+        open $file, '>', $toFile or die "Can't open file $toFile for writing. $!";
 		$session->output->setHandle($file);
 	}
 	my $content = $asset->www_view;
 	unless ($content eq "chunked") {
-		$session->output->print($content);	
+		$session->output->print($content);
 		$session->output->setHandle(undef);
 	}
-	$file->close if (defined $file);
-} else {
+    close $file
+        if defined $file;
+}
+else {
 	print "Asset not defined!!\n";
 }
 
@@ -150,6 +142,6 @@ Shows this documentation, then exits.
 
 =head1 AUTHOR
 
-Copyright 2001-2009 Plain Black Corporation.
+Copyright 2001-2012 Plain Black Corporation.
 
 =cut

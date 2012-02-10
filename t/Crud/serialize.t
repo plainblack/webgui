@@ -1,6 +1,6 @@
 # vim:syntax=perl
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -12,9 +12,7 @@
 # Tests WebGUI::Crud
 
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../lib";
 use Test::More;
 use Test::Deep;
 use JSON;
@@ -38,11 +36,13 @@ WebGUI::Test->addToCleanup(sub {
     WebGUI::Serialize->crud_dropTable($session);
 });
 
-my $cereal = WebGUI::Serialize->create($session);
+my $cereal = WebGUI::Serialize->new($session);
 isa_ok($cereal, 'WebGUI::Serialize');
 cmp_deeply(
     $cereal->get,
     {
+        _new           => 1,
+        _dirty         => 0,
         someName       => 'someName',
         jsonField      => [],
         dateCreated    => ignore(),
@@ -101,18 +101,20 @@ cmp_deeply(
     'new: deserialized data correctly'
 );
 
+use Data::Dumper;
 my $objData = $cereal->get('jsonField');
 $objData->[0]->{fiber} = 0;
 cmp_deeply(
     $cereal->get('jsonField'),
     [
         {
+            fiber            => 0,
             sugarContent     => 50,
             averageNutrition => 3,
             foodColoring     => 15,
         },
     ],
-    'get: returns safe references'
-);
+    'get: returns unsafe references'
+) or diag Dumper($cereal->jsonField);
 
 #vim:ft=perl

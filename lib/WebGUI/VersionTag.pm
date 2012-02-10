@@ -3,7 +3,7 @@ package WebGUI::VersionTag;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -18,6 +18,7 @@ use strict;
 use WebGUI::Asset;
 use WebGUI::Workflow::Instance;
 use WebGUI::DateTime;
+use WebGUI::Session;
 
 =head1 NAME
 
@@ -99,7 +100,7 @@ sub autoCommitWorkingIfEnabled {
         }
         else {
             my $url = $versionTag->autoCommitUrl($options->{returnUrl});
-            $session->http->setRedirect($url);
+            $session->response->setRedirect($url);
             return 'redirect';
         }
     }
@@ -192,9 +193,11 @@ sub commit {
 	my $now = time;
 	my $finished = 1;
 	foreach my $asset (@{$self->getAssets({"byLineage"=>1, onlyPending=>1})}) {
+                $self->session->log->info( "Committing " . $asset->getId );
 		$asset->commit;
 		if ($now + $timeout < time) {
 			$finished = 0;	
+                        $self->session->log->info( "NOES!" );
 			last;
 		}
 	}
@@ -245,7 +248,7 @@ sub commitAsUser {
     return 0 unless (defined $userId);
 
     #Open a new session
-    my $new_session = WebGUI::Session->open( $config->getWebguiRoot, $config->getFilename );
+    my $new_session = WebGUI::Session->open( $config );
     #Set the userId in the new session
     $new_session->user( { userId => $userId } );
 
@@ -262,7 +265,7 @@ sub commitAsUser {
         }
     }
     #End the new session
-    $new_session->var->end;
+    $new_session->end;
     $new_session->close;
     return 1;
 }
@@ -389,16 +392,51 @@ sub getAssets {
 	if ($options->{onlyPending}) {
 		$pending = " and assetData.status='pending' ";
 	}
-	my $sth = $self->session->db->read("select asset.assetId,asset.className,assetData.revisionDate from assetData left join asset on asset.assetId=assetData.assetId where assetData.tagId=? ".$pending." order by ".$sort." ".$direction, [$self->getId]);
-	while (my ($id,$class,$version) = $sth->array) {
-		my $asset = WebGUI::Asset->new($self->session,$id,$class,$version);
-                unless (defined $asset) {
-                        $self->session->errorHandler->error("Asset $id $class $version could not be instanciated by version tag ".$self->getId.". Perhaps it is corrupt.");
-                        next;
-                }
-                push(@assets, $asset);
+	my $sth = $self->session->db->read("select asset.assetId,assetData.revisionDate from assetData left join asset on asset.assetId=assetData.assetId where assetData.tagId=? ".$pending." order by ".$sort." ".$direction, [$self->getId]);
+	ASSETID: while (my ($id,$version) = $sth->array) {
+		my $asset = eval { WebGUI::Asset->newById($self->session,$id,$version); };
+            unless (defined $asset) {
+                $self->session->log->error("Asset $id $version could not be instanciated by version tag ".$self->getId.". Perhaps it is corrupt.");
+                next ASSETID;
+            }
+            push(@assets, $asset);
 	}
 	return \@assets;
+}
+
+#-------------------------------------------------------------------
+
+=head2 getCommitUrl ( )
+
+Get the URL to commit this version tag. Will check settings to see
+if commit comments are on or off
+
+=cut
+
+sub getCommitUrl {
+    my ( $self ) = @_;
+    my $session = $self->session;
+    my ( $url ) = $session->quick(qw( url ));
+
+    if ($session->setting->get("skipCommitComments")) {
+        return $url->page("op=commitVersionTagConfirm;tagId=".$self->getId);
+    }
+    else {
+        return $url->page("op=commitVersionTag;tagId=".$self->getId);
+    }
+}
+
+#-------------------------------------------------------------------
+
+=head2 getEditUrl ( )
+
+Get the URL to edit this version tag
+
+=cut
+
+sub getEditUrl {
+    my ( $self ) = @_;
+    return $self->session->url->page( "op=editVersionTag;tagId=".$self->getId );
 }
 
 #-------------------------------------------------------------------
@@ -412,6 +450,19 @@ Returns the ID of this version tag.
 sub getId {
 	my $self = shift;
 	return $self->{_id};
+}
+
+#-------------------------------------------------------------------
+
+=head2 getJoinUrl ( )
+
+Get the URL to join this version tag
+
+=cut
+
+sub getJoinUrl {
+    my ( $self ) = @_;
+    return $self->session->url->page( "op=setWorkingVersionTag;tagId=".$self->getId );
 }
 
 #-------------------------------------------------------------------
@@ -462,10 +513,10 @@ sub getVersionTagMode {
 
     my $mode = q{};
 
-    $mode = $session->user()->profileField(q{versionTagMode});
+    $mode = $session->user()->get(q{versionTagMode});
 
     #verify mode.
-    if (!(defined $mode && WebGUI::Utility::isIn($mode, qw{autoCommit siteWide singlePerUser multiPerUser}))) {
+    if (!(defined $mode && $mode ~~ [qw{autoCommit siteWide singlePerUser multiPerUser}])) {
         $mode = q{};
     }
 
@@ -704,20 +755,23 @@ A subroutine for reporting the status of the rollback.  Typically used by WebGUI
 =cut
 
 sub rollback {
-	my $self      = shift;
+    my $self      = shift;
     my $session   = $self->session;
     my $options   = shift || {};
     my $outputSub = exists $options->{outputSub} ? $options->{outputSub} : sub {};
-	my $tagId     = $self->getId;
-	if ($tagId eq "pbversion0000000000001") {
-		$session->errorHandler->warn("You cannot rollback a tag that is required for the system to operate.");	
-		return 0;
-	}
-	my $sth = $session->db->read("select asset.className, asset.assetId, assetData.revisionDate from assetData left join asset on asset.assetId=assetData.assetId where assetData.tagId = ? order by asset.lineage desc, assetData.revisionDate desc", [ $tagId ]);
+    my $tagId     = $self->getId;
+    if ($tagId eq "pbversion0000000000001") {
+        $session->log->warn("You cannot rollback a tag that is required for the system to operate.");	
+        return 0;
+    }
+    my $sth = $session->db->read("select asset.assetId, assetData.revisionDate from assetData left join asset using(assetId) where assetData.tagId = ? order by asset.lineage desc, assetData.revisionDate desc", [ $tagId ]);
     my $i18n    = WebGUI::International->new($session, 'VersionTag');
-	REVISION: while (my ($class, $id, $revisionDate) = $sth->array) {
-		my $revision = WebGUI::Asset->new($session,$id, $class, $revisionDate);
-        next REVISION unless $revision;
+    REVISION: while (my ($id, $revisionDate) = $sth->array) {
+        my $revision = eval { WebGUI::Asset->newById($session, $id, $revisionDate); };
+        unless (defined $revision) {
+            $self->session->log->error("Asset $id $revisionDate could not be instanciated by version tag ".$self->getId.". Perhaps it is corrupt.");
+            next REVISION;
+        }
         $outputSub->(sprintf $i18n->get('Rolling back %s'), $revision->getTitle);
 		$revision->purgeRevision;
 	}

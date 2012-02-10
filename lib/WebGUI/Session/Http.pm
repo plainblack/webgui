@@ -3,7 +3,7 @@ package WebGUI::Session::Http;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -16,8 +16,14 @@ package WebGUI::Session::Http;
 
 
 use strict;
-use WebGUI::Utility;
 use Scalar::Util qw( weaken blessed );
+use HTTP::Date ();
+
+sub _deprecated {
+    my $alt = shift;
+    my $method = (caller(1))[3];
+    Carp::carp("$method is deprecated. Use 'WebGUI::$alt' instead.");
+}
 
 =head1 NAME
 
@@ -27,6 +33,9 @@ Package WebGUI::Session::Http
 
 This package allows the manipulation of HTTP protocol information.
 
+*** This module is deprecated in favor of L<WebGUI::Session::Request> and
+L<WebGUI::Session::Response>.
+
 =head1 SYNOPSIS
 
  use WebGUI::Session::Http;
@@ -35,16 +44,9 @@ This package allows the manipulation of HTTP protocol information.
 
  $http->sendHeader();
 
- $cookies = $http->getCookies();
- $mimetype = $http->getMimeType();
- $code = $http->getStatus();
- ($code, $description) = $http->getStatus();
- $description = $http->getStatusDescription();
  $boolean = $http->isRedirect();
  
  $http->setCookie($name,$value);
- $http->setFilename($filename,$mimetype);
- $http->setMimeType($mimetype);
  $http->setNoHeader($bool);
  $http->setRedirect($url);
 
@@ -53,208 +55,6 @@ This package allows the manipulation of HTTP protocol information.
 These methods are available from this package:
 
 =cut
-
-#-------------------------------------------------------------------
-
-=head2 DESTROY ( )
-
-Deconstructor.
-
-=cut
-
-sub DESTROY {
-        my $self = shift;
-        undef $self;
-}
-
-
-
-#-------------------------------------------------------------------
-
-=head2 getCacheControl  ( ) 
-
-Returns the cache control setting from this object.
-
-=cut
-
-sub getCacheControl {
-	my $self = shift;
-	return $self->{_http}{cacheControl} || 1;
-}
-
-#-------------------------------------------------------------------
-
-=head2 getCookies ( )
-
-Retrieves the cookies from the HTTP header and returns a hash reference containing them.
-
-=cut
-
-sub getCookies {
-	my $self = shift;
-	if ($self->session->request) {
-		# Have to require this instead of using it otherwise it causes problems for command-line scripts on some platforms (namely Windows)
-		require APR::Request::Apache2;
-		my $jarHashRef = eval { APR::Request::Apache2->handle($self->session->request)->jar(); };
-		return $jarHashRef if $jarHashRef;
-        if (blessed $@ and $@->isa('APR::Request::Error')) {
-            return $@->jar;
-        }
-		return {};
-	}
-	else {
-		return {};
-	}
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 getLastModified ( ) 
-
-Returns the stored epoch date when the page as last modified.
-
-=cut
-
-sub getLastModified {
-	my $self = shift;
-	return $self->{_http}{lastModified};
-}
-
-#-------------------------------------------------------------------
-
-=head2 getMimeType ( ) 
-
-Returns the current mime type of the document to be returned.
-
-=cut
-
-sub getMimeType {
-	my $self = shift;
-	return $self->{_http}{mimetype} || "text/html; charset=UTF-8";
-}
-
-#-------------------------------------------------------------------
-
-=head2 getNoHeader ( )
-
-Returns whether or not a HTTP header will be printed.
-
-=cut
-
-sub getNoHeader {
-	my $self = shift;
-        return $self->{_http}{noHeader};
-}
-
-#-------------------------------------------------------------------
-
-=head2 getRedirectLocation ( )
-
-Return the location that was set via setRedirect
-
-=cut
-
-sub getRedirectLocation {
-	my $self = shift;
-	return $self->{_http}{location};
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 getStatus ( ) {
-
-Returns the current HTTP status code.  If no code has been set,
-the code returned will be 200.
-
-=cut
-
-sub getStatus {
-	my $self = shift;
-	$self->{_http}{statusDescription} = $self->{_http}{statusDescription} || "OK";
-	my $status = $self->{_http}{status} || "200";
-	return $status;
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 getStatusDescription ( ) {
-
-Returns the current HTTP status description.  If no description has
-been set, "OK" will be returned.
-
-=cut
-
-sub getStatusDescription {
-	my $self = shift;
-	return $self->{_http}{statusDescription} || "OK";
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 getStreamedFile ( ) {
-
-Returns the location of a file to be streamed thru mod_perl, if one has been set.
-
-=cut
-
-sub getStreamedFile {
-	my $self = shift;
-	return $self->{_http}{streamlocation} || undef;
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 ifModifiedSince ( epoch [, maxCacheTimeout] )
-
-Returns 1 if the epoch is greater than the modified date check.
-
-=head3 epoch
-
-The date that the requested content was last modified in epoch format.
-
-=head3 maxCacheTimeout
-
-A modifier to the epoch, that allows us to set a maximum timeout where content will appear to
-have changed and a new page request will be allowed to be processed.
-
-=cut
-
-sub ifModifiedSince {
-    my $self            = shift;
-    my $epoch           = shift;
-    my $maxCacheTimeout = shift;
-    require APR::Date;
-    my $modified = $self->session->request->headers_in->{'If-Modified-Since'};
-    return 1 if ($modified eq "");
-    $modified = APR::Date::parse_http($modified);
-    ##Implement a step function that increments the epoch time in integer multiples of
-    ##the maximum cache time.  Used to handle the case where layouts containing macros
-    ##(like assetproxied Navigations) can be periodically updated.
-    if ($maxCacheTimeout) {
-        my $delta = time() - $epoch;
-        $epoch   += $delta - ($delta % $maxCacheTimeout);
-    }
-    return ($epoch > $modified);
-}
-
-#-------------------------------------------------------------------
-
-=head2 isRedirect ( )
-
-Returns a boolean value indicating whether the current page will redirect to some other location.
-
-=cut
-
-sub isRedirect {
-	my $self = shift;
-	return isIn($self->getStatus(), qw(302 301));
-}
-
 
 #-------------------------------------------------------------------
 
@@ -271,83 +71,10 @@ A reference to the current session.
 sub new {
 	my $class = shift;
 	my $session = shift;
-	my $self = bless {_session=>$session}, $class;
-        weaken( $self->{_session} );
-        return $self;
+    my $self = bless { _session => $session }, $class;
+    weaken $self->{_session};
+    return $self;
 }
-
-
-#-------------------------------------------------------------------
-
-=head2 sendHeader ( )
-
-Generates and sends HTTP headers for a response.
-
-=cut
-
-sub sendHeader {
-	my $self = shift;
-	return undef if ($self->{_http}{noHeader});
-	return $self->_sendMinimalHeader unless defined $self->session->db(1);
-
-	my ($request, $datetime, $config, $var) = $self->session->quick(qw(request datetime config var));
-	return undef unless $request;
-	my $userId = $var->get("userId");
-	
-	# send webgui session cookie
-	my $cookieName = $config->getCookieName;
-	$self->setCookie($cookieName,$var->getId, $config->getCookieTTL, $config->get("cookieDomain")) unless $var->getId eq $self->getCookies->{$cookieName};
-
-	$self->setNoHeader(1);
-	my %params;
-	if ($self->isRedirect()) {
-		$request->headers_out->set(Location => $self->getRedirectLocation);
-		$request->status($self->getStatus);
-	} else {
-		$request->content_type($self->getMimeType);
-		my $cacheControl = $self->getCacheControl;
-		my $date = ($userId eq "1") ? $datetime->epochToHttp($self->getLastModified) : $datetime->epochToHttp;
-		# under these circumstances, don't allow caching
-		if ($userId ne "1" ||  $cacheControl eq "none" || $self->session->setting->get("preventProxyCache")) {
-			$request->headers_out->set("Cache-Control" => "private, max-age=1");
-			$request->no_cache(1);
-		} 
-		# in all other cases, set cache, but tell it to ask us every time so we don't mess with recently logged in users
-		else {
-            if ( $cacheControl eq "none" ) {
-                $request->headers_out->set("Cache-Control" => "private, max-age=1");
-                $request->no_cache(1);
-            }
-            else {
-                $request->headers_out->set('Last-Modified' => $date);
-                $request->headers_out->set('Cache-Control' => "must-revalidate, max-age=" . $cacheControl);
-            }
-			# do an extra incantation if the HTTP protocol is really old
-			if ($request->protocol =~ /(\d\.\d)/ && $1 < 1.1) {
-				my $date = $datetime->epochToHttp(time() + $cacheControl);
-  				$request->headers_out->set('Expires' => $date);
-			}
-  		}
-		if ($self->getFilename) {
-                        $request->headers_out->set('Content-Disposition' => qq{attachment; filename="}.$self->getFilename().'"');
-		}
-		$request->status($self->getStatus());
-		$request->status_line($self->getStatus().' '.$self->getStatusDescription());
-	}
-	return undef;
-}
-
-sub _sendMinimalHeader {
-	my $self = shift;
-	my $request = $self->session->request;
-	$request->content_type('text/html; charset=UTF-8');
-	$request->headers_out->set('Cache-Control' => 'private');
-	$request->no_cache(1);
-	$request->status($self->getStatus());
-	$request->status_line($self->getStatus().' '.$self->getStatusDescription());
-	return undef;
-}
-
 
 #-------------------------------------------------------------------
 
@@ -361,6 +88,106 @@ sub session {
 	my $self = shift;
 	return $self->{_session};
 }
+
+
+#-------------------------------------------------------------------
+
+=head2 getCacheControl  ( ) 
+
+Returns the cache control setting from this object.
+
+=cut
+
+sub getCacheControl {
+	my $self = shift;
+	return $self->session->response->getCacheControl;
+}
+
+#-------------------------------------------------------------------
+
+=head2 getCookies ( )
+
+Retrieves the cookies from the HTTP header and returns a hash reference containing them.
+
+=cut
+
+sub getCookies {
+	my $self = shift;
+	_deprecated('Session::Request::cookies');
+	return $self->session->request->cookies;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 getLastModified ( ) 
+
+Returns the stored epoch date when the page as last modified.
+
+=cut
+
+sub getLastModified {
+	my $self = shift;
+	return $self->session->response->getLastModified;
+}
+
+#-------------------------------------------------------------------
+
+=head2 getNoHeader ( )
+
+Returns whether or not a HTTP header will be printed.
+
+=cut
+
+sub getNoHeader {
+	my $self = shift;
+    return $self->session->response->getNoHeader;
+}
+
+#-------------------------------------------------------------------
+
+=head2 getStreamedFile ( ) {
+
+Returns the location of a file to be streamed thru mod_perl, if one has been set.
+
+=cut
+
+sub getStreamedFile {
+	my $self = shift;
+	_deprecated('Session::Response::getStreamedFile');
+	return $self->session->response->getStreamedFile;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 isRedirect ( )
+
+Returns a boolean value indicating whether the current page will redirect to some other location.
+
+=cut
+
+sub isRedirect {
+	my $self = shift;
+	_deprecated('Session::Response::isRedirect');
+    return $self->session->response->isRedirect;
+}
+
+
+#-------------------------------------------------------------------
+
+=head3 sendHeader
+
+Moved to L<WebGUI::Session::Response>.
+
+=cut
+
+sub sendHeader {
+	my $self = shift;
+	_deprecated('Session::Response::sendHeader');
+    $self->session->response->sendHeader(@_);
+}
+
 
 #-------------------------------------------------------------------
 
@@ -376,96 +203,21 @@ Either the number of seconds until the cache expires, or the word "none" to disa
 
 sub setCacheControl {
 	my $self = shift;
-	my $timeout = shift;
-	$self->{_http}{cacheControl} = $timeout;
+	_deprecated('Session::Response::setCacheControl');
+	$self->session->response->setCacheControl(@_);
 }
 
 #-------------------------------------------------------------------
 
 =head2 setCookie ( name, value [ , timeToLive, domain ] ) 
 
-Sends a cookie to the browser.
-
-=head3 name
-
-The name of the cookie to set. Must be unique from all other cookies from this domain or it will overwrite that cookie.
-
-=head3 value
-
-The value to set.
-
-=head3 timeToLive
-
-The time that the cookie should remain in the browser. Defaults to "+10y" (10 years from now).
-This may be "session" to indicate that the cookie is for the current browser session only.
-
-=head3 domain
-
-Explicitly set the domain for this cookie.
-
-=cut
+Moved to L<WebGUI::Session::Response>.
 
 sub setCookie {
 	my $self = shift;
-	my $name = shift;
-	my $value = shift;
-	my $ttl = shift;
-	my $domain = shift;
-	$ttl = (defined $ttl ? $ttl : '+10y');
-
-	if ($self->session->request) {
-		require Apache2::Cookie;
-		my $cookie = Apache2::Cookie->new($self->session->request,
-			-name=>$name,
-			-value=>$value,
-			-path=>'/'
-		);
-
-		$cookie->expires($ttl) if $ttl ne 'session';
-		$cookie->domain($domain) if ($domain);
-		$cookie->bake($self->session->request);
-	}
+	_deprecated('Session::Request');
+    $self->session->response->setCookie(@_);
 }
-
-
-#-------------------------------------------------------------------
-
-=head2 setFilename ( filename [, mimetype] )
-
-Override the default filename for the document, which is usually the page url. Usually used with setMimeType().
-
-=head3 filename
-
-The filename to set.
-
-=head3 mimetype
-
-The mimetype for this file. Defaults to "application/octet-stream".
-
-=cut
-
-sub setFilename {
-	my $self = shift;
-	$self->{_http}{filename} = shift;
-	my $mimetype = shift || "application/octet-stream";
-	$self->setMimeType($mimetype);
-}
-
-
-
-#-------------------------------------------------------------------
-
-=head2 getFilename ( )
-
-Returns the default filename for the document.
-
-=cut
-
-sub getFilename {
-	my $self = shift;
-	return $self->{_http}{filename};
-}
-
 
 
 #-------------------------------------------------------------------
@@ -480,27 +232,8 @@ The epoch date when the page was last modified.
 
 sub setLastModified {
 	my $self = shift;
-	my $epoch = shift;
-	$self->{_http}{lastModified} = $epoch;
-}
-
-#-------------------------------------------------------------------
-
-=head2 setMimeType ( mimetype )
-
-Override mime type for the document, which is defaultly "text/html; charset=UTF-8". Also see setFilename().
-
-B<NOTE:> By setting the mime type to something other than "text/html" WebGUI will automatically not process the normal page contents. Instead it will return only the content of your Wobject function or Operation.
-
-=head3 mimetype
-
-The mime type for the document.
-
-=cut
-
-sub setMimeType {
-	my $self = shift;
-	$self->{_http}{mimetype} = shift;
+	_deprecated('Session::Response::setLastModified');
+	$self->session->response->setLastModified(@_);
 }
 
 #-------------------------------------------------------------------
@@ -518,73 +251,24 @@ Any value other than 0 will disable header printing.
 
 sub setNoHeader {
 	my $self = shift;
-        $self->{_http}{noHeader} = shift;
+	_deprecated('Session::Response::setNoHeader');
+    $self->session->response->setNoHeader(@_);
 }
 
 #-------------------------------------------------------------------
 
 =head2 setRedirect ( url, [ type ] )
 
-Sets the necessary information in the HTTP header to redirect to another URL.
-
-=head3 url
-
-The URL to redirect to.  To prevent infinite loops, no redirect will be set if
-url is the same as the current page, as found through $session->url->page.
-
-=head3 type
-
-Defaults to 302 (temporary redirect), but you can optionally set 301 (permanent redirect).
+Moved to L<WebGUI::Session::Response>.
 
 =cut
 
 sub setRedirect {
 	my $self = shift;
-	my $url = shift;
-    my $type = shift || 302;
-	my @params = $self->session->form->param;
-	return undef if ($url eq $self->session->url->page() && scalar(@params) < 1); # prevent redirecting to self
-	$self->session->errorHandler->info("Redirecting to $url");
-	$self->setRedirectLocation($url);
-	$self->setStatus($type, "Redirect");
-	$self->session->style->setMeta({"http-equiv"=>"refresh",content=>"0; URL=".$url});
+	_deprecated('Session::Response');
+    $self->session->response->setRedirect(@_);
 }
 
-
-#-------------------------------------------------------------------
-
-=head2 setRedirectLocation ( url )
-
-Sets the HTTP redirect URL.
-
-=cut
-
-sub setRedirectLocation {
-	my $self = shift;
-	$self->{_http}{location} = shift;
-}
-
-#-------------------------------------------------------------------
-
-=head2 setStatus ( code, description )
-
-Sets the HTTP status code.
-
-=head3 code
-
-An HTTP status code. It is a 3 digit status number.
-
-=head3 description
-
-An HTTP status code description. It is a little one line of text that describes the status code.
-
-=cut
-
-sub setStatus {
-	my $self = shift;
-	$self->{_http}{status} = shift;
-	$self->{_http}{statusDescription} = shift;
-}
 
 #-------------------------------------------------------------------
 
@@ -596,7 +280,8 @@ Set a file to be streamed thru mod_perl.
 
 sub setStreamedFile {
 	my $self = shift;
-	$self->{_http}{streamlocation} = shift;
+	_deprecated('Session::Response');
+	$self->session->response->setStreamedFile(@_);
 }
 
 

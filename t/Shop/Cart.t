@@ -1,6 +1,6 @@
 # vim:syntax=perl
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -13,9 +13,7 @@
 # 
 #
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../lib";
 use Test::More;
 use Test::Deep;
 use Test::Exception;
@@ -32,11 +30,6 @@ use JSON 'from_json';
 # Init
 my $session         = WebGUI::Test->session;
 my $i18n = WebGUI::International->new($session, "Shop");
-
-#----------------------------------------------------------------------------
-# Tests
-
-plan tests => 38;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -84,11 +77,7 @@ $item->update({shippingAddressId => "XXXX"});
 is($item->get("shippingAddressId"), "XXXX", "Can set shippingAddressId in the cart item properties.");
 $item->update({shippingAddressId => undef});
 
-my $now = time();
-$cart->update({creationDate => $now});
-is($cart->get('creationDate'), $now, 'update: set creationDate');
-
-like($cart->getId, qr/[A-Za-z0-9\_\-]{22}/, "Id looks like a guid.");
+ok($session->id->valid($cart->getId), "Id looks like a guid.");
 
 is(ref($cart->get), "HASH", "Cart properties are a hash reference.");
 is($cart->get("sessionId"), $session->getId, "Can retrieve a value from the cart properties.");
@@ -157,7 +146,7 @@ is( $cart->readyForCheckout, 0, 'Cannot checkout an empty cart' );
 is($session->db->quickScalar("select count(*) from cartItem where cartId=?",[ $cart->getId ]), 0, "Items are removed from cart.");
 
 
-my $session2 = WebGUI::Session->open(WebGUI::Test->root, WebGUI::Test->file);
+my $session2 = WebGUI::Test->newSession;
 WebGUI::Test->addToCleanup($session2);
 $session2->user({userId => 3});
 my $cart2 = WebGUI::Shop::Cart->newBySession($session2);
@@ -232,3 +221,5 @@ SKIP: {
     skip 1, 'requiresShipping died, so skipping' unless $requiresShipping_ok;
     ok !$cart->requiresShipping, 'Shipping no longer required on a cart with missing assets';
 }
+
+done_testing;

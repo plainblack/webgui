@@ -3,7 +3,7 @@ package Spectre::Admin;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -24,6 +24,9 @@ use POE::Component::IKC::Server;
 use POE::Component::IKC::Specifier;
 use Spectre::Cron;
 use Spectre::Workflow;
+use WebGUI::Paths;
+use WebGUI::Config;
+use File::Spec;
 
 
 #-------------------------------------------------------------------
@@ -135,38 +138,40 @@ Fetches the site from each defined site, and loads it into the Workflow and Cron
 =cut
 
 sub loadSiteData {
-        my ( $kernel, $self) = @_[ KERNEL, OBJECT ];
-	my $configs = WebGUI::Config->readAllConfigs($self->{_config}->getWebguiRoot);
+    my ( $kernel, $self) = @_[ KERNEL, OBJECT ];
     $self->debug("Reading site configs.");
-	foreach my $key (keys %{$configs}) {
-		next if $key =~ m/^demo/;
-		$self->debug("Fetching site data for $key");
-		 my $userAgent = new LWP::UserAgent;
+    my @configs = WebGUI::Paths->siteConfigs;
+    foreach my $configFile (@configs) {
+        my $shortName = (File::Spec->splitpath($configFile))[2];
+        next if $shortName =~ m/\bdemo/;
+        my $siteConfig = WebGUI::Config->new($configFile);
+        $self->debug("Fetching site data for $shortName");
+        my $userAgent = new LWP::UserAgent;
         if (!$self->config->get('ignoreEnvProxy')) {
             $userAgent->env_proxy;
         }
         	$userAgent->agent("Spectre");
         	$userAgent->timeout(30);
-		my $url = "http://".$configs->{$key}->get("sitename")->[0].":".$self->{_config}->get("webguiPort").$configs->{$key}->get("gateway")."?op=spectreGetSiteData";
+		my $url = "http://".$siteConfig->get("sitename")->[0].":".$self->{_config}->get("webguiPort").$siteConfig->get("gateway")."?op=spectreGetSiteData";
         	my $request = new HTTP::Request (GET => $url);
         	my $response = $userAgent->request($request);
         	if ($response->is_error) {
-			$self->error( "Couldn't connect to WebGUI site $key at $url.  Response: " . $response->status_line );
+			$self->error( "Couldn't connect to WebGUI site $shortName at $url.  Response: " . $response->status_line );
         	} 
 		else {
 			my $siteData = {};
 			eval { $siteData = JSON::decode_json($response->content); };
 			if ($@) {
-				$self->error("Couldn't fetch Spectre configuration data for $key : $@");
+				$self->error("Couldn't fetch Spectre configuration data for $shortName : $@");
 			}
 			else {
-				$self->debug("Loading workflow data for $key");
+				$self->debug("Loading workflow data for $shortName");
 				foreach my $instance (@{$siteData->{workflow}}) {
 					$kernel->post("workflow" ,"addInstance", $instance);
 				}
-				$self->debug("Loading scheduler data for $key");
+				$self->debug("Loading scheduler data for $shortName");
 				foreach my $task (@{$siteData->{cron}}) {
-					$task->{config} = $key;
+					$task->{config} = $shortName;
 					$kernel->post("cron", "addJob", $task);
 				}
 			}
@@ -194,7 +199,7 @@ sub new {
 	my $class = shift;
 	my $config = shift;
 	my $debug = shift;
- 	Log::Log4perl->init( $config->getWebguiRoot."/etc/log.conf" );   
+ 	Log::Log4perl->init( WebGUI::Paths->logConfig );
 	$Log::Log4perl::caller_depth = $Log::Log4perl::caller_depth+3;
 	my $logger = Log::Log4perl->get_logger($config->getFilename);
 	my $self = {_debug=>$debug, _config=>$config, _logger=>$logger};
@@ -244,29 +249,31 @@ sub runTests {
 	my $class = shift;
 	my $config = shift;
 	print "Running connectivity tests.\n";
-	my $configs = WebGUI::Config->readAllConfigs($config->getWebguiRoot);
-	foreach my $key (keys %{$configs}) {
-		next if $key =~ m/^demo/;
-		print "Testing $key\n";
+    my @configs = WebGUI::Paths->siteConfigs;
+	foreach my $configFile (@configs) {
+        my $shortName = (File::Spec->splitpath($configFile))[2];
+        next if $shortName =~ m/\bdemo/;
+        my $siteConfig = WebGUI::Config->new($configFile);
+        print "Testing $shortName\n";
 		 my $userAgent = new LWP::UserAgent;
         if (!$config->get('ignoreEnvProxy')) {
             $userAgent->env_proxy;
         }
         	$userAgent->agent("Spectre");
         	$userAgent->timeout(30);
-		my $url = "http://".$configs->{$key}->get("sitename")->[0].":".$config->get("webguiPort").$configs->{$key}->get("gateway")."?op=spectreTest";
+		my $url = "http://".$siteConfig->get("sitename")->[0].":".$config->get("webguiPort").$siteConfig->get("gateway")."?op=spectreTest";
         	my $request = new HTTP::Request (GET => $url);
         	my $response = $userAgent->request($request);
         	if ($response->is_error) {
-			print "ERROR: Couldn't connect to WebGUI site $key\n";
+			print "ERROR: Couldn't connect to WebGUI site $shortName\n";
         	} else {
                 	my $response = $response->content;
 			if ($response eq "subnet") {
-				print "ERROR: Spectre cannot communicate with WebGUI. Perhaps you need to adjust the spectreSubnets setting in this config file: $key.\n";
+				print "ERROR: Spectre cannot communicate with WebGUI. Perhaps you need to adjust the spectreSubnets setting in this config file: $shortName.\n";
 			} elsif ($response eq "spectre") {
-				print "ERROR: WebGUI cannot communicate with Spectre. Perhaps you need to adjust the spectreIp or spectrePort setting the this config file: $key.";
+				print "ERROR: WebGUI cannot communicate with Spectre. Perhaps you need to adjust the spectreIp or spectrePort setting the this config file: $shortName.";
 			} elsif ($response ne "success") {
-				print "ERROR: Spectre received an invalid response ($response) from WebGUI while testing $key\n";
+				print "ERROR: Spectre received an invalid response ($response) from WebGUI while testing $shortName\n";
 			}
         	}
 	}	

@@ -18,7 +18,7 @@ WebGUI::Wizard -- Generate wizards
  # Show a form for the first step
  sub www_step1 { 
     my ( $self ) = @_;
-    my $f   = $self->getForm; # Get a WebGUI::HTMLForm
+    my $f   = $self->getForm; # Get a WebGUI::FormBuilder
     $f->text( name => "user" );
     return $f->print;
  }
@@ -244,14 +244,14 @@ sub getCurrentStep {
 
 =head2 getForm ( [step] )
 
-Get a WebGUI::HTMLForm object for a given step, defaulting to the current step.
+Get a WebGUI::FormBuilder object for a given step, defaulting to the current step.
 
 =cut
 
 sub getForm {
     my ( $self, $step ) = @_;
     $step ||= $self->getCurrentStep;
-    my $form = WebGUI::HTMLForm->new( $self->session, 
+    my $form = WebGUI::FormBuilder->new( $self->session, 
         action      => $self->getStepUrl( $step ),
     );
     return $form;
@@ -377,7 +377,7 @@ sub www_cleanup {
     my ( $self ) = @_;
 
     $self->cleanup;
-    $self->session->http->setRedirect( $self->session->url->page );
+    $self->session->response->setRedirect( $self->session->url->page );
     return "redirect";
 }
 

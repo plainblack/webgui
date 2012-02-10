@@ -1,6 +1,6 @@
 # vim:syntax=perl
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -13,9 +13,7 @@
 # 
 #
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../lib";
 use Test::More;
 use Test::Deep;
 use Exception::Class;
@@ -29,11 +27,6 @@ use WebGUI::Shop::AddressBook;
 my $session         = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
-# Tests
-
-plan tests => 28;
-
-#----------------------------------------------------------------------------
 # put your tests here
 
 my $storage;
@@ -42,13 +35,13 @@ my $address;
 
 #######################################################################
 #
-# create
+# new
 #
 #######################################################################
 
-eval { $address = WebGUI::Shop::Address->create(); };
+eval { $address = WebGUI::Shop::Address->new(); };
 $e = Exception::Class->caught();
-isa_ok($e, 'WebGUI::Error::InvalidObject', 'create takes exception to not giving it an address book');
+isa_ok($e, 'WebGUI::Error::InvalidObject', 'new takes exception to not giving it an address book');
 cmp_deeply(
     $e,
     methods(
@@ -57,12 +50,12 @@ cmp_deeply(
         got      => '',
         param    => undef,
     ),
-    'create takes exception to not giving it address book',
+    '... parameter check',
 );
 
-eval { $address = WebGUI::Shop::Address->create($session); };
+eval { $address = WebGUI::Shop::Address->new($session); };
 $e = Exception::Class->caught();
-isa_ok($e, 'WebGUI::Error::InvalidObject', 'create takes exception to not giving it a session variable');
+isa_ok($e, 'WebGUI::Error::InvalidObject', 'new takes exception to giving it a session variable');
 cmp_deeply(
     $e,
     methods(
@@ -71,29 +64,17 @@ cmp_deeply(
         got      => 'WebGUI::Session',
         param    => $session,
     ),
-    'create takes exception to giving it a session variable',
+    '... parameter check',
 );
 
 $session->user({userId => 3});
 
-my $book  = WebGUI::Shop::AddressBook->create($session);
-my $book2 = WebGUI::Shop::AddressBook->create($session);
+my $book  = WebGUI::Shop::AddressBook->new($session);
+my $book2 = WebGUI::Shop::AddressBook->new($session);
 WebGUI::Test->addToCleanup($book, $book2);
 
-eval { $address = WebGUI::Shop::Address->create($book); };
-$e = Exception::Class->caught();
-isa_ok($e, 'WebGUI::Error::InvalidParam', 'create takes exception to not giving it address data');
-cmp_deeply(
-    $e,
-    methods(
-        error    => 'Need a hash reference.',
-        param    => undef,
-    ),
-    'create takes exception to giving it address data',
-);
-
-$address = WebGUI::Shop::Address->create($book, {});
-isa_ok($address, 'WebGUI::Shop::Address', 'create returns an Address object with an empty hashref');
+$address = WebGUI::Shop::Address->new($book, {});
+isa_ok($address, 'WebGUI::Shop::Address', 'new returns an Address object with an empty hashref');
 
 #######################################################################
 #
@@ -126,29 +107,30 @@ is($address->getId, $address->get('addressId'), 'getId is an alias for get addre
 cmp_deeply(
     $address->get,
     {
-        label        => undef,
-        firstName    => undef,
-        lastName     => undef,
-        address1     => undef,
-        address2     => undef,
-        address3     => undef,
-        city         => undef,
-        state        => undef,
-        country      => undef,
-        code         => undef,
-        phoneNumber  => undef,
-        email        => undef,
-        organization => undef,
-        addressId   => ignore(), #checked elsewhere
+        label        => '',
+        firstName    => '',
+        lastName     => '',
+        address1     => '',
+        address2     => '',
+        address3     => '',
+        city         => '',
+        state        => '',
+        country      => '',
+        code         => '',
+        phoneNumber  => '',
+        email        => '',
+        organization => '',
+        addressId    => ignore(), #checked elsewhere
         addressBookId  => $book->getId,
-        isProfile   => 0,
+        addressBook  => $book,
+        isProfile   => bool(0),
     },
     'get the whole thing and check a new, blank object'
 );
 
 my $addressGuts = $address->get();
 $addressGuts->{'label'} = 'hacked';
-is($address->get('label'), undef, 'get returns a safe copy of the hash');
+is($address->get('label'), '', 'get returns a safe copy of the hash');
 
 #######################################################################
 #
@@ -172,46 +154,6 @@ $address->update({ addressBookId => $book->getId });
 # new
 #
 #######################################################################
-
-eval { $address = WebGUI::Shop::Address->new(); };
-$e = Exception::Class->caught();
-isa_ok($e, 'WebGUI::Error::InvalidObject', 'new takes exception to not giving it an address book');
-cmp_deeply(
-    $e,
-    methods(
-        error    => 'Need an address book.',
-        expected => 'WebGUI::Shop::AddressBook',
-        got      => '',
-        param    => ignore,
-    ),
-    'new takes exception to not giving it address book',
-);
-
-eval { $address = WebGUI::Shop::Address->new($session); };
-$e = Exception::Class->caught();
-isa_ok($e, 'WebGUI::Error::InvalidObject', 'new takes exception to not giving it a session variable');
-cmp_deeply(
-    $e,
-    methods(
-        error    => 'Need an address book.',
-        expected => 'WebGUI::Shop::AddressBook',
-        got      => 'WebGUI::Session',
-        param    => ignore,
-    ),
-    'new takes exception to giving it a session variable',
-);
-
-eval { $address = WebGUI::Shop::Address->new($book); };
-$e = Exception::Class->caught();
-isa_ok($e, 'WebGUI::Error::InvalidParam', 'new takes exception to not giving it an address to instanciate');
-cmp_deeply(
-    $e,
-    methods(
-        error    => 'Need an addressId.',
-        param    => undef,
-    ),
-    'new takes exception to giving it an address to instanciate',
-);
 
 eval { $address = WebGUI::Shop::Address->new($book, 'neverAnId'); };
 $e = Exception::Class->caught();
@@ -246,3 +188,5 @@ cmp_deeply(
 $address->delete;
 my $check = $session->db->quickScalar('select count(*) from address where addressId=?',[$address->getId]);
 is( $check, 0, 'delete worked');
+
+done_testing;

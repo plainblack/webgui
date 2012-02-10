@@ -3,7 +3,7 @@ package WebGUI::Form::SelectList;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -134,7 +134,7 @@ sub toHtml {
 		$output .= '>'.$options->{$key}.'</option>';
 	}
 	$output .= '</select>'."\n";
-    $output .= WebGUI::Form::Hidden($session, { name => $self->privateName('isIn'), value => 1, });
+    $output .= WebGUI::Form::Hidden->new($session, { name => $self->privateName('isIn'), value => 1, })->toHtml;
 	return $output;
 }
 

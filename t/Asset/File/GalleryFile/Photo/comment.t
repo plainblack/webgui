@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -8,9 +8,7 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../../../../lib";
 
 ## The goal of this test is to test the adding, deleting, editing, and 
 # getting comments for photos
@@ -26,29 +24,20 @@ use WebGUI::International;
 #----------------------------------------------------------------------------
 # Init
 my $session         = WebGUI::Test->session;
-my $node            = WebGUI::Asset->getImportNode($session);
 
-my @versionTags = ();
-push @versionTags, WebGUI::VersionTag->getWorking($session);
-WebGUI::Test->addToCleanup($versionTags[-1]);
-$versionTags[-1]->set({name=>"Photo Test, add Gallery, Album and 1 Photo"});
-
-my @addArguments    = ( undef, undef, { skipAutoCommitWorkflows => 1 } );
 my $gallery
-    = $node->addChild({
+    = WebGUI::Test->asset(
         className           => "WebGUI::Asset::Wobject::Gallery",
         groupIdAddComment   => "2", # "Registered Users"
-    });
+    );
 my $album
     = $gallery->addChild({
         className           => "WebGUI::Asset::Wobject::GalleryAlbum",
-    }, @addArguments );
+    });
 my $photo
     = $album->addChild({
         className           => "WebGUI::Asset::File::GalleryFile::Photo",
-    }, @addArguments );
-
-$versionTags[-1]->commit;
+    });
 
 #----------------------------------------------------------------------------
 # Tests
@@ -257,7 +246,7 @@ my $html;
 $photo 
     = $album->addChild({
         className       => "WebGUI::Asset::File::GalleryFile::Photo",
-    }, @addArguments );
+    });
 
 # Permissions
 $html   = WebGUI::Test->getPage($photo, "www_editCommentSave", {

@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -8,9 +8,7 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../lib";
 
 use Test::MockObject;
 my $mocker = Test::MockObject->new();
@@ -66,15 +64,15 @@ my $asset = $defaultAsset->addChild($properties, $properties->{id});
 ############################################
 
 ok($asset->getStorageLocation, 'File Asset getStorageLocation initialized');
-ok($asset->get('storageId'), 'getStorageLocation updates asset object with storage location');
-is($asset->get('storageId'), $asset->getStorageLocation->getId, 'Asset storageId and cached storageId agree');
+ok($asset->storageId, 'getStorageLocation updates asset object with storage location');
+is($asset->storageId, $asset->getStorageLocation->getId, 'Asset storageId and cached storageId agree');
 
 $asset->update({
 	storageId => $storage->getId,
 	filename => $filename,
 });
 
-is($storage->getId, $asset->get('storageId'), 'Asset updated with correct new storageId');
+is($storage->getId, $asset->storageId, 'Asset updated with correct new storageId');
 is($storage->getId, $asset->getStorageLocation->getId, 'Cached Asset storage location updated with correct new storageId');
 
 $versionTag->commit;
@@ -86,7 +84,8 @@ $versionTag->commit;
 ############################################
 
 my $fileStorage = WebGUI::Storage->create($session);
-WebGUI::Test::addToCleanup($fileStorage);
+WebGUI::Test->addToCleanup($fileStorage);
+$mocker->set_always('get',      $fileStorage->getId);
 $mocker->set_always('getValue', $fileStorage->getId);
 my $fileFormStorage = $asset->getStorageFromPost();
 isa_ok($fileFormStorage, 'WebGUI::Storage', 'Asset::File::getStorageFromPost');
@@ -108,7 +107,7 @@ cmp_deeply(
 #----------------------------------------------------------------------------
 # Add another new revision, changing the privs
 my $newRev  = $asset->addRevision( { ownerUserId => '3', groupIdView => '3' }, time + 5 );
-WebGUI::Test::addToCleanup( WebGUI::VersionTag->getWorking( $session ) );
+WebGUI::Test->addToCleanup( $newRev );
 $privs   = JSON->new->decode( $newRev->getStorageLocation->getFileContentsAsScalar('.wgaccess') );
 cmp_deeply(
     $privs,
@@ -122,7 +121,7 @@ cmp_deeply(
 
 # Add a new revision, changing the privs
 my $newRev  = $asset->addRevision( { groupIdView => '7' }, time + 8 );
-WebGUI::Test::addToCleanup( WebGUI::VersionTag->getWorking( $session ) );
+WebGUI::Test->addToCleanup( $newRev );
 is( $newRev->getStorageLocation->getFileContentsAsScalar('.wgaccess'), undef, "wgaccess doesn't exist" );
 
 #----------------------------------------------------------------------------
@@ -137,15 +136,13 @@ is ($privs, '{"state":"trash"}', '... correct state');
 
 #----------------------------------------------------------------------------
 # trash should update storage location
-my $tag = WebGUI::VersionTag->getWorking( $session );
 $asset  = $defaultAsset->addChild( $properties );
 $asset->getStorageLocation->addFileFromScalar($filename, $filename);
 $asset->update({
     filename => $filename,
 });
 
-$tag->commit;
-addToCleanup( $tag );
+WebGUI::Test->addToCleanup( $asset );
 $asset->trash;
 my $storage = $asset->getStorageLocation;
 my $dir = $storage->getPathClassDir();
@@ -160,7 +157,6 @@ is ($privs, '{"state":"trash"}', '... correct state');
 $asset->restore;
 unlike( $storage->getFileContentsAsScalar('.wgaccess'), qr{"state"\:"trash"}, "wgaccess not trashed" );
 
-
 ############################################
 #
 # www_view
@@ -169,9 +165,9 @@ unlike( $storage->getFileContentsAsScalar('.wgaccess'), qr{"state"\:"trash"}, "w
 
 $session->config->set('enableStreamingUploads', '0');
 $asset->www_view;
-is($session->http->getRedirectLocation, $storage->getUrl('someScalarFile.txt'), 'www_view: sets a redirect');
+is($session->response->location, $storage->getUrl('someScalarFile.txt'), 'www_view: sets a redirect');
 
 $session->config->set('enableStreamingUploads', '1');
-$session->http->setRedirectLocation('');
+$session->response->location('');
 $asset->www_view;
-is($session->http->getRedirectLocation, '', '... redirect not set when enableStreamingUploads is set');
+is($session->response->location, '', '... redirect not set when enableStreamingUploads is set');

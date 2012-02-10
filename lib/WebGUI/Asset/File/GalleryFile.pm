@@ -3,7 +3,7 @@ package WebGUI::Asset::File::GalleryFile;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -15,7 +15,36 @@ package WebGUI::Asset::File::GalleryFile;
 =cut
 
 use strict;
-use base 'WebGUI::Asset::File';
+use Tie::IxHash;
+use Moose;
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset::File';
+define assetName           => ['assetName', 'Asset_GalleryFile'];
+define tableName           => 'GalleryFile';
+property views => (
+            fieldType           => 'integer',
+            noFormPost          => 1,
+            default             => 0,
+         );
+property friendsOnly => (
+            fieldType           => 'yesNo',
+            label               => ['editForm friendsOnly','Asset_Photo'],
+            default             => 0,
+         );
+property rating => (
+            fieldType           => 'integer',
+            noFormPost          => 1,
+            default             => 0,
+         );
+for my $i ( 1 .. 5 ) {
+    property 'userDefined'.$i => (
+        default     => undef,
+        label       => '',
+        fieldType   => 'text',
+    );
+}
+
+with 'WebGUI::Role::Asset::AlwaysHidden';
 
 use Carp qw( croak confess );
 use URI::Escape;
@@ -37,50 +66,6 @@ WebGUI::Asset::File::GalleryFile - Superclass to create files for the Gallery
 These methods are available from this class
 
 =cut
-
-#-------------------------------------------------------------------
-
-=head2 definition ( session, definition )
-
-Define the properties of all GalleryFile assets.
-
-=cut
-
-sub definition {
-    my $class       = shift;
-    my $session     = shift;
-    my $definition  = shift;
-    my $i18n        = WebGUI::International->new($session,'Asset_Photo');
-
-    tie my %properties, 'Tie::IxHash', (
-        views   => {
-            defaultValue        => 0,
-        },
-        friendsOnly => {
-            defaultValue        => 0,
-        },
-        rating  => {
-            defaultValue        => 0,
-        },
-    );
-
-    # UserDefined Fields
-    for my $i (1 .. 5) {
-        $properties{"userDefined".$i} = {
-            defaultValue        => undef,
-        };
-    }
-
-    push @{$definition}, {
-        assetName           => $i18n->get('assetName'),
-        autoGenerateForms   => 0,
-        tableName           => 'GalleryFile',
-        className           => 'WebGUI::Asset::File::GalleryFile',
-        properties          => \%properties,
-    };
-
-    return $class->SUPER::definition($session, $definition);
-}
 
 #----------------------------------------------------------------------------
 
@@ -137,7 +122,7 @@ sub appendTemplateVarsCommentForm {
     $var->{ commentForm_bodyText }
         = WebGUI::Form::HTMLArea( $session, {
             name        => "bodyText",
-            richEditId  => $self->getGallery->get("richEditIdComment"),
+            richEditId  => $self->getGallery->richEditIdComment,
             value       => $comment->{ bodyText },
         });
 
@@ -203,7 +188,7 @@ sub canEdit {
     my $userId      = shift || $self->session->user->userId;
     my $album       = $self->getParent;
 
-    return 1 if $userId eq $self->get("ownerUserId");
+    return 1 if $userId eq $self->ownerUserId;
     return $album && $album->canEdit($userId);
 }
 
@@ -241,8 +226,8 @@ sub canView {
     my $album       = $self->getParent;
     return 0 unless $album && $album->canView($userId);
 
-    if ($self->isFriendsOnly && $userId ne $self->get("ownerUserId") ) {
-        my $owner       = WebGUI::User->new( $self->session, $self->get("ownerUserId") );
+    if ($self->isFriendsOnly && $userId ne $self->ownerUserId ) {
+        my $owner       = WebGUI::User->new( $self->session, $self->ownerUserId );
         return 0
             unless WebGUI::Friends->new($self->session, $owner)->isFriend($userId);
     }
@@ -284,7 +269,7 @@ sub getAutoCommitWorkflowId {
     my $self        = shift;
     my $gallery = $self->getGallery;
     if ($gallery->hasBeenCommitted) {
-        return $gallery->get("workflowIdCommit")
+        return $gallery->workflowIdCommit
             || $self->session->setting->get('defaultVersionTagWorkflow');
     }
     return undef;
@@ -358,7 +343,7 @@ are authorized to see them.
 
 =cut
 
-sub getCurrentRevisionDate {
+override getCurrentRevisionDate => sub {
     my $class       = shift;
     my $session     = shift;
     my $assetId     = shift;
@@ -373,17 +358,17 @@ sub getCurrentRevisionDate {
 
     return undef unless $revisionDate;
 
-    my $asset   = WebGUI::Asset->new( $session, $assetId, $class, $revisionDate );
+    my $asset   = WebGUI::Asset->newById( $session, $assetId, $revisionDate );
 
     return undef unless $asset;
 
-    if ( $asset->get( 'status' ) eq "approved" || $asset->canEdit ) {
+    if ( $asset->status eq 'approved' || $asset->canEdit ) {
         return $revisionDate;
     }
     else {
-        return $class->SUPER::getCurrentRevisionDate( $session, $assetId );
+        return super();
     }
-}
+};
 
 #----------------------------------------------------------------------------
 
@@ -410,9 +395,9 @@ Get the parent GalleryAlbum. If the only revision of the GalleryAlbum is
 
 =cut
 
-sub getParent {
+override getParent => sub {
     my $self        = shift;
-    if ( my $album = $self->SUPER::getParent ) {
+    if ( my $album = super() ) {
         return $album;
     }
     # Only get the pending version if we're allowed to see this photo in its pending status
@@ -423,7 +408,7 @@ sub getParent {
             statusToInclude     => [ 'pending', 'approved' ],
             invertTree          => 1,
         } )->[ 0 ];
-    if ( ($gallery && $gallery->canEdit) || $self->get( 'ownerUserId' ) eq $self->session->user->userId ) {
+    if ( ($gallery && $gallery->canEdit) || $self->ownerUserId eq $self->session->user->userId ) {
         my $album
             = $self->getLineage( ['ancestors'], {
                 includeOnlyClasses  => [ 'WebGUI::Asset::Wobject::GalleryAlbum' ],
@@ -434,7 +419,7 @@ sub getParent {
         return $album;
     }
     return undef;
-}
+};
 
 #----------------------------------------------------------------------------
 
@@ -450,7 +435,7 @@ sub getFirstFile {
     my $allFileIds = $self->getParent->getFileIds;
 
     return undef unless @{ $allFileIds };
-    return WebGUI::Asset->newByDynamicClass( $self->session, shift @{ $allFileIds });
+    return WebGUI::Asset->newById( $self->session, shift @{ $allFileIds });
 }
 
 #----------------------------------------------------------------------------
@@ -467,7 +452,7 @@ sub getLastFile {
     my $allFileIds = $self->getParent->getFileIds;
 
     return undef unless @{ $allFileIds };
-    return WebGUI::Asset->newByDynamicClass( $self->session, pop @{ $allFileIds });
+    return WebGUI::Asset->newById( $self->session, pop @{ $allFileIds });
 }
 
 #----------------------------------------------------------------------------
@@ -484,7 +469,7 @@ sub getNextFile {
     return $self->{_nextFile} if $self->{_nextFile};
     my $nextId = $self->getParent->getNextFileId( $self->getId );
     return undef unless $nextId;
-    $self->{_nextFile} = WebGUI::Asset->newByDynamicClass( $self->session, $nextId );
+    $self->{_nextFile} = WebGUI::Asset->newById( $self->session, $nextId );
     return $self->{_nextFile};
 }
 
@@ -502,7 +487,7 @@ sub getPreviousFile {
     return $self->{_previousFile} if $self->{_previousFile};
     my $previousId  = $self->getParent->getPreviousFileId( $self->getId );
     return undef unless $previousId;
-    $self->{_previousFile} = WebGUI::Asset->newByDynamicClass( $self->session, $previousId );
+    $self->{_previousFile} = WebGUI::Asset->newById( $self->session, $previousId );
     return $self->{_previousFile};
 }
 
@@ -534,15 +519,12 @@ sub getTemplateVars {
     my $self        = shift;
     my $session     = $self->session;
     my $var         = $self->get;
-    my $owner       = WebGUI::User->new( $session, $self->get("ownerUserId") );
+    my $owner       = WebGUI::User->new( $session, $self->ownerUserId );
 
     $var->{ fileUrl             } = $self->getFileUrl;
     $var->{ thumbnailUrl        } = $self->getThumbnailUrl;
 
-    # Set a flag for pending files
-    if ( $self->get( "status" ) eq "pending" ) {
-        $var->{ 'isPending' } = 1;
-    }
+    $var->{ isPending } = $self->status eq "pending";
 
     # Fix 'undef' vars since HTML::Template does inheritence on them
     for my $key ( qw( synopsis ) ) {
@@ -552,7 +534,7 @@ sub getTemplateVars {
     }
     
     # Add a text-only synopsis
-    $var->{ synopsis_textonly   } = WebGUI::HTML::filter( $self->get('synopsis'), "all" );
+    $var->{ synopsis_textonly   } = WebGUI::HTML::filter( $self->synopsis, "all" );
 
     # Figure out on what page of the album the gallery file belongs.
     my $album           = $self->getParent;
@@ -561,7 +543,7 @@ sub getTemplateVars {
     my $pageNumber      = 
         int (
             ( first_index { $_ eq $id } @{ $fileIdsInAlbum } )     # Get index of file in album
-            / $album->getParent->get( 'defaultFilesPerPage' )               # Divide by the number of files per page
+            / $album->getParent->defaultFilesPerPage               # Divide by the number of files per page
         ) + 1;                                                              # Round upwards
 
     $var->{ canComment          } = $self->canComment;
@@ -582,7 +564,7 @@ sub getTemplateVars {
     $var->{ url_slideshow       } = $self->getParent->getUrl('func=slideshow');
     $var->{ url_makeShortcut    } = $self->getUrl('func=makeShortcut');
     $var->{ url_listFilesForOwner } 
-        = $self->getGallery->getUrl('func=listFilesForUser;userId=' . $self->get("ownerUserId"));
+        = $self->getGallery->getUrl('func=listFilesForUser;userId=' . $self->ownerUserId);
     $var->{ url_promote         } = $self->getUrl('func=promote');
 
     if ( my $firstFile = $self->getFirstFile ) {
@@ -619,7 +601,7 @@ Returns true if this GalleryFile is friends only. Returns false otherwise.
 
 sub isFriendsOnly {
     my $self        = shift;
-    return $self->get("friendsOnly");
+    return $self->friendsOnly;
 }
 
 #----------------------------------------------------------------------------
@@ -642,7 +624,7 @@ sub makeShortcut {
     croak "GalleryFile->makeShortcut: parentId must be defined"
         unless $parentId;
 
-    my $parent      = WebGUI::Asset->newByDynamicClass($session, $parentId)
+    my $parent      = WebGUI::Asset->newById($session, $parentId)
                     || croak "GalleryFile->makeShortcut: Could not instanciate asset '$parentId'";
 
     my $shortcut
@@ -675,10 +657,9 @@ Prepare the template to be used for the C<view> method.
 
 sub prepareView {
     my $self        = shift;
-    $self->SUPER::prepareView();
 
     my $template    
-        = WebGUI::Asset::Template->new($self->session, $self->getGallery->get("templateIdViewFile"));
+        = WebGUI::Asset::Template->newById($self->session, $self->getGallery->templateIdViewFile);
     $template->prepare($self->getMetaDataAsTemplateVariables);
 
     $self->{_viewTemplate}  = $template;
@@ -715,7 +696,7 @@ sub processCommentEditForm {
                     ;
 
     my $visitorIp   = $session->user->isVisitor
-                    ? $session->env->get("REMOTE_ADDR")
+                    ? $session->request->remote_host
                     : undef
                     ;
 
@@ -733,19 +714,19 @@ sub processCommentEditForm {
 
 #----------------------------------------------------------------------------
 
-=head2 processPropertiesFromFormPost ( )
+=head2 processEditForm ( )
 
 
 =cut
 
-sub processPropertiesFromFormPost {
+override processEditForm => sub {
     my $self    = shift;
     my $i18n    = WebGUI::International->new( $self->session,'Asset_Photo' );
     my $form    = $self->session->form;
-    my $errors  = $self->SUPER::processPropertiesFromFormPost || [];
+    my $errors  = super() || [];
 
     # Make sure we have the disk space for this
-    if ( !$self->getGallery->hasSpaceAvailable( $self->get( 'assetSize' ) ) ) {
+    if ( !$self->getGallery->hasSpaceAvailable( $self->assetSize ) ) {
         push @{ $errors }, $i18n->get( "error no space" );
     }
 
@@ -755,14 +736,14 @@ sub processPropertiesFromFormPost {
     ### Passes all checks
 
     # If the album doesn't yet have a thumbnail, make this File the thumbnail
-    if ( !$self->getParent->get('assetIdThumbnail') ) {
+    if ( !$self->getParent->assetIdThumbnail ) {
         $self->getParent->update( {
             assetIdThumbnail        => $self->getId,
         } );
     }
 
     return;
-}
+};
 
 #----------------------------------------------------------------------------
 
@@ -785,15 +766,15 @@ Purge the asset. Remove all comments on the GalleryFile.
 
 =cut
 
-sub purge {
+override purge => sub {
     my $self        = shift;
     
     for my $commentId ( @{ $self->getCommentIds } ) {
         $self->deleteComment( $commentId );
     }
 
-    return $self->SUPER::purge;
-}
+    return super();
+};
 
 #----------------------------------------------------------------------------
 
@@ -831,32 +812,16 @@ sub setComment {
     );
 }
 
-####################################################################
+#-------------------------------------------------------------------
 
-=head2 update
+=head2 valid_parent_classes
 
-Wrap update so that isHidden is always set to be a 1.
-
-=cut
-
-sub update {
-    my $self = shift;
-    my $properties = shift;
-    return $self->SUPER::update({%$properties, isHidden => 1});
-}
-
-
-#----------------------------------------------------------------------------
-
-=head2 validParent ( )
-
-Override validParent to only allow GalleryAlbums to hold GalleryFiles.
+Restrict valid parents to GalleryAlbums and Shortcuts.
 
 =cut
 
-sub validParent {
-    my ($class, $session) = @_;
-    return $session->asset->isa('WebGUI::Asset::Wobject::GalleryAlbum');
+sub valid_parent_classes {
+    return [qw/WebGUI::Asset::Wobject::GalleryAlbum WebGUI::Asset::Shortcut/];
 }
 
 #----------------------------------------------------------------------------
@@ -909,8 +874,8 @@ sub view {
             url_searchKeywordUser
                 => $self->getGallery->getUrl(
                     "func=search;submit=1;"
-                    . "userId=" . $self->get("ownerUserId") . ';'
-                    . 'keywords=' . uri_escape_utf8( $keyword ) 
+                    . "userId=" . $self->ownerUserId . ';'
+                    . 'keywords=' . uri_escape_utf8( $keyword )
                 ),
         };
     }
@@ -957,7 +922,7 @@ sub www_delete {
     # TODO Get albums with shortcuts to this asset
 
     return $self->processStyle(
-        $self->processTemplate( $var, $self->getGallery->get("templateIdDeleteFile") )
+        $self->processTemplate( $var, $self->getGallery->templateIdDeleteFile )
     );
 }
 
@@ -1055,7 +1020,7 @@ sub www_editComment {
     $var->{ isNew   } = $commentId eq "new";
 
     return $self->processStyle(
-        $self->processTemplate( $var, $self->getGallery->get("templateIdEditComment") )
+        $self->processTemplate( $var, $self->getGallery->templateIdEditComment )
     );
 }
 
@@ -1134,9 +1099,9 @@ sub www_makeShortcut {
     my $albums          = $self->getGallery->getAlbumIds;
     my %albumOptions;
     for my $assetId ( @$albums ) {
-        my $asset   = WebGUI::Asset->newByDynamicClass($session, $assetId);
+        my $asset   = WebGUI::Asset->newById($session, $assetId);
         if ($asset->canAddFile) {
-            $albumOptions{ $assetId } = $asset->get("title");
+            $albumOptions{ $assetId } = $asset->title;
         }
     }
     $var->{ form_parentId }
@@ -1147,7 +1112,7 @@ sub www_makeShortcut {
         });
 
     return $self->processStyle(
-        $self->processTemplate($var, $self->getGallery->get("templateIdMakeShortcut"))
+        $self->processTemplate($var, $self->getGallery->templateIdMakeShortcut)
     );
 }
 
@@ -1186,10 +1151,10 @@ sub www_view {
     return $self->session->privilege->insufficient unless $self->canView;
 
     # Add to views
-    $self->update({ views => $self->get('views') + 1 });
+    $self->update({ views => $self->views + 1 });
 
-    $self->session->http->setLastModified($self->getContentLastModified);
-    $self->session->http->sendHeader;
+    $self->session->response->setLastModified($self->getContentLastModified);
+    $self->session->response->sendHeader;
     $self->prepareView;
     my $style = $self->processStyle($self->getSeparator);
     my ($head, $foot) = split($self->getSeparator,$style);
@@ -1205,4 +1170,5 @@ sub setPrivileges {
 }
 
 
+__PACKAGE__->meta->make_immutable;
 1; # Who knew the truth would be so obvious?

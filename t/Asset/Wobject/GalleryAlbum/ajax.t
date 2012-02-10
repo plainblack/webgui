@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -8,9 +8,7 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../../../lib";
 
 ## The goal of this test is to test the creation and deletion of album assets
 
@@ -18,13 +16,12 @@ use JSON;
 use WebGUI::Test;
 use WebGUI::Session;
 use Test::More; 
+use WebGUI::Asset::Wobject::GalleryAlbum;
 
 #----------------------------------------------------------------------------
 # Init
 my $session         = WebGUI::Test->session;
-my $node            = WebGUI::Asset->getImportNode($session);
-my $versionTag      = WebGUI::VersionTag->getWorking($session);
-WebGUI::Test->addToCleanup($versionTag);
+my $node            = WebGUI::Test->asset;
 
 my %user;
 $user{'1'} = WebGUI::User->new( $session, "new" );
@@ -36,27 +33,15 @@ WebGUI::Test->addToCleanup($user{'2'});
 # Create everything as user no. 1
 $session->user({ user => $user{'1'} });
 
-$versionTag->set({name=>"Album Test"});
-
 # Create gallery and a single album
 my $gallery
     = $node->addChild({
         className           => "WebGUI::Asset::Wobject::Gallery",
         groupIdEdit         => 3,   # Admins
-    },
-    undef,
-    undef,
-    {
-        skipAutoCommitWorkflows => 1,
     });
 my $album
     = $gallery->addChild({
         className           => "WebGUI::Asset::Wobject::GalleryAlbum",
-    },
-    undef,
-    undef,
-    {
-        skipAutoCommitWorkflows => 1,
     });
     
 # Create 5 photos inside the gallery
@@ -67,17 +52,9 @@ for (my $i = 0; $i < 5; $i++)
     my $photo
         = $album->addChild({
             className           => "WebGUI::Asset::File::GalleryFile::Photo",
-        },
-        undef,
-        undef,
-        {
-            skipAutoCommitWorkflows => 1,
         });
     $photoId[$i] = $photo->getId;
 }
-
-# Commit all changes
-$versionTag->commit;
 
 # Make album default asset
 $session->asset( $album );
@@ -87,16 +64,12 @@ my $result;
 
 #----------------------------------------------------------------------------
 # Tests
-plan tests => 19;
-
-#----------------------------------------------------------------------------
-# Test module compiles okay
-use_ok("WebGUI::Asset::Wobject::GalleryAlbum");
+plan tests => 18;
 
 #----------------------------------------------------------------------------
 # Test calling without arguments
 
-diag("general testing");
+note("general testing");
 
 # Provide no arguments at all
 $result = callAjaxService({ });
@@ -106,7 +79,7 @@ ok( $result->{ err } != 0 && $result->{ errMessage }, "Error after call without 
 #----------------------------------------------------------------------------
 # Test moveFile action with incomplete of invalid arguments
 
-diag("moveFile action");
+note("moveFile action");
 
 # Omit target
 $result = callAjaxService({
@@ -251,7 +224,7 @@ sub callAjaxService {
     my $args = shift;
 
     # Setup the mock request object
-    $session->request->method('POST');
+    $session->request->env->{'REQUEST_METHOD'} = 'POST';
     $session->request->setup_body({ args => encode_json($args) });
     
     # Call ajax service function and decode reply

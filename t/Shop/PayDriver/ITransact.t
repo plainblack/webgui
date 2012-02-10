@@ -1,6 +1,6 @@
 # vim:syntax=perl
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2008 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -13,9 +13,7 @@
 #
 #
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../../lib";
 use Test::More;
 use Test::Deep;
 use WebGUI::Test; # Must use this before any other WebGUI modules
@@ -26,6 +24,8 @@ use WebGUI::Shop::Transaction;
 use WebGUI::Shop::PayDriver::ITransact;
 use JSON;
 use HTML::Form;
+use WebGUI::Shop::PayDriver::ITransact;
+use XML::Simple;
 
 #----------------------------------------------------------------------------
 # Init
@@ -36,11 +36,8 @@ $session->user({userId => 3});
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 28;
-
 #----------------------------------------------------------------------------
 # figure out if the test can actually run
-
 
 my $e;
 my $ship = WebGUI::Shop::Ship->new($session);
@@ -62,9 +59,7 @@ $cart->update({
 });
 my $transaction;
 
-my $versionTag = WebGUI::VersionTag->getWorking($session);
-
-my $home = WebGUI::Asset->getDefault($session);
+my $home = WebGUI::Test->asset;
 
 my $rockHammer = $home->addChild({
     className          => 'WebGUI::Asset::Sku::Product',
@@ -88,64 +83,17 @@ my $foreignHammer = $rockHammer->setCollateral('variantsJSON', 'variantId', 'new
     }
 );
 
-
-$versionTag->commit;
-WebGUI::Test->addToCleanup($versionTag);
-
 my $hammerItem = $rockHammer->addToCart($rockHammer->getCollateral('variantsJSON', 'variantId', $smallHammer));
 
-
-#######################################################################
-#
-# definition
-#
-#######################################################################
-
-note('Testing definition');
-my $definition;
-
-eval { $definition = WebGUI::Shop::PayDriver::ITransact->definition(); };
-$e = Exception::Class->caught();
-isa_ok      ($e, 'WebGUI::Error::InvalidParam', 'definition takes an exception to not giving it a session variable');
-cmp_deeply  (
-    $e,
-    methods(
-        error => 'Must provide a session variable',
-    ),
-    'definition: requires a session variable',
-);
-
-#######################################################################
-#
-# create
-#
-#######################################################################
-
-my $driver;
-
-# Test incorrect for parameters
-
-eval { $driver = WebGUI::Shop::PayDriver::ITransact->create(); };
-$e = Exception::Class->caught();
-isa_ok      ($e, 'WebGUI::Error::InvalidParam', 'create takes exception to not giving it a session object');
-cmp_deeply  (
-    $e,
-    methods(
-        error => 'Must provide a session variable',
-    ),
-    'create takes exception to not giving it a session object',
-);
-
-eval { $driver = WebGUI::Shop::PayDriver::ITransact->create($session,  {}); };
-$e = Exception::Class->caught();
-isa_ok      ($e, 'WebGUI::Error::InvalidParam', 'create takes exception to giving it an empty hashref of options');
-cmp_deeply  (
-    $e,
-    methods(
-        error => 'Must provide a hashref of options',
-    ),
-    'create takes exception to not giving it an empty hashref of options',
-);
+my $ship = WebGUI::Shop::Ship->new($session);
+my $cart = WebGUI::Shop::Cart->newBySession($session);
+WebGUI::Test->addToCleanup($cart);
+my $shipper = $ship->getShipper('defaultfreeshipping000');
+my $address = $cart->getAddressBook->addAddress( { firstName => 'Ellis Boyd', lastName => 'Redding'} );
+$cart->update({
+    shippingAddressId => $address->getId,
+    shipperId         => $shipper->getId,
+});
 
 my $vendorId = $session->config->get("testing/ITransact/vendorId");
 my $password = $session->config->get("testing/ITransact/password");
@@ -158,6 +106,20 @@ if (!$password) {
     $password = "joePass";
 }
 
+#######################################################################
+#
+# getName
+#
+#######################################################################
+
+ok(WebGUI::Shop::PayDriver::ITransact->getName($session), 'getName returns a name');
+
+#######################################################################
+#
+# _generatePaymentRequestXML
+#
+#######################################################################
+
 my $options = {
     label           => 'Fast and harmless',
     enabled         => 1,
@@ -166,92 +128,9 @@ my $options = {
     password        => $password,
     useCVV2         => 1,
 };
-
-$driver = WebGUI::Shop::PayDriver::ITransact->create( $session, $options );
-
-isa_ok  ($driver, 'WebGUI::Shop::PayDriver::ITransact', 'create creates WebGUI::Shop::PayDriver object');
-like($driver->getId, $session->id->getValidator, 'driver id is a valid GUID');
-
-#######################################################################
-#
-# session
-#
-#######################################################################
-
-isa_ok      ($driver->session,  'WebGUI::Session',          'session method returns a session object');
-is          ($session->getId,   $driver->session->getId,    'session method returns OUR session object');
-
-#######################################################################
-#
-# paymentGatewayId, getId
-#
-#######################################################################
-
-like        ($driver->paymentGatewayId, $session->id->getValidator, 'got a valid GUID for paymentGatewayId');
-is          ($driver->getId,            $driver->paymentGatewayId,  'getId returns the same thing as paymentGatewayId');
-
-#######################################################################
-#
-# className
-#
-#######################################################################
-
-is          ($driver->className, ref $driver, 'className property set correctly');
-
-#######################################################################
-#
-# options
-#
-#######################################################################
-
-cmp_deeply(
-    $driver->options,
-    superhashof( $options ),
-    'options accessor works'
-);
-
-#######################################################################
-#
-# getName
-#
-#######################################################################
-
-eval { WebGUI::Shop::PayDriver::ITransact->getName(); };
-$e = Exception::Class->caught();
-isa_ok      ($e, 'WebGUI::Error::InvalidParam', 'getName requires a session object passed to it');
-cmp_deeply  (
-    $e,
-    methods(
-        error => 'Must provide a session variable',
-    ),
-    'getName requires a session object passed to it',
-);
-
-is(WebGUI::Shop::PayDriver::ITransact->getName($session), 'Credit Card (ITransact)', 'getName returns the human readable name of this driver');
-
-#######################################################################
-#
-# get
-#
-#######################################################################
-
-cmp_deeply  ($driver->get,              $driver->options,       'get works like the options method with no param passed');
-is          ($driver->get('enabled'),   1,                      'get the enabled entry from the options');
-is          ($driver->get('label'),     'Fast and harmless',    'get the label entry from the options');
-
-my $optionsCopy = $driver->get;
-$optionsCopy->{label} = 'And now for something completely different';
-isnt(
-    $driver->get('label'),
-    'And now for something completely different',
-    'hashref returned by get() is a copy of the internal hashref'
-);
-
-#######################################################################
-#
-# _generatePaymentRequestXML
-#
-#######################################################################
+my $driver = WebGUI::Shop::PayDriver::ITransact->new( $session, $options );
+$driver->write;
+WebGUI::Test->addToCleanup($driver);
 
 my $dt = WebGUI::DateTime->new($session, time());
 $dt->add({ years => 1, });
@@ -265,7 +144,7 @@ $driver->{_cardData} = {
 };
 
 $cart->update({gatewayId => $driver->getId,});
-$transaction = WebGUI::Shop::Transaction->create($session, {
+$transaction = WebGUI::Shop::Transaction->new($session, {
     cart          => $cart,
     isRecurring   => $cart->requiresRecurringPayment,
 });
@@ -285,11 +164,17 @@ TODO: {
 #######################################################################
 
 SKIP: {
-    skip "Skipping XML requests to ITransact due to lack of userId and password", 2 unless $hasTestAccount;
-    my $response = eval { $driver->doXmlRequest($xml) };
+    skip "Skipping XML requests to ITransact due to lack of real userId and password", 2 unless $hasTestAccount;
     note 'doXmlrequest';
-    isa_ok($response, 'HTTP::Response', 'returns a HTTP::Response object');
-    ok( $response->is_success, '... was successful');
+    my $response = eval { $driver->doXmlRequest($xml) };
+    my $ok_response = isa_ok($response, 'HTTP::Response', 'returns a HTTP::Response object');
+    SKIP: {
+        skip "Skipping response check since we did not get a response", 1 unless $ok_response;
+        ok( $response->is_success, '... response was successful');
+        my $transactionResult = XMLin( $response->content,  SuppressEmpty => '' );
+        ok defined($transactionResult->{TransactionData}), '... transaction was successful'
+            or diag $xml.$response->content;
+    }
 }
 
 my $hammer2 = $rockHammer->addToCart($rockHammer->getCollateral('variantsJSON', 'variantId', $foreignHammer));
@@ -304,25 +189,17 @@ TODO: {
 SKIP: {
     skip "Skipping XML requests to ITransact due to lack of userId and password", 2 unless $hasTestAccount;
     my $response = eval { $driver->doXmlRequest($xml) };
-    isa_ok($response, 'HTTP::Response', 'returns a HTTP::Response object');
-    ok( $response->is_success, '... was successful');
-    note $response->content;
+    my $ok_response = isa_ok($response, 'HTTP::Response', 'returns a HTTP::Response object');
+    ok( $response->is_success, '... was successful for two item transaction');
+    SKIP: {
+        skip "Skipping response check since we did not get a response", 1 unless $ok_response;
+        ok( $response->is_success, '... response was successful for a two item transaction');
+        my $transactionResult = XMLin( $response->content,  SuppressEmpty => '' );
+        ok defined($transactionResult->{TransactionData}), '... transaction was successful'
+            or diag $xml.$response->content;
+    }
 }
 
-#######################################################################
-#
-# delete
-#
-#######################################################################
-
-$driver->delete;
-
-my $count = $session->db->quickScalar('select count(*) from paymentGateway where paymentGatewayId=?', [
-    $driver->paymentGatewayId
-]);
-
-is ($count, 0, 'delete deleted the object');
-
-undef $driver;
+done_testing;
 
 #vim:ft=perl

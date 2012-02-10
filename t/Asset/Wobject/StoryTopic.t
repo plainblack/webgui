@@ -1,6 +1,6 @@
 # vim:syntax=perl
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -13,9 +13,7 @@
 # 
 #
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../../lib";
 use Test::More;
 use Test::Deep;
 use Data::Dumper;
@@ -38,9 +36,7 @@ plan tests => 21;
 
 my $class  = 'WebGUI::Asset::Wobject::StoryTopic';
 
-my $versionTag = WebGUI::VersionTag->getWorking($session);
-
-my $archive    = WebGUI::Asset->getDefault($session)->addChild({className => 'WebGUI::Asset::Wobject::StoryArchive', title => 'My Stories', url => '/home/mystories'});
+my $archive    = WebGUI::Test->asset->addChild({className => 'WebGUI::Asset::Wobject::StoryArchive', title => 'My Stories', url => '/home/mystories'});
 
 my $now = time();
 my $nowFolder = $archive->getFolder($now);
@@ -53,6 +49,7 @@ my $creationDateSth = $session->db->prepare('update asset set creationDate=? whe
 my $pastStory = $newFolder->addChild({ className => 'WebGUI::Asset::Story', title => "Yesterday is history", keywords => 'andy,norton'});
 $creationDateSth->execute([$yesterday, $pastStory->getId]);
 $pastStory->requestAutoCommit;
+$pastStory = $pastStory->cloneFromDb;
 
 my @staff       = qw/norton hadley mert trout/;
 my @inmates     = qw/bogs red brooks andy heywood tommy jake skeet/;
@@ -63,14 +60,14 @@ my $storyHandler = {};
 
 STORY: foreach my $name (@characters) {
     my $namedStory = $nowFolder->addChild({ className => 'WebGUI::Asset::Story', title => $name, keywords => $name, } );
-    $storyHandler->{$name} = $namedStory;
     $creationDateSth->execute([$now, $namedStory->getId]);
     $namedStory->requestAutoCommit;
+    $storyHandler->{$name} = $namedStory->cloneFromDb;
 }
 
 $storyHandler->{bogs}->update({subtitle => 'drinking his food through a straw'});
 
-my $topic = WebGUI::Asset->getDefault($session)->addChild({
+my $topic = WebGUI::Test->asset->addChild({
     className   => 'WebGUI::Asset::Wobject::StoryTopic',
     title       => 'Popular inmates in Shawshank Prison',
     keywords    => join(',', @inmates),
@@ -83,8 +80,7 @@ $topic->update({
     storiesShort => 3,
 });
 
-$versionTag->commit;
-addToCleanup($versionTag);
+$topic = $topic->cloneFromDb;
 
 ################################################################
 #
@@ -355,6 +351,7 @@ cmp_deeply(
 
 $pastStory->update( { title => "aaaay was history but isn't any more" } );
 $pastStory->requestAutoCommit;
+$pastStory = $pastStory->cloneFromDb;
 
 $topic->update({ storiesPer   => 4, storiesShort => 4, }); # storiesPer is used when _standAlone is true, storiesShort otherwise
 $topic->{_standAlone} = 0;
@@ -400,15 +397,13 @@ cmp_variable_loop(
 # Regression -- Empty StoryTopics shouldn't blow up
 ################################################################
 
-my $emptyarchive    = WebGUI::Asset->getDefault($session)->addChild({
+my $emptyarchive    = WebGUI::Test->asset->addChild({
     className => 'WebGUI::Asset::Wobject::StoryTopic', 
     title => 'Why Do Good Things Happen To Bad People', 
     url => '/home/badstories', 
     keywords => 'aksjhgkja asgjhshs assajshhsg5',
 });
-addToCleanup($emptyarchive); # blows up under the debugger...?
 
-$versionTag->commit;
 $emptyarchive->{_standAlone} = 1;  
 ok(eval { $emptyarchive->viewTemplateVariables() }, "viewTemplateVariables with _standAlone = 1 doesn't throw an error");
 

@@ -1,6 +1,6 @@
 # vim:syntax=perl
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -13,10 +13,9 @@
 # 
 #
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../lib";
 use Test::More;
+use Test::Exception;
 use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
 
@@ -28,7 +27,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 10;
+my $tests = 9;
 plan tests => $tests + 1;       # Add initial use_ok test
 
 
@@ -45,11 +44,7 @@ SKIP: {
     #
     #######################################################################
 
-    eval { my $tax = WebGUI::Shop::Tax->new( ) };
-
-    my $e = Exception::Class->caught();
-    isa_ok( $e, 'WebGUI::Error::InvalidParam', 'new: throws error when no session object is passed' );
-    is( $e->error, 'Need a session.', 'add: correct message for ommitted session object' );
+    dies_ok { my $tax = WebGUI::Shop::Tax->new( ) } 'new: throws error when no session object is passed';
 
     my $tax = WebGUI::Shop::Tax->new( $session );
 

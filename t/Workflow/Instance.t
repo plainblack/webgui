@@ -1,6 +1,6 @@
 # vim:syntax=perl
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -12,9 +12,7 @@
 # Tests for WebGUI::Workflow::Instance
 #
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../lib";
 use Test::More;
 use Test::Deep;
 use Test::Exception;
@@ -69,7 +67,7 @@ my $wf = WebGUI::Workflow->create(
     }
 );
 isa_ok($wf, 'WebGUI::Workflow', 'workflow created for test');
-addToCleanup($wf);
+WebGUI::Test->addToCleanup($wf);
 
 # create an instance of $wfId
 my $properties = {
@@ -87,13 +85,14 @@ cmp_ok(abs ($instance->get('lastUpdate')-$dateUpdated), '<=', 3, 'Date updated f
 my $otherInstance = WebGUI::Workflow::Instance->create($session, $properties);
 is ($otherInstance, undef, 'create: only allows one instance of a singleton to be created');
 
-WebGUI::Test->interceptLogging;
-
-$instance->set({ 'parameters' => {session => 1}, });
-$otherInstance = WebGUI::Workflow::Instance->create($session, {workflowId => $wf->getId, parameters => { session => 1,} });
-is($otherInstance, undef, 'create: another singleton instance can not be created if it the same parameters as a currently existing instance');
-my $expectedId = $wf->getId;
-like($WebGUI::Test::logger_info, qr/An instance of singleton workflow $expectedId already exists/, 'create: Warning logged for trying to make another singleton');
+WebGUI::Test->interceptLogging( sub {
+    my $log_data = shift;
+    $instance->set({ 'parameters' => {session => 1}, });
+    $otherInstance = WebGUI::Workflow::Instance->create($session, {workflowId => $wf->getId, parameters => { session => 1,} });
+    is($otherInstance, undef, 'create: another singleton instance can not be created if it the same parameters as a currently existing instance');
+    my $expectedId = $wf->getId;
+    like($log_data->{info}, qr/An instance of singleton workflow $expectedId already exists/, 'create: Warning logged for trying to make another singleton');
+} );
 
 $otherInstance = WebGUI::Workflow::Instance->create($session, {workflowId => $wf->getId, parameters => { session => 2,}});
 isnt ($otherInstance, undef, 'create: another singleton instance can be created if it has different parameters');
@@ -180,7 +179,7 @@ my $wf2 = WebGUI::Workflow->create(
         type => 'None',
     }
 );
-addToCleanup($wf2);
+WebGUI::Test->addToCleanup($wf2);
 
 my $wf2Instance = WebGUI::Workflow::Instance->create($session, {workflowId => $wf2->getId});
 cmp_deeply($wf2Instance->get('parameters'), {}, 'get returns {} for parameters when there are no parameters stored');

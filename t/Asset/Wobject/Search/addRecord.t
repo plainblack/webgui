@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -20,6 +20,7 @@ use WebGUI::Test;
 use WebGUI::Session;
 use Test::More tests => 6; # increment this value for each test you create
 use Test::Deep;
+use WebGUI::Test::MockAsset;
 use WebGUI::Asset::Wobject::Search;
 
 my $session = WebGUI::Test->session;
@@ -29,8 +30,8 @@ $session->user({userId => 3});
 my $node = WebGUI::Asset->getImportNode($session);
 
 
-my $default = WebGUI::Asset->getDefault($session);
-my $importArticle = $node->addChild({
+my $default = WebGUI::Test->asset;
+my $importArticle = WebGUI::Test->asset->addChild({
     className     => 'WebGUI::Asset::Wobject::Article',
     description   => 'rockhound',
 });
@@ -48,34 +49,33 @@ my $defaultArticle = $default->addChild({
     description   => 'shawshank prison',
     url           => 'introduction'
 });
+$defaultArticle->indexContent;
 my $search = $default->addChild({
     className  => 'WebGUI::Asset::Wobject::Search',
     searchRoot => $default->getId,
     templateId => $templateId,
 });
-my $tag = WebGUI::VersionTag->getWorking($session);
-$tag->commit;
-WebGUI::Test->addToCleanup($tag);
+$search->indexContent;
 my $indexer = WebGUI::Search::Index->new($defaultArticle);
 $indexer->addRecord(url => 'brochure', keywords => 'roomy spacious prison');
 
 {
-    WebGUI::Test->mockAssetId($templateId, $templateMock);
+    WebGUI::Test::MockAsset->mock_id($templateId, $templateMock);
     $search->prepareView();
     $session->request->setup_body({doit => 1, keywords => 'shawshank'});
     $search->view();
-    WebGUI::Test->unmockAssetId($templateId);
+    WebGUI::Test::MockAsset->unmock_id($templateId);
 }
 
 is scalar @{ $templateVars->{result_set} }, 1, 'search for shawshank, returns 1 record';
 is $templateVars->{result_set}->[0]->{url}, 'introduction', '... url is correct';
 
 {
-    WebGUI::Test->mockAssetId($templateId, $templateMock);
+    WebGUI::Test::MockAsset->mock_id($templateId, $templateMock);
     $search->prepareView();
     $session->request->setup_body({doit => 1, keywords => 'prison'});
     $search->view();
-    WebGUI::Test->unmockAssetId($templateId);
+    WebGUI::Test::MockAsset->unmock_id($templateId);
 }
 
 is scalar @{ $templateVars->{result_set} }, 2, 'search for prison, returns 2 records';

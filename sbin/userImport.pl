@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -11,23 +11,14 @@
 #-------------------------------------------------------------------
 
 use strict;
-use File::Basename ();
-use File::Spec;
-
-my $webguiRoot;
-BEGIN {
-    $webguiRoot = File::Spec->rel2abs(File::Spec->catdir(File::Basename::dirname(__FILE__), File::Spec->updir));
-    unshift @INC, File::Spec->catdir($webguiRoot, 'lib');
-}
-
 use Digest::MD5;
 use Getopt::Long;
 use Pod::Usage;
+use WebGUI::Paths -inc;
 use WebGUI::DateTime;
 use WebGUI::Group;
 use WebGUI::Session;
 use WebGUI::User;
-use WebGUI::Utility;
 
 $|=1;
 
@@ -80,7 +71,7 @@ if (!($^O =~ /^Win/i) && $> != 0 && !$override) {
 
 
 print "Starting up..." unless ($quiet);
-my $session = WebGUI::Session->open($webguiRoot,$configFile);
+my $session = WebGUI::Session->open($configFile);
 $session->user({userId=>3});
 open(FILE,"<".$usersFile) || die("Could not open $usersFile for reading: $!");
 print "OK\n" unless ($quiet);
@@ -183,8 +174,8 @@ while(my $line = <FILE>) {
             if $user{connectDN};
         $auth->saveParams($u->userId,"WebGUI",{changePassword=>$user{changePassword}});
         foreach my $field (keys %user) {
-            if (isIn($field, @profileFields)) {
-                $u->profileField($field,$user{$field});
+            if ($field ~~ @profileFields) {
+                $u->update({$field => $user{$field}});
             }
         }
         if ($user{groups}) {
@@ -293,15 +284,22 @@ names are:
 =over
 
 =item B<username>
+
 =item B<password>
+
 =item B<authMethod>
+
 =item B<status>
+
 =item B<ldapUrl>
+
 =item B<connectDN>
+
 =item B<groups>
+
 =item B<expireOffset>
-=item Any valid User Profile field name available in WebGUI's database,
-      e.g. B<firstName>, B<lastName>, B<mail>, etc.
+
+=item Any valid User Profile field name available in WebGUI's database, e.g. B<firstName>, B<lastName>, B<mail>, etc.
 
 =back
 
@@ -434,6 +432,6 @@ Shows this documentation, then exits.
 
 =head1 AUTHOR
 
-Copyright 2001-2009 Plain Black Corporation.
+Copyright 2001-2012 Plain Black Corporation.
 
 =cut

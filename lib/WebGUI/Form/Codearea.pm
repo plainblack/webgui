@@ -3,7 +3,7 @@ package WebGUI::Form::Codearea;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -72,10 +72,10 @@ sub definition {
 	my $definition = shift || [];
 	push(@{$definition}, {
 		height=>{
-			defaultValue=> 450 
+			defaultValue=> '200px'
 			},
 		width=>{
-			defaultValue=> 550 
+			defaultValue=> '100%'
 			},
 		style=>{
 			defaultValue => undef,

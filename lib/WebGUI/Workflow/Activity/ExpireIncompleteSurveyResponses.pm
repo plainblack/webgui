@@ -4,7 +4,7 @@ package WebGUI::Workflow::Activity::ExpireIncompleteSurveyResponses;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2008 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -133,7 +133,7 @@ sub execute {
                     username => $ref->{username},
                     userId => $ref->{userId},
                 };
-            my $template = WebGUI::Asset->newByDynamicClass($self->session,$self->get('emailTemplateId')); 
+            my $template = WebGUI::Asset->newById($self->session,$self->get('emailTemplateId')); 
             my $message = $template->processTemplate($var, $self->get("emailTemplateId"));
             WebGUI::Macro::process($self->session,\$message);
             my $mail = WebGUI::Mail::Send->create($self->session,{
@@ -163,11 +163,11 @@ sub getSql {
     return <<END_SQL;
 select  
     r.Survey_responseId, r.username, r.userId, r.startDate, 
-    upd.email, upd.firstName, upd.lastName, 
+    u.email, u.firstName, u.lastName, 
     s.timeLimit, s.doAfterTimeLimit, 
     ad.title, ad.url  
 from 
-    Survey_response r left outer join userProfileData upd on r.userId = upd.userId, Survey s, assetData ad
+    Survey_response r left outer join users u on r.userId = u.userId, Survey s, assetData ad
 where 
     r.isComplete = 0 
     and s.timeLimit > 0 

@@ -3,7 +3,7 @@ package WebGUI::Shop::PayDriver::PayPal::PayPalStd;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -16,8 +16,6 @@ package WebGUI::Shop::PayDriver::PayPal::PayPalStd;
 
 use strict;
 
-use base qw/WebGUI::Shop::PayDriver::PayPal/;
-
 use URI;
 use URI::Escape;
 use LWP::UserAgent;
@@ -25,6 +23,69 @@ use Readonly;
 use WebGUI::Shop::Transaction;
 
 Readonly my $I18N => 'PayDriver_PayPalStd'; 
+
+use Moose;
+use WebGUI::Definition::Shop;
+extends qw/WebGUI::Shop::PayDriver::PayPal/;
+
+define pluginName => [qw/PayPal PayDriver_PayPalStd/];
+property vendorId => (
+            fieldType => 'text',
+            label     => ['vendorId', 'PayDriver_PayPalStd'],
+            hoverHelp => ['vendorId help', 'PayDriver_PayPalStd'],
+         );
+property signature => (
+            fieldType => 'textarea',
+            label     => ['signature', 'PayDriver_PayPalStd'],
+            hoverHelp => ['signature help', 'PayDriver_PayPalStd'],
+         );
+property identityToken => (
+            fieldType => 'text',
+            label     => ['identity token', 'PayDriver_PayPalStd'],
+            hoverHelp => ['identity token help', 'PayDriver_PayPalStd'],
+         );
+property currency => (
+            fieldType    => 'selectBox',
+            label        => ['currency', 'PayDriver_PayPalStd'],
+            hoverHelp    => ['currency help', 'PayDriver_PayPalStd'],
+            default      => 'USD',
+            options      => \&_currency_options,
+         );
+sub _currency_options {
+    my $self = shift;
+    return $self->getPaymentCurrencies();
+}
+property useSandbox => (
+            fieldType    => 'yesNo',
+            label        => ['use sandbox', 'PayDriver_PayPalStd'],
+            hoverHelp    => ['use sandbox help', 'PayDriver_PayPalStd'],
+            default      => 1,
+         );
+property sandboxUrl => (
+            fieldType    => 'text',
+            label        => ['sandbox url', 'PayDriver_PayPalStd'],
+            hoverHelp    => ['sandbox url help', 'PayDriver_PayPalStd'],
+            default      => 'https://www.sandbox.paypal.com/cgi-bin/webscr',
+         );
+property liveUrl => (
+            fieldType    => 'text',
+            label        => ['live url', 'PayDriver_PayPalStd'],
+            hoverHelp    => ['live url help', 'PayDriver_PayPalStd'],
+            default      => 'https://www.paypal.com/cgi-bin/webscr',
+         );
+property buttonImage => (
+            fieldType    => 'text',
+            label        => ['button image', 'PayDriver_PayPalStd'],
+            hoverHelp    => ['button image help', 'PayDriver_PayPalStd'],
+            default      => '',
+         );
+property summaryTemplateId => (
+            fieldType    => 'template',
+            label        => ['summary template', 'PayDriver_PayPalStd'],
+            hoverHelp    => ['summary template help', 'PayDriver_PayPalStd'],
+            namespace    => 'Shop/Credentials',
+            default      => '',
+         );
 
 =head1 NAME
 
@@ -66,82 +127,6 @@ sub handlesRecurring { 0 }
 # Recurring TX stuff removed, for now.
 
 #-------------------------------------------------------------------
-sub definition {
-    my $class   = shift;
-    my $session = shift;
-    WebGUI::Error::InvalidParam->throw( error => q{Must provide a session variable} )
-        unless ref $session eq 'WebGUI::Session';
-    my $definition = shift;
-
-    my $i18n = WebGUI::International->new( $session, $I18N );
-
-    tie my %fields, 'Tie::IxHash';
-    %fields = (
-        vendorId => {
-            fieldType => 'text',
-            label     => $i18n->get('vendorId'),
-            hoverHelp => $i18n->get('vendorId help'),
-        },
-        signature => {
-            fieldType => 'textarea',
-            label     => $i18n->get('signature'),
-            hoverHelp => $i18n->get('signature help'),
-        },
-        identityToken => {
-            fieldType => 'text',
-            label     => $i18n->get('identity token'),
-            hoverHelp => $i18n->get('identity token help'),
-        },
-        currency => {
-            fieldType    => 'selectBox',
-            label        => $i18n->get('currency'),
-            hoverHelp    => $i18n->get('currency help'),
-            defaultValue => 'USD',
-            options      => $class->getPaymentCurrencies(),
-        },
-        useSandbox => {
-            fieldType    => 'yesNo',
-            label        => $i18n->get('use sandbox'),
-            hoverHelp    => $i18n->get('use sandbox help'),
-            defaultValue => 1,
-        },
-        sandboxUrl => {
-            fieldType    => 'text',
-            label        => $i18n->get('sandbox url'),
-            hoverHelp    => $i18n->get('sandbox url help'),
-            defaultValue => 'https://www.sandbox.paypal.com/cgi-bin/webscr',
-        },
-        liveUrl => {
-            fieldType    => 'text',
-            label        => $i18n->get('live url'),
-            hoverHelp    => $i18n->get('live url help'),
-            defaultValue => 'https://www.paypal.com/cgi-bin/webscr',
-        },
-        buttonImage => {
-            fieldType    => 'text',
-            label        => $i18n->get('button image'),
-            hoverHelp    => $i18n->get('button image help'),
-            defaultValue => '',
-        },
-        summaryTemplateId  => {
-            fieldType    => 'template',
-            label        => $i18n->get('summary template'),
-            hoverHelp    => $i18n->get('summary template help'),
-            namespace    => 'Shop/Credentials',
-            defaultValue => '',
-        },
-    );
-
-    push @{$definition},
-        {
-        name       => $i18n->get('PayPal'),
-        properties => \%fields,
-        };
-
-    return $class->SUPER::definition( $session, $definition );
-}
-
-#-------------------------------------------------------------------
 
 =head2 getButton 
 
@@ -175,8 +160,8 @@ sub getButton {
     my $button;
     my $i18n = WebGUI::International->new( $session, 'PayDriver_PayPalStd' );
     my $text = $i18n->get('PayPal');
-    if ( $self->get('buttonImage') ) {
-        my $raw = $self->get('buttonImage');
+    if ( $self->buttonImage ) {
+        my $raw = $self->buttonImage;
         WebGUI::Macro::process( $session, \$raw );
         $button = qq{
             <input type='image' 
@@ -214,7 +199,7 @@ sub getPayPalParams {
     my %form = (
         cmd => '_notify-synch',
         tx  => $tx,
-        at  => $self->get('identityToken'),
+        at  => $self->identityToken,
     );
     my $response = LWP::UserAgent->new->post($self->payPalUrl, \%form);
     my ($status, @lines) = split("\n", $response->content);
@@ -257,8 +242,8 @@ sub paymentVariables {
     my %params = (
         cmd           => '_cart',
         upload        => 1,
-        business      => $self->get('vendorId'),
-        currency_code => $self->get('currency'),
+        business      => $self->vendorId,
+        currency_code => $self->currency,
         no_shipping   => 1,
 
         return        => $return->as_string,
@@ -303,8 +288,8 @@ Returns the url of the paypal gateway, taking into account useSandbox.
 
 sub payPalUrl {
     my $self  = shift;
-    my $field = $self->get('useSandbox') ? 'sandboxUrl' : 'liveUrl';
-    return $self->get($field);
+    my $field = $self->useSandbox ? 'sandboxUrl' : 'liveUrl';
+    return $self->$field;
 }
 
 #-------------------------------------------------------------------
@@ -390,7 +375,7 @@ sub www_completeTransaction {
     $self->_setPaymentStatus(1, $params->{PAYPAL_TX}, $params->{payment_status}, 'Complete');
     $self->processTransaction($transaction);
 
-    return $transaction->get('isSuccessful')
+    return $transaction->isSuccessful
         ? $transaction->thankYou
         : $self->displayPaymentError($transaction);
 }

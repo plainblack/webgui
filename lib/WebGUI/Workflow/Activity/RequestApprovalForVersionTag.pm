@@ -4,7 +4,7 @@ package WebGUI::Workflow::Activity::RequestApprovalForVersionTag;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -295,7 +295,7 @@ sub sendMessage {
         comments => $versionTag->get('comments'),
         url      => $approvalUrl,
     };
-    my $template     = WebGUI::Asset->newByDynamicClass($self->session, $self->get('templateId'));
+    my $template     = WebGUI::Asset->newById($self->session, $self->get('templateId'));
     my $messageText  = $template->process($var);
     for my $groupId ( @{ $self->getGroupToApprove } ) {
         my $message 

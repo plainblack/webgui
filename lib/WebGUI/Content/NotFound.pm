@@ -3,7 +3,7 @@ package WebGUI::Content::NotFound;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -46,7 +46,7 @@ The content handler for this package.
 
 sub handler {
     my ($session) = @_;
-	$session->http->setStatus("404","Page Not Found");
+	$session->response->status(404);
     my $output = "";
 	my $notFound = WebGUI::Asset->getNotFound($session);
 	if (defined $notFound) {
@@ -54,7 +54,7 @@ sub handler {
         $output = eval { $notFound->www_view };
 	} 
     else {
-        $session->errorHandler->error("The notFound page could not be instanciated!");
+        $session->log->error("The notFound page could not be instanciated!");
 		$output = "An error was encountered while processing your request.";
 	}
 	$output = "An error was encountered while processing your request." if $output eq '';

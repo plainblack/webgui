@@ -5,7 +5,7 @@ use JSON;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -67,7 +67,7 @@ See the synopsis for what kind of response this generates.
 sub handler {
     my $process = shift;
     my $status  = $process->getStatus;
-    my ( $finished, $startTime, $endTime, $error ) = $process->get( 'finished', 'startTime', 'endTime', 'error' );
+    my ( $finished, $startTime, $endTime, $error, $redirect ) = $process->get( qw/finished startTime endTime error redirect/ );
 
     $endTime = time() unless $finished;
 
@@ -76,8 +76,9 @@ sub handler {
         elapsed  => ( $endTime - $startTime ),
         finished => ( $finished ? \1 : \0 ),
     );
-    $status{error} = $error if $finished;
-    $process->session->http->setMimeType('text/plain');
+    $status{error}    = $error    if $finished;
+    $status{redirect} = $redirect if $finished;
+    $process->session->response->content_type('text/plain');
     JSON::encode_json( \%status );
 } ## end sub handler
 

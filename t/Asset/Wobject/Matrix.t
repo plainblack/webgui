@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -8,16 +8,14 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use FindBin;
 use strict;
 use File::Spec;
-use lib "$FindBin::Bin/../../lib";
 
 ##The goal of this test is to test the creation of UserList Wobjects.
 
 use WebGUI::Test;
 use WebGUI::Session;
-use Test::More tests => 30; # increment this value for each test you create
+use Test::More; # increment this value for each test you create
 use Test::Deep;
 use JSON;
 use WebGUI::Asset::Wobject::Matrix;
@@ -31,6 +29,8 @@ my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Matrix Test"});
 WebGUI::Test->addToCleanup($versionTag);
 my $matrix = $node->addChild({className=>'WebGUI::Asset::Wobject::Matrix'});
+$versionTag->commit;
+$matrix = $matrix->cloneFromDb;
 
 # Test for a sane object type
 isa_ok($matrix, 'WebGUI::Asset::Wobject::Matrix');
@@ -104,11 +104,12 @@ is($newAttribute->{attributeId},undef,"The new attribute was successfully delete
 
 # add a listing
 
-my $matrixListing = $matrix->addChild({className=>'WebGUI::Asset::MatrixListing'}, undef, undef, { skipAutoCommitWorkflows => 1, skipNotification => 1});
+my $listing_tag = WebGUI::VersionTag->getWorking($session);
+my $matrixListing = $matrix->addChild({className=>'WebGUI::Asset::MatrixListing'}, undef, undef, { skipNotification => 1});
+$listing_tag->commit;
+$matrixListing = $matrixListing->cloneFromDb;
 
-my $secondVersionTag = WebGUI::VersionTag->new($session,$matrixListing->get("tagId"));
-$secondVersionTag->commit;
-WebGUI::Test->addToCleanup($secondVersionTag);
+WebGUI::Test->addToCleanup($matrixListing);
 
 # Test for sane object type
 isa_ok($matrixListing, 'WebGUI::Asset::MatrixListing');
@@ -157,7 +158,7 @@ cmp_deeply(
 
 # Test Listings Caching
 
-my $listingsEncoded = WebGUI::Cache->new($session,"matrixListings_".$matrix->getId)->get;
+my $listingsEncoded = $session->cache->get("matrixListings_".$matrix->getId);
 $listings = JSON->new->decode($listingsEncoded);
 
 cmp_deeply(
@@ -229,9 +230,9 @@ cmp_deeply(
 
 # Test statistics caching by view method
 
-WebGUI::Cache->new($session,"matrixStatistics_".$matrix->getId)->delete;
+$session->cache->remove("matrixStatistics_".$matrix->getId);
 $matrix->view;
-my $varStatisticsEncoded = WebGUI::Cache->new($session,"matrixStatistics_".$matrix->getId)->get;
+my $varStatisticsEncoded = $session->cache->get("matrixStatistics_".$matrix->getId);
 my $varStatistics = JSON->new->decode($varStatisticsEncoded);
 
 cmp_deeply(
@@ -302,9 +303,9 @@ $matrixListing->setRatings({category1=>'1',category2=>'9'});
 $matrixListing->setRatings({category1=>'3',category2=>'5'});
 $matrixListing->setRatings({category1=>'1',category2=>'9'});
 
-WebGUI::Cache->new($session,"matrixStatistics_".$matrix->getId)->delete;
+$session->cache->remove("matrixStatistics_".$matrix->getId);
 $matrix->view;
-my $varStatisticsEncoded = WebGUI::Cache->new($session,"matrixStatistics_".$matrix->getId)->get;
+my $varStatisticsEncoded = $session->cache->get("matrixStatistics_".$matrix->getId);
 my $varStatistics = JSON->new->decode($varStatisticsEncoded);
 
 cmp_deeply(
@@ -349,10 +350,10 @@ cmp_deeply(
     'With only 9 ratings, still no statistics'
 );
 
-WebGUI::Cache->new($session,"matrixStatistics_".$matrix->getId)->delete;
+$session->cache->remove("matrixStatistics_".$matrix->getId);
 $matrixListing->setRatings({category1=>'3'});
 $matrix->view;
-my $varStatisticsEncoded = WebGUI::Cache->new($session,"matrixStatistics_".$matrix->getId)->get;
+my $varStatisticsEncoded = $session->cache->get("matrixStatistics_".$matrix->getId);
 my $varStatistics = JSON->new->decode($varStatisticsEncoded);
 
 cmp_deeply(
@@ -364,7 +365,7 @@ cmp_deeply(
         best_rating_loop => [{
             url     => '/'.$matrixListing->get('url'),
             category=> 'category1',
-            name    => 'untitled',
+            name    => 'Untitled',
             mean    => 2,
             median  => 3,
             count   => 10,
@@ -380,7 +381,7 @@ cmp_deeply(
         worst_rating_loop => [{
             url     => '/'.$matrixListing->get('url'),
             category=> 'category1',
-            name    => 'untitled',
+            name    => 'Untitled',
             mean    => 2,
             median  => 3,
             count   => 10,
@@ -397,10 +398,10 @@ cmp_deeply(
     'statistics calculated for the category with 10 ratings'
 );
 
-WebGUI::Cache->new($session,"matrixStatistics_".$matrix->getId)->delete;
+$session->cache->remove("matrixStatistics_".$matrix->getId);
 $matrixListing->setRatings({category2=>'5'});
 $matrix->view;
-my $varStatisticsEncoded = WebGUI::Cache->new($session,"matrixStatistics_".$matrix->getId)->get;
+my $varStatisticsEncoded = $session->cache->get("matrixStatistics_".$matrix->getId);
 my $varStatistics = JSON->new->decode($varStatisticsEncoded);
 
 cmp_deeply(
@@ -412,7 +413,7 @@ cmp_deeply(
         best_rating_loop => [{
             url     => '/'.$matrixListing->get('url'),
             category=> 'category1',
-            name    => 'untitled',
+            name    => 'Untitled',
             mean    => 2,
             median  => 3,
             count   => 10,
@@ -420,7 +421,7 @@ cmp_deeply(
         {
             url     => '/'.$matrixListing->get('url'),
             category=> 'category2',
-            name    => 'untitled',
+            name    => 'Untitled',
             mean    => 7,
             median  => 9,
             count   => 10,
@@ -428,7 +429,7 @@ cmp_deeply(
         worst_rating_loop => [{
             url     => '/'.$matrixListing->get('url'),
             category=> 'category1',
-            name    => 'untitled',
+            name    => 'Untitled',
             mean    => 2,
             median  => 3,
             count   => 10,
@@ -436,7 +437,7 @@ cmp_deeply(
         {
             url     => '/'.$matrixListing->get('url'),
             category=> 'category2',
-            name    => 'untitled',
+            name    => 'Untitled',
             mean    => 7,
             median  => 9,
             count   => 10,
@@ -444,3 +445,5 @@ cmp_deeply(
     },
     'statistics calculated for the category with 10 ratings'
 );
+
+done_testing;

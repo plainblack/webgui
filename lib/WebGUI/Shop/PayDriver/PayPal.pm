@@ -3,7 +3,7 @@ package WebGUI::Shop::PayDriver::PayPal;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -16,7 +16,9 @@ package WebGUI::Shop::PayDriver::PayPal;
 
 ## this holds some shared functionality, and MUST be overridden for a full payment driver
 use strict;
-use base qw/WebGUI::Shop::PayDriver/;
+use Moose;
+use WebGUI::Definition::Shop;
+extends qw/WebGUI::Shop::PayDriver/;
 
 =head1 NAME
 

@@ -4,7 +4,7 @@ package WebGUI::Workflow::Instance;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -53,6 +53,7 @@ is singleton and an instance of it already exists.
 A reference to the current session.
 
 =head3 properties
+
 The settable properties of the workflow instance. See the set() method for details.
 
 A key/value for C<workflowId> is required in the properties for this method.
@@ -158,7 +159,6 @@ sub DESTROY {
 		$self->start;
 	}
     delete $self->{_workflow};
-    undef $self;
 }
 
 
@@ -204,7 +204,7 @@ sub getAllInstances {
             push(@instances, $instance);
         }
         else {
-            $session->errorHandler->warn('Tried to instance instanceId '.$instanceId.' but it returned undef');
+            $session->log->warn('Tried to instance instanceId '.$instanceId.' but it returned undef');
         }
     }
     return \@instances;	
@@ -374,7 +374,7 @@ sub run {
     }
     my $activity = $self->getNextActivity;
 	unless  (defined $activity)  {
-        $session->errorHandler->error(
+        $session->log->error(
             sprintf q{Unable to load Workflow Activity for activity after id %s in workflow %s},
                 $self->get('currentActivityId'),
                 $workflow->getId
@@ -382,7 +382,7 @@ sub run {
         $self->set({lastStatus=>"error"}, 1);
         return "error";
 	}
-	$session->errorHandler->info("Running workflow activity ".$activity->getId.", which is a ".(ref $activity).", for instance ".$self->getId.".");
+	$session->log->info("Running workflow activity ".$activity->getId.", which is a ".(ref $activity).", for instance ".$self->getId.".");
     my $object = eval { $self->getObject };
     if ( my $e = WebGUI::Error::ObjectNotFound->caught ) {
         $session->log->warn(
@@ -392,7 +392,7 @@ sub run {
         return "done";
     }
     elsif ($@) {
-        $session->errorHandler->error(
+        $session->log->error(
             q{Error on workflow instance '} . $self->getId . q{': }. $@
         );
         $self->set({lastStatus=>"error"}, 1);
@@ -401,7 +401,7 @@ sub run {
 
 	my $status = eval { $activity->execute($object, $self) };
 	if ($@) {
-		$session->errorHandler->error("Caught exception executing workflow activity ".$activity->getId." for instance ".$self->getId." which reported ".$@);
+		$session->log->error("Caught exception executing workflow activity ".$activity->getId." for instance ".$self->getId." which reported ".$@);
 		$self->set({lastStatus=>"error"}, 1);
 		return "error";
 	}
@@ -609,7 +609,7 @@ sub set {
     if ($self->{_started} && !$skipNotify) {
 		my $spectre = WebGUI::Workflow::Spectre->new($self->session);
 		$spectre->notify("workflow/deleteInstance",$self->getId);
-		$spectre->notify("workflow/addInstance", {cookieName=>$self->session->config->getCookieName, gateway=>$self->session->config->get("gateway"), sitename=>$self->session->config->get("sitename")->[0], instanceId=>$self->getId, priority=>$self->{_data}{priority}});
+		$spectre->notify("workflow/addInstance", {cookieName=>$self->session->config->getCookieName, gateway=>$self->session->request->base->path, sitename=>$self->session->config->get("sitename")->[0], instanceId=>$self->getId, priority=>$self->{_data}{priority}});
 	}
 }
 
@@ -652,7 +652,7 @@ When a workflow instance is started WebGUI tries to run it immediately to see if
 
 sub start {
 	my ($self, $skipRealtime) = @_;
-	my $log = $self->session->errorHandler;
+	my $log = $self->session->log;
 	$self->{_started} = 1;
 	
 	# run the workflow in realtime to start.

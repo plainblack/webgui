@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -8,9 +8,7 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
  
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
 use WebGUI::Session;
@@ -54,7 +52,7 @@ for (my $count = 1; $count <= $maxCount; $count++){
 }
 
 ##Creating a new session with the previous session's Id should clone the scratch data
-my $newSession = WebGUI::Session->open(WebGUI::Test->root, WebGUI::Test->file, undef, undef, $session->getId);
+my $newSession = WebGUI::Session->open(WebGUI::Test->file, undef, $session->getId);
 WebGUI::Test->addToCleanup($newSession);
 
 is($newSession->getId, $session->getId, "Successful session duplication");
@@ -82,7 +80,7 @@ is($scratch->set('','value'), undef, 'set returns undef unless it gets a name ev
 #
 ############################################
 
-my @sessionBank = map { WebGUI::Session->open(WebGUI::Test->root, WebGUI::Test->file) } 0..3;
+my @sessionBank = map { WebGUI::Session->open(WebGUI::Test->file) } 0..3;
 
 WebGUI::Test->addToCleanup(@sessionBank);
 

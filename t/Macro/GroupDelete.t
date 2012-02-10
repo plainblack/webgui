@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -8,9 +8,7 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
 use WebGUI::Session;
@@ -22,7 +20,7 @@ use HTML::TokeParser;
 
 my $session = WebGUI::Test->session;
 
-my $homeAsset = WebGUI::Asset->getDefault($session);
+my $homeAsset = WebGUI::Test->asset;
 my ($template, $groups, $users) = setupTest($session, $homeAsset);
 
 my @testSets = (
@@ -146,16 +144,14 @@ sub setupTest {
 	$groups[1] = WebGUI::Group->new($session, "new");
 	$groups[1]->name('Regular Old Group');
 	$groups[1]->autoDelete(0);
-    addToCleanup(@groups);
+    WebGUI::Test->addToCleanup(@groups);
 
 	##Three users.  One in each group and one with no group membership
 	my @users = map { WebGUI::User->new($session, "new") } 0..2;
 	$users[0]->addToGroups([$groups[0]->getId]);
 	$users[1]->addToGroups([$groups[1]->getId]);
-    addToCleanup(@users);
+    WebGUI::Test->addToCleanup(@users);
 
-	my $versionTag = WebGUI::VersionTag->getWorking($session);
-	$versionTag->set({name=>"GroupDelete test"});
 	my $properties = {
 		title => 'GroupDelete test template',
 		className => 'WebGUI::Asset::Template',
@@ -168,8 +164,6 @@ sub setupTest {
 		id => 'GroupDelete001Template',
 	};
 	my $asset = $defaultNode->addChild($properties, $properties->{id});
-	$versionTag->commit;
-    addToCleanup($versionTag);
 
 	return $asset, \@groups, \@users;
 }

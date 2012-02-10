@@ -3,7 +3,7 @@ package WebGUI::Form::Image;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -19,7 +19,6 @@ use base 'WebGUI::Form::File';
 use WebGUI::International;
 use WebGUI::Storage;
 use WebGUI::Form::YesNo;
-use WebGUI::Utility qw/isIn/;
 
 =head1 NAME
 
@@ -141,7 +140,7 @@ sub getValue {
 			my @files = @{$storage->getFiles};
 			my @images = grep{$storage->isImage($_)} @files; # Put all filenames that isImage returns true for into @images
 			if ($self->get('forceImageOnly')) {
-				$storage->deleteFile($_) for grep{!isIn($_, @images)} @files; # Search @files for filenames that are not in @images and delete them
+				$storage->deleteFile($_) for grep{ ! ($_ ~~ @images) } @files; # Search @files for filenames that are not in @images and delete them
 				@files = @images;
 			}
 

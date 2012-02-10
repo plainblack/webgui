@@ -1,7 +1,7 @@
 package WebGUI::Macro::Widget;
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -11,6 +11,9 @@ package WebGUI::Macro::Widget;
 #-------------------------------------------------------------------
 
 use strict;
+use WebGUI::Exception;
+use WebGUI::Asset;
+use WebGUI::Storage;
 
 #-------------------------------------------------------------------
 
@@ -30,33 +33,20 @@ sub process {
 
     # Get location for CSS and JS files
     my $conf            = $session->config;
-    my $extras          = $conf->get("extrasURL");
+    my $extras          = $session->url->make_urlmap_work($conf->get("extrasURL"));
 
     # add CSS and JS to the page
     my $style           = $session->style;
-    $style->setLink($extras."/yui/build/container/assets/container.css",{
-                        rel=>"stylesheet",
-                        type=>"text/css",
-                    }
-    );
+    $style->setCss($extras."/yui/build/container/assets/container.css");
     
     # and the JS
-    $style->setScript($extras."/wgwidget.js",{ 
-                          type=>"text/javascript" 
-                      }
-    );
-    $style->setScript($extras."/yui/build/yahoo-dom-event/yahoo-dom-event.js",{ 
-                          type=>"text/javascript" 
-                      }
-    );
-    $style->setScript($extras."/yui/build/container/container-min.js",{ 
-                          type=>"text/javascript" 
-                      }
-    );
+    $style->setScript($extras."/wgwidget.js");
+    $style->setScript($extras."/yui/build/yahoo-dom-event/yahoo-dom-event.js");
+    $style->setScript($extras."/yui/build/container/container-min.js");
 
     # construct the absolute URL and get the asset ID
-    my $asset           = WebGUI::Asset->newByUrl($session, $url);
-    if ( !$asset ) {
+    my $asset           = eval { WebGUI::Asset->newByUrl($session, $url); };
+    if ( Exception::Class->caught() ) {
         return "Widget: Could not find asset with URL '$url'";
     }
     my $assetId         = $asset->getId;

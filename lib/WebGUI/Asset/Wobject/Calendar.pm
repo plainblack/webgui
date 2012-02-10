@@ -3,7 +3,7 @@ package WebGUI::Asset::Wobject::Calendar;
 use strict;
 
 #----------------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #----------------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -12,18 +12,299 @@ use strict;
 # http://www.plainblack.com                     info@plainblack.com
 #----------------------------------------------------------------------------
 
+#use base qw/WebGUI::Asset::Wobject WebGUI::JSONCollateral/;
+use Moose;
 use Tie::IxHash;
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset::Wobject';
+with 'WebGUI::Role::Asset::JSONCollateral';
 
-use WebGUI::Utility;
+define assetName   => ['assetName', 'Asset_Calendar'];
+define icon        => 'calendar.gif';
+define tableName   => 'Calendar';
+property defaultView => (
+            fieldType       => "SelectBox",
+            default         => "month",
+            options         => \&_defaultView_options,
+            tab             => "display",
+            label           => ["defaultView label", 'Asset_Calendar'],
+            hoverHelp       => ["defaultView description", 'Asset_Calendar'],
+        );
+sub _defaultView_options {
+    my $self = shift;
+    my $i18n = WebGUI::International->new($self->session, 'Asset_Calendar');
+    tie my %optionsDefaultView, 'Tie::IxHash', (
+        month   => $i18n->get("defaultView value month"),
+        week    => $i18n->get("defaultView value week"),
+        day     => $i18n->get("defaultView value day"),
+        list    => $i18n->get('defaultView value list'),
+    );
+    return %optionsDefaultView;
+}
+
+property defaultDate => (
+            fieldType       => "SelectBox",
+            default         => 'current',
+            options         => \&_defaultDate_options,
+            tab             => "display",
+            label           => ["defaultDate label", 'Asset_Calendar'],
+            hoverHelp       => ["defaultDate description", 'Asset_Calendar'],
+        );
+sub _defaultDate_options {
+    my $self = shift;
+    my $i18n = WebGUI::International->new($self->session, 'Asset_Calendar');
+    tie my %optionsDefaultDate, 'Tie::IxHash', (
+        current => $i18n->get("defaultDate value current"),
+        first   => $i18n->get("defaultDate value first"),
+        last    => $i18n->get("defaultDate value last"),
+    );
+    return %optionsDefaultDate;
+}
+
+        ##### GROUPS / ACCESS #####
+        # Edit events
+property groupIdEventEdit => (
+            fieldType       => "group",
+            default         => "3",
+            tab             => "security",
+            label           => ["groupIdEventEdit label", 'Asset_Calendar'],
+            hoverHelp       => ["groupIdEventEdit description", 'Asset_Calendar'],
+        );
+
+property groupIdSubscribed => (
+            noFormPost      => 1,
+            fieldType       => 'hidden',
+        );
+
+        ##### TEMPLATES - DISPLAY #####
+        # Month
+property templateIdMonth => (
+            fieldType       => "template",  
+            default         => 'CalendarMonth000000001',
+            tab             => "display",
+            namespace       => "Calendar/Month", 
+            hoverHelp       => ['templateIdMonth description', 'Asset_Calendar'],
+            label           => ['templateIdMonth label', 'Asset_Calendar'],
+        );
+
+        # Week
+property templateIdWeek => (
+            fieldType       => "template",  
+            default         => 'CalendarWeek0000000001',
+            tab             => "display",
+            namespace       => "Calendar/Week", 
+            hoverHelp       => ['templateIdWeek description', 'Asset_Calendar'],
+            label           => ['templateIdWeek label', 'Asset_Calendar'],
+        );
+
+        # Day
+property templateIdDay => (
+            fieldType       => "template",  
+            default         => 'CalendarDay00000000001',
+            tab             => "display",
+            namespace       => "Calendar/Day", 
+            hoverHelp       => ['templateIdDay description', 'Asset_Calendar'],
+            label           => ['templateIdDay label', 'Asset_Calendar'],
+        );
+
+        # List
+property templateIdList => (
+            fieldType       => "template",  
+            default         => 'kj3b-X3i6zRKnhLb4ZiCLw',
+            tab             => "display",
+            namespace       => "Calendar/List", 
+            hoverHelp       => ['editForm templateIdList description', 'Asset_Calendar'],
+            label           => ['editForm templateIdList label', 'Asset_Calendar'],
+        );
+
+        # Event Details
+property templateIdEvent => (
+            fieldType       => "template",  
+            default         => 'CalendarEvent000000001',
+            tab             => "display",
+            namespace       => "Calendar/Event", 
+            hoverHelp       => ['templateIdEvent description', 'Asset_Calendar'],
+            label           => ['templateIdEvent label', 'Asset_Calendar'],
+        );
+
+        # Event Edit
+property templateIdEventEdit => (
+            fieldType       => "template",  
+            default         => 'CalendarEventEdit00001',
+            tab             => "display",
+            namespace       => "Calendar/EventEdit", 
+            hoverHelp       => ['templateIdEventEdit description', 'Asset_Calendar'],
+            label           => ['templateIdEventEdit label', 'Asset_Calendar'],
+        );
+
+        # Search
+property templateIdSearch => (
+            fieldType       => "template",  
+            default         => 'CalendarSearch00000001',
+            tab             => "display",
+            namespace       => "Calendar/Search", 
+            hoverHelp       => ['templateIdSearch description', 'Asset_Calendar'],
+            label           => ['templateIdSearch label', 'Asset_Calendar'],
+        );
+
+
+        ##### TEMPLATES - PRINT #####
+        # Month
+property templateIdPrintMonth => (
+            fieldType       => "template",  
+            default         => 'CalendarPrintMonth0001',
+            tab             => "display",
+            namespace       => "Calendar/Print/Month", 
+            hoverHelp       => ['templateIdPrintMonth description', 'Asset_Calendar'],
+            label           => ['templateIdPrintMonth label', 'Asset_Calendar'],
+        );
+
+        # Week
+property templateIdPrintWeek => (
+            fieldType       => "template",  
+            default         => 'CalendarPrintWeek00001',
+            tab             => "display",
+            namespace       => "Calendar/Print/Week", 
+            hoverHelp       => ['templateIdPrintWeek description', 'Asset_Calendar'],
+            label           => ['templateIdPrintWeek label', 'Asset_Calendar'],
+        );
+
+        # Day
+property templateIdPrintDay => (
+            fieldType       => "template",  
+            default         => 'CalendarPrintDay000001',
+            tab             => "display",
+            namespace       => "Calendar/Print/Day", 
+            hoverHelp       => ['templateIdPrintDay description', 'Asset_Calendar'],
+            label           => ['templateIdPrintDay label', 'Asset_Calendar'],
+        );
+
+        # List
+property templateIdPrintList => (
+            fieldType       => "template",  
+            default         => '',
+            tab             => "display",
+            namespace       => "Calendar/Print/List", 
+            hoverHelp       => ['editForm templateIdPrintList description', 'Asset_Calendar'],
+            label           => ['editForm templateIdPrintList label', 'Asset_Calendar'],
+        );
+
+        # Event Details
+property templateIdPrintEvent => (
+            fieldType       => "template",  
+            default         => 'CalendarPrintEvent0001',
+            tab             => "display",
+            namespace       => "Calendar/Print/Event", 
+            hoverHelp       => ['templateIdPrintEvent description', 'Asset_Calendar'],
+            label           => ['templateIdPrintEvent label', 'Asset_Calendar'],
+        );
+
+
+        ##### Miscellany #####
+property visitorCacheTimeout => (
+            fieldType       => "integer",
+            default         => "60",
+            tab             => "display",
+            hoverHelp       => ['visitorCacheTimeout description', 'Asset_Calendar'],
+            label           => ['visitorCacheTimeout label', 'Asset_Calendar'],
+        );
+property sortEventsBy => (
+            fieldType       => "SelectBox",
+            default         => "time",
+            options         => \&_sortEventsBy_options,
+            tab             => "display",
+            label           => ["sortEventsBy label", 'Asset_Calendar'],
+            hoverHelp       => ["sortEventsBy description", 'Asset_Calendar'],
+        );
+sub _sortEventsBy_options {
+    my $self = shift;
+    my $i18n = WebGUI::International->new($self->session, 'Asset_Calendar');
+    tie my %optionsEventSort, 'Tie::IxHash', (
+        time            => $i18n->get("sortEventsBy value time"),
+        sequencenumber  => $i18n->get("sortEventsBy value sequencenumber"),
+    );
+    return %optionsEventSort;
+}
+
+
+property listViewPageInterval => (
+            fieldType       => "interval",
+            builder         => '_listViewPageInterval_builder',
+            tab             => "display",
+            label           => ['editForm listViewPageInterval label', 'Asset_Calendar'],
+            hoverHelp       => ['editForm listViewPageInterval description', 'Asset_Calendar'],
+            unitsAvailable  => [ qw( days weeks months years ) ],
+            lazy            => 1,
+        );
+sub _listViewPageInterval_builder {
+    my $self = shift;
+    return $self->session->datetime->intervalToSeconds( 3, 'months' );
+}
+
+property icalFeeds    => (
+            fieldType       => "JsonTable",
+            default         => sub { return []; },
+            isa             => 'WebGUI::Type::JSONArray',
+            coerce          => 1,
+            traits          => ['Array', 'WebGUI::Definition::Meta::Property::Serialize',],
+            tab             => "feeds",
+            label           => ['feeds','Asset_Calendar'],
+            fields          => [
+                {
+                    name        => 'feedId',
+                    type        => 'id',
+                },
+                {
+                    name        => 'url',
+                    type        => 'text',
+                    size        => '40',
+                    label       => ['Feed URL','Asset_Calendar'],
+                },
+                {
+                    name        => 'lastResult',
+                    type        => 'readonly',
+                    label       => ['434','WebGUI'],
+                },
+                {
+                    name        => 'lastUpdated',
+                    type        => 'readonly',
+                    label       => ['454', 'WebGUI'],
+                },
+            ],
+        );
+
+property icalInterval    => (
+            fieldType       => "interval",
+            builder         => '_icalInterval_builder',
+            lazy            => 1,
+            tab             => "display",
+            label           => ['editForm icalInterval label', 'Asset_Calendar'],
+            hoverHelp       => ['editForm icalInterval description', 'Asset_Calendar'],
+            unitsAvailable  => [ qw( days weeks months years ) ],
+        );
+sub _icalInterval_builder {
+    return shift->session->datetime->intervalToSeconds( 3, 'months' );
+}
+
+property workflowIdCommit => (
+            fieldType       => "workflow",
+            builder         => '_workflowIdCommit_builder',
+            lazy            => 1,
+            tab             => 'security',
+            label           => ['editForm workflowIdCommit label', 'Asset_Calendar'],
+            hoverHelp       => ['editForm workflowIdCommit description', 'Asset_Calendar'],
+            type            => 'WebGUI::VersionTag',
+        );
+sub _workflowIdCommit_builder {
+    return shift->session->setting->get('defaultVersionTagWorkflow'),
+}
+
 use WebGUI::International;
 use WebGUI::Search;
 use WebGUI::Form;
 use WebGUI::HTML;
-use WebGUI::ICal;
 use WebGUI::DateTime;
-use Class::C3;
-
-use base qw/WebGUI::Asset::Wobject WebGUI::JSONCollateral/;
+use WebGUI::ICal;
 
 use DateTime;
 use JSON;
@@ -41,281 +322,6 @@ use Text::Wrap;
 =head1 METHODS
 
 =cut
-
-#----------------------------------------------------------------------------
-
-sub definition {
-    my $class       = shift;
-    my $session     = shift;
-    my $definition  = shift || [];
-
-    my $i18n        = WebGUI::International->new($session, 'Asset_Calendar');
-
-    ### Set up list options ###
-    tie my %optionsDefaultView, 'Tie::IxHash', (
-        month   => $i18n->get("defaultView value month"),
-        week    => $i18n->get("defaultView value week"),
-        day     => $i18n->get("defaultView value day"),
-        list    => $i18n->get('defaultView value list'),
-    );
-
-    tie my %optionsDefaultDate, 'Tie::IxHash', (
-        current => $i18n->get("defaultDate value current"),
-        first   => $i18n->get("defaultDate value first"),
-        last    => $i18n->get("defaultDate value last"),
-    );
-
-    tie my %optionsEventSort, 'Tie::IxHash', (
-        time            => $i18n->get("sortEventsBy value time"),
-        sequencenumber  => $i18n->get("sortEventsBy value sequencenumber"),
-    );
-
-
-    ### Build properties hash ###
-    tie my %properties, 'Tie::IxHash', (
-        ##### DEFAULTS #####
-        defaultView => {
-            fieldType       => "SelectBox",
-            defaultValue    => "month",
-            options         => \%optionsDefaultView,
-            tab             => "display",
-            label           => $i18n->get("defaultView label"),
-            hoverHelp       => $i18n->get("defaultView description"),
-        },
-
-        defaultDate => {
-            fieldType       => "SelectBox",
-            defaultValue    => 'current',
-            options         => \%optionsDefaultDate,
-            tab             => "display",
-            label           => $i18n->get("defaultDate label"),
-            hoverHelp       => $i18n->get("defaultDate description"),
-        },
-
-        ##### GROUPS / ACCESS #####
-        # Edit events
-        groupIdEventEdit => {
-            fieldType       => "group",
-            defaultValue    => "3",
-            tab             => "security",
-            label           => $i18n->get("groupIdEventEdit label"),
-            hoverHelp       => $i18n->get("groupIdEventEdit description"),
-        },
-
-        groupIdSubscribed => {
-            fieldType       => 'hidden',
-        },
-
-
-        ##### TEMPLATES - DISPLAY #####
-        # Month
-        templateIdMonth => {
-            fieldType       => "template",  
-            defaultValue    => 'CalendarMonth000000001',
-            tab             => "display",
-            namespace       => "Calendar/Month", 
-            hoverHelp       => $i18n->get('templateIdMonth description'),
-            label           => $i18n->get('templateIdMonth label'),
-        },
-
-        # Week
-        templateIdWeek => {
-            fieldType       => "template",  
-            defaultValue    => 'CalendarWeek0000000001',
-            tab             => "display",
-            namespace       => "Calendar/Week", 
-            hoverHelp       => $i18n->get('templateIdWeek description'),
-            label           => $i18n->get('templateIdWeek label'),
-        },
-
-        # Day
-        templateIdDay => {
-            fieldType       => "template",  
-            defaultValue    => 'CalendarDay00000000001',
-            tab             => "display",
-            namespace       => "Calendar/Day", 
-            hoverHelp       => $i18n->get('templateIdDay description'),
-            label           => $i18n->get('templateIdDay label'),
-        },
-
-        # List
-        templateIdList => {
-            fieldType       => "template",  
-            defaultValue    => 'kj3b-X3i6zRKnhLb4ZiCLw',
-            tab             => "display",
-            namespace       => "Calendar/List", 
-            hoverHelp       => $i18n->get('editForm templateIdList description'),
-            label           => $i18n->get('editForm templateIdList label'),
-        },
-
-        # Event Details
-        templateIdEvent => {
-            fieldType       => "template",  
-            defaultValue    => 'CalendarEvent000000001',
-            tab             => "display",
-            namespace       => "Calendar/Event", 
-            hoverHelp       => $i18n->get('templateIdEvent description'),
-            label           => $i18n->get('templateIdEvent label'),
-        },
-
-        # Event Edit
-        templateIdEventEdit => {
-            fieldType       => "template",  
-            defaultValue    => 'CalendarEventEdit00001',
-            tab             => "display",
-            namespace       => "Calendar/EventEdit", 
-            hoverHelp       => $i18n->get('templateIdEventEdit description'),
-            label           => $i18n->get('templateIdEventEdit label'),
-        },
-
-        # Search
-        templateIdSearch => {
-            fieldType       => "template",  
-            defaultValue    => 'CalendarSearch00000001',
-            tab             => "display",
-            namespace       => "Calendar/Search", 
-            hoverHelp       => $i18n->get('templateIdSearch description'),
-            label           => $i18n->get('templateIdSearch label'),
-        },
-
-
-        ##### TEMPLATES - PRINT #####
-        # Month
-        templateIdPrintMonth => {
-            fieldType       => "template",  
-            defaultValue    => 'CalendarPrintMonth0001',
-            tab             => "display",
-            namespace       => "Calendar/Print/Month", 
-            hoverHelp       => $i18n->get('templateIdPrintMonth description'),
-            label           => $i18n->get('templateIdPrintMonth label'),
-        },
-
-        # Week
-        templateIdPrintWeek => {
-            fieldType       => "template",  
-            defaultValue    => 'CalendarPrintWeek00001',
-            tab             => "display",
-            namespace       => "Calendar/Print/Week", 
-            hoverHelp       => $i18n->get('templateIdPrintWeek description'),
-            label           => $i18n->get('templateIdPrintWeek label'),
-        },
-
-        # Day
-        templateIdPrintDay => {
-            fieldType       => "template",  
-            defaultValue    => 'CalendarPrintDay000001',
-            tab             => "display",
-            namespace       => "Calendar/Print/Day", 
-            hoverHelp       => $i18n->get('templateIdPrintDay description'),
-            label           => $i18n->get('templateIdPrintDay label'),
-        },
-
-        # List
-        templateIdPrintList => {
-            fieldType       => "template",  
-            defaultValue    => '',
-            tab             => "display",
-            namespace       => "Calendar/Print/List", 
-            hoverHelp       => $i18n->get('editForm templateIdPrintList description'),
-            label           => $i18n->get('editForm templateIdPrintList label'),
-        },
-
-        # Event Details
-        templateIdPrintEvent => {
-            fieldType       => "template",  
-            defaultValue    => 'CalendarPrintEvent0001',
-            tab             => "display",
-            namespace       => "Calendar/Print/Event", 
-            hoverHelp       => $i18n->get('templateIdPrintEvent description'),
-            label           => $i18n->get('templateIdPrintEvent label'),
-        },
-
-
-        ##### Miscellany #####
-        visitorCacheTimeout => {
-            fieldType       => "integer",
-            defaultValue    => "60",
-            tab             => "display",
-            hoverHelp       => $i18n->get('visitorCacheTimeout description'),
-            label           => $i18n->get('visitorCacheTimeout label'),
-        },
-        sortEventsBy => {
-            fieldType       => "SelectBox",
-            defaultValue    => "time",
-            options         => \%optionsEventSort,
-            tab             => "display",
-            label           => $i18n->get("sortEventsBy label"),
-            hoverHelp       => $i18n->get("sortEventsBy description"),
-        },
-
-        listViewPageInterval => {
-            fieldType       => "interval",
-            defaultValue    => $session->datetime->intervalToSeconds( 3, 'months' ),
-            tab             => "display",
-            label           => $i18n->get('editForm listViewPageInterval label'),
-            hoverHelp       => $i18n->get('editForm listViewPageInterval description'),
-            unitsAvailable  => [ qw( days weeks months years ) ],
-        },
-
-        icalFeeds    => {
-            fieldType       => "JsonTable",
-            defaultValue    => [],
-            serialize       => 1,
-            tab             => "feeds",
-            fields          => [
-                {
-                    name        => 'feedId',
-                    type        => 'id',
-                },
-                {
-                    name        => 'url',
-                    type        => 'text',
-                    size        => '40',
-                    label       => $i18n->get('Feed URL'),
-                },
-                {
-                    name        => 'lastResult',
-                    type        => 'readonly',
-                    label       => $i18n->get('434','WebGUI'),
-                },
-                {
-                    name        => 'lastUpdated',
-                    type        => 'readonly',
-                    label       => $i18n->get('454', 'WebGUI'),
-                },
-            ],
-        },
-
-        icalInterval    => {
-            fieldType       => "interval",
-            defaultValue    => $session->datetime->intervalToSeconds( 3, 'months' ),
-            tab             => "display",
-            label           => $i18n->get('editForm icalInterval label'),
-            hoverHelp       => $i18n->get('editForm icalInterval description'),
-            unitsAvailable  => [ qw( days weeks months years ) ],
-        },
-
-        workflowIdCommit => {
-            fieldType       => "workflow",
-            defaultValue    => $session->setting->get('defaultVersionTagWorkflow'),
-            tab             => 'security',
-            label           => $i18n->get('editForm workflowIdCommit label'),
-            hoverHelp       => $i18n->get('editForm workflowIdCommit description'),
-            type            => 'WebGUI::VersionTag',
-        },
-    );
-
-    push @{$definition}, {
-        assetName           => $i18n->get('assetName'),
-        icon                => 'calendar.gif',
-        tableName           => 'Calendar',
-        className           => 'WebGUI::Asset::Wobject::Calendar',
-        properties          => \%properties,
-        autoGenerateForms   => 1,
-    };
-
-    return $class->SUPER::definition($session, $definition);
-}
 
 #----------------------------------------------------------------------------
 
@@ -425,7 +431,8 @@ around the canEdit check when www_editSave is being used to add an asset).
 
 =cut
 
-sub canEdit {
+around canEdit => sub {
+    my $orig    = shift;
     my $self    = shift;
     my $userId  = shift     || $self->session->user->userId;
     my $form    = $self->session->form;
@@ -438,18 +445,18 @@ sub canEdit {
     return 1 if (
         $self->canAddEvent( $userId ) 
         && $form->process("assetId")    eq "new"
-        && $form->process("func")       eq "editSave"
-        && $form->process("class")      eq "WebGUI::Asset::Event"
+        && $form->process("func")       eq "addSave"
+        && $form->process("className")  eq "WebGUI::Asset::Event"
     );
 
     # Who can edit the Calendar can do everything
-    if ( $self->SUPER::canEdit( $userId ) ) {
+    if ( $self->$orig( $userId ) ) {
         return 1;
     }
 
     # Fails all checks
     return 0;
-}
+};
 
 #----------------------------------------------------------------------------
 
@@ -472,8 +479,8 @@ sub canAddEvent {
                 ;
 
     return 1 if (
-        $user->isInGroup( $self->get("groupIdEventEdit") ) 
-        || $self->SUPER::canEdit( $userId )
+        $user->isInGroup( $self->groupIdEventEdit ) 
+        || $self->SUPER::canEdit($userId)
     );
 }
 
@@ -524,20 +531,6 @@ sub deleteFeed {
 
 #----------------------------------------------------------------------------
 
-=head2 getEditTabs ( )
-
-Add the feeds tab to the edit form
-
-=cut
-
-sub getEditTabs {
-    my ( $self ) = @_;
-    my $i18n    = WebGUI::International->new($self->session,"Asset_Calendar");
-    return $self->SUPER::getEditTabs, ["feeds",$i18n->get("feeds"), 6];
-}
-
-#----------------------------------------------------------------------------
-
 =head2 getEvent ( assetId )
 
 Gets an Event object from the database. Returns a WebGUI::Asset::Event object
@@ -550,20 +543,20 @@ sub getEvent {
     my $self    = shift;
     my $assetId = shift;
     # Warn and return undef if no assetId
-    $self->session->errorHandler->warn("WebGUI::Asset::Wobject::Calendar->getEvent :: No asset ID."), return
+    $self->session->log->warn("WebGUI::Asset::Wobject::Calendar->getEvent :: No asset ID."), return
         unless $assetId;
 
     # ? Perhaps use Stow to cache events ?
 
-    my $event = WebGUI::Asset->newByDynamicClass($self->session, $assetId);
+    my $event = WebGUI::Asset->newById($self->session, $assetId);
 
     unless ( $event ) {
-        $self->session->errorHandler->warn("Event '$assetId' doesn't exist!");
+        $self->session->log->warn("Event '$assetId' doesn't exist!");
         return undef;
     }
 
-    $self->session->errorHandler->warn("WebGUI::Asset::Wobject::Calendar->getEvent :: Event '$assetId' not a child of calendar '".$self->getId."'"), return
-        unless $event->get("parentId") eq $self->getId;
+    $self->session->log->warn("WebGUI::Asset::Wobject::Calendar->getEvent :: Event '$assetId' not a child of calendar '".$self->getId."'"), return
+        unless $event->parentId eq $self->getId;
 
     return $event;
 }
@@ -610,11 +603,11 @@ sub getEventsIn {
     my $params  = shift;
 
     $params->{order} = '' if $params->{order} !~ /^(?:time|sequencenumber)/i;
-    my $order_by_type = $params->{order} ? lc($params->{order}) : $self->get('sortEventsBy');
+    my $order_by_type = $params->{order} ? lc($params->{order}) : $self->sortEventsBy;
 
     # Warn and return undef if no startDate or endDate
     unless ($start && $end) {
-        $self->session->errorHandler->warn("WebGUI::Asset::Wobject::Calendar->getEventsIn() called with not enough arguments at ".join('::',(caller)[1,2]));
+        $self->session->log->warn("WebGUI::Asset::Wobject::Calendar->getEventsIn() called with not enough arguments at ".join('::',(caller)[1,2]));
         return undef;
     }
 
@@ -721,7 +714,7 @@ TODO: Format lastUpdated into the user's time zone
 
 sub getFeeds {
     my $self    = shift;
-    my $feeds   = $self->get('icalFeeds');
+    my $feeds   = $self->icalFeeds;
     return $feeds if (ref $feeds);
     $self->session->log->warn('improperly stored icalFeed in calendar assetId:'.$self->getId);
     return JSON::from_json($feeds);
@@ -737,7 +730,7 @@ Gets the first event in this calendar. Returns the Event object.
 
 sub getFirstEvent {
     my $self = shift;
-    my $lineage     = $self->get("lineage");
+    my $lineage     = $self->lineage;
 
     my ($assetId)   = $self->session->db->quickArray(<<ENDSQL);
         SELECT asset.assetId 
@@ -763,7 +756,7 @@ Gets the last event in this calendar. Returns the Event object.
 
 sub getLastEvent {
     my $self    = shift;
-    my $lineage = $self->get("lineage");
+    my $lineage = $self->lineage;
 
     my ($assetId) = $self->session->db->quickArray(<<ENDSQL);
         SELECT asset.assetId 
@@ -819,12 +812,12 @@ parameters.
 
 =cut
 
-sub prepareView {
+override prepareView => sub {
     my $self = shift;
-    $self->SUPER::prepareView();
+    super();
 
     my $view = ucfirst lc $self->session->form->param("type")
-            || ucfirst $self->get("defaultView") 
+            || ucfirst $self->defaultView 
             || "Month";
 
     if ($self->session->form->param("print")){
@@ -832,9 +825,9 @@ sub prepareView {
         $self->session->style->makePrintable(1);
     }
 
-    #$self->session->errorHandler->warn("Prepare view ".$view." with template ".$self->get("templateId".$view));
+    #$self->session->log->warn("Prepare view ".$view." with template ".$self->get("templateId".$view));
 
-    my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId".$view));
+    my $template = WebGUI::Asset::Template->newById($self->session, $self->get("templateId".$view));
     if (!$template) {
         WebGUI::Error::ObjectNotFound::Template->throw(
             error      => qq{Template not found},
@@ -845,11 +838,11 @@ sub prepareView {
     $template->prepare($self->getMetaDataAsTemplateVariables);
 
     $self->{_viewTemplate} = $template;
-}
+};
 
 #----------------------------------------------------------------------------
 
-=head2 processPropertiesFromFormPost ( )
+=head2 processEditForm ( )
 
 Process the Calendar Edit form.
 
@@ -859,13 +852,13 @@ Adds / removes feeds from the feed trough.
 
 =cut
 
-sub processPropertiesFromFormPost {
+override processEditForm => sub {
     my $self    = shift;
     my $session = $self->session;
     my $form    = $self->session->form;
-    $self->SUPER::processPropertiesFromFormPost;
+    super();
 
-    unless ($self->get("groupIdSubscribed")) {
+    unless ($self->groupIdSubscribed) {
         $self->createSubscriptionGroup();
     }
 
@@ -881,7 +874,7 @@ sub processPropertiesFromFormPost {
     }
 
     return;
-}
+};
 
 
 #----------------------------------------------------------------------------
@@ -932,7 +925,7 @@ sub view {
 
     # Get the form parameters
     my $params        = {};    
-    $params->{type}   = $form->param("type") || $self->get( 'defaultView' );
+    $params->{type}   = $form->param("type") || $self->defaultView;
     $params->{start}  = $form->param("start");
 
     # Validate type passed, or recover from session scratchpad
@@ -940,7 +933,7 @@ sub view {
        $session->scratch->set('cal_view_type', $params->{'type'});
     }
     else {
-       $params->{type} = $session->scratch->get('cal_view_type') || $self->get( 'defaultView' ) || 'month';
+       $params->{type} = $session->scratch->get('cal_view_type') || $self->defaultView || 'month';
        $session->scratch->set('cal_view_type', $params->{'type'});
     }
 
@@ -955,9 +948,9 @@ sub view {
     # Set defaults if necessary
     if (!$params->{start}) {
         $params->{start}    
-            = $self->get("defaultDate") eq "first" && $self->getFirstEvent 
+            = $self->defaultDate eq "first" && $self->getFirstEvent 
                 ? $self->getFirstEvent->getDateTimeStart
-            : $self->get("defaultDate") eq "last" && $self->getLastEvent
+            : $self->defaultDate eq "last" && $self->getLastEvent
                 ? $self->getLastEvent->getDateTimeStart
             :   WebGUI::DateTime->new($session, time)->toUserTimeZone
             ;
@@ -971,13 +964,13 @@ sub view {
             : lc $params->{type} eq "week"      ? $self->viewWeek( $params )
             : lc $params->{type} eq "day"       ? $self->viewDay( $params )
             : lc $params->{type} eq "list"      ? $self->viewList( $params )
-            : return $self->errorHandler->error("Calendar invalid 'type=' url parameter")
+            : return $self->log->error("Calendar invalid 'type=' url parameter")
             ;
 
     ##### Process the template
     # Add any global variables
     # Admin
-    if ($self->session->var->isAdminOn) {
+    if ($self->session->isAdminOn) {
         $var->{'admin'}         = 1;
         $var->{'adminControls'} = $self->getToolbar;
     }
@@ -985,7 +978,7 @@ sub view {
     # Event editor
     if ($self->canAddEvent) {
         $var->{'editor'}    = 1;
-        $var->{"urlAdd"}    = $self->getUrl("func=add;class=WebGUI::Asset::Event;type=".$params->{type}.";start=$params->{start}");
+        $var->{"urlAdd"}    = $self->getUrl("func=add;className=WebGUI::Asset::Event;type=".$params->{type}.";start=$params->{start}");
     }
 
     # URLs
@@ -1124,7 +1117,7 @@ sub viewList {
     ### Get the events
     my $dtStart     = WebGUI::DateTime->new( $session, $params->{start} );
     $dtStart->set_time_zone($tz);
-    my $dtEnd       = $dtStart->clone->add( seconds => $self->get('listViewPageInterval') );
+    my $dtEnd       = $dtStart->clone->add( seconds => $self->listViewPageInterval );
 
     my @events
         = $self->getEventsIn(
@@ -1133,7 +1126,7 @@ sub viewList {
         );
 
     ### Build the event vars
-    my $dtLast = $dtStart; # The DateTime of the last event
+    my $dtLast = WebGUI::DateTime->new(0); # The DateTime of the last event
     EVENT: for my $event (@events) {
         next EVENT unless $event && $event->canView();
         my ( %eventVar, %eventDate )
@@ -1142,12 +1135,15 @@ sub viewList {
         # Add the change flags
         my $dt  = $event->getDateTimeStart;
         if ( $dt->year > $dtLast->year ) {
-            $eventVar{ new_year } = 1;
-        }
-        if ( $dt->month > $dtLast->month ) {
+            $eventVar{ new_year }  = 1;
             $eventVar{ new_month } = 1;
+            $eventVar{ new_day }   = 1;
         }
-        if ( $dt->day > $dtLast->day ) {
+        elsif ( $dt->month > $dtLast->month ) {
+            $eventVar{ new_month } = 1;
+            $eventVar{ new_day }   = 1;
+        }
+        elsif ( $dt->day > $dtLast->day ) {
             $eventVar{ new_day } = 1;
         }
 
@@ -1163,7 +1159,7 @@ sub viewList {
     # Previous and next pages
     if ( $self->getFirstEvent && $self->getFirstEvent->getDateTimeStart < $dtStart ) {
         my $dtPrevious
-            = $dtStart->clone->add( seconds => 0 - $self->get('listViewPageInterval') );
+            = $dtStart->clone->add( seconds => 0 - $self->listViewPageInterval );
         $var->{ url_previousPage }
             = $self->getUrl( 'type=list;start=' . $dtPrevious->toDatabase );
     }
@@ -1220,7 +1216,7 @@ sub viewMonth {
 
     #### Create the template parameters
     ## The grid
-    my $first_dow     = $session->user->profileField("firstDayOfWeek") || 0;
+    my $first_dow     = $session->user->get("firstDayOfWeek") || 0;
                 # 0 - sunday
                 # 1 - mon
                 # 2 - tue
@@ -1353,7 +1349,7 @@ sub viewWeek {
     $dt->truncate( to => "day");
 
     # Apply First Day of Week settings
-    my $first_dow = $session->user->profileField("firstDayOfWeek") || 0;
+    my $first_dow = $session->user->get("firstDayOfWeek") || 0;
                 # 0 - sunday
                 # 1 - monday 
                 # 2 - tuesday, etc...
@@ -1364,7 +1360,7 @@ sub viewWeek {
     my $dtEnd   = $dt->clone->add(days => 7)->add( seconds => -1);
     my $end     = $dtEnd->toMysql; # Clone to prevent saving change
 
-    my $sort_by_sequence++ if $self->get('sortEventsBy') eq 'sequencenumber';
+    my $sort_by_sequence++ if $self->sortEventsBy eq 'sequencenumber';
     my $can_edit_order++ if $self->canEdit && $sort_by_sequence;
 
     my $reorder_request++ if $can_edit_order && $session->form->param( 'eventMove' ) =~ /^(?:UP|DOWN)$/;
@@ -1380,7 +1376,7 @@ sub viewWeek {
        for my $event ( @events ) {
            next unless $event->canView();
 
-           my $event_asset_id = $event->get( 'assetId' );
+           my $event_asset_id = $event->getId;
 
            # Add Event object use by assetId
            $event_asset_of{ $event_asset_id }{ object } = $event;
@@ -1486,7 +1482,7 @@ sub viewWeek {
 
            $session->db->dbh->do
                ("UPDATE Event SET sequenceNumber = ? WHERE assetId = ? AND revisionDate = ?",{},
-                $prev_seq_num-$incr, $event_asset_id, $event_object->get( 'revisionDate' )
+                $prev_seq_num-$incr, $event_asset_id, $event_object->revisionDate
                 );
 #          warn "Moved Asset New Seq Num: ".($prev_seq_num - $incr)." by $incr\n";
 
@@ -1515,7 +1511,7 @@ sub viewWeek {
 
            $session->db->dbh->do
                ("UPDATE Event SET sequenceNumber = ? WHERE assetId = ? AND revisionDate = ?",{},
-                $next_seq_num + $incr, $event_asset_id, $event_object->get( 'revisionDate' )
+                $next_seq_num + $incr, $event_asset_id, $event_object->revisionDate
                 );
 #          warn "Moved Asset New Seq Num: ".($next_seq_num + $incr)." by $incr\n";
        }
@@ -1571,7 +1567,7 @@ sub viewWeek {
         my %eventTemplateVariables = $self->getEventVars($event);
 
         foreach my $weekDay ($start_dow .. $end_dow) {
-            my $eventAssetId = $event->get( 'assetId' );
+            my $eventAssetId = $event->getId;
 
             my %hash = %eventTemplateVariables;
 
@@ -1665,28 +1661,6 @@ sub wrapIcal {
 
 #----------------------------------------------------------------------------
 
-=head2 www_edit ( )
-
-Adds a submenu to the default edit page that includes links to Add an Event.
-
-=cut
-
-sub www_edit {
-    my $self    = shift;
-    my $session = $self->session;
-    my $i18n    = WebGUI::International->new($session, 'Asset_Calendar');
-
-    return $session->privilege->insufficient() unless $self->canEdit;
-
-
-    return $self->getAdminConsole->render(
-            $self->getEditForm->print,
-            $i18n->get("assetName")
-        );
-}
-
-#----------------------------------------------------------------------------
-
 =head2 www_ical
 
 Export an iCalendar feed of this Events Calendar's events.
@@ -1712,7 +1686,7 @@ sub www_ical {
         my ($spectreTest) 
             = $self->session->db->quickArray(
                 "SELECT value FROM userSessionScratch WHERE sessionId=? and name=?",
-                [$adminId,$self->get("assetId")]
+                [$adminId,$self->getId]
             );
 
         if ($spectreTest eq "SPECTRE") {
@@ -1745,7 +1719,7 @@ sub www_ical {
             );
     }
     else {
-        $dt_end = $dt_start->clone->add( seconds => $self->get('icalInterval') );
+        $dt_end = $dt_start->clone->add( seconds => $self->icalInterval );
     }
 
     my $ical = WebGUI::ICal->new();
@@ -1809,7 +1783,7 @@ sub www_search {
         my %rules       = (
             keywords        => $keywords,
             classes         => ['WebGUI::Asset::Event'],
-            lineage         => [$self->get("lineage")],
+            lineage         => [$self->lineage],
             join            => "join Event on assetIndex.assetId=Event.assetId and assetIndex.revisionDate=Event.revisionDate",
             columns         => ['Event.startDate','Event.startTime'],
         );
@@ -1916,7 +1890,7 @@ sub www_search {
 
     # This is very bad! It should be $self->processStyle or whatnot.
     return $self->processStyle(
-        $self->processTemplate( $var, $self->get('templateIdSearch') )
+        $self->processTemplate( $var, $self->templateIdSearch )
     );
 }
 
@@ -1968,5 +1942,6 @@ toUserTimeZone methods of WebGUI::DateTime for to make less confusion.
 
 =cut
 
+__PACKAGE__->meta->make_immutable;
 1;
 

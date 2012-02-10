@@ -3,7 +3,7 @@ package WebGUI::HTML;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -39,6 +39,7 @@ A package for manipulating and massaging HTML.
  $html = WebGUI::HTML::makeAbsolute($session, $html);
  $html = WebGUI::HTML::processReplacements($session, $html);
  $html = WebGUI::HTML::splitTag([$tag,]$html[,$count]);    # defaults to ( 'p', $html, 1 )
+ $html = WebGUI::HTML::arrayToRow(@columnData);
 
 =head1 METHODS
 
@@ -46,6 +47,27 @@ These methods are available from this package:
 
 =cut
 
+
+#-------------------------------------------------------------------
+
+=head2 arrayToRow ( @columnData )
+
+Wraps each element of @columnData in a table cell tag, concatenates them all together,
+and then wraps that in table row tags.
+
+=head3 @columnData
+
+An array of strings to wrap.
+
+=cut
+
+sub arrayToRow {
+    my @columnData = @_;
+    my $output = '<tr><td>';
+    $output .= join '</td><td>', @columnData;
+    $output .= '</td></tr>';
+    return $output;
+}
 
 #-------------------------------------------------------------------
 
@@ -188,7 +210,7 @@ The text content to be formatted.
 =head3 contentType
 
 The content type to use as formatting. Valid types are 'text', 'code', and 'mixed'. The default contentType is 'mixed'.
-See also the contentType method in WebGUI::Form, WebGUI::HTMLForm, and WebGUI::FormProcessor.
+See also the WebGUI::Form::ContentType control
 
 =cut
 

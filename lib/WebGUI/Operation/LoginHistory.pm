@@ -1,7 +1,7 @@
 package WebGUI::Operation::LoginHistory;
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -53,7 +53,6 @@ sub www_viewLoginHistory {
         return $session->privilege->adminOnly() unless canView($session);
 	my ($output, $p, @row, $i, $sth, %data);
 	my $i18n = WebGUI::International->new($session);
-	tie %data, 'Tie::CPHash';
 	$sth = $session->db->read("select * from users,userLoginLog where users.userId=userLoginLog.userId order by userLoginLog.timeStamp desc");	
 	while (%data = $sth->hash) {
 		$data{username} = $i18n->get('unknown user') if ($data{userId} eq "0");

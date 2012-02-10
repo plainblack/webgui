@@ -3,7 +3,7 @@ package WebGUI::Form::CheckList;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -162,7 +162,7 @@ sub toHtml {
     $self->headTags;
     my $session = $self->session;
     my $output = '<fieldset style="border:none;margin:0;padding:0">';
-    $output .= WebGUI::Form::Hidden($session, { name => $self->privateName('isIn'), value => 1, });
+    $output .= WebGUI::Form::Hidden->new($session, { name => $self->privateName('isIn'), value => 1, })->toHtml;
 	my $alignment   = $self->alignmentSeparator;
 
     # Add the select all button

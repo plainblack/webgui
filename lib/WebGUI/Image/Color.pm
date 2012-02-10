@@ -356,7 +356,7 @@ sub setFillColor {
 		$self->setFillTriplet($1);
 		$self->setFillAlpha($2 || '00');
 	} else {
-		$self->session->errorHandler->fatal("Invalid fill color: ($color)");
+		$self->session->log->fatal("Invalid fill color: ($color)");
 	}
 }
 
@@ -380,7 +380,7 @@ sub setFillTriplet {
 		$self->{_properties}->{fillTriplet} = $triplet;
 		$self->update;
 	} else {
-		$self->session->errorHandler->fatal("Invalid fill triplet: ($triplet)");
+		$self->session->log->fatal("Invalid fill triplet: ($triplet)");
 	}
 }
 
@@ -404,7 +404,7 @@ sub setFillAlpha {
 		$self->{_properties}->{fillAlpha} = $alpha;
 		$self->update;
 	} else {
-		$self->session->errorHandler->fatal("Invalid fill alpha: ($alpha)");
+		$self->session->log->fatal("Invalid fill alpha: ($alpha)");
 	}
 }
 
@@ -448,7 +448,7 @@ sub setStrokeColor {
 		$self->setStrokeTriplet($1);
 		$self->setStrokeAlpha($2 || '00');
 	} else {
-		$self->session->errorHandler->fatal("Invalid stroke color: ($color)");
+		$self->session->log->fatal("Invalid stroke color: ($color)");
 	}
 }
 
@@ -472,7 +472,7 @@ sub setStrokeTriplet {
 		$self->{_properties}->{strokeTriplet} = $triplet;
 		$self->update;
 	} else {
-		$self->session->errorHandler->fatal("Invalid stroke triplet: ($triplet)");
+		$self->session->log->fatal("Invalid stroke triplet: ($triplet)");
 	}
 }
 
@@ -496,7 +496,7 @@ sub setStrokeAlpha {
 		$self->{_properties}->{strokeAlpha} = $alpha;
 		$self->update;
 	} else {
-		$self->session->errorHandler->fatal("Invalid stroke alpha: ($alpha)");
+		$self->session->log->fatal("Invalid stroke alpha: ($alpha)");
 	}
 }
 

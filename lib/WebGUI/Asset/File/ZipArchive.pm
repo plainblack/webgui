@@ -3,7 +3,7 @@ package WebGUI::Asset::File::ZipArchive;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -15,16 +15,36 @@ package WebGUI::Asset::File::ZipArchive;
 =cut
 
 use strict;
-use base 'WebGUI::Asset::File';
-use WebGUI::HTMLForm;
+
+use Moose;
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset::File';
+define assetName => ['assetName', 'Asset_ZipArchive'];
+define tableName => 'ZipArchiveAsset';
+define icon      => 'ziparchive.gif';
+property showPage => (
+            tab          => "properties",
+            label        => ['show page', 'Asset_ZipArchive'],
+            hoverHelp    => ['show page description', 'Asset_ZipArchive'],
+            fieldType    => 'text',
+            default      => 'index.html',
+         );
+property templateId => (
+            tab          => "display",
+            label        => ['template label', 'Asset_ZipArchive'],
+            hoverHelp    => ['template description', 'Asset_ZipArchive'],
+            namespace    => "ZipArchiveAsset",
+            fieldType    => 'template',
+            default      => 'ZipArchiveTMPL00000001',
+         );
+
+
 use WebGUI::SQL;
-use WebGUI::Utility;
 
 use Archive::Tar;
 use Archive::Zip;
 use Cwd ();
 use Scope::Guard ();
-
 
 
 =head1 NAME
@@ -77,7 +97,7 @@ sub unzip {
 	if ($filename =~ m/\.zip$/i) {
 		my $zip = Archive::Zip->new();
 		unless ($zip->read($filename) == $zip->AZ_OK){
-			$self->session->errorHandler->warn($i18n->get("zip_error"));
+			$self->session->log->warn($i18n->get("zip_error"));
 			return 0;
 		}
 		$zip->extractTree();
@@ -85,75 +105,16 @@ sub unzip {
 	} elsif ($filename =~ m/\.tar$/i) {
 		Archive::Tar->extract_archive($filepath.'/'.$filename,1);
 		if (Archive::Tar->error) {
-			$self->session->errorHandler->warn(Archive::Tar->error);
+			$self->session->log->warn(Archive::Tar->error);
 			return 0;
 		}
         $self->fixFilenames;
 	} else {
-		$self->session->errorHandler->warn($i18n->get("bad_archive"));
+		$self->session->log->warn($i18n->get("bad_archive"));
 	}
 
 	return 1;
 }
-
-#-------------------------------------------------------------------
-
-=head2 addRevision ( )
-
-This method exists for demonstration purposes only.  The superclass
-handles revisions to ZipArchive Assets.
-
-=cut
-
-sub addRevision {
-	my $self = shift;
-	my $newSelf = $self->SUPER::addRevision(@_);
-	return $newSelf;
-}
-
-#-------------------------------------------------------------------
-
-=head2 definition ( definition )
-
-Defines the properties of this asset.
-
-=head3 definition
-
-A hash reference passed in from a subclass definition.
-
-=cut
-
-sub definition {
-	my $class = shift;
-	my $session = shift;
-	my $definition = shift;
-	my $i18n = WebGUI::International->new($session,"Asset_ZipArchive");
-	push(@{$definition}, {
-		assetName=>$i18n->get('assetName'),
-		tableName=>'ZipArchiveAsset',
-		autoGenerateForms=>1,
-		icon=>'ziparchive.gif',
-		className=>'WebGUI::Asset::File::ZipArchive',
-		properties=>{
-			showPage=>{
-				tab=>"properties",
-				label=>$i18n->get('show page'),
-				hoverHelp=>$i18n->get('show page description'),
-				fieldType=>'text',
-				defaultValue=>'index.html'
-			},
-			templateId=>{
-				tab=>"display",
-				label=>$i18n->get('template label'),
-				namespace=>"ZipArchiveAsset",
-				fieldType=>'template',
-				defaultValue=>'ZipArchiveTMPL00000001',
-			},
-		}
-	});
-	return $class->SUPER::definition($session,$definition);
-}
-
 
 #-------------------------------------------------------------------
 
@@ -170,7 +131,7 @@ sub fixFilenames {
     my $files   = $storage->getFiles('all');
     FILE: foreach my $file (@{ $files }) {
         my $extension = $storage->getFileExtension($file);
-        next FILE unless isIn($extension, qw/pl perl pm cgi php asp sh/);
+        next FILE unless $extension ~~ [qw/pl perl pm cgi php asp sh/];
         my $newFile = $file;
         #$newFile =~ s/\.$extension$/_$extension.txt/;
         $newFile =~ s/\.$extension$/_$extension.txt/;
@@ -186,31 +147,31 @@ See WebGUI::Asset::prepareView() for details.
 
 =cut
 
-sub prepareView {
+override prepareView => sub {
 	my $self = shift;
-	$self->SUPER::prepareView();
-	my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId"));
+	super();
+	my $template = WebGUI::Asset::Template->newById($self->session, $self->get("templateId"));
 	$template->prepare($self->getMetaDataAsTemplateVariables);
 	$self->{_viewTemplate} = $template;
-}
+};
 
 
 #-------------------------------------------------------------------
 
-=head2 processPropertiesFromFormPost ( )
+=head2 processEditForm ( )
 
 Used to process properties from the form posted.  In this asset, we use
 this method to deflate the zip file into the proper folder
 
 =cut
 
-sub processPropertiesFromFormPost {
+override processEditForm => sub {
 	my $self = shift;
 	#File should be saved here by the superclass
-	$self->SUPER::processPropertiesFromFormPost;
+	super();
 	my $storage = $self->getStorageLocation();
 	
-	my $file = $self->get("filename");
+	my $file = $self->filename;
 	
 	#return undef unless $file;
 	my $i18n = WebGUI::International->new($self->session, 'Asset_ZipArchive');
@@ -228,10 +189,10 @@ sub processPropertiesFromFormPost {
 		return undef;
 	}
 	
-	unless ($self->unzip($storage,$self->get("filename"))) {
-		$self->session->errorHandler->warn($i18n->get("unzip_error"));
+	unless ($self->unzip($storage,$self->filename)) {
+		$self->session->log->warn($i18n->get("unzip_error"));
 	}
-}
+};
 
 
 #-------------------------------------------------------------------
@@ -245,52 +206,35 @@ used to show the file to administrators.
 
 sub view {
 	my $self = shift;
-	if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
-        my $cache = $self->getCache;
-        my $out   = $cache->get if defined $cache;
+    my $cache = $self->session->cache;
+    my $cacheKey = $self->getWwwCacheKey('view');
+    if (!$self->session->isAdminOn && $self->cacheTimeout > 10) {
+        my $out = $cache->get( $cacheKey );
 		return $out if $out;
 	}
 	my %var = %{$self->get};
-	#$self->session->errorHandler->warn($self->getId);
+	#$self->session->log->warn($self->getId);
 	$var{controls} = $self->getToolbar;
 	if($self->session->scratch->get("za_error")) {
 	   $var{error} = $self->session->scratch->get("za_error");
 	}
 	$self->session->scratch->delete("za_error");
 	my $storage = $self->getStorageLocation;
-	if($self->get("filename") ne "") {
-	   $var{fileUrl} = $storage->getUrl($self->get("showPage"));
-	   $var{fileIcon} = $storage->getFileIconUrl($self->get("showPage"));
+	if($self->filename ne "") {
+	   $var{fileUrl} = $storage->getUrl($self->showPage);
+	   $var{fileIcon} = $storage->getFileIconUrl($self->showPage);
 	}
-	unless($self->get("showPage")) {
+	unless($self->showPage) {
 	   $var{pageError} = "true";
 	}
 	my $i18n = WebGUI::International->new($self->session,"Asset_ZipArchive");
 	$var{noInitialPage} = $i18n->get('noInitialPage');
 	$var{noFileSpecified} = $i18n->get('noFileSpecified');
        	my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
-	if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
-		WebGUI::Cache->new($self->session,"view_".$self->getId)->set($out,$self->get("cacheTimeout"));
-	}
-       	return $out;
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 www_edit ( )
-
-Web facing method which is the default edit page
-
-=cut
-
-sub www_edit {
-    my $self = shift;
-    return $self->session->privilege->insufficient() unless $self->canEdit;
-    return $self->session->privilege->locked() unless $self->canEditIfLocked;
-	my $i18n = WebGUI::International->new($self->session, 'Asset_Wobject');
-	my $addEdit = ($self->session->form->process("func") eq 'add') ? $i18n->get('add') : $i18n->get('edit');
-    return $self->getAdminConsole->render($self->getEditForm->print, $self->addEditLabel);
+    if (!$self->session->isAdminOn && $self->cacheTimeout > 10) {
+        $cache->set( $cacheKey, $out, $self->cacheTimeout);
+    }
+    return $out;
 }
 
 #-------------------------------------------------------------------
@@ -305,13 +249,14 @@ Web facing method which is the default view page.  This method does a
 sub www_view {
 	my $self = shift;
 	return $self->session->privilege->noAccess() unless $self->canView;
-	if ($self->session->var->isAdminOn) {
+	if ($self->session->isAdminOn) {
 		return $self->session->asset($self->getContainer)->www_view;
 	}
-	$self->session->http->setRedirect($self->getFileUrl($self->getValue("showPage")));
+	$self->session->response->setRedirect($self->getFileUrl($self->showPage));
 	return "1";
 }
 
 
+__PACKAGE__->meta->make_immutable;
 1;
 

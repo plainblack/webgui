@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -14,7 +14,6 @@ use lib "$FindBin::Bin/../../lib";
 
 use WebGUI::Test;
 use WebGUI::Session;
-use WebGUI::Utility;
 use WebGUI::Workflow::Activity::UpdateAssetSubscribers;
 use WebGUI::Asset;
 
@@ -32,16 +31,14 @@ my $betterGroup     = WebGUI::Group->new($session, "new");  ##New group for grou
 my $oldUser         = WebGUI::User->create($session);       ##User who should be unsubscribed
 my $betterUser      = WebGUI::User->create($session);       ##User who should remain subscribed
 my $otherUser       = WebGUI::User->create($session);       ##Just a user, we should never see him
-my $root = WebGUI::Asset->getRoot($session);
+my $root = WebGUI::Test->asset;
 my $cs = $root->addChild({
     className           => 'WebGUI::Asset::Wobject::Collaboration',
     title               => 'Test Calendar',
     subscriptionGroupId => $subscriberGroup->getId,
     groupIdView         => $betterGroup->getId,
 });
-my $tag = WebGUI::VersionTag->getWorking($session);
-$tag->commit;
-WebGUI::Test->addToCleanup($tag, $oldGroup, $subscriberGroup, $betterGroup, $oldUser, $betterUser, $otherUser);
+WebGUI::Test->addToCleanup($oldGroup, $subscriberGroup, $betterGroup, $oldUser, $betterUser, $otherUser);
 
 $subscriberGroup->addUsers([$oldUser->getId, $betterUser->getId, ]);
 $betterGroup->addUsers([$betterUser->getId, ]);
@@ -63,7 +60,7 @@ my $instance1 = WebGUI::Workflow::Instance->create($session,
         workflowId              => $workflow->getId,
         skipSpectreNotification => 1,
         className  => 'WebGUI::Asset',
-        methodName => 'newByDynamicClass',
+        methodName => 'newById',
         parameters => $cs->getId,
     }
 );

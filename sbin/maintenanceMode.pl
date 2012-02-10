@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -11,17 +11,9 @@
 #-------------------------------------------------------------------
 
 use strict;
-use File::Basename ();
-use File::Spec;
-
-my $webguiRoot;
-BEGIN {
-    $webguiRoot = File::Spec->rel2abs(File::Spec->catdir(File::Basename::dirname(__FILE__), File::Spec->updir));
-    unshift @INC, File::Spec->catdir($webguiRoot, 'lib');
-}
-
 use Getopt::Long;
 use Pod::Usage;
+use WebGUI::Paths -inc;
 use WebGUI::Session;
 
 my $help;
@@ -40,10 +32,20 @@ pod2usage( verbose => 2 ) if $help;
 pod2usage() if $configFile eq "";
 
 
-my $session = WebGUI::Session->open($webguiRoot,$configFile);
+my $session = WebGUI::Session->open($configFile);
 $session->setting->remove('specialState');
 $session->setting->add('specialState','upgrading') unless $stop;
-$session->var->end;
+
+my $upgradeState = $session->setting->get('upgradeState');
+if( $upgradeState eq WebGUI->VERSION ) {
+    $session->setting->remove('upgradeState');
+}
+elsif( $upgradeState ) {
+    print "Warning!  WebGUI will continue to show the maintenance screen due to database/code version mismatch:\n";
+    print "Code: @{[ WebGUI->VERSION ]} versus upgradeState setting in database: $upgradeState\n";
+}                  
+
+$session->end;
 $session->close;
 
 __END__
@@ -88,6 +90,6 @@ Shows this documentation, then exits.
 
 =head1 AUTHOR
 
-Copyright 2001-2009 Plain Black Corporation.
+Copyright 2001-2012 Plain Black Corporation.
 
 =cut

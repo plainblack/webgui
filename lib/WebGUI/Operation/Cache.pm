@@ -1,7 +1,7 @@
 package WebGUI::Operation::Cache;
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -12,7 +12,6 @@ package WebGUI::Operation::Cache;
 
 use strict;
 use WebGUI::AdminConsole;
-use WebGUI::Cache;
 use WebGUI::International;
 use WebGUI::Form;
 
@@ -93,7 +92,7 @@ sub www_flushCache {
     return $session->privilege->adminOnly unless canView($session);
 
     # Flush the cache
-    WebGUI::Cache->new($session)->flush;
+    $session->cache->clear;
 
     return www_manageCache($session);
 }
@@ -110,20 +109,15 @@ provides an option to clear the cache.
 sub www_manageCache {
     my $session     = shift;
     return $session->privilege->adminOnly unless canView($session);
-    my $cache       = WebGUI::Cache->new($session);
     my $flushURL    = $session->url->page('op=flushCache');
     my $i18n        = WebGUI::International->new($session);
-    my $output 
-        = '<table>'
-        . '<tr><td align="right" class="tableHeader">'.$i18n->get('cache type').':</td><td class="tableData">'.ref($cache).'</td></tr>'
-        . '<tr><td align="right" valign="top" class="tableHeader">'.$i18n->get('cache statistics').':</td><td class="tableData"><pre>'.$cache->stats.'</pre></td></tr>'
-        . '<tr><td align="right" valign="top" class="tableHeader">&nbsp;</td><td class="tableData">'
-        . WebGUI::Form::button($session, {
+    my $output =
+        WebGUI::Form::formHeader($session)
+         .WebGUI::Form::button($session, {
             value   => $i18n->get("clear cache"),
             extras  => qq{onclick="document.location.href='$flushURL';"},
         }) 
-        . '</td></tr>'
-        . '</table>'
+         .WebGUI::Form::formFooter($session)
         ;
 
     return _submenu($session,$output);

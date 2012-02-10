@@ -3,7 +3,7 @@ package WebGUI::Session::Scratch;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -16,7 +16,7 @@ package WebGUI::Session::Scratch;
 
 use strict;
 use WebGUI::International;
-use Scalar::Util qw( weaken );
+use Scalar::Util qw(weaken);
 
 =head1 NAME
 
@@ -64,7 +64,10 @@ sub delete {
 	my $name = shift;
 	return undef unless ($name);
 	my $value = delete $self->{_data}{$name};
-	$self->session->db->write("delete from userSessionScratch where name=? and sessionId=?", [$name, $self->session->getId]);
+    my $session = $self->session;
+    my $id = $session->getId;
+    $session->cache->set("sessionscratch_".$id, $self->{_data}, $session->setting->get('sessionTimeout'));
+	$session->db->write("delete from userSessionScratch where name=? and sessionId=?", [$name, $id]);
 	return $value;
 }
 
@@ -80,7 +83,10 @@ Deletes all scratch variables for this session.
 sub deleteAll {
 	my $self = shift;
 	delete $self->{_data};
-	$self->session->db->write("delete from userSessionScratch where sessionId=?", [$self->session->getId]);
+    my $session = $self->session;
+    my $id = $session->getId;
+    $session->cache->remove("sessionscratch_".$id);
+	$session->db->write("delete from userSessionScratch where sessionId=?", [$id]);
 }
 
 
@@ -101,7 +107,9 @@ sub deleteName {
 	my $name = shift;
 	return undef unless ($name);	
 	delete $self->{_data}{$name};
-	$self->session->db->write("delete from userSessionScratch where name=?", [$name]);
+    my $session = $self->session;
+    $session->cache->clear;
+	$session->db->write("delete from userSessionScratch where name=?", [$name]);
 }
 
 #-------------------------------------------------------------------
@@ -126,23 +134,10 @@ sub deleteNameByValue {
 	my $value = shift;
 	return undef unless ($name and defined $value);
 	delete $self->{_data}{$name} if ($self->{_data}{$name} eq $value);
-	$self->session->db->write("delete from userSessionScratch where name=? and value=?", [$name,$value]);
+    my $session = $self->session;
+    $session->cache->clear;
+	$session->db->write("delete from userSessionScratch where name=? and value=?", [$name,$value]);
 }
-
-
-#-------------------------------------------------------------------
-
-=head2 DESTROY ( )
-
-Deconstructor.
-
-=cut
-
-sub DESTROY {
-        my $self = shift;
-        undef $self;
-}
-
 
 #-------------------------------------------------------------------
 
@@ -157,8 +152,7 @@ The name of the variable.
 =cut
 
 sub get {
-	my $self = shift;
-	my $var = shift;
+    my ($self, $var) = @_;
 	return $self->{_data}{$var};
 }
 
@@ -189,12 +183,15 @@ The current session.
 =cut
 
 sub new {
-	my $class = shift;
-	my $session = shift;
-	my $data = $session->db->buildHashRef("select name,value from userSessionScratch where sessionId=?",[$session->getId], {noOrder => 1});
-	my $self = bless {_session=>$session, _data=>$data}, $class;
-        weaken( $self->{_session} );
-        return $self;
+    my ($class, $session) = @_;
+    my $self = bless { _session => $session }, $class;
+    weaken $self->{_session};
+    my $scratch = $session->cache->get("sessionscratch_".$session->getId);
+    unless (ref $scratch eq "HASH") {
+	    $scratch = $session->db->buildHashRef("select name,value from userSessionScratch where sessionId=?",[$session->getId], {noOrder => 1});
+    }
+    $self->{_data} = $scratch;
+    return $self;
 }
 
 #-------------------------------------------------------------------
@@ -240,12 +237,13 @@ The value of the scratch variable.  Must be a string no longer than 16000 charac
 =cut
 
 sub set {
-	my $self = shift;
-	my $name = shift;
-	my $value = shift;
+    my ($self, $name, $value) = @_;
 	return undef unless ($name);
 	$self->{_data}{$name} = $value;
-	$self->session->db->write("insert into userSessionScratch (sessionId, name, value) values (?,?,?) on duplicate key update value=VALUES(value)", [$self->session->getId, $name, $value]);
+    my $session = $self->session;
+    my $id = $session->getId;
+    $session->cache->set("sessionscratch_".$id, $self->{_data}, $session->setting->get('sessionTimeout'));
+	$session->db->write("replace into userSessionScratch (sessionId, name, value) values (?,?,?)", [$id, $name, $value]);
 }
 
 #----------------------------------------------------------------------

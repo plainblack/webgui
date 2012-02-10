@@ -3,7 +3,7 @@ package WebGUI::Form::Textarea;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -77,7 +77,7 @@ sub definition {
 			defaultValue=> 150
         },
 		width=>{
-			defaultValue=> 400
+			defaultValue=> '100%',
         },
 		style=>{
 			defaultValue => undef,
@@ -129,20 +129,14 @@ sub headTags {
     my $self = shift;
 	my ($style, $url) = $self->session->quick(qw(style url));
     if ($self->get("resizable")) {
-        $style->setLink($url->extras("yui/build/resize/assets/skins/sam/resize.css"), {type=>"text/css", rel=>"stylesheet"});
-        $style->setScript($url->extras("yui/build/utilities/utilities.js"), {type=>"text/javascript"});
-        $style->setScript($url->extras("yui/build/resize/resize-min.js"), {type=>"text/javascript"});
+        $style->setCss($url->extras("yui/build/resize/assets/skins/sam/resize.css"));
+        $style->setScript($url->extras("yui/build/utilities/utilities.js"));
+        $style->setScript($url->extras("yui/build/resize/resize-min.js"));
     }
     if ($self->get('maxlength')) {
         # Add the maxlength script
-        $style->setScript(
-            $url->extras( 'yui/build/yahoo-dom-event/yahoo-dom-event.js' ),
-            { type => 'text/javascript' },
-        );
-        $style->setScript(
-            $url->extras( 'yui-webgui/build/form/textarea.js' ),
-            { type => 'text/javascript' },
-        );
+        $style->setScript( $url->extras( 'yui/build/yahoo-dom-event/yahoo-dom-event.js' ));
+        $style->setScript( $url->extras( 'yui-webgui/build/form/textarea.js' ));
     }
 }
 

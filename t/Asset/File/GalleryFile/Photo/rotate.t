@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -8,9 +8,7 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../../../../lib";
 
 # The goal of this test is to confirm correct rotation of all files attached
 # to a Photo asset after calling the rotate method.
@@ -27,50 +25,27 @@ use Test::Deep;
 # Init
 my $session    = WebGUI::Test->session;
 my $node       = WebGUI::Asset->getImportNode($session);
-my $versionTag = WebGUI::VersionTag->getWorking($session);
-
-# Name version tag and make sure it gets cleaned up
-$versionTag->set({name=>"Photo rotation test"});
-addToCleanup($versionTag);
 
 # Create gallery and a single album
 my $gallery
-    = $node->addChild({
+    = WebGUI::Test->asset(
         className           => "WebGUI::Asset::Wobject::Gallery",
         imageResolutions    => "1024",
-    },
-    undef,
-    undef,
-    {
-        skipAutoCommitWorkflows => 1,
-    });
+    );
 my $album
     = $gallery->addChild({
         className           => "WebGUI::Asset::Wobject::GalleryAlbum",
-    },
-    undef,
-    undef,
-    {
-        skipAutoCommitWorkflows => 1,
     });
 
 # Create single photo inside the album    
 my $photo
     = $album->addChild({
         className           => "WebGUI::Asset::File::GalleryFile::Photo",
-    },
-    undef,
-    undef,
-    {
-        skipAutoCommitWorkflows => 1,
     });
 
 # Attach image file to photo asset (setFile also makes download versions)
 $photo->setFile( WebGUI::Test->getTestCollateralPath("rotation_test.png") );
 my $storage = $photo->getStorageLocation;
-
-# Commit all changes
-$versionTag->commit;
 
 #----------------------------------------------------------------------------
 

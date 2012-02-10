@@ -3,7 +3,7 @@ package WebGUI::Session::Icon;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -16,8 +16,8 @@ package WebGUI::Session::Icon;
 
 use strict;
 use WebGUI::International;
-use Scalar::Util qw( weaken );
-
+use Tie::IxHash;
+use Scalar::Util qw(weaken);
 
 =head1 NAME
 
@@ -64,14 +64,104 @@ Returns the base URL for this user's toolbar icon set.
 sub getBaseURL {
 	my $self = shift;
 	my $url = $self->session->url->extras('toolbar/');
-	my $toolbar = $self->session->user->profileField("toolbar");
+	my $toolbar = $self->session->user->get("toolbar");
 	if ($toolbar ne "useLanguageDefault") {
 		$url .= $toolbar;
 	} else {
-		$url .= WebGUI::International->new($self->session,'Icon')->getLanguage($self->session->user->profileField("language"),"toolbar");
+		$url .= WebGUI::International->new($self->session,'Icon')->getLanguage($self->session->user->get("language"),"toolbar");
 	}
 	$url .= '/';	
 	return $url;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 _basic ( )
+
+Returns a basic icon with i18n title and alt text.
+
+=head3 $i18n_tag
+
+The name of an i18n tag to show for the TITLE and ALT properties in the image tag.
+
+=head3 $icon_name
+
+The name of an icon, such as delete, edit, manage, moveLeft, etc.  See /data/WebGUI/www/extras/toolbar/bullet for a full list.
+
+=head3 $url_params
+
+Parameters to append to the URL.
+
+=head3 $pageURL
+
+The URL of a page to call.  If empty, defaults to the current page which is fine for most operations.
+
+=cut
+
+sub _basic {
+    my $self       = shift;
+    my $i18n_tag   = shift;
+    my $icon_name  = shift;
+    my $url_params = shift;
+    my $pageURL    = shift || $self->session->url->getRequestedUrl;
+	my $i18n       = WebGUI::International->new($self->session,'Icon');
+    my $tag        = $i18n->get($i18n_tag);
+    my $output     = '<span class="toolbarIcon" style="vertical-align:middle;"><a href="'
+                   . $self->session->url->gateway($pageURL,$url_params)
+                   . '">';
+    $output        .= '<img src="'.$self->getBaseURL().$icon_name.'" style="vertical-align:middle;border: 0px;" alt="'.$tag.'" title="'.$tag.'" /></a></span>';
+    return $output;
+}
+
+#-------------------------------------------------------------------
+
+=head2 _form_with_confirmation ( )
+
+Generates a form containing an icon.  When the icon is clicked, it pops up a confirmation window, and submits
+the form if the confirmation is accepted.
+
+=head3 $i18n_tag
+
+The name of an i18n tag to show for the TITLE and ALT properties in the image tag.
+
+=head3 $icon_name
+
+The name of an icon, such as delete, edit, manage, moveLeft, etc.  See /data/WebGUI/www/extras/toolbar/bullet for a full list.
+
+=head3 $url_params
+
+Parameters to append to the URL.
+
+=head3 $pageURL
+
+The URL of a page to call.  If empty, defaults to the current page which is fine for most operations.
+
+=head3 $confirm
+
+Text to show to the user in the pop-up confirmation for the action.
+
+=cut
+
+sub _form_with_confirmation {
+    my $self       = shift;
+    my $session    = $self->session;
+    my $i18n_tag   = shift;
+    my $icon_name  = shift;
+    my $url_params = shift;
+    my $pageURL    = shift || $session->url->getRequestedUrl;
+    my $confirm    = shift;
+
+	my $i18n   = WebGUI::International->new($session,'Icon');
+    my $tag    = $i18n->get($i18n_tag);
+    ##Escape JS characters
+    $confirm   =~ s/([\\\'])/\\$1/g;
+    use WebGUI::Form;
+    my $output = WebGUI::Form::formHeader($session, { action => $session->url->append($pageURL,$url_params), });
+    $output   .= q|<span class="toolbarIcon" style="vertical-align:middle;"><a href="#" onclick="var ack = confirm('|.$confirm.q|'); if (ack) {this.form.submit();} return false;">|;
+    $output   .= '<img src="'.$self->getBaseURL().$icon_name.'" style="vertical-align:middle;border: 0px;" alt="'.$tag.'" title="'.$tag.'" /></a></span>';
+    $output   .= WebGUI::Form::formFooter();
+    return $output;
 }
 
 
@@ -93,13 +183,8 @@ file will be prepended to it.
 =cut
 
 sub copy {
-	my $self = shift;
-	my $urlParams = shift;
-	my $pageURL = shift || $self->session->url->getRequestedUrl;
-	my $i18n = WebGUI::International->new($self->session,'Icon');
-        my $output = '<span class="toolbarIcon" style="vertical-align:middle;"><a href="'.$self->session->url->gateway($pageURL,$urlParams).'">';
-        $output .= '<img src="'.$self->getBaseURL().'copy.gif" style="vertical-align:middle;border: 0px;" alt="'.$i18n->get('Copy').'" title="'.$i18n->get('Copy').'" /></a></span>';
-        return $output;
+    my $self = shift;
+    return $self->_basic('Copy', 'copy.gif', @_);
 }
 
 #-------------------------------------------------------------------
@@ -120,28 +205,9 @@ file will be prepended to it.
 =cut
 
 sub cut {
-	 my $self = shift;
-        my $urlParams = shift;
-        my $pageURL = shift || $self->session->url->getRequestedUrl;
-	my $i18n = WebGUI::International->new($self->session,'Icon');
-        my $output = '<span class="toolbarIcon" style="vertical-align:middle;"><a href="'.$self->session->url->gateway($pageURL,$urlParams).'">';
-        $output .= '<img src="'.$self->getBaseURL().'cut.gif" style="vertical-align:middle;border: 0px;" alt="'.$i18n->get('Cut').'" title="'.$i18n->get('Cut').'" /></a></span>';
-        return $output;
+    my $self = shift;
+    return $self->_basic('Cut', 'cut.gif', @_);
 }
-
-#-------------------------------------------------------------------
-
-=head2 DESTROY ( )
-
-Deconstructor.
-
-=cut
-
-sub DESTROY {
-        my $self = shift;
-        undef $self;
-}
-
 
 #-------------------------------------------------------------------
 
@@ -181,6 +247,32 @@ sub delete {
 
 #-------------------------------------------------------------------
 
+=head2 delete_with_form ( urlParameters [, pageURL, confirmText ] )
+
+Generates a button that represents a delete operation inside of a form for CSRF purposes.
+
+=head3 urlParameters
+
+Any URL parameters that need to be tacked on to the current URL to accomplish whatever function this button represents.
+
+=head3 pageURL
+
+The URL to any page. Defaults to the current page.  If a URL is passed, the gateway URL from the site's config
+file will be prepended to it.
+
+=head3 confirmText 
+
+If defined, a confirm box will popup to ask the user if they want to delete.
+
+=cut
+
+sub delete_with_form {
+    my $self = shift;
+    return $self->_form_with_confirmation('Delete', 'delete.gif', @_);
+}
+
+#-------------------------------------------------------------------
+
 =head2 drag ( extras )
 
 Generates an icon that can be used to drag content.
@@ -216,13 +308,8 @@ file will be prepended to it.
 =cut
 
 sub edit {
-	 my $self = shift;
-        my $urlParams = shift;
-        my $pageURL = shift || $self->session->url->getRequestedUrl;
-	my $i18n = WebGUI::International->new($self->session,'Icon');
-        my $output = '<span class="toolbarIcon" style="vertical-align:middle;"><a href="'.$self->session->url->gateway($pageURL,$urlParams).'">';
-        $output .= '<img src="'.$self->getBaseURL().'edit.gif" style="vertical-align:middle;border: 0px;" alt="'.$i18n->get('Edit').'" title="'.$i18n->get('Edit').'" /></a></span>';
-        return $output;
+    my $self = shift;
+    return $self->_basic('Edit', 'edit.gif', @_);
 }
 
 #-------------------------------------------------------------------
@@ -244,13 +331,8 @@ file will be prepended to it.
 =cut
 
 sub export {
-	 my $self = shift;
-        my $urlParams = shift;
-        my $pageURL = shift || $self->session->url->getRequestedUrl;
-	my $i18n = WebGUI::International->new($self->session,'Icon');
-        my $output = '<span class="toolbarIcon" style="vertical-align:middle;"><a href="'.$self->session->url->gateway($pageURL,$urlParams).'">';
-        $output .= '<img src="'.$self->getBaseURL().'export.gif" style="vertical-align:middle;border: 0px;" alt="'.$i18n->get('Export').'" title="'.$i18n->get('Export').'" /></a></span>';
-        return $output;
+    my $self = shift;
+    return $self->_basic('Export', 'export.gif', @_);
 }
 
 #-------------------------------------------------------------------
@@ -267,7 +349,7 @@ sub getToolbarOptions {
 	my $self = shift;
 	$options{useLanguageDefault} = WebGUI::International->new($self->session,'WebGUI')->get(1084);
 	my $dir = $self->session->config->get("extrasPath")."/toolbar";
-        opendir (DIR,$dir) or $self->session->errorHandler->warn("Can't open toolbar directory!: $!");
+        opendir (DIR,$dir) or $self->session->log->warn("Can't open toolbar directory!: $!");
         my @files = readdir(DIR);
         foreach my $file (@files) {
                 if (substr($file,0,1) ne ".") {
@@ -297,13 +379,8 @@ file will be prepended to it.
 =cut
 
 sub locked {
-	 my $self = shift;
-        my $urlParams = shift;
-        my $pageURL = shift || $self->session->url->getRequestedUrl;
-	my $i18n = WebGUI::International->new($self->session,'Icon');
-        my $output = '<span class="toolbarIcon" style="vertical-align:middle;"><a href="'.$self->session->url->gateway($pageURL,$urlParams).'">';
-        $output .= '<img src="'.$self->getBaseURL().'locked.gif" style="vertical-align:middle;border: 0px;" alt="'.$i18n->get('locked').'" title="'.$i18n->get('locked').'" /></a></span>';
-        return $output;
+    my $self = shift;
+    return $self->_basic('locked', 'locked.gif', @_);
 }
 
 #-------------------------------------------------------------------
@@ -325,13 +402,8 @@ file will be prepended to it.
 =cut
 
 sub manage {
-	 my $self = shift;
-        my $urlParams = shift;
-        my $pageURL = shift || $self->session->url->getRequestedUrl;
-	my $i18n = WebGUI::International->new($self->session,'Icon');
-        my $output = '<span class="toolbarIcon" style="vertical-align:middle;"><a href="'.$self->session->url->gateway($pageURL,$urlParams).'">';
-        $output .= '<img src="'.$self->getBaseURL().'manage.gif" style="vertical-align:middle;border: 0px;" alt="'.$i18n->get('Manage').'" title="'.$i18n->get('Manage').'" /></a></span>';
-        return $output;
+    my $self = shift;
+    return $self->_basic('Manage', 'manage.gif', @_);
 }
 
 #-------------------------------------------------------------------
@@ -353,13 +425,8 @@ file will be prepended to it.
 =cut
 
 sub moveBottom {
-	 my $self = shift;
-        my $urlParams = shift;
-        my $pageURL = shift || $self->session->url->getRequestedUrl;
-	my $i18n = WebGUI::International->new($self->session,'Icon');
-        my $output = '<span class="toolbarIcon" style="vertical-align:middle;"><a href="'.$self->session->url->gateway($pageURL,$urlParams).'">';
-        $output .= '<img src="'.$self->getBaseURL().'moveBottom.gif" style="vertical-align:middle;border: 0px;" alt="'.$i18n->get('Move To Bottom').'" title="'.$i18n->get('Move To Bottom').'" /></a></span>';
-        return $output;
+    my $self = shift;
+    return $self->_basic('Move To Bottom', 'moveBotom.gif', @_);
 }
 
 #-------------------------------------------------------------------
@@ -417,13 +484,8 @@ file will be prepended to it.
 =cut
 
 sub moveLeft {
-	 my $self = shift;
-        my $urlParams = shift;
-        my $pageURL = shift || $self->session->url->getRequestedUrl;
-	my $i18n = WebGUI::International->new($self->session,'Icon');
-        my $output = '<span class="toolbarIcon" style="vertical-align:middle;"><a href="'.$self->session->url->gateway($pageURL,$urlParams).'">';
-        $output .= '<img src="'.$self->getBaseURL().'moveLeft.gif" style="vertical-align:middle;border: 0px;" alt="'.$i18n->get('Move Left').'" title="'.$i18n->get('Move Left').'" /></a></span>';
-        return $output;
+    my $self = shift;
+    return $self->_basic('Move Left', 'moveLeft.gif', @_);
 }
 
 #-------------------------------------------------------------------
@@ -445,13 +507,8 @@ file will be prepended to it.
 =cut
 
 sub moveRight {
-	 my $self = shift;
-        my $urlParams = shift;
-        my $pageURL = shift || $self->session->url->getRequestedUrl;
-	my $i18n = WebGUI::International->new($self->session,'Icon');
-        my $output = '<span class="toolbarIcon" style="vertical-align:middle;"><a href="'.$self->session->url->gateway($pageURL,$urlParams).'">';
-        $output .= '<img src="'.$self->getBaseURL().'moveRight.gif" style="vertical-align:middle;border: 0px;" alt="'.$i18n->get('Move Right').'" title="'.$i18n->get('Move Right').'" /></a></span>';
-        return $output;
+    my $self = shift;
+    return $self->_basic('Move Right', 'moveRight.gif', @_);
 }
 
 #-------------------------------------------------------------------
@@ -473,13 +530,8 @@ file will be prepended to it.
 =cut
 
 sub moveTop {
-	 my $self = shift;
-        my $urlParams = shift;
-        my $pageURL = shift || $self->session->url->getRequestedUrl;
-	my $i18n = WebGUI::International->new($self->session,'Icon');
-        my $output = '<span class="toolbarIcon" style="vertical-align:middle;"><a href="'.$self->session->url->gateway($pageURL,$urlParams).'">';
-        $output .= '<img src="'.$self->getBaseURL().'moveTop.gif" style="vertical-align:middle;border: 0px;" alt="'.$i18n->get('Move To Top').'" title="'.$i18n->get('Move To Top').'" /></a></span>';
-        return $output;
+    my $self = shift;
+    return $self->_basic('Move To Top', 'moveTop.gif', @_);
 }
 
 #-------------------------------------------------------------------
@@ -534,9 +586,9 @@ A reference to the current session.
 sub new {
 	my $class = shift;
 	my $session = shift;
-	my $self = bless {_session=>$session}, $class;
-        weaken( $self->{_session} );
-        return $self;
+    my $self = bless { _session => $session }, $class;
+    weaken $self->{_session};
+    return $self;
 }
 
 
@@ -573,13 +625,8 @@ file will be prepended to it.
 =cut
 
 sub shortcut {
-	 my $self = shift;
-        my $urlParams = shift;
-        my $pageURL = shift || $self->session->url->getRequestedUrl;
-	my $i18n = WebGUI::International->new($self->session,'Icon');
-        my $output = '<span class="toolbarIcon" style="vertical-align:middle;"><a href="'.$self->session->url->gateway($pageURL,$urlParams).'">';
-        $output .= '<img src="'.$self->getBaseURL().'shortcut.gif" style="vertical-align:middle;border: 0px;" alt="'.$i18n->get('Create Shortcut').'" title="'.$i18n->get('Create Shortcut').'" /></a></span>';
-        return $output;
+    my $self = shift;
+    return $self->_basic('Create Shortcut', 'shortcut.gif', @_);
 }
 
 #-------------------------------------------------------------------
@@ -601,13 +648,8 @@ file will be prepended to it.
 =cut
 
 sub view {
-	 my $self = shift;
-        my $urlParams = shift;
-        my $pageURL = shift || $self->session->url->getRequestedUrl;
-	my $i18n = WebGUI::International->new($self->session,'Icon');
-        my $output = '<span class="toolbarIcon" style="vertical-align:middle;"><a href="'.$self->session->url->gateway($pageURL,$urlParams).'">';
-        $output .= '<img src="'.$self->getBaseURL().'view.gif" style="vertical-align:middle;border: 0px;" alt="'.$i18n->get('View').'" title="'.$i18n->get('View').'" /></a></span>';
-        return $output;
+    my $self = shift;
+    return $self->_basic('View', 'view.gif', @_);
 }
 
 

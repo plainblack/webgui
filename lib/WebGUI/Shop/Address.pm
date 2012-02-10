@@ -3,7 +3,7 @@ package WebGUI::Shop::Address;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -15,7 +15,91 @@ package WebGUI::Shop::Address;
 =cut
 
 use strict;
-use Class::InsideOut qw{ :std };
+use Moose;
+use WebGUI::Definition;
+
+property label => (
+    noFormPost => 1,
+    default    => '',
+);
+
+property firstName => (
+    noFormPost => 1,
+    default    => '',
+);
+
+property lastName => (
+    noFormPost => 1,
+    default    => '',
+);
+
+property address1 => (
+    noFormPost => 1,
+    default    => '',
+);
+
+property address2 => (
+    noFormPost => 1,
+    default    => '',
+);
+
+property address3 => (
+    noFormPost => 1,
+    default    => '',
+);
+
+property city => (
+    noFormPost => 1,
+    default    => '',
+);
+
+property state => (
+    noFormPost => 1,
+    default    => '',
+);
+
+property code => (
+    noFormPost => 1,
+    default    => '',
+);
+
+property country => (
+    noFormPost => 1,
+    default    => '',
+);
+
+property phoneNumber => (
+    noFormPost => 1,
+    default    => '',
+);
+
+property email => (
+    noFormPost => 1,
+    default    => '',
+);
+
+property organization => (
+    noFormPost => 1,
+    default    => '',
+);
+
+property "addressBookId" => (
+    noFormPost => 1,
+    required   => 1,
+);
+
+property "isProfile" => (
+    noFormPost => 1,
+    required   => 0,
+    default    => 0,
+);
+
+has [ qw/addressId addressBook/] => (
+    is => 'ro',
+    required => 1,
+);
+
+use Scalar::Util qw/blessed/;
 use WebGUI::Exception::Shop;
 
 =head1 NAME
@@ -39,179 +123,30 @@ These subroutines are available from this package:
 
 =cut
 
-readonly addressBook => my %addressBook;
-private properties => my %properties;
-
 #-------------------------------------------------------------------
 
-=head2 addressBook ( )
+=head2 new ( $book, $addressId )
 
-Returns a reference to the Address Book.
+Constructor.  Instanciates an address based upon an addressId.
 
-=cut
+=head2 new ( $book, $properties )
 
-#-------------------------------------------------------------------
+Constructor.  Builds a new, default address.
 
-=head2 create ( addressBook, address)
+=head2 new ( $properties )
 
-Constructor. Adds an address to an address book. Returns a reference to the address.
+Constructor.  Builds a new, default address book object in Moose style with default properties set by $properties. This does not
+persist them to the database automatically.  This needs to be done via $self->write.
 
-=head3 addressBook
+=head3 $addressBook
 
-A reference to a WebGUI::Shop::AddressBook object.
+A reference to an addressBook object
 
-=head3 address
+=head3 $addressId
 
-A hash reference containing the properties to set in the address.
+The unique id of an address to instanciate.
 
-=cut
-
-sub create {
-    my ($class, $book, $addressData) = @_;
-    unless (defined $book && $book->isa("WebGUI::Shop::AddressBook")) {
-        WebGUI::Error::InvalidObject->throw(expected=>"WebGUI::Shop::AddressBook", got=>(ref $book), error=>"Need an address book.", param=>$book);
-    }
-    unless (defined $addressData && ref $addressData eq "HASH") {
-        WebGUI::Error::InvalidParam->throw(param=>$addressData, error=>"Need a hash reference.");
-    }
-    my $id = $book->session->db->setRow("address","addressId", {addressId=>"new", addressBookId=>$book->getId});
-    my $address = $class->new($book, $id);
-    $address->update($addressData);
-    return $address;
-}
-
-#-------------------------------------------------------------------
-
-=head2 delete ( )
-
-Removes this address from the book.
-
-=cut
-
-sub delete {
-    my $self = shift;
-    $self->addressBook->session->db->deleteRow("address","addressId",$self->getId);
-    undef $self;
-    return undef;
-}
-
-#-------------------------------------------------------------------
-
-=head2 get ( [ property ] )
-
-Returns a duplicated hash reference of this object’s data.
-
-=head3 property
-
-Any field − returns the value of a field rather than the hash reference.
-
-=cut
-
-sub get {
-    my ($self, $name) = @_;
-    if (defined $name) {
-        return $properties{id $self}{$name};
-    }
-    my %copyOfHashRef = %{$properties{id $self}};
-    return \%copyOfHashRef;
-}
-
-#-------------------------------------------------------------------
-
-=head2 getHtmlFormatted ()
-
-Returns an HTML formatted address for display.
-
-=cut
-
-sub getHtmlFormatted {
-    my $self = shift;
-    my $address = $self->get("firstName"). " " .$self->get("lastName") . "<br />";
-    $address .= $self->get("organization") . "<br />" if ($self->get("organization") ne "");
-    $address .= $self->get("address1") . "<br />";
-    $address .= $self->get("address2") . "<br />" if ($self->get("address2") ne "");
-    $address .= $self->get("address3") . "<br />" if ($self->get("address3") ne "");
-    $address .= $self->get("city") . ", ";
-    $address .= $self->get("state") . " " if ($self->get("state") ne "");
-    $address .= $self->get("code") if ($self->get("code") ne "");
-    $address .= '<br />' . $self->get("country");
-    $address .= '<br />'.$self->get("phoneNumber") if ($self->get("phoneNumber") ne "");
-    $address .= '<br /><a href="mailto:'.$self->get("email").'">'.$self->get("email").'</a>' if ($self->get("email") ne "");
-    return $address;
-}
-
-#-------------------------------------------------------------------
-
-=head2 getId () 
-
-Returns the unique id of this item.
-
-=cut
-
-sub getId {
-    my $self = shift;
-    return $self->get("addressId");
-}
-
-#-------------------------------------------------------------------
-
-=head2 isProfile ()
-
-Returns 1 if the address is linked to the user's profile.
-
-=cut
-
-sub isProfile {
-    my $self = shift;
-    return ($self->get("isProfile") eq 1);
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 new ( addressBook, addressId )
-
-Constructor.  Instanciates an existing address from the database based upon addressId.
-
-=head3 addressBook
-
-A reference to a WebGUI::Shop::AdressBook object.
-
-=head3 addressId
-
-The unique id of the address to instanciate.
-
-=cut
-
-sub new {
-    my ($class, $book, $addressId) = @_;
-    unless (defined $book && $book->isa("WebGUI::Shop::AddressBook")) {
-        WebGUI::Error::InvalidObject->throw(expected=>"WebGUI::Shop::AddressBook", got=>(ref $book), error=>"Need an address book.");
-    }
-    unless (defined $addressId) {
-        WebGUI::Error::InvalidParam->throw(error=>"Need an addressId.", param=>$addressId);
-    }
-    my $address = $book->session->db->quickHashRef('select * from address where addressId=?', [$addressId]);
-    if ($address->{addressId} eq "") {
-        WebGUI::Error::ObjectNotFound->throw(error=>"Address not found.", id=>$addressId);
-    }
-    if ($address->{addressBookId} ne $book->getId) {
-        WebGUI::Error::ObjectNotFound->throw(error=>"Address not in this address book.", id=>$addressId);
-    }
-    my $self = register $class;
-    my $id        = id $self;
-    $addressBook{ $id }   = $book;
-    $properties{ $id } = $address;
-    return $self;
-}
-
-#-------------------------------------------------------------------
-
-=head2 update ( properties )
-
-Sets properties of the address.
-
-=head3 properties
+=head3 $properties
 
 A hash reference that contains one or more of the following:
 
@@ -267,24 +202,169 @@ An email address for this user.
 
 The organization or company that this user is a part of.
 
-=head4 addressBookId
-
-The address book that this address belongs to.
-
 =head4 isProfile
 
 Whether or not this address is linked to the user profile.  Defaults to 0
 
 =cut
 
-sub update {
-    my ($self, $newProperties) = @_;
-    my $id = id $self;
 
-    foreach my $field (qw(addressBookId email organization address1 address2 address3 state code city label firstName lastName country phoneNumber isProfile)) {
-        $properties{$id}{$field} = (exists $newProperties->{$field}) ? $newProperties->{$field} : $properties{$id}{$field};
+around BUILDARGS => sub {
+    my $orig  = shift;
+    my $class = shift;
+    if (ref $_[0] eq 'HASH') {
+        my $properties = $_[0];
+        my $book = $properties->{addressBook};
+        if (! (blessed $book && $book->isa('WebGUI::Shop::AddressBook')) ) {
+            WebGUI::Error::InvalidObject->throw(expected=>"WebGUI::Shop::AddressBook", got=>(ref $book), error=>"Need an address book.", param=>$book);
+        }
+        my ($addressId)              = $class->_init($book);
+        $properties->{addressId}     = $addressId;
+        $properties->{addressBookId} = $book->addressBookId;
+        $properties->{addressBook}   = $book;
+        return $class->$orig($properties);
     }
-    $self->addressBook->session->db->setRow("address","addressId",$properties{$id});
+    my $book = shift;
+    if (! (blessed $book && $book->isa('WebGUI::Shop::AddressBook')) ) {
+        WebGUI::Error::InvalidObject->throw(expected=>"WebGUI::Shop::AddressBook", got=>(ref $book), error=>"Need an address book.", param=>$book);
+    }
+    my $argument2 = shift;
+    if (!defined $argument2) {
+        my ($addressId)              = $class->_init($book);
+        my $properties = {};
+        $properties->{addressId}     = $addressId;
+        $properties->{addressBookId} = $book->addressBookId;
+        $properties->{addressBook}   = $book;
+        return $class->$orig($properties);
+    }
+    elsif (ref $argument2 eq 'HASH') {
+        my $properties = $argument2;
+        my ($addressId)              = $class->_init($book);
+        $properties->{addressId}     = $addressId;
+        $properties->{addressBookId} = $book->addressBookId;
+        $properties->{addressBook}   = $book;
+        return $class->$orig($properties);
+    }
+    ##Look up one in the db
+    my $address = $book->session->db->quickHashRef("select * from address where addressId=?", [$argument2]);
+    if ($address->{addressId} eq "") {
+        WebGUI::Error::ObjectNotFound->throw(error=>"Address not found.", id=>$argument2);
+    }
+    if ($address->{addressBookId} ne $book->getId) {
+        WebGUI::Error::ObjectNotFound->throw(error=>"Address not in this address book.", id=>$argument2);
+    }
+    $address->{addressBook} = $book;
+    return $class->$orig($address);
+};
+
+#-------------------------------------------------------------------
+
+=head2 _init ( session )
+
+Builds a stub of object information in the database, and returns the newly created
+addressId, and the creationDate fields so the object can be initialized correctly.
+
+=cut
+
+sub _init {
+    my $class     = shift;
+    my $book      = shift;
+    my $session   = $book->session;
+    my $addressId = $session->id->generate;
+    $session->db->write('insert into address (addressId, addressBookId) values (?,?)', [$addressId, $book->getId]);
+    return ($addressId);
+}
+
+#-------------------------------------------------------------------
+
+=head2 addressBook ( )
+
+Returns a reference to the Address Book.
+
+=cut
+
+#-------------------------------------------------------------------
+
+=head2 create ( book )
+
+Deprecated, left as a stub for existing code.  Use L<new> instead.
+
+=head3 book
+
+A reference to an address book.
+
+=cut
+
+sub create {
+    my ($class, $book) = @_;
+    return $class->new($book);
+}
+
+#-------------------------------------------------------------------
+
+=head2 delete ( )
+
+Removes this address from the book.
+
+=cut
+
+sub delete {
+    my $self = shift;
+    $self->addressBook->session->db->deleteRow("address","addressId",$self->getId);
+    return undef;
+}
+
+#-------------------------------------------------------------------
+
+=head2 getHtmlFormatted ()
+
+Returns an HTML formatted address for display.
+
+=cut
+
+sub getHtmlFormatted {
+    my $self = shift;
+    my $address = $self->firstName. " " .$self->lastName . "<br />";
+    $address .= $self->organization . "<br />" if ($self->organization ne "");
+    $address .= $self->address1 . "<br />";
+    $address .= $self->address2 . "<br />" if ($self->address2 ne "");
+    $address .= $self->address3 . "<br />" if ($self->address3 ne "");
+    $address .= $self->city . ", ";
+    $address .= $self->state . " " if ($self->state ne "");
+    $address .= $self->code if ($self->code ne "");
+    $address .= '<br />' . $self->country;
+    $address .= '<br />'.$self->phoneNumber if ($self->phoneNumber ne "");
+    $address .= '<br /><a href="mailto:'.$self->email.'">'.$self->email.'</a>' if ($self->email ne "");
+    return $address;
+}
+
+#-------------------------------------------------------------------
+
+=head2 getId () 
+
+Returns the unique id of this item.
+
+=cut
+
+sub getId {
+    my $self = shift;
+    return $self->get("addressId");
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 write ( )
+
+Store the object's properties to the db.
+
+=cut
+
+sub write {
+    my ($self) = @_;
+    my $properties = $self->get();
+    my $book = delete $properties->{addressBook};
+    $book->session->db->setRow("address","addressId",$properties);
 }
 
 1;

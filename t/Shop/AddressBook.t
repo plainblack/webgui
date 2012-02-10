@@ -1,6 +1,6 @@
 # vim:syntax=perl
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -13,16 +13,16 @@
 # 
 #
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../lib";
 use Test::More;
 use Test::Deep;
+use Data::Dumper;
 use Exception::Class;
 
 use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
 use WebGUI::Text;
+use WebGUI::Shop::AddressBook;
 use JSON;
 
 #----------------------------------------------------------------------------
@@ -33,11 +33,6 @@ my $tempAdmin = WebGUI::User->create($session);
 $tempAdmin->addToGroups(['3']);
 WebGUI::Test->addToCleanup($tempAdmin);
 $session->user({ userId => $tempAdmin->getId} );
-
-#----------------------------------------------------------------------------
-# Tests
-
-plan tests => 42;
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -65,17 +60,7 @@ cmp_deeply(
     'new takes exception to not giving it a session object',
 );
 
-eval { $book = WebGUI::Shop::AddressBook->new($session); };
-$e = Exception::Class->caught();
-isa_ok($e, 'WebGUI::Error::InvalidParam', 'new takes exception to not giving it a addressBookId');
-cmp_deeply(
-    $e,
-    methods(
-        error => 'Need an addressBookId.',
-    ),
-    'new takes exception to not giving it a addressBook Id',
-);
-
+$session->user({userId => 3});
 eval { $book = WebGUI::Shop::AddressBook->new($session, 'neverAGUID'); };
 $e = Exception::Class->caught();
 isa_ok($e, 'WebGUI::Error::ObjectNotFound', 'new takes exception to not giving it an existing addressBookId');
@@ -87,31 +72,12 @@ cmp_deeply(
     ),
     'new takes exception to not giving it a addressBook Id',
 );
-
-
-#######################################################################
-#
-# create
-#
-#######################################################################
-
-eval { $book = WebGUI::Shop::AddressBook->create(); };
-$e = Exception::Class->caught();
-isa_ok($e, 'WebGUI::Error::InvalidParam', 'create takes exception to not giving it a session object');
-cmp_deeply(
-    $e,
-    methods(
-        error    => 'Need a session.',
-        expected => 'WebGUI::Session',
-        got      => '',
-    ),
-    'create takes exception to not giving it a session object',
-);
-
 $session->user({userId => 1});
-eval { $book = WebGUI::Shop::AddressBook->create($session); };
+
+
+eval { $book = WebGUI::Shop::AddressBook->new($session); };
 $e = Exception::Class->caught();
-isa_ok($e, 'WebGUI::Error::InvalidParam', 'create takes exception to making an address book for Visitor');
+isa_ok($e, 'WebGUI::Error::InvalidParam', 'new takes exception to making an address book for Visitor');
 cmp_deeply(
     $e,
     methods(
@@ -121,22 +87,23 @@ cmp_deeply(
 );
 
 $session->user({userId => $tempAdmin->getId});
-$book = WebGUI::Shop::AddressBook->create($session);
-isa_ok($book, 'WebGUI::Shop::AddressBook', 'create returns the right kind of object');
+$book = WebGUI::Shop::AddressBook->new($session);
+isa_ok($book, 'WebGUI::Shop::AddressBook', 'new returns the right kind of object');
 
 isa_ok($book->session, 'WebGUI::Session', 'session method returns a session object');
 
 is($session->getId, $book->session->getId, 'session method returns OUR session object');
 
-ok($session->id->valid($book->getId), 'create makes a valid GUID style addressBookId');
+ok($session->id->valid($book->getId), 'new makes a valid GUID style addressBookId');
 
 is($book->get('userId'), $tempAdmin->getId, 'create uses $session->user to get the userid for this book');
+is($book->userId, $tempAdmin->getId, '... testing direct accessor');
 
 my $bookCount = $session->db->quickScalar('select count(*) from addressBook where addressBookId=?',[$book->getId]);
 is($bookCount, 1, 'only 1 address book was created');
 
-my $alreadyHaveBook = WebGUI::Shop::AddressBook->create($session);
-isnt($book->getId, $alreadyHaveBook->getId, 'creating an addressbook as visitor, even when you already have one, always returns a new one');
+my $alreadyHaveBook = WebGUI::Shop::AddressBook->new($session);
+isnt($book->getId, $alreadyHaveBook->getId, 'creating an addressbook, even when you already have one, always returns a new one');
 
 #######################################################################
 #
@@ -182,15 +149,16 @@ $book->update({ lastShipId => $address1->getId, lastPayId => $address2->getId});
 cmp_deeply(
     $book->get(),
     {
-        userId     => ignore(),
-        addressBookId  => ignore(),
+        userId           => ignore(),
+        addressBookId    => ignore(),
         defaultAddressId => ignore(),
     },
-    'update updates the object properties cache'
+    'update does not add new properties to the object'
 );
 
 my $bookClone = WebGUI::Shop::AddressBook->new($session, $book->getId);
 
+delete $book->{_addressCache};
 cmp_deeply(
     $bookClone,
     $book,
@@ -227,9 +195,6 @@ is($profile_address->getId,$address1->getId,"getProfileAddress returns addresses
 #
 #######################################################################
 
-#Clear the book address cache
-$book->uncache;
-
 my $address_info = {
     label           => 'Profile Label',
     addressId       => $address1->getId,
@@ -265,13 +230,10 @@ cmp_bag(
 my $u = WebGUI::User->new($session,$book->get("userId"));
 
 cmp_bag(
-    [ map { $u->profileField($_) } keys %{ $book->getProfileAddressMappings } ],
+    [ map { $u->get($_) } keys %{ $book->getProfileAddressMappings } ],
     [ map { $address1->get($_) } values %{ $book->getProfileAddressMappings } ],
     'Profile address was updated and matches address fields'
 );
-
-#Test that updates to non profile address does not update the profile
-$book->uncache;
 
 $address_info = {
     label           => 'Non Profile Label',
@@ -308,7 +270,7 @@ cmp_bag(
 );
 
 cmp_bag(
-    [ map { $u->profileField($_) } keys %{ $book->getProfileAddressMappings } ],
+    [ map { $u->get($_) } keys %{ $book->getProfileAddressMappings } ],
     [ map { $address1->get($_) } values %{ $book->getProfileAddressMappings } ],
     'Profile address was not updated when non profile fields were saved'
 );
@@ -318,9 +280,6 @@ cmp_bag(
 # www_deleteAddress
 #
 #######################################################################
-
-#clear the cache
-$book->uncache;
 
 $session->request->setup_body({
     'addressId' => $address2->getId,
@@ -336,9 +295,6 @@ cmp_bag(
     'Address was deleted properly'
 );
 
-
-#clear the cache
-$book->uncache;
 
 $session->request->setup_body({
     'addressId' => $address1->getId,
@@ -361,9 +317,6 @@ cmp_bag(
 #
 #######################################################################
 
-#clear the cache
-$book->uncache;
-
 my $addressBookId = $alreadyHaveBook->getId;
 my $firstCount    = $session->db->quickScalar('select count(*) from addressBook where addressBookId=?',[$addressBookId]);
 $alreadyHaveBook->delete();
@@ -375,7 +328,7 @@ ok(($firstCount == 1 && $afterCount == 0), 'delete: one book deleted');
 $addressBookId    = $bookClone->getId;
 $bookClone->delete();
 $bookCount = $session->db->quickScalar('select count(*) from addressBook where addressBookId=?',[$addressBookId]);
-my $addrCount = $session->db->quickScalar('select count(*) from address where addressBookId=?',[$addressBookId]);
+$addrCount = $session->db->quickScalar('select count(*) from address where addressBookId=?',[$addressBookId]);
 
 is($bookCount, 0, '... book deleted');
 is($addrCount, 0, '... also deletes addresses in the book');
@@ -390,13 +343,14 @@ my $otherSession = WebGUI::Test->newSession;
 my $mergeUser    = WebGUI::User->create($otherSession);
 WebGUI::Test->addToCleanup($mergeUser);
 $otherSession->user({user => $mergeUser});
-my $adminBook   = WebGUI::Shop::AddressBook->create($otherSession);
+my $adminBook   = WebGUI::Shop::AddressBook->new($otherSession);
 WebGUI::Test->addToCleanup($adminBook);
 my $goodAddress = $adminBook->addAddress({label => 'first'});
 
 my $session2 = WebGUI::Test->newSession;
 $session2->user({user => $mergeUser});
 my $bookAdmin = WebGUI::Shop::AddressBook->newByUserId($session2);
+WebGUI::Test->addToCleanup($bookAdmin);
 
 cmp_bag(
     [ map { $_->getId } @{ $bookAdmin->getAddresses } ],
@@ -413,6 +367,7 @@ cmp_bag(
 #Create some data to search for
 my $andySession = WebGUI::Test->newSession;
 my $andy = WebGUI::User->create($andySession);
+$andy->username('andy');
 WebGUI::Test->addToCleanup($andy);
 $andySession->user({ userId => $andy->getId });
 my $andyBook   = WebGUI::Shop::AddressBook->create($andySession);
@@ -453,6 +408,7 @@ my $andyAddr2 = $andyBook->addAddress({
 
 my $redSession = WebGUI::Test->newSession;
 my $red = WebGUI::User->create($redSession);
+$red->username('red');
 WebGUI::Test->addToCleanup($red);
 $redSession->user({userId => $red->getId});
 my $redBook   = WebGUI::Shop::AddressBook->create($redSession);
@@ -471,12 +427,14 @@ my $redAddr = $redBook->addAddress({
     country         => 'US',
     phoneNumber     => '111-111-1111',
     email           => 'red@shawshank.com',
-    organization    => 'Shawshank'
+    organization    => 'Shawshank',
+    isProfile       => 0,
 });
 
 
 my $brooksSession = WebGUI::Test->newSession;
 my $brooks = WebGUI::User->create($brooksSession);
+$brooks->username('brooks');
 WebGUI::Test->addToCleanup($brooks);
 $brooksSession->user({userId => $brooks->getId});
 my $brooksBook   = WebGUI::Shop::AddressBook->create($brooksSession);
@@ -495,7 +453,8 @@ my $brooksAddr = $brooksBook->addAddress({
     country         => 'US',
     phoneNumber     => '111-111-1111',
     email           => 'brooks@shawshank.com',
-    organization    => 'Shawshank'
+    organization    => 'Shawshank',
+    isProfile       => 0,
 });
 
 #Test search as admin
@@ -505,11 +464,20 @@ $session->request->setup_body({
 
 my $results = JSON->new->decode($book->www_ajaxSearch);
 
+my $andyAddr1_get  = $andyAddr1->get;
+my $andyAddr2_get  = $andyAddr2->get;
+my $redAddr_get    = $redAddr->get;
+my $brooksAddr_get = $brooksAddr->get;
+
+foreach my $addr ($andyAddr1_get, $andyAddr2_get, $redAddr_get, $brooksAddr_get) {
+    delete $addr->{addressBook};
+}
+
 cmp_bag(
     $results,
     [
-        { %{$andyAddr1->get}, username => $andy->username },
-        { %{$andyAddr2->get}, username => $andy->username },
+        { %{$andyAddr1_get}, username => $andy->username, },
+        { %{$andyAddr2_get}, username => $andy->username, },
     ],
     'Ajax Address Search matches name correctly for admins'
 );
@@ -533,7 +501,7 @@ $results = JSON->new->decode($book->www_ajaxSearch);
 
 cmp_bag(
     $results,
-    [{ %{$andyAddr1->get}, username => $andy->username }],
+    [{ %{$andyAddr1_get}, username => $andy->username }],
     'Ajax Address Search matches multiple fields correctly'
 );
 
@@ -571,9 +539,9 @@ $results = JSON->new->decode($book->www_ajaxSearch);
 cmp_bag(
     $results,
     [
-        { %{$andyAddr1->get}, username => $andy->username },
-        { %{$redAddr->get}, username => $red->username },
-        { %{$brooksAddr->get}, username => $brooks->username },
+        { %{$andyAddr1_get},  username => $andy->username },
+        { %{$redAddr_get},    username => $red->username },
+        { %{$brooksAddr_get}, username => $brooks->username },
     ],
     'Ajax Address Search returns cross user results for admins'
 );
@@ -588,9 +556,9 @@ $results = JSON->new->decode($andyBook->www_ajaxSearch);
 cmp_bag(
     $results,
     [
-        { %{$andyAddr1->get}, username => $andy->username },
-        { %{$redAddr->get}, username => $red->username },
-        { %{$brooksAddr->get}, username => $brooks->username },
+        { %{$andyAddr1_get}, username => $andy->username },
+        { %{$redAddr_get}, username => $red->username },
+        { %{$brooksAddr_get}, username => $brooks->username },
     ],
     'Ajax Address Search returns cross user results for shop admins'
 );
@@ -605,9 +573,9 @@ $results = JSON->new->decode($redBook->www_ajaxSearch);
 cmp_bag(
     $results,
     [
-        { %{$andyAddr1->get}, username => $andy->username },
-        { %{$redAddr->get}, username => $red->username },
-        { %{$brooksAddr->get}, username => $brooks->username },
+        { %{$andyAddr1_get}, username => $andy->username },
+        { %{$redAddr_get}, username => $red->username },
+        { %{$brooksAddr_get}, username => $brooks->username },
     ],
     'Ajax Address Search returns cross user results for shop cashiers'
 );
@@ -620,8 +588,10 @@ $results = JSON->new->decode($brooksBook->www_ajaxSearch);
 
 cmp_bag(
     $results,
-    [{ %{$brooksAddr->get}, username => $brooks->username }],
+    [{ %{$brooksAddr_get}, username => $brooks->username }],
     'Ajax Address Search returns only current user results for non privileged users'
 );
 
 undef $book;
+
+done_testing;

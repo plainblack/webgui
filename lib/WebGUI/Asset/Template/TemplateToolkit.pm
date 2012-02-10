@@ -3,7 +3,7 @@ package WebGUI::Asset::Template::TemplateToolkit;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -17,6 +17,7 @@ package WebGUI::Asset::Template::TemplateToolkit;
 use strict;
 use base 'WebGUI::Asset::Template::Parser';
 use Template;
+use WebGUI::Template::Provider;
 
 #-------------------------------------------------------------------
 sub _rewriteVars { # replace dots with underscrores in keys (except in keys that aren't usable as variables (URLs etc.))
@@ -27,7 +28,12 @@ sub _rewriteVars { # replace dots with underscrores in keys (except in keys that
                 $newKey =~ s/\./_/g if $newKey !~ /\//;
 		if ( ref $vars->{$key} eq 'ARRAY') {
 			foreach my $entry (@{$vars->{$key}}) {
+                            if ( ref $entry eq 'HASH' ) {
 				push(@{$newVars->{$newKey}}, _rewriteVars($entry));
+                            }
+                            else {
+                                push(@{$newVars->{$newKey}}, $entry );
+                            }
 			}
                 } elsif(ref $vars->{$key} eq 'HASH') {
                         $newVars->{$newKey} = _rewriteVars($vars->{$key});
@@ -76,16 +82,26 @@ sub process {
     my $vars = $self->addSessionVars(shift);
     my ($t,$output);
     eval {
-        $t = Template->new({
-            INTERPOLATE  => 1,               # expand "$var" in plain text
-            POST_CHOMP   => 1,               # cleanup whitespace 
-            EVAL_PERL    => 0,               # evaluate Perl code blocks
-        });
+        my $config = $self->session->config->get( 'template' ) || {};
+        $config->{INTERPOLATE}  //= 1; # expand "$var" in plain text
+        $config->{POST_CHOMP}   //= 1; # cleanup whitespace
+        $config->{EVAL_PERL}    //= 0; # evaluate Perl code blocks
+        # Add WebGUI::Template::Plugin to PLUGIN_BASE
+        if ( defined $config->{PLUGIN_BASE} && !ref $config->{PLUGIN_BASE} ) {
+            $config->{PLUGIN_BASE} = [ $config->{PLUGIN_BASE} ];
+        }
+        elsif ( !defined $config->{PLUGIN_BASE} ) {
+            $config->{PLUGIN_BASE} = [];
+        }
+        push @{$config->{PLUGIN_BASE}}, 'WebGUI::Template::Plugin';
+
+        # Allow WebGUI assets to be included in templates
+        $config->{LOAD_TEMPLATES} = [ WebGUI::Template::Provider->new( $self->session, $config ) ];
+
+        $t = Template->new( $config );
         $vars = _rewriteVars($vars);
-        # store the session so plugins can access it.
-        # underscore prefix prevents direct access from templates
         $vars->{_session} = $self->session;
-        unless ($t->process( \$template, $vars,\$output)) {
+        unless ($t->process( \$template, $vars, \$output)) {
             my $e = $t->error;
             $self->session->log->error($e);
             die $e;

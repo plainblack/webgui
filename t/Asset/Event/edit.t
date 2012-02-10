@@ -1,6 +1,6 @@
 # vim:syntax=perl
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -13,16 +13,14 @@
 # assets.
 #
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../../lib";
 use Test::More;
 use Test::Deep;
 use WebGUI::Test; # Must use this before any other WebGUI modules
+use WebGUI::Test::Mechanize;
 use WebGUI::Asset;
 use WebGUI::VersionTag;
 use WebGUI::Session;
-plan skip_all => 'set WEBGUI_LIVE to enable this test' unless $ENV{WEBGUI_LIVE};
 
 #----------------------------------------------------------------------------
 # Init
@@ -30,25 +28,13 @@ my $session         = WebGUI::Test->session;
 my $node            = WebGUI::Asset->getImportNode( $session );
 my @versionTags     = ( WebGUI::VersionTag->getWorking( $session ) );
 
-# Override some settings to make things easier to test
-# userFunctionStyleId 
-$session->setting->set( 'userFunctionStyleId', 'PBtmpl0000000000000132' );
-$session->setting->set( 'defaultVersionTagWorkflow', 'pbworkflow000000000003' );
-
 # Create a user for testing purposes
 my $user        = WebGUI::User->new( $session, "new" );
 WebGUI::Test->addToCleanup($user);
 $user->username( 'dufresne' . time );
-my $identifier  = 'ritahayworth';
-my $auth        = WebGUI::Operation::Auth::getInstance( $session, $user->authMethod, $user->userId );
-$auth->saveParams( $user->userId, $user->authMethod, {
-    'identifier'    => Digest::MD5::md5_base64( $identifier ), 
-});
 
 my ( $mech );
 
-# Get the site's base URL
-my $baseUrl         = 'http://' . $session->config->get('sitename')->[0];
 
 # Create a Calendar to add Events to
 my $calendar    = $node->addChild( {
@@ -67,30 +53,17 @@ WebGUI::Test->addToCleanup($versionTags[-1]);
 #----------------------------------------------------------------------------
 # Tests
 
-if ( !eval { require Test::WWW::Mechanize; 1; } ) {
-    plan skip_all => 'Cannot load Test::WWW::Mechanize. Will not test.';
-}
-$mech    = Test::WWW::Mechanize->new;
-$mech->get( $baseUrl );
-if ( !$mech->success ) {
-    plan skip_all => "Cannot load URL '$baseUrl'. Will not test.";
-}
-
-plan skip_all => 'set WEBGUI_LIVE to enable this test'
-    unless $ENV{WEBGUI_LIVE};
-
-plan tests => 8;        # Increment this number for each test you create
-
 #----------------------------------------------------------------------------
 # Add event: Users without permission are not shown form
-$mech       = Test::WWW::Mechanize->new;
-$mech->get( $baseUrl . $calendar->getUrl('func=add;class=WebGUI::Asset::Event') );
+my $mech       = WebGUI::Test::Mechanize->new( config => WebGUI::Test->file );
+$mech->get( $calendar->getUrl('func=add;className=WebGUI::Asset::Event') );
 
 $mech->content_lacks( q{value="editSave"} );
 
 #----------------------------------------------------------------------------
 # Add event: Users with permission are shown form to add event
-$mech       = getMechLogin( $baseUrl, $user, $identifier );
+$mech->get('/');
+$mech->session->user({ user => $user });
 
 # Properties given to the form
 my $properties  = {
@@ -98,7 +71,7 @@ my $properties  = {
     menuTitle   => 'Event Menu Title',
 };
 
-$mech->get_ok( $baseUrl . $calendar->getUrl('func=add;class=WebGUI::Asset::Event') );
+$mech->get_ok( $calendar->getUrl('func=add;className=WebGUI::Asset::Event') );
 $mech->submit_form_ok( 
     {
         with_fields => $properties,
@@ -128,17 +101,18 @@ $eventUrl       = $event->getUrl;
 
 #----------------------------------------------------------------------------
 # Edit Event: Users without permission are not shown form
-$mech       = Test::WWW::Mechanize->new;
+$mech       = WebGUI::Test::Mechanize->new( config => WebGUI::Test->file );
 
-$mech->get( $baseUrl . $eventUrl . '?func=edit' );
-
+$mech->get( $eventUrl . '?func=edit' );
+ok !$mech->success, 'edit form was not loaded';
 $mech->content_lacks( q{value="editSave"} );
 
 #----------------------------------------------------------------------------
 # Edit Event: User with permission is shown form to edit event
-$mech       = getMechLogin( $baseUrl, $user, $identifier );
+$mech->get('/');
+$mech->session->user({ user => $user });
 
-$mech->get_ok( $baseUrl . $eventUrl . '?func=edit' );
+$mech->get_ok( $eventUrl . '?func=edit' );
 
 my $properties  = {
     title       => "Event Title" . time,
@@ -170,26 +144,6 @@ $properties = {
 
 cmp_deeply( $event->get, superhashof( $properties ), 'Events properties saved correctly' );
 
-#----------------------------------------------------------------------------
-# getMechLogin( baseUrl, WebGUI::User, "identifier" )
-# Returns a Test::WWW::Mechanize session after logging in the given user using
-# the given identifier (password)
-# baseUrl is a fully-qualified URL to the site to login to
-sub getMechLogin {
-    my $baseUrl     = shift;
-    my $user        = shift;
-    my $identifier  = shift;
-    
-    my $mech    = Test::WWW::Mechanize->new;
-    $mech->get( $baseUrl . '?op=auth;method=displayLogin' );
-    $mech->submit_form( 
-        with_fields => {
-            username        => $user->username,
-            identifier      => $identifier,
-        },
-    ); 
-
-    return $mech;
-}
+done_testing;
 
 #vim:ft=perl

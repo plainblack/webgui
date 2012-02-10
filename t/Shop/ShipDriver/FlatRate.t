@@ -1,6 +1,6 @@
 # vim:syntax=perl
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -13,9 +13,7 @@
 # 
 #
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../../lib";
 use Test::More;
 use Test::Deep;
 use JSON;
@@ -31,101 +29,12 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 19;
-plan tests => 1 + $tests;
+plan tests => 17;
 
 #----------------------------------------------------------------------------
 # put your tests here
 
-my $loaded = use_ok('WebGUI::Shop::ShipDriver::FlatRate');
-
-my $storage;
-my ($driver, $cart, $car, $key);
-my $versionTag;
-
-SKIP: {
-
-skip 'Unable to load module WebGUI::Shop::ShipDriver::FlatRate', $tests unless $loaded;
-
-#######################################################################
-#
-# definition
-#
-#######################################################################
-
-my $definition;
-my $e; ##Exception variable, used throughout the file
-
-eval { $definition = WebGUI::Shop::ShipDriver::FlatRate->definition(); };
-$e = Exception::Class->caught();
-isa_ok($e, 'WebGUI::Error::InvalidParam', 'definition takes an exception to not giving it a session variable');
-cmp_deeply(
-    $e,
-    methods(
-        error => 'Must provide a session variable',
-    ),
-    'definition: requires a session variable',
-);
-
-
-$definition = WebGUI::Shop::ShipDriver::FlatRate->definition($session);
-
-cmp_deeply(
-    $definition,
-    [ {
-        name => 'Flat Rate',
-        properties => {
-            flatFee => {
-                fieldType => 'float',
-                label => ignore(),
-                hoverHelp => ignore(),
-                defaultValue => 0,
-            },
-            percentageOfPrice => {
-                fieldType => 'float',
-                label => ignore(),
-                hoverHelp => ignore(),
-                defaultValue => 0,
-            },
-            pricePerWeight => {
-                fieldType => 'float',
-                label => ignore(),
-                hoverHelp => ignore(),
-                defaultValue => 0,
-            },
-            pricePerItem => {
-                fieldType => 'float',
-                label => ignore(),
-                hoverHelp => ignore(),
-                defaultValue => 0,
-            },
-        }
-    },
-    {
-        name => 'Shipper Driver',
-        properties => {
-            label => {
-                fieldType => 'text',
-                label => ignore(),
-                hoverHelp => ignore(),
-                defaultValue => undef,
-            },
-            enabled => {
-                fieldType => 'yesNo',
-                label => ignore(),
-                hoverHelp => ignore(),
-                defaultValue => 1,
-            },
-            groupToUse => {
-                fieldType => 'group',
-                label => ignore(),
-                hoverHelp => ignore(),
-                defaultValue => 7,
-            },
-        }
-    } ],
-    'Definition returns an array of hashrefs',
-);
+use_ok('WebGUI::Shop::ShipDriver::FlatRate');
 
 #######################################################################
 #
@@ -142,11 +51,13 @@ my $options = {
                 pricePerItem      => 0.1,
               };
 
-$driver = WebGUI::Shop::ShipDriver::FlatRate->create($session, $options);
+my $driver2 = WebGUI::Shop::ShipDriver::FlatRate->new($session, $options);
+$driver2->write;
+WebGUI::Test->addToCleanup($driver2);
 
-isa_ok($driver, 'WebGUI::Shop::ShipDriver::FlatRate');
+isa_ok($driver2, 'WebGUI::Shop::ShipDriver::FlatRate');
 
-isa_ok($driver, 'WebGUI::Shop::ShipDriver');
+isa_ok($driver2, 'WebGUI::Shop::ShipDriver');
 
 #######################################################################
 #
@@ -162,18 +73,18 @@ is (WebGUI::Shop::ShipDriver::FlatRate->getName($session), 'Flat Rate', 'getName
 #
 #######################################################################
 
-my $form = $driver->getEditForm;
+my $form = $driver2->getEditForm;
 
-isa_ok($form, 'WebGUI::HTMLForm', 'getEditForm returns an HTMLForm object');
+isa_ok($form, 'WebGUI::FormBuilder', 'getEditForm returns an HTMLForm object');
 
-my $html = $form->print;
+my $html = $form->toHtml;
 
 ##Any URL is fine, really
 my @forms = HTML::Form->parse($html, 'http://www.webgui.org');
 is (scalar @forms, 1, 'getEditForm generates just 1 form');
 
 my @inputs = $forms[0]->inputs;
-is (scalar @inputs, 14, 'getEditForm: the form has 14 controls');
+is (scalar @inputs, 13, 'getEditForm: the form has 13 controls');
 
 my @interestingFeatures;
 foreach my $input (@inputs) {
@@ -186,16 +97,8 @@ cmp_deeply(
     \@interestingFeatures,
     [
         {
-            name => 'webguiCsrfToken',
-            type => 'hidden',
-        },
-        {
-            name => undef,
+            name => "send",
             type => 'submit',
-        },
-        {
-            name => 'driverId',
-            type => 'hidden',
         },
         {
             name => 'shop',
@@ -207,6 +110,10 @@ cmp_deeply(
         },
         {
             name => 'do',
+            type => 'hidden',
+        },
+        {
+            name => 'driverId',
             type => 'hidden',
         },
         {
@@ -252,13 +159,13 @@ cmp_deeply(
 #
 #######################################################################
 
-my $driverId = $driver->getId;
-$driver->delete;
+my $driverId = $driver2->getId;
+$driver2->delete;
 
 my $count = $session->db->quickScalar('select count(*) from shipper where shipperId=?',[$driverId]);
 is($count, 0, 'delete deleted the object');
 
-undef $driver;
+undef $driver2;
 
 #######################################################################
 #
@@ -266,7 +173,7 @@ undef $driver;
 #
 #######################################################################
 
-$car = WebGUI::Asset->getImportNode($session)->addChild({
+my $car = WebGUI::Test->asset->addChild({
     className          => 'WebGUI::Asset::Sku::Product',
     title              => 'Automobiles',
     isShippingRequired => 1,
@@ -298,12 +205,9 @@ my $reallyNiceCar = $car->setCollateral('variantsJSON', 'variantId', 'new',
         varSku    => 'nice-car',
         price     => 90_000,
         weight    => 3000,
-        quantity  => 3,
+        quantity  => 4,
     }
 );
-
-$versionTag = WebGUI::VersionTag->getWorking($session);
-$versionTag->commit;
 
 $options = {
     label   => 'flat rate, ship weight',
@@ -314,9 +218,11 @@ $options = {
     pricePerItem      => 10,
 };
 
-$driver = WebGUI::Shop::ShipDriver::FlatRate->create($session, $options);
+my $driver = WebGUI::Shop::ShipDriver::FlatRate->new($session, $options);
+WebGUI::Test->addToCleanup($driver);
 
-$cart = WebGUI::Shop::Cart->newBySession($session);
+my $cart = WebGUI::Shop::Cart->newBySession($session);
+WebGUI::Test->addToCleanup($cart);
 
 $car->addToCart($car->getCollateral('variantsJSON', 'variantId', $crappyCar));
 is($driver->calculate($cart), 1511, 'calculate by weight, perItem and flat fee work');
@@ -345,7 +251,7 @@ $driver->update({
     pricePerItem      => 0,
 });
 
-$key = WebGUI::Asset->getImportNode($session)->addChild({
+my $key = WebGUI::Test->asset->addChild({
     className          => 'WebGUI::Asset::Sku::Product',
     title              => 'Key',
     isShippingRequired => 1,
@@ -388,25 +294,3 @@ is($driver->calculate($cart), 1, '... returns one, since all can be bundled toge
 $car->update({shipsSeparately => 1});
 $key->update({shipsSeparately => 1});
 is($driver->calculate($cart), 4, '... returns four, since all must be shipped separately now');
-
-}
-
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-    if (defined $driver && ref $driver eq 'WebGUI::Shop::ShipDriver::FlatRate') {
-        $driver->delete;
-    }
-    if (defined $cart && ref $cart eq 'WebGUI::Shop::Cart') {
-        $cart->delete;
-    }
-    if (defined $car && (ref($car) eq 'WebGUI::Asset::Sku::Product')) {
-        $car->purge;
-    }
-    if (defined $key && (ref($key) eq 'WebGUI::Asset::Sku::Product')) {
-        $key->purge;
-    }
-    if (defined $versionTag) {
-        $versionTag->rollback;
-    }
-}

@@ -1,6 +1,6 @@
 # vim:syntax=perl
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -13,9 +13,7 @@
 # 
 #
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../lib";
 use Test::More;
 use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
@@ -73,9 +71,6 @@ sub www_dies {
 
 package main;
 
-my $tag = WebGUI::VersionTag->getWorking( $session );
-WebGUI::Test->addToCleanup( $tag );
-
 #----------------------------------------------------------------------------
 # Tests
 
@@ -85,7 +80,7 @@ plan tests => 18;        # Increment this number for each test you create
 # Test dispatch
 
 # Add a TestDispatch asset and test
-my $td  = WebGUI::Asset->getImportNode( $session )->addChild( { 
+my $td  = WebGUI::Test->asset->addChild( { 
     url         => 'testDispatch',
     className   => 'WebGUI::Asset::TestDispatch',
 } );
@@ -126,12 +121,12 @@ isnt( $output, "www_view", "?func= dispatch cancelled because of unhandled fragm
 $td->cut();
 $output = $td->dispatch();
 is $output, undef, 'dispatch returns undef when trying to access an asset that is not published, and admin is not on';
-$session->var->switchAdminOn;
+$session->user({ userId => 3 });
 $output = $td->dispatch();
 is $output, 'www_view', 'when admin is on, the asset can be accessed';
 
 $td->publish();
-$session->var->switchAdminOff;
+$session->user({ userId => 1 });
 $output = $td->dispatch();
 is $output, 'www_view', 'asset state restored for next tests';
 
@@ -139,14 +134,20 @@ is $output, 'www_view', 'asset state restored for next tests';
 $session->request->setup_body( {
     func        => 'brokenTemplate',
 } );
-WebGUI::Test->interceptLogging;
-is( $td->dispatch, "www_view", "if a query method throws a Template exception, view is returned instead" );
-is $WebGUI::Test::logger_error, 'Template not found templateId: This is a GUID assetId: '. $td->getId, '... and logged an error';
-$session->request->setup_body( {
-    func        => 'dies',
-} );
-is( $td->dispatch, "www_view", "if a query method dies, view is returned instead" );
-is $WebGUI::Test::logger_warns, "Couldn't call method www_dies on asset for url:  Root cause: ...aside from that bullet\n", '.. and logged a warn';
-WebGUI::Test->restoreLogging;
+WebGUI::Test->interceptLogging(sub {
+    my $log_data = shift;
+    is( $td->dispatch, "www_view", "if a query method throws a Template exception, view is returned instead" );
+    my $template_id = $td->getId;
+    ok $log_data->{error} =~ m /Template not found/ && $log_data->{error} =~ m/templateId: / && $log_data->{error} =~ m/$template_id/, '... and logged an error';
+});
+
+WebGUI::Test->interceptLogging(sub {
+    my $log_data = shift;
+    $session->request->setup_body( {
+        func        => 'dies',
+    } );
+    is( $td->dispatch, "www_view", "if a query method dies, view is returned instead" );
+    ok $log_data->{error} =~ m/Couldn't call method/ && $log_data->{error} =~ m/www_dies/ && $log_data->{error} =~ m/\.\.\.aside from that bullet/, '.. and logged an error';
+});
 
 #vim:ft=perl

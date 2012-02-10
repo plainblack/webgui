@@ -1,6 +1,6 @@
 # vim:syntax=perl
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -13,11 +13,10 @@
 # 
 #
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../lib";
 use Test::More;
 use Test::Deep;
+use Test::Exception;
 use JSON;
 use HTML::Form;
 use Data::Dumper;
@@ -32,8 +31,6 @@ my $session         = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-
-plan tests => 22;
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -50,22 +47,10 @@ my $ship;
 #
 #######################################################################
 
-my $e;
+dies_ok { $ship = WebGUI::Shop::Ship->new(); } 'new takes an exception to not giving it a session variable';
 
-eval { $ship = WebGUI::Shop::Ship->new(); };
-$e = Exception::Class->caught();
-isa_ok($e, 'WebGUI::Error::InvalidParam', 'new takes an exception to not giving it a session variable');
-cmp_deeply(
-    $e,
-    methods(
-        error => 'Must provide a session variable',
-        got   => '',
-        expected => 'WebGUI::Session',
-    ),
-    'new: requires a session variable',
-);
-
-$ship = WebGUI::Shop::Ship->new($session);
+lives_ok { $ship = WebGUI::Shop::Ship->new(session => $session); } 'new takes hash arguments';
+lives_ok { $ship = WebGUI::Shop::Ship->new($session); } 'new takes a bare session object';
 isa_ok($ship, 'WebGUI::Shop::Ship', 'new returned the right kind of object');
 
 isa_ok($ship->session, 'WebGUI::Session', 'session method returns a session object');
@@ -100,6 +85,8 @@ cmp_bag(
 #######################################################################
 
 my $shipper;
+
+my $e;
 
 eval { $shipper = $ship->addShipper(); };
 $e = Exception::Class->caught();
@@ -137,13 +124,13 @@ cmp_deeply(
 
 eval { $shipper = $ship->addShipper('WebGUI::Shop::ShipDriver::FlatRate', {}); };
 $e = Exception::Class->caught();
-isa_ok($e, 'WebGUI::Error::InvalidParam', 'addShipper croaks without options to build a object with');
+isa_ok($e, 'WebGUI::Error::InvalidParam', 'addShipper croaks with empty options to build a object with');
 cmp_deeply(
     $e,
     methods(
         error => 'You must pass a hashref of options to create a new ShipDriver object',
     ),
-    'addShipper croaks without options to build a object with',
+    'addShipper croaks with empty options to build a object with',
 );
 
 my $driver = $ship->addShipper('WebGUI::Shop::ShipDriver::FlatRate', { enabled=>1, label=>q{Jake's Jailbird Airmail}, groupToUse=>7});
@@ -213,4 +200,7 @@ cmp_deeply(
 );
 
 $cart->delete;
+
+done_testing();
+
 #vim:ft=perl

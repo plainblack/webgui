@@ -1,6 +1,6 @@
 # vim:syntax=perl
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -13,13 +13,12 @@
 # 
 #
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../lib";
 use Test::More;
 use Test::Deep;
 use Test::LongString;
 use WebGUI::Test; # Must use this before any other WebGUI modules
+use WebGUI::Test::MockAsset;
 use WebGUI::Session;
 use WebGUI::Shop::Transaction;
 use WebGUI::Inbox;
@@ -38,38 +37,38 @@ plan tests => 83;        # Increment this number for each test you create
 #----------------------------------------------------------------------------
 # put your tests here
 
-my $transaction = WebGUI::Shop::Transaction->create($session,{
-    amount               => 40,
-    shippingAddressId    => 'xxx1',
-    shippingAddressName  => 'abc',
+my $transaction = WebGUI::Shop::Transaction->new($session,{
+    amount              => 40,
+    shippingAddressId   => 'xxx1',
     shippingOrganization => 'Ship To Us',
-    shippingAddress1     => 'def',
-    shippingAddress2     => 'hij',
-    shippingAddress3     => 'lmn',
-    shippingCity         => 'opq',
-    shippingState        => 'wxy',
-    shippingCountry      => 'z',
-    shippingCode         => '53333',
-    shippingPhoneNumber  => '123456',
-    shippingDriverId     => 'xxx2',
-    shippingDriverLabel  => 'foo',
-    shippingPrice        => 5,
-    paymentAddressId     => 'xxx3',
-    paymentAddressName   => 'abc1',
+    shippingAddressName => 'abc',
+    shippingAddress1    => 'def',
+    shippingAddress2    => 'hij',
+    shippingAddress3    => 'lmn',
+    shippingCity        => 'opq',
+    shippingState       => 'wxy',
+    shippingCountry     => 'z',
+    shippingCode        => '53333',
+    shippingPhoneNumber => '123456',
+    shippingDriverId    => 'xxx2',
+    shippingDriverLabel => 'foo',
+    shippingPrice       => 5,
+    paymentAddressId    => 'xxx3',
+    paymentAddressName  => 'abc1',
     paymentOrganization  => 'Pay To Us',
-    paymentAddress1      => 'def1',
-    paymentAddress2      => 'hij1',
-    paymentAddress3      => 'lmn1',
-    paymentCity          => 'opq1',
-    paymentState         => 'wxy1',
-    paymentCountry       => 'z1',
-    paymentCode          => '66666',
-    paymentPhoneNumber   => '908765',
-    paymentDriverId      => 'xxx4',
-    paymentDriverLabel   => 'kkk',
-    taxes                => 7,
+    paymentAddress1     => 'def1',
+    paymentAddress2     => 'hij1',
+    paymentAddress3     => 'lmn1',
+    paymentCity         => 'opq1',
+    paymentState        => 'wxy1',
+    paymentCountry      => 'z1',
+    paymentCode         => '66666',
+    paymentPhoneNumber  => '908765',
+    paymentDriverId     => 'xxx4',
+    paymentDriverLabel  => 'kkk',
+    taxes               => 7,
     });
-addToCleanup($transaction);
+WebGUI::Test->addToCleanup($transaction);
 
 # objects work
 isa_ok($transaction, "WebGUI::Shop::Transaction");
@@ -77,36 +76,35 @@ isa_ok($transaction->session, "WebGUI::Session");
 
 
 # basic transaction properties
-is($transaction->get("amount"), 40, "set and get amount");
-is($transaction->get("shippingAddressId"), 'xxx1', "set and get shipping address id");
-is($transaction->get("shippingOrganization"), 'Ship To Us', "set and get shipping organization");
-is($transaction->get("shippingAddressName"), 'abc', "set and get shipping address name");
-is($transaction->get("shippingAddress1"), 'def', "set and get shipping address 1");
-is($transaction->get("shippingAddress2"), 'hij', "set and get shipping address 2");
-is($transaction->get("shippingAddress3"), 'lmn', "set and get shipping address 3");
-is($transaction->get("shippingCity"), 'opq', "set and get shipping city");
-is($transaction->get("shippingState"), 'wxy', "set and get shipping state");
-is($transaction->get("shippingCountry"), 'z', "set and get shipping country");
-is($transaction->get("shippingCode"), '53333', "set and get shipping code");
-is($transaction->get("shippingPhoneNumber"), '123456', "set and get shipping phone number");
-is($transaction->get("shippingDriverId"), 'xxx2', "set and get shipping driver id");
-is($transaction->get("shippingDriverLabel"), 'foo', "set and get shipping driver label");
-is($transaction->get("shippingPrice"), 5, "set and get shipping price");
-is($transaction->get("paymentAddressId"), 'xxx3', "set and get payment address id");
-is($transaction->get("paymentAddressName"), 'abc1', "set and get payment address name");
-is($transaction->get("paymentOrganization"), 'Pay To Us', "set and get payment organization");
-is($transaction->get("paymentAddress1"), 'def1', "set and get payment address 1");
-is($transaction->get("paymentAddress2"), 'hij1', "set and get payment address 2");
-is($transaction->get("paymentAddress3"), 'lmn1', "set and get payment address 3");
-is($transaction->get("paymentCity"), 'opq1', "set and get payment city");
-is($transaction->get("paymentState"), 'wxy1', "set and get payment state");
-is($transaction->get("paymentCountry"), 'z1', "set and get payment country");
-is($transaction->get("paymentCode"), '66666', "set and get payment code");
-is($transaction->get("paymentPhoneNumber"), '908765', "set and get payment phone number");
-is($transaction->get("paymentDriverId"), 'xxx4', "set and get payment driver id");
-is($transaction->get("paymentDriverLabel"), 'kkk', "set and get payment driver label");
-is($transaction->get("taxes"), 7, "set and get taxes");
-
+is($transaction->amount, 40, "set and get amount");
+is($transaction->shippingAddressId, 'xxx1', "set and get shipping address id");
+is($transaction->shippingAddressName, 'abc', "set and get shipping address name");
+is($transaction->shippingOrganization, 'Ship To Us', "set and get shipping organization");
+is($transaction->shippingAddress1, 'def', "set and get shipping address 1");
+is($transaction->shippingAddress2, 'hij', "set and get shipping address 2");
+is($transaction->shippingAddress3, 'lmn', "set and get shipping address 3");
+is($transaction->shippingCity, 'opq', "set and get shipping city");
+is($transaction->shippingState, 'wxy', "set and get shipping state");
+is($transaction->shippingCountry, 'z', "set and get shipping country");
+is($transaction->shippingCode, '53333', "set and get shipping code");
+is($transaction->shippingPhoneNumber, '123456', "set and get shipping phone number");
+is($transaction->shippingDriverId, 'xxx2', "set and get shipping driver id");
+is($transaction->shippingDriverLabel, 'foo', "set and get shipping driver label");
+is($transaction->shippingPrice, 5, "set and get shipping price");
+is($transaction->paymentAddressId, 'xxx3', "set and get payment address id");
+is($transaction->paymentAddressName, 'abc1', "set and get payment address name");
+is($transaction->paymentOrganization, 'Pay To Us', "set and get payment organization");
+is($transaction->paymentAddress1, 'def1', "set and get payment address 1");
+is($transaction->paymentAddress2, 'hij1', "set and get payment address 2");
+is($transaction->paymentAddress3, 'lmn1', "set and get payment address 3");
+is($transaction->paymentCity, 'opq1', "set and get payment city");
+is($transaction->paymentState, 'wxy1', "set and get payment state");
+is($transaction->paymentCountry, 'z1', "set and get payment country");
+is($transaction->paymentCode, '66666', "set and get payment code");
+is($transaction->paymentPhoneNumber, '908765', "set and get payment phone number");
+is($transaction->paymentDriverId, 'xxx4', "set and get payment driver id");
+is($transaction->paymentDriverLabel, 'kkk', "set and get payment driver label");
+is($transaction->taxes, 7, "set and get taxes");
 
 $transaction->update({
     isSuccessful        => 1,
@@ -115,11 +113,11 @@ $transaction->update({
     statusMessage       => 'was a success',
 });
  
-is($transaction->get("isSuccessful"), 1,"update and get isSuccessful");
-is($transaction->get("transactionCode"), 'yyy',"update and get transaction code");
-is($transaction->get("statusCode"), 'jd31',"update and get status code");
-is($transaction->get("statusMessage"), 'was a success',"update and get status message");
-is($transaction->get('taxes'), 7, 'update does not modify things it was not sent');
+is($transaction->isSuccessful, 1,"update and get isSuccessful");
+is($transaction->transactionCode, 'yyy',"update and get transaction code");
+is($transaction->statusCode, 'jd31',"update and get status code");
+is($transaction->statusMessage, 'was a success',"update and get status message");
+is($transaction->taxes, 7, 'update does not modify things it was not sent');
 
 # make sure new() works
 my $tcopy = WebGUI::Shop::Transaction->new($session, $transaction->getId);
@@ -168,7 +166,7 @@ is($item->get("shippingPhoneNumber"), 'l', "set and get shipping phone number");
 is($item->get("quantity"), 5, "set and get quantity");
 is($item->get("price"), 33,  "set and get price");
 is($item->get('taxRate'), 19, 'set and get taxRate' );
-is($item->get('shippingOrganization'), 'organized', 'set and get shipping organization' );
+is($item->shippingOrganization, 'organized', 'set and get shipping organization' );
 
 $item->update({
     shippingTrackingNumber  => 'adfs',
@@ -199,7 +197,7 @@ is(scalar @{$transaction->getItems}, 0, "can delete items");
 $session->user({userId=>3});
 my $json = WebGUI::Shop::Transaction->www_getTransactionsAsJson($session);
 ok($json, 'www_getTransactionsAsJson returned something');
-is($session->http->getMimeType, 'application/json', 'MIME type set to application/json');
+is($session->response->content_type, 'application/json', 'MIME type set to application/json');
 my $jsonTransactions = JSON::from_json($json);
 cmp_deeply(
     $jsonTransactions,
@@ -245,13 +243,13 @@ my $shopGroup  = WebGUI::Group->new($session, 'new');
 my $shopAdmin  = WebGUI::User->create($session);
 $shopUser->username('shopAdmin');
 $shopGroup->addUsers([$shopAdmin->getId]);
-addToCleanup($shopUser, $shopAdmin, $shopGroup);
+WebGUI::Test->addToCleanup($shopUser, $shopAdmin, $shopGroup);
 $session->setting->set('shopSaleNotificationGroupId', $shopGroup->getId);
 $session->user({userId => $shopUser->getId});
 
-my $trans = WebGUI::Shop::Transaction->create($session, {});
+my $trans = WebGUI::Shop::Transaction->new($session, {});
 ok($trans->can('sendNotifications'), 'sendNotifications: valid method for transactions');
-addToCleanup($trans);
+WebGUI::Test->addToCleanup($trans);
 
 ##Disable sending email
 my $sendmock = Test::MockObject->new( {} );
@@ -265,9 +263,8 @@ $sendmock->fake_module('WebGUI::Mail::Send',
                  #1234567890123456789012#
 my $templateId = 'SHOP_NOTIFICATION_____';
 
-my $templateMock = Test::MockObject->new({});
-$templateMock->set_isa('WebGUI::Asset::Template');
-$templateMock->set_always('getId', $templateId);
+my $templateMock = WebGUI::Test::MockAsset->new('WebGUI::Asset::Template');
+$templateMock->mock_id($templateId);
 my @templateVars;
 $templateMock->mock('process', sub { push @templateVars, clone $_[1]; } );
 
@@ -275,7 +272,6 @@ $session->setting->set('shopReceiptEmailTemplateId', $templateId);
 
 {
     WebGUI::Test->addToCleanup(sub { WebGUI::Test->cleanupAdminInbox(); });
-    WebGUI::Test->mockAssetId($templateId, $templateMock);
     $trans->sendNotifications;
     is(@templateVars, 2, '... called template->process twice');
     my $inbox = WebGUI::Inbox->new($session);
@@ -287,7 +283,6 @@ $session->setting->set('shopReceiptEmailTemplateId', $templateId);
     like($adminMessages->[0]->get('subject'), qr/^A sale has been made/, '... subject for admin email okay');
     like($templateVars[0]->{viewDetailUrl}, qr/shop=transaction;method=viewMy;/, '... viewDetailUrl okay for user');
     like($templateVars[1]->{viewDetailUrl}, qr/shop=transaction;method=view;/  , '... viewDetailUrl okay for admin');
-    WebGUI::Test->unmockAssetId($templateId);
 }
 
 #######################################################################

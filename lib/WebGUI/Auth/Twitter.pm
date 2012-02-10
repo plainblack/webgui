@@ -3,7 +3,7 @@ package WebGUI::Auth::Twitter;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -34,19 +34,6 @@ These methods are available from this class:
 
 #----------------------------------------------------------------------------
 
-=head2 new ( ... )
-
-Create a new object
-
-=cut
-
-sub new {
-    my $self    = shift->SUPER::new(@_);
-    return bless $self, __PACKAGE__; # Auth requires rebless
-}
-
-#----------------------------------------------------------------------------
-
 =head2 createTwitterUser ( twitterUserId, username )
 
     my $user    = $self->createTwitterUser( $twitterUserId, $username );
@@ -59,9 +46,10 @@ sub createTwitterUser {
     my ( $self, $twitterUserId, $username ) = @_;
     my $user    = WebGUI::User->create( $self->session );
     $user->username( $username );
-    $self->saveParams( $user->userId, $self->authMethod, { 
+    $self->user( $user );
+    $self->update( 
         "twitterUserId" => $twitterUserId,
-    } );
+    );
     return $user;
 }
 
@@ -81,16 +69,16 @@ sub editUserSettingsForm {
 
     my $keyUrl  = 'http://dev.twitter.com/apps/new';
 
-    my $f = WebGUI::HTMLForm->new( $session );
+    my $f = WebGUI::FormBuilder->new( $session );
 
-    $f->yesNo(
+    $f->addField( "yesNo",
         name        => 'twitterEnabled',
         value       => $setting->get( 'twitterEnabled' ),
         label       => $i18n->get('enabled'),
         hoverHelp   => $i18n->get('enabled help'),
     );
 
-    $f->text(
+    $f->addField( "text",
         name        => 'twitterConsumerKey',
         value       => $setting->get( 'twitterConsumerKey' ),
         label       => $i18n->get('consumer key'),
@@ -98,14 +86,14 @@ sub editUserSettingsForm {
         subtext     => sprintf( $i18n->get('get key'), ($keyUrl) x 2 ),
     );
 
-    $f->text(
+    $f->addField( "text",
         name        => 'twitterConsumerSecret',
         value       => $setting->get( 'twitterConsumerSecret' ),
         label       => $i18n->get('consumer secret'),
         hoverHelp   => $i18n->get('consumer secret help'),
     );
 
-    $f->template(
+    $f->addField( "template",
         name        => 'twitterTemplateIdChooseUsername',
         value       => $setting->get( 'twitterTemplateIdChooseUsername' ),
         label       => $i18n->get('choose username template'),
@@ -113,7 +101,7 @@ sub editUserSettingsForm {
         namespace   => 'Auth/Twitter/ChooseUsername',
     );
 
-    return $f->printRowsOnly;
+    return $f;
 }
 
 #----------------------------------------------------------------------------
@@ -151,7 +139,7 @@ Get the template to choose a username
 sub getTemplateChooseUsername {
     my ( $self ) = @_;
     my $templateId  = $self->session->setting->get('twitterTemplateIdChooseUsername');
-    return WebGUI::Asset::Template->new( $self->session, $templateId );
+    return WebGUI::Asset->newById( $self->session, $templateId );
 }
 
 #----------------------------------------------------------------------------
@@ -199,7 +187,7 @@ sub www_login {
     $scratch->set( 'AuthTwitterToken', $nt->request_token );
     $scratch->set( 'AuthTwitterTokenSecret', $nt->request_token_secret );
 
-    $session->http->setRedirect($auth_url);
+    $session->response->setRedirect($auth_url);
     return "redirect";
 }
 
@@ -239,13 +227,13 @@ sub www_callback {
     if ( $userId ) {
         my $user    = WebGUI::User->new( $session, $userId );
         $self->user( $user );
-        return $self->login;
+        return $self->SUPER::www_login;
     }
     # Otherwise see if their screen name exists and create a user
     elsif ( !WebGUI::User->newByUsername( $session, $twitterScreenName ) ) {
         my $user = $self->createTwitterUser( $twitterUserId, $twitterScreenName );
         $self->user( $user );
-        return $self->login;
+        return $self->SUPER::www_login;
     }
 
     # Otherwise ask them for a new username to use
@@ -281,7 +269,6 @@ sub www_setUsername {
     if ( !WebGUI::User->newByUsername( $session, $username ) ) {
         my $twitterUserId = $scratch->get( "AuthTwitterUserId" );
         my $user = $self->createTwitterUser( $twitterUserId, $username );
-        $self->user( $user );
         return $self->login;
     }
 

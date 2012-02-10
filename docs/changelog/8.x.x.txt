@@ -1,0 +1,6 @@
+8.0.0
+ - Replaced the existing caching mechanism with memcached, which results in a 400% improvement to cache speed. See migration.txt for API changes and gotcha.txt for prereq changes.
+ - Added "hot sessions" so sessions interact with the database less.
+ - Added Facebook Auth and FacebookLogin macro.
+ - Removed the WebGUI statistics program and code.
+

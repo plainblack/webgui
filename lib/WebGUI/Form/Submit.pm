@@ -3,7 +3,7 @@ package WebGUI::Form::Submit;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -49,25 +49,19 @@ sub getName {
     return WebGUI::International->new($session, 'WebGUI')->get('submit');
 }
 
-#-------------------------------------------------------------------
+#----------------------------------------------------------------------------
 
-=head2 toHtml ( )
+=head2 new ( session, properties )
 
-Renders a button.
+Preconfigure this button to be a Submit button
 
 =cut
 
-sub toHtml {
-	my $self = shift;
-	my $value = $self->fixQuotes($self->getOriginalValue);
-    my $extras = $self->get("extras") || q|class="forwardButton"|;
-	my $i18n = WebGUI::International->new($self->session);
-	$self->{_params}{extras} ||= 'onclick="this.value=\''.$i18n->get(452).'\'"';
-	my $html = '<input type="submit" ';
-	$html .= 'name="'.$self->get("name").'" ' if ($self->get("name"));
-	$html .= 'id="'.$self->get('id').'" ' unless ($self->get('id') eq "_formId");
-	$html .= 'value="'.$value.'" '.$extras.' />';
-	return $html;
+sub new {
+    my ( $class, @args ) = @_;
+    my $self = $class->SUPER::new( @args );
+    $self->set( 'type' => 'submit' );
+    return $self;
 }
 
 1;

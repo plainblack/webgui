@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -27,19 +27,15 @@ use Data::Dumper;
 my $session = WebGUI::Test->session;
 
 # Do our work in the import node
-my $node = WebGUI::Asset->getImportNode($session);
+my $node = WebGUI::Test->asset;
 
-my $versionTag = WebGUI::VersionTag->getWorking($session);
-$versionTag->set({name=>"Thingy Test"});
-WebGUI::Test->addToCleanup($versionTag);
 my $thingy = $node->addChild({
     className   => 'WebGUI::Asset::Wobject::Thingy',
     groupIdView => 7,
     url         => 'some_thing',
 });
 is $session->db->quickScalar('select count(*) from assetIndex where assetId=?',[$thingy->getId]), 0, 'no records yet';
-$versionTag->commit;
-$thingy = $thingy->cloneFromDb;
+$thingy->commit;
 
 # Test indexThing, without needing a real thing
 my $groupIdEdit = $thingy->get("groupIdEdit");

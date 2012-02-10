@@ -1,8 +1,36 @@
 package WebGUI::Shop::ShipDriver::FlatRate;
 
 use strict;
-use base qw/WebGUI::Shop::ShipDriver/;
+use Moose;
+use WebGUI::Definition::Shop;
+extends qw/WebGUI::Shop::ShipDriver/;
 use WebGUI::Exception;
+
+define pluginName => ['Flat Rate','ShipDriver_FlatRate'];
+property flatFee => (
+            fieldType    => 'float',
+            label        => ['flatFee', 'ShipDriver_FlatRate'],
+            hoverHelp    => ['flatFee help', 'ShipDriver_FlatRate'],
+            default      => 0,
+         );
+property percentageOfPrice => (
+            fieldType    => 'float',
+            label        => ['percentageOfPrice', 'ShipDriver_FlatRate'],
+            hoverHelp    => ['percentageOfPrice help', 'ShipDriver_FlatRate'],
+            default      => 0,
+         );
+property pricePerWeight => (
+            fieldType    => 'float',
+            label        => ['percentageOfWeight', 'ShipDriver_FlatRate'],
+            hoverHelp    => ['percentageOfWeight help', 'ShipDriver_FlatRate'],
+            default      => 0,
+         );
+property pricePerItem => (
+            fieldType    => 'float',
+            label        => ['pricePerItem', 'ShipDriver_FlatRate'],
+            hoverHelp    => ['pricePerItem help', 'ShipDriver_FlatRate'],
+            default      => 0,
+         );
 
 =head1 NAME
 
@@ -51,16 +79,16 @@ sub calculate {
 		my $sku = $item->getSku;
 		if ($sku->isShippingRequired) {
             my $quantity = $item->get('quantity');
-			$cost += ($quantity * $sku->getPrice * $self->get("percentageOfPrice") / 100)  # cost by price
-				   + ($quantity * $sku->getWeight * $self->get("pricePerWeight") / 100)	# cost by weight
-				   + ($quantity * $self->get("pricePerItem"));								# cost by item
+			$cost += ($quantity * $sku->getPrice * $self->percentageOfPrice / 100)  # cost by price
+				   + ($quantity * $sku->getWeight * $self->pricePerWeight / 100)	# cost by weight
+				   + ($quantity * $self->pricePerItem);								# cost by item
 			$anyShippable = 1;
             ##Account for items which must be shipped separately, and with those that can be shipped
             ##together.
             ## Two items shipped separately    = two bundles
             ## 1 shipped separately plus 1 not = two bundles
             ## two items shipped together      = one bundle
-            if ($sku->shipsSeparately) {
+            if ($sku->isShippingSeparately) {
                 $separatelyShipped += $quantity;
             }
             else {
@@ -69,61 +97,9 @@ sub calculate {
 		}
 	}
 	if ($anyShippable) {
-		$cost += $self->get('flatFee') * ($separatelyShipped + $looseBundle);
+		$cost += $self->flatFee * ($separatelyShipped + $looseBundle);
 	}
     return $cost;
-}
-
-#-------------------------------------------------------------------
-
-=head2 definition ( $session )
-
-This subroutine returns an arrayref of hashrefs, used to validate data put into
-the object by the user, and to automatically generate the edit form to show
-the user.
-
-=cut
-
-sub definition {
-    my $class      = shift;
-    my $session    = shift;
-    WebGUI::Error::InvalidParam->throw(error => q{Must provide a session variable})
-        unless ref $session eq 'WebGUI::Session';
-    my $definition = shift || [];
-    my $i18n = WebGUI::International->new($session, 'ShipDriver_FlatRate');
-    tie my %fields, 'Tie::IxHash';
-    %fields = (
-        flatFee => {
-            fieldType    => 'float',
-            label        => $i18n->get('flatFee'),
-            hoverHelp    => $i18n->get('flatFee help'),
-            defaultValue => 0,
-        },
-        percentageOfPrice => {
-            fieldType    => 'float',
-            label        => $i18n->get('percentageOfPrice'),
-            hoverHelp    => $i18n->get('percentageOfPrice help'),
-            defaultValue => 0,
-        },
-        pricePerWeight => {
-            fieldType    => 'float',
-            label        => $i18n->get('percentageOfWeight'),
-            hoverHelp    => $i18n->get('percentageOfWeight help'),
-            defaultValue => 0,
-        },
-        pricePerItem => {
-            fieldType    => 'float',
-            label        => $i18n->get('pricePerItem'),
-            hoverHelp    => $i18n->get('pricePerItem help'),
-            defaultValue => 0,
-        },
-    );
-    my %properties = (
-        name        => 'Flat Rate',
-        properties  => \%fields,
-    );
-    push @{ $definition }, \%properties;
-    return $class->SUPER::definition($session, $definition);
 }
 
 1;

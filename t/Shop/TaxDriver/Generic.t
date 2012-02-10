@@ -1,6 +1,6 @@
 # vim:syntax=perl
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -13,9 +13,7 @@
 # 
 #
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../../lib";
 use Test::More;
 use Test::Deep;
 use Exception::Class;
@@ -38,16 +36,13 @@ $session->user({userId => 3});
 
 my $addExceptions = getAddExceptions($session);
 
-my $tests = 80 + 2*scalar(@{$addExceptions});
-plan tests => $tests;
-
-#WebGUI::Test->addToCleanup(SQL => 'delete from tax_generic_rates');
+WebGUI::Test->addToCleanup(SQL => 'delete from tax_generic_rates');
 
 #----------------------------------------------------------------------------
 # put your tests here
 
 
-my ($taxableDonation, $taxFreeDonation);
+my $storage;
 
 #######################################################################
 #
@@ -71,7 +66,7 @@ is($session->getId, $taxer->session->getId, 'session method returns OUR session 
 
 my $taxIterator = $taxer->getItems;
 
-isa_ok($taxIterator, 'WebGUI::SQL::ResultSet');
+isa_ok($taxIterator, 'WebGUI::SQL::st');
 
 is($taxIterator->rows, 0, 'WebGUI ships with no predefined tax data');
 
@@ -534,23 +529,23 @@ cmp_deeply(
     'importTaxData: error handling for file that does not exist in the filesystem',
 );
 
-cmp_deeply(
+cmp_bag(
     $taxer->getTaxRates($taxingAddress),
     [0, 5, 0.5],
     'getTaxRates: return correct data for a state with tax data'
-);
+) or diag Dumper $taxer->getTaxRates($taxingAddress);
 
-cmp_deeply(
+cmp_bag(
     $taxer->getTaxRates($taxFreeAddress),
     [0,0],
     'getTaxRates: return correct data for a state with no tax data'
-);
+) or diag Dumper $taxer->getTaxRates($taxFreeAddress);
 
-cmp_deeply(
+cmp_bag(
     $taxer->getTaxRates($alternateAddress),
     [0.0, 8.25], #Hits USA and Los Angeles, California using the alternate spelling of the state
     'getTaxRates: return correct data for a state when the address has alternations'
-);
+) or diag Dumper $taxer->getTaxRates($alternateAddress);
 
 my $capitalized = $taxer->add({
     country => 'USA',
@@ -558,11 +553,11 @@ my $capitalized = $taxer->add({
     taxRate => '50',
 });
 
-cmp_deeply(
+cmp_bag(
     $taxer->getTaxRates($taxingAddress),
     [0, 5, 0.5],
     '... multiple entries with different capitalization, first matches'
-);
+) or diag Dumper $taxer->getTaxRates($taxingAddress);
 
 $taxer->delete({ taxId => $capitalized });
 
@@ -591,21 +586,18 @@ $taxer->importTaxData(
     WebGUI::Test->getTestCollateralPath('taxTables/largeTaxTable.csv')
 ),
 
-$taxableDonation = WebGUI::Asset->getRoot($session)->addChild({
+my $taxableDonation = WebGUI::Asset->getRoot($session)->addChild({
     className => 'WebGUI::Asset::Sku::Donation',
     title     => 'Taxable donation',
     defaultPrice => 100.00,
 });
-WebGUI::Test->addToCleanup($taxableDonation);
+
+my $tag1 = WebGUI::VersionTag->getWorking($session);
+$tag1->commit;
+WebGUI::Test->addToCleanup($tag1);
+$taxableDonation = $taxableDonation->cloneFromDb;
 
 is($taxer->getTaxRate($taxableDonation), 0, 'calculate returns 0 if there is no shippingAddressId in the cart');
-
-
-#    $cart->addItem($taxableDonation);
-
-#   foreach my $item (@{ $cart->getItems }) {
-#        $item->setQuantity(1);
-#    }
 
 my $tax = $taxer->getTaxRate( $taxableDonation, $taxingAddress );
 is($tax, 5.5, 'calculate: simple tax calculation on 1 item in the cart');
@@ -613,38 +605,22 @@ is($tax, 5.5, 'calculate: simple tax calculation on 1 item in the cart');
 $cart->update({ shippingAddressId => $taxFreeAddress->getId});
 is($taxer->getTaxRate( $taxableDonation, $taxFreeAddress ), 0, 'calculate: simple tax calculation on 1 item in the cart, tax free location');
 
-#    foreach my $item (@{ $cart->getItems }) {
-#        $item->setQuantity(2);
-#    }
-#
-#    $cart->update({ shippingAddressId => $taxingAddress->getId});
-#    is($taxer->calculate($cart), 11, 'calculate: simple tax calculation on 1 item in the cart, qty 2');
-
-$taxFreeDonation = WebGUI::Asset->getRoot($session)->addChild({
+my $taxFreeDonation = WebGUI::Asset->getRoot($session)->addChild({
     className => 'WebGUI::Asset::Sku::Donation',
     title     => 'Tax Free Donation',
     defaultPrice => 100.00,
 });
-WebGUI::Test->addToCleanup($taxFreeDonation);
-$taxFreeDonation->setTaxConfiguration( 'WebGUI::Shop::TaxDriver::Generic', {
-    overrideTaxRate => 1,
-    taxRateOverride => 0,
-});
 
-#    $cart->addItem($taxFreeDonation);
+my $tag2 = WebGUI::VersionTag->getWorking($session);
+$tag2->commit;
+WebGUI::Test->addToCleanup($tag2);
+$taxFreeDonation = $taxFreeDonation->cloneFromDb;
 
-#    foreach my $item (@{ $cart->getItems }) {
-#        $item->setQuantity(1);
-#    }
-is($taxer->getTaxRate( $taxFreeDonation, $taxingAddress), 0, 'getTaxRate: tax rate override should override tax derived from address');
+my $tax = $taxer->getTaxRate( $taxableDonation, $taxingAddress );
+is($tax, 5.5, 'calculate: simple tax calculation on 1 item in the cart');
 
-#    my $remoteItem = $cart->addItem($taxableDonation);
-#    $remoteItem->update({shippingAddressId => $taxFreeAddress->getId});
-#
-#    foreach my $item (@{ $cart->getItems }) {
-#        $item->setQuantity(1);
-#    }
-#    is($taxer->calculate($cart), 5.5, 'calculate: simple tax calculation on 2 items in the cart, 1 without taxes, 1 shipped to a location with no taxes');
+$cart->update({ shippingAddressId => $taxFreeAddress->getId});
+is($taxer->getTaxRate( $taxableDonation, $taxFreeAddress ), 0, 'calculate: simple tax calculation on 1 item in the cart, tax free location');
 
 #######################################################################
 #
@@ -655,7 +631,7 @@ is($taxer->getTaxRate( $taxFreeDonation, $taxingAddress), 0, 'getTaxRate: tax ra
 $session->user({userId=>3});
 my $json = $taxer->www_getTaxesAsJson();
 ok($json, 'www_getTaxesAsJson returned something');
-is($session->http->getMimeType, 'application/json', 'MIME type set to application/json');
+is($session->response->content_type, 'application/json', 'MIME type set to application/json');
 my $jsonTax = JSON::from_json($json);
 cmp_deeply(
     $jsonTax,
@@ -684,6 +660,11 @@ TODO: {
     ok(0, 'test results form variable');
     ok(0, 'test keywords');
 }
+
+$cart->delete;
+$book->delete;
+$taxableDonation->purge;
+$taxFreeDonation->purge;
 
 sub getAddExceptions {
     my $session = shift;
@@ -720,4 +701,6 @@ sub getAddExceptions {
         },
     ];
 }
+
+done_testing;
 #vim:ft=perl

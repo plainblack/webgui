@@ -122,7 +122,13 @@ is displayed as part of a Layout Asset, the Layout Asset's <b>Style Template</b>
 
     'mobileStyleTemplateId description' => {
         message => q|Select a style template from the list to enclose your asset if it is viewed on a mobile browser|,
-		lastUpdated => 1268412949,
+		lastUpdated => 1268412722,
+    },
+
+    'Wobject' => {
+        message => q|Wobject|,
+		lastUpdated => 1268412724,
+        context => q|Name of the prototypical wobject object|,
     },
 
 };

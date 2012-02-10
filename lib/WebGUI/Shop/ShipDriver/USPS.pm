@@ -1,7 +1,73 @@
 package WebGUI::Shop::ShipDriver::USPS;
 
 use strict;
-use base qw/WebGUI::Shop::ShipDriver/;
+use Moose;
+use WebGUI::Definition::Shop;
+extends qw/WebGUI::Shop::ShipDriver/;
+define pluginName => ['United States Postal Service', 'ShipDriver_USPS'];
+property instructions => (
+            fieldType     => 'readOnly',
+            label         => ['instructions', 'ShipDriver_USPS'],
+            builder       => '_instructions_default',
+            lazy          => 1,
+            noFormProcess => 1,
+         );
+sub _instructions_default {
+    my $session = shift->session;
+    my $i18n = WebGUI::International->new($session, 'ShipDriver_USPS');
+    return $i18n->get('instructions');
+}
+property userId => (
+            fieldType    => 'text',
+            label        => ['userid', 'ShipDriver_USPS'],
+            hoverHelp    => ['userid help', 'ShipDriver_USPS'],
+            default      => '',
+         );
+property password => (
+            fieldType    => 'password',
+            label        => ['password', 'ShipDriver_USPS'],
+            hoverHelp    => ['password help', 'ShipDriver_USPS'],
+            default      => '',
+         );
+property sourceZip => (
+            fieldType    => 'zipcode',
+            label        => ['source zipcode', 'ShipDriver_USPS'],
+            hoverHelp    => ['source zipcode help', 'ShipDriver_USPS'],
+            default      => '',
+         );
+property shipType => (
+            fieldType    => 'selectBox',
+            label        => ['ship type', 'ShipDriver_USPS'],
+            hoverHelp    => ['ship type help', 'ShipDriver_USPS'],
+            default      => 'PARCEL',
+            options      => \&_shipType_options,
+         );
+sub _shipType_options {
+    my $session = shift->session;
+    my $i18n = WebGUI::International->new($session, 'ShipDriver_USPS');
+    tie my %shippingTypes, 'Tie::IxHash';
+    ##Note, these keys are used by buildXML
+    $shippingTypes{'PRIORITY VARIABLE'} = $i18n->get('priority variable');
+    $shippingTypes{'PRIORITY'}          = $i18n->get('priority');
+    $shippingTypes{'EXPRESS' }          = $i18n->get('express');
+    $shippingTypes{'PARCEL'  }          = $i18n->get('parcel post');
+    return \%shippingTypes;
+}
+property addInsurance => (
+            fieldType    => 'yesNo',
+            label        => ['add insurance', 'ShipDriver_USPS'],
+            hoverHelp    => ['add insurance help', 'ShipDriver_USPS'],
+            default      => 0,
+         );
+property insuranceRates => (
+            fieldType    => 'textarea',
+            label        => ['insurance rates', 'ShipDriver_USPS'],
+            hoverHelp    => ['insurance rates help', 'ShipDriver_USPS'],
+            default      => "50:1.75\n100:2.25",
+         );
+
+
+
 use WebGUI::Exception;
 use XML::Simple;
 use LWP;
@@ -50,15 +116,15 @@ sub buildXML {
     tie my %xmlHash, 'Tie::IxHash';
     %xmlHash = ( RateV3Request => {}, );
     my $xmlTop = $xmlHash{RateV3Request};
-    $xmlTop->{USERID}  = $self->get('userId');
+    $xmlTop->{USERID}  = $self->userId;
     $xmlTop->{Package} = [];
     ##Do a request for each package.
     my $packageIndex;
-    my $shipType  = $self->get('shipType');
+    my $shipType  = $self->shipType;
     my $service   = $shipType eq 'PRIORITY VARIABLE'
                   ? 'PRIORITY'
                   : $shipType;
-    my $sourceZip = $self->get('sourceZip');
+    my $sourceZip = $self->sourceZip;
     $sourceZip    =~ s/^(\d{5}).*$/$1/;
     PACKAGE: for(my $packageIndex = 0; $packageIndex < scalar @packages; $packageIndex++) {
         my $package = $packages[$packageIndex];
@@ -70,7 +136,7 @@ sub buildXML {
             my $itemWeight = $sku->getWeight();
             ##Items that ship separately with a quantity > 1 are rate estimated as 1 item and then the
             ##shipping cost is multiplied by the quantity.
-            if (! $sku->shipsSeparately ) {
+            if (! $sku->isShippingSeparately ) {
                 $itemWeight *= $item->get('quantity');
             }
             $weight += $itemWeight;
@@ -85,7 +151,7 @@ sub buildXML {
         $destZipCode    =~ s/^(\d{5}).*$/$1/;
         $packageData{ID}              = $packageIndex;
         $packageData{Service}         = [ $service                ];
-        $packageData{ZipOrigination}  = [ $self->get('sourceZip') ];
+        $packageData{ZipOrigination}  = [ $self->sourceZip        ];
         $packageData{ZipDestination}  = [ $destZipCode            ];
         $packageData{Pounds}          = [ $pounds                 ];
         $packageData{Ounces}          = [ $ounces                 ];
@@ -128,10 +194,10 @@ costs are assessed.
 
 sub calculate {
     my ($self, $cart) = @_;
-    if (! $self->get('sourceZip')) {
+    if (! $self->sourceZip) {
         WebGUI::Error::InvalidParam->throw(error => q{Driver configured without a source zipcode.});
     }
-    if (! $self->get('userId')) {
+    if (! $self->userId) {
         WebGUI::Error::InvalidParam->throw(error => q{Driver configured without a USPS userId.});
     }
     if ($cart->getShippingAddress->get('country') ne 'United States') {
@@ -146,7 +212,6 @@ sub calculate {
     }
     my $anyShippable = $packageCount > 0 ? 1 : 0;
     return $cost unless $anyShippable;
-    #$cost = scalar @shippableUnits * $self->get('flatFee');
     ##Build XML ($cart, @shippableUnits)
     my $xml = $self->buildXML($cart, @shippableUnits);
     ##Do request ($xml)
@@ -210,7 +275,7 @@ sub _calculateFromXML {
             WebGUI::Error::Shop::RemoteShippingRate->throw(error => $package->{Error}->{Description});
         }
         my $unit = $shippableUnits[$id];
-        if ($unit->[0]->getSku->shipsSeparately) {
+        if ($unit->[0]->getSku->isShippingSeparately) {
             ##This is a single item due to ships separately.  Since in reality there will be
             ## N things being shipped, multiply the rate by the quantity.
             $cost += $rate * $unit->[0]->get('quantity');
@@ -238,8 +303,8 @@ The set of shippable units, which are required to do quantity and cost lookups.
 sub _calculateInsurance {
     my ($self, @shippableUnits) = @_;
     my $insuranceCost  = 0;
-    return $insuranceCost unless $self->get('addInsurance') && $self->get('insuranceRates');
-    my @insuranceTable = _parseInsuranceRates($self->get('insuranceRates'));
+    return $insuranceCost unless $self->addInsurance && $self->insuranceRates;
+    my @insuranceTable = _parseInsuranceRates($self->insuranceRates);
     ##Sort by decreasing value for easy post processing
     @insuranceTable = sort { $a->[0] <=> $b->[0] } @insuranceTable;
     foreach my $package (@shippableUnits) {
@@ -289,92 +354,6 @@ sub _parseInsuranceRates {
         push @table, [ $value, $cost ];
     }
     return @table;
-}
-
-#-------------------------------------------------------------------
-
-=head2 definition ( $session )
-
-This subroutine returns an arrayref of hashrefs, used to validate data put into
-the object by the user, and to automatically generate the edit form to show
-the user.
-
-=cut
-
-sub definition {
-    my $class      = shift;
-    my $session    = shift;
-    WebGUI::Error::InvalidParam->throw(error => q{Must provide a session variable})
-        unless ref $session eq 'WebGUI::Session';
-    my $definition = shift || [];
-    my $i18n = WebGUI::International->new($session, 'ShipDriver_USPS');
-    tie my %shippingTypes, 'Tie::IxHash';
-    ##Note, these keys are used by buildXML
-    $shippingTypes{'PRIORITY VARIABLE'} = $i18n->get('priority variable');
-    $shippingTypes{'PRIORITY'}          = $i18n->get('priority');
-    $shippingTypes{'EXPRESS' }          = $i18n->get('express');
-    $shippingTypes{'PARCEL'  }          = $i18n->get('parcel post');
-    tie my %fields, 'Tie::IxHash';
-    %fields = (
-        instructions => {
-            fieldType     => 'readOnly',
-            label         => $i18n->get('instructions'),
-            defaultValue  => $i18n->get('usps instructions'),
-            noFormProcess => 1,
-        },
-        userId => {
-            fieldType    => 'text',
-            label        => $i18n->get('userid'),
-            hoverHelp    => $i18n->get('userid help'),
-            defaultValue => '',
-        },
-        password => {
-            fieldType    => 'password',
-            label        => $i18n->get('password'),
-            hoverHelp    => $i18n->get('password help'),
-            defaultValue => '',
-        },
-        sourceZip => {
-            fieldType    => 'zipcode',
-            label        => $i18n->get('source zipcode'),
-            hoverHelp    => $i18n->get('source zipcode help'),
-            defaultValue => '',
-        },
-        shipType => {
-            fieldType    => 'selectBox',
-            label        => $i18n->get('ship type'),
-            hoverHelp    => $i18n->get('ship type help'),
-            options      => \%shippingTypes,
-            defaultValue => 'PARCEL',
-        },
-        addInsurance => {
-            fieldType    => 'yesNo',
-            label        => $i18n->get('add insurance'),
-            hoverHelp    => $i18n->get('add insurance help'),
-            defaultValue => 0,
-        },
-        insuranceRates => {
-            fieldType    => 'textarea',
-            label        => $i18n->get('insurance rates'),
-            hoverHelp    => $i18n->get('insurance rates help'),
-            defaultValue => "50:1.75\n100:2.25",
-        },
-##Note, if a flat fee is added to this driver, then according to the license
-##terms the website must display a note to the user (shop customer) that additional
-##fees have been added.
-#        flatFee => {
-#            fieldType    => 'float',
-#            label        => $i18n->get('flatFee'),
-#            hoverHelp    => $i18n->get('flatFee help'),
-#            defaultValue => 0,
-#        },
-    );
-    my %properties = (
-        name        => 'U.S. Postal Service',
-        properties  => \%fields,
-    );
-    push @{ $definition }, \%properties;
-    return $class->SUPER::definition($session, $definition);
 }
 
 #-------------------------------------------------------------------
@@ -437,7 +416,7 @@ sub _getShippableUnits {
     ITEM: foreach my $item (@{$cart->getItems}) {
         my $sku = $item->getSku;
         next ITEM unless $sku->isShippingRequired;
-        if ($sku->shipsSeparately) {
+        if ($sku->isShippingSeparately) {
             push @shippableUnits, [ $item ];
         }
         else {

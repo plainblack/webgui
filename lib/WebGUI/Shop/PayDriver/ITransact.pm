@@ -3,7 +3,7 @@ package WebGUI::Shop::PayDriver::ITransact;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -17,8 +17,41 @@ package WebGUI::Shop::PayDriver::ITransact;
 use strict;
 use XML::Simple;
 use Data::Dumper;
+use Tie::IxHash;
+use LWP::UserAgent;
+use HTTP::Request;
 
-use base qw/WebGUI::Shop::PayDriver/;
+use Moose;
+use WebGUI::Definition::Shop;
+extends 'WebGUI::Shop::PayDriver';
+define pluginName => [qw/Itransact PayDriver_ITransact/];
+property vendorId => (
+           fieldType    => 'text',
+           label        => ['vendorId', 'PayDriver_ITransact'],
+           hoverHelp    => ['vendorId help', 'PayDriver_ITransact'],
+         );
+property password => (
+            fieldType   => 'password',
+            label       => ['password', 'PayDriver_ITransact'],
+            hoverHelp   => ['password help', 'PayDriver_ITransact'],
+         );
+property useCVV2 => (
+            fieldType   => 'yesNo',
+            label       => ['use cvv2', 'PayDriver_ITransact'],
+            hoverHelp   => ['use cvv2 help', 'PayDriver_ITransact'],
+         );
+property credentialsTemplateId => (
+            fieldType    => 'template',
+            label        => ['credentials template', 'PayDriver_ITransact'],
+            hoverHelp    => ['credentials template help', 'PayDriver_ITransact'],
+            namespace    => 'Shop/Credentials',
+            default      => 'itransact_credentials1',    
+         );
+property emailMessage => (
+            fieldType   => 'textarea',
+            label       => ['emailMessage', 'PayDriver_ITransact'],
+            hoverHelp   => ['emailMessage help', 'PayDriver_ITransact'],
+         );
 
 #-------------------------------------------------------------------
 sub _generateCancelRecurXml {
@@ -27,8 +60,8 @@ sub _generateCancelRecurXml {
 
     # Construct xml
     my $vendorIdentification;
-    $vendorIdentification->{ VendorId           } = $self->get('vendorId');
-    $vendorIdentification->{ VendorPassword     } = $self->get('password');
+    $vendorIdentification->{ VendorId           } = $self->vendorId;
+    $vendorIdentification->{ VendorPassword     } = $self->password;
     $vendorIdentification->{ HomePage           } = $self->session->setting->get("companyURL");
     
     my $recurUpdate;
@@ -79,7 +112,7 @@ sub _generatePaymentRequestXML {
     $cardInfo->{ CCNum      } = $cardData->{ acct       };
     $cardInfo->{ CCMo       } = $cardData->{ expMonth   };
     $cardInfo->{ CCYr       } = $cardData->{ expYear    };
-    $cardInfo->{ CVV2Number } = $cardData->{ cvv2       } if $self->get('useCVV2');
+    $cardInfo->{ CVV2Number } = $cardData->{ cvv2       } if $self->useCVV2;
 
     my $customerData;
     $customerData->{ Email                          } = $paymentAddress->{ email };
@@ -89,7 +122,7 @@ sub _generatePaymentRequestXML {
     # --- Transaction data part ---
     my $emailText;
     $emailText->{ EmailTextItem     } = [
-        $self->get('emailMessage'),
+        $self->emailMessage,
         'ID: '. $transaction->getId,
     ];
 
@@ -152,8 +185,8 @@ sub _generatePaymentRequestXML {
     $vendorData->{ Element  }->{ Value  } = $transaction->getId;
 
     my $transactionData;
-    $transactionData->{ VendorId        } = $self->get('vendorId');
-    $transactionData->{ VendorPassword  } = $self->get('password');
+    $transactionData->{ VendorId        } = $self->vendorId;
+    $transactionData->{ VendorPassword  } = $self->password;
     $transactionData->{ VendorData      } = $vendorData;
     $transactionData->{ HomePage        } = $self->session->setting->get("companyURL");
     $transactionData->{ RecurringData   } = $recurringData if $recurringData;
@@ -246,7 +279,7 @@ sub cancelRecurringPayment {
 
     # Get the payment definition XML
     my $xml = $self->_generateCancelRecurXml( $transaction );
-    $session->errorHandler->debug("XML Request: $xml");
+    $session->log->debug("XML Request: $xml");
 
     # Post the xml to ITransact 
     my $response = $self->doXmlRequest( $xml, 1 );
@@ -254,11 +287,11 @@ sub cancelRecurringPayment {
     # Process response
 	if ($response->is_success) {
 		# We got some XML back from iTransact, now parse it.
-        $session->errorHandler->info('Starting request');
+        $session->log->info('Starting request');
         my $transactionResult = XMLin( $response->content );
 		unless (defined $transactionResult->{ RecurUpdateResponse }) {
 			# GatewayFailureResponse: This means the xml is invalid or has the wrong mime type
-            $session->errorHandler->info( "GatewayFailureResponse: result: [" . $response->content . "]" );
+            $session->log->info( "GatewayFailureResponse: result: [" . $response->content . "]" );
             return( 
                 0, 
                 "Status: "      . $transactionResult->{ Status }
@@ -268,7 +301,7 @@ sub cancelRecurringPayment {
 		} else {
             # RecurUpdateResponse: We have succesfully sent the XML and it was correct. Note that this doesn't mean
             # that the cancellation has succeeded. It only has if Status is set to OK and the remaining terms is 0.
-            $session->errorHandler->info( "RecurUpdateResponse: result: [" . $response->content . "]" );
+            $session->log->info( "RecurUpdateResponse: result: [" . $response->content . "]" );
             my $transactionData = $transactionResult->{ RecurUpdateResponse };
 
             my $status          = $transactionData->{ Status            };
@@ -283,7 +316,7 @@ sub cancelRecurringPayment {
 		}
 	} else {
 		# Connection Error
-        $session->errorHandler->info("Connection error");
+        $session->log->info("Connection error");
 
         return ( 0, undef, 'ConnectionError', $response->status_line );
 	}
@@ -317,8 +350,8 @@ sub checkRecurringTransaction {
     my $xmlStructure = {
         GatewayInterface => {
             VendorIdentification    => {
-                VendorId        => $self->get('vendorId'),
-                VendorPassword  => $self->get('password'),
+                VendorId        => $self->vendorId,
+                VendorPassword  => $self->password,
                 HomePage        => ,
             },
             RecurDetails            => {
@@ -338,26 +371,26 @@ sub checkRecurringTransaction {
     my $response = $self->doXmlRequest( $xml, 1 );
 
     if ($response->is_success) {
-        $session->errorHandler->info("Check recurring postback response: [".$response->content."]"); 
+        $session->log->info("Check recurring postback response: [".$response->content."]"); 
 		# We got some XML back from iTransact, now parse it.
         my $transactionResult = XMLin( $response->content || '<empty></empty>');
 
         unless (defined $transactionResult->{ RecurDetailsResponse }) {
             # Something went wrong.
-            $session->errorHandler->info("Check recurring postback failed!");
+            $session->log->info("Check recurring postback failed!");
 
             return 0;
 		} else {
-            $session->errorHandler->info("Check recurring postback! Response: [".$response->content."]");
+            $session->log->info("Check recurring postback! Response: [".$response->content."]");
             
             my $data    = $transactionResult->{ RecurDetailsResponse };
 
             my $status  = $data->{ Status       };
             my $amount  = $data->{ RecurDetails }->{ RecurTotal };
 
-            $session->errorHandler->info("Check recurring postback! Status: $status");
+            $session->log->info("Check recurring postback! Status: $status");
             if ( $amount != $expectedAmount ) {
-                $session->errorHandler->info(
+                $session->log->info(
                     "Check recurring postback, received amount: $amount not equal to expected amount: $expectedAmount"
                 );
 
@@ -368,60 +401,10 @@ sub checkRecurringTransaction {
 		}
 	} else {
 		# Connection Error
-        $session->errorHandler->info("Connection error");
+        $session->log->info("Connection error");
 
         return 0;
 	}
-}
-
-#-------------------------------------------------------------------
-sub definition {
-    my $class       = shift;
-    my $session     = shift;
-    WebGUI::Error::InvalidParam->throw(error => q{Must provide a session variable})
-        unless ref $session eq 'WebGUI::Session';
-    my $definition  = shift;
-
-    my $i18n = WebGUI::International->new($session, 'PayDriver_ITransact');
-
-    tie my %fields, 'Tie::IxHash';
-    %fields = (
-        vendorId        => {
-           fieldType    => 'text',
-           label        => $i18n->get('vendorId'),
-           hoverHelp    => $i18n->get('vendorId help'),
-        },
-        password        => {
-            fieldType   => 'password',
-            label       => $i18n->get('password'),
-            hoverHelp   => $i18n->get('password help'),
-        },
-        useCVV2         => {
-            fieldType   => 'yesNo',
-            label       => $i18n->get('use cvv2'),
-            hoverHelp   => $i18n->get('use cvv2 help'),
-        },
-        credentialsTemplateId  => {
-            fieldType    => 'template',
-            label        => $i18n->get('credentials template'),
-            hoverHelp    => $i18n->get('credentials template help'),
-            namespace    => 'Shop/Credentials',
-            defaultValue => 'itransact_credentials1',	
-        },
-        emailMessage    => {
-            fieldType   => 'textarea',
-            label       => $i18n->get('emailMessage'),
-            hoverHelp   => $i18n->get('emailMessage help'),
-        },
-        # readonly stuff from old plugin here?
-    );
- 
-    push @{ $definition }, {
-        name        => $i18n->get('Itransact'),
-        properties  => \%fields,
-    };
-
-    return $class->SUPER::definition($session, $definition);
 }
 
 #-------------------------------------------------------------------
@@ -546,7 +529,7 @@ sub processPayment {
 #### TODO: More checking: price, address, etc
 		unless (defined $transactionResult->{ TransactionData }) {
 			# GatewayFailureResponse: This means the xml is invalid or has the wrong mime type
-            $session->errorHandler->info("GatewayFailureResponse: result: [".$response->content."]");
+            $session->log->info("GatewayFailureResponse: result: [".$response->content."]");
             return( 
                 0, 
                 undef, 
@@ -556,7 +539,7 @@ sub processPayment {
 		} else {
             # SaleResponse: We have succesfully sent the XML and it was correct. Note that this doesn't mean that
             # the transaction has succeeded. It only has if Status is set to OK.
-            $session->errorHandler->info("SaleResponse: result: [".$response->content."]");
+            $session->log->info("SaleResponse: result: [".$response->content."]");
             my $transactionData = $transactionResult->{ TransactionData };
 
             my $status          = $transactionData->{ Status            };
@@ -571,7 +554,7 @@ sub processPayment {
 		}
 	} else {
 		# Connection Error
-        $session->errorHandler->info("Connection error");
+        $session->log->info("Connection error");
 
         return ( 0, undef, 'ConnectionError', $response->status_line );
 	}
@@ -596,16 +579,17 @@ sub www_edit {
     my $form = $self->getEditForm;
     $form->submit;
 
+    ##Form to let the user log into their ITransact account from here.
     my $terminal = WebGUI::HTMLForm->new($session, action=>"https://secure.paymentclearing.com/cgi-bin/rc/sess.cgi", extras=>'target="_blank"');
     $terminal->hidden(name=>"ret_addr", value=>"/cgi-bin/rc/sure/sure.cgi?sure_template_code=session_check&sure_use_session_mid=1");
     $terminal->hidden(name=>"override", value=>1);
     $terminal->hidden(name=>"cookie_precheck", value=>0);
-    $terminal->hidden(name=>"mid", value=>$self->get('vendorId'));
-    $terminal->hidden(name=>"pwd", value=>$self->get('password'));
+    $terminal->hidden(name=>"mid", value=>$self->vendorId);
+    $terminal->hidden(name=>"pwd", value=>$self->password);
     $terminal->submit(value=>$i18n->get('show terminal'));
     
     my $output = '<br />';
-    if ($self->get('vendorId')) {
+    if ($self->vendorId) {
         $output .= $terminal->print.'<br />';
     }
     $output .= $i18n->get('extra info').'<br />'
@@ -661,7 +645,7 @@ sub www_getCredentials {
     $var->{cvv2Field} = WebGUI::Form::integer($session, {
         name  => 'cvv2',
         value => $self->session->form->process("cvv2"),
-    }) if $self->get('useCVV2');
+    }) if $self->useCVV2;
 
     $var->{checkoutButton} = WebGUI::Form::submit($session, {
         value => $i18n->get('checkout button', 'Shop'),
@@ -669,7 +653,7 @@ sub www_getCredentials {
     });
     $self->appendCartVariables($var);
 
-    my $output   = $self->processTemplate($self->get("credentialsTemplateId"), $var);
+    my $output   = $self->processTemplate($self->credentialsTemplateId, $var);
     return $session->style->userStyle($output);
 }
 
@@ -715,7 +699,7 @@ do whatever other activity a Sku purchase would allow.
 sub www_processRecurringTransactionPostback {
 	my $self    = shift;
     my $session = $self->session;
-	$session->http->setMimeType('text/plain');
+	$session->response->content_type('text/plain');
     my $form    = $session->form;
 
     # Get posted data of interest
@@ -730,15 +714,15 @@ sub www_processRecurringTransactionPostback {
     #---- Check the validity of the request -------
     # First check whether the original transaction actualy exists
     if (WebGUI::Error->caught || !(defined $baseTransaction) ) {   
-        $session->errorHandler->warn("Check recurring postback: No base transction for XID: [$originatingXid]");
-	$session->http->setStatus('500', "No base transction for XID: [$originatingXid]");
+        $session->log->warn("Check recurring postback: No base transction for XID: [$originatingXid]");
+        $session->response->status(500);
         return "Check recurring postback. No base transction for XID: [$originatingXid]";
     }
 
     # Secondly check if the postback is coming from secure.paymentclearing.com
     # This will most certainly fail on mod_proxied webgui instances
 #    unless ( $ENV{ HTTP_HOST } eq 'secure.paymentclearing.com') {
-#        $session->errorHandler->info('ITransact Recurring Payment Postback is coming from host: ['.$ENV{ HTTP_HOST }.']');
+#        $session->log->info('ITransact Recurring Payment Postback is coming from host: ['.$ENV{ HTTP_HOST }.']');
 #        return;
 #    }
 
@@ -747,7 +731,7 @@ sub www_processRecurringTransactionPostback {
 #        $baseTransaction->get('amount') + $baseTransaction->get('taxes') + $baseTransaction->get('shippingPrice') );
 
 #    unless ( $self->checkRecurringTransaction( $xid, $expectedAmount ) ) {
-#        $session->errorHandler->warn('Check recurring postback: transaction check failed.');
+#        $session->log->warn('Check recurring postback: transaction check failed.');
  #       return 'Check recurring postback: transaction check failed.';
 #    }
     #---- Passed all test, continue ---------------

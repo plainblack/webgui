@@ -1,7 +1,7 @@
 package WebGUI::Macro::L_loginBox;
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -14,6 +14,7 @@ use strict;
 use WebGUI::Form;
 use WebGUI::International;
 use WebGUI::Asset::Template;
+use URI;
 
 =head1 NAME
 
@@ -68,7 +69,7 @@ sub process {
 	my $templateId = $param[2] || "PBtmpl0000000000000044";
 	my %var;	
 	my $i18n = WebGUI::International->new($session,'Macro_L_loginBox');
-        $var{'user.isVisitor'} = ($session->var->get("userId") eq "1");
+        $var{'user.isVisitor'} = ($session->user->isVisitor);
 	$var{'customText'} = $param[1];
 	$var{'customText'} =~ s/%(.*?)%/_createURL($session,$1)/ge;
 	$var{'hello.label'} = $i18n->get(48);
@@ -77,57 +78,63 @@ sub process {
         $var{'logout.label'} = $i18n->get(49);
         
         # A hidden field with the current URL
+    use WebGUI::Form::Hidden;
         my $returnUrl   = $session->url->page;
         if ( !$session->form->get("op") eq "auth" ) {
-            $returnUrl  .= '?' . $session->env->get( "QUERY_STRING" );
+            $returnUrl  .= '?' . $session->request->env->{ "QUERY_STRING" };
         }
         $var{'form.returnUrl'} 
-            = WebGUI::Form::hidden( $session, {
+            = WebGUI::Form::Hidden->new( $session, {
                 name        => 'returnUrl',
-                value       => $session->url->page($session->env->get("QUERY_STRING")),
-            });
+                value       => $session->url->page($session->request->env->{"QUERY_STRING"}),
+            })->toHtml;
             
         # Fix box size
         my $boxSize = $param[0];
         $boxSize = 12 unless ($boxSize);
-        if (index(lc($session->env->get("HTTP_USER_AGENT")),"msie") < 0) {
+        if ($session->request->browser->ie) {
         	$boxSize = int($boxSize=$boxSize*2/3);
         }
 
 	my $action;
         if ($session->setting->get("encryptLogin")) {
-                $action = $session->url->page(undef,1);
-                $action =~ s/http:/https:/;
+                my $uri = URI->new($session->url->page(undef,1));
+                $uri->scheme('https');
+                $uri->host_port($uri->host);
+                $action = $uri->canonical->as_string;
         }
+    use WebGUI::Form::Text;
+    use WebGUI::Form::Password;
+    use WebGUI::Form::Submit;
 	$var{'form.header'} = WebGUI::Form::formHeader($session,{action=>$action})
-		.WebGUI::Form::hidden($session,{
+		.WebGUI::Form::Hidden->new($session,{
 			name=>"op",
 			value=>"auth"
-			})
-		.WebGUI::Form::hidden($session,{
+			})->toHtml
+		.WebGUI::Form::Hidden->new($session,{
 			name=>"method",
 			value=>"login"
-			});
+			})->toHtml;
 	$var{'username.label'} = $i18n->get(50, 'WebGUI');
-	$var{'username.form'} = WebGUI::Form::text($session,{
+	$var{'username.form'} = WebGUI::Form::Text->new($session,{
 		name=>"username",
 		size=>$boxSize,
 		extras=>'class="loginBoxField"'
-		});
+		})->toHtml;
         $var{'password.label'} = $i18n->get(51, 'WebGUI');
-        $var{'password.form'} = WebGUI::Form::password($session,{
+        $var{'password.form'} = WebGUI::Form::Password->new($session,{
 		name=>"identifier",
 		size=>$boxSize,
 		extras=>'class="loginBoxField"'
-		});
-        $var{'form.login'} = WebGUI::Form::submit($session,{
+		})->toHtml;
+        $var{'form.login'} = WebGUI::Form::Submit->new($session,{
 		value=>$i18n->get(52, 'WebGUI'),
 		extras=>'class="loginBoxButton"'
-		});
+		})->toHtml;
         $var{'account.create.url'} = $session->url->page('op=auth;method=createAccount');
 	$var{'account.create.label'} = $i18n->get(407, 'WebGUI');
 	$var{'form.footer'} = WebGUI::Form::formFooter($session,);
-        return WebGUI::Asset::Template->new($session,$templateId)->process(\%var); 
+        return WebGUI::Asset::Template->newById($session,$templateId)->process(\%var); 
 }
 
 1;

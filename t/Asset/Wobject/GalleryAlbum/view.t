@@ -1,6 +1,6 @@
 # $vim: syntax=perl
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -9,9 +9,7 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../../../lib";
 
 ## The goal of this test is to test the default view and associated subs
 
@@ -42,11 +40,6 @@ my $album
     = $gallery->addChild({
         className           => "WebGUI::Asset::Wobject::GalleryAlbum",
         ownerUserId         => "3", # Admin
-    },
-    undef,
-    undef,
-    {
-        skipAutoCommitWorkflows => 1,
     });
 my @photos;
 for my $i ( 0 .. 5 ) {
@@ -54,11 +47,6 @@ for my $i ( 0 .. 5 ) {
         = $album->addChild({
             className           => "WebGUI::Asset::File::GalleryFile::Photo",
             filename            => "$i.jpg",
-        },
-        undef,
-        undef,
-        {
-            skipAutoCommitWorkflows => 1,
         });
 }
 
@@ -96,7 +84,7 @@ cmp_deeply(
 my $expected = {
     "url_addPhoto" 
         => all( 
-            re( qr/class=WebGUI::Asset::File::GalleryFile::Photo/ ), 
+            re( qr/className=WebGUI::Asset::File::GalleryFile::Photo/ ), 
             re( qr/func=add/ ),
             re( $album->getUrl ),
         ),

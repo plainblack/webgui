@@ -1,7 +1,7 @@
 package WebGUI::Operation::Auth;
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -20,7 +20,6 @@ use WebGUI::Operation::Shared;
 use WebGUI::Pluggable;
 use WebGUI::SQL;
 use WebGUI::User;
-use WebGUI::Utility;
 
 
 #-------------------------------------------------------------------
@@ -46,9 +45,9 @@ sub getInstance {
 
 	my $userId = $_[1];
 	#Create Auth Object
-    my $auth = eval { WebGUI::Pluggable::instanciate("WebGUI::Auth::".$authMethod, "new", [ $session, $authMethod, $userId ] ) };
+    my $auth = eval { WebGUI::Pluggable::instanciate("WebGUI::Auth::".$authMethod, "new", [ $session, $userId ] ) };
     if ($@) {
-        $session->errorHandler->fatal($@);
+        $session->log->fatal($@);
     }
     else {
         return $auth;
@@ -70,13 +69,13 @@ is returned.
 
 sub www_auth {
 	my $session = shift;
-	$session->http->setCacheControl("none");
+	$session->response->setCacheControl("none");
 	my $auth;
 	($auth) = $session->db->quickArray("select authMethod from users where username=".$session->db->quote($session->form->process("username"))) if($session->form->process("username"));
 	my $authMethod = getInstance($session,$auth);
-	my $methodCall = shift || $session->form->process("method") || "init";
+	my $methodCall = shift || $session->form->process("method") || "view";
 	if(!$authMethod->isCallable($methodCall)){
-		$session->errorHandler->security("access uncallable auth method: $methodCall");
+		$session->log->security("access uncallable auth method: $methodCall");
 		my $i18n = WebGUI::International->new($session);
 		return $i18n->get(1077);
 	}
@@ -85,7 +84,7 @@ sub www_auth {
         my $method  = $authMethod->can( 'www_' . $methodCall )
                     || $authMethod->can( $methodCall );
     my $out = $method->( $authMethod );
-    if (substr($session->http->getMimeType(),0,9) eq "text/html") {
+    if (substr($session->response->content_type(),0,9) eq "text/html") {
 	    return $session->style->userStyle($out);
     }
     else {

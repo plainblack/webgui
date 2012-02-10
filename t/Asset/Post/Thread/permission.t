@@ -1,6 +1,6 @@
 # vim:syntax=perl
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -13,9 +13,7 @@
 # 
 #
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../../../lib";
 use Test::More;
 use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
@@ -26,7 +24,7 @@ use WebGUI::Test::Maker::Permission;
 my $session         = WebGUI::Test->session;
 $session->user( { userId => 3 } );
 my $maker           = WebGUI::Test::Maker::Permission->new;
-my $node            = WebGUI::Asset->getImportNode( $session );
+my $node            = WebGUI::Test->asset();
 
 my %user;
 $user{"2"}          = WebGUI::User->new( $session, "new" );
@@ -58,12 +56,13 @@ my $thread
         ownerUserId         => $user{"2"}->userId,  
         groupIdView         => 7,
     }, @addArgs );
+$thread->setSkipNotification;
 
 $versionTag->commit( { timeout => 1_000_000 } );
 
 # Re-load the collab to get the newly committed properties
-$collab = WebGUI::Asset->newByDynamicClass( $session, $collab->getId );
-$thread = WebGUI::Asset->newByDynamicClass( $session, $thread->getId );
+$collab = WebGUI::Asset->newById( $session, $collab->getId );
+$thread = WebGUI::Asset->newById( $session, $thread->getId );
 
 #----------------------------------------------------------------------------
 # Tests
@@ -104,7 +103,7 @@ $maker->prepare( {
 
 # Reply with allowReplies = 0
 $collab->update({ allowReplies => 0 });
-$thread = WebGUI::Asset->newByDynamicClass( $session, $thread->getId );
+$thread = WebGUI::Asset->newById( $session, $thread->getId );
 $maker->prepare( {
     object      => $thread,
     method      => 'canReply',

@@ -5,8 +5,8 @@ use strict;
 use WebGUI::Exception;
 use WebGUI::International;
 use WebGUI::Pluggable;
-use WebGUI::Utility;
 use WebGUI::Operation::Auth;
+use Tie::IxHash;
 
 use base qw/WebGUI::Account/;
 
@@ -41,23 +41,23 @@ sub editSettingsForm {
     my $session = $self->session;
     my $setting = $session->setting;
     my $i18n    = WebGUI::International->new($session,'Account_Contributions');
-    my $f       = WebGUI::HTMLForm->new($session);
+    my $f       = WebGUI::FormBuilder->new($session);
 
-    $f->template(
+    $f->addField( "template",
 		name      => "contribStyleTemplateId",
 		value     => $self->getStyleTemplateId,
 		namespace => "style",
 		label     => $i18n->get("contrib style template label"),
         hoverHelp => $i18n->get("contrib style template hoverHelp")
     );
-    $f->template(
+    $f->addField( "template",
 		name      => "contribLayoutTemplateId",
 		value     => $self->getLayoutTemplateId,
 		namespace => "Account/Layout",
 		label     => $i18n->get("contrib layout template label"),
         hoverHelp => $i18n->get("contrib layout template hoverHelp")
     );
-    $f->template(
+    $f->addField( "template",
 		name      => "contribViewTemplateId",
 		value     => $self->getViewTemplateId,
 		namespace => "Account/Contrib/View",
@@ -65,7 +65,7 @@ sub editSettingsForm {
         hoverHelp => $i18n->get("contrib view template hoverHelp")
     );
 
-    return $f->printRowsOnly;
+    return $f;
 }
 
 #-------------------------------------------------------------------
@@ -196,9 +196,13 @@ sub www_view {
     
     #Export page to template
     my @contribs = ();
-    foreach my $row ( @{$p->getPageData} ) {
+    ROW: foreach my $row ( @{$p->getPageData} ) {
         my $assetId    = $row->{assetId};
-        my $asset      = WebGUI::Asset->newByDynamicClass( $session, $assetId );
+        my $asset      = eval { WebGUI::Asset->newById( $session, $assetId ); };
+        if (Exception::Class->caught()) {
+            $session->log->error("Unable to instanciate assetId $assetId: $@");
+            next ROW;
+        }
         my $props      = $asset->get;
         $props->{url}  = $asset->getUrl;
         push(@contribs,$props);
@@ -211,12 +215,12 @@ sub www_view {
 
     tie my %rpps, "Tie::IxHash";
     %rpps = (25 => "25", 50 => "50", 100=>"100");
-    $var->{'contributions_rpp'  } = WebGUI::Form::selectBox($session,{
+    $var->{'contributions_rpp'  } = WebGUI::Form::SelectBox->new($session,{
         name    =>"rpp",
         options => \%rpps,
         value   => $session->form->get("rpp") || 25,
         extras  => q{onchange="location.href='}.$var->{'rpp_url'}.q{;rpp='+this.options[this.selectedIndex].value"}
-    });
+    })->toHtml;
 
     $self->appendCommonVars($var);
     $p->appendTemplateVars($var);

@@ -3,7 +3,7 @@ package WebGUI::Asset::NewAsset;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -143,11 +143,12 @@ Making private. See WebGUI::Asset::indexContent() for additonal details.
 
 =cut
 
-sub indexContent {
+around indexContent => sub {
+    my $orig    = shift;
     my $self    = shift;
-    my $indexer = $self->SUPER::indexContent;
+    my $indexer = $self->$orig(@_);
     $indexer->setIsPublic(0);
-}
+};
 
 #-------------------------------------------------------------------
 
@@ -160,14 +161,14 @@ See WebGUI::Asset::prepareView() for details.
 sub prepareView {
     my $self = shift;
     $self->SUPER::prepareView();
-    my $template = WebGUI::Asset::Template->new( $self->session, $self->get("templateId") );
+    my $template = WebGUI::Asset::Template->newById( $self->session, $self->get("templateId") );
     $template->prepare($self->getMetaDataAsTemplateVariables);
     $self->{_viewTemplate} = $template;
 }
 
 #-------------------------------------------------------------------
 
-=head2 processPropertiesFromFormPost ( )
+=head2 processEditForm ( )
 
 Used to process properties from the form posted.  Do custom things with
 noFormPost fields here, or do whatever you want.  This method is called
@@ -175,9 +176,9 @@ when /yourAssetUrl?func=editSave is requested/posted.
 
 =cut
 
-sub processPropertiesFromFormPost {
+sub processEditForm {
     my $self = shift;
-    $self->SUPER::processPropertiesFromFormPost;
+    $self->SUPER::processEditForm;
 }
 
 #-------------------------------------------------------------------
@@ -192,10 +193,10 @@ asset instances, you will need to purge them here.
 
 =cut
 
-sub purge {
+override purge => sub {
     my $self = shift;
-    return $self->SUPER::purge;
-}
+    return super();
+};
 
 #-------------------------------------------------------------------
 
@@ -205,10 +206,10 @@ This method is called when data is purged by the system.
 
 =cut
 
-sub purgeRevision {
+override purgeRevision => sub {
     my $self = shift;
-    return $self->SUPER::purgeRevision;
-}
+    return super();
+};
 
 #-------------------------------------------------------------------
 

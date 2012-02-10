@@ -3,7 +3,7 @@ package WebGUI::International;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -16,7 +16,6 @@ package WebGUI::International;
 
 
 use strict qw(vars subs);
-use WebGUI::Session;
 use WebGUI::Pluggable;
 use Module::Find qw(findsubmod);
 
@@ -170,7 +169,7 @@ sub getLanguage {
         no strict 'refs';
         ${"$pack\::LANGUAGE"};
     };
-    $self->session->errorHandler->warn("Failed to retrieve language properties because ".$@) if ($@);
+    $self->session->log->warn("Failed to retrieve language properties because ".$@) if ($@);
     if ($property) {
         return $langInfo->{$property};
     }
@@ -280,7 +279,7 @@ Specify a default language. Defaults to user preference or "English".
 sub new {
 	my ($class, $session, $namespace, $language) = @_;
     $namespace ||= 'WebGUI';
-    $language ||= $session->scratch->getLanguageOverride() || $session->user->profileField('language');
+    $language ||= $session->scratch->getLanguageOverride() || $session->user->get('language');
 	my $self =
         bless {
             _session   => $session,

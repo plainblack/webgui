@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -13,6 +13,7 @@ use strict;
 use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
+use WebGUI::Test::MockAsset;
 use WebGUI::Session;
 use WebGUI::Asset;
 
@@ -48,8 +49,8 @@ $session->request->setup_body({
     assetId         => 'new',
 });
 {
-    WebGUI::Test->mockAssetId($templateId, $templateMock);
-    $rootAsset->www_editSave;
+    WebGUI::Test::MockAsset->mock_id($templateId, $templateMock);
+    $rootAsset->www_addSave;
     like $templateVars->{'body.content'}, qr/limited the number of assets/, 'tripped maximumAssets';
     my $count = $session->db->quickScalar('select count(*) from asset');
 }

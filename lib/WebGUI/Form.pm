@@ -3,7 +3,7 @@ package WebGUI::Form;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -17,19 +17,19 @@ package WebGUI::Form;
 use strict;
 use Carp qw( croak );
 use Scalar::Util qw( blessed );
-use Tie::IxHash;
-use WebGUI::Asset;
-use WebGUI::Asset::RichEdit;
-use WebGUI::Asset::Template;
 use WebGUI::International;
 use WebGUI::Pluggable;
-use WebGUI::Utility;
+use WebGUI::Deprecate;
 
 =head1 NAME
 
 Package WebGUI::Form
 
 =head1 DESCRIPTION
+
+NOTE: This module is deprecated. You should use WebGUI::FormBuilder to create
+and process forms built with WebGUI::Form::Control objects (all of the 
+WebGUI::Form::* modules).
 
 This is a convenience package which provides a simple interface to use all of the form controls without having to load each one seperately, create objects, and call methods.
 
@@ -63,14 +63,16 @@ Dynamically creates functions on the fly for all the different form control type
 sub AUTOLOAD {
 	our $AUTOLOAD;
     return if $AUTOLOAD =~ m/::DESTROY$/;
-	my $name = ucfirst((split /::/, $AUTOLOAD)[-1]);	
+        my $method = (split /::/, $AUTOLOAD)[-1];
+	my $name = ucfirst($method);	
 	my $session = shift;
 	my @params = @_;
     my $control = eval { WebGUI::Pluggable::instanciate("WebGUI::Form::".$name, "new", [ $session, @params ]) };
     if ($@) {
-        $session->errorHandler->error($@);
+        $session->log->error($@);
         return undef;
     }
+    derp "Using WebGUI::Form::$method is deprecated. Use WebGUI::Form::$name->new() and toHtml() instead.";
 	return $control->toHtml;
 }
 
@@ -142,13 +144,15 @@ sub formHeader {
     my $enctype     = (exists $params->{enctype} && $params->{enctype} ne "") ? $params->{enctype} : "multipart/form-data";
 
     # Fix a query string in the action URL
-    my $hidden = csrfToken($session);
+    use WebGUI::Form::CsrfToken;
+    my $hidden = WebGUI::Form::CsrfToken->new($session)->toHtml;
+    use WebGUI::Form::Hidden;
     if ($action =~ /\?/) {
         ($action, my $query) = split /\?/, $action, 2;
         my @params = split /[&;]/, $query;
         foreach my $param ( @params ) {
             my ($name, $value) = split /=/, $param;
-            $hidden .= hidden( $session, { name => $name, value => $value } );
+            $hidden .= WebGUI::Form::Hidden->new( $session, { name => $name, value => $value } )->toHtml;
         }
     }
 

@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -266,7 +266,7 @@ is @{ $search->getAssetIds }, 3, 'setup for indexContent, start with 3 records..
 
 my $updateTag = WebGUI::VersionTag->getWorking($session);
 WebGUI::Test->addToCleanup($updateTag);
-$thingy = $thingy->addRevision({ url => 'wild_thing' });
+$thingy = $thingy->addRevision({ url => 'wild_thing',});
 $updateTag->commit;
 $thingy = $thingy->cloneFromDb;
 

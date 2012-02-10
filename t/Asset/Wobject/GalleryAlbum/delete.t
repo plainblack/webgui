@@ -1,6 +1,6 @@
 # $vim: syntax=perl
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -9,9 +9,7 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../../../lib";
 
 ## The goal of this test is to test the deleting of GalleryAlbums
 
@@ -25,10 +23,7 @@ use Test::More;
 my $maker           = WebGUI::Test::Maker::HTML->new;
 my $session         = WebGUI::Test->session;
 $session->user({ userId => 3 });
-my $node            = WebGUI::Asset->getImportNode($session);
-my $versionTag      = WebGUI::VersionTag->getWorking($session);
-$versionTag->set({name=>"Album Test"});
-WebGUI::Test->addToCleanup($versionTag);
+my $node            = WebGUI::Test->asset;
 my $gallery
     = $node->addChild({
         className           => "WebGUI::Asset::Wobject::Gallery",
@@ -42,14 +37,7 @@ my $album
     = $gallery->addChild({
         className           => "WebGUI::Asset::Wobject::GalleryAlbum",
         ownerUserId         => "3", # Admin
-    },
-    undef,
-    undef,
-    {
-        skipAutoCommitWorkflows => 1,
     });
-
-$versionTag->commit;
 
 #----------------------------------------------------------------------------
 # Tests
@@ -96,11 +84,7 @@ $maker->prepare({
 });
 $maker->run;
 
-is(
-    WebGUI::Asset->newByDynamicClass( $session, $assetId ),
-    undef,
-    "GalleryAlbum cannot be instanciated after www_deleteConfirm",
-);
-
+eval { WebGUI::Asset->newById( $session, $assetId ); };
+ok (Exception::Class->caught(), "GalleryAlbum cannot be instanciated after www_deleteConfirm");
 
 #vim:ft=perl

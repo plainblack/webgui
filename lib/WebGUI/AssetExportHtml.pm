@@ -3,7 +3,7 @@ package WebGUI::Asset;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -20,11 +20,11 @@ use Path::Class ();
 use Scalar::Util qw(looks_like_number);
 use WebGUI::International;
 use WebGUI::Exception;
-use WebGUI::Utility ();
 use WebGUI::Session;
-use URI::URL;
+use URI::URL ();
 use Scope::Guard qw(guard);
 use WebGUI::ProgressTree;
+use WebGUI::FormBuilder;
 use WebGUI::Event;
 
 =head1 NAME
@@ -157,6 +157,10 @@ This scratch variable is used by the Widget Macro.
 
 Takes a hashref of arguments, containing the following keys:
 
+=head3 depth
+
+How many levels deep to export.
+
 =head3 quiet
 
 Boolean. To be or not to be quiet with our output. Defaults to false.
@@ -252,11 +256,11 @@ sub exportAsHtml {
 
     # extrasUploadAction and rootUrlAction must have values matching something
     # in the arrays defined above
-    if( defined $extrasUploadAction && !WebGUI::Utility::isIn($extrasUploadAction, @extraUploadActions) ) {
+    if( defined $extrasUploadAction && !($extrasUploadAction ~~ @extraUploadActions) ) {
         WebGUI::Error->throw(error => "'$extrasUploadAction' is not a valid extrasUploadAction");
     }
 
-    if( defined $rootUrlAction && !WebGUI::Utility::isIn($rootUrlAction, @rootUrlActions) ) {
+    if( defined $rootUrlAction && !($rootUrlAction ~~ @rootUrlActions) ) {
         WebGUI::Error->throw(error => "'$rootUrlAction' is not a valid rootUrlAction");
     }
 
@@ -266,12 +270,9 @@ sub exportAsHtml {
 
     # now, create a new session as the user doing the exports. this is so that
     # the exported assets are taken from that user's perspective.
-    my $exportSession = WebGUI::Session->open(
-        $session->config->getWebguiRoot,
-        $session->config->getFilename,
-    );
+    my $exportSession = WebGUI::Session->open($session->config);
     my $esGuard = Scope::Guard->new(sub {
-        $exportSession->var->end;
+        $exportSession->end;
         $exportSession->close;
     });
 
@@ -282,10 +283,9 @@ sub exportAsHtml {
     $exportSession->scratch->set('exportUrl',   $exportUrl);
     $exportSession->style->setMobileStyle(0);
 
-    my $asset = WebGUI::Asset->new(
+    my $asset = WebGUI::Asset->newById(
         $exportSession,
         $self->getId,
-        $self->get('className'),
         $self->get('revisionDate'),
     );
 
@@ -364,7 +364,7 @@ sub exportBranch {
             $outputSession = undef;
         });
 
-        my $asset       = WebGUI::Asset->new($outputSession, $assetId);
+        my $asset       = WebGUI::Asset->newById($outputSession, $assetId);
         my $fullPath    = $asset->exportGetUrlAsPath;
 
         # skip this asset if we can't view it as this user.
@@ -384,8 +384,8 @@ sub exportBranch {
 
         # try to write the file
         eval { $asset->exportWriteFile };
-        if( $@ ) {
-            WebGUI::Error->throw(error => "could not export asset with URL " . $asset->getUrl . ": $@");
+        if( my $e = WebGUI::Error->caught() || $@ ) {
+            WebGUI::Error->throw(error => "could not export asset with URL " . $asset->getUrl . ": $e");
         }
 
         # next, tell the asset that we're exporting, so that it can export any
@@ -400,6 +400,7 @@ sub exportBranch {
             $cs->output->setHandle($handle);
             my $guard = guard {
                 close $handle;
+                $cs->end;
                 $cs->close();
                 $asset->$report('collateral notes', $output) if $output;
             };
@@ -531,7 +532,7 @@ sub exportGetAssetIds {
     # assets onto the end (unless, of course, they're already in the set).
     my %set;
     while (my $id = shift @$ids) {
-        my $asset = WebGUI::Asset->new($session, $id);
+        my $asset = WebGUI::Asset->newById($session, $id);
         undef $set{$id};
         for my $id (@{ $asset->exportGetRelatedAssetIds }) {
             push(@$ids, $id) unless exists $set{$id};
@@ -586,20 +587,16 @@ sub exportGetDescendants {
         # open a temporary session as the user doing the exporting so we don't get
         # assets that they can't see
         if ( ref $user && $user->isa('WebGUI::User') ) {
-            $session = WebGUI::Session->open(
-                $session->config->getWebguiRoot,
-                $session->config->getFilename,
-            );
+            $session = WebGUI::Session->open($session->config);
             $session->user( { userId => $user->userId } );
             $sGuard = Scope::Guard->new(sub {
-                $session->var->end;
+                $session->end;
                 $session->close;
             });
             # clone self in the new session
-            $asset = WebGUI::Asset->new(
+            $asset = WebGUI::Asset->newById(
                 $session,
                 $self->getId,
-                $self->get('className'),
                 $self->get('revisionDate'),
             );
         }
@@ -705,7 +702,7 @@ sub exportGetUrlAsPath {
     my $filename        = pop @pathComponents; 
 
     my ($extension) = $filename =~ /\.([^.]+)$/;
-    if ($extension && WebGUI::Utility::isIn($extension, @{ $fileTypes }) ) {
+    if ($extension && $extension ~~ $fileTypes ) {
         return Path::Class::File->new($exportPath, @pathComponents, $filename);
     }
     else {
@@ -725,7 +722,7 @@ specified asset and keeps a json structure as the status.
 sub exportInFork {
     my ( $process, $args ) = @_;
     my $session = $process->session;
-    my $self = WebGUI::Asset->new( $session, delete $args->{assetId} );
+    my $self = WebGUI::Asset->newById( $session, delete $args->{assetId} );
     $args->{indexFileName} = delete $args->{index};
     my $assetIds = $self->exportGetAssetIds($args);
     my $tree = WebGUI::ProgressTree->new( $session, $assetIds );
@@ -792,9 +789,9 @@ sub exportSymlinkExtrasUploads {
 
     my $config      = $session->config;
     my $extrasPath  = $config->get('extrasPath');
-    my $extrasUrl   = $config->get('extrasURL');
+    my $extrasUrl   = $session->url->make_urlmap_work($config->get('extrasURL'));
     my $uploadsPath = $config->get('uploadsPath');
-    my $uploadsUrl  = $config->get('uploadsURL');
+    my $uploadsUrl  = $session->url->make_urlmap_work($config->get('uploadsURL'));
 
     # we have no assurance whether the exportPath is valid or not, so check it.
     my $exportPath = WebGUI::Asset->exportCheckPath($session);
@@ -981,165 +978,6 @@ depends on there being an actual HTTP response on the other end.
 sub exportHtml_view {
     my $self = shift;
     $self->www_view(@_);
-}
-
-#-------------------------------------------------------------------
-
-=head2 www_export
-
-Displays the export page administrative interface
-
-=cut
-
-sub www_export {
-    my $self    = shift;
-    return $self->session->privilege->insufficient() unless ($self->session->user->isInGroup(13));
-    my $i18n    = WebGUI::International->new($self->session, "Asset");
-    my $f       = WebGUI::HTMLForm->new($self->session, -action => $self->getUrl);
-    $f->hidden(
-        -name           => "func",
-        -value          => "exportStatus"
-    );
-    $f->integer(
-        -label          => $i18n->get('Depth'),
-        -hoverHelp      => $i18n->get('Depth description'),
-        -name           => "depth",
-        -value          => 99,
-    );
-    $f->yesNo(
-        -label          => $i18n->get('Export Related Assets'),
-        -hoverHelp      => $i18n->get('Export Related Assets description'),
-        -name           => "exportRelated",
-        -value          => '',
-    );
-    $f->selectBox(
-        -label          => $i18n->get('Export as user'),
-        -hoverHelp      => $i18n->get('Export as user description'),
-        -name           => "userId",
-        -options        => $self->session->db->buildHashRef("select userId, username from users"),
-        -value          => [1],
-    );
-    $f->text(
-        -label          => $i18n->get("directory index"),
-        -hoverHelp      => $i18n->get("directory index description"),
-        -name           => "index",
-        -value          => "index.html"
-    );
-
-    $f->text(
-        -label          => $i18n->get("Export site root URL"),
-        -name           => 'exportUrl',
-        -value          => '',
-        -hoverHelp      => $i18n->get("Export site root URL description"),
-    );
-
-    # TODO: maybe add copy options to these boxes alongside symlink
-    $f->selectBox(
-        -label          => $i18n->get('extrasUploads form label'),
-        -hoverHelp      => $i18n->get('extrasUploads form hoverHelp'),
-        -name           => "extrasUploadsAction",
-        -options        => { 
-            'symlink'   => $i18n->get('extrasUploads form option symlink'),
-            'none'      => $i18n->get('extrasUploads form option none') },
-        -value          => ['none'],
-    );
-    $f->selectBox(
-        -label          => $i18n->get('rootUrl form label'),
-        -hoverHelp      => $i18n->get('rootUrl form hoverHelp'),
-        -name           => "rootUrlAction",
-        -options        => {
-            'symlink'   => $i18n->get('rootUrl form option symlinkDefault'),
-            'none'      => $i18n->get('rootUrl form option none') },
-        -value          => ['none'],
-    );
-    $f->submit;
-    my $message;
-    eval { $self->exportCheckPath };
-    if($@) {
-        $message = $@;
-    }
-    $self->getAdminConsole->render($message . $f->print, $i18n->get('Export Page'));
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 www_exportStatus
-
-Displays the export status page
-
-=cut
-
-sub www_exportStatus {
-    my $self    = shift;
-    my $session = $self->session;
-    return $session->privilege->insufficient
-        unless $session->user->isInGroup(13);
-    my $form    = $session->form;
-    my @vars    = qw(index depth userId rootUrlAction exportUrl exportRelated);
-    $self->forkWithStatusPage({
-            plugin   => 'ProgressTree',
-            title    => 'Page Export Status',
-            method   => 'exportInFork',
-            groupId  => 13,
-            args     => {
-                # Note the difference in spelling...
-                #           v---no s                           s-----v
-                extrasUploadAction => scalar $form->get('extrasUploadsAction'),
-                assetId => $self->getId,
-                map { $_ => scalar $form->get($_) } @vars
-            }
-        }
-    );
-}
-
-#-------------------------------------------------------------------
-
-=head2 www_exportGenerate
-
-Executes the export process and displays real time status. This operation is displayed by exportStatus in an IFRAME.
-
-=cut
-
-# This routine is called in an IFRAME and prints status output directly to the browser.
-
-sub www_exportGenerate {
-    my $self = shift;
-    my $session = $self->session;
-    return $session->privilege->insufficient
-        unless $session->user->isInGroup(13);
-
-    # Unbuffered data output
-    $|++;
-    $session->style->useEmptyStyle(1);
-    $session->http->sendHeader;
-    my $splitter = $self->getSeparator;
-    my $style = $session->style->process($splitter);
-    my ($head, $foot) = split /\Q$splitter/, $style;
-    $session->output->print($head, 1);
-
-    my $i18n = WebGUI::International->new($session, 'Asset');
-    my $args = {
-        quiet               => 0,
-        userId              => $session->form->process('userId'),
-        indexFileName       => $session->form->process('index'),
-        extrasUploadAction  => $session->form->process('extrasUploadsAction'),
-        rootUrlAction       => $session->form->process('rootUrlAction'),
-        depth               => $session->form->process('depth'),
-        exportUrl           => $session->form->process('exportUrl'),
-    };
-    eval {
-        my $message = $self->exportAsHtml( $args );
-        $self->session->output->print($message, 1);
-        $self->session->output->print(
-            '<a target="_parent" href="' . $self->getUrl . '">' . $i18n->get(493, 'WebGUI') . '</a>'
-        );
-    };
-    if ($@) {
-        $self->session->output->print("$@", 1);
-    }
-    $session->output->print($foot, 1);
-    return "chunked";
 }
 
 1;

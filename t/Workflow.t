@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -8,14 +8,11 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/lib";
 use WebGUI::Test;
 use WebGUI::Session;
 use WebGUI::Workflow;
 use WebGUI::Workflow::Cron;
-use WebGUI::Utility qw/isIn/;
 use Test::More tests => 75; # increment this value for each test you create
 use Test::Deep;
 
@@ -47,12 +44,12 @@ is_deeply($wf->getCrons, [], 'workflow has no crons');
 
 isa_ok(WebGUI::Workflow->getList($session), 'HASH', 'getList returns a hashref');
 
-ok(!isIn($wfId, keys %{WebGUI::Workflow->getList($session)}), 'workflow not in enabled list');
-is(scalar keys %{WebGUI::Workflow->getList($session)}, 13, 'There are twelve enabled, default workflows, of all types, shipped with WebGUI');
+ok(! exists WebGUI::Workflow->getList($session)->{$wfId}, 'workflow not in enabled list');
+is(scalar keys %{WebGUI::Workflow->getList($session)}, 13, 'There are thirteen enabled, default workflows, of all types, shipped with WebGUI');
 
 $wf->set({enabled => 1});
 ok($wf->get('enabled'), 'workflow is enabled');
-ok(isIn($wfId, keys %{WebGUI::Workflow->getList($session)}), 'workflow in enabled list');
+ok(exists WebGUI::Workflow->getList($session)->{$wfId}, 'workflow in enabled list');
 $wf->set({enabled => 0});
 ok(!$wf->get('enabled'), 'workflow is disabled again');
 

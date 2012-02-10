@@ -4,7 +4,7 @@ package WebGUI::Workflow::Activity::DeleteExpiredSessions;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -84,12 +84,12 @@ sub execute {
         } else {
             # If something strange happened and we ended up with > 1 matching rows, cut our losses and remove offending userLoginLog rows (otherwise we
             # could end up with ridiculously long user recorded times)
-            $self->session->errorHandler->warn("More than 1 old userLoginLog rows found, removing offending rows");
+            $self->session->log->warn("More than 1 old userLoginLog rows found, removing offending rows");
             $self->session->db->write("delete from userLoginLog where lastPageViewed = timeStamp and sessionId = ? ", [$sessionId] );
         }
-		my $session = WebGUI::Session->open($self->session->config->getWebguiRoot, $self->session->config->getFilePath, undef, undef, $sessionId, 1);
+		my $session = WebGUI::Session->open($self->session->config, undef, $sessionId, 1);
 		if (defined $session) {
-			$session->var->end;
+			$session->end;
 			$session->close;
 		}
 		if ((time() - $time) > $ttl) {

@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -8,9 +8,7 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
 use WebGUI::Session;
@@ -21,7 +19,7 @@ my $session = WebGUI::Test->session;
 
 use Test::More; # increment this value for each test you create
 
-my $homeAsset = WebGUI::Asset->getDefault($session);
+my $homeAsset = WebGUI::Test->asset;
 my ($asset, $group, @users) = setupTest($session, $homeAsset);
 
 my @testSets = (
@@ -86,8 +84,6 @@ sub setupTest {
 	my $cm = WebGUI::Group->find($session, "Content Managers");
 	$cm->addGroups([$editGroup->getId]);
 	##Create an asset with specific editing privileges
-	my $versionTag = WebGUI::VersionTag->getWorking($session);
-	$versionTag->set({name=>"CanEditText test"});
 	my $properties = {
 		title => 'CanEditText test template',
 		className => 'WebGUI::Asset::Wobject::Article',
@@ -96,13 +92,12 @@ sub setupTest {
 		id => 'CanEditTextTestAsset01',
 		groupIdEdit => $editGroup->getId(),
 	};
-	my $asset = $defaultNode->addChild($properties, $properties->{id});
-	$versionTag->commit;
+	my $asset = WebGUI::Test->asset->addChild($properties, $properties->{id});
 	my @users = map { WebGUI::User->new($session, "new") } 0..2;
 	##User 1 is a content manager
 	$users[1]->addToGroups([$cm->getId]);
 	##User 2 is a member of a content manager sub-group
 	$users[2]->addToGroups([$editGroup->getId]);
-    addToCleanup($versionTag, $editGroup, @users);
+    WebGUI::Test->addToCleanup($editGroup, @users);
 	return ($asset, $editGroup, @users);
 }

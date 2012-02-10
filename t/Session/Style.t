@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -8,9 +8,7 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
  
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../lib";
 use HTML::TokeParser;
 
 use WebGUI::Test;
@@ -19,16 +17,15 @@ use WebGUI::Asset;
 use WebGUI::VersionTag;
 use WebGUI;
 
-use Test::More tests => 58; # increment this value for each test you create
+use Test::More;
 use Test::Deep;
+use Data::Dumper;
  
 my $session = WebGUI::Test->session;
  
 # put your tests here
 
 my $style = $session->style;
-
-my $crappyPerl = $^V lt v5.8;
 
 isa_ok($style, 'WebGUI::Session::Style', 'session has correct object type');
 
@@ -139,19 +136,20 @@ is($url, '-', 'setScript: called with no params or script url');
 $style->setScript('http://www.plainblack.com/stuff.js');
 is($style->setScript('http://www.plainblack.com/stuff.js'), undef, 'setScript: called with duplicate url returns undef');
 my $scriptOutput = $style->generateAdditionalHeadTags;
-($url) = simpleLinkParser('script', $scriptOutput);
-is($url, 'http://www.plainblack.com/stuff.js', 'setScript: called with script url');
+($url, $params) = simpleLinkParser('script', $scriptOutput);
+is($url, 'http://www.plainblack.com/stuff.js', '... called with script url');
+is_deeply($params, { type => 'text/javascript', }, '... defaults to text/javascript');
 
-my $setParams = { type => 'text/javascript' };
+my $setParams = { type => 'textual/mongoscript' };
 my $setUrl = 'http://www.webguidev.org/sorting.js';
 $style->setScript($setUrl, $setParams);
 my $scriptOutput = $style->generateAdditionalHeadTags;
 ($url, $params) = simpleLinkParser('script', $scriptOutput);
-is($url, $setUrl, 'setScript: called with new script url');
-is_deeply($params, $setParams, 'setScript: params set properly');
+is($url, $setUrl, '... called with new script url');
+is_deeply($params, $setParams, '... params set properly');
 
 sendImmediate($style, 'setScript', 'http://dev.setscript.com/script.js',
-	'setScript, sent: data automatically sent out via Session->Output');
+	'... sent: data automatically sent out via Session->Output');
 
 TODO: {
 	local $TODO = "more setScript tests";
@@ -175,8 +173,7 @@ is($macroOutput, 1, 'generateAdditionalHeadTags: process a macro');
 #
 ####################################################
 
-my ($versionTag, $templates, $article, $snippet) = setup_assets($session);
-WebGUI::Test->addToCleanup($versionTag);
+my ($templates, $article, $snippet) = setup_assets($session);
 
 $style->sent(0);
 is($style->sent, 0, 'process: setup sent to 0');
@@ -198,7 +195,7 @@ $session->setting->set('userFunctionStyleId', $templates->{user}->getId);
 
 is($style->userStyle('userStyle'), 'USER PRINTABLE STYLE TEMPLATE:userStyle',
 'userStyle returns templated output according to userFunctionStyleId in settings');
-is($session->http->{_http}{cacheControl}, 'none', 'userStyle(via process): HTTP cacheControl set to none to prevent proxying');
+is($session->http->getCacheControl, 'none', 'userStyle(via process): HTTP cacheControl set to none to prevent proxying');
 
 is($style->userStyle('userStyle'), 'USER PRINTABLE STYLE TEMPLATE:userStyle',
 'userStyle returns templated output according to userFunctionStyleId in settings');
@@ -309,8 +306,7 @@ $head =~ s/(^HEAD=.+$)/$1/s;
 cmp_bag(\@metas, $expectedMetas, 'process:default meta tags with no caching head tags, preventProxyCache setting');
 $session->setting->set('preventProxyCache', $origPreventProxyCache);
 
-##No accessor
-is($session->http->{_http}{cacheControl}, 'none', 'process: HTTP cacheControl set to none to prevent proxying');
+is($session->http->getCacheControl, 'none', 'process: HTTP cacheControl set to none to prevent proxying');
 
 ####################################################
 #
@@ -409,6 +405,8 @@ is($style->process('test output'),
 	"WebGUI was unable to instantiate your style template with the id: .test output",
 	'process:  no valid printableStyleTemplateFound in asset branch returns error');
 
+done_testing();
+
 ####################################################
 #
 # Utility routines for printing
@@ -452,24 +450,16 @@ sub fetchMultipleMetas {
 sub sendImmediate {
 	my ($style, $action, $output, $comment) = @_;
 
-	SKIP: {
-		skip "You have an old perl", 1 if $crappyPerl;
-        my $request = $style->session->request;
-        $request->clear_output;
-		$style->sent(1);
-		$style->$action($output);
-		like($request->get_output, qr/$output/, $comment);
-		$style->sent(0);
-	}
-
+    $style->sent(1);
+    $style->$action($output);
+    like($style->session->response->body->[-1], qr/$output/, $comment);
+    $style->sent(0);
 }
 
 #like($buffer, qr/$output/, );
 sub setup_assets {
 	my $session = shift;
-	my $importNode = WebGUI::Asset->getImportNode($session);
-	my $versionTag = WebGUI::VersionTag->getWorking($session);
-	$versionTag->set({name=>"Session Style test"});
+	my $importNode = WebGUI::Test->asset;
 	my $templates = {};
 	my $properties = {
 		title => 'personal style test template',
@@ -563,6 +553,6 @@ sub setup_assets {
 		snippet => 'I am a snippet',
 	};
 	my $snippet = $daddySnippet->addChild($properties, $properties->{id});
-	$versionTag->commit;
-	return ($versionTag, $templates, $asset, $snippet);
+    WebGUI::Test->addToCleanup($daddySnippet, $snippet);
+	return ($templates, $asset, $snippet);
 }

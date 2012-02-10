@@ -3,6 +3,11 @@ use strict;
 
 our $I18N = {
 
+        'buttons' => {
+            message         => q{Buttons},
+            lastUpdated     => 0,
+        },
+
 	'toolbar buttons' => {
 		message => q|Toolbar Buttons|,
         	lastUpdated => 1115139736,

@@ -3,7 +3,7 @@ package WebGUI::Form::Date;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -154,7 +154,7 @@ sub getValue {
 		# NOTE: Cannot fix time zone since we don't have a complete date/time
 
         if($value =~ $isaEpoch){
-            return $self->session->datetime->epochToSet($value,$self->session->user->profileField( 'timeZone' ));
+            return $self->session->datetime->epochToSet($value,$self->session->user->get( 'timeZone' ));
         }
 
         # Verify format
@@ -201,15 +201,15 @@ sub headTags {
     my $session = $self->session;
     my $style   = $session->style;
     my $url     = $session->url;
-    $style->setLink($url->extras('yui/build/calendar/assets/skins/sam/calendar.css'), { rel=>"stylesheet", type=>"text/css", media=>"all" });
-    $style->setScript($url->extras('yui/build/utilities/utilities.js'),         { type => 'text/javascript' });
-    $style->setScript($url->extras('yui/build/json/json-min.js'),               { type => 'text/javascript' });
-    $style->setScript($url->extras('yui/build/yahoo/yahoo-min.js'),             { type => 'text/javascript' });
-    $style->setScript($url->extras('yui/build/dom/dom-min.js'),                 { type => 'text/javascript' });
-    $style->setScript($url->extras('yui/build/event/event-min.js'),             { type => 'text/javascript' });
-    $style->setScript($url->extras('yui/build/calendar/calendar-min.js'),       { type => 'text/javascript' });
-    $style->setScript($url->extras('yui-webgui/build/i18n/i18n.js' ),           { type => 'text/javascript' });
-    $style->setScript($url->extras('yui-webgui/build/datepicker/datepicker.js'),{ type => 'text/javascript' });
+    $style->setCss($url->extras('yui/build/calendar/assets/skins/sam/calendar.css'));
+    $style->setScript($url->extras('yui/build/utilities/utilities.js'));
+    $style->setScript($url->extras('yui/build/json/json-min.js'));
+    $style->setScript($url->extras('yui/build/yahoo/yahoo-min.js'));
+    $style->setScript($url->extras('yui/build/dom/dom-min.js'));
+    $style->setScript($url->extras('yui/build/event/event-min.js'));
+    $style->setScript($url->extras('yui/build/calendar/calendar-min.js'));
+    $style->setScript($url->extras('yui-webgui/build/i18n/i18n.js' ));
+    $style->setScript($url->extras('yui-webgui/build/datepicker/datepicker.js'));
 }
 
 #-------------------------------------------------------------------
@@ -251,7 +251,6 @@ sub toHtml {
         }
         $value = $dt->toMysqlDate;
     }
-
 
     my $field = WebGUI::Form::Text->new($self->session,
         name      => $self->get("name"),

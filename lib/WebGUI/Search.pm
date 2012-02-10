@@ -3,7 +3,7 @@ package WebGUI::Search;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -117,14 +117,14 @@ Returns an array reference containing asset objects for those that matched.
 
 sub getAssets {
 	my $self = shift;
-	my $query = $self->_getQuery([qw(assetIndex.assetId assetIndex.className assetIndex.revisionDate)]);
+	my $query = $self->_getQuery([qw(assetIndex.assetId assetIndex.revisionDate)]);
 	my $rs = $self->session->db->prepare($query);
 	$rs->execute($self->{_params});
 	my @assets = ();
 	while (my ($id, $class, $version) = $rs->array) {
-		my $asset = WebGUI::Asset->new($self->session, $id, $class, $version);
-		unless (defined $asset) {
-			$self->session->errorHandler->warn("Search index contains assetId $id even though it no longer exists.");
+		my $asset = eval { WebGUI::Asset->newById($self->session, $id, $version); };
+		if (Exception::Class->caught()) {
+			$self->session->log->warn("Search index contains assetId $id even though it no longer exists.");
 			next;
 		}
 		push(@assets, $asset);		
@@ -450,15 +450,12 @@ sub search {
             my $join        = [ "left join assetData on assetIndex.assetId=assetData.assetId" ];
             for my $className ( @{ $rules->{ joinClass } } ) {
                 if ( ! eval { WebGUI::Pluggable::load($className) } ) {
-                    $self->session->errorHandler->fatal($@);
+                    $self->session->log->fatal($@);
                 }
-                foreach my $definition (@{$className->definition($self->session)}) {
-                    unless ($definition->{tableName} eq "asset") {
-                        my $tableName = $definition->{tableName};
-                        push @$join, 
-                            "left join $tableName on assetData.assetId=".$tableName.".assetId and assetData.revisionDate=".$tableName.".revisionDate";
-                    }
-                    last;
+                TABLE: foreach my $tableName ($className->meta->get_tables) {
+                    next TABLE if $tableName eq 'assetData';
+                    push @{ $join },
+                        "left join $tableName on assetData.assetId=".$tableName.".assetId and assetData.revisionDate=".$tableName.".revisionDate";
                 }
             }
             # Get only the latest revision

@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -8,9 +8,7 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../../lib";
 
 use WebGUI::Test;
 use WebGUI::Asset;
@@ -32,17 +30,15 @@ WebGUI::Test->addToCleanup(sub { WebGUI::Test->cleanupAdminInbox; });
 WebGUI::Test->addToCleanup(SQL =>  "delete from mailQueue  where message like '%Threshold=15%'");
 my $inbox = WebGUI::Inbox->new($session);
 
-my $import = WebGUI::Asset->getImportNode($session);
+my $import = WebGUI::Test->asset;
+
+my $tag = WebGUI::VersionTag->getWorking($session);
 
 my $posters = $import->addChild({
     className => 'WebGUI::Asset::Sku::Product',
     url       => 'cell_posters',
     title     => "Red's Posters",
 }, undef, time()-15, { skipAutoCommitWorkflows => 1, });
-
-my $versionTag = WebGUI::VersionTag->getWorking($session);
-$versionTag->commit();
-addToCleanup($versionTag);
 
 my $ritaVarId = $posters->setCollateral('variantsJSON', 'variantId', 'new',
     {
@@ -74,6 +70,9 @@ my $marilynVarId = $posters->setCollateral('variantsJSON', 'variantId', 'new',
     },
 );
 
+$tag->commit;
+WebGUI::Test->addToCleanup($tag);
+
 my $workflow  = WebGUI::Workflow->create($session,
     {
         enabled    => 1,
@@ -81,7 +80,7 @@ my $workflow  = WebGUI::Workflow->create($session,
         mode       => 'realtime',
     },
 );
-addToCleanup($workflow);
+WebGUI::Test->addToCleanup($workflow);
 
 my $threshold = $workflow->addActivity('WebGUI::Workflow::Activity::NotifyAboutLowStock');
 $threshold->set('className'    , 'WebGUI::Activity::NotifyAboutLowStock');
@@ -156,6 +155,7 @@ WebGUI::Test->addToCleanup(sub {
     $session->db->write("delete from Product    where assetId=?",[$otherPosters->getId]);
     $session->db->write("delete from assetIndex where assetId=?",[$otherPosters->getId]);
 });
+my $otherTag     = WebGUI::VersionTag->getWorking($session);
 my $movie_posters = $import->addChild({
     className => 'WebGUI::Asset::Sku::Product',
     url       => 'movie_posters',
@@ -171,8 +171,7 @@ my $movieVarId = $movie_posters->setCollateral('variantsJSON', 'variantId', 'new
         quantity  => 5,
     },
 );
-my $otherTag     = WebGUI::VersionTag->getWorking($session);
-addToCleanup($otherTag);
+WebGUI::Test->addToCleanup($otherTag);
 $otherTag->commit;
 
 $threshold->set('warningLimit' , 10);
@@ -199,7 +198,8 @@ my $instance4 = WebGUI::Workflow::Instance->create($session,
 );
 #break the asset
 $session->db->write('delete from asset where assetId=?', [$otherPosters->getId]);
-is(WebGUI::Asset->new($session, $otherPosters->getId), undef, 'middle asset broken');
+$otherPosters->purgeCache;
+dies_ok { WebGUI::Asset->newById($session, $otherPosters->getId); } 'middle asset broken';
 
 $retVal = $instance4->run();
 $retVal = $instance4->run();

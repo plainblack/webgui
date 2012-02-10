@@ -3,7 +3,7 @@ package WebGUI::Session::DateTime;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -22,7 +22,7 @@ use DateTime::TimeZone;
 use Scalar::Util qw( weaken );
 use Tie::IxHash;
 use WebGUI::International;
-use WebGUI::Utility;
+use Scalar::Util qw(weaken);
 
 
 =head1 NAME
@@ -227,19 +227,6 @@ sub dayStartEnd {
 
 #-------------------------------------------------------------------
 
-=head2 DESTROY ( )
-
-Deconstructor.
-
-=cut
-
-sub DESTROY {
-        my $self = shift;
-        undef $self;
-}
-
-#-------------------------------------------------------------------
-
 =head2 epochToHttp ( [ epoch ] ) 
 
 Converts and epoch date into an HTTP formatted date.
@@ -305,7 +292,7 @@ sub epochToHuman {
         $epoch = time();
     }
 	my $i18n = WebGUI::International->new($self->session);
-	my $language = $i18n->getLanguage($self->session->user->profileField('language'));
+	my $language = $i18n->getLanguage($self->session->user->get('language'));
 	my $locale = $language->{languageAbbreviation} || 'en';
 	$locale .= "_".$language->{locale} if ($language->{locale});
 	my $time_zone = $self->getTimeZone();
@@ -313,10 +300,10 @@ sub epochToHuman {
 	my $output = shift || "%z %Z";
 	my $temp;
   #---date format preference
-	$temp = $self->session->user->profileField('dateFormat') || '%M/%D/%y';
+	$temp = $self->session->user->get('dateFormat') || '%M/%D/%y';
 	$output =~ s/\%z/$temp/g;
   #---time format preference
-	$temp = $self->session->user->profileField('timeFormat') || '%H:%n %p';
+	$temp = $self->session->user->get('timeFormat') || '%H:%n %p';
 	$output =~ s/\%Z/$temp/g;
   #--- convert WebGUI date formats to DateTime formats
 	my %conversion = (
@@ -388,7 +375,7 @@ sub epochToMail {
 
 =head2 epochToSet ( [ epoch, withTime ] )
 
-Returns a set date (used by WebGUI::HTMLForm->date) in the format of YYYY-MM-DD. 
+Returns a set date (used by WebGUI::Form::Date) in the format of YYYY-MM-DD. 
 
 =head3 epoch
 
@@ -622,10 +609,10 @@ sub getTimeZone {
 	return 'America/Chicago' unless defined $self->session->db(1);
 	return $self->session->user->{_timeZone} if $self->session->user->{_timeZone};
 	my @zones = @{DateTime::TimeZone::all_names()};
-	my $zone = $self->session->user->profileField('timeZone');
+	my $zone = $self->session->user->get('timeZone');
 	$zone =~ s/ /\_/g;
 	if ($zone) {
-        if (isIn($zone, @zones)) {
+        if ( $zone ~~ @zones ) {
 				$self->session->user->{_timeZone} = $zone;
 				return $zone;
 		}
@@ -738,7 +725,7 @@ sub mailToEpoch {
 	my $parser = DateTime::Format::Mail->new->loose;
 	my $dt = eval {$parser->parse_datetime($date)};
 	if ($@) {
-		$self->session->errorHandler->warn($date." is not a valid date for email, and is so poorly formatted, we can't even guess what it is.");
+		$self->session->log->warn($date." is not a valid date for email, and is so poorly formatted, we can't even guess what it is.");
 		return undef;
 	}
 	return $dt->epoch;
@@ -813,9 +800,9 @@ A reference to the current session.
 sub new {
 	my $class = shift;
 	my $session = shift;
-	my $self = bless {_session=>$session}, $class;
-        weaken( $self->{_session} );
-        return $self;
+    my $self = bless { _session => $session }, $class;
+    weaken $self->{_session};
+    return $self;
 }
 
 #-------------------------------------------------------------------
@@ -831,40 +818,25 @@ The number of seconds in the interval.
 
 =cut
 
+my %intervals = (
+    31536000    => "703", # years
+    2592000     => "702", # months
+    604800      => "701", # weeks
+    86400       => "700", # days
+    3600        => "706", # hours
+    60          => "705", # minutes
+);
+
 sub secondsToInterval {
-	my $self = shift;
-	my $seconds = shift;
+    my $self = shift;
+    my $seconds = shift;
     my $i18n = WebGUI::International->new($self->session, 'WebGUI');
-	my ($interval, $units);
-	if ($seconds >= 31536000) {
-		$interval = round($seconds/31536000);
-		$units = $i18n->get("703");
-	}
-    elsif ($seconds >= 2592000) {
-        $interval = round($seconds/2592000);
-        $units = $i18n->get("702");
-	}
-    elsif ($seconds >= 604800) {
-        $interval = round($seconds/604800);
-        $units = $i18n->get("701");
-	}
-    elsif ($seconds >= 86400) {
-        $interval = round($seconds/86400);
-        $units = $i18n->get("700");
+    for my $unit (sort { $b <=> $a } keys %intervals) {
+        if ($seconds >= $unit) {
+            return (sprintf('%.0f', $seconds / $unit), $i18n->get($intervals{$unit}));
+        }
     }
-    elsif ($seconds >= 3600) {
-        $interval = round($seconds/3600);
-        $units = $i18n->get("706");
-    }
-    elsif ($seconds >= 60) {
-        $interval = round($seconds/60);
-        $units = $i18n->get("705");
-    }
-    else {
-        $interval = $seconds;
-        $units = $i18n->get("704");
-	}
-	return ($interval, $units);
+    return ($seconds, $i18n->get("704")); # seconds
 }
 
 #-------------------------------------------------------------------
@@ -883,17 +855,9 @@ sub secondsToExactInterval {
     my $self = shift;
     my $seconds = shift;
     my $i18n = WebGUI::International->new($self->session, 'WebGUI');
-    my %units = (
-        31536000    => "703", # years
-        2592000     => "702", # months
-        604800      => "701", # weeks
-        86400       => "700", # days
-        3600        => "706", # hours
-        60          => "705", # minutes
-    );
-    for my $unit (sort { $b <=> $a } keys %units) {
+    for my $unit (sort { $b <=> $a } keys %intervals) {
         if ($seconds % $unit == 0) {
-            return ($seconds / $unit, $i18n->get($units{$unit}));
+            return ($seconds / $unit, $i18n->get($intervals{$unit}));
         }
     }
     return ($seconds, $i18n->get("704")); # seconds
@@ -959,7 +923,7 @@ sub setToEpoch {
 		$dt = $parser->parse_datetime($set);
 	}
 	unless ($dt) {
-		$self->session->errorHandler->warn("Could not format date $set for epoch.  Returning current time");
+		$self->session->log->warn("Could not format date $set for epoch.  Returning current time");
 		return time();
 	}
 	return $dt->epoch;

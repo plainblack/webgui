@@ -1,7 +1,7 @@
 package WebGUI::Asset::Wobject::StockData;
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -12,12 +12,56 @@ package WebGUI::Asset::Wobject::StockData;
 
 use strict;
 use WebGUI::International;
-use WebGUI::Utility;
 use WebGUI::Asset::Wobject;
 use Finance::Quote;
+use Tie::IxHash;
+use Number::Format ();
 
-use Class::C3;
-use base qw/WebGUI::Asset::Wobject WebGUI::AssetAspect::Dashlet/;
+use Moose;
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset::Wobject';
+with 'WebGUI::Role::Asset::Dashlet';
+define tableName => 'StockData';
+define icon      => 'stockData.gif';
+define assetName => ["assetName", 'Asset_StockData'];
+property templateId => (
+            fieldType   => "template",
+            default     => 'StockDataTMPL000000001',
+            tab         => 'display',
+            namespace   => 'StockData',
+            label       => ["template_label", 'Asset_StockData'],
+            hoverHelp   => ["template_label_description", 'Asset_StockData'],
+        );
+property displayTemplateId => (
+            fieldType   => "template",
+            default     => 'StockDataTMPL000000002',
+            tab         => 'display',
+            namespace   => "StockData/Display",
+            label       => ["display_template_label", 'Asset_StockData'],
+            hoverHelp   => ["display_template_label_description", 'Asset_StockData'],
+        );
+property defaultStocks => (
+            fieldType   => "textarea",
+            default     => "DELL\nMSFT\nORCL\nSUNW\nYHOO",
+            tab         => 'properties',
+            label       => ["default_stock_label", 'Asset_StockData'],
+            hoverHelp   => ["default_stock_label_description", 'Asset_StockData'],
+            dashletOverridable => 1,
+        );
+property source => (
+            fieldType   => "selectList",
+            default     => "usa",
+            tab         => 'properties',
+            options     => &_getStockSources,
+            label       => ["stock_source", 'Asset_StockData'],
+            hoverHelp   => ["stock_source_description", 'Asset_StockData'],
+        );
+property failover => (
+            fieldType   => "yesNo",
+            default     => undef,
+            label       => ["failover_label", 'Asset_StockData'],
+            hoverHelp   => ["failover_description", 'Asset_StockData'],
+        );
 
 #-------------------------------------------------------------------
 
@@ -65,10 +109,10 @@ sub _appendStockVars {
    }
    $hash->{'stocks.p_change'} = _na($data->{$symbol,"p_change"});
    $hash->{'stocks.volume'} = _na($data->{$symbol,"volume"});
-   $hash->{'stocks.volume.millions'} = _na(WebGUI::Utility::round(($hash->{'stocks.volume'}/1000000),2));
+   $hash->{'stocks.volume.millions'} = _na(sprintf('%.2f', $hash->{'stocks.volume'}/1000000));
    $hash->{'stocks.avg_vol'} = _na($data->{$symbol,"avg_vol"});
    $hash->{'stocks.bid'} = _na($data->{$symbol,"bid"});
-   $hash->{'stocks.ask'} = _na(WebGUI::Utility::commify($data->{$symbol,"ask"}));
+   $hash->{'stocks.ask'} = _na(Number::Format::format_number($data->{$symbol,"ask"}));
    $hash->{'stocks.close'} = _na($data->{$symbol,"close"});
    $hash->{'stocks.open'} = _na($data->{$symbol,"open"});
    $hash->{'stocks.day_range'} = _na($data->{$symbol,"day_range"});
@@ -161,7 +205,7 @@ sub _convertToEpoch {
    my ($month,$day,$year) = split("/",$date);
    $month = $self->_appendZero($month);
    $day = $self->_appendZero($day);   
-   my $tfixed = substr($time,0,-2);
+   my $tfixed = substr($time,0,5);
    my ($hour,$minute) = split(":",$tfixed);
    if($time =~ m/pm/i) {
       $hour += 12;
@@ -194,20 +238,19 @@ sub _getStocks {
     # Create a new Finance::Quote object
     my $q = Finance::Quote->new;
     # Disable failover if specified
-    unless ($self->getValue("failover")) {
+    unless ($self->failover) {
        $q->failover(0);
     }
     # Hardcoded timeout for now.
     $q->timeout(15);
 
-    my $source = $self->getValue('source');
+    my $source = $self->source;
     my %stocks = ();
     my @stocks_to_fetch = ();
     STOCK: foreach my $stock (@{$stocks}) {
         $stock = uc $stock;
-        my $cache = WebGUI::Cache->new($session, [$self->getId, $source, $stock]);
-        if ($cache->get()) {
-            my $value = $cache->get();
+        my $value = $session->cache->get( join "", $self->getId, $source, $stock );
+        if ($value) {
             %stocks = (%stocks, %{ $value });
         }
         else {
@@ -220,11 +263,10 @@ sub _getStocks {
     foreach my $stock (@stocks_to_fetch) {
         $stock = uc $stock;
         my @stock_keys = grep { /$stock\b/ } keys %new_stocks;
-        my $cache = WebGUI::Cache->new($session, [$self->getId, $source, $stock]);
         my %slice;
         @slice{ @stock_keys } = @new_stocks{ @stock_keys };
         $slice{$stock,'last_fetch'} = time();
-        $cache->set(\%slice, $self->get('cacheTimeout'));
+        $session->cache->set( join( "", $self->getId, $source, $stock ), \%slice, $self->get('cacheTimeout') );
         %stocks = (%stocks, %slice);
     }
     return \%stocks;
@@ -276,118 +318,27 @@ sub _trim {
 
 #-------------------------------------------------------------------
 
-=head2 definition ( )
-
-defines wobject properties for Stock Data instances
-
-=cut
-
-sub definition {
-	my $class = shift;
-	my $session = shift;
-	my $definition = shift;
-	my $i18n = WebGUI::International->new($session,"Asset_StockData");
-
-	my %properties;
-	tie %properties, 'Tie::IxHash';
-	%properties = (
-		templateId =>{
-			fieldType=>"template",
-			defaultValue=>'StockDataTMPL000000001',
-			tab=>'display',
-			namespace=>'StockData',
-			label=>$i18n->get("template_label"),
-			hoverHelp=>$i18n->get("template_label_description"),
-		},
-		displayTemplateId=>{
-			fieldType=>"template",
-			defaultValue=>'StockDataTMPL000000002',
-			tab=>'display',
-			namespace=>"StockData/Display",
-			label=>$i18n->get("display_template_label"),
-			hoverHelp=>$i18n->get("display_template_label_description"),
-		},
-		defaultStocks=>{
-			fieldType=>"textarea",
-			defaultValue=>"DELL\nMSFT\nORCL\nSUNW\nYHOO",
-			tab=>'properties',
-			label=> $i18n->get("default_stock_label"),
-			hoverHelp=> $i18n->get("default_stock_label_description"),
-            dashletOverridable => 1,
-		},
-		source=>{
-			fieldType=>"selectList",
-			defaultValue=>"usa",
-			tab=>'properties',
-			label=> $i18n->get("stock_source"),
-			options=>$class->_getStockSources(),
-			hoverHelp=>$i18n->get("stock_source_description"),
-		},
-		failover=>{
-			fieldType=>"yesNo",
-			defaultValue=>undef,
-			label=> $i18n->get("failover_label"),
-			hoverHelp=> $i18n->get("failover_description"),
-		},
-        cacheTimeout => {
-            tab => "display",
-            fieldType => "interval",
-            defaultValue => 3600,
-            uiLevel => 5,
-            label => $i18n->get("cache timeout", 'Asset_Snippet'),
-            hoverHelp => $i18n->get("cache timeout help"),
-        },
-	);
-
-	push(@{$definition}, {
-		tableName=>'StockData',
-		className=>'WebGUI::Asset::Wobject::StockData',
-		icon=>'stockData.gif',
-		assetName=>$i18n->get("assetName"),
-		autoGenerateForms=>1,
-		properties=>\%properties
-	});
-
-        return $class->SUPER::definition($session, $definition);
-}
-
-#-------------------------------------------------------------------
-
 =head2 prepareView ( )
 
 See WebGUI::Asset::prepareView() for details.
 
 =cut
 
-sub prepareView {
+override prepareView => sub {
     my $self = shift;
-    $self->SUPER::prepareView();
-    my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId"));
+    super();
+    my $template = WebGUI::Asset::Template->newById($self->session, $self->templateId);
     if (!$template) {
         WebGUI::Error::ObjectNotFound::Template->throw(
             error      => qq{Template not found},
-            templateId => $self->get("templateId"),
+            templateId => $self->templateId,
             assetId    => $self->getId,
         );
     }
     $template->prepare($self->getMetaDataAsTemplateVariables);
     $self->{_viewTemplate} = $template;
-}
+};
 
-
-#-------------------------------------------------------------------
-
-=head2 purge ( )
-
-removes collateral data associated with a StockData when the system
-purges it's data.
-
-=cut
-
-sub purge {
-	my $self = shift;
-	return $self->SUPER::purge;
-}
 
 #-------------------------------------------------------------------
 
@@ -409,7 +360,7 @@ sub view {
 	
 	#Build list of stocks as an array
     my $overrides = $self->fetchUserOverrides($self->getParent->getId);
-	my $defaults  = $overrides->{defaultStocks} || $self->getValue("defaultStocks");
+	my $defaults  = $overrides->{defaultStocks} || $self->defaultStocks;
 	#replace any windows newlines
 	$defaults =~ s/\r//;
 	my @array = split("\n",$defaults);
@@ -476,8 +427,9 @@ sub www_displayStock {
 	       ('(not available)') x 2;
    }
    
-   return $self->processTemplate($var, $self->get("displayTemplateId"));
+   return $self->processTemplate($var, $self->displayTemplateId);
 }
 
 
+__PACKAGE__->meta->make_immutable;
 1;

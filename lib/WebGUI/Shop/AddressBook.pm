@@ -2,9 +2,27 @@ package WebGUI::Shop::AddressBook;
 
 use strict;
 
-use Class::InsideOut qw{ :std };
+use Moose;
+use WebGUI::Definition;
+
+property 'userId' => (
+    noFormPost => 1,
+    default    => '',
+);
+
+property 'defaultAddressId' => (
+    noFormPost => 1,
+    default    => '',
+);
+
+has [ qw/addressBookId session/] => (
+    is => 'ro',
+    required => 1,
+);
+
+
 use JSON;
-use WebGUI::Asset::Template;
+require WebGUI::Asset::Template;
 use WebGUI::Exception::Shop;
 use WebGUI::Form;
 use WebGUI::International;
@@ -32,9 +50,103 @@ These subroutines are available from this package:
 
 =cut
 
-readonly session => my %session;
-private properties => my %properties;
-private addressCache => my %addressCache;
+#-------------------------------------------------------------------
+
+=head2 new ( $session, $addressBookId )
+
+Constructor.  Instanciates an address book based upon an addressBookId.
+
+=head2 new ( $session )
+
+Constructor.  Builds a new, default address book object.
+
+=head2 new ( $properties )
+
+Constructor.  Builds a new, default address book object in Moose style with default properties set by $properties. This does not
+persist them to the database automatically.  This needs to be done via $self->write.
+
+=head3 $session
+
+A reference to the current session.
+
+=head3 $addressBookId
+
+The unique id of a cart to instanciate.
+
+=head3 $properties
+
+A hash reference that contains one or more of the following:
+
+=head4 defaultAddressId
+
+The unique id for a address attached to this cart.
+
+=head4 userId
+
+The unique id for the user who owns this cart.
+
+=cut
+
+
+around BUILDARGS => sub {
+    my $orig  = shift;
+    my $class = shift;
+    if (ref $_[0] eq 'HASH') {
+        my $properties = $_[0];
+        my $session = $properties->{session};
+        if (! (blessed $session && $session->isa('WebGUI::Session')) ) {
+            WebGUI::Error::InvalidObject->throw(expected=>"WebGUI::Session", got=>(ref $session), error=>"Need a session.");
+        }
+        if ($session->user->isVisitor) {
+            WebGUI::Error::InvalidParam->throw(error=>"Visitor cannot have an address book.");
+        }
+        my ($addressBookId)          = $class->_init($session);
+        $properties->{addressBookId} = $addressBookId;
+        $properties->{userId}        ||= $session->user->userId;
+        return $class->$orig($properties);
+    }
+    my $session = shift;
+    if (! (blessed $session && $session->isa('WebGUI::Session'))) {
+        WebGUI::Error::InvalidObject->throw(expected=>"WebGUI::Session", got=>(ref $session), error=>"Need a session.");
+    }
+    if ($session->user->isVisitor) {
+        WebGUI::Error::InvalidParam->throw(error=>"Visitor cannot have an address book.");
+    }
+    my $argument2 = shift;
+    if (!defined $argument2) {
+        my ($addressBookId)          = $class->_init($session);
+        my $properties = {};
+        $properties->{session}       = $session;
+        $properties->{addressBookId} = $addressBookId;
+        $properties->{userId}        = $session->user->userId;
+        return $class->$orig($properties);
+    }
+    ##Look up one in the db
+    my $book = $session->db->quickHashRef("select * from addressBook where addressBookId=?", [$argument2]);
+    if ($book->{addressBookId} eq "") {
+        WebGUI::Error::ObjectNotFound->throw(error=>"No such address book.", id=>$argument2);
+    }
+    $book->{session} = $session;
+    return $class->$orig($book);
+};
+
+#-------------------------------------------------------------------
+
+=head2 _init ( session )
+
+Builds a stub of object information in the database, and returns the newly created
+addressBookId, and the creationDate fields so the object can be initialized correctly.
+
+=cut
+
+sub _init {
+    my $class          = shift;
+    my $session        = shift;
+    my $addressBookId  = $session->id->generate;
+    $session->db->write('insert into addressBook (addressBookId, userId) values (?,?)', [$addressBookId, $session->user->userId]);
+    return ($addressBookId);
+}
+
 
 #-------------------------------------------------------------------
 
@@ -52,7 +164,8 @@ A hash reference containing address information.
 
 sub addAddress {
     my ($self, $address) = @_;
-    my $addressObj = WebGUI::Shop::Address->create( $self, $address);
+    my $addressObj = WebGUI::Shop::Address->create($self);
+    $addressObj->update($address);
     return $addressObj;
 }
 
@@ -115,32 +228,19 @@ sub appendAddressFormVars {
 
 #-------------------------------------------------------------------
 
-=head2 create ( session, userId )
+=head2 create ( session )
 
-Constructor. Creates a new address book for this user.
+Deprecated, left as a stub for existing code.  Use L<new> instead.
 
 =head3 session
 
 A reference to the current session.
 
-=head3 userId
-
-The userId for the user.  Throws an exception if it is Visitor.  Defaults to the session
-user if omitted.
-
 =cut
 
 sub create {
-    my ($class, $session, $userId) = @_;
-    unless (defined $session && $session->isa("WebGUI::Session")) {
-        WebGUI::Error::InvalidObject->throw(expected=>"WebGUI::Session", got=>(ref $session), error=>"Need a session.");
-    }
-    $userId ||= $session->user->userId;
-    if ($userId eq '1') {
-        WebGUI::Error::InvalidParam->throw(error=>"Visitor cannot have an address book.");
-    }
-    my $id = $session->db->setRow("addressBook", "addressBookId", {addressBookId=>"new", userId=>$userId}); 
-    return $class->new($session, $id);
+    my ($class, $session) = @_;
+    return $class->new($session);
 }
 
 #-------------------------------------------------------------------
@@ -153,13 +253,10 @@ Deletes this address book and all addresses contained in it.
 
 sub delete {
     my ($self) = @_;
-    my $myId   = id $self;
     foreach my $address (@{$self->getAddresses}) {
-        delete $addressCache{$myId}{$address->getId};
         $address->delete;
     } 
     $self->session->db->write("delete from addressBook where addressBookId=?",[$self->getId]);
-    undef $self;
     return undef;
 }
 
@@ -183,33 +280,6 @@ sub formatCallbackForm {
 
 #-------------------------------------------------------------------
 
-=head2 get ( [ property ] )
-
-Returns a duplicated hash reference of this object’s data.
-
-=head3 property
-
-Any field − returns the value of a field rather than the hash reference.  See the 
-C<update> method.
-
-=cut
-
-sub get {
-    my ($self, $name) = @_;
-    if($name eq "profileAddressId" && !$properties{id $self}{$name}) {
-        $properties{id $self}{$name} = $self->session->db->quickScalar(q{
-            select addressId from address where addressBookId=? and isProfile=1
-        },[$self->getId]);
-    }
-    if (defined $name) {
-        return $properties{id $self}{$name};
-    }
-    my %copyOfHashRef = %{$properties{id $self}};
-    return \%copyOfHashRef;
-}
-
-#-------------------------------------------------------------------
-
 =head2 getAddress ( id )
 
 Returns an address object.
@@ -222,11 +292,10 @@ An address object's unique id.
 
 sub getAddress {
     my ($self, $addressId) = @_;
-    my $id = id $self;
-    unless (exists $addressCache{$id}{$addressId}) {
-        $addressCache{$id}{$addressId} = WebGUI::Shop::Address->new($self, $addressId);
+    unless (exists $self->{_addressCache}->{$addressId}) {
+        $self->{_addressCache}->{$addressId} = WebGUI::Shop::Address->new($self, $addressId);
     }
-    return $addressCache{$id}{$addressId};
+    return $self->{_addressCache}->{$addressId};
 }
 
 #-------------------------------------------------------------------
@@ -309,21 +378,21 @@ Returns the profile address for this address book if there is one. Otherwise thr
 
 sub getProfileAddress {
     my ($self) = @_;
-    my $id = $self->get('profileAddressId');
-    if ($id ne '') {
-        my $address = eval { $self->getAddress($id) };
-        my $e;
-        if ($e = WebGUI::Error->caught('WebGUI::Error::ObjectNotFound')) {
-            $e->rethrow;
-        }
-        elsif ($e = WebGUI::Error->caught) {
-            $e->rethrow;
-        }
-        else {
-            return $address;
-        }
+    my $id = $self->session->db->quickScalar(q{ select addressId from address where addressBookId=? and isProfile=1 },[$self->getId]);
+    if (!$id) {
+        WebGUI::Error::ObjectNotFound->throw(error=>"No profile address.");
     }
-    WebGUI::Error::ObjectNotFound->throw(error=>"No profile address.");
+    my $address = eval { $self->getAddress($id) };
+    my $e;
+    if ($e = WebGUI::Error->caught('WebGUI::Error::ObjectNotFound')) {
+        $e->rethrow;
+    }
+    elsif ($e = WebGUI::Error->caught) {
+        $e->rethrow;
+    }
+    else {
+        return $address;
+    }
 }
 
 #-------------------------------------------------------------------
@@ -393,41 +462,6 @@ sub missingFields {
 
 #-------------------------------------------------------------------
 
-=head2 new ( session, addressBookId )
-
-Constructor.  Instanciates an addressBook based upon a addressBookId.
-
-=head3 session
-
-A reference to the current session.
-
-=head3 addressBookId
-
-The unique id of an address book to instanciate.
-
-=cut
-
-sub new {
-    my ($class, $session, $addressBookId) = @_;
-    unless (defined $session && $session->isa("WebGUI::Session")) {
-        WebGUI::Error::InvalidObject->throw(expected=>"WebGUI::Session", got=>(ref $session), error=>"Need a session.");
-    }
-    unless (defined $addressBookId) {
-        WebGUI::Error::InvalidParam->throw(error=>"Need an addressBookId.");
-    }
-    my $addressBook = $session->db->quickHashRef('select * from addressBook where addressBookId=?', [$addressBookId]);
-    if ($addressBook->{addressBookId} eq "") {
-        WebGUI::Error::ObjectNotFound->throw(error=>"No such address book.", id=>$addressBookId);
-    }
-    my $self = register $class;
-    my $id        = id $self;
-    $session{ $id }   = $session;
-    $properties{ $id } = $addressBook;
-    return $self;
-}
-
-#-------------------------------------------------------------------
-
 =head2 newByUserId ( session, userId )
 
 Constructor. Creates a new address book for this user if they don't have one.  In any case returns a reference to the address book.
@@ -474,7 +508,9 @@ sub newByUserId {
     }
     else {
         # nope create one for the user
-        return $class->create($session,$userId);
+        my $book = $class->new({session => $session, userId => $userId});
+        $book->write;
+        return $book
     }
 }
 
@@ -520,49 +556,16 @@ sub processAddressForm {
 
 #-------------------------------------------------------------------
 
-=head2 update ( properties )
+=head2 write ( )
 
-Sets properties in the addressBook
-
-=head3 properties
-
-A hash reference that contains one of the following:
-
-=head4 userId
-
-Assign the user that owns this address book.
-
-=head4 defaultAddressId
-
-The id of the address to be made the default for this address book.
+Writes the object properties to the database.
 
 =cut
 
-sub update {
+sub write {
     my ($self, $newProperties) = @_;
-    my $id = id $self;
-    foreach my $field (qw(userId defaultAddressId)) {
-        $properties{$id}{$field} = (exists $newProperties->{$field}) ? $newProperties->{$field} : $properties{$id}{$field};
-    }
- 
-    my %postProperties = %{$properties{$id}};
-    delete $postProperties{profileAddressId};
-    $self->session->db->setRow("addressBook","addressBookId",\%postProperties);
+    $self->session->db->setRow("addressBook","addressBookId",$self->get());
 }
-
-#-------------------------------------------------------------------
-
-=head2 uncache (  )
-
-Deletes the addressBook cache
-
-=cut
-
-sub uncache {
-    my $self      = shift;
-    delete $addressCache{id $self};
-}
-
 
 #-------------------------------------------------------------------
 
@@ -576,7 +579,7 @@ parameter
 sub www_ajaxGetAddress {
     my $self    = shift;
     my $session = $self->session;
-    $session->http->setMimeType('text/plain');
+    $session->response->content_type('text/plain');
 
     my $addressId = $session->form->get('addressId');
     my $address   = $self->getAddress($addressId) or return;
@@ -602,7 +605,7 @@ sub www_ajaxSave {
     else {
         $obj = $self->addAddress($address);
     }
-    $session->http->setMimeType('text/plain');
+    $session->response->content_type('text/plain');
     return $obj->getId;
 }
 
@@ -622,18 +625,18 @@ sub www_ajaxSearch {
 
     my $name      = $form->get('name');
     my $fields = {
-        firstName       => (split(" ",$name))[0] || "",
-        lastName        => (split(" ",$name))[1] || "",
-        organization    => $form->get('organization') || "",
-        address1        => $form->get('address1') || "",
-        address2        => $form->get('address2') || "",
-        address3        => $form->get('address3') || "",
-        city            => $form->get('city') || "",
-        state           => $form->get('state') || "",
-        code            => $form->get('zipcode') || "",
-        country         => $form->get('country') || "",
-        email           => $form->get('email') || "",
-        phoneNumber     => $form->get('phone') || "",
+        'address.firstName'       => (split(" ",$name))[0] || "",
+        'address.lastName'        => (split(" ",$name))[1] || "",
+        'address.organization'    => $form->get('organization') || "",
+        'address.address1'        => $form->get('address1') || "",
+        'address.address2'        => $form->get('address2') || "",
+        'address.address3'        => $form->get('address3') || "",
+        'address.city'            => $form->get('city') || "",
+        'address.state'           => $form->get('state') || "",
+        'address.code'            => $form->get('zipcode') || "",
+        'address.country'         => $form->get('country') || "",
+        'address.email'           => $form->get('email') || "",
+        'address.phoneNumber'     => $form->get('phone') || "",
     };
 
     my $clause = [];
@@ -642,7 +645,7 @@ sub www_ajaxSearch {
     foreach my $field (keys %$fields) {
         my $field_value = $fields->{$field};
         if($field_value) {
-            $field       = $session->db->dbh->quote_identifier($field);
+            $field       = join('.', map { $session->db->quote_identifier($_) } split(/\./, $field));
             $field_value = $field_value."%";
             push(@$clause,qq{$field like ?});
             push(@$params,$field_value);
@@ -660,8 +663,8 @@ sub www_ajaxSearch {
 
     my $query = qq{
         select
-            address.*,
-            users.username
+            users.username,
+            address.*
         from
             address
             join addressBook on address.addressBookId = addressBook.addressBookId
@@ -676,7 +679,7 @@ sub www_ajaxSearch {
         push(@$var,$hash);
     }
 
-    $session->http->setMimeType('text/plain');
+    $session->response->content_type('text/plain');
     return JSON->new->encode($var);
 }
 
@@ -740,17 +743,17 @@ sub www_editAddress {
     if ( $copyFrom eq 'work' || $copyFrom eq 'home' ) {
         my $user = $session->user;
 
-        $properties->{ address1     } = $user->profileField( $copyFrom . 'Address' );
-        $properties->{ firstName    } = $user->profileField( 'firstName' );
+        $properties->{ address1     } = $user->get( $copyFrom . 'Address' );
+        $properties->{ firstName    } = $user->get( 'firstName' );
         $properties->{ lastName     } = 
-            join ' ', $user->profileField( 'middleName' ), $user->profileField( 'lastName' );
-        $properties->{ city         } = $user->profileField( $copyFrom . 'City'     );
-        $properties->{ state        } = $user->profileField( $copyFrom . 'State'    );
-        $properties->{ country      } = $user->profileField( $copyFrom . 'Country'  );
-        $properties->{ code         } = $user->profileField( $copyFrom . 'Zip'      );
-        $properties->{ phoneNumber  } = $user->profileField( $copyFrom . 'Phone'    );
-        $properties->{ email        } = $user->profileField( 'email' );
-        $properties->{ organization } = $user->profileField( 'workName' ) if $copyFrom eq 'work';
+            join ' ', $user->get( 'middleName' ), $user->get( 'lastName' );
+        $properties->{ city         } = $user->get( $copyFrom . 'City'     );
+        $properties->{ state        } = $user->get( $copyFrom . 'State'    );
+        $properties->{ country      } = $user->get( $copyFrom . 'Country'  );
+        $properties->{ code         } = $user->get( $copyFrom . 'Zip'      );
+        $properties->{ phoneNumber  } = $user->get( $copyFrom . 'Phone'    );
+        $properties->{ email        } = $user->get( 'email' );
+        $properties->{ organization } = $user->get( 'workName' ) if $copyFrom eq 'work';
     }
 
     # Setup tmpl_vars
@@ -810,7 +813,10 @@ sub www_editAddress {
             defaultValue    =>$form->get('email') || $properties->{ email }
         } );
 
-    my $template = WebGUI::Asset::Template->new( $session, $session->setting->get('shopAddressTemplateId') );
+    my $template = eval { WebGUI::Asset::Template->newById( $session, $session->setting->get('shopAddressTemplateId') ); };
+    if (Exception::Class->caught()) {
+        return '';
+    }
     $template->prepare;
 
     return $session->style->userStyle( $template->process( $var ) );
@@ -938,7 +944,10 @@ sub www_view {
                     .WebGUI::Form::submit($session, {value=>$i18n->get("add a new address")})
                     .WebGUI::Form::formFooter($session),
         );
-    my $template = WebGUI::Asset::Template->new($session, $session->setting->get("shopAddressBookTemplateId"));
+    my $template = eval { WebGUI::Asset::Template->newById($session, $session->setting->get("shopAddressBookTemplateId")); };
+    if (Exception::Class->caught()) {
+        return '';
+    }
     $template->prepare;
     return $session->style->userStyle($template->process(\%var));
 }

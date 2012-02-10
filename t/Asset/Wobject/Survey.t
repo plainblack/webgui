@@ -4,12 +4,11 @@
 
 use strict;
 use warnings;
-use FindBin;
-use lib "$FindBin::Bin/../../lib";
 use Test::More;
 use Test::Deep;
 use Data::Dumper;
 use WebGUI::Test;    # Must use this before any other WebGUI modules
+use WebGUI::Test::Mechanize;
 use WebGUI::Session;
 
 #----------------------------------------------------------------------------
@@ -18,7 +17,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-plan tests => 47;
+plan tests => 53;
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -27,17 +26,16 @@ my ($survey);
 
 my $user = WebGUI::User->new( $session, 'new' );
 WebGUI::Test->addToCleanup($user);
-my $import_node = WebGUI::Asset->getImportNode($session);
+my $import_node = WebGUI::Test->asset;
 
 # Create a Survey
-$survey = $import_node->addChild( { className => 'WebGUI::Asset::Wobject::Survey', } );
 my $tag = WebGUI::VersionTag->getWorking($session);
+$survey = $import_node->addChild( { className => 'WebGUI::Asset::Wobject::Survey', } );
 $tag->commit;
 $survey = $survey->cloneFromDb;
-WebGUI::Test->addToCleanup($survey);
 isa_ok($survey, 'WebGUI::Asset::Wobject::Survey');
 
-my $sJSON = $survey->surveyJSON;
+my $sJSON = $survey->getSurveyJSON;
 
 # Load bare-bones survey, containing a single section (S0)
 $sJSON->update([0], { variable => 'S0' });
@@ -68,9 +66,9 @@ my $responseId = $survey->responseId;
     my $s = WebGUI::Asset::Wobject::Survey->newByResponseId($session, $responseId);
     is($s->getId, $survey->getId, 'newByResponseId returns same Survey');
 }
-is($survey->get('maxResponsesPerUser'), 1, 'maxResponsesPerUser defaults to 1');
+is($survey->maxResponsesPerUser, 1, 'maxResponsesPerUser defaults to 1');
 ok($survey->canTakeSurvey, '..which means user can take survey');
-is($survey->get('revisionDate'), $session->db->quickScalar('select revisionDate from Survey_response where Survey_responseId = ?', [$responseId]), 'Current revisionDate used');
+is($survey->revisionDate, $session->db->quickScalar('select revisionDate from Survey_response where Survey_responseId = ?', [$responseId]), 'Current revisionDate used');
 
 ####################################################
 #
@@ -174,7 +172,7 @@ cmp_deeply(from_json($surveyEnd), { type => 'forward', url => '/getting_started'
     # Check a simple www_jumpTo request
     $session->user( { userId => 3 } );
     WebGUI::Test->getPage( $survey, 'www_jumpTo', { formParams => {id => '0'} } );
-    is( $session->http->getStatus, '201', 'Page request ok' ); # why is "201 - created" status used??
+    is( $session->response->status, '201', 'Page request ok' ); # why is "201 - created" status used??
     is($survey->responseJSON->nextResponse, 0, 'S0 is the first response');
 
     tie my %expectedSurveyOrder, 'Tie::IxHash';
@@ -206,20 +204,21 @@ cmp_deeply(from_json($surveyEnd), { type => 'forward', url => '/getting_started'
 
     # Modify Survey structure, new revision not created
     $survey->submitObjectEdit({ id =>  "0", text => "new text"});
-    is($survey->surveyJSON->section([0])->{text}, 'new text', 'Survey updated');
+    is($survey->getSurveyJSON->section([0])->{text}, 'new text', 'Survey updated');
     is($session->db->quickScalar('select revisionDate from Survey where assetId = ?', [$surveyId]), $revisionDate, 'Revision unchanged');
 
     # Push revisionDate into the past because we can't have 2 revision dates with the same epoch (this is very hacky)
-    $revisionDate--;
+    $revisionDate -= 5;
     $session->stow->deleteAll();
-    WebGUI::Cache->new($session)->flush;
+    $session->cache->clear;
     $session->db->write('update Survey set revisionDate = ? where assetId = ?', [$revisionDate, $surveyId]);
     $session->db->write('update assetData set revisionDate = ? where assetId = ?', [$revisionDate, $surveyId]);
     $session->db->write('update wobject set revisionDate = ? where assetId = ?', [$revisionDate, $surveyId]);
 
-    $survey = WebGUI::Asset->new($session, $surveyId);
+    $survey = WebGUI::Asset->newById($session, $surveyId);
     isa_ok($survey, 'WebGUI::Asset::Wobject::Survey', 'Got back survey after monkeying with revisionDate');
     is($session->db->quickScalar('select revisionDate from Survey where assetId = ?', [$surveyId]), $revisionDate, 'Revision date pushed back');
+    is($survey->revisionDate, $revisionDate, '... and in the object, too');
 
     # Create new response
     my $responseId = $survey->responseId;
@@ -232,11 +231,11 @@ cmp_deeply(from_json($surveyEnd), { type => 'forward', url => '/getting_started'
     # Make another change, causing new revision to be automatically created
     $survey->submitObjectEdit({ id =>  "0", text => "newer text"});
 
-    my $newerSurvey = WebGUI::Asset->new($session, $surveyId); # retrieve newer revision
+    my $newerSurvey = WebGUI::Asset->newById($session, $surveyId); # retrieve newer revision
     isa_ok($newerSurvey, 'WebGUI::Asset::Wobject::Survey', 'After change, re-retrieved Survey instance');
     is($newerSurvey->getId, $surveyId, '..which is the same survey');
-    is($newerSurvey->surveyJSON->section([0])->{text}, 'newer text', '..with updated text');
-    ok($newerSurvey->get('revisionDate') > $revisionDate, '..and newer revisionDate');
+    is($newerSurvey->getSurveyJSON->section([0])->{text}, 'newer text', '..with updated text');
+    ok($newerSurvey->revisionDate > $revisionDate, '..and newer revisionDate');
 
     # Create another response (this one will use the new revision)
     my $newUser = WebGUI::User->new( $session, 'new' );
@@ -257,7 +256,7 @@ SKIP: {
 
 skip "Unable to load GraphViz", 1 if $@;
 
-$survey->surveyJSON->remove([1]);
+$survey->getSurveyJSON->remove([1]);
 my ($storage, $filename) = $survey->graph( { format => 'plain', layout => 'dot' } );
 like($storage->getFileContentsAsScalar($filename), qr{
     ^graph .*       # starts with graph
@@ -266,51 +265,22 @@ like($storage->getFileContentsAsScalar($filename), qr{
     stop$            # ..and end with stop
 }xs, 'Generated graph looks roughly okay');
 
-}
-
-$survey->getAdminConsole();
-my $adminConsole = $survey->getAdminConsole();
-cmp_deeply(
-    $adminConsole->{_submenuItem},
-    [
-        {
-          'extras' => undef,
-          'url' => re('func=edit$'),
-          'label' => 'Edit'
+my $mech = WebGUI::Test::Mechanize->new( config => WebGUI::Test->file );
+$mech->get_ok( '/' );
+$mech->session->user({ userId => 3 });
+$mech->get_ok( $survey->getUrl( 'func=graph' ) );
+$mech->submit_form_ok({ 
+        fields => {
+            format => "plain",
+            layout => "dot",
         },
-        {
-          'extras' => undef,
-          'url' => re('func=editSurvey$'),
-          'label' => 'Edit Survey'
-        },
-        {
-          'extras' => undef,
-          'url' => re('func=takeSurvey$'),
-          'label' => 'Take Survey'
-        },
-        {
-          'extras' => undef,
-          'url' => re('func=graph$'),
-          'label' => 'Visualize'
-        },
-        {
-          'extras' => undef,
-          'url' => re('func=editTestSuite$'),
-          'label' => 'Test Suite'
-        },
-        {
-          'extras' => undef,
-          'url' => re('func=runTests$'),
-          'label' => 'Run All Tests'
-        },
-        {
-          'extras' => undef,
-          'url' => re('func=runTests;format=tap$'),
-          'label' => 'Run All Tests (TAP)'
-        }
-    ],
-    "Admin console submenu",
+    }, 
+    "generate a graph",
 );
+# Can only test for the uploads, mech doesn't have uploads handler
+$mech->content_contains( 'uploads/temp', 'uploads link exists' );
+
+}
 
 ####################################################
 #
@@ -321,3 +291,27 @@ cmp_deeply(
 my $survey_json = $survey->www_loadSurvey({});
 my $survey_data = JSON::from_json($survey_json);
 unlike($survey_data->{edithtml}, qr/\^International/, 'www_loadSurvey process macros');
+
+#----------------------------------------------------------------------------
+# www_editTest
+my $mech = WebGUI::Test::Mechanize->new( config => WebGUI::Test->file );
+$mech->get_ok( '/' );
+$mech->session->user({ userId => 3 });
+$mech->get_ok( $survey->getUrl( 'func=editTest' ) );
+$mech->submit_form_ok({
+        fields => {
+            name => 'TEST Test',
+        },
+    }, "Create a new test"
+);
+
+use WebGUI::Asset::Wobject::Survey::Test;
+my $tests = WebGUI::Asset::Wobject::Survey::Test->getAllIds( $session, {
+    constraints => [{
+        'assetId = ?' => $survey->getId,
+    }],
+});
+is( @$tests, 1, "test exists" );
+my $test = WebGUI::Asset::Wobject::Survey::Test->new( $session, $tests->[0] );
+ok( $test, "test exists" );
+is( $test->name, "TEST Test", "name set correctly" );

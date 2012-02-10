@@ -4,7 +4,7 @@ package WebGUI::Workflow::Activity::SendNewsletters;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -66,19 +66,19 @@ See WebGUI::Workflow::Activity::execute() for details.
 
 sub execute {
 	my $self = shift;
-    my ($db,$eh) = $self->session->quick(qw(db errorHandler));
+    my ($db,$log) = $self->session->quick(qw(db log));
     
     my $time = time();
     my $newsletter = undef;
 
-    $eh->info("Getting subscriptions");
+    $log->info("Getting subscriptions");
     my $subscriptionResultSet = $db->read("select assetId, userId, subscriptions, lastTimeSent
         from Newsletter_subscriptions where lastTimeSent < unix_timestamp() - 60*60*23
         order by assetId, userId"); # only sending to people who haven't been sent to in the past 23 hours
     while (my ($assetId, $userId, $subscriptions, $lastTimeSent) = $subscriptionResultSet->array) {
        
         # get user object
-        $eh->info("Getting user $userId");
+        $log->info("Getting user $userId");
         my $user = WebGUI::User->new($self->session, $userId);
         next if ($user->isVisitor);
         my $emailAddress = $user->get("email");
@@ -87,18 +87,18 @@ sub execute {
 
         # get newsletter asset
         unless (defined $newsletter && $newsletter->getId eq $assetId) { # cache newsletter object
-            $eh->info("Getting newsletter asset $assetId");
-            $newsletter = WebGUI::Asset->new($self->session, $assetId);
+            $log->info("Getting newsletter asset $assetId");
+            $newsletter = WebGUI::Asset->newById($self->session, $assetId);
         }
 
         # find matching threads
         my @threads = ();
         my %foundThreads;
-        $eh->info("Find threads in $assetId matching $userId subscriptions.");
+        $log->info("Find threads in $assetId matching $userId subscriptions.");
         foreach my $subscription (split("\n", $subscriptions)) {
-            $eh->info("Found subscription $subscription");
+            $log->info("Found subscription $subscription");
             my ($fieldId, $value) = split("~", $subscription);
-            $eh->info("Searching for threads that match $subscription");
+            $log->info("Searching for threads that match $subscription");
             my $matchingThreads = $db->read("
                 select mv.assetId
                 from metaData_values mv
@@ -117,24 +117,24 @@ sub execute {
             while (my ($threadId) = $matchingThreads->array) {
                 next
                     if $foundThreads{$threadId};
-                my $thread = WebGUI::Asset->new($self->session, $threadId);
-                if (defined $thread) {
-                    $eh->info("Found thread $threadId");
+                my $thread = eval { WebGUI::Asset->newById($self->session, $threadId); };
+                if (! Exception::Class->caught()) {
+                    $log->info("Found thread $threadId");
                     push(@threads, $thread);
                     $foundThreads{$threadId} = 1;
                 }
                 else {
-                    $eh->error("Couldn't instanciate thread $threadId");
+                    $log->error("Couldn't instanciate thread $threadId: $@");
                 }    
             }
         }
         unless (scalar(@threads)) { # don't send a message if there aren't matching threads
-            $eh->info("No threads found matching $userId subscriptions.");
+            $log->info("No threads found matching $userId subscriptions.");
             next;
         }
 
         # build newsletter
-        $eh->info("Building newsletter for $userId.");
+        $log->info("Building newsletter for $userId.");
 	    my $siteurl = $self->session->url->getSiteURL();
         my @threadLoop = ();
         foreach my $thread (@threads) {
@@ -152,11 +152,11 @@ sub execute {
             footer      => $newsletter->get("newsletterFooter"),
             thread_loop => \@threadLoop,
             );
-        my $template = WebGUI::Asset->new($self->session, $newsletter->get("newsletterTemplateId"));
+        my $template = WebGUI::Asset->newById($self->session, $newsletter->get("newsletterTemplateId"));
         my $content = $template->process(\%var);
         
         # send newsletter
-        $eh->info("Sending newsletter for $userId.");
+        $log->info("Sending newsletter for $userId.");
 	    my $setting = $self->session->setting;
 	    my $returnAddress = $setting->get("mailReturnPath");
 	    my $companyAddress = $setting->get("companyEmail");
@@ -196,12 +196,12 @@ sub execute {
 		$mail->queue;
 
         # mark sent
-        $eh->info("Email sent.");
+        $log->info("Email sent.");
         $db->write("update Newsletter_subscriptions set lastTimeSent = ?", [time()]);
 
         # timeout if we're taking too long
         if (time() - $time > $self->getTTL ) {
-            $eh->info("Oops. Ran out of time. Will continue building newsletters in a bit.");
+            $log->info("Oops. Ran out of time. Will continue building newsletters in a bit.");
             $subscriptionResultSet->finish;
             return $self->WAITING(1);
         }

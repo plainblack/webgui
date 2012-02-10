@@ -3,7 +3,7 @@ package WebGUI::Content::Asset;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -20,11 +20,9 @@ use Time::HiRes;
 use WebGUI::Asset;
 use WebGUI::PassiveAnalytics::Logging;
 
-use Apache2::Const -compile => qw(OK);
-
 =head1 NAME
 
-Package WebGUI::Content::MyHandler
+Package WebGUI::Content::Asset
 
 =head1 DESCRIPTION
 
@@ -71,10 +69,9 @@ sub dispatch {
             WebGUI::PassiveAnalytics::Logging::log($session, $asset);
             # display from cache if page hasn't been modified.
             if ($session->user->isVisitor
-             && !$session->http->ifModifiedSince($asset->getContentLastModified, $session->setting->get('maxCacheTimeout'))) {
-                $session->http->setStatus("304","Content Not Modified");
-                $session->http->sendHeader;
-                $session->close;
+             && !$session->request->ifModifiedSince($asset->getContentLastModified, $session->setting->get('maxCacheTimeout'))) {
+                $session->response->status("304");
+                $session->response->sendHeader;
                 return "chunked";
             } 
 
@@ -82,12 +79,21 @@ sub dispatch {
             $fragment =~ s/$url//;
             $session->asset($asset);
             my $output = eval { $asset->dispatch($fragment); };
+            if( $@ ) {
+                my $e = WebGUI::Error->caught('WebGUI::Error');
+                if( $session->request->env->{'webgui.debug'} ) {
+                    $e->rethrow; 
+                } else
+                {
+                    $session->log->error( "Problem with dispatching $url: " . $e, $e );
+                }
+            }
             return $output if defined $output;
         }
     }
     $session->clearAsset;
-    if ($session->var->isAdminOn) {
-        my $asset = WebGUI::Asset->newByUrl($session, $session->url->getRefererUrl) || WebGUI::Asset->getDefault($session);
+    if ($session->isAdminOn) {
+        my $asset = eval { WebGUI::Asset->newByUrl($session, $session->url->getRefererUrl) } || WebGUI::Asset->getDefault($session);
         return $asset->addMissing($assetUrl);
     }
     return undef;
@@ -105,8 +111,8 @@ sub getAsset {
     my $session = shift;
 	my $assetUrl = shift;
 	my $asset = eval{WebGUI::Asset->newByUrl($session,$assetUrl,$session->form->process("revision"))};
-	if ($@) {
-		$session->errorHandler->warn("Couldn't instantiate asset for url: ".$assetUrl." Root cause: ".$@);
+	if (Exception::Class->caught()) {
+		$session->log->warn("Couldn't instantiate asset for url: ".$assetUrl." Root cause: ".$@);
 	}
     return $asset;
 }
@@ -166,47 +172,16 @@ The content handler for this package.
 
 sub handler {
     my ($session) = @_;
-    my ($errorHandler, $http, $var, $asset, $request, $config) = $session->quick(qw(errorHandler http var asset request config));
+    my ($log, $asset, $request, $config) = $session->quick(qw(errorHandler asset request config));
     my $output = "";
-    if ($errorHandler->canShowPerformanceIndicators) { #show performance indicators if required
+    if (my $perfLog = $log->performanceLogger) { #show performance indicators if required
         my $t = [Time::HiRes::gettimeofday()];
         $output = dispatch($session, getRequestedAssetUrl($session));
-        $t = Time::HiRes::tv_interval($t) ;
-        if ($output =~ /<\/title>/) {
-            $output =~ s/<\/title>/ : ${t} seconds<\/title>/i;
-        } 
-        else {
-            # Kludge.
-            my $mimeType = $http->getMimeType();
-            if ($mimeType eq 'text/css') {
-                $session->output->print("\n/* Page generated in $t seconds. */\n");
-            } 
-            elsif ($mimeType =~ m{text/html}) {
-                $session->output->print("\nPage generated in $t seconds.\n");
-            } 
-            else {
-                # Don't apply to content when we don't know how
-                # to modify it semi-safely.
-            }
-        }
-    } 
+        $perfLog->({ time => Time::HiRes::tv_interval($t), type => 'Page' });
+    }
     else {
         $output = dispatch($session, getRequestedAssetUrl($session));
     }
-
-    my $filename = $http->getStreamedFile();
-    if ((defined $filename) && ($config->get("enableStreamingUploads") eq "1")) {
-        my $ct = guess_media_type($filename);
-        my $oldContentType = $request->content_type($ct);
-        if ($request->sendfile($filename) ) {
-            $session->close;
-            return Apache2::Const::OK;
-        } 
-        else {
-            $request->content_type($oldContentType);
-        }
-    }
-
     return $output;
 }
 

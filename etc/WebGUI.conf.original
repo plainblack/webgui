@@ -88,24 +88,42 @@
 
 #"webServerPort" : 80,
 
-# What kind of cache do you wish to use? Available types are 
-# WebGUI::Cache::FileCache and WebGUI::Cache::Database.
-# We highly recommend the database cache if you are running
-# sites with more than a few hundred pages, or if you're
-# running in a multi-server environment. The file cache is better
-# for very small sites.
+# The cache key defines the configuration of the caching mechanism.
+# Required keys:
+#   driver  -> one of "Memory", "DBI", "FastMmap", "Memcached"
+#               FastMmap is recommended for single-server sites
+#               Memcached is recommended for multi-server sites
+#
+# Optional keys:
+#   expires_variance    -> Define a percentage of variance in a cache item's 
+#                       expiration. This prevents "cache miss stampedes" where
+#                       many things will attempt to refresh the cache at once.
+#                       Set as a decimal percentage: "0.10" = 10% variance
+#   l1_cache    -> Define a Level 1 cache, a faster cache to use for commonly-
+#               accessed stuff. Uses the same format and keys as the top level.
+#               ex:
+#                   "l1_cache" : { 
+#                       "driver"  : "Memory"
+#                   },
+#   mirror_cache    -> Define a write-only mirror. Used to warm up a new cache
+#                   before switching over to it. Defined exactly like an l1_cache
+#
+"cache" : {
+    "driver" : "FastMmap",
+    "expires_variance" : "0.10",
+    "root_dir" : "/tmp/WebGUICache"
+},
 
-"cacheType" : "WebGUI::Cache::FileCache",
+# Sessions that are "hot", those that are not only not expired,
+# but that are currently active on the site are kept in memory
+# to make them exceptionally fast. The hotSessionFlushToDb 
+# directive allows you to say how often (in seconds) those
+# sessions should be pushed down to the database. On most sites
+# 10 minutes is a good duration. If you have an exceptionally
+# short session timeout (in the settings) then you may wish to
+# set it lower.
 
-# Tell WebGUI where to store cached files. Defaults to the 
-# /tmp or c:\temp folder depending upon your operating system.
-
-# "fileCacheRoot" : "/path/to/cache",
-
-# Set this to 1 to disable WebGUI's caching subsystems. This is
-# mainly useful for developers.
-
-"disableCache" : 0,
+"hotSessionFlushToDb" : 600,
 
 # The database connection string. It usually takes the form of
 # DBI:<driver>:<db>;host:<hostname>
@@ -190,7 +208,7 @@
 # List the authentication plug-ins you wish to be available on
 # this site.
 
-"authMethods" : [ "LDAP", "WebGUI", "Twitter" ],
+"authMethods" : [ "LDAP", "WebGUI", "Twitter", "Facebook"],
 
 # List the merchant gateways you have installed and wish to be
 # available on this site.
@@ -217,7 +235,8 @@
 # Specify the list of template parsers available in the system.
 
 "templateParsers" : [
-    "WebGUI::Asset::Template::HTMLTemplate"
+    "WebGUI::Asset::Template::HTMLTemplate",
+    "WebGUI::Asset::Template::TemplateToolkit"
     ],
 
 # Enable the Survey Expression Engine, which allows goto expressions in
@@ -258,13 +277,6 @@
       "uiLevel" : 5,
       "url" : "^PageUrl(\"\",func=manageClipboard);",
       "title" : "^International(948,WebGUI);"
-   },
-   "statistics" : {
-      "icon" : "statistics.gif",
-      "uiLevel" : 1,
-      "url" : "^PageUrl(\"\",op=viewStatistics);",
-      "title" : "^International(437,WebGUI);",
-      "groupSetting" : "groupIdAdminStatistics"
    },
    "users" : {
       "icon" : "users.gif",
@@ -488,7 +500,7 @@
    }
 },
 
-# Specify a the list of assets you want to appear in your
+# Specify the list of assets you want to appear in your
 # "New Content" menu categories. See "assetCategories" for details
 # about categories. Each listing has a key of class name, and then
 # has several properties, which are:
@@ -588,9 +600,6 @@
    },
    "WebGUI::Asset::Wobject::StockData" : {
       "category" : "intranet"
-   },
-   "WebGUI::Asset::FilePile" : {
-      "category" : "basic"
    },
    "WebGUI::Asset::Wobject::Collaboration" : {
       "category" : "community"
@@ -812,7 +821,6 @@
     "#"                : "Hash_userId", 
     "/"                : "Slash_gatewayUrl", 
     "a"                : "a_account", 
-    "AdminBar"         : "AdminBar", 
     "AdminText"        : "AdminText", 
     "AdminToggle"      : "AdminToggle", 
     "AdSpace"          : "AdSpace",
@@ -827,9 +835,9 @@
     "c"                : "c_companyName", 
     "D"                : "D_date", 
     "DeactivateAccount": "DeactivateAccount",
-    "EditableToggle"   : "EditableToggle", 
     "e"                : "e_companyEmail", 
     "Extras"           : "Extras", 
+    "FacebookLogin"    : "FacebookLogin",
     "FetchMimeType"    : "FetchMimeType", 
     "FilePump"         : "FilePump", 
     "FileUrl"          : "FileUrl", 
@@ -840,6 +848,7 @@
     "H"                : "H_homeLink", 
     "If"               : "If",
     "International"    : "International", 
+    "i18n"             : "International", 
     "LastModified"     : "LastModified", 
     "LastModifiedBy"   : "LastModifiedBy", 
     "L"                : "L_loginBox", 
@@ -858,6 +867,7 @@
     "SpectreCheck"     : "SpectreCheck",
     "TwitterLogin"     : "TwitterLogin", 
     "Thumbnail"        : "Thumbnail", 
+    "TwitterLogin"     : "TwitterLogin",
     "User"             : "User", 
     "UsersOnline"      : "UsersOnline", 
     "u"                : "u_companyUrl",
@@ -897,8 +907,6 @@
         "WebGUI::Workflow::Activity::ArchiveOldStories",
         "WebGUI::Workflow::Activity::ArchiveOldThreads",
         "WebGUI::Workflow::Activity::CalendarUpdateFeeds",
-        "WebGUI::Workflow::Activity::CleanDatabaseCache",
-        "WebGUI::Workflow::Activity::CleanFileCache",
         "WebGUI::Workflow::Activity::CleanLoginHistory",
         "WebGUI::Workflow::Activity::CleanTempStorage", 
         "WebGUI::Workflow::Activity::CreateCronJob",
@@ -958,23 +966,6 @@
     "WebGUI::Image::Graph::XYGraph::Line"
     ],
 
-# Here you can define the dictionaries that are available through the tinyMCE spellchecker. You should set
-# id to the name the dictionary is known by ASpell (eg. en or en_US or nl), use the name parameter to set 
-# the name the dictionary is displayed with in tinyMCE. To set the default dictionary please set the 'default'
-# parameter.
-
-#"availableDictionaries" : [
-#    {
-#        "id"      : "en_US",
-#        "name"    : "English",
-#        "default" : "1"
-#    },
-#    {
-#        "id"      : "nl",
-#        "name"    : "Dutch"
-#    }
-#],
-
 # Optional script to run upon successful login.  The script can contain macros
 # ex: /data/WebGUI/sbin/doLogin.pl --configFile=dev.localhost.localdomain.conf --loginPage=^PageUrl();
 
@@ -985,22 +976,6 @@
 
 "runOnLogout" : "",
 
-# URL handlers are used to associate functionality with a URL via a regular expression.
-
-"urlHandlers" : [
-    { "^/extras" : "WebGUI::URL::PassThru" },
-#    { "^/icons" : "WebGUI::URL::PassThru" },
-#    { "^/documentation/pdf" : "WebGUI::URL::PassThru" },
-#    { "^/my-custom-application$" : "WebGUI::URL::PassThru" },
-#    { "^/server-status$" : "WebGUI::URL::PassThru" },
-#    { "^/perl-status$" : "WebGUI::URL::PassThru" },
-    { "^/uploads/dictionaries" : "WebGUI::URL::Unauthorized" },
-    { "^/uploads" : "WebGUI::URL::Uploads" },
-    { "^/\\*give-credit-where-credit-is-due\\*$" : "WebGUI::URL::Credits" },
-    { "^/abcdefghijklmnopqrstuvwxyz$" : "WebGUI::URL::Snoop" },
-    { ".*" : "WebGUI::URL::Content" }
-    ],
-
 # Content handlers are used to produce content from the content URL handler.
 # Note, these handlers are processed in the order listed.  Do not change
 # unless you know what you're doing.
@@ -1009,7 +984,7 @@
     "WebGUI::Content::Prefetch",
     "WebGUI::Content::Maintenance",
     "WebGUI::Content::Referral",
-    "WebGUI::Content::AssetManager",
+    "WebGUI::Content::Admin",
     "WebGUI::Content::AssetDiscovery",
     "WebGUI::Content::PassiveAnalytics",
     "WebGUI::Content::SetLanguage",
@@ -1020,6 +995,7 @@
     "WebGUI::Content::Wizard",
     "WebGUI::Content::Operation",
     "WebGUI::Content::Setup",
+    "WebGUI::Content::FacebookAuth",
     "WebGUI::Content::Shop",
     "WebGUI::Content::SiteIndex",
     "WebGUI::Content::Asset",
@@ -1083,41 +1059,14 @@
 #          "extrasExclude": ["tinymce", "^blah$"]
 #        },
 
-#A list of UserAgents of recognized mobile platforms.  If useMobileStyle is set in the
-#Admin settings, then the mobile style will be used for these browsers.
-   "mobileUserAgents" : [
-      "AvantGo",
-      "DoCoMo",
-      "Vodafone",
-      "EudoraWeb",
-      "Minimo",
-      "UP\\.Browser",
-      "PLink",
-      "Plucker",
-      "NetFront",
-      "^WM5 PIE$",
-      "Xiino",
-      "iPhone",
-      "Opera Mobi",
-      "BlackBerry",
-      "Opera Mini",
-      "HP iPAQ",
-      "IEMobile",
-      "Profile/MIDP",
-      "Smartphone",
-      "Symbian ?OS",
-      "J2ME/MIDP",
-      "PalmSource",
-      "PalmOS",
-      "Windows CE",
-      "Opera Mini"
-   ],
-
 # For the siteIndex content plugin.  Whether or not the auto-generated siteIndex should
 # show hidden pages
    "siteIndex" : {
       "showHiddenPages" : 0
    },
+
+#The complete path to the maintenance page.
+   "maintenancePage" : "/data/WebGUI/www/maintenance.html",
 
 # An array of SPAM words.  Used in the Post and WikiPage to block spam by sending the asset directly
 # to the trash.

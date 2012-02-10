@@ -3,7 +3,7 @@ package WebGUI::Form::CommentRating;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -16,6 +16,7 @@ package WebGUI::Form::CommentRating;
 
 use strict;
 use base 'WebGUI::Form::RadioList';
+use Tie::IxHash;
 
 =head1 NAME
 

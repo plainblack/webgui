@@ -3,7 +3,7 @@ package WebGUI::AssetCollateral::DataForm::Entry;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -29,26 +29,73 @@ they relate and function.
 
 =head1 METHODS
 
-This packages is a subclass of L<WebGUI::Crud>.  Please refer to that module
-for a list of base methods that are available.
-
 =cut
 
 our $VERSION = '0.0.1';
 
-use Class::InsideOut qw(readonly private public id register);
+use Moose;
+use Scalar::Util qw/blessed/;
 use WebGUI::Exception;
+use WebGUI::DateTime;
 use WebGUI::Asset::Wobject::DataForm;
 
-readonly    session         => my %session;
-private     entryData       => my %entryData;
-readonly    entryId         => my %entryId;
-readonly    assetId         => my %assetId;
-readonly    asset           => my %asset;
-private     userId          => my %userId;
-readonly    username        => my %username;
-public      ipAddress       => my %ipAddress;
-public      submissionDate  => my %submissionDate;
+has session => (
+    is       => 'ro',
+    required => 1,
+);
+
+has submissionDate => (
+    isa => 'WebGUI::DateTime',
+    is  => 'rw',
+);
+
+has [ qw{assetId asset ipAddress} ] => (
+    is => 'rw',
+);
+
+has userId => (
+    is      => 'rw',
+    builder => '_default_userId',
+    lazy    => 1,
+);
+sub _default_userId {
+    return shift->session->user->userId;
+}
+
+has username => (
+    is      => 'rw',
+    builder => '_default_username',
+    lazy    => 1,
+);
+sub _default_username {
+    return shift->session->user->username;
+}
+
+has entryData => (
+    is => 'rw',
+    default    => sub { return {}; },
+    traits     => ['Hash', 'WebGUI::Definition::Meta::Property::Serialize',],
+    isa        => 'WebGUI::Type::JSONHash',
+    coerce     => 1,
+);
+
+around userId => sub {
+    my $orig   = shift;
+    my $self   = shift;
+    if (my $userId = $_[0]) {
+        my $user   = WebGUI::User->new($self->session, $userId);
+        if (!defined $user) {
+            WebGUI::Error::InvalidParam->throw(error=>$userId . ' is not a valud userId');
+        }
+        $self->username($user->username);
+    }
+    $self->$orig(@_);
+};
+
+has entryId => (
+    is     => 'ro',
+    writer => '_set_entryId',
+);
 
 #-------------------------------------------------------------------
 
@@ -61,7 +108,6 @@ Deletes this entry from the database. Returns true.
 sub delete {
     my $self = shift;
     $self->session->db->deleteRow('DataForm_entry', 'DataForm_entryId', $self->getId);
-    delete $entryId{ id $self };
     return 1;
 }
 
@@ -77,11 +123,11 @@ does not exist.  Otherwise, returns the entry for this field after deleting it.
 sub deleteField {
     my $self = shift;
     my ($field) = @_;
-    my $entryData = $entryData{ id $self };
-    if ( !exists $entryData{ $field } ) {
+    my $entryData = $self->entryData;
+    if ( !exists $entryData->{ $field } ) {
         WebGUI::Error::InvalidParam->throw(error=>"cannot delete field that doesn't exist");
     }
-    return delete $entryData{$field};
+    return delete $entryData->{$field};
 }
 
 #-------------------------------------------------------------------
@@ -104,7 +150,7 @@ If passed in, this value will be stored in the field.
 sub field {
     my $self = shift;
     my $fieldName = shift;
-    my $entryData = $entryData{ id $self };
+    my $entryData = $self->entryData;
     if (@_) {
         my $fieldValue = shift;
         return $entryData->{ $fieldName } = $fieldValue;
@@ -127,7 +173,7 @@ A hash reference of new data to store in this entry.
 
 sub fields {
     my $self = shift;
-    my $entryData = $entryData{ id $self };
+    my $entryData = $self->entryData;
     if (@_) {
         my $newData = shift;
         @{ $entryData }{ keys %$newData } = values %$newData;
@@ -155,16 +201,15 @@ Gets a hash reference of data for this entry, which looks like this:
 
 sub getHash {
     my $self    = shift;
-    my $id      = id $self;
 
     my $var = {
-        DataForm_entryId    => $entryId{$id},
-        userId              => $userId{$id},
-        username            => $username{$id},
-        ipAddress           => $ipAddress{$id},
-        assetId             => $assetId{$id},
-        submissionDate      => $submissionDate{$id}->toDatabase,
-        entryData           => $entryData{$id},
+        DataForm_entryId    => $self->entryId,
+        userId              => $self->userId,
+        username            => $self->username,
+        ipAddress           => $self->ipAddress,
+        assetId             => $self->assetId,
+        submissionDate      => $self->submissionDate->toDatabase,
+        entryData           => $self->entryData,
     };
 
     return $var;
@@ -202,7 +247,7 @@ Returns the GUID for this entry.
 
 sub getId {
     my $self = shift;
-    return $entryId{ id $self };
+    return $self->entryId;
 }
 
 #-------------------------------------------------------------------
@@ -241,7 +286,7 @@ sub iterateAll {
     my $sth     = $slave->read($sql, $placeHolders);
     my $allRows = $slave->quickScalar('SELECT FOUND_ROWS()');
     my $sub   = sub {
-        return $allRows if $_[0] eq 'rowCount';
+        return $allRows if $_[0] && $_[0] eq 'rowCount';
         if (defined wantarray) {
             my $properties = $sth->hashRef;
             if ($properties) {
@@ -271,42 +316,40 @@ from the database. If C<entryId> is not defined, will create a new entry.
 
 =cut
 
-sub new {
-    my ($class, $asset, $entryId) = @_;
-    my $self = register($class);
-    my $id = id $self;
+around BUILDARGS => sub {
+    my $orig  = shift;
+    my $class = shift;
+    my ($asset, $entryId) = @_;
     my $session;
-    if (defined $asset && ref $asset && $asset->isa('WebGUI::Asset::Wobject::DataForm')) {
-        $session = $session{$id} = $asset->session;
-        $assetId{$id} = $asset->getId;
-        $asset{$id} = $asset;
+    my %properties;
+    if (blessed $asset && $asset->isa('WebGUI::Asset::Wobject::DataForm')) {
+        $session = $properties{session} = $asset->session;
+        $properties{assetId} = $asset->getId;
+        $properties{asset}   = $asset;
     }
-    elsif (defined $asset && ref $asset && $asset->isa('WebGUI::Session') && $entryId) {
-        $session = $session{$id} = $asset;
+    elsif (blessed $asset && $asset->isa('WebGUI::Session') && $entryId) {
+        $session = $properties{session} = $asset;
         undef $asset;
     }
     else {
         WebGUI::Error::InvalidObject->throw(error=>'need a DataForm object or a session and entryId', got => ref $asset, expected => 'WebGUI::Asset::Wobject::DataForm');
     }
     if ($entryId) {
-        my $properties = $session->db->getRow('DataForm_entry', 'DataForm_entryId', $entryId);
-        if (! defined $properties->{'DataForm_entryId'}) {
+        %properties = %{ $session->db->getRow('DataForm_entry', 'DataForm_entryId', $entryId) };
+        if (! defined $properties{'DataForm_entryId'}) {
             WebGUI::Error::ObjectNotFound->throw(error => 'no such DataForm_entryId', id => $entryId);
         }
-        if (! $assetId{$id}) {
-            $assetId{$id} = $properties->{assetId};
-            $asset{$id} = WebGUI::Asset::Wobject::DataForm->new($session, $properties->{assetId});
-        }
-        $self->setFromHash($properties);
+        $properties{asset} = $asset = eval { WebGUI::Asset->newById($session, $properties{assetId}); };
+        $properties{submissionDate} = WebGUI::DateTime->new($session, $properties{submissionDate});
     }
     else {
-        $self->user($session->user);
-        $self->ipAddress($session->env->getIp);
-        $self->submissionDate(WebGUI::DateTime->new($session, time));
-        $entryData{id $self} = {};
+        $properties{user}           = ($session->user);
+        $properties{ipAddress}      = ($session->request->address);
+        $properties{submissionDate} = (WebGUI::DateTime->new($session, time));
+        $properties{entryData}      = {};
     }
-    return $self;
-}
+    return $class->$orig(%properties);
+};
 
 #----------------------------------------------------------------------------
 
@@ -323,16 +366,16 @@ sub newFromHash {
     my $asset   = shift;
     my $self;
 
-    if ( defined $asset && ref $asset && $asset->isa( 'WebGUI::Asset::Wobject::DataForm' ) ) {
+    if ( blessed $asset && $asset->isa( 'WebGUI::Asset::Wobject::DataForm' ) ) {
         my $properties  = shift;
         $self           = $class->new( $asset );
         $self->setFromHash( $properties );
     } 
-    elsif ( defined $asset && ref $asset && $asset->isa( 'WebGUI::Session' ) ) {
+    elsif ( blessed $asset && $asset->isa( 'WebGUI::Session' ) ) {
         my $session     = $asset;
         my $assetId     = shift;
         my $properties  = shift;
-        $asset          = WebGUI::Asset->newByDynamicClass( $session, $assetId );
+        $asset          = WebGUI::Asset->newById( $session, $assetId );
         $self           = $class->new( $asset );
         $self->setFromHash( $properties );
     }
@@ -379,14 +422,14 @@ The new name of the field.
 sub renameField {
     my $self = shift;
     my ($oldField, $newField) = @_;
-    my $entryData = $entryData{ id $self };
-    if ( !exists $entryData{ $oldField } ) {
+    my $entryData = $self->entryData;
+    if ( !exists $entryData->{ $oldField } ) {
         WebGUI::Error::InvalidParam->throw(error=>"cannot rename field that doesn't exist");
     }
-    elsif ( exists $entryData{ $newField } ) {
+    elsif ( exists $entryData->{ $newField } ) {
         WebGUI::Error::InvalidParam->throw(error=>'cannot rename field over existing field');
     }
-    $entryData->{$newField} = delete $entryData{$oldField};
+    $entryData->{$newField} = delete $entryData->{$oldField};
     return $newField;
 }
 
@@ -400,21 +443,22 @@ Persists data from this entry into the db.
 
 sub save {
     my $self = shift;
-    my $id = id $self;
-    my $entryData = $entryData{ $id };
+    my $entryData = $self->entryData;
     if (!$entryData || ref $entryData ne 'HASH') {
         $entryData = {};
     }
     my %dbData = (
-        DataForm_entryId    => $entryId{$id} || 'new',
-        userId              => $userId{$id},
-        username            => $username{$id},
-        ipAddress           => $ipAddress{$id},
-        assetId             => $assetId{$id},
-        submissionDate      => $submissionDate{$id}->toDatabase,
+        DataForm_entryId    => $self->entryId || 'new',
+        userId              => $self->userId,
+        username            => $self->username,
+        ipAddress           => $self->ipAddress,
+        assetId             => $self->assetId,
+        submissionDate      => $self->submissionDate->toDatabase,
         entryData           => JSON::to_json($entryData),
     );
-    return $entryId{$id} = $session{$id}->db->setRow('DataForm_entry', 'DataForm_entryId', \%dbData);
+    my $newId = $self->session->db->setRow('DataForm_entry', 'DataForm_entryId', \%dbData);
+    $self->_set_entryId($newId);
+    return $newId;
 }
 
 #-------------------------------------------------------------------
@@ -456,29 +500,17 @@ Data, either as JSON or a perl data structure.
 
 sub setFromHash {
     my $self = shift;
-    my $id = id $self;
     my $properties = shift;
     my $session = $self->session;
-    $entryId{$id}           = $properties->{DataForm_entryId}
-        if defined $properties->{DataForm_entryId};
-    $userId{$id}            = $properties->{userId}
-        if defined $properties->{userId};
-    $username{$id}          = $properties->{username}
-        if defined $properties->{username};
-    $ipAddress{$id}         = $properties->{ipAddress}
-        if defined $properties->{ipAddress};
-    $submissionDate{$id}    = WebGUI::DateTime->new($session, $properties->{submissionDate})
+    $self->_set_entryId($properties->{DataForm_entryId}) if defined $properties->{DataForm_entryId};
+    $self->userId(    $properties->{userId}    )         if defined $properties->{userId};
+    $self->username(  $properties->{username}  )         if defined $properties->{username};
+    $self->ipAddress( $properties->{ipAddress} )         if defined $properties->{ipAddress};
+    $self->entryData( $properties->{entryData} )         if defined $properties->{entryData};
+
+    $self->submissionDate(WebGUI::DateTime->new($session, $properties->{submissionDate}))
         if defined $properties->{submissionDate};
-    if (defined $properties->{entryData}) {
-        if (ref $properties->{entryData} && ref $properties->{entryData} eq 'HASH') {
-            $entryData{$id} = $properties->{entryData};
-        }
-        else {
-            if (!eval { $entryData{$id} = JSON::from_json($properties->{entryData}); 1 } ) {
-                $session->log->warn('DataForm entry ' . $entryId{$id} . ' has invalid data, ignoring');
-            }
-        }
-    }
+
     return 1;
 }
 
@@ -496,46 +528,16 @@ set from it for this entry.
 =cut
 
 sub user {
-    my $self = shift;
-    my $id = id $self;
+    my ($self) = shift;
     if (@_) {
         my $user = shift;
-        if (!defined $user || !ref $user || !$user->isa('WebGUI::User')) {
+        if (!(blessed $user && $user->isa('WebGUI::User'))) {
             WebGUI::Error::InvalidObject->throw(expected=>'WebGUI::User', got=>(ref $user), error=>'Need a user.');
         }
-        $userId{$id} = $user->userId;
-        $username{$id} = $user->username;
+        $self->username($user->username);
+        $self->userId($user->userId);
     }
-    return $userId{$id};
-}
-
-#-------------------------------------------------------------------
-
-=head2 userId ( [ $user ] )
-
-Returns the userId of the user who submitted this entry.
-
-=head3 $user
-
-An optional WebGUI::User object.  If passed, the userId and username will be
-set from it for this entry.
-
-=cut
-
-sub userId {
-    my $self = shift;
-    my $id = id $self;
-    if (@_) {
-        my $userId = shift;
-        my $user = WebGUI::User->new($self->session, $userId);
-        if (!defined $user) {
-            WebGUI::Error::InvalidParam->throw(error=>$userId . ' is not a valud userId');
-        }
-        $userId{$id} = $userId;
-        $username{$id} = $user->username;
-    }
-    return $userId{$id};
+    return $self->userId;
 }
 
 1;
-

@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -25,11 +25,7 @@ use Data::Dumper;
 my $session = WebGUI::Test->session;
 
 # Do our work in the import node
-my $node = WebGUI::Asset->getImportNode($session);
-
-my $versionTag = WebGUI::VersionTag->getWorking($session);
-$versionTag->set({name=>"Thingy Test"});
-WebGUI::Test->addToCleanup($versionTag);
+my $node = WebGUI::Test->asset;
 my $thingy = $node->addChild({className=>'WebGUI::Asset::Wobject::Thingy'});
 
 # Test adding a new Thing

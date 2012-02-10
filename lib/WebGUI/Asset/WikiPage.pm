@@ -1,7 +1,7 @@
 package WebGUI::Asset::WikiPage;
 
 # -------------------------------------------------------------------
-#  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+#  WebGUI is Copyright 2001-2012 Plain Black Corporation.
 # -------------------------------------------------------------------
 #  Please read the legal notices (docs/legal.txt) and the license
 #  (docs/license.txt) that came with this distribution before using
@@ -11,16 +11,59 @@ package WebGUI::Asset::WikiPage;
 # -------------------------------------------------------------------
 
 use strict;
-use Class::C3;
-use base qw(
-    WebGUI::AssetAspect::Subscribable
-    WebGUI::AssetAspect::Comments 
-    WebGUI::AssetAspect::AutoSynopsis
-    WebGUI::Asset
-);
-use Tie::IxHash;
+
+use Moose;
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset';
+
+define assetName => ['assetName', 'Asset_WikiPage'];
+define icon      => 'wikiPage.gif';
+define tableName => 'WikiPage';
+
+property content => (
+            label        => ['contentLabel', 'Asset_WikiPage'],
+            fieldType    => "HTMLArea",
+            default      => undef
+         );
+property views => (
+            fieldType  => "integer",
+            default    => 0,
+            noFormPost => 1
+         );
+property isProtected => (
+            fieldType  => "yesNo",
+            default    => 0,
+            noFormPost => 1
+         );
+property actionTaken => (
+            fieldType  => "text",
+            default    => '',
+            noFormPost => 1,
+         );
+property actionTakenBy => (
+            fieldType  => "user",
+            default    => '',
+            noFormPost => 1,
+         );
+property isFeatured => (
+            fieldType  => "yesNo",
+            default    => 0,
+            noFormPost => 1,
+         );
+
+override _default_title => sub {
+    my $self = shift;
+    my $title = $self->session->form->get('title') || super();
+    return $title;
+};
+
+with 'WebGUI::Role::Asset::AlwaysHidden';
+with 'WebGUI::Role::Asset::Subscribable';
+with 'WebGUI::Role::Asset::Comments';
+with 'WebGUI::Role::Asset::AutoSynopsis';
+
 use WebGUI::International;
-use WebGUI::Utility;
+
 use WebGUI::VersionTag;
 
 
@@ -38,24 +81,6 @@ sub addChild {
 
 #-------------------------------------------------------------------
 
-=head2 addRevision ( )
-
-Override the default method in order to deal with attachments.
-
-=cut
-
-sub addRevision {
-        my $self = shift;
-        my $newSelf = $self->next::method(@_);
-	my $now = time();
-	$newSelf->update({
-		isHidden => 1,
-		});
-        return $newSelf;
-}
-
-#-------------------------------------------------------------------
-
 =head2 canAdd ($session)
 
 This functions as a class or an object method.  It sets the subclassGroupId to 7
@@ -63,11 +88,12 @@ instead of the default of 12.
 
 =cut
 
-sub canAdd {
+around canAdd => sub {
+    my $orig  = shift;
     my $class = shift;
     my $session = shift;
-    return $class->next::method($session, undef, '7');
-}
+    return $class->$orig($session, undef, '7');
+};
 
 #-------------------------------------------------------------------
 
@@ -87,65 +113,11 @@ sub canEdit {
 	my $form      = $self->session->form;
     my $addNew    = $form->process("func"              ) eq "add";
     my $editSave  = $form->process("assetId"           ) eq "new"
-                 && $form->process("func"              ) eq "editSave"
-                 && $form->process("class","className" ) eq "WebGUI::Asset::WikiPage";
+                 && $form->process("func"              ) eq "addSave"
+                 && $form->process("className","className" ) eq "WebGUI::Asset::WikiPage";
     return $wiki->canAdminister
         || ( $wiki->canEditPages && ( $addNew || $editSave || !$self->isProtected) );
 }
-
-#-------------------------------------------------------------------
-sub definition {
-	my $class = shift;
-	my $session = shift;
-	my $definition = shift;
-	my $i18n = WebGUI::International->new($session, "Asset_WikiPage");
-
-	my %properties;
-	tie %properties, 'Tie::IxHash';
-	%properties =
-	    (
-	     content => { fieldType => "HTMLArea",
-			  defaultValue => undef },
-		views => {
-			fieldType => "integer",
-			defaultValue => 0,
-			noFormPost => 1
-			},
-		isProtected => {
-			fieldType => "yesNo",
-			defaultValue => 0,
-			noFormPost => 1
-			},
-		actionTaken => {
-			fieldType => "text",
-			defaultValue => '',
-			noFormPost => 1,
-			},
-		actionTakenBy => {
-			fieldType => "user",
-			defaultValue => '',
-			noFormPost => 1,
-			},
-                isFeatured => {
-                    fieldType       => "yesNo",
-                    defaultValue    => 0,
-                    noFormPost      => 1,
-                },
-	    );
-
-	push @$definition,
-	     {
-	      assetName => $i18n->get('assetName'),
-	      icon => 'wikiPage.gif',
-	      autoGenerateForms => 1,
-	      tableName => 'WikiPage',
-	      className => 'WebGUI::Asset::WikiPage',
-	      properties => \%properties,
-	     };
-
-	return $class->next::method($session, $definition);
-}
-
 
 #-------------------------------------------------------------------
 
@@ -168,8 +140,8 @@ sub getAutoCommitWorkflowId {
         if (ref $spamStopWords eq 'ARRAY' && @{ $spamStopWords }) {
             my $spamRegex = join('|',@{$spamStopWords});
             $spamRegex =~ s/\s/\\ /g;
-            if ($self->get('content') =~ m{$spamRegex}xmsi) {
-                my $tag = WebGUI::VersionTag->new($self->session, $self->get('tagId'));
+            if ($self->content =~ m{$spamRegex}xmsi) {
+                my $tag = WebGUI::VersionTag->new($self->session, $self->assetId);
                 $self->purgeRevision;
                 if ($tag->getAssetCount == 0) {
                     $tag->rollback;
@@ -178,7 +150,7 @@ sub getAutoCommitWorkflowId {
             }
         }
 
-        return $wiki->get('approvalWorkflow')
+        return $wiki->approvalWorkflow
             || $self->session->setting->get('defaultVersionTagWorkflow');
     }
     return undef;
@@ -187,36 +159,41 @@ sub getAutoCommitWorkflowId {
 
 #-------------------------------------------------------------------
 
-=head2 getEditForm 
+=head2 getEditTemplate 
 
 Renders a templated edit form for adding or editing a wiki page.
 
 =cut
 
-sub getEditForm {
+sub getEditTemplate {
 	my $self = shift;
 	my $session = $self->session;
 	my $form = $session->form;
 	my $i18n = WebGUI::International->new($session, "Asset_WikiPage");
-	my $newPage = 0;
 	my $wiki = $self->getWiki;
 	my $url = ($self->getId eq "new") ? $wiki->getUrl : $self->getUrl;
+    use WebGUI::Form::HTMLArea;
+    use WebGUI::Form::Submit;
+    use WebGUI::Form::YesNo;
+    use WebGUI::Form::Hidden;
+    use WebGUI::Form::Keywords;
+    use WebGUI::Form::Attachments;
 	my $var = {
-		title=> $i18n->get("editing")." ".(defined($self->get('title'))? $self->get('title') : $i18n->get("assetName")),
+		title=> $i18n->get("editing")." ".(defined($self->title)? $self->title : $i18n->get("assetName")),
 		formHeader => WebGUI::Form::formHeader($session, { action => $url}) 
-			.WebGUI::Form::hidden($session, { name => 'func', value => 'editSave' }) 
-			.WebGUI::Form::hidden($session, { name=>"proceed", value=>"showConfirmation" }),
-	 	formTitle => WebGUI::Form::text($session, { name => 'title', maxlength => 255, size => 40, 
-                value => $self->get('title'), defaultValue=>$form->get("title","text") }),
-		formContent => WebGUI::Form::HTMLArea($session, { name => 'content', richEditId => $wiki->get('richEditor'), value => $self->get('content') }) ,
-		formSubmit => WebGUI::Form::submit($session, { value => 'Save' }),
-		formProtect => WebGUI::Form::yesNo($session, { name => "isProtected", value=>$self->getValue("isProtected")}),
-                formFeatured => WebGUI::Form::yesNo( $session, { name => 'isFeatured', value=>$self->getValue('isFeatured')}),
-        formKeywords => WebGUI::Form::keywords($session, {
+			.WebGUI::Form::Hidden->new($session, { name => 'func', value => ( $self->getId eq 'new' ? 'addSave' : 'editSave' ) })->toHtml 
+			.WebGUI::Form::Hidden->new($session, { name=>"proceed", value=>"showConfirmation" })->toHtml,
+	 	formTitle => WebGUI::Form::Text->new($session, { name => 'title', maxlength => 255, size => 40, 
+                value => $self->title, defaultValue=>$form->get("title","text") })->toHtml,
+		formContent => WebGUI::Form::HTMLArea->new($session, { name => 'content', richEditId => $wiki->richEditor, value => $self->content })->toHtml ,
+		formSubmit => WebGUI::Form::Submit->new($session, { value => 'Save' })->toHtml,
+		formProtect => WebGUI::Form::YesNo->new($session, { name => "isProtected", value=>$self->isProtected})->toHtml,
+                formFeatured => WebGUI::Form::YesNo->new( $session, { name => 'isFeatured', value=>$self->isFeatured})->toHtml,
+        formKeywords => WebGUI::Form::Keywords->new($session, {
             name    => "keywords",
             value   => WebGUI::Keyword->new($session)->getKeywordsForAsset({asset=>$self}),
-            }),
-		allowsAttachments => $wiki->get("allowAttachments"),
+            })->toHtml,
+		allowsAttachments => $wiki->allowAttachments,
 		formFooter => WebGUI::Form::formFooter($session),
 		isNew => ($self->getId eq "new"),
 		canAdminister => $wiki->canAdminister,
@@ -231,18 +208,21 @@ sub getEditForm {
 		};
     my $children = [];
 	if ($self->getId eq "new") {
-		$var->{formHeader} .= WebGUI::Form::hidden($session, { name=>"assetId", value=>"new" }) 
-			.WebGUI::Form::hidden($session, { name=>"class", value=>$form->process("class","className") });
+		$var->{formHeader} .= WebGUI::Form::Hidden->new($session, { name=>"assetId", value=>"new" })->toHtml 
+			.WebGUI::Form::Hidden->new($session, { name=>"className", value=>$form->process("className","className") })->toHtml;
 	} else {
         $children = $self->getLineage(["children"]);
     }
-    $var->{formAttachment} = WebGUI::Form::Attachments($session, { 
+    $var->{formAttachment} = WebGUI::Form::Attachments->new($session, { 
         value           => $children,
-        maxAttachments  => $wiki->get("allowAttachments"),
-        maxImageSize    => $wiki->get("maxImageSize"),
-        thumbnailSize   => $wiki->get("thumbnailSize"),
-        });
-	return $self->processTemplate($var, $wiki->getValue('pageEditTemplateId'));
+        maxAttachments  => $wiki->allowAttachments,
+        maxImageSize    => $wiki->maxImageSize,
+        thumbnailSize   => $wiki->thumbnailSize,
+        })->toHtml;
+    my $template    = WebGUI::Asset->newById( $session, $wiki->pageEditTemplateId );
+    $template->style( $wiki->getStyleTemplateId );
+    $template->setParam( %$var );
+    return $template;
 }
 
 #-------------------------------------------------------------------
@@ -269,7 +249,7 @@ sub getTemplateVars {
     my $session  = $self->session;
     my $i18n     = WebGUI::International->new($session, "Asset_WikiPage");
     my $wiki     = $self->getWiki;
-    my $owner    = WebGUI::User->new( $session, $self->get('ownerUserId') );
+    my $owner    = WebGUI::User->new( $session, $self->ownerUserId );
     my $keyObj   = WebGUI::Keyword->new($session);
 
     my $keywords    = $keyObj->getKeywordsForAsset({
@@ -301,14 +281,14 @@ sub getTemplateVars {
         wikiHomeUrl         => $wiki->getUrl,
         historyUrl          => $self->getUrl("func=getHistory"),
         editContent         => $self->getEditForm,
-        allowsAttachments   => $wiki->get("allowAttachments"),
-        comments	        => $self->getFormattedComments(),
+        allowsAttachments   => $wiki->allowAttachments,
+        comments            => $self->getFormattedComments,
         canEdit             => $self->canEdit,
         canAdminister       => $wiki->canAdminister,
 		isProtected         => $self->isProtected,
         content             => $wiki->autolinkHtml(
             $self->scrubContent,
-            {skipTitles => [$self->get('title')]},
+            {skipTitles => [$self->title]},
         ),	
         isSubscribed        => $self->isSubscribed,
         subscribeUrl        => $self->getSubscribeUrl,
@@ -342,25 +322,13 @@ Extends the master class to handle indexing the wiki content.
 
 =cut
 
-sub indexContent {
+around indexContent => sub {
+	my $orig = shift;
 	my $self = shift;
-	my $indexer = $self->next::method;
-	$indexer->addKeywords($self->get('content'));
+	my $indexer = $self->$orig(@_);
+	$indexer->addKeywords($self->content);
 	return $indexer;
-}
-
-#-------------------------------------------------------------------
-
-=head2 isProtected 
-
-Returns a boolean indicating whether or not this WikiPage is protected.
-
-=cut
-
-sub isProtected {
-	my $self = shift;
-	return $self->get("isProtected");
-}
+};
 
 #-------------------------------------------------------------------
 
@@ -375,7 +343,7 @@ sub preparePageTemplate {
 	my $self = shift;
 	return $self->{_pageTemplate} if $self->{_pageTemplate};
 	$self->{_pageTemplate} =
-	    WebGUI::Asset::Template->new($self->session, $self->getWiki->get('pageTemplateId'));
+	    WebGUI::Asset::Template->newById($self->session, $self->getWiki->pageTemplateId);
 	$self->{_pageTemplate}->prepare;
 	return $self->{_pageTemplate};
 }
@@ -388,32 +356,32 @@ Extends the master class to handle preparing the main view template for the page
 
 =cut
 
-sub prepareView {
+override prepareView => sub {
 	my $self = shift;
-	$self->next::method;
+	super();
 	$self->preparePageTemplate;
-}
+};
 
 
 #-------------------------------------------------------------------
 
-=head2 processPropertiesFromFormPost 
+=head2 processEditForm 
 
 Extends the master method to handle properties and attachments.
 
 =cut
 
-sub processPropertiesFromFormPost {
+override processEditForm => sub {
     my $self    = shift;
     my $session = $self->session;
-    $self->next::method(@_);
+    super();
     my $actionTaken = ($session->form->process("assetId") eq "new") ? "Created" : "Edited";
     my $wiki = $self->getWiki;
     my $properties = {
-        groupIdView 	=> $wiki->get('groupIdView'),
-        groupIdEdit 	=> $wiki->get('groupToAdminister'),
-        actionTakenBy 	=> $self->session->user->userId,
-        actionTaken 	=> $actionTaken,
+        groupIdView     => $wiki->groupIdView,
+        groupIdEdit     => $wiki->groupToAdminister,
+        actionTakenBy   => $session->user->userId,
+        actionTaken     => $actionTaken,
     };
 
     if ($wiki->canAdminister) {
@@ -427,25 +395,25 @@ sub processPropertiesFromFormPost {
 
     # deal with attachments from the attachments form control
     my $options = {
-        maxImageSize    => $wiki->get('maxImageSize'),
-        thumbnailSize   => $wiki->get('thumbnailSize'),
+        maxImageSize    => $wiki->maxImageSize,
+        thumbnailSize   => $wiki->thumbnailSize,
     };
     my @attachments = $session->form->param("attachments");
     my @tags = ();
     foreach my $assetId (@attachments) {
-        my $asset = WebGUI::Asset->newByDynamicClass($session, $assetId);
+        my $asset = WebGUI::Asset->newById($session, $assetId);
         if (defined $asset) {
-            unless ($asset->get("parentId") eq $self->getId) {
+            unless ($asset->parentId eq $self->getId) {
                 $asset->setParent($self);
                 $asset->update({
-                    ownerUserId => $self->get( "ownerUserId"      ),
-                    groupIdEdit => $wiki->get( "groupToEditPages" ),
-                    groupIdView => $self->get( "groupIdView"      ),
+                    ownerUserId => $self->ownerUserId,
+                    groupIdEdit => $self->groupIdEdit,
+                    groupIdView => $self->groupIdView,
                     });
             }
             $asset->applyConstraints($options);
-            push(@tags, $asset->get("tagId"));
-            $asset->setVersionTag($self->get("tagId"));
+            push(@tags, $asset->tagId);
+            $asset->setVersionTag($self->tagId);
         }
     }
 
@@ -458,7 +426,7 @@ sub processPropertiesFromFormPost {
             }
         }
     }
-}
+};
 
 #-------------------------------------------------------------------
 
@@ -474,12 +442,12 @@ Optionally pass the ontent that we want to run the filters on.  Otherwise we get
 
 sub scrubContent {
         my $self = shift;
-        my $content = shift || $self->get("content");
+        my $content = shift || $self->content;
 
         $content =~ s/\^-\;//g;
         my $scrubbedContent = WebGUI::HTML::filter($content, $self->getWiki->get("filterCode"));
 
-        if ($self->getWiki->get("useContentFilter")) {
+        if ($self->getWiki->useContentFilter) {
                 $scrubbedContent = WebGUI::HTML::processReplacements($self->session, $scrubbedContent);
         }
 
@@ -488,22 +456,7 @@ sub scrubContent {
 
 #-------------------------------------------------------------------
 
-=head2 update
-
-Wrap update to force isHidden to be on, all the time.
-
-=cut
-
-sub update {
-    my $self = shift;
-    my $properties = shift;
-	$properties->{isHidden} = 1;
-    return $self->next::method($properties);
-}
-
-#-------------------------------------------------------------------
-
-=head2 validParent
+=head2 valid_parent_classes
 
 Make sure that the current session asset is a WikiMaster for pasting and adding checks.
 
@@ -511,10 +464,8 @@ This is a class method.
 
 =cut
 
-sub validParent {
-    my $class   = shift;
-    my $session = shift;
-    return $session->asset->isa('WebGUI::Asset::Wobject::WikiMaster');
+sub valid_parent_classes {
+    return [qw/WebGUI::Asset::Wobject::WikiMaster/];
 }
 
 #-------------------------------------------------------------------
@@ -527,7 +478,7 @@ Renders this asset.
 
 sub view {
 	my $self = shift;
-	return $self->processTemplate($self->getTemplateVars, $self->getWiki->get("pageTemplateId"));
+	return $self->processTemplate($self->getTemplateVars, $self->getWiki->pageTemplateId);
 }
 
 #-------------------------------------------------------------------
@@ -549,21 +500,6 @@ sub www_delete {
 
 #-------------------------------------------------------------------
 
-=head2 www_edit 
-
-Overrides the master class to render the edit form in the parent wiki's style.
-
-=cut
-
-sub www_edit {
-	my $self = shift;
-	return $self->session->privilege->insufficient unless $self->canEdit;
-	return $self->session->privilege->locked unless $self->canEditIfLocked;
-	return $self->getWiki->processStyle($self->getEditForm);
-}
-
-#-------------------------------------------------------------------
-
 =head2 www_getHistory 
 
 Returns the version history of this wiki page.  The output is templated.
@@ -579,16 +515,16 @@ sub www_getHistory {
 	foreach my $revision (@{$self->getRevisions}) {
 		my $user = WebGUI::User->new($self->session, $revision->get("actionTakenBy"));
 		push(@{$var->{pageHistoryEntries}}, {
-			toolbar => $icon->delete("func=purgeRevision;revisionDate=".$revision->get("revisionDate"), $revision->get("url"), $i18n->get("delete confirmation"))
-                        	.$icon->edit('func=edit;revision='.$revision->get("revisionDate"), $revision->get("url"))
-                        	.$icon->view('func=view;revision='.$revision->get("revisionDate"), $revision->get("url")),
-			date => $date->epochToHuman($revision->get("revisionDate")),
-			username => $user->profileField('alias') || $user->username,
-			actionTaken => $revision->get("actionTaken"),
-			interval => join(" ", $date->secondsToInterval(time() - $revision->get("revisionDate")))
+			toolbar => $icon->delete("func=purgeRevision;revisionDate=".$revision->revisionDate, $revision->url, $i18n->get("delete confirmation"))
+                        	.$icon->edit('func=edit;revision='.$revision->revisionDate, $revision->url)
+                        	.$icon->view('func=view;revision='.$revision->revisionDate, $revision->url),
+			date => $date->epochToHuman($revision->revisionDate),
+			username => $user->get('alias') || $user->username,
+			actionTaken => $revision->actionTaken,
+			interval => join(" ", $date->secondsToInterval(time() - $revision->revisionDate))
 			});		
 	}
-	return $self->processTemplate($var, $self->getWiki->get('pageHistoryTemplateId'));
+	return $self->processTemplate($var, $self->getWiki->pageHistoryTemplateId);
 }
 
 #-------------------------------------------------------------------
@@ -612,7 +548,7 @@ sub www_purgeRevision {
 	$asset->purgeRevision;
 	if ($session->form->process("proceed") eq "manageRevisionsInTag") {
 		my $working = (defined $self) ? $self : $parent;
-		$session->http->setRedirect($working->getUrl("op=manageRevisionsInTag"));
+		$session->response->setRedirect($working->getUrl("op=manageRevisionsInTag"));
 		return undef;
 	}
 	unless (defined $self) {
@@ -663,15 +599,15 @@ and to render it with the parent's style.
 sub www_view {
 	my $self = shift;
 	return $self->session->privilege->noAccess unless $self->canView;
-	$self->update({ views => $self->get('views')+1 });
+	$self->update({ views => $self->views+1 });
 	# TODO: This should probably exist, as the CS has one.
-#	$self->session->http->setCacheControl($self->getWiki->get('visitorCacheTimeout'))
+#	$self->session->response->setCacheControl($self->getWiki->get('visitorCacheTimeout'))
 #	    if ($self->session->user->isVisitor);
-	$self->session->http->sendHeader;
+	$self->session->response->sendHeader;
 	$self->prepareView;
 	return $self->getWiki->processStyle($self->view);
 }
 
 
-
+__PACKAGE__->meta->make_immutable;
 1;

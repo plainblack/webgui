@@ -1,6 +1,6 @@
 # vim:syntax=perl
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -13,9 +13,7 @@
 # 
 #
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../../lib";
 use Test::More;
 use Test::Deep;
 use WebGUI::Test; # Must use this before any other WebGUI modules
@@ -29,7 +27,6 @@ use Data::Dumper;
 #----------------------------------------------------------------------------
 # Init
 my $session         = WebGUI::Test->session;
-WebGUI::Test->originalConfig( "serviceSubnets" );
 $session->config->delete('serviceSubnets');
 
 my ( $response, $responseObj, $auth, $userAndy, $userRed );
@@ -46,7 +43,7 @@ plan tests => 56;        # Increment this number for each test you create
 # - user
 $session->user({ userId => 1 });
 $response = WebGUI::Operation::User::www_ajaxCreateUser( $session );
-is( $session->http->getMimeType, 'application/json', "Correct mime type (default: json)" );
+is( $session->response->content_type, 'application/json', "Correct mime type (default: json)" );
 cmp_deeply(
     JSON->new->decode( $response ),
     {
@@ -57,14 +54,14 @@ cmp_deeply(
 );
 
 # - serviceSubnets
-$ENV{REMOTE_ADDR} = '2.2.2.2';
+$session->request->env->{REMOTE_ADDR} = '2.2.2.2';
 $session->config->set('serviceSubnets',['1.1.1.1/32']);
 $session->user({ userId => 3 });
 $session->request->setup_body({
     as          => "xml",
 });
 $response = WebGUI::Operation::User::www_ajaxCreateUser( $session );
-is( $session->http->getMimeType, 'application/xml', "Correct mime type (as => xml)" );
+is( $session->response->content_type, 'application/xml', "Correct mime type (as => xml)" );
 cmp_deeply(
     XML::Simple::XMLin( $response ),
     {
@@ -85,7 +82,7 @@ $session->request->setup_body({
 });
 $session->user({ userId => 3 });
 $response   = WebGUI::Operation::User::www_ajaxCreateUser( $session );
-is( $session->http->getMimeType, 'application/json', "Correct mime type (as => json)" );
+is( $session->response->content_type, 'application/json', "Correct mime type (as => json)" );
 cmp_deeply(
     JSON->new->decode( $response ),
     {
@@ -102,7 +99,7 @@ $session->request->setup_body({
     firstName           => 'Jake',
 });
 $response = WebGUI::Operation::User::www_ajaxCreateUser( $session );
-is( $session->http->getMimeType, 'application/json', "Correct mime type (default: json)" );
+is( $session->response->content_type, 'application/json', "Correct mime type (default: json)" );
 cmp_deeply(
     JSON->new->decode( $response ),
     {
@@ -124,7 +121,7 @@ $session->request->setup_body({
     'auth:LDAP:connectDN'       => 'u=andy;o=block-e;dc=shawshank;dc=me',
 });
 $response   = WebGUI::Operation::User::www_ajaxCreateUser( $session );
-is( $session->http->getMimeType, 'application/json', "Correct mime type (default: json" );
+is( $session->response->content_type, 'application/json', "Correct mime type (default: json" );
 $responseObj    = JSON->new->decode( $response );
 cmp_deeply(
     $responseObj,
@@ -156,7 +153,7 @@ $session->request->setup_body({
     'auth:LDAP:connectDN'       => 'u=red;o=block-e;dc=shawshank;dc=me',
 });
 $response   = WebGUI::Operation::User::www_ajaxCreateUser( $session );
-is( $session->http->getMimeType, 'application/json', "Correct mime type (default: json" );
+is( $session->response->content_type, 'application/json', "Correct mime type (default: json" );
 $responseObj    = JSON->new->decode( $response );
 cmp_deeply(
     $responseObj,
@@ -186,7 +183,7 @@ is( $auth->getParams->{connectDN}, 'u=red;o=block-e;dc=shawshank;dc=me', "Auth p
 # - user
 $session->user({ userId => 1 });
 $response = WebGUI::Operation::User::www_ajaxUpdateUser( $session );
-is( $session->http->getMimeType, 'application/json', "Correct mime type (default: json)" );
+is( $session->response->content_type, 'application/json', "Correct mime type (default: json)" );
 cmp_deeply(
     JSON->new->decode( $response ),
     {
@@ -197,14 +194,14 @@ cmp_deeply(
 );
 
 # - serviceSubnets
-$ENV{REMOTE_ADDR} = '2.2.2.2';
+$session->request->env->{REMOTE_ADDR} = '2.2.2.2';
 $session->config->set('serviceSubnets',['1.1.1.1/32']);
 $session->user({ userId => 3 });
 $session->request->setup_body({
     as          => "xml",
 });
 $response = WebGUI::Operation::User::www_ajaxUpdateUser( $session );
-is( $session->http->getMimeType, 'application/xml', "Correct mime type (as => xml)" );
+is( $session->response->content_type, 'application/xml', "Correct mime type (as => xml)" );
 cmp_deeply(
     XML::Simple::XMLin( $response ),
     {
@@ -225,7 +222,7 @@ $session->request->setup_body({
 });
 $session->user({ userId => 3 });
 $response   = WebGUI::Operation::User::www_ajaxUpdateUser( $session );
-is( $session->http->getMimeType, 'application/json', "Correct mime type (as => json)" );
+is( $session->response->content_type, 'application/json', "Correct mime type (as => json)" );
 cmp_deeply(
     JSON->new->decode( $response ),
     {
@@ -244,7 +241,7 @@ $session->request->setup_body({
 });
 $session->user({ userId => 3 });
 $response   = WebGUI::Operation::User::www_ajaxUpdateUser( $session );
-is( $session->http->getMimeType, 'application/json', "Correct mime type (default: json)" );
+is( $session->response->content_type, 'application/json', "Correct mime type (default: json)" );
 cmp_deeply(
     JSON->new->decode( $response ),
     {
@@ -266,7 +263,7 @@ $session->request->setup_body({
     'auth:LDAP:connectDN'       => 'u=rich;o=escapee;dc=shawshank;dc=me',
 });
 $response   = WebGUI::Operation::User::www_ajaxUpdateUser( $session );
-is( $session->http->getMimeType, 'application/json', "Correct mime type (default: json" );
+is( $session->response->content_type, 'application/json', "Correct mime type (default: json" );
 $responseObj    = JSON->new->decode( $response );
 cmp_deeply(
     $responseObj,
@@ -297,7 +294,7 @@ $session->request->setup_body({
     'auth:LDAP:connectDN'       => 'u=red;o=parollee;dc=shawshank;dc=me',
 });
 $response   = WebGUI::Operation::User::www_ajaxUpdateUser( $session );
-is( $session->http->getMimeType, 'application/json', "Correct mime type (default: json" );
+is( $session->response->content_type, 'application/json', "Correct mime type (default: json" );
 $responseObj    = JSON->new->decode( $response );
 cmp_deeply(
     $responseObj,
@@ -326,7 +323,7 @@ is( $auth->getParams->{connectDN}, 'u=red;o=parollee;dc=shawshank;dc=me', "Auth 
 # - user
 $session->user({ userId => 1 });
 $response = WebGUI::Operation::User::www_ajaxDeleteUser( $session );
-is( $session->http->getMimeType, 'application/json', "Correct mime type (default: json)" );
+is( $session->response->content_type, 'application/json', "Correct mime type (default: json)" );
 cmp_deeply(
     JSON->new->decode( $response ),
     {
@@ -337,14 +334,14 @@ cmp_deeply(
 );
 
 # - serviceSubnets
-$ENV{REMOTE_ADDR} = '2.2.2.2';
+$session->request->env->{REMOTE_ADDR} = '2.2.2.2';
 $session->config->set('serviceSubnets',['1.1.1.1/32']);
 $session->user({ userId => 3 });
 $session->request->setup_body({
     as          => "xml",
 });
 $response = WebGUI::Operation::User::www_ajaxDeleteUser( $session );
-is( $session->http->getMimeType, 'application/xml', "Correct mime type (as => xml)" );
+is( $session->response->content_type, 'application/xml', "Correct mime type (as => xml)" );
 cmp_deeply(
     XML::Simple::XMLin( $response ),
     {
@@ -363,7 +360,7 @@ $session->request->setup_body({
 });
 $session->user({ userId => 3 });
 $response   = WebGUI::Operation::User::www_ajaxDeleteUser( $session );
-is( $session->http->getMimeType, 'application/json', "Correct mime type (as => json)" );
+is( $session->response->content_type, 'application/json', "Correct mime type (as => json)" );
 cmp_deeply(
     JSON->new->decode( $response ),
     {
@@ -380,7 +377,7 @@ $session->request->setup_body({
 });
 $session->user({ userId => 3 });
 $response   = WebGUI::Operation::User::www_ajaxDeleteUser( $session );
-is( $session->http->getMimeType, 'application/json', "Correct mime type (default: json)" );
+is( $session->response->content_type, 'application/json', "Correct mime type (default: json)" );
 cmp_deeply(
     JSON->new->decode( $response ),
     {
@@ -397,7 +394,7 @@ $session->request->setup_body({
 });
 $session->user({ userId => 3 });
 $response   = WebGUI::Operation::User::www_ajaxDeleteUser( $session );
-is( $session->http->getMimeType, 'application/json', "Correct mime type (default: json)" );
+is( $session->response->content_type, 'application/json', "Correct mime type (default: json)" );
 cmp_deeply(
     JSON->new->decode( $response ),
     {
@@ -414,7 +411,7 @@ $session->request->setup_body({
 });
 $session->user({ userId => 3 });
 $response   = WebGUI::Operation::User::www_ajaxDeleteUser( $session );
-is( $session->http->getMimeType, 'application/json', "Correct mime type (default: json)" );
+is( $session->response->content_type, 'application/json', "Correct mime type (default: json)" );
 cmp_deeply(
     JSON->new->decode( $response ),
     {
@@ -430,7 +427,7 @@ $session->request->setup_body({
     userId              => $userAndy->getId,
 });
 $response = WebGUI::Operation::User::www_ajaxDeleteUser( $session );
-is( $session->http->getMimeType, 'application/json', 'Correct mime type (default: json)' );
+is( $session->response->content_type, 'application/json', 'Correct mime type (default: json)' );
 cmp_deeply(
     JSON->new->decode( $response ),
     {
@@ -444,7 +441,7 @@ $session->request->setup_body({
     userId              => $userRed->getId,
 });
 $response = WebGUI::Operation::User::www_ajaxDeleteUser( $session );
-is( $session->http->getMimeType, 'application/json', 'Correct mime type (default: json)' );
+is( $session->response->content_type, 'application/json', 'Correct mime type (default: json)' );
 cmp_deeply(
     JSON->new->decode( $response ),
     {

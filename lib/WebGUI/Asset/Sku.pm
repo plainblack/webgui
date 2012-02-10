@@ -3,7 +3,7 @@ package WebGUI::Asset::Sku;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -15,12 +15,59 @@ package WebGUI::Asset::Sku;
 =cut
 
 use strict;
-use Tie::IxHash;
-use base 'WebGUI::Asset';
+use Moose;
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset';
 use WebGUI::International;
 use WebGUI::Inbox;
 use WebGUI::Shop::Cart;
 use JSON qw{ from_json to_json };
+
+define assetName => ['assetName', 'Asset_Sku'];
+define icon      => 'Sku.gif';
+define tableName => 'sku';
+
+property description => (
+            tab             => "properties",
+            fieldType       => "HTMLArea",
+            default         => undef,
+            label           => ["description", 'Asset_Sku'],
+            hoverHelp       => ["description help", 'Asset_Sku'],
+         );
+property sku => (
+            tab             => "shop",
+            fieldType       => "text",
+            default         => sub { shift->session->id->generate },
+            lazy            => 1,
+            label           => ["sku", 'Asset_Sku'],
+            hoverHelp       => ["sku help", 'Asset_Sku'],
+         );
+property displayTitle => (
+            tab             => "display",
+            fieldType       => "yesNo",
+            default         => 1,
+            label           => ["display title", 'Asset_Sku'],
+            hoverHelp       => ["display title help", 'Asset_Sku'],
+         );
+property vendorId => (
+            tab             => "shop",
+            fieldType       => "vendor",
+            default         => 'defaultvendor000000000',
+            label           => ["vendor", 'Asset_Sku'],
+            hoverHelp       => ["vendor help", 'Asset_Sku'],
+         );
+property taxConfiguration => (
+            noFormPost      => 1,
+            fieldType       => 'hidden',
+            default         => '{}',
+         );
+property shipsSeparately => (
+            tab             => 'shop',
+            fieldType       => 'yesNo',
+            default         => 0,
+            label           => ['shipsSeparately', 'Asset_Sku'],
+            hoverHelp       => ['shipsSeparately help', 'Asset_Sku'],
+         );
 
 =head1 NAME
 
@@ -90,76 +137,6 @@ sub applyOptions {
 
 #-------------------------------------------------------------------
 
-=head2 definition ( session, definition )
-
-See super class.
-
-=cut
-
-sub definition {
-	my $class = shift;
-	my $session = shift;
-	my $definition = shift;
-	my %properties;
-	tie %properties, 'Tie::IxHash';
-
-	my $i18n = WebGUI::International->new($session, "Asset_Sku");
-	%properties = (
-		description => {
-			tab				=> "properties",
-			fieldType		=> "HTMLArea",
-			defaultValue	=> undef,
-			label			=> $i18n->get("description"),
-			hoverHelp		=> $i18n->get("description help")
-			},
-		sku => {
-			tab				=> "shop",
-			fieldType		=> "text",
-			defaultValue	=> $session->id->generate,
-			label			=> $i18n->get("sku"),
-			hoverHelp		=> $i18n->get("sku help")
-			},
-		displayTitle => {
-			tab				=> "display",
-			fieldType		=> "yesNo",
-			defaultValue	=> 1,
-			label			=> $i18n->get("display title"),
-			hoverHelp		=> $i18n->get("display title help")
-			},
-		vendorId => {
-			tab				=> "shop",
-			fieldType		=> "vendor",
-			defaultValue	=> 'defaultvendor000000000',
-			label			=> $i18n->get("vendor"),
-			hoverHelp		=> $i18n->get("vendor help")
-			},
-        taxConfiguration => {
-            noFormPost      => 1,
-            fieldType       => 'hidden',
-            defaultValue    => '{}',
-        },
-        shipsSeparately => {
-            tab             => 'shop',
-            fieldType       => 'yesNo',
-            defaultValue    => 0,
-            label           => $i18n->get('shipsSeparately'),
-            hoverHelp       => $i18n->get('shipsSeparately help'),
-        },
-	);
-	push(@{$definition}, {
-		assetName=>$i18n->get('assetName'),
-		icon=>'Sku.gif',
-		autoGenerateForms=>1,
-		tableName=>'sku',
-		className=>'WebGUI::Asset::Sku',
-		properties=>\%properties
-	});
-	return $class->SUPER::definition($session, $definition);
-}
-
-
-#-------------------------------------------------------------------
-
 =head2 getAddToCartForm ( )
 
 Returns a form to add this Sku to the cart.  Used when this Sku is part of
@@ -213,41 +190,27 @@ Extends the base class to add Tax information for the Sku, in a new tab.
 
 =cut
 
-sub getEditForm {
+override getEditForm => sub {
     my $self    = shift;
     my $session = $self->session;
 
-    my $tabform = $self->SUPER::getEditForm;
+    my $form = super();
 
     my $taxDriver   = WebGUI::Shop::Tax->getDriver( $session );
     my $definition  = $taxDriver->skuFormDefinition;
     my $config      = $self->getTaxConfiguration( $taxDriver->className );
-    my $shop        = $tabform->getTab( 'shop' );
+    my $shop        = $form->getTab( 'shop' );
 
     foreach my $fieldName ( keys %{ $definition } ) {
-        $shop->dynamicField(
+        $shop->addField( "DynamicField",
             %{ $definition->{ $fieldName } },
             name    => $fieldName,
             value   => $config->{ $fieldName },
         );
     }
 
-    return $tabform;
-}
-
-#-------------------------------------------------------------------
-
-=head2 getEditTabs ( )
-
-Not to be modified, just defines a new tab.
-
-=cut
-
-sub getEditTabs {
-	my $self = shift;
-	my $i18n = WebGUI::International->new($self->session,"Asset_Sku");
-	return ($self->SUPER::getEditTabs(), ['shop', $i18n->get('shop'), 9]);
-}
+    return $form;
+};
 
 #-------------------------------------------------------------------
 
@@ -348,7 +311,7 @@ sub getTaxConfiguration {
     my $self        = shift;
     my $namespace   = shift;
 
-    my $configs = eval { from_json( $self->getValue('taxConfiguration') ) };
+    my $configs = eval { from_json( $self->taxConfiguration ) };
     if ($@) {
         $self->session->log->error( 'Tax configuration of asset ' . $self->getId . ' appears to be corrupt. :' . $@ );
         return undef;
@@ -417,12 +380,13 @@ Adding sku as a keyword. See WebGUI::Asset::indexContent() for additonal details
 
 =cut
 
-sub indexContent {
+around indexContent => sub {
+	my $orig = shift;
 	my $self = shift;
-	my $indexer = $self->SUPER::indexContent;
-    $indexer->addKeywords($self->get('sku'));
+	my $indexer = $self->$orig(@_);
+    $indexer->addKeywords($self->sku);
 	return $indexer;
-}
+};
 
 #-------------------------------------------------------------------
 
@@ -482,7 +446,7 @@ The sku attached to the object you wish to instanciate.
 sub newBySku {
     my ($class, $session, $sku) = @_;
     my $assetId = $session->db->quickScalar("select assetId from sku where sku=?", [$sku]);
-    return WebGUI::Asset->newByDynamicClass($session, $assetId); 
+    return WebGUI::Asset->newById($session, $assetId); 
 }
 
 #-------------------------------------------------------------------
@@ -589,16 +553,16 @@ sub onRemoveFromCart {
 
 #-------------------------------------------------------------------
 
-=head2 processPropertiesFromFormPost ( )
+=head2 processEditForm ( )
 
 Extends the base class to process the tax data.
 
 =cut
 
-sub processPropertiesFromFormPost {
+override processEditForm => sub {
     my $self = shift;
 
-    my $output = $self->SUPER::processPropertiesFromFormPost( @_ );
+    my $output = super();
 
     my $taxDriver = WebGUI::Shop::Tax->new( $self->session )->getDriver;
     $self->session->log->fatal( 'Could not instanciate tax driver.' ) unless $taxDriver;
@@ -606,7 +570,7 @@ sub processPropertiesFromFormPost {
     $self->setTaxConfiguration( $taxDriver->className, $taxDriver->processSkuFormPost );
 
     return $output;
-}
+};
 
 #-------------------------------------------------------------------
 
@@ -634,13 +598,13 @@ Extent the base class to clean out any items using this Sku in all Carts.
 
 =cut
 
-sub purge {
+override purge => sub {
 	my $self = shift;
     my $assetId = $self->getId;
-    my $success = $self->SUPER::purge;
+    my $success = super();
     return $success unless $success;
     $self->session->db->write('delete from cartItem where assetId=?',[$assetId]);
-}
+};
 
 #-------------------------------------------------------------------
 
@@ -658,7 +622,7 @@ sub setTaxConfiguration {
     my $configuration   = shift;
 
     # Fetch current tax configurations
-    my $configs = eval { from_json( $self->getValue('taxConfiguration') ) };
+    my $configs = eval { from_json( $self->taxConfiguration ) };
     if ($@) {
         $self->session->log->error( 'Tax configuration of asset ' . $self->getId . ' is corrupt.' );
         return undef;
@@ -675,7 +639,7 @@ sub setTaxConfiguration {
 
 #-------------------------------------------------------------------
 
-=head2 shipsSeparately
+=head2 isShippingSeparately
 
 Returns a boolean indicating whether this item must be shipped separately from other items.
 If the shipsSeparately property is true, but isShippingRequired is false, this will return
@@ -683,9 +647,9 @@ false.
 
 =cut
 
-sub shipsSeparately {
+sub isShippingSeparately {
     my ($self) = @_;
-    return $self->isShippingRequired && $self->get('shipsSeparately');
+    return $self->isShippingRequired && $self->shipsSeparately;
 }
 
 
@@ -701,8 +665,8 @@ sub www_view {
 	my $self = shift;
 	my $check = $self->checkView;
 	return $check if (defined $check);
-	$self->session->http->setLastModified($self->getContentLastModified);
-	$self->session->http->sendHeader;
+	$self->session->response->setLastModified($self->getContentLastModified);
+	$self->session->response->sendHeader;
 	$self->prepareView;
 	my $style = $self->processStyle($self->getSeparator);
 	my ($head, $foot) = split($self->getSeparator,$style);
@@ -712,4 +676,5 @@ sub www_view {
 	return "chunked";
 }
 
+__PACKAGE__->meta->make_immutable;
 1;

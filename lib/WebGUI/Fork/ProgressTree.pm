@@ -3,7 +3,7 @@ package WebGUI::Fork::ProgressTree;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -25,6 +25,65 @@ WebGUI::Fork::ProgressTree
 
 Renders an admin console page that polls ::Status to draw a friendly graphical
 representation of how progress on a tree of assets is coming along.
+
+=head1 SYNOPSIS
+
+    package MyClass;
+
+    # User has requested we do some work
+    sub www_doWork {
+        my ( $self ) = @_;
+
+        # Get the assets that need work
+        my @assetIds = ();
+
+        # Start the fork with our "doWork" sub
+        my $process = WebGUI::Fork->start(
+            $self->session, 'MyClass', 'doWork',
+            { assetIds => \@assetIds },
+        );
+
+        # Get the URL for a status page
+        my $statusUrl = $process->contentPairs( 'ProgressTree', {
+            title   => 'Doing Work',
+            icon    => 'assets',
+            proceed => '/home?message=Work%20Done',
+        } );
+
+        # Go to the status page
+        $self->session->response->location( $statusUrl );
+        return 'redirect';
+    }
+
+    # Do the work of our WebGUI::Fork
+    sub doWork {
+        my ( $process, $args ) = @_;
+        # All the Assets we need to work on
+        my $assetIds = $args->{ assetIds };
+
+        # Build a tree and update process status
+        my $tree = WebGUI::ProgressTree->new( $process->session, $assetIds );
+        $process->update( sub { $tree->json } );
+
+        # Do the actual work
+        for my $id ( @$assetIds ) {
+            # ... Do something
+
+            # Update our tree and process again
+            $tree->update( $id, "Done!" );
+            $process->update( sub { $tree->json } );
+        }
+    }
+
+=head1 SEE ALSO
+
+=over 4
+
+=item WebGUI::ProgressTree
+
+Stores the data for the asset tree we are working on
+
+=back
 
 =head1 SUBROUTINES
 
@@ -114,7 +173,7 @@ my $template = <<'TEMPLATE';
                 document.getElementById('ui').style.display = 'block';
             },
             finish : function () {
-                YAHOO.WebGUI.Fork.redirect(params.redirect);
+                YAHOO.WebGUI.Fork.redirect(params);
             },
             error  : function (msg) {
                 alert(msg)
@@ -124,15 +183,6 @@ my $template = <<'TEMPLATE';
 }([% params %]));
 </script>
 TEMPLATE
-
-my $stylesheet = <<'STYLESHEET';
-<style>
-#tree li         { color: black }
-#tree li.focus   { color: cyan }
-#tree li.failure { color: red }
-#tree li.success { color: green }
-</style>
-STYLESHEET
 
 #-------------------------------------------------------------------
 
@@ -145,11 +195,12 @@ See WebGUI::Operation::Fork.
 sub handler {
     my $process = shift;
     my $session = $process->session;
-    my $style   = $session->style;
     my $url     = $session->url;
-    $style->setRawHeadTags($stylesheet);
-    $style->setScript($url->extras('underscore/underscore-min.js'));
-    WebGUI::Fork::ProgressBar::renderBar($process, $template);
+    WebGUI::Fork::ProgressBar::renderBar($process, $template, {
+            css => [ $url->extras('Fork/ProgressTree.css') ],
+            js  => [ $url->extras('underscore/underscore-min.js') ],
+        }
+    );
 }
 
 1;

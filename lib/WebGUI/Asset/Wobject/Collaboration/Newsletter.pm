@@ -1,7 +1,7 @@
 package WebGUI::Asset::Wobject::Collaboration::Newsletter;
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -11,99 +11,66 @@ package WebGUI::Asset::Wobject::Collaboration::Newsletter;
 #-------------------------------------------------------------------
 
 use strict;
-use Tie::IxHash;
-use WebGUI::Form;
-use WebGUI::International;
-use WebGUI::Utility;
-use base 'WebGUI::Asset::Wobject::Collaboration';
-
-#-------------------------------------------------------------------
-
-=head2 definition ( )
-
-defines wobject properties for Newsletter instances.  You absolutely need 
-this method in your new Wobjects.  If you choose to "autoGenerateForms", the
-getEditForm method is unnecessary/redundant/useless.  
-
-=cut
-
-sub definition {
-	my $class = shift;
-	my $session = shift;
-	my $definition = shift;
-	my $i18n = WebGUI::International->new($session, 'Asset_Newsletter');
-	my %properties;
-	tie %properties, 'Tie::IxHash';
-	%properties = (
-        newsletterHeader => {
-            defaultValue=>undef,
-            fieldType=>"HTMLArea",
-            tab=>"mail",
-            label=>$i18n->get("newsletter header"),
-            hoverHelp=>$i18n->get("newsletter header help"),
-        },
-        newsletterFooter => {
-            defaultValue=>undef,
-            fieldType=>"HTMLArea",
-            tab=>"mail",
-            label=>$i18n->get("newsletter footer"),
-            hoverHelp=>$i18n->get("newsletter footer help"),
-        },
-        newsletterTemplateId => {
-            defaultValue=>'newsletter000000000001',
-            fieldType=>"template",
-            namespace=>"newsletter",
-            tab=>"mail",
-            label=>$i18n->get("newsletter template"),
-            hoverHelp=>$i18n->get("newsletter template help"),
-        },
-        mySubscriptionsTemplateId => {
-            defaultValue=>'newslettersubscrip0001',
-            fieldType=>"template",
-            namespace=>"newsletter/mysubscriptions",
-            tab=>"display",
-            label=>$i18n->get("my subscriptions template"),
-            hoverHelp=>$i18n->get("my subscriptions template help"),
-        },
-	);
-    if ($session->setting->get("metaDataEnabled")) {
-	    $properties{newsletterCategories} = {
-            defaultValue=>undef,
-            fieldType=>"checkList",
-            tab=>"properties",
-            options=>$session->db->buildHashRef("select fieldId, fieldName from metaData_properties where 
-                fieldType in ('selectBox', 'checkList', 'radioList') order by fieldName"),
-            label=>$i18n->get("newsletter categories"),
-            hoverHelp=>$i18n->get("newsletter categories help"),
-            vertical=>1,
-            };
-    }
-    else {
-        $properties{newsletterCategories} = {
-            fieldType=>"readOnly",
-            value=>'<b style="color: #800000;">'.$i18n->get("content profiling needed").'</b>',
-            };
-    }
-	push(@{$definition}, {
-		assetName=>$i18n->get('assetName'),
-		icon=>'newsletter.gif',
-		autoGenerateForms=>1,
-		tableName=>'Newsletter',
-		className=>'WebGUI::Asset::Wobject::Collaboration::Newsletter',
-		properties=>\%properties
-		});
-        $class->SUPER::definition($session, $definition);
-
-        # Change the default Collaboration template
-        for my $def ( @$definition ) {
-            if ( exists $def->{properties}->{collaborationTemplateId} ) {
-                $def->{properties}->{collaborationTemplateId}->{defaultValue} = 'newslettercs0000000001';
-            }
-        }
-
-        return $definition;
+use Moose;
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset::Wobject::Collaboration';
+define assetName => ['assetName', 'Asset_Newsletter'];
+define icon      => 'newsletter.gif';
+define tableName => 'Newsletter';
+property newsletterHeader => (
+    default   => undef,
+    fieldType => "HTMLArea",
+    tab       => "mail",
+    label     => [ "newsletter header", 'Asset_Newsletter' ],
+    hoverHelp => [ "newsletter header help", 'Asset_Newsletter' ],
+);
+property newsletterFooter => (
+    default   => undef,
+    fieldType => "HTMLArea",
+    tab       => "mail",
+    label     => [ "newsletter footer", 'Asset_Newsletter' ],
+    hoverHelp => [ "newsletter footer help", 'Asset_Newsletter' ],
+);
+property newsletterTemplateId => (
+    default   => 'newsletter000000000001',
+    fieldType => "template",
+    namespace => "newsletter",
+    tab       => "mail",
+    label     => [ "newsletter template", 'Asset_Newsletter' ],
+    hoverHelp => [ "newsletter template help", 'Asset_Newsletter' ],
+);
+property mySubscriptionsTemplateId => (
+    default   => 'newslettersubscrip0001',
+    fieldType => "template",
+    namespace => "newsletter/mysubscriptions",
+    tab       => "display",
+    label     => [ "my subscriptions template", 'Asset_Newsletter' ],
+    hoverHelp => [ "my subscriptions template help", 'Asset_Newsletter' ],
+);
+property newsletterCategories => (
+    default   => undef,
+    fieldType => "checkList",
+    tab       => "properties",
+    options   => \&_newsletterCategories_options,
+    label     => [ "newsletter categories", 'Asset_Newsletter' ],
+    hoverHelp => [ "newsletter categories help", 'Asset_Newsletter' ],
+    vertical  => 1,
+);
+sub _newsletterCategories_options {
+    my $session = shift->session;
+    return $session->db->buildHashRef("select fieldId, fieldName from metaData_properties where fieldType in ('selectBox', 'checkList', 'radioList') order by fieldName");
 }
 
+# XXX TODO: Do this in Moose instead, if we can.
+#        # Change the default Collaboration template
+#        for my $def ( @$definition ) {
+#            if ( exists $def->{properties}->{collaborationTemplateId} ) {
+#                $def->{properties}->{collaborationTemplateId}->{defaultValue} = 'newslettercs0000000001';
+#            }
+#        }
+
+use WebGUI::Form;
+use WebGUI::International;
 
 #-------------------------------------------------------------------
 
@@ -134,12 +101,12 @@ Extends the base method to add custom template variables for the Newsletter.
 
 =cut
 
-sub getViewTemplateVars {
+override getViewTemplateVars => sub {
     my $self = shift;
-    my $var = $self->SUPER::getViewTemplateVars;
+    my $var = super();
     $var->{mySubscriptionsUrl} = $self->getUrl("func=mySubscriptions");
     return $var;
-}
+};
 
 
 
@@ -151,11 +118,11 @@ Extend the base method to handle deleting information from the Newsletter_subscr
 
 =cut
 
-sub purge {
+override purge => sub {
     my $self = shift;
     $self->session->db->write("delete from Newsletter_subscriptions where assetId=?", [$self->getId]);
-    $self->SUPER::purge(@_);
-}
+    super();
+};
 
 
 #-------------------------------------------------------------------
@@ -224,7 +191,7 @@ sub www_mySubscriptions {
     my @userPrefs = $self->getUserSubscriptions;
     foreach my $id (keys %{$meta}) {
         my @options = ();
-        if (isIn($id, split("\n", $self->get("newsletterCategories")))) {
+        if ($id ~~ [split("\n", $self->newsletterCategories)]) {
             foreach my $option (split("\n", $meta->{$id}{possibleValues})) {
                 $option =~ s/\s+$//;    # remove trailing spaces
                 next if $option eq "";  # skip blank values
@@ -234,7 +201,7 @@ sub www_mySubscriptions {
                     optionForm  => WebGUI::Form::checkbox($self->session, {
                             name    => "subscriptions",
                             value   => $preferenceName,
-                            checked => isIn($preferenceName, @userPrefs),
+                            checked => $preferenceName ~~ @userPrefs,
                             })
                     });
             }
@@ -251,7 +218,7 @@ sub www_mySubscriptions {
         $var{formFooter} = WebGUI::Form::formFooter($self->session);
         $var{formSubmit} = WebGUI::Form::submit($self->session);
     }
-    return $self->processStyle($self->processTemplate(\%var, $self->get("mySubscriptionsTemplateId")));
+    return $self->processStyle($self->processTemplate(\%var, $self->mySubscriptionsTemplateId));
 }
 
 #-------------------------------------------------------------------
@@ -270,4 +237,5 @@ sub www_mySubscriptionsSave {
     return $self->www_view;
 }
 
+__PACKAGE__->meta->make_immutable;
 1;

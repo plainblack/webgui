@@ -3,7 +3,7 @@ package WebGUI::Form::Button;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -61,6 +61,9 @@ sub definition {
 		defaultValue=>{
 			defaultValue=>$i18n->get(62)
 			},
+                type => {
+                    defaultValue     => 'button',
+                },
 		});
         return $class->SUPER::definition($session, $definition);
 }
@@ -89,10 +92,16 @@ Renders a button.
 sub toHtml {
 	my $self = shift;
  	my $value = $self->fixQuotes($self->getOriginalValue);
-	my $html = '<input type="button" ';
+	my $html = '<input type="' . $self->get('type') . '" ';
 	$html .= 'name="'.$self->get("name").'" ' if ($self->get("name"));
 	$html .= 'id="'.$self->get('id').'" ' unless ($self->get('id') eq "_formId");
 	$html .= 'value="'.$value.'" '.$self->get("extras").' />';
+        my ( $style, $url ) = $self->session->quick(qw( style url ));
+        $style->setCss($url->extras('yui/build/button/assets/skins/sam/button.css'));
+        $style->setScript($url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'));
+        $style->setScript($url->extras('yui/build/element/element-min.js'));
+        $style->setScript($url->extras('yui/build/button/button-min.js'));
+        $html .= '<script type="text/javascript">new YAHOO.widget.Button("' . $self->get('id') . '");</script>';
 	return $html;
 }
 

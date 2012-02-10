@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -8,37 +8,34 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../../lib";
 
 ##The goal of this test is to test the creation of Thingy Wobjects.
 
 use WebGUI::Test;
+use WebGUI::Test::MockAsset;
 use WebGUI::Session;
-use Test::More tests => 38; # increment this value for each test you create
+use Test::More tests => 47; # increment this value for each test you create
 use Test::Deep;
 use JSON;
 use WebGUI::Asset::Wobject::Thingy;
+use WebGUI::Test::Mechanize;
 use Data::Dumper;
 
 my $session = WebGUI::Test->session;
 
 # Do our work in the import node
-my $node = WebGUI::Asset->getImportNode($session);
+my $node = WebGUI::Test->asset;
 
 my $templateId = 'THING_EDIT_TEMPLATE___';
-my $templateMock = Test::MockObject->new({});
-$templateMock->set_isa('WebGUI::Asset::Template');
-$templateMock->set_always('getId', $templateId);
+my $templateMock = WebGUI::Test::MockAsset->new('WebGUI::Asset::Template');
+$templateMock->mock_id($templateId);
 my $templateVars;
 $templateMock->mock('process', sub { $templateVars = $_[1]; } );
 
-my $versionTag = WebGUI::VersionTag->getWorking($session);
-$versionTag->set({name=>"Thingy Test"});
-WebGUI::Test->addToCleanup($versionTag);
+my $tag = WebGUI::VersionTag->getWorking($session);
 my $thingy = $node->addChild({className=>'WebGUI::Asset::Wobject::Thingy'});
-$versionTag->commit;
+$tag->commit;
 $thingy = $thingy->cloneFromDb;
 
 # Test for a sane object type
@@ -323,7 +320,6 @@ ok( ! $thingy->hasEnteredMaxPerUser($otherThingId), 'hasEnteredMaxPerUser: retur
 my @edit_thing_form_fields = qw/form_start form_end form_submit field_loop/;
 
 {
-    WebGUI::Test->mockAssetId($templateId, $templateMock);
     $thingy->editThingData($otherThingId);
     my %miniVars;
     @miniVars{@edit_thing_form_fields} = @{ $templateVars }{ @edit_thing_form_fields };
@@ -343,7 +339,6 @@ $thingy->editThingDataSave($otherThingId, 'new', {"field_".$otherFieldId => 'oth
 ok( $thingy->hasEnteredMaxPerUser($otherThingId), 'hasEnteredMaxPerUser returns true with one row entered, and maxEntriesPerUser=1');
 
 {
-    WebGUI::Test->mockAssetId($templateId, $templateMock);
     $thingy->editThingData($otherThingId);
     my %miniVars;
     @miniVars{@edit_thing_form_fields} = @{ $templateVars }{ @edit_thing_form_fields };
@@ -375,7 +370,6 @@ ok( ! $thingy->hasEnteredMaxEntries($otherThingId), 'hasEnteredMaxEntries: retur
 my @edit_thing_form_fields = qw/form_start form_end form_submit field_loop/;
 
 {
-    WebGUI::Test->mockAssetId($templateId, $templateMock);
     $thingy->editThingData($otherThingId);
     my %miniVars;
     @miniVars{@edit_thing_form_fields} = @{ $templateVars }{ @edit_thing_form_fields };
@@ -395,7 +389,6 @@ $thingy->editThingDataSave($otherThingId, 'new', {"field_".$otherFieldId => 'oth
 ok( $thingy->hasEnteredMaxEntries($otherThingId), 'hasEnteredMaxEntries returns true with one row entered, and maxEntriesTotal=1');
 
 {
-    WebGUI::Test->mockAssetId($templateId, $templateMock);
     $thingy->editThingData($otherThingId);
     my %miniVars;
     @miniVars{@edit_thing_form_fields} = @{ $templateVars }{ @edit_thing_form_fields };
@@ -491,12 +484,104 @@ $session->request->setup_body({
 });
 
 $session->user({userId => '3'});
-$session->http->setStatus(200);
+$session->response->status(200);
 my $json = $thingy->www_editThingDataSaveViaAjax();
 is $json, '{}', 'www_editThingDataSaveViaAjax: Empty JSON hash';
-is $session->http->getStatus, 200, '... http status=200';
+is $session->response->status, 200, '... http status=200';
 
 $session->request->setup_body({ });
+
+#----------------------------------------------------------------------------
+# www_editField
+
+my $fieldThingId = $thingy->addThing();
+diag( "Field Thing ID: $fieldThingId" );
+
+my $mech = WebGUI::Test::Mechanize->new( config => WebGUI::Test->file );
+$mech->get_ok( '/' );
+$mech->session->user({ userId => 3 });
+
+my %fieldInfo = (
+    thingId => $fieldThingId,
+    label => 'Escape Plan',
+    defaultValue => 'zihuatanejo',
+    pretext => '',
+    subtext => 'PS: Dont tell anyone!',
+);
+$mech->get_ok( $thingy->getUrl( 'func=editField;thingId=' . $fieldThingId . ';fieldId=new' ) );
+$mech->submit_form_ok({
+        fields => \%fieldInfo,
+    },
+    "add field to thing",
+);
+
+my $field = $session->db->quickHashRef(
+    "SELECT * FROM Thingy_fields WHERE assetId=? AND thingId=?",
+    [ $thingy->getId, $fieldThingId ],
+);
+ok( $field, "field exists" );
+cmp_deeply( $field, superhashof( \%fieldInfo ), 'field info saved' );
+
+#----------------------------------------------------------------------------
+# www_importForm
+
+my $tag2 = WebGUI::VersionTag->getWorking($session);
+my $thingy = WebGUI::Test->asset(
+    className => 'WebGUI::Asset::Wobject::Thingy',
+);
+$tag2->commit;
+$thingy = $thingy->cloneFromDb;
+my $thingId = $thingy->addThing();
+my @fieldIds = (
+    $thingy->addField({
+            assetId => $thingy->getId,
+            thingId => $thingId,
+            sequenceNumber => 1,
+            label => 'Name',
+            fieldType => 'text',
+        }),
+    $thingy->addField({
+            assetId => $thingy->getId,
+            thingId => $thingId,
+            sequenceNumber => 2,
+            label => 'Age',
+            fieldType => 'Integer',
+        }),
+);
+
+my $mech = WebGUI::Test::Mechanize->new( config => WebGUI::Test->file );
+$mech->get_ok( '/' );
+$mech->session->user({ userId => 3 });
+
+$mech->get_ok( $thingy->getUrl( 'func=importForm;thingId=' . $thingId ) );
+$mech->submit_form_ok({
+        fields => {
+            importFile_file => WebGUI::Test::collateral( "thingy.csv" ),
+            "fileContains_$fieldIds[0]" => 1,
+            "fileContains_$fieldIds[1]" => 1,
+        },
+    },
+    "Import data into thing",
+);
+
+my @thingData = $session->db->buildArrayRefOfHashRefs(
+    "select * from ". $session->db->quote_identifier("Thingy_".$thingId),
+);
+cmp_deeply(
+    @thingData,
+    bag(
+        superhashof({
+            "field_$fieldIds[0]" => "Andy Dufresne",
+            "field_$fieldIds[1]" => "42",
+        }),
+        superhashof({
+            "field_$fieldIds[0]" => "Red Ellis",
+            "field_$fieldIds[1]" => "47",
+        }),
+    ),
+    " All rows imported ",
+) or diag( explain \@thingData );
+
 
 #################################################################
 #

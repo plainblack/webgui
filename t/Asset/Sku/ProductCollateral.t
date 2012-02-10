@@ -1,6 +1,6 @@
 # vim:syntax=perl
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -13,9 +13,7 @@
 #
 # This tests WebGUI::Asset::Sku::Donation
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../../lib";
 
 use Test::More;
 use Test::Deep;
@@ -304,8 +302,8 @@ my $product6 = $root->addChild({
 $newVid = $product6->setCollateral('variantsJSON', 'vid', 'new', { wideChar => qq!on 16\x{201d} hand-crocheted Cord!
 , vid => 'new' });
 
-my $product6a = WebGUI::Asset->newByDynamicClass($session, $product6->getId);
-lives_ok { $product6a->getAllCollateral('variantsJSON', 'vid', $newVid); } 'Product collateral handles wide-character encodings okay';
+my $product6a = WebGUI::Asset->newById($session, $product6->getId);
+lives_ok { $product6a->getAllCollateral('variantsJSON', 'vid', $newVid); }, 'Product collateral handles wide-character encodings okay';
 
 $product6->purge;
 

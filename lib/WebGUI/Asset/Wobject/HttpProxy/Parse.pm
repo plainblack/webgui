@@ -5,7 +5,7 @@ use strict;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -49,11 +49,6 @@ my %tag_attr = (
 	"area href" => 1,
 	"script src" => 1
 	);
-
-sub DESTROY {
-	my $self = shift;
-	$self = undef;
-}
 
 =head2 new ( $class, $session)
 

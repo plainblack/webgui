@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -12,6 +12,7 @@ use strict;
 use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
+use WebGUI::Test::MockAsset;
 use WebGUI::Session;
 use WebGUI::Asset::Template;
 use WebGUI::Macro::RenderThingData;
@@ -21,37 +22,24 @@ use Test::More; # increment this value for each test you create
 use Test::MockObject;
 use Test::Deep;
 
-my $templateId = 'PICKLANGUAGE_TEMPLATE_';
-my $templateId = 'VIEW_THING_DATA_TEMPL8T';
+my $templateId = lc 'VIEW_THING_DATA_TEMPL8T';
 my $templateUrl = 'view_thing_data_template';
-my $templateMock = Test::MockObject->new({});
-$templateMock->set_isa('WebGUI::Asset::Template');
-$templateMock->set_always('getId', $templateId);
+my $templateMock = WebGUI::Test::MockAsset->new('WebGUI::Asset::Template');
 my $templateVars;
 my $templateProcessed = 0;
 $templateMock->mock('process', sub { $templateVars = $_[1]; $templateProcessed = 1; } );
 my $session = WebGUI::Test->session;
-WebGUI::Test->mockAssetId($templateId,   $templateMock);
-WebGUI::Test->mockAssetUrl($templateUrl, $templateMock);
-
-WebGUI::Test->addToCleanup(sub {
-    WebGUI::Test->unmockAssetId($templateId);
-    WebGUI::Test->unmockAssetUrl($templateUrl);
-});
+$templateMock->mock_id( $templateId );
+$templateMock->mock_url( $templateUrl );
 
 plan tests => 7;
 
-my $node = WebGUI::Asset->getImportNode($session);
-my $versionTag = WebGUI::VersionTag->getWorking($session);
-$versionTag->set({name=>"Thingy Test"});
-WebGUI::Test->addToCleanup($versionTag);
+my $node = WebGUI::Test->asset;
 my $thingy = $node->addChild({
     className   => 'WebGUI::Asset::Wobject::Thingy',
     groupIdView => 7,
     url         => 'some_thing',
 });
-$versionTag->commit;
-$thingy = $thingy->cloneFromDb;
 
 my %thingProperties = (
     thingId           => "THING_RECORD",

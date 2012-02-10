@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -8,11 +8,10 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
+use WebGUI::Paths;
 use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::Macro::Include;
@@ -23,8 +22,8 @@ my $session = WebGUI::Test->session;
 
 my $i18n = WebGUI::International->new($session, 'Macro_Include');
 
-my $configFile = WebGUI::Test->root .'/etc/'. WebGUI::Test->file;
-my $spectreConf = WebGUI::Test->root . '/etc/spectre.conf';
+my $configFile = WebGUI::Paths->configBase . '/'. WebGUI::Test->file;
+my $spectreConf = WebGUI::Paths->spectreConfig;
 
 my $goodFile = 'The contents of this file are accessible';
 my $twoLines = "This file contains two lines of text\nThis is the second line";

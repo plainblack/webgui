@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -8,25 +8,23 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use FindBin;
 use strict;
 use File::Spec;
-use lib "$FindBin::Bin/../../lib";
 
 ##The goal of this test is to test the creation of Article Wobjects.
 
 use WebGUI::Test;
+use WebGUI::Test::MockAsset;
 use WebGUI::Session;
 use Test::More tests => 24; # increment this value for each test you create
 use Test::Deep;
-use Test::MockObject;
 use Data::Dumper;
 use WebGUI::Asset::Wobject::Article;
 
 my $session = WebGUI::Test->session;
 
 # Do our work in the import node
-my $node = WebGUI::Asset->getImportNode($session);
+my $node = WebGUI::Test->asset;
 
 # Lets create an article wobject using all defaults then test to see if those defaults were set
 #
@@ -41,9 +39,6 @@ my $node = WebGUI::Asset->getImportNode($session);
 #	storageId    => undef,
 #};
 
-my $versionTag = WebGUI::VersionTag->getWorking($session);
-$versionTag->set({name=>"Article Test"});
-WebGUI::Test->addToCleanup($versionTag);
 my $article = $node->addChild({className=>'WebGUI::Asset::Wobject::Article'});
 
 # Test for a sane object type
@@ -121,12 +116,12 @@ my $output = $article->view;
 isnt ($output, "", 'view method returns something');
 
 # Lets see if caching works
-my $cachedOutput = WebGUI::Cache->new($session, 'view_'.$article->getId)->get;
+my $cachedOutput = $session->cache->get('view_'.$article->getId);
 is ($output, $cachedOutput, 'view method caches output');
 
 # Lets see if the purgeCache method works
 $article->purgeCache;
-$cachedOutput = WebGUI::Cache->new($session, 'view_'.$article->getId)->get;  # Check cache post purge
+$cachedOutput = $session->cache->get('view_'.$article->getId);  # Check cache post purge
 isnt ($output, $cachedOutput, 'purgeCache method deletes cache');
 
 
@@ -136,9 +131,8 @@ isnt ($output, $cachedOutput, 'purgeCache method deletes cache');
 # --------------------------------------------------------------------------------------------------
 my $templateId = 'DUMMY_TEMPLATE________';
 
-my $templateMock = Test::MockObject->new({});
-$templateMock->set_isa('WebGUI::Asset::Template');
-$templateMock->set_always('getId', $templateId);
+my $templateMock = WebGUI::Test::MockAsset->new('WebGUI::Asset::Template');
+$templateMock->mock_id($templateId);
 my $templateVars;
 $templateMock->set_true('prepare', sub {  } );
 $templateMock->mock('process', sub { $templateVars = $_[1]; } );
@@ -151,12 +145,8 @@ foreach my $f (@extTestFiles) {
 }
 
 $article->update({templateId=>$templateId});
-{
-    WebGUI::Test->mockAssetId($templateId, $templateMock);
-    $article->prepareView;
-    $article->view;
-    WebGUI::Test->unmockAssetId($templateId);
-}
+$article->prepareView;
+$article->view;
 
 cmp_bag(
     $templateVars->{attachment_loop},

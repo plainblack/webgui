@@ -3,7 +3,7 @@ package WebGUI::HTMLForm;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -14,12 +14,11 @@ package WebGUI::HTMLForm;
 
 =cut
 
+use strict;
 use CGI::Util qw(rearrange);
-use strict qw(vars refs);
 use WebGUI::Form;
 use WebGUI::International;
 use WebGUI::Pluggable;
-use WebGUI::Utility;
 
 =head1 NAME
 
@@ -62,7 +61,7 @@ These methods are available from this class:
 #-------------------------------------------------------------------
 sub _uiLevelChecksOut {
 	my $self = shift;
-	if ($_[0] <= $self->session->user->profileField("uiLevel")) {
+	if ($_[0] <= $self->session->user->get("uiLevel")) {
 		return 1;
 	} 
     else {
@@ -87,26 +86,12 @@ sub AUTOLOAD {
 	$params{rowClass} ||= $self->{_class};
     my $control = eval { WebGUI::Pluggable::instanciate("WebGUI::Form::".$name, "new", [ $self->session, %params ]) };
     if ($@) {
-        $self->session->errorHandler->error($@);
+        $self->session->log->error($@);
         return undef;
     }
 	$self->{_data} .= $control->toHtmlWithWrapper;
 }       
         
-#-------------------------------------------------------------------
-
-=head2 DESTROY ( )
-
-Disposes of the form object.
-
-=cut
-
-sub DESTROY {
-	my $self = shift;
-	$self = undef;
-}
-
-
 #-------------------------------------------------------------------
 
 =head2 dynamicForm ( $formDefinition, $listName, $who ) 
@@ -166,7 +151,7 @@ sub dynamicForm {
                     $params{$key} = $formDefinition->[0]{name};
                 }
             }
-            $params{value} = $parent->get($fieldname);
+            $params{value} = $parent->get($fieldname) if $parent;
             $params{name}  = $fieldname;
             $self->dynamicField(%params);
         }
@@ -284,13 +269,13 @@ sub print {
 	my $self = shift;
     my $style = $self->session->style;
     my $url = $self->session->url;
-    $style->setLink($url->extras('/yui/build/container/assets/container.css'),{ type=>'text/css', rel=>"stylesheet" });
-    $style->setLink($url->extras('/hoverhelp.css'),{ type=>'text/css', rel=>"stylesheet" });
-    $style->setScript($url->extras('/yui/build/yahoo/yahoo-min.js'),{ type=>'text/javascript' });
-    $style->setScript($url->extras('/yui/build/dom/dom-min.js'),{ type=>'text/javascript' });
-    $style->setScript($url->extras('/yui/build/event/event-min.js'),{ type=>'text/javascript' });
-    $style->setScript($url->extras('/yui/build/container/container-min.js'),{ type=>'text/javascript' });
-    $style->setScript($url->extras('/hoverhelp.js'),{ type=>'text/javascript' });
+    $style->setCss($url->extras('/yui/build/container/assets/container.css'));
+    $style->setCss($url->extras('/hoverhelp.css'));
+    $style->setScript($url->extras('/yui/build/yahoo/yahoo-min.js'));
+    $style->setScript($url->extras('/yui/build/dom/dom-min.js'));
+    $style->setScript($url->extras('/yui/build/event/event-min.js'));
+    $style->setScript($url->extras('/yui/build/container/container-min.js'));
+    $style->setScript($url->extras('/hoverhelp.js'));
         return $self->{_header}.$self->{_data}.$self->{_footer};
 }
 

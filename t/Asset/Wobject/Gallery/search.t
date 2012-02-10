@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -8,9 +8,7 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../../../lib";
 
 # Test of the Gallery basic and advanced search. In non-live tests, the Gallery 
 # search is accessed via the "search" method. Form parameters are passed in via
@@ -34,17 +32,12 @@ my $node            = WebGUI::Asset->getImportNode($session);
 my $versionTag      = WebGUI::VersionTag->getWorking($session);
 
 $versionTag->set( { name=>"Gallery Search Test" } );
-addToCleanup( $versionTag );
+WebGUI::Test->addToCleanup( $versionTag );
 
 # Create gallery and a single album
 my $gallery
     = $node->addChild({
         className           => "WebGUI::Asset::Wobject::Gallery",
-    },
-    undef,
-    undef,
-    {
-        skipAutoCommitWorkflows => 1,
     });
 
 my $album
@@ -53,11 +46,6 @@ my $album
         title           => "album",
         synopsis        => "synopsis2",
         keywords        => "group2",        
-    },
-    undef,
-    undef,
-    {
-        skipAutoCommitWorkflows => 1,
     });
 my $albumId = $album->getId;    
 
@@ -69,11 +57,6 @@ my $photo1
         synopsis        => "synopsis1",
         keywords        => "group1",
         location        => "Heidelberg",
-    },
-    undef,
-    undef,
-    {
-        skipAutoCommitWorkflows => 1,
     });
 my $id1 = $photo1->getId;    
     
@@ -84,11 +67,6 @@ my $photo2
         synopsis        => "synopsis2",
         keywords        => "group1",
         location        => "Mannheim",
-    },
-    undef,
-    undef,
-    {
-        skipAutoCommitWorkflows => 1,
     });
 my $id2 = $photo2->getId;    
 
@@ -99,11 +77,6 @@ my $photo3
         synopsis        => "synopsis1",
         keywords        => "group2",
         location        => "Mannheim",
-    },
-    undef,
-    undef,
-    {
-        skipAutoCommitWorkflows => 1,
     });
 my $id3 = $photo3->getId;
     

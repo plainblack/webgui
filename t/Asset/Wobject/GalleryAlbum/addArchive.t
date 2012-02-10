@@ -1,6 +1,6 @@
 # $vim: syntax=perl
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -9,9 +9,7 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../../../lib";
 
 ## The goal of this test is to test the permissions of GalleryAlbum assets
 
@@ -25,9 +23,8 @@ use Test::Deep;
 my $session         = WebGUI::Test->session;
 my $node            = WebGUI::Asset->getImportNode($session);
 my $versionTag      = WebGUI::VersionTag->getWorking($session);
-
 $versionTag->set({name=>"Add Archive to Album Test"});
-addToCleanup($versionTag);
+WebGUI::Test->addToCleanup($versionTag);
 
 my $gallery
     = $node->addChild({
@@ -43,19 +40,7 @@ my $album
     = $gallery->addChild({
         className           => "WebGUI::Asset::Wobject::GalleryAlbum",
         ownerUserId         => "3", # Admin
-    },
-    undef,
-    undef,
-    {
-        skipAutoCommitWorkflows => 1,
     });
-
-# Properties applied to every photo in the archive
-my $properties  = {
-    keywords        => "something",
-    location        => "somewhere",
-    friendsOnly     => "1",
-};
 
 $versionTag->commit;
 
@@ -70,6 +55,13 @@ plan tests => 11;
 # elephant_images.zip contains three jpgs: Aana1.jpg, Aana2.jpg, Aana3.jpg
 
 $versionTag = WebGUI::VersionTag->getWorking($session);
+# Properties applied to every photo in the archive
+my $properties  = {
+    keywords        => "something",
+    location        => "somewhere",
+    friendsOnly     => "1",
+};
+
 $album->addArchive( WebGUI::Test->getTestCollateralPath('elephant_images.zip'), $properties );
 
 my $images  = $album->getLineage(['descendants'], { returnObjects => 1 });

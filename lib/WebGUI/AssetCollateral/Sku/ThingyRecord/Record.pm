@@ -3,7 +3,7 @@ package WebGUI::AssetCollateral::Sku::ThingyRecord::Record;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -34,51 +34,45 @@ for a list of base methods that are available.
 
 =cut
 
-use base 'WebGUI::Crud';
-
-#----------------------------------------------------------------
-
-=head2 crud_definition ($session)
-
-Defintion subroutine to set up CRUD.
-
-=cut
-
-sub crud_definition {
-	my ($class, $session) = @_;
-	my $definition = $class->SUPER::crud_definition($session);
-	$definition->{tableName} = 'ThingyRecord_record';
-	$definition->{tableKey} = 'recordId';
-    my $properties  = $definition->{properties};
-    $properties->{transactionId} = {
-        fieldType       => "hidden",
-        defaultValue    => undef,
-    };
-    $properties->{assetId} = {
-        fieldType       => "hidden",
-        defaultValue    => undef,
-    };
-    $properties->{expires} = {
-        fieldType       => "DateTime",
-        defaultValue    => 0,
-    };
-    $properties->{userId} = {
-        fieldType       => "hidden",
-        defaultValue    => undef,
-    };
-    $properties->{fields} = {
-        fieldType       => 'textarea',
-        defaultValue    => '',
-    };
-    $properties->{isHidden} = {
-        fieldType       => 'yesNo',
-        defaultValue    => 0,
-    };
-    $properties->{sentExpiresNotice} = {
-        fieldType       => 'yesNo',
-        defaultValue    => 0,
-    };
-    return $definition;
-}
+use Moose;
+use WebGUI::Definition::Crud;
+extends 'WebGUI::Crud';
+define tableName => 'ThingyRecord_record';
+define tableKey  => 'recordId';
+has recordId     => (
+    required => 1,
+    is       => 'ro',
+);
+property transactionId => (
+    label     => 'transactionId',
+    fieldType => "hidden",
+);
+property assetId => (
+    label     => 'assetId',
+    fieldType => "hidden",
+);
+property expires => (
+    label     => 'expires',
+    fieldType => "DateTime",
+);
+property userId => (
+    label     => 'userId',
+    fieldType => "hidden",
+);
+property fields => (
+    label     => 'fields',
+    fieldType => 'textarea',
+    default   => '',
+);
+property isHidden => (
+    label     => 'isHidden',
+    fieldType => 'yesNo',
+    default   => 0,
+);
+property sentExpiresNotice => (
+    label     => 'sentExpiresNotice',
+    fieldType => 'yesNo',
+    default   => 0,
+);
 
 1;

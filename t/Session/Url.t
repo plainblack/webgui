@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -8,12 +8,9 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
-use WebGUI::PseudoRequest;
 use WebGUI::Session;
 use WebGUI::Asset;
 
@@ -29,7 +26,7 @@ my @getRefererUrlTests = (
 		comment => 'getRefererUrl returns the url minus the gateway',
 	},
 	{
-		input => 'http://www.domain.com/myUrl.html?op=switchAdminOn',
+		input => 'http://www.domain.com/myUrl.html?op=admin',
 		output => 'myUrl.html',
 		comment => 'getRefererUrl returns the url minus the gateway',
 	},
@@ -51,13 +48,9 @@ my @getRefererUrlTests = (
 );
 
 use Test::More;
-use Test::MockObject::Extends;
-plan tests => 87 + scalar(@getRefererUrlTests);
 
 my $session = WebGUI::Test->session;
-
-my $pseudoRequest = WebGUI::PseudoRequest->new();
-$session->{_request} = $pseudoRequest;
+my $request = $session->request;
 
 #disable caching
 my $preventProxyCache = $session->setting->get('preventProxyCache');
@@ -138,17 +131,14 @@ $session->url->setSiteURL('http://webgui.org');
 is( $session->url->getSiteURL, 'http://webgui.org', 'override config setting with setSiteURL');
 
 ##Create a fake environment hash so we can muck with it.
-my %mockEnv = %ENV;
-my $env = $session->env;
-$env = Test::MockObject::Extends->new($env);
-$env->mock('get', sub { return $mockEnv{$_[1]} } );
+my $env = $session->request->env;
 
-$mockEnv{HTTPS} = "on";
+$env->{'psgi.url_scheme'} = "https";
 $session->url->setSiteURL(undef);
 is( $session->url->getSiteURL, 'https://'.$sitename, 'getSiteURL from config as http_host with SSL');
 
-$mockEnv{HTTPS} = "";
-$mockEnv{HTTP_HOST} = "devsite.com";
+$env->{'psgi.url_scheme'} = "http";
+$env->{HTTP_HOST} = "devsite.com";
 $session->url->setSiteURL(undef);
 is( $session->url->getSiteURL, 'http://'.$sitename, 'getSiteURL where requested host is not a configured site');
 
@@ -200,31 +190,25 @@ is( $session->url->makeCompliant($character), $character, 'utf8 allowed in URLs'
 #
 #######################################
 
-my $originalRequest = $session->request;  ##Save the original request object
-$session->{_request} = undef;
+my $setUri = sub {
+    $request->env->{PATH_INFO} = $_[0];
+};
 
-is($session->url->getRequestedUrl, undef, 'getRequestedUrl returns undef unless it has a request object');
-$session->{_request} = $originalRequest;
+$setUri->('empty');
+is($session->request->uri, 'http://devsite.com/empty', 'Validate Mock Object operation');
 
-$pseudoRequest->uri('empty');
-is($session->request->uri, 'empty', 'Validate Mock Object operation');
+$setUri->('full');
+is($session->request->uri, 'http://devsite.com/full', 'Validate Mock Object operation #2');
 
-$pseudoRequest->uri('full');
-is($session->request->uri, 'full', 'Validate Mock Object operation #2');
+$setUri->('/path1/file1');
+is($session->url->getRequestedUrl, '/path1/file1', 'getRequestedUrl, fetch');
 
-$pseudoRequest->uri('/path1/file1');
-is($session->url->getRequestedUrl, 'path1/file1', 'getRequestedUrl, fetch');
-
-$pseudoRequest->uri('/path2/file2');
-is($session->url->getRequestedUrl, 'path1/file1', 'getRequestedUrl, check cache of previous result');
-
-$session->url->{_requestedUrl} = undef;  ##Manually clear cached value
-$pseudoRequest->uri('/path2/file2?param1=one;param2=two');
-is($session->url->getRequestedUrl, 'path2/file2', 'getRequestedUrl, does not return params');
+$setUri->('/path2/file2');
+is($session->url->getRequestedUrl, '/path1/file1', 'getRequestedUrl, check cache of previous result');
 
 $session->url->{_requestedUrl} = undef;
 my $utf8_url = "Viel Spa\x{00DF}";
-$pseudoRequest->uri($utf8_url);
+$setUri->($utf8_url);
 use Encode;
 my $decoded_url = decode_utf8($utf8_url);
 is $session->url->getRequestedUrl(), $decoded_url, 'getRequestedUrl returns utf8 decoded data';
@@ -239,7 +223,7 @@ my $sessionAsset = $session->asset;
 $session->asset(undef);
 
 $session->url->{_requestedUrl} = undef;  ##Manually clear cached value
-$pseudoRequest->uri('/path1/">file1');
+$setUri->('/path1/">file1');
 is($session->url->page, '/path1/%22%3Efile1', 'page with no args returns getRequestedUrl through gateway, escaping the requested URL for safety');
 
 is($session->url->page('op=viewHelpTOC;topic=Article'), '/path1/%22%3Efile1?op=viewHelpTOC;topic=Article', 'page: pairs are appended');
@@ -269,12 +253,8 @@ $session->asset($sessionAsset);
 #
 #######################################
 
-$mockEnv{'HTTP_REFERER'} = 'test';
-
-is($session->env->get('HTTP_REFERER'), 'test', 'testing overridden ENV');
-
 foreach my $test (@getRefererUrlTests) {
-	$mockEnv{HTTP_REFERER} = $test->{input};
+    $session->request->referer($test->{input});
 	is($session->url->getRefererUrl, $test->{output}, $test->{comment});
 }
 
@@ -330,14 +310,10 @@ is($session->url->extras('/dir1/foo.html'), join('', $cdnCfg->{extrasCdn}, 'dir1
 is($session->url->extras('tinymce'), join('', $extras, 'tinymce'),
    'extras exclusion from CDN');
 # Note: env is already mocked above.
-$mockEnv{HTTPS} = 'on';
+$env->{'psgi.url_scheme'} = "https";
 is($session->url->extras('/dir1/foo.html'), join('', $cdnCfg->{extrasSsl}, 'dir1/foo.html'),
    'extras using extrasSsl with HTTPS');
-$mockEnv{HTTPS} = undef;
-$mockEnv{SSLPROXY} = 1;
-is($session->url->extras('/dir1/foo.html'), join('', $cdnCfg->{extrasSsl}, 'dir1/foo.html'),
-   'extras using extrasSsl with SSLPROXY');
-delete $mockEnv{SSLPROXY};
+$env->{'psgi.url_scheme'} = "http";
 
 #######################################
 #
@@ -377,7 +353,7 @@ is $session->url->urlize('home/././here'),            'home/here', '... removes 
 $sessionAsset = $session->asset;
 $session->{_asset} = undef;
 $session->url->{_requestedUrl} = undef;  ##Manually clear cached value
-$pseudoRequest->uri('/goBackToTheSite');
+$setUri->('/goBackToTheSite');
 
 is($session->url->getBackToSiteURL, '/goBackToTheSite', 'getBackToSiteURL: when session asset is undefined, the method falls back to using page');
 
@@ -413,27 +389,26 @@ TODO: {
     ok(0, 'test a child of the media folder');
 }
 
-my $versionTag = WebGUI::VersionTag->getWorking($session);
-WebGUI::Test->addToCleanup($versionTag);
-my $statefulAsset = WebGUI::Asset->getRoot($session)->addChild({ className => 'WebGUI::Asset::Snippet' });
-$versionTag->commit;
-$session->asset( $statefulAsset );
+my $parentAsset = WebGUI::Asset->getRoot($session);
+my $statefulAsset = $parentAsset->addChild({ className => 'WebGUI::Asset::Snippet' });
+WebGUI::Test->addToCleanup($statefulAsset);
+$statefulAsset = $statefulAsset->cloneFromDb;
+$session->asset($statefulAsset);
 
-$statefulAsset->{_properties}{state} = 'published';
 is(
     $session->url->getBackToSiteURL, 
-    WebGUI::Asset->getRoot($session)->getUrl,
+    $parentAsset->getUrl,
     q!getBackToSiteURL: When asset state is published, it returns you to the Assets container!
 );
 
-$statefulAsset->{_properties}{state} = 'trash';
+$statefulAsset->state( 'trash');
 is(
     $session->url->getBackToSiteURL, 
     $defaultAssetUrl,
     q!getBackToSiteURL: When asset state is trash, it returns you to the default Asset!
 );
 
-$statefulAsset->{_properties}{state} = 'clipboard';
+$statefulAsset->state('clipboard');
 is(
     $session->url->getBackToSiteURL, 
     $defaultAssetUrl,
@@ -451,42 +426,35 @@ WebGUI::Test->originalConfig('sslEnabled');
 ##Test all the false cases, first
 
 $session->config->set('sslEnabled', 0);
-$mockEnv{HTTPS}    = 'not on';
-$mockEnv{SSLPROXY} = 0;
+$env->{'psgi.url_scheme'} = "http";
 ok( ! $session->url->forceSecureConnection(), 'sslEnabled must be 1 to force SSL');
 
 $session->config->set('sslEnabled', 1);
-$mockEnv{HTTPS}    = 'on';
-$mockEnv{SSLPROXY} = 0;
+$env->{'psgi.url_scheme'} = "https";
 ok( ! $session->url->forceSecureConnection(), 'HTTPS must not be "on" to force SSL');
-
-$session->config->set('sslEnabled', 1);
-$mockEnv{HTTPS}    = 'not on';
-$mockEnv{SSLPROXY} = 1;
-ok( ! $session->url->forceSecureConnection(), 'SSLPROXY must not be true to force SSL');
 ok( ! $session->url->forceSecureConnection('/test/url'), 'all conditions must be met, even if a URL is directly passed in');
 
 ##Validate the HTTP object state before we start
-$session->http->setStatus('200', 'OK');
-is($session->http->getStatus, 200, 'http status is okay, 200');
-is($session->http->getRedirectLocation, undef, 'redirect location is empty');
+$session->response->status('200');
+is($session->response->status, 200, 'http status is okay, 200');
+is($session->response->location, undef, 'redirect location is empty');
 
-$mockEnv{HTTPS}    = 'not on';
-$mockEnv{SSLPROXY} = 0;
+$env->{'psgi.url_scheme'} = "http";
 
 my $secureUrl = $session->url->getSiteURL . '/foo/bar/baz/buz';
 $secureUrl =~ s/http:/https:/;
 
 ok($session->url->forceSecureConnection('/foo/bar/baz/buz'), 'forced secure connection');
-is($session->http->getStatus, 302, 'http status set to redirect, 302');
-is($session->http->getRedirectLocation, $secureUrl, 'redirect location set to proper passed in URL with SSL and sitename added');
+is($session->response->status, 302, 'http status set to redirect, 302');
+is($session->response->location, $secureUrl, 'redirect location set to proper passed in URL with SSL and sitename added');
 
-$session->http->setStatus('200', 'OK');
-$session->http->setRedirectLocation(undef);
+$session->response->status('200', 'OK');
+$session->response->location(undef);
 
 $secureUrl = $session->url->getSiteURL . $session->url->page();
 $secureUrl =~ s/http:/https:/;
 ok($session->url->forceSecureConnection(), 'forced secure connection with no url param');
 ok($session->http->isRedirect, '... and redirect status code was set');
-is($session->http->getRedirectLocation, $secureUrl, '... and redirect status code was set');
+is($session->response->location, $secureUrl, '... and redirect status code was set');
 
+done_testing;

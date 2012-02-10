@@ -1,6 +1,6 @@
 # vim:syntax=perl
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -19,6 +19,7 @@ use lib "$FindBin::Bin/../../../lib";
 use Test::More;
 use Test::Deep;
 use WebGUI::Test; # Must use this before any other WebGUI modules
+use WebGUI::Test::MockAsset;
 use WebGUI::Session;
 
 #----------------------------------------------------------------------------
@@ -28,9 +29,9 @@ my $import          = WebGUI::Asset->getImportNode( $session );
 
 my $templateId = 'WIKIMASTER_TEMPLATE___';
 
-my $templateMock = Test::MockObject->new({});
-$templateMock->set_isa('WebGUI::Asset::Template');
-$templateMock->set_always('getId', $templateId);
+my $templateMock = WebGUI::Test::MockAsset->new('WebGUI::Asset::Template');
+$templateMock->mock_id($templateId);
+$templateMock->set_true('prepare');
 my $templateVars;
 $templateMock->mock('process', sub { $templateVars = $_[1]; } );
 
@@ -55,13 +56,11 @@ $session->request->setup_body({
 $session->user({userId => 3});
 
 {
-    WebGUI::Test->mockAssetId($templateId, $templateMock);
     $wiki->www_search();
-    WebGUI::Test->unmockAssetId($templateId);
 }
 
 is $templateVars->{addPageUrl},
-    $wiki->getUrl('func=add;class=WebGUI::Asset::WikiPage;title=Red%26Andy'),
+    $wiki->getUrl('func=add;className=WebGUI::Asset::WikiPage;title=Red%26Andy'),
     'search encodes unsafe characters in addPageUrl';
 
 $session->user({userId => 1});
@@ -71,7 +70,7 @@ $templateVars = {};
 
 $wiki->www_search;
 is_deeply $templateVars, {}, '... no template variables set';
-is $session->http->getStatus, 401, '... HTTP status set to 401, no access';
+is $session->response->status, 401, '... HTTP status set to 401, no access';
 
 #----------------------------------------------------------------------------
 # 

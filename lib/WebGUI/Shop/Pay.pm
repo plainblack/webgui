@@ -3,7 +3,7 @@ package WebGUI::Shop::Pay;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -16,13 +16,14 @@ package WebGUI::Shop::Pay;
 
 use strict;
 
-use Class::InsideOut qw{ :std };
+use Moose;
 use WebGUI::Exception;
 use WebGUI::International;
 use WebGUI::Pluggable;
 use WebGUI::Shop::Admin;
 #use WebGUI::Shop::PayDriver;
-use WebGUI::Utility;
+use Tie::IxHash;
+use Scalar::Util;
 
 =head1 NAME
 
@@ -42,8 +43,31 @@ These subroutines are available from this package:
 
 =cut
 
-readonly session => my %session;
+#-------------------------------------------------------------------
 
+=head2 session () 
+
+Returns a reference to the current session.
+
+=cut
+
+
+has session => (
+    is              => 'ro',
+    required        => 1,
+);
+
+around BUILDARGS => sub {
+    my $orig       = shift;
+    my $className  = shift;
+
+    ##Original arguments start here.
+    my $protoSession = $_[0];
+    if (blessed $protoSession && $protoSession->isa('WebGUI::Session')) {
+        return $className->$orig(session => $protoSession);
+    }
+    return $className->$orig(@_);
+};
 
 #-------------------------------------------------------------------
 
@@ -69,10 +93,11 @@ sub addPaymentGateway {
     WebGUI::Error::InvalidParam->throw(error => q{Must provide a class to create an object})
         unless defined $requestedClass;
     WebGUI::Error::InvalidParam->throw(error => q{The requested class is not enabled in your WebGUI configuration file}, param => $requestedClass)
-        unless isIn($requestedClass, (keys %{$self->getDrivers}) );
+        unless exists $self->getDrivers->{$requestedClass};
     WebGUI::Error::InvalidParam->throw(error => q{You must pass a hashref of options to create a new PayDriver object})
         unless defined($options) and ref $options eq 'HASH' and scalar keys %{ $options };
-    my $driver = eval { WebGUI::Pluggable::instanciate($requestedClass, 'create', [ $self->session, $options ]) };
+    my $driver = eval { WebGUI::Pluggable::instanciate($requestedClass, 'new', [ $self->session, $options ]) };
+    $driver->write;
 
     return $driver;
 }
@@ -89,6 +114,7 @@ sub getDrivers {
     my $self      = shift;
     my %drivers = ();
     CLASS: foreach my $class (@{$self->session->config->get('paymentDrivers')}) {
+        $self->session->log->warn($class);
         my $driverName   = eval { WebGUI::Pluggable::instanciate($class, 'getName', [ $self->session ])};
         if ($@) {
             $self->session->log->warn("Error loading $class: $@");
@@ -212,36 +238,6 @@ sub getRecurringPeriodValues {
 
 #-------------------------------------------------------------------
 
-=head2 new ( $session )
-
-Constructor.
-
-=head3 $session
-
-A WebGUI::Session object.
-
-=cut
-
-sub new {
-    my $class     = shift;
-    my $session   = shift;
-    WebGUI::Error::InvalidObject->throw(expected=>"WebGUI::Session", got=>(ref $session), error => q{Must provide a session variable}) unless ref $session eq 'WebGUI::Session';
-    my $self = register $class;
-    my $id        = id $self;
-    $session{ $id }   = $session;
-    return $self;
-}
-
-#-------------------------------------------------------------------
-
-=head2 session () 
-
-Returns a reference to the current session.
-
-=cut
-
-#-------------------------------------------------------------------
-
 =head2 www_addPaymentGateway ( $session ) 
 
 Add a new payment gateway, based on the className form variable.  It will throw
@@ -333,7 +329,7 @@ sub www_manage {
         .WebGUI::Form::hidden($session,     { name  => "shop",      value   => "pay" })
         .WebGUI::Form::hidden($session,     { name  => "method",    value   => "addPaymentGateway" })
         .WebGUI::Form::selectBox($session,  { name  => "className", options => $self->getDrivers })
-        .WebGUI::Form::submit($session,     { value => $i18n->get("add payment method") })
+        .WebGUI::Form::submit($session,     { name => "add", value => $i18n->get("add payment method") })
         .WebGUI::Form::formFooter($session);
 
     # Add a row with edit/delete buttons for each payment gateway.
@@ -344,7 +340,7 @@ sub www_manage {
             .WebGUI::Form::hidden($session, { name   => "shop",                value => "pay" })
             .WebGUI::Form::hidden($session, { name   => "method",              value => "deletePaymentGateway" })
             .WebGUI::Form::hidden($session, { name   => "paymentGatewayId",    value => $paymentGateway->getId })
-            .WebGUI::Form::submit($session, { value  => $i18n->get("delete"),  extras => 'class="backwardButton"' }) 
+            .WebGUI::Form::submit($session, { name => 'delete', value  => $i18n->get("delete"),  extras => 'class="backwardButton"' }) 
             .WebGUI::Form::formFooter($session)
 
             # Edit button for current payment gateway
@@ -353,7 +349,7 @@ sub www_manage {
             .WebGUI::Form::hidden($session, { name   => "method",            value => "do" })
             .WebGUI::Form::hidden($session, { name   => "do",                value => "edit" })
             .WebGUI::Form::hidden($session, { name   => "paymentGatewayId",  value => $paymentGateway->getId })
-            .WebGUI::Form::submit($session, { value  => $i18n->get("edit"),  extras => 'class="normalButton"' })
+            .WebGUI::Form::submit($session, { name => 'edit', value  => $i18n->get("edit"),  extras => 'class="normalButton"' })
             .WebGUI::Form::formFooter($session)
 
             # Append payment gateway label

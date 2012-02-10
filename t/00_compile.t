@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -26,7 +26,7 @@ my $wgLib = catdir($wgRoot, 'lib');
 unshift @INC, $wgLib;
 
 my @modules = findModules($wgLib);
-my @scripts = findScripts(catdir($wgRoot, 'docs', 'upgrades'), catdir($wgRoot, 'sbin'));
+my @scripts = findScripts(catdir($wgRoot, 'sbin'), catdir($wgRoot, 'share', 'upgrades', '*'));
 
 plan tests => 2 * (scalar @modules + scalar @scripts);
 my $failed_compile = 0;
@@ -37,9 +37,10 @@ foreach my $library (@modules) {
     local $SIG{__WARN__} = sub {
         my $warn = shift;
         # file the warning occurred in
+        my $caller = caller;
         my $warning_file = realpath( (caller(0))[1] );
-        # only care about it if it is within the WebGUI lib directory
-        if ($warning_file =~ /^\Q$wgLib/) {
+        # only care about it if it is within the WebGUI lib directory or is an explicit warning
+        if ($warning_file =~ /^\Q$wgLib/ || $caller eq 'Carp') {
             $warnings .= $warn;
         }
     };
@@ -74,6 +75,8 @@ for my $script (@scripts) {
     local $SIG{__WARN__} = sub {
         $warnings .= shift;
     };
+    # upgrade scripts need a version defined to be able to compile
+    local $ENV{WEBGUI_UPGRADE_VERSION} = '8.0.0';
     eval $to_compile;
     chomp $warnings;
     is($@, '', "$short_name compiles successfully");

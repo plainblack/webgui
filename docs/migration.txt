@@ -1,0 +1,429 @@
+WebGUI 8 Migration Guide
+------------------------
+
+The information contained herein documents the API changes that have occurred
+in the WebGUI 8 development effort and how to migrate your code to accomodate
+the new APIs.
+
+WebGUI::Auth
+==========================
+
+The API for new() has changed: new( $session, $userId );
+
+editUserSettingsForm deprecated. Use editSettingsForm
+editUserSettingsFormSave is deprecated. Use editSettingsFormSave
+editUserForm and editSettingsForm now return WebGUI::FormBuilder objects instead of raw HTML.
+deleteParams is deprecated. use delete()
+deleteSingleParam is deprecated. use delete("param")
+saveParams is deprecated. use update()
+getParams is deprecated. use get()
+init() is deprecated. Use www_view()
+isAdmin, isVisitor, isRegistered are all deprecated. use user->is* instead
+setCallable and isCallable are deprecated. use www_ prefix instead.
+
+WebGUI::User
+==========================
+
+updateProfileFields is deprecated. Use update
+profileField is deprecated. Use get() and update()
+authInstance is deprecated. Instead instantiate the auth method and give it a
+    user or userId
+
+WebGUI::Macro::AdminBar
+==========================
+There is no Admin Bar for normal pages. Only the admin mode can see the admin bar.
+
+WebGUI::Macro::AdminToggle
+==========================
+The Admin Toggle can only enter admin mode, it cannot leave it, so there is no "Turn Off" text. The second 
+parameter is now the template ID.
+
+
+WebGUI::Config
+==============
+WebGUI::Config->new has a new API.  Its WebGUI root parameter has been
+eliminated.  It now only accepts a config file as either an absolute path, or
+a path relative to WebGUI's etc directory.
+
+my $config = WebGUI::Config->new($filename);
+
+
+
+WebGUI::Session
+===============
+WebGUI::Session->open has a new API.  Its WebGUI root parameter has been
+eliminated.  The config file it is given can be either an absolute path, or a
+path relative to WebGUI's etc directory.
+
+my $session = WebGUI::Session->open($configFile);
+
+perldoc WebGUI::Session for more details about the arguments.
+
+
+WebGUI::Session::Env
+====================
+WebGUI::Session::Env has been moved into WebGUI::Session::Request.  A listing
+of replacements and equivalents follows:
+
+$session->env->getIp => $session->request->address
+
+WebGUI::Session::ErrorHandler
+=============================
+
+ErrorHandler has been changed to "log" in all circumstances. $session->errorHandler no longer exists,
+use $session->log. WebGUI::Session::ErrorHandler no longer exists, use WebGUI::Session::Log
+
+WebGUI::Utility
+===============
+This module has been removed.  It had many functions that weren't used, and others have better replacements.
+
+    formatBytes       -> Number::Format::format_bytes
+    commify           -> Number::Format::format_number
+    emailRegex        -> Email::Valid->address()
+    isBetween         -> <= / >=
+    makeArrayTabSafe  -> Text::CSV_XS methods
+    scalarEquals      -> eq
+    randint           -> int( rand( $x ) )
+    isInSubnet        -> Net::CIDR::Lite->new(@filters)->find($ip)
+    round             -> sprintf '%.0f', $x
+    isIn              -> smart match
+    sortHash          -> sort with map
+
+All other subs were unused and were just removed.
+
+
+WebGUI::Cache
+=============
+WebGUI::Cache has been completely rewritten. If you were using the cache API
+in the past, you'll need to update your code to reflect the changes. NOTE: you
+can get a cached reference to the cache object from WebGUI::Session, which
+will be substantially faster than instantiating the object yourself.
+
+my $cache = $session->cache;
+
+
+
+WebGUI::Asset 
+============= 
+The Asset API has been changed in small, but
+significant ways. You'll need to make a few changes to your asset subclasses
+to support these changes.
+
+Definition 
+----------
+You must migrate your asset to use the new
+WebGUI::Definition::Asset class instead of the definition() method. This
+executes several orders of magnitude faster, but is different in a few ways.
+
+1) You define your definition using property and define calls, as well as
+standard Moose syntax.
+
+2) You no longer have a reference to $session, so you'll need to make sub
+routine refs to to method calls. However, you cannot use sub refs on any
+attributes or the following property elements: tableName.
+
+3) You no longer have the "customDrawMethod" element. You must make custom
+form controls.
+
+4) You no longer have filters. Instead, each property has a method called
+propertyName (so a property called 'title' would be title()). You can override
+that to achieve the same result.  You can see examples of this in Asset.pm,
+look at the url and title properties.
+
+5) Because you don't have a reference to $session, you can't internationalize
+right in the definition. So property elements like "label" and "hoverHelp" are
+just i18n identifiers and will automatically be run through
+internationalization on calling the getFormProperties() method.  To specify an
+i18n identifier, place the label and namespace in an arrayref, like this:
+    
+    label => ['i18n key', 'namespace'],
+
+6) Definition's are now rigid. This means that every property needs to be
+defined in the definition, and it must at least have a "fieldType" element. If
+the field is to be displayed (ie: it doesn't have a noFormPost=>1 element)
+then it must also at minimum have label elements. In addition, you must
+specify assetName, tableName, and properties defines at minimum. Anything less
+is invalid. 
+
+7) The properties attribute must be an array reference of properties. No more
+Tie::IxHash.
+
+8) The autoGenerateForms has been removed. All edit forms are autogenerated in
+WebGUI 8.
+
+9) You no longer have the "visible" element. It was a duplicate of
+"noFormPost", so use "noFormPost" instead.
+
+10) You no longer have the "displayOnly" element. Make a custom form control
+instead.
+
+11) Defaults for properties are set by the default key in the property.  This
+sets form defaults as well.  This means that newly created Assets always have
+sane defaults.  Unless specifically overridden, any property can be set to
+undef.  This takes care of the long standing problem with sticky titles and
+other fields.
+
+12) You no longer have the "allowEmpty" element. However, you can now specify
+an initial value in the "value" element, and set "default" to undef if you
+want to have an initial value but allow the field to become empty or undef.
+
+Here's an example.
+
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset';
+define assetName  => 'Gadget';
+define tableName  => 'gadget'; 
+define uiLevel    => 5;
+define icon       => 'gadget.gif';
+property urlToJavascript => (
+            fieldType    => 'url',
+            label        => ['URL to Javascript Class','Asset_Gadget'],
+            hoverHelp    => ['URL to Javascript Class help','Asset_Gadget'],
+         );
+property foo => (
+            fieldType    => 'text',
+            noFormPost   => 1,
+         );
+property bar => (
+            fieldType    => 'codearea',
+            uiLevel      => 9,
+            label        => ['Bar','Asset_Gadget'],
+            hoverHelp    => ['Bar help','Asset_Gadget'],
+            builder      => '_bar_builder',  ##Set default using Moose's builder and lazy method
+            lazy         => 1,
+         );
+sub _bar_builder {
+    my $self = shift;
+    return $self->callSomeMethod;
+}
+property baz => (
+            fieldType    => 'checkboxList',
+            label        => ['Baz','Asset_Gadget'],
+            hoverHelp    => ['Baz help','Asset_Gadget'],
+            default      => 1,
+            options      => \&_baz_options, ##method called when getFormProperties called, automatically lazy
+         );
+sub _baz_options {
+    my ($self, $property_meta_object, $property_name) = @_;
+    my $session = $self->session;
+    my $i18n    = WebGUI::International->new($session, 'Asset_Gadget');
+    tie my %options, 'Tie::IxHash';
+    %options = (
+        one   => $i18n->get('one'),
+        two   => $i18n->get('two'),
+        three => $i18n->get('three'),
+    );
+    return \%options;
+}
+
+Asset Instanciators
+-------------------
+Moose does not allow a dynamic class to be passed into ->new.  Trying to
+access an asset from the database like this:
+
+    WebGUI::Asset->new($session, $assetId, 'WebGUI::Asset::Template');
+
+will give you back an object with class WebGUI::Asset, with some of the data from the Template.
+
+You have two options to deal with this:
+
+1) Brute force method
+
+my $class = WebGUI::Asset->loadModule($asset_module_name);
+my $asset = $class->new($session, $assetId);
+
+2) Use newById
+
+newById replaces the older, and longer, newByDynamicClass method.
+
+my $asset = WebGUI::Asset->newById($session, $assetId);
+
+->new itself will either lookup an asset in the database and return you an object, or build you
+an object without storing the data into the database, depending on how it's called.
+
+WebGUI::Asset::SomeClass->new($session, $assetId, $revisionDate)  will try to look up the requested object
+of type SomeClass, populated with information from the database.
+
+WebGUI::Asset::SomeClass->new($propertyHashRef) will return you an object of type SomeClass populated
+with the properties you have passed in.  Missing properties will have default set from the definition.
+
+Asset & Moose
+-------------
+The update method for Asset's now comes from WebGUI::Definition::Role::Object.  Since the Asset base
+class does not have an update method, you cannot use Moose's "override" method modifier to add
+behavior to it.  You must use "around" instead.  Note, in most cases, you should never need
+to do this, because it is much more modular to use modifiers on individual asset properties.
+
+Exceptions
+----------
+All Asset instanciators, new, newById, newByUrl, newPending, newByPropertyHashRef throw exceptions instead
+of returning undef to indicate an error.  You should wrap any call to an instanciator in an eval, and catch
+any exceptions that are thrown and deal with them.
+
+my $asset = eval { WebGUI::Asset->newById($session, $assetId); };
+if (my $exception = Exception::Class->caught() ) {
+    ##Log or handle the exception.  Exceptions can also be rethrown to be passed farther up the call chain.
+}
+
+Removed Methods
+---------------
+assetDbProperties - Simply instanciate the asset if you want it's properties.
+
+assetExists - Simply instanciate the asset if you want to know if it exists.
+
+getValue - Use get() or the individual property accessors instead.
+
+fixTitle - The title() method does what this used to do as the title is set.
+
+fixUrlFromParent - This functionality is built into fixUrl, so that all fixes happen and can't cause breakages.
+
+fixId - Never assign the asset anything other than a GUID.
+
+Asset API
+----------
+->get will still work, but will be slightly slower since inside it calls the direct Moose accessor.  Similarly,
+getId is slightly slower than ->assetId.
+
+processPropertiesFromFormPost
+-----------------------------
+Absurdly long and non-descriptive name, changed to processEditForm
+
+Admin Controls
+--------------------
+The admin controls are now added to the asset with javascript. This javascript
+is located in www/extras/admin/toolbar.js
+
+Turn Admin On
+--------------------
+There is no Turn Admin On. In order to maintain some backwards compatibility, 
+if you are a member of the Turn Admin On group, "Admin On" will be set when you
+log in.
+
+www_add/www_edit
+--------------------
+www_add is now its own page, it is no longer handled by www_edit. www_addSave
+is also its own page, it is no longer handled by www_addSave.
+
+If you had previously overrode www_edit to provide a template, you must move
+that code into an overridden getEditTemplate.  See WebGUI::Asset::Event,
+WebGUI::Asset::Post, WebGUI::Asset::Wobject::GalleryAlbum for examples.
+
+Lineage
+--------------------
+Assets created for use during www_add do NOT have a lineage.  Calling
+getLineage on them will return assets from below the root asset, and not
+the child.  See WebGUI::Asset::Wobject::GalleryAlbum::getFileIds.
+
+WebGUI::Shop::Vendor
+====================
+Object properties are no longer written to the database when an object is
+created from scratch.  The write method needs to be called.
+
+WebGUI::Shop::AddressBook
+=========================
+Since create is now really new, there is no way to create an address book for
+an arbitrary userId.  To work around this, update the address book with the
+new userId after it has been created.
+
+WebGUI::Shop::PayDriver
+=======================
+getEditForm now returns a WebGUI::FormBuilder object
+
+WebGUI::Shop::ShipDriver
+========================
+getEditForm now returns a WebGUI::FormBuilder object
+
+WebGUI::Shop::TaxDriver
+=======================
+getConfigurationScreen is now called getEditForm and should return a WebGUI::FormBuilder object
+
+WebGUI::Shop::Address
+=====================
+Object properties are no longer written to the database when an object is
+created from scratch.  The write method needs to be called.
+
+WebGUI::Shop::Transaction
+=========================
+Object properties are no longer written to the database when an object is
+created from scratch.  The write method needs to be called.
+
+WebGUI::Shop::TransactionItem
+=============================
+Object properties are no longer written to the database when an object is
+created from scratch.  The write method needs to be called.
+
+WebGUI::Shop::CartItem
+=============================
+Object properties are no longer written to the database when an object is
+created from scratch.  The write method needs to be called.
+
+Inventory adjust is also no longer done when an object is created from
+scratch.  You will need to call onAdjustQuantityInCart manually.
+
+WebGUI::URL
+==========================
+In WebGUI 8, URL handlers are now done as Plack middleware.  See
+WebGUI::Middleware::Snoop and WebGUI::Middleware::WGAccess for examples.
+
+WebGUI::Session::Var
+==========================
+WebGUI::Session::Var was removed, and all of its code merged into
+WebGUI::Session.  Any call that used to be made to $session->var should now go
+directly to $session.
+
+WebGUI::Session::Http
+==========================
+getStatus and setStatus have been removed.  To set or get the status of an HTTP response
+generated by WebGUI, access the WebGUI::Response object in the session:
+
+OLD: $session->http->getStatus();
+NEW: $session->response->status();
+
+OLD: $session->http->setStatus(200);
+NEW: $session->response->status(200);
+
+getMimeType and setMimeType have been removed.  To set or get the content type of an HTTP response
+generated by WebGUI, access the WebGUI::Response object in the session:
+
+OLD: $session->http->getMimeType();
+NEW: $session->response->content_type();
+
+OLD: $session->http->setMimeType('application/json');
+NEW: $session->response->content_type('application/json');
+
+getFilename and setFilename have been removed.  To set the filename that should be
+uploaded to the user, access the WebGUI::Response object in the session.  First, set
+the header for the Content-Dispostion, then set the content type.
+
+OLD: $session->http->setFilename($filename);
+NEW: $session->response->header( 'Content-Disposition' => qq{attachment; filename="}.$filename.'"');
+     $session->response->content_type('application/octet-stream');
+
+getRedirectLocation and setRedirectLocation have been removed.  These methods were not
+used outside of WebGUI::Session::Http, but were designed for object encapsulation
+inside the object.  If you need to directly set or access the redirect location,
+use the location mutator in the WebGUI::Response object in the session.
+
+OLD: $session->http->setRedirectLocation($url);
+NEW: $session->response->location($url);
+
+OLD: $session->http->getRedirectLocation();
+NEW: $session->response->location();
+
+ifModifiedSince was moved from WebGUI::Session::Http to WebGUI::Session::Request.
+
+OLD: $session->http->ifModifiedSince;
+NEW: $session->request->ifModifiedSince;
+
+WebGUI::Workflow::Activity
+==========================
+getEditForm now returns a WebGUI::FormBuilder object
+
+Show Performance Indicators
+==========================
+This setting is removed, as the Plack debug console shows this for us.
+
+WebGUI::Asset::Wobject::Survey
+==========================
+The surveyJSON method conflicted with the new Moose accessor.  In WebGUI 8,
+the old surveyJSON is called getSurveyJSON.

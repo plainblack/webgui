@@ -4,7 +4,7 @@ package WebGUI::Workflow::Activity::RequestApprovalForVersionTag::ByLineage;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -83,7 +83,7 @@ sub execute {
     my $self        = shift;
     my $tag         = shift;
     my $instance    = shift;
-    my $ancestor    = WebGUI::Asset->newByDynamicClass( $self->session, $self->get( 'assetId' ) );
+    my $ancestor    = WebGUI::Asset->newById( $self->session, $self->get( 'assetId' ) );
     my $lineage     = $ancestor->get( 'lineage' );
     # Descendant has at least the ancestors lineage plus 6 more character
     my $isDescendant    = qr{^$lineage.{6}};

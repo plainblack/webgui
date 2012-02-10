@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -11,42 +11,38 @@
 # The goal of this test is to test the makeShortcut method and www_makeShortcut
 # pages
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../../../../lib";
 
 use Scalar::Util;
 use WebGUI::Test;
 use WebGUI::Session;
 use Test::More; 
 use Test::Deep;
-use WebGUI::Test::Maker::HTML;
 use WebGUI::Asset::File::GalleryFile::Photo;
 
 #----------------------------------------------------------------------------
 # Init
 my $session         = WebGUI::Test->session;
 my $node            = WebGUI::Asset->getImportNode($session);
-my $versionTag      = WebGUI::VersionTag->getWorking($session);
-$versionTag->set({name=>"Photo Test"});
-WebGUI::Test->addToCleanup($versionTag);
-my $maker           = WebGUI::Test::Maker::HTML->new;
 my $otherParent
-    = $node->addChild({
+    = WebGUI::Test->asset(
         className           => "WebGUI::Asset::Wobject::Layout",
-    });
-my $photo
-    = $node->addChild({
-        className           => "WebGUI::Asset::File::GalleryFile::Photo",
-        userDefined1        => "ORIGINAL",
-    },
-    undef,
-    undef,
-    {
-        skipAutoCommitWorkflows => 1,
+    );
+my $gallery
+    = WebGUI::Test->asset(
+        className           => "WebGUI::Asset::Wobject::Gallery",
+        imageResolutions    => "1600x1200\n1024x768\n800x600\n640x480",
+    );
+my $album
+    = $gallery->addChild({
+        className           => "WebGUI::Asset::Wobject::GalleryAlbum",
     });
 
-$versionTag->commit;
+my $photo
+    = $album->addChild({
+        className           => "WebGUI::Asset::File::GalleryFile::Photo",
+        userDefined1        => "ORIGINAL",
+    });
 
 #----------------------------------------------------------------------------
 # Tests

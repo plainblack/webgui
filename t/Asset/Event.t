@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -8,14 +8,13 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
 
 use Test::More; # increment this value for each test you create
 use Test::Deep;
+
 plan tests => 30;
 
 use WebGUI::Session;
@@ -28,8 +27,13 @@ my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Adding Calendar for Event Asset Test"});
 WebGUI::Test->addToCleanup($versionTag);
 my $defaultAsset = WebGUI::Asset->getDefault($session);
-my $cal = $defaultAsset->addChild({className=>'WebGUI::Asset::Wobject::Calendar'});
+my $cal = $defaultAsset->addChild({
+    className=>'WebGUI::Asset::Wobject::Calendar',
+});
 $versionTag->commit;
+
+my $versionTag2 = WebGUI::VersionTag->getWorking($session);
+WebGUI::Test->addToCleanup($versionTag2);
 
 my $properties = {
 	#     '1234567890123456789012'
@@ -128,8 +132,6 @@ my $event6 = $cal->addChild($properties3, $properties3->{id}, time()-5);
 my $event6a = $event6->addRevision({ title => 'Event with storage', }, undef, { skipAutoCommitWorkflows => 1, });
 ok($session->id->valid($event6a->get('storageId')), 'addRevision gives the new revision a valid storageId');
 isnt($event6a->get('storageId'), $event6->get('storageId'), '... and it is different from the previous revision');
-my $versionTag2 = WebGUI::VersionTag->getWorking($session);
-WebGUI::Test->addToCleanup($versionTag2);
 
 my $event7 = $cal->addChild({
     className => 'WebGUI::Asset::Event',
@@ -149,8 +151,8 @@ is ($event7->get('endDate'), '2000-09-02', 'endDate bumped by 1 day');
 # Valid dates
 $session->request->setup_body({ startDate => '0000-00-01', endDate => '1000-00-01' });
 my $event = $cal->addChild({ className => 'WebGUI::Asset::Event' }, undef, time()+10);
-my $output = $event->processPropertiesFromFormPost;
-is( ref $output, 'ARRAY', 'ppffp returns error array' );
+my $output = $event->processEditForm;
+is( ref $output, 'ARRAY', 'returns error array' );
 is( scalar @$output, 2, 'has two errors' );
 
 #######################################

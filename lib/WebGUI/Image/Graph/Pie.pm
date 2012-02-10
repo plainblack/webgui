@@ -331,85 +331,80 @@ documentation.
 
 sub configurationForm {
 	my $self = shift;
-	
+    my $tab  = shift;
+
+    $self->SUPER::configurationForm($tab);
 	my $i18n = WebGUI::International->new($self->session, 'Image_Graph_Pie');
-	
-	my $f = WebGUI::HTMLForm->new($self->session);
-	$f->trClass('Graph_Pie');
-	$f->float(
-		-name		=> 'pie_radius',
-		-value		=> $self->getRadius,
-		-label		=> $i18n->get('radius'),
-		-hoverHelp	=> $i18n->get('radius description'),
+
+	$tab->addField('float',
+		name		=> 'pie_radius',
+		value		=> $self->getRadius,
+		label		=> $i18n->get('radius'),
+		hoverHelp	=> $i18n->get('radius description'),
 	);
-	$f->float(
-		-name		=> 'pie_topHeight',
-		-value		=> $self->getTopHeight,
-		-label		=> $i18n->get('pie height'),
-		-hoverHelp	=> $i18n->get('pie height description'),
+	$tab->addField('float',
+		name		=> 'pie_topHeight',
+		value		=> $self->getTopHeight,
+		label		=> $i18n->get('pie height'),
+		hoverHelp	=> $i18n->get('pie height description'),
 	);
-	$f->float(
-		-name		=> 'pie_tiltAngle',
-		-value		=> $self->getTiltAngle,
-		-label		=> $i18n->get('tilt angle'),
-		-hoverHelp	=> $i18n->get('tilt angle description'),
+	$tab->addField('float',
+		name		=> 'pie_tiltAngle',
+		value		=> $self->getTiltAngle,
+		label		=> $i18n->get('tilt angle'),
+		hoverHelp	=> $i18n->get('tilt angle description'),
 	);
-	$f->float(
-		-name		=> 'pie_startAngle',
-		-value		=> $self->getStartAngle,
-		-label		=> $i18n->get('start angle'),
-		-hoverHelp	=> $i18n->get('start angle description'),
+	$tab->addField('float',
+		name		=> 'pie_startAngle',
+		value		=> $self->getStartAngle,
+		label		=> $i18n->get('start angle'),
+		hoverHelp	=> $i18n->get('start angle description'),
 	);
-	$f->selectBox(
-		-name		=> 'pie_pieMode',
-		-value		=> [ $self->getPieMode ],
-		-label		=> $i18n->get('pie mode'),
-		-hoverHelp	=> $i18n->get('pie mode description'),
-		-options	=> {
+	$tab->addField('selectBox',
+		name		=> 'pie_pieMode',
+		value		=> [ $self->getPieMode ],
+		label		=> $i18n->get('pie mode'),
+		hoverHelp	=> $i18n->get('pie mode description'),
+		options	=> {
 			normal	=> $i18n->get('normal'),
 			stepped	=> $i18n->get('stepped'),
 		},
 	);
-	$f->yesNo(
-		-name		=> 'pie_shadedSides',
-		-value		=> $self->hasShadedSides,
-		-label		=> $i18n->get('shade sides'),
-		-hoverHelp	=> $i18n->get('shade sides description'),
+	$tab->addField('yesNo',
+		name		=> 'pie_shadedSides',
+		value		=> $self->hasShadedSides,
+		label		=> $i18n->get('shade sides'),
+		hoverHelp	=> $i18n->get('shade sides description'),
 	);
-	$f->float(
-		-name		=> 'pie_stickLength',
-		-value		=> $self->getStickLength,
-		-label		=> $i18n->get('stick length'),
-		-hoverHelp	=> $i18n->get('stick length description'),
+	$tab->addField('float',
+		name		=> 'pie_stickLength',
+		value		=> $self->getStickLength,
+		label		=> $i18n->get('stick length'),
+		hoverHelp	=> $i18n->get('stick length description'),
 	);
-	$f->float(
-		-name		=> 'pie_stickOffset',
-		-value		=> $self->getStickOffset,
-		-label		=> $i18n->get('stick offset'),
-		-hoverHelp	=> $i18n->get('stick offset description'),
+	$tab->addField('float',
+		name		=> 'pie_stickOffset',
+		value		=> $self->getStickOffset,
+		label		=> $i18n->get('stick offset'),
+		hoverHelp	=> $i18n->get('stick offset description'),
 	);
-	$f->color(
-		-name		=> 'pie_stickColor',
-		-value		=> $self->getStickColor,
-		-label		=> $i18n->get('stick color'),
-		-hoverHelp	=> $i18n->get('stick color description'),
+	$tab->addField('color',
+		name		=> 'pie_stickColor',
+		value		=> $self->getStickColor,
+		label		=> $i18n->get('stick color'),
+		hoverHelp	=> $i18n->get('stick color description'),
 	);
-	$f->selectBox(
-		-name		=> 'pie_labelPosition',
-		-value		=> [ $self->getLabelPosition ],
-		-label		=> $i18n->get('label position'),
-		-hoverHelp	=> $i18n->get('label position description'),	
-		-options=> {
+	$tab->addField('selectBox',
+		name		=> 'pie_labelPosition',
+		value		=> [ $self->getLabelPosition ],
+		label		=> $i18n->get('label position'),
+		hoverHelp	=> $i18n->get('label position description'),	
+		options=> {
 			center	=> $i18n->get('center'), 
 			top	=> $i18n->get('top'),
 			bottom	=> $i18n->get('bottom'),
 		},
 	);
-
-my	$configForms = $self->SUPER::configurationForm;
-	$configForms->{'graph_pie'} = $f->printRowsOnly;
-
-	return $configForms;
 }
 
 #-------------------------------------------------------------------

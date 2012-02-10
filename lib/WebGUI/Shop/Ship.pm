@@ -2,13 +2,13 @@ package WebGUI::Shop::Ship;
 
 use strict;
 
-use Class::InsideOut qw{ :std };
+use Moose;
 use WebGUI::Exception;
 use WebGUI::International;
 use WebGUI::Pluggable;
 use WebGUI::Shop::Admin;
 use WebGUI::Shop::ShipDriver;
-use WebGUI::Utility;
+use Scalar::Util;
 
 =head1 NAME
 
@@ -28,7 +28,22 @@ These subroutines are available from this package:
 
 =cut
 
-readonly session => my %session;
+has session => (
+    is              => 'ro',
+    required        => 1,
+);
+
+around BUILDARGS => sub {
+    my $orig       = shift;
+    my $className  = shift;
+
+    ##Original arguments start here.
+    my $protoSession = $_[0];
+    if (blessed $protoSession && $protoSession->isa('WebGUI::Session')) {
+        return $className->$orig(session => $protoSession);
+    }
+    return $className->$orig(@_);
+};
 
 
 #-------------------------------------------------------------------
@@ -55,10 +70,11 @@ sub addShipper {
     WebGUI::Error::InvalidParam->throw(error => q{Must provide a class to create an object})
         unless defined $requestedClass;
     WebGUI::Error::InvalidParam->throw(error => q{The requested class is not enabled in your WebGUI configuration file}, param => $requestedClass)
-        unless isIn($requestedClass, (keys %{$self->getDrivers}) );
+        unless exists $self->getDrivers->{$requestedClass};
     WebGUI::Error::InvalidParam->throw(error => q{You must pass a hashref of options to create a new ShipDriver object})
         unless defined($options) and ref $options eq 'HASH' and scalar keys %{ $options };
-    my $driver = eval { WebGUI::Pluggable::instanciate($requestedClass, 'create', [ $self->session, $options ]) };
+    my $driver = eval { WebGUI::Pluggable::instanciate($requestedClass, 'new', [ $self->session, $options ]) };
+    $driver->write;
     return $driver;
 }
 
@@ -179,28 +195,6 @@ sub getShippers {
 
 #-------------------------------------------------------------------
 
-=head2 new ( $session )
-
-Constructor.
-
-=head3 $session
-
-A WebGUI::Session object.
-
-=cut
-
-sub new {
-    my $class     = shift;
-    my $session   = shift;
-    WebGUI::Error::InvalidObject->throw(expected=>"WebGUI::Session", got=>(ref $session), error => q{Must provide a session variable}) unless ref $session eq 'WebGUI::Session';
-    my $self = register $class;
-    my $id        = id $self;
-    $session{ $id }   = $session;
-    return $self;
-}
-
-#-------------------------------------------------------------------
-
 =head2 session () 
 
 Returns a reference to the current session.
@@ -279,7 +273,7 @@ sub www_manage {
         .WebGUI::Form::hidden($session, {name=>"shop", value=>"ship"})
         .WebGUI::Form::hidden($session, {name=>"method", value=>"addDriver"})
         .WebGUI::Form::selectBox($session, {name=>"className", options=>$self->getDrivers})
-        .WebGUI::Form::submit($session, {value=>$i18n->get("add shipper")})
+        .WebGUI::Form::submit($session, {name => 'add', value=>$i18n->get("add shipper")})
         .WebGUI::Form::formFooter($session);
     my $hasShipper = 0;
     foreach my $shipper (@{$self->getShippers}) {
@@ -288,14 +282,14 @@ sub www_manage {
             .WebGUI::Form::hidden($session, {name=>"shop", value=>"ship"})
             .WebGUI::Form::hidden($session, {name=>"method", value=>"deleteDriver"})
             .WebGUI::Form::hidden($session, {name=>"driverId", value=>$shipper->getId})
-            .WebGUI::Form::submit($session, {value=>$i18n->get("delete"), extras=>'class="backwardButton"'})
+            .WebGUI::Form::submit($session, {name => 'delete', value=>$i18n->get("delete"), extras=>'class="backwardButton"'})
             .WebGUI::Form::formFooter($session)
             .WebGUI::Form::formHeader($session, {extras=>'style="float: left;"'})
             .WebGUI::Form::hidden($session, {name=>"shop", value=>"ship"})
             .WebGUI::Form::hidden($session, {name=>"method", value=>"do"})
             .WebGUI::Form::hidden($session, {name=>"do", value=>"edit"})
             .WebGUI::Form::hidden($session, {name=>"driverId", value=>$shipper->getId})
-            .WebGUI::Form::submit($session, {value=>$i18n->get("edit"), extras=>'class="normalButton"'})
+            .WebGUI::Form::submit($session, {name => 'edit', value=>$i18n->get("edit"), extras=>'class="normalButton"'})
             .WebGUI::Form::formFooter($session)
             .' '
             .$shipper->get("label")

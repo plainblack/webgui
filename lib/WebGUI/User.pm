@@ -3,7 +3,7 @@ package WebGUI::User;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -15,20 +15,18 @@ package WebGUI::User;
 =cut
 
 use strict;
-use WebGUI::Cache;
 use WebGUI::Group;
-use WebGUI::DatabaseLink;
-use WebGUI::Exception;
-use WebGUI::Utility;
-use WebGUI::Operation::Shared;
 use WebGUI::Workflow::Instance;
-use WebGUI::Shop::AddressBook;
-use WebGUI::Shop::Credit;
-use JSON;
+use JSON ();
 use WebGUI::Exception;
 use WebGUI::ProfileField;
+use WebGUI::Inbox;
 use List::MoreUtils qw( any );
 use Scalar::Util qw( weaken );
+use Net::CIDR::Lite;
+use WebGUI::Friends;
+use WebGUI::Deprecate;
+use Carp qw( carp );
 
 =head1 NAME
 
@@ -36,7 +34,8 @@ Package WebGUI::User
 
 =head1 DESCRIPTION
 
-This package provides an object-oriented way of managing WebGUI users as well as getting/setting a users's profile data.
+This package provides an object-oriented way of managing WebGUI users as well 
+as getting/setting a users's profile data.
 
 =head1 SYNOPSIS
 
@@ -72,6 +71,22 @@ This package provides an object-oriented way of managing WebGUI users as well as
 
  WebGUI::User->validUserId($session, $userId);
 
+=head1 MAGIC NUMBERS
+
+These magic user IDs are used throughout WebGUI
+
+=over 4
+
+=item 1
+
+Visitor. Any user that is not logged-in is a Visitor.
+
+=item 3
+
+Admin. This is the main site admin account.
+
+=back
+
 =head1 METHODS
 
 These methods are available from this class:
@@ -92,13 +107,13 @@ sub _create {
     my @fields     = @{WebGUI::ProfileField->getFields($session)};
     my $privacy  = {};
     foreach my $field (@fields) {
-        #$session->errorHandler->warn('getting privacy setting for field: '.$fieldName);
+        #$session->log->warn('getting privacy setting for field: '.$fieldName);
         my $privacySetting = $field->get('defaultPrivacySetting');
-        next unless (WebGUI::Utility::isIn($privacySetting,qw(all none friends)));
+        next unless $privacySetting ~~ [qw(all none friends)];
         $privacy->{$field->get('fieldName')} = $privacySetting;
     }
     my $json = JSON->new->encode($privacy);
-    $session->db->write("update userProfileData set wg_privacySettings=? where userId=?",[$json,$userId]);
+    $session->db->write("update users set privacyFields=? where userId=?",[$json,$userId]);
 
     WebGUI::Group->new($session,2)->addUsers([$userId]);
     WebGUI::Group->new($session,7)->addUsers([$userId]);
@@ -160,7 +175,7 @@ sub acceptsPrivateMessages {
     if($pmSetting eq "friends") {
         my $friendsGroup = $self->friends;
         my $sentBy       = WebGUI::User->new($self->session,$userId);
-        #$self->session->errorHandler->warn($self->isInGroup($friendsGroup->getId));
+        #$self->session->log->warn($self->isInGroup($friendsGroup->getId));
         return $sentBy->isInGroup($friendsGroup->getId);
     }
 
@@ -202,11 +217,16 @@ sub acceptsFriendsRequests {
 
 =head2 authInstance
 
+NOTE: This method is deprecated. Users may have any number of auth methods.
+Instead, instantiate the desired auth method and give it the user's ID.
+
 Returns an instance of the authentication object for this user.
 
 =cut
 
+# DEPRECATED. Remove in 9.0
 sub authInstance {
+    derp "WebGUI::User::authInstance is deprecated. Instantiate the auth method directly instead.";
     my $self    = shift;
     my $session = $self->session;
 
@@ -217,20 +237,18 @@ sub authInstance {
     else {
         $authMethod = $self->authMethod || $session->setting->get("authMethod");
     }
-    if ( ! isIn($authMethod, @{ $session->config->get('authMethods') } ) ) {
+    if ( ! $authMethod ~~ $session->config->get('authMethods') ) {
         $authMethod = $session->config->get('authMethods')->[0] || 'WebGUI';
     }
     my $authClass = 'WebGUI::Auth::' . $authMethod;
     WebGUI::Pluggable::load($authClass);
-    my $auth = $authClass->new($session, $authMethod, $self->getId);
+    my $auth = $authClass->new($session, $self->getId);
     return $auth;
 }
 
 #-------------------------------------------------------------------
 
 =head2 authMethod ( [ value ] )
-
-DEPRECATED! Use get("authMethod") and update({ authMethod => "value })
 
 Returns the authentication method for this user.
 
@@ -285,13 +303,12 @@ Saves the user object into the cache.
 
 sub cache {
     my $self = shift;
-    my $cache = WebGUI::Cache->new($self->session,["user",$self->userId]);
     # copy user object
     my %userData;
     for my $k (qw(_userId _user _profile)) {
         $userData{$k} = $self->{$k};
     }
-    $cache->set(\%userData, 60*60*24);
+    $self->session->cache->set("user_" . $self->userId, \%userData, 60*60*24);
 }
 
 #-------------------------------------------------------------------
@@ -307,7 +324,7 @@ sub canUseAdminMode {
 	my $pass = 1;
 	my $subnets = $self->session->config->get("adminModeSubnets") || [];
 	if (scalar(@$subnets)) {
-		$pass = WebGUI::Utility::isInSubnet($self->session->env->getIp, $subnets);
+		$pass = Net::CIDR::Lite->new(@$subnets)->find($self->session->request->address);
 	}
 
 	return $pass && $self->isInGroup(12)
@@ -341,7 +358,7 @@ sub canViewField {
     return 1 if ($self->userId eq $user->userId);
     
     my $privacySetting = $self->getProfileFieldPrivacySetting($field);
-    return 0 unless (WebGUI::Utility::isIn($privacySetting,qw(all none friends)));
+    return 0 unless $privacySetting ~~ [qw(all none friends)];
     return 1 if ($privacySetting eq "all");
     return 0 if ($privacySetting eq "none");
 
@@ -352,8 +369,6 @@ sub canViewField {
 #-------------------------------------------------------------------
 
 =head2 dateCreated ( )
-
-DEPRECATED! Use get("dateCreated") instead
 
 Returns the epoch for when this user was created.
 
@@ -387,8 +402,8 @@ sub delete {
         $group->deleteUsers([$userId]) if $group;
     }
 
-    my $auth = $self->authInstance;
-    $auth->deleteParams($userId);
+    # Delete all auth instances for this user
+    $db->write( "DELETE FROM authentication WHERE userId=?", [ $userId ] );
 
     $self->friends->delete
         if ($self->{_user}{"friendsGroup"} ne "");
@@ -418,6 +433,7 @@ sub delete {
     # Shop cleanups
     my $sth = $session->db->prepare('select addressBookId from addressBook where userId=?');
     $sth->execute([$userId]);
+    require WebGUI::Shop::AddressBook;
     BOOK: while (my $bookId = $sth->hashRef) {
         my $book;
         eval { $book =  WebGUI::Shop::AddressBook->new($session, $bookId->{addressBookId}); };
@@ -425,6 +441,7 @@ sub delete {
         $book->delete;
     }
 
+    require WebGUI::Shop::Credit;
     my $credit = WebGUI::Shop::Credit->new($session, $userId);
     $credit->purge;
 
@@ -575,14 +592,20 @@ sub get {
     my $session     = $self->session;
 
     if ( $field ) {
+        return if $field eq 'privacyFields';
         if ( exists $self->{_user}->{$field} ) {
+            if ( !defined $self->{_user}->{$field} ) {
+                my $default = $session->db->quickScalar("SELECT dataDefault FROM userProfileField WHERE fieldName=?", [$field]);
+                $self->{_user}{$field}
+                    = WebGUI::Operation::Shared::secureEval($session, $default);
+            }
             return $self->{_user}->{$field};
         }
         else {
             # XXX Should the defaults be set in new() ...
             if ( !exists $self->{_profile}->{$field} ) {
                 if ( !WebGUI::ProfileField->exists( $session, $field ) ) {
-                    $self->session->errorHandler->warn("No such profile field: $field");
+                    $self->session->log->warn("No such profile field: $field");
                 }
 
                 my $default = $session->db->quickScalar("SELECT dataDefault FROM userProfileField WHERE fieldName=?", [$field]);
@@ -603,7 +626,11 @@ sub get {
         "SELECT fieldName, dataDefault FROM userProfileField",
     );
     for my $key ( keys %default ) {
-        if ( !exists $self->{_profile}{$key} ) {
+        if ( exists $self->{_user}->{$key} && !defined $self->{_user}->{$key} ) {
+            $self->{_user}{$key}
+                = WebGUI::Operation::Shared::secureEval($session, $default{$key});
+        }
+        elsif ( !exists $self->{_user}->{$key} && !exists $self->{_profile}{$key} ) {
             $self->{_profile}{$key}
                 = WebGUI::Operation::Shared::secureEval($session, $default{$key});
         }
@@ -729,9 +756,9 @@ sent.
 sub getInboxNotificationAddresses {
     my $self   = shift;
     my $emails = '';
-    if ( $self->profileField('receiveInboxEmailNotifications')
-      && $self->profileField('email')) {
-        $emails = $self->profileField('email');
+    if ( $self->get('receiveInboxEmailNotifications')
+      && $self->get('email')) {
+        $emails = $self->get('email');
     }
     return $emails;
 }
@@ -786,7 +813,7 @@ sub getProfileFieldPrivacySetting {
     unless ($self->{_privacySettings}) {
         #Look it up manually because we want to cache this separately.
         my $privacySettings        = $session->db->quickScalar(
-            q{select wg_privacySettings from userProfileData where userId=?},
+            q{select privacyFields from users where userId=?},
             [$self->userId]
         );
         $privacySettings          = "{}" unless $privacySettings;
@@ -796,7 +823,7 @@ sub getProfileFieldPrivacySetting {
     return $self->{_privacySettings} unless ($fieldId);
 
     #No privacy settings returned the privacy setting field
-    return "none" if($fieldId eq "wg_privacySettings");
+    return "none" if($fieldId eq "privacyFields");
 
     if (exists $self->{_privacySettings}->{$fieldId}) {
         return $self->{_privacySettings}->{$fieldId};
@@ -908,7 +935,7 @@ sub isDuplicateEmail {
     my ( $self, $email ) = @_;
 
     my @userIds = $self->session->db->quickArray(
-        "SELECT userId FROM userProfileData WHERE email = ?",
+        "SELECT userId FROM users WHERE email = ?",
         [ $email ],
     );
 
@@ -957,8 +984,8 @@ sub isInGroup {
 
 	### Don't bother checking File Cache if we already have a stow for this group.
 	### We can find what we need there and save ourselves a bunch of time
-    my $cache         = WebGUI::Cache->new($session,["groupMembers",$gid]);
-    my $groupMembers  = $cache->get || {};
+    my $cache        = undef;
+    my $groupMembers = $session->cache->get("groupMembers".$gid) || {};
     #If we have this user's membership cached, return what we have stored
     if (exists $groupMembers->{$uid}) {
         return $groupMembers->{$uid}->{isMember} if (!$self->isVisitor);
@@ -976,7 +1003,7 @@ sub isInGroup {
 	my $isInGroup = $group->hasUser($self);
 
 	#Write what we found to file cache
-	$group->cacheGroupings( $self, $isInGroup, $cache, $groupMembers );
+	$group->cacheGroupings( $self, $isInGroup, $groupMembers );
 	return $isInGroup;
 }
 
@@ -1062,8 +1089,6 @@ sub karma {
 
 =head2 lastUpdated ( )
 
-DEPRECATED! Use get("lastUpdated")
-
 Returns the epoch for when this user was last modified.
 
 =cut
@@ -1099,14 +1124,12 @@ sub new {
     my $userId      = shift || 1;
     my $overrideId  = shift;
     $userId         = _create($session, $overrideId) if ($userId eq "new");
-    my $cache       = WebGUI::Cache->new($session,["user",$userId]);
-    my $self        = $cache->get || {};
+    my $self        = $session->cache->get("user_" . $userId) || {};
     bless $self, $class;
     $self->{_session} = $session;
     weaken( $self->{_session} );
     unless ($self->{_userId} && $self->{_user}{username}) {
         my %user;
-        tie %user, 'Tie::CPHash';
         %user = $session->db->quickHash("select * from users where userId=?",[$userId]);
         my %profile 
             = $session->db->quickHash(
@@ -1114,11 +1137,11 @@ sub new {
                 [$user{userId}]
             );
         delete $profile{userId};
-        delete $profile{wg_privacySettings};
 
         # Fill in dataDefault
         my $default = $session->db->buildHashRef(
-            "SELECT fieldName, dataDefault FROM userProfileField"
+            "SELECT fieldName, dataDefault FROM userProfileField", [],
+            { noOrder => 1 },
         );
         for my $key (keys %profile) {
             if (!defined $profile{$key} || $profile{$key} eq '') {
@@ -1126,8 +1149,8 @@ sub new {
             }
         }
 
-        if (($profile{alias} =~ /^\W+$/ || $profile{alias} eq "") and $user{username}) {
-            $profile{alias} = $user{username};
+        if (($user{alias} =~ /^\W+$/ || $user{alias} eq "") and $user{username}) {
+            $user{alias} = $user{username};
         }
         $self->{_userId}    = $userId;
         $self->{_user}      = \%user,
@@ -1159,7 +1182,7 @@ sub newByEmail {
 	my $class = shift;
 	my $session = shift;
 	my $email = shift;
-	my ($id) = $session->dbSlave->quickArray("select userId from userProfileData where email=?",[$email]);
+	my ($id) = $session->dbSlave->quickArray("select userId from users where email=?",[$email]);
 	my $user = $class->new($session, $id);
 	return undef if ($user->isVisitor); # visitor is never valid for this method
 	return undef unless $user->username;
@@ -1214,7 +1237,9 @@ The value to set the profile field name to.
 
 =cut
 
+# DEPRECATED! Remove in 9.0
 sub profileField {
+    derp "WebGUI::User::profileField is deprecated. Use get() and update() instead";
     my $self        = shift;
     my $fieldName   = shift;
     my $value       = shift;
@@ -1260,8 +1285,6 @@ sub profileIsViewable {
 #-------------------------------------------------------------------
 
 =head2 referringAffiliate ( [ value ] )
-
-DEPRECATED! Use get("referringAffiliate") and update({ referringAffiliate => "value" })
 
 Returns the unique identifier of the affiliate that referred this user to the site. 
 
@@ -1318,13 +1341,13 @@ sub setProfileFieldPrivacySetting {
     
     foreach my $fieldId (keys %{$settings}) {
         my $privacySetting = $settings->{$fieldId};
-        next unless (WebGUI::Utility::isIn($privacySetting,qw(all none friends)));
+        next unless $privacySetting ~~ [qw(all none friends)];
         $currentSettings->{$fieldId} = $settings->{$fieldId};
     }
     
     #Store the data in the database
     my $json = JSON->new->encode($currentSettings);
-    $session->db->write("update userProfileData set wg_privacySettings=? where userId=?",[$json,$self->userId]);
+    $session->db->write("update users set privacyFields=? where userId=?",[$json,$self->userId]);
 
     #Recache the current settings
     $self->{_privacySettings} = $currentSettings;
@@ -1334,8 +1357,6 @@ sub setProfileFieldPrivacySetting {
 #-------------------------------------------------------------------
 
 =head2 status ( [ value ] )
-
-DEPRECATED! Use get("status") and enable() and disable() instead
 
 Returns the status of the user. 
 
@@ -1375,37 +1396,69 @@ Deletes this user object out of the cache.
 
 sub uncache {
 	my $self = shift;
-	my $cache = WebGUI::Cache->new($self->session,["user",$self->userId]);
-	$cache->delete;
+	$self->session->cache->remove("user_" . $self->userId);
 }
 
 #----------------------------------------------------------------------------
 
 =head2 update ( properties )
 
-Update properties for the user. C<properties> is a hash reference of user properties
-and/or profile fields.
+Update properties for the user. C<properties> is a hash reference or a list of 
+name => value pairs of user properties and/or profile fields.
 
 Valid user properties:
 
- authMethod
- dateCreated
- friendsGroup
+ authMethod         - The default auth method for the user. DEPRECATED, all users
+                    can be authed by all auth methods
+ dateCreated        - The unix timestamp when the user was created
+ friendsGroup       - The WebGUI::Group containing the user's friends
  karma              - NOTE: To add karma, use the karma() method
- lastUpdated
- referringAffiliate
+ lastUpdated        - The unix timestamp when the user was last updated
+ referringAffiliate - A WebGUI::User who referred the user
  status             - One of "Activated", "Deactivated", or "Selfdestructed"
- username
+ username           - The username
+
+ ableToBeFriend                     - Whether the user can be added as a friend
+ alias                              - Show this instead of the username
+ allowPrivateMessages               - Whether this user can receive private messages
+ avatar                             - A WebGUI::Storage containing an avatar image
+ cellPhone                          - The user's cell number. Used for the SMS gateway
+ dateFormat                         - The desired date format. See WebGUI::DateTime for fields
+ email                              - The user's email
+ firstDayOfWeek                     - The preferred first day of the week
+ firstName                          - The first name
+ language                           - The user's i18n language
+ lastName                           - The last name
+ publicProfile                      - Whether the profile is visible to the public
+ receiveInboxEmailNotifications     - Should inbox messages be sent to the user's email
+ receiveInboxSmsNotifications       - Should inbox messages be sent to user's SMS
+ showMessageOnLoginSeen             - How many times they've seen the login message
+ showOnline                         - Should we reveal if the user is online?
+ signature                          - The signature for private messages and forum posts
+ timeFormat                         - The desired time format. See WebGUI::DateTime for fields
+ timeZone                           - The user's time zone. All datetimes will appear local to this
+ toolbar                            - Customize the toolbar for an i18n language
+ uiLevel                            - The UI Level. Allow users to see more based on their comprehension
+ versionTagMode                     - Their version tag mode
 
 Anything else is a profile field.
 
 =cut
 
 sub update {
-    my ( $self, $properties ) = @_;
+    my $self        = shift;
     my $session     = $self->session;
     my $db          = $session->db;
     
+    # Allow name => value and hashref
+    my $properties  = {};
+    if ( @_ == 1 ) {
+        $properties = shift;
+    }
+    else {
+        $properties = { @_ };
+    }
+
     # Make a safe copy of properties, we'll be deleting from it
     $properties = { %$properties };
     $self->uncache;
@@ -1415,7 +1468,8 @@ sub update {
     delete $properties->{userId};
 
     # This is an internal field with its own api to set it
-    delete $properties->{wg_privacySettings};
+    ### CHANGE THIS to be settable by update
+    delete $properties->{privacyFields};
 
     # $self->{_user} contains all fields in `users` table
     my @userFields = ();
@@ -1423,8 +1477,8 @@ sub update {
     for my $key ( keys %{$self->{_user}} ) {
         if ( exists $properties->{$key} ) {
             # Delete the value because it's not a profile field
-            my $value = delete $properties->{$key};
-            push @userFields, $db->dbh->quote_identifier( $key ) . " = ?";
+            my $value   = delete $properties->{$key};
+            push @userFields, $db->quote_identifier( $key ) . " = ?";
             push @userValues, $value;
             $self->{_user}->{$key} = $value;
         }
@@ -1442,10 +1496,10 @@ sub update {
 
     for my $key ( keys %{$properties} ) {
         if (!exists $self->{_profile}{$key} && !WebGUI::ProfileField->exists($session,$key)) {
-            $self->session->errorHandler->warn("No such profile field: $key");
+            $self->session->log->warn("No such profile field: $key");
             next;
         }
-        push @profileFields, $db->dbh->quote_identifier( $key ) . " = ?";
+        push @profileFields, $db->quote_identifier( $key ) . " = ?";
         push @profileValues, $properties->{ $key };
         $self->{_profile}->{$key} = $properties->{ $key };
     }
@@ -1474,18 +1528,12 @@ Hash ref of key/value pairs of data in the users's profile to update.
 
 =cut
 
-sub updateProfileFields {
-    my $self    = shift;
-    my $profile = shift;
-
-    $self->update($profile);
-}
+deprecate updateProfileFields => 'update';
 
 #-------------------------------------------------------------------
 
 =head2 username ( [ value ] )
 
-DEPRECATED! Use get("username") and update({ username => "value" }) instead.
 Returns the username. 
 
 =head3 value
@@ -1506,8 +1554,6 @@ sub username {
 #-------------------------------------------------------------------
 
 =head2 userId ( )
-
-DEPRECATED: Use getId() instead!
 
 Returns the userId for this user.
 

@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -8,9 +8,7 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../lib";
 
 ##The goal of this test is to check the creation and purging of
 ##versions.
@@ -18,17 +16,17 @@ use lib "$FindBin::Bin/../lib";
 use WebGUI::Test;
 use WebGUI::Test::Metadata;
 use WebGUI::Session;
-use WebGUI::Utility;
 use WebGUI::Asset;
 use WebGUI::VersionTag;
+use WebGUI::Test::Mechanize;
 
 use Test::More; # increment this value for each test you create
 use Test::Deep;
-plan tests => 16;
+plan tests => 25;
 
 my $session = WebGUI::Test->session;
 $session->user({userId => 3});
-my $root = WebGUI::Asset->getRoot($session);
+my $root = WebGUI::Test->asset;
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Asset Package test"});
 WebGUI::Test->addToCleanup($versionTag);
@@ -253,12 +251,11 @@ cmp_deeply(
 
 # check that asset metadata versioning works properly
 subtest 'asset metadata versioning' => sub {
-    my $asset = WebGUI::Asset->getImportNode($session)->addChild(
+    my $asset = WebGUI::Test->asset->addChild(
         {
             className => 'WebGUI::Asset::Snippet',
         }
     );
-    WebGUI::Test->addToCleanup($asset);
     my $meta = WebGUI::Test::Metadata->new($asset);
     $meta->update('version one');
     sleep 1;
@@ -313,5 +310,48 @@ sub buildNameIndex {
     }
     return $nameStruct;
 }
+
+#----------------------------------------------------------------------------
+# www_editMetaDataField
+
+my $mech = WebGUI::Test::Mechanize->new( config => WebGUI::Test->file );
+$mech->get_ok( '/' );
+$mech->session->user({userId => 3});
+
+my %fieldInfo = (
+    fieldName   => 'rsi_type',
+    description => 'What type of RSI this content will inflict upon you',
+    fieldType   => 'text',
+);
+$mech->get_ok( $folder->getUrl( 'func=editMetaDataField' ) );
+$mech->submit_form_ok({
+        fields => \%fieldInfo,
+    },
+    "add a new field",
+);
+
+my $field = ( grep { $_->{fieldName} eq $fieldInfo{fieldName} } values %{$folder->getMetaDataFields} )[0];
+ok( $field );
+cmp_deeply(
+    $field,
+    superhashof( \%fieldInfo ),
+    "Field info saved correctly",
+);
+
+$mech->get_ok( $folder->getUrl( 'func=editMetaDataField;fid=' . $field->{fieldId} ) );
+$fieldInfo{ description } = 'What type of RSI this content will protect you from';
+$mech->submit_form_ok({
+        fields => \%fieldInfo,
+    },
+    "edit an existing field",
+);
+
+$field = $folder->getMetaDataFields( $field->{fieldId} );
+ok( $field );
+cmp_deeply(
+    $field,
+    superhashof( \%fieldInfo ),
+    "Field info saved correctly",
+);
 
 #vim:ft=perl

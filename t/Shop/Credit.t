@@ -1,6 +1,6 @@
 # vim:syntax=perl
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -37,11 +37,6 @@ my $session = WebGUI::Test->session;
 
 plan tests => 27;
 
-#----------------------------------------------------------------------------
-# figure out if the test can actually run
-
-my $e;
-
 #######################################################################
 #
 # new
@@ -53,6 +48,8 @@ my $credit_user = WebGUI::User->create($session);
 WebGUI::Test->addToCleanup($credit_user);
 
 # Test incorrect for parameters
+
+my $e;
 
 eval { $credit = WebGUI::Shop::Credit->new(); };
 $e = Exception::Class->caught();

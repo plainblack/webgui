@@ -3,7 +3,7 @@ package WebGUI::Asset::Redirect;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -15,10 +15,41 @@ package WebGUI::Asset::Redirect;
 =cut
 
 use strict;
-use WebGUI::Asset;
 use WebGUI::Macro;
 
-our @ISA = qw(WebGUI::Asset);
+use Moose;
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset';
+define assetName => ['assetName', 'Asset_Redirect'];
+define icon      => 'redirect.gif';
+define tableName => 'redirect';
+property redirectUrl => (
+                tab          => "properties",
+                label        => ['redirect url', 'Asset_Redirect'],
+                hoverHelp    => ['redirect url description', 'Asset_Redirect'],
+                fieldType    => 'url',
+                default      => undef,
+         );
+property redirectType => (
+                tab          => "properties",
+                label        => ['Redirect Type', 'Asset_Redirect'],
+                hoverHelp    => ['redirect type description', 'Asset_Redirect'],
+                fieldType    => 'selectBox',
+                default      => 302,
+                options      => \&_redirectType_options,
+         );
+sub _redirectType_options {
+    my $session = shift->session;
+	my $i18n = WebGUI::International->new($session, "Asset_Redirect");
+    return {
+        302 => $i18n->get('302 Moved Temporarily'),       
+        301 => $i18n->get('301 Moved Permanently'),       
+    };
+}
+has '+uiLevel' => (
+    default => 9,
+);
+
 
 
 =head1 NAME
@@ -40,56 +71,6 @@ These methods are available from this class:
 
 =cut
 
-
-
-#-------------------------------------------------------------------
-
-=head2 definition ( definition )
-
-Defines the properties of this asset.
-
-=head3 definition
-
-A hash reference passed in from a subclass definition.
-
-=cut
-
-sub definition {
-        my $class = shift;
-        my $session = shift;
-        my $definition = shift;
-	my $i18n = WebGUI::International->new($session,"Asset_Redirect");
-        push(@{$definition}, {
-		assetName=>$i18n->get('assetName'),
-		uiLevel => 9,
-		autoGenerateForms=>1,
-		icon=>'redirect.gif',
-                tableName=>'redirect',
-                className=>'WebGUI::Asset::Redirect',
-                properties=>{
-                        redirectUrl=>{
-                                tab             => "properties",
-                                label           => $i18n->get('redirect url'),
-                                hoverHelp       => $i18n->get('redirect url description'),
-                                fieldType       => 'url',
-                                defaultValue    => undef
-                        },
-                        redirectType=>{
-                                tab             => "properties",
-                                label           => $i18n->get('Redirect Type'),
-                                hoverHelp       => $i18n->get('redirect type description'),
-                                fieldType       => 'selectBox',
-                                defaultValue    => 302,
-                                options         => {
-                                        302 => $i18n->get('302 Moved Temporarily'),       
-                                        301 => $i18n->get('301 Moved Permanently'),       
-                                }
-                        },
-                },
-        });
-        return $class->SUPER::definition($session,$definition);
-}
-
 #-------------------------------------------------------------------
 
 =head2 exportHtml_view
@@ -101,10 +82,10 @@ Override the method from AssetExportHtml to handle the redirect.
 sub exportHtml_view {
         my $self = shift;
         return $self->session->privilege->noAccess() unless $self->canView;
-        my $url = $self->get("redirectUrl");
+        my $url = $self->redirectUrl;
         WebGUI::Macro::process($self->session, \$url);
-	return '' if ($url eq $self->get("url"));
-	$self->session->http->setRedirect($url);
+	return '' if ($url eq $self->url);
+	$self->session->response->setRedirect($url);
 	return $self->session->style->process('', 'PBtmpl0000000000000060');
 }
 
@@ -118,8 +99,8 @@ Display the redirect url when in admin mode.
 
 sub view {
 	my $self = shift;
-	if ($self->session->var->isAdminOn) {
-		return $self->getToolbar.' '.$self->getTitle.' '.$self->get('redirectUrl');
+	if ($self->session->isAdminOn) {
+		return $self->getToolbar.' '.$self->getTitle.' '.$self->redirectUrl;
 	}
     else {
 		return "";
@@ -138,22 +119,25 @@ sub www_view {
     my $self = shift;
     return $self->session->privilege->noAccess() unless $self->canView;
 	my $i18n = WebGUI::International->new($self->session, "Asset_Redirect");
-    my $url = $self->get("redirectUrl");
+    my $url = $self->redirectUrl;
     WebGUI::Macro::process($self->session, \$url);
-    if ($self->session->var->isAdminOn() && $self->canEdit) {
-        return $self->getAdminConsole->render($i18n->get("what do you want to do with this redirect").'
+    if ($self->session->isAdminOn() && $self->canEdit) {
+        return '<h1>' . $i18n->get('assetName') . '</h1>'
+            . $i18n->get("what do you want to do with this redirect").'
             <ul>
                 <li><a href="'.$url.'">'.$i18n->get("go to the redirect url").'</a></li>
                 <li><a href="'.$self->getUrl("func=edit").'">'.$i18n->get("edit the redirect properties").'</a></li>
                 <li><a href="'.$self->getParent->getUrl.'">'.$i18n->get("go to the redirect parent page").'</a></li>
-             </ul>',$i18n->get("assetName"));
+            </ul>'
+            ;
     }
-    unless ($url eq $self->get("url")) {
-        $self->session->http->setRedirect($url,$self->get('redirectType'));
+    unless ($url eq $self->url) {
+        $self->session->response->setRedirect($url,$self->redirectType);
 		return undef;
 	}
     return $i18n->get('self_referential');
 }
 
+__PACKAGE__->meta->make_immutable;
 1;
 

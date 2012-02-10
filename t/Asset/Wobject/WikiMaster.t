@@ -1,6 +1,6 @@
 # vim:syntax=perl
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -13,9 +13,7 @@
 # 
 #
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../../lib";
 use Test::More;
 use Test::Differences;
 use Test::Deep;
@@ -26,7 +24,7 @@ use WebGUI::Session;
 #----------------------------------------------------------------------------
 # Init
 my $session         = WebGUI::Test->session;
-my $import          = WebGUI::Asset->getImportNode( $session );
+my $import          = WebGUI::Test->asset;
 
 my @childCoda = (undef, undef, { skipAutoCommitWorkflows => 1, skipNotification => 1, } );
 my @revCoda   = (undef,        { skipAutoCommitWorkflows => 1, skipNotification => 1, } );
@@ -40,24 +38,13 @@ my $wiki
         groupIdView      => '2',
     }, @childCoda );
 
-my $wikitag = WebGUI::VersionTag->getWorking( $session );
-$wikitag->commit;
-WebGUI::Test->addToCleanup($wikitag);
-$wiki = $wiki->cloneFromDb;
-
 my %page_set = ();
-
 foreach my $keywords (qw/staff inmates criminals/) {
     $page_set{$keywords} = $wiki->addChild({
         className => 'WebGUI::Asset::WikiPage',
         title     => $keywords,
     }, @childCoda);
 }
-
-my $tag_set1 = WebGUI::VersionTag->getWorking($session);
-$tag_set1->commit;
-WebGUI::Test->addToCleanup($tag_set1);
-
 
 #----------------------------------------------------------------------------
 # Tests
@@ -152,10 +139,6 @@ foreach my $title (qw/red andy brooks heywood norton hadley/) {
     }, @childCoda);
 }
 
-my $tag_set2 = WebGUI::VersionTag->getWorking($session);
-$tag_set2->commit;
-WebGUI::Test->addToCleanup($tag_set2);
-
 cmp_deeply(
     $wiki->getKeywordHierarchy(),
     [
@@ -190,10 +173,6 @@ cmp_deeply(
 ##Check depth-first display, and try to make a keyword loop
 $wiki->setSubKeywords('andy', 'criminals', 'inmates');
 $wiki->setSubKeywords('brooks', 'criminals');
-
-my $tag_set3 = WebGUI::VersionTag->getWorking($session);
-$tag_set3->commit;
-WebGUI::Test->addToCleanup($tag_set3);
 
 cmp_deeply(
     $wiki->getKeywordHierarchy(),
@@ -261,12 +240,12 @@ $page_set{criminals}->update({keywords => 'red,andy,tommy'});
 $session->user({userId => 3});
 ok $wiki->canView(), 'checking permission handling in www_byKeyword: Admin can view the wiki';
 $wiki->www_byKeyword;
-is $session->http->getStatus, 201, '... HTTP status set to 201';
+is $session->response->status, 201, '... HTTP status set to 201';
 
 $session->user({userId => 1});
 ok !$wiki->canView(), '... visitor cannot view the wiki';
 $wiki->www_byKeyword;
-is $session->http->getStatus, 401, '... HTTP status set to 401, no access';
+is $session->response->status, 401, '... HTTP status set to 401, no access';
 
 
 #vim:ft=perl

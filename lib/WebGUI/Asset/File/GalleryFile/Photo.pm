@@ -3,7 +3,7 @@ package WebGUI::Asset::File::GalleryFile::Photo;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -15,17 +15,30 @@ package WebGUI::Asset::File::GalleryFile::Photo;
 =cut
 
 use strict;
-use base 'WebGUI::Asset::File::GalleryFile';
+use Moose;
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset::File::GalleryFile';
+define assetName           => ['assetName', 'Asset_Photo'];
+define icon                => 'photo.gif';
+define tableName           => 'Photo';
+property exifData => (
+            fieldType           => 'text',
+            noFormPost          => 1,
+            default             => undef,
+         );
+property location => (
+            fieldType           => 'text',
+            label               => ['editForm location','Asset_Photo'],
+            default             => undef,
+         );
 
 use Carp qw( carp croak );
 use Image::ExifTool qw( :Public );
 use JSON qw/ to_json from_json /;
 use URI::Escape;
-use Tie::IxHash;
 
 use WebGUI::DateTime;
 use WebGUI::Friends;
-use WebGUI::Utility;
 use WebGUI::Storage;
 
 
@@ -58,47 +71,12 @@ These methods are available from this class:
 
 =cut
 
-#-------------------------------------------------------------------
-
-=head2 definition ( session, definition )
-
-Define the properties of the Photo asset.
-
-=cut
-
-sub definition {
-    my $class       = shift;
-    my $session     = shift;
-    my $definition  = shift;
-    my $i18n        = WebGUI::International->new($session, 'Asset_Photo');
-
-    tie my %properties, 'Tie::IxHash', (
-        exifData => {
-            defaultValue        => undef,
-        },
-        location    => {
-            defaultValue        => undef,
-        },
-    );
-
-    push @{$definition}, {
-        assetName           => $i18n->get('assetName'),
-        autoGenerateForms   => 0,
-        icon                => 'photo.gif',
-        tableName           => 'Photo',
-        className           => 'WebGUI::Asset::File::GalleryFile::Photo',
-        properties          => \%properties,
-    };
-
-    return $class->SUPER::definition($session, $definition);
-}
-
 #----------------------------------------------------------------------------
 
 =head2 applyConstraints ( options )
 
 Apply the constraints to the original file. Called automatically by C<setFile>
-and C<processPropertiesFromFormPost>.
+and C<processEditForm>.
 
 This is a sort of catch-all method for applying things to the file after it's
 uploaded. This method simply calls other methods to do its work.
@@ -107,16 +85,16 @@ C<options> is a hash reference of options and is currently not used.
 
 =cut
 
-sub applyConstraints {
+override applyConstraints => sub {
     my $self        = shift;
     my $options     = shift;
     my $gallery     = $self->getGallery;
     
     # Update the asset's size and make a thumbnail
-    my $maxImageSize    = $gallery->get("imageViewSize") 
-                            || $self->session->setting->get("maxImageSize");
+    my $maxImageSize    = $gallery->imageViewSize 
+                        || $self->session->setting->get("maxImageSize");
     my $storage         = $self->getStorageLocation;
-    my $file            = $self->get("filename");
+    my $file            = $self->filename;
 
     # Adjust orientation based on exif data. Do this before we start to 
     # generate resolutions so that all images have the correct orientation.
@@ -127,17 +105,13 @@ sub applyConstraints {
     $self->makeResolutions;
 
     # adjust density before size, so that the dimensions won't change
-    $storage->resize( $file, undef, undef, $gallery->get( 'imageDensity' ) );
+    $storage->resize( $file, undef, undef, $gallery->imageDensity );
     $storage->adjustMaxImageSize($file, $maxImageSize);
 
     $self->generateThumbnail;        
     $self->updateExifDataFromFile;
-    
-    # setSize method is already called by WebGUI::Asset::File::applyConstraints (SUPER)
-    # $self->setSize;
-    
-    $self->SUPER::applyConstraints( $options );
-}
+    super();
+};
 
 #----------------------------------------------------------------------------
 
@@ -204,8 +178,8 @@ Generates a thumbnail for this image.
 sub generateThumbnail {
     my $self        = shift;
     $self->getStorageLocation->generateThumbnail(
-        $self->get("filename"),
-        $self->getGallery->get("imageThumbnailSize"),
+        $self->filename,
+        $self->getGallery->imageThumbnailSize,
     );
     return;
 }
@@ -236,8 +210,7 @@ sub getDownloadFileUrl {
 =head2 getEditFormUploadControl
 
 Returns the HTML to display the current photo, if it has one, and a file chooser
-to either upload one, or replace the current one.  Subclasses the master class
-to change i18n labels.
+to either upload one, or replace the current one. 
 
 =cut
 
@@ -247,9 +220,9 @@ sub getEditFormUploadControl {
     my $i18n        = WebGUI::International->new($session, 'Asset_File');
     my $html        = '';
 
-    if ($self->get("filename") ne "") {
+    if ($self->filename ne "") {
         $html .= WebGUI::Form::readOnly( $session, {
-            value       => '<p style="display:inline;vertical-align:middle;"><a href="'.$self->getFileUrl.'"><img src="'.$self->getThumbnailUrl.'" alt="'.$self->get("filename").'" style="border-style:none;vertical-align:middle;" /> '.$self->get("filename").'</a></p>'
+            value       => '<p style="display:inline;vertical-align:middle;"><a href="'.$self->getFileUrl.'"><img src="'.$self->getThumbnailUrl.'" alt="'.$self->filename.'" style="border-style:none;vertical-align:middle;" /> '.$self->filename.'</a></p>'
         });
     }
 
@@ -267,6 +240,123 @@ sub getEditFormUploadControl {
 
 #----------------------------------------------------------------------------
 
+=head2 getEditTemplate ( )
+
+Override the method in the base class to get the parent's templates and data.
+
+=cut
+
+sub getEditTemplate {
+    my $self    = shift;
+    my $session = $self->session;
+    my $form    = $session->form;
+
+    my $i18n = WebGUI::International->new($session, 'WebGUI');
+
+    # Prepare the template variables
+    # Cannot get all template vars since they require a storage location, doesn't work for
+    # creating new assets.
+    #my $var     = $self->getTemplateVars;
+    my $var     = {
+        url_addArchive      => $self->getParent->getUrl('func=addArchive'),
+        url_album           => $self->getParent->getUrl('func=album'),
+    };
+
+    # Process errors if any
+    if ( $session->stow->get( 'editFormErrors' ) ) {
+        for my $error ( @{ $session->stow->get( 'editFormErrors' ) } ) {
+            push @{ $var->{ errors } }, {
+                error       => $error,
+            };
+        }
+    }
+
+    if ( $form->get('func') eq "add" ) {
+        $var->{ isNewPhoto }    = 1;
+    }
+
+    # Generate the form
+    if ( $var->{ isNewPhoto } ) {
+        $var->{ form_start }
+            = WebGUI::Form::formHeader( $session, {
+                action      => $self->getParent->getUrl('func=addSave;assetId=new;className='.__PACKAGE__),
+                extras      => 'name="photoAdd"',
+            })
+            . WebGUI::Form::hidden( $session, {
+                name        => 'ownerUserId',
+                value       => $session->user->userId,
+            })
+            ;
+    }
+    else {
+        $var->{ form_start }
+            = WebGUI::Form::formHeader( $session, {
+                action      => $self->getUrl('func=editSave'),
+                extras      => 'name="photoEdit"',
+            })
+            . WebGUI::Form::hidden( $session, {
+                name        => 'ownerUserId',
+                value       => $self->ownerUserId,
+            })
+            ;
+    }
+    $var->{ form_start }
+        .= WebGUI::Form::hidden( $session, {
+            name        => "proceed",
+            value       => $form->get('proceed') || "showConfirmation",
+        });
+
+    $var->{ form_end } = WebGUI::Form::formFooter( $session );
+
+    $var->{ form_submit }
+        = WebGUI::Form::submit( $session, {
+            name        => "submit",
+            value       => $i18n->get('save'),
+        });
+
+    $var->{ form_title  }
+        = WebGUI::Form::Text( $session, {
+            name        => "title",
+            value       => ( $form->get("title") || $self->title ),
+        });
+
+    $var->{ form_synopsis }
+        = WebGUI::Form::HTMLArea( $session, {
+            name        => "synopsis",
+            value       => ( $form->get("synopsis") || $self->synopsis ),
+            richEditId  => $self->getGallery->richEditIdFile,
+        });
+
+    $var->{ form_photo } = $self->getEditFormUploadControl;
+
+    $var->{ form_keywords }
+        = WebGUI::Form::Text( $session, {
+            name        => "keywords",
+            value       => ( $form->get("keywords") || $self->keywords ),
+        });
+
+    $var->{ form_location }
+        = WebGUI::Form::Text( $session, {
+            name        => "location",
+            value       => ( $form->get("location") || $self->location ),
+        });
+
+    $var->{ form_friendsOnly }
+        = WebGUI::Form::yesNo( $session, {
+            name            => "friendsOnly",
+            value           => ( $form->get("friendsOnly") || $self->friendsOnly ),
+            defaultValue    => undef,
+        });
+
+    my $gallery  = $self->getGallery;
+    my $template = eval { WebGUI::Asset->newById($session, $gallery->getTemplateIdEditFile) };
+    $template->setParam(%{ $var });
+    $template->style($gallery->getStyleTemplateId);
+    return $template;
+}
+
+#----------------------------------------------------------------------------
+
 =head2 getExifData ( )
 
 Gets a hash reference of Exif data about this Photo.
@@ -276,14 +366,14 @@ Gets a hash reference of Exif data about this Photo.
 sub getExifData {
     my $self        = shift;
 
-    return unless $self->get('exifData');    
+    return unless $self->exifData;    
 
     # Our processing and eliminating of bad / unparsable keys
     # isn't perfect, so handle errors gracefully
-    my $exif    = eval { from_json( $self->get('exifData') ) };
+    my $exif    = eval { from_json( $self->exifData ) };
     if ( $@ ) {
-        $self->session->errorHandler->warn( 
-            "Could not parse JSON data for EXIF in Photo '" . $self->get('title') 
+        $self->session->log->warn( 
+            "Could not parse JSON data for EXIF in Photo '" . $self->title 
             . "' (" . $self->getId . "): " . $@
         );
         return;
@@ -336,10 +426,10 @@ Get a hash reference of template variables shared by all views of this asset.
 
 =cut
 
-sub getTemplateVars {
+override getTemplateVars => sub {
     my $self        = shift;
     my $session     = $self->session;
-    my $var         = $self->SUPER::getTemplateVars;
+    my $var         = super();
 
     ### Download resolutions
     for my $resolution ( @{ $self->getResolutions } ) {
@@ -364,7 +454,7 @@ sub getTemplateVars {
     }
 
     return $var;
-}
+};
 
 #----------------------------------------------------------------------------
 
@@ -377,7 +467,7 @@ Get the URL to the thumbnail for this Photo.
 sub getThumbnailUrl {
     my $self = shift;
     return $self->getStorageLocation->getThumbnailUrl(
-        $self->get("filename")
+        $self->filename
     );
 }
 
@@ -390,12 +480,12 @@ additonal details.
 
 =cut
 
-sub indexContent {
+override indexContent => sub {
 	my $self = shift;
-	my $indexer = $self->SUPER::indexContent;
+	my $indexer = super();
 	$indexer->addKeywords($self->get("location"));
 	return $indexer;
-}
+};
 
 #----------------------------------------------------------------------------
 
@@ -427,7 +517,7 @@ sub makeResolutions {
     $resolutions    ||= $self->getGallery->getImageResolutions;
     
     my $storage     = $self->getStorageLocation;
-    $self->session->errorHandler->info(" Making resolutions for '" . $self->get("filename") . q{'});
+    $self->session->log->info(" Making resolutions for '" . $self->filename . q{'});
 
     for my $res ( @$resolutions ) {
         # carp if resolution is bad
@@ -436,14 +526,14 @@ sub makeResolutions {
             next;
         }
         my $newFilename     = $res . ".jpg";
-        $storage->copyFile( $self->get("filename"), $newFilename );
-        $storage->resize( $newFilename, $res, undef, $self->getGallery->get( 'imageDensity' ) );
+        $storage->copyFile( $self->filename, $newFilename );
+        $storage->resize( $newFilename, $res, undef, $self->getGallery->imageDensity );
     }
 }
 
 #----------------------------------------------------------------------------
 
-=head2 processPropertiesFromFormPost ( )
+=head2 processEditForm ( )
 
 Process the asset edit form. 
 
@@ -451,11 +541,11 @@ Make the default title into the file name minus the extention.
 
 =cut
 
-sub processPropertiesFromFormPost {
+override processEditForm => sub {
     my $self    = shift;
     my $i18n    = WebGUI::International->new( $self->session,'Asset_Photo' );
     my $form    = $self->session->form;
-    my $errors  = $self->SUPER::processPropertiesFromFormPost || [];
+    my $errors  = super() || [];
 
     # Make sure there is an image file attached to this asset.
     if ( !$self->get('filename') ) {
@@ -469,7 +559,7 @@ sub processPropertiesFromFormPost {
     
     # If no title was given, make it the file name
     if ( !$form->get('title') ) {
-        my $title   = $self->get('filename');
+        my $title   = $self->filename;
         $title  =~ s/\.[^.]*$//;
         $title  =~ tr/-/ /; # De-mangle the spaces at the expense of the dashes
         $self->update( {
@@ -480,13 +570,13 @@ sub processPropertiesFromFormPost {
         # If this is a new Photo, change some other things too
         if ( $form->get('assetId') eq "new" ) {
             $self->update( {
-                url         => $self->session->url->urlize( join "/", $self->getParent->get('url'), $title ),
+                url         => $self->session->url->urlize( join "/", $self->getParent->url, $title ),
             } );
         }
     }
 
     return undef;
-}
+};
 
 
 #----------------------------------------------------------------------------
@@ -519,11 +609,11 @@ Extend the superclass setFile to automatically generate thumbnails.
 
 =cut
 
-sub setFile {
+override setFile => sub {
     my $self    = shift;
-    $self->SUPER::setFile(@_);
+    super();
     $self->generateThumbnail;
-}
+};
 
 #----------------------------------------------------------------------------
 
@@ -539,7 +629,7 @@ sub updateExifDataFromFile {
     
     my $exifTool    = Image::ExifTool->new;
     $exifTool->Options( PrintConv => 1 );
-    my $info        = $exifTool->ImageInfo( $storage->getPath( $self->get('filename') ) );
+    my $info        = $exifTool->ImageInfo( $storage->getPath( $self->filename ) );
     
     # Sanitize Exif data by removing keys with references as values
     for my $key ( keys %$info ) {
@@ -574,139 +664,16 @@ sub www_download {
     
     my $storage     = $self->getStorageLocation;
 
-    $self->session->http->setMimeType( "image/jpeg" );
-    $self->session->http->setLastModified( $self->getContentLastModified );
+    $self->session->response->content_type( "image/jpeg" );
+    $self->session->response->setLastModified( $self->getContentLastModified );
 
     my $resolution  = $self->session->form->get("resolution");
     if ($resolution) {
         return $storage->getFileContentsAsScalar( $resolution . ".jpg" ); 
     }
     else {
-        return $storage->getFileContentsAsScalar( $self->get("filename") );
+        return $storage->getFileContentsAsScalar( $self->filename );
     }
-}
-
-#----------------------------------------------------------------------------
-
-=head2 www_edit ( )
-
-Web facing method which is the default edit page
-
-This page is only available to those who can edit this Photo.
-
-=cut
-
-sub www_edit {
-    my $self    = shift;
-    my $session = $self->session;
-    my $form    = $session->form;
-
-    return $session->privilege->insufficient  unless $self->canEdit;
-    return $session->privilege->locked        unless $self->canEditIfLocked;
-
-    my $i18n = WebGUI::International->new($session, 'WebGUI');
-
-    # Prepare the template variables
-    # Cannot get all template vars since they require a storage location, doesn't work for
-    # creating new assets.
-    #my $var     = $self->getTemplateVars; 
-    my $var     = {
-        url_addArchive      => $self->getParent->getUrl('func=addArchive'),
-        url_album           => $self->getParent->getUrl('func=album'),
-    };
-    
-    # Process errors if any
-    if ( $session->stow->get( 'editFormErrors' ) ) {
-        for my $error ( @{ $session->stow->get( 'editFormErrors' ) } ) {
-            push @{ $var->{ errors } }, {
-                error       => $error,
-            };
-        }
-    }
-
-    if ( $form->get('func') eq "add" ) {
-        $var->{ isNewPhoto }    = 1;
-    }
-    
-    # Generate the form
-    if ($form->get("func") eq "add") {
-        $var->{ form_start  } 
-            = WebGUI::Form::formHeader( $session, {
-                action      => $self->getParent->getUrl('func=editSave;assetId=new;class='.__PACKAGE__),
-                extras      => 'name="photoAdd"',
-            })
-            . WebGUI::Form::hidden( $session, {
-                name        => 'ownerUserId',
-                value       => $session->user->userId,
-            })
-            ;
-    }
-    else {
-        $var->{ form_start  } 
-            = WebGUI::Form::formHeader( $session, {
-                action      => $self->getUrl('func=editSave'),
-                extras      => 'name="photoEdit"',
-            })
-            . WebGUI::Form::hidden( $session, {
-                name        => 'ownerUserId',
-                value       => $self->get('ownerUserId'),
-            })
-            ;
-    }
-    $var->{ form_start } 
-        .= WebGUI::Form::hidden( $session, {
-            name        => "proceed",
-            value       => $form->get('proceed') || "showConfirmation",
-        });
-
-    $var->{ form_end } = WebGUI::Form::formFooter( $session );
-    
-    $var->{ form_submit }
-        = WebGUI::Form::submit( $session, {
-            name        => "submit",
-            value       => $i18n->get('save'),
-        });
-
-    $var->{ form_title  }
-        = WebGUI::Form::Text( $session, {
-            name        => "title",
-            value       => ( $form->get("title") || $self->get("title") ),
-        });
-    
-    $self->getGallery;
-
-    $var->{ form_synopsis }
-        = WebGUI::Form::HTMLArea( $session, {
-            name        => "synopsis",
-            value       => ( $form->get("synopsis") || $self->get("synopsis") ),
-            richEditId  => $self->getGallery->get("richEditIdFile"),
-        });
-
-    $var->{ form_photo } = $self->getEditFormUploadControl;
-    
-    $var->{ form_keywords }
-        = WebGUI::Form::Text( $session, {
-            name        => "keywords",
-            value       => ( $form->get("keywords") || $self->get("keywords") ),
-        });
-
-    $var->{ form_location }
-        = WebGUI::Form::Text( $session, {
-            name        => "location",
-            value       => ( $form->get("location") || $self->get("location") ),
-        });
-
-    $var->{ form_friendsOnly }
-        = WebGUI::Form::yesNo( $session, {
-            name            => "friendsOnly",
-            value           => ( $form->get("friendsOnly") || $self->get("friendsOnly") ),
-            defaultValue    => undef,
-        });
-
-
-    return $self->processStyle(
-        $self->processTemplate( $var, $self->getGallery->getTemplateIdEditFile )
-    );
 }
 
 #----------------------------------------------------------------------------
@@ -725,9 +692,10 @@ sub www_showConfirmation {
     return $self->processStyle(
         sprintf( $i18n->get('save message'), 
             $self->getUrl, 
-            $self->getParent->getUrl('func=add;class='.__PACKAGE__),
+            $self->getParent->getUrl('func=add;className='.__PACKAGE__),
         )
     );
 }
 
+__PACKAGE__->meta->make_immutable;
 1;

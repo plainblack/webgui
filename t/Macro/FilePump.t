@@ -1,6 +1,6 @@
 # vim:syntax=perl
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -13,9 +13,7 @@
 # 
 #
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../lib";
 use Test::More;
 use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
@@ -34,10 +32,10 @@ plan tests => 11;
 #----------------------------------------------------------------------------
 # put your tests here
 
-my $bundle = WebGUI::FilePump::Bundle->create($session, { bundleName => 'test bundle'});
+my $bundle = WebGUI::FilePump::Bundle->new($session, { bundleName => 'test bundle'});
 WebGUI::Test->addToCleanup( sub { $bundle->delete } );
 
-my $root = WebGUI::Asset->getRoot($session);
+my $root = WebGUI::Test->asset;
 
 my $snippet =  $root->addChild({
     className => 'WebGUI::Asset::Snippet',
@@ -53,10 +51,6 @@ my $fileAsset = $root->addChild({
 
 $fileAsset->getStorageLocation->addFileFromScalar('pumpfile.css', qq|   body {\npadding:   0px;}\n\n|);
 is($fileAsset->getStorageLocation->getFileContentsAsScalar($fileAsset->get('filename')), qq|   body {\npadding:   0px;}\n\n|, 'Sanity check - got back expected file contents');
-
-my $snippetTag = WebGUI::VersionTag->getWorking($session);
-WebGUI::Test->addToCleanup($snippetTag);
-$snippetTag->commit;
 
 ok($bundle->addFile('JS',  'asset://filePumpSnippet'), 'Added filePumpSnippet');
 ok($bundle->addFile('CSS', 'asset://filePumpFileAsset'), 'Added filePumpAsset');
@@ -95,7 +89,7 @@ is(
     '... check illegal file type access returns empty string'
 );
 
-$session->var->switchAdminOn();
+$session->user({ userId => 3 });
 is(
     WebGUI::Macro::FilePump::process($session, 'test bundle', 'JS'),
     sprintf(qq|<script type="text/javascript" src="%s" ></script>\n<script type="text/javascript" src="%s" ></script>\n|,

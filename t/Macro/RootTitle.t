@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -8,9 +8,7 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
 use WebGUI::Session;
@@ -32,7 +30,7 @@ my $session = WebGUI::Test->session;
 
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Adding assets for RootTitle tests"});
-addToCleanup($versionTag);
+WebGUI::Test->addToCleanup($versionTag);
 
 my $root = WebGUI::Asset->getRoot($session);
 my %properties_A = (
@@ -118,7 +116,9 @@ my $asset_ = $root->addChild(\%properties__, $properties__{id});
 
 $versionTag->commit;
 
-my $origLineage = $asset_->get('lineage');
+WebGUI::Test->addToCleanup($assetZ, $asset_);
+
+my $origLineage = $asset_->lineage;
 my $newLineage = substr $origLineage, 0, length($origLineage)-1; 
 $session->db->write('update asset set lineage=? where assetId=?',[$newLineage, $asset_->getId]);
 
@@ -164,6 +164,8 @@ my $numTests = scalar @testSets;
 $numTests += 1;
 
 plan tests => $numTests;
+
+use WebGUI::Macro::RootTitle;
 
 is(
 	WebGUI::Macro::RootTitle::process($session),

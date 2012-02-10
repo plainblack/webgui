@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -8,9 +8,7 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/lib";
 use WebGUI::Test;
 use WebGUI::Session;
 use WebGUI::Keyword;
@@ -24,7 +22,10 @@ use Data::Dumper;
 my $session = WebGUI::Test->session;
 
 # put your tests here
-my $home = WebGUI::Asset->getDefault($session);
+my $tag = WebGUI::VersionTag->getWorking($session);
+my $home = WebGUI::Test->asset;
+$tag->commit;
+$home = $home->cloneFromDb;
 
 isa_ok($home, "WebGUI::Asset");
 my $keyword = WebGUI::Keyword->new($session);
@@ -77,13 +78,9 @@ my $snippet = $home->addChild({
     keywords  => 'webgui',
 });
 
-my $tag = WebGUI::VersionTag->getWorking($session);
-WebGUI::Test->addToCleanup($tag);
-$tag->commit;
-
 my $assetIds = $keyword->getMatchingAssets({ keyword => 'webgui', });
 
-cmp_deeply(
+cmp_bag(
     $assetIds,
     [ $snippet->getId, $home->getId, ],
     'getMatchingAssets, by keyword, assetIds in order by creationDate, descending'
@@ -91,8 +88,7 @@ cmp_deeply(
 
 # sorted by title, alphabetically
 
-my $aa_story = $home->addChild({ className => 'WebGUI::Asset::Story', title => "aaaa", keywords => 'webgui' });
-WebGUI::Test->addToCleanup($aa_story);
+my $aa_story = $home->addChild({ className => 'WebGUI::Asset::Snippet', title => "aaaa", keywords => 'webgui' });
 
 $assetIds = $keyword->getMatchingAssets({ keyword => 'webgui', sortOrder => 'Alphabetically', });
 
@@ -115,7 +111,7 @@ cmp_deeply(
     '... only published assets'
 );
 
-cmp_deeply(
+cmp_bag(
     $keyword->getMatchingAssets({ keyword => 'webgui', states => [ qw/published trash/, ]}),
     [$snippet->getId, $home->getId, ],
     '... retrieving assets in more than one state'

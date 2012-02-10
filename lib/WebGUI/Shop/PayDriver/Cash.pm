@@ -3,7 +3,7 @@ package WebGUI::Shop::PayDriver::Cash;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -18,8 +18,20 @@ use strict;
 
 use WebGUI::Shop::PayDriver;
 use WebGUI::Exception;
+use Tie::IxHash;
 
-use base qw/WebGUI::Shop::PayDriver/;
+use Moose;
+use WebGUI::Definition::Shop;
+extends 'WebGUI::Shop::PayDriver';
+
+define pluginName => [qw/label PayDriver_Cash/];
+property summaryTemplateId => (
+            fieldType    => 'template',
+            label        => ['summary template', 'PayDriver_Cash'],
+            hoverHelp    => ['summary template help', 'PayDriver_Cash'],
+            namespace    => 'Shop/Credentials',
+            default      => '30h5rHxzE_Q0CyI3Gg7EJw',
+         );
 
 #-------------------------------------------------------------------
 
@@ -37,40 +49,6 @@ sub canCheckoutCart {
     return 0 if $cart->requiresRecurringPayment;
 
     return 1;
-}
-
-#-------------------------------------------------------------------
-
-=head2 definition ( session, definition )
-
-See WebGUI::Shop::PayDriver->definition.
-
-=cut
-
-sub definition {
-    my $class       = shift;
-    my $session     = shift;
-    my $definition  = shift;
-
-    my $i18n = WebGUI::International->new($session, 'PayDriver_Cash');
-
-    tie my %fields, 'Tie::IxHash';
-    %fields = (
-        summaryTemplateId  => {
-            fieldType    => 'template',
-            label        => $i18n->get('summary template'),
-            hoverHelp    => $i18n->get('summary template help'),
-            namespace    => 'Shop/Credentials',
-            defaultValue => '30h5rHxzE_Q0CyI3Gg7EJw',
-        },
-    );
-
-    push @{ $definition }, {
-        name        => $i18n->get('label'),
-        properties  => \%fields,
-    };
-
-    return $class->SUPER::definition($session, $definition);
 }
 
 #-------------------------------------------------------------------

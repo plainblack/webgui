@@ -1,7 +1,7 @@
 package WebGUI::Operation::SpellCheck;
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -11,7 +11,6 @@ package WebGUI::Operation::SpellCheck;
 #-------------------------------------------------------------------
 
 use strict;
-use WebGUI::Utility;
 use File::Path qw(mkpath);
 # Optional, but if unavailable, spell checking will have no effect.
 my $spellerAvailable;
@@ -57,7 +56,7 @@ sub _getSpeller {
     # Get language
     my $speller = Text::Aspell->new;
     die "Language not available in server side spellcheck"
-        unless (isIn($lang, map {m/^.*?:([^:]*):.*?$/} $speller->list_dictionaries));
+        unless ($lang ~~ [map {m/^.*?:([^:]*):.*?$/} $speller->list_dictionaries]);
 
     # User homedir
     my $homeDir = $session->config->get('uploadsPath').'/dictionaries/';
@@ -223,7 +222,7 @@ sub www_spellCheck {
     }
     # add request id and send to client as JSON blob
     $result->{id} = $params->{id};
-    $session->http->setMimeType("text/plain; charset=utf-8");
+    $session->response->content_type("text/plain; charset=utf-8");
     return JSON->new->encode($result);
 }
 

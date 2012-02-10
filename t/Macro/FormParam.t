@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -8,9 +8,7 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
 use WebGUI::Session;
@@ -70,35 +68,22 @@ TODO: {
 
 sub auto_check {
 	my ($session, $testBlock) = @_;
-	my $origSessionRequest = $session->{_request};
 
 	##Create a by-name interface to the test to simplify the
 	##mocked request.
 	my %tests = map { $_->{key} => $_ } @{ $testBlock };
 	is(scalar keys %tests, scalar @{ $testBlock }, 'no collisions in testBlock');
 
-	my $request = Test::MockObject->new;
-	$request->mock('body',
-		sub {
-			my ($self, $value) = @_;
-			return unless exists $tests{$value};
-			if (ref $tests{$value}->{testValue} eq "ARRAY") {
-				return @{ $tests{$value}->{testValue} } ;
-			}
-			else {
-				return $tests{$value}->{testValue};
-			}
-		}
-	);
-    $request->mock('param', sub {shift->body(@_)});
-
-	$session->{_request} = $request;
+    my $param_hash = Hash::MultiValue->from_mixed(
+        map { $_->{key} => $_->{testValue} } @{ $testBlock }
+    );
+    local $session->request->env->{'plack.request.query'} = $param_hash;
+    local $session->request->env->{'plack.request.body'} = $param_hash;
+    local $session->request->env->{'plack.request.merged'} = $param_hash;
 
 	foreach my $test ( @{ $testBlock } ) {
 		$test->{expected} = $test->{testValue} if $test->{expected} eq 'EQUAL';
 		my $value = WebGUI::Macro::FormParam::process($session, $test->{key});
 		is($value, $test->{expected}, $test->{comment});
 	}
-
-	$session->{_request} = $origSessionRequest;
 }

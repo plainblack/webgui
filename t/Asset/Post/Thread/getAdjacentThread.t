@@ -1,7 +1,7 @@
 
 # vim:syntax=perl
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -14,9 +14,7 @@
 # 
 #
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../../../lib";
 use Test::More;
 use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
@@ -27,10 +25,10 @@ my $session         = WebGUI::Test->session;
 
 my @versionTags     = ( WebGUI::VersionTag->getWorking( $session ) );
 my @addChildArgs    = ( {skipAutoCommitWorkflows=>1} );
-my $collab          = WebGUI::Asset->getImportNode( $session )->addChild({
+my $collab          = WebGUI::Test->asset(
     className       => 'WebGUI::Asset::Wobject::Collaboration',
     threadsPerPage  => 20,
-});
+);
 
 my @threads = (
     $collab->addChild( {
@@ -60,8 +58,6 @@ my @threads = (
 );
 
 $_->setSkipNotification for @threads; 
-$versionTags[-1]->commit;
-WebGUI::Test->addToCleanup($versionTags[-1]);
 
 #----------------------------------------------------------------------------
 # Tests
@@ -157,10 +153,10 @@ $session->scratch->delete($collab->getId.'_sortDir');
 # @threads = all the threads
 sub testGetAdjacentThread {
     my ( $label, $sort, $order, @threads ) = @_;
-    
+
     my $idxFirst    = shift @{$order};
     my $idxLast     = pop @{$order};
-    
+
     # First
     is( $threads[$idxFirst]->getNextThread->getId, 
         getNextThread( $sort, $threads[$idxFirst], @threads )->getId,
@@ -216,7 +212,7 @@ sub sortThreads {
 sub getNextThread {
     my ( $sortSub, $thread, @threads ) = @_;
     my @sorted  = @{ sortThreads( $sortSub, @threads ) };
-    
+
     for my $i ( 0..$#sorted ) {
         if ( $sorted[$i]->getId eq $thread->getId ) {
             return $sorted[$i+1];
@@ -228,7 +224,7 @@ sub getPreviousThread {
     my ( $sortSub, $thread, @threads ) = @_;
     # Use reverse so that $i-1 != -1 (which gets us the last thread)
     my @sorted  = reverse @{ sortThreads( $sortSub, @threads ) };
-    
+
     for my $i ( 0..$#sorted ) {
         if ( $sorted[$i]->getId eq $thread->getId ) {
             return $sorted[$i+1];

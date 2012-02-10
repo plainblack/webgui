@@ -1,5 +1,20 @@
+7.10.25
+
 7.10.24
+ - fixed #12318: asset error causes asset manager to fail
+ - fixed #12308: error message used scalar as reference
  - fixed #12256: Calendar Search doesn't show admin controls
+ - fixed #12268: Point of sale form missing from cart screen.
+ - fixed #12201: AssetReport - no selects.
+ - fixed #12269: Login / Loginbox with encryptlogin
+ - fixed #12271: Calendar List View does not always show labels
+ - fixed Passive Analytics, UI, Progress Bar, server load.
+ - fixed #12303: Survey custom multiple choice question types
+ - fixed #12304: Surven packages do not include custom question types
+ - fixed #12309: Some child assets ignore visitor cache timeouts
+ - fixed possible values and default values on EMS submission.
+ - fixed #12312: Shop account plugin has unrendered macro
+ - fixed #12315: Remove yui tests from git repo.
 
 7.10.23
  - fixed #12225: Stock asset, multiple instances on a page

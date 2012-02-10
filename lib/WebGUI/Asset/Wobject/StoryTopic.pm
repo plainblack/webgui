@@ -3,7 +3,7 @@ package WebGUI::Asset::Wobject::StoryTopic;
 $VERSION = "1.0.0";
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -13,88 +13,66 @@ $VERSION = "1.0.0";
 #-------------------------------------------------------------------
 
 use strict;
-use Tie::IxHash;
-use WebGUI::International;
-use WebGUI::Utility;
-use WebGUI::Asset::Story;
-use Class::C3;
-use base qw/WebGUI::AssetAspect::RssFeed WebGUI::Asset::Wobject/;
-
-use constant DATE_FORMAT => '%c_%D_%y';
-
-#-------------------------------------------------------------------
-
-=head2 definition ( )
-
-defines wobject properties for New Wobject instances.  You absolutely need 
-this method in your new Wobjects.  If you choose to "autoGenerateForms", the
-getEditForm method is unnecessary/redundant/useless.  
-
-=cut
-
-sub definition {
-    my $class = shift;
-    my $session = shift;
-    my $definition = shift;
-    my $i18n = WebGUI::International->new($session, 'Asset_StoryTopic');
-    my $other_i18n = WebGUI::International->new($session, 'Asset_StoryArchive');
-    my %properties;
-    tie %properties, 'Tie::IxHash';
-    %properties = (
-        storiesPer => {
+use Moose;
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset::Wobject';
+define assetName => ['assetName', 'Asset_StoryTopic'];
+define icon      => 'storytopic.gif';
+define tableName => 'StoryTopic';
+property storiesPer => (
             tab          => 'display',  
             fieldType    => 'integer',  
-            label        => $i18n->get('stories per topic'),
-            hoverHelp    => $i18n->get('stories per topic help'),
-            defaultValue => 15,
-        },
-        storiesShort => {
+            label        => ['stories per topic', 'Asset_StoryTopic'],
+            hoverHelp    => ['stories per topic help', 'Asset_StoryTopic'],
+            default      => 15,
+         );
+property storiesShort => (
             tab          => 'display',  
             fieldType    => 'integer',  
-            label        => $i18n->get('stories short'),
-            hoverHelp    => $i18n->get('stories short help'),
-            defaultValue => 5,
-        },
-        templateId => {
+            label        => ['stories short', 'Asset_StoryTopic'],
+            hoverHelp    => ['stories short help', 'Asset_StoryTopic'],
+            default      => 5,
+         );
+property templateId => (
             tab          => 'display',
             fieldType    => 'template',
-            label        => $i18n->get('template'),
-            hoverHelp    => $i18n->get('template help'),
-            filter       => 'fixId',
+            label        => ['template', 'Asset_StoryTopic'],
+            hoverHelp    => ['template help', 'Asset_StoryTopic'],
             namespace    => 'StoryTopic',
-            defaultValue => 'A16v-YjWAShXWvSACsraeg',
-        },
-        storyTemplateId => {
+            default      => 'A16v-YjWAShXWvSACsraeg',
+         );
+property storyTemplateId => (
             tab          => 'display',
             fieldType    => 'template',
-            label        => $i18n->get('story template'),
-            hoverHelp    => $i18n->get('story template help'),
-            filter       => 'fixId',
+            label        => ['story template', 'Asset_StoryTopic'],
+            hoverHelp    => ['story template help', 'Asset_StoryTopic'],
             namespace    => 'Story',
-            defaultValue => 'TbDcVLbbznPi0I0rxQf2CQ',
-        },
-        storySortOrder => { 
+            default      => 'TbDcVLbbznPi0I0rxQf2CQ',
+         );
+property storySortOrder => ( 
             fieldType     => "selectBox",
             tab           => 'display',
-            defaultValue  => 'Chronologically',
-            options       => {
-                 Alphabetically  => $other_i18n->get('alphabetically'),
-                 Chronologically => $other_i18n->get('chronologically')
-            },
-            label         => $other_i18n->get('sortAlphabeticallyChronologically'),
-            hoverHelp     => $other_i18n->get('sortAlphabeticallyChronologically description'),
-        },
-    );
-    push(@{$definition}, {
-        assetName=>$i18n->get('assetName'),
-        icon=>'storytopic.gif',
-        autoGenerateForms=>1,
-        tableName=>'StoryTopic',
-        className=>'WebGUI::Asset::Wobject::StoryTopic',
-        properties=>\%properties,
-    });
-    return $class->SUPER::definition($session, $definition);
+            default       => 'Chronologically',
+            options       => \&_storySortOrder_options,
+            label         => ['sortAlphabeticallyChronologically', 'Asset_StoryArchive'],
+            hoverHelp     => ['sortAlphabeticallyChronologically description', 'Asset_StoryArchive'],
+         );
+sub _storySortOrder_options {
+    my $session = shift->session;
+    my $i18n    = WebGUI::International->new($session, 'Asset_StoryArchive');
+    return {
+        Alphabetically  => $i18n->get('alphabetically'),
+        Chronologically => $i18n->get('chronologically'),
+    };
 }
+
+with 'WebGUI::Role::Asset::RssFeed';
+
+
+use WebGUI::International;
+use WebGUI::Asset::Story;
+
+use constant DATE_FORMAT => '%c_%D_%y';
 
 #-------------------------------------------------------------------
 
@@ -108,16 +86,16 @@ for generating an RSS and Atom feeds.
 sub getRssFeedItems {
     my ($self)   = @_;
     my $session  = $self->session;    
-    my $wordList = WebGUI::Keyword::string2list($self->get('keywords'));
+    my $wordList = WebGUI::Keyword::string2list($self->keywords);
     my $key      = WebGUI::Keyword->new($session);
     my $storyIds = $key->getMatchingAssets({
         keywords     => $wordList,
         isa          => 'WebGUI::Asset::Story',
-        rowsPerPage  => $self->get('storiesPer'),
+        rowsPerPage  => $self->storiesPer,
     });
     my $storyData = [];
     STORY: foreach my $storyId (@{ $storyIds }) {
-        my $story = WebGUI::Asset->newByDynamicClass($session, $storyId);
+        my $story = WebGUI::Asset->newById($session, $storyId);
         next STORY unless $story;
         push @{ $storyData }, $story->getRssData;
     }
@@ -132,20 +110,21 @@ See WebGUI::Asset::prepareView() for details.
 
 =cut
 
-sub prepareView {
+around prepareView => sub {
+    my $orig = shift;
     my $self = shift;
-    $self->SUPER::prepareView();
-    my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId"));
+    $self->$orig(@_);
+    my $template = WebGUI::Asset::Template->newById($self->session, $self->templateId);
     if (!$template) {
         WebGUI::Error::ObjectNotFound::Template->throw(
             error      => qq{Template not found},
-            templateId => $self->get("templateId"),
+            templateId => $self->templateId,
             assetId    => $self->getId,
         );
     }
     $template->prepare;
     $self->{_viewTemplate} = $template;
-}
+};
 
 
 #-------------------------------------------------------------------
@@ -180,10 +159,10 @@ sub viewTemplateVariables {
     my $session         = $self->session;    
     my $exporting       = $session->scratch->get('isExporting');
     my $numberOfStories = $self->{_standAlone}
-                        ? $self->get('storiesPer')
-                        : $self->get('storiesShort');
+                        ? $self->storiesPer
+                        : $self->storiesShort;
     my $var = $self->get();
-    my $wordList = WebGUI::Keyword::string2list($self->get('keywords'));
+    my $wordList = WebGUI::Keyword::string2list($self->keywords);
     my $key      = WebGUI::Keyword->new($session);
     my $p        = $key->getMatchingAssets({
         sortOrder      => $self->get('storySortOrder') || 'Chronologically',
@@ -195,7 +174,7 @@ sub viewTemplateVariables {
     my $storyIds = $p->getPageData();
 
     my $icon          = $session->icon;
-    my $userUiLevel   = $session->user->profileField("uiLevel");
+    my $userUiLevel   = $session->user->get("uiLevel");
     my $uiLevels      = $session->config->get('assetToolbarUiLevel');
     my $i18n          = WebGUI::International->new($session);
     my $url           = $session->url;
@@ -224,9 +203,7 @@ sub viewTemplateVariables {
         }
         grep { $_ }
         map  {
-            WebGUI::Asset->new(
-                $session, @{ $_ }{ qw( assetId className revisionDate ) }
-            )
+            WebGUI::Asset->newById( $session, $_->{assetId} )
         }
         @{ $storyIds }
     ];
@@ -235,12 +212,12 @@ sub viewTemplateVariables {
         my $topStoryData = $storyIds->[0];
         my $topStoryVars = shift @{ $var->{story_loop} };
         ##Note, this could have saved from the loop above, but this looks more clean and encapsulated to me.
-        my $topStory   = WebGUI::Asset->new($session, $topStoryData->{assetId}, $topStoryData->{className}, $topStoryData->{revisionDate});
+        my $topStory   = WebGUI::Asset->newById($session, $topStoryData->{assetId}, $topStoryData->{revisionDate});
         $var->{topStory}               = $topStoryVars;
         $var->{topStoryTitle}          = $topStory->getTitle;
-        $var->{topStorySubtitle}       = $topStory->get('subtitle');
+        $var->{topStorySubtitle}       = $topStory->subtitle;
         $var->{topStoryUrl}            = $session->url->append($self->getUrl, 'func=viewStory;assetId='.$topStoryData->{assetId}),
-        $var->{topStoryCreationDate}   = $topStory->get('creationDate');
+        $var->{topStoryCreationDate}   = $topStory->creationDate;
         $var->{topStoryEditIcon}       = $topStoryVars->{editIcon};
         $var->{topStoryDeleteIcon}     = $topStoryVars->{deleteIcon};
         ##TODO: Photo variables
@@ -277,11 +254,11 @@ variables are set correctly in viewTemplateVars.
 =cut
 
 
-sub www_view {
+override www_view => sub {
     my $self = shift;
     $self->{_standAlone} = 1;
-    return $self->SUPER::www_view;
-}
+    return super();
+};
 
 #-------------------------------------------------------------------
 
@@ -298,7 +275,7 @@ sub www_viewStory {
     my $storyId = $session->form->get('assetId');
     my $story;
     if ($storyId) {
-        $story = WebGUI::Asset->new($session, $storyId);
+        $story = WebGUI::Asset->newById($session, $storyId);
     }
     if (! $story) {
         my $notFound = WebGUI::Asset->getNotFound($session);
@@ -310,5 +287,6 @@ sub www_viewStory {
 }
 
 
+__PACKAGE__->meta->make_immutable;
 1;
 #vim:ft=perl

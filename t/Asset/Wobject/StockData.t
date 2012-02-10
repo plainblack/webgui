@@ -1,6 +1,6 @@
 # vim:syntax=perl
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -22,7 +22,6 @@ use Test::Deep;
 use JSON;
 use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
-use WebGUI::Cache;
 
 #----------------------------------------------------------------------------
 # Init
@@ -52,8 +51,9 @@ is $stocks->{qw/GWR symbol/}, 'GWR', 'stock fetch successful';
 cmp_ok $stocks->{qw/GWR last_fetch/}, '<', $now-500, 'last_fetch set in the past';
 my $last_fetch = $stocks->{qw/GWR last_fetch/};
 
-my $cache = WebGUI::Cache->new($session, [$asset->getId, 'usa', 'GWR']);
-is $cache->get()->{qw/GWR symbol/}, 'GWR', 'cache loaded with valid data';
+is $session->cache->get( join "", $asset->getId, 'usa', 'GWR' )->{qw/GWR symbol/},
+    'GWR',
+    'cache loaded with valid data';
 
 restore_time();
 

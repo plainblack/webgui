@@ -52,23 +52,23 @@ sub editSettingsForm {
     my $self    = shift;
     my $session = $self->session;
     my $i18n    = WebGUI::International->new($session,'Account_NewModule');
-    my $f       = WebGUI::HTMLForm->new($session);
+    my $f       = WebGUI::FormBuilder->new($session);
 
-    $f->template(
+    $f->addField( "Template",
 		name      => "moduleStyleTemplateId",
 		value     => $self->getStyleTemplateId,
 		namespace => "style",
 		label     => $i18n->get("style template label"),
         hoverHelp => $i18n->get("style template hoverHelp")
     );
-    $f->template(
+    $f->addField( "Template",
 		name      => "moduleLayoutTemplateId",
 		value     => $self->getLayoutTemplateId,
 		namespace => "Account/Layout",
 		label     => $i18n->get("layout template label"),
         hoverHelp => $i18n->get("layout template hoverHelp")
     );
-    $f->template(
+    $f->addField( "Template",
 		name      => "moduleViewTemplateId",
 		value     => $self->session->setting->get("moduleViewTemplateId"),
 		namespace => "Account/NewModule/View",
@@ -76,7 +76,7 @@ sub editSettingsForm {
         hoverHelp => $i18n->get("view template hoverHelp")
     );
 
-    return $f->printRowsOnly;
+    return $f;
 }
 
 #-------------------------------------------------------------------

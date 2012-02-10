@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -8,9 +8,7 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
 use WebGUI::Session;
@@ -57,6 +55,7 @@ my $folder1a2 = $folder1a->addChild({
 
 $versionTag->commit;
 
+
 ####################################################
 #
 # trash
@@ -64,11 +63,11 @@ $versionTag->commit;
 ####################################################
 
 is( $topFolder->trash, 1, 'trash: returns 1 if successful' );
-is($topFolder->get('state'),              'trash', '... state set to trash on the trashed asset object');
-is($topFolder->cloneFromDb->get('state'), 'trash', '... state set to trash in db on object');
-is($folder1a->cloneFromDb->get('state'), 'trash-limbo', '... state set to trash-limbo on child #1');
-is($folder1b->cloneFromDb->get('state'), 'trash-limbo', '... state set to trash-limbo on child #2');
-is($folder1a2->cloneFromDb->get('state'), 'trash-limbo', '... state set to trash-limbo on grandchild #1-1');
+is($topFolder->state,              'trash', '... state set to trash on the trashed asset object');
+is($topFolder->cloneFromDb->state, 'trash', '... state set to trash in db on object');
+is($folder1a->cloneFromDb->state, 'trash-limbo', '... state set to trash-limbo on child #1');
+is($folder1b->cloneFromDb->state, 'trash-limbo', '... state set to trash-limbo on child #2');
+is($folder1a2->cloneFromDb->state, 'trash-limbo', '... state set to trash-limbo on grandchild #1-1');
 
 ####################################################
 #

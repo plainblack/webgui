@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -8,9 +8,7 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
 use WebGUI::Session;
@@ -20,13 +18,7 @@ use Test::Deep;
 use Test::MockObject;
 use HTML::TokeParser;
 
-my $numTests = 10;
-
 my @iconTests = fetchTestSet();
-
-$numTests += scalar(@iconTests) * 4;
-
-plan tests => $numTests;
 
 my $session = WebGUI::Test->session;
 
@@ -38,14 +30,13 @@ my $session = WebGUI::Test->session;
 #
 ####################################################
 
-my $origToolbar = $session->user->profileField('toolbar');
-WebGUI::Test->addToCleanup(sub { $session->user->profileField('toolbar', $origToolbar); },);
+my $origToolbar = $session->user->get('toolbar');
+WebGUI::Test->addToCleanup(sub { $session->user->update('toolbar', $origToolbar); },);
 my $toolbars = $session->url->extras('toolbar/');
 
-my $newRequest = Test::MockObject->new;
+my $request = $session->request;
 my $requestedUrl = '/home/depot';
-$newRequest->set_bound('uri', \$requestedUrl);
-$session->{_request} = $newRequest;
+$request->env->{PATH_INFO} = $requestedUrl;
 
 my $i18n = WebGUI::International->new($session, 'Icon');
 
@@ -55,13 +46,13 @@ my $i18n = WebGUI::International->new($session, 'Icon');
 #
 ####################################################
 
-$session->user->profileField('toolbar', 'useLanguageDefault');
+$session->user->update('toolbar', 'useLanguageDefault');
 is($session->icon->getBaseURL, $toolbars.'bullet/', 'getBaseUrl: default English toolbar is bullet');
 
-$session->user->profileField('toolbar', 'mullet');
+$session->user->update('toolbar', 'mullet');
 is($session->icon->getBaseURL, $toolbars.'mullet/', 'getBaseUrl: fetch user preference of mullet toolbar');
 
-$session->user->profileField('toolbar', $origToolbar);
+$session->user->update('toolbar', $origToolbar);
 
 ####################################################
 #
@@ -157,6 +148,7 @@ SKIP: {
 	cmp_bag(\@toolbarDirs, \@toolbarOptionDirs, 'getToolbarOptions');
 }
 
+done_testing;
 
 sub linkAndText {
 	my ($text, $tag, @params) = @_;

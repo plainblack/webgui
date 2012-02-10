@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -8,9 +8,7 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/lib";
 
 use WebGUI::Test;
 use WebGUI::Session;
@@ -34,7 +32,6 @@ $registeredUser->username('TimBob');
 WebGUI::Test->addToCleanup($registeredUser);
 $session->user({user => $registeredUser});
 
-WebGUI::Test->originalConfig('macros');
 ##Overwrite any local configuration so that we know how to call it.
 foreach my $macro (qw/
     GroupText LoginToggle PageTitle MacroStart MacroEnd MacroNest
@@ -43,8 +40,6 @@ foreach my $macro (qw/
 	$session->config->addToHash('macros', $macro, $macro);
 }
 $session->config->addToHash('macros', "Ex'tras", "Extras");
-
-plan tests => 51;
 
 my $macroText = "CompanyName: ^c;";
 my $companyName = $session->setting->get('companyName');
@@ -338,3 +333,31 @@ is (
     '@MacroCall[`1`.` 2`.`3`]:',
     'internal spaces are okay'
 );
+
+my $macroText = 'before ^VisualMacro("1", 2,); after';
+my $macroData;
+WebGUI::Macro::transform($session, \$macroText, sub {
+    $macroData = shift;
+    return "replace";
+});
+
+is (
+    $macroText,
+    'before replace after',
+    'transform replaces macro calls'
+);
+
+is_deeply($macroData, {
+    session => $session,
+    macro => 'VisualMacro',
+    macroPackage => 'WebGUI::Macro::VisualMacro',
+    originalString => '^VisualMacro("1", 2,);',
+    parameters => [
+        '1',
+        ' 2',
+    ],
+    parameterString => '("1", 2,)',
+}, 'transform passes sub correct data');
+
+done_testing;
+

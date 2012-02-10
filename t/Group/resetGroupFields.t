@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -8,9 +8,7 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
 use WebGUI::Session;
@@ -33,7 +31,7 @@ WebGUI::Test->addToCleanup($settingGroup);
 my $activityGroup = WebGUI::Group->new($session, 'new');
 WebGUI::Test->addToCleanup($activityGroup);
 
-my $home = WebGUI::Asset->getDefault($session);
+my $home = WebGUI::Test->asset;
 
 my $snippet1 = $home->addChild({
     className   => 'WebGUI::Asset::Snippet',
@@ -91,7 +89,6 @@ my $workflow  = WebGUI::Workflow->create($session,
 );
 WebGUI::Test->addToCleanup($workflow);
 
-WebGUI::Test->originalConfig('workflowActivities');
 $session->config->addToArray('workflowActivities/User', 'WebGUI::Workflow::Activity::AddUserToGroup');
 
 my $userActivity = $workflow->addActivity('WebGUI::Workflow::Activity::AddUserToGroup');
@@ -107,7 +104,7 @@ is($userActivity->get('groupId'), $activityGroup->getId, 'group in Workflow Acti
 
 $assetGroup->delete;
 
-my $newSnippet1 = WebGUI::Asset->newByDynamicClass($session, $snippet1->getId);
+my $newSnippet1 = WebGUI::Asset->newById($session, $snippet1->getId);
 
 cmp_deeply(
     $newSnippet1->get,
@@ -118,7 +115,7 @@ cmp_deeply(
     'groupIdEdit updated on test snippet'
 );
 
-my $newSnippet2 = WebGUI::Asset->newByDynamicClass($session, $snippet2->getId);
+my $newSnippet2 = WebGUI::Asset->newById($session, $snippet2->getId);
 
 cmp_deeply(
     $newSnippet2->get,
@@ -129,7 +126,7 @@ cmp_deeply(
     'other snippet not touched'
 );
 
-my $newSnippet3 = WebGUI::Asset->newByDynamicClass($session, $snippet3->getId);
+my $newSnippet3 = WebGUI::Asset->newById($session, $snippet3->getId);
 
 cmp_deeply(
     $newSnippet3->get,
@@ -140,7 +137,7 @@ cmp_deeply(
     'multiple fields updated'
 );
 
-my $newGallery1 = WebGUI::Asset->newByDynamicClass($session, $gallery1->getId);
+my $newGallery1 = WebGUI::Asset->newById($session, $gallery1->getId);
 
 cmp_deeply(
     $newGallery1->get,
@@ -177,4 +174,3 @@ $activityGroup->delete;
 my $userActivity2 = WebGUI::Workflow::Activity->new($session, $userActivity->getId);
 is ($userActivity2->get('groupId'), 3, 'group in Workflow Activity set to Admin');
 
-WebGUI::Test->addToCleanup(WebGUI::VersionTag->getWorking($session));

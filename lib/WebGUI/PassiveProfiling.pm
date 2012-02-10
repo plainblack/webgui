@@ -3,7 +3,7 @@ package WebGUI::PassiveProfiling;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -16,7 +16,6 @@ package WebGUI::PassiveProfiling;
 
 
 use strict;
-use Tie::IxHash;
 
 =head1 NAME
 
@@ -59,8 +58,8 @@ sub add {
     my $assetId = shift;
 	$session->db->write("insert into passiveProfileLog (passiveProfileLogId, userId, sessionId, assetId, dateOfEntry) values (?,?,?,?,?)",
                        [
-                        $session->id->generate(),        $session->user->userId,
-                        $session->var->get("sessionId"), $assetId,
+                        $session->id->generate(),  $session->user->userId,
+                        $session->getId,           $assetId,
                         time(),
                        ]);
     return undef;

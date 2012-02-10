@@ -3,7 +3,7 @@ package WebGUI::Asset::Wobject::MultiSearch;
 =head1 LEGAL 
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -19,66 +19,34 @@ package WebGUI::Asset::Wobject::MultiSearch;
 
 use strict;
 
-use Tie::CPHash;
-use Tie::IxHash;
 use JSON;
 use WebGUI::International;
 use WebGUI::SQL;
-use WebGUI::Cache;
 use WebGUI::Asset::Wobject;
-use WebGUI::Utility;
 
-our @ISA = qw(WebGUI::Asset::Wobject);
+use Moose;
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset::Wobject';
+define tableName => 'MultiSearch';
+define assetName => ['assetName', 'Asset_MultiSearch'];
+define icon      => 'multiSearch.gif';
+property cacheTimeout => (
+            tab           => "display",
+            fieldType     => "interval",
+            default       => 3600,
+            uiLevel       => 8,
+            label         => ["cache timeout", 'Asset_MultiSearch'],
+            hoverHelp     => ["cache timeout help", 'Asset_MultiSearch'],
+         );
+property templateId => (
+            fieldType     => "template",
+            tab           => "display",
+            default       => 'MultiSearchTmpl0000001',
+            namespace     => "MultiSearch",
+            hoverHelp     => ['MultiSearch Template description', 'Asset_MultiSearch'],
+            label         => ['MultiSearch Template', 'Asset_MultiSearch'],
+         );
 
-
-#-------------------------------------------------------------------
-
-=head2 definition
-
-defines wobject properties for MultiSearch instances
-
-=cut
-
-sub definition {
-	my $class = shift;
-	my $session = shift;
-	my $definition = shift;
-	my $i18n = WebGUI::International->new($session, "Asset_MultiSearch");
-	my $properties = {
-			cacheTimeout => {
-				tab => "display",
-				fieldType => "interval",
-				defaultValue => 3600,
-				uiLevel => 8,
-				label => $i18n->get("cache timeout"),
-				hoverHelp => $i18n->get("cache timeout help")
-				},
-		templateId =>{
-			fieldType=>"template",
-			tab=>"display",
-			defaultValue=>'MultiSearchTmpl0000001',
-			namespace=>"MultiSearch",
-			hoverHelp=>$i18n->get('MultiSearch Template description'),
-			label=>$i18n->get('MultiSearch Template')
-		},
-#		predefinedSearches=>{
-#			fieldType=>"textarea",
-#			defaultValue=>"WebGUI",
-#			tab=>"properties",
-#			hoverHelp=>$i18n->get('article template description','Asset_Article'),
-#			label=>$i18n->get(72,"Asset_Article")
-#		},
-	};
-	push(@{$definition}, {
-		tableName=>'MultiSearch',
-		className=>'WebGUI::Asset::Wobject::MultiSearch',
-		assetName=>$i18n->get('assetName'),
-		icon=>'multiSearch.gif',
-		autoGenerateForms=>1,
-		properties=>$properties
-	});
-        return $class->SUPER::definition($session, $definition);
-}
 
 #-------------------------------------------------------------------
 
@@ -88,20 +56,20 @@ See WebGUI::Asset::prepareView() for details.
 
 =cut
 
-sub prepareView {
+override prepareView => sub {
     my $self = shift;
-    $self->SUPER::prepareView();
-    my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId"));
+    super();
+    my $template = WebGUI::Asset::Template->newById($self->session, $self->templateId);
     if (!$template) {
         WebGUI::Error::ObjectNotFound::Template->throw(
             error      => qq{Template not found},
-            templateId => $self->get("templateId"),
+            templateId => $self->templateId,
             assetId    => $self->getId,
         );
     }
     $template->prepare($self->getMetaDataAsTemplateVariables);
     $self->{_viewTemplate} = $template;
-}
+};
 
 
 #-------------------------------------------------------------------
@@ -112,11 +80,11 @@ See WebGUI::Asset::purgeCache() for details.
 
 =cut
 
-sub purgeCache {
+override purgeCache => sub {
 	my $self = shift;
-	WebGUI::Cache->new($self->session,"view_".$self->getId)->delete;
-	$self->SUPER::purgeCache;
-}
+	eval{$self->session->cache->remove("view_".$self->getId)};
+	super();
+};
 
 #-------------------------------------------------------------------
 
@@ -129,9 +97,10 @@ to be displayed within the page style
 
 sub view {
 	my $self = shift;	
-	if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
-        my $cache = $self->getCache;
-        my $out   = $cache->get if defined $cache;
+    my $cache = $self->session->cache;
+    my $cacheKey = $self->getWwwCacheKey( 'view' );
+    if (!$self->session->isAdminOn && $self->cacheTimeout > 10) {
+        my $out = eval { $cache->get( $cacheKey ) };
 		return $out if $out;
 	}
 	my $i18n = WebGUI::International->new($self->session, 'Asset_MultiSearch');
@@ -143,10 +112,10 @@ sub view {
 	$var{'submit'} = WebGUI::Form::Submit->new($self->session, {name=>'SearchSubmit',value=>$i18n->get('submit','WebGUI')})->toHtml();
 
        	my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
-	if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
-		WebGUI::Cache->new($self->session,"view_".$self->getId)->set($out,$self->get("cacheTimeout"));
-	}
-       	return $out;
+    if (!$self->session->isAdminOn && $self->cacheTimeout > 10) {
+        eval { $cache->set( $cacheKey, $out, $self->cacheTimeout) };
+    }
+    return $out;
 }
 
 #-------------------------------------------------------------------
@@ -157,10 +126,11 @@ See WebGUI::Asset::Wobject::www_view() for details.
 
 =cut
 
-sub www_view {
+override www_view => sub {
 	my $self = shift;
-	$self->session->http->setCacheControl($self->get("cacheTimeout"));
-	$self->SUPER::www_view(@_);
-}
+	$self->session->response->setCacheControl($self->cacheTimeout);
+	super();
+};
 
+__PACKAGE__->meta->make_immutable;
 1;

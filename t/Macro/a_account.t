@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -8,9 +8,7 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
 use WebGUI::Session;
@@ -25,7 +23,7 @@ my $session = WebGUI::Test->session;
 # <a class="myAccountLink" href="<tmpl_var account.url>"><tmpl_var account.text></a>
 my $template = addTemplate();
 
-my $homeAsset = WebGUI::Asset->getDefault($session);
+my $homeAsset = WebGUI::Test->asset;
 
 $session->asset($homeAsset);
 
@@ -84,22 +82,18 @@ foreach my $testSet (@testSets) {
 
 sub addTemplate {
 	$session->user({userId=>3});
-	my $importNode = WebGUI::Asset->getImportNode($session);
-	my $versionTag = WebGUI::VersionTag->getWorking($session);
-	$versionTag->set({name=>"a_account test"});
+	my $importNode = WebGUI::Test->asset;
 	my $properties = {
 		title => 'a_account test template',
 		className => 'WebGUI::Asset::Template',
 		parser    => 'WebGUI::Asset::Template::HTMLTemplate',
 		url => 'a_account-test',
 		namespace => 'Macro/a_account',
-		template => "HREF=<tmpl_var account.url>\nLABEL=<tmpl_var account.text>",
+		template => "HREF=<tmpl_var account_url>\nLABEL=<tmpl_var account_text>",
 		id => 'testTemplatea_account1',
         usePacked => 1,
 	};
 	my $template = $importNode->addChild($properties, $properties->{id});
-	$versionTag->commit;
-    addToCleanup($versionTag);
 	return $template;
 }
 

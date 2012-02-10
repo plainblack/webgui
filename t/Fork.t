@@ -1,6 +1,6 @@
 # vim:syntax=perl
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -39,7 +39,7 @@ my $request = $process->request( $testClass, 'simple', ['data'] );
 
 cmp_bag(
     [ keys %$request ],
-    [qw(webguiRoot configFile sessionId id module subname data)],
+    [qw(configFile sessionId id module subname data)],
     'request hash has the right keys'
 );
 
@@ -100,6 +100,8 @@ is $forkCount, 0, 'we did not fork';
 close $pipe;
 backgroundTest('On-demand fork');
 is $forkCount, 1, 'we did fork';
+
+ok(WebGUI::Test->waitForAllForks(10), "Forks finished");
 
 done_testing;
 

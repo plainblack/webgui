@@ -1,6 +1,6 @@
 # vim:syntax=perl
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -13,21 +13,19 @@
 # 
 #
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../../../lib";
 use Test::More;
 use Test::Deep;
 use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
 
+my $addArgs = { skipNotifications => 1, skipAutoCommitWorkflows => 1, };
+
 #----------------------------------------------------------------------------
 # Init
 my $session         = WebGUI::Test->session;
-my @versionTags     = ( WebGUI::VersionTag->getWorking( $session ) );
-WebGUI::Test->addToCleanup($versionTags[-1]);
-my @addChildArgs    = ( {skipAutoCommitWorkflows=>1} );
-my $collab          = WebGUI::Asset->getImportNode( $session )->addChild({
+my $tag = WebGUI::VersionTag->getWorking($session);
+my $collab          = WebGUI::Test->asset->addChild({
     className       => 'WebGUI::Asset::Wobject::Collaboration',
     threadsPerPage  => 20,
 });
@@ -38,29 +36,34 @@ my @threads = (
         title           => "X - Foo",
         isSticky        => 0,
         threadRating    => 4,
-    }, undef, 1, @addChildArgs),
+    }, undef, 1, $addArgs ),
     $collab->addChild( {
         className       => 'WebGUI::Asset::Post::Thread',
         title           => "W - Bar",
         isSticky        => 0,
         threadRating    => 2,
-    }, undef, 2,  @addChildArgs),
+    }, undef, 2, $addArgs ),
     $collab->addChild( {
         className       => 'WebGUI::Asset::Post::Thread',
         title           => "Z - Baz",
         isSticky        => 1,
         threadRating    => 6,
-    }, undef, 3, @addChildArgs),
+    }, undef, 3, $addArgs ),
     $collab->addChild( {
         className       => 'WebGUI::Asset::Post::Thread',
         title           => "Y - Shank",
         isSticky        => 1,
         threadRating    => 5,
-    }, undef, 4, @addChildArgs),
+    }, undef, 4, $addArgs ),
 );
 
+
 $_->setSkipNotification for @threads; # 100+ messages later...
-$versionTags[-1]->commit;
+$tag->commit;
+
+foreach my $asset ($collab, @threads) {
+    $asset = $asset->cloneFromDb;
+}
 
 #----------------------------------------------------------------------------
 # Tests
@@ -88,13 +91,16 @@ $session->db->write(
     'UPDATE Collaboration SET sortBy=NULL,sortOrder=NULL WHERE assetId=?',
     [$collab->getId]
 );
-my $collab2 = WebGUI::Asset::Wobject::Collaboration->new( $session, $collab->getId );
+my $collab2 = WebGUI::Asset::Wobject::Collaboration->newById( $session, $collab->getId );
 $p      = $collab2->getThreadsPaginator;
 $page   = $p->getPageData;
 $expect = sortThreads( sub { $b->get('revisionDate') <=> $a->get('revisionDate') }, @threads );
 cmp_deeply( $page, $expect, 'getThreadsPaginator sort by no default' )
 or diag( "GOT: " . Dumper $page ), diag( "EXPECTED: " . Dumper $expect );
 undef $collab2;
+# clear scratch to reset sort
+$session->scratch->delete($collab->getId.'_sortBy');
+$session->scratch->delete($collab->getId.'_sortDir');
 
 # sortBy default from asset
 $collab->update({ 

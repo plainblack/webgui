@@ -3,7 +3,7 @@ package WebGUI::Form::Hexadecimal;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -118,7 +118,7 @@ A class method that returns a boolean indicating whether this control is compati
 
 sub headTags {
     my $self = shift;
-	$self->session->style->setScript($self->session->url->extras('inputCheck.js'),{ type=>'text/javascript' });
+	$self->session->style->setScript($self->session->url->extras('inputCheck.js'));
 }
 
 #-------------------------------------------------------------------

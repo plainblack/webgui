@@ -4,7 +4,7 @@ package WebGUI::Workflow::Activity::NotifyAdminsWithOpenVersionTags;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -86,7 +86,7 @@ sub execute {
         SELECT email, count(distinct(tagId)) AS count
         FROM assetVersionTag
         JOIN assetData USING (tagId)
-        JOIN userProfileData ON assetVersionTag.createdBy = userProfileData.userId
+        JOIN users ON assetVersionTag.createdBy = users.userId
         WHERE isCommitted = 0
         AND DATE_ADD(FROM_UNIXTIME(creationDate), INTERVAL $daysLeftOpen DAY) < NOW()
         GROUP BY userId
@@ -108,7 +108,7 @@ sub _notify {
     my $i18n = shift;
     
     my $hostname = $self->session->config->get('sitename')->[0];
-    my($from)    = $self->session->db->quickScalar(" SELECT email FROM userProfileData WHERE userId = 3 ");
+    my($from)    = $self->session->db->quickScalar(" SELECT email FROM users WHERE userId = 3 ");
 
     my $s = $dataHashRef->{count} > 1 ? 's' : '';
     my $subject = sprintf($i18n->get('email subject'), $s, $hostname);

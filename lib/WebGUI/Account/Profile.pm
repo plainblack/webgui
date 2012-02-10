@@ -7,7 +7,7 @@ use WebGUI::International;
 use WebGUI::Pluggable;
 use WebGUI::ProfileCategory;
 use WebGUI::ProfileField;
-use WebGUI::Utility;
+use WebGUI::Shop::AddressBook;
 use base qw/WebGUI::Account/;
 
 =head1 NAME
@@ -114,7 +114,7 @@ sub appendCommonVars {
     $self->SUPER::appendCommonVars($var);
 
     $var->{'edit_profile_url'     } = $self->getUrl("module=profile;do=edit");
-    $var->{'invitations_enabled'  } = $user->profileField('ableToBeFriend');
+    $var->{'invitations_enabled'  } = $user->get('ableToBeFriend');
     $var->{'profile_category_loop'} = [];
 
     #Append the categories
@@ -147,37 +147,37 @@ sub editSettingsForm {
     my $session = $self->session;
     my $setting = $session->setting;
     my $i18n    = WebGUI::International->new($session,'Account_Profile');
-    my $f       = WebGUI::HTMLForm->new($session);
+    my $f       = WebGUI::FormBuilder->new($session);
 
-	$f->template(
+	$f->addField( "template",
 		name      => "profileStyleTemplateId",
 		value     => $self->getStyleTemplateId,
 		namespace => "style",
 		label     => $i18n->get("profile style template label"),
         hoverHelp => $i18n->get("profile style template hoverHelp")
 	);
-	$f->template(
+	$f->addField( "template",
 		name      => "profileLayoutTemplateId",
 		value     => $self->getLayoutTemplateId,
 		namespace => "Account/Layout",
 		label     => $i18n->get("profile layout template label"),
         hoverHelp => $i18n->get("profile layout template hoverHelp")
 	);
-	$f->template(
+	$f->addField( "template",
         name      => "profileEditTemplateId",
         value     => $self->getEditTemplateId,
         namespace => "Account/Profile/Edit",
         label     => $i18n->get("profile edit template label"),
         hoverHelp => $i18n->get("profile edit template hoverHelp")
 	);
-    $f->template(
+    $f->addField( "template",
         name      => "profileViewTemplateId",
         value     => $self->getViewTemplateId,
         namespace => "Account/Profile/View",
         label     => $i18n->get("profile view template label"),
         hoverHelp => $i18n->get("profile view template hoverHelp")
 	);
-    $f->template(
+    $f->addField( "template",
         name      => "profileErrorTemplateId",
         value     => $self->getErrorTemplateId,
         namespace => "Account/Profile/Error",
@@ -186,7 +186,7 @@ sub editSettingsForm {
 	);
 
 
-    return $f->printRowsOnly;
+    return $f;
 }
 
 
@@ -243,9 +243,9 @@ sub getExtrasStyle {
     my $requiredStyle    = q{class="profilefield_required"};
     my $errorStyle       = q{class="profilefield_error"};     #Required Field Not Filled In and Error Returend
 
-    return $errorStyle if(WebGUI::Utility::isIn($field->getId,@{$fieldErrors}));
+    return $errorStyle if $field->getId ~~ $fieldErrors;
     return "" unless ($field->isRequired);
-    return $requiredStyle unless($self->session->user->profileField($field->getId) || $fieldValue);
+    return $requiredStyle unless($self->session->user->get($field->getId) || $fieldValue);
     return $requiredStyleOff;
 }
 
@@ -360,7 +360,7 @@ sub www_edit {
         foreach my $field (@{ $category->getFields( { editable => 1 } ) }) {
             my $fieldId             = $field->getId;
             my $fieldLabel          = $field->getLabel;
-            my $fieldForm           = $field->formField({ extras=>$self->getExtrasStyle($field,\@errorFields,$user->profileField($fieldId)) });
+            my $fieldForm           = $field->formField({ extras=>$self->getExtrasStyle($field,\@errorFields,$user->get($fieldId)) });
             my $fieldRequired       = $field->isRequired;
             my $fieldExtras         = $field->getExtras;
             my $fieldViewable       = $field->isViewable;
@@ -463,9 +463,7 @@ sub www_editSave {
             if($e = WebGUI::Error->caught('WebGUI::Error::ObjectNotFound')) {
                 #Get home address only mappings to avoid creating addresses with just firstName, lastName, email
                 my %home_address_map = %{$address_mappings};
-                foreach my $exclude ( qw{ firstName lastName email } ) {
-                    delete $home_address_map{$exclude};
-                }
+                delete $home_address_map{qw/firstName lastName email/};
                 #Add the profile address for the user if there are homeAddress fields
                 if( grep { $address->{$_} } values %home_address_map ) {
                     $address->{label} = "Profile Address";
@@ -524,7 +522,7 @@ sub www_view {
 
     $self->appendCommonVars($var);
 
-    my $privacySetting = $user->profileField('publicProfile') || 'none';
+    my $privacySetting = $user->get('publicProfile') || 'none';
     $var->{"profile_privacy_$privacySetting"} = "true";
 
     $var->{'acceptsPrivateMessages'} 
@@ -553,7 +551,7 @@ sub www_view {
             my $fieldId            = $field->getId;
             my $fieldLabel         = $field->getLabel;
             my $fieldValue         = $field->formField(undef,2,$user);
-            my $fieldRaw           = $user->profileField($fieldId);;
+            my $fieldRaw           = $user->get($fieldId);;
             #Create a seperate template var for each field
             my $fieldBase = 'profile_field_'.$fieldId;
             $var->{$fieldBase.'_label'                          } = $fieldLabel;

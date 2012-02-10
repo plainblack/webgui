@@ -1,7 +1,7 @@
 package WebGUI::Macro::Env;
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -32,7 +32,8 @@ then undef will be returned.
 #-------------------------------------------------------------------
 sub process {
 	my $session = shift;
-	return $session->env->get(shift);
+    my $key     = shift;
+	return $session->request->env->{$key};
 }
 
 1;

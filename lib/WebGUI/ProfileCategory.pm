@@ -3,7 +3,7 @@ package WebGUI::ProfileCategory;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -151,7 +151,7 @@ sub getCategories {
     my $bindvars    = [];
 
     foreach my $key (keys %{$options}) {
-        next unless WebGUI::Utility::isIn($key,qw(editable visible));
+        next unless $key ~~ [qw(editable visible)];
         $whereClause .= " and" unless ($whereClause eq "");
         $whereClause .= " $key=?";
         push(@{$bindvars},$options->{$key});
@@ -214,7 +214,7 @@ sub getFields {
 
     foreach my $key (keys %{$options}) {
         #Skip bad stuff that will crash the query
-        next unless WebGUI::Utility::isIn($key,qw(editable visible required));
+        next unless $key ~~ [qw(editable visible required)];
         $whereClause .= " and $key=?";
         push(@{$bindvars},$options->{$key});
     }

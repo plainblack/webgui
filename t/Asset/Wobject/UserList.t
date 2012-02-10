@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -8,10 +8,8 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use FindBin;
 use strict;
 use File::Spec;
-use lib "$FindBin::Bin/../../lib";
 
 ##The goal of this test is to test the creation of UserList Wobjects.
 
@@ -23,11 +21,7 @@ use WebGUI::Asset::Wobject::UserList;
 my $session = WebGUI::Test->session;
 
 # Do our work in the import node
-my $node = WebGUI::Asset->getImportNode($session);
-
-my $versionTag = WebGUI::VersionTag->getWorking($session);
-$versionTag->set({name=>"UserList Test"});
-WebGUI::Test->addToCleanup($versionTag);
+my $node = WebGUI::Test->asset;
 my $userList = $node->addChild({className=>'WebGUI::Asset::Wobject::UserList'});
 
 # Test for a sane object type

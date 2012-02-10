@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -11,22 +11,12 @@
 #-------------------------------------------------------------------
 
 use strict;
-use File::Basename ();
-use File::Spec;
-
-my $webguiRoot;
-BEGIN {
-    $webguiRoot = File::Spec->rel2abs(File::Spec->catdir(File::Basename::dirname(__FILE__), File::Spec->updir));
-    unshift @INC, File::Spec->catdir($webguiRoot, 'lib');
-}
-
-$| = 1;
-
 use Getopt::Long;
 use Pod::Usage;
+use WebGUI::Paths -inc;
 use WebGUI::Session;
-use WebGUI::Utility;
 
+$| = 1;
 my $configFile;
 my $help;
 my $quiet;
@@ -41,7 +31,7 @@ pod2usage( verbose => 2 ) if $help;
 pod2usage() unless (defined($configFile) && $configFile ne '');
 
 print "Starting..." unless ($quiet);
-my $session = WebGUI::Session->open($webguiRoot,$configFile);
+my $session = WebGUI::Session->open($configFile);
 # We might take a while, reconnect if we get disconnected for inactivity
 $session->db->dbh->{mysql_auto_reconnect} = 1;
 print "OK\n" unless ($quiet);
@@ -54,7 +44,7 @@ print "\nLooking for orphans...\n" unless ($quiet);
 my $orphansFound = 0;
 my $rs = $session->db->read("select assetId from asset order by lineage");
 while (my ($id) = $rs->array) {
-	unless (isIn($id, @found)) {
+	unless ($id ~~ @found) {
 		print "\tFound an orphan with an assetId of $id. Moving it to the import node.\n";
 		$session->db->write("update asset set parentId='PBasset000000000000002' where assetId=?",[$id]);
 		getDescendants($id);
@@ -91,7 +81,7 @@ print "\nDon't forget to clear your cache.\n" unless ($quiet);
 sub getDescendants {
 	my $parentId = shift;
     my $depth = shift || 0;
-    if (isIn($parentId, @found)) {
+    if ($parentId ~~ @found) {
 		print "\nFound circular relationships involving $parentId. This requires manual intervention.\n" unless ($quiet);
 		exit;
 	}
@@ -177,6 +167,6 @@ Shows this documentation, then exits.
 
 =head1 AUTHOR
 
-Copyright 2001-2009 Plain Black Corporation.
+Copyright 2001-2012 Plain Black Corporation.
 
 =cut

@@ -1,7 +1,7 @@
 package WebGUI::Operation::Group;
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -11,7 +11,6 @@ package WebGUI::Operation::Group;
 #-------------------------------------------------------------------
 
 use strict;
-use Tie::CPHash;
 use WebGUI::AdminConsole;
 use WebGUI::Group;
 use WebGUI::Form;
@@ -21,7 +20,7 @@ use WebGUI::Mail::Send;
 use WebGUI::Operation::User;
 use WebGUI::Paginator;
 use WebGUI::SQL;
-use WebGUI::Utility;
+use Tie::IxHash;
 
 #----------------------------------------------------------------------------
 sub _submenu {

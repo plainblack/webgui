@@ -1,6 +1,6 @@
 # vim:syntax=perl
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -13,9 +13,7 @@
 # 
 #
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../lib";
 use Test::More;
 use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
@@ -37,7 +35,7 @@ my $ldapProps   = WebGUI::Test->getSmokeLDAPProps();
 
 $session->db->setRow("ldapLink","ldapLinkId",$ldapProps, $ldapProps->{ldapLinkId});
 my $ldapLink        = WebGUI::LDAPLink->new( $session, $ldapProps->{ldapLinkId} );
-addToCleanup($ldapLink);
+WebGUI::Test->addToCleanup($ldapLink);
 my $ldap            = $ldapLink->bind;
 $session->setting->set('ldapConnection', $ldapProps->{ldapLinkId} );
 
@@ -47,7 +45,7 @@ $ldapGroup->set( "ldapLinkId", $ldapProps->{ldapLinkId} );
 $ldapGroup->set( "ldapGroup", "cn=Convicts,o=shawshank" );
 $ldapGroup->set( "ldapGroupProperty", "member" );
 $ldapGroup->set( "ldapRecursiveProperty", "uid" );
-addToCleanup($ldapGroup);
+WebGUI::Test->addToCleanup($ldapGroup);
 
 #----------------------------------------------------------------------------
 # Test Login of existing user
@@ -58,17 +56,17 @@ $user->update({
     username        => "Andy Dufresne",
 });
 my $auth    = $user->authInstance;
-$auth->saveParams( $user->getId, $user->get('authMethod'), {
+$auth->update( 
     ldapUrl         => $ldapProps->{ldapUrl},
     connectDN       => "uid=Andy Dufresne,o=shawshank",
     ldapConnection  => $ldapProps->{ldapLinkId},
-} );
+);
 
 $session->request->setup_body({
     username        => 'Andy Dufresne',
     identifier      => 'AndyDufresne',
 });
-my $out = $auth->login();
+my $out = $auth->www_login();
 
 is( $session->user->getId, $user->getId, 'Andy is logged in' );
 
@@ -85,7 +83,7 @@ $session->request->setup_body({
 });
 $auth   = WebGUI::Auth::LDAP->new( $session, 'LDAP' );
 
-$out = $auth->createAccountSave;
+$out = $auth->www_createAccountSave;
 
 is( $session->user->get('username'), 'Ellis Redding', 'Ellis was created' );
 WebGUI::Test->addToCleanup( $session->user );
@@ -101,7 +99,7 @@ $session->request->setup_body({
     identifier      => 'BogsDiamond',
 });
 $auth   = WebGUI::Auth::LDAP->new( $session, 'LDAP' );
-$out    = $auth->login;
+$out    = $auth->www_login;
 
 is( $session->user->get('username'), 'Bogs Diamond', 'Bogs was created' )
 or diag( $auth->error );
@@ -134,10 +132,10 @@ $session->request->setup_body({
     identifier      => 'BrooksHatley',
 });
 $auth   = WebGUI::Auth::LDAP->new( $session, 'LDAP' );
-$out    = $auth->login;
+$out    = $auth->www_login;
 is $session->user->get('username'), 'Brooks Hatley', 'Brooks was created';
 cmp_deeply(
-    $auth->getParams,
+    $auth->get,
     {
         connectDN      => 'uid=Brooks Hatley,o=shawshank',
         ldapConnection => '00000000000000testlink',
@@ -146,7 +144,7 @@ cmp_deeply(
     'authentication information set after creating account'
 );
 WebGUI::Test->addToCleanup( $session->user, );
-$out    = $auth->logout;
+$out    = $auth->www_logout;
 is $session->user->get('username'), 'Visitor', 'Brooks was logged out';
 
 $ldap->moddn( 'uid=Brooks Hatley,o=shawshank',
@@ -167,10 +165,10 @@ $session->request->setup_body({
 });
 
 $auth   = WebGUI::Auth::LDAP->new( $session, 'LDAP' );
-$out    = $auth->login;
+$out    = $auth->www_login;
 is $session->user->get('username'), 'Brooks Hatley', 'Brooks was logged in after name change';
 cmp_deeply(
-    $auth->getParams,
+    $auth->get,
     {
         connectDN      => 'uid=Brooks Hatlen,o=shawshank',
         ldapConnection => '00000000000000testlink',

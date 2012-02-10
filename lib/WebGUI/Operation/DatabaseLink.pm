@@ -1,7 +1,7 @@
 package WebGUI::Operation::DatabaseLink;
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -11,7 +11,6 @@ package WebGUI::Operation::DatabaseLink;
 #-------------------------------------------------------------------
 
 use strict;
-use Tie::CPHash;
 use WebGUI::AdminConsole;
 use WebGUI::DatabaseLink;
 use WebGUI::Exception;
@@ -157,7 +156,6 @@ sub www_editDatabaseLink {
 	my $session = shift;
         return $session->privilege->insufficient unless canView($session);
         my ($output, %db, $f);
-	tie %db, 'Tie::CPHash';
 	if ($session->form->process("dlid") eq "new") {
 		# Default values are SELECT, DESCRIBE and SHOW
 		$db{allowedKeywords} = "select\ndescribe\nshow";		

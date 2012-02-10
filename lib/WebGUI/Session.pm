@@ -3,7 +3,7 @@ package WebGUI::Session;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -15,26 +15,29 @@ package WebGUI::Session;
 =cut
 
 use strict;
-use Scalar::Util qw( weaken );
+use 5.010;
+
+use CHI;
+use File::Temp qw( tempdir );
+use HTTP::Message::PSGI;
+use HTTP::Request::Common;
 use WebGUI::Config;
 use WebGUI::SQL;
 use WebGUI::User;
 use WebGUI::Session::DateTime;
-use WebGUI::Session::Env;
-use WebGUI::Session::ErrorHandler;
+use WebGUI::Session::Log;
 use WebGUI::Session::Form;
 use WebGUI::Session::Http;
 use WebGUI::Session::Icon;
 use WebGUI::Session::Id;
-use WebGUI::Session::Os;
 use WebGUI::Session::Output;
 use WebGUI::Session::Privilege;
+use WebGUI::Session::Request;
 use WebGUI::Session::Scratch;
 use WebGUI::Session::Setting;
 use WebGUI::Session::Stow;
 use WebGUI::Session::Style;
 use WebGUI::Session::Url;
-use WebGUI::Session::Var;
 
 =head1 NAME
 
@@ -50,7 +53,7 @@ B<NOTE:> It is important to distinguish the difference between a WebGUI session 
 
  use WebGUI::Session;
 
- $session = WebGUI::Session->open($webguiRoot, $configFile);
+ $session = WebGUI::Session->open($configFile);
  $sessionId = $session->getId;
  ($form, $db, $user) = $session->quick("form", "db", "user");
  $session->close;
@@ -60,25 +63,22 @@ B<NOTE:> It is important to distinguish the difference between a WebGUI session 
  $session->datetime
  $session->db
  $session->dbSlave
- $session->env
  $session->log
  $session->form
  $session->http
  $session->icon
  $session->id
  $session->output
- $session->os
  $session->privilege
  $session->request
+ $session->response
  $session->scratch
- $session->server
  $session->setting
  $session->stow
  $session->style
  $session->url
  $session->user
- $session->var
- 
+
 
 =head1 METHODS
 
@@ -110,6 +110,50 @@ sub asset {
 
 #-------------------------------------------------------------------
 
+=head2 cache ( ) 
+
+Returns a CHI object, configured according to the settings in the config file.
+
+=cut
+
+sub cache {
+    my $self = shift;
+    unless (exists $self->{_cache}) {
+        my $cacheConf    = $self->config->get('cache') || { driver => "Memory", global => 1 };
+
+        # Default values
+        my $resolveConf = sub {
+            my ($config) = @_;
+            given ( $config->{driver} ) {
+                when ( /DBI/ ) {
+                    $config->{ dbh } = $self->db->dbh;
+                    continue;
+                }
+                when ( /File|FastMmap|BerkeleyDB/ ) {
+                    $config->{ root_dir } ||= tempdir();
+                    continue;
+                }
+                when ( /FastMmap/ ) {
+                    #$config->{ cache_size } = '64m';
+                    continue;
+                }
+            }
+            $config->{namespace} ||= $self->config->get('sitename')->[0];
+        };
+
+        $resolveConf->( $cacheConf );
+        if ( $cacheConf->{l1_cache} ) {
+            $resolveConf->( $cacheConf->{l1_cache} );
+        }
+
+        my $cache   = CHI->new( %{$cacheConf} );
+        $self->{_cache} = $cache;
+    }
+    return $self->{_cache};
+}
+
+#-------------------------------------------------------------------
+
 =head2 clearAsset ( )
 
 Clears out the session asset.
@@ -135,10 +179,23 @@ sub close {
 
 	# Kill circular references.  The literal list is so that the order
 	# can be explicitly shuffled as necessary.
-        # XXX Is this necessary when we have weakened session refs?
-	foreach my $key (qw/_asset _datetime _icon _slave _db _env _form _http _id _output _os _privilege _scratch _setting _stow _style _url _user _var _errorHandler /) {
+	foreach my $key (qw/_asset _datetime _icon _slave _db _form _http _id _output _privilege _scratch _setting _stow _style _url _user _cache _log _response _request/) {
 		delete $self->{$key};
 	}
+    $self->{closed} = 1;
+}
+
+#-------------------------------------------------------------------
+
+=head2 closed
+
+Returns true if this session has been closed.
+
+=cut
+
+sub closed {
+    my $self = shift;
+    return $self->{closed};
 }
 
 #-------------------------------------------------------------------
@@ -187,11 +244,11 @@ sub db {
 	my $self = shift;
 	my $skipFatal = shift;
 	unless (exists $self->{_db}) {
-		my $db = WebGUI::SQL->connect($self,$self->config->get("dsn"), $self->config->get("dbuser"), $self->config->get("dbpass"));
+		my $db = WebGUI::SQL->connect($self->config->get("dsn"), $self->config->get("dbuser"), $self->config->get("dbpass"));
 		if (!defined $db && defined $self->config->get("failoverdb")) {
-			$self->errorHandler->warn("Main DB down, resorting to using failover.");
+			$self->log->warn("Main DB down, resorting to using failover.");
 			my $failover = $self->config->get("failoverdb");
-			$db = WebGUI::SQL->connect($self,$failover->{dsn}, $failover->{user}, $failover->{password});
+			$db = WebGUI::SQL->connect($failover->{dsn}, $failover->{user}, $failover->{password});
 		}
 		if (defined $db) {
 			$self->{_db} = $db;
@@ -201,7 +258,7 @@ sub db {
 				return undef;
 			}
 			else { 	
-				$self->errorHandler->fatal("Couldn't connect to WebGUI database, and can't continue without it.");
+				$self->log->fatal("Couldn't connect to WebGUI database, and can't continue without it.");
 			}
 		}
 	}
@@ -218,7 +275,7 @@ Returns a random slave database handler, if one is defined, otherwise it returns
 
 sub dbSlave {
 	my $self = shift;
-    return $self->db if $self->var->isAdminOn;
+    return $self->db if $self->isAdminOn;
 	unless (exists $self->{_slave}) {
 		my @slaves = ();
 		foreach (1..3) {
@@ -229,7 +286,7 @@ sub dbSlave {
 		}
         if (scalar @slaves > 0) {
             my $slave = $slaves[rand @slaves];
-            $self->{_slave} = WebGUI::SQL->connect($self, $slave->{dsn},$slave->{user},$slave->{pass});
+            $self->{_slave} = WebGUI::SQL->connect($slave->{dsn},$slave->{user},$slave->{pass});
         }
 	}
     if (!exists $self->{_slave}) {
@@ -265,9 +322,7 @@ Creates a new session using the same WebGUI root, config file, and user.
 sub duplicate {
     my $self = shift;
     my $newSession = WebGUI::Session->open(
-        $self->config->getWebguiRoot,
-        $self->config->getFilename,
-        undef,
+        $self->config,
         undef,
         $self->getId,
     );
@@ -277,20 +332,20 @@ sub duplicate {
 
 #-------------------------------------------------------------------
 
-=head2 env ( )
+=head2 end ( )
 
-Returns a WebGUI::Session::Env object.
+Removes the specified session from memory and database.
 
 =cut
 
-sub env {
-	my $self = shift;
-	unless (exists $self->{_env}) {
-		$self->{_env} = WebGUI::Session::Env->new;
-	}
-	return $self->{_env};
+sub end {
+    my $self = shift;
+    my $id = $self->getId;
+    $self->cache->remove($id);
+    $self->scratch->deleteAll;
+    $self->db->write("delete from userSession where sessionId=?",[$id]);
+    delete $self->{_user};
 }
-
 
 #-------------------------------------------------------------------
 
@@ -319,6 +374,51 @@ sub form {
 		$self->{_form} = WebGUI::Session::Form->new($self);
 	}
 	return $self->{_form};
+}
+
+#-------------------------------------------------------------------
+
+=head2 get ( varName )
+
+Retrieves the current value of a session variable.
+
+=head3 varName
+
+The name of the variable.
+
+=head4 lastIP
+
+The last IP address the user came from.
+
+=head4 lastPageView
+
+The epoch date of the last interaction with the session.
+
+=head4 userId
+
+The unique id of the user this session currently bound to.
+
+=head4 adminOn
+
+A boolean indicating whether this session has admin mode enabled or not.
+
+=head4 sessionId
+
+The sessionId associated with this session.
+
+=head4 expires
+
+The epoch date when this user session will expire if it's not accessed again by then.
+
+=cut
+
+sub get {
+	my $self    = shift;
+	my $varName = shift;
+    if ($varName) {
+        return $self->{_var}{$varName};
+    }
+    return $self->{_var};
 }
 
 #-------------------------------------------------------------------
@@ -392,7 +492,7 @@ Returns a reference to the WebGUI::Session::Id object.
 sub id {
 	my $self = shift;
 	unless ($self->{_id}) {
-		$self->{_id} = WebGUI::Session::Id->new($self);
+		$self->{_id} = WebGUI::Session::Id->new($self->config->getFilename);
 	}
 	return $self->{_id};
 }
@@ -400,67 +500,121 @@ sub id {
 
 #-------------------------------------------------------------------
 
+=head2 isAdminOn  ( )
+
+Returns a boolean indicating whether admin mode is on or not.
+
+=cut
+
+sub isAdminOn {
+        my $self = shift;
+        return $self->get("adminOn");
+}
+
+#-------------------------------------------------------------------
+
 =head2 log ( )
 
-Returns a WebGUI::Session::ErrorHandler object, which is used for logging.
+Returns a WebGUI::Session::Log object, which is used for logging.
 
 =cut
 
 sub log {
 	my $self = shift;
-	unless (exists $self->{_errorHandler}) {
-		$self->{_errorHandler}  = WebGUI::Session::ErrorHandler->new($self);
+	unless (exists $self->{_log}) {
+		$self->{_log}  = WebGUI::Session::Log->new($self);
 	}
-	return $self->{_errorHandler};
+	return $self->{_log};
 }
 
 #-------------------------------------------------------------------
 
-=head2 open ( webguiRoot, configFile [, requestObject, serverObject, sessionId, noFuss ] )
+=head2 open ( configFile [, env, sessionId, noFuss ] )
 
 Constructor. Opens a closed ( or new ) WebGUI session.
 
-=head3 webguiRoot
-
-The path to the WebGUI files.
-
 =head3 configFile
 
-The filename of the config file that WebGUI should operate from.
+The filename of the config file that WebGUI should operate from, or a WebGUI::Config object
 
-=head3 requestObject
+=head3 env
 
-The Apache request object (aka $r). If this session is being instanciated from the web, this is required.
-
-=head3 serverObject
-
-The Apache server object (Apache2::ServerUtil). If this session is being instanciated from the web, this is required.
+The L<PSGI> env hash. If this session is being instanciated from the web, this is required.
 
 =head3 sessionId
 
 Optionally retrieve a specific session id. Normally this is set by a cookie in the user's browser.
+If you have a L<PSGI> env hash, you might find the sessionId at: $env->{'psgix.session'}->id
 
 =head3 noFuss
 
-Uses simple session vars. See WebGUI::Session::Var::new() for more details.
+Uses simple session vars. See WebGUI::Session->open() for more details.
 
 =cut
 
 sub open {
-	my $class = shift;
-	my $webguiRoot = shift;
-	my $configFile = shift;
-	my $request = shift;
-	my $server = shift;
-	my $config = WebGUI::Config->new($webguiRoot,$configFile);
-	my $self = {_config=>$config, _server=>$server};
-	bless $self , $class;
-	$self->{_request} = $request if (defined $request);
-	my $sessionId = shift || $self->http->getCookies->{$config->getCookieName} || $self->id->generate;
-	$sessionId = $self->id->generate unless $self->id->valid($sessionId);
-	my $noFuss = shift;
-	$self->{_var} = WebGUI::Session::Var->new($self,$sessionId, $noFuss);
-	$self->errorHandler->warn("You've disabled cache in your config file and that can cause many problems on a production site.") if ($config->get("disableCache"));
+    my ($class, $c, $env, $sessionId, $noFuss) = @_;
+    my $config = ref $c ? $c : WebGUI::Config->new($c);
+    my $self = { _config => $config };
+    bless $self, $class;
+
+    ##No env was passed, so construct one
+    if (! $env) {
+        my $url = 'http://' . $config->get('sitename')->[0];
+        my $request = HTTP::Request::Common::GET($url);
+        $request->headers->user_agent('WebGUI');
+        $env = $request->to_psgi;
+    }
+
+    my $request = WebGUI::Session::Request->new($env);
+    $self->{_request} = $request;
+    ##Set defaults
+    $self->{_response} = $request->new_response( 200 );
+    $self->{_response}->content_type('text/html; charset=UTF-8');
+    $self->{_response}->session( $self );
+
+    # Use the WebGUI::Session::Request object to look up the sessionId from cookies, if it
+    # wasn't given explicitly
+    $sessionId ||= $request->cookies->{$config->getCookieName};
+
+    # If the sessionId is still unset or is invalid, generate a new one
+    if (!$sessionId || !$self->id->valid($sessionId)) {
+        $sessionId = $self->id->generate;
+    }
+    $self->{_var} = $self->cache->get($sessionId);
+    unless ($self->{_var}{sessionId} eq $sessionId) {
+        $self->{_var} = $self->db->quickHashRef("select * from userSession where sessionId=?", [$sessionId]);
+    }
+    ##We have to make sure that the session variable has a sessionId, otherwise downstream users of
+    ##the object will break
+    if ($noFuss && $self->{_var}{sessionId}) {
+        $self->{_sessionId} = $self->{_var}{sessionId};
+        return $self;
+    }
+    if ($self->{_var}{expires} && $self->{_var}{expires} < time()) { ##Session expired, start a new one with the same Id, as visitor
+        $self->end;
+        $self->start(1, $sessionId);
+    }
+    elsif ($self->{_var}{sessionId} ne "") { ##Fetched an existing session.  Update variables with recent data.
+        my $time = time();
+        my $timeout = $self->setting->get("sessionTimeout");
+        $self->{_sessionId}         = $self->{_var}{sessionId};
+        $self->{_var}{lastPageView} = $time;
+        $self->{_var}{lastIP}       = $self->request->address;
+        $self->{_var}{expires}      = $time + $timeout;
+        if ($self->{_var}{nextCacheFlush} > 0 && $self->{_var}{nextCacheFlush} < $time) {
+            delete $self->{_var}{nextCacheFlush};
+            $self->db->setRow("userSession","sessionId",$self->{_var});
+        }
+        else {
+            $self->{_var}{nextCacheFlush} = $time + $self->config->get("hotSessionFlushToDb");
+            $self->cache->set($sessionId, $self->{_var}, $timeout);
+        }
+    }
+    else {  ##Start a new default session with the requested, non-existant id.
+        $self->start(1,$sessionId);
+    }
+
 	return $self;
 }
 
@@ -478,23 +632,6 @@ sub output {
 		$self->{_output} = WebGUI::Session::Output->new($self);
 	}
 	return $self->{_output};
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 os ( ) 
-
-Returns a WebGUI::Session::Os object.
-
-=cut
-
-sub os {
-	my $self = shift;
-	unless (exists $self->{_os}) {
-		$self->{_os} = WebGUI::Session::Os->new();
-	}
-	return $self->{_os};
 }
 
 
@@ -540,13 +677,26 @@ sub quick {
 
 =head2 request ( )
 
-Returns the Apache request (aka $r) object, or undef if it doesn't exist.
+Returns the L<Plack::Request> object, or undef if it doesn't exist.
 
 =cut
 
 sub request {
 	my $self = shift;
 	return $self->{_request};
+}
+
+#-------------------------------------------------------------------
+
+=head2 response ( )
+
+Returns the L<Plack::Response> object, or undef if it doesn't exist.
+
+=cut
+
+sub response {
+	my $self = shift;
+	return $self->{_response};
 }
 
 #-------------------------------------------------------------------
@@ -569,13 +719,13 @@ sub scratch {
 
 =head2 server ( )
 
-Returns the Apache server object (Apache2::ServerUtil), or undef if it doesn't exist.
+DEPRECATED (used to return the Apache2::ServerUtil object)
 
 =cut
 
 sub server {
 	my $self = shift;
-	return $self->{_server};
+	$self->log->fatal('WebGUI::Session::server is deprecated');
 }
 
 #-------------------------------------------------------------------
@@ -594,6 +744,48 @@ sub setting {
 	return $self->{_setting};
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 start ( [ userId,  sessionId ] )
+
+Start a new user session. Returns the user session id.  The session variable's sessionId
+is set to the var object's session id.  Also sets the user's CSRF token.
+
+=head3 userId
+
+The user id of the user to create a session for. Defaults to 1 (Visitor).
+
+=head3 sessionId
+
+Session id will be generated if not specified. In almost every case you should let the system generate the session id.
+
+=cut
+
+sub start {
+	my $self = shift;
+	my $userId = shift;
+	$userId    = 1 if ($userId eq "");
+	my $sessionId = shift;
+	$sessionId    = $self->id->generate if ($sessionId eq "");
+    my $timeout   = $self->setting->get('sessionTimeout');
+	my $time = time();
+	$self->{_var} = {
+		expires      => $time + $timeout,
+		lastPageView => $time,
+		lastIP       => $self->request->address,
+		adminOn      => 0,
+		userId       => $userId
+	};
+    $self->{_sessionId} = $sessionId;
+    $self->cache->set($sessionId, $self->{_var}, $timeout);
+    delete $self->{_var}{nextCacheFlush};
+        if ( $self->user->isInGroup( 12 ) ) { # Turn Admin On!!
+            $self->{_var}{adminOn} = 1;
+        }
+	$self->db->setRow("userSession","sessionId",$self->{_var}, $sessionId);
+    $self->scratch->set('webguiCsrfToken', $self->id->generate); # create cross site request forgery token
+}
 
 #-------------------------------------------------------------------
 
@@ -626,7 +818,6 @@ sub style {
 	}
 	return $self->{_style}
 }
-
 
 #-------------------------------------------------------------------
 
@@ -669,16 +860,17 @@ sub user {
 	my $option = shift;
 	if (defined $option) {
 		my $userId = $option->{userId} || $option->{user}->userId; 
-   		$self->var->start($userId,$self->getId);
 		if ($self->setting->get("passiveProfilingEnabled")) {
 			$self->db->write("update passiveProfileLog set userId = ? where sessionId = ?",[$userId,$self->getId]);
 		}	
 		delete $self->{_stow};
 		$self->{_user} = $option->{user} || WebGUI::User->new($self, $userId);
-		$self->request->user($self->{_user}->username) if $self->request;
-	} elsif (!exists $self->{_user}) {
-		$self->{_user} = WebGUI::User->new($self, $self->var->get('userId'));
-		$self->request->user($self->{_user}->username) if $self->request;
+		$self->request->env->{REMOTE_USER} = $self->{_user}->username if $self->request;
+   		$self->start($userId,$self->getId);
+	}
+    elsif (!exists $self->{_user}) {
+		$self->{_user} = WebGUI::User->new($self, $self->get('userId'));
+		$self->request->env->{REMOTE_USER} = $self->{_user}->username if $self->request;
 	} 
     return $self->{_user};
 }
@@ -688,16 +880,14 @@ sub user {
 
 =head2 var ( )
 
+DEPRECATED.  Session::Var was absorbed into Session in WebGUI 8.0.
+
 Returns a reference to the WebGUI::Session::Var object.
 
 =cut
 
 sub var {
-	my $self = shift;
-	unless ($self->{_var}) {
-		$self->{_var} = WebGUI::Session::Var->new($self);
-	}
-	return $self->{_var};
+	return $_[0];
 }
 
 1;

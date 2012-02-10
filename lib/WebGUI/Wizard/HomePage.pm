@@ -175,7 +175,7 @@ sub www_pickStyle {
     my @styles;
     for my $styleId ( @styleIds ) {
         next if grep { $_ eq $styleId } @skipStyleIds;
-        my $style   = WebGUI::Asset->newByDynamicClass( $session, $styleId );
+        my $style   = WebGUI::Asset->newById( $session, $styleId );
         push @styles, $style;
     }
 
@@ -188,17 +188,21 @@ sub www_pickStyle {
         $synopsis =~ s{(https?://\S+)}{<a href="$1">$1</a>}g;
         $synopsis = WebGUI::HTML::format( $synopsis );
 
-        $f->raw(
-            '<div class="stylePicker' . $class . '"><label><input type="radio" name="styleTemplateId" value="' . $style->getId . '"/>'
-            . '<img src="' . $style->getExampleImageUrl . '" height="150" />' 
-            . '<div class="title">' . $style->getTitle . '</div>'
-            . '<div class="synopsis">' . $synopsis . '</div></label>'
-            . '</div>'
+        my $label   = '<img src="' . $style->getExampleImageUrl . '" height="150" />' 
+                    . '<div class="title">' . $style->getTitle . '</div>'
+                    . '<div class="synopsis">' . $synopsis . '</div></label>'
+                    ;
+
+        $f->addField( "radio",
+            name    => "styleTemplateId",
+            value   => $style->getId,
+            subtext   => $label,
+            rowClass   => 'stylePicker' . $class,
+            extras => 'onclick="this.form.submit()"',
         );
     }
-    $f->submit;
 
-    $output .= $f->print;
+    $output .= $f->toHtml;
 
     return $output . '<div style="clear: both;">&nbsp;</div>';
 }
@@ -238,7 +242,7 @@ sub www_chooseContent {
     my ($self)  = @_;
     my $session = $self->session;
     my $form    = $session->form;
-    $session->http->setCacheControl("none");
+    $session->response->setCacheControl("none");
     my $i18n = WebGUI::International->new( $session, "WebGUI" );
 
     my $output = '<h1>' . $i18n->get('Initial Pages') . '</h1>';

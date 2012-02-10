@@ -3,7 +3,7 @@ package WebGUI::Asset::Wobject::NewWobject;
 $VERSION = "1.0.0";
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -120,7 +120,7 @@ See WebGUI::Asset::prepareView() for details.
 sub prepareView {
     my $self = shift;
     $self->SUPER::prepareView();
-    my $template = WebGUI::Asset::Template->new( $self->session, $self->get("templateId") );
+    my $template = WebGUI::Asset::Template->newById( $self->session, $self->get("templateId") );
     $template->prepare($self->getMetaDataAsTemplateVariables);
     $self->{_viewTemplate} = $template;
 }
@@ -136,13 +136,13 @@ wobject instances, you will need to purge them here.
 
 =cut
 
-sub purge {
+override purge => sub {
     my $self = shift;
 
     #purge your wobject-specific data here.  This does not include fields
     # you create for your NewWobject asset/wobject table.
-    return $self->SUPER::purge;
-}
+    return super();
+};
 
 #-------------------------------------------------------------------
 

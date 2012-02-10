@@ -3,6 +3,8 @@ package WebGUI::Wizard::Setup;
 use strict;
 use base 'WebGUI::Wizard';
 
+use WebGUI::Wizard::HomePage;
+
 =head1 NAME
 
 WebGUI::Wizard::Setup -- Initial site setup
@@ -20,7 +22,6 @@ sub _get_steps {
     return [qw(
         adminAccount
         companyInformation
-        siteStats
         defaultStyle
     )];
 }
@@ -55,7 +56,7 @@ sub wrapStyle {
     my ( $self, $output ) = @_;
     my $session = $self->session;
     my $form    = $session->form;
-    $session->http->setCacheControl("none");
+    $session->response->setCacheControl("none");
     my $i18n = WebGUI::International->new( $session, "WebGUI" );
     my $page = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -77,7 +78,7 @@ body {
     margin-top:     120px;
     margin-left:    5%;
     margin-right:   5%;
-    background-color:   #ccf;
+    background-color:   #1e78f2;
 }
 
 h1 {
@@ -96,6 +97,11 @@ h1 {
     border: 1px solid black;
     padding: 10px;
 }
+
+/* From asset www_edit */
+* { font: 12pt Helvetica, sans-serif; }
+label.formDescription { display: block; margin-top: 1em; font-weight: bold }
+/* End from asset www_edit */
 
 .stylePicker img {
     margin: 1em 0;
@@ -119,7 +125,7 @@ h1 {
 </head>
 <body><div id="wrapper"> ' . $output . ' </div></body>
 </html>';
-    $session->http->setMimeType("text/html");
+    $session->response->content_type("text/html");
     return $page;
 }
 
@@ -135,46 +141,46 @@ sub www_adminAccount {
     my ( $self ) = @_;
     my $session = $self->session;
     my $form    = $session->form;
-    $session->http->setCacheControl("none");
+    $session->response->setCacheControl("none");
     my $i18n = WebGUI::International->new( $session, "WebGUI" );
 
     my $legend = $i18n->get('admin account');
     my $u = WebGUI::User->new( $session, '3' );
     my $f = $self->getForm;
-    $f->text(
-        -name      => "username",
-        -value     => $u->username,
-        -label     => $i18n->get(50),
-        -hoverHelp => $i18n->get('50 setup description'),
+    $f->addField( "text",
+        name      => "username",
+        value     => $u->username,
+        label     => $i18n->get(50),
+        hoverHelp => $i18n->get('50 setup description'),
     );
-    $f->text(
-        -name      => "identifier",
-        -value     => "123qwe",
-        -label     => $i18n->get(51),
-        -hoverHelp => $i18n->get('51 description'),
-        -subtext   => '<div style=\"font-size: 10px;\">(' . $i18n->get("password clear text") . ')</div>'
+    $f->addField( "text",
+        name      => "identifier",
+        value     => "123qwe",
+        label     => $i18n->get(51),
+        hoverHelp => $i18n->get('51 description'),
+        subtext   => '<div style=\"font-size: 10px;\">(' . $i18n->get("password clear text") . ')</div>'
     );
-    $f->email(
-        -name      => "email",
-        -value     => $u->profileField("email"),
-        -label     => $i18n->get(56),
-        -hoverHelp => $i18n->get('56 description'),
+    $f->addField( "email",
+        name      => "email",
+        value     => $u->get("email"),
+        label     => $i18n->get(56),
+        hoverHelp => $i18n->get('56 description'),
     );
-    $f->timeZone(
-        -name      => "timeZone",
-        -value     => $u->profileField("timeZone"),
-        -label     => $i18n->get( 'timezone', 'DateTime' ),
-        -hoverHelp => $i18n->get('timezone help'),
+    $f->addField( "timeZone",
+        name      => "timeZone",
+        value     => $u->get("timeZone"),
+        label     => $i18n->get( 'timezone', 'DateTime' ),
+        hoverHelp => $i18n->get('timezone help'),
     );
-    $f->selectBox(
-        -name      => "language",
-        -value     => $u->profileField("language"),
-        -label     => $i18n->get('304'),
-        -hoverHelp => $i18n->get('language help'),
-        -options   => $i18n->getLanguages(),
+    $f->addField( "selectBox",
+        name      => "language",
+        value     => $u->get("language"),
+        label     => $i18n->get('304'),
+        hoverHelp => $i18n->get('language help'),
+        options   => $i18n->getLanguages(),
     );
-    $f->submit;
-    return '<h1>' . $legend . '</h1>' . $f->print;
+    $f->addField( "submit", name => "send" );
+    return '<h1>' . $legend . '</h1>' . $f->toHtml;
 }
 
 #----------------------------------------------------------------------------
@@ -192,20 +198,24 @@ sub www_adminAccountSave {
 
     my $timezone = $form->timeZone("timeZone");
     my $language = $form->selectBox("language");
+    my $email    = $form->email('email');
 
     ##update Admin and Visitor users
     my $u = WebGUI::User->new( $session, "3" );
     $u->username( $form->process( "username", "text", "Admin" ) );
-    $u->profileField( "email",    $form->email("email") );
-    $u->profileField( "timeZone", $timezone );
-    $u->profileField( "language", $language );
+    $u->update( email     =>    $email,
+        timeZone  =>  $timezone, 
+        language  =>  $language, 
+    );
     $u->identifier( Digest::MD5::md5_base64( $form->process( "identifier", "password", "123qwe" ) ) );
     # The user is now Admin
     $session->user({ userId => "3" });
 
     $u = WebGUI::User->new( $session, "1" );
-    $u->profileField( "timeZone", $timezone );
-    $u->profileField( "language", $language );
+    $u->update(
+        timeZone => $timezone,
+        language => $language,
+    );
 
     ##update ProfileField defaults so new users the get the defaults, too
     my $properties;
@@ -235,33 +245,32 @@ sub www_companyInformation {
     my ( $self ) = @_;
     my $session = $self->session;
     my $form    = $session->form;
-    $session->http->setCacheControl("none");
+    $session->response->setCacheControl("none");
     my $i18n = WebGUI::International->new( $session, "WebGUI" );
 
     my $output = '<h1>' . $i18n->get('company information') . '</h1>';
 
     my $f = $self->getForm;
-    $f->hidden( name => "step", value => "3" );
-    $f->text(
+    $f->addField( "text",
         name      => "companyName",
         value     => $session->setting->get("companyName"),
         label     => $i18n->get(125),
         hoverHelp => $i18n->get('125 description'),
     );
-    $f->email(
+    $f->addField( "email",
         name      => "companyEmail",
         value     => $session->setting->get("companyEmail"),
         label     => $i18n->get(126),
         hoverHelp => $i18n->get('126 description'),
     );
-    $f->url(
+    $f->addField( "url",
         name      => "companyURL",
         value     => $session->setting->get("companyURL"),
         label     => $i18n->get(127),
         hoverHelp => $i18n->get('127 description'),
     );
-    $f->submit;
-    $output .= $f->print;
+    $f->addField( "submit", name => "send" );
+    $output .= $f->toHtml;
 
     return $output;
 }
@@ -281,57 +290,6 @@ sub www_companyInformationSave {
     $session->setting->set( 'companyName',  $form->text("companyName") )   if ( $form->get("companyName") );
     $session->setting->set( 'companyURL',   $form->url("companyURL") )     if ( $form->get("companyURL") );
     $session->setting->set( 'companyEmail', $form->email("companyEmail") ) if ( $form->get("companyEmail") );
-    return;
-}
-
-#----------------------------------------------------------------------------
-
-=head2 www_siteStats ( ) 
-
-Opt-in to the global WebGUI statistics
-
-=cut
-
-sub www_siteStats {
-    my ( $self ) = @_;
-    my $session = $self->session;
-    my $form    = $session->form;
-    $session->http->setCacheControl("none");
-    my $i18n = WebGUI::International->new( $session, "WebGUI" );
-
-    my $enableForm  = $self->getForm;
-    $enableForm->hidden( name => "enableStats", value => 1 );
-    $enableForm->submit( value => $i18n->get( 'enable', 'Activity_SendWebguiStats' ) );
-
-    my $disableForm = $self->getForm;
-    $disableForm->hidden( name => "enableStats", value => 0 );
-    $disableForm->submit( value => $i18n->get( 'disable', 'Activity_SendWebguiStats' ) );
-
-    my $output = '<h1>' . $i18n->get( 'topicName', 'Activity_SendWebguiStats' ) . '</h1>';
-    $output .= ' <p>' . $i18n->get( 'why to send', 'Activity_SendWebguiStats' ) . '</p>
-         <p>' . $i18n->get( 'would you participate', 'Activity_SendWebguiStats' ) . '</p>
-        <div style="float: left">' . $enableForm->print . '</div><div style="float: left">'
-        . $disableForm->print
-        . '</div>'
-        . '<div style="clear: both;">&nbsp;</div>'
-        ;
-
-    return $output;
-}
-
-#----------------------------------------------------------------------------
-
-=head2 www_siteStatsSave ( ) 
-
-Opt-in to the global WebGUI statistics
-
-=cut
-
-sub www_siteStatsSave {
-    my ( $self ) = @_;
-    my $session = $self->session;
-    my $form    = $session->form;
-    WebGUI::Operation::Statistics::www_enableSendWebguiStats($session) if ( $form->get("enableStats") );
     return;
 }
 
@@ -379,7 +337,7 @@ sub www_cleanup {
     my ( $self ) = @_;
     my $session = $self->session;
     my $form    = $session->form;
-    $session->http->setCacheControl("none");
+    $session->response->setCacheControl("none");
     my $i18n = WebGUI::International->new( $session, "WebGUI" );
 
     $self->cleanup;

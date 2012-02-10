@@ -3,7 +3,7 @@ package WebGUI::Asset::Wobject;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -14,17 +14,53 @@ package WebGUI::Asset::Wobject;
 
 =cut
 
-#use CGI::Util qw(rearrange);
-use DBI;
-use strict qw(subs vars);
-use Tie::IxHash;
+use Moose;
+use WebGUI::Definition::Asset;
 use WebGUI::Asset;
 use WebGUI::International;
-use WebGUI::Macro;
-use WebGUI::SQL;
-use WebGUI::Utility;
-
-our @ISA = qw(WebGUI::Asset);
+extends 'WebGUI::Asset';
+define tableName   => 'wobject';
+define assetName   => ['Wobject', 'Asset_Wobject'];
+property description => (
+            fieldType       => 'HTMLArea',
+            default         => undef,
+            tab             => "properties",
+            label           => [85,'Asset_Wobject'],
+            hoverHelp       => ['85 description','Asset_Wobject'],
+         );
+property displayTitle => (
+            fieldType       => 'yesNo',
+            default         => 1,
+            tab             => "display",
+            label           => [174,'Asset_Wobject'],
+            hoverHelp       => ['174 description','Asset_Wobject'],
+            uiLevel         => 5
+         );
+property styleTemplateId => (
+            fieldType       => 'template',
+            default         => 'PBtmpl0000000000000060',
+            tab             => "display",
+            label           => [1073,'Asset_Wobject'],
+            hoverHelp       => ['1073 description','Asset_Wobject'],
+            namespace       => 'style'
+         );
+property printableStyleTemplateId => (
+            fieldType       => 'template',
+            default         => 'PBtmpl0000000000000060',
+            tab             => "display",
+            label           => [1079,'Asset_Wobject'],
+            hoverHelp       => ['1079 description','Asset_Wobject'],
+            namespace       => 'style'
+         );
+property mobileStyleTemplateId => (
+            fieldType       =>  'template',
+            noFormPost      =>  sub { return !$_[0]->session->setting->get('useMobileStyle'); },
+            default         =>  'PBtmpl0000000000000060',
+            tab             =>  'display',
+            label           =>  ['mobileStyleTemplateId label','Asset_Wobject'],
+            hoverHelp       =>  ['mobileStyleTemplateId description','Asset_Wobject'],
+            namespace       =>  'style',
+         );
 
 =head1 NAME
 
@@ -46,78 +82,6 @@ See the subclasses in lib/WebGUI/Wobjects for details.
 These methods are available from this class:
 
 =cut
-
-#-------------------------------------------------------------------
-
-=head2 definition ( session, [definition] )
-
-Returns an array reference of definitions. Adds tableName, className, properties to array definition.
-
-=head3 definition
-
-An array of hashes to prepend to the list
-
-=cut
-
-sub definition {
-	my $class = shift;
-	my $session = shift;
-	my $definition = shift;
-	my $i18n = WebGUI::International->new($session,'Asset_Wobject');
-	my %properties;
-	tie %properties, 'Tie::IxHash';
-	%properties = (
-	description=>{
-		fieldType=>'HTMLArea',
-		defaultValue=>undef,
-		tab=>"properties",
-		label=>$i18n->get(85),
-		hoverHelp=>$i18n->get('85 description')
-	},
-	displayTitle=>{
-		fieldType=>'yesNo',
-		defaultValue=>1,
-		tab=>"display",
-		label=>$i18n->get(174),
-		hoverHelp=>$i18n->get('174 description'),
-		uiLevel=>5
-	},
-	styleTemplateId=>{
-		fieldType=>'template',
-		defaultValue=>'PBtmpl0000000000000060',
-		tab=>"display",
-		label=>$i18n->get(1073),
-		hoverHelp=>$i18n->get('1073 description'),
-	    filter=>'fixId',
-		namespace=>'style'
-	},
-	printableStyleTemplateId=>{
-		fieldType=>'template',
-		defaultValue=>'PBtmpl0000000000000060',
-		tab=>"display",
-		label=>$i18n->get(1079),
-		hoverHelp=>$i18n->get('1079 description'),
-	    filter=>'fixId',
-		namespace=>'style'
-	},
-    mobileStyleTemplateId => {
-        fieldType       => ( $session->setting->get('useMobileStyle') ? 'template' : 'hidden' ),
-        defaultValue    => 'PBtmpl0000000000000060',
-        tab             => 'display',
-        label           => $i18n->get('mobileStyleTemplateId label'),
-        hoverHelp       => $i18n->get('mobileStyleTemplateId description'),
-        filter          => 'fixId',
-        namespace       => 'style',
-    },
-	);
-	push(@{$definition}, {
-		tableName=>'wobject',
-		className=>'WebGUI::Asset::Wobject',
-		autoGenerateForms=>1,
-		properties => \%properties
-	});
-	return $class->SUPER::definition($session,$definition);
-}
 
 #-------------------------------------------------------------------
 
@@ -148,11 +112,11 @@ sub copyCollateral {
     my $newId = $self->session->id->generate;
 
     my $temp = $self->session->db->buildArrayRefOfHashRefs(
-        "select * from ".$db->dbh->quote_identifier($table)." where ".$db->dbh->quote_identifier($keyName)."=".$db->quote($keyValue));
+        "select * from ".$db->quote_identifier($table)." where ".$db->dbh->quote_identifier($keyName)."=".$db->quote($keyValue));
     my $hash = $temp->[0];
     $hash->{$keyName} = $newId;
     my @keys = keys %$hash;
-    my $sql = "insert into ".$db->dbh->quote_identifier($table)
+    my $sql = "insert into ".$db->quote_identifier($table)
             ." (".join(',',map("`$_`",@keys)).") values(".join(',',map("?",@keys)).")";
     $self->session->db->write($sql,[map($hash->{$_},@keys)]);
 }
@@ -183,8 +147,8 @@ sub deleteCollateral {
 	my $keyName = shift;
 	my $keyValue = shift;
     my $db = $self->session->db;
-        $self->session->db->write("delete from ".$db->dbh->quote_identifier($table)
-            ." where ".$db->dbh->quote_identifier($keyName)."=".$db->quote($keyValue));
+        $self->session->db->write("delete from ".$db->quote_identifier($table)
+            ." where ".$db->quote_identifier($keyName)."=".$db->quote($keyValue));
 	$self->updateHistory("deleted collateral item ".$keyName." ".$keyValue);
 }
 
@@ -256,11 +220,40 @@ sub getCollateral {
 	if ($keyValue eq "new" || $keyValue eq "") {
 		return {$keyName=>"new"};
 	} else {
-		return $db->quickHashRef("select * from ".$db->dbh->quote_identifier($table)
-            ." where ".$db->dbh->quote_identifier($keyName)."=?",[$keyValue]);
+		return $db->quickHashRef("select * from ".$db->quote_identifier($table)
+            ." where ".$db->quote_identifier($keyName)."=?",[$keyValue]);
 	}
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 getInheritableProperties ( )
+
+Extend the base class to include the mobileStyleTemplateId.
+
+=cut
+
+override getInheritableProperties => sub {
+	my $self = shift;
+    my %properties = super();
+    $properties{mobileStyleTemplateId} = $self->mobileStyleTemplateId;
+    return %properties;
+};
+
+#-------------------------------------------------------------------
+
+=head2 getStyleTemplateId
+
+This returns the correct style to use, either a regular style or a mobile style,
+based on $session->style->useMobileStyle.
+
+=cut
+
+sub getStyleTemplateId {
+	my $self = shift;
+    return $self->session->style->useMobileStyle ? $self->mobileStyleTemplateId : $self->styleTemplateId;
+}
 
 #-------------------------------------------------------------------
 
@@ -377,15 +370,12 @@ Returns output parsed under the current style.  See also Asset::processStyle.
 
 =cut
 
-sub processStyle {
+override processStyle => sub {
 	my ($self, $output, $options) = @_;
-    $output   = $self->SUPER::processStyle($output, $options);
+    $output   = super();
     my $style = $self->session->style;
-    if ($style->useMobileStyle) {
-        return $style->process($output,$self->get("mobileStyleTemplateId"));
-    }
-    return $style->process($output,$self->get("styleTemplateId"));
-}
+    return $style->process($output,$self->getStyleTemplateId);
+};
 
 
 #-------------------------------------------------------------------
@@ -489,13 +479,13 @@ sub setCollateral {
 	
     if ($properties->{$keyName} eq "new" || $properties->{$keyName} eq "") {
 		$properties->{$keyName} = $self->session->id->generate();
-		$sql = "insert into ".$db->dbh->quote_identifier($table)." (";
+		$sql = "insert into ".$db->quote_identifier($table)." (";
 		my $dbkeys = "";
      		my $dbvalues = "";
 		unless ($useSequence eq "0") {
 			unless (exists $properties->{sequenceNumber}) {
 				my ($seq) = $self->session->db->quickArray("select max(sequenceNumber) "
-                    ." from ".$db->dbh->quote_identifier($table)." where $setName=?",[$setValue]);
+                    ." from ".$db->quote_identifier($table)." where $setName=?",[$setValue]);
 				$properties->{sequenceNumber} = $seq+1;
 			}
 		}
@@ -507,20 +497,20 @@ sub setCollateral {
 				$dbkeys .= ',';
 				$dbvalues .= ',';
 			}
-			$dbkeys .= $db->dbh->quote_identifier($key);
+			$dbkeys .= $db->quote_identifier($key);
 			$dbvalues .= $self->session->db->quote($properties->{$key});
 		}
 		$sql .= $dbkeys.') values ('.$dbvalues.')';
 		$self->updateHistory("added collateral item ".$table." ".$properties->{$keyName});
 	} else {
-		$sql = "update ".$db->dbh->quote_identifier($table)." set ";
+		$sql = "update ".$db->quote_identifier($table)." set ";
 		foreach my $key (keys %{$properties}) {
 			unless ($key eq "sequenceNumber" && $updateSequence ne "1") {
 				$sql .= ',' if ($counter++ > 0);
-				$sql .= $db->dbh->quote_identifier($key)."=".$db->quote($properties->{$key});
+				$sql .= $db->quote_identifier($key)."=".$db->quote($properties->{$key});
 			}
 		}
-		$sql .= " where ".$db->dbh->quote_identifier($keyName)."=".$db->quote($properties->{$keyName});
+		$sql .= " where ".$db->quote_identifier($keyName)."=".$db->quote($properties->{$keyName});
 		$self->updateHistory("edited collateral item ".$table." ".$properties->{$keyName});
 	}
   	$self->session->db->write($sql);
@@ -541,8 +531,8 @@ sub www_view {
 	my $self = shift;
 	my $check = $self->checkView;
 	return $check if (defined $check);
-	$self->session->http->setLastModified($self->getContentLastModified);
-	$self->session->http->sendHeader;
+	$self->session->response->setLastModified($self->getContentLastModified);
+	$self->session->response->sendHeader;
     ##Have to dupe this code here because Wobject does not call SUPER.
 	$self->prepareView;
 	my $style = $self->processStyle($self->getSeparator, { noHeadTags => 1 });
@@ -553,5 +543,6 @@ sub www_view {
 	return "chunked";
 }
 
+__PACKAGE__->meta->make_immutable;
 1;
 

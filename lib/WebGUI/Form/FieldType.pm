@@ -3,7 +3,7 @@ package WebGUI::Form::FieldType;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -19,7 +19,6 @@ use base 'WebGUI::Form::SelectBox';
 use Tie::IxHash;
 use WebGUI::International;
 use WebGUI::Pluggable;
-use WebGUI::Utility;
 use Module::Find qw(findallmod);
 
 =head1 NAME

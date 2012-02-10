@@ -1,7 +1,7 @@
 package WebGUI::Macro::AssetProxy;
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -14,6 +14,7 @@ use strict;
 use Time::HiRes;
 use WebGUI::Asset;
 use WebGUI::International;
+use WebGUI::Exception;
 
 =head1 NAME
 
@@ -45,32 +46,33 @@ sub process {
     if (!$identifier) {
         $session->errorHandler->warn('AssetProxy macro called without an asset to proxy. ' 
         . 'The macro was called through this url: '.$session->url->page);
-        if ($session->var->isAdminOn) {
+        if ($session->isAdminOn) {
             my $i18n = WebGUI::International->new($session, 'Macro_AssetProxy');
             return $i18n->get('invalid url');
         }
         return;
     }
-    my $t = ($session->errorHandler->canShowPerformanceIndicators()) ? [Time::HiRes::gettimeofday()] : undef;
+    my $perfLog = $session->log->performanceLogger;
+    my $t = $perfLog ? [Time::HiRes::gettimeofday()] : undef;
     my $asset;
     if ($type eq 'assetId') {
-        $asset = WebGUI::Asset->newByDynamicClass($session, $identifier);
+        $asset = eval { WebGUI::Asset->newById($session, $identifier); };
     }
     else {
-        $asset = WebGUI::Asset->newByUrl($session,$identifier);
+        $asset = eval { WebGUI::Asset->newByUrl($session,$identifier); };
     }
     if (!defined $asset) {
         $session->errorHandler->warn('AssetProxy macro called invalid asset: '.$identifier
             .'. The macro was called through this url: '.$session->url->page);
-        if ($session->var->isAdminOn) {
+        if ($session->isAdminOn) {
             my $i18n = WebGUI::International->new($session, 'Macro_AssetProxy');
             return $i18n->get('invalid url');
         }
     }
     elsif ($asset->get('state') =~ /^trash/) {
-        $session->errorHandler->warn('AssetProxy macro called on asset in trash: '.$identifier
+        $session->log->warn('AssetProxy macro called on asset in trash: '.$identifier
             .'. The macro was called through this url: '.$session->url->page);
-        if ($session->var->isAdminOn) {
+        if ($session->isAdminOn) {
             my $i18n = WebGUI::International->new($session, 'Macro_AssetProxy');
             return $i18n->get('asset in trash');
         }
@@ -78,17 +80,16 @@ sub process {
     elsif ($asset->get('state') =~ /^clipboard/) {
         $session->errorHandler->warn('AssetProxy macro called on asset in clipboard: '.$identifier
             .'. The macro was called through this url: '.$session->url->page);
-        if ($session->var->isAdminOn) {
+        if ($session->isAdminOn) {
             my $i18n = WebGUI::International->new($session, 'Macro_AssetProxy');
             return $i18n->get('asset in clipboard');
         }
     }
     elsif ($asset->canView) {
-        $asset->toggleToolbar;
         $asset->prepareView;
         my $output = $asset->view;
-        $output .= "AssetProxy:" . Time::HiRes::tv_interval($t)
-            if $t;
+        $perfLog->({ asset => $asset, time => Time::HiRes::tv_interval($t), type => 'Proxy'})
+            if $perfLog;
         return $output;
     }
     return '';

@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -8,13 +8,10 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
 use WebGUI::Session;
-use WebGUI::Utility;
 
 use Test::More;
 
@@ -53,23 +50,27 @@ my @testSets = (
 
 my $session = WebGUI::Test->session;
 
-plan tests => scalar(@testSets) + 6;
-
 # generate
 my $generateId = $session->id->generate();
 is(length($generateId), 22, "generate() - length of 22 characters");
-my @uniqueIds;
-my $isUnique = 1;
-my $isValid = 1;
-for (1..2000) {
-	last unless $isUnique;
-	my $id = $session->id->generate();
-	$isUnique = ($isUnique ? !isIn($id,@uniqueIds) : 0);
-	$isValid = ($isValid ? $session->id->valid($id) : 0);
-	push(@uniqueIds,$id);
+
+my %uniqueIds;
+GEN_LOOP: {
+    for (1..2000) {
+        my $id = $session->id->generate();
+        if (! $session->id->valid($id)) {
+            fail "GUID $id is valid";
+            last GEN_LOOP;
+        }
+        elsif ($uniqueIds{$id}) {
+            fail "GUID $id is unique";
+            last GEN_LOOP;
+        }
+        $uniqueIds{$id} = 1;
+    }
+    pass "All GUIDs valid";
+    pass "All GUIDs unique";
 }
-ok($isUnique, "generate() - unique");
-ok($isValid, "generate() - valid id generated");
 
 foreach my $testSet (@testSets) {
 	is($session->id->valid($testSet->{guid}), $testSet->{valid}, $testSet->{comment});
@@ -80,6 +81,10 @@ foreach my $testSet (@testSets) {
 
 is($session->id->toHex('wjabZsKOb7kBBSiO3bQwzA'), 'c2369b66c28e6fb90105288eddb430cc', 'toHex works');
 is($session->id->fromHex('c2369b66c28e6fb90105288eddb430cc'), 'wjabZsKOb7kBBSiO3bQwzA', 'fromHex works');
+is( $session->id->toHex('EhTwB4FAnLZPn-ftde39aA'), '1214f00781409cb64f9ff7ed75edfd68', 'toHex with -' );
 
 my $re = $session->id->getValidator;
 is( ref $re, 'Regexp', 'getValidator returns a regexp object');
+
+done_testing;
+

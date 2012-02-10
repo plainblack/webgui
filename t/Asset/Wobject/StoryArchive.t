@@ -1,6 +1,6 @@
 # vim:syntax=perl
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -13,9 +13,7 @@
 # 
 #
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../../lib";
 use Test::More;
 use Test::Deep;
 use File::Copy qw/mv/;
@@ -27,7 +25,6 @@ use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Test::Maker::Permission;
 use WebGUI::Session;
 use WebGUI::Text;
-use WebGUI::Utility;
 use WebGUI::DateTime;
 use DateTime;
 
@@ -63,36 +60,26 @@ $canPostMaker->prepare({
     fail     => [1, $reader            ],
 });
 
-my $tests = 56
-          + $canPostMaker->plan
-          ;
-plan tests => 1
-            + $tests;
-
 #----------------------------------------------------------------------------
 # put your tests here
 
-my $class  = 'WebGUI::Asset::Wobject::StoryArchive';
-my $loaded = use_ok($class);
+use_ok('WebGUI::Asset::Wobject::StoryArchive');
 
 my $storage;
 my $versionTag;
 
 my $creationDateSth = $session->db->prepare('update asset set creationDate=? where assetId=?');
-my @skipAutoCommit  = (undef, undef, { skipAutoCommitWorkflows => 1 });
+my @skipAutoCommit  = WebGUI::Test->getAssetSkipCoda;
 
-SKIP: {
+my $home = WebGUI::Test->asset;
 
-skip "Unable to load module $class", $tests unless $loaded;
-my $home = WebGUI::Asset->getDefault($session);
-
+$versionTag = WebGUI::VersionTag->getWorking($session);
 $archive    = $home->addChild({
-                className => $class,
+                className => 'WebGUI::Asset::Wobject::StoryArchive',
                 title => 'My Stories',
                 url => '/home/mystories',
                 styleTemplateId => $home->get('styleTemplateId'),
               });
-$versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->commit;
 WebGUI::Test->addToCleanup($versionTag);
 $archive = $archive->cloneFromDb;
@@ -142,17 +129,17 @@ is($todayFolder->get('styleTemplateId'), $archive->get('styleTemplateId'),  '...
 {
     my $undo = WebGUI::Test->overrideSetting(urlExtension => 'ext');
     my $arch2 = $home->addChild({
-        className => $class,
+        className => 'WebGUI::Asset::Wobject::StoryArchive',
         title     => 'Extension Tester',
     });
-    addToCleanup($arch2);
+    WebGUI::Test->addToCleanup($arch2);
 
     is $arch2->get('url'),
-        'home/extension-tester.ext',
+        $home->get('url').'/extension-tester.ext',
         'ext added';
 
     is $arch2->getFolderUrl('blah'),
-        'home/extension-tester/blah.ext',
+        $home->get('url').'/extension-tester/blah.ext',
         'folder url: strip extension from parent and add to child';
 
     my $folder = $arch2->getFolder($now);
@@ -205,8 +192,8 @@ isa_ok($child, 'WebGUI::Asset::Wobject::Folder', '... will add folders, so impor
 
 $child->purge;
 
-$child = $archive->addChild({className => 'WebGUI::Asset::Story', title => 'First Story'}, @skipAutoCommit);
 my $tag1 = WebGUI::VersionTag->getWorking($session);
+$child = $archive->addChild({className => 'WebGUI::Asset::Story', title => 'First Story', }, @skipAutoCommit);
 $tag1->commit;
 WebGUI::Test->addToCleanup($tag1);
 isa_ok($child, 'WebGUI::Asset::Story', 'addChild added and returned a Story');
@@ -242,9 +229,9 @@ my $newFolder = $archive->getFolder($yesterday);
 my ($wgBdayMorn,undef)    = $session->datetime->dayStartEnd($wgBday);
 my ($yesterdayMorn,undef) = $session->datetime->dayStartEnd($yesterday);
 
-my $story = $oldFolder->addChild({ className => 'WebGUI::Asset::Story', title => 'WebGUI is released', keywords => 'roger,foxtrot,echo,all'}, @skipAutoCommit);
-$creationDateSth->execute([$wgBday, $story->getId]);
 my $tag2 = WebGUI::VersionTag->getWorking($session);
+my $story = $oldFolder->addChild({ className => 'WebGUI::Asset::Story', title => 'WebGUI is released', keywords => 'roger,foxtrot,echo,all', }, @skipAutoCommit);
+$creationDateSth->execute([$wgBday, $story->getId]);
 $tag2->commit;
 WebGUI::Test->addToCleanup($tag2);
 
@@ -253,9 +240,9 @@ WebGUI::Test->addToCleanup($tag2);
     is ($storyDB->get('status'), 'approved', 'addRevision always calls for an autocommit');
 }
 
-my $pastStory = $newFolder->addChild({ className => 'WebGUI::Asset::Story', title => "Yesterday is history" }, @skipAutoCommit);
-$creationDateSth->execute([$yesterday, $pastStory->getId]);
 my $tag3 = WebGUI::VersionTag->getWorking($session);
+my $pastStory = $newFolder->addChild({ className => 'WebGUI::Asset::Story', title => "Yesterday is history", }, @skipAutoCommit);
+$creationDateSth->execute([$yesterday, $pastStory->getId]);
 $tag3->commit;
 WebGUI::Test->addToCleanup($tag3);
 
@@ -283,7 +270,7 @@ cmp_deeply(
 );
 
 KEY: foreach my $key (keys %{ $templateVars }) {
-    next KEY if isIn($key, qw/canPostStories addStoryUrl date_loop mode/);
+    next KEY if $key ~~ [qw/canPostStories addStoryUrl date_loop mode/];
     delete $templateVars->{$key};
 }
 
@@ -324,14 +311,14 @@ cmp_deeply(
     'viewTemplateVariables: returns expected template variables with 3 stories in different folders, user is cannot edit stories'
 );
 
-my $story2 = $folder->addChild({ className => 'WebGUI::Asset::Story', title => 'Story 2', keywords => "roger,foxtrot,all"}, @skipAutoCommit);
-my $story3 = $folder->addChild({ className => 'WebGUI::Asset::Story', title => 'Story 3', keywords => "foxtrot,echo,all"},  @skipAutoCommit);
-my $story4 = $folder->addChild({ className => 'WebGUI::Asset::Story', title => 'Story 4', keywords => "roger,echo,all"},    @skipAutoCommit);
+my $tag4 = WebGUI::VersionTag->getWorking($session);
+my $story2 = $folder->addChild({ className => 'WebGUI::Asset::Story', title => 'Story 2', keywords => "roger,foxtrot,all", }, @skipAutoCommit);
+my $story3 = $folder->addChild({ className => 'WebGUI::Asset::Story', title => 'Story 3', keywords => "foxtrot,echo,all", },  @skipAutoCommit);
+my $story4 = $folder->addChild({ className => 'WebGUI::Asset::Story', title => 'Story 4', keywords => "roger,echo,all", },    @skipAutoCommit);
 foreach my $storilet ($story2, $story3, $story4) {
     $session->db->write("update asset set creationDate=$now where assetId=?",[$storilet->getId]);
 }
 $archive->update({storiesPerPage => 3});
-my $tag4 = WebGUI::VersionTag->getWorking($session);
 $tag4->commit;
 WebGUI::Test->addToCleanup($tag4);
 
@@ -341,7 +328,7 @@ $session->user({userId => 3});
 
 $templateVars = $archive->viewTemplateVariables();
 KEY: foreach my $key (keys %{ $templateVars }) {
-    next KEY if isIn($key, qw/canPostStories addStoryUrl date_loop/);
+    next KEY if $key ~~ [qw/canPostStories addStoryUrl date_loop/];
     delete $templateVars->{$key};
 }
 
@@ -349,7 +336,7 @@ cmp_deeply(
     $templateVars,
     {
         canPostStories => 1,
-        addStoryUrl    => '/home/mystories?func=add;class=WebGUI::Asset::Story',
+        addStoryUrl    => '/home/mystories?func=add;className=WebGUI::Asset::Story',
         date_loop      => [
             {
                 epochDate => ignore(),
@@ -717,10 +704,6 @@ WebGUI::Test->addToCleanup($zzz_child);
 
 $archive->update({storiesPerPage => 25, storySortOrder => 'Alphabetically' });
 
-$tag1 = WebGUI::VersionTag->getWorking($session);
-$tag1->commit;
-WebGUI::Test->addToCleanup($tag1);
-
 $templateVars = $archive->viewTemplateVariables();
 
 cmp_deeply (
@@ -766,9 +749,10 @@ cmp_deeply (
         'viewTemplateVariables: sorted by story title'
 );
 
-}           ##  end SKIP block
-
 $creationDateSth->finish;
+done_testing();
+
+#----------------------------------------------------------------------------
 
 sub simpleHrefParser {
 	my ($text) = @_;

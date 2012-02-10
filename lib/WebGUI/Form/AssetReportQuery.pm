@@ -4,7 +4,6 @@ use strict;
 use base 'WebGUI::Form::Control';
 use JSON;
 use WebGUI::International;
-use WebGUI::Utility;
 
 =head1 NAME
 
@@ -178,7 +177,7 @@ Sets the JS for this form plugin
 sub headTags {
     my $self    = shift;
     my $session = $self->session;
-    $session->style->setScript($session->url->extras("yui-webgui/build/form/assetReportQuery.js"),{ type=>"text/javascript" });    
+    $session->style->setScript($session->url->extras("yui-webgui/build/form/assetReportQuery.js"));    
 }
 
 #-------------------------------------------------------------------
@@ -247,11 +246,16 @@ sub toHtml {
             foreach my $property (keys %{$properties}) {
                 my $key = $tableName.".".$property;
                 $fields{$key} = qq{$property ($tableName)};
-            }   
+            }
         }
 
         %fields = (%asset,%fields);
-        %fields = WebGUI::Utility::sortHash(%fields);
+        %fields =
+            map { @$_ }
+            sort { $a->[1] cmp $b->[1] }
+            map { [ $_, $fields{$_} ] }
+            keys %fields;
+
         $json->{$class} = \%fields;
     }
 
@@ -261,6 +265,7 @@ sub toHtml {
     $style->setRawHeadTags(qq|<script type="text/javascript">var classValues = $jsonStr; </script>|);
     my $jsonData            = $self->get("value") || q|{ "isNew" : "true" }|;
     $style->setRawHeadTags(qq|<script type="text/javascript">var dataValues  = $jsonData; var first_row_error_msg = '$first_row_error_msg';</script>|);
+    $self->headTags();
 
     #Decode JSON data for filling in some of the fields
     my $jsonDataHash = JSON->new->decode($jsonData);

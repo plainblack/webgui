@@ -3,7 +3,7 @@ package WebGUI::Paginator;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -16,7 +16,6 @@ package WebGUI::Paginator;
 
 use strict;
 use WebGUI::International;
-use WebGUI::Utility;
 use List::Util qw/min/;
 
 =head1 NAME
@@ -502,7 +501,7 @@ sub getPageLinks {
 	if ($limit) {
 		my $output;
 		my $i = 1;
-		my $minPage = $self->getPageNumber - round($limit/2);
+		my $minPage = $self->getPageNumber - sprintf('%.0f', $limit/2);
 		my $start = ($minPage > 0) ? $minPage : 1;
 		my $maxPage = $start + $limit - 1;
 		my $end = ($maxPage < $self->getPageNumber) ? $self->getPageNumber : $maxPage;
@@ -758,7 +757,7 @@ sub setDataByQuery {
         $sql =~ s/;?\s*$/ LIMIT $start,$rowsPerPage/;
     }
     
-    #$self->session->errorHandler->warn($sql);    
+    #$self->session->log->warn($sql);    
     #Get only the data necessary from the database
 	my $sth;
 	if ($unconditional) {

@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -8,20 +8,18 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../lib";
 
 use JSON;
 
 use WebGUI::Test;
 use WebGUI::International;
 use WebGUI::Session;
-use WebGUI::Session::Var;
 use WebGUI::User;
 use WebGUI::Macro::UsersOnline;
 
 use Test::More; # increment this value for each test you create
+use Test::Exception;
 
 my $session = WebGUI::Test->session;
 
@@ -34,12 +32,11 @@ plan tests => 30;
 # Basic testing -----------------------------------------------------------
 
 # Check for default template
-my $defTemplate = WebGUI::Asset->new($session, 'h_T2xtOxGRQ9QJOR6ebLpQ');
-ok(defined $defTemplate, 'default template is present');
+lives_ok { WebGUI::Asset->newById($session, 'h_T2xtOxGRQ9QJOR6ebLpQ'); }, 'default template is present';
 
 # Call with default values
 my $html = WebGUI::Macro::UsersOnline::process($session);
-cmp_ok((length $html), '>', 0, 'call with default template and values returns some output');
+ok($html, 'call with default template and values returns some output');
 
 
 # Test labels -------------------------------------------------------------
@@ -178,10 +175,10 @@ sub setupUsers {
 
     # Create sessions such that users are added to the userSession table
     foreach (@users) {
-        my $newSession = WebGUI::Session->open(WebGUI::Test::root, WebGUI::Test::file);
+        my $newSession = WebGUI::Session->open(WebGUI::Test::file);
         $newSession->user({user => $_});
     }
-    addToCleanup(@users);
+    WebGUI::Test->addToCleanup(@users);
     return @users;
 }
 
@@ -235,6 +232,6 @@ sub setupJSONtemplate {
     }
 EOTMPL
     my $template = WebGUI::Asset->getImportNode($session)->addChild({className=>'WebGUI::Asset::Template', parser => 'WebGUI::Asset::Template::HTMLTemplate', namespace => 'Macro/UsersOnline', template=>$templateBody});
-    addToCleanup($template);
+    WebGUI::Test->addToCleanup($template);
     return $template;
 }

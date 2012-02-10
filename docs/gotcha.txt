@@ -7,6 +7,37 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+8.0.0
+--------------------------------------------------------------------
+ * WebGUI 8 is not API compatible with WebGUI 7. If you have custom
+   code, chances are you'll need to update it to make it work with
+   WebGUI 8.  Please read docs/migration.txt for information about
+   changes to the WebGUI API.
+
+ * Many scripts in the sbin directory have been replaced by the webgui.pl
+   master script.
+   
+   * upgrade.pl -> webgui.pl upgrade
+
+ * The rotation, deletion and reordering of Photos in a Gallery Album
+   has been removed because the way it was implemented in WebGUI 7
+   is incompatible with WebGUI 8.
+
+ * As part of the migration to Template::Toolkit, we will be changing template
+   variables from using dots to underscores.  All templates using that namespace were
+   automatically upgraded to use the new variables.
+
+   In this version, these templates were updated:
+       Account Macro template
+       Admin Toggle Macro template
+
+ * The new Admin Console required changes to layout templates.  Old templates
+   will continue to work, but show two sets of editing and drag controls.
+
+ * WebGUI 8 does not support HTTP Basic Authentication any longer.
+
+ * Support for server-side spell checking in the Rich Editor TinyMCE has been removed.
+
 7.10.24
 --------------------------------------------------------------------
     * WebGUI now depends on Business::OnlinePayment::AuthorizeNet.  This version
@@ -104,6 +135,7 @@ save you many hours of grief.
        is in WebGUI again. Licencing information was overlooked. An 
        upgrade to 7.10.1 will break the Matrix. This is fixed now.
 
+
 7.10.1
 --------------------------------------------------------------------
      * WebGUI now depends on PerlIO::eol, for doing line ending translation.
@@ -140,12 +172,14 @@ save you many hours of grief.
 --------------------------------------------------------------------
      * The javascript check for email addresses has been removed.
 
+
 7.9.5
 --------------------------------------------------------------------
      * Starting in WebGUI 7.9.4, the CHI and Cache::FastMmap modules are required.
 
      * Starting in WebGUI 7.9.5, you cannot enter in a URL that is a has more than 2 dashes,
      "-", in a row.  They will be collapsed down into 1 dash.
+
 
 7.9.4
 --------------------------------------------------------------------
@@ -181,7 +215,6 @@ save you many hours of grief.
      * Test:Deep, which had been an optional dependency for testing, has been used
        in components of the core for a while, since the release of the new Survey.
        Test::Deep version 0.095 or higher is now required.
-
 
 7.9.2
 --------------------------------------------------------------------
@@ -286,7 +319,6 @@ save you many hours of grief.
       then WebGUI would throw an error.  Starting with 7.8.1, files
       that start with "thumb-" will be renamed by removing that
       prefix from the filename.
-
 
 
 7.8.0

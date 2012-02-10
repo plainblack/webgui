@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -8,24 +8,23 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../../lib";
 use Test::MockObject;
 use Test::MockObject::Extends;
 
 ##The goal of this test is to test the creation of Article Wobjects.
 
 use WebGUI::Test;
+use WebGUI::Test::MockAsset;
+use WebGUI::Test::Mechanize;
 use WebGUI::Session;
-use Test::More tests => 9; # increment this value for each test you create
+use Test::More; # increment this value for each test you create
 use Test::Deep;
 use Data::Dumper;
 
 my $templateId = 'INOUTBOARD_TEMPLATE___';
-my $templateMock = Test::MockObject->new({});
-$templateMock->set_isa('WebGUI::Asset::Template');
-$templateMock->set_always('getId', $templateId);
+my $templateMock = WebGUI::Test::MockAsset->new('WebGUI::Asset::Template');
+$templateMock->mock_id($templateId);
 my $templateVars;
 $templateMock->mock('prepare', sub {  } );
 $templateMock->mock('process', sub { $templateVars = $_[1]; } );
@@ -46,18 +45,13 @@ foreach my $name (@names) {
 }
 WebGUI::Test->addToCleanup(@users);
 
-# Do our work in the import node
-my $node = WebGUI::Asset->getImportNode($session);
-
-my $versionTag = WebGUI::VersionTag->getWorking($session);
-$versionTag->set({name=>"InOutBoard Test"});
-WebGUI::Test->addToCleanup($versionTag);
-my $board = $node->addChild({
+my $tag = WebGUI::VersionTag->getWorking($session);
+my $board = WebGUI::Test->asset(
     className       => 'WebGUI::Asset::Wobject::InOutBoard',
-    inOutTemplateId => $templateId,
-});
+);
+$tag->commit;
+$board = $board->cloneFromDb;
 
-WebGUI::Test->mockAssetId($templateId, $templateMock);
 $board->prepareView();
 
 # Test for a sane object type
@@ -69,13 +63,17 @@ isa_ok($board, 'WebGUI::Asset::Wobject::InOutBoard');
 #
 ################################################################
 
-$session->request->setup_body({
-    delegate => $users[0]->userId,
-    status   => 'In',
-    message  => 'work time',
-});
-$session->scratch->set('userId', $users[0]->userId);
-$board->www_setStatus;
+my $mech = WebGUI::Test::Mechanize->new( config => WebGUI::Test->file );
+$mech->get_ok( '/' );
+$mech->session->user({ user => $users[0] });
+
+$mech->get_ok( $board->getUrl );
+$mech->submit_form_ok({
+    fields   => {
+        status   => 'In',
+        message  => 'work time',
+    },
+}, "update status" );
 my $status;
 $status = $session->db->quickHashRef('select * from InOutBoard_status where assetId=? and userId=?',[$board->getId, $users[0]->userId]);
 cmp_deeply(
@@ -99,18 +97,22 @@ cmp_deeply(
         status  => 'In',
         message => 'work time',
         dateStamp => re('^\d+$'),
-        createdBy => 1,
+        createdBy => $users[0]->getId, 
     },
     '... set statusLog for a user'
 );
 
-$session->scratch->set('userId', $users[1]->userId);
-$session->request->setup_body({
-    delegate => $users[1]->userId,
-    status   => undef,
-    message  => 'work time',
+my $mech = WebGUI::Test::Mechanize->new( config => WebGUI::Test->file );
+$mech->get_ok( '/' );
+$mech->session->user({ user => $users[1] });
+
+$mech->get_ok( $board->getUrl );
+$mech->submit_form_ok({
+    fields   => {
+        status   => undef,
+        message  => 'work time',
+    },
 });
-$board->www_setStatus;
 $status = $session->db->quickHashRef('select * from InOutBoard_status where assetId=? and userId=?',[$board->getId, $users[1]->userId]);
 cmp_deeply(
     $status,
@@ -124,10 +126,6 @@ cmp_deeply(
     { },
     '... no statusLog set when status is blank'
 );
-
-
-$session->request->setup_body({ });
-$session->scratch->delete('userId');
 
 ################################################################
 #
@@ -143,6 +141,8 @@ is_deeply [$board->getStatusList], [qw(In Out Home Lunch)], 'getStatusList';
 #
 ################################################################
 
+$board->update({ inOutTemplateId => $templateId });
+$board->prepareView;
 $board->view;
 cmp_bag(
     $templateVars->{rows_loop},
@@ -162,7 +162,6 @@ cmp_bag(
     'view: returns one entry for each user, entry is correct for user with status'
 ) or diag(Dumper $templateVars->{rows_loop});
 
-WebGUI::Test->unmockAssetId($templateId);
 ################################################################
 #
 #  purge
@@ -176,3 +175,74 @@ $count = $session->db->quickScalar('select count(*) from InOutBoard_status where
 is ($count, 0, 'purge: cleans up status table');
 $count = $session->db->quickScalar('select count(*) from InOutBoard_statusLog where assetId=?',[$boardId]);
 is ($count, 0, '... cleans up statusLog table');
+
+
+#----------------------------------------------------------------------------
+# selectDelegates
+my $tag2 = WebGUI::VersionTag->getWorking($session);
+$board = WebGUI::Test->asset(
+    className       => 'WebGUI::Asset::Wobject::InOutBoard',
+    inOutGroup => '7', # everyone
+);
+$tag2->commit;
+$board = $board->cloneFromDb;
+
+my $mech = WebGUI::Test::Mechanize->new( config => WebGUI::Test->file );
+$mech->get_ok( '/' );
+$mech->session->user({ user => $users[0] });
+
+$mech->get_ok( $board->getUrl( 'func=selectDelegates' ) );
+$mech->submit_form_ok({
+    fields => {
+        delegates => $users[1]->getId,
+    },
+}, "add a delegate" );
+
+my $hasDelegate = $session->db->quickScalar(
+        "SELECT COUNT(*) FROM InOutBoard_delegates WHERE userId=? AND
+        delegateUserId=? AND assetId=?",
+        [ $users[0]->getId, $users[1]->getId, $board->getId ],
+    );
+ok( $hasDelegate, "delegate saved in db" );
+
+#----------------------------------------------------------------------------
+# selectDelegates
+
+my $mech = WebGUI::Test::Mechanize->new( config => WebGUI::Test->file );
+$mech->get_ok( '/' );
+$mech->session->user({ userId => '3' });
+
+# Add some input to report on
+$session->db->write(
+    "insert into InOutBoard_statusLog (assetId,userId,createdBy,status,dateStamp,message) values (?,?,?,?,?,?)",
+    [$board->getId, $users[0]->getId, '3', "in", time, "No sleep till Brooklyn!" ], 
+);
+$session->db->write(
+    "insert into InOutBoard_statusLog (assetId,userId,createdBy,status,dateStamp,message) values (?,?,?,?,?,?)",
+    [$board->getId, $users[1]->getId, '3', "out", time+1000, "Sleeping till Brooklyn!" ], 
+);
+
+$mech->get_ok( $board->getUrl( 'func=viewReport' ) );
+$mech->submit_form_ok( {
+        fields => {
+        },
+    }, "configure the report",
+);
+
+# Report was ok!
+$mech->content_contains( "No sleep till Brooklyn!" );
+$mech->content_contains( "Sleeping till Brooklyn!" );
+
+$mech->submit_form_ok( {
+        fields => {
+            startDate => time + 100,
+            endDate => time + 2000,
+        },
+    }, "configure the report again",
+);
+
+# Report was ok!
+$mech->content_lacks( "No sleep till Brooklyn!" );
+$mech->content_contains( "Sleeping till Brooklyn!" );
+
+done_testing;

@@ -1,6 +1,6 @@
 # vim:syntax=perl
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -13,9 +13,7 @@
 #
 # This tests WebGUI::Asset::Sku, which is the base class for commerce items
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../lib";
 use Test::More;
 use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
@@ -30,11 +28,12 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 22;        # Increment this number for each test you create
+plan tests => 24;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # put your tests here
 my $root = WebGUI::Asset->getRoot($session);
+note "Make sku\n";
 my $sku = $root->addChild({
         className=>"WebGUI::Asset::Sku",
         title=>"Test Sku",
@@ -43,6 +42,7 @@ isa_ok($sku, "WebGUI::Asset::Sku");
 WebGUI::Test->addToCleanup($sku);
 
 $sku->addToCart;
+WebGUI::Test->addToCleanup($sku->getCart);
 
 $sku->applyOptions({
         test1   => "YY"
@@ -52,6 +52,7 @@ my $options = $sku->getOptions;
 is($options->{test1}, "YY", "Can set and get an option.");
 
 
+is $sku->taxConfiguration, '{}', 'default tax configuration is a string with an empty hashref in it';
 is($sku->getMaxAllowedInCart, 99999999, "Got a valid default max in cart.");
 is($sku->getQuantityAvailable, 99999999, "skus should have an unlimited quantity by default");
 is($sku->getQuantityAvailable, $sku->getMaxAllowedInCart, "quantity available and max allowed in cart should be the same");
@@ -65,13 +66,14 @@ is($sku->isRecurring, 0, "skus are not recurring by default");
 is($sku->isShippingRequired, 0, "skus are not shippable by default");
 is($sku->getConfiguredTitle, $sku->getTitle, "configured title and title should be the same by default");
 is($sku->shipsSeparately, 0, 'shipsSeparately return 0 by default');
+is($sku->isShippingSeparately, 0, 'isShippingSeparately return 0 by default');
 
-$sku->update({shipsSeparately => 1,});
-is($sku->shipsSeparately, 0, 'shipsSeparately only returns true when isShippingRequired AND shipsSeparately');
+$sku->shipsSeparately(1);
+is($sku->isShippingSeparately, 0, 'isShippingSeparately only returns true when isShippingRequired AND shipsSeparately');
 
 {
     local *WebGUI::Asset::Sku::isShippingRequired = sub { return 1};
-    is($sku->shipsSeparately, 1, 'shipsSeparately only returns true when isShippingRequired AND shipsSeparately');
+    is($sku->isShippingSeparately, 1, 'isShippingSeparately only returns true when isShippingRequired AND shipsSeparately');
 }
 
 ok(! $sku->isShippingRequired, 'Making sure that GLOB is no longer in effect');
@@ -79,7 +81,6 @@ ok(! $sku->isShippingRequired, 'Making sure that GLOB is no longer in effect');
 isa_ok($sku->getCart, "WebGUI::Shop::Cart", "can get a cart object");
 my $item = $sku->addToCart;
 isa_ok($item, "WebGUI::Shop::CartItem", "can add to cart");
-$item->cart->delete;
 
 my $loadSku = WebGUI::Asset::Sku->newBySku($session, $sku->get("sku"));
 is($loadSku->getId, $sku->getId, "newBySku() works.");

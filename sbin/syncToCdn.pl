@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -11,17 +11,9 @@
 #-------------------------------------------------------------------
 
 use strict;
-use File::Basename ();
-use File::Spec;
-
-my $webguiRoot;
-BEGIN {
-    $webguiRoot = File::Spec->rel2abs(File::Spec->catdir(File::Basename::dirname(__FILE__), File::Spec->updir));
-    unshift @INC, File::Spec->catdir($webguiRoot, 'lib');
-}
-
 use Fcntl ':flock';
 use Getopt::Long;
+use WebGUI::Paths -inc;
 use WebGUI::Session;
 use WebGUI::Storage;
 use Pod::Usage;
@@ -55,7 +47,7 @@ if ( !( $^O =~ /^Win/i ) && $> != 0 && !$override ) {
 }
 
 print "Starting..." unless ($quiet);
-my $session = WebGUI::Session->open( $webguiRoot, $configFile );
+my $session = WebGUI::Session->open( $configFile );
 $session->user( { userId => 3 } );
 print "OK\n" unless ($quiet);
 
@@ -249,6 +241,6 @@ Content Delivery Network (CDN) is not enabled.
 
 =head1 AUTHOR
 
-Copyright 2001-2009 Plain Black Corporation.
+Copyright 2001-2012 Plain Black Corporation.
 
 =cut

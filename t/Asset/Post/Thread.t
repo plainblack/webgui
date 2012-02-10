@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -8,9 +8,7 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../../lib";
 use WebGUI::Test;
 use WebGUI::Session;
 use Test::More tests => 17; # increment this value for each test you create
@@ -27,10 +25,10 @@ my $node = WebGUI::Asset->getImportNode($session);
 # Grab a named version tag
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Collab setup"});
-addToCleanup($versionTag);
+WebGUI::Test->addToCleanup($versionTag);
 
 # Need to create a Collaboration system in which the post lives.
-my @addArgs = ( undef, undef, { skipAutoCommitWorkflows => 1, skipNotification => 1 } );
+my @addArgs = ( undef, undef, { skipNotification => 1, skipAutoCommitWorkflows => 1 } );
 my $collab = $node->addChild({
         className      => 'WebGUI::Asset::Wobject::Collaboration',
         editTimeout    => '1',
@@ -47,22 +45,17 @@ my $props = {
 };
 
 my $thread = $collab->addChild($props, @addArgs);
+$thread->setSkipNotification;
 
 $versionTag->commit();
+$collab = $collab->cloneFromDb;
+$thread = $thread->cloneFromDb;
 
 my $uncommittedThread = $collab->addChild($props, @addArgs);
+$uncommittedThread->setSkipNotification;
 
 # Test for a sane object type
 isa_ok($thread, 'WebGUI::Asset::Post::Thread');
-
-my $env = $session->env;
-$env    = Test::MockObject::Extends->new($env);
-
-my %mockEnv = (
-    REMOTE_ADDR          => '192.168.0.2',
-);
-
-$env->mock('get', sub { return $mockEnv{$_[1]}});
 
 $session->user({userId => 3});
 $thread->rate(1);
@@ -80,11 +73,17 @@ $collab->update({threadsPerPage => 3, postsPerPage => 10,});
 note 'getCSLinkUrl';
 my @newThreads;
 my $threadCount = 15;
+my $versionTag2 = WebGUI::VersionTag->getWorking($session);
+WebGUI::Test->addToCleanup( $versionTag2 );
 while ($threadCount--) {
     push @newThreads, $collab->addChild($props, @addArgs);
 }
-my $versionTag2 = WebGUI::VersionTag->getWorking($session);
+$_->setSkipNotification for @newThreads;
 $versionTag2->commit;
+
+foreach my $asset (@newThreads) {
+    $asset = $asset->cloneFromDb;
+}
 
 my $csUrl = $collab->get('url');
 like $newThreads[-1]->getCSLinkUrl, qr/^$csUrl/, 'getCsLinkUrl returns URL of the parent CS with no gateway';

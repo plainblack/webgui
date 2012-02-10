@@ -3,7 +3,7 @@ package WebGUI::Form::Username;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -98,12 +98,13 @@ Set the head tags for this form plugin
 
 sub headTags {
     my $self = shift;
-    $self->session->style->setScript($self->session->url->extras('form/fieldCheck.js'),{ type=>'text/javascript' });
-    $self->session->style->setScript($self->session->url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'), {type=>'text/javascript'});
-    $self->session->style->setScript($self->session->url->extras('yui/build/connection/connection-min.js'), {type => 'text/javascript'});
-    $self->session->style->setScript($self->session->url->extras('yui/build/json/json-min.js'),                   {type=>'text/javascript'});
-    $self->session->style->setScript($self->session->url->extras('yui/build/datasource/datasource-min.js'),       {type=>'text/javascript'});
-    $self->session->style->setScript($self->session->url->extras('yui-webgui/build/i18n/i18n.js'), {type=>'text/javascript'});
+    my ($style, $url) = $self->session->quick(qw/style url/);
+    $style->setScript($url->extras('form/fieldCheck.js'));
+    $style->setScript($url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'));
+    $style->setScript($url->extras('yui/build/connection/connection-min.js'));
+    $style->setScript($url->extras('yui/build/json/json-min.js'));
+    $style->setScript($url->extras('yui/build/datasource/datasource-min.js'));
+    $style->setScript($url->extras('yui-webgui/build/i18n/i18n.js'));
 }
 
 #-------------------------------------------------------------------
@@ -137,7 +138,7 @@ sub www_check {
   my $session = shift;
   my $input = $session->form->param('input');
 
-  $session->http->setMimeType( 'application/json' );
+  $session->response->content_type( 'application/json' );
   my $i18n = WebGUI::International->new($session, 'Form_Username');
 
   my $error = '';

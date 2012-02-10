@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -8,9 +8,7 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
 use WebGUI::Session;
@@ -20,7 +18,7 @@ use Test::More; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
-my $homeAsset = WebGUI::Asset->getDefault($session);
+my $homeAsset = WebGUI::Test->asset;
 
 my ($time) = $session->dbSlave->quickArray("SELECT max(revisionDate) FROM assetData where assetId=?",[$homeAsset->getId]);
 
@@ -51,9 +49,6 @@ $numTests += 2; #For the use_ok, default asset, and revisionDate=0
 
 plan tests => $numTests;
 
-my $versionTag = WebGUI::VersionTag->getWorking($session);
-addToCleanup($versionTag);
-
 my $output = WebGUI::Macro::LastModified::process($session);
 is($output, '', "Macro returns '' if no asset is defined");
 
@@ -65,9 +60,7 @@ foreach my $testSet (@testSets) {
 	is($output, $testSet->{output}, $testSet->{comment});
 }
 
-$versionTag->set({name=>"Adding assets for LastModified macro tests"});
-
-my $root = WebGUI::Asset->getRoot($session);
+my $root = WebGUI::Test->asset;
 my %properties_A = (
 		className   => 'WebGUI::Asset',
 		title       => 'Asset A',
@@ -80,7 +73,6 @@ my %properties_A = (
 );
 
 my $assetA = $root->addChild(\%properties_A, $properties_A{id}, 0e0);
-$versionTag->commit;
 
 ##Save the original revisionDate and then rewrite it in the db to be 0
 my $revDate = $session->db->quickArray('select max(revisionDate) from assetData where assetId=?', [$assetA->getId]);

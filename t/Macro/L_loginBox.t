@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -8,9 +8,7 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
 use WebGUI::Session;
@@ -21,7 +19,7 @@ use Test::More; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
-my $homeAsset = WebGUI::Asset->getDefault($session);
+my $homeAsset = WebGUI::Test->asset;
 $session->asset($homeAsset);
 my $template = setupTest($session, $homeAsset);
 $session->user({userId=>1});
@@ -29,16 +27,13 @@ $session->user({userId=>1});
 ##Replace the original ENV hash with one that will return a
 ##known user agent.  Since it usually contains a reference to %ENV,
 ##you can't just modify that hash since it's protected
-my $origEnv = $session->{_env};
-my %newEnvHash = (
-    'HTTP_USER_AGENT'   => 'mozilla',
-    'QUERY_STRING'      => 'func=search',
-);
-$session->{_env}->{_env} = \%newEnvHash;
+my $env = $session->request->env;
+$session->request->headers->user_agent('mozilla');
+$env->{'QUERY_STRING'}    = 'func=search';
 
 my $i18n = WebGUI::International->new($session,'Macro_L_loginBox');
 
-plan tests => 30;
+plan tests => 31;
 
 my $output = WebGUI::Macro::L_loginBox::process($session,'','',$template->getId);
 my %vars = simpleTextParser($output);
@@ -61,7 +56,7 @@ is(
 	$vars{'password.form'},
 	WebGUI::Form::password($session,{
 		name=>"identifier",
-		size=>8,
+		size=>12,
 		extras=>'class="loginBoxField"'
 		}),
 	'password.form'
@@ -71,7 +66,7 @@ is(
 	$vars{'username.form'},
 	WebGUI::Form::text($session,{
 		name=>"username",
-		size=>8,
+		size=>12,
 		extras=>'class="loginBoxField"'
 	}),
 	'username.form'
@@ -105,7 +100,7 @@ is($vars{'form.footer'}, WebGUI::Form::formFooter($session), 'form.footer');
 is( $vars{'form.returnUrl'}, 
     WebGUI::Form::hidden( $session, {
         name    => 'returnUrl',
-        value   => $session->url->page($session->env->get("QUERY_STRING")), 
+        value   => $session->url->page($session->request->env->{"QUERY_STRING"}), 
     }),
     'form.returnUrl' 
 );
@@ -118,11 +113,11 @@ $output = WebGUI::Macro::L_loginBox::process($session,24,'Log In',$template->get
 %vars = simpleTextParser($output);
 
 is($vars{'customText'}, 'Log In', 'custom text sent');
-like($vars{'username.form'}, qr/size="16"/, 'boxSize set in username.form');
-like($vars{'password.form'}, qr/size="16"/, 'boxSize set in password.form');
+like($vars{'username.form'}, qr/size="24"/, 'boxSize set in username.form');
+like($vars{'password.form'}, qr/size="24"/, 'boxSize set in password.form');
 
 ##Change browser to be MSIE like and watch boxSize change
-$newEnvHash{'HTTP_USER_AGENT'} = "msie";
+$session->request->headers->user_agent('msie');
 
 $output = WebGUI::Macro::L_loginBox::process($session,24,'Log In',$template->getId);
 %vars = simpleTextParser($output);
@@ -154,6 +149,12 @@ $session->setting->set("encryptLogin", 1);
 $output = WebGUI::Macro::L_loginBox::process($session,'','',$template->getId);
 %vars = simpleTextParser($output);
 like($vars{'form.header'}, qr{https://}, 'form.header action set to use SSL by encryptLogin');
+
+WebGUI::Test->originalConfig('webServerPort');
+$session->config->set('webServerPort', 8081);
+$output = WebGUI::Macro::L_loginBox::process($session,'','',$template->getId);
+%vars = simpleTextParser($output);
+unlike($vars{'form.header'}, qr{:8081}, '... when setting, remove the port');
 
 ##Finally, a test that the default Template exists
 
@@ -202,8 +203,6 @@ sub setupTest {
 	my ($session, $defaultNode) = @_;
 	$session->user({userId=>3});
 	##Create an asset with specific editing privileges
-	my $versionTag = WebGUI::VersionTag->getWorking($session);
-	$versionTag->set({name=>"L_loginBox test"});
 	my $properties = {
 		title => 'L_loginBox test template',
 		className => 'WebGUI::Asset::Template',
@@ -225,7 +224,5 @@ sub setupTest {
 		account.create.label form.footer form.returnUrl/;
 	#$properties->{template} .= "\n";
 	my $template = $defaultNode->addChild($properties, $properties->{id});
-	$versionTag->commit;
-    addToCleanup($versionTag);
 	return $template;
 }

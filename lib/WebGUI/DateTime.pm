@@ -3,7 +3,7 @@ package WebGUI::DateTime;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -130,7 +130,7 @@ sub new
     if (ref $param0 eq "WebGUI::Session") {
        $session = shift;
        my $i18n = WebGUI::International->new($session);
-       my $language = $i18n->getLanguage($session->user->profileField('language'));
+       my $language = $i18n->getLanguage($session->user->get('language'));
 	   $locale = $language->{languageAbbreviation} || 'en';
        $locale .= "_".$language->{locale} if ($language->{locale});
     }
@@ -208,7 +208,7 @@ current users's time zone.
 sub cloneToUserTimeZone {
     my $self = shift;
     my $copy = $self->clone;
-    my $timezone = $self->session->user->profileField("timeZone");
+    my $timezone = $self->session->user->get("timeZone");
     $copy->set_time_zone($timezone);
     return $copy;
 }
@@ -504,11 +504,11 @@ sub webguiToStrftime {
     my $temp;
 
     #--- date format preference
-    $temp = $session->user->profileField('dateFormat') || '%y-%M-%D';
+    $temp = $session->user->get('dateFormat') || '%y-%M-%D';
     $format =~ s/\%z/$temp/g;
 
     #--- time format preference
-    $temp = $session->user->profileField('timeFormat') || '%H:%n %p';
+    $temp = $session->user->get('timeFormat') || '%H:%n %p';
     $format =~ s/\%Z/$temp/g;
 
     #--- convert WebGUI date formats to DateTime formats

@@ -3,7 +3,7 @@ package WebGUI::Asset::File::Image;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -15,11 +15,37 @@ package WebGUI::Asset::File::Image;
 =cut
 
 use strict;
-use base 'WebGUI::Asset::File';
 use WebGUI::Storage;
-use WebGUI::HTMLForm;
-use WebGUI::Utility;
 use WebGUI::Form::Image;
+
+use Moose;
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset::File';
+define assetName     => ['assetName', 'Asset_Image'];
+define tableName     => 'ImageAsset';
+define icon          => 'image.gif';
+property thumbnailSize => (
+                label           => ['thumbnail size', 'Asset_Image'],
+                hoverHelp       => ['Thumbnail size description', 'Asset_Image'],
+                fieldType       => 'integer',
+                builder         => '_default_thumbnailSize',
+                lazy            => 1,
+         );
+sub _default_thumbnailSize {
+    my $self = shift;
+    return $self->session->setting->get('thumbnailSize');
+}
+property parameters => (
+                label           => ['parameters', 'Asset_Image'],
+                hoverHelp       => ['Parameters description', 'Asset_Image'],
+                fieldType       => 'textarea',
+                default         => 'style="border-style:none;"',
+         );
+property annotations => (
+                fieldType       => 'hidden',
+                noFormPost      => 1,
+                default         => '',
+         );
 
 =head1 NAME
 
@@ -62,62 +88,18 @@ An integer (in pixels) representing the longest edge a thumbnail may have.
 
 =cut
 
-sub applyConstraints {
+override applyConstraints => sub {
     my $self = shift;
     my $options = shift;
-    $self->SUPER::applyConstraints($options);
-    my $maxImageSize = $options->{maxImageSize} || $self->get('maxImageSize') || $self->session->setting->get("maxImageSize");
-    my $thumbnailSize = $options->{thumbnailSize} || $self->get('thumbnailSize') || $self->session->setting->get("thumbnailSize");
-    my $storage    = $self->getStorageLocation;
-    my $file       = $self->get("filename");
+    super();
+    my $maxImageSize  = $options->{maxImageSize}  || $self->session->setting->get("maxImageSize");
+    my $thumbnailSize = $options->{thumbnailSize} || $self->thumbnailSize || $self->session->setting->get("thumbnailSize");
+    my $storage = $self->getStorageLocation;
+    my $file = $self->filename;
     $storage->adjustMaxImageSize($file, $maxImageSize);
     $self->generateThumbnail($thumbnailSize);
     $self->setSize;
-}
-
-
-
-#-------------------------------------------------------------------
-
-=head2 definition ( definition )
-
-Defines the properties of this asset.
-
-=head3 definition
-
-A hash reference passed in from a subclass definition.
-
-=cut
-
-sub definition {
-    my $class       = shift;
-    my $session     = shift;
-    my $definition  = shift;
-    my $i18n        = WebGUI::International->new($session,"Asset_Image");
-    push @{$definition}, {
-        assetName       => $i18n->get('assetName'),
-        tableName       => 'ImageAsset',
-        className       => 'WebGUI::Asset::File::Image',
-        icon            => 'image.gif',
-        properties => {
-            thumbnailSize => {
-                fieldType       => 'integer',
-                defaultValue    => $session->setting->get("thumbnailSize"),
-            },
-            parameters => {
-                fieldType       => 'textarea',
-                defaultValue    => 'style="border-style:none;"',
-                allowEmpty      => 1,
-            },
-            annotations => {
-                fieldType       => 'hidden',
-                noFormPost      => 1,
-                defaultValue    => '',
-            },
-        },
-    };
-    return $class->SUPER::definition($session,$definition);
-}
+};
 
 
 
@@ -139,7 +121,7 @@ sub generateThumbnail {
 	if (defined $thumbnailSize) {
 		$self->update({thumbnailSize=>$thumbnailSize});
 	}
-	$self->getStorageLocation->generateThumbnail($self->get("filename"),$self->get("thumbnailSize"));
+	$self->getStorageLocation->generateThumbnail($self->filename,$self->thumbnailSize);
 }
 
 
@@ -147,58 +129,77 @@ sub generateThumbnail {
 
 =head2 getEditForm ( )
 
-Returns the TabForm object that will be used in generating the edit page for this asset.
+Returns the WebGUI::FormBuilder object that will be used in generating the edit page for this asset.
 
 =cut
 
-sub getEditForm {
+override getEditForm => sub {
     my $self = shift;
-    my $tabform = $self->SUPER::getEditForm();
-
-# Add the fields defined locally and apply any overrides from the config file
+    my $f = super();
     my $i18n = WebGUI::International->new($self->session,"Asset_Image");
 
-    tie my %extraFields, "Tie::IxHash";
+    # Fix templateId to use correct namespace and default
+    my $template = $f->getTab('display')->getField('templateId');
+    $template->set( hoverHelp => $i18n->get('image template description') );
+    $template->set( namespace => 'ImageAsset' );
+    $template->set( defaultValue => 'PBtmpl0000000000000088' );
 
-    $extraFields{thumbnailSize} = {
-        fieldType => "integer",
-        name      => "thumbnailSize",
-        label     => $i18n->get('thumbnail size'),
-        hoverHelp => $i18n->get('Thumbnail size description'),
-        value     => $self->getValue("thumbnailSize"),
-    };
-    $extraFields{parameters} = {
-        fieldType => "textarea",
-        name      => "parameters",
-        label     => $i18n->get('parameters'),
-        hoverHelp => $i18n->get('Parameters description'),
-        value     => $self->getValue("parameters"),
-    };
 
-    if ($self->get("filename") ne "") {
-          my ($x, $y) = $self->getStorageLocation->getSizeInPixels($self->get("filename"));
+    # Add the fields defined locally and apply any overrides from the config file
+    my $overrides = $self->session->config->get("assets/".$self->className);
 
-          $extraFields{thumbnail} = {
-              fieldType => "readOnly",
+    if ($self->filename ne "") {
+          my ($x, $y) = $self->getStorageLocation->getSizeInPixels($self->filename);
+
+          $f->getTab('properties')->addField( "ReadOnly", 
+              name      => 'thumbnail',
               label     => $i18n->get('thumbnail'),
               hoverHelp => $i18n->get('Thumbnail description'),
-              value     => '<a href="'.$self->getFileUrl.'"><img src="'.$self->getThumbnailUrl.'?noCache='.$self->session->datetime->time().'" alt="thumbnail" /></a>'
-          };
-          $extraFields{imageSize} = {
-              fieldType => "readOnly",
+              value     => '<a href="'.$self->getFileUrl.'"><img src="'.$self->getThumbnailUrl.'?noCache='.time().'" alt="thumbnail" /></a>',
+              ( $overrides->{thumbnail} ? %{$overrides->{thumbnail}} : () ),
+          );
+          $f->getTab('properties')->addField( "ReadOnly", 
+              name      => 'imageSize',
               label     => $i18n->get('image size'),
               value     => $x.' x '.$y,
-          };
+              ( $overrides->{imageSize} ? %{$overrides->{imageSize}} : () ),
+          );
     }
 
-    my $overrides = $self->session->config->get("assets/".$self->get("className"));
+    return $f;
+};
 
-    foreach my $fieldName (keys %extraFields) {
-        $self->setupFormField($tabform, $fieldName, \%extraFields, $overrides);
-    }
+#-------------------------------------------------------------------
 
-    return $tabform;
-}
+=head2 getHelpers ( )
+
+Add the image helpers
+
+=cut
+
+override getHelpers => sub {
+    my ( $self ) = @_;
+
+    my $helpers = super();
+    $helpers->{resize} = {
+        className   => 'WebGUI::AssetHelper::Image::Resize',
+        label       => 'Resize Image',
+    };
+    $helpers->{rotate} = {
+        className   => 'WebGUI::AssetHelper::Image::Rotate',
+        label       => 'Rotate Image',
+    };
+    $helpers->{crop} = {
+        className   => 'WebGUI::AssetHelper::Image::Crop',
+        label       => 'Crop Image',
+    };
+    $helpers->{annotate} = {
+        url         => $self->getUrl( 'func=annotate' ),
+        label       => "Annotate Image",
+    };
+
+    return $helpers;
+};
 
 #-------------------------------------------------------------------
 
@@ -210,21 +211,7 @@ Returns the URL to the thumbnail of the image stored in the Asset.
 
 sub getThumbnailUrl {
 	my $self = shift;
-	return $self->getStorageLocation->getThumbnailUrl($self->get("filename"));
-}
-
-#-------------------------------------------------------------------
-
-=head2 getToolbar ( )
-
-Returns a toolbar with a set of icons that hyperlink to functions that delete, edit, promote, demote, cut, and copy.
-
-=cut
-
-sub getToolbar {
-	my $self = shift;
-	return undef if ($self->getToolbarState);
-	return $self->SUPER::getToolbar();
+	return $self->getStorageLocation->getThumbnailUrl($self->filename);
 }
 
 #-------------------------------------------------------------------
@@ -236,11 +223,12 @@ Renders this asset.
 =cut
 
 sub view {
-	my $self    = shift;
+	my $self = shift;
     my $session = $self->session;
-	if (!$session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
-        my $cache = $self->getCache;
-        my $out   = $cache->get if defined $cache;
+    my $cache = $session->cache;
+    my $cacheKey = $self->getWwwCacheKey('view');
+    if (!$session->isAdminOn && $self->cacheTimeout > 10) {
+        my $out = $cache->get( $cacheKey );
 		return $out if $out;
 	}
 	my %var = %{$self->get};
@@ -249,21 +237,21 @@ sub view {
     if ($crop_js) {
         my ($style, $url) = $session->quick(qw(style url));
 
-        $style->setLink($url->extras('yui/build/fonts/fonts-min.css'), {rel=>'stylesheet', type=>'text/css'});
-        $style->setLink($url->extras('yui/container/assets/container.css'), {rel=>'stylesheet', type=>'text/css'});
-        $style->setScript($url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'), {type=>'text/javascript'});
-        $style->setScript($url->extras('yui/build/container/container-min.js'), {type=>'text/javascript'});
+        $style->setCss($url->extras('yui/build/fonts/fonts-min.css'));
+        $style->setCss($url->extras('yui/container/assets/container.css'));
+        $style->setScript($url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'));
+        $style->setScript($url->extras('yui/build/container/container-min.js'));
     }
 
     $var{controls}    = $self->getToolbar;
     $var{fileUrl}     = $self->getFileUrl;
     $var{fileIcon}    = $self->getFileIconUrl;
     $var{thumbnail}   = $self->getThumbnailUrl;
-    $var{annotateJs}  = "$crop_js$domMe";
-    $var{parameters} .= sprintf(q{ id="%s"}, $self->getId());
+    $var{annotateJs}  = $crop_js . $domMe;
+    $var{parameters} .= sprintf(q{ id="%s"}, $self->getId);
     my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
-    if (!$session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
-        WebGUI::Cache->new($self->session,"view_".$self->getId)->set($out,$self->get("cacheTimeout"));
+    if (!$session->isAdminOn && $self->cacheTimeout > 10) {
+        $cache->set( $cacheKey, $out, $self->get("cacheTimeout") );
     }
     return $out;
 }
@@ -277,64 +265,11 @@ Extend the superclass setFile to automatically generate thumbnails.
 
 =cut
 
-sub setFile {
+override setFile => sub {
     my $self    = shift;
-    $self->SUPER::setFile(@_);
+    super();
     $self->generateThumbnail;
-}
-
-#-------------------------------------------------------------------
-
-=head2 www_edit 
-
-Override the master class to add image editing controls to the edit screen.
-Also adds the Image template form variable.
-
-=cut
-
-sub www_edit {
-    my $self    = shift;
-    my $session = $self->session;
-    return $session->privilege->insufficient() unless $self->canEdit;
-    return $session->privilege->locked()       unless $self->canEditIfLocked;
-    my $i18n = WebGUI::International->new($session, 'Asset_Image');
-    if ($self->get('filename')) {
-        my $ac   = $self->getAdminConsole;
-        $ac->addSubmenuItem($self->getUrl('func=resize'),   $i18n->get("resize image"));
-        $ac->addSubmenuItem($self->getUrl('func=rotate'),   $i18n->get("rotate image"));
-        $ac->addSubmenuItem($self->getUrl('func=crop'),     $i18n->get("crop image"));
-        $ac->addSubmenuItem($self->getUrl('func=annotate'), $i18n->get("annotate image"));
-        $ac->addSubmenuItem($self->getUrl('func=undo'),     $i18n->get("undo image"));
-    }
-    my $tabform = $self->getEditForm;
-    $tabform->getTab("display")->template(
-        -value        => $self->get("templateId"),
-        -namespace    => "ImageAsset",
-        -hoverHelp    => $i18n->get('image template description'),
-        -defaultValue => "PBtmpl0000000000000088",
-    );
-    return $self->getAdminConsole->render($tabform->print,$i18n->get("edit image"));
-}
-
-#-------------------------------------------------------------------
-
-=head2 www_undo 
-
-Rolls back the last revision of this asset, undoing any work that may
-have been done to it.
-
-=cut
-
-sub www_undo {
-    my $self = shift;
-    my $previous = (@{$self->getRevisions()})[1];
-    if ($previous) {
-	    $self->purgeRevision();
-	    $self = $previous;
-	    $self->generateThumbnail;
-    }
-    return $self->www_edit();
-}
+};
 
 #-------------------------------------------------------------------
 
@@ -356,10 +291,12 @@ sub www_annotate {
     return $session->privilege->insufficient() unless $self->canEdit;
     return $session->privilege->locked()       unless $self->canEditIfLocked;
 	if (1) {
-		my $newSelf = $self->addRevision();
+                my $tag = WebGUI::VersionTag->getWorking( $session );
+		my $newSelf = $self->addRevision({ tagId => $tag->getId, status => "pending" });
+                $newSelf->setVersionLock;
 		delete $newSelf->{_storageLocation};
-		$newSelf->getStorageLocation->annotate($newSelf->get("filename"),$newSelf,$session->form);
-		$newSelf->setSize($newSelf->getStorageLocation->getFileSize($newSelf->get("filename")));
+		$newSelf->getStorageLocation->annotate($newSelf->filename,$newSelf,$session->form);
+		$newSelf->setSize($newSelf->getStorageLocation->getFileSize($newSelf->filename));
 		$self = $newSelf;
 		$self->generateThumbnail;
         WebGUI::VersionTag->autoCommitWorkingIfEnabled($session, { allowComments => 0 });
@@ -367,17 +304,17 @@ sub www_annotate {
 
     my ($style, $url) = $session->quick(qw(style url));
 
-	$style->setLink($url->extras('yui/build/resize/assets/skins/sam/resize.css'), {rel=>'stylesheet', type=>'text/css'});
-	$style->setLink($url->extras('yui/build/fonts/fonts-min.css'), {rel=>'stylesheet', type=>'text/css'});
-	$style->setLink($url->extras('yui/build/imagecropper/assets/skins/sam/imagecropper.css'), {rel=>'stylesheet', type=>'text/css'});
+	$style->setCss($url->extras('yui/build/resize/assets/skins/sam/resize.css'));
+	$style->setCss($url->extras('yui/build/fonts/fonts-min.css'));
+	$style->setCss($url->extras('yui/build/imagecropper/assets/skins/sam/imagecropper.css'));
 
-	$style->setScript($url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'), {type=>'text/javascript'});
-	$style->setScript($url->extras('yui/build/element/element-min.js'), {type=>'text/javascript'});
-	$style->setScript($url->extras('yui/build/dragdrop/dragdrop-min.js'), {type=>'text/javascript'});
-	$style->setScript($url->extras('yui/build/resize/resize-min.js'), {type=>'text/javascript'});
-	$style->setScript($url->extras('yui/build/imagecropper/imagecropper-min.js'), {type=>'text/javascript'});
+	$style->setScript($url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'));
+	$style->setScript($url->extras('yui/build/element/element-min.js'));
+	$style->setScript($url->extras('yui/build/dragdrop/dragdrop-min.js'));
+	$style->setScript($url->extras('yui/build/resize/resize-min.js'));
+	$style->setScript($url->extras('yui/build/imagecropper/imagecropper-min.js'));
 
-	my @pieces = split(/\n/, $self->get('annotations'));
+	my @pieces = split(/\n/, $self->annotations);
 	
     my ($img_null, $tooltip_block, $tooltip_none) = ('', '', '');
 	for (my $i = 0; $i < $#pieces; $i += 3) {
@@ -387,52 +324,52 @@ sub www_annotate {
         my $j = $i + 2;
     }
 
-    my $image = '<div align="center" class="yui-skin-sam"><img src="'.$self->getStorageLocation->getUrl($self->get("filename")).'" style="border-style:none;" alt="'.$self->get("filename").'" id="yui_img" /></div>';
+    my $image = '<div align="center" class="yui-skin-sam"><img src="'.$self->getStorageLocation->getUrl($self->filename).'" style="border-style:none;" alt="'.$self->filename.'" id="yui_img" /></div>';
 
-	my ($width, $height) = $self->getStorageLocation->getSize($self->get("filename"));
+	my ($width, $height) = $self->getStorageLocation->getSize($self->filename);
 
 	my @checkboxes = ();
 	my $i18n = WebGUI::International->new($session,"Asset_Image");
-	my $f    = WebGUI::HTMLForm->new($session);
+	my $f    = WebGUI::FormBuilder->new($session);
 
-	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=edit'),$i18n->get("edit image"));
-	$f->hidden(
+	$f->addField( "hidden", 
 		-name=>"func",
 		-value=>"annotate"
 		);
-    $f->text(
+    $f->addField( "text", 
 		-label=>$i18n->get('annotate image'),
 		-value=>'',
 		-hoverHelp=>$i18n->get('annotate image description'),
 		-name=>'annotate_text'
 		);
-	$f->integer(
+	$f->addField( "integer", 
 		-label=>$i18n->get('top'),
 		-name=>"annotate_top",
 		-value=>,
 		);
-	$f->integer(
+	$f->addField( "integer", 
 		-label=>$i18n->get('left'),
 		-name=>"annotate_left",
 		-value=>,
 		);
-	$f->integer(
+	$f->addField( "integer", 
 		-label=>$i18n->get('width'),
 		-name=>"annotate_width",
 		-value=>,
 		);
-	$f->integer(
+	$f->addField( "integer", 
 		-label=>$i18n->get('height'),
 		-name=>"annotate_height",
 		-value=>,
 		);
-    $f->button(
+    $f->addField( "button", 
         -value=>$i18n->get('annotate'),
         -extras=>'onclick="switchState();"',
         );
-	$f->submit;
+	$f->addField( "submit", name => "send" );
     my ($crop_js, $domMe) = $self->annotate_js();
-    return $self->getAdminConsole->render($f->print."$image$crop_js$domMe",$i18n->get("annotate image"));
+    my $output = '<h1>' . $i18n->get('annotate image') . '</h1>' . $f->toHtml . $image . $crop_js . $domMe;
+    return $style->process( $output, "PBtmplBlankStyle000001" );
 }
 
 #-------------------------------------------------------------------
@@ -453,7 +390,7 @@ sub annotate_js {
     my $self = shift;
     my $opts = shift;
 
-	my @pieces = split(/\n/, $self->get('annotations'));
+	my @pieces = split(/\n/, $self->annotations);
 
     # warn("pieces: $#pieces: ". $self->getId());
     return "" if !@pieces && $opts->{just_image};
@@ -558,287 +495,5 @@ sub annotate_js {
     return($crop_js, $domMe);
 }
 
-#-------------------------------------------------------------------
-
-=head2 www_rotate 
-
-Displays a form to the user to rotate their image.  If the C<Rotate> form variable
-is true, does the rotation as well.
-
-Returns the user to the roate form.
-
-=cut
-
-sub www_rotate {
-    my $self    = shift;
-    my $session = $self->session;
-    return $session->privilege->insufficient() unless $self->canEdit;
-    return $session->privilege->locked()       unless $self->canEditIfLocked;
-	if (defined $session->form->process("Rotate")) {
-		my $newSelf = $self->addRevision();
-		delete $newSelf->{_storageLocation};
-		$newSelf->getStorageLocation->rotate($newSelf->get("filename"),$session->form->process("Rotate"));
-		$newSelf->setSize($newSelf->getStorageLocation->getFileSize($newSelf->get("filename")));
-		$self = $newSelf;
-		$self->generateThumbnail;
-        WebGUI::VersionTag->autoCommitWorkingIfEnabled($session, { allowComments => 0 });
-	}
-
-	my ($x, $y) = $self->getStorageLocation->getSizeInPixels($self->get("filename"));
-
-	##YUI specific datatable CSS
-	my ($style, $url) = $session->quick(qw(style url));
-
-	my $img_name = $self->getStorageLocation->getUrl($self->get("filename"));
-	my $img_file = $self->get("filename");
-	my $image = '<div align="center" class="yui-skin-sam"><img src="'.$self->getStorageLocation->getUrl($self->get("filename")).'" style="border-style:none;" alt="'.$self->get("filename").'" id="yui_img" /></div>';
-
-	my $i18n = WebGUI::International->new($session,"Asset_Image");
-	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=edit'),$i18n->get("edit image"));
-	my $f = WebGUI::HTMLForm->new($session);
-	$f->hidden(
-		-name=>"func",
-		-value=>"rotate"
-    );
-    $f->button(
-        -value=>"Left",
-        -extras=>qq(onclick="var deg = document.getElementById('Rotate_formId').value; deg = parseInt(deg) + 90; document.getElementById('Rotate_formId').value = deg;"),
-    );
-    $f->button(
-        -value=>"Right",
-        -extras=>qq(onclick="var deg = document.getElementById('Rotate_formId').value; deg = parseInt(deg) - 90; document.getElementById('Rotate_formId').value = deg;"),
-    );
-	$f->integer(
-		-label=>$i18n->get('degree'),
-		-name=>"Rotate",
-		-value=>0,
-    );
-	$f->submit;
-    return $self->getAdminConsole->render($f->print.$image,$i18n->get("rotate image"));
-}
-
-#-------------------------------------------------------------------
-
-=head2 www_resize 
-
-Displays a form for the user to resize this image.  If either of the C<newWidth> or
-C<newHeight> form variables are true, also does the resizing.
-
-Returns the user to the resize form.
-
-=cut
-
-sub www_resize {
-    my $self    = shift;
-    my $session = $self->session;
-    return $session->privilege->insufficient() unless $self->canEdit;
-    return $session->privilege->locked()       unless $self->canEditIfLocked;
-    if ($session->form->process("newWidth") || $session->form->process("newHeight")) {
-        my $newSelf = $self->addRevision();
-        delete $newSelf->{_storageLocation};
-        $newSelf->getStorageLocation->resize($newSelf->get("filename"),$session->form->process("newWidth"),$session->form->process("newHeight"));
-        $newSelf->setSize($newSelf->getStorageLocation->getFileSize($newSelf->get("filename")));
-        $self = $newSelf;
-        $self->generateThumbnail;
-        WebGUI::VersionTag->autoCommitWorkingIfEnabled($session, { allowComments => 0 });
-    }
-
-	my ($x, $y) = $self->getStorageLocation->getSizeInPixels($self->get("filename"));
-
-	##YUI specific datatable CSS
-	my ($style, $url) = $session->quick(qw(style url));
-
-	$style->setLink($url->extras('yui/build/fonts/fonts-min.css'), {rel=>'stylesheet', type=>'text/css'});
-	$style->setLink($url->extras('yui/build/resize/assets/skins/sam/resize.css'), {rel=>'stylesheet', type=>'text/css'});
-	$style->setScript($url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'), {type=>'text/javascript'});
-	$style->setScript($url->extras('yui/build/element/element-min.js'), {type=>'text/javascript'});
-	$style->setScript($url->extras('yui/build/dragdrop/dragdrop-min.js'), {type=>'text/javascript'});
-	$style->setScript($url->extras('yui/build/resize/resize-min.js'), {type=>'text/javascript'});
-	$style->setScript($url->extras('yui/build/animation/animation-min.js'), {type=>'text/javascript'});
-
-	my $resize_js = qq(
-		<script>
-		(function() { 
-			  var Dom = YAHOO.util.Dom, 
-			      Event = YAHOO.util.Event; 
-		       
-			      var resize = new YAHOO.util.Resize('yui_img', { 
-				  handles: 'all', 
-				  knobHandles: true, 
-				  height: '${y}px', 
-				  width: '${x}px', 
-				    proxy: true, 
-				    ghost: true, 
-				    status: true, 
-				    draggable: false, 
-				    ratio: true,
-				    animate: true, 
-				    animateDuration: .75, 
-				    animateEasing: YAHOO.util.Easing.backBoth 
-				}); 
-			 
-				resize.on('startResize', function() { 
-				    this.getProxyEl().innerHTML = '<img src="' + this.get('element').src + '" style="height: 100%; width: 100%;">'; 
-				    Dom.setStyle(this.getProxyEl().firstChild, 'opacity', '.25'); 
-				}, resize, true); 
-
-				resize.on('resize', function(e) { 
-				    element = document.getElementById('newWidth_formId');
-				    element.value = e.width;
-
-				    element = document.getElementById('newHeight_formId');
-				    element.value = e.height;
-			        }, resize, true); 
-			})(); 
-		</script>
-	);
-
-    my $i18n = WebGUI::International->new($session,"Asset_Image");
-    $self->getAdminConsole->addSubmenuItem($self->getUrl('func=edit'),$i18n->get("edit image"));
-    my $f = WebGUI::HTMLForm->new($session);
-    $f->hidden(
-        -name=>"func",
-        -value=>"resize"
-        );
-        $f->readOnly(
-        -label=>$i18n->get('image size'),
-        -hoverHelp=>$i18n->get('image size description'),
-        -value=>$x.' x '.$y,
-        );
-    $f->integer(
-        -label=>$i18n->get('new width'),
-        -hoverHelp=>$i18n->get('new width description'),
-        -name=>"newWidth",
-        -value=>$x,
-        );
-    $f->integer(
-        -label=>$i18n->get('new height'),
-        -hoverHelp=>$i18n->get('new height description'),
-        -name=>"newHeight",
-        -value=>$y,
-        );
-    $f->submit;
-    my $image = '<div align="center" class="yui-skin-sam"><img src="'.$self->getStorageLocation->getUrl($self->get("filename")).'" style="border-style:none;" alt="'.$self->get("filename").'" id="yui_img" /></div>'.$resize_js;
-    return $self->getAdminConsole->render($f->print.$image,$i18n->get("resize image"));
-}
-
-#-------------------------------------------------------------------
-
-=head2 www_crop 
-
-Display a form that allows the user to Crop their images.  Also does the
-cropping if any of the C<Width>, C<Height>, C<Top> or C<Left> form
-variables are true.
-
-Returns the user to the cropping form.
-
-=cut
-
-sub www_crop {
-    my $self    = shift;
-    my $session = $self->session;
-    return $session->privilege->insufficient() unless $self->canEdit;
-    return $session->privilege->locked()       unless $self->canEditIfLocked;
-
-    if ($session->form->process("Width") || $session->form->process("Height") 
-        || $session->form->process("Top") || $session->form->process("Left")) {
-        my $newSelf = $self->addRevision();
-        delete $newSelf->{_storageLocation};
-        $newSelf->getStorageLocation->crop(
-            $newSelf->get("filename"),
-            $session->form->process("Width"),
-            $session->form->process("Height"),
-            $session->form->process("Top"),
-            $session->form->process("Left")
-        );
-		$self = $newSelf;
-		$self->generateThumbnail;
-        WebGUI::VersionTag->autoCommitWorkingIfEnabled($session, { allowComments => 0 });
-    }
-
-	my $filename = $self->get("filename");
-
-	##YUI specific datatable CSS
-    my ($style, $url) = $session->quick(qw(style url));
-
-	my $crop_js = qq(
-		<script>
-		(function() {
-            var Dom = YAHOO.util.Dom, Event = YAHOO.util.Event, results = null; 
-
-        Event.onDOMReady(function() { 
-                var crop = new YAHOO.widget.ImageCropper('yui_img', { 
-                    initialXY: [20, 20], 
-                    keyTick: 5, 
-                    shiftKeyTick: 50 
-                }); 
-                crop.on('moveEvent', function() { 
-                    var region = crop.getCropCoords(); 
-                    element = document.getElementById('Width_formId');
-                    element.value = region.width;
-                    element = document.getElementById('Height_formId');
-                    element.value = region.height;
-                    element = document.getElementById('Top_formId');
-                    element.value = region.top;
-                    element = document.getElementById('Left_formId');
-                    element.value = region.left;
-                }); 
-            }); 
-        })(); 
-		</script>
-    );
-
-	$style->setLink($url->extras('yui/build/resize/assets/skins/sam/resize.css'), {rel=>'stylesheet', type=>'text/css'});
-	$style->setLink($url->extras('yui/build/fonts/fonts-min.css'), {rel=>'stylesheet', type=>'text/css'});
-	$style->setLink($url->extras('yui/build/imagecropper/assets/skins/sam/imagecropper.css'), {rel=>'stylesheet', type=>'text/css'});
-	$style->setScript($url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'), {type=>'text/javascript'});
-	$style->setScript($url->extras('yui/build/element/element-min.js'), {type=>'text/javascript'});
-	$style->setScript($url->extras('yui/build/dragdrop/dragdrop-min.js'), {type=>'text/javascript'});
-	$style->setScript($url->extras('yui/build/resize/resize-min.js'), {type=>'text/javascript'});
-	$style->setScript($url->extras('yui/build/imagecropper/imagecropper-min.js'), {type=>'text/javascript'});
-
-	my $i18n = WebGUI::International->new($session,"Asset_Image");
-
-	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=edit'),$i18n->get("edit image"));
-	my $f = WebGUI::HTMLForm->new($session);
-	$f->hidden(
-		-name=>"degree",
-		-value=>"0"
-		);
-	$f->hidden(
-		-name=>"func",
-		-value=>"crop"
-		);
-	my ($x, $y) = $self->getStorageLocation->getSizeInPixels($filename);
-	$f->integer(
-		-label=>$i18n->get('width'),
-		-hoverHelp=>$i18n->get('new width description'),
-		-name=>"Width",
-		-value=>$x,
-		);
-	$f->integer(
-		-label=>$i18n->get('height'),
-		-hoverHelp=>$i18n->get('new height description'),
-		-name=>"Height",
-		-value=>$y,
-		);
-	$f->integer(
-		-label=>$i18n->get('top'),
-		-hoverHelp=>$i18n->get('new width description'),
-		-name=>"Top",
-		-value=>$x,
-		);
-	$f->integer(
-		-label=>$i18n->get('left'),
-		-hoverHelp=>$i18n->get('new height description'),
-		-name=>"Left",
-		-value=>$y,
-		);
-	$f->submit;
-
-    my $image = '<div align="center" class="yui-skin-sam"><img src="'.$self->getStorageLocation->getUrl($filename).'" style="border-style:none;" alt="'.$filename.'" id="yui_img" /></div>'.$crop_js;
-
-    return $self->getAdminConsole->render($f->print.$image,$i18n->get("crop image"));
-}
-
+__PACKAGE__->meta->make_immutable;
 1;

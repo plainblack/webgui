@@ -3,7 +3,7 @@ package WebGUI::FormValidator;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -17,7 +17,7 @@ package WebGUI::FormValidator;
 use strict qw(vars subs);
 use WebGUI::HTML;
 use WebGUI::Pluggable;
-use Scalar::Util qw( weaken );
+use Scalar::Util qw(weaken);
 
 =head1 NAME
 
@@ -75,26 +75,14 @@ sub AUTOLOAD {
 	$params = {name=>$params} if ref ($params) ne "HASH";
     my $control = eval { WebGUI::Pluggable::instanciate("WebGUI::Form::".$name, "new", [ $self->session, $params ]) };
     if ($@) {
-        $self->session->errorHandler->error($@);
+        $self->session->log->error($@);
         return undef;
     }
 	return $control->getValue(@args);
 }
 
-#-------------------------------------------------------------------
-
-=head2 DESTROY ( )
-
-Deconstructor.
-
-=cut
-
-sub DESTROY {
-        my $self = shift;
-        undef $self;
-}
-
-
+# so it doesn't get autoloaded
+sub DESTROY {}
 
 #-------------------------------------------------------------------
 
@@ -122,11 +110,11 @@ A reference to the current session.
 =cut
 
 sub new {
-	my $class = shift;
-	my $session = shift;
-	my $self = bless {_session=>$session}, $class;
-        weaken( $self->{_session} );
-        return $self;
+    my $class = shift;
+    my $session = shift;
+    my $self = bless {_session=>$session}, $class;
+    weaken $self->{_session};
+    return $self;
 }
 
 

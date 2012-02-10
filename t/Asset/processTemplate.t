@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -13,6 +13,7 @@ use strict;
 use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
+use WebGUI::Test::MockAsset;
 use WebGUI::Session;
 use WebGUI::Asset;
 
@@ -35,14 +36,12 @@ $snippet = $snippet->cloneFromDb;
 ##Override the user function style template so we can examine its output easily
                  #1234567890123456789012#
 my $templateId = 'USER_STYLE_OVERRIDE___';
-my $templateMock = Test::MockObject->new({});
-$templateMock->set_isa('WebGUI::Asset::Template');
-$templateMock->set_always('getId', $templateId);
+my $templateMock = WebGUI::Test::MockAsset->new('WebGUI::Asset::Template');
+$templateMock->mock_id($templateId);
 my $templateVars;
 $templateMock->mock('process', sub { $templateVars = clone($_[1]); } );
 
 {
-    WebGUI::Test->mockAssetId($templateId, $templateMock);
     $snippet->processTemplate({}, $templateId);
     use WebGUI::Keyword;
     my $keywords = WebGUI::Keyword::string2list($templateVars->{keywords});

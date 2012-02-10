@@ -6,8 +6,11 @@ use WebGUI::Text;
 use WebGUI::Storage;
 use WebGUI::Exception::Shop;
 use List::Util qw{ sum };
+use Tie::IxHash;
 
-use base qw{ WebGUI::Shop::TaxDriver };
+use Moose;
+use WebGUI::Definition;
+extends 'WebGUI::Shop::TaxDriver';
 
 
 =head1 NAME
@@ -141,18 +144,6 @@ sub getTaxRate {
     my $itemTax = sum @{ $taxables };
     
     return $itemTax;
-}
-
-#-------------------------------------------------------------------
-
-=head2 className
-
-Returns the name of this class.
-
-=cut
-
-sub className {
-    return 'WebGUI::Shop::TaxDriver::Generic';
 }
 
 #-------------------------------------------------------------------
@@ -468,7 +459,7 @@ sub www_exportTax {
     return $session->privilege->insufficient unless $self->canManage;
 
     my $storage = $self->exportTaxData();
-    $self->session->http->setRedirect($storage->getUrl($storage->getFiles->[0]));
+    $self->session->response->setRedirect($storage->getUrl($storage->getFiles->[0]));
     return "redirect";
 }
 
@@ -490,7 +481,8 @@ sub www_getTaxesAsJson {
     my ($db, $form) = $session->quick(qw(db form));
     my $startIndex      = $form->get('startIndex') || 0;
     my $numberOfResults = $form->get('results')    || 25;
-    my %goodKeys = qw/country 1 state 1 city 1 code 1 'tax rate' 1/;
+    my %goodKeys = qw/country 1 state 1 city 1 code 1/;
+    $goodKeys{'tax rate'} = 1;
     my $sortKey = $form->get('sortKey');
     $sortKey = $goodKeys{$sortKey} == 1 ? $sortKey : 'country';
     my $sortDir = $form->get('sortDir');
@@ -516,7 +508,7 @@ sub www_getTaxesAsJson {
     $results{'startIndex'}   = $startIndex;
     $results{'sort'}         = undef;
     $results{'dir'}          = $sortDir;
-    $session->http->setMimeType('application/json');
+    $session->response->content_type('application/json');
     return JSON::to_json(\%results);
 }
 
@@ -558,13 +550,13 @@ sub www_importTax {
 
 #-----------------------------------------------------------
 
-=head2 getConfigurationScreen ( )
+=head2 getEditForm ( )
 
 Returns the form that contains the configuration options for this plugin in the admin console.
 
 =cut
 
-sub getConfigurationScreen {
+sub getEditForm {
     my $self            = shift;
     my $session         = $self->session;
     my $status_message  = $session->stow->get( 'tax_message' );
@@ -573,15 +565,15 @@ sub getConfigurationScreen {
 
     ##YUI specific datatable CSS
     my ($style, $url) = $session->quick(qw(style url));
-    $style->setLink($url->extras('/yui/build/fonts/fonts-min.css'), {rel=>'stylesheet', type=>'text/css'});
-    $style->setLink($url->extras('yui/build/datatable/assets/skins/sam/datatable.css'), {rel=>'stylesheet', type => 'text/CSS'});
-    $style->setLink($url->extras('yui/build/paginator/assets/skins/sam/paginator.css'), {rel=>'stylesheet', type => 'text/CSS'});
-    $style->setScript($url->extras('/yui/build/utilities/utilities.js'), {type=>'text/javascript'});
-    $style->setScript($url->extras('yui/build/json/json-min.js'), {type => 'text/javascript'});
-    $style->setScript($url->extras('yui/build/paginator/paginator-min.js'), {type => 'text/javascript'});
-    $style->setScript($url->extras('yui/build/datasource/datasource-min.js'), {type => 'text/javascript'});
+    $style->setCss($url->extras('/yui/build/fonts/fonts-min.css'));
+    $style->setCss($url->extras('yui/build/datatable/assets/skins/sam/datatable.css'));
+    $style->setCss($url->extras('yui/build/paginator/assets/skins/sam/paginator.css'));
+    $style->setScript($url->extras('/yui/build/utilities/utilities.js'));
+    $style->setScript($url->extras('yui/build/json/json-min.js'));
+    $style->setScript($url->extras('yui/build/paginator/paginator-min.js'));
+    $style->setScript($url->extras('yui/build/datasource/datasource-min.js'));
     ##YUI Datatable
-    $style->setScript($url->extras('yui/build/datatable/datatable-min.js'), {type => 'text/javascript'});
+    $style->setScript($url->extras('yui/build/datatable/datatable-min.js'));
     ##Default CSS
     $style->setRawHeadTags('<style type="text/css"> #paging a { color: #0000de; } #search, #export form { display: inline; } </style>');
     my $i18n=WebGUI::International->new($session, 'Tax');

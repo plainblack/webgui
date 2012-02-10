@@ -1,6 +1,6 @@
 # vim:syntax=perl
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -9,10 +9,7 @@
 # http://www.plainblack.com                     info@plainblack.com
 #------------------------------------------------------------------
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../../lib";
-use lib "$FindBin::Bin/../../t/lib";
 use Test::More;
 use WebGUI::Test;
 use WebGUI::Session;
@@ -21,10 +18,9 @@ use DateTime;
 use Data::Dumper;
 
 my $session = WebGUI::Test->session;
-my $temp    = WebGUI::Asset->getTempspace($session);
+my $temp    = WebGUI::Test->asset;
 
 my $tag = WebGUI::VersionTag->getWorking($session);
-WebGUI::Test::addToCleanup($tag);
 
 my $calendar = $temp->addChild(
     {   className => 'WebGUI::Asset::Wobject::Calendar' }
@@ -57,11 +53,6 @@ my $clipped_event = $calendar->addChild(
 );
 $clipped_event->cut;
 
-$tag->commit;
-foreach my $asset($calendar, $event, $clipped_event, $trashed_event) {
-    $asset = $asset->cloneFromDb;
-}
-
 my $recurId = $event->setRecurrence(
     {   recurType => 'monthDay',
         every     => 2,
@@ -85,6 +76,9 @@ $clipped_event->setRecurrence(
         dayNumber => $eventStartDate->day,
     }
 );
+
+$tag->commit;
+WebGUI::Test->addToCleanup($tag);
 
 my $workflow = WebGUI::Workflow->create(
     $session, {
@@ -119,9 +113,11 @@ my $instance = WebGUI::Workflow::Instance->create(
 );
 
 
+my $count = 0;
 while (my $status = $instance->run ne 'complete') {
     note $status;
     $instance->run;
+    last if $count++ > 30;
 }
 
 #my $sql = q{

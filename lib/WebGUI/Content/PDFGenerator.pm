@@ -7,7 +7,6 @@ use List::Util qw(first);
 use Scope::Guard qw(guard);
 use WebGUI::Session;
 use WebGUI::Content::Asset;
-use WebGUI::Cache;
 
 =head1 NAME
 
@@ -63,14 +62,12 @@ Returns the cached PDF for an asset, if necessary
 sub cache {
     my $asset   = shift;
     my $session = $asset->session;
-    my $key     = [
-        'PDFGen', $session->url->getRequestedUrl, $asset->get('revisionDate'),
-    ];
-    my $cache   = WebGUI::Cache->new($session, $key);
-    my $content = $cache->get;
+    my $key     = join '', 'PDFGen', $session->url->getRequestedUrl, $asset->get('revisionDate');
+    my $cache   = $session->cache();
+    my $content = $cache->get($key);
     unless ($content) {
         $content = generate($asset);
-        $cache->set($content, $session->config->get('pdfGen/cacheTimeout'));
+        $cache->set($key, $content, $session->config->get('pdfGen/cacheTimeout'));
     }
     return $content;
 }
@@ -141,7 +138,7 @@ sub handler {
     return undef unless $op && $op eq 'generatePdf';
     my $asset = getRequestedAsset($session);
     return $session->privilege->noAccess unless $asset->canView;
-    $session->http->setMimeType('application/pdf');
+    $session->response->content_type('application/pdf');
     return cache($asset);
 }
 

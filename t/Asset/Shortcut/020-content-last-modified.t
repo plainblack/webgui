@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -25,11 +25,8 @@ use WebGUI::Asset::Snippet;
 #----------------------------------------------------------------------------
 # Init
 my $session         = WebGUI::Test->session;
-my $node            = WebGUI::Asset->getImportNode($session);
+my $node            = WebGUI::Test->asset;
 
-my $versionTag      = WebGUI::VersionTag->getWorking($session);
-$versionTag->set({name=>"Shortcut Test"});
-WebGUI::Test->addToCleanup($versionTag);
 # Make a snippet to shortcut
 my $now = time();
 my $snippet = $node->addChild({
@@ -42,7 +39,6 @@ my $shortcut = $node->addChild({
                 shortcutToAssetId   => $snippet->getId,
            },
            undef, $now-10);
-$versionTag->commit;
 $session->db->write(q|update assetData set lastModified=? where assetId=?|,[WebGUI::Test->webguiBirthday, $snippet->getId]);
 foreach my $asset ($snippet, $shortcut) {
     $asset = $asset->cloneFromDb;

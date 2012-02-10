@@ -1,18 +1,17 @@
 package WebGUI::PassiveAnalytics::Flow;
 
 use strict;
-use Tie::IxHash;
 use WebGUI::AdminConsole;
 use WebGUI::HTMLForm;
 use WebGUI::International;
 use WebGUI::Pluggable;
 use WebGUI::PassiveAnalytics::Rule;
-use WebGUI::Utility;
 use WebGUI::HTMLForm;
 use WebGUI::Workflow;
 use WebGUI::Workflow::Instance;
 use WebGUI::User;
 use WebGUI::Text;
+use WebGUI::Fork;
 
 =head1 NAME
 
@@ -59,7 +58,7 @@ sub canView {
 
 #----------------------------------------------------------------------------
 
-=head2 exportSomething ( session, sth, filename )
+=head2 exportSomething ( $process, $data )
 
 Generates CSV data from the supplied statement handle and generates
 a temporary WebGUI::Storage object containing that data in the requested
@@ -68,31 +67,53 @@ filename.
 This subroutine also does a setRedirect to the URL of the file in
 the storage object.
 
-=head3 session
+=head3 $process
 
-Session variable, to set the http redirect correctly.
+A WebGUI::Fork object, to let the user know what's going on.
 
-=head3 sth
+=head3 $data
 
-Statement handle for reading data and getting column names
+Hash ref of data.
+
+=head3 tableName
+
+The name of the table where data will be pulled and translated into CSV.
 
 =head3 filename
 
-The name of the file to create inside the storage object.
+The name of the file to generate
 
 =cut
 
 sub exportSomething {
-    my ($session, $sth, $filename) = @_;
+    my ($process, $data) = @_;
+    my $session = $process->session;
+    my $i18n = WebGUI::International->new($session, 'Asset_Thingy');
     my $storage = WebGUI::Storage->createTemp($session);
+    open my $CSV, '>', $storage->getPath($data->{filename});
+    my $sth = $session->db->read('select SQL_CALC_FOUND_ROWS * from '.$data->{tableName});
+    my %status = (
+        current  => 0,
+        message  => '',
+        total    => $session->db->quickScalar('select found_rows()') + 0,
+    );
+    my $update = sub {
+        $process->update( sub { JSON::to_json(\%status) } );
+    };
+    $update->();
     my @columns = $sth->getColumnNames;
-    my $csvData = WebGUI::Text::joinCSV( @columns ). "\n";
+    print $CSV WebGUI::Text::joinCSV( @columns ). "\n";
+    my $rowCounter = 0;
+    $status{message} = $i18n->get('Writing data');
+    $update->();
     while (my $row = $sth->hashRef()) {
         my @row = @{ $row }{@columns};
-        $csvData .= WebGUI::Text::joinCSV(@row) . "\n";
+        print $CSV WebGUI::Text::joinCSV(@row) . "\n";
+        ++$status{current };
+        $update->();
     }
-    $storage->addFileFromScalar($filename, $csvData);
-    $session->http->setRedirect($storage->getUrl($filename));
+    close $CSV;
+    $sth->finish;
 }
 
 #-------------------------------------------------------------------
@@ -271,7 +292,7 @@ sub www_editRule {
     else {
         ##We need a temporary rule so that we can call dynamicForm, below
         $ruleId = 'new';
-        $rule = WebGUI::PassiveAnalytics::Rule->create($session, {});
+        $rule = WebGUI::PassiveAnalytics::Rule->new($session, {});
     }
 
     ##Build the form
@@ -279,7 +300,7 @@ sub www_editRule {
 	$form->hidden( name=>"op",     value=>"passiveAnalytics");
 	$form->hidden( name=>"func",   value=>"editRuleSave");
 	$form->hidden( name=>"ruleId", value=>$ruleId);
-    $form->dynamicForm([WebGUI::PassiveAnalytics::Rule->crud_definition($session)], 'properties', $rule);
+    $rule->crud_form($form, $rule);
 	$form->submit;
 
 	my $i18n = WebGUI::International->new($session, 'PassiveAnalytics');
@@ -317,7 +338,7 @@ sub www_editRuleSave {
     my $ruleId = $form->get('ruleId');
     my $rule;
     if ($ruleId eq 'new') {
-        $rule = WebGUI::PassiveAnalytics::Rule->create($session, {});
+        $rule = WebGUI::PassiveAnalytics::Rule->new($session, {});
     }
     else {
         $rule = WebGUI::PassiveAnalytics::Rule->new($session, $ruleId);
@@ -336,8 +357,24 @@ Dump the contents of the bucket log.
 
 sub www_exportBucketData {
     my ($session) = @_;
-    my $bucket = $session->db->read('select * from bucketLog order by userId, Bucket, timeStamp');
-    exportSomething($session, $bucket, 'bucketData.csv');
+
+    my $process = WebGUI::Fork->start(
+        $session,
+        __PACKAGE__, 'exportSomething',
+        { tableName => 'bucketLog', filename => 'bucketData.csv', },
+    );
+    my $i18n = WebGUI::International->new($session, 'PassiveAnalytics');
+    $session->http->setRedirect(
+        $session->url->page(
+            $process->contentPairs(
+                'ProgressBar', {
+                    icon => 'passiveAnalytics',
+                    title => $i18n->get('Export bucket data'),
+                    proceed => $session->url->page('op=passiveAnalytics;func=editRuleflow'),
+                },
+            ),
+        ),
+    );
     return "redirect";
 }
 
@@ -351,8 +388,23 @@ Dump the contents of the delta log.
 
 sub www_exportDeltaData {
     my ($session) = @_;
-    my $delta = $session->db->read('select * from deltaLog order by userId, timeStamp');
-    exportSomething($session, $delta, 'deltaData.csv');
+    my $process = WebGUI::Fork->start(
+        $session,
+        __PACKAGE__, 'exportSomething',
+        { tableName => 'deltaLog', filename => 'deltaData.csv', },
+    );
+    my $i18n = WebGUI::International->new($session, 'PassiveAnalytics');
+    $session->http->setRedirect(
+        $session->url->page(
+            $process->contentPairs(
+                'ProgressBar', {
+                    icon => 'passiveAnalytics',
+                    title => $i18n->get('Export delta data'),
+                    proceed => $session->url->page('op=passiveAnalytics;func=editRuleflow'),
+                },
+            ),
+        ),
+    );
     return "redirect";
 }
 
@@ -366,8 +418,23 @@ Dump the contents of the raw log.
 
 sub www_exportLogs {
     my ($session) = @_;
-    my $raw = $session->db->read('select * from passiveLog order by userId, timeStamp');
-    exportSomething($session, $raw, 'passiveData.csv');
+    my $process = WebGUI::Fork->start(
+        $session,
+        __PACKAGE__, 'exportSomething',
+        { tableName => 'passiveLog', filename => 'passiveData.csv', },
+    );
+    my $i18n = WebGUI::International->new($session, 'PassiveAnalytics');
+    $session->http->setRedirect(
+        $session->url->page(
+            $process->contentPairs(
+                'ProgressBar', {
+                    icon => 'passiveAnalytics',
+                    title => $i18n->get('Export raw logs'),
+                    proceed => $session->url->page('op=passiveAnalytics;func=editRuleflow'),
+                },
+            ),
+        ),
+    );
     return "redirect";
 }
 

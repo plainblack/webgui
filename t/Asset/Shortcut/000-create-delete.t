@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -8,9 +8,7 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../../lib";
 
 ## The goal of this test is to test the creation and deletion of shortcut assets
 
@@ -22,16 +20,12 @@ use WebGUI::Asset::Snippet;
 #----------------------------------------------------------------------------
 # Init
 my $session         = WebGUI::Test->session;
-my $node            = WebGUI::Asset->getImportNode($session);
-my $versionTag      = WebGUI::VersionTag->getWorking($session);
-$versionTag->set({name=>"Shortcut Test"});
-WebGUI::Test->addToCleanup($versionTag);
 
 # Make a snippet to shortcut
 my $snippet 
-    = $node->addChild({
+    = WebGUI::Test->asset(
         className       => "WebGUI::Asset::Snippet",
-    });
+    );
 
 #----------------------------------------------------------------------------
 # Tests
@@ -46,10 +40,10 @@ use_ok("WebGUI::Asset::Shortcut");
 # Test creating a shortcut to snippet
 # plan tests => 2
 my $shortcut
-    = $node->addChild({
+    = WebGUI::Test->asset(
         className           => "WebGUI::Asset::Shortcut",
         shortcutToAssetId   => $snippet->getId,
-    });
+    );
 
 isa_ok(
     $shortcut, "WebGUI::Asset::Shortcut",

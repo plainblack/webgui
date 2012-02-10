@@ -1,7 +1,7 @@
 package WebGUI::Operation::Workflow;
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -11,7 +11,6 @@ package WebGUI::Operation::Workflow;
 #-------------------------------------------------------------------
 
 use strict;
-use Tie::IxHash;
 use WebGUI::AdminConsole;
 use WebGUI::HTMLForm;
 use WebGUI::International;
@@ -19,9 +18,9 @@ use WebGUI::Pluggable;
 use WebGUI::Workflow;
 use WebGUI::Workflow::Activity;
 use WebGUI::Workflow::Instance;
-use WebGUI::Utility;
 use POE::Component::IKC::ClientLite;
 use JSON qw/ decode_json /;
+use Net::CIDR::Lite;
 
 =head1 NAME
 
@@ -83,7 +82,7 @@ sub www_activityHelper {
 
     my $output = eval {WebGUI::Pluggable::instanciate($class, "www_".$sub, [$session])};
     if ($@) {
-        $session->errorHandler->error($@); 
+        $session->log->error($@); 
         return "ERROR";
     }
     return $output;
@@ -386,14 +385,15 @@ sub www_editWorkflowActivity {
 		$activity = WebGUI::Workflow::Activity->new($session, $session->form->get("activityId"));
 	}
 	my $form = $activity->getEditForm;
-	$form->hidden( name=>"op", value=>"editWorkflowActivitySave");
-	$form->hidden( name=>"workflowId", value=>$session->form->get("workflowId"));
-	$form->submit;
+        $form->action( $session->url->page );
+	$form->addField( "hidden", name=>"op", value=>"editWorkflowActivitySave");
+	$form->addField( "hidden", name=>"workflowId", value=> scalar $session->form->get("workflowId"));
+	$form->addField( "submit", name => "send" );
 	my $i18n = WebGUI::International->new($session, "Workflow");
 	my $ac = WebGUI::AdminConsole->new($session,"workflow");
 	$ac->addSubmenuItem($session->url->page("op=addWorkflow"), $i18n->get("add a new workflow"));
 	$ac->addSubmenuItem($session->url->page("op=manageWorkflows"), $i18n->get("manage workflows"));
-	return $ac->render($form->print,$activity->getName);
+	return $ac->render($form->toHtml,$activity->getName);
 }
 
 #-------------------------------------------------------------------
@@ -481,10 +481,10 @@ Checks to ensure the requestor is who we think it is, and then executes a workfl
 
 sub www_runWorkflow {
         my $session = shift;
-	$session->http->setMimeType("text/plain");
-	$session->http->setCacheControl("none");
-	unless (isInSubnet($session->env->getIp, $session->config->get("spectreSubnets")) || canRunWorkflow($session)) {
-		$session->errorHandler->security("make a Spectre workflow runner request, but we're only allowed to accept requests from ".join(",",@{$session->config->get("spectreSubnets")}).".");
+	$session->response->content_type("text/plain");
+	$session->response->setCacheControl("none");
+	unless (Net::CIDR::Lite->new(@{ $session->config->get('spectreSubnets')} )->find($session->request->address) || canRunWorkflow($session)) {
+		$session->log->security("make a Spectre workflow runner request, but we're only allowed to accept requests from ".join(",",@{$session->config->get("spectreSubnets")}).".");
         	return "error";
 	}
 	my $instanceId = $session->form->param("instanceId");
@@ -497,7 +497,7 @@ sub www_runWorkflow {
 		}
 		return "complete";
 	}
-	$session->errorHandler->warn("No instance ID passed to workflow runner.");
+	$session->log->warn("No instance ID passed to workflow runner.");
 	return "error";
 }
 

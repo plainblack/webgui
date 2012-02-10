@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -8,9 +8,7 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/lib";
 use WebGUI::Test;
 use WebGUI::Session;
 use WebGUI::VersionTag;
@@ -44,7 +42,7 @@ sub setSiteVersionTagMode {
 sub setUserVersionTagMode {
     my ($user, $newMode) = @_;
 
-    $user->profileField(q{versionTagMode}, $newMode);
+    $user->update(versionTagMode => $newMode);
 
     return;
 } #setUserVersionTagMode
@@ -160,23 +158,29 @@ ok(!defined $tagAgain2, 'nonexistent tag cannot be instantiated');
 $tag2->rollback;
 ($tag, $tagAgain1, $tag2, $tagAgain2) = ();
 
+my $master_tag = WebGUI::VersionTag->getWorking($session);
+my $node = WebGUI::Test->asset;
+$master_tag->commit;
+$node = $node->cloneFromDb;
+WebGUI::Test->addToCleanup($master_tag);
+
 my $tag3 = WebGUI::VersionTag->create($session, {});
 $tag3->setWorking;
-my $asset1 = WebGUI::Asset->getRoot($session)->addChild({ className => 'WebGUI::Asset::Snippet' });
-my $asset2 = WebGUI::Asset->getRoot($session)->addChild({ className => 'WebGUI::Asset::Snippet' });
+my $asset1 = $node->addChild({ className => 'WebGUI::Asset::Snippet', });
+my $asset2 = $node->addChild({ className => 'WebGUI::Asset::Snippet', });
 is($tag3->getAssetCount, 2, 'tag with two assets');
 is($tag3->getRevisionCount, 2, 'tag with two revisions');
-$asset1 = $asset1->addRevision({ title => 'revised once' }, time+10);
-$asset1 = $asset1->addRevision({ title => 'revised twice' }, time+20);
-$asset2 = $asset2->addRevision({ title => 'other revised once' }, time+30);
+$asset1 = $asset1->addRevision({ title => 'revised once', }, time+10);
+$asset1 = $asset1->addRevision({ title => 'revised twice', }, time+20);
+$asset2 = $asset2->addRevision({ title => 'other revised once', }, time+30);
 is($tag3->getRevisionCount, 5, 'tag with five revisions');
 
 my $tag4 = WebGUI::VersionTag->create($session, {});
 $tag4->setWorking;
-my $asset3 = WebGUI::Asset->getRoot($session)->addChild({ className => 'WebGUI::Asset::Snippet' });
+my $asset3 = $node->addChild({ className => 'WebGUI::Asset::Snippet', });
 is($tag4->getAssetCount, 1, 'other tag with one asset');
 is($tag4->getRevisionCount, 1, 'other tag with one revision');
-$asset3->addRevision({ title => 'again revised once' }, time+40);
+$asset3->addRevision({ title => 'again revised once', }, time+40);
 is($tag4->getRevisionCount, 2, 'other tag still with one asset');
 is($tag4->getRevisionCount, 2, 'other tag with two revisions');
 is($tag3->getAssetCount, 2, 'original tag still with two assets');
@@ -188,7 +192,7 @@ $tag4->rollback;
 #Test commitAsUser
 my $tag5   = WebGUI::VersionTag->create($session, {});
 $tag5->setWorking;
-my $asset5 = WebGUI::Asset->getRoot($session)->addChild({ className => 'WebGUI::Asset::Snippet' });
+my $asset5 = $node->addChild({ className => 'WebGUI::Asset::Snippet', });
 is($tag5->get("createdBy"),1,'tag created by visitor');
 $tag5->commitAsUser(3);
 $tag5      = WebGUI::VersionTag->new($session, $tag5->getId); #Get the tag again - properties have changed
@@ -199,11 +203,11 @@ $tag5->rollback;
 #Test commitAsUser with options
 my $tag6   = WebGUI::VersionTag->create($session, {});
 $tag6->setWorking;
-my $asset6 = WebGUI::Asset->getRoot($session)->addChild({ className => 'WebGUI::Asset::Snippet' });
+my $asset6 = $node->addChild({ className => 'WebGUI::Asset::Snippet', });
 $tag6->commitAsUser(3, { commitNow => "yes" });
 $tag6      = WebGUI::VersionTag->new($session, $tag6->getId); #Get the tag again - properties have changed
 is($tag6->get("committedBy"),3,'tag committed by admin again');
-$asset6    = WebGUI::Asset->newByDynamicClass($session,$asset6->getId); #Get the asset again - properties have changed
+$asset6    = WebGUI::Asset->newById($session,$asset6->getId); #Get the asset again - properties have changed
 is($asset6->get("status"),"approved","asset status approved");
 $tag6->clearWorking;
 $tag6->rollback;
@@ -215,7 +219,8 @@ $tag6->rollback;
 setSiteVersionTagMode($session, q{singlePerUser});
 setUserVersionTagMode($user, q{inherited});
 
-ok(!defined getWorking(1), 'versionTagMode singlePerUser: no working tag initially present');
+ok(!defined getWorking(1), 'versionTagMode singlePerUser: no working tag initially present')
+    or diag(getWorking(1)->getId);
 
 $tag = WebGUI::VersionTag->create($session, {});
 isa_ok($tag, 'WebGUI::VersionTag', 'versionTagMode singlePerUser: empty tag');
@@ -229,13 +234,16 @@ my $siteWideTag;
 
 $tag->clearWorking();
 
-ok(defined ($userTag = getWorking(1)), 'versionTagMode singlePerUser: reclaim version tag after clearWorking');
-is ($userTag->getId(), $userTagId, q{versionTagMode singlePerUser:  reclaimed version tag has same id});
+my $gotTag = ok(defined ($userTag = getWorking(1)), 'versionTagMode singlePerUser: reclaim version tag after clearWorking');
+SKIP: {
+    skip 'userTag not set', 1 unless $gotTag;
+    is ($userTag->getId(), $userTagId, q{versionTagMode singlePerUser:  reclaimed version tag has same id});
+    $userTag->clearWorking();
+}
 
 
 #switch to sitewide mode
 
-$userTag->clearWorking();
 
 setSiteVersionTagMode($session, q{siteWide});
 
@@ -251,7 +259,7 @@ ok($siteWideTag->getId() ne $userTagId, 'versionTagMode siteWide: siteWide tag h
 
 $siteWideTag->clearWorking();
 
-my $asset4 = WebGUI::Asset->getRoot($session)->addChild({ className => 'WebGUI::Asset::Snippet' });
+my $asset4 = $node->addChild({ className => 'WebGUI::Asset::Snippet' });
 
 ok(defined ($siteWideTag = getWorking(1)), 'versionTagMode siteWide: reclaim version tag after clearWorking and addding new asset');
 
@@ -259,7 +267,7 @@ is($siteWideTag->getId(), $siteWideTagId, 'versionTagMode siteWide: reclaim site
 
 
 ## Through in a new session as different user
-my $admin_session = WebGUI::Session->open($WebGUI::Test::WEBGUI_ROOT, $WebGUI::Test::CONFIG_FILE);
+my $admin_session = WebGUI::Session->open(WebGUI::Test->file);
 $admin_session->user({'userId' => 3});
 WebGUI::Test->addToCleanup($admin_session);
 
@@ -285,7 +293,7 @@ ok($adminSiteWideTag->get(q{isSiteWide}), 'versionTagMode siteWide + admin inher
 ok($adminSiteWideTag->getId() eq $siteWideTagId, 'versionTagMode siteWide + admin inherited: empty has same ID as site wide');
 
 
-$admin_session->var()->end();
+$adminUserTag->rollback();
 $admin_session->close();
 
 # Check if get returns a safe copy
@@ -310,7 +318,6 @@ isnt(
 
 $userTag->rollback();
 $siteWideTag->rollback();
-$adminUserTag->rollback();
 
 ## Additional VersionTagMode to make sure that auto commit happens only when user is tag creator and tag is not site wide.
 ## See bug #10689 (Version Tag Modes)
@@ -320,12 +327,11 @@ $adminUserTag->rollback();
     setUserVersionTagMode($user, q{singlePerUser});
     my $tag = WebGUI::VersionTag->create($session, {});
     $tag->setWorking;
-    my $asset = WebGUI::Asset->getRoot($session)->addChild({ className => 'WebGUI::Asset::Snippet' });
+    my $asset = $node->addChild({ className => 'WebGUI::Asset::Snippet', });
     is($tag->getAssetCount, 1, qq{$test_prefix [singlePerUser] tag with 1 asset});
 
     # create admin session
-    my $admin_session = WebGUI::Session->open($WebGUI::Test::WEBGUI_ROOT, $WebGUI::Test::CONFIG_FILE);
-    WebGUI::Test->addToCleanup($admin_session);
+    my $admin_session = WebGUI::Test->newSession;
     $admin_session->user({'userId' => 3});
 
     setUserVersionTagMode($admin_session->user(), q{autoCommit});
@@ -372,11 +378,12 @@ $adminUserTag->rollback();
     setUserVersionTagMode($user, q{siteWide});
     $tag = WebGUI::VersionTag->create($session, {});
     $tag->setWorking;
-    $asset = WebGUI::Asset->getRoot($session)->addChild({ className => 'WebGUI::Asset::Snippet' });
+    $asset = $node->addChild({ className => 'WebGUI::Asset::Snippet', });
     is($tag->getAssetCount, 1, qq{$test_prefix [siteWide] tag with 1 asset});
 
     # create admin session
-    $admin_session = WebGUI::Session->open($WebGUI::Test::WEBGUI_ROOT, $WebGUI::Test::CONFIG_FILE);
+    $admin_session = WebGUI::Test->newSession;
+    WebGUI::Test->addToCleanup($admin_session);
     WebGUI::Test->addToCleanup($admin_session);
     $admin_session->user({'userId' => 3});
 
@@ -429,10 +436,10 @@ my $redSession  = WebGUI::Test->newSession();
 
 my $andy = WebGUI::User->create($andySession);
 my $red  = WebGUI::User->create($redSession);
-addToCleanup($andy, $red);
+WebGUI::Test->addToCleanup($andy, $red);
 
 my $andyTag = WebGUI::VersionTag->getWorking($andySession);
-addToCleanup($andyTag);
+WebGUI::Test->addToCleanup($andyTag);
 my $redTag  = WebGUI::VersionTag->new($redSession, $andyTag->getId);
 $redTag->setWorking();
 is($andyTag->getId, $redTag->getId, 'users share the same version tag');
@@ -452,7 +459,7 @@ $andyTag2->clearWorking;
     my $andyTagCheck = WebGUI::VersionTag->getWorking($andySession, 'nocreate');
     is($andyTagCheck, undef, 'clearWorking: user andy does not have tag');
     my $redSession2  = $redSession->duplicate;
-    addToCleanup($redSession2);
+    WebGUI::Test->addToCleanup($redSession2);
     my $redTagCheck  = WebGUI::VersionTag->getWorking($redSession2, 'nocreate');
     is($redTagCheck, undef, 'red does not either');
 }

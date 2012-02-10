@@ -3,7 +3,7 @@ package WebGUI::Asset::Wobject::DataForm;
 =head1 LEGAL
 
 -------------------------------------------------------------------
-WebGUI is Copyright 2001-2009 Plain Black Corporation.
+WebGUI is Copyright 2001-2012 Plain Black Corporation.
 -------------------------------------------------------------------
 Please read the legal notices (docs/legal.txt) and the license
 (docs/license.txt) that came with this distribution before using
@@ -17,24 +17,217 @@ http://www.plainblack.com                     info@plainblack.com
 use strict;
 use Tie::IxHash;
 use WebGUI::Form;
-use WebGUI::HTMLForm;
+use WebGUI::FormBuilder;
 use WebGUI::International;
 use WebGUI::Mail::Send;
 use WebGUI::Macro;
 use WebGUI::Inbox;
 use WebGUI::SQL;
-use WebGUI::Asset::Wobject;
+use JSON ();
+
+use Moose;
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset::Wobject';
+
+define assetName           => ['assetName', 'Asset_DataForm'];
+define tableName           => 'DataForm';
+define icon                => 'dataForm.gif';
+property templateId => (
+            fieldType       => 'template',
+            default         => 'PBtmpl0000000000000141',
+            namespace       => 'DataForm',
+            tab             => 'display',
+            label           => [82, 'Asset_DataForm'],
+            hoverHelp       => ['82 description', 'Asset_DataForm'],
+            afterEdit       => 'func=edit',
+        );
+property htmlAreaRichEditor => (
+            fieldType   => "selectBox",
+            default     => 0,
+            options     => \&_htmlAreaRichEditor_options,
+            tab         => 'display',
+            label       => ['htmlAreaRichEditor', 'Asset_DataForm'],
+            hoverHelp   => ['htmlAreaRichEditor description', 'Asset_DataForm'],
+	);
+sub _htmlAreaRichEditor_options {
+    my $self    = shift;
+    my $session = $self->session;
+    my $i18n    = WebGUI::International->new($session, 'Asset_DataForm');
+    my $selectRichEditor = WebGUI::Form::SelectRichEditor->new($session,{});
+    my $richEditorOptions  = $selectRichEditor->getOptions();
+    $richEditorOptions->{'**Use_Default_Editor**'} = $i18n->get("Use Default Rich Editor");
+    return $richEditorOptions;
+}
+    # populate hash of Rich Editors and add an entry to the list to use the default
+property emailTemplateId => (
+            fieldType       => "template",
+            default         => 'PBtmpl0000000000000085',
+            namespace       => 'DataForm',
+            tab             => 'display',
+            label           => ['80', 'Asset_DataForm'],
+            hoverHelp       => ['80 description', 'Asset_DataForm'],
+            afterEdit       => 'func=edit',
+        );
+property acknowlegementTemplateId => (
+            fieldType       => "template",
+            default         => 'PBtmpl0000000000000104',
+            namespace       => 'DataForm',
+            tab             => 'display',
+            label           => ['81', 'Asset_DataForm'],
+            hoverHelp       => ['81 description', 'Asset_DataForm'],
+            afterEdit       => 'func=edit',
+        );
+property listTemplateId => (
+            fieldType       => "template",
+            default         => 'PBtmpl0000000000000021',
+            namespace       => 'DataForm/List',
+            tab             => 'display',
+            label           => ['87', 'Asset_DataForm'],
+            hoverHelp       => ['87 description', 'Asset_DataForm'],
+            afterEdit       => 'func=edit',
+        );
+property defaultView => (
+            fieldType       => "radioList",
+            default         => 0,
+            options         => \&_defaultView_options,
+            label           => ['defaultView', 'Asset_DataForm'],
+            hoverHelp       => ['defaultView description', 'Asset_DataForm'],
+            tab             => 'display',
+        );
+sub _defaultView_options {
+    my $self = shift;
+    my $i18n = WebGUI::International->new($self->session, 'Asset_DataForm');
+    return {
+        0 => $i18n->get('data form'),
+        1 => $i18n->get('data list'),
+    };
+}
+property acknowledgement => (
+            fieldType       => "HTMLArea",
+            default         => undef,
+            tab             => 'properties',
+            label           => ['16', 'Asset_DataForm'],
+            hoverHelp       => ['16 description', 'Asset_DataForm'],
+        );
+property mailData => (
+            fieldType       => "yesNo",
+            default         => 0,
+            tab             => 'display',
+            label           => ['74', 'Asset_DataForm'],
+            hoverHelp       => ['74 description', 'Asset_DataForm'],
+        );
+property storeData => (
+            fieldType       => "yesNo",
+            default         => 1,
+            tab             => 'display',
+            label           => ['store data', 'Asset_DataForm'],
+            hoverHelp       => ['store data description', 'Asset_DataForm'],
+        );
+property mailAttachments => (
+            fieldType       => 'yesNo',
+            default         => 0,
+            tab             => 'properties',
+            label           => ["mail attachments", 'Asset_DataForm'],
+            hoverHelp       => ["mail attachments description", 'Asset_DataForm'],
+        );
+property groupToViewEntries => (
+            fieldType       => "group",
+            default         => 7,
+            tab             => 'security',
+            label           => ['group to view entries', 'Asset_DataForm'],
+            hoverHelp       => ['group to view entries description', 'Asset_DataForm'],
+        );
+property useCaptcha  => (
+            tab             => 'properties',
+            fieldType       => "yesNo",
+            default         => 0,
+            label           => ['editForm useCaptcha label', 'Asset_DataForm'],
+            hoverHelp       => ['editForm useCaptcha description', 'Asset_DataForm'],
+        );
+property workflowIdAddEntry  => (
+            tab             => "properties",
+            fieldType       => "workflow",
+            default         => undef,
+            type            => "WebGUI::AssetCollateral::DataForm::Entry",
+            none            => 1,
+            label           => ['editForm workflowIdAddEntry label', 'Asset_DataForm'],
+            hoverHelp       => ['editForm workflowIdAddEntry description', 'Asset_DataForm'],
+        );
+property fieldConfiguration => (
+            fieldType       => 'hidden',
+            noFormPost      => 1,
+            builder         => '_fieldConfiguration_builder',
+            lazy            => 1,
+        );
+sub _fieldConfiguration_builder {
+    my $self    = shift;
+    my $session = $self->session;
+    my $i18n    = WebGUI::International->new($session,"Asset_DataForm");
+    my @defFieldConfig = (
+        {
+            name=>"from",
+            label=>$i18n->get(10),
+            status=>"editable",
+            isMailField=>1,
+            width=>0,
+            type=>"email",
+        },
+        {
+            name=>"to",
+            label=>$i18n->get(11),
+            status=>"hidden",
+            isMailField=>1,
+            width=>0,
+            type=>"email",
+            defaultValue=>$session->setting->get("companyEmail"),
+        },
+        {
+            name=>"cc",
+            label=>$i18n->get(12),
+            status=>"hidden",
+            isMailField=>1,
+            width=>0,
+            type=>"email",
+        },
+        {
+            name=>"bcc",
+            label=>$i18n->get(13),
+            status=>"hidden",
+            isMailField=>1,
+            width=>0,
+            type=>"email",
+        },
+        {
+            name=>"subject",
+            label=>$i18n->get(14),
+            status=>"editable",
+            isMailField=>1,
+            width=>0,
+            type=>"text",
+            defaultValue=>$i18n->get(2),
+        },
+    );
+    my $json = JSON::to_json(\@defFieldConfig);
+    return $json;
+}
+property tabConfiguration => (
+            fieldType       => 'hidden',
+            noFormPost      => 1,
+        );
+has '+uiLevel' => (
+    default => 5,
+);
+
+
+
 use WebGUI::Pluggable;
 use WebGUI::DateTime;
 use WebGUI::User;
-use WebGUI::Utility;
 use WebGUI::Group;
 use WebGUI::AssetCollateral::DataForm::Entry;
 use WebGUI::Form::SelectRichEditor;
 use WebGUI::Paginator;
-use JSON ();
 
-our @ISA = qw(WebGUI::Asset::Wobject);
 
 =head1 NAME
 
@@ -77,7 +270,7 @@ sub _createForm {
     elsif ( $class->isa('WebGUI::Form::List') ) {
         delete $param{size};
     }
-    elsif ( $type eq 'HTMLArea' && $data->{htmlAreaRichEditor} ne '**Use_Default_Editor**') {
+    elsif ( $type eq 'HTMLArea' && $data->{htmlAreaRichEditor} ne '') {
         $param{richEditId} = $data->{htmlAreaRichEditor}  ;
     }
     return $class->new($session, \%param);
@@ -97,7 +290,7 @@ sub _getFormFields {
     my $entry         = $self->entry;
     my @orderedFields = map { $self->getFieldConfig($_) } @{ $self->getFieldOrder };
     my $func       = $session->form->process('func');
-    my $ignoreForm = $func eq 'editSave' || $func eq 'editFieldSave';
+    my $ignoreForm = $func eq 'addSave'|| $func eq 'editSave' || $func eq 'editFieldSave';
     my @forms      = ();
     for my $field (@orderedFields) {
         my $value;
@@ -108,7 +301,7 @@ sub _getFormFields {
             $value = $formValue;
         }
         my $hidden
-            = ($field->{status} eq 'hidden' && !$session->var->isAdminOn)
+            = ($field->{status} eq 'hidden' && !$session->isAdminOn)
             || ($field->{isMailField} && !$self->get('mailData'));
 	
         # populate Rich Editor field if the field is an HTMLArea
@@ -142,10 +335,10 @@ sub _tabAdminIcons {
     my $tabId = shift;
     my $i18n = WebGUI::International->new($self->session,"Asset_DataForm");
     my $output
-        = $self->session->icon->delete('func=deleteTabConfirm;tabId='.$tabId,$self->get("url"),$i18n->get(100))
-        . $self->session->icon->edit('func=editTab;tabId='.$tabId,$self->get("url"))
-        . $self->session->icon->moveLeft('func=moveTabLeft;tabId='.$tabId,$self->get("url"))
-        . $self->session->icon->moveRight('func=moveTabRight;tabId='.$tabId,$self->get("url"));
+        = $self->session->icon->delete('func=deleteTabConfirm;tabId='.$tabId,$self->url,$i18n->get(100))
+        . $self->session->icon->edit('func=editTab;tabId='.$tabId,$self->url)
+        . $self->session->icon->moveLeft('func=moveTabLeft;tabId='.$tabId,$self->url)
+        . $self->session->icon->moveRight('func=moveTabRight;tabId='.$tabId,$self->url);
     return $output;
 }
 
@@ -167,7 +360,7 @@ Returns true if defaultView is set to 0.
 
 sub defaultViewForm {
     my $self = shift;
-    return ($self->get("defaultView") == 0);
+    return ($self->defaultView == 0);
 }
 
 #-------------------------------------------------------------------
@@ -179,9 +372,9 @@ it returns 'list'.
 
 =cut
 
-sub defaultView {
+sub defaultViewName {
     my $self = shift;
-    return ($self->get("defaultView") == 0 ? 'form' : 'list');
+    return ($self->defaultViewForm ? 'form' : 'list');
 }
 
 #-------------------------------------------------------------------
@@ -195,7 +388,7 @@ cached mode, then it checks for a C<mode> form parameter, then it resorts to def
 
 sub currentView {
     my $self = shift;
-    my $view = $self->{_mode} || $self->session->form->param('mode') || $self->defaultView;
+    my $view = $self->{_mode} || $self->session->form->param('mode') || $self->defaultViewName;
     return $view;
 }
 
@@ -265,13 +458,13 @@ an entry is being viewed, or the DataForm has a captcha, bypass caching altogeth
 
 =cut
 
-sub getContentLastModified {
+override getContentLastModified => sub {
     my $self = shift;
     if ($self->currentView eq 'list' || $self->session->form->process('entryId') || $self->hasCaptcha) {
         return time;
     }
-    return $self->SUPER::getContentLastModified;
-}
+    return super();
+};
 
 #-------------------------------------------------------------------
 
@@ -308,7 +501,7 @@ Returns true if the DataForm uses a captcha as one of the fields.
 
 sub hasCaptcha {
     my $self = shift;
-    return isIn('Captcha', map { $_->{type} } map { $self->getFieldConfig($_) } @{ $self->getFieldOrder });
+    return 'Captcha' ~~ [map { $_->{type} } map { $self->getFieldConfig($_) } @{ $self->getFieldOrder } ];
 }
 
 #-------------------------------------------------------------------
@@ -367,206 +560,10 @@ sub _saveTabConfig {
 
 #-------------------------------------------------------------------
 
-=head2 definition ( session, [definition] )
-
-Returns an array reference of definitions. Adds tableName, className, properties to array definition.
-
-=head3 definition
-
-An array of hashes to prepend to the list
-
-=cut
-
-sub definition {
-    my $class = shift;
-    my $session = shift;
-    my $definition = shift;
-    my $i18n = WebGUI::International->new($session,"Asset_DataForm");
-    my %properties;
-    
-    # populate hash of Rich Editors and add an entry to the list to use the default
-    my $selectRichEditor = WebGUI::Form::SelectRichEditor->new($session,{}) ;
-    my $richEditorOptions  = $selectRichEditor->getOptions() ;
-    $richEditorOptions->{'**Use_Default_Editor**'} = $i18n->get("Use Default Rich Editor");
-    
-    tie %properties, 'Tie::IxHash';
-    %properties = (
-        templateId => {
-            fieldType       => 'template',
-            defaultValue    => 'PBtmpl0000000000000141',
-            namespace       => 'DataForm',
-            tab             => 'display',
-            label           => $i18n->get(82),
-            hoverHelp       => $i18n->get('82 description'),
-            afterEdit       => 'func=edit',
-        },
-        htmlAreaRichEditor =>{
-            fieldType=>"selectBox",
-            defaultValue=>0,
-            options=>$richEditorOptions,
-            tab=>'display',
-            label=>$i18n->get('htmlAreaRichEditor'),
-            hoverHelp=>$i18n->get('htmlAreaRichEditor description'),
-	},
-        emailTemplateId => {
-            fieldType       => "template",
-            defaultValue    => 'PBtmpl0000000000000085',
-            namespace       => 'DataForm',
-            tab             => 'display',
-            label           => $i18n->get(80),
-            hoverHelp       => $i18n->get('80 description'),
-            afterEdit       => 'func=edit',
-        },
-        acknowlegementTemplateId => {
-            fieldType       => "template",
-            defaultValue    => 'PBtmpl0000000000000104',
-            namespace       => 'DataForm',
-            tab             => 'display',
-            label           => $i18n->get(81),
-            hoverHelp       => $i18n->get('81 description'),
-            afterEdit       => 'func=edit',
-        },
-        listTemplateId => {
-            fieldType       => "template",
-            defaultValue    => 'PBtmpl0000000000000021',
-            namespace       => 'DataForm/List',
-            tab             => 'display',
-            label           => $i18n->get(87),
-            hoverHelp       => $i18n->get('87 description'),
-            afterEdit       => 'func=edit',
-        },
-        defaultView => {
-            fieldType       => "radioList",
-            defaultValue    => 0,
-            options         => {
-                0 => $i18n->get('data form'),
-                1 => $i18n->get('data list'),
-            },
-            label           => $i18n->get('defaultView'),
-            hoverHelp       => $i18n->get('defaultView description'),
-            tab             => 'display',
-        },
-        acknowledgement => {
-            fieldType       => "HTMLArea",
-            defaultValue    => undef,
-            tab             => 'properties',
-            label           => $i18n->get(16),
-            hoverHelp       => $i18n->get('16 description'),
-        },
-        mailData => {
-            fieldType       => "yesNo",
-            defaultValue    => 0,
-            tab             => 'display',
-            label           => $i18n->get(74),
-            hoverHelp       => $i18n->get('74 description'),
-        },
-        storeData => {
-            fieldType       => "yesNo",
-            defaultValue    => 1,
-            tab             => 'display',
-            label           => $i18n->get('store data'),
-            hoverHelp       => $i18n->get('store data description'),
-        },
-        mailAttachments => {
-            fieldType       => 'yesNo',
-            defaultValue    => 0,
-            tab             => 'properties',
-            label           => $i18n->get("mail attachments"),
-            hoverHelp       => $i18n->get("mail attachments description"),
-        },
-        groupToViewEntries => {
-            fieldType       => "group",
-            defaultValue    => 7,
-            tab             => 'security',
-            label           => $i18n->get('group to view entries'),
-            hoverHelp       => $i18n->get('group to view entries description'),
-        },
-        useCaptcha  => {
-            tab             => 'properties',
-            fieldType       => "yesNo",
-            defaultValue    => 0,
-            label           => $i18n->get('editForm useCaptcha label'),
-            hoverHelp       => $i18n->get('editForm useCaptcha description'),
-        },
-        workflowIdAddEntry  => {
-            tab             => "properties",
-            fieldType       => "workflow",
-            defaultValue    => undef,
-            type            => "WebGUI::AssetCollateral::DataForm::Entry",
-            none            => 1,
-            label           => $i18n->get('editForm workflowIdAddEntry label'),
-            hoverHelp       => $i18n->get('editForm workflowIdAddEntry description'),
-        },
-        fieldConfiguration => {
-            fieldType       => 'hidden',
-        },
-        tabConfiguration => {
-            fieldType       => 'hidden',
-        },
-    );
-    my @defFieldConfig = (
-        {
-            name=>"from",
-            label=>$i18n->get(10),
-            status=>"editable",
-            isMailField=>1,
-            width=>0,
-            type=>"email",
-        },
-        {
-            name=>"to",
-            label=>$i18n->get(11),
-            status=>"hidden",
-            isMailField=>1,
-            width=>0,
-            type=>"email",
-            defaultValue=>$session->setting->get("companyEmail"),
-        },
-        {
-            name=>"cc",
-            label=>$i18n->get(12),
-            status=>"hidden",
-            isMailField=>1,
-            width=>0,
-            type=>"email",
-        },
-        {
-            name=>"bcc",
-            label=>$i18n->get(13),
-            status=>"hidden",
-            isMailField=>1,
-            width=>0,
-            type=>"email",
-        },
-        {
-            name=>"subject",
-            label=>$i18n->get(14),
-            status=>"editable",
-            isMailField=>1,
-            width=>0,
-            type=>"text",
-            defaultValue=>$i18n->get(2),
-        },
-    );
-    $properties{fieldConfiguration}{defaultValue} = JSON::to_json(\@defFieldConfig);
-    push @$definition, {
-        assetName           => $i18n->get('assetName'),
-        uiLevel             => 5,
-        tableName           => 'DataForm',
-        icon                => 'dataForm.gif',
-        className           => __PACKAGE__,
-        properties          => \%properties,
-        autoGenerateForms   => 1,
-    };
-    return $class->SUPER::definition($session, $definition);
-}
-
-#-------------------------------------------------------------------
-
 sub _cacheFieldConfig {
     my $self = shift;
     if (!$self->{_fieldConfig}) {
-        my $jsonData = $self->get("fieldConfiguration");
+        my $jsonData = $self->fieldConfiguration;
         my $fieldData;
         if ($jsonData && eval { $jsonData = JSON::from_json($jsonData) ; 1 }) {
             # jsonData is an array in the order the fields should be
@@ -591,7 +588,7 @@ sub _cacheFieldConfig {
 sub _cacheTabConfig {
     my $self = shift;
     if (!$self->{_tabConfig}) {
-        my $jsonData = $self->get("tabConfiguration");
+        my $jsonData = $self->tabConfiguration;
         my $fieldData;
         if ($jsonData && eval { $jsonData = JSON::from_json($jsonData) ; 1 }) {
             # jsonData is an array in the order the fields should be
@@ -816,9 +813,9 @@ sub getListTemplateVars {
             %dataVars,
             "record.ipAddress"              => $entry->ipAddress,
             "record.edit.url"               => $self->getFormUrl("func=view;entryId=".$entry->getId),
-            "record.edit.icon"              => $session->icon->edit("func=view;entryId=".$entry->getId, $self->get('url')),
+            "record.edit.icon"              => $session->icon->edit("func=view;entryId=".$entry->getId, $self->url),
             "record.delete.url"             => $self->getUrl("func=deleteEntry;entryId=".$entry->getId),
-            "record.delete.icon"            => $session->icon->delete("func=deleteEntry;entryId=".$entry->getId, $self->get('url'), $i18n->get('Delete entry confirmation')),
+            "record.delete.icon"            => $session->icon->delete("func=deleteEntry;entryId=".$entry->getId, $self->url, $i18n->get('Delete entry confirmation')),
             "record.username"               => $entry->username,
             "record.userId"                 => $entry->userId,
             "record.submissionDate.epoch"   => $entry->submissionDate->epoch,
@@ -960,12 +957,12 @@ sub getRecordTemplateVars {
     for my $field_form (@fields) {
         my ($field, $form) = @{ $field_form };
         # need a copy
-        my $hidden =  ($field->{status} eq 'hidden' && !$session->var->isAdminOn)
-                   || ($field->{isMailField} && !$self->get('mailData'));
+        my $hidden =  ($field->{status} eq 'hidden' && !$session->isAdminOn)
+                   || ($field->{isMailField} && !$self->mailData);
 	
         # populate Rich Editor field if the field is an HTMLArea
         if ($field->{type} eq "HTMLArea") { 
-            $field->{htmlAreaRichEditor} = $self->get("htmlAreaRichEditor") ;
+            $field->{htmlAreaRichEditor} = $self->htmlAreaRichEditor ;
         }
         my $value = $form->getValueAsHtml;
         my %fieldProperties = (
@@ -1001,7 +998,7 @@ sub getRecordTemplateVars {
     $var->{'form.send'} = WebGUI::Form::submit($session, { value => $i18n->get(73) });
     $var->{'form.save'} = WebGUI::Form::submit($session);
     # Create CAPTCHA if configured and user is not a Registered User
-    if ( $self->useCaptcha ) {
+    if ( $self->shouldUseCaptcha ) {
         # Create one captcha we can use multiple times
         $var->{ 'form_captcha' } = WebGUI::Form::Captcha( $session, {
             name        => 'captcha',
@@ -1029,9 +1026,9 @@ sub getTemplateVars {
     my $var         = $self->get;
     my $i18n = WebGUI::International->new($self->session,"Asset_DataForm");
 
-    $var->{'useCaptcha'             } = ( $self->useCaptcha ? 1 : 0 );
+    $var->{'useCaptcha'             } = ( $self->shouldUseCaptcha ? 1 : 0 );
     $var->{'canEdit'                } = ($self->canEdit);
-    $var->{'canViewEntries'         }  = ($self->session->user->isInGroup($self->get("groupToViewEntries")));
+    $var->{'canViewEntries'         }  = ($self->session->user->isInGroup($self->groupToViewEntries));
     $var->{'hasEntries'             } = $self->hasEntries;
     $var->{'entryList.url'          } = $self->getListUrl;
     $var->{'entryList.label'        } = $i18n->get(86);
@@ -1073,9 +1070,9 @@ Extends the base class to handle form and list mode.
 
 =cut
 
-sub prepareView {
+override prepareView => sub {
     my $self = shift;
-    $self->SUPER::prepareView(@_);
+    super();
     my $view = $self->currentView;
     if ( $view eq 'form' ) {
         $self->prepareViewForm(@_);
@@ -1083,7 +1080,7 @@ sub prepareView {
     else {
         $self->prepareViewList(@_);
     }
-}
+};
 
 #-------------------------------------------------------------------
 
@@ -1094,12 +1091,12 @@ entry collateral.
 
 =cut
 
-sub purge {
+override purge => sub {
     my $self = shift;
     $self->deleteAttachedFiles;
     $self->entryClass->purgeAssetEntries($self);
-    return $self->SUPER::purge(@_);
-}
+    return super();
+};
 
 #-------------------------------------------------------------------
 
@@ -1127,9 +1124,9 @@ sub sendEmail {
     my $from = $entry->field('from');
     my $bcc = $entry->field('bcc');
     my $cc = $entry->field('cc');
-    my $message = $self->processTemplate($var, $self->get("emailTemplateId"));
+    my $message = $self->processTemplate($var, $self->emailTemplateId);
     WebGUI::Macro::process($self->session,\$message);
-    my @attachments = $self->get('mailAttachments')
+    my @attachments = $self->mailAttachments
         ? @{ $self->getAttachedFiles($entry) }
         : ();
     if ($to =~ /\@/) {
@@ -1156,7 +1153,7 @@ sub sendEmail {
             $groupId = $group->getId;
         }
         else {
-            $self->session->errorHandler->warn($self->getId . ": Unable to send message, no user or group found.");
+            $self->session->log->warn($self->getId . ": Unable to send message, no user or group found.");
             return;
         }
         WebGUI::Inbox->new($self->session)->addMessage({
@@ -1186,7 +1183,7 @@ sub sendEmail {
 
 #----------------------------------------------------------------------------
 
-=head2 useCaptcha ( )
+=head2 shouldUseCaptcha ( )
 
 Returns true if we should use and process the CAPTCHA.
 
@@ -1195,10 +1192,10 @@ user is not a Registered User.
 
 =cut
 
-sub useCaptcha {
+sub shouldUseCaptcha {
     my $self        = shift;
 
-    if ( $self->get('useCaptcha') && $self->session->user->isVisitor ) {
+    if ( $self->useCaptcha && $self->session->user->isVisitor ) {
         return 1;
     }
 
@@ -1233,19 +1230,19 @@ or are part of the groupToViewEntries.
 
 =cut
 
-sub canView {
+override canView => sub {
     my $self = shift;
     return 0
-        if !$self->SUPER::canView;
+        if !super();
     if ($self->currentView eq 'list') {
         return 1
             if $self->canEdit;
         return 1
-            if $self->session->user->isInGroup($self->get('groupToViewEntries'));
+            if $self->session->user->isInGroup($self->groupToViewEntries);
         return 0;
     }
     return 1;
-}
+};
 
 #-------------------------------------------------------------------
 
@@ -1257,8 +1254,8 @@ Like prepareView, but for the list view of the template.
 
 sub prepareViewList {
     my $self = shift;
-    my $templateId = $self->get('listTemplateId');
-    my $template = WebGUI::Asset::Template->new($self->session, $templateId);
+    my $templateId = $self->listTemplateId;
+    my $template = WebGUI::Asset::Template->newById($self->session, $templateId);
     if (!$template) {
         WebGUI::Error::ObjectNotFound::Template->throw(
             error      => qq{Template not found},
@@ -1294,10 +1291,10 @@ Prepare the template for the form mode of the template.
 
 sub prepareViewForm {
     my $self = shift;
-    $self->session->style->setLink($self->session->url->extras('tabs/tabs.css'), {"type"=>"text/css"});
-    $self->session->style->setScript($self->session->url->extras('tabs/tabs.js'), {"type"=>"text/javascript"});
-    my $templateId = $self->get('templateId');
-    my $template = WebGUI::Asset::Template->new($self->session, $templateId);
+    $self->session->style->setCss($self->session->url->extras('tabs/tabs.css'));
+    $self->session->style->setScript($self->session->url->extras('tabs/tabs.js'));
+    my $templateId = $self->templateId;
+    my $template = WebGUI::Asset::Template->newById($self->session, $templateId);
     if (!$template) {
         WebGUI::Error::ObjectNotFound::Template->throw(
             error      => qq{Template not found},
@@ -1344,7 +1341,7 @@ sub viewForm {
     }
     $var = $passedVars || $self->getRecordTemplateVars($var, $entry);
     if ($self->hasCaptcha) {
-        $self->session->http->setCacheControl('none');
+        $self->session->response->setCacheControl('none');
     }
     return $self->processTemplate($var, undef, $self->{_viewFormTemplate});
 }
@@ -1428,7 +1425,9 @@ sub www_deleteFieldConfirm {
         unless $self->canEdit;
     return $self->session->privilege->locked
         unless $self->canEditIfLocked;
-    my $newSelf = $self->addRevision;
+    my $tag     = WebGUI::VersionTag->getWorking( $self->session );
+    my $newSelf = $self->addRevision({ tagId => $tag->getId, status => "pending" });
+    $newSelf->setVersionLock;
     $newSelf->deleteField($self->session->form->process("fieldName"));
     $newSelf->{_mode} = 'form';
     WebGUI::VersionTag->autoCommitWorkingIfEnabled($self->session);
@@ -1455,7 +1454,9 @@ sub www_deleteTabConfirm {
         unless $self->canEdit;
     return $self->session->privilege->locked
         unless $self->canEditIfLocked;
-    my $newSelf = $self->addRevision;
+    my $tag     = WebGUI::VersionTag->getWorking( $self->session );
+    my $newSelf = $self->addRevision({ tagId => $tag->getId, status => "pending" });
+    $newSelf->setVersionLock;
     $newSelf->deleteTab($self->session->form->process("tabId"));
     $newSelf->{_mode} = 'form';
     WebGUI::VersionTag->autoCommitWorkingIfEnabled($self->session);
@@ -1490,23 +1491,23 @@ sub www_editField {
     else {
         $field = {};
     }
-    my $f = WebGUI::HTMLForm->new($self->session, action => $self->getUrl);
-    $f->hidden(
+    my $f = WebGUI::FormBuilder->new($self->session, action => $self->getUrl);
+    $f->addField( "hidden",
         name => "fieldName",
         value => $field->{name},
     );
-    $f->hidden(
+    $f->addField( "hidden",
         name => "func",
         value => "editFieldSave"
     );
-    $f->text(
+    $f->addField( "text",
         name=>"label",
         label=>$i18n->get(77),
         hoverHelp=>$i18n->get('77 description'),
         value=>$field->{label}
     );
     if ($field->{isMailField}) {
-        $f->readOnly(
+        $f->addField( "readOnly",
             name        => "newName",
             label       => $i18n->get(21),
             hoverHelp   => $i18n->get('21 description'),
@@ -1514,7 +1515,7 @@ sub www_editField {
         );
     }
     else {
-        $f->text(
+        $f->addField( "text",
             name        => "newName",
             label       => $i18n->get(21),
             hoverHelp   => $i18n->get('21 description'),
@@ -1526,14 +1527,14 @@ sub www_editField {
         0   => $i18n->get("no tab"),
         map { $_ => $self->getTabConfig($_)->{label} } @{ $self->getTabOrder },
     );
-    $f->selectBox(
+    $f->addField( "selectBox",
         name        => "tabId",
         options     => \%tabs,
         label       => $i18n->get(104),
         hoverHelp   => $i18n->get('104 description'),
         value       => [ $field->{tabId} ]
     );
-    $f->text(
+    $f->addField( "text",
         name        => "subtext",
         value       => $field->{subtext},
         label       => $i18n->get(79),
@@ -1546,62 +1547,62 @@ sub www_editField {
         "editable"  => $i18n->get(6),
         "required"  => $i18n->get(75),
     );
-    $f->selectBox(
+    $f->addField( "selectBox",
         name        => "status",
         options     => \%fieldStatus,
         label       => $i18n->get(22),
         hoverHelp   => $i18n->get('22 description'),
         value       => [ $field->{status} || "editable" ],
     );
-    $f->fieldType(
+    $f->addField( "fieldType",
         name        => "type",
         label       => $i18n->get(23),
         hoverHelp   => $i18n->get('23 description'),
         value       => "\u$field->{type}" || "Text",
         types       => [qw(DateTime TimeField Float Zipcode Text Textarea HTMLArea Url Date Email Phone Integer YesNo SelectList RadioList CheckList SelectBox File)],
     );
-    $f->integer(
+    $f->addField( "integer",
         name        => "width",
         label       => $i18n->get(8),
         hoverHelp   => $i18n->get('8 description'),
         value       => ($field->{width} || 0),
     );
-    $f->integer(
+    $f->addField( "integer",
         name        => "rows",
         value       => $field->{rows} || 0,
         label       => $i18n->get(27),
         hoverHelp   => $i18n->get('27 description'),
         subtext     => $i18n->get(28),
     );
-    $f->yesNo(
+    $f->addField( "yesNo",
         name=>"vertical",
         value=>$field->{vertical},
         label=>$i18n->get('editField vertical label'),
         hoverHelp=>$i18n->get('editField vertical label description'),
         subtext=>$i18n->get('editField vertical subtext')
     );
-    $f->text(
+    $f->addField( "text",
         name=>"extras",
         value=>$field->{extras},
         label=>$i18n->get('editField extras label'),
         hoverHelp=>$i18n->get('editField extras label description'),
     );
-    $f->textarea(
-        -name=>"options",
-        -label=>$i18n->get(24),
-        -hoverHelp=>$i18n->get('24 description'),
-        -value=>$field->{options},
-        -subtext=>'<br />'.$i18n->get(85)
+    $f->addField( "textarea",
+        name=>"options",
+        label=>$i18n->get(24),
+        hoverHelp=>$i18n->get('24 description'),
+        value=>$field->{options},
+        subtext=>'<br />'.$i18n->get(85)
     );
-    $f->textarea(
-        -name=>"defaultValue",
-        -label=>$i18n->get(25),
-        -hoverHelp=>$i18n->get('25 description'),
-        -value=>$field->{defaultValue},
-        -subtext=>'<br />'.$i18n->get(85)
+    $f->addField( "textarea",
+        name=>"defaultValue",
+        label=>$i18n->get(25),
+        hoverHelp=>$i18n->get('25 description'),
+        value=>$field->{defaultValue},
+        subtext=>'<br />'.$i18n->get(85)
     );
     if (!$fieldName) {
-        $f->whatNext(
+        $f->addField( "whatNext",
             options => {
                 "editField"     => $i18n->get(76),
                 "viewDataForm"  => $i18n->get(745),
@@ -1609,9 +1610,8 @@ sub www_editField {
             value  => "editField"
         );
     }
-    $f->submit;
-    my $ac = $self->getAdminConsole;
-    return $ac->render($f->print,$i18n->get('20'));
+    $f->addField( "submit", name => "send" );
+    return '<h1>' . $i18n->get('20') . '</h1>' . $f->toHtml;
 }
 
 #-------------------------------------------------------------------
@@ -1672,7 +1672,9 @@ sub www_editFieldSave {
         $field{isMailField} = 1;
     }
 
-    my $newSelf = $self->addRevision;
+    my $tag     = WebGUI::VersionTag->getWorking( $session );
+    my $newSelf = $self->addRevision({ tagId => $tag->getId, status => "pending" });
+    $newSelf->setVersionLock;
     if ($fieldName) {
         if ($fieldName ne $newName) {
             $newSelf->renameField($fieldName, $newName);
@@ -1747,7 +1749,7 @@ sub setField {
     my $self = shift;
     my $fieldName = shift;
     my $field = shift;
-    
+
     $field->{ name } = $fieldName;
 
     my $fieldConfig = $self->getFieldConfig;
@@ -1782,28 +1784,28 @@ sub www_editTab {
         $tab = $self->getTabConfig($tabId);
     }
 
-    my $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
-    $f->hidden(
+    my $f = WebGUI::FormBuilder->new($self->session,action=>$self->getUrl);
+    $f->addField( "hidden",
         -name => "tabId",
         -value => $tabId,
     );
-    $f->hidden(
+    $f->addField( "hidden",
         -name => "func",
         -value => "editTabSave"
     );
-    $f->text(
+    $f->addField( "text",
         -name=>"label",
         -label=>$i18n->get(101),
         -value=>$tab->{label}
     );
-    $f->textarea(
+    $f->addField( "textarea",
         -name=>"subtext",
         -label=>$i18n->get(79),
         -value=>$tab->{subtext},
         -subtext=>""
     );
     if ($tabId eq "new") {
-        $f->whatNext(
+        $f->addField( "whatNext",
             options=>{
                 editTab=>$i18n->get(103),
                 ""=>$i18n->get(745)
@@ -1811,10 +1813,9 @@ sub www_editTab {
             -value=>"editTab"
         );
     }
-    $f->submit;
-    my $ac = $self->getAdminConsole;
-    return $ac->render($f->print,$i18n->get('103')) if $tabId eq "new";
-    return $ac->render($f->print,$i18n->get('102'));
+    $f->addField( "submit", name => "send" );
+    return '<h1>' . $i18n->get('103') . '</h1>' . $f->toHtml if $tabId eq "new";
+    return '<h1>' . $i18n->get('102') . '</h1>' . $f->toHtml;
 }
 
 #-------------------------------------------------------------------
@@ -1875,7 +1876,7 @@ sub www_exportTab {
     my @exportFields;
     for my $field ( map { $self->getFieldConfig($_) } @{$self->getFieldOrder} ) {
         next
-            if $field->{isMailField} && !$self->get('mailData');
+            if $field->{isMailField} && !$self->mailData;
         push @exportFields, $field->{name};
     }
     my $tsv = Text::CSV_XS->new({sep_char => "\t", eol => "\n", binary => 1});
@@ -1888,8 +1889,9 @@ sub www_exportTab {
         @exportFields,
     );
 
-    $session->http->setFilename($self->get("url").".tab","text/plain");
-    $session->http->sendHeader;
+    $session->response->header( 'Content-Disposition' => qq{attachment; filename="}.$self->url.'.tab"');
+    $session->response->content_type('text/plain');
+    $session->response->sendHeader;
     $session->output->print($tsv->string, 1);
 
     my $entryIter = $self->entryClass->iterateAll($self);
@@ -1927,7 +1929,9 @@ sub www_moveFieldDown {
         unless $self->canEdit;
     return $self->session->privilege->locked
         unless $self->canEditIfLocked;
-    my $newSelf = $self->addRevision;
+    my $tag     = WebGUI::VersionTag->getWorking( $self->session );
+    my $newSelf = $self->addRevision({ tagId => $tag->getId, status => "pending" });
+    $newSelf->setVersionLock;
     my $fieldName = $self->session->form->process('fieldName');
     $newSelf->moveFieldDown($fieldName);
     WebGUI::VersionTag->autoCommitWorkingIfEnabled($self->session);
@@ -1987,7 +1991,9 @@ sub www_moveFieldUp {
         unless $self->canEdit;
     return $self->session->privilege->locked
         unless $self->canEditIfLocked;
-    my $newSelf = $self->addRevision;
+    my $tag     = WebGUI::VersionTag->getWorking( $self->session );
+    my $newSelf = $self->addRevision({ tagId => $tag->getId, status => "pending" });
+    $newSelf->setVersionLock;
     my $fieldName = $self->session->form->process('fieldName');
     $newSelf->moveFieldUp($fieldName);
     WebGUI::VersionTag->autoCommitWorkingIfEnabled($self->session);
@@ -2048,7 +2054,9 @@ sub www_moveTabRight {
         unless $self->canEdit;
     return $self->session->privilege->locked
         unless $self->canEditIfLocked;
-    my $newSelf = $self->addRevision;
+    my $tag     = WebGUI::VersionTag->getWorking( $self->session );
+    my $newSelf = $self->addRevision({ tagId => $tag->getId, status => "pending" });
+    $newSelf->setVersionLock;
     my $tabId = $self->session->form->process('tabId');
     $newSelf->moveTabRight($tabId);
     WebGUI::VersionTag->autoCommitWorkingIfEnabled($self->session);
@@ -2104,7 +2112,9 @@ sub www_moveTabLeft {
         unless $self->canEdit;
     return $self->session->privilege->locked
         unless $self->canEditIfLocked;
-    my $newSelf = $self->addRevision;
+    my $tag     = WebGUI::VersionTag->getWorking( $self->session );
+    my $newSelf = $self->addRevision({ tagId => $tag->getId, status => "pending" });
+    $newSelf->setVersionLock;
     my $tabId = $self->session->form->process('tabId');
     $newSelf->moveTabLeft($tabId);
     WebGUI::VersionTag->autoCommitWorkingIfEnabled($self->session);
@@ -2198,7 +2208,7 @@ sub www_process {
     }
 
     # Process CAPTCHA
-    if ( $self->useCaptcha  && !$session->form->process( 'captcha', 'captcha' ) ) {
+    if ( $self->shouldUseCaptcha  && !$session->form->process( 'captcha', 'captcha' ) ) {
         push @errors, {
             "error.message" => $i18n->get( 'error captcha' ),
         };
@@ -2215,24 +2225,24 @@ sub www_process {
     }
 
     # Send email
-    if ($self->get("mailData") && !$entry->entryId) {
+    if ($self->mailData && !$entry->entryId) {
         $self->sendEmail($var, $entry);
     }
 
     # Save entry to database
-    if ($self->get('storeData')) {
+    if ($self->storeData) {
         $entry->save;
     }
-    
+
     # Run the workflow
-    if ( $self->get("workflowIdAddEntry") ) {
+    if ( $self->workflowIdAddEntry ) {
         my $instanceVar = {
-            workflowId  => $self->get( "workflowIdAddEntry" ),
+            workflowId  => $self->workflowIdAddEntry,
             className   => "WebGUI::AssetCollateral::DataForm::Entry",
         };
 
         # If we've saved the entry, we only need the ID
-        if ( $self->get( 'storeData' ) ) {
+        if ( $self->storeData ) {
             $instanceVar->{ methodName     } = "new";
             $instanceVar->{ parameters     } = $entry->getId;
         }
@@ -2245,10 +2255,11 @@ sub www_process {
         WebGUI::Workflow::Instance->create( $self->session, $instanceVar )->start;
     }
 
-    return $self->processStyle($self->processTemplate($var,$self->get("acknowlegementTemplateId")))
+    return $self->processStyle($self->processTemplate($var,$self->acknowlegementTemplateId))
         if $self->defaultViewForm;
     return '';
 }
 
+__PACKAGE__->meta->make_immutable;
 1;
 

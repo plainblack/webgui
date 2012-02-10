@@ -1411,12 +1411,89 @@ Couldn't open %-s because %-s <br />
         context     => q{},
     },
 
+    'cut asset' => {
+        message     => q{Asset %s was cut to the clipboard.},
+        lastUpdated => 0,
+        context     => q{%s will be replaced by the title of the asset.},
+    },
+
+    'copied asset' => {
+        message     => q{Asset %s was copied to the clipboard.},
+        lastUpdated => 0,
+        context     => q{%s will be replaced by the title of the asset.},
+    },
+
+    'copied asset with children' => {
+        message     => q{Asset %s was copied to the clipboard with its children.},
+        lastUpdated => 0,
+        context     => q{%s will be replaced by the title of the asset.},
+    },
+
+    'copied asset with descendants' => {
+        message     => q{Asset %s was copied to the clipboard with all descendants.},
+        lastUpdated => 0,
+        context     => q{%s will be replaced by the title of the asset.},
+    },
+
+    'promoted asset' => {
+        message     => q{Asset %s was promoted.},
+        lastUpdated => 0,
+        context     => q{%s will be replaced by the title of the asset.},
+    },
+
+    'unable to promote asset' => {
+        message     => q{Unable to promote asset %s.},
+        lastUpdated => 0,
+        context     => q{%s will be replaced by the title of the asset.},
+    },
+
+    'demoted asset' => {
+        message     => q{Asset %s was demoted.},
+        lastUpdated => 0,
+        context     => q{%s will be replaced by the title of the asset.},
+    },
+
+    'unable to demote asset' => {
+        message     => q{Unable to demote asset %s.},
+        lastUpdated => 0,
+        context     => q{%s will be replaced by the title of the asset.},
+    },
+
+    'already locked' => {
+        message     => q{The asset %s is already locked.},
+        lastUpdated => 0,
+        context     => q{%s will be replaced by the title of the asset.},
+    },
+
+    'locked asset' => {
+        message     => q{Locked the asset %s.},
+        lastUpdated => 0,
+        context     => q{%s will be replaced by the title of the asset.},
+    },
+
     'Any Class' => {
         message     => q{Any Class},
         lastUpdated => 0,
         context     => q{Class, as in name of class, or type of asset},
     },
 
+    'history' => {
+        message     => q{History},
+        lastUpdated => 0,
+        context     => q{Label for list of asset's revisions},
+    },
+
+    'copy branch' => {
+        message     => q{Copy Branch},
+        lastUpdated => 0,
+        context     => q{Label for asset helper},
+    },
+
+    'export as html' => {
+        message     => q{Export As HTML},
+        lastUpdated => 0,
+        context     => q{Label for asset helper},
+    },
     'Allowed Classes' => {
         message     => 'Allowed Classes',
         lastUpdated => 1295986062,
@@ -1424,7 +1501,13 @@ Couldn't open %-s because %-s <br />
     'Allowed Classes hoverHelp' => {
         message     => 'Which assets use this metadata?',
         lastUpdated => 1295986062,
-    }
+    },
+
+    'upload files' => {
+        message => q|Upload Files|,
+        context => q|Name of the asset helper.|,
+        lastUpdated => 1107387247,
+    },
 };
 
 1;

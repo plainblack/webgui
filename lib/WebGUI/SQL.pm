@@ -3,7 +3,7 @@ package WebGUI::SQL;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -15,12 +15,14 @@ package WebGUI::SQL;
 =cut
 
 use strict;
-use Scalar::Util qw( weaken );
-use DBI;
-use Tie::IxHash;
-use WebGUI::SQL::ResultSet;
-use WebGUI::Utility;
-use Text::CSV_XS;
+use DBI ();
+use Tie::IxHash ();
+use Text::CSV_XS ();
+use WebGUI::SQL::ResultSet ();
+use WebGUI::Exception;
+use WebGUI::GUID;
+use Try::Tiny;
+use namespace::clean;
 
 =head1 NAME
 
@@ -34,7 +36,7 @@ Package for interfacing with SQL databases. This package implements Perl DBI fun
 
  use WebGUI::SQL;
 
- $db = WebGUI::SQL->connect($session,$dsn, $user, $pass);
+ $db = WebGUI::SQL->connect($dsn, $user, $pass);
  $db->disconnect;
  
  $sth = $db->prepare($sql);
@@ -68,6 +70,82 @@ These methods are available from this package:
 
 =cut
 
+our @ISA = qw(DBI);
+
+#-------------------------------------------------------------------
+
+=head2 connect ( dsn, user, pass )
+
+Constructor. Connects to the database using DBI.
+
+=head2 dsn
+
+The Database Service Name of the database  you wish to connect to. It looks like 'DBI:mysql:dbname;host=localhost'.
+
+=head2 user
+
+The username to use to connect to the database defined by dsn.
+
+=head2 pass
+
+The password to use to connect to the database defined by dsn.
+
+=cut
+
+sub connect {
+    my $class   = shift;
+    my $dsn;
+    my $user;
+    my $pass;
+    if (ref $_[0] && $_[0]->isa('WebGUI::Config')) {
+        my $config = shift;
+        $dsn = $config->get('dsn');
+        $user = $config->get('dbuser');
+        $pass = $config->get('dbpass');
+    }
+    else {
+        $dsn = shift;
+        $user = shift;
+        $pass = shift;
+    }
+    my $params = shift;
+
+    if (! $params) {
+        $params = {};
+    }
+    if (ref $params) {
+        $params = { %$params };
+    }
+    else {
+        my @params = map { split /=/, $_, 2 } split /\n/, $params;
+        for (@params) {
+            s/\s+$//;
+            s/^\s+//;
+        }
+        $params = { @params };
+    }
+    $params->{RaiseError} = 0;
+    $params->{PrintError} = 0;
+    $params->{AutoCommit} = 1;
+    $params->{ShowErrorStatement} = 1;
+    $params->{HandleError} = sub {
+        WebGUI::Error::Database->throw(shift);
+    };
+    if ( ($class->parse_dsn($dsn))[1] eq 'mysql' ) {
+        $params->{mysql_enable_utf8} = 1;
+    }
+
+    my $dbh = $class->SUPER::connect($dsn, $user, $pass, $params);
+    unless (defined $dbh) {
+        die "Couldn't connect to database: $dsn : $DBI::errstr";
+    }
+    return $dbh;
+}
+
+
+package WebGUI::SQL::db;
+use Try::Tiny;
+our @ISA = qw(DBI::db);
 
 #-------------------------------------------------------------------
 
@@ -78,8 +156,8 @@ Starts a transaction sequence. To be used with commit and rollback. Any writes a
 =cut
 
 sub beginTransaction {
-	my $self = shift;
-	$self->dbh->begin_work;
+    my $self = shift;
+    $self->begin_work;
 }
 
 
@@ -105,7 +183,6 @@ sub buildArray {
     return @{ $arrayRef };
 }
 
-
 #-------------------------------------------------------------------
 
 =head2 buildArrayRef ( sql, params )
@@ -123,16 +200,15 @@ An array reference containing values for any placeholder params used in the SQL 
 =cut
 
 sub buildArrayRef {
-	my $self = shift;
-	my $sql = shift;
-	my $params = shift;
-    my $sth = $self->prepare($sql);
-    $sth->execute($params);
-    my @array;
-    while (my $data = $sth->arrayRef) {
-        push @array, $data->[0];
+    my $self = shift;
+    my $sql = shift;
+    my $params = shift;
+    my $array = $self->selectall_arrayref($sql, { Slice => [0] }, @$params);
+    for (@$array) {
+        $_ = $_->[0];
     }
-    return \@array;
+
+    return $array;
 }
 
 
@@ -163,7 +239,7 @@ straight hash that is faster but does not maintain order.
 =cut
 
 sub buildHash {
-	my $self = shift;
+    my $self = shift;
     my $hashRef = $self->buildHashRef(@_);
     return %{ $hashRef };
 }
@@ -196,25 +272,20 @@ straight hash that is faster but does not maintain order.
 =cut
 
 sub buildHashRef {
-	my $self = shift;
-	my $sql = shift;
-	my $params = shift;
+    my $self = shift;
+    my $sql = shift;
+    my $params = shift;
     my $options = shift || {};
     my %hash;
     unless ($options->{noOrder}) {
-        tie %hash, "Tie::IxHash";
+        tie %hash, 'Tie::IxHash';
     }
-    $self->session->log->query($sql, $params);
-    my $dbh = $self->dbh;
-    my $results = $dbh->selectall_arrayref($sql, {}, @$params);
-    if ($dbh->err) {
-        $self->session->log->fatal("Couldn't execute prepared statement: $sql : With place holders: ".join(", ", @{$params}).".  Root cause: ". $dbh->errstr);
-    }
+    my $results = $self->selectall_arrayref($sql, {}, @$params);
     my $width = @{$results} && @{$results->[0]};
     %hash
-        = $width == 2 ? map { @{ $_ } } @{ $results }
+        = $width == 2 ? map { @$_ } @{ $results }
         # for single column, use it for both key and value
-        : $width == 1 ? map { $_->[0], $_->[0] } @{ $results }
+        : $width == 1 ? map { ($_->[0]) x 2 } @{ $results }
         : $width == 0 ? ()
         : map {
             # for more than 2 columns, use all but last joined with colons for key
@@ -248,13 +319,8 @@ sub buildArrayRefOfHashRefs {
     my $self = shift;
     my $sql = shift;
     my $params = shift;
-    my @array;
-    my $sth = $self->read($sql, $params);
-    while (my $data = $sth->hashRef) {
-        push @array, $data;
-    }
-    $sth->finish;
-    return \@array;
+    my $array = $self->selectall_arrayref($sql, { Slice => {} }, @$params);
+    return $array;
 }
 
 
@@ -284,18 +350,21 @@ sub buildDataTableStructure {
     my $self = shift;
     my $sql = shift;
     my $params = shift;
-    my %hash;
-    my @array;
+
     ##Note, I need a valid statement handle for doing the rows method on.
-	my $sth = $self->read($sql,$params);
-	while (my $data = $sth->hashRef) {
-		push(@array,$data);
-	}
-    $hash{records}         = \@array;
-    $hash{totalRecords}    = $self->quickScalar('select found_rows()') + 0; ##Convert to numeric
-    $hash{recordsReturned} = $sth->rows()+0;
-	$sth->finish;
-	return %hash;
+    my $sth = $self->prepare($sql);
+    $sth->execute(@$params);
+    my $array = $sth->fetchall_arrayref( {} );
+
+    my %hash = (
+        records         => $array,
+        totalRecords    => $self->selectrow_array('SELECT found_rows()') + 0, ##Convert to numeric
+        recordsReturned => $sth->rows + 0,
+    );
+
+    $sth->finish;
+
+    return %hash;
 }
 
 #-------------------------------------------------------------------
@@ -321,21 +390,21 @@ Which column of the result set to use as the key when creating the hashref.
 =cut
 
 sub buildHashRefOfHashRefs {
-	my $self = shift;
-	my $sql = shift;
-	my $params = shift;
-	my $key = shift;
-	my $sth = $self->read($sql, $params);
-	my %hash;
-	tie %hash, "Tie::IxHash";
-	while (my $data = $sth->hashRef) {
-		$hash{$data->{$key}} = $data;
-	}
-	$sth->finish;
-	return \%hash;
+    my $self   = shift;
+    my $sql    = shift;
+    my $params = shift;
+    my $key    = shift;
+
+    my $sth = $self->prepare($sql);
+    $sth->execute(@$params);
+    tie my %hash, 'Tie::IxHash';
+    while (my $data = $sth->fetchrow_hashref) {
+        $hash{$data->{$key}} = $data;
+    }
+    $sth->finish;
+    return \%hash;
 }
 
-                                                                              
 #-------------------------------------------------------------------
 
 =head2 buildSearchQuery ( $sql, $placeholders, $keywords, $columns )
@@ -366,7 +435,7 @@ An arrayref of column names that should be searched for $keywords.
 
 sub buildSearchQuery {
     my ($self, $sql, $placeHolders, $keywords, $columns) = @_;
-    if ($$sql =~ m/where/) {
+    if ($$sql =~ m/where/i) {
         $$sql .= ' and (';
     }
     else { 
@@ -385,74 +454,6 @@ sub buildSearchQuery {
 
 #-------------------------------------------------------------------
 
-=head2 commit ( )
-
-Ends a transaction sequence. To be used with beginTransaction. Applies all of the writes since beginTransaction to the database.
-
-=cut
-
-sub commit {
-	my $self = shift;
-	$self->dbh->commit;
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 connect ( session, dsn, user, pass )
-
-Constructor. Connects to the database using DBI.
-
-=head2 session
-
-A reference to the active WebGUI::Session object.
-
-=head2 dsn
-
-The Database Service Name of the database  you wish to connect to. It looks like 'DBI:mysql:dbname;host=localhost'.
-
-=head2 user
-
-The username to use to connect to the database defined by dsn.
-
-=head2 pass
-
-The password to use to connect to the database defined by dsn.
-
-=cut
-
-sub connect {
-	my $class   = shift;
-	my $session = shift;
-	my $dsn     = shift;
-	my $user    = shift;
-	my $pass    = shift;
-    my $params  = shift;
-
-    my (undef, $driver) = DBI->parse_dsn($dsn);
-    my $dbh = DBI->connect($dsn,$user,$pass,{RaiseError => 0, AutoCommit => 1,
-        $driver eq 'mysql' ? (mysql_enable_utf8 => 1) : (),
-    });
-
-	unless (defined $dbh) {
-		$session->errorHandler->error("Couldn't connect to database: $dsn : $DBI::errstr");
-		return undef;
-	}
-
-    ##Set specific attributes for this database.
-    my @params = split /\s*\n\s*/, $params;
-    foreach my $param ( @params ) {
-        my ($paramName, $paramValue) = split /\s*=\s*/, $param;
-        $dbh->{$paramName} = $paramValue;
-    }
-
-	my $self = bless {_dbh=>$dbh, _session=>$session}, $class;
-        weaken( $self->{_session} );
-        return $self;
-}
-
-#-------------------------------------------------------------------
-
 =head2 dbh ( )
 
 Returns a reference to the working DBI database handler for this WebGUI::SQL object.
@@ -460,8 +461,8 @@ Returns a reference to the working DBI database handler for this WebGUI::SQL obj
 =cut
 
 sub dbh {
-	my $self = shift;
-	return $self->{_dbh};
+    my $self = shift;
+    return $self;
 }
 
 
@@ -486,42 +487,11 @@ The value to search for in the key column.
 =cut
 
 sub deleteRow {
-	my ($self, $table, $key, $keyValue) = @_;
-	my $sth = $self->write("delete from ".$self->dbh->quote_identifier($table)." where ".$key."=?", [$keyValue]);
+    my ($self, $table, $key, $keyValue) = @_;
+    $table = $self->quote_identifier($table);
+    $key = $self->quote_identifier($key);
+    return $self->do("DELETE FROM $table WHERE $key = ?", {}, $keyValue);
 }
-
-
-#-------------------------------------------------------------------
-
-=head2 DESTROY ( )
-
-Deconstructor.
-
-=cut
-
-sub DESTROY {
-	my $self = shift;
-	$self->disconnect;
-	undef $self;
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 disconnect ( )
-
-Disconnects from the database. And destroys the object.
-
-=cut
-
-sub disconnect {
-    my $self = shift;
-    my $dbh = delete $self->{_dbh};
-    if ($dbh) {
-        $dbh->disconnect;
-    }
-}
-
 
 #-------------------------------------------------------------------
 
@@ -532,8 +502,8 @@ Returns an error code for the current handler.
 =cut
 
 sub errorCode {
-	my $self = shift;
-	return $self->dbh->err;
+    my $self = shift;
+    return $self->err;
 }
 
 
@@ -546,8 +516,8 @@ Returns a text error message for the current handler.
 =cut
 
 sub errorMessage {
-	my $self = shift;
-	return $self->dbh->errstr;
+    my $self = shift;
+    return $self->errstr;
 }
 
 
@@ -555,7 +525,7 @@ sub errorMessage {
 
 =head2 getNextId ( idName )
 
-Increments an incrementer of the specified type and returns the value. 
+Increments an incrementer of the specified type and returns the value.
 
 =head3 idName
 
@@ -564,14 +534,13 @@ Specify the name of one of the incrementers in the incrementer table.
 =cut
 
 sub getNextId {
-	my $self = shift;
-	my $name = shift;
-	my ($id);
-	$self->beginTransaction;
-	($id) = $self->quickArray("select nextValue from incrementer where incrementerId=?", [$name]);
-	$self->write("update incrementer set nextValue=nextValue+1 where incrementerId=?",[$name]);
-	$self->commit;
-	return $id;
+    my $self = shift;
+    my $name = shift;
+    $self->begin_work;
+    my $id = $self->selectrow_array('SELECT nextValue FROM incrementer WHERE incrementerId = ?', {}, $name);
+    $self->do('UPDATE incrementer SET nextValue=nextValue+1 WHERE incrementerId=?', {}, $name);
+    $self->commit;
+    return $id;
 }
 
 #-------------------------------------------------------------------
@@ -584,7 +553,7 @@ Returns the DBI driver used by this database link
 
 sub getDriver {
     my $self = shift;
-    return  $self->{_dbh}->{Driver}->{Name};
+    return  $self->{Driver}->{Name};
 }
 
 #-------------------------------------------------------------------
@@ -608,29 +577,17 @@ The value to search for in the key column.
 =cut
 
 sub getRow {
-        my ($self, $table, $key, $keyValue) = @_;
-        my $row = $self->quickHashRef("select * from ".$self->dbh->quote_identifier($table)." where ".$key."=?",[$keyValue]);
-        return $row;
+    my ($self, $table, $key, $keyValue) = @_;
+    my $row = $self->selectrow_hashref(
+        sprintf('SELECT * FROM %s WHERE %s = ?',
+            $self->quote_identifier($table),
+            $self->quote_identifier($key)
+        ),
+        {},
+        $keyValue,
+    );
+    return $row;
 }
-
-#-------------------------------------------------------------------
-
-=head2 prepare ( sql ) 
-
-This is a wrapper for WebGUI::SQL::ResultSet->prepare()
-
-=head3 sql
-
-An SQL statement. 
-
-=cut
-
-sub prepare {
-	my $self = shift;
-	my $sql = shift;
-	return WebGUI::SQL::ResultSet->prepare($sql, $self);
-}
-
 
 #-------------------------------------------------------------------
 
@@ -649,11 +606,11 @@ An array reference containing values for any placeholder params used in the SQL 
 =cut
 
 sub quickArray {
-	my $self = shift;
-	my $sql = shift;
-	my $params = shift || [];
-    my $data = $self->dbh->selectrow_arrayref($sql, {}, @{ $params }) || [];
-    return @{ $data };
+    my $self = shift;
+    my $sql = shift;
+    my $params = shift || [];
+    my @result = $self->selectrow_array($sql, {}, @{ $params });
+    return @result;
 }
 
 
@@ -674,29 +631,27 @@ An array reference containing values for any placeholder params used in the SQL 
 =cut
 
 sub quickCSV {
-	my $self = shift;
-	my $sql = shift;
-	my $params = shift;
-	my ($sth, $output, @data);
+    my $self = shift;
+    my $sql = shift;
+    my $params = shift;
 
 	my $csv = Text::CSV_XS->new({ eol => "\n", binary => 1 });
 
-	$sth = $self->prepare($sql);
-	$sth->execute($params);
+    my $sth = $self->prepare($sql);
+    $sth->execute(@$params);
 
-	return undef unless $csv->combine($sth->getColumnNames);
-	$output = $csv->string();
+    return undef unless $csv->combine($sth->getColumnNames);
+    my $output = $csv->string;
 
-	while (@data = $sth->array) {
-		if ( ! $csv->combine(@data) ) {
-                    $self->session->log->error( "Problem creating CSV row: " . $csv->error_diag );
-                    return undef;
-                }
-		$output .= $csv->string();
-	}
+    while (my @data = $sth->array) {
+        if ( ! $csv->combine(@data) ) {
+            WebGUI::Error->throw( "Problem creating CSV row: " . $csv->error_diag );
+        }
+        $output .= $csv->string();
+    }
 
-	$sth->finish;
-	return $output;
+    $sth->finish;
+    return $output;
 }
 
 
@@ -717,19 +672,11 @@ An array reference containing values for any placeholder params used in the SQL 
 =cut
 
 sub quickHash {
-	my $self = shift;
-	my $sql = shift;
-	my $params = shift;
-	my ($sth, $data);
-	$sth = $self->prepare($sql);
-	$sth->execute($params);
-	$data = $sth->hashRef;
-	$sth->finish;
-	if (defined $data) {
-		return %{$data};
-	} else {
-		return ();
-	}
+    my $self = shift;
+    my $sql = shift;
+    my $params = shift;
+    my $row = $self->selectrow_hashref($sql, {}, @$params);
+    return $row ? %{$row} : ();
 }
 
 #-------------------------------------------------------------------
@@ -749,18 +696,10 @@ An array reference containing values for any placeholder params used in the SQL 
 =cut
 
 sub quickHashRef {
-	my $self = shift;
-	my $sql = shift;
-	my $params = shift;
-	my $sth = $self->prepare($sql);
-	$sth->execute($params);
-	my $data = $sth->hashRef;
-	$sth->finish;
-	if (defined $data) {
-		return $data;
-	} else {
-		return {};
-	}
+    my $self = shift;
+    my $sql = shift;
+    my $params = shift;
+    return $self->selectrow_hashref($sql, {}, @$params) || {};
 }
 
 #-------------------------------------------------------------------
@@ -780,15 +719,11 @@ An array reference containing values for any placeholder params used in the SQL 
 =cut
 
 sub quickScalar {
-	my $self = shift;
-	my $sql = shift;
-	my $params = shift;
-	my ($sth, @data);
-	$sth = $self->prepare($sql);
-	$sth->execute($params);
-	@data = $sth->array;
-	$sth->finish;
-	return $data[0];
+    my $self = shift;
+    my $sql = shift;
+    my $params = shift;
+    my ($data) = $self->selectrow_array($sql, {}, @$params);
+    return $data;
 }
 
 
@@ -809,39 +744,30 @@ An array reference containing values for any placeholder params used in the SQL 
 =cut
 
 sub quickTab {
-	my $self = shift;
-	my $sql = shift;
-	my $params = shift;
-	my ($sth, $output, @data);
-	$sth = $self->prepare($sql);
-	$sth->execute($params);
-	$output = join("\t",$sth->getColumnNames)."\n";
-	while (@data = $sth->array) {
-		makeArrayTabSafe(\@data);
-		$output .= join("\t",@data)."\n";
-	}
-	$sth->finish;
-	return $output;
-}
+    my $self = shift;
+    my $sql = shift;
+    my $params = shift;
 
-#-------------------------------------------------------------------
+    my $sth = $self->prepare($sql);
+    $sth->execute(@{$params});
 
-=head2 quote ( string ) 
+    my $csv = Text::CSV_XS->new({
+        eol => "\n",
+        quote_char => undef,
+        escape_char => undef,
+        sep_char => "\t",
+    });
 
-Returns a string quoted and ready for insert into the database.  
+    return undef
+        unless $csv->combine($sth->getColumnNames);
 
-B<NOTE:> You should use this sparingly. It is much faster and safer to use prepare/execute style queries and passing in place holder parameters. Even the convenience methods like quickArray() support the use of place holder parameters.
-
-=head3 string
-
-Any scalar variable that needs to be escaped to be inserted into the database.
-
-=cut
-
-sub quote {
-	my $self = shift;
-	my $value = shift;
-	return $self->dbh->quote($value);
+    my $output = $csv->string;
+    while (my @data = $sth->fetchrow_array) {
+        return undef unless $csv->combine(@data);
+        $output .= $csv->string;
+    }
+    $sth->finish;
+    return $output;
 }
 
 #-------------------------------------------------------------------
@@ -857,15 +783,28 @@ An array reference containing strings to be quoted.
 =cut
 
 sub quoteAndJoin {
-	my $self = shift;
-	my $arrayRef = shift;
-	my @newArray;
-	foreach my $value (@$arrayRef) {
- 		push(@newArray,$self->quote($value));
-	}
-	return join(",",@newArray);
+    my $self = shift;
+    my $arrayRef = shift;
+    return join ',', map { $self->quote($_) } @$arrayRef;
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 quoteIdentifier ( string ) 
+
+Returns a string quoted as an identifier to be used as a table name, column name, etc.
+
+=head3 string
+
+Any scalar variable that needs to be escaped to be inserted into the database.
+
+=cut
+
+sub quoteIdentifier {
+    my $self  = shift;
+    return $self->quote_identifier(@_);
+}
 
 #-------------------------------------------------------------------
 
@@ -885,44 +824,13 @@ An array reference containing a list of values to be used in the placeholders de
 =cut
 
 sub read {
-	my $self = shift;
-	my $sql = shift;
-	my $placeholders = shift;
-	return WebGUI::SQL::ResultSet->read($sql, $self, $placeholders);
+    my $self = shift;
+    my $sql = shift;
+    my $placeholders = shift;
+    my $sth = $self->prepare($sql);
+    $sth->execute(@$placeholders);
+    return $sth;
 }
-
-
-#-------------------------------------------------------------------
-
-=head2 rollback ( )
-
-Ends a transaction sequence. To be used with beginTransaction. Cancels all of the writes since beginTransaction.
-
-=head3 dbh
-
-A database handler. Defaults to the WebGUI default database handler.
-
-=cut
-
-sub rollback {
-	my $self = shift;
-	$self->dbh->rollback;
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 session ( )
-
-Returns a reference to the current session.
-
-=cut
-
-sub session {
-	my $self = shift;
-	return $self->{_session};
-}
-
 
 #-------------------------------------------------------------------
 
@@ -949,28 +857,35 @@ Use this ID to create a new row. Same as setting the key value to "new" except t
 =cut
 
 sub setRow {
-	my ($self, $table, $keyColumn, $data, $id) = @_;
-	if ($data->{$keyColumn} eq "new" || $id) {
-		$data->{$keyColumn} = $id || $self->session->id->generate();
-		$self->write("replace into ".$self->dbh->quote_identifier($table)
-            ." (" . $self->dbh->quote_identifier($keyColumn) . ") values (?)",[$data->{$keyColumn}]);
-	}
-	my @fields = ();
-	my @data = ();
-	foreach my $key (keys %{$data}) {
-		unless ($key eq $keyColumn) {
-			push(@fields, $self->dbh->quote_identifier($key).'=?');
-			push(@data,$data->{$key});
-		}
-	}
-	if ($fields[0] ne "") {
-		push(@data,$data->{$keyColumn});
-		$self->write("update ".$self->dbh->quote_identifier($table)." set " . join(", ", @fields)
-            . " where " . $self->dbh->quote_identifier($keyColumn) . "=?", \@data);
-	}
-	return $data->{$keyColumn};
-}
+    my ($self, $table, $keyColumn, $data, $id) = @_;
+    $table = $self->quote_identifier($table);
+    my $key = $self->quote_identifier($keyColumn);
 
+    if ($data->{$keyColumn} eq 'new' || $id) {
+        $id ||= WebGUI::GUID->generate;
+        $data->{$keyColumn} = $id;
+    }
+    else {
+        $id = $data->{$keyColumn};
+    }
+
+    try {
+        my $fields = join ', ', map { $self->quote_identifier($_) } keys %$data;
+        my $values = join ', ', ('?') x values %$data;
+        $self->do("INSERT INTO $table ($fields) VALUES ($values)", {}, values %$data);
+    }
+    catch {
+        my %data = %$data;
+        delete $data{$keyColumn};
+
+        if ( keys %data ) {
+            my $fields = join ', ', map { $self->quote_identifier($_). '=?' } keys %data;
+            $self->do("UPDATE $table SET $fields WHERE $key = ?", {}, values %data, $id);
+        }
+    };
+
+    return $id;
+}
 
 #-------------------------------------------------------------------
 
@@ -989,10 +904,11 @@ An array reference containing a list of values to be used in the placeholders de
 =cut
 
 sub unconditionalRead {
-	my $self = shift;
-	my $sql = shift;
-	my $placeholders = shift;
-	return WebGUI::SQL::ResultSet->unconditionalRead($sql, $self, $placeholders);
+    my $self = shift;
+    local $self->{RaiseError} = 0;
+    local $self->{HandleError} = undef;
+    my $sth = $self->read(@_);
+    return $sth;
 }
 
 
@@ -1014,11 +930,10 @@ An array reference containing values for any placeholder params used in the SQL 
 =cut
 
 sub write {
-	my $self = shift;
-	my $sql = shift;
-	my $params = shift;
-	my $sth = $self->prepare($sql);
-	$sth->execute($params);
+    my $self = shift;
+    my $sql = shift;
+    my $params = shift;
+    return $self->do($sql, {}, @$params);
 }
 
 

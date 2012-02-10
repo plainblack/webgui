@@ -1,6 +1,6 @@
 # vim:syntax=perl
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -14,9 +14,7 @@
 #
 
 use Path::Class;
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../lib";
 use Test::More;
 plan skip_all => 'set CODE_COP to enable this test' unless $ENV{CODE_COP};
 
@@ -33,6 +31,6 @@ if ($@) {
 # Init
 my $session         = WebGUI::Test->session;
 
-my $label_profile = Path::Class::File->new( WebGUI::Test->root , 't', 'i18n', 'perlcriticrc');
+my $label_profile = Path::Class->dir(WebGUI::Test->lib)->parent->subdir('t')->subdir('i18n')->file('perlcritic');
 Test::Perl::Critic->import(-profile => $label_profile->stringify);
 all_critic_ok(WebGUI::Test->lib);

@@ -4,7 +4,7 @@ package WebGUI::Workflow::Activity::PurgeOldAssetRevisions;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -18,6 +18,7 @@ package WebGUI::Workflow::Activity::PurgeOldAssetRevisions;
 use strict;
 use base 'WebGUI::Workflow::Activity';
 use WebGUI::Asset;
+use WebGUI::Exception;
 
 =head1 NAME
 
@@ -77,7 +78,7 @@ See WebGUI::Workflow::Activity::execute() for details.
 sub execute {
 	my ($self, $nothing, $instance) = @_;
     my $session = $self->session;
-    my $log = $session->errorHandler;
+    my $log = $session->log;
 
     # keep track of how much time it's taking
     my $start = time();
@@ -99,16 +100,16 @@ sub execute {
         }
 
         # instanciate and purge
-        my $asset = WebGUI::Asset->new($session, $id,$class,$version);
-		if (defined $asset) {
+        my $asset = eval { WebGUI::Asset->newById($session, $id, $version); };
+        if (Exception::Class->caught()) {
+            $log->error("Could not instanciate asset $id $class $version perhaps it is corrupt.")
+        }
+        else {
             if ($asset->getRevisionCount("approved") > 1) {
                 $log->info("Purging revision $version for asset $id.");
                 $asset->purgeRevision;
             }
-		}
-        else {
-			$log->error("Could not instanciate asset $id $class $version perhaps it is corrupt.")
-		}
+        }
 
         # give up if we're taking too long
         if (time() - $start > $ttl) { 

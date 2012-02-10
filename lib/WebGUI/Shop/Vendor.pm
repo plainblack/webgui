@@ -1,11 +1,96 @@
 package WebGUI::Shop::Vendor;
 
 use strict;
-use Class::InsideOut qw{ :std };
+use Scalar::Util qw/blessed/;
+use Moose;
+use WebGUI::Definition;
+
+property 'name' => (
+    is         => 'rw',
+    noFormPost => 1,
+    default    => '',
+);
+
+property 'userId' => (
+    is         => 'rw',
+    noFormPost => 1,
+    default    => '',
+);
+
+property 'url' => (
+    is         => 'rw',
+    noFormPost => 1,
+    default    => '',
+);
+
+property 'paymentInformation' => (
+    is         => 'rw',
+    noFormPost => 1,
+    default    => '',
+);
+
+property 'preferredPaymentType' => (
+    is         => 'rw',
+    noFormPost => 1,
+    default    => '',
+);
+
+has 'dateCreated' => (
+    is => 'ro',
+);
+has [ qw/session vendorId/ ] => (
+    is       => 'ro',
+    required => 1,
+);
+
+around BUILDARGS => sub {
+    my $orig  = shift;
+    my $class = shift;
+    if (ref $_[0] eq 'HASH') {
+        ##Need same db code as below here.
+        ##Session check goes here?
+        ##Build a new one
+        my $properties = $_[0];
+        my $session = $properties->{session};
+        if (! (blessed $session && $session->isa('WebGUI::Session')) ) {
+            WebGUI::Error::InvalidObject->throw(expected=>"WebGUI::Session", got=>(ref $session), error=>"Need a session.");
+        }
+        my ($vendorId, $dateCreated) = $class->_init($session);
+        $properties->{vendorId}    = $vendorId;
+        $properties->{dateCreated} = $dateCreated;
+        return $class->$orig($properties);
+    }
+    my $session = shift;
+    if (! (blessed $session && $session->isa('WebGUI::Session'))) {
+        WebGUI::Error::InvalidObject->throw(expected=>"WebGUI::Session", got=>(ref $session), error=>"Need a session.");
+    }
+    my $argument2 = shift;
+    if (!defined $argument2) {
+        WebGUI::Error::InvalidParam->throw( param=>$argument2, error=>"Need a vendorId.");
+    }
+    if (ref $argument2 eq 'HASH') {
+        ##Build a new one
+        my ($vendorId, $dateCreated) = $class->_init($session);
+        my $properties             = $argument2;
+        $properties->{session}     = $session;
+        $properties->{vendorId}    = $vendorId;
+        $properties->{dateCreated} = $dateCreated;
+        return $class->$orig($properties);
+    }
+    else {
+        ##Look up one in the db
+        my $vendor = $session->db->quickHashRef("select * from vendor where vendorId=?", [$argument2]);
+        if ($vendor->{vendorId} eq "") {
+            WebGUI::Error::ObjectNotFound->throw(error=>"Vendor not found.", id=>$argument2);
+        }
+        $vendor->{session} = $session;
+        return $class->$orig($vendor);
+    }
+};
+
 use WebGUI::Shop::Admin;
 use WebGUI::Exception::Shop;
 use WebGUI::International;
-use WebGUI::Utility qw{ isIn };
 use List::Util qw{ sum };
 use JSON qw{ encode_json };
 
@@ -21,7 +106,7 @@ Keeps track of vendors that sell merchandise in the store.
 
  use WebGUI::Shop::Vendor;
 
- my $vendor = WebGUI::Shop::Vendor->new($session, $vendord);
+ my $vendor = WebGUI::Shop::Vendor->new($session, $vendorId);
 
 =head1 METHODS
 
@@ -29,35 +114,35 @@ These subroutines are available from this package:
 
 =cut
 
-readonly session => my %session;
-readonly properties => my %properties;
+#-------------------------------------------------------------------
+
+=head2 _init ( session )
+
+Builds a stub of object information in the database, and returns the newly created
+vendorId, and the dateCreated fields so the object can be initialized correctly.
+
+=cut
+
+sub _init {
+    my $class       = shift;
+    my $session     = shift;
+    my $vendorId    = $session->id->generate;
+    my $dateCreated = WebGUI::DateTime->new($session)->toDatabase;
+    $session->db->write("insert into vendor (vendorId, dateCreated) values (?, ?)",[$vendorId, $dateCreated]);
+    return ($vendorId, $dateCreated);
+}
 
 #-------------------------------------------------------------------
 
 =head2 create ( session, properties )
 
-Constructor. Creates a new vendor.
-
-=head3 session
-
-A reference to the current session.
-
-=head3 properties
-
-A hash reference containing the properties for this vendor. See update() for details.
+Constructor. Creates a new vendor.  Really an alias for WebGUI::Shop::Vendor->new($session, $properties)
 
 =cut
 
 sub create {
     my ($class, $session, $properties) = @_;
-    unless (defined $session && $session->isa("WebGUI::Session")) {
-        WebGUI::Error::InvalidObject->throw(expected=>"WebGUI::Session", got=>(ref $session), error=>"Need a session.");
-    }
-    my $id = $session->id->generate;
-    $session->db->write("insert into vendor (vendorId, dateCreated) values (?, now())",[$id]);
-    my $self = $class->new($session, $id);
-    $self->update($properties);
-    return $self;
+    return $class->new($session, $properties);
 }
 
 #-------------------------------------------------------------------
@@ -70,51 +155,20 @@ Deletes this vendor.
 
 sub delete {
     my ($self) = @_;
-    $self->session->db->deleteRow("vendor","vendorId",$self->getId);
-}
-
-#-------------------------------------------------------------------
-
-=head2 get ( [ property ] )
-
-Returns a duplicated hash reference of this objectÕs data. See update() for details.
-
-=head3 property
-
-Any field returns the value of a field rather than the hash reference.
-
-=head3 Additional properties
-
-=head4 dateCreated
-
-The date this vendor was created in the system.
-
-=head4 vendorId
-
-The id of this vendor from the database.  Use getId() instead.
-
-=cut
-
-sub get {
-    my ($self, $name) = @_;
-    if (defined $name) {
-        return $properties{id $self}{$name};
-    }
-    my %copyOfHashRef = %{$properties{id $self}};
-    return \%copyOfHashRef;
+    $self->session->db->deleteRow("vendor", "vendorId", $self->vendorId);
 }
 
 #-------------------------------------------------------------------
 
 =head2 getId () 
 
-Returns the unique id of this item.
+Returns the unique id of this item.  You should use $self->vendorId instead.
 
 =cut
 
 sub getId {
     my $self = shift;
-    return $self->get("vendorId");
+    return $self->vendorId;
 }
 
 #-------------------------------------------------------------------
@@ -147,7 +201,7 @@ sub getPayoutTotals {
     my %totals = $self->session->db->buildHash(
         'select vendorPayoutStatus, sum(vendorPayoutAmount) as amount from transactionItem as t1, transaction as t2 '
         .'where t1.transactionId = t2.transactionId and t2.isSuccessful <> 0 and vendorId=? group by vendorPayoutStatus ',
-        [ $self->getId ]
+        [ $self->vendorId ]
     );
 
     # Format the payout categories and calc the total those.
@@ -204,10 +258,10 @@ sub isVendorInfoComplete {
     my $self = shift;
 
     my $complete = 
-           defined $self->get( 'name' )
-        && defined $self->get( 'userId' )
-        && defined $self->get( 'preferredPaymentType' )
-        && defined $self->get( 'paymentInformation' );
+           defined $self->name
+        && defined $self->userId
+        && defined $self->preferredPaymentType
+        && defined $self->paymentInformation;
 
     return $complete
 }
@@ -216,7 +270,12 @@ sub isVendorInfoComplete {
 
 =head2 new ( session, vendorId )
 
-Constructor.   Returns a WebGUI::Shop::Vendor object.
+=head2 new ( session, properties )
+
+=head2 new ( hashref )
+
+Constructor.   Returns a WebGUI::Shop::Vendor object, either by fetching information from the database,
+or using passed in properties.
 
 =head3 session
 
@@ -229,26 +288,44 @@ A unique id for a vendor that already exists in the database.  If the vendorId i
 in, then a WebGUI::Error::InvalidParam Exception will be thrown.  If the requested Id cannot
 be found in the database, then a WebGUI::Error::ObjectNotFound exception will be thrown.
 
+=head3 properties
+
+A hashref of properties to assign to the object when it is created.
+
+=head3 hashref
+
+A classic Moose-style hashref of options.  It must include a WebGUI::Session object.
+
+=head3 Attributes
+
+=head4 name
+
+The name of the vendor.
+
+=head4 userId
+
+The unique GUID of the vendor.
+
+=head4 url
+
+The vendor's url.
+
+=head4 vendorId
+
+A unique identifier for this vendor.  This option may be included in the properties for the new object, but it will
+be ignored.
+
+=head4 dateCreated
+
+The date this vendor was created, in database format.  This option may be included in the properties for the new object,
+but it will be ignored.
+
+=head4 paymentInformation
+
+=head4 preferredPaymentType
+
 =cut
 
-sub new {
-    my ($class, $session, $vendorId) = @_;
-    unless (defined $session && $session->isa("WebGUI::Session")) {
-        WebGUI::Error::InvalidObject->throw(expected=>"WebGUI::Session", got=>(ref $session), error=>"Need a session.");
-    }
-    unless (defined $vendorId) {
-        WebGUI::Error::InvalidParam->throw( param=>$vendorId, error=>"Need a vendorId.");
-    }
-    my $vendor = $session->db->quickHashRef("select * from vendor where vendorId=?",[$vendorId]);
-    if ($vendor->{vendorId} eq "") {
-        WebGUI::Error::ObjectNotFound->throw(error=>"Vendor not found.", id=>$vendorId);
-    }
-    my $self = register $class;
-    my $id        = id $self;
-    $session{ $id } = $session;
-    $properties{ $id } = $vendor;
-    return $self;
-}
 
 #-------------------------------------------------------------------
 
@@ -262,7 +339,7 @@ A reference to the current session.
 
 =head3 userId
 
-A unique userId. Will pull from the session if not specified.
+A unique userId.  Will pull from the session if not specified.
 
 =cut
 
@@ -289,44 +366,16 @@ Returns a reference to the current session.
 
 #-------------------------------------------------------------------
 
-=head2 update ( properties )
+=head2 write ( )
 
-Sets properties of the vendor
-
-=head3 properties
-
-A hash reference that contains one of the following:
-
-=head4 name
-
-The name of the vendor.
-
-=head4 userId
-
-The unique GUID of the vendor.
-
-=head4 url
-
-The vendor's url.
-
-=head4 paymentInformation
-
-????
-
-=head4 preferredPaymentType
-
-????
+Serializes the object's properties to the database
 
 =cut
 
-sub update {
-    my ($self, $newProperties) = @_;
-    my $id = id $self;
-    my @fields = (qw(name userId url paymentInformation preferredPaymentType));
-    foreach my $field (@fields) {
-        $properties{$id}{$field} = (exists $newProperties->{$field}) ? $newProperties->{$field} : $properties{$id}{$field};
-    }
-    $self->session->db->setRow("vendor","vendorId",$properties{$id});
+sub write {
+    my ($self) = @_;
+    my $properties = $self->get();
+    $self->session->db->setRow("vendor", "vendorId", $properties);
 }
 
 #-------------------------------------------------------------------
@@ -447,7 +496,7 @@ sub www_manage {
 			.WebGUI::Form::formHeader($session, {extras=>'style="float: left;"' })
             .WebGUI::Form::hidden($session, { name   => "shop",                value => "vendor" })
             .WebGUI::Form::hidden($session, { name   => "method",              value => "delete" })
-            .WebGUI::Form::hidden($session, { name   => "vendorId",    value => $vendor->getId })
+            .WebGUI::Form::hidden($session, { name   => "vendorId",    value => $vendor->vendorId })
             .WebGUI::Form::submit($session, { value  => $i18n->get("delete"), extras => 'class="backwardButton"' }) 
             .WebGUI::Form::formFooter($session)
 
@@ -455,12 +504,12 @@ sub www_manage {
             .WebGUI::Form::formHeader($session, {extras=>'style="float: left;"' })
             .WebGUI::Form::hidden($session, { name   => "shop",              value => "vendor" })
             .WebGUI::Form::hidden($session, { name   => "method",            value => "edit" })
-            .WebGUI::Form::hidden($session, { name   => "vendorId",  value => $vendor->getId })
+            .WebGUI::Form::hidden($session, { name   => "vendorId",  value => $vendor->vendorId })
             .WebGUI::Form::submit($session, { value  => $i18n->get("edit"), extras => 'class="normalButton"' })
             .WebGUI::Form::formFooter($session)
 
             # Append name
-            .' '. $vendor->get("name") 
+            .' '. $vendor->name 
         .'</div>';        
     }
 
@@ -487,20 +536,20 @@ sub www_managePayouts {
     return $session->privilege->adminOnly() unless ($admin->canManage);
     
     # Load the required YUI stuff.
-    $style->setLink($url->extras('yui/build/paginator/assets/skins/sam/paginator.css'), {type=>'text/css', rel=>'stylesheet'});
-    $style->setLink($url->extras('yui/build/datatable/assets/skins/sam/datatable.css'), {type=>'text/css', rel=>'stylesheet'});
-    $style->setLink($url->extras('yui/build/button/assets/skins/sam/button.css'),       {type=>'text/css', rel=>'stylesheet'});
+    $style->setCss($url->extras('yui/build/paginator/assets/skins/sam/paginator.css'));
+    $style->setCss($url->extras('yui/build/datatable/assets/skins/sam/datatable.css'));
+    $style->setCss($url->extras('yui/build/button/assets/skins/sam/button.css'));
 
-    $style->setScript($url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'), {type=>'text/javascript'});
-    $style->setScript($url->extras('yui/build/element/element-min.js'),             {type=>'text/javascript'});
-    $style->setScript($url->extras('yui/build/connection/connection-min.js'),       {type=>'text/javascript'});
-    $style->setScript($url->extras('yui/build/json/json-min.js'),                   {type=>'text/javascript'});
-    $style->setScript($url->extras('yui/build/paginator/paginator-min.js'),         {type=>'text/javascript'});
-    $style->setScript($url->extras('yui/build/datasource/datasource-min.js'),       {type=>'text/javascript'});
-    $style->setScript($url->extras('yui/build/datatable/datatable-min.js'),         {type=>'text/javascript'});
-    $style->setScript($url->extras('yui/build/button/button-min.js'),               {type=>'text/javascript'});
-    $style->setScript($url->extras('yui-webgui/build/i18n/i18n.js'),                {type=>'text/javascript'});
-    $style->setScript($url->extras('VendorPayout/vendorPayout.js'),                 {type=>'text/javascript'});
+    $style->setScript($url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'));
+    $style->setScript($url->extras('yui/build/element/element-min.js'));
+    $style->setScript($url->extras('yui/build/connection/connection-min.js'));
+    $style->setScript($url->extras('yui/build/json/json-min.js'));
+    $style->setScript($url->extras('yui/build/paginator/paginator-min.js'));
+    $style->setScript($url->extras('yui/build/datasource/datasource-min.js'));
+    $style->setScript($url->extras('yui/build/datatable/datatable-min.js'));
+    $style->setScript($url->extras('yui/build/button/button-min.js'));
+    $style->setScript($url->extras('yui-webgui/build/i18n/i18n.js'));
+    $style->setScript($url->extras('VendorPayout/vendorPayout.js'));
 
     # Add css for scheduled payout highlighting
     $style->setRawHeadTags(<<CSS);
@@ -570,7 +619,7 @@ sub www_payoutDataAsJSON {
         results         => $paginator->getPageData,
     };
 
-    $session->http->setMimeType( 'application/json' );
+    $session->response->content_type( 'application/json' );
 
     return JSON::to_json( $data );
 }
@@ -596,7 +645,7 @@ sub www_setPayoutStatus {
     return $session->privilege->adminOnly() unless ($admin->canManage);
 
     my $status  = $form->process('status');
-    return "error: wrong status [$status]" unless isIn( $status, qw{ NotPaid Scheduled } );
+    return "error: wrong status [$status]" unless $status ~~ [qw{ NotPaid Scheduled }];
 
     my @itemIds;
     if ( $form->process( 'all' ) ) {
@@ -616,7 +665,7 @@ sub www_setPayoutStatus {
        $item->update({ vendorPayoutStatus => $status });
     }
 
-    $session->http->setMimeType( 'text/plain' );
+    $session->response->content_type( 'text/plain' );
     return $status;
 }
 
@@ -696,7 +745,7 @@ sub www_vendorTotalsAsJSON {
         push @dataset, $dataset;
     }
 
-    $session->http->setMimeType( 'application/json' );
+    $session->response->content_type( 'application/json' );
     return JSON::to_json( { vendors => \@dataset } );
 }
 

@@ -2,8 +2,6 @@
 
 use strict;
 use warnings;
-use FindBin qw($Bin);
-use lib "$FindBin::Bin/../../lib";
 use WebGUI::Test;
 use Test::More;
 
@@ -39,7 +37,7 @@ WebGUI::Test->addToCleanup($user);
 my $survey = WebGUI::Asset->getImportNode($session)->addChild( { className => 'WebGUI::Asset::Wobject::Survey', } );
 WebGUI::Test->addToCleanup(WebGUI::VersionTag->getWorking($session));
 WebGUI::Test->addToCleanup($survey);
-my $sJSON = $survey->surveyJSON;
+my $sJSON = $survey->getSurveyJSON;
 $sJSON->newObject([0]);    # add a question to 0th section
 $sJSON->update([0,0], { questionType => 'Yes/No' });
 $survey->persistSurveyJSON;

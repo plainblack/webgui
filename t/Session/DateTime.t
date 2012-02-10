@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -8,9 +8,7 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
  
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../lib";
 use File::Copy;
 use File::Spec;
 
@@ -19,9 +17,9 @@ use WebGUI::Session;
 
 use Test::More tests => 95; # increment this value for each test you create
 
-installBadLocale();
-WebGUI::Test->addToCleanup(sub { unlink File::Spec->catfile(WebGUI::Test->lib, qw/WebGUI i18n BadLocale.pm/); });
- 
+local @INC = @INC;
+unshift @INC, File::Spec->catdir( WebGUI::Test->getTestCollateralPath, 'Session-DateTime', 'lib' );
+
 my $session = WebGUI::Test->session;
 
 my $dt = $session->datetime;
@@ -120,10 +118,12 @@ $session->user({userId => 1});  ##back to Visitor
 my $wgBdayMail = 'Thu, 16 Aug 2001 08:00:00 -0500';
 is ($dt->mailToEpoch($wgBdayMail), $wgbday, 'mailToEpoch');
 
-WebGUI::Test->interceptLogging();
+WebGUI::Test->interceptLogging( sub {
+    my $log_data = shift;
 
-is ($dt->mailToEpoch(750), undef, 'mailToEpoch returns undef on failure to parse');
-like($WebGUI::Test::logger_warns, qr{750 is not a valid date for email}, "DateTime logs a warning on failure to parse");
+    is ($dt->mailToEpoch(750), undef, 'mailToEpoch returns undef on failure to parse');
+    like($log_data->{warn}, qr{750 is not a valid date for email}, "DateTime logs a warning on failure to parse");
+});
 
 ####################################################
 #
@@ -306,12 +306,5 @@ is($dt->epochToHuman($wgbday,'%M'), '8', '... single digit month');
 my $dayEpoch = DateTime->from_epoch(epoch => $wgbday)->subtract(days => 10)->epoch;
 is($dt->epochToHuman($dayEpoch,'%D'), '6', '... single digit day');
 is($dt->epochToHuman($dayEpoch,'%H'), '8', '... single digit hour');
-
-sub installBadLocale {
-	copy(
-		WebGUI::Test->getTestCollateralPath('BadLocale.pm'),
-		File::Spec->catfile(WebGUI::Test->lib, qw/WebGUI i18n BadLocale.pm/)
-	);
-}
 
 #vim:ft=perl

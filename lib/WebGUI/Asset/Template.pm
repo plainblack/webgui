@@ -3,7 +3,7 @@ package WebGUI::Asset::Template;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -15,10 +15,128 @@ package WebGUI::Asset::Template;
 =cut
 
 use strict;
-use base 'WebGUI::Asset';
+
+use Moose;
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset';
+
+define assetName   => ['assetName', 'Asset_Template'];
+define icon        => 'template.gif';
+define tableName   => 'template';
+
+property template => (
+             fieldType       => 'codearea',
+             syntax          => "html",
+             default         => undef,
+             trigger         => \&_template_autopack,
+             label           => ['assetName', 'Asset_Template'],
+             hoverHelp       => ['template description', 'Asset_Template'],
+         );
+sub _template_autopack {
+    my ($self, $new, $old) = @_;
+    return if $new eq $old;
+    $self->_clear_templatePacked;
+}
+property isEditable => (
+             noFormPost      => 1,
+             fieldType       => 'hidden',
+             default         => 1,
+         );
+property isDefault => (
+             noFormPost      => 1,
+             fieldType       => 'hidden',
+             default         => 0,
+         );
+property showInForms => (
+             fieldType       => 'yesNo',
+             default         => 1,
+             label           => ['show in forms', 'Asset_Template'],
+             hoverHelp       => ['show in forms description', 'Asset_Template'],
+         );
+property parser => (
+             noFormPost      => 1,
+             fieldType       => 'selectBox',
+             lazy            => 1,
+             builder         => '_default_parser',
+             options        => sub {
+                 my $self = shift;
+                 my $session = $self->session;
+                 tie my %parsers, 'Tie::IxHash';
+                 for my $class ( @{$session->config->get('templateParsers')} ) {
+                     $parsers{$class} = $self->getParser($session, $class)->getName();
+                 }
+             },
+         );
+sub _default_parser {
+    my $self = shift;
+    return $self->session->config->get('defaultTemplateParser');
+}
+property namespace => (
+             fieldType       => 'combo',
+             default         => undef,
+			 label           => ['namespace', 'Asset_Template'],
+			 hoverHelp       => ['namespace description', 'Asset_Template'],
+            options => sub {
+                my $namespaces = shift->session->dbSlave->buildHashRef("select distinct(namespace) from template order by namespace");
+            },
+         );
+property templatePacked => (
+             fieldType       => 'hidden',
+             noFormPost      => 1,
+             lazy            => 1,
+             clearer         => '_clear_templatePacked',
+             builder         => '_build_templatePacked',
+         );
+sub _build_templatePacked {
+    my $self = shift;
+    my $template = $self->template;
+    if (defined $template) {
+        HTML::Packer::minify( \$template, {
+            do_javascript       => 'shrink',
+            do_stylesheet       => 'minify',
+        } );
+    }
+    $template;
+}
+
+property usePacked => (
+             fieldType       => 'yesNo',
+             default         => 0,
+             label           => ['usePacked label', 'Asset_Template'],
+             hoverHelp       => ['usePacked description', 'Asset_Template'],
+         );
+
+property storageIdExample => (
+             fieldType       => 'image',
+             label           => ['field storageIdExample', 'Asset_Template'],
+             hoverHelp       => ['field storageIdExample description', 'Asset_Template'],
+         );
+
+property attachmentsJson => (
+    fieldType       => 'JsonTable',
+    label           => [ "attachment display label", "Asset_Template" ],
+    fields      => [
+        {
+            type            => "text",
+            name            => "url",
+            label           => [ 'attachment header url', 'Asset_Template' ],
+            size            => '48',
+        },
+        {
+            type            => "select",
+            name            => "type",
+            label           => ['attachment header type','Asset_Template'],
+            options         => [
+                stylesheet => ['css label','Asset_Template'],
+                headScript => ['js head label','Asset_Template'],
+                bodyScript => ['js body label','Asset_Template'],
+            ],
+        },
+    ],
+);
+
 use WebGUI::International;
 use WebGUI::Asset::Template::HTMLTemplate;
-use WebGUI::Utility;
 use WebGUI::Form;
 use WebGUI::Exception;
 use List::MoreUtils qw{ any };
@@ -38,8 +156,78 @@ Provides a mechanism to provide a templating system in WebGUI.
 
 =head1 SYNOPSIS
 
-use WebGUI::Asset::Template;
+    my $template    = WebGUI::Asset::Template->newById( $session, "template id" );
+    $template->setParam( param => "value", param2 => "value" );
+    print $template->process;
 
+
+=head1 ATTRIBUTES
+
+#----------------------------------------------------------------------------
+
+=head2 forms
+
+A hash of WebGUI::FormBuilder objects to be included in this template. 
+The forms' template variables will be automatically added to the L<param> hash 
+when the template is processed.
+
+Hash keys are the form's unique name, which will be prefixed to the form's
+template variables
+
+=cut
+
+has forms => (
+    traits  => ['Hash'],
+    is      => 'rw',
+    isa     => 'HashRef',
+    default => sub { {} },
+    handles => {
+        addForm => 'set',
+        getForm => 'get',
+        deleteForm => 'delete',
+        hasForms => 'count',
+    },
+);
+
+#----------------------------------------------------------------------------
+
+=head2 param
+
+Save params in the template for later processing. This allows a template to be
+passed around, adding variables until finally it is processed and output for
+the user.
+
+Use L<setParam> method to set parameters.
+
+=cut
+
+has param => (
+    traits  => [ 'Hash' ],
+    is      => 'rw',
+    isa     => 'HashRef',
+    default => sub { {} },
+    handles => {
+        setParam    => 'set',
+        getParam    => 'get',
+        deleteParam => 'delete',
+    },
+);
+
+#----------------------------------------------------------------------------
+
+=head2 style
+
+Attach a style template to this template. This will allow you to return the
+template from a www_ method and have the WebGUI PSGI handler do the processing.
+
+Accepts an asset ID
+
+=cut
+
+has style => (
+    is      => 'rw',
+    isa     => 'Maybe[Str]',
+);
 
 =head1 METHODS
 
@@ -84,88 +272,14 @@ If the current template is the User Function Style template with the Fail Safe t
 
 =cut
 
-sub cut {
-    my ( $self )    = @_;
-    my $returnValue = $self->SUPER::cut();
+around cut => sub {
+    my ( $orig, $self )    = @_;
+    my $returnValue = $self->$orig();
     if ($returnValue && $self->getId eq $self->session->setting->get('userFunctionStyleId')) {
         $self->session->setting->set('userFunctionStyleId', 'PBtmpl0000000000000060');
     }
     return $returnValue;
-}
-
-#-------------------------------------------------------------------
-
-=head2 definition ( session, definition )
-
-Defines the properties of this asset.
-
-=head3 session
-
-A reference to an existing session.
-
-=head3 definition
-
-A hash reference passed in from a subclass definition.
-
-=cut
-
-sub definition {
-    my $class       = shift;
-	my $session     = shift;
-    my $definition  = shift;
-	my $i18n        = WebGUI::International->new($session,"Asset_Template");
-    push @{$definition}, {
-		assetName   => $i18n->get('assetName'),
-		icon        => 'template.gif',
-        tableName   => 'template',
-        className   => 'WebGUI::Asset::Template',
-        properties  => {
-            template => {
-                fieldType       => 'codearea',
-                syntax          => "html",
-                defaultValue    => undef,
-                filter          => 'packTemplate',
-            },
-            isEditable => {
-                noFormPost      => 1,
-                fieldType       => 'hidden',
-                defaultValue    => 1,
-            },
-            isDefault => {
-                fieldType       => 'hidden',
-                defaultValue    => 0,
-            },
-            showInForms => {
-                fieldType       => 'yesNo',
-                defaultValue    => 1,
-            },
-            parser => {
-                fieldType    => 'templateParser',
-                defaultValue => $session->config->get('defaultTemplateParser'),
-            },	
-            namespace => {
-                fieldType       => 'combo',
-                defaultValue    => undef,
-            },
-            templatePacked => {
-                fieldType       => 'hidden',
-                defaultValue    => undef,
-                noFormPost      => 1,
-            },
-            usePacked => {
-                fieldType       => 'yesNo',
-                defaultValue    => 0,
-            },
-            storageIdExample => {
-                fieldType       => 'image',
-            },
-            attachmentsJson => {
-                fieldType       => 'JsonTable',
-            },
-        },
-    };
-    return $class->SUPER::definition($session,$definition);
-}
+};
 
 #-------------------------------------------------------------------
 
@@ -175,31 +289,12 @@ Override the master addRevision to copy attachments
 
 =cut
 
-sub addRevision {
+override addRevision => sub {
     my ( $self, $properties, @args ) = @_;
-    my $asset = $self->SUPER::addRevision($properties, @args);
+    my $asset = super();
     delete $properties->{templatePacked};
     return $asset;
-}
-
-#-------------------------------------------------------------------
-
-=head2 drawExtraHeadTags ( )
-
-Override the master drawExtraHeadTags to prevent Style template from having
-Extra Head Tags.
-
-=cut
-
-sub drawExtraHeadTags {
-	my ($self, $params) = @_;
-    if ($self->get('namespace') eq 'style') {
-        my $i18n = WebGUI::International->new($self->session);
-        return $i18n->get(881);
-    }
-    return $self->SUPER::drawExtraHeadTags($params);
-}
-
+};
 
 #-------------------------------------------------------------------
 
@@ -210,16 +305,16 @@ copy.
 
 =cut
 
-sub duplicate {
-	my $self = shift;
-	my $newTemplate = $self->SUPER::duplicate(@_);
+override duplicate => sub {
+    my $self = shift;
+    my $newTemplate = super();
     $newTemplate->update({isDefault => 0});
     if ( my $storageId = $self->get('storageIdExample') ) {
         my $newStorage  = WebGUI::Storage->get( $self->session, $storageId )->copy;
         $newTemplate->update({ storageIdExample => $newStorage->getId });
     }
     return $newTemplate;
-}
+};
 
 #-------------------------------------------------------------------
 
@@ -229,14 +324,14 @@ Override to add attachments to package data
 
 =cut
 
-sub exportAssetData {
+override exportAssetData => sub {
     my ( $self ) = @_;
-    my $data    = $self->SUPER::exportAssetData;
+    my $data    = super();
     if ( $self->get('storageIdExample') ) {
         push @{$data->{storage}}, $self->get('storageIdExample');
     }
     return $data;
-}
+};
 
 #-------------------------------------------------------------------
 
@@ -278,76 +373,29 @@ sub getAttachments {
 
 =head2 getEditForm ( )
 
-Returns the TabForm object that will be used in generating the edit page for this asset.
+Returns the WebGUI::FormBuilder object that will be used in generating the edit page for this asset.
 
 =cut
 
-sub getEditForm {
+override getEditForm => sub {
 	my $self = shift;
-	my $session = $self->session;
-
-	my ( $db, $url, $style, $form, $config )
-	    = $session->quick(qw( db url style form config ));
-
-	my $tabform = $self->SUPER::getEditForm();
+	my $tabform = super();
+        my $session = $self->session;
+        my ( $url, $style ) = $session->quick(qw( url style ));
 	my $i18n = WebGUI::International->new($session, 'Asset_Template');
-
-	my ( $properties, $meta, $display ) =
-	    map { $tabform->getTab($_) } qw( properties meta display );
-
-	my $returnUrl = $form->get('returnUrl');
-	$tabform->hidden({
+        my $returnUrl = $session->form->get("returnUrl");
+	$tabform->addField( "hidden",
 		name=>"returnUrl",
 		value=>$returnUrl,
-		});
-	if ($self->getValue("namespace") eq "") {
-		my $namespaces = $db->buildHashRef("select distinct(namespace) from template order by namespace");
-		$properties->combo(
-			-name=>"namespace",
-			-options=>$namespaces,
-			-label=>$i18n->get('namespace'),
-			-hoverHelp=>$i18n->get('namespace description'),
-			-value=>[$form->get("namespace")]
-			);
-	} else {
-		$meta->readOnly(
-			-label=>$i18n->get('namespace'),
-			-hoverHelp=>$i18n->get('namespace description'),
-			-value=>$self->getValue("namespace")
-			);
-		$meta->hidden(
-			-name=>"namespace",
-			-value=>$self->getValue("namespace")
-			);
-	}
-	$display->yesNo(
-		-name=>"showInForms",
-		-value=>$self->getValue("showInForms"),
-		-label=>$i18n->get('show in forms'),
-		-hoverHelp=>$i18n->get('show in forms description'),
 		);
-	$properties->codearea(
-		-name=>"template",
-		-label=>$i18n->get('assetName'),
-		-hoverHelp=>$i18n->get('template description'),
-		-syntax => "html",
-		-value=>$self->getValue("template")
-		);
-	$properties->raw(qq(
-	    <tr>
-	        <td class='formDescription' valign='top'>
-	            ${\ $i18n->get('Preview') }
-	        </td>
-	        <td class='tableData'>
-	            <input type='button'
-	                   value='${\ $i18n->get('Preview') }'
-	                   id='preview'/>
-	            <input type='button'
-	                   value='${\ $i18n->get('Configure') }'
-	                   id='previewConfig'/>
-	        </td>
-	    </tr>
-	));
+
+	my $previewButtons 
+            = $tabform->getTab('properties')->addField( "ButtonGroup", 
+                name => 'previewButtons', 
+                label => $i18n->get('Preview'),
+            );
+        $previewButtons->addButton( 'Button' => { id => 'preview', value => $i18n->get('Preview') } );
+        $previewButtons->addButton( 'Button' => { id => 'previewConfig', value => $i18n->get('Configure') } );
 	my $cform = WebGUI::HTMLForm->new($session);
 	$cform->yesNo(
 	    id        => 'previewRaw',
@@ -375,10 +423,9 @@ sub getEditForm {
 
 	$cform->hidden(id => 'previewId', value => $self->getId);
 	$cform->hidden(id => 'previewGateway', value => $url->gateway);
-	$properties->raw(qq(
-	    <tr>
-	    <td></td>
-	    <td>
+	$tabform->getTab('properties')->addField("ReadOnly", 
+            name => 'previewDialog', 
+            value => qq(
 	        <div id='previewConfigForm'>
 	            <div class='hd'>${\ $i18n->get('Configure Preview') }</div>
 	            <table class='bd'>${\ $cform->printRowsOnly }</table>
@@ -386,16 +433,8 @@ sub getEditForm {
 	                <button id='previewConfigClose'>Close</button>
 	            </div>
 	        </div>
-	    </td>
-	    </tr>
-	));
-
-	$properties->yesNo(
-	    name        => "usePacked",
-	    label       => $i18n->get('usePacked label'),
-	    hoverHelp   => $i18n->get('usePacked description'),
-	    value       => $self->getValue("usePacked"),
-	);
+	    ),
+        );
 
 	$style->setScript($url->extras($_)) for qw(
 	    yui/build/json/json-min.js
@@ -403,46 +442,15 @@ sub getEditForm {
 	    templatePreview.js
 	);
 
-	$properties->templateParser(
-		name      => 'parser',
-		label     => $i18n->get('parser'),
-		hoverHelp => $i18n->get('parser description'),
-		value     => $self->getValue('parser'),
-	);
-
-	$properties->jsonTable(
-	    name        => 'attachmentsJson',
-	    value       => $self->get('attachmentsJson'),
-	    label       => $i18n->get("attachment display label"),
-	    fields      => [
-	        {
-	            type            => "text",
-	            name            => "url",
-	            label           => $i18n->get('attachment header url'),
-	            size            => '48',
-	        },
-	        {
-	            type            => "select",
-	            name            => "type",
-	            label           => $i18n->get('attachment header type'),
-	            options         => [
-	                stylesheet => $i18n->get('css label'),
-	                headScript => $i18n->get('js head label'),
-	                bodyScript => $i18n->get('js body label'),
-	            ],
-	        },
-	    ],
-	);
-
-	$properties->image(
-	    name        => 'storageIdExample',
-	    value       => $self->getValue('storageIdExample'),
-	    label       => $i18n->get('field storageIdExample'),
-	    hoverHelp   => $i18n->get('field storageIdExample description'),
-	);
+        $tabform->getTab('properties')->addField( image =>
+            name        => 'storageIdExample',
+            value       => $self->storageIdExample,
+            label       => $i18n->get('field storageIdExample'),
+            hoverHelp   => $i18n->get('field storageIdExample description'),
+        );
 
 	return $tabform;
-}
+};
 
 #-------------------------------------------------------------------
 
@@ -499,8 +507,10 @@ sub getList {
 	my $sth = $session->dbSlave->read($sql, [$namespace, $session->scratch->get("versionTag")]);
 	my %templates;
 	tie %templates, 'Tie::IxHash';
-	while (my ($id, $version) = $sth->array) {
-		$templates{$id} = WebGUI::Asset::Template->new($session,$id,undef,$version)->getTitle;
+	TEMPLATE: while (my ($id, $version) = $sth->array) {
+		my $template = eval { WebGUI::Asset::Template->newById($session,$id,$version); };
+        next TEMPLATE if Exception::Class->caught();
+		$templates{$id} = $template->getTitle;
 	}	
 	$sth->finish;	
 	return \%templates;
@@ -570,14 +580,13 @@ Override to import attachments from old versions of WebGUI
 
 =cut
 
-sub importAssetCollateralData {
+override importAssetCollateralData => sub {
     my ( $self, $data, @args ) = @_;
     if ( $data->{template_attachments} ) {
         $self->update( { attachmentsJson => JSON::to_json($data->{template_attachments}) } );
     }
-    return $self->SUPER::importAssetCollateralData( $data, @args );
-}
-
+    return super();
+};
     
 #-------------------------------------------------------------------
 
@@ -587,31 +596,13 @@ Making private. See WebGUI::Asset::indexContent() for additonal details.
 
 =cut
 
-sub indexContent {
+around indexContent => sub {
+	my $orig = shift;
 	my $self = shift;
-	my $indexer = $self->SUPER::indexContent;
-	$indexer->addKeywords($self->get("namespace"));
+	my $indexer = $self->$orig(@_);
+	$indexer->addKeywords($self->namespace);
 	$indexer->setIsPublic(0);
-}
-
-#-------------------------------------------------------------------
-
-=head2 packTemplate ( template )
-
-Pack the template into a minified version for faster downloads.
-
-=cut
-
-sub packTemplate {
-    my ( $self, $template ) = @_;
-    my $packed  = $template;
-    HTML::Packer::minify( \$packed, {
-        do_javascript       => "shrink",
-        do_stylesheet       => "minify",
-    } );
-    $self->update({ templatePacked => $packed });
-    return $template;
-}
+};
 
 #-------------------------------------------------------------------
 
@@ -637,11 +628,11 @@ sub prepare {
 
 	my $id   = $self->getId;
 	# don't send head block if we've already sent it for this template
-	return if isIn($id, @$sent);
+	return if $id ~~ $sent;
 
 	my $session      = $self->session;
 	my ($db, $style) = $session->quick(qw(db style));
-	my $parser       = $self->getParser($session, $self->get('parser'));
+	my $parser       = $self->getParser($session, $self->parser);
 	my $headBlock    = $parser->process($self->getExtraHeadTags, $vars);
 
 	$style->setRawHeadTags($headBlock);
@@ -674,9 +665,13 @@ Evaluate a template replacing template commands for HTML.  If the internal prope
 is set to true, the packed, minimized template will be used.  Otherwise, the original template
 will be used.
 
+Will also process the style template attached to this template
+
 =head3 vars
 
 A hash reference containing template variables and loops. Automatically includes the entire WebGUI session.
+
+These parameters will override any parameters set by L<param> and L<forms>
 
 =cut
 
@@ -685,23 +680,37 @@ sub process {
 	my $vars    = shift;
     my $session = $self->session;
 
-    if ($self->get('state') =~ /^trash/) {
+    if ($self->state =~ /^trash/) {
         my $i18n = WebGUI::International->new($session, 'Asset_Template');
-        $session->errorHandler->warn('process called on template in trash: '.$self->getId
-            .'. The template was called through this url: '.$session->asset->get('url'));
-        return $session->var->isAdminOn ? $i18n->get('template in trash') : '';
+        $session->log->warn('process called on template in trash: '.$self->getId
+            .'. The template was called through this url: '.$session->asset->url);
+        return $session->isAdminOn ? $i18n->get('template in trash') : '';
     }
-    elsif ($self->get('state') =~ /^clipboard/) {
+    elsif ($self->state =~ /^clipboard/) {
         my $i18n = WebGUI::International->new($session, 'Asset_Template');
-        $session->errorHandler->warn('process called on template in clipboard: '.$self->getId
-            .'. The template was called through this url: '.$session->asset->get('url'));
-        return $session->var->isAdminOn ? $i18n->get('template in clipboard') : '';
+        $session->log->warn('process called on template in clipboard: '.$self->getId
+            .'. The template was called through this url: '.$session->asset->url);
+        return $session->isAdminOn ? $i18n->get('template in clipboard') : '';
     }
 
+    # Merge the forms with the prepared vars
+    if ( $self->hasForms ) {
+        for my $name ( keys %{$self->forms} ) {
+            my $form = $self->forms->{$name};
+            $self->setParam( %{$form->toTemplateVars( "${name}_" )} );
+        }
+    }
+
+    # Merge the passed-in vars with the prepared vars
+    if ( keys %$vars > 0 ) { # can't call setParam with an empty hash
+        $self->setParam( %$vars );
+    }
+
+
     # Return a JSONinfied version of vars if JSON is the only requested content type.
-    if ( defined $session->request && $session->request->headers_in->{Accept} eq 'application/json' ) {
-       $session->http->setMimeType( 'application/json' );
-       return to_json( $vars );
+    if ( defined $session->request && $session->request->header('Accept') eq 'application/json' ) {
+       $session->response->content_type( 'application/json' );
+       return to_json( $self->param );
     }
 
     my $stow = $session->stow;
@@ -714,18 +723,25 @@ sub process {
     }
 
 	$self->prepare unless ($self->{_prepared});
-    my $parser      = $self->getParser($session, $self->get("parser"));
-    my $template    = $self->get('usePacked')
-                    ? $self->get('templatePacked')
-                    : $self->get('template')
+    my $parser      = $self->getParser($session, $self->parser);
+    my $template    = $self->usePacked
+                    ? $self->templatePacked
+                    : $self->template
                     ;
     my $output;
-    eval { $output = $parser->process($template, $vars); };
+    eval { $output = $parser->process($template, $self->param); };
     if (my $e = Exception::Class->caught) {
-        $session->log->error(sprintf "Error processing template: %s, %s, %s", $self->getUrl, $self->getId, $e->error);
+    	my $message = ref $e ? $e->error : $e;
+        $session->log->error(sprintf "Error processing template: %s, %s, %s", $self->getUrl, $self->getId, $message);
         my $i18n = WebGUI::International->new($session, 'Asset_Template');
-        $output = sprintf $i18n->get('template error').$e->error, $self->getUrl, $self->getId;
+        $output = sprintf $i18n->get('template error').$message, $self->getUrl, $self->getId;
     }
+
+    # Process the style template
+    if ( $self->style ) {
+        $output = $self->session->style->process( $output, $self->style );
+    }
+
 	return $output;
 }
 
@@ -764,13 +780,14 @@ sub process {
     sub processVariableHeaders {
         my ($class, $session) = @_;
         my $r = $session->request;
-        if (my $id = $r->headers_in->{$head}) {
+        if (my $id = $r->headers->header($head)) {
             my $rnd = join('', map { $chr[int(rand($#chr))] } (1..32));
-            my $out = $r->headers_out;
+            my $out = {};
             my $st  = "<!-- $rnd ";
             my $end = " $rnd -->";
             $out->{"$head-Start"} = $st;
             $out->{"$head-End"}   = $end;
+            $session->response->headers( $out );
             $session->stow->set(
                 showTemplateVars => {
                     assetId        => $id,
@@ -784,22 +801,22 @@ sub process {
 
 #-------------------------------------------------------------------
 
-=head2 processPropertiesFromFormPost 
+=head2 processEditForm 
 
 Extends the master class to handle template parsers, namespaces and template attachments.
 
 =cut
 
-sub processPropertiesFromFormPost {
+override processEditForm => sub {
 	my $self = shift;
+	super();
         my $session = $self->session;
-	$self->SUPER::processPropertiesFromFormPost;
     # TODO: Perhaps add a way to check template syntax before it blows stuff up?
     my %data;
     my $needsUpdate = 0;
-	if ($self->getValue("parser") ne $self->session->form->process("parser","className") && ($self->session->form->process("parser","className") ne "")) {
+	if ($self->parser ne $self->session->form->process("parser","className") && ($self->session->form->process("parser","className") ne "")) {
         $needsUpdate = 1;
-		if (isIn($self->session->form->process("parser","className"),@{$self->session->config->get("templateParsers")})) {
+		if ($self->session->form->process("parser","className") ~~ $self->session->config->get("templateParsers") ) {
 			%data = ( parser => $self->session->form->process("parser","className") );
 		} else {
 			%data = ( parser => $self->session->config->get("defaultTemplateParser") );
@@ -818,7 +835,7 @@ sub processPropertiesFromFormPost {
     $self->update({ attachmentsJson => $session->form->process( 'attachmentsJson', 'JsonTable' ), });
 
     return;
-}
+};
 
 #-------------------------------------------------------------------
 
@@ -836,7 +853,7 @@ A scalar containing the template text.
 
 =head3 vars
 
-A hash reference containing template variables.
+A hash reference containing template variables to add to the existing params.
 
 =head3 parser
 
@@ -862,14 +879,17 @@ If the current template is the User Function Style template with the Fail Safe t
 
 =cut
 
-sub purge {
+around purge => sub {
+	my $orig = shift;
 	my $self = shift;
-    my $returnValue = $self->SUPER::purge;
-    if ($returnValue && $self->getId eq $self->session->setting->get('userFunctionStyleId')) {
-        $self->session->setting->set('userFunctionStyleId', 'PBtmpl0000000000000060');
+    my $session = $self->session;
+    my $assetId = $self->assetId;
+    my $returnValue = $self->$orig(@_);
+    if ($returnValue && $assetId eq $session->setting->get('userFunctionStyleId')) {
+        $session->setting->set('userFunctionStyleId', 'PBtmpl0000000000000060');
     }
 	return $returnValue;
-}
+};
 
 #-------------------------------------------------------------------
 
@@ -890,36 +910,32 @@ sub removeAttachments {
     my @attachments = ();
 
     if ($urls) {
-        @attachments = grep { !isIn($_->{url}, @{ $urls }) } @{ $self->getAttachments() };
+        @attachments = grep { ! ($_->{url} ~~ $urls) } @{ $self->getAttachments() };
     }
 
     my $json = JSON->new->encode( \@attachments );
     $self->update({ attachmentsJson => $json, });
 }
 
-#-------------------------------------------------------------------
+#----------------------------------------------------------------------------
 
-=head2 update
+=head2 replaceParamName ( oldName, newName )
 
-Override update from Asset.pm to handle backwards compatibility with the old
-packages that contain headBlocks. This will be removed in the future.  Don't plan
-on this being here.
+Replace all instances of oldName with newName. Updates the template instance with
+the new names and returns the new template data. This is only to be used to alter
+the names of template parameters.
 
 =cut
 
-sub update {
-    my $self = shift;
-    my $requestedProperties = shift;
-    my $properties = clone($requestedProperties);
+sub replaceParamName {
+    my ( $self, $oldName, $newName ) = @_;
 
-    if (exists $properties->{headBlock}) {
-        $properties->{extraHeadTags} .= $properties->{headBlock};
-        delete $properties->{headBlock};
-    }
-
-    $self->SUPER::update($properties);
+    # We're lazy here. If this fails, we'll add more checks, or call out to the parser
+    my $template    = $self->template;
+    $template =~ s/$oldName/$newName/g;
+    $self->template( $template );
+    return $template;
 }
-
 
 #-------------------------------------------------------------------
 
@@ -930,7 +946,7 @@ default template.
 
 =cut
 
-sub www_edit {
+override www_edit => sub {
     my $self = shift;
     return $self->session->privilege->insufficient() unless $self->canEdit;
     return $self->session->privilege->locked() unless $self->canEditIfLocked;
@@ -938,7 +954,7 @@ sub www_edit {
     my $form    = $session->form;
     my $url     = $session->url;
     my $i18n    = WebGUI::International->new($session, "Asset_Template");
-    my $output  = '';
+    my $template = super();
 
     # Add an unfriendly warning message if this is a default template
     if ( $self->get( 'isDefault' ) ) {
@@ -950,33 +966,20 @@ sub www_edit {
                 $duplicateUrl = $url->append( $duplicateUrl, "returnUrl=" . $form->get( "returnUrl" ) );
             }
         }
-        
-        $session->style->setRawHeadTags( <<'ENDHTML' );
-<style type="text/css">
-.wGwarning { 
-    border              : 1px solid red;
-    background-color    : #FF6666;
-    padding             : 10px;
-    margin              : 5px;
-    /* TODO: Add a nice little image here */
-    /* TODO: Make this a generic warning class from the default webgui stylesheet */
-}
-</style>
-ENDHTML
 
-        $output .= q{<div class="wGwarning"><p>}
+        my $errors  = $template->getParam('errors') || [];
+        my $message .= q{<p>}
                 . $i18n->get( "warning default template" )
                 . q{</p><p>}
                 . sprintf( q{<a href="} . $duplicateUrl . q{">%s</a>}, $i18n->get( "make duplicate label" ) )
-                . q{</p></div>}
+                . q{</p>}
                 ;
+        push @$errors, $message;
+        $template->setParam( 'errors' => $errors );
     }
-    
-    $output .= $self->getEditForm->print;
 
-    $self->getAdminConsole->addSubmenuItem($self->getUrl('func=styleWizard'),$i18n->get("style wizard")) if ($self->get("namespace") eq "style");
-    return $self->getAdminConsole->render( $output, $i18n->get('edit template') );
-}
+    return $template;
+};
 
 #-------------------------------------------------------------------
 
@@ -989,7 +992,7 @@ the user back to the site.
 
 sub www_goBackToPage {
 	my $self = shift;
-	$self->session->http->setRedirect($self->session->form->get("returnUrl")) if ($self->session->form->get("returnUrl"));
+	$self->session->response->setRedirect($self->session->form->get("returnUrl")) if ($self->session->form->get("returnUrl"));
 	return undef;
 }
 
@@ -1025,7 +1028,9 @@ sub www_editDuplicate {
                     next PROP unless lc $properties->{ $prop }->{ fieldType } eq "template";
                     next PROP unless $asset->get( $prop ) eq $self->getId;
                     if ( $properties->{ $prop }->{ namespace } eq $self->get( "namespace" ) ) {
-                        $asset->addRevision( { $prop => $newTemplate->getId } );
+                        my $tag = WebGUI::VersionTag->getWorking( $session );
+                        $asset->addRevision( { $prop => $newTemplate->getId, tagId => $tag->getId, status => "pending" } );
+                        $asset->setVersionLock;
 
                         # Auto-commit our revision if necessary
                         # TODO: This needs to be handled automatically somehow...
@@ -1059,261 +1064,6 @@ sub www_manage {
 	return $self->getParent->www_manageAssets;
 }
 
-
-#-------------------------------------------------------------------
-
-=head2 www_styleWizard 
-
-Edit form for building style templates in a WYSIWIG fashion.
-
-=cut
-
-sub www_styleWizard {
-	my $self = shift;
-    return $self->session->privilege->insufficient() unless $self->canEdit;
-    return $self->session->privilege->locked() unless $self->canEditIfLocked;
-	my $i18n = WebGUI::International->new($self->session, "Asset_Template");
-	my $form = $self->session->form;
-	my $output = "";
-	if ($form->get("step") == 2) {
-		my $f = WebGUI::HTMLForm->new($self->session,{action=>$self->getUrl});
-		$f->hidden(name=>"func", value=>"styleWizard");
-		$f->hidden(name=>"proceed", value=>"manageAssets") if ($form->get("proceed"));
-		$f->hidden(name=>"step", value=>3);
-		$f->hidden(name=>"layout", value=>$form->get("layout"));
-		$f->text(
-			name=>"heading",
-			value=>"My Site",
-			label=>$i18n->get("site name"),
-			hoverHelp=>$i18n->get("site name description")
-		);
-		$f->file(
-			name=>"logo",
-			label=>$i18n->get("logo"),
-			hoverHelp=>$i18n->get("logo description"),
-			subtext=>$i18n->get("logo subtext")
-		);
-		$f->color(
-			name=>"pageBackgroundColor",
-			value=>"#ccccdd",
-			label=>$i18n->get("page background color"),
-			hoverHelp=>$i18n->get("page background color description"),
-		);
-		$f->color(
-			name=>"headingBackgroundColor",
-			value=>"#ffffff",
-			label=>$i18n->get("header background color"),
-			hoverHelp=>$i18n->get("header background color description"),
-		);
-		$f->color(
-			name=>"headingForegroundColor",
-			value=>"#000000",
-			label=>$i18n->get("header text color"),
-			hoverHelp=>$i18n->get("header text color description"),
-		);
-		$f->color(
-			name=>"bodyBackgroundColor",
-			value=>"#ffffff",
-			label=>$i18n->get("body background color"),
-			hoverHelp=>$i18n->get("body background color description"),
-		);
-		$f->color(
-			name=>"bodyForegroundColor",
-			value=>"#000000",
-			label=>$i18n->get("body text color"),
-			hoverHelp=>$i18n->get("body text color description"),
-		);
-		$f->color(
-			name=>"menuBackgroundColor",
-			value=>"#eeeeee",
-			label=>$i18n->get("menu background color"),
-			hoverHelp=>$i18n->get("menu background color description"),
-		);
-		$f->color(
-			name=>"linkColor",
-			value=>"#0000ff",
-			label=>$i18n->get("link color"),
-			hoverHelp=>$i18n->get("link color description"),
-		);
-		$f->color(
-			name=>"visitedLinkColor",
-			value=>"#ff00ff",
-			label=>$i18n->get("visited link color"),
-			hoverHelp=>$i18n->get("visited link color description"),
-		);
-		$f->submit;
-		$output = $f->print;
-	} elsif ($form->get("step") == 3) {
-		my $storageId = $form->get("logo","file");
-		my $logo;
-		my $logoContent = '';
-		if ($storageId) {
-			my $storage = WebGUI::Storage->get($self->session,$storageId);
-			$logo = $self->addChild({
-				className=>"WebGUI::Asset::File::Image",
-				title=>join(' ', $form->get("heading"), $i18n->get('logo')),
-				menuTitle=>join(' ', $form->get("heading"), $i18n->get('logo')),
-				url=>join(' ', $form->get("heading"), $i18n->get('logo')),
-				storageId=>$storage->getId,
-				filename=>@{$storage->getFiles}[0],
-				templateId=>"PBtmpl0000000000000088"
-				});
-			$logo->generateThumbnail;
-			$logoContent = '<div class="logo"><a href="^H(linkonly);">^AssetProxy('.$logo->get("url").');</a></div>';
-		}
-		my $customHead = '';
-		if ($form->get("layout") eq "1") {
-			$customHead .= '
-			.bodyContent {
-			 	background-color: '.$form->get("bodyBackgroundColor","color").';
-                		color: '.$form->get("bodyForegroundColor","color").';
-				width: 70%; 
-				float: left;
-			}
-			.menu {
-				width: 30%;
-				float: left;
-			}
-			.wrapper { 
-				width: 80%;
-				margin-right: 10%;
-				margin-left: 10%;
-				background-color: '.$form->get("menuBackgroundColor","color").';
-			}
-			';
-		} else {
-			$customHead .= '
-			.bodyContent {
-			 	background-color: '.$form->get("bodyBackgroundColor","color").';
-                		color: '.$form->get("bodyForegroundColor","color").';
-				width: 100%;
-			}
-			.menu {
-                		background-color: '.$form->get("menuBackgroundColor","color").';
-				width: 100%;
-				text-align: center;
-			}
-			.wrapper { 
-				width: 80%;
-				margin-right: 10%;
-				margin-left: 10%;
-			}
-			';
-		}
-		my $style = '<html>
-<head>
-	<tmpl_var head.tags>
-	<title>^Page(title); - ^c;</title>
-	<style type="text/css">
-	.siteFunctions {
-		float: right;
-		font-size: 12px;
-	}
-	.copyright {
-		font-size: 12px;
-	}
-	body {
-		background-color: '.$form->get("pageBackgroundColor","color").';
-		font-family: helvetica;
-		font-size: 14px;
-	}
-	.heading {
-		background-color: '.$form->get("headingBackgroundColor","color").';
-		color: '.$form->get("headingForegroundColor","color").';
-		font-size: 30px;
-		margin-left: 10%;
-		margin-right: 10%;
-		vertical-align: middle;
-	}
-	.logo {
-		width: 200px; 
-		float: left;
-		text-align: center;
-	}
-	.logo img {
-		border: 0px;
-	}
-	.endFloat {
-		clear: both;
-	}
-	.padding {
-		padding: 5px;
-	}
-	'.$customHead.'
-	a {
-		color: '.$form->get("linkColor","color").';
-	}
-	a:visited {
-		color: '.$form->get("visitedLinkColor","color").';
-	}
-	</style>
-</head>
-<body>
-^AdminBar;
-<div class="heading">
-	<div class="padding">
-		'.$logoContent.'
-		'.$form->get("heading").'
-		<div class="endFloat"></div>
-	</div>
-</div>
-<div class="wrapper">
-	<div class="menu">
-		<div class="padding">^AssetProxy('.($form->get("layout") == 1 ? 'flexmenu' : 'toplevelmenuhorizontal').');</div>
-	</div>
-	<div class="bodyContent">
-		<div class="padding"><tmpl_var body.content></div>
-	</div>
-	<div class="endFloat"></div>
-</div>
-<div class="heading">
-	<div class="padding">
-		<div class="siteFunctions">^a(^@;); ^AdminToggle;</div>
-		<div class="copyright">&copy; ^D(%y); ^c;</div>
-	<div class="endFloat"></div>
-	</div>
-</div>
-</body>
-</html>';
-		return $self->addRevision({
-			template=>$style
-			})->www_edit;
-	} else {
-		$output = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl}).WebGUI::Form::hidden($self->session,{name=>"func", value=>"styleWizard"});
-		$output .= WebGUI::Form::hidden($self->session,{name=>"proceed", value=>"manageAssets"}) if ($form->get("proceed"));
-		$output .= '<style type="text/css">
-			.chooser { float: left; width: 150px; height: 150px; } 
-			.representation, .representation td { font-size: 12px; width: 120px; border: 1px solid black; } 
-			.representation { height: 130px; }
-			</style>';
-		$output .= $i18n->get('choose a layout');
-		$output .= WebGUI::Form::hidden($self->session,{name=>"step", value=>2});
-		$output .= '<div class="chooser">'.WebGUI::Form::radio($self->session,{name=>"layout", value=>1, checked=>1}).sprintf(q|<table class="representation"><tbody>
-			<tr><td>%s</td><td>%s</td></tr>
-			<tr><td>%s</td><td>%s</td></tr>
-			</tbody></table></div>|,
-			$i18n->get('logo'),
-			$i18n->get('heading'),
-			$i18n->get('menu'),
-			$i18n->get('body content'),
-			);
-		$output .= '<div class="chooser">'.WebGUI::Form::radio($self->session,{name=>"layout", value=>2}).sprintf(q|<table class="representation"><tbody>
-			<tr><td>%s</td><td>%s</td></tr>
-			<tr><td style="text-align: center;" colspan="2">%s</td></tr>
-			<tr><td colspan="2">%s</td></tr>
-			</tbody></table></div>|,
-			$i18n->get('logo'),
-			$i18n->get('heading'),
-			$i18n->get('menu'),
-			$i18n->get('body content'),
-			);
-		$output .= WebGUI::Form::submit($self->session);
-		$output .= WebGUI::Form::formFooter($self->session);
-	}
-	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=edit'),$i18n->get("edit template")) if ($self->get("url"));
-        return $self->getAdminConsole->render($output,$i18n->get('style wizard'));
-}
-
 #-------------------------------------------------------------------
 
 =head2 www_preview
@@ -1327,8 +1077,8 @@ sub www_preview {
     my $session = $self->session;
     return $session->privilege->insufficient unless $self->canEdit;
 
-    my $form = $session->form;
-    my $http = $session->http;
+    my $form     = $session->form;
+    my $response = $session->response;
 
     try {
         my $output = $self->processRaw(
@@ -1338,14 +1088,14 @@ sub www_preview {
             $form->get('parser'),
         );
         if ($form->get('plainText')) {
-            $http->setMimeType('text/plain');
+            $response->content_type('text/plain');
         }
         elsif ($output !~ /<html>/) {
             $output = $session->style->userStyle($output);
         }
         return $output;
     } catch {
-        $http->setMimeType('text/plain');
+        $response->content_type('text/plain');
         $_[0];
     }
 }
@@ -1365,5 +1115,6 @@ sub www_view {
 }
 
 
+__PACKAGE__->meta->make_immutable;
 
 1;

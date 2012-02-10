@@ -4,7 +4,7 @@ use strict;
 our $VERSION = "1.0.0";
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -16,10 +16,70 @@ our $VERSION = "1.0.0";
 use DateTime;
 use Tie::IxHash;
 use WebGUI::International;
-use WebGUI::Utility;
+use Number::Format ();
 use WebGUI::HTML;
 use POSIX qw(ceil floor);
-use base 'WebGUI::Asset::Wobject';
+use Moose;
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset::Wobject';
+define assetName => ['assetName', 'Asset_ProjectManager'];
+define icon      => 'projManagement.gif';
+define tableName => 'PM_wobject';
+property projectDashboardTemplateId => (
+            fieldType   => "template",  
+            default     => 'ProjectManagerTMPL0001',
+            tab         => "display",
+            namespace   => "ProjectManager_dashboard", 
+            hoverHelp   => ['projectDashboardTemplate hoverhelp', 'Asset_ProjectManager'],
+            label       => ['projectDashboardTemplate label', 'Asset_ProjectManager'],
+        );
+property projectDisplayTemplateId => (
+            fieldType   => "template",  
+            default     => 'ProjectManagerTMPL0002',
+            tab         => "display",
+            namespace   => "ProjectManager_project", 
+            hoverHelp   => ['projectDisplayTemplate hoverhelp', 'Asset_ProjectManager'],
+            label       => ['projectDisplayTemplate label', 'Asset_ProjectManager'],
+        );
+property ganttChartTemplateId => (
+            fieldType   => "template",  
+            default     => 'ProjectManagerTMPL0003',
+            tab         => "display",
+            namespace   => "ProjectManager_gantt", 
+            hoverHelp   => ['ganttChartTemplate hoverhelp', 'Asset_ProjectManager'],
+            label       => ['ganttChartTemplate label', 'Asset_ProjectManager'],
+        );
+property editTaskTemplateId => (
+            fieldType   => "template",  
+            default     => 'ProjectManagerTMPL0004',
+            tab         => "display",
+            namespace   => "ProjectManager_editTask", 
+            hoverHelp   => ['editTaskTemplate hoverhelp', 'Asset_ProjectManager'],
+            label       => ['editTaskTemplate label', 'Asset_ProjectManager'],
+        );
+property resourcePopupTemplateId => (
+            fieldType   => "template",  
+            default     => 'ProjectManagerTMPL0005',
+            tab         => "display",
+            namespace   => "ProjectManager_resourcePopup", 
+            hoverHelp   => ['resourcePopupTemplate hoverhelp', 'Asset_ProjectManager'],
+            label       => ['resourcePopupTemplate label', 'Asset_ProjectManager'],
+        );
+property resourceListTemplateId => (
+            fieldType   => "template",  
+            default     => 'ProjectManagerTMPL0006',
+            tab         => "display",
+            namespace   => "ProjectManager_resourceList", 
+            hoverHelp   => ['resourceListTemplate hoverhelp', 'Asset_ProjectManager'],
+            label       => ['resourceListTemplate label', 'Asset_ProjectManager'],
+        );
+property groupToAdd => (
+            fieldType   => "group",
+            default     => 3,
+            tab         => "security",
+            hoverHelp   => ['groupToAdd hoverhelp', 'Asset_ProjectManager'],
+            label       => ['groupToAdd label', 'Asset_ProjectManager'],
+        );
 
 #-------------------------------------------------------------------
 
@@ -30,7 +90,7 @@ use base 'WebGUI::Asset::Wobject';
 sub _addDaysForMonth {
    my $self = shift;
    my $dt = $self->session->datetime;
-   my $eh = $self->session->errorHandler;
+   my $log = $self->session->log;
    
    my $days_loop = $_[0];
    my $hash = $_[1];
@@ -48,13 +108,13 @@ sub _addDaysForMonth {
    while ($monday < $monthEnd) {
       my $hash = {};
 	  $hash->{'day.number'} = $dt->epochToHuman($monday,"%d");
-	  #$eh->warn($hash->{'day.number'});
+	  #$log->warn($hash->{'day.number'});
 	  $monday += 604800; # Add one week to the first monday of the month
 	  push(@{$days_loop},$hash);
 	  $colCount++;
    }
    $hash->{'month.colspan'} = $colCount;
-   #$eh->warn($dt->epochToHuman($firstMonday));
+   #$log->warn($dt->epochToHuman($firstMonday));
 }
 
 #-------------------------------------------------------------------
@@ -203,7 +263,7 @@ sub _htmlOfResourceList {
 			$subvar->{resourceIcon} = 'groups.gif';
 		} elsif ($resourceKind eq 'user') {
 			my $user = WebGUI::User->new($self->session, $resourceId);
-			my ($firstName, $lastName, $username) = ($user->profileField('firstName'), $user->profileField('lastName'), $user->username);
+			my ($firstName, $lastName, $username) = ($user->get('firstName'), $user->get('lastName'), $user->username);
 			my $displayName = do {
 				if (length($firstName) && length($lastName)) { "$lastName, $firstName" }
 				elsif (length($firstName)) { $firstName }
@@ -213,13 +273,13 @@ sub _htmlOfResourceList {
 			$subvar->{resourceName} = WebGUI::HTML::format($displayName, 'text');
 			$subvar->{resourceIcon} = 'users.gif';
 		} else {
-			$self->session->errorHandler->fatal("Unknown kind of resource '$resourceKind'!");
+			$self->session->log->fatal("Unknown kind of resource '$resourceKind'!");
 		}
 
 		push @{$var->{resourceLoop}}, $subvar;
 	}
 
-	return $self->processTemplate($var, $self->getValue('resourceListTemplateId'));
+	return $self->processTemplate($var, $self->resourceListTemplateId);
 }
 
 #-------------------------------------------------------------------
@@ -306,7 +366,7 @@ sub _resourceSearchPopup {
 		$var->{doingSearch} = 0;
 	}
 
-	return $self->processTemplate($var, $self->getValue('resourcePopupTemplateId'));
+	return $self->processTemplate($var, $self->resourcePopupTemplateId);
 }
 
 #-------------------------------------------------------------------
@@ -325,7 +385,6 @@ sub _userSearchQuery {
 	my $query = <<"SQL";
 SELECT 'user' AS resourceKind, users.userId AS resourceId
   FROM users
-       LEFT JOIN userProfileData ON users.userId = userProfileData.userId
  WHERE (LOWER(lastName) LIKE ? OR LOWER(firstName) LIKE ?
         OR LOWER(users.username) LIKE ?) AND (users.userId NOT IN $excludePlaceholders)
  ORDER BY lastName, firstName
@@ -363,7 +422,7 @@ sub _updateDependantDates {
 			my $pred = $taskHash->{$predecessor};
 			unless ($pred) {
 				# Predecessor has to have a lower sequence number, right?  Right?
-				$self->session->errorHandler->error("Internal: predecessor '$predecessor' of task with seqNum '$seqNum' not in task hash?!");
+				$self->session->log->error("Internal: predecessor '$predecessor' of task with seqNum '$seqNum' not in task hash?!");
 				next;
 			}
 
@@ -405,7 +464,7 @@ sub _userCanManageProject {
     my $user = shift;
     my $projectId = shift;
     my ($managerGroup) = $self->session->db->quickArray("select projectManager from PM_project where projectId = ?", [$projectId]);
-    return $self->canView($user->userId) && ($user->isInGroup($managerGroup) || $user->isInGroup($self->get('groupToAdd')));
+    return $self->canView($user->userId) && ($user->isInGroup($managerGroup) || $user->isInGroup($self->groupToAdd));
 }
 
 #-------------------------------------------------------------------
@@ -417,7 +476,7 @@ sub _userCanManageProject {
 sub _userCanManageProjectList {
 	my $self = shift;
 	my $user = shift;
-	return $self->canView($user->userId) && $user->isInGroup($self->get('groupToAdd'));
+	return $self->canView($user->userId) && $user->isInGroup($self->groupToAdd);
 }
 
 #-------------------------------------------------------------------
@@ -431,91 +490,8 @@ sub _userCanObserveProject {
 	my $user = shift;
 	my $projectId = shift;
 	my ($managerGroup, $observerGroup) = $self->session->db->quickArray("select projectManager, projectObserver from PM_project where projectId = ?", [$projectId]);
-	return $self->canView($user->userId) && ($user->isInGroup($managerGroup) || $user->isInGroup($observerGroup) || $user->isInGroup($self->get('groupToAdd')));
+	return $self->canView($user->userId) && ($user->isInGroup($managerGroup) || $user->isInGroup($observerGroup) || $user->isInGroup($self->groupToAdd));
 }
-
-#-------------------------------------------------------------------
-
-=head2 definition 
-
-=cut
-
-sub definition {
-	my $class = shift;
-	my $session = shift;
-	my $definition = shift;
-	my $i18n = WebGUI::International->new($session,'Asset_ProjectManager');
-	my $db = $session->db;
-	my %properties;
-	tie %properties, 'Tie::IxHash';
-	%properties = (
-		projectDashboardTemplateId =>{
-			fieldType=>"template",  
-			defaultValue=>'ProjectManagerTMPL0001',
-			tab=>"display",
-			namespace=>"ProjectManager_dashboard", 
-			hoverHelp=>$i18n->get('projectDashboardTemplate hoverhelp'),
-		    label=>$i18n->get('projectDashboardTemplate label')
-		},
-		projectDisplayTemplateId => {
-			fieldType=>"template",  
-			defaultValue=>'ProjectManagerTMPL0002',
-			tab=>"display",
-			namespace=>"ProjectManager_project", 
-			hoverHelp=>$i18n->get('projectDisplayTemplate hoverhelp'),
-		    label=>$i18n->get('projectDisplayTemplate label')
-		},
-		ganttChartTemplateId => {
-			fieldType=>"template",  
-			defaultValue=>'ProjectManagerTMPL0003',
-			tab=>"display",
-			namespace=>"ProjectManager_gantt", 
-			hoverHelp=>$i18n->get('ganttChartTemplate hoverhelp'),
-		    label=>$i18n->get('ganttChartTemplate label')
-		},
-		editTaskTemplateId =>{
-			fieldType=>"template",  
-			defaultValue=>'ProjectManagerTMPL0004',
-			tab=>"display",
-			namespace=>"ProjectManager_editTask", 
-			hoverHelp=>$i18n->get('editTaskTemplate hoverhelp'),
-		    label=>$i18n->get('editTaskTemplate label')
-		},
-		resourcePopupTemplateId =>{
-			fieldType=>"template",  
-			defaultValue=>'ProjectManagerTMPL0005',
-			tab=>"display",
-			namespace=>"ProjectManager_resourcePopup", 
-			hoverHelp=>$i18n->get('resourcePopupTemplate hoverhelp'),
-		    label=>$i18n->get('resourcePopupTemplate label')
-		},
-		resourceListTemplateId =>{
-			fieldType=>"template",  
-			defaultValue=>'ProjectManagerTMPL0006',
-			tab=>"display",
-			namespace=>"ProjectManager_resourceList", 
-			hoverHelp=>$i18n->get('resourceListTemplate hoverhelp'),
-		    label=>$i18n->get('resourceListTemplate label')
-		},
-		groupToAdd => {
-			fieldType=>"group",
-			defaultValue=>3,
-			tab=>"security",
-			hoverHelp=>$i18n->get('groupToAdd hoverhelp'),
-			label=>$i18n->get('groupToAdd label')
-		}
-	);
-	push(@{$definition}, {
-		assetName=>$i18n->get('assetName'),
-		icon=>'projManagement.gif',
-		autoGenerateForms=>1,
-		tableName=>'PM_wobject',
-		className=>'WebGUI::Asset::Wobject::ProjectManager',
-		properties=>\%properties
-	 });
-     return $class->SUPER::definition($session, $definition);
-}
-
 
 #-------------------------------------------------------------------
 #API method called by Time Tracker to return the instance of the PM wobject which this project blongs
@@ -532,7 +508,7 @@ sub getProjectInstance {
    return undef unless $projectId;
    my ($assetId) = $db->quickArray("select assetId from PM_project where projectId=?",[$projectId]);
    if($assetId) {
-      return WebGUI::Asset->newByDynamicClass($session,$assetId);
+      return WebGUI::Asset->newById($session,$assetId);
    }
    return undef;
 }
@@ -612,20 +588,20 @@ sub i18n {
 
 =cut
 
-sub prepareView {
+override prepareView => sub {
     my $self = shift;
-    $self->SUPER::prepareView();
-    my $template = WebGUI::Asset::Template->new($self->session, $self->get("projectDashboardTemplateId"));
+    super();
+    my $template = WebGUI::Asset::Template->newById($self->session, $self->projectDashboardTemplateId);
     if (!$template) {
         WebGUI::Error::ObjectNotFound::Template->throw(
             error      => qq{Template not found},
-            templateId => $self->get("projectDashboardTemplateId"),
+            templateId => $self->projectDashboardTemplateId,
             assetId    => $self->getId,
         );
     }
     $template->prepare($self->getMetaDataAsTemplateVariables);
     $self->{_viewTemplate} = $template;
-}
+};
 
 #-------------------------------------------------------------------
 
@@ -646,19 +622,6 @@ sub processErrors {
    return $errors;
 }
 
-
-#-------------------------------------------------------------------
-
-=head2 purge 
-
-=cut
-
-sub purge {
-	my $self = shift;
-	#purge your wobject-specific data here.  This does not include fields 
-	# you create for your NewWobject asset/wobject table.
-	return $self->SUPER::purge;
-}
 
 #-------------------------------------------------------------------
 
@@ -691,7 +654,7 @@ sub setSessionVars {
 sub updateProjectTask {
 	my $self = shift;
 	my $db = $self->session->db;
-	my $eh = $self->session->errorHandler;
+	my $log = $self->session->log;
    
 	my $taskId = $_[0];
 	my $projectId = $_[1];
@@ -762,9 +725,9 @@ sub view {
 	
 	my ($session,$privilege,$form,$db,$datetime,$i18n,$user) = $self->setSessionVars;
 	my $config = $session->config;
-	my $eh = $session->errorHandler;
+	my $log = $session->log;
 	
-	$var->{'extras'} = $config->get("extrasURL")."/wobject/ProjectManager"; 
+	$var->{'extras'} = $session->url->make_urlmap_work($config->get("extrasURL"))."/wobject/ProjectManager"; 
 	$var->{'project.create'} = $self->getUrl("func=editProject;projectId=new");
 	$var->{'project.create.label'} = $i18n->get("project new label");
 	
@@ -785,7 +748,7 @@ sub view {
 	
 	#Project Data
 	my @projects = ();
-	my $sth = $db->read("select * from PM_project where assetId=".$db->quote($self->get("assetId")));
+	my $sth = $db->read("select * from PM_project where assetId=".$db->quote($self->assetId));
 	while (my $project = $sth->hashRef) {
 	   my $hash = {};
 	   my $projectId = $project->{projectId};
@@ -798,8 +761,8 @@ sub view {
 	   $hash->{'project.description.data'} = $project->{description};
 	   $hash->{'project.startDate.data'} = $project->{startDate}?$datetime->epochToSet($project->{startDate}):$i18n->get("N_A");
 	   $hash->{'project.endDate.data'} = $project->{endDate}?$datetime->epochToSet($project->{endDate}):$i18n->get("N_A");
-	   $hash->{'project.cost.data.int'} = WebGUI::Utility::commify(int($project->{targetBudget}));
-	   $hash->{'project.cost.data.float'} = WebGUI::Utility::commify($project->{targetBudget});
+	   $hash->{'project.cost.data.int'} = Number::Format::format_number($project->{targetBudget}, 0);
+	   $hash->{'project.cost.data.float'} = Number::Format::format_number($project->{targetBudget});
 	   $hash->{'project.complete.data.int'} = int($project->{percentComplete});
 	   $hash->{'project.complete.data.int'} = 100 if($hash->{'project.complete.data.int'} > 100);
 	   $hash->{'project.complete.data.float'} = sprintf("%2.2f",$project->{percentComplete});
@@ -875,18 +838,18 @@ sub www_deleteTask {
    #Reorder dependants and tasks
    my $tasks = $db->buildArrayRefOfHashRefs("select * from PM_task where projectId=? order by sequenceNumber",[$projectId]);
    my $taskLen = scalar(@{$tasks});
-   #$eh->warn("Task Length = $taskLen");
+   #$log->warn("Task Length = $taskLen");
    foreach my $tsk (@{$tasks}) {
       my $seqNum = $tsk->{sequenceNumber};
       next unless ($seqNum >= $taskRank);
-	  #$eh->warn("Fixing task $seqNum");		 
+	  #$log->warn("Fixing task $seqNum");		 
 	  my $dependant = $tsk->{dependants};
-	  #$eh->warn("Dependant is $dependant");
+	  #$log->warn("Dependant is $dependant");
 	  #Only decrement the dependant if it's greater than the rank point of the deleted task
 	  if($dependant >= $taskRank){
 	     $dependant--;
 	  }
-	  #$eh->warn("New dependant is $dependant");
+	  #$log->warn("New dependant is $dependant");
 	  $db->write("update PM_task set dependants=? where taskId=?",[$dependant,$tsk->{taskId}]);
    }
    $self->reorderCollateral("PM_task","taskId","projectId",$projectId);
@@ -907,7 +870,7 @@ sub www_drawGanttChart {
 	my ($session,$privilege,$form,$db,$dt,$i18n,$user) = $self->setSessionVars;
 	my $config = $session->config;
 	my $style = $session->style;
-	my $eh = $session->errorHandler;
+	my $log = $session->log;
 	
 	#Set up some the task data
 	my $projectId = $_[0];
@@ -927,7 +890,7 @@ sub www_drawGanttChart {
 	
 	my ($dunits,$hoursPerDay) = $db->quickArray("select durationUnits,hoursPerDay from PM_project where projectId=".$db->quote($projectId));
 
-	$var->{'extras'} = $config->get("extrasURL")."/wobject/ProjectManager";
+	$var->{'extras'} = $session->url->make_urlmap_work($config->get("extrasURL"))."/wobject/ProjectManager";
 	
 	#Initialize display settings 
 	my $projectDisplay = "weeks";
@@ -944,7 +907,7 @@ sub www_drawGanttChart {
 	   ($startMonth) = $db->quickArray("select min(startDate) from PM_task where projectId=".$db->quote($projectId));
 	   ($endMonth) = $db->quickArray("select max(endDate) from PM_task where projectId=".$db->quote($projectId));
 	   
-	   #$eh->warn("Interval is: ".$dt->getDaysInInterval($startMonth,$endMonth));
+	   #$log->warn("Interval is: ".$dt->getDaysInInterval($startMonth,$endMonth));
 	   if($dt->getDaysInInterval($startMonth,$endMonth) < 60) {
 	      $endMonth = $dt->addToDate($startMonth,0,3);
 	   }
@@ -953,8 +916,8 @@ sub www_drawGanttChart {
 	   $endMonth = $dt->addToDate($startMonth,0,3);
 	}
 	
-	#$eh->warn($dt->epochToSet($startMonth));
-	#$eh->warn($dt->epochToSet($endMonth));
+	#$log->warn($dt->epochToSet($startMonth));
+	#$log->warn($dt->epochToSet($endMonth));
 	#Build the loops of weeks and days
 	my @monthsLoop = ();
 	my @daysLoop = ();
@@ -975,8 +938,8 @@ sub www_drawGanttChart {
 					$i18n->get("friday label"),
 					$i18n->get("saturday label"),
 				   ); 
-	   #$eh->warn($dt->epochToSet($sundayOfFirstWeek));
-	   #$eh->warn($dt->epochToSet($endMonth));
+	   #$log->warn($dt->epochToSet($sundayOfFirstWeek));
+	   #$log->warn($dt->epochToSet($endMonth));
 	   my $datecounter = $startMonth;
 	   my $counter = 0;
 	   while($datecounter <= $endMonth || $counter++ == 1000) {
@@ -988,7 +951,7 @@ sub www_drawGanttChart {
 		  foreach (@days) {
 		     push(@daysLoop,{'day.number' => $_ });
 		  }
-		  #$eh->warn($dt->epochToSet($datecounter));
+		  #$log->warn($dt->epochToSet($datecounter));
 		  $datecounter = $dt->addToDateTime($datecounter,0,0,7);
 	   }
 	
@@ -1080,7 +1043,7 @@ sub www_drawGanttChart {
 		}
 		
 		#Adjust top for MSIE
-		my $isMSIE = ($session->env->get("HTTP_USER_AGENT") =~ /msie/i);
+		my $isMSIE = $session->request->browser->ie;
 		my $divTop =  $isMSIE ? 45 : 45;
 		#Start at 45 px and add 20px as the start of the new task
 		#Set the propert mutiplier
@@ -1089,15 +1052,15 @@ sub www_drawGanttChart {
 		
 		my $daysFromStart = $dt->getDaysInInterval($startMonth,$startDate);
 		#Add day part of predecessor if necessary
-		#$eh->warn("Task $seq is currently $daysFromStart days from the first day on ".$dt->epochToHuman($startDate));
+		#$log->warn("Task $seq is currently $daysFromStart days from the first day on ".$dt->epochToHuman($startDate));
 		my $daysLeft = $daysFromStart;
 		#Only adjust for predecessor if the start date of the task falls on the same day as it's predecessors end date
 		if($startDate eq $predEndDate) {
 		   $daysLeft += $predDayPart;
-		   #$eh->warn("Adjusting this by $predDayPart days");
+		   #$log->warn("Adjusting this by $predDayPart days");
 		}
 		$hash->{'task.div.left'} = int(($daysLeft * $pixelSize));  #Each day is 23 pixels so calculate the days and round
-		#$eh->warn("Starts at: $daysLeft * $pixelSize :".$hash->{'task.div.left'});
+		#$log->warn("Starts at: $daysLeft * $pixelSize :".$hash->{'task.div.left'});
 		
 		# Buggo.  Refactor.
 		$hash->{'task.isUntimed'} = ($task->{taskType} ne 'timed');
@@ -1111,7 +1074,7 @@ sub www_drawGanttChart {
 		my $rduration = $task->{duration};
 		
 		#Adjust duration of days to only include the part of the day used
-		#$eh->warn("day part is being set to: $duration - ".floor($duration)." : ".($duration-floor($duration)));
+		#$log->warn("day part is being set to: $duration - ".floor($duration)." : ".($duration-floor($duration)));
         $duration = $duration - floor($duration);
 		
 		$hash->{'task.div.percentComplete'} = $task->{percentComplete} || 0;
@@ -1141,7 +1104,7 @@ sub www_drawGanttChart {
 	my $scrollWidth = (1- (560 / $projVar->{'project.table.width'})) * 100;
 	$var->{'project.scroll.percentWidth'} = $projVar->{'project.scroll.percentWidth'} =  sprintf("%2.2f",$scrollWidth); 	
 	
-	return $self->processTemplate($var,$self->getValue("ganttChartTemplateId"));
+	return $self->processTemplate($var,$self->ganttChartTemplateId);
 }
 
 #-------------------------------------------------------------------
@@ -1164,83 +1127,78 @@ sub www_editProject {
    my $addEditText = ($projectId eq "new")?$i18n->get("create project"):$i18n->get("edit project");
    
    #Build Form
-   my $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl, -extras=>q|onsubmit="return checkform(this);"|);
-   $f->hidden( 
-			    -name=>"func",
-				-value=>"editProjectSave" 
+   my $f = WebGUI::FormBuilder->new($self->session,
+        action=>$self->getUrl,
+        extras=>q|onsubmit="return checkform(this);"|
+    );
+   $f->addField( "hidden",
+			    name=>"func",
+				value=>"editProjectSave" 
    );
-   $f->hidden( 
-               -name=>"projectId", 
-               -value=>$projectId 
+   $f->addField( "hidden", 
+               name=>"projectId", 
+               value=>$projectId 
    );
-   $f->readOnly(
-		-label=>$i18n->get("project id"),
-		-hoverHelp => $i18n->get('project name hoverhelp'),
-		-value=>$projectId
+   $f->addField( "readOnly",
+		label=>$i18n->get("project id"),
+		hoverHelp => $i18n->get('project name hoverhelp'),
+		value=>$projectId
    );
-   $f->text(
-		   -name  => "name",
-		   -value => $form->get("name") || $project->{name},
-		   -hoverHelp => $i18n->get('project name hoverhelp'),
-		   -label => $i18n->get('project name label')
+   $f->addField( "text",
+		   name  => "name",
+		   value => $form->get("name") || $project->{name},
+		   hoverHelp => $i18n->get('project name hoverhelp'),
+		   label => $i18n->get('project name label')
    );
-   $f->HTMLArea(
-		-name  => "description",
-		-value => $form->get("description") || $project->{description},
-		-hoverHelp => $i18n->get('project description hoverhelp'),
-		-label => $i18n->get('project description label')
+   $f->addField( "HTMLArea",
+		name  => "description",
+		value => $form->get("description") || $project->{description},
+		hoverHelp => $i18n->get('project description hoverhelp'),
+		label => $i18n->get('project description label')
    );
-   $f->group(
-         -name=> "projectManager",
-		 -value=> $form->get("projectManager") || $project->{projectManager} || $self->get("groupToAdd"),
-		 -hoverHelp=> $i18n->get('project manager hoverhelp'),
-		 -label => $i18n->get('project manager label')
+   $f->addField( "group",
+         name=> "projectManager",
+		 value=> $form->get("projectManager") || $project->{projectManager} || $self->groupToAdd,
+		 hoverHelp=> $i18n->get('project manager hoverhelp'),
+		 label => $i18n->get('project manager label')
    );
-   $f->group(
-         -name=> "projectObserver",
-		 -value=> $form->get("projectObserver") || $project->{projectObserver} || '7',
-		 -hoverHelp=> $i18n->get('project observer hoverhelp'),
-		 -label => $i18n->get('project observer label')
+   $f->addField( "group",
+         name=> "projectObserver",
+		 value=> $form->get("projectObserver") || $project->{projectObserver} || '7',
+		 hoverHelp=> $i18n->get('project observer hoverhelp'),
+		 label => $i18n->get('project observer label')
    );
    
    my $dunitValue = $form->get("durationUnits") || $project->{durationUnits} || "hours";
-   $f->selectBox(
-          -name=>"durationUnits",
-		  -value=> $dunitValue,
-		  -options=>$self->_getDurationUnitHash,
-		  -hoverHelp => $i18n->get('duration units hoverhelp'),
-		  -label => $i18n->get('duration units label'),
-		  -extras=> q|onchange="if(this.value == 'hours'){ document.getElementById('hoursper').style.display='' } else { document.getElementById('hoursper').style.display='none' }"|
+   $f->addField( "selectBox",
+          name=>"durationUnits",
+		  value=> $dunitValue,
+		  options=>$self->_getDurationUnitHash,
+		  hoverHelp => $i18n->get('duration units hoverhelp'),
+		  label => $i18n->get('duration units label'),
+		  extras=> q|onchange="if(this.value == 'hours'){ document.getElementById('hoursper').style.display='' } else { document.getElementById('hoursper').style.display='none' }"|
    );
    
   
    
-   my $hpdLabel = $i18n->get('hours per day label');
-   my $hpdHoverHelp = $i18n->get('hours per day hoverhelp');
-   my $hpdValue = $form->get("hoursPerDay") || $project->{hoursPerDay} || "8.0";
-   my $hpdStyle = ($dunitValue eq "days"?"display:none":"");
    
-   my $html = qq|
-   <tr id="hoursper" style="$hpdStyle">
-      <td class="formDescription" valign="top" style="width: 180px;">
-	     <div class="wg-hoverhelp">$hpdHoverHelp</div>
-         <label for="hoursPerDay_formId">$hpdLabel</label>
-	  </td>
-	  <td valign="top" class="tableData"  style="width: *;">
-	     <input id="hoursPerDay_formId" type="text" name="hoursPerDay" value="$hpdValue" size="11" maxlength="14" />
-	  </td>
-   </tr>|;
-   $f->raw($html);		
-   
-   $f->float (
-           -name=>"targetBudget",
-		   -value=> $form->get("targetBudget") || $project->{targetBudget} || "0.00",
-		   -hoverHelp => $i18n->get('target budget hoverhelp'),
-		   -label=> $i18n->get('target budget label')
+   $f->addField( "text",
+        name => 'hoursPerDay',
+        label => $i18n->get('hours per day label'),
+        hoverHelp => $i18n->get('hours per day hoverhelp'),
+        value => $form->get("hoursPerDay") || $project->{hoursPerDay} || "8.0",
+        extras => ($dunitValue eq "days"? q{ style="display:none"} :""),
+    );
+
+   $f->addField( "float",
+           name=>"targetBudget",
+		   value=> $form->get("targetBudget") || $project->{targetBudget} || "0.00",
+		   hoverHelp => $i18n->get('target budget hoverhelp'),
+		   label=> $i18n->get('target budget label')
    );
-   $f->submit( 
-           -extras=>"name='subbutton'",
-		   -value=>$addEditText
+   $f->addField( "submit", 
+           extras=>"name='subbutton'",
+		   value=>$addEditText
    );
    
    my $jscript = qq|
@@ -1258,8 +1216,8 @@ sub www_editProject {
    
    my $errors = $self->processErrors($_[0]);
    
-   my $output = $jscript."\n".$errors.$f->print;
-   return $self->getAdminConsole->render($output,$addEditText);
+   my $output = $jscript."\n".$errors.$f->toHtml;
+   return '<h1>' . $addEditText . '</h1>' . $output;
 }
 
 #-------------------------------------------------------------------
@@ -1272,7 +1230,7 @@ sub www_editProjectSave {
 	my $self = shift;
     #Set Method Helpers
     my ($session,$privilege,$form,$db,$dt,$i18n,$user) = $self->setSessionVars;
-    my $eh = $session->errorHandler;
+    my $log = $session->log;
 	
     #Check Privileges
     return $privilege->insufficient unless $self->_userCanManageProjectList($user);
@@ -1517,8 +1475,8 @@ sub www_editTask {
 				});
    $var->{'form.footer'} = WebGUI::Form::formFooter($session);
 
-   $var->{'extras'} = $config->get("extrasURL");
-   $var->{'assetExtras'} = $config->get("extrasURL").'/wobject/ProjectManager';
+   $var->{'extras'} = $session->url->make_urlmap_work($config->get("extrasURL"));
+   $var->{'assetExtras'} = $session->url->make_urlmap_work($config->get("extrasURL")).'/wobject/ProjectManager';
    
    $var->{'task_name_label'}        = $i18n->get('task name label');
    $var->{'task_start_label'}       = $i18n->get('task start label');
@@ -1530,7 +1488,7 @@ sub www_editTask {
    $var->{'task_resource_label'}    = $i18n->get('task resource label');
    $var->{'task_save_label'}        = $i18n->get('task save label');
 
-   return $self->processTemplate($var,$self->getValue("editTaskTemplateId"));
+   return $self->processTemplate($var,$self->editTaskTemplateId);
 }
 
 #-------------------------------------------------------------------
@@ -1545,7 +1503,7 @@ sub www_editTaskSave {
    #Set Method Helpers
    my ($session,$privilege,$form,$db,$dt,$i18n,$user) = $self->setSessionVars;
    my $config = $session->config;
-   my $eh = $session->errorHandler;
+   my $log = $session->log;
 
    my $projectId = $form->get("projectId");
    my $project = $db->quickHashRef("select * from PM_project where projectId=".$db->quote($projectId));
@@ -1596,26 +1554,26 @@ sub www_editTaskSave {
    #Reorder tasks if task is inserted
    my $insertAt = $form->get("insertAt");
    if($insertAt) {
-      #$eh->warn("Inserting at $insertAt");
+      #$log->warn("Inserting at $insertAt");
 	  my $tasks = $db->buildArrayRefOfHashRefs("select * from PM_task where projectId=? order by sequenceNumber",[$projectId]);
 	  my $taskLen = scalar(@{$tasks});
-	  #$eh->warn("Task Length = $taskLen");
+	  #$log->warn("Task Length = $taskLen");
 	  foreach my $task (@{$tasks}) {
 	     my $seqNum = $task->{sequenceNumber};
 		 next unless ($seqNum >= $insertAt);
-		 #$eh->warn("Fixing task $seqNum");		 
+		 #$log->warn("Fixing task $seqNum");		 
 		 my $newSeq = $seqNum + 1;
 		 if($seqNum eq $taskLen) {
 		    $newSeq = $insertAt;
 		 }
-		 #$eh->warn("New seqNum is $newSeq");
+		 #$log->warn("New seqNum is $newSeq");
 		 my $dependant = $task->{dependants};
-		 #$eh->warn("Dependant is $dependant");
+		 #$log->warn("Dependant is $dependant");
 		 #Only increment the dependant if it's greater than or equal to the insertAt point
 		 if($dependant >= $insertAt){
 		    $dependant++;
 		 }
-		 #$eh->warn("New dependant is $dependant");
+		 #$log->warn("New dependant is $dependant");
 		 $db->write("update PM_task set sequenceNumber=?, dependants=? where taskId=?",[$newSeq,$dependant,$task->{taskId}]);
 	  }
 	  $self->reorderCollateral("PM_task","taskId","projectId",$projectId);
@@ -1742,90 +1700,47 @@ sub www_viewProject {
     my $user        = $session->user;
     my $config      = $session->config;
 	my $style       = $session->style;
-	my $eh          = $session->errorHandler;
+	my $log          = $session->log;
 	my $projectId   = shift || $form->get("projectId");
 		
     #Check Privileges
 	return $privilege->insufficient unless $self->_userCanObserveProject($user, $projectId);
 	
     #Set extras template variables
-    my $extras            = $config->get("extrasURL");
-	my $assetExtras       = $config->get("extrasURL")."/wobject/ProjectManager";	
+    my $extras            = $session->url->make_urlmap_work($config->get("extrasURL"));
+	my $assetExtras       = $session->url->make_urlmap_work($config->get("extrasURL"))."/wobject/ProjectManager";	
     $var->{'extras'     } = $assetExtras;
 	$var->{'extras.base'} = $extras;
     
 	
 	#Set page styles
-	$style->setLink($assetExtras."/subModal.css", { 
-                        rel=>"stylesheet", 
-                        type=>"text/css", 
-                    }
-    );
-    $style->setLink($assetExtras."/taskEdit.css", {
-                        rel=>"stylesheet",
-                        type=>"text/css",
-                    }
-    );
-    $style->setLink($assetExtras."/cMenu.css",{
-                        rel=>"stylesheet",
-                        type=>"text/css",
-                    }
-    );
+	$style->setCss($assetExtras."/subModal.css");
+    $style->setCss($assetExtras."/taskEdit.css");
+    $style->setCss($assetExtras."/cMenu.css");
 	
     #Set page scripts
-	$style->setScript($assetExtras."/cMenu.js",{ 
-                          type=>"text/javascript",
-                      }
-    );
+	$style->setScript($assetExtras."/cMenu.js");
     
-	$style->setScript($extras."/contextMenu/contextMenu.js",{ 
-                          type=>"text/javascript" 
-                     }
-    );
+	$style->setScript($extras."/contextMenu/contextMenu.js");
 	
-    $self->session->style->setScript(
-      $self->session->url->extras('yui/build/yahoo/yahoo-min.js'),
-      { type=>'text/javascript' }
-    );
+    $self->session->style->setScript( $self->session->url->extras('yui/build/yahoo/yahoo-min.js'));
     
-    $self->session->style->setScript(
-      $self->session->url->extras('yui/build/event/event-min.js'),
-      { type=>'text/javascript' }
-    );
+    $self->session->style->setScript( $self->session->url->extras('yui/build/event/event-min.js'));
     
-    $self->session->style->setScript(
-      $self->session->url->extras('yui/build/dom/dom-min.js'),
-      { type=>'text/javascript' }
-    );
+    $self->session->style->setScript( $self->session->url->extras('yui/build/dom/dom-min.js'));
    
-    $self->session->style->setScript(
-      $self->session->url->extras('yui/build/connection/connection-min.js'),
-      { type=>'text/javascript' }
-    );
+    $self->session->style->setScript( $self->session->url->extras('yui/build/connection/connection-min.js'));
     
-    $self->session->style->setScript(
-      $self->session->url->extras('yui/build/container/container-min.js'),
-      { type=>'text/javascript' }
-    );
+    $self->session->style->setScript( $self->session->url->extras('yui/build/container/container-min.js'));
     
-    $style->setScript($assetExtras."/modal.js",{ 
-                          type=>"text/javascript" 
-                      }
-    );
-    
+    $style->setScript($assetExtras."/modal.js"); 
     #$self->session->style->setScript(
     #  $self->session->url->extras('yui-webgui/build/datepicker/datepicker.js'),
     #  { type=>'text/javascript' }
     #);
 
-	$style->setScript($assetExtras."/projectDisplay.js",{ 
-                          type=>"text/javascript" 
-                      }
-    );
-	$style->setScript($assetExtras."/taskEdit.js",{ 
-                          type=>"text/javascript" 
-                      }
-    );
+	$style->setScript($assetExtras."/projectDisplay.js");
+	$style->setScript($assetExtras."/taskEdit.js");
 	
 	#Get Project Data
     my $sql          = q|select * from PM_project where projectId=?|;   
@@ -2018,8 +1933,8 @@ sub www_viewProject {
 	$var->{'task.back.label'} = $i18n->get("task back label");
 	$var->{'task.back.url'} = $self->getUrl;
 
-	return $self->processStyle($self->processTemplate($var,$self->getValue("projectDisplayTemplateId")));
+	return $self->processStyle($self->processTemplate($var,$self->projectDisplayTemplateId));
 }
 
-
+__PACKAGE__->meta->make_immutable;
 1;

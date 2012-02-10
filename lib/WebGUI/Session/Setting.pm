@@ -3,7 +3,7 @@ package WebGUI::Session::Setting;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -15,7 +15,7 @@ package WebGUI::Session::Setting;
 =cut
 
 use strict;
-use Scalar::Util qw( weaken );
+use Scalar::Util qw(weaken);
 
 =head1 NAME
 
@@ -67,21 +67,6 @@ sub add {
 	my $self = shift;
     $self->set(@_);
 }
-
-#-------------------------------------------------------------------
-
-=head2 DESTROY ( )
-
-Deconstructor.
-
-=cut
-
-sub DESTROY {
-        my $self = shift;
-        undef $self;
-}
-
-
 
 #-------------------------------------------------------------------
 
@@ -146,10 +131,10 @@ A reference to the current WebGUI::Session.
 sub new {
 	my $class = shift;
 	my $session = shift;
-	my $settings = $session->db->buildHashRef("select * from settings", [], {noOrder => 1});
-	my $self = bless {_settings=>$settings, _session=>$session}, $class;
-        weaken( $self->{_session} );
-        return $self;
+	my $self = bless { _session => $session }, $class;
+    weaken $self->{_session};
+	$self->{_settings} = $session->db->buildHashRef("select * from settings", [], {noOrder => 1});
+    return $self;
 }
 
 

@@ -3,7 +3,7 @@ package WebGUI::Asset::Wobject::Survey::SurveyJSON;
 =head1 LEGAL
 
 -------------------------------------------------------------------
-WebGUI is Copyright 2001-2009 Plain Black Corporation.
+WebGUI is Copyright 2001-2012 Plain Black Corporation.
 -------------------------------------------------------------------
 Please read the legal notices (docs/legal.txt) and the license
 (docs/license.txt) that came with this distribution before using
@@ -169,7 +169,7 @@ sub addType {
     my $questionType = shift;
     my $address = shift;
     my $question = $self->question($address);
-    my $ansString = $question->{answers} ? to_json $question->{answers} : {};
+    my $ansString = $question->{answers} ? to_json $question->{answers} : '{}';
     $self->session->db->write("INSERT INTO Survey_questionTypes VALUES(?,?) ON DUPLICATE KEY UPDATE answers = ?",[$questionType,$ansString,$ansString]);
     $question->{questionType} = $questionType;
 }
@@ -659,19 +659,19 @@ sub compress {
                 my $newA = {};
                 while (my($key, $value) = each %$a) {
                     next if ref $value;
-                    $newA->{$key} = $value unless WebGUI::Utility::scalarEquals($value, $amold->{$key});
+                    $newA->{$key} = $value unless $value eq $amold->{$key};
                 }
                 push @{$newQ->{answers}}, $newA;
             }
             while (my($key, $value) = each %$q) {
                 next if ref $value;
-                $newQ->{$key} = $value unless WebGUI::Utility::scalarEquals($value, $qmold->{$key});
+                $newQ->{$key} = $value unless $value eq $qmold->{$key};
             }
             push @{$newS->{questions}}, $newQ;
         }
         while (my($key, $value) = each %$s) {
             next if ref $value;
-            $newS->{$key} = $value unless WebGUI::Utility::scalarEquals($value, $smold->{$key});
+            $newS->{$key} = $value unless $value eq $smold->{$key};
         }
         push @sections, $newS;
     }

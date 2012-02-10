@@ -1,7 +1,7 @@
 package WebGUI::Asset::Wobject::HttpProxy;
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -18,13 +18,138 @@ use HTTP::Request::Common;
 use HTML::Entities;
 use WebGUI::International;
 use WebGUI::Storage;
-use WebGUI::Asset::Wobject;
 use WebGUI::Asset::Wobject::HttpProxy::Parse;
-use WebGUI::Cache;
 use WebGUI::Macro;
-use Apache2::Upload;
+use Tie::IxHash;
 
-our @ISA = qw(WebGUI::Asset::Wobject);
+use Moose;
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset::Wobject';
+define assetName => ['assetName', 'Asset_HttpProxy'];
+define icon      => 'httpProxy.gif';
+define tableName => 'HttpProxy';
+property templateId => (
+                fieldType => "template",
+                default   => 'PBtmpl0000000000000033',
+                namespace => 'HttpProxy',
+                tab       => 'display',
+                label     => ['http proxy template title', 'Asset_HttpProxy'],
+                hoverHelp => ['http proxy template title description', 'Asset_HttpProxy'],
+         );
+
+property proxiedUrl => (
+                fieldType => "url",
+                default   => 'http://',
+                tab       => 'properties',
+                label     => [1, 'Asset_HttpProxy'],
+                hoverHelp => ['1 description', 'Asset_HttpProxy'],
+         );
+
+property useAmpersand => (
+                fieldType => "yesNo",
+                default   => 0,
+                tab       => 'properties',
+                label     => ["use ampersand", 'Asset_HttpProxy'],
+                hoverHelp => ["use ampersand help", 'Asset_HttpProxy'],
+         );
+
+property timeout => (
+                fieldType => "selectBox",
+                default   => 30,
+                tab       => 'properties',
+                options   => \&_timeout_options,
+                label     => [4, 'Asset_HttpProxy'],
+                hoverHelp => ['4 description', 'Asset_HttpProxy'],
+         );
+sub _timeout_options {
+	my %timeoutOptions;
+	tie %timeoutOptions, 'Tie::IxHash';
+	%timeoutOptions = map{$_ => $_} (5, 10, 20, 30, 60);
+    return \%timeoutOptions;
+}
+
+property removeStyle => (
+                fieldType => "yesNo",
+                default   => 1,
+                tab       => 'display',
+                label     => [6, 'Asset_HttpProxy'],
+                hoverHelp => ['6 description', 'Asset_HttpProxy'],
+         );
+
+property cacheTimeout => (
+                fieldType => "interval",
+                default   => 0,
+                tab       => 'display',
+                label     => ['cache timeout', 'Asset_HttpProxy'],
+                hoverHelp => ['cache timeout description', 'Asset_HttpProxy'],
+                uiLevel   => 8,
+         );
+
+property filterHtml => (
+                fieldType => "filterContent",
+                default   => "javascript",
+                tab       => 'display',
+                label     => [418, 'WebGUI', 'Asset_HttpProxy'],
+                hoverHelp => ['418 description', 'WebGUI', 'Asset_HttpProxy'],
+         );
+            
+property urlPatternFilter => (
+                fieldType    => "textarea",
+                default      => "",
+                tab          => "display",
+                label        => ["url pattern filter label", 'Asset_HttpProxy'],
+                hoverHelp    => ["url pattern filter hover help", 'Asset_HttpProxy'],
+         );
+            
+property followExternal => (
+                fieldType => "yesNo",
+                default   => 1,
+                tab       => 'security',
+                label     => [5, 'Asset_HttpProxy'],
+                hoverHelp => ['5 description', 'Asset_HttpProxy'],
+         );
+
+property rewriteUrls => (
+                fieldType => "yesNo",
+                default   => 1,
+                tab       => 'properties',
+                label     => [12, 'Asset_HttpProxy'],
+                hoverHelp => ['12 description', 'Asset_HttpProxy'],
+         );
+
+property followRedirect => (
+                fieldType => "yesNo",
+                default   => 0,
+                tab       => 'security',
+                label     => [8, 'Asset_HttpProxy'],
+                hoverHelp => ['8 description', 'Asset_HttpProxy'],
+         );
+
+property searchFor => (
+                fieldType => "text",
+                default   => undef,
+                tab       => 'display',
+                label     => [13, 'Asset_HttpProxy'],
+                hoverHelp => ['13 description', 'Asset_HttpProxy'],
+         );
+
+property stopAt => (
+                fieldType => "text",
+                default   => undef,
+                tab       => 'display',
+                label     => [14, 'Asset_HttpProxy'],
+                hoverHelp => ['14 description', 'Asset_HttpProxy'],
+         );
+
+property cookieJarStorageId => (
+                noFormPost => 1,
+                fieldType  => "hidden",
+                default    => undef
+         );
+has '+uiLevel' => (
+    default => 5,
+);
+
 
 #-------------------------------------------------------------------
 
@@ -48,7 +173,7 @@ sub appendToUrl {
 	my $self = shift;
         my $url = shift;
 	my $paramSet = shift;
-	my $seperator = ($self->get("useAmpersand")) ? "&" : ";";
+	my $seperator = ($self->useAmpersand) ? "&" : ";";
 	if (index($url, '?') == length($url)-1) {
 		$url .= $paramSet;
 	} elsif (index($url, '?') >= 0) {
@@ -59,141 +184,6 @@ sub appendToUrl {
         return $url;
 }
 
-
-#-------------------------------------------------------------------
-sub definition {
-	my $class = shift;
-	my $session = shift;
-	my $definition = shift;
-	my $i18n = WebGUI::International->new($session,"Asset_HttpProxy");
-	my %timeoutOptions;
-	tie %timeoutOptions, 'Tie::IxHash';
-	%timeoutOptions = map{$_ => $_} (5, 10, 20, 30, 60);
-
-	push(@{$definition}, {
-		assetName => $i18n->get('assetName'),
-		uiLevel => 5,
-		icon => 'httpProxy.gif',
-		tableName => 'HttpProxy',
-		className => 'WebGUI::Asset::Wobject::HttpProxy',
-		autoGenerateForms => 1,
-		properties => {
-			templateId => {
-				fieldType => "template",
-				defaultValue => 'PBtmpl0000000000000033',
-				namespace => 'HttpProxy',
-				tab => 'display',
-				label => $i18n->get('http proxy template title'),
-				hoverHelp => $i18n->get('http proxy template title description'),
-				},
-
-			proxiedUrl => {
-				fieldType => "url",
-				defaultValue => 'http://',
-				tab => 'properties',
-				label => $i18n->get(1),
-				hoverHelp => $i18n->get('1 description'),
-				},
-
-			useAmpersand => {
-				fieldType => "yesNo",
-				defaultValue => 0,
-				tab => 'properties',
-				label => $i18n->get("use ampersand"),
-				hoverHelp => $i18n->get("use ampersand help")
-				},
-
-			timeout => {
-				fieldType => "selectBox",
-				defaultValue => 30,
-				tab => 'properties',
-				options => \%timeoutOptions,
-				label => $i18n->get(4),
-				hoverHelp => $i18n->get('4 description'),
-				},
-
-			removeStyle => {
-				fieldType => "yesNo",
-				defaultValue => 1,
-				tab => 'display',
-				label => $i18n->get(6),
-				hoverHelp => $i18n->get('6 description'),
-				},
-
-			cacheTimeout => {
-				fieldType => "interval",
-				defaultValue => 0,
-				tab => 'display',
-				label => $i18n->get('cache timeout'),
-				hoverHelp => $i18n->get('cache timeout description'),
-				uiLevel => 8,
-				},
-
-			filterHtml => {
-				fieldType => "filterContent",
-				defaultValue => "javascript",
-				tab => 'display',
-				label => $i18n->get(418, 'WebGUI'),
-				hoverHelp => $i18n->get('418 description', 'WebGUI'),
-				},
-            
-            urlPatternFilter=>{
-                fieldType => "textarea",
-                defaultValue => "",
-                tab          => "display",
-                label        => $i18n->get("url pattern filter label"),
-                hoverHelp    => $i18n->get("url pattern filter hover help"),
-                },
-            
-			followExternal => {
-				fieldType => "yesNo",
-				defaultValue => 1,
-				tab => 'security',
-				label => $i18n->get(5),
-				hoverHelp => $i18n->get('5 description'),
-				},
-
-            rewriteUrls => {
-				fieldType => "yesNo",
-                defaultValue => 1,
-				tab => 'properties',
-				label => $i18n->get(12),
-				hoverHelp => $i18n->get('12 description'),
-                },
-
-			followRedirect => {
-				fieldType => "yesNo",
-				defaultValue => 0,
-				tab => 'security',
-				label => $i18n->get(8),
-				hoverHelp => $i18n->get('8 description'),
-				},
-
-			searchFor => {
-				fieldType => "text",
-                                defaultValue => undef,
-				tab => 'display',
-				label => $i18n->get(13),
-				hoverHelp => $i18n->get('13 description'),
-                                },
-
-                        stopAt => {
-				fieldType => "text",
-                                defaultValue => undef,
-				tab => 'display',
-				label => $i18n->get(14),
-				hoverHelp => $i18n->get('14 description'),
-                                },
-
-			cookieJarStorageId => {
-                                noFormPost => 1,
-                                fieldType => "hidden",
-                                defaultValue => undef
-                                }
-			}
-		});
-        return $class->SUPER::definition($session, $definition);
-}
 
 #-------------------------------------------------------------------
 
@@ -219,11 +209,11 @@ Return a WebGUI::Storage object to hold cookie data.
 sub getCookieJar {
 	my $self = shift;
 	my $storage;
-	unless ($self->get("cookieJarStorageId")) {
+	unless ($self->cookieJarStorageId) {
 		$storage = WebGUI::Storage->create($self->session);
 		$self->update({cookieJarStorageId=>$storage->getId});
 	} else {
-		$storage = WebGUI::Storage->get($self->session,$self->get("cookieJarStorageId"));
+		$storage = WebGUI::Storage->get($self->session,$self->cookieJarStorageId);
 	}
 	return $storage;
 }
@@ -236,20 +226,20 @@ See WebGUI::Asset::prepareView() for details.
 
 =cut
 
-sub prepareView {
+override prepareView => sub {
 	my $self = shift;
-	$self->SUPER::prepareView();
-	my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId"));
+	super();
+	my $template = WebGUI::Asset::Template->newById($self->session, $self->templateId);
     if (!$template) {
         WebGUI::Error::ObjectNotFound::Template->throw(
             error      => qq{Template not found},
-            templateId => $self->get("templateId"),
+            templateId => $self->templateId,
             assetId    => $self->getId,
         );
     }
 	$template->prepare($self->getMetaDataAsTemplateVariables);
 	$self->{_viewTemplate} = $template;
-}
+};
 
 
 #-------------------------------------------------------------------
@@ -260,11 +250,11 @@ Extend the base method to delete the cookie jar
 
 =cut
 
-sub purge {
+override purge => sub {
 	my $self = shift;
 	$self->getCookieJar->delete;	
-	$self->SUPER::purge;
-}
+	super();
+};
 
 
 #-------------------------------------------------------------------
@@ -275,12 +265,15 @@ See WebGUI::Asset::purgeCache() for details.
 
 =cut
 
-sub purgeCache {
+override purgeCache => sub {
 	my $self = shift;
-	WebGUI::Cache->new($self->session,$self->get("proxiedUrl"),"URL")->delete;
-	WebGUI::Cache->new($self->session,$self->get("proxiedUrl"),"HEADER")->delete;
-	$self->SUPER::purgeCache;
-}
+    my $cache = $self->session->cache;
+	eval {
+        $cache->remove($self->proxiedUrl."_URL");
+	    $cache->remove($self->proxiedUrl."_HEADER");
+    };
+	super();
+};
 
 #-------------------------------------------------------------------
 
@@ -297,13 +290,13 @@ sub view {
 	my $redirect 	= 0; 
 	my $response; 
 	my $header; 
-	my $proxiedUrl = $self->get("proxiedUrl");
+	my $proxiedUrl = $self->proxiedUrl;
 	WebGUI::Macro::process($self->session,\$proxiedUrl);
 
 	my $i18n = WebGUI::International->new($self->session, 'Asset_HttpProxy');
 	
 	### Set up a cookie jar
-	my $cookiebox = $self->session->url->escape($self->session->var->get("sessionId"));
+	my $cookiebox = $self->session->url->escape($self->session->getId);
 	$cookiebox =~ s/[^A-Za-z0-9\-\.\_]//g;  #removes all funky characters
 	$cookiebox .= '.cookie';
 	my $jar = HTTP::Cookies->new(File => $self->getCookieJar->getPath($cookiebox), AutoSave => 1, Ignore_Discard => 1);
@@ -314,18 +307,18 @@ sub view {
 		$proxiedUrl = $self->session->form->process("FormAction") || $self->session->form->process("proxiedUrl") || $proxiedUrl ;
 	}
 	
-	return $self->processTemplate({},$self->get("templateId")) 
+	return $self->processTemplate({},$self->templateId) 
 		unless ($proxiedUrl ne "");
 	
-	my $requestMethod = $self->session->env->get("REQUEST_METHOD") || "GET";
+	my $requestMethod = $self->session->request->method || "GET";
 	
 	### Do we have cached content to get?
-	my $cacheContent = WebGUI::Cache->new($self->session,$proxiedUrl,"URL");
-	my $cacheHeader = WebGUI::Cache->new($self->session,$proxiedUrl,"HEADER");
-	if ($requestMethod =~ /^GET$/i)
-	{
-		$var{header} 	= $cacheHeader->get;
-		$var{content} 	= $cacheContent->get;
+    my $cache = $self->session->cache;
+	if ($requestMethod =~ /^GET$/i) {
+        eval {
+		    $var{header} 	= $cache->get($proxiedUrl.'_HEADER');
+		    $var{content} 	= $cache->get($proxiedUrl."_URL");
+        };
 	}
 	
 	# Unless we have cached content
@@ -335,8 +328,8 @@ sub view {
 		REDIRECT: for my $redirect (0..4) { # We follow max 5 redirects to prevent bouncing/flapping
 			
 			my $userAgent = new LWP::UserAgent;
-			$userAgent->agent($self->session->env->get("HTTP_USER_AGENT"));
-			$userAgent->timeout($self->get("timeout"));
+			$userAgent->agent($self->session->request->user_agent);
+			$userAgent->timeout($self->timeout);
 			$userAgent->env_proxy;
 			
 			
@@ -349,16 +342,16 @@ sub view {
 			
 			
 			## Make sure the user isn't leaving where we've allowed
-			if ($self->get("followExternal")==0 
-				&& (URI->new($self->get('proxiedUrl'))->host) ne (URI->new($proxiedUrl)->host) ) {
+			if ($self->followExternal==0 
+				&& (URI->new($self->proxiedUrl)->host) ne (URI->new($proxiedUrl)->host) ) {
 				$var{header} 	= "text/html";
-				$var{content} 	= sprintf $i18n->get('may not leave error message'), $self->get("proxiedUrl");
+				$var{content} 	= sprintf $i18n->get('may not leave error message'), $self->proxiedUrl;
 				last;
 			}
 			
 			
 			$header = new HTTP::Headers;
-			$header->referer($self->get("proxiedUrl")); # To get around referrer blocking
+			$header->referer($self->proxiedUrl); # To get around referrer blocking
 			
 			
 			my $request;	# Create the request
@@ -379,8 +372,8 @@ sub view {
 				}
 				### DEBUG
 				#require Data::Dumper;
-				#$self->session->errorHandler->warn("DEBUG: ".Data::Dumper::Dumper($params));
-				#$self->session->errorHandler->warn("URL: $proxiedUrl");
+				#$self->session->log->warn("DEBUG: ".Data::Dumper::Dumper($params));
+				#$self->session->log->warn("URL: $proxiedUrl");
 				
 				$request = HTTP::Request->new(GET => $proxiedUrl, $header) || return "wrong url"; # Create GET request
 			} else { # It's a POST
@@ -426,7 +419,7 @@ sub view {
 				last REDIRECT;
 			}
 			##At least 1 time through the loop
-			last REDIRECT if (not $self->get("followRedirect")); # No redirection. Overruled by setting
+			last REDIRECT if (not $self->followRedirect); # No redirection. Overruled by setting
 		}
 		
 		if($response->is_success) {
@@ -435,8 +428,8 @@ sub view {
 			if($response->content_type eq "text/html"
 			    || ($response->content_type eq "" && $var{content}=~/<html/gis)) {
 				
-				$var{"search.for"} = $self->getValue("searchFor");
-				$var{"stop.at"} = $self->getValue("stopAt");
+				$var{"search.for"} = $self->searchFor;
+				$var{"stop.at"} = $self->stopAt;
 				if ($var{"search.for"}) {
 					$var{content} =~ /^(.*?)\Q$var{"search.for"}\E(.*)$/gis;
 					$var{"content.leading"} = $1 || $var{content};
@@ -447,31 +440,33 @@ sub view {
 					$var{content} = $1 || $var{content};
 					$var{"content.trailing"} = $2;
 				}
-				my $p = WebGUI::Asset::Wobject::HttpProxy::Parse->new($self->session, $proxiedUrl, $var{content}, $self->getId,$self->get("rewriteUrls"),$self->getUrl,$self->get("urlPatternFilter"));
+				my $p = WebGUI::Asset::Wobject::HttpProxy::Parse->new($self->session, $proxiedUrl, $var{content}, $self->getId,$self->rewriteUrls,$self->getUrl,$self->urlPatternFilter);
 				$var{content} = $p->filter; # Rewrite content. (let forms/links return to us).
-				$p->DESTROY;
+				undef $p;
 		
 				if ($var{content} =~ /<frame/gis) {
 					$var{header} = "text/html";
 					$var{content} = sprintf $i18n->get('no frame error message'), $proxiedUrl;
 				} else {
-					$var{content} =~ s/\<style.*?\/style\>//isg if ($self->get("removeStyle"));
+					$var{content} =~ s/\<style.*?\/style\>//isg if ($self->removeStyle);
 					$var{content} = WebGUI::HTML::cleanSegment($var{content}, 1);
-					$var{content} = WebGUI::HTML::filter($var{content}, $self->get("filterHtml"));
+					$var{content} = WebGUI::HTML::filter($var{content}, $self->filterHtml);
 				}
 			}
 		} else { # Fetching page failed...
 			$var{header} = "text/html";
 			$var{content} = sprintf $i18n->get('fetch page error'), $proxiedUrl, $proxiedUrl, $response->status_line;
 		}
-		unless ($self->get("cacheTimeout") <= 10) {
-			$cacheContent->set($var{content},$self->get("cacheTimeout"));
-			$cacheHeader->set($var{header},$self->get("cacheTimeout"));
+		unless ($self->cacheTimeout <= 10) {
+			eval{
+                $cache->set($proxiedUrl.'URL', $var{content}, $self->cacheTimeout);
+			    $cache->set($proxiedUrl.'HEADER', $var{header}, $self->cacheTimeout);
+            };
 		}
 	}
 	
 	
-	$self->session->http->setMimeType($var{header});
+	$self->session->response->content_type($var{header});
 	
 	if($var{header} ne "text/html") {
 		return $var{content};
@@ -499,10 +494,10 @@ sub www_view {
     return $self->session->privilege->noAccess() unless $self->canView;
     $self->prepareView;
     my $output = $self->view;
-    if ($self->session->http->getMimeType ne "text/html") {
+    if ($self->session->response->content_type ne "text/html") {
         return $output;
     } else {
-        $self->session->http->sendHeader;
+        $self->session->response->sendHeader;
         my $style = $self->processStyle($self->getSeparator, { noHeadTags => 1 });
         my ($head, $foot) = split($self->getSeparator,$style);
         $self->session->output->print($head);
@@ -512,4 +507,5 @@ sub www_view {
     }
 }
 
+__PACKAGE__->meta->make_immutable;
 1;

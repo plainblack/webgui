@@ -38,6 +38,12 @@ our $I18N = {
         context => q|Hover help for the group to use option.|,
     },
 
+    'Shipping Driver' => {
+        message => q|Shipping Driver|,
+        lastUpdated => 0,
+        context => q|Name of the base Shipping Driver|,
+    },
+
 };
 
 1;

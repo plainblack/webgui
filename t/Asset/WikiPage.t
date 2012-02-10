@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -8,9 +8,7 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../lib";
 
 ##The goal of this test is to test the creation of a WikiPage Asset.
 
@@ -23,23 +21,19 @@ use WebGUI::Asset::WikiPage;
 
 
 my $session = WebGUI::Test->session;
-my $node = WebGUI::Asset->getImportNode($session);
+my $node = WebGUI::Test->asset;
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Wiki Test"});
 WebGUI::Test->addToCleanup($versionTag);
-
-my $wiki = $node->addChild({className=>'WebGUI::Asset::Wobject::WikiMaster', title => 'Wiki Test', url => 'wikitest'});
+my $wiki = $node->addChild({className=>'WebGUI::Asset::Wobject::WikiMaster', title => 'Wiki Test', url => 'wikitest',});
 my @autoCommitCoda = (undef, undef, {skipAutoCommitWorkflows => 1, skipNotification => 1});
-$versionTag->commit;
 my $wikipage = $wiki->addChild(
-    {className=>'WebGUI::Asset::WikiPage'},
+    {className=>'WebGUI::Asset::WikiPage',
+     title    =>'wikipage', },
     @autoCommitCoda,
 );
 
-# Wikis create and autocommit a version tag when a child is added.  Lets get the name so we can roll it back.
-my $secondVersionTag = WebGUI::VersionTag->new($session,$wikipage->get("tagId"));
-$secondVersionTag->commit;
-WebGUI::Test->addToCleanup($secondVersionTag );
+WebGUI::Test->addToCleanup($wikipage);
 
 # Test for sane object types
 isa_ok($wiki, 'WebGUI::Asset::Wobject::WikiMaster');
@@ -51,9 +45,9 @@ is($article, undef, "Can't add an Article wobject as a child to a Wiki Page.");
 
 # See if the duplicate method works
 my $wikiPageCopy = $wikipage->duplicate();
+$wikiPageCopy    = $wikiPageCopy->cloneFromDb;
+$wikiPageCopy->update({ title => 'wikipage copy', });
 isa_ok($wikiPageCopy, 'WebGUI::Asset::WikiPage');
-my $thirdVersionTag = WebGUI::VersionTag->new($session,$wikiPageCopy->get("tagId"));
-WebGUI::Test->addToCleanup($thirdVersionTag);
 
 ## isProtected
 

@@ -3,7 +3,7 @@ package WebGUI::Asset::Sku::Subscription;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -15,8 +15,90 @@ package WebGUI::Asset::Sku::Subscription;
 =cut
 
 use strict;
-use Tie::IxHash;
-use base 'WebGUI::Asset::Sku';
+use Moose;
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset::Sku';
+define assetName           => ['assetName', 'Asset_Subscription'];
+define icon                => 'subscription.gif';
+define tableName           => 'Subscription';
+property templateId => (
+            tab             => "display",
+            fieldType       => "template",
+            namespace       => "Subscription",
+            default         => 'eqb9sWjFEVq0yHunGV8IGw',
+            label           => ["template", 'Asset_Subscription'],
+            hoverHelp       => ["template help", 'Asset_Subscription'],
+         );
+property redeemSubscriptionCodeTemplateId => (
+            tab             => "display",
+            fieldType       => "template",
+            namespace       => "Operation/RedeemSubscription",
+            default         => 'PBtmpl0000000000000053',
+            label           => ["redeem subscription code template", 'Asset_Subscription'],
+            hoverHelp       => ["redeem subscription code template help", 'Asset_Subscription'],
+         );
+property thankYouMessage => (
+            tab             => "properties",
+            builder         => '_thankYouMessage_default',
+            lazy            => 1,
+            fieldType       => "HTMLArea",
+            label           => ["thank you message", 'Asset_Subscription'],
+            hoverHelp       => ["thank you message help", 'Asset_Subscription'],
+         );
+sub _thankYouMessage_default {
+    my $session = shift->session;
+	my $i18n = WebGUI::International->new($session, "Asset_Subscription");
+    return $i18n->get("default thank you message");
+}
+property price => (
+            fieldType       => 'float',
+            label           => ['subscription price', 'Asset_Subscription'],
+            hoverHelp       => ['subscription price description', 'Asset_Subscription'],
+            default         => '0.00',
+         );
+property subscriptionGroup => (
+            fieldType       => 'group',
+            label           => ['subscription group', 'Asset_Subscription'],
+            hoverHelp       => ['subscription group description', 'Asset_Subscription'],
+            defaultvalue    => [ 2 ]
+         );
+property recurringSubscription => (
+            fieldType       => 'yesNo',
+            label           => ['recurring subscription', 'Asset_Subscription'],
+            hoverHelp       => ['recurring subscription description', 'Asset_Subscription'],
+            default         => 1,
+         );
+property duration => ( 
+            fieldType       => 'selectBox',
+            label           => ['subscription duration', 'Asset_Subscription'],
+            hoverHelp       => ['subscription duration description', 'Asset_Subscription'],
+            default         => 'Monthly',
+            options         => \&_duration_options,
+         );
+sub _duration_options {
+    my $session = shift->session;
+    return WebGUI::Shop::Pay->new( session => $session )->getRecurringPeriodValues,
+}
+property executeOnSubscription => (
+            fieldType       => 'text',
+            label           => ['execute on subscription', 'Asset_Subscription'],
+            hoverHelp       => ['execute on subscription description', 'Asset_Subscription'],
+            default         => '',
+         );
+property karma => (
+    fieldType       => 'integer',
+    noFormPost      => \&_karma_noFormPost,
+    label           => ['subscription karma', 'Asset_Subscription'],
+    hoverHelp       => ['subscription karma description', 'Asset_Subscription'],
+    defaultvalue	=> 0,
+);
+sub _karma_noFormPost {
+    my $session = shift->session;
+    return ! $session->setting->get('useKarma');
+}
+
+
+
 use WebGUI::Asset::Template;
 use WebGUI::Form;
 use WebGUI::Shop::Pay;
@@ -60,7 +142,7 @@ sub apply {
 	my $self    = shift;
     my $session = $self->session;
 	my $userId  = shift || $session->user->userId;
-	my $groupId = $self->get('subscriptionGroup');
+	my $groupId = $self->subscriptionGroup;
 
 	# Make user part of the right group and adjust the expiration date
 	my $group   = WebGUI::Group->new($session, $groupId);
@@ -76,107 +158,15 @@ sub apply {
 
 	# Add karma to the user's account
     if ($session->setting->get('useKarma')) {
-        WebGUI::User->new($session,$userId)->karma($self->get('karma'), 'Subscription', 'Added for purchasing subscription '.$self->get('title'));
+        WebGUI::User->new($session,$userId)->karma($self->karma, 'Subscription', 'Added for purchasing subscription '.$self->title);
     }
 
 	# Process the executeOnPurchase field
-	my $command = $self->get('executeOnSubscription');
+	my $command = $self->executeOnSubscription;
 	WebGUI::Macro::process($session,\$command);
-	system($command) if ($self->get('executeOnSubscription') ne "");
+	system($command) if ($self->executeOnSubscription ne "");
 }
 
-
-#-------------------------------------------------------------------
-
-=head2 definition
-
-=cut
-
-sub definition {
-	my $class = shift;
-	my $session = shift;
-	my $definition = shift;
-	my %properties;
-	tie %properties, 'Tie::IxHash';
-	my $i18n = WebGUI::International->new($session, "Asset_Subscription");
-	%properties = (
-		templateId      => {
-			tab             => "display",
-			fieldType       => "template",
-            namespace       => "Subscription",
-			defaultValue    => 'eqb9sWjFEVq0yHunGV8IGw',
-			label           => $i18n->get("template"),
-			hoverHelp       => $i18n->get("template help"),
-		},
-        redeemSubscriptionCodeTemplateId => {
-            tab             => "display",
-            fieldType       => "template",
-            namespace       => "Operation/RedeemSubscription",
-            defaultValue    => 'PBtmpl0000000000000053',
-            label           => $i18n->get("redeem subscription code template"),
-            hoverHelp       => $i18n->get("redeem subscription code template help"),
-        },
-        thankYouMessage => {
-            tab             => "properties",
-			defaultValue    => $i18n->get("default thank you message"),
-			fieldType       => "HTMLArea",
-			label           => $i18n->get("thank you message"),
-			hoverHelp       => $i18n->get("thank you message help"),
-            },
-
-        price           => {
-            fieldType       => 'float',
-            label	        => $i18n->get('subscription price'),
-            hoverHelp	    => $i18n->get('subscription price description'),
-            defaultValue    => '0.00',
-        },
-        subscriptionGroup   => {
-            fieldType       => 'group',
-            label	        => $i18n->get('subscription group'),
-            hoverHelp	    => $i18n->get('subscription group description'),
-            defaultvalue	=> [ 2 ]
-        },
-        recurringSubscription => {
-            fieldType       => 'yesNo',
-            label           => $i18n->get('recurring subscription'),
-            hoverHelp       => $i18n->get('recurring subscription description'),
-            defaultValue    => 1,
-        },
-        duration        => { 
-            fieldType       => 'selectBox',
-            label	        => $i18n->get('subscription duration'),
-            hoverHelp       => $i18n->get('subscription duration description'),
-            defaultValue	=> 'Monthly',
-            options         => WebGUI::Shop::Pay->new( $session )->getRecurringPeriodValues,
-        },
-        executeOnSubscription   => {
-            fieldType       => 'text',
-            label           => $i18n->get('execute on subscription'),
-            hoverHelp       => $i18n->get('execute on subscription description'),
-            defaultValue    => '',
-        },
-    );
-
-    # Show the karma field only if karma is enabled
-    if ($session->setting->get("useKarma")) {
-        $properties{ karma    } = {
-            type            => 'integer',
-            label           => $i18n->get('subscription karma'),
-            hoverHelp       => $i18n->get('subscription karma description'),
-            defaultvalue	=> 0,
-        };
-    }
-
-	push(@{$definition}, {
-		assetName           => $i18n->get('assetName'),
-		icon                => 'subscription.gif',
-		autoGenerateForms   => 1,
-		tableName           => 'Subscription',
-		className           => 'WebGUI::Asset::Sku::Subscription',
-		properties          => \%properties,
-	    });
-	return $class->SUPER::definition($session, $definition);
-}
 
 #-------------------------------------------------------------------
 
@@ -299,27 +289,6 @@ sub getAddToCartForm {
 
 #-------------------------------------------------------------------
 
-=head2 getAdminConsoleWithSubmenu ( )
-
-Returns an admin console with management links added to the submenu.
-
-=cut
-
-sub getAdminConsoleWithSubmenu {
-	my $self    = shift;
-    my $session = $self->session;
-	my $ac      = $self->getAdminConsole;
-	my $i18n    = WebGUI::International->new( $session, 'Asset_Subscription' );
-
-	$ac->addSubmenuItem( $self->getUrl('func=createSubscriptionCodeBatch'),        $i18n->get('generate batch'));
-	$ac->addSubmenuItem( $self->getUrl('func=listSubscriptionCodes;selection=dc'), $i18n->get('manage codes')  );
-	$ac->addSubmenuItem( $self->getUrl('func=listSubscriptionCodeBatches'),        $i18n->get('manage batches'));
-
-	return $ac;
-}
-
-#-------------------------------------------------------------------
-
 =head2 getCode ( code )
 
 Returns a hashref with the properties of the passed code.
@@ -409,7 +378,7 @@ The identifier of the interval. Can be either 'Weekly', 'BiWeekly', 'FourWeekly'
 
 sub getExpirationOffset {
     my $self        = shift;
-	my $duration    = shift || $self->get('duration');
+	my $duration    = shift || $self->duration;
     
     #                                              y, m,  d  
     return $self->session->datetime->addToDate( 1, 0, 0,  7 ) - 1 if $duration eq 'Weekly';
@@ -425,6 +394,36 @@ sub getExpirationOffset {
 
 #-------------------------------------------------------------------
 
+=head2 getHelpers ( )
+
+Get the some links to manage subscription codes
+
+=cut
+
+override getHelpers => sub {
+    my ( $self ) = @_;
+    my $session = $self->session;
+    my $helpers = super();
+    my $i18n    = WebGUI::International->new( $session, 'Asset_Subscription' );
+
+    $helpers->{createSubscriptionCodeBatch} = {
+        url     => $self->getUrl('func=createSubscriptionCodeBatch'),
+        label   => $i18n->get('generate batch'),
+    };
+    $helpers->{listSubscriptionCodes} = {
+        url     => $self->getUrl('func=listSubscriptionCodes;selection=dc'), 
+        label   => $i18n->get('manage codes'),
+    };
+    $helpers->{listSubscriptionCodeBatches} = {
+        url     => $self->getUrl('func=listSubscriptionCodeBatches'),
+        label   => $i18n->get('manage batches'),
+    };
+
+    return $helpers;
+};
+
+#-------------------------------------------------------------------
+
 =head2 getPrice
 
 Returns configured price, 0.00 if neither of those are available.
@@ -433,7 +432,7 @@ Returns configured price, 0.00 if neither of those are available.
 
 sub getPrice {
     my $self = shift;
-    return $self->get('price') || 0.00;
+    return $self->price || 0.00;
 }
 
 #-------------------------------------------------------------------
@@ -447,7 +446,7 @@ Returns the duration of this subscription in a format used by the commerce syste
 sub getRecurInterval {
     my $self    = shift;
 
-    return $self->get('duration');
+    return $self->duration;
 }
 
 #-------------------------------------------------------------------
@@ -461,7 +460,7 @@ Tells the commerce system this Sku is recurring.
 sub isRecurring {
     my $self = shift;
 
-    return $self->getValue('recurringSubscription');
+    return $self->recurringSubscription;
 }
 
 #-------------------------------------------------------------------
@@ -486,14 +485,14 @@ Prepares the template.
 
 =cut
 
-sub prepareView {
+override prepareView => sub {
 	my $self = shift;
-	$self->SUPER::prepareView();
-	my $templateId = $self->get("templateId");
-	my $template = WebGUI::Asset::Template->new($self->session, $templateId);
+	super();
+	my $templateId = $self->templateId;
+	my $template = WebGUI::Asset::Template->newById($self->session, $templateId);
 	$template->prepare($self->getMetaDataAsTemplateVariables);
 	$self->{_viewTemplate} = $template;
-}
+};
 
 #-------------------------------------------------------------------
 
@@ -520,8 +519,9 @@ sub redeemCode {
         $self->apply;
 
         # Set code to Used
-        $session->db->write("update Subscription_code set status='Used', dateUsed=? where code =?", [
+        $session->db->write("update Subscription_code set status='Used', dateUsed=?, usedBy=? where code =?", [
             time,
+            $self->session->user->userId,
             $code,
         ]);
     } else {
@@ -592,45 +592,45 @@ sub www_createSubscriptionCodeBatch {
 	my $errorMessage = $i18n->get('create batch error').'<ul><li>'.join('</li><li>', @{$error}).'</li></ul>' if ($error);
 	
     # Generate the properties form for this subscription code batch	
-	my $f = WebGUI::HTMLForm->new( $session );
-	$f->submit;
-	$f->hidden(
-		-name       => 'func', 
-		-value      => 'createSubscriptionCodeBatchSave'
+	my $f = WebGUI::FormBuilder->new( $session, action => $self->getUrl );
+	$f->addField( "submit", name => "send" );
+	$f->addField( "hidden",
+		name       => 'func', 
+		value      => 'createSubscriptionCodeBatchSave'
 		);
-	$f->integer(
-		-name	    => 'noc',
-		-label	    => $i18n->get('noc'),
-		-hoverHelp  => $i18n->get('noc description'),
-		-value	    => $session->form->process("noc") || 1
+	$f->addField( "integer",
+		name	    => 'noc',
+		label	    => $i18n->get('noc'),
+		hoverHelp  => $i18n->get('noc description'),
+		value	    => $session->form->process("noc") || 1
 		);
-	$f->integer(
-		-name	    => 'codeLength',
-		-label	    => $i18n->get('code length'),
-		-hoverHelp  => $i18n->get('code length description'),
-		-value	    => $session->form->process("codeLength") || 64
+	$f->addField( "integer",
+		name	    => 'codeLength',
+		label	    => $i18n->get('code length'),
+		hoverHelp  => $i18n->get('code length description'),
+		value	    => $session->form->process("codeLength") || 64
 		);
-	$f->interval(
-		-name       => 'expires',
-		-label      => $i18n->get('codes expire'),
-		-hoverHelp  => $i18n->get('codes expire description'),
-		-value      => $session->form->process("expires") || $session->datetime->intervalToSeconds(1, 'months')
+	$f->addField( "interval",
+		name       => 'expires',
+		label      => $i18n->get('codes expire'),
+		hoverHelp  => $i18n->get('codes expire description'),
+		value      => $session->form->process("expires") || $session->datetime->intervalToSeconds(1, 'months')
 		);
-    $f->text(
-        -name       => 'name',
-        -label      => $i18n->get('batch name'),
-        -hoverHelp  => $i18n->get('batch name description'),
-        -value      => $session->form->process('name'),
+    $f->addField( "text",
+        name       => 'name',
+        label      => $i18n->get('batch name'),
+        hoverHelp  => $i18n->get('batch name description'),
+        value      => $session->form->process('name') || '',
         );
-	$f->textarea(
-		-name	    => 'description',
-		-label	    => $i18n->get('batch description'),
-		-hoverHelp	=> $i18n->get('batch description description'),
-		-value	    => $session->form->process("description"),
+	$f->addField( "textarea",
+		name	    => 'description',
+		label	    => $i18n->get('batch description'),
+		hoverHelp	=> $i18n->get('batch description description'),
+		value	    => $session->form->process("description") || '',
 		);
-	$f->submit;
+	$f->addField( "submit", name => "send" );
 
-	return $self->getAdminConsoleWithSubmenu->render( $errorMessage.$f->print, $i18n->get('create batch menu') );
+	return $errorMessage.$f->toHtml;
 }
 
 #-------------------------------------------------------------------
@@ -774,13 +774,13 @@ sub www_listSubscriptionCodeBatches {
 	my $dcStop      = $session->datetime->addToTime($session->form->date('dcStop'), 23, 59);
     my $selection   = $session->form->process('selection');
 
-    my $f = WebGUI::HTMLForm->new( $session );
-    $f->hidden(
+    my $f = WebGUI::FormBuilder->new( $session, action => $self->getUrl );
+    $f->addField( "hidden",
         name    => 'func',
         value   => 'listSubscriptionCodeBatches',
     );
 
-    $f->readOnly(
+    $f->addField( "readOnly",
         label   =>
             WebGUI::Form::radio( $session, { name => 'selection', value => 'dc', checked => ($selection eq 'dc') } )
             . $i18n->get('selection created'),
@@ -789,13 +789,13 @@ sub www_listSubscriptionCodeBatches {
             . ' ' . $i18n->get( 'and' ) . ' ' 
             . WebGUI::Form::date( $session, { name => 'dcStop',     value=> $dcStop } ),
     );
-    $f->readOnly(
+    $f->addField( "readOnly",
         label   =>
             WebGUI::Form::radio( $session, { name => 'selection', value => 'all', checked => ($selection ne 'dc') } )
             . $i18n->get('display all'),
         value   => '',
     );
-    $f->submit(
+    $f->addField( "submit",
         value   => $i18n->get('select'),
     );
 
@@ -814,7 +814,7 @@ sub www_listSubscriptionCodeBatches {
     # Fetch the list of batches at the current paginition index
     my $batches = $p->getPageData;
 
-	my $output = $f->print;
+	my $output = $f->toHtml;
 	$output .= $p->getBarTraditional($session->form->process("pn"));
 	$output .= '<table border="1" cellpadding="5" cellspacing="0" align="center">';
 	foreach my $batch ( @{$batches} ) {
@@ -836,7 +836,7 @@ sub www_listSubscriptionCodeBatches {
 	
 	$output = $i18n->get('no subscription code batches') unless $session->db->quickScalar('select count(*) from Subscription_codeBatch');
 
-	return $self->getAdminConsoleWithSubmenu->render( $output, $i18n->get('manage batches') );
+	return $output;
 }
 
 #-------------------------------------------------------------------
@@ -868,13 +868,13 @@ sub www_listSubscriptionCodes {
 
 
     # Build a subscription code selection form
-    my $f = WebGUI::HTMLForm->new( $session );
-    $f->hidden(
+    my $f = WebGUI::FormBuilder->new( $session, action => $self->getUrl );
+    $f->addField( "hidden",
         name    => 'func',
         value   => 'listSubscriptionCodes',
     );
-    #--- Selection by date created
-    $f->readOnly(
+    #--- Selection by date used
+    $f->addField( "readOnly",
         label   => 
             WebGUI::Form::radio( $session, { name => 'selection', value => 'du', checked => ($selection eq 'du') } ) 
             . $i18n->get('selection used'),
@@ -883,8 +883,8 @@ sub www_listSubscriptionCodes {
             . ' ' . $i18n->get( 'and' ) . ' ' 
             . WebGUI::Form::date( $session, { name => 'duStop',     value=> $duStop } ),
     );
-    #--- Selection by date used
-    $f->readOnly(
+    #--- Selection by date created
+    $f->addField( "readOnly",
         label   =>
             WebGUI::Form::radio( $session, { name => 'selection', value => 'dc', checked => ($selection eq 'dc') } )
             . $i18n->get('selection created'),
@@ -894,7 +894,7 @@ sub www_listSubscriptionCodes {
             . WebGUI::Form::date( $session, { name => 'dcStop',     value=> $dcStop } ),
     );
     #--- Selection by batch
-    $f->readOnly(
+    $f->addField( "readOnly",
         label   =>
             WebGUI::Form::radio( $session, { name => 'selection', value => 'b', checked => ($selection eq 'b') } )
             . $i18n->get('selection batch name'),
@@ -902,9 +902,12 @@ sub www_listSubscriptionCodes {
             WebGUI::Form::selectBox( $session, { name => 'bid', value => $batchId, options => $batches } ),
     );
     #--- Submit button
-    $f->submit(
+    $f->addField( "submit",
         value   => $i18n->get('select'),
     );
+
+	$output = $i18n->get('selection message');
+    $output .= $f->toHtml;
 
 	if ($session->form->process("selection") eq 'du') {
 		$where = " and dateUsed >= ".$session->db->quote($duStart)." and dateUsed <= ".$session->db->quote($duStop);
@@ -919,7 +922,7 @@ sub www_listSubscriptionCodes {
 		$ops = ';bid='.$session->form->process("bid").';selection=b';
 		$delete = '<a href="'.$self->getUrl('func=deleteSubscriptionCodeBatch'.$ops).'">'.$i18n->get('delete codes').'</a>';
 	} else {
-        return $self->getAdminConsoleWithSubmenu->render( $output, $i18n->get('listSubscriptionCodes title') );
+        return $output;
 	}
 	
 	$p = WebGUI::Paginator->new( $session, $self->getUrl('func=listSubscriptionCodes'.$ops) );
@@ -934,8 +937,6 @@ sub www_listSubscriptionCodes {
 
 	$codes = $p->getPageData;
 
-	$output = $i18n->get('selection message');
-    $output .= $f->print;
 	$output .= '<br />'.$delete.'<br />' if ($delete) and $p->getRowCount;
 	$output .= $p->getBarTraditional($session->form->process("pn"));
 	$output .= '<br />';
@@ -957,7 +958,7 @@ sub www_listSubscriptionCodes {
 	$output .= '</table>';
 	$output .= $p->getBarTraditional($session->form->process("pn"));
 
-	return $self->getAdminConsoleWithSubmenu->render( $output, $i18n->get('listSubscriptionCodes title') );
+	return $output;
 }
 
 
@@ -1003,23 +1004,24 @@ sub www_redeemSubscriptionCode {
 		$var->{ message             } = $i18n->get('redeem code ask for code');
 	}
 	
-	my $f = WebGUI::HTMLForm->new( $session );
-	$f->hidden(
+	my $f = WebGUI::FormBuilder->new( $session );
+	$f->addField( "hidden",
 		-name       => 'func',
 		-value      => 'redeemSubscriptionCode'
 		);
-	$f->text(
+	$f->addField( "text",
 		-name		=> 'code',
 		-label		=> $i18n->get('code'),
 		-hoverHelp	=> $i18n->get('code description'),
 		-maxLength	=> 64,
 		-size		=> 30
 		);
-	$f->submit;
-	$var->{ codeForm } = $f->print;
+	$f->addField( "submit", name => "send" );
+	$var->{ codeForm } = $f->toHtml;
 
-    return $self->processStyle($self->processTemplate($var, $self->get('redeemSubscriptionCodeTemplateId')));
+    return $self->processStyle($self->processTemplate($var, $self->redeemSubscriptionCodeTemplateId));
 }
 
+__PACKAGE__->meta->make_immutable;
 1;
 

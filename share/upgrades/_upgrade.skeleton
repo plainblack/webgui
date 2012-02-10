@@ -1,0 +1,23 @@
+use WebGUI::Upgrade::Script;
+
+start_step "Running an upgrade step";
+
+# clear_cache;
+
+# my $session = session;
+# my $config = config;
+# my $dbh = dbh;
+# sql 'CREATE TABLE ...';
+# version_tag "Doing asset work";
+
+# rm_lib 'WebGUI::Old::Module';
+
+# my $asset = asset('assetId');
+# my $asset = asset('asset/url');
+# my $asset = import_node->addChild( ... );
+# my $assets = root_asset->getLineage( ... );
+
+# my $file = collateral->file('filename');
+# import_package 'some_files.wgpkg';
+
+done;

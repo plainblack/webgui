@@ -3,7 +3,7 @@ package WebGUI::Form::File;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -245,8 +245,8 @@ Set the head tags for this form plugin
 
 sub headTags {
     my $self = shift;
-    $self->session->style->setScript($self->session->url->extras('FileUploadControl.js'),{type=>"text/javascript"});
-    $self->session->style->setScript($self->session->url->extras('fileIcons.js'),{type=>"text/javascript"});
+    $self->session->style->setScript($self->session->url->extras('FileUploadControl.js'));
+    $self->session->style->setScript($self->session->url->extras('fileIcons.js'));
 }
 
 #-------------------------------------------------------------------
@@ -293,7 +293,10 @@ sub toHtml {
 	my @files = @{ $storage->getFiles } if (defined $storage);
 	my $maxFiles = $self->get('maxAttachments') - scalar(@files);
 	if ($maxFiles > 0) {
-        $uploadControl = '<script type="text/javascript">'
+        # Add basic field, use JS to replace with better field
+        $uploadControl = 
+            '<input type="file" name="' . $self->get("name") . '_file" id="' . $self->get("name") . '_file" />'
+            . '<script type="text/javascript">'
             . sprintf(q!var uploader = new FileUploadControl("%s", fileIcons, "%s","%d", "%s"); uploader.addRow();!
                 , $self->get("name")."_file", $i18n->get("removeLabel"), $maxFiles, $self->get("size"))
             . '</script>'

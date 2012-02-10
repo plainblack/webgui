@@ -3,7 +3,7 @@ package WebGUI::Asset::MatrixListing;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -16,10 +16,107 @@ package WebGUI::Asset::MatrixListing;
 
 use strict;
 use Tie::IxHash;
-use Class::C3;
-use base qw(WebGUI::AssetAspect::Comments WebGUI::Asset);
-use WebGUI::Utility;
+use Moose;
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset';
+define assetName => ['assetName', 'Asset_MatrixListing'];
+define tableName => 'MatrixListing';
+property screenshots => (
+            tab             => "properties",
+            fieldType       => "image",
+            default         => undef,
+            maxAttachments  => 20,
+            label           => ["screenshots label", 'Asset_MatrixListing'],
+            hoverHelp       => ["screenshots description", 'Asset_MatrixListing'],
+         );
+property description => (
+            tab             => "properties",
+            fieldType       => "HTMLArea",
+            default         => undef,
+            label           => ["description label", 'Asset_MatrixListing'],
+            hoverHelp       => ["description description", 'Asset_MatrixListing'],
+         );
+property version => (
+            tab             => "properties",
+            fieldType       => "text",
+            default         => undef,
+            label           => ["version label", 'Asset_MatrixListing'],
+            hoverHelp       => ["version description", 'Asset_MatrixListing'],
+         );
+property score => (
+            fieldType       => 'integer',
+            default         => 0,
+            noFormPost      => 1,
+         );
+property views => (
+            fieldType       => 'integer',
+            default         => 0,
+            noFormPost      => 1,
+         );
+property compares => (
+            fieldType       => 'integer',
+            default         => 0,
+            noFormPost      => 1,
+         );
+property clicks => (
+            fieldType       => 'integer',
+            default         => 0,
+            noFormPost      => 1,
+         );
+property viewsLastIp => (
+            fieldType       => 'text',
+            default         => undef,
+            noFormPost      => 1,
+         );
+property comparesLastIp => (
+            fieldType       => 'text',
+            default         => undef,
+            noFormPost      => 1,
+         );
+property clicksLastIp => (
+            fieldType       => 'text',
+            default         => undef,
+            noFormPost      => 1,
+         );
+property maintainer => (
+            tab             => "properties",
+            fieldType       => "user",
+            builder         => '_maintainer_default',
+            lazy            => 1,
+            label           => ["maintainer label", 'Asset_MatrixListing'],
+            hoverHelp       => ["maintainer description", 'Asset_MatrixListing'],
+         );
+sub _maintainer_default {
+    return shift->session->user->userId;
+}
+property manufacturerName => (
+            tab             => "properties",
+            fieldType       => "text",
+            default         => undef,
+            label           => ["manufacturerName label", 'Asset_MatrixListing'],
+            hoverHelp       => ["manufacturerName description", 'Asset_MatrixListing']
+         );
+property manufacturerURL => (
+            tab             => "properties",
+            fieldType       => "url",
+            default         => undef,
+            label           => ["manufacturerURL label", 'Asset_MatrixListing'],
+            hoverHelp       => ["manufacturerURL description", 'Asset_MatrixListing']
+         );
+property productURL => (
+            tab             => "properties",
+            fieldType       => "url",
+            default         => undef,
+            label           => ["productURL label", 'Asset_MatrixListing'],
+            hoverHelp       => ["productURL description", 'Asset_MatrixListing']
+         );
+property lastUpdated => (
+            default         => sub { time() },
+            noFormPost      => 1,
+            fieldType       => 'hidden',
+         );
 
+with 'WebGUI::Role::Asset::Comments';
 
 
 =head1 NAME
@@ -40,23 +137,6 @@ use WebGUI::Asset::MatrixListing;
 These methods are available from this class:
 
 =cut
-
-
-
-#-------------------------------------------------------------------
-
-=head2 addRevision
-
-   This method exists for demonstration purposes only.  The superclass
-   handles revisions to MatrixListing Assets.
-
-=cut
-
-sub addRevision {
-	my $self = shift;
-	my $newSelf = $self->next::method(@_);
-	return $newSelf;
-}
 
 #----------------------------------------------------------------------------
 
@@ -97,145 +177,6 @@ sub canEdit {
 
 #-------------------------------------------------------------------
 
-=head2 definition ( session, definition )
-
-defines asset properties for MatrixListing instances.  
-
-=head3 session
-
-=head3 definition
-
-A hash reference passed in from a subclass definition.
-
-=cut
-
-sub definition {
-	my $class = shift;
-	my $session = shift;
-	my $definition = shift;
-	my %properties;
-	tie %properties, 'Tie::IxHash';
-	my $i18n = WebGUI::International->new($session, "Asset_MatrixListing");
-	%properties = (
-        screenshots => {
-            tab             =>"properties",
-            fieldType       =>"image",
-            defaultValue    =>undef,
-            maxAttachments  =>20,
-            label           =>$i18n->get("screenshots label"),
-            hoverHelp       =>$i18n->get("screenshots description")
-            },
-        description => {
-            tab             =>"properties",
-            fieldType       =>"HTMLArea",
-            defaultValue    =>undef,
-            label           =>$i18n->get("description label"),
-            hoverHelp       =>$i18n->get("description description")
-            },
-        version => {
-            tab             =>"properties",
-            fieldType       =>"text",
-            defaultValue    =>undef,
-            label           =>$i18n->get("version label"),
-            hoverHelp       =>$i18n->get("version description")
-            },
-        score => {
-            defaultValue    =>0,
-            autoGenerate    =>0,
-            noFormPost      =>1,
-            },
-        views => {
-            defaultValue    =>0,
-            autoGenerate    =>0,
-            noFormPost      =>1,
-            },
-        compares => {
-            defaultValue    =>0,
-            autoGenerate    =>0,
-            noFormPost      =>1,
-            },
-        clicks => {
-            defaultValue    =>0,
-            autoGenerate    =>0,
-            noFormPost      =>1,
-            },
-        viewsLastIp => {
-            defaultValue    =>undef,
-            autoGenerate    =>0,
-            noFormPost      =>1,
-            },
-        comparesLastIp => {
-            defaultValue    =>undef,
-            autoGenerate    =>0,
-            noFormPost      =>1,
-            },
-        clicksLastIp => {
-            defaultValue    =>undef,
-            autoGenerate    =>0,
-            noFormPost      =>1,
-            },
-        maintainer => {
-            tab             =>"properties",
-            fieldType       =>"user",
-            defaultValue    =>$session->user->userId,
-            label           =>$i18n->get("maintainer label"),
-            hoverHelp       =>$i18n->get("maintainer description")
-            },
-        manufacturerName => {
-            tab             =>"properties",
-            fieldType       =>"text",
-            defaultValue    =>undef,
-            label           =>$i18n->get("manufacturerName label"),
-            hoverHelp       =>$i18n->get("manufacturerName description")
-            },
-        manufacturerURL => {
-            tab             =>"properties",
-            fieldType       =>"url",
-            defaultValue    =>undef,
-            label           =>$i18n->get("manufacturerURL label"),
-            hoverHelp       =>$i18n->get("manufacturerURL description")
-            },
-        productURL => {
-            tab             =>"properties",
-            fieldType       =>"url",
-            defaultValue    =>undef,
-            label           =>$i18n->get("productURL label"),
-            hoverHelp       =>$i18n->get("productURL description")
-            },
-        lastUpdated => {
-            defaultValue    =>time(),
-            fieldType       =>'hidden',
-            },
-	);
-	push(@{$definition}, {
-		assetName=>$i18n->get('assetName'),
-		autoGenerateForms=>1,
-		tableName=>'MatrixListing',
-		className=>'WebGUI::Asset::MatrixListing',
-		properties=>\%properties
-	});
-	return $class->next::method($session, $definition);
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 duplicate
-
-   This method exists for demonstration purposes only.  The superclass
-   handles duplicating MatrixListing Assets.  This method will be called 
-   whenever a copy action is executed
-
-=cut
-
-sub duplicate {
-	my $self = shift;
-	my $newAsset = $self->next::method(@_);
-	return $newAsset;
-}
-
-#-------------------------------------------------------------------
-
 =head2 getAutoCommitWorkflowId
 
 Gets the WebGUI::VersionTag workflow to use to automatically commit MatrixListings. 
@@ -256,7 +197,7 @@ sub getAutoCommitWorkflowId {
 
 =head2 getEditForm ( )
 
-Returns the TabForm object that will be used in generating the edit page for this asset.
+Returns the FormBuilder object that will be used in generating the edit page for this asset.
 
 =cut
 
@@ -268,48 +209,55 @@ sub getEditForm {
     my $i18n        = WebGUI::International->new($session, 'Asset_MatrixListing');
     my $func        = $session->form->process("func");
 
-    my $form = WebGUI::HTMLForm->new($session);
-    
-    if ($func eq "add" || ( $func eq "editSave" && $session->form->process("assetId") eq "new")) {
-        $form->hidden(
-            -name           =>'assetId',
-            -value          =>'new',
+    my $form = WebGUI::FormBuilder->new($session, action => $self->getParent->getUrl, );
+
+    if ($func eq "add" || ( $func eq "addSave" && $session->form->process("assetId") eq "new")) {
+        $form->addField( "hidden", 
+            name           => 'assetId',
+            value          => 'new',
         );
-        $form->hidden(
-            -name           =>'class',
-            -value          =>'WebGUI::Asset::MatrixListing',
+        $form->addField( "hidden", 
+            name           => 'className',
+            value          => 'WebGUI::Asset::MatrixListing',
+        );
+        $form->addField( "hidden", 
+            name           =>'func',
+            value          =>'addSave',
         );
     }
-    $form->hidden(
-        -name           =>'func',
-        -value          =>'editSave',
+    else {
+        $form->addField( "hidden", 
+            name           =>'func',
+            value          =>'editSave',
         );
-    $form->text(
-        -name           =>'title',
-        -defaultValue   =>'Untitled',
-        -label          =>$i18n->get("product name label"),
-        -hoverHelp      =>$i18n->get('product name description'),
-        -value          =>$self->getValue('title'),
+    }
+    $form->addField( "text", 
+        name           =>'title',
+        defaultValue   =>'Untitled',
+        label          =>$i18n->get("product name label"),
+        hoverHelp      =>$i18n->get('product name description'),
+        value          =>$self->title,
+    );
+
+    $form->addField( "image", 
+        name           =>'screenshots',
+        defaultValue   =>undef,
+        maxAttachments =>20,
+        label          =>$i18n->get("screenshots label"),
+        hoverHelp      =>$i18n->get("screenshots description"),,
+        value          =>$self->screenshots,
         );
-    $form->image(
-        -name           =>'screenshots',
-        -defaultValue   =>undef,
-        -maxAttachments =>20,
-        -label          =>$i18n->get("screenshots label"),
-        -hoverHelp      =>$i18n->get("screenshots description"),,
-        -value          =>$self->getValue('screenshots'),
-        );
-    $form->HTMLArea(
-        -name           =>'description',
-        -defaultValue   =>undef,
-        -label          =>$i18n->get("description label"),
-        -hoverHelp      =>$i18n->get("description description"),
-        -value          =>$self->getValue('description'),
+    $form->addField( "HTMLArea", 
+        name           =>'description',
+        defaultValue   =>undef,
+        label          =>$i18n->get("description label"),
+        hoverHelp      =>$i18n->get("description description"),
+        value          =>$self->description,
         );
     if ($self->getParent->canEdit) {
-        $form->user(
+        $form->addField( "user", 
             name        =>"ownerUserId",
-            value       =>$self->getValue('ownerUserId'),
+            value       =>$self->ownerUserId,
             label       =>$i18n->get('maintainer label'),
             hoverHelp   =>$i18n->get('maintainer description'),
             );
@@ -322,42 +270,42 @@ sub getEditForm {
         else{
             $userId = $self->get('ownerUserId');
         }
-        $form->hidden(
-            -name           =>'ownerUserId',
-            -value          =>$userId,
+        $form->addField( "hidden", 
+            name           =>'ownerUserId',
+            value          =>$userId,
         );
     }
-    $form->text(        
-        -name           =>'version',
-        -defaultValue   =>undef,
-        -label          =>$i18n->get("version label"),
-        -hoverHelp      =>$i18n->get("version description"),
-        -value          =>$self->getValue('version'),
+    $form->addField( "text", 
+        name           =>'version',
+        defaultValue   =>undef,
+        label          =>$i18n->get("version label"),
+        hoverHelp      =>$i18n->get("version description"),
+        value          =>$self->version,
         );
-    $form->text(
-        -name           =>'manufacturerName',
-        -defaultValue   =>undef,
-        -label          =>$i18n->get("manufacturerName label"),
-        -hoverHelp      =>$i18n->get("manufacturerName description"),
-        -value          =>$self->getValue('manufacturerName'),
+    $form->addField( "text", 
+        name           =>'manufacturerName',
+        defaultValue   =>undef,
+        label          =>$i18n->get("manufacturerName label"),
+        hoverHelp      =>$i18n->get("manufacturerName description"),
+        value          =>$self->manufacturerName,
         );
-    $form->url(
-        -name           =>'manufacturerURL',
-        -defaultValue   =>undef,
-        -label          =>$i18n->get("manufacturerURL label"),
-        -hoverHelp      =>$i18n->get("manufacturerURL description"),
-        -value          =>$self->getValue('manufacturerURL'),
+    $form->addField( "url", 
+        name           =>'manufacturerURL',
+        defaultValue   =>undef,
+        label          =>$i18n->get("manufacturerURL label"),
+        hoverHelp      =>$i18n->get("manufacturerURL description"),
+        value          =>$self->manufacturerURL,
         );
-    $form->url(
-        -name           =>'productURL',
-        -defaultValue   =>undef,
-        -label          =>$i18n->get("productURL label"),
-        -hoverHelp      =>$i18n->get("productURL description"),
-        -value          =>$self->getValue('productURL'),
+    $form->addField( "url", 
+        name           =>'productURL',
+        defaultValue   =>undef,
+        label          =>$i18n->get("productURL label"),
+        hoverHelp      =>$i18n->get("productURL description"),
+        value          =>$self->productURL,
         );
 
     foreach my $category (keys %{$self->getParent->getCategories}) {
-        $form->raw('<tr><td colspan="2"><b>'.$category.'</b></td></tr>');
+        my $fieldset = $form->addFieldset( name => $category, label => $category );
         my $attributes = $db->read("select * from Matrix_attribute where category = ? and assetId = ?",
             [$category,$matrixId]);
         while (my $attribute = $attributes->hashRef) {
@@ -377,21 +325,39 @@ sub getEditForm {
                 $attribute->{options}   = \%options;
                 $attribute->{extras}    = "style='width:120px'";
             }
-            $form->dynamicField(%{$attribute});           
+            $fieldset->addField( delete $attribute->{fieldType}, %{$attribute});
         }
     }
 
-    $form->raw(
-    '<tr><td COLSPAN=2>'.
-    WebGUI::Form::Submit($session, {}).
-    WebGUI::Form::Button($session, {
-        -value  => $i18n->get('cancel', 'WebGUI'),
-        -extras => q|onclick="history.go(-1);" class="backwardButton"|
-    }).
-    '</td></tr>'
-    );
+    my $buttons = $form->addField( "ButtonGroup", name => "saveButtons", rowClass => "saveButtons" );
+    $buttons->addButton( "Submit", { name => "send", });
+    $buttons->addButton( "Button", {
+        name => "cancel", 
+        value => $i18n->get('cancel', 'WebGUI'),
+        extras => q{onclick="history.go(-1);" class="backwardButton"},
+    } );
 
     return $form;
+}
+
+#-------------------------------------------------------------------
+
+=head2 getEditTemplate ( )
+
+Override the base method to get the template from the parent Matrix asset.
+
+=cut
+
+sub getEditTemplate {
+    my $self = shift;
+    my $var         = $self->get;
+    my $matrix      = $self->getParent;
+    my $template    = eval { WebGUI::Asset->newById($self->session, $matrix->get('editListingTemplateId')); };
+    # TODO: Change to FormBuilder
+    $var->{form}    = $self->getEditForm->toHtml;
+    $template->setParam(%{ $var });
+    $template->style($matrix->getStyleTemplateId);
+    return $template;
 }
 
 #-------------------------------------------------------------------
@@ -408,7 +374,7 @@ sub hasRated {
 
     my $hasRated = $self->session->db->quickScalar("select count(*) from MatrixListing_rating where
         ((userId=? and userId<>'1') or (userId='1' and ipAddress=?)) and listingId=?",
-        [$session->user->userId,$session->env->get("HTTP_X_FORWARDED_FOR"),$self->getId]);
+        [$session->user->userId,$session->request->env->{"HTTP_X_FORWARDED_FOR"}, $self->getId]);
     return $hasRated;
 
 }
@@ -430,7 +396,7 @@ sub incrementCounter {
     my $db      = $self->session->db;
     my $counter = shift;
     
-    my $currentIp = $self->session->env->get("HTTP_X_FORWARDED_FOR");
+    my $currentIp = $self->session->request->env->{"HTTP_X_FORWARDED_FOR"};
     
     unless ($self->get($counter."LastIp") && ($self->get($counter."LastIp") eq $currentIp)) {
         $self->update({ 
@@ -449,12 +415,13 @@ Making private. See WebGUI::Asset::indexContent() for additonal details.
 
 =cut
 
-sub indexContent {
+around indexContent => sub {
+	my $orig = shift;
 	my $self = shift;
-	my $indexer = $self->next::method;
+	my $indexer = $self->$orig(@_);
 	$indexer->setIsPublic(0);
     return undef;
-}
+};
 
 
 #-------------------------------------------------------------------
@@ -468,7 +435,7 @@ See WebGUI::Asset::prepareView() for details.
 sub prepareView {
 	my $self = shift;
 	$self->next::method();
-	my $template = WebGUI::Asset::Template->new($self->session, $self->getParent->get('detailTemplateId'));
+	my $template = WebGUI::Asset::Template->newById($self->session, $self->getParent->get('detailTemplateId'));
     $template->prepare;
 	$self->{_viewTemplate} = $template;
     return undef;
@@ -477,13 +444,13 @@ sub prepareView {
 
 #-------------------------------------------------------------------
 
-=head2 processPropertiesFromFormPost ( )
+=head2 processEditForm ( )
 
 Used to process properties from the form posted.  
 
 =cut
 
-sub processPropertiesFromFormPost {
+sub processEditForm {
 	my $self    = shift;
     my $session = $self->session;
     my $score   = 0;
@@ -550,7 +517,7 @@ purges it's data.
 
 =cut
 
-sub purge {
+override purge => sub {
 	my $self    = shift;
     my $db      = $self->session->db;
 
@@ -558,21 +525,8 @@ sub purge {
     $db->write("delete from MatrixListing_rating        where listingId=?"      ,[$self->getId]);
     $db->write("delete from MatrixListing_ratingSummary where listingId=?"      ,[$self->getId]);
 
-	return $self->next::method;
-}
-
-#-------------------------------------------------------------------
-
-=head2 purgeRevision ( )
-
-This method is called when data is purged by the system.
-
-=cut
-
-sub purgeRevision {
-	my $self = shift;
-	return $self->next::method;
-}
+	return super();
+};
 
 #-------------------------------------------------------------------
 
@@ -598,13 +552,13 @@ sub setRatings {
             $db->write("insert into MatrixListing_rating 
                 (userId, category, rating, timeStamp, listingId, ipAddress, assetId) values (?,?,?,?,?,?,?)",
                 [$session->user->userId,$category,$ratings->{$category},time(),$self->getId,
-                $session->env->get("HTTP_X_FORWARDED_FOR"),$matrixId]);
+                $session->request->env->{"HTTP_X_FORWARDED_FOR"}, $matrixId]);
         }
         my $sql     = "from MatrixListing_rating where listingId=? and category=?";
         my $sum     = $db->quickScalar("select sum(rating) $sql", [$self->getId,$category]);
         my $count   = $db->quickScalar("select count(*) $sql", [$self->getId,$category]);
         
-        my $half    = round($count/2);
+        my $half    = sprintf('%.0f', $count/2);
         my $mean    = $sum / ($count || 1);
         my $median  = $db->quickScalar("select rating $sql order by rating limit $half,1",[$self->getId,$category]);
         
@@ -690,18 +644,12 @@ sub view {
         $var->{productUrl_click}        .= ';revision='.$revisionDate;
     }
 
-    $self->session->style->setScript($self->session->url->extras('yui/build/utilities/utilities.js'),
-        {type => 'text/javascript'});
-    $self->session->style->setScript($self->session->url->extras('yui/build/datasource/datasource-min.js'),
-        {type => 'text/javascript'});
-    $self->session->style->setScript($self->session->url->extras('yui/build/datatable/datatable-min.js'),
-        {type =>'text/javascript'});
-    $self->session->style->setScript($self->session->url->extras('yui/build/button/button-min.js'),
-        {type =>'text/javascript'});
-    $self->session->style->setScript($self->session->url->extras('yui/build/json/json-min.js'),
-        {type => 'text/javascript'});
-    $self->session->style->setLink($self->session->url->extras('yui/build/datatable/assets/skins/sam/datatable.css'),
-        {type =>'text/css', rel=>'stylesheet'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/utilities/utilities.js'));
+    $self->session->style->setScript($self->session->url->extras('yui/build/datasource/datasource-min.js'));
+    $self->session->style->setScript($self->session->url->extras('yui/build/datatable/datatable-min.js'));
+    $self->session->style->setScript($self->session->url->extras('yui/build/button/button-min.js'));
+    $self->session->style->setScript($self->session->url->extras('yui/build/json/json-min.js'));
+    $self->session->style->setCss($self->session->url->extras('yui/build/datatable/assets/skins/sam/datatable.css'));
 
     # Attributes
    
@@ -816,7 +764,7 @@ sub view {
     $mailForm->email(
         -extras     =>'class="content"',
         -name       =>"from",
-        -value      =>$session->user->profileField("email"),
+        -value      =>$session->user->get("email"),
         -label      =>$i18n->get('your email label'),
         );
     $mailForm->selectBox(
@@ -863,10 +811,10 @@ sub www_click {
 
     $self->incrementCounter('clicks');
     if ($session->form->process("manufacturer")) {
-        $session->http->setRedirect( $self->get('manufacturerURL') );
+        $session->response->setRedirect( $self->get('manufacturerURL') );
     }
     else {
-        $session->http->setRedirect( $self->get('productURL') );
+        $session->response->setRedirect( $self->get('productURL') );
     }
     return undef;
 }
@@ -891,32 +839,6 @@ sub www_deleteStickied {
 
 #-------------------------------------------------------------------
 
-=head2 www_edit ( )
-
-Web facing method which is the default edit page
-
-=cut
-
-sub www_edit {
-    my $self = shift;
-    my $i18n = WebGUI::International->new($self->session, "Asset_MatrixListing");
-
-    if($self->session->form->process('func') eq 'add'){
-        return $self->session->privilege->noAccess() unless $self->getParent->canAddMatrixListing();
-    }else{
-        return $self->session->privilege->insufficient() unless $self->canEdit;
-        return $self->session->privilege->locked() unless $self->canEditIfLocked;
-    }
-
-    my $var         = $self->get;
-    my $matrix      = $self->getParent;
-    $var->{form}    = $self->getEditForm->print;
-        
-    return $matrix->processStyle($self->processTemplate($var,$matrix->get("editListingTemplateId")));
-}
-
-#-------------------------------------------------------------------
-
 =head2 www_getAttributes ( )
 
 Gets a listings attributes grouped by category as json.
@@ -931,7 +853,7 @@ sub www_getAttributes {
 
     return $session->privilege->noAccess() unless $self->canView;
 
-    $session->http->setMimeType("application/json");
+    $session->response->content_type("application/json");
 
     my @results;
     my @categories  = keys %{$self->getParent->getCategories};
@@ -978,7 +900,7 @@ sub www_getScreenshots {
 
     return $self->session->privilege->noAccess() unless $self->canView;
 
-    $self->session->http->setMimeType('text/xml');
+    $self->session->response->content_type('text/xml');
 
     my $xml = qq |<?xml version="1.0" encoding="UTF-8"?>
 <content>
@@ -1004,7 +926,7 @@ sub www_getScreenshots {
             <thumb_source>".$storage->getUrl($thumb)."</thumb_source>
             <width>".$width."</width>
             <height>".$height."</height>
-        </slide>            
+        </slide>
             ";
             }
         }
@@ -1032,7 +954,7 @@ sub www_getScreenshotsConfig {
 
     return $self->session->privilege->noAccess() unless $self->canView;
 
-    $self->session->http->setMimeType('text/xml');
+    $self->session->response->content_type('text/xml');
 
     return $self->processTemplate($var,$self->getParent->get("screenshotsConfigTemplateId"));
 }
@@ -1094,7 +1016,7 @@ sub www_sendEmail {
         if ($form->process("body") ne "") {
             my $user = WebGUI::User->new($self->session, $self->get('maintainerId'));
             my $mail = WebGUI::Mail::Send->create($self->session,{
-                        to      =>$user->profileField("email"),
+                        to      =>$user->get("email"),
                         subject =>$self->get('productName')." - ".$form->process("subject"),
                         from=>$form->process("from")
                 });
@@ -1160,6 +1082,8 @@ sub www_viewScreenshots {
 
     return $self->processTemplate($var,$self->getParent->get("screenshotsTemplateId"));
 }
+
+__PACKAGE__->meta->make_immutable;
 1;
 
 #vim:ft=perl

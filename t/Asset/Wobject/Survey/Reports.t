@@ -4,8 +4,6 @@
 
 use strict;
 use warnings;
-use FindBin;
-use lib "$FindBin::Bin/../../../lib";
 use Test::More;
 use Test::Deep;
 use Data::Dumper;
@@ -19,13 +17,12 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-my $tests = 2;
-plan tests => $tests + 1;
+plan tests => 3;
 
 #----------------------------------------------------------------------------
 # put your tests here
 
-my $usedOk = use_ok('WebGUI::Asset::Wobject::Survey');
+use_ok('WebGUI::Asset::Wobject::Survey');
 
 my $user = WebGUI::User->new( $session, 'new' );
 WebGUI::Test->addToCleanup($user);
@@ -39,7 +36,7 @@ isa_ok($survey, 'WebGUI::Asset::Wobject::Survey');
 # Returns the contents of the Survey_tempReport table
 sub getAll { $session->db->buildArrayRefOfHashRefs('select * from Survey_tempReport where assetId = ?', [$survey->getId]) }
 
-my $sJSON = $survey->surveyJSON;
+my $sJSON = $survey->getSurveyJSON;
 
 # Load bare-bones survey, containing a single section (S0)
 $sJSON->update([0], { variable => 'S0' });
@@ -124,6 +121,5 @@ superhashof({
     isCorrect => 1,
     value => 20, # e.g. score
 })]);
-
 
 #vim:ft=perl

@@ -3,7 +3,7 @@ package WebGUI::Form::HTMLArea;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -156,9 +156,12 @@ Set the head tags for this form plugin
 
 sub headTags {
     my $self = shift;
-    $self->session->style->setScript($self->session->url->extras('textFix.js'),{ type=>'text/javascript' });
-    $self->{_richEdit} ||= WebGUI::Asset::RichEdit->new($self->session,$self->get("richEditId")); 
-    $self->{_richEdit}->richedit_headTags if $self->{_richEdit};
+    if (! $self->{_richEdit}) {
+        $self->{_richEdit} = eval { WebGUI::Asset->newById($self->session,$self->get("richEditId")) };
+        return if Exception::Class->caught();
+    }
+    $self->session->style->setScript($self->session->url->extras('textFix.js'));
+    $self->{_richEdit}->richedit_headTags;
 }
 
 #-------------------------------------------------------------------
@@ -184,21 +187,20 @@ Renders an HTML area field.
 sub toHtml {
 	my $self = shift;
     ##Do not display a rich editor on any mobile browser.
-    if ($self->session->style->mobileBrowser) {
+    if ($self->session->request->browser->mobile) {
         return $self->SUPER::toHtml;
     }
-    my $i18n = WebGUI::International->new($self->session);
-	my $richEdit = $self->{_richEdit};
-    $richEdit ||= WebGUI::Asset::RichEdit->new($self->session,$self->get("richEditId")); 
-	if (defined $richEdit) {
-	   $self->set("extras", $self->get('extras') . q{ onblur="fixChars(this.form['}.$self->get("name").q{'])" mce_editable="true" });
-	   $self->set("resizable", 0);
-	   return $self->SUPER::toHtml.$richEdit->getRichEditor($self->get('id'));
-    } else {
-	   $self->session->errorHandler->warn($i18n->get('rich editor load error','Form_HTMLArea'));
-	   return $self->SUPER::toHtml;
-	}
-
+	my $i18n = WebGUI::International->new($self->session);
+    if (! $self->{_richEdit}) {
+        my $richEdit = eval { WebGUI::Asset::RichEdit->newById($self->session, $self->get("richEditId")); };
+        if (Exception::Class->caught() ) {
+            $self->session->log->warn($i18n->get('rich editor load error','Form_HTMLArea'));
+            return $self->SUPER::toHtml;
+        }
+    }
+    $self->set("extras", $self->get('extras') . q{ onblur="fixChars(this.form['}.$self->get("name").q{'])" mce_editable="true" });
+    $self->set("resizable", 0);
+    return $self->SUPER::toHtml.$self->{_richEdit}->getRichEditor($self->get('id'));
 }
 
 #-------------------------------------------------------------------
@@ -211,8 +213,8 @@ Asset picker for the rich editor.
 
 sub www_pageTree {
     my $session = shift;
-    $session->http->setCacheControl("none");
-    $session->style->setLink($session->url->extras('/tinymce-webgui/plugins/wgpagetree/css/pagetree.css'),{ type=>'text/css', rel=>"stylesheet" });
+    $session->response->setCacheControl("none");
+    $session->style->setCss($session->url->extras('/tinymce-webgui/plugins/wgpagetree/css/pagetree.css'));
     $session->style->setRawHeadTags(<<"JS");
 <style type="text/css">body { margin: 0 }</style>
 <script type="text/javascript">//<![CDATA[
@@ -268,8 +270,8 @@ Each link display a thumbnail of the image via www_viewThumbnail.
 
 sub www_imageTree {
     my $session = shift;
-    $session->http->setCacheControl("none");
-    $session->style->setLink($session->url->extras('/tinymce-webgui/plugins/wginsertimage/css/insertimage.css'),{ type=>'text/css', rel=>"stylesheet" });
+    $session->response->setCacheControl("none");
+    $session->style->setCss($session->url->extras('/tinymce-webgui/plugins/wginsertimage/css/insertimage.css'));
     $session->style->setRawHeadTags(<<"JS");
 <style type="text/css">body { margin: 0 }</style>
 <script type="text/javascript">//<![CDATA[
@@ -347,8 +349,8 @@ URL in the session object is used to determine which Image is used.
 
 sub www_viewThumbnail {
     my $session = shift;
-    $session->http->setCacheControl("none");
-    $session->style->setLink($session->url->extras('/tinymce-webgui/plugins/wginsertimage/css/insertimage.css'),{ type=>'text/css', rel=>"stylesheet" });
+    $session->response->setCacheControl("none");
+    $session->style->setCss($session->url->extras('/tinymce-webgui/plugins/wginsertimage/css/insertimage.css'));
     my $image = WebGUI::Asset->newByUrl($session);
     my $i18n = WebGUI::International->new($session);
     my $output = '<div class="preview">';
@@ -373,7 +375,7 @@ Returns a form to add a folder using the rich editor. The purpose of this featur
 
 sub www_addFolder {
 	my $session = shift;
-	$session->http->setCacheControl("none");
+	$session->response->setCacheControl("none");
 	my $i18n = WebGUI::International->new($session, 'Operation_FormHelpers');
 	my $f = WebGUI::HTMLForm->new($session);
 	$f->hidden(
@@ -414,7 +416,7 @@ Creates a directory under the current asset. The filename should be specified in
 
 sub www_addFolderSave {
 	my $session = shift;
-	$session->http->setCacheControl("none");
+	$session->response->setCacheControl("none");
 	# get base url
 	my $base = WebGUI::Asset->newByUrl($session) || WebGUI::Asset->getRoot($session);
 	# check if user can edit the current asset
@@ -451,7 +453,7 @@ sub www_addFolderSave {
 		#filename                 => $filename,
 		});
     WebGUI::VersionTag->autoCommitWorkingIfEnabled($session, { allowComments => 0 });
-	$session->http->setRedirect($base->getUrl('op=formHelper;class=HTMLArea;sub=imageTree'));
+	$session->response->setRedirect($base->getUrl('op=formHelper;class=HTMLArea;sub=imageTree'));
 	return undef;
 }
 
@@ -465,7 +467,7 @@ Returns a form to add an image using the rich editor. The purpose of this featur
 
 sub www_addImage {
 	my $session = shift;
-	$session->http->setCacheControl("none");
+	$session->response->setCacheControl("none");
 	my $i18n = WebGUI::International->new($session, 'Operation_FormHelpers');
 	my $f = WebGUI::HTMLForm->new($session);
 	$f->hidden(
@@ -506,7 +508,7 @@ Creates an Image asset under the current asset. The filename should be specified
 
 sub www_addImageSave {
 	my $session = shift;
-	$session->http->setCacheControl("none");
+	$session->response->setCacheControl("none");
 	# get base asset
 	my $base = WebGUI::Asset->newByUrl($session) || WebGUI::Asset->getRoot($session);
 
@@ -537,7 +539,7 @@ sub www_addImageSave {
         $child->applyConstraints;
     }
     WebGUI::VersionTag->autoCommitWorkingIfEnabled($session, { allowComments => 0 });
-    $session->http->setRedirect($base->getUrl('op=formHelper;class=HTMLArea;sub=imageTree'));
+    $session->response->setRedirect($base->getUrl('op=formHelper;class=HTMLArea;sub=imageTree'));
     return undef;
 }
 

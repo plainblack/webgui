@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -8,16 +8,13 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/lib";
 
 use WebGUI::Test;
 use WebGUI::Session;
 use Data::Dumper;
+use Test::More;
 use Test::Deep;
-
-use Test::More tests => 57; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -145,6 +142,8 @@ my $setRowId = $session->db->setRow("incrementer","incrementerId",{incrementerId
 ok($setRowId ne "", "setRow() - return ID");
 my ($setRowResult) = $session->db->quickArray("select nextValue from incrementer where incrementerId=".$session->db->quote($setRowId));
 is($setRowResult, 47, "setRow() - set data");
+is $session->db->setRow("incrementer", "incrementerId",{incrementerId=>'new', nextValue => 48}, 'oogeyBoogeyBoo'),
+   'oogeyBoogeyBoo', 'overriding default id with a custom one';
 
 # getRow
 my $getRow = $session->db->getRow("incrementer","incrementerId",$setRowId);
@@ -174,9 +173,9 @@ SKIP: {
 	skip("No InnoDB tables in this MySQL.  Skipping all transaction related tests.",7) if (lc $mysqlVariables{have_innodb} ne 'yes');
     $session->db->dbh->do('DROP TABLE IF EXISTS testTable');
     $session->db->dbh->do('CREATE TABLE testTable (myIndex int(8) NOT NULL default 0, message CHAR(64), PRIMARY KEY(myIndex)) TYPE=InnoDB');
-    addToCleanup( SQL => 'DROP TABLE testTable' );
+    WebGUI::Test->addToCleanup( SQL => 'DROP TABLE testTable' );
 
-    my $dbh2 = WebGUI::SQL->connect($session,$session->config->get("dsn"), $session->config->get("dbuser"), $session->config->get("dbpass"));
+    my $dbh2 = WebGUI::SQL->connect($session->config->get("dsn"), $session->config->get("dbuser"), $session->config->get("dbpass"));
     my ($sth, $sth2, $rc);
 
     $sth  = $session->db->prepare('select myIndex from testTable');
@@ -310,3 +309,4 @@ $session->db->write(
 );
 ok( $session->db->quickCSV( 'SELECT * FROM testTable' ), 'get some output even with newlines in data' );
 
+done_testing();

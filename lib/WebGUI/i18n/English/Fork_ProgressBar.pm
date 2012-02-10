@@ -3,6 +3,11 @@ package WebGUI::i18n::English::Fork_ProgressBar;
 use strict;
 
 our $I18N = {
+    'link to this page' => {
+		message     => 'Link to this page',
+        lastUpdated => 1288884190,
+        context     => 'Label for the link to this status page',
+    },
 	'time elapsed' => {
 		message     => 'Time Elapsed',
 		lastUpdated => 1286466369,

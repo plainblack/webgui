@@ -3,7 +3,7 @@ package WebGUI::Asset::Wobject::AssetReport;
 $VERSION = "1.0.0";
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -16,10 +16,35 @@ use strict;
 use Tie::IxHash;
 use WebGUI::International;
 use WebGUI::Paginator;
-use WebGUI::Utility;
-use Class::C3;
 use WebGUI::Form::AssetReportQuery;
-use base qw/WebGUI::Asset::Wobject/;
+
+use Moose;
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset::Wobject';
+
+define   assetName         => ['assetName', 'Asset_AssetReport'];
+define   tableName         => 'AssetReport';
+property settings => (
+            tab          => 'properties',
+            fieldType    => 'AssetReportQuery',
+            default      => undef,
+            label        => '',
+         );
+property templateId => (
+            tab          => "display",
+            fieldType    => "template",
+            namespace    => "AssetReport",
+            default      => "sJtcUCfn0CVbKdb4QM61Yw",
+            label        => ["templateId label", 'Asset_AssetReport'],
+            hoverHelp    => ["templateId description", 'Asset_AssetReport'],
+         );
+property paginateAfter => (
+            tab             => 'display',
+            fieldType       => 'integer',
+            default         => 25,
+            label           => [ 'paginateAfter label' , 'Asset_AssetReport'],
+            hoverHelp       => [ 'paginateAfter description' , 'Asset_AssetReport'],
+         );
 
 
 #-------------------------------------------------------------------
@@ -38,57 +63,12 @@ The session variable.
 
 =cut
 
-sub canAdd {
+around canAdd => sub {
+    my $orig  = shift;
 	my $class = shift;
 	my $session = shift;
-	$class->SUPER::canAdd($session, undef, '3');
-}
-
-#-------------------------------------------------------------------
-
-=head2 definition ( session, definition )
-
-=cut
-
-sub definition {
-    my $class      = shift;
-    my $session    = shift;
-    my $definition = shift;
-    my $i18n       = WebGUI::International->new( $session, 'Asset_AssetReport' );
-
-    tie my %properties, 'Tie::IxHash', (
-        settings => {
-            tab          => 'properties',
-            fieldType    => 'AssetReportQuery',
-            defaultValue => undef,
-        },
-        templateId => {
-            tab          => "display",
-            fieldType    => "template",
-            namespace    => "AssetReport",
-            defaultValue => "sJtcUCfn0CVbKdb4QM61Yw",
-            label        => $i18n->get("templateId label"),
-            hoverHelp    => $i18n->get("templateId description"),
-        },
-        paginateAfter => {
-            tab             => 'display',
-            fieldType       => 'integer',
-            defaultValue    => 25,
-            label           => $i18n->get( 'paginateAfter label' ),
-            hoverHelp       => $i18n->get( 'paginateAfter description' ),
-        },
-    );
-
-    push @{$definition}, {
-        assetName         => $i18n->get('assetName'),
-        autoGenerateForms => 1,
-        tableName         => 'AssetReport',
-        className         => 'WebGUI::Asset::Wobject::AssetReport',
-        properties        => \%properties,
-    };
-
-    return $class->SUPER::definition( $session, $definition );
-}
+	return $class->$orig($session, undef, '3');
+};
 
 
 #----------------------------------------------------------------------------
@@ -99,13 +79,14 @@ Prepare the view. Add stuff to HEAD.
 
 =cut
 
-sub prepareView {
+around prepareView => sub {
+    my $orig = shift;
     my $self = shift;
-    $self->SUPER::prepareView(@_);
+    $self->$orig(@_);
     my $session = $self->session;
 
     # Prepare the template
-    my $template = WebGUI::Asset::Template->new( $session, $self->get("templateId") );
+    my $template = WebGUI::Asset::Template->new( $session, $self->templateId );
     if (!$template) {
         WebGUI::Error::ObjectNotFound::Template->throw(
             error      => qq{Template not found},
@@ -117,7 +98,7 @@ sub prepareView {
     $self->{_template} = $template;
 
     return;
-}
+};
 
 #----------------------------------------------------------------------------
 
@@ -135,12 +116,12 @@ sub getTemplateVars {
     my $var      = $self->get;
 
     #Build the lineage query
-    my $settings = JSON->new->decode($self->getValue("settings"));
+    my $settings = JSON->new->decode($self->settings);
 
     #TO DO - ADD CACHE CONTROL
 
     my $assetId  = $settings->{startNode};
-    my $asset    = WebGUI::Asset->newByDynamicClass($session,$assetId);
+    my $asset    = WebGUI::Asset->newById($session,$assetId);
 
     my $rules               = {};
     $rules->{'isa'}         = $settings->{className};
@@ -182,14 +163,15 @@ sub getTemplateVars {
     }
     my $sql = $asset->getLineageSql(["descendants"],$rules);
 
-    my $p    = WebGUI::Paginator->new($session,$self->getUrl,$self->get("paginateAfter"));
+    my $p    = WebGUI::Paginator->new($session,$self->getUrl,$self->paginateAfter);
     $p->setDataByQuery($sql);
 
     #Build the data for all the assets on the page
     $var->{'asset_loop'} = [];
     my $data = $p->getPageData;
     foreach my $row (@{$data}) {
-        my $returnAsset = WebGUI::Asset->new($session,$row->{assetId},$row->{className},$row->{revisionDate});
+        my $returnAsset = eval { WebGUI::Asset->newById($session, $row->{assetId}); };
+        next ROW if Exception::Class->caught();
         push(@{$var->{'asset_loop'}}, {
                 %{$returnAsset->get}, 
                 %{$returnAsset->getMetaDataAsTemplateVariables}
@@ -219,10 +201,10 @@ sub secure_identifier {
     if(scalar(@parts) > 1) {
         my $table  = $parts[0];
         my $column = $parts[1];
-        $identifier = $db->dbh->quote_identifier($table).".".$db->dbh->quote_identifier($column);
+        $identifier = $db->quote_identifier($table).".".$db->dbh->quote_identifier($column);
     }
     else {
-        $identifier = $db->dbh->quote_identifier($identifier);
+        $identifier = $db->quote_identifier($identifier);
     }
     
     return $identifier;

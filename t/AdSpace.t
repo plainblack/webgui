@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -8,12 +8,11 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/lib";
 use WebGUI::Test;
 use WebGUI::Session;
 use WebGUI::AdSpace::Ad;
+use WebGUI::AdSpace;
 
 use Test::More;
 use Test::Deep;
@@ -30,18 +29,15 @@ my $newAdSpaceSettings = {
 
 my $numTests = 35; # increment this value for each test you create
 $numTests += 2 * scalar keys %{ $newAdSpaceSettings };
-++$numTests; ##For conditional testing on module load
 
 plan tests => $numTests;
-
-my $loaded = use_ok('WebGUI::AdSpace');
 
 my $session = WebGUI::Test->session;
 my ($adSpace, $alfred, $alfred2, $bruce, $catWoman, );
 my ($jokerAd, $penguinAd, $twoFaceAd);
 
-local $ENV{REMOTE_ADDR} = '10.0.0.1';
-local $ENV{HTTP_USER_AGENT} = 'Mozilla/5.0';
+$session->request->env->{REMOTE_ADDR} = '10.0.0.1';
+$session->request->env->{HTTP_USER_AGENT} = 'Mozilla/5.0';
 
 $adSpace = WebGUI::AdSpace->create($session, {name=>"Alfred"});
 

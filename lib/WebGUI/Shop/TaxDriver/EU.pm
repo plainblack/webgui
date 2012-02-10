@@ -3,7 +3,7 @@ package WebGUI::Shop::TaxDriver::EU;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -17,8 +17,6 @@ package WebGUI::Shop::TaxDriver::EU;
 use strict;
 
 use WebGUI::Content::Account;
-use WebGUI::TabForm;
-use WebGUI::Utility qw{ isIn };
 use WebGUI::International;
 
 use Business::Tax::VAT::Validation;
@@ -26,6 +24,45 @@ use JSON qw{ to_json };
 use Tie::IxHash;
 
 use base qw{ WebGUI::Shop::TaxDriver };
+use Moose;
+use WebGUI::Definition;
+extends 'WebGUI::Shop::TaxDriver';
+
+property taxGroups => (
+    fieldType  => 'text',
+    noFormPost => 1,
+    default    => sub { [] },
+);
+
+property shopCountry => (
+    fieldType  => 'text',
+    noFormPost => 1,
+    default    => '',
+);
+
+property userTemplateId => (
+    fieldType  => 'text',
+    noFormPost => 1,
+    default    => '',
+);
+
+property automaticViesApproval => (
+    fieldType  => 'text',
+    noFormPost => 1,
+    default    => '',
+);
+
+property acceptOnViesUnavailable => (
+    fieldType  => 'text',
+    noFormPost => 1,
+    default    => '',
+);
+
+property defaultGroup => (
+    fieldType  => 'text',
+    noFormPost => 1,
+    default    => '',
+);
 
 =head1 NAME
 
@@ -200,18 +237,6 @@ sub appendCartItemVars {
 
 #-------------------------------------------------------------------
 
-=head2 className
-
-Returns the name of this class.
-
-=cut
-
-sub className {
-    return 'WebGUI::Shop::TaxDriver::EU';
-}
-
-#-------------------------------------------------------------------
-
 =head2 deleteGroup ( groupId )
 
 Deletes a tax group.
@@ -265,13 +290,13 @@ sub deleteVATNumber {
     
 #-----------------------------------------------------------
 
-=head2 getConfigurationScreen ( )
+=head2 getEditForm ( )
 
 Returns the form that contains the configuration options for this plugin in the admin console.
 
 =cut
 
-sub getConfigurationScreen {
+sub getEditForm {
     my $self    = shift;
     my $session = $self->session;
     my $i18n    = WebGUI::International->new( $session, 'TaxDriver_EU' );
@@ -284,48 +309,48 @@ sub getConfigurationScreen {
     );
 
     # General setting form
-    my $f = WebGUI::HTMLForm->new( $session );
-    $f->hidden(
+    my $f = WebGUI::FormBuilder->new( $session );
+    $f->addField( "hidden",
         name        => 'shop',
         value       => 'tax',
     );
-    $f->hidden(
+    $f->addField( "hidden",
         name        => 'method',
         value       => 'do',
     );
-    $f->hidden(
+    $f->addField( "hidden",
         name        => 'do',
         value       => 'saveConfiguration',
     );
-    $f->selectBox(
+    $f->addField( "selectBox",
         name        => 'shopCountry',
         value       => $self->get( 'shopCountry' ),
         label       => $i18n->get('shop country'),
         hoverHelp   => $i18n->get('shop country help'),
         options     => \%countryOptions,
     );
-    $f->template(
+    $f->addField( "template",
         name        => 'userTemplateId',
         value       => $self->get('userTemplateId'),
         label       => $i18n->get('user template'),
         hoverHelp   => $i18n->get('user template help'), 
         namespace   => 'TaxDriver/EU/User',
     );
-    $f->yesNo(
+    $f->addField( "yesNo",
         name        => 'automaticViesApproval',
         value       => $self->get('automaticViesApproval'),
         label       => $i18n->get('auto vies approval'),
         hoverHelp   => $i18n->get('auto vies approval help'),
     );
-    $f->yesNo(
+    $f->addField( "yesNo",
         name        => 'acceptOnViesUnavailable',
         value       => $self->get('acceptOnViesUnavailable'),
         label       => $i18n->get('accept when vies unavailable'),
         hoverHelp   => $i18n->get('accept when vies unavailable help'),
     );
 
-    $f->submit;
-    my $general = $f->print;
+    $f->addField( "submit", name => "send" );
+    my $general = $f->toHtml;
 
     # VAT groups manager
     my $vatGroups = 
@@ -339,25 +364,25 @@ sub getConfigurationScreen {
         . $i18n->get('rate')
         . WebGUI::Form::float(  $session, { name => 'rate' } )
         . '%'
-        . WebGUI::Form::submit( $session, { value => 'Add' } )
+        . WebGUI::Form::submit( $session, { name => 'send', value => 'Add' } )
         . WebGUI::Form::formFooter( $session );
 
     # Wrap output in a YUI Tab widget.
     my ($style, $url) = $session->quick( qw{ style url } );
-	$style->setLink($self->{_css},{rel=>"stylesheet", rel=>"stylesheet",type=>"text/css"});
-	$style->setLink($url->extras('/yui/build/fonts/fonts-min.css'),{type=>"text/css", rel=>"stylesheet"});
-	$style->setLink($url->extras('/yui/build/tabview/assets/skins/sam/tabview.css'),{type=>"text/css", rel=>"stylesheet"});
-	$style->setLink($url->extras('/yui/build/button/assets/skins/sam/button.css'),{type=>"text/css", rel=>"stylesheet"});
-    $style->setLink($url->extras('/yui/build/container/assets/container.css'),{ type=>'text/css', rel=>"stylesheet" });
-    $style->setLink($url->extras('/hoverhelp.css'),{ type=>'text/css', rel=>"stylesheet" });
-    $style->setLink($url->extras('yui/build/datatable/assets/skins/sam/datatable.css'), {rel=>'stylesheet', type => 'text/CSS'});
-    $style->setScript($url->extras('/yui/build/utilities/utilities.js'),{ type=>'text/javascript' });
-    $style->setScript($url->extras('/yui/build/container/container-min.js'),{ type=>'text/javascript' });
-    $style->setScript($url->extras('/yui/build/tabview/tabview-min.js'),{ type=>'text/javascript' });
-    $style->setScript($url->extras('/hoverhelp.js'),{ type=>'text/javascript' });
-    $style->setScript($url->extras('yui/build/datasource/datasource-min.js'), {type => 'text/javascript'});
-    $style->setScript($url->extras('yui/build/datatable/datatable-min.js'), {type => 'text/javascript'});
-    $style->setScript($url->extras('yui/build/button/button-min.js'), {type => 'text/javascript'});
+	$style->setCss($self->{_css});
+	$style->setCss($url->extras('/yui/build/fonts/fonts-min.css'));
+	$style->setCss($url->extras('/yui/build/tabview/assets/skins/sam/tabview.css'));
+	$style->setCss($url->extras('/yui/build/button/assets/skins/sam/button.css'));
+    $style->setCss($url->extras('/yui/build/container/assets/container.css'));
+    $style->setCss($url->extras('/hoverhelp.css'));
+    $style->setCss($url->extras('yui/build/datatable/assets/skins/sam/datatable.css'));
+    $style->setScript($url->extras('/yui/build/utilities/utilities.js'));
+    $style->setScript($url->extras('/yui/build/container/container-min.js'));
+    $style->setScript($url->extras('/yui/build/tabview/tabview-min.js'));
+    $style->setScript($url->extras('/hoverhelp.js'));
+    $style->setScript($url->extras('yui/build/datasource/datasource-min.js'));
+    $style->setScript($url->extras('yui/build/datatable/datatable-min.js'));
+    $style->setScript($url->extras('yui/build/button/button-min.js'));
    
     my $generalLabel    = $i18n->get('general configuration');
     my $groupsLabel     = $i18n->get('vat groups');
@@ -656,7 +681,7 @@ sub getUserScreen {
 
     $var->{ addVatNumber_form } = $f->print;
 
-    my $template = WebGUI::Asset::Template->new( $self->session, $self->get('userTemplateId') );
+    my $template = WebGUI::Asset::Template->newById( $self->session, $self->get('userTemplateId') );
 
     return $template->process( $var );
 }
@@ -980,7 +1005,7 @@ sub www_addVATNumber {
     my ($countryCode, $number) = $vatNumber =~ m/^([A-Z]{2})([A-Z0-9]+)$/;    
 
     my $errorMessage;
-    $errorMessage = $i18n->get('illegal country code')      unless isIn( $countryCode, keys %EU_COUNTRIES );
+    $errorMessage = $i18n->get('illegal country code')      unless exists $EU_COUNTRIES{$countryCode};
     $errorMessage = $i18n->get('already has vat number')    if     @{ $self->getVATNumbers( $countryCode ) };
     $errorMessage = $self->addVATNumber( $vatNumber )       unless $errorMessage;
 
@@ -1053,7 +1078,7 @@ sub www_getTaxGroupsAsJSON {
         $group->{ isDefault     } = 1 if $id eq $self->get( 'defaultGroup' );
     }
 
-    $self->session->http->setMimeType( 'application/json' );
+    $self->session->response->content_type( 'application/json' );
     return to_json( { records => $taxGroups  } );
 }
 
@@ -1132,7 +1157,7 @@ sub www_getVATNumbersAsJSON {
         push @numbers, $number;
     }
 
-    $self->session->http->setMimeType( 'application/json' );
+    $self->session->response->content_type( 'application/json' );
     return to_json( { records => \@numbers } );
 }
 

@@ -1,7 +1,7 @@
 package WebGUI::Operation::Cron;
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -17,7 +17,7 @@ use WebGUI::HTMLForm;
 use WebGUI::International;
 use WebGUI::Workflow::Cron;
 use WebGUI::Workflow::Instance;
-use WebGUI::Utility;
+use Net::CIDR::Lite;
 
 =head1 NAME
 
@@ -269,10 +269,10 @@ Checks to ensure the requestor is who we think it is, and then executes a cron j
 
 sub www_runCronJob {
         my $session = shift;
-	$session->http->setMimeType("text/plain");
-	$session->http->setCacheControl("none");
-	unless (isInSubnet($session->env->getIp, $session->config->get("spectreSubnets")) || canView($session)) {
-		$session->errorHandler->security("make a Spectre cron job runner request, but we're only allowed to accept requests from ".join(",",@{$session->config->get("spectreSubnets")}).".");
+	$session->response->content_type("text/plain");
+	$session->response->setCacheControl("none");
+	unless (Net::CIDR::Lite->new(@{ $session->config->get('spectreSubnets') })->find($session->request->address) || canView($session)) {
+		$session->log->security("make a Spectre cron job runner request, but we're only allowed to accept requests from ".join(",",@{$session->config->get("spectreSubnets")}).".");
         	return "error";
 	}
 	my $taskId = $session->form->param("taskId");
@@ -292,13 +292,13 @@ sub www_runCronJob {
                     });
                 if ( !$instance ) {
                     if ($session->stow->get('singletonWorkflowClash')) {
-                        $session->errorHandler->warn( 
+                        $session->log->warn( 
                             "Could not create workflow instance for workflowId '" . $task->get( "workflowId" )
                             . "' from taskId '".$taskId."': It is a singleton workflow and is still running from the last invocation."
                         );
                         return "done";
                     }
-                    $session->errorHandler->error( 
+                    $session->log->error( 
                         "Could not create workflow instance for workflowId '" . $task->get( "workflowId" )
                         . "' from taskId '".$taskId."': The result was undefined"
                     );
@@ -316,7 +316,7 @@ sub www_runCronJob {
         $task->delete( 1 ) if ( $task->get("runOnce") );
         return "done";
 	}
-	$session->errorHandler->warn("No task ID passed to cron job runner.");
+	$session->log->warn("No task ID passed to cron job runner.");
 	return "error";
 }
 

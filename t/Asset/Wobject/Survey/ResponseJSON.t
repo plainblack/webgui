@@ -4,8 +4,6 @@
 
 use strict;
 use warnings;
-use FindBin;
-use lib "$FindBin::Bin/../../../lib";
 use Test::More;
 use Test::Deep;
 use Test::MockObject::Extends;
@@ -336,7 +334,6 @@ cmp_deeply($rJSON->responseScores(indexBy => 'variable'), { s1q0 => 100, s1q1 =>
 #
 ####################################################
 # Turn on the survey Expression Engine
-WebGUI::Test->originalConfig('enableSurveyExpressionEngine');
 $session->config->set('enableSurveyExpressionEngine', 1);
 $rJSON->survey->section([0])->{variable} = 's0';
 $rJSON->survey->question([0,0])->{variable} = 's0q0'; # surveyOrder index = 0

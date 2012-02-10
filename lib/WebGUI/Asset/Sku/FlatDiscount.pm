@@ -3,7 +3,7 @@ package WebGUI::Asset::Sku::FlatDiscount;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -15,8 +15,56 @@ package WebGUI::Asset::Sku::FlatDiscount;
 =cut
 
 use strict;
-use Tie::IxHash;
-use base 'WebGUI::Asset::Sku';
+use Moose;
+use WebGUI::Definition::Asset;
+extends 'WebGUI::Asset::Sku';
+define assetName           => ['assetName', 'Asset_FlatDiscount'];
+define icon                => 'FlatDiscount.gif';
+define tableName           => 'FlatDiscount';
+property templateId => (
+            tab             => "display",
+            fieldType       => "template",
+            namespace       => "FlatDiscount",
+            default         => "63ix2-hU0FchXGIWkG3tow",
+            label           => ["template", 'Asset_FlatDiscount'],
+            hoverHelp       => ["template help", 'Asset_FlatDiscount'],
+         );
+property mustSpend => (
+            tab             => "shop",
+            fieldType       => "float",
+            default         => 0.00,
+            label           => ["must spend", 'Asset_FlatDiscount'],
+            hoverHelp       => ["must spend help", 'Asset_FlatDiscount'],
+         );
+property percentageDiscount => (
+            tab             => "shop",
+            fieldType       => "integer",
+            default         => 0,
+            label           => ["percentage discount", 'Asset_FlatDiscount'],
+            hoverHelp       => ["percentage discount help", 'Asset_FlatDiscount'],
+         );
+property priceDiscount => (
+            tab             => "shop",
+            fieldType       => "float",
+            default         => 0.00,
+            label           => ["price discount", 'Asset_FlatDiscount'],
+            hoverHelp       => ["price discount help", 'Asset_FlatDiscount'],
+         );
+property thankYouMessage => (
+            tab             => "properties",
+            builder         => '_thankYouMessage_default',
+            lazy            => 1,
+            fieldType       => "HTMLArea",
+            label           => ["thank you message", 'Asset_FlatDiscount'],
+            hoverHelp       => ["thank you message help", 'Asset_FlatDiscount'],
+         );
+sub _thankYouMessage_default {
+    my $session = shift->session;
+	my $i18n = WebGUI::International->new($session, "Asset_FlatDiscount");
+    return $i18n->get("default thank you message");
+}
+
+
 use WebGUI::Asset::Template;
 use WebGUI::Form;
 
@@ -50,77 +98,14 @@ Checks to make sure there isn't already a coupon of this type in the cart.
 
 =cut
 
-sub addToCart {
-    my ($self, $options) = @_;
+override addToCart => sub {
+    my ($self) = @_;
 	my $found = $self->hasCoupon();
 	unless ($found) {
         $self->{_hasAddedToCart} = 1;
-		$self->SUPER::addToCart($options);
+		super();
 	}
-}
-
-#-------------------------------------------------------------------
-
-=head2 definition
-
-=cut
-
-sub definition {
-	my $class = shift;
-	my $session = shift;
-	my $definition = shift;
-	my %properties;
-	tie %properties, 'Tie::IxHash';
-	my $i18n = WebGUI::International->new($session, "Asset_FlatDiscount");
-	%properties = (
-		templateId => {
-			tab             => "display",
-			fieldType       => "template",
-            namespace       => "FlatDiscount",
-			defaultValue    => "63ix2-hU0FchXGIWkG3tow",
-			label           => $i18n->get("template"),
-			hoverHelp       => $i18n->get("template help"),
-			},
-		mustSpend => {
-			tab             => "shop",
-			fieldType       => "float",
-			defaultValue    => 0.00,
-			label           => $i18n->get("must spend"),
-			hoverHelp       => $i18n->get("must spend help"),
-			},
-		percentageDiscount => {
-			tab             => "shop",
-			fieldType       => "integer",
-			defaultValue    => 0,
-			label           => $i18n->get("percentage discount"),
-			hoverHelp       => $i18n->get("percentage discount help"),
-			},
-		priceDiscount => {
-			tab             => "shop",
-			fieldType       => "float",
-			defaultValue    => 0.00,
-			label           => $i18n->get("price discount"),
-			hoverHelp       => $i18n->get("price discount help"),
-			},
-        thankYouMessage => {
-            tab             => "properties",
-			defaultValue    => $i18n->get("default thank you message"),
-			fieldType       => "HTMLArea",
-			label           => $i18n->get("thank you message"),
-			hoverHelp       => $i18n->get("thank you message help"),
-            },
-	    );
-	push(@{$definition}, {
-		assetName           => $i18n->get('assetName'),
-		icon                => 'FlatDiscount.gif',
-		autoGenerateForms   => 1,
-		tableName           => 'FlatDiscount',
-		className           => 'WebGUI::Asset::Sku::FlatDiscount',
-		properties          => \%properties
-	    });
-	return $class->SUPER::definition($session, $definition);
-}
-
+};
 
 #-------------------------------------------------------------------
 
@@ -147,15 +132,15 @@ sub getPrice {
     my $self = shift;
 	my $subtotal = 0;
 	foreach my $item (@{$self->getCart->getItems()}) {
-		next if ($item->get('assetId') eq $self->getId); # avoid an infinite loop
-		$subtotal += $item->getSku->getPrice * $item->get('quantity');
+		next if ($item->assetId eq $self->getId); # avoid an infinite loop
+		$subtotal += $item->getSku->getPrice * $item->quantity;
 	}
-	if ($subtotal >= $self->get('mustSpend')) {
-		if ($self->get('percentageDiscount') > 0) {
-			return $subtotal * $self->get('percentageDiscount') / -100;
+	if ($subtotal >= $self->mustSpend) {
+		if ($self->percentageDiscount > 0) {
+			return $subtotal * $self->percentageDiscount / -100;
 		}
 		else {
-			return $self->get('priceDiscount');
+			return $self->priceDiscount;
 		}
 	}
 	return 0;
@@ -204,14 +189,14 @@ Prepares the template.
 
 =cut
 
-sub prepareView {
+override prepareView => sub {
 	my $self = shift;
-	$self->SUPER::prepareView();
-	my $templateId = $self->get("templateId");
-	my $template = WebGUI::Asset::Template->new($self->session, $templateId);
+	super();
+	my $templateId = $self->templateId;
+	my $template = WebGUI::Asset::Template->newById($self->session, $templateId);
 	$template->prepare($self->getMetaDataAsTemplateVariables);
 	$self->{_viewTemplate} = $template;
-}
+};
 
 #-------------------------------------------------------------------
 
@@ -254,4 +239,5 @@ sub www_addToCart {
     return $self->www_view;
 }
 
+__PACKAGE__->meta->make_immutable;
 1;

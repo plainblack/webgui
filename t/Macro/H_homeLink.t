@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -8,23 +8,27 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
 use WebGUI::Session;
 use HTML::TokeParser;
 use Data::Dumper;
+use WebGUI::VersionTag;
 
 use Test::More; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
-my ($versionTag, $template) = addTemplate();
-WebGUI::Test->addToCleanup($versionTag);
+my $tag = WebGUI::VersionTag->getWorking($session);
+my ($template) = addTemplate();
+my $homeAsset = WebGUI::Test->asset;
+$tag->commit;
 
-my $homeAsset = WebGUI::Asset->getDefault($session);
+my $originalDefault = $session->setting->get('defaultPage');
+WebGUI::Test->addToCleanup(sub { $session->setting->set('defaultPage', $originalDefault); });
+$session->setting->set( 'defaultPage', $homeAsset->getId );
+WebGUI::Test->addToCleanup($tag);
 
 my $i18n = WebGUI::International->new($session,'Macro_H_homeLink');
 
@@ -91,9 +95,7 @@ foreach my $testSet (@testSets) {
 
 sub addTemplate {
 	$session->user({userId=>3});
-	my $importNode = WebGUI::Asset->getImportNode($session);
-	my $versionTag = WebGUI::VersionTag->getWorking($session);
-	$versionTag->set({name=>"H_homeLink test"});
+	my $importNode = WebGUI::Test->asset;
 	my $properties = {
 		title => 'H_homeLink test template',
 		className => 'WebGUI::Asset::Template',
@@ -105,8 +107,7 @@ sub addTemplate {
         usePacked => 1,
 	};
 	my $template = $importNode->addChild($properties, $properties->{id});
-	$versionTag->commit;
-	return ($versionTag, $template);
+	return ($template);
 }
 
 sub simpleHTMLParser {

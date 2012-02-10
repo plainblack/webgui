@@ -4,7 +4,7 @@ package WebGUI::Workflow::Activity::DeleteExportedFiles;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -102,14 +102,14 @@ sub execute {
 	my $instance = shift;
 
 	unless ($self->session->config->get('exportPath')) {
-		$self->session->errorHandler->warn("DeleteExportedFiles: no export path, so not doing anything");
+		$self->session->log->warn("DeleteExportedFiles: no export path, so not doing anything");
 		return $self->COMPLETE;
 	}
 
 	my $time = time;
 	my $filesRef = Storable::thaw($instance->getScratch(DELETE_FILES_SCRATCH));
 	unless ($filesRef) {
-		$self->session->errorHandler->error("DeleteExportedFiles: can't find list of files to delete");
+		$self->session->log->error("DeleteExportedFiles: can't find list of files to delete");
 		return $self->ERROR;
 	}
 
@@ -119,14 +119,14 @@ sub execute {
     my $ttl = $self->getTTL;
 	while (defined(my $filename = shift @files)) {
 		my $cfilename = $self->_canonExportPath($filename);
-		unlink $cfilename or $self->session->errorHandler->warn("DeleteExportedFiles: Couldn't unlink $filename: $!"), next;
+		unlink $cfilename or $self->session->log->warn("DeleteExportedFiles: Couldn't unlink $filename: $!"), next;
 		push @dirs, $self->_pruneOfFile($filename);
 		goto pause if (time - $time > $ttl);
 	}
 
 	while (defined(my $dirname = shift @dirs)) {
 		my $cdirname = $self->_canonExportPath($dirname);
-		rmdir $cdirname or $self->session->errorHandler->warn("DeleteExportedFiles: couldn't rmdir $dirname: $!"), next;
+		rmdir $cdirname or $self->session->log->warn("DeleteExportedFiles: couldn't rmdir $dirname: $!"), next;
 		push @dirs, $self->_pruneOfFile($dirname);
 		goto pause if (time - $time > $ttl);
 	}

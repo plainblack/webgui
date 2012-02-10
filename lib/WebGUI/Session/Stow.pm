@@ -3,7 +3,7 @@ package WebGUI::Session::Stow;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -15,7 +15,7 @@ package WebGUI::Session::Stow;
 =cut
 
 use strict;
-use Scalar::Util qw( weaken );
+use Scalar::Util qw(weaken);
 
 =head1 NAME
 
@@ -80,20 +80,6 @@ sub deleteAll {
 
 #-------------------------------------------------------------------
 
-=head2 DESTROY ( )
-
-Deconstructor.
-
-=cut
-
-sub DESTROY {
-        my $self = shift;
-        undef $self;
-}
-
-
-#-------------------------------------------------------------------
-
 =head2 get( varName ) 
 
 Retrieves the current value of a stow variable. By default, will try
@@ -119,7 +105,6 @@ sub get {
 	my $self    = shift;
 	my $var     = shift;
     my $opt     = shift || {};
-	return undef if $self->session->config->get("disableCache");
     my $value   = $self->{_data}{$var};
     return undef unless defined $value;
     my $ref     = ref $value;
@@ -157,9 +142,9 @@ A reference to the session.
 sub new {
 	my $class = shift;
 	my $session = shift;
-	my $self = bless {_session=>$session}, $class;
-        weaken( $self->{_session} );
-        return $self;
+    my $self = bless { _session => $session }, $class;
+    weaken $self->{_session};
+    return $self;
 }
 
 
@@ -193,8 +178,6 @@ The value of the stow variable.  Any scalar or reference.
 
 sub set {
 	my $self = shift;
-	$self->session->errorHandler->debug('Stow->set() is being called but cache has been disabled')
-		if $self->session->config->get("disableCache");
 	my $name = shift;
 	my $value = shift;
 	return undef unless ($name);

@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -8,17 +8,17 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
 use WebGUI::Session;
 use WebGUI::User;
 
 use WebGUI::Asset;
-use Test::More tests => 99; # increment this value for each test you create
+use Test::More tests => 111; # increment this value for each test you create
 use Test::Deep;
+use Test::Exception;
+use Data::Dumper;
 
 # Test the methods in WebGUI::AssetLineage
 
@@ -84,10 +84,131 @@ my $snippet2 = $folder2->addChild( {
 
 $versionTag->commit;
 
-my @snipIds = map { $_->getId } @snippets;
-my $lineageIds = $folder->getLineage(['descendants']);
+####################################################
+#
+# getLineageSql
+#
+####################################################
 
-cmp_bag(\@snipIds, $lineageIds, 'default order returned by getLineage is lineage order');
+note "getLineageSql";
+ok $root->getLineageSql(['ancestors']), 'valid SQL returned in an error condition';
+
+####################################################
+#
+# getLineage
+#
+####################################################
+
+my @snipIds;
+my $lineageIds;
+
+@snipIds = map { $_->getId } @snippets;
+$lineageIds = $folder->getLineage(['descendants']);
+
+cmp_deeply($lineageIds, \@snipIds, 'default order returned by getLineage is lineage order');
+
+@snipIds = map { $_->getId } @snippets;
+my $ids = $folder->getLineage(['descendants']);
+cmp_bag(
+    \@snipIds,
+    $ids,
+    '... get descendants of folder'
+);
+
+$ids = $folder->getLineage(['self','descendants']);
+unshift @snipIds, $folder->getId;
+cmp_bag(
+    \@snipIds,
+    $ids,
+    '... get descendants of folder and self'
+);
+
+$ids = $folder->getLineage(['self','children']);
+cmp_bag(
+    \@snipIds,
+    $ids,
+    '... descendants == children if there are no grandchildren'
+);
+
+$ids = $topFolder->getLineage(['self','children']);
+cmp_bag(
+    [$topFolder->getId, $folder->getId, $folder2->getId, ],
+    $ids,
+    '... children (no descendants) of topFolder',
+);
+
+$ids = $topFolder->getLineage(['self','descendants']);
+cmp_bag(
+    [$topFolder->getId, @snipIds, $folder2->getId, $snippet2->getId],
+    $ids,
+    '... descendants of topFolder',
+);
+
+my $empty = getListFromIterator($root->getLineageIterator(['ancestors']));
+cmp_bag(
+    $empty,
+    [],
+    '... getting ancestors of root returns empty array'
+);
+
+####################################################
+#
+# getLineageIterator
+#
+####################################################
+
+sub getListFromIterator {
+    my $iterator = shift;
+    my @items;
+    while (my $item = $iterator->()) {
+        push @items, $item->getId;
+    }
+    return \@items;
+}
+
+@snipIds = map { $_->getId } @snippets;
+my $ids = getListFromIterator($folder->getLineageIterator(['descendants']));
+cmp_bag(
+    \@snipIds,
+    $ids,
+    'getLineageIterator: get descendants of folder'
+);
+
+$ids = getListFromIterator($folder->getLineageIterator(['self','descendants']));
+cmp_bag(
+    [$folder->getId, @snipIds],
+    $ids,
+    'getLineageIterator: get descendants of folder and self'
+);
+
+$ids = getListFromIterator($folder->getLineageIterator(['self','children']));
+cmp_bag(
+    [$folder->getId, @snipIds],
+    $ids,
+    'getLineageIterator: descendants == children if there are no grandchildren'
+);
+
+$ids = getListFromIterator($topFolder->getLineageIterator(['self','children']));
+cmp_bag(
+    [$topFolder->getId, $folder->getId, $folder2->getId, ],
+    $ids,
+    'getLineageIterator: children (no descendants) of topFolder',
+);
+
+$ids = getListFromIterator($topFolder->getLineageIterator(['self','descendants']));
+cmp_bag(
+    [$topFolder->getId, $folder->getId, @snipIds, $folder2->getId, $snippet2->getId],
+    $ids,
+    'getLineageIterator: descendants of topFolder',
+);
+
+my $empty = getListFromIterator($root->getLineageIterator(['ancestors']));
+cmp_bag(
+    $empty,
+    [],
+    '... getting ancestors of root returns empty array'
+);
+
 
 ####################################################
 #
@@ -184,12 +305,12 @@ is(
 #
 ####################################################
 
-#note $snippets[0]->get('lineage');
-#note $snippet2->get('lineage');
+#note $snippets[0]->lineage;
+#note $snippet2->lineage;
 ##Uncomment me to crash the test
-#$snippet2->cascadeLineage($snippets[0]->get('lineage'));
-#note $snippets[0]->get('lineage');
-#note $snippet2->get('lineage');
+#$snippet2->cascadeLineage($snippets[0]->lineage);
+#note $snippets[0]->lineage;
+#note $snippet2->lineage;
 
 ####################################################
 #
@@ -246,17 +367,19 @@ $session->config->delete( 'db' );
 #
 ####################################################
 
-is($snippets[0]->swapRank($snippets[1]->get('lineage')),  1, 'swapRank: self and adjacent');
+is($snippets[0]->swapRank($snippets[1]->lineage),  1, 'swapRank: self and adjacent');
+
+$folder->cloneFromDb;
 
 @snipIds[0,1] = @snipIds[1,0];
 $lineageIds = $folder->getLineage(['descendants']);
 cmp_bag(
     \@snipIds,
     $lineageIds,
-    'swapRank: swapped first and second snippets'
+    '... swapped first and second snippets'
 );
 
-@snippets[0..1] = map { WebGUI::Asset->newByUrl($session, "snippet$_") } 0..1;
+@snippets[0..1] = map { $_->cloneFromDb } @snippets[0..1];
 
 is(
     $snippets[1]->swapRank($snippets[0]->get('lineage'), $snippets[1]->get('lineage'), ), 
@@ -280,10 +403,10 @@ is(scalar @snippets, $folder->getChildCount,  'changing lineage does not change 
 is(1               , $folder2->getChildCount, 'changing lineage does not change relationship in folder2');
 
 ##Reinstance the asset object due to db manipulation
-$folder  = WebGUI::Asset->newByDynamicClass($session, $folder->getId);
-$folder2 = WebGUI::Asset->newByDynamicClass($session, $folder2->getId);
-@snippets = map { WebGUI::Asset->newByDynamicClass($session, $snippets[$_]->getId) } 0..6;
-$snippet2 = WebGUI::Asset->newByDynamicClass($session, $snippet2->getId);
+$folder   = $folder->cloneFromDb;
+$folder2  = $folder2->cloneFromDb;
+@snippets = map { $_->cloneFromDb } @snippets;
+$snippet2 = $snippet2->cloneFromDb;
 
 ####################################################
 #
@@ -405,7 +528,7 @@ delete $cachedLineage->{$snippet4->get('lineage')}->{class};
 my $snippet4 = WebGUI::Asset->newByLineage($session, $snippets[4]->get('lineage'));
 is ($snippet4->getId, $snippets[4]->getId, '... failing class cache forces lookup');
 
-is(WebGUI::Asset->newByLineage($session, 'notALineage'), undef, '... returns undef');
+dies_ok { WebGUI::Asset->newByLineage($session, 'notALineage') }  '... throws an exception';
 ok(!exists $session->stow->get('assetLineage')->{assetLineage}, '... no entry for the bad lineage in stow');
 
 ####################################################
@@ -536,44 +659,26 @@ my $vTag2 = WebGUI::VersionTag->getWorking($session);
 $vTag2->set({name=>"deep addChild test"});
 WebGUI::Test->addToCleanup($vTag2);
 
-WebGUI::Test->interceptLogging();
+WebGUI::Test->interceptLogging( sub {
+    my $log_data = shift;
 
-my @deepAsset = ($root);
+    my @deepAsset = ($root);
 
-for (1..42) {
-    $deepAsset[$_] = $deepAsset[$_-1]->addChild( {
-            className   => "WebGUI::Asset::Snippet",
-            groupIdView => 7,
-            ownerUserId => 3, #For coverage on addChild properties
-            title       => "Deep Snippet $_",
-            menuTitle   => "Deep Snip $_",
-    });
-}
+    for (1..42) {
+        $deepAsset[$_] = $deepAsset[$_-1]->addChild( {
+                className   => "WebGUI::Asset::Snippet",
+                groupIdView => 7,
+                ownerUserId => 3, #For coverage on addChild properties
+                title       => "Deep Snippet $_",
+                menuTitle   => "Deep Snip $_",
+        });
+    }
 
-$vTag2->commit;
+    $vTag2->commit;
 
-is($deepAsset[41]->getParent->getId, $deepAsset[40]->getId, 'addChild will not create an asset with a lineage deeper than 42 levels');
-like($WebGUI::Test::logger_warns, qr/Adding it as a sibling instead/, 'addChild logged a warning about deep assets');
-
-{
-    my $tag = WebGUI::VersionTag->getWorking($session);
-    addToCleanup($tag);
-    my $uncommittedParent = $root->addChild({
-        className   => "WebGUI::Asset::Wobject::Layout",
-        groupIdView => 7,
-        ownerUserId => 3,
-        title       => "Uncommitted Parent",
-    });
-    $tag->leaveTag;
-    my $parent = WebGUI::Asset->newPending($session, $uncommittedParent->getId);
-    my $floater = $parent->addChild({
-        className   => "WebGUI::Asset::Snippet",
-        groupIdView => 7,
-        ownerUserId => 3, #For coverage on addChild properties
-        title       => "Child of uncommitted parent",
-    });
-    is $parent->get('tagId'), $floater->get('tagId'), 'addChild: with uncommitted parent, adds child and puts it into the same tag as the parent';
-}
+    is($deepAsset[41]->getParent->getId, $deepAsset[40]->getId, 'addChild will not create an asset with a lineage deeper than 42 levels');
+    like($log_data->{warn}, qr/Adding it as a sibling instead/, 'addChild logged a warning about deep assets');
+});
 
 TODO: {
     local $TODO = "Tests to make later";

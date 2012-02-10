@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -8,9 +8,7 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../lib";
 use WebGUI::Test;
 use WebGUI::Session;
 use WebGUI::Content::SiteIndex;
@@ -28,7 +26,8 @@ my $session = WebGUI::Test->session;
 my $output = WebGUI::Content::SiteIndex::handler($session);
 is $output, undef, 'no content returned unless sitemap.xml is requested';
 
-$session->request->uri('/sitemap.xml');
+$session->request->env->{PATH_INFO} = '/sitemap.xml';
+delete $session->url->{_requestedUrl};
 $output = WebGUI::Content::SiteIndex::handler($session);
 my $xmlData = XMLin($output,
     KeepRoot   => 1,
@@ -48,9 +47,7 @@ my $hiddenPage = WebGUI::Asset->getDefault($session)->addChild({
     title     => 'seekrit hidden page',
     url       => 'hidden_page',
 });
-my $versionTag = WebGUI::VersionTag->getWorking($session);
-$versionTag->commit;
-addToCleanup($versionTag);
+WebGUI::Test->addToCleanup($hiddenPage);
 
 $output = WebGUI::Content::SiteIndex::handler($session);
 $xmlData = XMLin($output,

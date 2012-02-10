@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -11,29 +11,21 @@
 #-------------------------------------------------------------------
 
 use strict;
-use File::Basename ();
-use File::Spec;
-
-my $webguiRoot;
-BEGIN {
-    $webguiRoot = File::Spec->rel2abs(File::Spec->catdir(File::Basename::dirname(__FILE__), File::Spec->updir));
-    unshift @INC, File::Spec->catdir($webguiRoot, 'lib');
-}
-
-my @nailable = qw(jpg jpeg png gif);
-$| = 1;
-
 use File::Path;
 use File::stat;
 use FileHandle;
 use Getopt::Long;
 use POSIX;
 use Pod::Usage;
+use WebGUI::Paths -inc;
 use WebGUI::Asset::File;
 use WebGUI::Asset::File::Image;
 use WebGUI::Session;
 use WebGUI::Storage;
-use WebGUI::Utility;
+
+$| = 1;
+
+my @nailable = qw(jpg jpeg png gif);
 
 # TB : Get the time as soon as possible. Use $now as global variable.
 # $now is used for skipOlderThan feature.
@@ -90,7 +82,7 @@ my %ListAssetExists;
 my %filelisthash;
 
 print "Starting..." unless ($quiet);
-my $session = WebGUI::Session->open($webguiRoot,$configFile);
+my $session = WebGUI::Session->open($configFile);
 $session->user({userId=>3});
 print "OK\n" unless ($quiet);
 
@@ -128,7 +120,7 @@ sub addFiles {
 		print "\tAdding ".$file->{fullPathFile}." to the database.\n" unless ($quiet);	
 
 		# Figure out whether the file is an image or not by its extension.
-		if (isIn(lc($file->{ext}),@nailable)) {
+		if (lc($file->{ext}) ~~ @nailable) {
 			$class = 'WebGUI::Asset::File::Image';
 			$templateId = 'PBtmpl0000000000000088';
 		}
@@ -209,7 +201,7 @@ sub setPrivilege {
 	my $path = shift;
 	print "\t\tSetting filesystem privilege. " unless ($quiet);
 	
-	if ($session->os->get("type") eq "Linuxish") {
+    if ($^O ne 'MSWin32') {
 		unless (system("chown -R ".$webUser." ". $path)) {
 			print "Privileges set.\n" unless ($quiet);
 		}
@@ -444,6 +436,6 @@ The following exit values are returned upon completion:
 
 =head1 AUTHOR
 
-Copyright 2001-2009 Plain Black Corporation.
+Copyright 2001-2012 Plain Black Corporation.
 
 =cut

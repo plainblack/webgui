@@ -1,9 +1,11 @@
 package WebGUI::Content::Wizard;
 
+use strict;
+
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -31,7 +33,7 @@ sub handler {
 
     if ( $session->form->get('op') eq 'wizard' && $session->form->get('wizard_class') ) {
         my $class = $session->form->get('wizard_class');
-        WebGUI::Pluggable->load($class);
+        WebGUI::Pluggable::load($class);
         if ( $class->isa( 'WebGUI::Wizard' ) ) {
             my $wizard  = $class->new( $session );
             return $wizard->dispatch;

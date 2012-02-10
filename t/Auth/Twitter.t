@@ -1,6 +1,6 @@
 # vim:syntax=perl
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -13,9 +13,7 @@
 #
 #
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../lib";
 use Test::More;
 use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
@@ -70,7 +68,7 @@ isa_ok( $nt, 'Net::Twitter' );
 is( $auth->www_login, "redirect", "www_login always returns redirect" );
 ok( $session->scratch->get('AuthTwitterToken'), 'auth token gets set to scratch' );
 ok( $session->scratch->get('AuthTwitterTokenSecret'), 'auth token secret gets set to scratch' );
-like( $session->http->getRedirectLocation, qr/twitter[.]com/, "redirect to twitter.com" );
+like( $session->response->location, qr/twitter[.]com/, "redirect to twitter.com" );
 
 # www_callback
 # I have no idea how to test this...
@@ -90,8 +88,9 @@ my $userId  = $session->db->quickScalar(
                 "SELECT userId FROM authentication WHERE authMethod=? AND fieldName=? AND fieldData=?",
                 [ "Twitter", "twitterUserId", "2345" ],
             );
-ok( $userId, 'user exists in authentication table' );
 $user = WebGUI::User->new( $session, $userId );
+note( $userId );
+isnt( $user->userId, 1, 'user exists in authentication table' );
 is( $user->username, "RedHerring", "correct username is set" );
 WebGUI::Test->addToCleanup( $user );
 

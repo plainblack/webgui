@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 
 # -------------------------------------------------------------------
-#  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+#  WebGUI is Copyright 2001-2012 Plain Black Corporation.
 # -------------------------------------------------------------------
 #  Please read the legal notices (docs/legal.txt) and the license
 #  (docs/license.txt) that came with this distribution before using
@@ -26,6 +26,7 @@ use File::Find;
 use Getopt::Long;
 use Pod::Usage;
 use Scalar::Util qw( blessed );
+use WebGUI::Paths -inc;
 use WebGUI::Asset::Wobject::Collaboration;
 use WebGUI::Asset::Wobject::GalleryAlbum;
 use WebGUI::Asset::Wobject::Gallery;
@@ -33,6 +34,7 @@ use WebGUI::Asset::Wobject::Folder;
 use WebGUI::Asset::Post::Thread;
 use WebGUI::Storage;
 
+$|=1;
 
 # custom flags
 my ($fromAssetId, $fromPath, $fromAssetUrl, $toId, $toUrl) = undef;
@@ -62,7 +64,7 @@ if ( $gallery && $gallery->isa('WebGUI::Asset::Wobject::Gallery') ) {
     else {
         my $fromAsset = undef;
         if (defined $fromAssetId) {
-            $fromAsset = WebGUI::Asset->newByDynamicClass($session, $fromAssetId);
+            $fromAsset = WebGUI::Asset->newById($session, $fromAssetId);
         }
         else {
             $fromAsset = WebGUI::Asset->newByUrl($session, $fromAssetUrl);
@@ -239,7 +241,7 @@ sub addAlbumFromFolder {
         } );
 
     for my $fileId ( @{ $fileIds } ) {
-        my $oldFile     = WebGUI::Asset->newByDynamicClass( $session, $fileId );
+        my $oldFile     = WebGUI::Asset->newById( $session, $fileId );
         my $oldStorage  = $oldFile->getStorageLocation;
         my $className   = $gallery->getAssetClassForFile( $oldStorage->getPath( $oldFile->get('filename') ) );
         if ( !$className ) {
@@ -386,7 +388,7 @@ sub start {
         pod2usage("$0: Must specify a --configFile");
     }
 
-    my $session = WebGUI::Session->open("..",$configFile);
+    my $session = WebGUI::Session->open($configFile);
     $session->user({userId=>3});
 
     my $versionTag = WebGUI::VersionTag->getWorking($session);
@@ -470,7 +472,7 @@ URL parameter of the Gallery, and not the fully qualified URL.
 
 =head1 AUTHOR
 
-Copyright 2001-2009 Plain Black Corporation.
+Copyright 2001-2012 Plain Black Corporation.
 
 =cut
 

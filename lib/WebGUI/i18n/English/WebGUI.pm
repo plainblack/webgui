@@ -2,6 +2,12 @@ package WebGUI::i18n::English::WebGUI;
 use strict;
 
 our $I18N = {
+	'JSON Blob' => {
+		message => q|JSON Blob|,
+		context => q|The name of hte JSON Blob form control.|,
+		lastUpdated => 0,
+	},
+
 	'ok' => {
 		message => q|OK|,
 		context => q|used by database link and other things to give a message to the user that a test passed|,
@@ -3165,8 +3171,8 @@ or are under your current version tag.</p>
         },
 
 	'admin console template' => {
-		message => q|Admin Console Template|,
-		lastUpdated =>1118453709,
+		message => q|Legacy Admin Console Template|,
+		lastUpdated => 0,
         },
 
 	'admin console template variables' => {
@@ -3499,14 +3505,6 @@ a user.|,
                 message => q|Cache|,
                 lastUpdated => 1031514049
         },
-	'cache type' => {
-                message => q|Cache type|,
-                lastUpdated => 1031514049
-        },
-	'cache statistics' => {
-                message => q|Cache Statistics|,
-                lastUpdated => 1031514049
-        },
 	'clear cache' => {
                 message => q|Clear Cache|,
                 lastUpdated => 1031514049
@@ -3625,7 +3623,13 @@ LongTruncOk=1</p>
 	'webgui' => {
 		message => q|WebGUI|,
 		lastUpdated => 1141963573,
-		context => q|Test key for International macro test.  DO NOT TRANSLATE|,
+		context => q|Test key for International macro test.  DO NOT TRANSLATE OR DELETE|,
+	},
+
+	'webgui help %s' => {
+		message => q|webgui help %s|,
+		lastUpdated => 1266003122,
+		context => q|Test key for Definition::Role::Object.  DO NOT TRANSLATE OR DELETE|,
 	},
 
 	'pages' => {
@@ -4725,6 +4729,29 @@ Users may override this setting in their profile.
         context     => 'Description for pick style template page',
     },
 
+    'show all' => {
+        message     => q{Show All},
+        lastUpdated => 0,
+        context     => q{Label to remove filtering and show all items in a list. Used by the Admin bar Clipboard pane.},
+    },
+    
+    'asset helpers' => {
+        message     => q{Asset Helpers},
+        lastUpdated => 0,
+        context     => q{Label for the asset helpers list. Used by the Admin bar.},
+    },
+
+    'log out' => {
+        message     => q{Log Out},
+        lastUpdated => 0,
+        context     => q{Label for button to log out.},
+    },
+
+    'shortcut created' => {
+        message     => q{Shortcut created},
+        lastUpdated => 0,
+        context     => q{Message after a shortcut is created successfully},
+    },
     'Up' => {
         message     => 'Up',
         lastUpdate  => 0,
@@ -4743,6 +4770,12 @@ Users may override this setting in their profile.
         context     => 'Add, as in to append or add more',
     },
 
+    'Choose...' => {
+        message     => 'Choose...',
+        lastUpdate  => 0,
+        context     => 'Choose, as in to select from a set of options',
+    },
+
     'Enable Users after Anonymous Registration?' => {
         message => 'Enable Users after Anonymous Registration?',
         lastUpdated => 1311618346,
@@ -4752,6 +4785,7 @@ Users may override this setting in their profile.
         message => 'If this is off, '
             . 'users must be manually activated by a workflow or an admin.',
         lastUpdated => 1311618419,
+
     },
 
 };

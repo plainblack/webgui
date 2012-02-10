@@ -1,6 +1,6 @@
 package Test::WebGUI::Form::Control;
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -40,8 +40,17 @@ sub t_00_method_check : Test(1) {
     can_ok $form, qw/get set headTags toHtml prepareWrapper toHtmlAsHidden toHtmlWithWrapper isInRequest isDynamicCompatible getName/;
 }
 
+sub t_01_getPackageClassName : Test(1) {
+    my $test    = shift;
+    my $session = $test->session;
 
-sub t_01_get_set : Test(2) {
+    my $form = $test->class->new($session);
+    my $package = $test->class;
+    $package =~ s/WebGUI::Form:://;
+    is $form->getPackageClassName, 'wg-form-' . lcfirst $package;
+}
+
+sub t_01_get_set : Test(3) {
     my $test    = shift;
     my $session = $test->session;
 
@@ -49,7 +58,7 @@ sub t_01_get_set : Test(2) {
 
     lives_ok { $form->set('name', 'form1'); } 'set name';
     is $form->get('name'), 'form1', 'get name';
-
+    cmp_deeply $form->get, superhashof({ name => 'form1' }), 'get hashref';
 }
 
 sub t_02_instanced : Test(1) {
@@ -61,6 +70,24 @@ sub t_02_instanced : Test(1) {
     });
 
     is $form->get('name'), 'form1', 'name set on instanciation';
+}
+
+sub t_03_toTemplateVars : Test(2) {
+    my $test    = shift;
+    my $session = $test->session;
+
+    my $form = $test->class->new($session, {
+        name => 'form1',
+    });
+
+    cmp_deeply $form->toTemplateVars, 
+        superhashof({ 
+            name  => 'form1',
+            label => $form->getLabel,
+            label_nohover => $form->get('label'),
+        }),
+        'toTemplateVars hashref';
+    isnt $form->toTemplateVars, $form->get, 'toTemplateVars creates safe hashref';
 }
 
 1;

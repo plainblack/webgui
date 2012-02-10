@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -12,9 +12,7 @@
 # 
 #
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/lib";
 use Test::More;
 use WebGUI::Test;
 use File::Find;
@@ -75,13 +73,13 @@ dies_ok { WebGUI::Pluggable::load( 'HA::::HA' ) } 'load dies on bad input';
 #----------------------------------------------------------------------------
 # Test find and findAndLoad
 { # Block to localize @INC
-    my $lib     = WebGUI::Test->lib;
+    my $lib = File::Spec->catdir( WebGUI::Test->getTestCollateralPath, 'Pluggable', 'lib' );
     local @INC  = ( $lib );
 
     # Use the i18n files to test
     my @testFiles   = ();
-    File::Find::find( 
-        sub { 
+    File::Find::find(
+        sub {
             if ( !/^[.]/ && /[.]pm$/ ) {
                 my $name    = $File::Find::name;
                 $name   =~ s{^$lib[/]}{};
@@ -90,60 +88,59 @@ dies_ok { WebGUI::Pluggable::load( 'HA::::HA' ) } 'load dies on bad input';
                 push @testFiles, $name;
             }
         },
-        File::Spec->catfile( $lib, 'WebGUI', 'i18n' ),
+        File::Spec->catfile( $lib, 'WebGUI', 'Test', 'Pluggable' ),
     );
 
     cmp_deeply(
-        [ WebGUI::Pluggable::find( 'WebGUI::i18n' ) ],
+        [ WebGUI::Pluggable::find( 'WebGUI::Test::Pluggable' ) ],
         bag( @testFiles ),
         "find() finds all modules by default",
     );
 
     cmp_deeply(
-        [ WebGUI::Pluggable::find( 'WebGUI::i18n', { onelevel => 1 } ) ],
-        bag( grep { /^WebGUI::i18n::[^:]+$/ } @testFiles ),
+        [ WebGUI::Pluggable::find( 'WebGUI::Test::Pluggable', { onelevel => 1 } ) ],
+        bag( grep { /^WebGUI::Test::Pluggable::[^:]+$/ } @testFiles ),
         "find() with onelevel",
     );
 
     cmp_deeply(
-        [ WebGUI::Pluggable::find( 'WebGUI::i18n', { exclude => [ 'WebGUI::i18n::English::WebGUI' ] } ) ],
-        bag( grep { $_ ne 'WebGUI::i18n::English::WebGUI' } @testFiles ),
+        [ WebGUI::Pluggable::find( 'WebGUI::Test::Pluggable', { exclude => [ 'WebGUI::Test::Pluggable::Second' ] } ) ],
+        bag( grep { $_ ne 'WebGUI::Test::Pluggable::Second' } @testFiles ),
         "find() with exclude",
     );
 
     cmp_deeply(
-        [ WebGUI::Pluggable::find( 'WebGUI::i18n', { exclude => [ 'WebGUI::i18n::English::WebGUI*' ] } ) ],
-        bag( grep { $_ ne 'WebGUI::i18n::English::WebGUI' && $_ ne 'WebGUI::i18n::English::WebGUIProfile' } @testFiles ),
+        [ WebGUI::Pluggable::find( 'WebGUI::Test::Pluggable', { exclude => [ 'WebGUI::Test::Pluggable::First*' ] } ) ],
+        bag( grep { $_ ne 'WebGUI::Test::Pluggable::First' && $_ ne 'WebGUI::Test::Pluggable::FirstOne' } @testFiles ),
         "find() with exclude with glob",
     );
 
     cmp_deeply(
-        [ WebGUI::Pluggable::find( 'WebGUI::i18n', { exclude => [ 'WebGUI::i18n::English*' ] } ) ],
+        [ WebGUI::Pluggable::find( 'WebGUI::Test::Pluggable', { exclude => [ 'WebGUI::Test::Pluggable*' ] } ) ],
         [], 
         "find() with exclude with massive glob",
     );
 
     cmp_deeply(
-        [ WebGUI::Pluggable::find( 'WebGUI::i18n', { exclude => [ 'WebGUI::i18n::English::WebGUI.*' ] } ) ],
-        bag( grep { $_ ne 'WebGUI::i18n::English::WebGUI' && $_ ne 'WebGUI::i18n::English::WebGUIProfile' } @testFiles ),
+        [ WebGUI::Pluggable::find( 'WebGUI::Test::Pluggable', { exclude => [ 'WebGUI::Test::Pluggable::First.*' ] } ) ],
+        bag( grep { $_ ne 'WebGUI::Test::Pluggable::First' && $_ ne 'WebGUI::Test::Pluggable::FirstOne' } @testFiles ),
         "find() with exclude with regex",
     );
 
     cmp_deeply(
-        [ WebGUI::Pluggable::find( 'WebGUI::i18n', { exclude => [ qw/WebGUI::i18n::English::WebGUI.* WebGUI::i18n::English::ShipDriver_USPS*/ ] } ) ],
+        [ WebGUI::Pluggable::find( 'WebGUI::Test::Pluggable', { exclude => [ qw/WebGUI::Test::Pluggable::First WebGUI::Test::Pluggable::Second::Child/ ] } ) ],
         bag( grep {
-            $_ ne 'WebGUI::i18n::English::WebGUI'
-         && $_ ne 'WebGUI::i18n::English::WebGUIProfile'
-         && $_ ne 'WebGUI::i18n::English::ShipDriver_USPS'
-         && $_ ne 'WebGUI::i18n::English::ShipDriver_USPSInternational'
+            $_ ne 'WebGUI::Test::Pluggable::First'
+         && $_ ne 'WebGUI::Test::Pluggable::Second::Child'
         } @testFiles ),
         "find() with multiple excludes",
     );
 
-    cmp_deeply( 
-        [ WebGUI::Pluggable::find( 'WebGUI::i18n', { onelevel => 1, return => "name" } ) ],
-        bag( map { /::([^:]+)$/; $1 } grep { /^WebGUI::i18n::[^:]+$/ } @testFiles ),
+    cmp_deeply(
+        [ WebGUI::Pluggable::find( 'WebGUI::Test::Pluggable', { onelevel => 1, return => "name" } ) ],
+        bag( map { /::([^:]+)$/; $1 } grep { /^WebGUI::Test::Pluggable::[^:]+$/ } @testFiles ),
         "find() with return => name",
     );
 };
+
 #vim:ft=perl

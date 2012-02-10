@@ -1,6 +1,6 @@
 # vim:syntax=perl
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -13,9 +13,7 @@
 # 
 #
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../../lib";
 use Test::More;
 use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
@@ -57,19 +55,21 @@ my $thread
         className           => 'WebGUI::Asset::Post::Thread',
         ownerUserId         => $user{"2"}->userId,  
     }, @addArgs );
+$thread->setSkipNotification;
 
 my $post
     = $thread->addChild({
         className           => 'WebGUI::Asset::Post',
         ownerUserId         => $user{"2"}->userId,
     }, @addArgs );
+$post->setSkipNotification;
 
 $versionTag->commit( { timeout => 1_000_000 } );
 
 # Re-load the collab to get the newly committed properties
-$collab = WebGUI::Asset->newByDynamicClass( $session, $collab->getId );
-$thread = WebGUI::Asset->newByDynamicClass( $session, $thread->getId );
-$post   = WebGUI::Asset->newByDynamicClass( $session, $post->getId );
+$collab = WebGUI::Asset->newById( $session, $collab->getId );
+$thread = WebGUI::Asset->newById( $session, $thread->getId );
+$post   = WebGUI::Asset->newById( $session, $post->getId );
 
 #----------------------------------------------------------------------------
 # Tests

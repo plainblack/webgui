@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -8,10 +8,8 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use FindBin;
 use strict;
 use JSON qw/from_json/;
-use lib "$FindBin::Bin/../../../lib";
 
 ##The goal of this test is to test the creation of Search Wobjects.
 
@@ -27,6 +25,8 @@ $session->user({userId => 3});
 # Do our work in the import node
 my $node = WebGUI::Asset->getImportNode($session);
 
+
+my $tag2 = WebGUI::VersionTag->getWorking($session);
 
 my $default = WebGUI::Asset->getDefault($session);
 my $importArticle = $node->addChild({
@@ -47,7 +47,6 @@ my $search = $default->addChild({
     searchRoot => $default->getId,
     templateId => $template->getId,
 });
-my $tag2 = WebGUI::VersionTag->getWorking($session);
 $tag2->commit;
 
 $search->prepareView();

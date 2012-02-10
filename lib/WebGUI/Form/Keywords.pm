@@ -3,7 +3,7 @@ package WebGUI::Form::Keywords;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -77,10 +77,10 @@ sub headTags {
     my $style = $session->style;
     my $url = $session->url;
 
-    $style->setLink($url->extras("yui/build/autocomplete/assets/skins/sam/autocomplete.css"), {rel=>"stylesheet", type=>"text/css"});
-    $style->setScript($url->extras("yui/build/yahoo-dom-event/yahoo-dom-event.js"), {type=>"text/javascript"});
-    $style->setScript($url->extras("yui/build/datasource/datasource-min.js"), {type=>"text/javascript"});
-    $style->setScript($url->extras("yui/build/autocomplete/autocomplete-min.js"), {type=>"text/javascript"});
+    $style->setCss($url->extras("yui/build/autocomplete/assets/skins/sam/autocomplete.css"));
+    $style->setScript($url->extras("yui/build/yahoo-dom-event/yahoo-dom-event.js"));
+    $style->setScript($url->extras("yui/build/datasource/datasource-min.js"));
+    $style->setScript($url->extras("yui/build/autocomplete/autocomplete-min.js"));
     $style->setRawHeadTags('<style type="text/css">.yui-skin-sam.webgui-keywords-autocomplete .yui-ac-input { position: static; width: auto }</style>');
 }
 
@@ -149,7 +149,7 @@ sub www_searchAsJSON {
     my $keyword = WebGUI::Keyword->new($session);
 
     my $keywords = $keyword->findKeywords({search => $search, limit => 20});
-    $session->http->setMimeType('application/json');
+    $session->response->content_type('application/json');
 
     return JSON::to_json({keywords => $keywords});
 }

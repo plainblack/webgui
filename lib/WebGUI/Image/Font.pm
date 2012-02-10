@@ -2,6 +2,7 @@ package WebGUI::Image::Font;
 
 use strict;
 use WebGUI::Storage;
+use WebGUI::Paths;
 
 #-------------------------------------------------------------------
 
@@ -72,7 +73,7 @@ sub getFile {
 	if ($self->getStorageId) {
 		return WebGUI::Storage->get($self->session, $self->getStorageId)->getPath($self->getFilename);
 	} else {
-		return $self->session->config->getWebguiRoot."/lib/default.ttf"
+		return WebGUI::Paths->share . '/default.ttf';
 	}
 }
 

@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -8,9 +8,7 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../../../../lib";
 
 # Test the 'adjustOrientation' method called by 'applyConstraints'. It is 
 # responsible for rotating JPEG images according to orientation information
@@ -33,7 +31,7 @@ my $versionTag      = WebGUI::VersionTag->getWorking($session);
 
 # Name version tag and make sure it gets cleaned up
 $versionTag->set({name=>"Orientation adjustment test"});
-addToCleanup($versionTag);
+WebGUI::Test->addToCleanup($versionTag);
 
 # Create gallery and a single album
 my $gallery

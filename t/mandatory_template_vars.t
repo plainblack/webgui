@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -8,9 +8,7 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/lib";
 
 use WebGUI::Test;
 use WebGUI::Asset;
@@ -165,7 +163,7 @@ plan tests => $numTests;
 
 foreach my $tmpl ( @tmplVarTable ) {
 	my $tmplId = $tmpl->{id};
-	my $tmplAsset = WebGUI::Asset->newByDynamicClass($session, $tmplId);
+	my $tmplAsset = eval { WebGUI::Asset->newById($session, $tmplId); };
 	my $tmplExists = is(ref($tmplAsset), 'WebGUI::Asset::Template', "$tmplId exists");
 	SKIP: {
 		skip("$tmplId could not be found",  $tmpl->{numTests} ) unless $tmplExists;

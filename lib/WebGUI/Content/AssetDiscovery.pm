@@ -3,7 +3,7 @@ package WebGUI::Content::AssetDiscovery;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -17,7 +17,6 @@ package WebGUI::Content::AssetDiscovery;
 use strict;
 use JSON;
 use WebGUI::Asset;
-use WebGUI::Utility;
 use XML::Simple;
 
 =head1 NAME
@@ -112,18 +111,18 @@ sub handler {
             my $limit = ($pageNumber * 100 - 100).','.($pageNumber * 100 - 1);
             my $siteUrl = $session->url->getSiteURL;
             my $date = $session->datetime;
-            my $matchingAssets = $session->db->read("select assetId from asset where lineage like ? and className=? limit ".$limit, [$start->get('lineage').'%', $class]);
+            my $matchingAssets = $session->db->read("select assetId from asset where lineage like ? and className=? limit ".$limit, [$start->lineage.'%', $class]);
             while (my ($id) = $matchingAssets->array) {
-                my $asset = WebGUI::Asset->new($session, $id, $class);
-                if (defined $asset) {
-                    if ($asset->canView && $asset->get('state') eq 'published' && isIn($asset->get('status'), 'approved', 'archived')) {
+                my $asset = eval { WebGUI::Asset->newById($session, $id); };
+                if (! Exception::Class->caught() ) {
+                    if ($asset->canView && $asset->state eq 'published' && $asset->status ~~ ['approved', 'archived']) {
                         push @assets, {
                             title       => $asset->getTitle,
-                            menuTitle   => $asset->get('menuTitle'),
-                            synopsis    => $asset->get('synopsis'),
+                            menuTitle   => $asset->menuTitle,
+                            synopsis    => $asset->synopsis,
                             url         => $siteUrl.$asset->getUrl,
-                            dateCreated => $date->epochToHuman($asset->get('creationDate'), '%y-%m-%d %j:%n:%s'),
-                            lastUpdated => $date->epochToHuman($asset->get('revisionDate'), '%y-%m-%d %j:%n:%s'),
+                            dateCreated => $date->epochToHuman($asset->creationDate, '%y-%m-%d %j:%n:%s'),
+                            lastUpdated => $date->epochToHuman($asset->revisionDate, '%y-%m-%d %j:%n:%s'),
                         };
                     }
                 }
@@ -135,10 +134,10 @@ sub handler {
             assets      => \@assets
         };
         if ($as eq "xml") {
-            $session->http->setMimeType('text/xml');
+            $session->response->content_type('text/xml');
             return XML::Simple::XMLout($document, NoAttr => 1);
         }
-        $session->http->setMimeType('application/json');
+        $session->response->content_type('application/json');
         return JSON->new->encode($document);
     }
     return undef;

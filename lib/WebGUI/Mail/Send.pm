@@ -3,7 +3,7 @@ package WebGUI::Mail::Send;
 =head1 LEGAL
 
 -------------------------------------------------------------------
-WebGUI is Copyright 2001-2009 Plain Black Corporation.
+WebGUI is Copyright 2001-2012 Plain Black Corporation.
 -------------------------------------------------------------------
 Please read the legal notices (docs/legal.txt) and the license
 (docs/license.txt) that came with this distribution before using
@@ -332,7 +332,7 @@ sub create {
                 $email = $user->getInboxNotificationAddresses;
             }
             else {
-                $email = $user->profileField("email");
+                $email = $user->get("email");
             }
 			if ($email) {
 				if ($headers->{to}) {
@@ -568,7 +568,7 @@ sub send {
                 $emailAddress = $user->getInboxNotificationAddresses;
             }
             else {
-                $emailAddress = $user->profileField('email');
+                $emailAddress = $user->get('email');
             }
             next USER unless $emailAddress;
             $mail->head->replace('To', $emailAddress);

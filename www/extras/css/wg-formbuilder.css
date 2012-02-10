@@ -1,0 +1,22 @@
+/**
+ * wg-formbuilder.css
+ * CSS rules for all forms built with WebGUI::FormBuilder
+ */
+
+.wg-formbuilder label.formDescription
+{
+    display: block;
+    margin-top: 1em;
+    font-weight: bold;
+}
+
+.wg-formbuilder .wg-message {
+
+}
+
+.wg-formbuilder .wg-error {
+    border              : 1px solid red;
+    background-color    : #FF6666;
+    padding             : 10px;
+    margin              : 10px;
+}

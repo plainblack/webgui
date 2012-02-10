@@ -1,14 +1,12 @@
 package WebGUI;
 
-
-our $VERSION = '7.10.24';
-our $STATUS = 'stable';
-
+our $VERSION = '8.0.0';
+our $STATUS = 'beta';
 
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -20,19 +18,16 @@ our $STATUS = 'stable';
 =cut
 
 use strict;
-use Apache2::Access (); 
-use Apache2::Const -compile => qw(OK DECLINED HTTP_UNAUTHORIZED SERVER_ERROR);
-use Apache2::Request;
-use Apache2::RequestIO;
-use Apache2::RequestUtil ();
-use Apache2::ServerUtil ();
-use APR::Request::Apache2;
-use MIME::Base64 ();
+use Moose;
+use MooseX::NonMoose;
 use Scalar::Util qw/blessed/;
 use WebGUI::Config;
 use WebGUI::Pluggable;
-use WebGUI::Session;
-use WebGUI::User;
+use WebGUI::Paths;
+use WebGUI::Types;
+use WebGUI::Exception; 
+
+extends 'Plack::Component';
 
 =head1 NAME
 
@@ -40,7 +35,7 @@ Package WebGUI
 
 =head1 DESCRIPTION
 
-An Apache mod_perl handler for WebGUI.
+PSGI handler for WebGUI.
 
 =head1 SYNOPSIS
 
@@ -52,143 +47,192 @@ These subroutines are available from this package:
 
 =cut
 
-#-------------------------------------------------------------------
+has config  => (
+    is => 'ro',
+    required => 1,
+    isa => 'WebGUI::Type::Config',
+    coerce => 1,
+);
 
-=head2 authen ( requestObject, user || undef, pass || undef, session ])
+=head2 call( $env )
 
-HTTP Basic auth for WebGUI.
-Either called from L<WebGUI::Content::URL> directly or indirectly when pushed back on the L<mod_perl> handler stack.
-HTTP Basic auth is an alternative authentication mechanism for WebGUI for robots such as RSS feed readers.
-L<WebGUI::Content::URL> does nothing with the return codes from here, but L<mod_perl> uses them if this routine
-gets pushed as a handler.
+Every web requests results in a call to this subroutine.
 
-=head3 requestObject
-
-The Apache2::RequestRec object passed in by Apache's mod_perl.
-
-=head3 user
-
-The username to authenticate with. Will pull from the request object if not specified.
-
-=head3 pass
-
-The password to authenticate with. Will pull from the request object if not specified.
-
-=head3 session
-
-A reference to a WebGUI::Session object.
+=head3 $env
 
 =cut
 
+sub call {
+    my $self = shift;
+    my $env = shift;
 
-sub authen {
-    my ($request, $username, $password, $session) = @_;
-    $request = Apache2::Request->new($request);
-	my $log = $session->log;
-    my $server = Apache2::ServerUtil->server;
-	my $status = Apache2::Const::OK;
+    ##Enable size limiting
+    $env->{'psgix.harakiri'} = 1;
 
-	# set username and password if it's an auth handler
-	if ($username eq "") {
-		if ($request->auth_type eq "Basic") {
-			($status, $password) = $request->get_basic_auth_pw;
-			$username = $request->user;
-			$username or return Apache2::Const::HTTP_UNAUTHORIZED;
-		}
-		else {
-            # per http://www.webgui.org/use/bugs/tracker/12198, failures result in the user remaining visitor, not them
-            # being denied access entirely.
-            # $status = Apache2::Const::HTTP_UNAUTHORIZED; # no
-			return $status;
-		}
-	}
+    my $session = $env->{'webgui.session'}
+        or die 'Missing WebGUI Session - check WebGUI::Middleware::Session';
 
-    my $user = WebGUI::User->newByUsername($session, $username);
-    if ( ! defined $user ) {
-        # $status = Apache2::Const::HTTP_UNAUTHORIZED; # no
-        return $status;
+    # Handle the request
+
+    $self->handle($session);
+
+    my $response = $session->response;
+    my $psgi_response = $response->finalize;
+
+    if ( ! $response->streaming ) {
+
+        # Not streaming, so immediately tell the callback to return 
+        # the response. In the future we could use an Event framework here 
+        # to make this a non-blocking delayed response.
+
+        return $psgi_response;
+
     }
+    else {
 
-    my $authMethod = $user->authMethod;
-    if ($authMethod) { # we have an auth method, let's try to instantiate
-        my $auth = eval { WebGUI::Pluggable::instanciate("WebGUI::Auth::".$authMethod, "new", [ $session, $authMethod ] ) };
-        if ($@) { # got an error
-            $log->error($@);
-            return Apache2::Const::SERVER_ERROR;
-        }
-        elsif ($auth->authenticate($username, $password)) { # lets try to authenticate
-            $log->info("BASIC AUTH: authenticated successfully");
-            my $sessionId = $session->db->quickScalar("select sessionId from userSession where userId=?",[$user->userId]);
-            unless (defined $sessionId) { # no existing session found
-                $log->info("BASIC AUTH: creating new session");
-                $sessionId = $session->id->generate;
-                $auth->_logLogin($user->userId, "success (HTTP Basic)");
+        # Use the PSGI callback style response, which allows for nice things like 
+        # delayed response/streaming body (server push). 
+        # Delayed response prevents any nice MiddleWare::StackTrace-like modules from 
+        # engaging so minimal error handling is done here.
+
+        return sub {
+            my $responder = shift;
+
+            # Construct the PSGI response
+
+            eval {
+                # Ask PSGI server for a streaming writer object by returning only the first
+                # two elements of the array reference
+                my $writer = $responder->( [ $psgi_response->[0], $psgi_response->[1] ] );
+
+                # Store the writer object in the WebGUI::Session::Response object
+                $response->writer($writer);
+
+                # Now call the callback that does the streaming
+                $response->streamer->($session);
+
+                # And finally, clean up
+                $writer->close;
+
+                # Close the session, because the WebGUI::Middleware::Session didn't
+                $session->close;
+                delete $env->{'webgui.session'};
+            };
+            if ( my $e = WebGUI::Error->caught ) {
+                if ($response->writer) {
+                    # Response has already been started, so log error and close writer
+                    $session->request->TRACE(
+                        "Error detected after streaming response started: " . $e->message . "\n" . $e->trace->as_string
+                    );
+                    $response->writer->close;
+                }
+                else {
+                    $responder->( [ 500, [ 'Content-Type' => 'text/plain' ], [ "Internal Server Error" ] ] );
+                }
             }
-            $session->{_var} = WebGUI::Session::Var->new($session, $sessionId);
-            $session->user({user=>$user});
-            return Apache2::Const::OK;
         }
     }
-
-    $log->security($username." failed to login using HTTP Basic Authentication");
-    # $status = Apache2::Const::HTTP_UNAUTHORIZED; # no
-    return $status;
 }
 
-#-------------------------------------------------------------------
+=head2 handle ($session)
 
-=head2 handler ( requestObject )
+Process the list of content handlers from the config file and then evaluate any Template objects which
+may have been returned.
 
-Primary http init/response handler for WebGUI.  This method decides whether to hand off the request to contentHandler() or uploadsHandler()
+=head3 $session
 
-=head3 requestObject
-
-The Apache2::RequestRec object passed in by Apache's mod_perl.
+A WebGUI::Session object.
 
 =cut
 
-sub handler {
-	my $request = shift;	#start with apache request object
-    $request = Apache2::Request->new($request);
-	my $configFile = shift || $request->dir_config('WebguiConfig'); #either we got a config file, or we'll build it from the request object's settings
-	my $server = Apache2::ServerUtil->server;	#instantiate the server api
-	my $config = WebGUI::Config->new($server->dir_config('WebguiRoot'), $configFile); #instantiate the config object
-    my $error = "";
-    my $matchUri = $request->uri;
-    my $gateway = $config->get("gateway");
-    $matchUri =~ s{^$gateway}{/};
-	my $gotMatch = 0;
+sub handle {
+    my ( $self, $session ) = @_;
 
-	# url handlers
-    WEBGUI_FATAL: foreach my $handler (@{$config->get("urlHandlers")}) {
-        my ($regex) = keys %{$handler};
-        if ($matchUri =~ m{$regex}i) {
-            my $output = eval { WebGUI::Pluggable::run($handler->{$regex}, "handler", [$request, $server, $config]) };
-            if ($@) {
-				$error = $@;
+    # uncomment the following to short-circuit contentHandlers (for benchmarking PSGI scaffolding vs. modperl)
+    # $session->output->print("WebGUI PSGI with contentHandlers short-circuited for benchmarking\n");
+    # return;
+
+    # contentHandlers that return text will have that content returned as the response
+    # Alternatively, contentHandlers can stream the response body by calling:
+    #  $session->response->stream_write()
+    # inside of a callback registered via:
+    #  $session->response->stream( sub {  } )
+    # This is generally a good thing to do, unless you want to send a file.
+
+    # uncomment the following to short-circuit contentHandlers with a streaming response:
+    # $session->response->stream(
+        # sub {
+            # my $session = shift;
+            # $session->output->print("WebGUI PSGI with contentHandlers short-circuited for benchmarking (streaming)\n");
+            # #sleep 1;
+            # $session->output->print("...see?\n");
+        # }
+    # );
+    # return;
+
+    local $SIG{__DIE__} = sub { WebGUI::Error::RunTime->throw( message => $_[0] ); };
+
+    # Look for the template preview HTTP headers
+    WebGUI::Asset::Template->processVariableHeaders($session);
+
+    # TODO: refactor the following loop, find all instances of "chunked" and "empty" in codebase, etc..
+    for my $handler (@{$session->config->get("contentHandlers")}) {
+        my $output = eval { WebGUI::Pluggable::run($handler, "handler", [ $session ] )};
+        if ( $@ ) {
+            # re-throwing errors back out to plack is useless; to get the exception through to any middleware that
+            # want to report on it, we have to stash it in $env
+            # as long as our $SIG{__DIE__} is in effect, errors should always be objects
+            my $e = WebGUI::Error->caught;
+            $session->request->env->{'webgui.error'} = $e if $session->request->env->{'webgui.debug'};
+            $session->log->error($e->package.":".$e->line." - ".$e->full_message, $@);
+            $session->log->debug($e->package.":".$e->line." - ".$e->trace, $@);
+        }
+        else {
+
+            # Not an error
+            
+            # Stop if the contentHandler is going to stream the response body
+            return if $session->response->streaming;
+            
+            # We decide what to do next depending on what the contentHandler returned
+            
+            # A WebGUI::Asset::Template object means we should process it
+            if ( defined $output && blessed $output && $output->isa( 'WebGUI::Asset::Template' ) ) {
+                $session->response->sendHeader;
+                $session->output->print( $output->process );
                 last;
             }
-            else {
-				$gotMatch = 1;
-				if ($output ne Apache2::Const::DECLINED) {
-					return $output;
-				}
+            # "chunked" or "empty" means it took care of its own output needs
+            elsif (defined $output && ( $output eq "chunked" || $output eq "empty" )) {
+                #warn "chunked and empty no longer stream, use session->response->stream() instead";
+                last;
+            }
+            # other non-empty output should be used as the response body
+            elsif (defined $output && $output ne "") {
+                # Auto-set the headers
+                $session->response->sendHeader;
+                
+                # Use contentHandler's return value as the output
+                $session->output->print($output);
+                last;
+            }
+            # Keep processing for success codes
+            elsif ($session->response->status < 200 || $session->response->status > 299) {
+                $session->response->sendHeader;
+                last;
             }
         }
-	}
-	return Apache2::Const::DECLINED if ($gotMatch);
-	
-	# can't handle the url due to error or misconfiguration
-    $request->push_handlers(PerlResponseHandler => sub { 
-        print "This server is unable to handle the url '".$request->uri."' that you requested. ".$error;
-        return Apache2::Const::OK;
-    } );
-	$request->push_handlers(PerlTransHandler => sub { return Apache2::Const::OK });
-	return Apache2::Const::DECLINED; 
+    }
+
+    # Print out the template preview variables
+    $session->output->print(
+        WebGUI::Asset::Template->getVariableJson($session), 1
+    );
+
+    return;
 }
 
-
-
+no Moose;
+__PACKAGE__->meta->make_immutable;
 
 1;
-

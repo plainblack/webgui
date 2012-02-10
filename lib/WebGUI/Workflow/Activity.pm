@@ -4,7 +4,7 @@ package WebGUI::Workflow::Activity;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+  WebGUI is Copyright 2001-2012 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -16,7 +16,7 @@ package WebGUI::Workflow::Activity;
 =cut
 
 use strict;
-use WebGUI::HTMLForm;
+use WebGUI::FormBuilder;
 use WebGUI::Pluggable;
 
 =head1 NAME
@@ -208,22 +208,7 @@ sub delete {
 	my $sth = $self->session->db->prepare("delete from WorkflowActivityData where activityId=?");
 	$sth->execute([$self->getId]);
 	$self->session->db->deleteRow("WorkflowActivity","activityId",$self->getId);
-	undef $self;
 }
-
-#-------------------------------------------------------------------
-
-=head2 DESTROY ( )
-
-Deconstructor.
-
-=cut
-
-sub DESTROY {
-        my $self = shift;
-        undef $self;
-}
-
 
 #-------------------------------------------------------------------
 
@@ -273,12 +258,17 @@ Returns the form that will be used to edit the properties of an activity.
 
 sub getEditForm {
     my $self = shift;
-    my $form = WebGUI::HTMLForm->new($self->session);
-    $form->submit;
-    $form->hidden(name=>"activityId", value=>$self->getId);
-    $form->hidden(name=>"className", value=>$self->get("className"));
+    my $form = WebGUI::FormBuilder->new($self->session);
+    $form->addField( "submit", name => "send" );
+    $form->addField( "hidden", name=>"activityId", value=>$self->getId);
+    $form->addField( "hidden", name=>"className", value=>$self->get("className"));
     my $fullDefinition = $self->definition($self->session);
-    $form->dynamicForm($fullDefinition, "properties", $self);
+    for my $hash ( map { $_->{properties} } @{$fullDefinition} ) {
+        for my $fieldName ( keys %$hash ) {
+            my $field = $hash->{ $fieldName };
+            $form->addField( delete $field->{fieldType}, name => $fieldName, %$field );
+        }
+    }
     return $form;
 }
 
@@ -347,7 +337,7 @@ sub new {
 	$class = $main->{className};
     eval { WebGUI::Pluggable::load($class) };
     if ($@) {
-        $session->errorHandler->error($@);
+        $session->log->error($@);
         return undef;
     }  
 	my $sub = $session->db->buildHashRef("select name,value from WorkflowActivityData where activityId=?",[$activityId]);
@@ -387,7 +377,7 @@ sub newByPropertyHashRef {
     my $className = $properties->{className};
     eval { WebGUI::Pluggable::load($className) };
     if ($@) {
-        $session->errorHandler->error($@);
+        $session->log->error($@);
         return undef;
     }  
     bless {_session=>$session, _id=>$properties->{activityId}, _data => $properties}, $className;

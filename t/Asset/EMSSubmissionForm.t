@@ -1,6 +1,6 @@
 # vim:syntax=perl
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -13,12 +13,11 @@
 # 
 #
 
-use FindBin;
 use strict;
-use lib "$FindBin::Bin/../lib";
 use Test::More;
 use Test::Deep;
 use Test::Warn;
+use Test::Exception;
 use HTML::Form;
 use JSON;
 use WebGUI::Test; # Must use this before any other WebGUI modules
@@ -74,11 +73,6 @@ sub logout     { $session->user({userId => 1}); }
 
 loginAdmin;
 
-# Create a version tag to work in
-my $versionTag = WebGUI::VersionTag->getWorking($session);
-$versionTag->set({name=>"EventManagementSystem Test"});
-WebGUI::Test->addToCleanup($versionTag);
-
 # Do our work in the import node
 my $node = WebGUI::Asset->getImportNode($session);
 
@@ -87,14 +81,14 @@ loginRgstr ;
 # Add an EMS asset
 my $ems = $node->addChild({
     className                =>'WebGUI::Asset::Wobject::EventManagementSystem',
-    title                    => 'Test EMS',
-    description              => 'This is a test ems',
-    url                      => '/test-ems',
     workflowIdCommit         => 'pbworkflow000000000003', # Commit Content Immediately
     registrationStaffGroupId => $registrars->getId,
     groupIdView              => $attendees->getId,
     submittedLocationsList   => join( "\n", my @submissionLocations = qw'loc1 loc2' ),
 });
+my $ems_tag = WebGUI::VersionTag->getWorking($session);
+$ems_tag->commit;
+WebGUI::Test->addToCleanup($ems, $ems_tag);
 # I scooped this out ot WG::Asset::Wobject::EventManagementSystem
 # its not pretty, but there is no other way to add a meta field
 my $mf1Id = $ems->setCollateral("EMSEventMetaField", "fieldId",{
@@ -119,9 +113,7 @@ my $mf2Id = $ems->setCollateral("EMSEventMetaField", "fieldId",{
 
 my $i18n = $ems->i18n;
 
-$versionTag->commit;
-$versionTag = WebGUI::VersionTag->getWorking($session);
-WebGUI::Test->addToCleanup($versionTag);
+$ems = $ems->cloneFromDb;
 
 my $id1 = $ems->getNextSubmissionId;
 my $id2 = $ems->getNextSubmissionId;
@@ -207,7 +199,7 @@ my $submission = {
     title => 'my favorite thing to talk about',
     description => 'the description',
     startDate => '1255150800',
-        };
+};
 $session->request->setup_body($submission);
 my $sub1 = $frmA->addSubmission;
 WebGUI::Test->addToCleanup( $sub1 );
@@ -225,7 +217,7 @@ $submission = {
     title => 'why i like to be important',
     description => 'the description',
     mfRequiredUrl => 'http://google.com',
-        };
+};
 $session->request->setup_body($submission);
 my $sub2 = $frmB->addSubmission;
 WebGUI::Test->addToCleanup( $sub2 );
@@ -320,7 +312,7 @@ cmp_deeply($sub1->get('comments')->[0],{
       comment => 'this is a test comment',
       rating => 0,
       date => re( qr/\d{10}/ ),
-      ip => undef,
+      ip => ignore(),
 }, "successfully added comment" );
 
 $sub1->update({
@@ -336,6 +328,8 @@ is($sub1->get('submissionStatus'),'approved','set status to approved');
 
 $sub2->update({ submissionStatus => 'denied' });
 is($sub2->get('submissionStatus'),'denied','set status to denied');
+diag $sub1->submissionStatus;
+diag $sub1->ticketId;
 
 SKIP: { skip "workflow activities not coded yet", 10 if 0;
 
@@ -351,13 +345,18 @@ is($approveSubmissions->run, 'complete', 'approval complete');
 is($approveSubmissions->run, 'done', 'approval done');
 
 $sub1 = $sub1->cloneFromDb;
+diag $sub1->submissionStatus;
+diag $sub1->ticketId;
+diag $sub1->getRevisionCount;
 is( $sub1->get('submissionStatus'),'created','approval successfull');
 
-my $ticket = WebGUI::Asset->newByDynamicClass($session, $sub1->get('ticketId'));
-WebGUI::Test->addToCleanup( $ticket ) if $ticket ;
+my $ticket = eval { WebGUI::Asset->newById($session, $sub1->get('ticketId')); };
+my $e = Exception::Class->caught();
 SKIP: {
-skip 'no ticket created', 1 unless isa_ok( $ticket, 'WebGUI::Asset::Sku::EMSTicket', 'approval created a ticket');
-is( $ticket->get('title'), $sub1->get('title'), 'Ticket title matches submission title' );
+    skip 'no ticket created', 2 if $e;
+    isa_ok( $ticket, 'WebGUI::Asset::Sku::EMSTicket', 'approval created a ticket');
+    WebGUI::Test->addToCleanup( $ticket ) if $ticket ;
+    is( $ticket->get('title'), $sub1->get('title'), 'Ticket title matches submission title' );
 }
  
 my $newDate = time - ( 60 * 60 * 24 * ( $sub2->getParent->get('daysBeforeCleanup') + 1 ) ),
@@ -372,14 +371,11 @@ $cleanupSubmissions->reset;
 is($cleanupSubmissions->run, 'complete', 'cleanup complete');
 is($cleanupSubmissions->run, 'done', 'cleanup done');
 
-$sub2 = WebGUI::Asset->newByDynamicClass($session, $sub2Id);
-is( $sub2, undef, 'submission deleted');
+dies_ok { WebGUI::Asset->newById($session, $sub2Id) } 'submission deleted';
 
 } # end of workflow skip
 
 } # end of create submission skip
-
-$versionTag->commit;
 
 # this is not the greatest test but it does run through the basic create submissionForm code.
 loginRgstr;

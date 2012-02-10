@@ -1,7 +1,7 @@
 package WebGUI::Asset::Shortcut;
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2009 Plain Black Corporation.
+# WebGUI is Copyright 2001-2012 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -11,9 +11,64 @@ package WebGUI::Asset::Shortcut;
 #-------------------------------------------------------------------
 
 use strict;
-use Carp;
+use Carp qw/croak/;
 use Tie::IxHash;
-use WebGUI::Asset;
+use Moose;
+use WebGUI::Definition::Asset;
+use WebGUI::Form::CheckList;
+extends 'WebGUI::Asset';
+
+define assetName => ['assetName', 'Asset_Shortcut'];
+define icon      => 'shortcut.gif';
+define tableName => 'Shortcut';
+
+property  shortcutToAssetId => (
+              noFormPost => 1,
+              fieldType  => "hidden",
+              required  => 1, # default    => undef, # XXX
+              noFormPost => 1,
+          );
+property  shortcutByCriteria => (
+              fieldType  => "yesNo",
+              default    => 0,
+              noFormPost => 1,
+          );
+property  disableContentLock => (
+              fieldType  => "yesNo",
+              default    => 0,
+              noFormPost => 1,
+          );
+property  resolveMultiples => (
+              fieldType  => "selectBox",
+              default    => "mostRecent",
+              noFormPost => 1,
+          );
+property  shortcutCriteria => (
+              fieldType  => "textarea",
+              default    => "",
+              noFormPost => 1,
+          );
+property  templateId => (
+              fieldType  => "template",
+              default    => "PBtmpl0000000000000140",
+              noFormPost => 1,
+          );
+property  prefFieldsToShow => (
+              fieldType  => "checkList",
+              default    => undef,
+              noFormPost => 1,
+          );
+property  prefFieldsToImport => (
+              fieldType  => "checkList",
+              default    => undef,
+              noFormPost => 1,
+          );
+property  showReloadIcon => (
+              fieldType  => "yesNo",
+              default    => 1,
+              noFormPost => 1,
+          );
+
 use WebGUI::International;
 use WebGUI::Operation::Profile;
 use WebGUI::ProfileField;
@@ -21,8 +76,6 @@ use WebGUI::ProfileCategory;
 use WebGUI::Macro;
 use HTML::Entities qw(encode_entities);
 use Data::Dumper;
-
-our @ISA = qw(WebGUI::Asset);
 
 #-------------------------------------------------------------------
 sub _drawQueryBuilder {
@@ -59,7 +112,7 @@ sub _drawQueryBuilder {
 	# Static form fields
 	my $shortcutCriteriaField = WebGUI::Form::textarea($session, {
 		name=>"shortcutCriteria",
-		value=>$self->getValue("shortcutCriteria"),
+		value=>$self->shortcutCriteria,
 		extras=>'style="width: 100%" '.$self->{_disabled}
 	});
 	my $conjunctionField = WebGUI::Form::selectBox($session, {
@@ -73,8 +126,8 @@ sub _drawQueryBuilder {
 	);
 
 	# html
-	$session->style->setScript($session->url->extras('wobject/Shortcut/querybuilder.js'), {type=>"text/javascript"});
-	$session->style->setLink($session->url->extras('wobject/Shortcut/querybuilder.css'), {type=>"text/css", rel=>"stylesheet"});
+	$session->style->setScript($session->url->extras('wobject/Shortcut/querybuilder.js'));
+	$session->style->setCss($session->url->extras('wobject/Shortcut/querybuilder.css'));
 	my $output;
 	$output .= qq|<table cellspacing="0" cellpadding="0" border="0"><tr><td colspan="5" align="right">$shortcutCriteriaField</td></tr><tr><td></td><td></td><td></td><td></td><td class="qbtdright"></td></tr><tr><td></td><td></td><td></td><td></td><td class="qbtdright">$conjunctionField</td></tr>|;
 
@@ -134,20 +187,6 @@ sub _drawQueryBuilder {
 }
 
 #-------------------------------------------------------------------
-sub _submenu {
-	my $self = shift;
-	my $workarea = shift;
-	my $title = shift;
-	my $help = shift;
-	my $ac = WebGUI::AdminConsole->new($self->session,"shortcutmanager");
-	$ac->setIcon($self->getIcon);
-	my $i18n = WebGUI::International->new($self->session,"Asset_Shortcut");
-	$ac->addSubmenuItem($self->getUrl('func=edit'), $i18n->get("Back to Edit Shortcut"));
-	$ac->addSubmenuItem($self->getUrl("func=manageOverrides"),$i18n->get("Manage Shortcut Overrides"));
-	return $ac->render($workarea, $title);
-}
-
-#-------------------------------------------------------------------
 
 =head2 canEdit 
 
@@ -156,11 +195,12 @@ can manage the parent you can edit this Shortcut.
 
 =cut
 
-sub canEdit {
-	my $self = shift;
-return 1 if ($self->SUPER::canEdit || ($self->isDashlet && $self->getParent->canManage));
-	return 0;
-}
+around canEdit => sub {
+    my $orig = shift;
+    my $self = shift;
+    return 1 if ($self->$orig(@_) || ($self->isDashlet && $self->getParent->canManage));
+    return 0;
+};
 
 #-------------------------------------------------------------------
 
@@ -176,60 +216,6 @@ sub canManage {
 }
 
 #-------------------------------------------------------------------
-sub definition {
-	my $class = shift;
-	my $session = shift;
-	my $definition = shift;
-	my $i18n = WebGUI::International->new($session,"Asset_Shortcut");
-	push(@{$definition}, {
-		assetName=>$i18n->get('assetName'),
-		icon=>'shortcut.gif',
-		tableName=>'Shortcut',
-		className=>'WebGUI::Asset::Shortcut',
-		properties=>{
-			shortcutToAssetId=>{
-				noFormPost=>1,
-				fieldType=>"hidden",
-				defaultValue=>undef
-			},
-			shortcutByCriteria=>{
-				fieldType=>"yesNo",
-				defaultValue=>0,
-			},
-			disableContentLock=>{
-				fieldType=>"yesNo",
-				defaultValue=>0
-			},
-			resolveMultiples=>{
-				fieldType=>"selectBox",
-				defaultValue=>"mostRecent",
-			},
-			shortcutCriteria=>{
-				fieldType=>"textarea",
-				defaultValue=>"",
-			},
-			templateId=>{
-				fieldType=>"template",
-				defaultValue=>"PBtmpl0000000000000140"
-			},
-			prefFieldsToShow=>{
-				fieldType=>"checkList",
-				defaultValue=>undef
-			},
-			prefFieldsToImport=>{
-				fieldType=>"checkList",
-				defaultValue=>undef
-			},
-			showReloadIcon=>{
-				fieldType=>"yesNo",
-				defaultValue=>1
-			}
-		}
-	});
-	return $class->SUPER::definition($session,$definition);
-}
-
-#-------------------------------------------------------------------
 
 =head2 discernUserId 
 
@@ -239,8 +225,8 @@ Shortcut that the Visitor would see, or their own.
 =cut
 
 sub discernUserId {
-	my $self = shift;
-	return ($self->canManage && $self->session->var->isAdminOn) ? '1' : $self->session->user->userId;
+   my $self = shift;
+   return ($self->canManage && $self->session->form->get('visitor')) ? '1' : $self->session->user->userId;
 }
 
 #-------------------------------------------------------------------
@@ -251,9 +237,9 @@ Extend the base method to duplicate shortcut overrides.
 
 =cut
 
-sub duplicate {
+override duplicate => sub {
     my $self = shift;
-    my $newAsset = $self->SUPER::duplicate(@_);
+    my $newAsset = super();
     $self->session->db->write(<<'END_SQL', [$newAsset->getId, $self->getId]);
 INSERT INTO Shortcut_overrides (assetId, fieldName, newValue)
 SELECT ?, fieldName, newValue
@@ -261,7 +247,7 @@ FROM Shortcut_overrides
 WHERE assetId = ?
 END_SQL
     return $newAsset;
-}
+};
 
 #-------------------------------------------------------------------
 
@@ -275,7 +261,7 @@ Return the largest of either the asset revision date, or the shortcut revision d
 sub getContentLastModified {
     my $self = shift;
     my $assetRev = $self->get('revisionDate');
-    my $shortcut = $self->getShortcut;
+    my $shortcut = $self->getShortcut;    # XXX "newById must get an assetId"
     my $shortcuttedRev;
     if (defined $shortcut) {
         $shortcuttedRev = $shortcut->getContentLastModified;
@@ -293,77 +279,72 @@ Extend the base class to handle hand drawing the query build and other pieces.
 
 =cut
 
-sub getEditForm {
+override getEditForm => sub {
 	my $self = shift;
-	my $tabform = $self->SUPER::getEditForm();
+	my $f = super();
 	my $originalTemplate;
 	my $i18n = WebGUI::International->new($self->session, "Asset_Shortcut");
 	my $shortcut = $self->getShortcut;
 	if (defined $shortcut) {
-		$tabform->getTab("properties")->readOnly(
-			-label=>$i18n->get(1),
-			-hoverHelp=>$i18n->get('1 description'),
-			-value=>'<a href="'.$shortcut->getUrl.'">'.$shortcut->get('title').'</a> ('.$shortcut->getId.')'
+		$f->getTab("properties")->addField( "ReadOnly",
+			label=>$i18n->get(1),
+			hoverHelp=>$i18n->get('1 description'),
+			value=>'<a href="'.$shortcut->getUrl.'">'.$shortcut->get('title').'</a> ('.$shortcut->getId.')'
 			);
 	} else {
-		$tabform->getTab("properties")->readOnly(
+		$f->getTab("properties")->addField( "ReadOnly",
 			value=>'<a href="'.$self->getUrl("func=delete").'"><span style="font-weight: bold; color: red;">'.$self->notLinked.'</span></a>'
 			);
 	}
-	$tabform->getTab("display")->template(
-		-value=>$self->getValue("templateId"),
-		-label=>$i18n->get('shortcut template title'),
-		-hoverHelp=>$i18n->get('shortcut template title description'),
-		-namespace=>"Shortcut"
-	);
+
 	if($self->session->setting->get("metaDataEnabled")) {
-		$tabform->getTab("properties")->yesNo(
-			-name     => "shortcutByCriteria",
-			-value    => $self->getValue("shortcutByCriteria"),
-			-label    => $i18n->get("Shortcut by alternate criteria"),
-			-hoverHelp=> $i18n->get("Shortcut by alternate criteria description"),
-			-extras   => q|onchange="wgCriteriaDisable(this.form, this.form.shortcutByCriteria[0].checked)"|,
+		$f->getTab("properties")->addField( "YesNo",
+			name     => "shortcutByCriteria",
+			value    => $self->shortcutByCriteria,
+			label    => $i18n->get("Shortcut by alternate criteria"),
+			hoverHelp=> $i18n->get("Shortcut by alternate criteria description"),
+			extras   => q|onchange="wgCriteriaDisable(this.form, this.form.shortcutByCriteria[0].checked)"|,
         );
-		$tabform->getTab("properties")->yesNo(
-			-name=>"disableContentLock",
-			-value=>$self->getValue("disableContentLock"),
-			-label=>$i18n->get("disable content lock"),
-			-hoverHelp=>$i18n->get("disable content lock description")
+		$f->getTab("properties")->addField( "YesNo",
+			name=>"disableContentLock",
+			value=>$self->disableContentLock,
+			label=>$i18n->get("disable content lock"),
+			hoverHelp=>$i18n->get("disable content lock description"),
 			);
-		if ($self->getValue("shortcutByCriteria") == 0) {
+		if ($self->shortcutByCriteria == 0) {
 			$self->{_disabled} = 'disabled=true';
 		}
-		$tabform->getTab("properties")->selectBox(
-			-name=>"resolveMultiples",
-			-value=>[ $self->getValue("resolveMultiples") ],
-			-label=>$i18n->get("Resolve Multiples"),
-			-hoverHelp=>$i18n->get("Resolve Multiples description"),
-			-options=>{
+		$f->getTab("properties")->addField( "SelectBox",
+			name=>"resolveMultiples",
+			value=>[ $self->resolveMultiples ],
+			label=>$i18n->get("Resolve Multiples"),
+			hoverHelp=>$i18n->get("Resolve Multiples description"),
+			options=>{
 				mostRecent=>$i18n->get("Most Recent"),
 				random=>$i18n->get("Random"),
 			},
-			-extras=>$self->{_disabled}
+			extras=>$self->{_disabled},
 		);
-		$tabform->getTab("properties")->readOnly(
-			-value=>$self->_drawQueryBuilder(),
-			-label=>$i18n->get("Criteria"),
-			-hoverHelp=>$i18n->get("Criteria description")
+		$f->getTab("properties")->addField( "ReadOnly",
+			value=>$self->_drawQueryBuilder(),
+			label=>$i18n->get("Criteria"),
+			hoverHelp=>$i18n->get("Criteria description"),
 		);
 	}
-	$tabform->addTab('overrides',$i18n->get('Overrides'));
-	$tabform->getTab('overrides')->raw('<tr><td>' . $self->getOverridesList . '</td></tr>');
+	$f->addTab( name => 'overrides', label => $i18n->get('Overrides') );
+	$f->getTab('overrides')->addField( "ReadOnly", value => $self->getOverridesList );
 	if ($self->isDashlet) {
-		$tabform->addTab('preferences',$i18n->get('Preferences'), 9);
-		$tabform->getTab('preferences')->raw($self->getFieldsList);
-		$tabform->getTab("properties")->yesNo(
-			-value=>$self->getValue("showReloadIcon"),
-			-name=>"showReloadIcon",
-			-label=>$i18n->get("show reload icon"),
-			-hoverHelp=>$i18n->get("show reload icon description")
+		$f->addTab( name => 'preferences', label => $i18n->get('Preferences'), uiLevel => 9);
+		$f->getTab('preferences')->addField( "ReadOnly", value => $self->getFieldsList );
+		$f->getTab("properties")->addField( "YesNo",
+			value=>$self->showReloadIcon,
+			name=>"showReloadIcon",
+			label=>$i18n->get("show reload icon"),
+			hoverHelp=>$i18n->get("show reload icon description"),
 		);
 	}
-	return $tabform;
-}
+	return $f;
+};
 
 
 #-------------------------------------------------------------------
@@ -414,6 +395,26 @@ sub getFieldsList {
 	return $output;
 }
 
+#----------------------------------------------------------------------------
+
+=head2 getHelpers
+
+Get the helpers to manage the shortcut overrides.
+
+NOTE: These are added to the edit form, so why do we also need a special page for them? Remove it in the future...
+
+=cut
+
+override getHelpers => sub {
+    my ( $self ) = @_;
+    my $helpers = super();
+    $helpers->{manageOverrides} = {
+        url     => $self->getUrl( 'func=manageOverrides' ),
+        label   => 'Manage Overrides',
+    };
+    return $helpers;
+};
+
 #-------------------------------------------------------------------
 
 =head2 getOverridesList
@@ -426,6 +427,7 @@ generated for that field
 
 sub getOverridesList {
 	my $self = shift;
+        my $session = $self->session;
 	my $output = '';
 	my $i18n = WebGUI::International->new($self->session, "Asset_Shortcut");
 	my %overrides = $self->getOverrides;
@@ -433,24 +435,36 @@ sub getOverridesList {
 	$output .= '<tr class="tableHeader"><td>'.$i18n->get('fieldName').'</td><td>'.$i18n->get('edit delete fieldname').'</td><td>'.$i18n->get('Original Value').'</td><td>'.$i18n->get('New value').'</td><td>'.$i18n->get('Replacement value').'</td></tr>';
 	my $shortcut = $self->getShortcutOriginal;
 	return undef unless defined $shortcut;
-	foreach my $definition (@{$shortcut->definition($self->session)}) {
-		foreach my $prop (keys %{$definition->{properties}}) {
-			next if $definition->{properties}{$prop}{fieldType} eq 'hidden';
-            next if $definition->{properties}{$prop}{label} eq '';
-			$output .= '<tr>';
-            $output .= '<td class="tableData">'.$definition->{properties}{$prop}{label}.'</td>';
-			$output .= '<td class="tableData">';
-			$output .= $self->session->icon->edit('func=editOverride;fieldName='.$prop,$self->get("url"));
-			$output .= $self->session->icon->delete('func=deleteOverride;fieldName='.$prop,$self->get("url")) if exists $overrides{overrides}{$prop};
-			$output .= '</td><td>';
-			$output .= $overrides{overrides}{$prop}{origValue};
-			$output .= '</td><td>';
-			$output .= encode_entities($overrides{overrides}{$prop}{newValue}, '<>&"^');
-			$output .= '</td><td>';
-			$output .= $overrides{overrides}{$prop}{parsedValue};
-			$output .= "</td></tr>\n";
-		}
+
+    # Config file overrides for properties
+    my $overrides = $session->config->get( "assets/" . $shortcut->get("className") . '/fields' ) || {};
+
+    # Get the properties of the shortcutted asset
+    for my $property_name ( $shortcut->getProperties ) {
+        my $property = $shortcut->meta->find_attribute_by_name( $property_name );
+        next if $property->noFormPost;
+        next if $property->fieldType eq 'hidden';
+
+        my $fieldType       = $property->fieldType;
+        my $fieldOverrides  = $overrides->{ $property_name } || {};
+        my $fieldHash       = {
+                                %{ $shortcut->getFormProperties( $property_name ) },
+                                %{ $overrides },
+                            };
+        $output .= '<tr>';
+        $output .= '<td class="tableData">'.$fieldHash->{label}.'</td>';
+        $output .= '<td class="tableData">';
+        $output .= $self->session->icon->edit('func=editOverride;fieldName='.$property_name,$self->get("url"));
+        $output .= $self->session->icon->delete('func=deleteOverride;fieldName='.$property_name,$self->get("url")) if exists $overrides{overrides}{$property_name};
+        $output .= '</td><td>';
+        $output .= $overrides{overrides}{$property_name}{origValue};
+        $output .= '</td><td>';
+        $output .= encode_entities($overrides{overrides}{$property_name}{newValue}, '<>&"^');
+        $output .= '</td><td>';
+        $output .= $overrides{overrides}{$property_name}{parsedValue};
+        $output .= "</td></tr>\n";
 	}
+
 	$output .= '</table>';
 	return $output;
 }
@@ -467,7 +481,7 @@ admin mode is on.
 sub _overridesCacheTag {
 	my $self = shift;
 	#cache by userId, assetId of this shortcut, and whether adminMode is on or not.
-	return ["shortcutOverrides", $self->getId, $self->session->user->userId, $self->session->var->isAdminOn];
+	return join "", "shortcutOverrides", $self->getId, $self->session->user->userId;
 }
 
 #-------------------------------------------------------------------
@@ -482,16 +496,19 @@ expired, or if the user's profile field has changed.
 
 =cut
 
+# The datastructure returned here is insane. There should be a simple "getOverride( 'name' )"
+# that works exactly like get() does.
+
 sub getOverrides {
 	my $self    = shift;
     my $session = $self->session;
-	my $cache   = WebGUI::Cache->new($self->session,$self->_overridesCacheTag);
+	my $cache   = $session->cache;
     my $u       = WebGUI::User->new($self->session, $self->discernUserId);
 
-	my $overridesRef = $cache->get;
+	my $overridesRef = $cache->get($self->_overridesCacheTag);
     ##If admin mode is not on, and the cache is valid, and not expired, and the user object was not updated,
     ##return the cached value.
-    if ( ! $session->var->isAdminOn
+    if ( ! $session->isAdminOn
         && $overridesRef
         && $overridesRef->{cacheNotExpired}
         && $overridesRef->{userLastUpdated} >= $u->get('lastUpdated')) {
@@ -501,9 +518,9 @@ sub getOverrides {
     my $orig = $self->getShortcutOriginal;
     if (defined $orig) {
         unless ( exists $orig->{_propertyDefinitions}) {
-        my %properties;
-            foreach my $definition (@{$orig->definition($self->session)}) {
-                %properties = (%properties, %{$definition->{properties}});
+            my %properties;
+            foreach my $property ($orig->getProperties) {
+                $properties{$property} = $orig->getFormProperties($property);
             }
             $orig->{_propertyDefinitions} = \%properties;
         }
@@ -518,7 +535,7 @@ sub getOverrides {
         $sth->finish;
     }
     else {
-        $self->session->errorHandler->warn("Original asset could not be instanciated by shortcut ".$self->getId);
+        $self->session->log->warn("Original asset could not be instanciated by shortcut ".$self->getId);
     }
     if ($self->isDashlet) {
         my @userPrefs = $self->getPrefFieldsToImport;
@@ -536,7 +553,7 @@ sub getOverrides {
         }
     }
     $overrides{userLastUpdated} = $session->user->get('lastUpdated');
-    $cache->set(\%overrides, 60*60);
+    $cache->set($self->_overridesCacheTag, \%overrides, 60*60);
     $overridesRef = \%overrides;
 	return %{ $overridesRef };
 }
@@ -553,7 +570,7 @@ processed if set.
 sub getShortcut {
 	my $self = shift;
 	unless ($self->{_shortcut}) {
-		$self->{_shortcut} = $self->getShortcutOriginal;
+		$self->{_shortcut} = $self->getShortcutOriginal;  # XXX "newById must get an assetId"
 	}
 	$self->{_shortcut}{_properties}{displayTitle} = undef if ($self->isDashlet);
 	# Hide title by default.  If you want, you can create an override
@@ -593,9 +610,9 @@ sub getShortcutByCriteria {
 	my $scratchId;
 	if ($assetId) {
 		$scratchId = "Shortcut_" . $assetId;
-		if($self->session->scratch->get($scratchId) && !$self->getValue("disableContentLock")) {
-			unless ($self->session->var->isAdminOn) {
-				return WebGUI::Asset->newByDynamicClass($self->session, $self->session->scratch->get($scratchId));
+		if($self->session->scratch->get($scratchId) && !$self->disableContentLock) {
+			unless ($self->session->isAdminOn) {
+				return WebGUI::Asset->newById($self->session, $self->session->scratch->get($scratchId));
 			}
 		}
 	}
@@ -690,7 +707,7 @@ sub getShortcutByCriteria {
 	# Store the matching assetId in user scratch. 
 	$self->session->scratch->set($scratchId,$id) if ($scratchId);
 
-	return WebGUI::Asset->newByDynamicClass($self->session, $id);
+	return WebGUI::Asset->newById($self->session, $id);
 }
 
 #-------------------------------------------------------------------
@@ -703,7 +720,7 @@ Return the asset that this Shortcut points to.
 
 sub getShortcutDefault {
 	my $self = shift;
-	return WebGUI::Asset->newByDynamicClass($self->session, $self->get("shortcutToAssetId"));
+	return WebGUI::Asset->newById($self->session, $self->get("shortcutToAssetId"));
 }
 
 #-------------------------------------------------------------------
@@ -720,7 +737,7 @@ sub getShortcutOriginal {
 	if ($self->get("shortcutByCriteria")) {
 		return $self->getShortcutByCriteria;
 	} else {
-		return $self->getShortcutDefault;
+		return $self->getShortcutDefault;     # XXX "newById must get an assetId"
 	}
 }
 
@@ -734,7 +751,7 @@ Returns an array of profile fields to show to the user as preferences.
 
 sub getPrefFieldsToShow {
 	my $self = shift;
-	return split("\n",$self->getValue("prefFieldsToShow"));
+	return split("\n",$self->prefFieldsToShow);
 }
 
 #-------------------------------------------------------------------
@@ -748,7 +765,7 @@ for overrides.
 
 sub getPrefFieldsToImport {
 	my $self = shift;
-	return split("\n",$self->getValue("prefFieldsToImport"));
+	return split("\n",$self->prefFieldsToImport);
 }
 
 #----------------------------------------------------------------------------
@@ -796,7 +813,7 @@ Returns an I18n'ed error message that the Asset that this Shortcut points to no 
 
 sub notLinked {
 	my $self = shift;
-	$self->session->errorHandler->warn("Shortcut ".$self->getId." is linked to an asset ".$self->get("shortcutToAssetId").", which no longer exists.");
+	$self->session->log->warn("Shortcut ".$self->getId." is linked to an asset ".$self->get("shortcutToAssetId").", which no longer exists.");
     my $i18n = WebGUI::International->new($self->session, 'Asset_Shortcut');
 	return $i18n->get('no longer exists');
 }
@@ -823,33 +840,33 @@ on the Asset that is shortcutted.
 
 =cut
 
-sub prepareView {
+override prepareView => sub {
 	my $self = shift;
-	$self->SUPER::prepareView();
-	my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId"));
+	super();
+	my $template = WebGUI::Asset::Template->newById($self->session, $self->get("templateId"));
 	$template->prepare($self->getMetaDataAsTemplateVariables);
 	$self->{_viewTemplate} = $template;
 	my $shortcut = $self->getShortcut;
 	$shortcut->prepareView if defined $shortcut;
-}
+};
 
 
 #-------------------------------------------------------------------
 
-=head2 processPropertiesFromFormPost ( )
+=head2 processEditForm ( )
 
-See WebGUI::Asset::processPropertiesFromFormPost () for details.  Extends the base class to delete
+See WebGUI::Asset::processEditForm () for details.  Extends the base class to delete
 the scratch variables, and to uncache the overrides.
 
 =cut
 
-sub processPropertiesFromFormPost {
+override processEditForm => sub {
 	my $self = shift;
-	$self->SUPER::processPropertiesFromFormPost;
+	super();
 	my $scratchId = "Shortcut_" . $self->getId;
 	$self->session->scratch->delete($scratchId);
 	$self->uncacheOverrides;
-}
+};
 
 #----------------------------------------------------------------------------
 
@@ -864,7 +881,7 @@ sub setOverride {
     my $self        = shift;
     my $override    = shift;
 
-    croak "Shortcut->setOverride - first argument must be hash reference" 
+    Carp::croak "Shortcut->setOverride - first argument must be hash reference" 
         unless $override && ref $override eq "HASH";
     
     for my $key ( %$override ) {
@@ -888,14 +905,14 @@ overrides.
 
 =cut
 
-sub purge {
+override purge => sub {
     my $self = shift;
     $self->session->db->write(<<'END_SQL', [$self->getId]);
 DELETE FROM Shortcut_overrides
 WHERE assetId = ?
 END_SQL
-    return $self->SUPER::purge(@_);
-}
+    return super();
+};
 
 #-------------------------------------------------------------------
 
@@ -907,7 +924,7 @@ Delete any cached overrides.
 
 sub uncacheOverrides {
 	my $self = shift;
-	WebGUI::Cache->new($self->session,$self->_overridesCacheTag)->delete;
+	$self->session->cache->remove($self->_overridesCacheTag);
 }
 
 #-------------------------------------------------------------------
@@ -964,23 +981,6 @@ sub view {
 
 #-------------------------------------------------------------------
 
-=head2 www_edit 
-
-Override the base class to handle adding a menu entry for Manage Overrides.
-
-=cut
-
-sub www_edit {
-	my $self = shift;
-	return $self->session->privilege->insufficient() unless $self->canEdit;
-	return $self->session->privilege->locked() unless $self->canEditIfLocked;
-	my $i18n = WebGUI::International->new($self->session,"Asset_Shortcut");
-	$self->getAdminConsole->addSubmenuItem($self->getUrl("func=manageOverrides"),$i18n->get("Manage Shortcut Overrides"));
-	return $self->getAdminConsole->render($self->getEditForm->print,$i18n->get(2));
-}
-
-#-------------------------------------------------------------------
-
 =head2 www_getUserPrefsForm 
 
 Returns a form displaying all user profile fields to show to the user, that they
@@ -997,15 +997,22 @@ sub www_getUserPrefsForm {
 	return $i18n->get('cannot personalize') unless $self->getParent->canPersonalize;
 	my $output;
 	my @fielden = $self->getPrefFieldsToShow;
-	my $f = WebGUI::HTMLForm->new($self->session,extras=>' onsubmit="submitForm(this,\''.$self->getId.'\',\''.$self->getUrl.'\');return false;"');
-	$f->raw('<table cellspacing="0" cellpadding="3" border="0">');
-    my $allowedToSave = ( ! $session->var->isAdminOn && $self->getParent->canPersonalize )
-                     || (   $session->var->isAdminOn && $session->user->isInGroup($session->setting->get('groupIdAdminUser')) );
-    if ($allowedToSave) {
-        $f->hidden(  
-            -name => 'func', 
-            -value => 'saveUserPrefs'
+	my $f = WebGUI::FormBuilder->new($self->session,
+            action => $self->getUrl,
+            extras => 'onsubmit="submitForm(this,\''.$self->getId.'\',\''.$self->getUrl.'\');return false;"',
         );
+    # Admins are allowed to edit visitor's preferences
+    my $editingVisitor  = $session->form->get('visitor') eq 1;
+    my $allowedToSave = ( ! $editingVisitor && $self->getParent->canPersonalize )
+                     || (   $editingVisitor && $session->user->isInGroup($session->setting->get('groupIdAdminUser')) );
+    if ($allowedToSave) {
+        $f->addField( "hidden",   
+            name => 'func', 
+            value => 'saveUserPrefs'
+        );
+        if ( $editingVisitor ) {
+            $f->addField( "hidden", name => 'visitor', value => 1 );
+        }
     }
 	my $u = WebGUI::User->new($session, $self->discernUserId);
 	FIELD: foreach my $fieldId (@fielden) {
@@ -1022,14 +1029,13 @@ sub www_getUserPrefsForm {
         if (! $allowedToSave) {
             $params->{extras} = ' disabled ';
         }
-		$f->raw($field->formField($params,1, $u));
+		$f->addField($field->formField($params,1, $u, 0, undef, 1));
 	}
     if ($allowedToSave) {
-        $f->submit({extras=>'className="nothing"'});
+        $f->addField( "submit", extras => 'className="nothing"' );
     }
-	$f->raw('</table>');
 	my $tags = $session->style->generateAdditionalHeadTags();
-	$output .= $tags.$f->print;
+	$output .= $tags.$f->toHtml;
 
 	return $output;
 }
@@ -1047,7 +1053,7 @@ sub www_manageOverrides {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless $self->canEdit;
 	my $i18n = WebGUI::International->new($self->session,"Asset_Shortcut");
-	return $self->_submenu($self->getOverridesList,$i18n->get("Manage Shortcut Overrides"));
+	return '<h1>' . $i18n->get("Manage Shortcut Overrides") . '</h1>' . $self->getOverridesList;
 }
 
 #-------------------------------------------------------------------
@@ -1098,13 +1104,14 @@ the form would allow someone who is not a User Admin to alter Visitor's profile.
 sub www_saveUserPrefs {
 	my $self    = shift;
     my $session = $self->session;
+    my $editingVisitor  = $session->form->get('visitor') eq 1;
 	return '' unless $self->getParent->canPersonalize
-                  || ( $session->var->isAdminOn && $session->user->isInGroup($session->setting->get('groupIdAdminUser')) );
+                  || ( $editingVisitor && $session->user->isInGroup($session->setting->get('groupIdAdminUser')) );
 	my @fellowFields = $self->getPrefFieldsToShow;
 	my %data = ();
 	$self->uncacheOverrides;
 	my $i18n = WebGUI::International->new($session);
-	my $u = WebGUI::User->new($session, $self->discernUserId);
+	my $u = $editingVisitor ? WebGUI::User->new( $session, '1' ) : $session->user;
 	foreach my $fieldId ($session->form->param) {
 		my $field = WebGUI::ProfileField->new($session,$fieldId);
 		next unless $field;
@@ -1158,62 +1165,55 @@ sub www_editOverride {
 	# Cannot fetch the original value from the overrides hash b/c it will be empty if
 	# the override has not been set before. Also getOverrides uses a cached version of
 	# the origValue, which can be out of date.
-	my $origValue = $self->getShortcutOriginal->getValue($fieldName); 
+	my $origValue = $self->getShortcutOriginal->$fieldName; 
 
 	my $output = '';
 	$output .= '</table>';
 	
-	my $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
-	$f->hidden(
-		-name		=> "func",
-		-value		=> "saveOverride"
+	my $f = WebGUI::FormBuilder->new( $self->session, action => $self->getUrl );
+	$f->addField( "hidden", 
+		name		=> "func",
+		value		=> "saveOverride"
 	);
-	$f->hidden(
-		-name		=> "overrideFieldName",
-		-value		=> $fieldName
+	$f->addField( "hidden", 
+		name		=> "overrideFieldName",
+		value		=> $fieldName
 	);
-	$f->readOnly(
-		-label		=> $i18n->get("fieldName"),
-		-value		=> $fieldName
+	$f->addField( "readOnly", 
+		label		=> $i18n->get("fieldName"),
+		value		=> $fieldName
 	);
-	$f->readOnly(
-		-label		=> $i18n->get("Original Value"),
-		-value		=> $origValue
+	$f->addField( "readOnly", 
+		label		=> $i18n->get("Original Value"),
+		value		=> $origValue
 	);
 
 	# Fetch the parameters for the dynamic field.
-	my (%params, %props);
-	foreach my $def (@{$self->getShortcutOriginal->definition($self->session)}) {
-		%props = (%props,%{$def->{properties}});
-	}
-	foreach my $key (keys %{$props{$fieldName}}) {
-		next if ($key eq "tab");
-		$params{$key} = $props{$fieldName}{$key};
-	}
+    my %params = %{ $self->getShortcutOriginal->getFormProperties($fieldName) };
 	$params{value} = $origValue;
 	$params{name} = $fieldName;
 	$params{label} = $params{label} || $i18n->get("Edit Field Directly");
 	$params{hoverHelp} = $params{hoverHelp} || $i18n->get("Use this field to edit the override using the native form handler for this field type");
 
-	if ($params{fieldType} eq 'template') {$params{namespace} = $params{namespace} || WebGUI::Asset->newByDynamicClass($self->session, $origValue)->get("namespace");}
+	if ($params{fieldType} eq 'template') {$params{namespace} = $params{namespace} || WebGUI::Asset->newById($self->session, $origValue)->get("namespace");}
 
-	$f->dynamicField(%params);
-	$f->textarea(
-		-name		=> "newOverrideValueText",
-		-label		=> $i18n->get("New Override Value"),
-		-value		=> $overrides{overrides}{$fieldName}{newValue},
-		-hoverHelp	=> $i18n->get("Place something in this box if you dont want to use the automatically generated field")
+	$f->addField( $params{fieldType} || "text", %params );
+	$f->addField( "textarea", 
+		name		=> "newOverrideValueText",
+		label		=> $i18n->get("New Override Value"),
+		value		=> $overrides{overrides}{$fieldName}{newValue},
+		hoverHelp	=> $i18n->get("Place something in this box if you dont want to use the automatically generated field")
 	);
-	$f->readOnly(
-		-label		=> $i18n->get("Replacement Value"),
-		-value		=> $overrides{overrides}{$fieldName}{parsedValue},
-		-hoverHelp	=> $i18n->get("This is the example output of the field when parsed for user preference macros")
+	$f->addField( "readOnly", 
+		label		=> $i18n->get("Replacement Value"),
+		value		=> $overrides{overrides}{$fieldName}{parsedValue},
+		hoverHelp	=> $i18n->get("This is the example output of the field when parsed for user preference macros")
 	) if $self->isDashlet;
-	$f->submit;
+	$f->addField( "submit", name => "send" );
 
-	$output .= $f->print;
+	$output .= $f->toHtml;
 	
-	return $self->_submenu($output,$i18n->get('Edit Override'));
+	return '<h1>' . $i18n->get('Edit Override') . '</h1>' . $output;
 }
 
 #-------------------------------------------------------------------
@@ -1230,11 +1230,8 @@ sub www_saveOverride {
     my $fieldName = $self->session->form->process("overrideFieldName");
     my %overrides = $self->getOverrides;
     my $output = '';
-    my %props;
-    foreach my $def (@{$self->getShortcutOriginal->definition($self->session)}) {
-        %props = (%props,%{$def->{properties}});
-    }
-    my $fieldType = $props{$fieldName}{fieldType};
+    my %params = %{ $self->getShortcutOriginal->getFormProperties($fieldName) };
+    my $fieldType = $params{fieldType} || "Text";
     my $value = $self->session->form->process($fieldName,$fieldType);
     $value = $self->session->form->process("newOverrideValueText") || $value;
     $self->session->db->write("delete from Shortcut_overrides where assetId=".$self->session->db->quote($self->getId)." and fieldName=".$self->session->db->quote($fieldName));
@@ -1265,8 +1262,8 @@ sub www_view {
         $shortcut->purgeCache();
 
         if ($shortcut->isa('WebGUI::Asset::Wobject')) {
-                $self->session->http->setLastModified($self->getContentLastModified);
-                $self->session->http->sendHeader;
+                $self->session->response->setLastModified($self->getContentLastModified);
+                $self->session->response->sendHeader;
                 ##Tell processStyle not to set the h
                 my $style = $shortcut->processStyle($shortcut->getSeparator, { noHeadTags => 1 });
                 my ($head, $foot) = split($shortcut->getSeparator,$style);
@@ -1305,11 +1302,11 @@ sub getShortcutsForAssetId {
     my $assetId     = shift;
     my $properties  = shift || {};
     
-    croak "First argument to getShortcutsForAssetId must be WebGUI::Session"
+    Carp::croak "First argument to getShortcutsForAssetId must be WebGUI::Session"
         unless $session && $session->isa("WebGUI::Session");
-    croak "Second argument to getShortcutsForAssetId must be assetId"
+    Carp::croak "Second argument to getShortcutsForAssetId must be assetId"
         unless $assetId;
-    croak "Third argument to getShortcutsForAssetId must be hash reference"
+    Carp::croak "Third argument to getShortcutsForAssetId must be hash reference"
         if $properties && !ref $properties eq "HASH";
 
     my $db      = $session->db;
@@ -1322,5 +1319,6 @@ sub getShortcutsForAssetId {
     return WebGUI::Asset->getRoot($session)->getLineage(['descendants'], $properties); 
 }
 
+__PACKAGE__->meta->make_immutable;
 1;
 
