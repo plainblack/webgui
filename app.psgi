@@ -15,6 +15,7 @@
 
 use strict;
 use Plack::Builder;
+use Plack::Util;
 
 use WebGUI::Paths -inc;
 use WebGUI::Config;
