@@ -38,6 +38,10 @@ save you many hours of grief.
 
  * Support for server-side spell checking in the Rich Editor TinyMCE has been removed.
 
+ * The field metaData_values.value has been changed from 'char(255)' to varchar(1024).
+   This may be incompatible with some MySQL operations.  Please check any custom modules
+   that access this field.
+
 7.10.24
 --------------------------------------------------------------------
     * WebGUI now depends on Business::OnlinePayment::AuthorizeNet.  This version
