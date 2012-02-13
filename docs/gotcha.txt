@@ -42,6 +42,9 @@ save you many hours of grief.
    This may be incompatible with some MySQL operations.  Please check any custom modules
    that access this field.
 
+ * Template::Toolkit is no longer an optional dependency.  Please install it before attempting
+   to upgrade to 8.0.
+
 7.10.24
 --------------------------------------------------------------------
     * WebGUI now depends on Business::OnlinePayment::AuthorizeNet.  This version
