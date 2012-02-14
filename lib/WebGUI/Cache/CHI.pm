@@ -3,7 +3,7 @@ package WebGUI::Cache::CHI;
 use strict;
 use base 'WebGUI::Cache';
 use File::Temp qw/tempdir/;
-use clone qw/clone/;
+use Clone qw/clone/;
 use CHI;
 
 =head1 NAME
