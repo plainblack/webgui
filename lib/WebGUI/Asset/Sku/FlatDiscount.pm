@@ -155,7 +155,7 @@ sub getPrice {
 			return $subtotal * $self->get('percentageDiscount') / -100;
 		}
 		else {
-			return $self->get('priceDiscount');
+			return -1 * abs($self->get('priceDiscount'));
 		}
 	}
 	return 0;
