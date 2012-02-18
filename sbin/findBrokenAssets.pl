@@ -112,12 +112,12 @@ while ( my %row = $sth->hash ) {
 
             my $asset   = WebGUI::Asset->newByDynamicClass( $session, $row{assetId} );
             # Make sure we have a valid parent
-            unless ( $asset && WebGUI::Asset->newByDynamicClass( $session, $row{parentId} ) ) {
-                $asset->setParent( WebGUI::Asset->getImportNode( $session ) );
-                print "\tNOTE: Invalid parent. Asset moved to Import Node\n";
-            }
             if (!$asset) {
                 print "\tWARNING.  Asset is still broken.\n";
+            }
+            elsif (! WebGUI::Asset->newByDynamicClass( $session, $row{parentId} )) {
+                $asset->setParent( WebGUI::Asset->getImportNode( $session ) );
+                print "\tNOTE: Invalid parent. Asset moved to Import Node\n";
             }
 
         } ## end if ($fix)
@@ -260,20 +260,25 @@ if ($file_assets) {
         }
         else {
             my $storage = $file_asset->getStorageLocation;
-            my $file = $storage->getPath($file_asset->get('filename'));
-            if (! -e $file) {
-                printf "\r%-s", "-- Broken file asset: ".$file_asset->getId." file does not exist: $file";
-                if ($delete) {
-                    my $success = $file_asset->purge;
-                    if ($success) {
-                        print "Purged File Asset";
-                    }
-                    else {
-                        print "Could not purge File Asset";
+            if (! $storage) {
+                printf "\r%-s", "-- No storage location: ".$file_asset->getId." storageId: ".$file_asset->get('storageId');
+            }
+            else {
+                my $file = $storage->getPath($file_asset->get('filename'));
+                if (! -e $file) {
+                    printf "\r%-s", "-- Broken file asset: ".$file_asset->getId." file does not exist: $file";
+                    if ($delete) {
+                        my $success = $file_asset->purge;
+                        if ($success) {
+                            print "Purged File Asset";
+                        }
+                        else {
+                            print "Could not purge File Asset";
+                        }
                     }
                 }
-                print "\n";
             }
+            print "\n";
         }
         progress( $file_assets, $count++ ) unless $no_progress;
     }
