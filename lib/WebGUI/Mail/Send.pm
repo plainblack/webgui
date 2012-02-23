@@ -343,7 +343,14 @@ sub create {
 			}	
 		}
 	}
-    my $from    = $headers->{from}        || $session->setting->get('companyName') . " <".$session->setting->get("companyEmail").">";
+    my $from    = $headers->{from};
+    $from ||= do {
+        my $CoNa = $session->setting->get('companyName');
+        my $CoEm = $session->setting->get("companyEmail");
+        $CoNa =~ s/"//g;
+        qq{"$CoNa" <$CoEm>}
+    };
+
 	my $type    = $headers->{contentType} || "multipart/mixed";
     my $replyTo = $headers->{replyTo}     || $session->setting->get("mailReturnPath");
 
