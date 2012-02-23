@@ -14,11 +14,9 @@ use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
 use WebGUI::Session;
-use WebGUI::Utility;
 
 use WebGUI::User;
 use WebGUI::Group;
-use WebGUI::Cache;
 
 use Test::More skip_all => 'Disabled until the test LDAP server is rejuvenated';
 use Test::Deep;
