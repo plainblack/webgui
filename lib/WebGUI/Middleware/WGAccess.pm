@@ -59,6 +59,10 @@ sub call {
         else {
             $privs = JSON->new->utf8->decode($contents);
         }
+        # in some cases there is nothing but state; default each list to an empty array
+        $privs->{user} ||= [ ];
+        $privs->{groups} ||= [ ];
+        $privs->{assets} ||= [ ];
 
         return @$r = (403, [ 'Content-Type' => 'text/plain' ], [ 'Forbidden' ])
             if $privs->{state} eq 'trash';
