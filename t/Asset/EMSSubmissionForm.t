@@ -348,7 +348,7 @@ $sub1 = $sub1->cloneFromDb;
 diag $sub1->submissionStatus;
 diag $sub1->ticketId;
 diag $sub1->getRevisionCount;
-is( $sub1->get('submissionStatus'),'created','approval successfull');
+is( $sub1->get('submissionStatus'),'approved','approval successfull');
 
 my $ticket = eval { WebGUI::Asset->newById($session, $sub1->get('ticketId')); };
 my $e = Exception::Class->caught();
