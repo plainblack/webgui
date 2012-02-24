@@ -656,7 +656,7 @@ sub www_editSettings {
 
     # Get fieldsets for avaiable auth methods
 	foreach my $authName (@{$session->config->get("authMethods")}) {
-		my $authInstance = WebGUI::Operation::Auth::getInstance($session,$_,1);
+		my $authInstance = WebGUI::Operation::Auth::getInstance($session,$authName,1);
                 $tabform->getTab( "auth" )->addFieldset( $authInstance->editUserSettingsForm, name => $authName, label => $authName );
 	}
 
