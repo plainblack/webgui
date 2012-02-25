@@ -1001,12 +1001,12 @@ sub www_createAccountSave {
         return $self->showMessageOnLogin;
     }
     elsif ($self->session->form->get('returnUrl')) {
-        $self->session->response->setRedirect( $self->session->form->get('returnUrl') );
+        $self->session->response->redirect( $self->session->form->get('returnUrl') );
         $self->session->scratch->delete("redirectAfterLogin");
     }
     elsif ($self->session->scratch->get("redirectAfterLogin")) {
         my $url = $self->session->scratch->delete("redirectAfterLogin");
-        $self->session->response->setRedirect($url);
+        $self->session->response->redirect($url);
         return undef;
     } 
     else {
@@ -1283,7 +1283,12 @@ sub www_logout {
 
     # Do not allow caching of the logout page (to ensure the page gets requested)
     $self->session->response->setCacheControl( "none" );
-   
+  
+    if ( $self->session->setting->get("redirectAfterLogoutUrl") ) {
+        $self->session->log->warn("redirecting to: ".$self->session->setting->get("redirectAfterLogoutUrl"));
+        $self->session->response->setRedirect($self->session->setting->get("redirectAfterLogoutUrl"));
+    }
+ 
 	return undef;
 }
 

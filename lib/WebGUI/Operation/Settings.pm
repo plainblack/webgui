@@ -497,6 +497,14 @@ sub definition {
     };
     push @fields, {
         tab             => "user",
+        name            => "redirectAfterLogoutUrl",
+        fieldType       => "url",
+        defaultValue    => $setting->get('redirectAfterLogoutUrl'),
+        label           => $i18n->get( 'redirectAfterLogoutUrl label' ),
+        hoverHelp       => $i18n->get( 'redirectAfterLogoutUrl description' ),
+    };
+    push @fields, {
+        tab             => "user",
         name            => "showMessageOnLogin",
         fieldType       => "yesNo",
         defaultValue    => $setting->get('showMessageOnLogin'),

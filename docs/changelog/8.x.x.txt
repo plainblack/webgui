@@ -6,4 +6,5 @@
  - Added Facebook Auth and FacebookLogin macro.
  - Removed the WebGUI statistics program and code.
  - Prevent Env Macro from being used to access objects in the environment - Thanks to Haarg
+ - added: Redirect on Logout setting
 
