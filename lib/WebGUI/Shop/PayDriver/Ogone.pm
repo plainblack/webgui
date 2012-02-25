@@ -424,7 +424,7 @@ sub www_edit {
     my $output = '<br />';
     $output .= sprintf $i18n->get('ogone setup'), $processUrl, $processUrl;
         
-    return $admin->getAdminConsole->render($form->print.$output, $i18n->get('payment methods','PayDriver'));
+    return $admin->getAdminConsole->render($form->toHtml.$output, $i18n->get('payment methods','PayDriver'));
 }
 
 #-------------------------------------------------------------------

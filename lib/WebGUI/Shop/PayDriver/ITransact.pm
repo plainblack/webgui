@@ -577,7 +577,7 @@ sub www_edit {
     return $session->privilege->insufficient() unless $admin->canManage;
 
     my $form = $self->getEditForm;
-    $form->submit;
+    $form->addField( "submit", name => "send" );
 
     ##Form to let the user log into their ITransact account from here.
     my $terminal = WebGUI::HTMLForm->new($session, action=>"https://secure.paymentclearing.com/cgi-bin/rc/sess.cgi", extras=>'target="_blank"');
@@ -596,7 +596,7 @@ sub www_edit {
             .'<b>https://'.$session->config->get("sitename")->[0]
             .'/?shop=pay;method=do;do=processRecurringTransactionPostback;paymentGatewayId='.$self->getId.'</b>';
 
-    return $admin->getAdminConsole->render($form->print.$output, $i18n->get('payment methods','PayDriver'));
+    return $admin->getAdminConsole->render($form->toHtml.$output, $i18n->get('payment methods','PayDriver'));
 }
 
 #-------------------------------------------------------------------

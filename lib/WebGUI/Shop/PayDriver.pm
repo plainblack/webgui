@@ -372,6 +372,7 @@ sub getEditForm {
     
     my $form = WebGUI::FormBuilder->new($self->session);
     $form->addField( "submit", name => "send" );
+    $form->addField( 'csrfToken', name => 'csrfToken' );
     
     $self->getDoFormTags('editSave', $form);
     $form->addField( "hidden",
@@ -657,7 +658,6 @@ sub www_edit {
     return $session->privilege->insufficient() unless $session->user->isAdmin;
 
     my $form = $self->getEditForm;
-    $form->addField( 'csrfToken', name => 'csrfToken' );
     $form->addField( "submit", name => "send" );
   
     return '<h1>' . $i18n->get('payment methods') . '</h1>' . $form->toHtml;
