@@ -3,6 +3,7 @@
 - fixed #12322: Cache/CHI stomps on the config file
 - fixed #12327: HttpProxy does not clean up cookie jar storage locations
 - fixed #12329: FlatDiscount Sku forces you to enter in negative numbers for price
+- fixed #12334: Company name with : in it breaks email sender identity
 
 7.10.24
  - fixed #12318: asset error causes asset manager to fail
