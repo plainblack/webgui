@@ -69,9 +69,9 @@ sub handler {
         }
         else {
             my $privs = JSON->new->decode($fileContents);
-            @users = @{ $privs->{users} };
-            @groups = @{ $privs->{groups} };
-            @assets = @{ $privs->{assets} };
+            @users  = @{ $privs->{users}  || [] };
+            @groups = @{ $privs->{groups} || [] };
+            @assets = @{ $privs->{assets} || [] };
             $state  = $privs->{state};
         }
 
