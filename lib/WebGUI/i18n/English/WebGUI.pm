@@ -4214,8 +4214,20 @@ LongTruncOk=1</p>
             context     => q{Label for site setting},
         },
 
-        'showMessageOnLogin description' => {
+        'redirectAfterLoginUrl description' => {
             message     => q{Users will be redirected to this url after logging in.},
+            lastUpdated => 0,
+            context     => q{Description for site setting},
+        },
+
+        'redirectAfterLogoutUrl label' => {
+            message     => q{Redirect After Logout Url},
+            lastUpdated => 0,
+            context     => q{Label for site setting},
+        },
+
+        'redirectAfterLogoutUrl description' => {
+            message     => q{Users will be redirected to this url after logging out.},
             lastUpdated => 0,
             context     => q{Description for site setting},
         },

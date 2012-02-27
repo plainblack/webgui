@@ -25,7 +25,8 @@ Macro for displaying fields from the Session env hash.
 =head3 key
 
 The key from the Session env hash to display.  If the key doesn't exist,
-then undef will be returned.
+then the empty string will be returned.  This does not allow objects or data references
+in the env hash to be accessed.
 
 =cut
 
@@ -33,7 +34,7 @@ then undef will be returned.
 sub process {
 	my $session = shift;
     my $key     = shift;
-	return $session->request->env->{$key};
+	return $session->request->env->{$key}.'';
 }
 
 1;

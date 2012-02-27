@@ -14,6 +14,7 @@ use WebGUI::Test;
 use WebGUI::Session;
 use Data::Dumper;
 use WebGUI::Macro::Env;
+use Scalar::Util qw/blessed/;
 
 use Test::More; # increment this value for each test you create
 
@@ -26,22 +27,25 @@ my $session = WebGUI::Test->session;
 my %env = %{ $session->request->env };
 my @keys = keys %env;
 
-my $numTests = 3 + scalar keys %env;
-
-plan tests => $numTests;
-
 my $output;
 
 $output =  WebGUI::Macro::Env::process($session, '');
-is($output, undef, 'null key');
+is($output, '', 'null key');
 
 $output =  WebGUI::Macro::Env::process($session, undef);
-is($output, undef, 'undef key');
+is($output, '', 'undef key');
 
 $output =  WebGUI::Macro::Env::process($session, 'KEY DOES NOT EXIST');
-is($output, undef, 'non existent key');
+is($output, '', 'non existent key');
 
-foreach my $key (keys %env) {
+foreach my $key (@keys) {
 	my $output =  WebGUI::Macro::Env::process($session, $key);
 	is($output, $env{$key}, 'Fetching: '.$key);
 }
+
+##Checking for object access
+$session->request->env->{'webgui.session'} = $session;
+my $neo_session = WebGUI::Macro::Env::process($session, 'webgui.session');
+ok ! ref $neo_session, 'did not get a reference back';
+
+done_testing;
