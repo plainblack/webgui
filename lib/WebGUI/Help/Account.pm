@@ -55,6 +55,7 @@ our $HELP = {
         isa => [ ],
         fields => [ ],
         variables => [
+            { name => "profile_user_id", },
             { name => "user_full_name", },
             { name => "user_member_since", },
             { name => "view_profile_url", },
