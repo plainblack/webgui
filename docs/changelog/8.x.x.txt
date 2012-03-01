@@ -7,4 +7,5 @@
  - Removed the WebGUI statistics program and code.
  - Prevent Env Macro from being used to access objects in the environment - Thanks to Haarg
  - added: Redirect on Logout setting
+ - RFE: 9730 (actually missing documentation)
 

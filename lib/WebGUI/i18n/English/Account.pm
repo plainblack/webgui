@@ -21,10 +21,16 @@ our $I18N = {
         lastUpdated => 1230844137,
     },
 
-    'user_full_name' => {
-        message     => q{The full name of the user},
+    'profile_user_id' => {
+        message     => q{The userId of the user whose account is being viewed.},
         context     => q{template variable},
         lastUpdated => 1230844137,
+    },
+
+    'user_full_name' => {
+        message     => q{The full name of the user whose account is being viewed},
+        context     => q{template variable},
+        lastUpdated => 1330588033,
     },
 
     'user_member_since' => {
