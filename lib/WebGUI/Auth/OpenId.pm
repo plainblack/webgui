@@ -367,7 +367,7 @@ sub www_callback {
       
    } elsif ( $csr->user_cancel ) {
       # restore web app state to prior to check_url
-      $session->errorHandler->info( $self->_i18n->get('error default') . $csr->user_cancel );
+      $session->errorHandler->debug( $self->_i18n->get('error default') . $csr->user_cancel );
       
    } elsif ( my $vident = $csr->verified_identity ){
       $error = ""; #You are $verified_url !";
@@ -381,7 +381,7 @@ sub www_callback {
       }
       
       # if the users does not exists try to create a new user
-      $session->errorHandler->info("Creating new user!");
+      $session->errorHandler->debug("Creating new user!");
       my $tmpl = $self->_getTemplateChooseUsername;
       my $var = {
          message => $self->_i18n->get( "create webgui username" )
@@ -422,7 +422,8 @@ sub www_setUsername {
    return unless $userIdentity;
 
    my $username = $form->get( 'newUsername' );
-   if ( ! WebGUI::User->newByUsername( $session, $username ) ) {
+   
+   if ( $username =~ /\S/ && ! WebGUI::User->newByUsername( $session, $username ) ) {
       $session->errorHandler->info( 'create new user: ' . $username );
         
       my $user = WebGUI::User->create( $self->session );
