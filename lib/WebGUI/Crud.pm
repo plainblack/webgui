@@ -976,7 +976,7 @@ sub update {
 	}
 
 	# set last updated
-	$data->{lastUpdated} ||= WebGUI::DateTime->new($session, time())->toDatabase;
+	$dbData->{lastUpdated} = $data->{lastUpdated} ||= WebGUI::DateTime->new($session, time())->toDatabase;
 
 	# update memory
 	my $refId = id $self;
