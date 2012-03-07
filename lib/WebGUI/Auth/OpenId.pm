@@ -101,7 +101,7 @@ sub _checkOpenIdSecurityLists {
             return 1; # Good it is on the accept list
          }
       }
-      $self->session->errorHandler->security( $self->_i18n->get('warnNoMatchAcceptList') . "[$openIdUri]");
+      $session->errorHandler->security( $self->_i18n->get('warnNoMatchAcceptList') . "[$openIdUri]");
       return;   
    }
 
@@ -167,7 +167,7 @@ sub _getUser{
      
       # Returning user
       if ( $userId ) {
-         $session->errorHandler->debug( "userid: $userId" ); 
+         $session->log->debug( "userid: $userId" ); 
          return WebGUI::User->new( $session, $userId );
          
       }     
@@ -302,7 +302,7 @@ sub www_login{
       
          if ( my $claimed_identity = $csr->claimed_identity( $openIdUri ) ) {
             my $returnToPage = qq|op=auth;authType=${className};method=callback|;
-            $session->errorHandler->debug( $self->_i18n->get("return page") . $returnToPage );
+            $session->log->debug( $self->_i18n->get("return page") . $returnToPage );
       
             my $return_to = $url->page( $returnToPage, 1, 1 );
             my $check_url = $claimed_identity->check_url(
@@ -367,7 +367,7 @@ sub www_callback {
       
    } elsif ( $csr->user_cancel ) {
       # restore web app state to prior to check_url
-      $session->errorHandler->debug( $self->_i18n->get('error default') . $csr->user_cancel );
+      $session->log->debug( $self->_i18n->get('error default') . $csr->user_cancel );
       
    } elsif ( my $vident = $csr->verified_identity ){
       $error = ""; #You are $verified_url !";
@@ -381,7 +381,7 @@ sub www_callback {
       }
       
       # if the users does not exists try to create a new user
-      $session->errorHandler->debug("Creating new user!");
+      $session->log->debug("Creating new user!");
       my $tmpl = $self->_getTemplateChooseUsername;
       my $var = {
          message => $self->_i18n->get( "create webgui username" )
@@ -390,11 +390,11 @@ sub www_callback {
       
 
    } else {
-      $error = $self->_i18n->get('error default') . $csr->err; 
+      $error = $self->_i18n->get( 'error default' ) . $csr->err; 
 
    }
-   $self->error($error);
-   $session->errorHandler->error($error) if $error;
+   $self->error( $error );
+   $session->errorHandler->error( $error ) if $error;
 
    # Return 1 on successful authentication
    return $error eq "";
@@ -415,29 +415,25 @@ sub www_setUsername {
    my ( $form, $scratch, $db ) = $session->quick( qw( form scratch db ) );
    my $className = $self->_getClassName();
    
-   $session->errorHandler->info( "Getting ${className}_uri value" );
    my $userIdentity = $scratch->get( "${className}_uri" );
-   $session->errorHandler->info( 'User identity (uri): ' . $userIdentity );
+   $session->log->debug( 'User identity (uri): ' . $userIdentity );
    # Don't allow just anybody to set a username
    return unless $userIdentity;
 
    my $username = $form->get( 'newUsername' );
-   
+   my $email = $form->get( 'email' );
    if ( $username =~ /\S/ && ! WebGUI::User->newByUsername( $session, $username ) ) {
-      $session->errorHandler->info( 'create new user: ' . $username );
-        
+      $session->log->debug( 'create new user: ' . $username );
       my $user = WebGUI::User->create( $self->session );
       $user->username( $username );
-      $self->saveParams( $user->userId, $self->authMethod, { 
-         "identity" => $userIdentity,
-      } );        
-
+      $user->profileField( 'email', $email ) if $email; # Would be great to get an email address but it is not necessary
+      $self->saveParams( $user->userId, $self->authMethod, { "identity" => $userIdentity } );
       $self->user( $user );
       return $self->login;
       
     }
 
-    $session->errorHandler->info( $self->_i18n->get( "webgui username taken" ) . $username );
+    $session->log->debug( $self->_i18n->get( "webgui username taken" ) . $username );
     # Username is again taken! Noooooo!
     my $tmpl = $self->_getTemplateChooseUsername;
     my $var = {

@@ -76,7 +76,7 @@ sub _client {
    if ( $config ){
 		my $returnToPage = qq|op=auth&authType=${className}&method=callback|; # Redirect URL's have problems with the semicolon ";"
 	   my $return_to = $url->page( $returnToPage, 1, 1 );
-	   $session->errorHandler->debug( $self->_i18n->get("return page") . $return_to );
+	   $session->log->debug( $self->_i18n->get("return page") . $return_to );
 	
       return Net::OAuth2::Client->new(
       	$config->{id},
@@ -132,7 +132,7 @@ sub _getUser{
      
       # Returning user
       if ( $userId ) {
-         $session->errorHandler->debug( "userid: $userId" ); 
+         $session->log->debug( "userid: $userId" ); 
          return WebGUI::User->new( $session, $userId );
          
       }     
@@ -259,7 +259,7 @@ sub www_login{
 		   return;
 			
 		}else{
-         $session->errorHandler->info( 'url setup' );
+         $session->log->debug( 'redirect url setup failed' );
 			 
 		}
               
@@ -311,18 +311,18 @@ sub www_callback {
 		   }
 		
       } else {
-         $session->errorHandler->warn("Got invalid response from provider: " . $response->status_line);		  
+         $session->log->warn("Got invalid response from provider: " . $response->status_line);		  
          $error = $self->_i18n->get('error default') . $response->status_line;
       
 		}
 		  
 	}else{
-      $session->errorHandler->warn("Invalid access token!");		  
+      $session->log->warn("Invalid access token!");		  
       $error = $self->_i18n->get('invalid access token');
 		  
 	}
    $self->error($error);
-   $session->errorHandler->error($error) if $error;
+   $session->log->error($error) if $error;
 
    # Return 1 on successful authentication
    return $error eq "";
@@ -341,24 +341,25 @@ sub www_setUsername {
    my ( $form, $scratch, $db ) = $session->quick( qw( form scratch db ) );
    my $className = $self->_getClassName();
    
-   $session->errorHandler->debug( "Getting ${className}_email value" );
+   $session->log->debug( "Getting ${className}_email value" );
    my $id = $scratch->get( "${className}_id" );
-   my $email = $scratch->get( "${className}_email" );	
    # Don't allow just anybody to set a username
    return unless $id;
 
    my $username = $form->get( 'newUsername' );
-   if ( ! WebGUI::User->newByUsername( $session, $username ) ) {
+	my $email = $form->get( 'email' ) || $scratch->get( "${className}_email" );	
+   if ( $username =~ /\S/ && ! WebGUI::User->newByUsername( $session, $username ) ) {
+      $session->log->debug( 'create new user: ' . $username );		  
       my $user = WebGUI::User->create( $self->session );
       $user->username( $username );
-		$user->profileField('email', $email);
+		$user->profileField( 'email', $email );
       $self->saveParams( $user->userId, $self->authMethod, { id => $id } );        
       $self->user( $user );
       return $self->login;
       
     }
 
-    $session->errorHandler->debug( $self->_i18n->get( "webgui username taken" ) . $username );
+    $session->log->debug( $self->_i18n->get( "webgui username taken" ) . $username );
     # Username is again taken! Noooooo!
     my $tmpl = $self->_getTemplateChooseUsername;
     my $var = {
