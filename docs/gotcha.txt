@@ -7,6 +7,14 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+7.10.25
+--------------------------------------------------------------------
+    * Custom WebGUI plugins written using WebGUI::Crud with hand built forms
+      should be reviewed.  A serious bug in how Crud handles forms has been fixed,
+      and the side-effect of the bug is now that forms processed by updateFromFormPost
+      must include ALL fields, otherwise the data in fields which are missing from the
+      form will be lost.
+
 7.10.24
 --------------------------------------------------------------------
     * WebGUI now depends on Business::OnlinePayment::AuthorizeNet.  This version
