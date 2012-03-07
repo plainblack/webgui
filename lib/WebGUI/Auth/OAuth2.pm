@@ -58,9 +58,9 @@ sub _client {
    my $className = $self->_getClassName; 	
    my $provider = $scratch->get( "${className}_provider" );
 
-	my @providerSessings = split( '\n', $setting->get( "${className}Providers" ) );
+	my @providerSettings = split( '\n', $setting->get( "${className}Providers" ) );
 	my $config = undef;
-	foreach my $providerSetting ( @providerSessings ){
+	foreach my $providerSetting ( @providerSettings ){
 		my ( $savedProvider, $savedSite, $savedId, $savedSecret ) = split( ',', $providerSetting );
       if ( $savedProvider eq $provider ){
 		   $config = {
@@ -85,64 +85,6 @@ sub _client {
       )->web_server( redirect_uri => $return_to );
 		
 	}
-}
-      
-#-------------------------------------------------------------------
-
-=head2 _checkOAuth2SecurityLists
-  
-  Private method wich attempts to match patterns in the Accept and Deny Admin settings.
-  
-  Accept list override Deny lists.  If there is a pattern in the accept list the 
-  identity MUST contain the pattern and the Deny list is not checked.
-  
-  If there are no entries in the accept list then the Deny list is checked.  If the 
-  identity is matched to a pattern from the deny list then the user is not allowed to Authenticate.
-  
-  If there are no entries in the Accept or Deny lists then all Provider Validated accounts are
-  allowed access.
-
-=cut
-
-sub _checkOauthSecurityLists {
-   my $self = shift; 
-   my $openIdUri = shift;
-   my $className = $self->_getClassName; 
-	
-   my $session = $self->session;
-   my ( $setting ) = $session->quick(qw( setting ));	
-   
-   my @acceptList = split( '\n', $setting->get( "${className}AcceptList" ) );
-   chomp(@acceptList);
-   
-   my $currentPattern = undef;
-   
-   if ( @acceptList ){
-      while($currentPattern = shift(@acceptList)){
-         $currentPattern =~ s/\s//g;
-         if ($currentPattern && $openIdUri =~ m/$currentPattern/g ){
-            return 1; # Good it is on the accept list
-         }
-      }
-      $self->session->errorHandler->security( $self->_i18n->get('warnNoMatchAcceptList') . "[$openIdUri]");
-      return;   
-   }
-
-   my @denyList = split( '\n', $setting->get( "${className}DenyList" ));
-   chomp(@denyList);
-   
-   if ( @denyList ){
-      while($currentPattern = shift(@denyList)){
-         $currentPattern =~ s/\s//g;
-         if ($currentPattern && $openIdUri =~ m/$currentPattern/g ){
-            # found it on the deny list
-            $session->errorHandler->security( $self->_i18n->get('warnFoundOnDenyList') . "[$openIdUri][$currentPattern]");
-            return;
-         }
-      }
-   }
-
-   return 1;
 }
 
 #-------------------------------------------------------------------
@@ -180,12 +122,12 @@ sub _getUser{
    my $self = shift;
    my $className = $self->_getClassName;
    
-   if ( my $username = shift ){
+   if ( my $id = shift ){
       my $session = $self->session;
       my ( $db ) = $session->quick( qw( db ) );	
       my $userId  = $db->quickScalar( 
          "SELECT userId FROM authentication WHERE authMethod = ? AND fieldName = ? AND fieldData = ?",
-         [ $className, "username", $username ]
+         [ $className, "id", $id ]
       );
      
       # Returning user
@@ -235,30 +177,19 @@ sub editUserSettingsForm {
       label       => $self->_i18n->get('enabled'),
       hoverHelp   => $self->_i18n->get('enabled help')
    );
+	
+    $f->HTMLArea(
+        -name      => "webguiWelcomeMessage",
+        -value     => '<b>strong</b>',
+        -label     => 'Does work:',
+        -hoverHelp => 'Hopefully it does work.',
+    );	
    
    $f->textarea(
       name        => "${className}Providers",
       value       => $setting->get( "${className}Providers" ),
       label       => $self->_i18n->get('provider list'),
       hoverHelp   => $self->_i18n->get('provider list help'),
-      rows        => 5,
-      cols        => 40
-   );
-	
-   $f->textarea(
-      name        => "${className}AcceptList",
-      value       => $setting->get( "${className}AcceptList" ),
-      label       => $self->_i18n->get('accept list'),
-      hoverHelp   => $self->_i18n->get('accept list help'),
-      rows        => 5,
-      cols        => 40
-   );
-
-   $f->textarea(
-      name        => "${className}DenyList",
-      value       => $setting->get( "${className}DenyList" ),
-      label       => $self->_i18n->get('deny list'),
-      hoverHelp   => $self->_i18n->get('deny list help'),
       rows        => 5,
       cols        => 40
    );
@@ -290,8 +221,6 @@ sub editUserSettingsFormSave {
 
    $setting->set( "${className}Enabled",    $form->get( "${className}Enabled" ) );
    $setting->set( "${className}Providers",  $form->get( "${className}Providers" ) );	
-   $setting->set( "${className}AcceptList", $form->get( "${className}AcceptList" ) );
-   $setting->set( "${className}DenyList",   $form->get( "${className}DenyList" ) );
    $setting->set( "${className}TemplateIdChooseUsername", $form->get( "${className}TemplateIdChooseUsername" ) );   
 
    return;
@@ -322,7 +251,7 @@ sub www_login{
       return $self->displayLogin;
    }
 	
-	if ( $provider && $self->_checkOauthSecurityLists( $provider ) ){  
+	if ( $provider ){  
 	   $scratch->set( "${className}_provider", $provider );
 	   if ( my $redirectUrl = $self->_client->authorize_url ){	  
 		   $http->setRedirect( $redirectUrl );
@@ -330,7 +259,7 @@ sub www_login{
 		   return;
 			
 		}else{
-          $session->errorHandler->info( 'url setup' );
+         $session->errorHandler->info( 'url setup' );
 			 
 		}
               
@@ -364,20 +293,20 @@ sub www_callback {
       if ( $response->is_success ) {
 		   my $data = decode_json( $response->decoded_content );
          # if this user already exists just login
-         if ( my $user = $self->_getUser( $data->{email} )  ){
+         if ( my $user = $self->_getUser( $data->{id} )  ){
             $self->user( $user );
             $self->login();
             return;
          
          }else{
             # if the users does not exists try to create a new user
-            $session->errorHandler->debug( "Creating new user with email: " . $data->{email} );
+				$scratch->set( "${className}_id", $data->{id} );
 				$scratch->set( "${className}_email", $data->{email} );
             my $tmpl = $self->_getTemplateChooseUsername;
             my $var = {
                message => $self->_i18n->get( "create webgui username" )
             };
-            return $tmpl->process( $var );		
+            return $tmpl->process( $var );
 		  
 		   }
 		
@@ -412,25 +341,24 @@ sub www_setUsername {
    my ( $form, $scratch, $db ) = $session->quick( qw( form scratch db ) );
    my $className = $self->_getClassName();
    
-   $session->errorHandler->info( "Getting ${className}_email value" );
-   my $userEmail = $scratch->get( "${className}_email" );
-   $session->errorHandler->info( 'User email: ' . $userEmail );
+   $session->errorHandler->debug( "Getting ${className}_email value" );
+   my $id = $scratch->get( "${className}_id" );
+   my $email = $scratch->get( "${className}_email" );	
    # Don't allow just anybody to set a username
-   return unless $userEmail;
+   return unless $id;
 
    my $username = $form->get( 'newUsername' );
    if ( ! WebGUI::User->newByUsername( $session, $username ) ) {
-      $session->errorHandler->info( 'create new user: ' . $username );
-        
       my $user = WebGUI::User->create( $self->session );
       $user->username( $username );
-      $self->saveParams( $user->userId, $self->authMethod, { "username" => $username, "email" => $userEmail } );        
+		$user->profileField('email', $email);
+      $self->saveParams( $user->userId, $self->authMethod, { id => $id } );        
       $self->user( $user );
       return $self->login;
       
     }
 
-    $session->errorHandler->info( $self->_i18n->get( "webgui username taken" ) . $username );
+    $session->errorHandler->debug( $self->_i18n->get( "webgui username taken" ) . $username );
     # Username is again taken! Noooooo!
     my $tmpl = $self->_getTemplateChooseUsername;
     my $var = {
