@@ -69,6 +69,11 @@ editing an existing Post.|,
 		lastUpdated => 1149829706,
 	},
 
+	'keywords.form' => {
+		message => q|A text input box to enter keywords.|,
+		lastUpdated => 1149829706,
+	},
+
 	'sticky.form' => {
 		message => q|A yes/no button to set the thread to be sticky, so that it stays at the top of the forum listing.|,
 		lastUpdated => 1149829706,

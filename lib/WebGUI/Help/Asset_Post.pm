@@ -32,6 +32,7 @@ our $HELP = {
             { 'name' => 'isNewThread' },
             { 'name' => 'archive.form' },
             { 'name' => 'sticky.form' },
+            { 'name' => 'keywords.form' },
             { 'name' => 'lock.form' },
             { 'name' => 'isThread' },
             { 'name' => 'isEdit' },
