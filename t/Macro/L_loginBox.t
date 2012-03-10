@@ -150,6 +150,8 @@ is($url2, $session->url->page("op=auth;method=logout"), "templated custom text, 
 
 ##Change settings to use encrypt login and verify which links use https.
 $session->setting->set("encryptLogin", 1);
+WebGUI::Test->originalConfig('sslEnabled');
+$session->config->set('sslEnabled', 1);
 
 $output = WebGUI::Macro::L_loginBox::process($session,'','',$template->getId);
 %vars = simpleTextParser($output);

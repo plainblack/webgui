@@ -8,6 +8,7 @@
  - fixed #12328: invalid wgaccess file in uploads
  - RFE: 9730 (actually missing documentation)
  - fixed: Crud updateFromFormPost
+ - fixed: encryptLogin and sslEnabled both need to be true
 
 7.10.24
  - fixed #12318: asset error causes asset manager to fail
