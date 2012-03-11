@@ -236,12 +236,9 @@ Returns a boolean indicating whether the user can view the current post.
 sub canView {
         my $self = shift;
         my $userId = shift || $self->session->user->userId;
-        $self->session->log->info( "$userId " . $self->status );
         if (($self->status eq "approved" || $self->status eq "archived") && $self->getThread->getParent->canView( $userId )) {
-                $self->session->log->info( "CAN VIEW" );
                 return 1;
         } elsif ($self->canEdit( $userId )) {
-                $self->session->log->info( "CAN EDIT" );
                 return 1;
         } else {
                 return $self->getThread->getParent->canEdit( $userId );
