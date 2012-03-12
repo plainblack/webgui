@@ -90,7 +90,7 @@ sub execute {
         my $b = $session->db->read($sql,[$archiveDate, $cs->lineage.'%']);
         THREAD: while (my ($id, $version) = $b->array) {
             my $thread = eval { WebGUI::Asset->newById($session, $id, $version); };
-            if (WebGUI::Exception->caught()) {
+            if (Exception::Class->caught()) {
                 $session->log->error("Unable to instanciate Thread: $@");
                 next THREAD;
             }
