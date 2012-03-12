@@ -325,7 +325,7 @@ sub getRequestedUrl {
 	my $self = shift;
 	unless ($self->{_requestedUrl}) {
         my $path_info = $self->session->request->path_info;
-        $path_info =~ s/\?.*//;
+        #$path_info =~ s/\?.*//;
         $self->{_requestedUrl} = decode_utf8($path_info);
 	}
 	return $self->{_requestedUrl};
