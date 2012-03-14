@@ -242,11 +242,11 @@ sub setByHTTP {
     my $response = $userAgent->request($request);
     if ($response->is_error) {
         $self->session->errorHandler->error($url." could not be retrieved.");
+        return undef;
     }
-    else {
-        $self->set($response->decoded_content,$ttl);
-    }
-    return $response->decoded_content;
+    my $value = $response->decoded_content;
+    $self->set($value ,$ttl);
+    return $value;
 }
 
 #-------------------------------------------------------------------
