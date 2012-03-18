@@ -341,13 +341,13 @@ SKIP: {
                             SvcCommitments => ignore(),
                             SvcDescription => ignore(),
                         },
-                        (ignore())x20,
+                        (ignore())x21,
                     ],
                 },
             ],
         },
         '... returned data from USPS in correct format.  If this test fails, the driver may need to be updated'
-    );
+    ) or diag Dumper $xmlData;
 }
 
 my $cost = $driver->_calculateFromXML(
