@@ -420,7 +420,7 @@ sub duplicate {
 	my $newAsset = $self->SUPER::duplicate(@_);
 	my $newStorage = $self->getStorageLocation->copy;
 	$newAsset->update({storageId=>$newStorage->getId});
-    my $links = $self->getRelatedLinks();
+    my $links = $self->getRelatedLinks('nolimit');
     my $id    = $self->session->id;
     foreach my $link (@{ $links }) {
         $link->{new_event}   = 1;
@@ -1076,12 +1076,16 @@ Gets an arrayref of hashrefs of related links.
 
 sub getRelatedLinks {
     my $self    = shift;
+    my $limitflag = shift || 'yes';
 
     my $sth
         = $self->session->db->prepare(
             "SELECT * FROM Event_relatedlink WHERE assetId=? ORDER BY sequenceNumber",
         );
     $sth->execute([ $self->getId ]);
+    if( $limitflag eq 'nolimit' ) {
+        return [ map { $sth->hashRef } ( 1..$sth->rows ) ];
+    }
 
     my @links;
     while ( my $link = $sth->hashRef ) {
