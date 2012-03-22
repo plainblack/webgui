@@ -23,7 +23,7 @@ use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::Asset;
 
-my $toVersion = "0.0.0"; # make this match what version you're going to
+my $toVersion = "7.10.22"; # make this match what version you're going to
 my $quiet; # this line required
 
 

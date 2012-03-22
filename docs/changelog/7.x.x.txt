@@ -1,4 +1,5 @@
 7.10.25
+ - fixed #12346: toVersion in upgrade_7.9.34-7.10.22.pl was "0.0.0"
  - fixed #12010 related link duplication where links have group view restrictions
  - fixed #12297: keywords.form missing from Post template help
  - fixed #12321: Error while deleting a group.
