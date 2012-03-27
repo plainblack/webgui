@@ -63,6 +63,12 @@ our $I18N = {
         context     => q{identity},
         lastUpdated => 1329866849,
     },
+    
+    'identity' => {
+        message     => q{Identity: %s},
+        context     => q{identity},
+        lastUpdated => 1329866849,
+    },    
    
     'error default' => {
         message     => q{There was an error with this transaction, please try again.},

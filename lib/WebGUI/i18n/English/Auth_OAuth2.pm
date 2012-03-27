@@ -50,6 +50,16 @@ our $I18N = {
         lastUpdated => 1329866849,
     },
     
+    'provider list' => {
+        message     => q{Provider Information},
+        lastUpdated => 1329866849,        
+    },
+
+    'provider list help' => {
+        message     => q{Example: facebook,https://graph.facebook.com,12345678911,feb00booaafoobooAf00Boox00},
+        lastUpdated => 1329866849,        
+    },
+    
     'return page' => {
         message     => q{Return page:},
         context     => q{Page},

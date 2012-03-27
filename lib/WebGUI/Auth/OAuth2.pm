@@ -178,13 +178,6 @@ sub editUserSettingsForm {
       hoverHelp   => $self->_i18n->get('enabled help')
    );
 	
-    $f->HTMLArea(
-        -name      => "webguiWelcomeMessage",
-        -value     => '<b>strong</b>',
-        -label     => 'Does work:',
-        -hoverHelp => 'Hopefully it does work.',
-    );	
-   
    $f->textarea(
       name        => "${className}Providers",
       value       => $setting->get( "${className}Providers" ),
@@ -199,7 +192,7 @@ sub editUserSettingsForm {
       value       => $setting->get( "${className}TemplateIdChooseUsername" ),
       label       => $self->_i18n->get('choose username template'),
       hoverHelp   => $self->_i18n->get('choose username template help'),
-      namespace   => 'Auth/OAuth2/ChooseUsername'
+      namespace   => qq|Auth/${className}/ChooseUsername|
    );   
 
    return $f->printRowsOnly;

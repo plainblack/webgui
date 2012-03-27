@@ -192,6 +192,47 @@ sub _getTemplateChooseUsername {
 
 #----------------------------------------------------------------------------
 
+=head2 editUserForm ( )
+
+  Creates user form elements specific to this Auth Method.
+
+=cut
+
+sub editUserForm {
+   my $self = shift;
+   my $className = $self->_getClassName;
+   my $userData = $self->getParams;
+   my $identity = $self->session->form->process( "${className}_uri" ) || $userData->{ identity };
+   
+	my $f = WebGUI::HTMLForm->new( $self->session );
+
+	$f->url(
+		-name => "${className}_uri",
+		-label => sprintf( $self->_i18n->get( 'identity' ) ),
+		-value => $identity,
+	);
+
+	return $f->printRowsOnly;
+}
+
+#-------------------------------------------------------------------
+
+=head2 editUserFormSave ( )
+
+  Saves user elements unique to this authentication method
+
+=cut
+
+sub editUserFormSave {
+   my $self = shift;
+   my $className = $self->_getClassName;   
+   my $properties;
+   $properties->{ identity } = $self->session->form->process( "${className}_uri" );
+   $self->SUPER::editUserFormSave($properties); 
+}
+
+#----------------------------------------------------------------------------
+
 =head2 editUserSettingsForm ( )
 
 Return the form to edit the settings of this Auth module
