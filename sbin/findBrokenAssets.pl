@@ -253,7 +253,7 @@ if ($file_assets) {
         my $file_asset = eval { $get_asset->() };
         if ( $@ || Exception::Class->caught() ) {
             ##Do nothing, since it would have been caught above
-            printf "\r%-68s", "No asset to check";
+            printf "\r%-68s\n", "No asset to check";
         }
         elsif (!$file_asset) {
             last FILE_ASSET
@@ -261,7 +261,7 @@ if ($file_assets) {
         else {
             my $storage = $file_asset->getStorageLocation;
             if (! $storage) {
-                printf "\r%-s", "-- No storage location: ".$file_asset->getId." storageId: ".$file_asset->get('storageId');
+                printf "\r%-s\n", "-- No storage location: ".$file_asset->getId." storageId: ".$file_asset->get('storageId');
             }
             else {
                 my $file = $storage->getPath($file_asset->get('filename'));
@@ -276,9 +276,9 @@ if ($file_assets) {
                             print "Could not purge File Asset";
                         }
                     }
+                    print "\n";
                 }
             }
-            print "\n";
         }
         progress( $file_assets, $count++ ) unless $no_progress;
     }
