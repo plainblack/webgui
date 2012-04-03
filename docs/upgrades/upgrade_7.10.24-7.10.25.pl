@@ -31,8 +31,24 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+installCleanCookieJars($session);
 
 finish($session); # this line required
+
+
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub installCleanCookieJars {
+    my $session = shift;
+    print "\tInstall the new CleanCookieJars workflow activity... " unless $quiet;
+    # and here's our code
+    $session->config->addToArray('workflowActivities/None', 'WebGUI::Workflow::Activity::CleanCookieJars');
+    my $workflow = WebGUI::Workflow->new($session, 'pbworkflow000000000001');
+    my $cleaner = $workflow->addActivity('WebGUI::Workflow::Activity::CleanCookieJars');
+    $cleaner->set('title', 'Clean HttpProxy Cookie jars');
+    $cleaner->set('description', 'Removes cookie jar files from the HttpProxy asset that are older than 1 day');
+    print "DONE!\n" unless $quiet;
+}
 
 
 #----------------------------------------------------------------------------

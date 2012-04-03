@@ -897,6 +897,7 @@
         "WebGUI::Workflow::Activity::ArchiveOldStories",
         "WebGUI::Workflow::Activity::ArchiveOldThreads",
         "WebGUI::Workflow::Activity::CalendarUpdateFeeds",
+        "WebGUI::Workflow::Activity::CleanCookieJars",
         "WebGUI::Workflow::Activity::CleanDatabaseCache",
         "WebGUI::Workflow::Activity::CleanFileCache",
         "WebGUI::Workflow::Activity::CleanLoginHistory",
