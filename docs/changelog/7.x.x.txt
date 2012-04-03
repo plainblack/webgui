@@ -12,6 +12,7 @@
  - fixed: Crud updateFromFormPost
  - fixed: encryptLogin and sslEnabled both need to be true
  - fixed: Cache's setByHTTP method returns content, even when it gets an error in the request.  This gives the SC asset fits.
+ - fixed #12349: Friends invitation error
 
 7.10.24
  - fixed #12318: asset error causes asset manager to fail

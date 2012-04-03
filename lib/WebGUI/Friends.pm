@@ -320,7 +320,10 @@ sub rejectAddRequest {
             status  => 'unread',
         });
     }
-    $inbox->getMessage($invite->{messageId})->setStatus('completed');
+    my $invitation = $inbox->getMessage($invite->{messageId});
+    if ($invitation) {
+        $invitation->setStatus('completed');
+    }
     $self->session->db->deleteRow("friendInvitations", "inviteId", $inviteId);
 }
 
