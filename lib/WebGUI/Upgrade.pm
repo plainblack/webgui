@@ -237,13 +237,13 @@ sub upgradeSite {
     my $fromVersion = $self->getCurrentVersion($configFile);
     my $toVersion = $self->getCodeVersion;
     my @steps = $self->calcUpgradePath($fromVersion, $toVersion);
-    if ( $self->useMaintenanceMode ) {
-        my $dbh = $self->dbhForConfig( $configFile );
-        $dbh->do('REPLACE INTO settings (name, value) VALUES (?, ?)', {}, 'upgradeState', 'started');
-    }
     if (! @steps) {
         print "No upgrades needed.\n"
             if ! $self->quiet;
+    }
+    elsif ( $self->useMaintenanceMode ) {
+        my $dbh = $self->dbhForConfig( $configFile );
+        $dbh->do('REPLACE INTO settings (name, value) VALUES (?, ?)', {}, 'upgradeState', 'started');
     }
     my $i = 0;
     for my $step ( @steps ) {
