@@ -6,12 +6,15 @@ To try this out:
  1) Run testEnvironment.pl to install all new requirements.
  2) Get a new wgd from http://haarg.org/wgd
  3) Copy etc/WebGUI.conf.original to www.whatever.com.conf; edit it and set dbuser, dbpass, 
-    dsn, and uploadsPath (eg to /data/domains/www.example.com/public/uploads/)
+    dsn, uploadsPath (eg to /data/domains/www.example.com/public/uploads/), extrasPath, 
+    maintenancePage and siteName
  4) Set WEBGUI_CONFIG to point at your new config file
  5) $ export PERL5LIB='/data/WebGUI/lib'
  6) $ wgd reset --upgrade
  7) $ cd /data/WebGUI (or whereever you unpacked it)
  8) $ rsync -r -a (or cp -a) /data/WebGUI/www/extras /data/domains/www.example.com/public/
+    (from whereever you unpacked it to whereever you pointed extrasPath to; note 'extras'
+    goes inside 'public', both under where extrasPath points to)
 
 To start it:
 
