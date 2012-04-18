@@ -1280,6 +1280,8 @@ Renders the list view of the DataForm.
 
 sub viewList {
     my $self    = shift;
+    return $self->session->privilege->insufficient
+        unless $self->session->user->isInGroup($self->get("groupToViewEntries"));
     my $var     = $self->getTemplateVars;
     return $self->processTemplate($self->getListTemplateVars($var), undef, $self->{_viewListTemplate});
 }
