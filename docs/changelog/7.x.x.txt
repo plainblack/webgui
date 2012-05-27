@@ -14,6 +14,7 @@
  - fixed: Cache's setByHTTP method returns content, even when it gets an error in the request.  This gives the SC asset fits.
  - fixed #12349: Friends invitation error
  - fixed #12353: Dataform List mode
+ - fixed #12364: Site export loses session info
 
 7.10.24
  - fixed #12318: asset error causes asset manager to fail

@@ -311,8 +311,9 @@ sub exportAsHtml {
 
 sub exportBranch {
     my ($self, $options, $reportSession) = @_;
+    my $session = $self->session;
     my $i18n = $reportSession &&
-        WebGUI::International->new($self->session, 'Asset');
+        WebGUI::International->new($session, 'Asset');
 
     my $depth               = $options->{depth};
     my $indexFileName       = $options->{indexFileName};
@@ -361,12 +362,21 @@ sub exportBranch {
     my $exportAsset = sub {
         my ( $assetId ) = @_;
         # Must be created once for each asset, since session is supposed to only handle
-        # one main asset
-        my $outputSession = $self->session->duplicate;
+        # one main asset.  It also cannot be a clone of the current session, since when
+        # this duplicate is closed it will overwrite the scratch from the original
+        my $outputSession = WebGUI::Session->open(
+            $session->config->getWebguiRoot,
+            $session->config->getFilename,
+        );
+        $outputSession->user( { userId => $session->user->getId } );
+        $outputSession->scratch->set('isExporting', 1);
+        $outputSession->scratch->set('exportUrl',$session->scratch->get('exportUrl'));
+        $outputSession->style->setMobileStyle($session->style->useMobileStyle?1:0);
         my $osGuard = Scope::Guard->new(sub {
             $outputSession->close;
             $outputSession = undef;
         });
+
 
         my $asset       = WebGUI::Asset->new($outputSession, $assetId);
         my $fullPath    = $asset->exportGetUrlAsPath;
