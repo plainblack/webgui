@@ -1792,6 +1792,7 @@ sub www_getScheduleDataJSON {
                  and EMSTicket.location in (  } . 
 		         join( ',', (map { $db->quote($_) } (@ticketLocations))) .
 			 q{ )
+                 and asset.state='published'
                  and assetData.revisionDate = (
                            select max(revisionDate)
                              from assetData

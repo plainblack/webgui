@@ -15,6 +15,7 @@
  - fixed #12349: Friends invitation error
  - fixed #12353: Dataform List mode
  - fixed #12364: Site export loses session info
+ - fixed #12345: tickets in trash still show up
 
 7.10.24
  - fixed #12318: asset error causes asset manager to fail
