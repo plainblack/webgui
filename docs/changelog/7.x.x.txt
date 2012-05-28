@@ -16,6 +16,7 @@
  - fixed #12353: Dataform List mode
  - fixed #12364: Site export loses session info
  - fixed #12345: tickets in trash still show up
+ - fixed #12305: dbSlave breaks WebGUI when not able to connect
 
 7.10.24
  - fixed #12318: asset error causes asset manager to fail
