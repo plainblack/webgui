@@ -582,7 +582,7 @@ sub www_managePendingVersions {
 	$ac->addSubmenuItem($session->url->page('op=manageCommittedVersions'), $i18n->get("manage committed versions")) if canView($session);
         my $output = '<table width="100%" class="content">
         <tr><th>'.$i18n->get("version tag name").'</th></tr> ';
-        my $sth = $session->db->read("select tagId,name,commitDate,committedBy from assetVersionTag where isCommitted=0 and isLocked=1");
+        my $sth = $session->db->read("select tagId,name from assetVersionTag where isCommitted=0 and isLocked=1");
         while (my ($id,$name) = $sth->array) {
                 $output .= '<tr>
 			<td><a href="'.$session->url->page("op=manageRevisionsInTag;tagId=".$id).'">'.$name.'</a></td>
