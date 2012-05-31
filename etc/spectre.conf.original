@@ -25,7 +25,7 @@
 # can help avoid creating a denial of service attack on overworked
 # or underpowered servers. 
 
-"timeBetweenRunningWorkflows" : 2,
+"timeBetweenRunningWorkflows" : 1,
 
 # How long should Spectre delay processing a workflow instance when
 # it gets suspended. It can get suspended if it's waiting for 
