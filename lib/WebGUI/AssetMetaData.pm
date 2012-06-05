@@ -388,6 +388,7 @@ sub www_editMetaDataField {
     my %usedNames;
     for my $class (WebGUI::Pluggable::findAndLoad('WebGUI::Asset')) {
         next unless $class->isa('WebGUI::Asset');
+        next unless isIn( $class, keys %{ $self->session->config->get("assets") } );
         my $name  = $class->definition($self->session)->[0]->{assetName};
         next unless $name; # abstract classes (e.g. wobject) don't have names
 
@@ -480,7 +481,7 @@ sub www_editMetaDataFieldSave {
 
 #-------------------------------------------------------------------
 
-=head2 www_manageMetaData ( )
+=head2 www_manageMetaData ( )n
 
 Returns an AdminConsole to deal with MetaDataFields. If isInGroup(4) is False, renders an insufficient privilege page.
 
