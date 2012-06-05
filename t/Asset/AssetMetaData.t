@@ -310,6 +310,7 @@ subtest 'asset metadata versioning' => sub {
 # configured in the config, which may cause a fatal error. 
 
 # Temporarily remove asset Article from config
+my $article_config = $session->config->get( 'assets' )->{ 'WebGUI::Asset::Wobject::Article' };
 $session->config->deleteFromHash( 'assets', 'WebGUI::Asset::Wobject::Article' );
 unlike( 
     my  $got = $root->www_editMetaDataField(),
@@ -317,7 +318,7 @@ unlike(
     'article was (temporarily) not in config and should not appear in form'
 );
 # Restore config:
-$session->config->addToHash( 'assets', 'WebGUI::Asset::Wobject::Article' );
+$session->config->addToHash( 'assets', 'WebGUI::Asset::Wobject::Article', $article_config );
 
 
 sub buildNameIndex {
