@@ -481,7 +481,7 @@ sub www_editMetaDataFieldSave {
 
 #-------------------------------------------------------------------
 
-=head2 www_manageMetaData ( )n
+=head2 www_manageMetaData ( )
 
 Returns an AdminConsole to deal with MetaDataFields. If isInGroup(4) is False, renders an insufficient privilege page.
 
