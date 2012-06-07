@@ -299,8 +299,10 @@ See WebGUI::Asset::purgeCache() for details.
 
 sub purgeCache {
 	my $self = shift;
-	WebGUI::Cache->new($self->session,$self->get("proxiedUrl"),"URL")->delete;
-	WebGUI::Cache->new($self->session,$self->get("proxiedUrl"),"HEADER")->delete;
+    if (my $proxiedUrl = $self->get("proxiedUrl")) {
+        WebGUI::Cache->new($self->session,$proxiedUrl,"URL")->delete;
+        WebGUI::Cache->new($self->session,$proxiedUrl,"HEADER")->delete;
+    }
 	$self->SUPER::purgeCache;
 }
 
