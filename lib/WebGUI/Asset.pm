@@ -849,7 +849,7 @@ following arguments are required in $args:
 
 =head3 method
 
-The name of the WebGUI::Asset method to call
+The name of the asset method to call
 
 =head3 args
 
@@ -867,13 +867,22 @@ An key in Asset's i18n hash for the title of the rendered console page
 
 The full url to redirect to after the fork has finished.
 
+=head3 className
+
+The class to call C<method> in, as in
+
+    $className->$method
+
+defaults to the current Asset's classname if left blank.
+
 =cut
 
 sub forkWithStatusPage {
     my ( $self, $args ) = @_;
     my $session = $self->session;
 
-    my $process = WebGUI::Fork->start( $session, 'WebGUI::Asset', $args->{method}, $args->{args} );
+    my $className = $args->{className} || $self->get('className');
+    my $process = WebGUI::Fork->start( $session, $className, $args->{method}, $args->{args} );
 
     if ( my $groupId = $args->{groupId} ) {
         $process->setGroup($groupId);
