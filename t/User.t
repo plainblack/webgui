@@ -22,7 +22,7 @@ use WebGUI::User;
 use WebGUI::ProfileField;
 use WebGUI::Shop::AddressBook;
 
-use Test::More tests => 235; # increment this value for each test you create
+use Test::More tests => 237; # increment this value for each test you create
 use Test::Deep;
 use Data::Dumper;
 
@@ -752,6 +752,24 @@ is ($friendsGroup->getId, $friendsGroup3->getId, 'friends: fetching group object
 undef $friendsGroup2;
 undef $friendsGroup3;
 undef $neighborClone;
+
+################################################################
+#
+# friend reciprication
+#
+################################################################
+#
+
+my $buddy1 = WebGUI::User->new($session, 'new');
+WebGUI::Test->addToCleanup($buddy1);
+
+my $buddy2 = WebGUI::User->new($session, 'new');
+WebGUI::Test->addToCleanup($buddy2);
+
+WebGUI::Friends->new( $session, $buddy1 )->add( [ $buddy2->userId ] );
+
+ok( exists $buddy1->friends->getUserList->{ $buddy2->userId }, 'buddy1 has buddy2 in his friends list' );
+ok( exists $buddy2->friends->getUserList->{ $buddy1->userId }, 'buddy2 has buddy1 in his friends list' );
 
 ################################################################
 #
