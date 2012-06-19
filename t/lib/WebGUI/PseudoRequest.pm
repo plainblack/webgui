@@ -73,6 +73,8 @@ sub new {
 	return $self;
 }
 
+sub hostname { 'localhost' }
+
 #----------------------------------------------------------------------------
 
 =head2 body ( [$value])
