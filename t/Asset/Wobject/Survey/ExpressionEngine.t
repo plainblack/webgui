@@ -22,7 +22,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-my $tests = 62;
+my $tests = 60;
 plan tests => $tests + 1;
 
 #----------------------------------------------------------------------------
@@ -236,13 +236,6 @@ cmp_deeply( $e->run( $session, qq{jump {scoreX('$url', ext_s0) == 200} target}, 
     { jump => 'target', tags => {} }, 'external score section totals work too' );
 cmp_deeply( $e->run( $session, qq{jump {taggedX('$url', ext_tag) == 199} target}, {userId => $user->userId} ),
     { jump => 'target', tags => {} }, 'external tag lookups work too' );
-
-# group() utility function
-$session->user( { userId => 3 });
-cmp_deeply( $e->run( $session, qq{jump { group('Admins') } target},  ),
-    { jump => 'target', tags => { }, }, 'group() function recognizes us as Admins' );
-cmp_deeply( $e->run( $session, qq{jump { group('Space Aliens') } target}, ),
-    { jump => undef, tags => { }, }, 'group() function recognizes that we are not Space Aliens' );
 
 # Test for nasty bugs caused by file-scoped lexicals not being properly initialised in L<ExpressionEngine::run>
 {
