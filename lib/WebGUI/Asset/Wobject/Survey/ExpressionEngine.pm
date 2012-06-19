@@ -36,6 +36,7 @@ my $validate;
 my $validTargets;
 my $otherInstances;
 my $tags;
+my $groups;
 
 =head2 value
 
@@ -352,6 +353,24 @@ sub avg {
     return sum(@vals) / @vals;
 }
 
+=head2 group ($name)
+
+Utility sub that returns a boolean indicating whether the user taking the survey is a member of a specified group, by name
+
+=head3 $name
+
+The name of the group
+
+=cut
+
+sub group {
+    my ($name) = @_;
+    my $value = grep( $_ eq $name, @$groups ) ? 1 : 0;
+    # warn "group($name) resolves to [$value]; groups = " . join( " ", map ">>$_<<", @$groups ) . " for userId " . $session->user->getId;
+    $session->log->debug("group($name) resolves to [$value]; groups = @$groups");
+    return $value;
+}
+
 =head2 round
 
 Utility sub shared with Safe compartment to allows expressions to easily round numbers
@@ -442,6 +461,15 @@ sub run {
     $validTargets = $opts->{validTargets};
     $tags = $opts->{tags} || {};
     $otherInstances = {};
+    $groups = $session->db->buildArrayRef( qq{
+        select groupName 
+        from groupings 
+        join groups using (groupId) 
+        where groupings.userId = ?
+        and expireDate > now()
+    }, [
+        $session->user->getId,
+    ] );
 
     if ( !$session->config->get('enableSurveyExpressionEngine') ) {
         $session->log->debug('enableSurveyExpressionEngine config option disabled, skipping');
@@ -469,6 +497,7 @@ sub run {
         $compartment->share('&restart');
         $compartment->share('&avg');
         $compartment->share('&round');
+        $compartment->share('&group');
 
         # Give them all of List::Util too
         $compartment->share_from( 'List::Util',
