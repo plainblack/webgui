@@ -13,6 +13,10 @@
 use strict;
 use Getopt::Long;
 use Pod::Usage;
+
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+
 use WebGUI::Paths -inc;
 use WebGUI::Session;
 
