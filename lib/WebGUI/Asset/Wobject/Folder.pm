@@ -162,14 +162,15 @@ override getEditForm => sub {
 	my $tabform = super();
 	my $i18n = WebGUI::International->new($self->session,"Asset_Folder");
 	if ($self->get("assetId") eq "new") {
-               	$tabform->getTab("properties")->whatNext(
-                       	-options=>{
-                               	view=>$i18n->get(823),
-                      	 	"viewParent"=>$i18n->get(847)
-                              	},
-			-value=>"view"
-			);
-	}
+                   $tabform->getTab("properties")->addField(
+                        'whatNext',
+                         -options=>{
+                                 view=>$i18n->get(823),
+                                 "viewParent"=>$i18n->get(847)
+                         },
+            -value=>"view"
+            );
+    }
 	return $tabform;
 };
 
@@ -187,7 +188,8 @@ sub getTemplateVars {
 	my $i18n        = WebGUI::International->new($self->session, 'Asset_Folder');
 
 	$vars->{ 'addFile.label'    } = $i18n->get('add file label');
-	$vars->{ 'addFile.url'      } = $self->getUrl('func=add;className=WebGUI::Asset::FilePile');
+	# $vars->{ 'addFile.url'      } = $self->getUrl('func=add;className=WebGUI::Asset::FilePile');
+	$vars->{ 'addFile.url'      } = $self->getUrl('op=assetHelper;assetId=' . $self->getId . ';helperId=upload_files;method=uploadFiles');
     $vars->{ canEdit            } = $self->canEdit;
     $vars->{ canAddFile         } = $self->canEdit;
     
@@ -340,7 +342,6 @@ override www_view => sub {
 	$self->session->response->setCacheControl($self->visitorCacheTimeout) if ($self->session->user->isVisitor);
 	super();
 };
-
 
 __PACKAGE__->meta->make_immutable;
 1;
