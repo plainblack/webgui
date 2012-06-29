@@ -1399,7 +1399,7 @@ sub view {
     my $responseDetails = $self->getResponseDetails || {};
 
     # Add lastResponse template vars
-    for my $tv qw(endDate complete restart timeout timeoutRestart) {
+    for my $tv ( qw(endDate complete restart timeout timeoutRestart) ) {
         $var->{"lastResponse\u$tv"} = $responseDetails->{$tv};
     }
     $var->{lastResponseFeedback} = $responseDetails->{templateText};
@@ -2185,7 +2185,7 @@ sub takenCount {
     my $sql = 'select count(*) from Survey_response where';
     $sql .= ' assetId = ' . $self->session->db->quote($self->getId);
     $sql .= ' and isComplete = ' . $self->session->db->quote($isComplete);
-    for my $o qw(userId ipAddress) {
+    for my $o ( qw(userId ipAddress) ) {
         if (my $o_value = $opts{$o}) {
             $sql .= " and $o = " . $self->session->db->quote($o_value);
         }
