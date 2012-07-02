@@ -1,8 +1,44 @@
+danny_mk, yeah. the best thing you could do is make a branch for the selenium work that doesn't have any other commits in it for other stuff
+	scrottie	git branch selenium; git checkout selenium
+	scrottie	git cherry-pick b8596fd10da910254150db02dc7336bda5a25c89 # to bring over the one commit that you did
+	scrottie	then to push that: git push origin selenium
+
+
 Install WebGUI using to the instructions at:  https://github.com/plainblack/webgui/tree/WebGUI8
+
+Create the following settings in your test site webgui.conf file:
+
+"selenium" : {
+    "server"  : "localhost",
+    "port" : "4444",
+    "browser" : "firefox",
+    "webgui_url" : "http://your_webgui_test_site_url"
+},
 
 Make sure you select all the defaults (do not change the "admin" user password)
 
 Pick the site design: "Style 03"  (This is the style selected for testing)
+
+Download the Selenium server from: http://seleniumhq.org/download/)
+   as of this writing it was selenium-server-standalone-2.24.1.jar
+  
+Running the Selenium Server (run in a separate command line/window)
+   java -jar selenium-server-standalone-2.24.1.jar
+   
+   The -browserSessionReuse is to keep the selenium session open so you may troubleshoot page issues
+   The Selenium software automatically closes the browser when the tests are concluded.  If you are writing/troubleshooting tests
+   and need the browser to remain open use:
+   java -jar selenium-server-standalone-2.24.1.jar -browserSessionReuse
+
+GOTCHAS ---
+   If running the selenium tests in the IDE make sure to change:
+       <link rel="selenium.base" href="http://webgui.dbash.com" />  TO:  <link rel="selenium.base" href="http://your_webgui_test_site_url" />
+
+   Selenium server not running (this may vary according to the values in your webgui.conf file):
+      Error requesting http://localhost:4444/selenium-server/driver/:
+      500 Can't connect to localhost:4444 (Connection refused)
+
+Optional:
 
 Download and install the Selenium IDE from: http://seleniumhq.org/projects/ide/
 
@@ -11,10 +47,3 @@ Take a look at the Selenium IDE documentation: http://seleniumhq.org/docs/02_sel
 Youtube videos can be quite handy:
    http://www.youtube.com/watch?v=i4NTGUm6oeQ
    http://www.youtube.com/results?search_query=selenium+tutorial+for+beginner
-
-Use the Selenium IDE to open the test suites:  
-   adminSuite.html
-   frameless/suite.html                                        
-
-GOTCHAS ---
-  Change: <link rel="selenium.base" href="http://webgui.dbash.com" />  TO:  <link rel="selenium.base" href="http://your_test_website" />
