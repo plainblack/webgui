@@ -1,0 +1,11 @@
+Install WebGUI using to the instructions at:  https://github.com/plainblack/webgui/tree/WebGUI8
+
+Make sure you select all the defaults (do not change the "admin" user password)
+
+Pick the site design: "Style 03"  (This is the style selected for testing)
+
+Download and install the Selenium IDE from: http://seleniumhq.org/projects/ide/
+
+Take a look at the Selenium IDE documentation: http://seleniumhq.org/docs/02_selenium_ide.html
+
+Use the Selenium IDE to open the test suite:  adminSuite.html
