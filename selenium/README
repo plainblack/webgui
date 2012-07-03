@@ -23,6 +23,10 @@ Running the Selenium Server (run in a separate command line/window)
    The Selenium software automatically closes the browser when the tests are concluded.  If you are writing/troubleshooting tests
    and need the browser to remain open use:
    java -jar selenium-server-standalone-2.24.1.jar -browserSessionReuse
+   
+Running the WebGUI tests
+   cd /data/WebGUI/selenium
+   perl test.pl
 
 GOTCHAS ---
    If running the selenium tests in the IDE make sure to change:
