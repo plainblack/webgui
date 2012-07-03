@@ -8,4 +8,13 @@ Download and install the Selenium IDE from: http://seleniumhq.org/projects/ide/
 
 Take a look at the Selenium IDE documentation: http://seleniumhq.org/docs/02_selenium_ide.html
 
-Use the Selenium IDE to open the test suite:  adminSuite.html
+Youtube videos can be quite handy:
+   http://www.youtube.com/watch?v=i4NTGUm6oeQ
+   http://www.youtube.com/results?search_query=selenium+tutorial+for+beginner
+
+Use the Selenium IDE to open the test suites:  
+   adminSuite.html
+   frameless/suite.html                                        
+
+GOTCHAS ---
+  Change: <link rel="selenium.base" href="http://webgui.dbash.com" />  TO:  <link rel="selenium.base" href="http://your_test_website" />
