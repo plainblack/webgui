@@ -24,7 +24,7 @@ Running the Selenium Server (run in a separate command line/window)
    and need the browser to remain open use:
    java -jar selenium-server-standalone-2.24.1.jar -browserSessionReuse
    
-Running the WebGUI tests
+Running the WebGUI tests (run in a separate command line/window)
    cd /data/WebGUI/selenium
    perl test.pl
 
