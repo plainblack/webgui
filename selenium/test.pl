@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use Test::More tests => 98;
+use Test::More tests => 159;
 use Test::WWW::Selenium;
 use Test::WWW::Selenium::HTML;
 use WebGUI::Paths -inc;
@@ -42,13 +42,13 @@ my $selh = Test::WWW::Selenium::HTML->new( $sel );
 $selh->diag_body_text_on_failure(0);
 
 #------------------------- Run All Tests here -----------------------
-
+# Test basic interface links
 ok(1, "Login test");
 $selh->run(path => "login.html");
 ok(1, "Turn On Admin test");
 $selh->run(path => "turnOnAdmin.html");
 ok(1, "Admin Console tests");
-$selh->run(path => "turnOnAdmin.html");
+$selh->run(path => "adminConsole.html");
 ok(1, "Version Tags tests");
 $selh->run(path => "versionTags.html");
 ok(1, "Clipboard test");
@@ -67,3 +67,17 @@ ok(1, "New Content->Shop tests");
 $selh->run(path => "newContentShop.html");
 ok(1, "New Content->Utilities tests");
 $selh->run(path => "newContentUtilities.html");
+
+# 
+ok(1, "FRAMELESS->Active Sessions");
+$selh->run(path => "frameless/activeSessions.html");
+ok(1, "FRAMELESS->Addons");
+$selh->run(path => "frameless/addons.html");
+ok(1, "FRAMELESS->Advertising");
+$selh->run(path => "frameless/advertising.html");
+ok(1, "FRAMELESS->Asset History");
+$selh->run(path => "frameless/assetHistory.html");
+ok(1, "FRAMELESS->Cache");
+$selh->run(path => "frameless/cache.html");
+ok(1, "FRAMELESS->Clipboard");
+$selh->run(path => "frameless/clipboard.html");

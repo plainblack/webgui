@@ -12,8 +12,73 @@
 <tr><td rowspan="1" colspan="3">Advertising</td></tr>
 </thead><tbody>
 <tr>
+	<td>open</td>
+	<td>/?op=manageAdSpaces</td>
+	<td></td>
+</tr>
+<tr>
 	<td>clickAndWait</td>
-	<td>css=img[alt=&quot;Advertising&quot;]</td>
+	<td>link=Add ad space.</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>id=name_formId</td>
+	<td>testAd</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>id=title_formId</td>
+	<td>Just a test Ad</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>id=description_formId</td>
+	<td>Just a test ad to ...</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>xpath=(//input[@value='save'])[2]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Manage ad spaces.</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>Just a test Ad</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>css=img[alt=&quot;Edit&quot;]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>id=title_formId</td>
+	<td>Just a test Ad (Changed)</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>css=input[type=&quot;submit&quot;]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>Just a test Ad (Changed)</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>css=img[alt=&quot;Delete&quot;]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertConfirmation</td>
+	<td>Are you certain you want to delete this ad space and all the ads attached to it?</td>
 	<td></td>
 </tr>
 <tr>
@@ -21,7 +86,6 @@
 	<td>id=application_title</td>
 	<td>Advertising</td>
 </tr>
-
 </tbody></table>
 </body>
 </html>

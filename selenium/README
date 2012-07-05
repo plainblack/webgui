@@ -19,7 +19,7 @@ Download the Selenium server from: http://seleniumhq.org/download/)
 Running the Selenium Server (run in a separate command line/window)
    java -jar selenium-server-standalone-2.24.1.jar
    
-   The -browserSessionReuse is to keep the selenium session open so you may troubleshoot page issues
+   The -browserSessionReuse is to keep the selenium session open so you may troubleshoot page issues (helpful for test writers)
    The Selenium software automatically closes the browser when the tests are concluded.  If you are writing/troubleshooting tests
    and need the browser to remain open use:
    java -jar selenium-server-standalone-2.24.1.jar -browserSessionReuse
@@ -44,5 +44,21 @@ Download and install the Selenium IDE from: http://seleniumhq.org/projects/ide/
 Take a look at the Selenium IDE documentation: http://seleniumhq.org/docs/02_selenium_ide.html
 
 Youtube videos can be quite handy:
+   http://www.youtube.com/watch?v=MXuhevKqImI
    http://www.youtube.com/watch?v=i4NTGUm6oeQ
    http://www.youtube.com/results?search_query=selenium+tutorial+for+beginner
+   
+Errors:
+
+   $ perl test.pl 
+   1..98
+   Error requesting http://localhost:4444/selenium-server/driver/:
+   500 Can't connect to localhost:4444 (Connection refused)
+   # Looks like your test exited with 61 before it could output anything.
+   --- this means you forgot to run the Selenium server or you are not running the Selenium server on the same
+   host:port as specified in your webgui.conf file.
+   
+Perl requirements:
+   Test::WWW::Selenium
+   Test::WWW::Selenium::HTML
+   
