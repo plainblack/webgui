@@ -100,12 +100,13 @@ The filename of the config file to read.
 
 =cut
 
-sub new {
-    my $package = shift;
+around BUILDARGS => sub {
+    my $orig = shift;
+    my $class = shift;
     my $filename = shift;
     $filename = Cwd::realpath(File::Spec->rel2abs($filename, WebGUI::Paths->configBase));
-    return $package->SUPER::new($filename);
-}
+    return $class->$orig($filename);
+};
 
 1;
 

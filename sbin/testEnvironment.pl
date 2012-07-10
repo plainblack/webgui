@@ -111,7 +111,7 @@ checkModule("XML::FeedPP::MediaRSS",        0.02         );
 checkModule("JSON",                         2.12         );
 checkModule("JSON::Any",                    1.22         );
 checkModule("JSON::PP",                     0.00         );
-checkModule("Config::JSON",                 1.5100       );
+checkModule("Config::JSON",                 "1.3.1"      );
 checkModule("Text::CSV_XS",                 "0.64"       );
 checkModule("Net::CIDR::Lite",              0.20         );
 checkModule("Finance::Quote",               1.15         );
