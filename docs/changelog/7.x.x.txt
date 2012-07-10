@@ -24,6 +24,7 @@
  - fixed #12345: tickets in trash still show up
  - fixed #12305: dbSlave breaks WebGUI when not able to connect
  - fixed: Http Proxy assets with no URL to proxy cannot be deleted.
+ - fixed: Friends request messages that no longer exist throw a warning.
 
 7.10.24
  - fixed #12318: asset error causes asset manager to fail

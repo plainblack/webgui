@@ -96,7 +96,10 @@ sub approveAddRequest {
         status  => 'unread',
         sentBy  => $self->user->userId,
     });
-    $inbox->getMessage($invite->{messageId})->setStatus('completed');
+    my $message = $inbox->getMessage($invite->{messageId});
+    if ($message) {
+        $message->setStatus('completed');
+    }
     $db->deleteRow("friendInvitations", "inviteId", $inviteId);
 }
 
