@@ -613,8 +613,8 @@ sub www_manageVersions {
 	my $i18n = WebGUI::International->new($session,"VersionTag");
     my ($icon, $url, $datetime, $user) = $session->quick(qw(icon url datetime user));
 	$ac->addSubmenuItem($url->page('op=editVersionTag'), $i18n->get("add a version tag"));
-	$ac->addSubmenuItem($url->page('op=managePendingVersions'), $i18n->get("manage pending versions")) if canView($session);
-	$ac->addSubmenuItem($url->page('op=manageCommittedVersions'), $i18n->get("manage committed versions")) if canView($session);
+	$ac->addSubmenuItem($url->page('op=managePendingVersions'), $i18n->get("manage pending versions"));
+	$ac->addSubmenuItem($url->page('op=manageCommittedVersions'), $i18n->get("manage committed versions"));
 	my ($tag,$workingTagId) = $session->db->quickArray("select name,tagId from assetVersionTag where tagId=?",[$session->scratch->get("versionTag")]);
 	$tag ||= "None";
 	my $rollback = $i18n->get("rollback");
@@ -630,9 +630,7 @@ sub www_manageVersions {
 		my $u = WebGUI::User->new($session,$tag->get("createdBy"));
 		$output .= '<tr>
 			<td>';
-        if (canView($session)) {
-				$output .= $icon->delete("op=rollbackVersionTag;tagId=".$tag->getId,undef,$rollbackPrompt);
-        }
+        $output .= $icon->delete("op=rollbackVersionTag;tagId=".$tag->getId,undef,$rollbackPrompt);
         $output .= $icon->edit("op=editVersionTag;tagId=".$tag->getId)
 			.'</td>
 			<td><a href="'.$url->page("op=manageRevisionsInTag;tagId=".$tag->getId).'">'.$tag->get("name").'</a></td>
