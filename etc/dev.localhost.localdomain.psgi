@@ -1,5 +1,8 @@
 use Plack::Builder;
-use lib '/data/WebGUI/lib';
+
+my $webgui_lib = '/data/WebGUI/lib';
+use lib $webgui_lib, $webgui_lib.'/plebgui_mock';
+
 use WebGUI;
 WebGUI->init( root => '/data/WebGUI', config => 'dev.localhost.localdomain.conf' );
 

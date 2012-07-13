@@ -43,7 +43,7 @@ These subroutines are available from this package:
 
 #-------------------------------------------------------------------
 
-=head2 handler ( request, server, config ) 
+=head2 handler ( request, server, config )
 
 The Apache request handler for this package.
 
@@ -64,9 +64,12 @@ to the user, instead of displaying the Page Not Found page.
 sub handler {
     my ($request, $server, $config) = @_;
     $request->push_handlers(PerlResponseHandler => sub {
-
         my $request = shift;
-        $request = Apache2::Request->new($request);
+
+        if (! $request->isa('WebGUI::Session::Plack') ){
+            require Apache2::Request;
+            $request = Apache2::Request->new($request);
+        }
 
         my $session = $request->pnotes('wgSession');
 
@@ -84,9 +87,9 @@ sub handler {
                     WebGUI::authen($request, split(":", MIME::Base64::decode_base64($auth), 2), $session);
                 }
                 else { # realm oriented
-                    $request->push_handlers(PerlAuthenHandler => sub { return WebGUI::authen($request, undef, undef, $session)}); 
-                } 
-            } 
+                    $request->push_handlers(PerlAuthenHandler => sub { return WebGUI::authen($request, undef, undef, $session)});
+                }
+            }
 
             WebGUI::Asset::Template->processVariableHeaders($session);
             foreach my $handler (@{$config->get("contentHandlers")}) {

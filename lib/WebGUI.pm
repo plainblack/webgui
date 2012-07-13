@@ -1,9 +1,7 @@
 package WebGUI;
 
-
 our $VERSION = '7.10.24';
 our $STATUS = 'stable';
-
 
 =head1 LEGAL
 
@@ -20,13 +18,18 @@ our $STATUS = 'stable';
 =cut
 
 use strict;
-use Apache2::Access ();
 use Apache2::Const -compile => qw(OK DECLINED HTTP_UNAUTHORIZED SERVER_ERROR);
-use Apache2::Request;
-use Apache2::RequestIO;
-use Apache2::RequestUtil ();
-use Apache2::ServerUtil ();
-use APR::Request::Apache2;
+
+# Eval loading the mod_perl modules as they might not be installed when running under plack.
+eval q{
+    require Apache2::Access ();
+    require Apache2::Request;
+    require Apache2::RequestIO;
+    require Apache2::RequestUtil ();
+    require Apache2::ServerUtil ();
+    require APR::Request::Apache2;
+};
+
 use MIME::Base64 ();
 use Scalar::Util qw/blessed/;
 use WebGUI::Config;
