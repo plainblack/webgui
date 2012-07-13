@@ -3,13 +3,15 @@ package WebGUI::Wizard::Setup;
 use strict;
 use base 'WebGUI::Wizard';
 
+use WebGUI::Wizard::HomePage;
+
 =head1 NAME
 
 WebGUI::Wizard::Setup -- Initial site setup
 
 =head1 DESCRIPTION
 
-A WebGUI::Wizard to perform initial site setup tasks like defining the Admin 
+A WebGUI::Wizard to perform initial site setup tasks like defining the Admin
 account, entering basic information, and choosing a default style.
 
 =head1 METHODS
@@ -27,7 +29,7 @@ sub _get_steps {
 
 #----------------------------------------------------------------------------
 
-=head2 canView ( ) 
+=head2 canView ( )
 
 A user can view this wizard if the site is newly created or if they are the
 admin user
@@ -39,13 +41,13 @@ sub canView {
     my $session = $self->session;
 
     # Only specialState="init" or admin user
-    return $session->setting->get('specialState') eq 'init' 
+    return $session->setting->get('specialState') eq 'init'
         || $session->user->getId eq '3';
 }
 
 #----------------------------------------------------------------------------
 
-=head2 wrapStyle ( $output ) 
+=head2 wrapStyle ( $output )
 
 Wrap the output in the wizard style.
 
@@ -81,11 +83,11 @@ body {
 }
 
 h1 {
-    position: absolute; 
+    position: absolute;
     top: 10px;
     padding: 0;
     margin: 0;
-    padding-left: 120px; 
+    padding-left: 120px;
 
     background: url(' . $session->url->extras('wg.png') . ') no-repeat;
     line-height: 100px;
@@ -125,7 +127,7 @@ h1 {
 
 #----------------------------------------------------------------------------
 
-=head2 www_adminAccount ( ) 
+=head2 www_adminAccount ( )
 
 Display the form to configure the admin account
 
@@ -179,7 +181,7 @@ sub www_adminAccount {
 
 #----------------------------------------------------------------------------
 
-=head2 www_adminAccountSave ( ) 
+=head2 www_adminAccountSave ( )
 
 Process the form and update the Admin account
 
@@ -225,7 +227,7 @@ sub www_adminAccountSave {
 
 #----------------------------------------------------------------------------
 
-=head2 www_companyInformation ( ) 
+=head2 www_companyInformation ( )
 
 Enter basic company information
 
@@ -268,7 +270,7 @@ sub www_companyInformation {
 
 #----------------------------------------------------------------------------
 
-=head2 www_companyInformationSave ( ) 
+=head2 www_companyInformationSave ( )
 
 Update the company information
 
@@ -286,7 +288,7 @@ sub www_companyInformationSave {
 
 #----------------------------------------------------------------------------
 
-=head2 www_siteStats ( ) 
+=head2 www_siteStats ( )
 
 Opt-in to the global WebGUI statistics
 
@@ -321,7 +323,7 @@ sub www_siteStats {
 
 #----------------------------------------------------------------------------
 
-=head2 www_siteStatsSave ( ) 
+=head2 www_siteStatsSave ( )
 
 Opt-in to the global WebGUI statistics
 
@@ -337,7 +339,7 @@ sub www_siteStatsSave {
 
 #----------------------------------------------------------------------------
 
-=head2 www_defaultStyle ( ) 
+=head2 www_defaultStyle ( )
 
 Choose the default site style
 
@@ -349,7 +351,7 @@ sub www_defaultStyle {
 
 #----------------------------------------------------------------------------
 
-=head2 www_defaultStyleSave ( ) 
+=head2 www_defaultStyleSave ( )
 
 Save the default style to all existing pages and the user function style
 
@@ -369,7 +371,7 @@ sub www_defaultStyleSave {
 
 #----------------------------------------------------------------------------
 
-=head2 www_cleanup ( ) 
+=head2 www_cleanup ( )
 
 Give the user a choice to do the Home Page wizard
 
