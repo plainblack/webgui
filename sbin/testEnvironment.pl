@@ -115,7 +115,8 @@ checkModule("Finance::Quote",               1.15         );
 checkModule("POE",                          1.005        );
 checkModule("POE::Component::IKC::Server",  0.2001       );
 checkModule("POE::Component::Client::HTTP", 0.88         );
-checkModule("Apache2::Request",             2.08         );
+# In plebgui the mod_perl modules are optional
+checkModule("Apache2::Request",             2.08, 2      );
 checkModule("URI::Escape",                  "3.29"       );
 checkModule("POSIX"                                      );
 checkModule("List::Util"                                 );
@@ -162,6 +163,8 @@ checkModule('Kwargs',                                    );
 checkModule('Data::ICal',                   '0.16'       );
 checkModule('common::sense',                '3.2'        );
 checkModule('Geo::Coder::Googlev3',         '0.07'       );
+# Plack is required for plebgui
+checkModule('Plack'                                      );
 
 failAndExit("Required modules are missing, running no more checks.") if $missingModule;
 
@@ -412,9 +415,9 @@ sub isIn {
 #----------------------------------------
 sub isRootRequirementMet {
     if (getOs() eq "Linuxish")	 {
-	return ($< == 0);	
+	    return ($< == 0);	
     } else {
-	return 1;
+	    return 1;
     }
 }
 
