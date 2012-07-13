@@ -20,7 +20,7 @@ our $STATUS = 'stable';
 =cut
 
 use strict;
-use Apache2::Access (); 
+use Apache2::Access ();
 use Apache2::Const -compile => qw(OK DECLINED HTTP_UNAUTHORIZED SERVER_ERROR);
 use Apache2::Request;
 use Apache2::RequestIO;
@@ -83,9 +83,14 @@ A reference to a WebGUI::Session object.
 
 sub authen {
     my ($request, $username, $password, $session) = @_;
-    $request = Apache2::Request->new($request);
 	my $log = $session->log;
-    my $server = Apache2::ServerUtil->server;
+    my $server;
+    if ($request->isa('WebGUI::Session::Plack')) {
+        $server  = $request->server;
+    } else {
+        $request = Apache2::Request->new($request);
+        $server  = Apache2::ServerUtil->server;	#instantiate the server api
+    }
 	my $status = Apache2::Const::OK;
 
 	# set username and password if it's an auth handler
@@ -148,11 +153,18 @@ The Apache2::RequestRec object passed in by Apache's mod_perl.
 =cut
 
 sub handler {
-	my $request = shift;	#start with apache request object
-    $request = Apache2::Request->new($request);
-	my $configFile = shift || $request->dir_config('WebguiConfig'); #either we got a config file, or we'll build it from the request object's settings
-	my $server = Apache2::ServerUtil->server;	#instantiate the server api
-	my $config = WebGUI::Config->new($server->dir_config('WebguiRoot'), $configFile); #instantiate the config object
+    my $request = shift; # either apache request object or PSGI env hash
+    my ($server, $config);
+    if ($request->isa('WebGUI::Session::Plack')) {
+        $server  = $request->server;
+        $config = WebGUI->config; # use our cached version
+    } else {
+        $request = Apache2::Request->new($request);
+        $server  = Apache2::ServerUtil->server;	#instantiate the server api
+        my $configFile = shift || $request->dir_config('WebguiConfig'); #either we got a config file, or we'll build it from the request object's settings
+        $config = WebGUI::Config->new($server->dir_config('WebguiRoot'), $configFile); #instantiate the config object
+    }
+
     my $error = "";
     my $matchUri = $request->uri;
     my $gateway = $config->get("gateway");
@@ -177,18 +189,43 @@ sub handler {
         }
 	}
 	return Apache2::Const::DECLINED if ($gotMatch);
-	
+
 	# can't handle the url due to error or misconfiguration
-    $request->push_handlers(PerlResponseHandler => sub { 
+    $request->push_handlers(PerlResponseHandler => sub {
         print "This server is unable to handle the url '".$request->uri."' that you requested. ".$error;
         return Apache2::Const::OK;
     } );
 	$request->push_handlers(PerlTransHandler => sub { return Apache2::Const::OK });
-	return Apache2::Const::DECLINED; 
+	return Apache2::Const::DECLINED;
 }
 
 
 
+sub handle_psgi {
+    my $env = shift;
+    require WebGUI::Session::Plack;
+    my $plack = WebGUI::Session::Plack->new( env => $env );
+
+    # returns something like Apache2::Const::OK, which we ignore
+    my $ret = handler($plack);
+
+    # let Plack::Response do its thing
+    return $plack->finalize;
+}
+
+# Experimental speed boost
+my ($root, $config_file, $config);
+sub init {
+    my $class = shift;
+    my %opts = @_;
+    $root = $opts{root};
+    $config_file = $opts{config};
+    $config = WebGUI::Config->new($root, $config_file);
+    warn 'INIT';
+}
+sub config { $config }
+sub root { $root }
+sub config_file { $config_file }
 
 1;
 
