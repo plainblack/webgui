@@ -9,10 +9,6 @@ Create the following settings in your test site webgui.conf file:
     "webgui_url" : "http://whatever-your-site-is.com"
 },
 
-Make sure you select all the defaults (do not change the "admin" user password)
-
-Pick the site design: "Style 03"  (This is the style selected for testing)
-
 Download the Selenium server from: http://seleniumhq.org/download/)
    as of this writing it was selenium-server-standalone-2.24.1.jar
   
@@ -23,10 +19,15 @@ Running the Selenium Server (run in a separate command line/window)
    The Selenium software automatically closes the browser when the tests are concluded.  If you are writing/troubleshooting tests
    and need the browser to remain open use:
    java -jar selenium-server-standalone-2.24.1.jar -browserSessionReuse
+
+The test.pl script can setup your WebGUI test site automagically (perl test.pl install)
+or you can setup the WebGUI test site yourself.  If you choose to setup the WebGUI site yourself
+please make sure you select all the defaults (do not change the "admin" user password) and 
+pick the site design: "Style 03"  (This is the style selected for testing)
    
 Running the WebGUI tests (run in a separate command line/window)
    cd /data/WebGUI/selenium
-   perl test.pl
+   perl test.pl [install]
 
 GOTCHAS ---
    If running the selenium tests in the IDE make sure to change:
@@ -57,6 +58,15 @@ Errors:
    # Looks like your test exited with 61 before it could output anything.
    --- this means you forgot to run the Selenium server or you are not running the Selenium server on the same
    host:port as specified in your webgui.conf file.
+   
+   $perl test.pl
+   ok 1 - Login test
+   Error requesting http://localhost:4444/selenium-server/driver/:
+   Timed out after 30000ms
+   # Looks like you planned 159 tests but ran 1.
+   # Looks like your test exited with 255 just after 1.
+   --- make sure your webgui test system is running and the "webgui_url" value in your selenium.conf is the same as the
+   address to your WebGUI test system
    
 Perl requirements:
    Test::WWW::Selenium
