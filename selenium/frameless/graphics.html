@@ -13,13 +13,28 @@
 </thead><tbody>
 <tr>
 	<td>open</td>
-	<td>/?op=filePump</td>
+	<td>/?op=listGraphicsOptions</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertText</td>
+	<td>id=application_title</td>
+	<td>Graphics</td>
+</tr>
+<tr>
+	<td>open</td>
+	<td>/?op=listPalettes</td>
 	<td></td>
 </tr>
 <tr>
 	<td>clickAndWait</td>
-	<td>link=Add a Bundle</td>
+	<td>link=Add a new palette</td>
 	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>id=paletteName_formId</td>
+	<td>new palette test</td>
 </tr>
 <tr>
 	<td>clickAndWait</td>
@@ -27,9 +42,19 @@
 	<td></td>
 </tr>
 <tr>
-	<td>assertText</td>
-	<td>link=New bundle</td>
-	<td>New bundle</td>
+	<td>clickAndWait</td>
+	<td>link=Add a color to this palette.</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>id=colorName_formId</td>
+	<td>new color test</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>css=input[type=&quot;submit&quot;]</td>
+	<td></td>
 </tr>
 <tr>
 	<td>clickAndWait</td>
@@ -37,14 +62,24 @@
 	<td></td>
 </tr>
 <tr>
-	<td>pause</td>
-	<td>2000</td>
+	<td>clickAndWait</td>
+	<td>link=Manage palettes</td>
 	<td></td>
 </tr>
 <tr>
-	<td>assertTextNotPresent</td>
-	<td>link=New bundle</td>
-	<td>New bundle</td>
+	<td>assertTextPresent</td>
+	<td>new palette test</td>
+	<td></td>
+</tr>
+<tr>
+	<td>open</td>
+	<td>/?op=listFonts</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertTextPresent</td>
+	<td>WebGUI default font</td>
+	<td></td>
 </tr>
 </tbody></table>
 </body>

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head profile="http://selenium-ide.openqa.org/profiles/test-case">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<link rel="selenium.base" href="http://webgui.dbash.com/" />
+<title>File Pump</title>
+</head>
+<body>
+<table cellpadding="1" cellspacing="1" border="1">
+<thead>
+<tr><td rowspan="1" colspan="3">File Pump</td></tr>
+</thead><tbody>
+<tr>
+	<td>open</td>
+	<td>/?op=manageVersions</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertText</td>
+	<td>id=application_title</td>
+	<td>Version Tags</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Add a version tag.</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>id=name_formId</td>
+	<td>Test Version Tag</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>xpath=(//input[@value='save'])[2]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertText</td>
+	<td>link=Test Version Tag</td>
+	<td>Test Version Tag</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=[Leave This Tag]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertTextPresent</td>
+	<td>You are currently working under a tag called: None.</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>css=img[alt=&quot;Delete&quot;]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertConfirmation</td>
+	<td>Are you certain you wish to delete this version tag and all content created under it? It CANNOT be restored if you delete it.</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>1000</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertTextNotPresent</td>
+	<td>id=application_title</td>
+	<td>Rollback Version Tag</td>
+</tr>
+<tr>
+	<td>open</td>
+	<td>/?op=manageVersions</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertTextNotPresent</td>
+	<td>link=Test Version Tag</td>
+	<td>Test Version Tag</td>
+</tr>
+</tbody></table>
+</body>
+</html>

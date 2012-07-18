@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head profile="http://selenium-ide.openqa.org/profiles/test-case">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<link rel="selenium.base" href="http://webgui.dbash.com/" />
+<title>File Pump</title>
+</head>
+<body>
+<table cellpadding="1" cellspacing="1" border="1">
+<thead>
+<tr><td rowspan="1" colspan="3">File Pump</td></tr>
+</thead><tbody>
+<tr>
+	<td>open</td>
+	<td>/?op=editProfileSettings</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertText</td>
+	<td>id=application_title</td>
+	<td>User Profiling</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Add a profile category.</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>id=label_formId</td>
+	<td>Test Profile Category</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>id=shortLabel_formId</td>
+	<td>testProfileCategory</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>id=visible1</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>id=editable1</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>xpath=(//input[@value='save'])[2]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertTextPresent</td>
+	<td>Test Profile Category</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Add a profile field.</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>id=fid_formId</td>
+	<td>testProfileField</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>id=label_formId</td>
+	<td>Test Profile Field</td>
+</tr>
+<tr>
+	<td>select</td>
+	<td>id=profileCategoryId_formId</td>
+	<td>label=Test Profile Category</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>xpath=(//input[@value='save'])[2]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertTextPresent</td>
+	<td>Test Profile Field</td>
+	<td></td>
+</tr>
+</tbody></table>
+</body>
+</html>

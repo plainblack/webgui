@@ -13,38 +13,28 @@
 </thead><tbody>
 <tr>
 	<td>open</td>
-	<td>/?op=filePump</td>
-	<td></td>
-</tr>
-<tr>
-	<td>clickAndWait</td>
-	<td>link=Add a Bundle</td>
-	<td></td>
-</tr>
-<tr>
-	<td>clickAndWait</td>
-	<td>css=input[type=&quot;submit&quot;]</td>
+	<td>/?op=viewHelpIndex</td>
 	<td></td>
 </tr>
 <tr>
 	<td>assertText</td>
-	<td>link=New bundle</td>
-	<td>New bundle</td>
+	<td>id=application_title</td>
+	<td>Help Index</td>
+</tr>
+<tr>
+	<td>assertText</td>
+	<td>link=Macros, List of Available</td>
+	<td>Macros, List of Available</td>
 </tr>
 <tr>
 	<td>clickAndWait</td>
-	<td>css=img[alt=&quot;Delete&quot;]</td>
+	<td>link=Macros, List of Available</td>
 	<td></td>
 </tr>
 <tr>
-	<td>pause</td>
-	<td>2000</td>
-	<td></td>
-</tr>
-<tr>
-	<td>assertTextNotPresent</td>
-	<td>link=New bundle</td>
-	<td>New bundle</td>
+	<td>assertText</td>
+	<td>id=application_title</td>
+	<td>exact:Help: Macros, List of Available</td>
 </tr>
 </tbody></table>
 </body>

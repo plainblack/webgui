@@ -13,12 +13,22 @@
 </thead><tbody>
 <tr>
 	<td>open</td>
-	<td>/?op=filePump</td>
+	<td>/?op=manageWorkflows</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertText</td>
+	<td>id=application_title</td>
+	<td>Manage all workflows.</td>
+</tr>
+<tr>
+	<td>assertTextPresent</td>
+	<td>Analyze Passive Analytics</td>
 	<td></td>
 </tr>
 <tr>
 	<td>clickAndWait</td>
-	<td>link=Add a Bundle</td>
+	<td>link=Add a new workflow.</td>
 	<td></td>
 </tr>
 <tr>
@@ -27,24 +37,44 @@
 	<td></td>
 </tr>
 <tr>
-	<td>assertText</td>
-	<td>link=New bundle</td>
-	<td>New bundle</td>
+	<td>type</td>
+	<td>id=title_formId</td>
+	<td>testWorkFlow</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>id=description_formId</td>
+	<td>Just a test workflow</td>
 </tr>
 <tr>
 	<td>clickAndWait</td>
-	<td>css=img[alt=&quot;Delete&quot;]</td>
+	<td>xpath=(//input[@value='save'])[2]</td>
 	<td></td>
 </tr>
 <tr>
-	<td>pause</td>
-	<td>2000</td>
+	<td>clickAndWait</td>
+	<td>css=input[type=&quot;submit&quot;]</td>
 	<td></td>
 </tr>
 <tr>
-	<td>assertTextNotPresent</td>
-	<td>link=New bundle</td>
-	<td>New bundle</td>
+	<td>open</td>
+	<td>/?op=manageWorkflows</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertTextPresent</td>
+	<td>testWorkFlow</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Show running workflows.</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertText</td>
+	<td>id=application_title</td>
+	<td>Show running workflows.</td>
 </tr>
 </tbody></table>
 </body>

@@ -13,38 +13,43 @@
 </thead><tbody>
 <tr>
 	<td>open</td>
-	<td>/?op=filePump</td>
-	<td></td>
-</tr>
-<tr>
-	<td>clickAndWait</td>
-	<td>link=Add a Bundle</td>
-	<td></td>
-</tr>
-<tr>
-	<td>clickAndWait</td>
-	<td>css=input[type=&quot;submit&quot;]</td>
+	<td>/?op=listUsers</td>
 	<td></td>
 </tr>
 <tr>
 	<td>assertText</td>
-	<td>link=New bundle</td>
-	<td>New bundle</td>
+	<td>id=application_title</td>
+	<td>Users</td>
 </tr>
 <tr>
 	<td>clickAndWait</td>
-	<td>css=img[alt=&quot;Delete&quot;]</td>
+	<td>link=Admin</td>
 	<td></td>
 </tr>
 <tr>
-	<td>pause</td>
-	<td>2000</td>
+	<td>assertTextPresent</td>
+	<td>Edit User</td>
 	<td></td>
 </tr>
 <tr>
-	<td>assertTextNotPresent</td>
-	<td>link=New bundle</td>
-	<td>New bundle</td>
+	<td>click</td>
+	<td>//div[@id='default']/ul/li[2]/a/em</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertTextPresent</td>
+	<td>Personal Information</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[@id='default']/ul/li[3]/a/em</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertTextPresent</td>
+	<td>GROUPS TO ADD</td>
+	<td></td>
 </tr>
 </tbody></table>
 </body>
