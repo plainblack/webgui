@@ -180,7 +180,7 @@ sub addHtml {
 	my $self = shift;
 	my $text = shift;
 	if ($text !~ /<(?:html|body)/) {
-	    my $site = $self->session->url->getSiteURL;
+	    my $site = $self->session->url->getSiteURL.$self->session->url->gateway;
 	    $text = <<END_HTML;
 <html>
 <head>

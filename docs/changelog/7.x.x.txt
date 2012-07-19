@@ -26,6 +26,7 @@
  - fixed: Http Proxy assets with no URL to proxy cannot be deleted.
  - fixed: Friends request messages that no longer exist throw a warning.
  - fixed: Asset Report asset can search for all wobjects in addition to all assets.
+ - fixed #12375: Gateway URL ignored for password recovery
 
 7.10.24
  - fixed #12318: asset error causes asset manager to fail

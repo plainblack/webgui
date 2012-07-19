@@ -1136,7 +1136,7 @@ sub emailRecoverPasswordFinish {
 
     my $mail = WebGUI::Mail::Send->create($session, { to=>$email, subject=>$i18n->get('WebGUI password recovery')});
     my $vars = { };
-    $vars->{recoverPasswordUrl} = $session->url->append($session->url->getSiteURL,'op=auth;method=emailResetPassword;token='.$recoveryGuid);
+    $vars->{recoverPasswordUrl} = $session->url->append($session->url->getSiteURL.$session->url->gateway,'op=auth;method=emailResetPassword;token='.$recoveryGuid);
     my $templateId = $session->setting->get('webguiPasswordRecoveryEmailTemplate');
     my $template  = WebGUI::Asset->newByDynamicClass($session, $templateId);
     if (!$template) {

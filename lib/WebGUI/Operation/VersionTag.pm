@@ -689,7 +689,7 @@ sub www_manageRevisionsInTag {
                 sprintf $html, 
                     $i18n->get( "error permission www_manageRevisionsInTag title" ),
                     $i18n->get( "error permission www_manageRevisionsInTag body" ),
-                    $session->url->getSiteURL,
+                    $session->url->getSiteURL . $session->url->gateway,
                     $i18n->get( "back to site" ),
                 );
         }
