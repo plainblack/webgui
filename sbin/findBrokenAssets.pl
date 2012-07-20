@@ -23,7 +23,7 @@ BEGIN {
 
 $|++;    # disable output buffering
 
-our ( $configFile, $help, $man, $fix, $delete, $no_progress );
+our ( $configFile, $help, $man, $fix, $delete, $no_progress, $op_assetId );
 use Pod::Usage;
 use Getopt::Long;
 use WebGUI::Session;
@@ -36,6 +36,7 @@ GetOptions(
     'fix'          => \$fix,
     'delete'       => \$delete,
     'noProgress'   => \$no_progress,
+    'assetId=s'    => \$op_assetId,
 );
 
 pod2usage( verbose => 1 ) if $help;
@@ -62,14 +63,32 @@ sub progress {
     printf ' (%d/%d)', $current, $total;
 }
 
-my $totalAsset      = $session->db->quickScalar('SELECT COUNT(*) FROM asset');
-my $totalAssetData  = $session->db->quickScalar('SELECT COUNT( DISTINCT( assetId ) ) FROM assetData' );
-my $total   = $totalAsset >= $totalAssetData ? $totalAsset : $totalAssetData;
+## SQL statements
+
+my $total_asset_sql     = 'SELECT COUNT(*) FROM asset ';
+my $total_assetdata_sql = 'SELECT COUNT( DISTINCT( assetId ) ) FROM assetData ';
+my $count_shortcut_sql  = q!select count(*) from asset where className='WebGUI::Asset::Shortcut' !;
+my $count_files_sql     = q!select count(*) from asset where className like 'WebGUI::Asset::File%' !;
 
 # Order by lineage to put corrupt parents before corrupt children
 # Join assetData to get all asset and assetData
-my $sql   = "SELECT * FROM asset LEFT JOIN assetData USING ( assetId ) GROUP BY assetId ORDER BY lineage ASC";
-my $sth   = $session->db->read($sql);
+my $iterator_sql   = "SELECT * FROM asset LEFT JOIN assetData USING ( assetId ) ";
+my $sql_args = [];
+if ($op_assetId) {
+    my $asset_selector    = 'where assetId = ? ';
+    $iterator_sql        .= $asset_selector;
+    $total_asset_sql     .= $asset_selector;
+    $total_assetdata_sql .= $asset_selector;
+    $count_shortcut_sql  .= ' AND assetId = ? ';
+    $count_files_sql      .= ' AND assetId = ? ';
+    push @{ $sql_args }, $op_assetId;
+}
+$iterator_sql .= "GROUP BY assetId ORDER BY lineage ASC";
+my $sth   = $session->db->read($iterator_sql, $sql_args);
+
+my $totalAsset      = $session->db->quickScalar($total_asset_sql, $sql_args);
+my $totalAssetData  = $session->db->quickScalar($total_assetdata_sql, $sql_args);
+my $total   = $totalAsset >= $totalAssetData ? $totalAsset : $totalAssetData;
 
 ##Guarantee that we get the most recent revisionDate
 my $max_revision  = $session->db->prepare('select max(revisionDate) from assetData where assetId=?');
@@ -207,9 +226,10 @@ $sth->finish;
 $max_revision->finish;
 print "\n";
 
-my $shortcuts = $session->db->quickScalar(q!select count(*) from asset where className='WebGUI::Asset::Shortcut'!);
+my $shortcuts = $session->db->quickScalar($count_shortcut_sql, $sql_args);
 if ($shortcuts) {
     print "Checking for broken shortcuts\n";
+    use WebGUI::Asset::Shortcut;
     my $get_shortcut = WebGUI::Asset::Shortcut->getIsa($session, 0, {returnAll => 1});
     $count = 0;
     SHORTCUT: while (1) {
@@ -244,9 +264,10 @@ if ($shortcuts) {
 
 print "\n";
 
-my $file_assets = $session->db->quickScalar(q!select count(*) from asset where className like 'WebGUI::Asset::File%'!);
+my $file_assets = $session->db->quickScalar($count_files_sql, $sql_args);
 if ($file_assets) {
     print "Checking for broken File Assets\n";
+    use WebGUI::Asset::File;
     my $get_asset = WebGUI::Asset::File->getIsa($session, 0, {returnAll => 1});
     $count = 0;
     FILE_ASSET: while (1) {
@@ -377,6 +398,10 @@ Delete any corrupted assets.
 =item B<--fix>
 
 Try to fix any corrupted assets.  The broken Shortcuts and File Assets cannot be fixed.
+
+=item B<--assetId=s>
+
+Limit the search for all broken assets to one assetId.
 
 =item B<--help>
 
