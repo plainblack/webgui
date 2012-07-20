@@ -72,7 +72,7 @@ my $count_files_sql     = q!select count(*) from asset where className like 'Web
 
 # Order by lineage to put corrupt parents before corrupt children
 # Join assetData to get all asset and assetData
-my $iterator_sql   = "SELECT * FROM asset LEFT JOIN assetData USING ( assetId ) ";
+my $iterator_sql   = "SELECT assetId, className, revisionDate, parentId FROM asset LEFT JOIN assetData USING ( assetId ) ";
 my $sql_args = [];
 if ($op_assetId) {
     my $asset_selector    = 'where assetId = ? ';
