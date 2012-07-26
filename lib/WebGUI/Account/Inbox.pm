@@ -687,8 +687,9 @@ sub www_deleteMessages {
 
     my @messages = $session->form->process("message","checkList");
 
-    foreach my $messageId (@messages) {
+    MESSAGE: foreach my $messageId (@messages) {
         my $message = WebGUI::Inbox::Message->new($session, $messageId);
+        next MESSAGE unless $message;
         $message->delete;
     }
 
