@@ -1,0 +1,356 @@
+
+================== Installing WebGUI 8 on the WRE ====================
+
+The WRE is the "WebGUI Runtime Environment".  It packages up a MySQL,
+Perl, and most of the Perl modules WebGUI needs to run.
+
+This document attempts to combine the install instructions that come
+with wG8 with the instructions that come with the WRE to create a
+single, coherent set of install instructions.
+
+======================================================================
+
+1. Get the latest WRE for your OS and unpack the WRE archive
+
+Get the WRE from sourceforge.net.  Go to this URL and pick out the latest
+version for your OS:
+
+   http://sourceforge.net/projects/pbwebgui/files/WebGUI%20Runtime%20Environment/
+
+At the time of this writing, WRE-0.9.6 is the latest.
+
+Then do:
+
+  $ mkdir /data
+  $ cd /data
+  $ tar xvfz /path/to/wre-x.x.x-osname.tar.gz
+
+wG8 doesn't have to go into the "/data" directory as 7 preferred to.  You may
+substitute whichever other directory you prefer whereever "/data" appears in
+these docs.
+
+2. Get WebGUI8 from GitHub:
+
+  $ cd /data
+  $ git clone https://github.com/plainblack/webgui.git WebGUI
+
+
+3. Add a "webgui" user to the system. Note that you can name this
+user whatever you want, but we recommend "webgui". On most systems
+you run a command similar to the following as the root user:
+
+  # adduser -s /sbin/nologin webgui
+            - or -
+  # useradd -s /sbin/nologin webgui
+
+NOTE: If you're just using the WRE for development on your machine, feel free
+to just use your own user account rather than creating a new one.
+
+
+4. Shut down httpd and mysql
+
+The nginx and plack webservers included with the WRE and the MySQL
+included with the WRE need to run instead of any already installed
+webserver or MySQL database.  If you need WebGUI to co-exist with an
+existing MySQL daemon or webserver, do not use the WRE install instructions.
+Use the source install instructions in install.txt instead, adapting them
+as necessary to suit your existing setup.
+
+If you have an Apache httpd daemon running from a previous WebGUI install, 
+please shut that down now.  WebGUI 8 doesn't use Apache.
+
+If you have an existing WebGUI, back up your database (with mysqldump
+--complete-insert) and each domain's 'uploads' directory.  It's a good idea to
+also back up your entire /data directory (while mysqld is stopped).
+
+Run these commands as root on Debian:
+
+  # /etc/init.d/apache2 stop
+  # update-rc.d -f apache2 remove
+
+  # /etc/init.d/mysql stop
+  # update-rc.d -f mysql remove
+
+Run these commands as root on RedHat/Centos:
+
+    # chkconfig httpd off
+    # chkconfig httpd --del
+
+    # chkconfig mysql off
+    # chkconfig mysql --del
+
+On most systems you can shut them down hard by running commands like this:
+
+  #  killall mysqld
+  #  killall httpd
+
+IMPORTANT:  If you have a MySQL config file at /etc/my.cnf please remove or
+rename it so that it doesn't interfere with the WRE MySQL.
+
+  # mv /etc/my.cnf /etc/my.cnf.old
+
+FIXME:  WRE mysql should be patched to not look in /etc/.
+
+
+6. Use the WRE environment
+
+    source /data/wre/sbin/setenvironment.sh  
+
+This command prepends WRE command paths, library paths, and Perl 5
+library paths to the shell's paths for each.
+
+You must always run this command before interacting with WebGUI using any
+command line utilities -- running upgrades, editing assets, starting and
+stopping wG related services and other things all require this.
+
+NOTE: You could add that command to your profile so it
+executes every time you log in. However, on CentOS 5 servers
+this can interfere with yum running.
+
+
+7. Initialize MySQL, set a MySQL root password and create a MySQL "webgui"
+   account
+
+XXX is the MySQL setup stuff redundant with what the WRE setup scripts do?
+
+Make sure that you're initializing database in the WRE, not another one.
+
+  $ which mysql_install_db
+
+That should output "/data/wre/prereqs/bin/mysql_install_db"
+
+  $ mysql_install_db --user=webgui
+
+That sets mysql to run as the "webgui" user previously created.
+
+Start the mysqld server daemon:
+
+  $ sudo mysqld_safe --user=webgui &
+
+Get into the mysql command shell:
+
+  $ mysql --user=root
+
+Set the root users (plural!) passwords:
+
+  mysql> SET PASSWORD FOR 'root' = PASSWORD('XXXnewpasswdXXX');
+  mysql> SET PASSWORD FOR 'root'@'localhost' = PASSWORD('XXXnewpasswdXXX');
+  mysql> SET PASSWORD FOR 'root'@'127.0.0.1' = PASSWORD('XXXnewpasswdXXX');
+
+Or else drop root users you don't want.
+
+Remember the password!  You have to put it in your WebGUI's config file in a 
+few steps here.  FIXME:  Does one of the site-setup tools that comes with the
+WRE do this for you?
+
+Pick your own password instead of "XXXnewpasswdXXX".
+
+Get rid of the anonymous user:
+
+  mysql> drop user '';
+
+Leave in the test user and database, as they're needed for the WRE to see if
+mysql is up and running.
+
+
+8. Create a MySQL user account for the domain WebGUI is to host
+and load share/create.sql into that database
+
+# IGNORE -- addsite.pl does this for you
+#Pick a database name.  The practice is to name it after the site.  If you're
+#hosting www.example.com, then "www_example_com" is a good database name
+#for the site, and the config file will be 
+#"/data/WebGUI/etc/www.example.com.conf".
+#
+#Create the new, empty database.  Change "www_example_com" here to whatever 
+#yours is.
+#
+#  $ mysql --password --user=root --password -e "create database www_example_com"
+#
+# Create the 'webgui' database user and set its password:
+# 
+#   $ mysql --password --user=root -e "grant all privileges on www_example_com.*
+#         to webgui@localhost identified by 'XXXXpasswordhereXXXX'"
+#
+#Load the database:
+#
+#  $ mysql --password --user=webgui www_example_com < share/create.sql
+
+That may not work.  Newer versions of MySQL will give you "ERROR 1064 (42000)
+at line 19: You have an error in your SQL syntax; check the manual that
+corresponds to your MySQL server version for the right syntax to use near
+'TYPE=InnoDB CHARSET=utf8' at line 14".  If so, do this instead:
+
+  $ cat share/create.sql | \
+    sed -e 's!^) TYPE=\([A-Za-z]*\) CHARSET=utf8;$!) ENGINE=\1 CHARSET=utf8;!' | \
+    mysql --user=webgui --password www_example_com
+
+FIXME:  Future versions of share/create.sql will target MySQL 5.5.
+
+
+9. Setup your configuration files
+
+Use the addsite.pl script to set up your first WebGUI site:
+
+  $ addsite.pl   
+      --adminPassword     # The "root" (administrator) password for the MySQL database
+      --databaseUser      # Username you'd like created to access this site's database
+      --databasePassword  # The password you'd like created to access this site's database.
+      --sitename          # The name of the site you'd like to create. For example: 
+                          # www.example.com or intranet.example.com
+      --databaseName      # The name of the database to create in MySQL (defaults to 
+                          # www_site_com for the domain www.site.com)
+
+# IGNORE -- addsite.pl does this for you
+# Copy /data/WebGUI/etc/WebGUI.conf.original to something named after the site's 
+# URL and ending in .conf, such as www.example.com.conf, and edit it, making sure
+# to insert your site's URL and the database connection information.
+#
+# These are the dbuser, dbpass, and dsn keys, as well as the uploadsPath.  
+# 
+# Set uploadsPath in the .conf file to eg 
+# /data/domains/www.example.com/public/uploads/.
+# 
+# This file is JSON formatted and may not have trailing commas after the last 
+# item in a list (FIXME:	use JSON relaxed).
+# 
+# If you're running WebGUI on a port other than 80, edit "etc/spectre.conf" to define 
+# port and worker settings for spectre.  
+
+10. Customize the WRE configuration file with database users, paths and other items.
+
+    vim /data/wre/etc/wre.conf
+
+
+11. Setup your environment
+
+Set the WEBGUI_CONFIG environment variable to point at your new configuration file:
+
+  $ export WEBGUI_CONFIG='/data/WebGUI/etc/www.example.com.conf'
+
+You may want to set your shell to automatically do that for you by putting
+that command into your .bashrc file in your home directory.
+
+
+12. Automatically install new Perl module dependencies:
+
+  $ sudo bash   
+  # source /data/wre/sbin/setenvironment.sh
+  # export WEBGUI_CONFIG='/data/WebGUI/etc/www.example.com.conf'
+  # sbin/testEnvironment.pl
+
+FIXME:  testEnvironment shouldn't insist on being root when the current user 
+can actually write to the perl libs directories in the wre.
+
+
+13. Update the wgd WebGUI Developer's Utility:
+
+WebGUI has a new upgrades system for wgd to support. The old system silently
+ignores the new upgrade scripts.
+
+Get wgd from http://haarg.org/wgd, put in /data/wre/prereqs/bin/ (if you're
+using the WRE), /usr/local/bin, or ~/bin.
+
+Do chmod ugo+x wgd to make it executable.
+
+   $ wget http://haarg.org/wgd -O wgd
+   $ sudo chmod ugo+x wgd
+   $ sudo mv wgd /data/wre/prereqs/bin/
+
+
+14. Initialize your /data/domains/www.example.com/public directory with static content
+
+  wgd reset --uploads
+
+
+15. Run the WRE setup script to create base templates for nginx, logrotate and Spectre
+
+    /data/wre/sbin/wresetup.pl
+
+
+16. Run upgrades
+
+  $ wgd reset --upgrade
+
+IMPORTANT:  Run upgrades even if you're doing a new install.  Run upgrades *especially*
+if you're doing a new install.  The code changes way faster than the create.sql 
+included here, and WebGUI depends heavily on upgrade scripts to make each new version work.
+The create.sql and .conf file template will not work without first being upgraded.
+
+
+17. Add the following cron jobs to your server's cron tab.
+
+  0 0 * * * /data/wre/sbin/logrotate.pl
+  */3 * * * * /data/wre/sbin/wremonitor.pl
+  0 2 * * * /data/wre/sbin/backup.pl
+
+If you are using the demo system then add this:
+
+  0 0 * * * /data/wre/sbin/democleanup.pl
+
+
+18. Copy new "extras" (images, CSS, JavaScript) over:
+
+  $ rsync -r -a (or cp -a) /data/WebGUI/www/extras \
+        /data/domains/www.example.com/public/
+
+
+19. Launch WebGUI 8:
+
+Launch mysql, nginx, spectre, and plack, as needed:
+
+  # wreservices.pl --start all
+
+(You may also instead run plackup app.psgi in /data/WebGUI to run WebGUI 
+manually for debugging.)
+
+You'll be guided through a few quick questions to setup an admin account.
+(Or, if you aren't but wanted to be, run wgd reset --starter to enable it.)
+ 
+Spectre is the background processing daemon that runs workflows you configure
+or are already configured which do things like deliver email, clean out the
+trash, and so on.  This may be optional for a development machine, depending
+on what you're developing and testing.
+
+
+PLATFORM SPECIFIC NOTES
+-----------------------
+
+* Red Hat Linux
+
+This note applies to all linux' that use chkconfig to setup services. These
+include RHEL, Fedora, Mandrake, SuSE, CentOS, and others. You can set up the
+WRE to start automatically at system boot by running the following commands
+after the WRE is installed:
+
+ln -s /data/wre/sbin/services/redhat/webgui /etc/init.d/webgui
+chkconfig --add webgui
+chkconfig webgui on
+
+On RHEL 5 or higher you need to install the libgomp RPM.
+
+Installing Percona via yum:
+
+rpm -Uhv http://www.percona.com/downloads/percona-release/percona-release-0.0-1.i386.rpm
+yum install -y Percona-Server-{server,client,shared,devel}-55
+
+
+* SELinux
+
+The WRE contains no policies for configuring SELinux. If you distribution
+uses SELinux, you will need to disable it, set it into permissive mode,
+or write your own policies for SELinux.
+
+
+* Mac OS X
+
+There is no command line user add script on Mac OSX. Therefore you can either
+use the graphical "Accounts" manager in "System Preferences", or the really
+horrible "netinfo" command line utility. Alternatively, you can also download
+some free user utilities from this site:
+
+http://www.osxgnu.org/software/pkgdetail.html?project_id=231#4095
+
+To get the WRE to start automatically at boot run the following commands:
+
+ln -s /data/wre/sbin/services/osx/org.webgui.wre.plist /Library/LaunchDaemons/
