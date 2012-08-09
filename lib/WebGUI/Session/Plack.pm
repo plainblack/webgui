@@ -154,6 +154,12 @@ sub dir_config {
 
 package Plack::Request::Upload;
 
-sub link { shift->link_to(@_) }
+sub link {
+    my $self    = shift;
+    my $target  = shift;
+    require File::Copy;
+
+    File::Copy::copy( $self->path, $target ) or die "copy failed $!, $@";
+}
 
 1;
