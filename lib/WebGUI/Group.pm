@@ -862,7 +862,7 @@ sub getLDAPUsers {
 	   if($userId) {
 	      push(@ldapUsers,$userId);
 	   } else {
-	      $self->session->errorHandler->warn("Could not find matching userId for dn/uid $person in WebGUI for group $gid");
+	      $self->session->errorHandler->info("Could not find matching userId for dn/uid $person in WebGUI for group $gid");
 	   }
 	}
 	
