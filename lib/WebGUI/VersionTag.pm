@@ -683,7 +683,6 @@ sub requestCommit {
 	$self->{_data}{workflowInstanceId} = $instance->getId;
 	$self->session->db->setRow("assetVersionTag","tagId",$self->{_data});
     return $instance->start;
-    return undef;
 }
 
 
