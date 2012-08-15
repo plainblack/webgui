@@ -1,4 +1,5 @@
 7.10.26
+ - fixed: Template diagnostics when called without a session asset.
 
 7.10.25
  - fixed: #12373: Asset::Wobject::Search::view() so HTML highlite not broken by search phrase with unmatched char pairs
