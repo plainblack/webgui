@@ -49,6 +49,7 @@ Contributing Developers..............C.J. Adams-Collier / <cjac@colliertech.org>
                                      Colin Kuskie / perlDreamer Consulting LLC
                                      Christophe Marcant
                                      Kristi McCombs / Plain Black
+                                     Vince Liao (Global NOC at IU)
                                      Tony Mountifield
                                      Kaleb Murphy / Plain Black
                                      Chris Nehren / Plain Black
