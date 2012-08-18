@@ -34,6 +34,7 @@ Contributing Developers..............C.J. Adams-Collier / <cjac@colliertech.org>
                                      Greg Fast / Brunswick
                                      Chris Gebhardt / OpenServe
                                      Andy Grundman
+                                     Chris Hanson / Plain Black
                                      Tessa Harmon / Knowmad Technologies
                                      Chris Jackson
                                      Roy Johnson / Plain Black
@@ -85,7 +86,6 @@ Contributing Developers..............C.J. Adams-Collier / <cjac@colliertech.org>
                                      Bernd Kalbfuß-Zimmermann
                                      Tabitha Zipperer / Plain Black
                                      Rory Zweistra / Oqapi
-                                     Chris Hanson / Plain Black
 
 The following are people/companies who didn't directly contribute
 to WebGUI, but whose work has made WebGUI possible:
