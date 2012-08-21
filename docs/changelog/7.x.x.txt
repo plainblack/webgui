@@ -1,3 +1,5 @@
+7.10.27
+
 7.10.26
  - fixed: Template diagnostics when called without a session asset.
  - fixed: #12378 Wiki search does not work with some metacharacters
