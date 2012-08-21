@@ -327,7 +327,7 @@ SKIP: {
                     AreasServed    => ignore(), Prohibitions   => ignore(),
                     ExpressMail    => ignore(), CustomsForms   => ignore(),
                     Observations   => ignore(), Restrictions   => ignore(),
-                    Service        => [
+                    Service        => superbagof(
                         {
                             ID             => ignore(),
                             MaxWeight      => ignore(),
@@ -341,8 +341,7 @@ SKIP: {
                             SvcCommitments => ignore(),
                             SvcDescription => ignore(),
                         },
-                        (ignore())x21,
-                    ],
+                    ),
                 },
             ],
         },
