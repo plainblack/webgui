@@ -1,4 +1,5 @@
 7.10.27
+- fixed #12379: userImport documentation error
 
 7.10.26
  - fixed: Template diagnostics when called without a session asset.

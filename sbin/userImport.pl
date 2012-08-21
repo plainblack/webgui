@@ -255,7 +255,7 @@ userImport - Bulk load users into WebGUI database
 
  userImport --configFile config.conf --usersFile pathname
             [--authMethod method]
-            [--canChangePasswd]
+            [--canChangePass]
             [--delimiter string]
             [--expireOffset integer [--expireUnits string]]
             [--groups groupid,...]
