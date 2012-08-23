@@ -24,6 +24,7 @@ use Clone qw/clone/;
 use WebGUI::DateTime;
 use WebGUI::Exception;
 use WebGUI::Utility;
+use WebGUI::Pluggable;
 
 private objectData => my %objectData;
 readonly session => my %session;
@@ -991,20 +992,28 @@ sub update {
 
 =head2 updateFromFormPost ( )
 
-Calls update() on any properties that are available from $session->form. Returns 1 on success.
+Calls update() on all properties that the object expects.
 
 =cut
 
 sub updateFromFormPost {
-	my $self = shift;
-	my $session = $self->session;
-	my $form = $session->form;
-	my %data;
-	my $properties = $self->crud_getProperties($session);
-	foreach my $property ($form->param) {
-		$data{$property} = $form->get($property, $properties->{$property}{fieldType}, $properties->{$property}{defaultValue});
-	}
-	return $self->update(\%data);
+    my $self = shift;
+    my $session = $self->session;
+    my $form    = $session->form;
+    my $data    = $self->get();
+    my $properties = $self->crud_getProperties($session);
+    PROPERTY: foreach my $property (keys %{ $properties }) {
+        my $fieldType = 'WebGUI::Form::'.ucfirst $properties->{$property}{fieldType};
+        my $control = eval { WebGUI::Pluggable::instanciate($fieldType, "new", [ $self->session, { name => $property, } ]) };
+        if ($@) {
+            $self->session->errorHandler->error($@);
+            next PROPERTY;
+        }
+        next PROPERTY if ! $control->isInRequest;
+        $data->{$property} =
+            $form->get($property, $properties->{$property}{fieldType}, $properties->{$property}{defaultValue});
+    }
+	return $self->update($data);
 }
 
 
