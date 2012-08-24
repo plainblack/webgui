@@ -40,8 +40,16 @@ sub AUTOLOAD {
 
 # Emulate/delegate/fake Apache2::* subs
 sub uri         { shift->{request}->path_info }
-sub param       { shift->{request}->param(@_) }
-sub params      { shift->{request}->prameters->mixed(@_) }
+sub param       {
+    my $self = shift;
+    if (@_) {
+        return $self->{request}->param(@_);
+    }
+    else {
+        return $self->params;
+    }
+}
+sub params      { shift->{request}->parameters->mixed(@_) }
 sub headers_in  { shift->{request}->headers(@_) }
 sub headers_out { shift->{headers_out} }
 sub protocol    { shift->{request}->protocol(@_) }
