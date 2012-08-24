@@ -16,6 +16,7 @@ package WebGUI::Workflow::Activity::ExpirePurchasedThingyRecords;
 
 use strict;
 use base 'WebGUI::Workflow::Activity';
+use WebGUI::AssetCollateral::Sku::ThingyRecord::Record;
 
 =head1 NAME
 
@@ -41,7 +42,7 @@ These methods are available from this class:
 
 See WebGUI::Workflow::Activity::definition() for details.
 
-=cut 
+=cut
 
 sub definition {
 	my $class = shift;
@@ -88,9 +89,9 @@ sub execute {
     my $instance    = shift;
     my $time        = time;
     my %asset       = (); # Keep track of assets we're using
-    
+
     ### Notify of those about to expire
-    my $iter 
+    my $iter
         = WebGUI::AssetCollateral::Sku::ThingyRecord::Record->getAllIterator(
             $self->session,
             {
@@ -103,7 +104,7 @@ sub execute {
         $record->update({
             sentExpiresNotice   => 1,
         });
-        
+
         my $msg = WebGUI::Mail::Send->create( $self->session, {
             toUser      => $record->get('userId'),
             subject     => $self->get('notificationSubject'),
@@ -117,7 +118,7 @@ sub execute {
     }
 
     ### Delete expired
-    $iter 
+    $iter
         = WebGUI::AssetCollateral::Sku::ThingyRecord::Record->getAllIterator(
             $self->session,
             {
@@ -128,10 +129,10 @@ sub execute {
             });
     while ( my $record = $iter->() ) {
         # Record is hidden
-        $record->update({ isHidden => 1 }); 
+        $record->update({ isHidden => 1 });
         my $asset;
         if ( !$asset{$record->get('assetId')} ) {
-            $asset = $asset{$record->get('assetId')} 
+            $asset = $asset{$record->get('assetId')}
                 = WebGUI::Asset->newByDynamicClass( $self->session, $record->get('assetId') );
         }
         else {
