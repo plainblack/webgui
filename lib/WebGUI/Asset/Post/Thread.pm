@@ -450,7 +450,7 @@ sub getLastPost {
 	my $lastPostId = $self->get("lastPostId");
 	my $lastPost;
 	if ($lastPostId) {
-		$lastPost = WebGUI::Asset::Post->new($self->session, $lastPostId);
+        $lastPost = WebGUI::Asset->newByDynamicClass($self->session, $lastPostId);
 	}
 	return $lastPost if (defined $lastPost);
 	return $self;	
