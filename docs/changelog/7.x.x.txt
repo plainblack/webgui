@@ -3,6 +3,7 @@
  - fixed #12382: WebGUI::Crud does not work with all form types
  - fixed: Threads with no posts return the wrong lastReply data.
  - fixed #12339: Upgrade to 7.10 causes metadata values to "disappear" (Dale Trexel)
+ - Upgraded TinyMCE to 3.5.6
 
 
 7.10.26
