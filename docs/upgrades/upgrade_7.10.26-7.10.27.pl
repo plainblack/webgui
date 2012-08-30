@@ -31,8 +31,64 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+fixMetaDataRevisionDates($session);
 
 finish($session); # this line required
+
+
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub fixMetaDataRevisionDates {
+    my $session = shift;
+    print "\tCheck to see if metaData has bad revision dates... " unless $quiet;
+    my $getMeta0 = $session->db->read(
+        'SELECT fieldId, assetId, value from metaData_values where revisionDate=0'
+    );
+    my $getRevisionDates = $session->db->prepare(
+        'select revisionDate from assetData where assetId=? order by revisionDate'
+    );
+    my $getMetaValue = $session->db->prepare(
+        'select value from metaData_values where assetId=? and fieldId=? and revisionDate=?'
+    );
+    my $updateMetaValue = $session->db->prepare(
+        'UPDATE metaData_values set value=? where assetId=? AND fieldId=? and revisionDate=?'
+    );
+    my $insertMetaValue = $session->db->prepare(
+        'INSERT INTO metaData_values (assetId, fieldId, value, revisionDate) VALUES (?,?,?,?)'
+    );
+    ##Get each metaData_value entry
+    METAENTRY: while (my $metaEntry = $getMeta0->hashRef) {
+        $getRevisionDates->execute([$metaEntry->{assetId}]);
+        ##Get all revisionDates for the asset in that entry
+        REVISIONDATE: while (my ($revisionDate) = $getRevisionDates->array) {
+            ##Find the metaData value for that revisionDate
+            $getMetaValue->execute([$metaEntry->{assetId}, $metaEntry->{fieldId}, $revisionDate, ]);
+            my ($metaValue) = $getMetaValue->array;
+            ##If that matches the current entry, we're done with this revisionDate
+            next REVISIONDATE if $metaValue eq $metaEntry->{value};
+            ##It doesn't match, so we have to fix it.
+            ##Update a bad entry
+            if (defined $metaValue) {
+                $updateMetaValue->execute([
+                    @{$metaEntry}{qw/value assetId fieldId/}, $revisionDate,
+                ]);
+            }
+            ##Insert a new one
+            else {
+                $insertMetaValue->execute([
+                    @{$metaEntry}{qw/assetId fieldId value/}, $revisionDate,
+                ]);
+            }
+        }
+    }
+    $getMeta0->finish;
+    $getRevisionDates->finish;
+    $getMetaValue->finish;
+    $insertMetaValue->finish;
+    $updateMetaValue->finish;
+    $session->db->write('delete from metaData_values where revisionDate=0');
+    print "DONE!\n" unless $quiet;
+}
 
 
 #----------------------------------------------------------------------------
