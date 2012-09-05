@@ -1132,7 +1132,8 @@ sub getFormPlugin {
     $param{name} = "field_".$data->{fieldId};
     my $name     = $param{name};
     $name =~ s/\^.*?\;//xgs ; # remove macro's from user input
-    $param{value}     = $data->{value} || $data->{defaultValue};
+    #$param{value}     = $data->{value} || $data->{defaultValue};
+    $param{value}     = $data->{value};
     $param{size}      = $data->{size};
     $param{height}    = $data->{height};
     $param{width}     = $data->{width};
@@ -1174,10 +1175,10 @@ sub getFormPlugin {
 
     if ($data->{fieldType} eq "YesNo") {
         if ($data->{defaultValue} =~ /yes/xi) {
-            $param{value} = 1;
+            $param{defaultValue} = 1;
         }
         elsif ($data->{defaultValue} =~ /no/xi) {
-            $param{value} = 0;
+            $param{defaultValue} = 0;
         }
     }
 
@@ -2881,7 +2882,8 @@ sub editThingData {
                 $fieldValue = $thingData{"field_".$field{fieldId}};
             }
         }
-        $field{value} = $fieldValue || $field{defaultValue};
+        #$field{value} = $fieldValue || $field{defaultValue};
+        $field{value} = $fieldValue;
         my $formElement .= $self->getFormPlugin(\%field,($resetForm eq ""))->toHtml;
         
         my $hidden = ($field{status} eq "hidden" && !$self->session->var->isAdminOn);
