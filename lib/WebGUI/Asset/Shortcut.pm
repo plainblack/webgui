@@ -942,7 +942,10 @@ sub view {
         # Make sure the www_view method won't be skipped b/c the asset is cached.
         $shortcut->purgeCache();
 
-		$content = $shortcut->view;
+        my $t = ($self->session->log->canShowPerformanceIndicators()) ? [Time::HiRes::gettimeofday()] : undef;
+        $content = $shortcut->view;
+        $content .= "Shortcut:" . Time::HiRes::tv_interval($t)
+            if $t;
 
         # Make sure the overrides are not cached by the original asset.
         $shortcut->purgeCache();
