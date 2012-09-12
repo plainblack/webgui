@@ -520,7 +520,7 @@ sub www_manageTrash {
          \n";
 
     # To avoid string escaping issues
-    my $json = JSON->new;
+    my $json = JSON->new->utf8(1);
     my $amethod = sub {
         my ($method, @args) = @_;
         my $array = $json->encode(\@args);
