@@ -86,6 +86,9 @@ sub start {
         'configFile=s'=>\$configFile,
         'quiet'=>\$quiet
     );
+    if ($toVersion eq "0.0.0") {
+        die "toVersion=$toVersion, aborting upgrade\n";
+    }
     my $session = WebGUI::Session->open($webguiRoot,$configFile);
     $session->user({userId=>3});
     my $versionTag = WebGUI::VersionTag->getWorking($session);
