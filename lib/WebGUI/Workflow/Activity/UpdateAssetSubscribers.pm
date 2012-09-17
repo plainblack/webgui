@@ -71,13 +71,18 @@ See WebGUI::Workflow::Activity::execute() for details.
 sub execute {
     my $self  = shift;
     my $asset = shift;
+    my $session = $self->session;
 
     return unless $asset->get('subscriptionGroupId');
 
     my $expireTime = time() + $self->getTTL();
-    my $subscriptionGroup = WebGUI::Group->new($self->session, $asset->get('subscriptionGroupId'));
+    my $subscriptionGroup = WebGUI::Group->new($session, $asset->get('subscriptionGroupId'));
 
     ##Deserialize from scratch
+    if (! $subscriptionGroup) {
+        $session->log->warn("Subscription group is missing for assetId: ".$asset->getId);
+        return $self->COMPLETE;
+    }
     my @users = @{ $subscriptionGroup->getUsers }; ##Cache
     my @usersToDelete = (); ##Cache
     ##Note, we could use grep here, but we can't interrupt if the workflow runs too long
