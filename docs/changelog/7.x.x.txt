@@ -8,6 +8,7 @@
  - fixed #12385: UTF-8 characters in Asset title break the Trash
  - fixed ... and the same problem in the Clipboard
  - fixed: UpdateAssetSubscribers workflow activity ERRORs if the group cannot be found.
+ - fixed: EMS has issues showing badges WITHOUT related badge groups.
 
 7.10.26
  - fixed: Template diagnostics when called without a session asset.

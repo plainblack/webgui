@@ -872,9 +872,11 @@ sub www_addTicketsToBadge {
 		my $badge = WebGUI::Asset->new($session, $assetId, 'WebGUI::Asset::Sku::EMSBadge');
                 if ( defined $badge ) {
                     my @badgeGroups = split("\n",$badge->get('relatedBadgeGroups'));
-                    %badgeGroups = $db->buildHash( 
-                        "SELECT badgeGroupId, ticketsPerBadge FROM EMSBadgeGroup WHERE badgeGroupId IN (" . $db->quoteAndJoin(\@badgeGroups) . ")",
-                    );
+                    if (@badgeGroups) {
+                        %badgeGroups = $db->buildHash(
+                            "SELECT badgeGroupId, ticketsPerBadge FROM EMSBadgeGroup WHERE badgeGroupId IN (" . $db->quoteAndJoin(\@badgeGroups) . ")",
+                        );
+                    }
                 }
 	}
         	
@@ -1909,9 +1911,11 @@ className='WebGUI::Asset::Sku::EMSTicket' and state='published' and revisionDate
 		my $badge = WebGUI::Asset->new($session, $assetId, 'WebGUI::Asset::Sku::EMSBadge');
                 if ( defined $badge ) {
                     my @badgeGroups = split("\n",$badge->get('relatedBadgeGroups'));
-                    %badgeGroups = $db->buildHash( 
-                        "SELECT badgeGroupId, ticketsPerBadge FROM EMSBadgeGroup WHERE badgeGroupId IN (" . $db->quoteAndJoin(\@badgeGroups) . ")",
-                    );
+                    if (@badgeGroups) {
+                        %badgeGroups = $db->buildHash(
+                            "SELECT badgeGroupId, ticketsPerBadge FROM EMSBadgeGroup WHERE badgeGroupId IN (" . $db->quoteAndJoin(\@badgeGroups) . ")",
+                        );
+                    }
                 }
 	}
         	
