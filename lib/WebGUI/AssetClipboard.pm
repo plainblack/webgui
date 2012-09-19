@@ -294,7 +294,8 @@ sub paste {
         # Update lineage in search index.
         my $assetIter = $pastedAsset->getLineageIterator(
             ['self', 'descendants'], {
-                statesToInclude => ['clipboard','clipboard-limbo']
+                statesToInclude => ['clipboard','clipboard-limbo'],
+                includeArchived => 1,
             }
         );
         while ( 1 ) {
