@@ -87,6 +87,7 @@ our $HELP = {
               ],
             },
             { name      => 'photoWidth',   },
+            { name      => 'photoHeight',   },
             { name      => 'hasPhotos',   },
             { name      => 'singlePhoto', },
             { name      => 'photo_loop',

@@ -10,6 +10,7 @@
  - fixed: UpdateAssetSubscribers workflow activity ERRORs if the group cannot be found.
  - fixed: EMS has issues showing badges WITHOUT related badge groups.
  - fixed: It's okay to paste assets which are archived, because if you don't they stay in the clipboard forever.
+ - fixed #12386: Story Manager - Carousel rendering broken in Story
 
 7.10.26
  - fixed: Template diagnostics when called without a session asset.

@@ -32,6 +32,7 @@ my $session = start(); # this line required
 
 # upgrade functions go here
 fixMetaDataRevisionDates($session);
+addPhotoHeightToStoryArchive($session);
 
 finish($session); # this line required
 
@@ -87,6 +88,22 @@ sub fixMetaDataRevisionDates {
     $insertMetaValue->finish;
     $updateMetaValue->finish;
     $session->db->write('delete from metaData_values where revisionDate=0');
+    print "DONE!\n" unless $quiet;
+}
+
+
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub addPhotoHeightToStoryArchive {
+    my $session = shift;
+    print "\tAdd Photo Height to the Story Manager... " unless $quiet;
+    # and here's our code
+    $session->db->write(<<EOSQL);
+ALTER TABLE StoryArchive add column photoHeight INT(11);
+EOSQL
+    $session->db->write(<<EOSQL);
+UPDATE StoryArchive set photoHeight=300
+EOSQL
     print "DONE!\n" unless $quiet;
 }
 

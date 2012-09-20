@@ -321,6 +321,12 @@ our $I18N = {
         lastUpdated => 0,
     },
 
+    'photoHeight' => {
+        message => q|The height used to display photos.|,
+        context => q|Template variable.|,
+        lastUpdated => 0,
+    },
+
     'photo width' => {
         message => q|Photo width|,
         context => q|Label in the edit screen|,
@@ -330,6 +336,18 @@ our $I18N = {
     'photo width help' => {
         message => q|Photos displayed by the YUI Carousel need to be similar sizes for it to render correctly.  This width will be used to resize all photos.  To disable this feature, set it to 0.|,
         context => q|hoverhelp for photoWidth in the edit screen|,
+        lastUpdated => 0,
+    },
+
+    'photo height' => {
+        message => q|Photo Height|,
+        context => q|Label in the edit screen|,
+        lastUpdated => 0,
+    },
+
+    'photo height help' => {
+        message => q|Slides in the photo carousel have to have a fixed height to render in some browsers.  To disable this feature, set it to 0.|,
+        context => q|hoverhelp for photoHeight in the edit screen|,
         lastUpdated => 0,
     },
 

@@ -126,6 +126,13 @@ sub definition {
             hoverHelp    => $i18n->get('photo width help'),
             defaultValue => '300',
         },
+        photoHeight => {
+            tab          => 'display',
+            fieldType    => 'integer',
+            label        => $i18n->get('photo height'),
+            hoverHelp    => $i18n->get('photo height help'),
+            defaultValue => '300',
+        },
         editStoryTemplateId => {
             tab          => 'display',
             fieldType    => 'template',
