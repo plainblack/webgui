@@ -17,7 +17,7 @@ use File::Spec;
 my $webguiRoot;
 BEGIN {
     $webguiRoot = File::Spec->rel2abs(File::Spec->catdir(File::Basename::dirname(__FILE__), File::Spec->updir));
-    unshift @INC, File::Spec->catdir($webguiRoot, 'lib');
+    unshift @INC, File::Spec->catdir($webguiRoot, 'lib'), File::Spec->catdir($webguiRoot, 'lib/plebgui_mock') ;
 }
 
 use Cwd ();
