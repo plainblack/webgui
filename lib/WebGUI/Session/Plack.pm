@@ -71,7 +71,11 @@ sub content_type {
 # TODO: I suppose this should do some sort of IO::Handle thing
 sub print {
     my $self = shift;
-    push @{ $self->{body} }, @_;
+    # Make sure we'll never output wide chars because plack will die when we do.
+    foreach ( @_ ) {
+        utf8::encode( $_ ) if utf8::is_utf8( $_ );
+        push @{ $self->{body} }, $_;
+    }
 }
 
 sub pnotes {
