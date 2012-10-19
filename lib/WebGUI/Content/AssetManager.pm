@@ -8,6 +8,7 @@ use WebGUI::Form;
 use WebGUI::Paginator;
 use WebGUI::Utility;
 use WebGUI::Macro::AdminBar;
+use WebGUI::Form::CsrfToken;
 
 #----------------------------------------------------------------------------
 
@@ -20,9 +21,9 @@ Gets a select box to choose a class name.
 sub getClassSelectBox {
     my $session     = shift;
     my $i18n        = WebGUI::International->new($session, 'Asset');
-    
+
     tie my %classes, "Tie::IxHash", (
-        ""  => $i18n->get("Any Class"), 
+        ""  => $i18n->get("Any Class"),
         $session->db->buildHash("select distinct(className) from asset"),
     );
     delete $classes{"WebGUI::Asset"}; # don't want to search for the root asset
@@ -78,7 +79,7 @@ sub getHeader {
     }
     else {
         $output     .= '<div style="float: right">'
-                    . join( " | ", 
+                    . join( " | ",
                         q{<strong>} . $i18n->get( "manage" ) . q{</strong>},
                         q{<a href="?op=assetManager;method=search">} . $i18n->get( "search" ) . q{</a>},
                     )
@@ -93,7 +94,7 @@ sub getHeader {
 
 =head2 getManagerPaginator ( session )
 
-Get a page for the Asset Manager view. Returns a WebGUI::Paginator object 
+Get a page for the Asset Manager view. Returns a WebGUI::Paginator object
 filled with asset IDs.
 
 =cut
@@ -129,7 +130,7 @@ sub getManagerPaginator {
 
     my $orderBy     = $session->db->dbh->quote_identifier( $orderByColumn ) . ' ' . $orderByDirection;
     $p->setDataByArrayRef( $asset->getLineage( ['children'], { orderByClause => $orderBy } ) );
-    
+
     return {
         paginator     => $p,
         sortColumn    => $orderByColumn,
@@ -139,7 +140,7 @@ sub getManagerPaginator {
 
 #----------------------------------------------------------------------------
 
-=head2 getSearchPaginator ( session, query ) 
+=head2 getSearchPaginator ( session, query )
 
 Get a page for the Asset Search view. Returns a WebGUI::Paginator object
 filled with asset IDs.
@@ -150,7 +151,7 @@ sub getSearchPaginator {
     my $session     = shift;
     my $query       = shift;
     my %parms;
-    
+
     my $s       = WebGUI::Search->new( $session, 0 );
     $s->search( {
         assetIds        => $query->{ assetIds },
@@ -166,7 +167,7 @@ sub getSearchPaginator {
     ##If the form was submitted, we always use page #1.  Otherwise, take the page # from the
     ##form or from the scratch variable.
     my $pageNumber  = $session->form->get('action') ? 1
-                    : $session->form->get('pn')     ? $session->form->get('pn') 
+                    : $session->form->get('pn')     ? $session->form->get('pn')
                     : $session->scratch->get('assetManagerSearchPageNumber')
                     ;
     my $p           = $s->getPaginatorResultSet( $session->url->page( $queryString ), undef, $pageNumber );
@@ -197,21 +198,21 @@ sub getMoreMenu {
     # These links are shown based on UI level
     if ( $userUiLevel >= $toolbarUiLevel->{ "changeUrl" } ) {
         push @more_fields, {
-            url     => 'func=changeUrl;proceed=manageAssets', 
+            url     => 'func=changeUrl;proceed=manageAssets',
             label   => $i18n->get( 'change url' ),
         };
     }
 
     if ( $userUiLevel >= $toolbarUiLevel->{ "editBranch" } ) {
         push @more_fields, {
-            url     => 'func=editBranch', 
+            url     => 'func=editBranch',
             label   => $i18n->get( 'edit branch' ),
         };
     }
 
     if ( $userUiLevel >= $toolbarUiLevel->{ "shortcut" } ) {
         push @more_fields, {
-            url     => 'func=createShortcut;proceed=manageAssets', 
+            url     => 'func=createShortcut;proceed=manageAssets',
             label   => $i18n->get( 'create shortcut' ),
         };
     }
@@ -266,7 +267,7 @@ Check permissions
 
 sub handler {
     my ( $session ) = @_;
- 
+
     if ( $session->form->get( 'op' ) eq 'assetManager' && getCurrentAsset( $session ) ) {
         $session->asset(getCurrentAsset($session));
 
@@ -276,7 +277,7 @@ sub handler {
                     ? 'www_' . $session->form->get( 'method' )
                     : 'www_manage'
                     ;
-        
+
         # Validate the method name
         if ( !__PACKAGE__->can( $method ) ) {
             return "Invalid method";
@@ -342,7 +343,7 @@ sub www_ajaxGetManagerPage {
     $assetInfo->{ totalAssets   } = $p->getRowCount;
     $assetInfo->{ sort          } = $pageInfo->{sortColumn};
     $assetInfo->{ dir           } = $pageInfo->{sortDirection};
-    
+
     $session->http->setMimeType( 'application/json' );
 
     return to_json( $assetInfo );
@@ -352,7 +353,7 @@ sub www_ajaxGetManagerPage {
 
 =head2 www_manage ( session )
 
-Show the main screen of the asset manager, paginated. Also load the 
+Show the main screen of the asset manager, paginated. Also load the
 JavaScript that will take over if the browser has the cojones.
 
 =cut
@@ -420,7 +421,7 @@ ENDHTML
             next;
         }
         last unless $ancestor;
-        $output .= sprintf $crumb_markup, 
+        $output .= sprintf $crumb_markup,
                 $ancestor->getUrl( 'op=assetManager;method=manage' ),
                 $ancestor->get( "menuTitle" ),
                 ;
@@ -433,7 +434,7 @@ ENDHTML
             $currentAsset->get( "menuTitle" ),
             ;
     $output .= '</ol>';
-    
+
     ### The page of assets
     $output         .= sprintf <<EOHTML, $session->asset->getUrl, WebGUI::Form::CsrfToken->new($session)->toHtml, $i18n->get( 'with selected' ), $i18n->get( "update" ), $i18n->get( "delete" ), $i18n->get( '43' ), $i18n->get( 'cut' ), $i18n->get( "Copy" ), $i18n->get( "duplicate" );
 <div>
@@ -443,7 +444,7 @@ ENDHTML
 <input type="hidden" name="proceed" value="manageAssets" />
 <div id="dataTableContainer">
 </div>
-<p class="actions"> %s 
+<p class="actions"> %s
 <input type="submit" name="action_update" value="%s" onclick="this.form.func.value='setRanks'; this.form.submit(); return false;" />
 <input type="submit" name="action_delete" value="%s" onclick="if( confirm('%s')){ this.form.func.value='deleteList'; this.form.submit(); return false;}{ return false; }" />
 <input type="submit" name="action_cut" value="%s" onclick="this.form.func.value='cutList'; this.form.submit(); return false;"/>
@@ -455,7 +456,7 @@ ENDHTML
 </div>
 </div>
 EOHTML
-    
+
     ### Clearing div
     $output         .= q{<div style="clear: both;">&nbsp;</div>};
 
@@ -476,7 +477,7 @@ EOHTML
                         ? WebGUI::Form::checkbox($session,{extras=>'onclick="toggleClipboardSelectAll(this.form);"'}).' '.$i18n->get("select all").'<br />'
                         : ''
                      )
-                    
+
                     .WebGUI::Form::checkList($session,{name=>"assetId",vertical=>1,options=>\%options})
                     .'<br />'
                     .WebGUI::Form::submit($session,{value=>$i18n->get('Paste')})
@@ -535,7 +536,7 @@ ENDJS
     # Can't be Perl datastructure because formatter must be a function ref not a string
     $output .= q(
     WebGUI.AssetManager.ColumnDefs
-        = [ 
+        = [
             { key: 'assetId', label: selectAllButton, formatter: WebGUI.AssetManager.formatAssetIdCheckbox },
             { key: 'lineage', label: ") . $i18n->get( 'rank' ) . q(", sortable: true, formatter: WebGUI.AssetManager.formatRank },
             { key: 'actions', label: "", formatter: WebGUI.AssetManager.formatActions },
@@ -564,11 +565,11 @@ Search assets underneath this asset.
 
 sub www_search {
     my $session      = shift;
-    my $ac           = WebGUI::AdminConsole->new( $session, "assets" ); 
+    my $ac           = WebGUI::AdminConsole->new( $session, "assets" );
     my $i18n         = WebGUI::International->new( $session, "Asset" );
     my $currentAsset = getCurrentAsset($session);
     my $output       = '<div id="assetSearch">' . getHeader( $session );
-    
+
     $session->style->setLink( $session->url->extras( 'yui-webgui/build/assetManager/assetManager.css' ), { rel => "stylesheet", type => 'text/css' } );
     $session->style->setScript( $session->url->extras( 'yui/build/yahoo-dom-event/yahoo-dom-event.js' ) );
     $session->style->setScript( $session->url->extras( 'yui-webgui/build/assetManager/assetManager.js' ) );
@@ -607,12 +608,12 @@ sub www_search {
             orderByColumn       => $session->form->get( 'orderByColumn' ),
             orderByDirection    => $session->form->get( 'orderByDirection' ),
         } );
-        
+
         if ( $p->getRowCount == 0 ) {
             $output     .= q{<p class="error">} . $i18n->get( 'no results' ) . q{</p>};
         }
         else {
-            ### Display the search results 
+            ### Display the search results
             $output         .= q{<form method="post" enctype="multipart/form-data" action="}.$currentAsset->getUrl.q{">}
                             . q{<input type="hidden" name="func"    value="searchAssets" />}
                             . q{<input type="hidden" name="proceed" value="searchAssets" />}
@@ -630,7 +631,7 @@ sub www_search {
                             . q{<thead>}
                             . q{<tr>}
                             . q{<th class="center"><input type="checkbox" onclick="WebGUI.Form.toggleAllCheckboxesInForm( this.form, 'assetId' )" /></th>} # Checkbox column
-                            . q{<th class="center">&nbsp;</th>}            # Edit 
+                            . q{<th class="center">&nbsp;</th>}            # Edit
                             . q{<th>} . $i18n->get( '99' ) . q{</th>}             # Title
                             . q{<th>} . $i18n->get( "type" ) . q{</th>}              # Type
                             . q{<th class="center">} . $i18n->get( "last updated" ) . q{</th>}      # Revision Date
@@ -652,12 +653,12 @@ sub www_search {
                             . q{<td class="center"><a href="%s?func=manageRevisions">%s</a></td>}
                             . q{</tr>}
                             ;
-            
+
             # The field keys to fill in the placeholders
             my @row_fields  = qw(
                             alt
                             assetId
-                            editLink 
+                            editLink
                             url
                             title
                             iconUrl type
@@ -670,7 +671,7 @@ sub www_search {
             for my $assetInfo ( @{ $p->getPageData } ) {
                 $count++;
                 my $asset       = WebGUI::Asset->newByDynamicClass( $session, $assetInfo->{ assetId } );
-                
+
                 # Populate the required fields to fill in
                 my %fields      = (
                     alt             => ( $count % 2 == 0 ? 'class="alt"' : '' ),
@@ -692,16 +693,16 @@ sub www_search {
                 $fields{ type       } = $type;
 
                 # The lock
-                if ( $asset->lockedBy ) { # lockedBy in case someone overrides isLocked (like the Collab System Thread )	
-                    $fields{ lockIcon } 
+                if ( $asset->lockedBy ) { # lockedBy in case someone overrides isLocked (like the Collab System Thread )
+                    $fields{ lockIcon }
                         = sprintf '<img src="%s" alt="locked by %s" title="locked by %s" style="border: 0px;" />',
                         $session->url->extras( 'assetManager/locked.gif' ),
                         WebGUI::HTML::format( $asset->lockedBy->username, "text" ),
                         WebGUI::HTML::format( $asset->lockedBy->username, "text" ),
                         ;
-                } 
+                }
                 else {
-                    $fields{ lockIcon } 
+                    $fields{ lockIcon }
                         = sprintf '<img src="%s" alt="unlocked" title="unlocked" style="border: 0px;" />',
                         $session->url->extras( 'assetManager/unlocked.gif' ),
                         ;
@@ -709,7 +710,7 @@ sub www_search {
 
                 # The edit link
                 if ( !$asset->lockedBy || $asset->canEditIfLocked ) {
-                    $fields{ editLink } 
+                    $fields{ editLink }
                         = sprintf '<a href="%s">' . $i18n->get( "edit" ) . '</a>',
                         $asset->getUrl( 'func=edit;proceed=manageAssets' )
                         ;
@@ -736,7 +737,7 @@ sub www_search {
                             $p->getPageNumber,
                             $p->getNumberOfPages,
                             ;
-            
+
             ### Clearing div
             $output         .= q{<div style="clear: both;">&nbsp;</div>};
         }
