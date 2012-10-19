@@ -288,7 +288,7 @@ sub env {
 
 	unless (exists $self->{_env}) {
         # make sure sure we override %ENV and put Placks env in there.
-        if ( $self->request->isa( 'WebGUI::Session::Plack' ) ) {
+        if ( $self->request && $self->request->isa( 'WebGUI::Session::Plack' ) ) {
             %ENV = %{ $self->request->{ request }->env };
         }
 		$self->{_env} = WebGUI::Session::Env->new;
