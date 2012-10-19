@@ -96,7 +96,10 @@ sub approveAddRequest {
         status  => 'unread',
         sentBy  => $self->user->userId,
     });
-    $inbox->getMessage($invite->{messageId})->setStatus('completed');
+    my $message = $inbox->getMessage($invite->{messageId});
+    if ($message) {
+        $message->setStatus('completed');
+    }
     $db->deleteRow("friendInvitations", "inviteId", $inviteId);
 }
 
@@ -320,7 +323,10 @@ sub rejectAddRequest {
             status  => 'unread',
         });
     }
-    $inbox->getMessage($invite->{messageId})->setStatus('completed');
+    my $invitation = $inbox->getMessage($invite->{messageId});
+    if ($invitation) {
+        $invitation->setStatus('completed');
+    }
     $self->session->db->deleteRow("friendInvitations", "inviteId", $inviteId);
 }
 
@@ -349,7 +355,7 @@ sub sendAddRequest {
     my $userId     = shift;
     my $comments   = shift;
     my $url        = $self->session->url;
-    my $inviteUrl  = shift || $url->append($url->getSiteURL,'op=account');
+    my $inviteUrl  = shift || $url->append($url->getSiteURL,$url->gateway('/','op=account'));
 
     my $i18n = WebGUI::International->new($self->session, "Friends");
 
@@ -362,7 +368,7 @@ sub sendAddRequest {
     $inviteUrl = $url->append($inviteUrl,'inviteId='.$inviteId);
 
     # Build the message
-    my $messageText = sprintf $i18n->get("invitation approval email"), $self->user->getWholeName, $self->session->url->getSiteURL, $comments, $inviteUrl;
+    my $messageText = sprintf $i18n->get("invitation approval email"), $self->user->getWholeName, $self->session->url->getSiteURL.$url->gateway('/'), $comments, $inviteUrl;
 
     # send message
     my $message = WebGUI::Inbox->new($self->session)->addMessage({

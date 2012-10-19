@@ -16,13 +16,12 @@ SET UNIQUE_CHECKS                   = 0;
 SET FOREIGN_KEY_CHECKS              = 0;
 SET SQL_MODE                        = 'NO_AUTO_VALUE_ON_ZERO';
 SET SQL_NOTES                       = 0;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
 CREATE TABLE `AdSku` (
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
-  `purchaseTemplate` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `manageTemplate` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `adSpace` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `purchaseTemplate` char(22) binary NOT NULL,
+  `manageTemplate` char(22) binary NOT NULL,
+  `adSpace` char(22) binary NOT NULL,
   `priority` int(11) DEFAULT '1',
   `pricePerClick` float DEFAULT '0',
   `pricePerImpression` float DEFAULT '0',
@@ -30,80 +29,75 @@ CREATE TABLE `AdSku` (
   `impressionDiscounts` char(22) DEFAULT NULL,
   `karma` int(11) DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `Article` (
   `linkTitle` char(255) DEFAULT NULL,
   `linkURL` text,
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `templateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) binary NOT NULL,
+  `templateId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
   `cacheTimeout` int(11) NOT NULL DEFAULT '3600',
-  `storageId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `storageId` char(22) binary DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `AssetReport` (
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
   `settings` mediumtext,
-  `templateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `templateId` char(22) binary DEFAULT NULL,
   `paginateAfter` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `Calendar` (
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
   `defaultDate` enum('current','first','last') DEFAULT 'current',
   `defaultView` enum('month','week','day','list') DEFAULT 'month',
   `visitorCacheTimeout` int(11) unsigned DEFAULT NULL,
-  `templateIdMonth` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT 'CalendarMonth000000001',
-  `templateIdWeek` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT 'CalendarWeek0000000001',
-  `templateIdDay` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT 'CalendarDay00000000001',
-  `templateIdEvent` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT 'CalendarEvent000000001',
-  `templateIdEventEdit` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT 'CalendarEventEdit00001',
-  `templateIdSearch` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT 'CalendarSearch00000001',
-  `templateIdPrintMonth` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT 'CalendarPrintMonth0001',
-  `templateIdPrintWeek` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT 'CalendarPrintWeek00001',
-  `templateIdPrintDay` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT 'CalendarPrintDay000001',
-  `templateIdPrintEvent` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT 'CalendarPrintEvent0001',
-  `groupIdEventEdit` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT '3',
-  `groupIdSubscribed` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `templateIdMonth` char(22) binary DEFAULT 'CalendarMonth000000001',
+  `templateIdWeek` char(22) binary DEFAULT 'CalendarWeek0000000001',
+  `templateIdDay` char(22) binary DEFAULT 'CalendarDay00000000001',
+  `templateIdEvent` char(22) binary DEFAULT 'CalendarEvent000000001',
+  `templateIdEventEdit` char(22) binary DEFAULT 'CalendarEventEdit00001',
+  `templateIdSearch` char(22) binary DEFAULT 'CalendarSearch00000001',
+  `templateIdPrintMonth` char(22) binary DEFAULT 'CalendarPrintMonth0001',
+  `templateIdPrintWeek` char(22) binary DEFAULT 'CalendarPrintWeek00001',
+  `templateIdPrintDay` char(22) binary DEFAULT 'CalendarPrintDay000001',
+  `templateIdPrintEvent` char(22) binary DEFAULT 'CalendarPrintEvent0001',
+  `groupIdEventEdit` char(22) binary DEFAULT '3',
+  `groupIdSubscribed` char(22) binary DEFAULT NULL,
   `subscriberNotifyOffset` int(11) DEFAULT NULL,
   `sortEventsBy` enum('time','sequencenumber') DEFAULT 'time',
   `listViewPageInterval` bigint(20) DEFAULT NULL,
-  `templateIdList` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `templateIdPrintList` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `templateIdList` char(22) binary DEFAULT NULL,
+  `templateIdPrintList` char(22) binary DEFAULT NULL,
   `icalInterval` bigint(20) DEFAULT NULL,
-  `workflowIdCommit` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `workflowIdCommit` char(22) binary DEFAULT NULL,
   `icalFeeds` longtext,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `Carousel` (
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
   `items` mediumtext,
-  `templateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `templateId` char(22) binary DEFAULT NULL,
   `slideWidth` int(11) DEFAULT NULL,
   `slideHeight` int(11) DEFAULT NULL,
   `autoPlay` int(11) DEFAULT NULL,
   `autoPlayInterval` int(11) DEFAULT NULL,
-  `richEditor` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `richEditor` char(22) binary DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `Collaboration` (
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `postGroupId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '2',
-  `canStartThreadGroupId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '2',
+  `assetId` char(22) binary NOT NULL,
+  `postGroupId` char(22) binary NOT NULL DEFAULT '2',
+  `canStartThreadGroupId` char(22) binary NOT NULL DEFAULT '2',
   `karmaPerPost` int(11) NOT NULL DEFAULT '0',
-  `collaborationTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `threadTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `postFormTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `searchTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `notificationTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `collaborationTemplateId` char(22) binary NOT NULL,
+  `threadTemplateId` char(22) binary NOT NULL,
+  `postFormTemplateId` char(22) binary NOT NULL,
+  `searchTemplateId` char(22) binary NOT NULL,
+  `notificationTemplateId` char(22) binary NOT NULL,
   `sortBy` char(35) NOT NULL DEFAULT 'assetData.revisionDate',
   `sortOrder` char(4) NOT NULL DEFAULT 'desc',
   `usePreview` int(11) NOT NULL DEFAULT '1',
@@ -116,21 +110,21 @@ CREATE TABLE `Collaboration` (
   `views` int(11) NOT NULL DEFAULT '0',
   `replies` int(11) NOT NULL DEFAULT '0',
   `rating` int(11) NOT NULL DEFAULT '0',
-  `lastPostId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `lastPostId` char(22) binary DEFAULT NULL,
   `lastPostDate` bigint(20) DEFAULT NULL,
   `archiveAfter` int(11) NOT NULL DEFAULT '31536000',
   `postsPerPage` int(11) NOT NULL DEFAULT '10',
   `threadsPerPage` int(11) NOT NULL DEFAULT '30',
-  `subscriptionGroupId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `subscriptionGroupId` char(22) binary DEFAULT NULL,
   `allowReplies` int(11) NOT NULL DEFAULT '0',
   `displayLastReply` int(11) NOT NULL DEFAULT '0',
-  `richEditor` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'PBrichedit000000000002',
+  `richEditor` char(22) binary NOT NULL DEFAULT 'PBrichedit000000000002',
   `karmaRatingMultiplier` int(11) NOT NULL DEFAULT '0',
   `karmaSpentToRate` int(11) NOT NULL DEFAULT '0',
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
   `avatarsEnabled` int(11) NOT NULL DEFAULT '0',
-  `approvalWorkflow` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'pbworkflow000000000003',
-  `threadApprovalWorkflow` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'pbworkflow000000000003',
+  `approvalWorkflow` char(22) binary NOT NULL DEFAULT 'pbworkflow000000000003',
+  `threadApprovalWorkflow` char(22) binary NOT NULL DEFAULT 'pbworkflow000000000003',
   `defaultKarmaScale` int(11) NOT NULL DEFAULT '1',
   `mailServer` char(255) DEFAULT NULL,
   `mailAccount` char(255) DEFAULT NULL,
@@ -139,7 +133,7 @@ CREATE TABLE `Collaboration` (
   `mailPrefix` char(255) DEFAULT NULL,
   `getMail` int(11) NOT NULL DEFAULT '0',
   `getMailInterval` char(64) DEFAULT NULL,
-  `getMailCronId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `getMailCronId` char(22) binary DEFAULT NULL,
   `visitorCacheTimeout` int(11) NOT NULL DEFAULT '3600',
   `autoSubscribeToThread` int(11) NOT NULL DEFAULT '1',
   `requireSubscriptionForEmailPosting` int(11) NOT NULL DEFAULT '1',
@@ -147,110 +141,101 @@ CREATE TABLE `Collaboration` (
   `maxImageSize` int(11) NOT NULL DEFAULT '0',
   `enablePostMetaData` int(11) NOT NULL DEFAULT '0',
   `useCaptcha` int(11) NOT NULL DEFAULT '0',
-  `groupToEditPost` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `groupToEditPost` char(22) binary NOT NULL,
   `archiveEnabled` int(1) DEFAULT '1',
-  `postReceivedTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT 'default_post_received1',
-  `replyRichEditor` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT 'PBrichedit000000000002',
-  `replyFilterCode` char(30) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT 'javascript',
+  `postReceivedTemplateId` char(22) binary DEFAULT 'default_post_received1',
+  `replyRichEditor` char(22) binary DEFAULT 'PBrichedit000000000002',
+  `replyFilterCode` char(30) binary DEFAULT 'javascript',
   `unsubscribeTemplateId` char(22) NOT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `Dashboard` (
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
-  `adminsGroupId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '4',
-  `usersGroupId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '2',
-  `templateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'DashboardViewTmpl00001',
+  `adminsGroupId` char(22) binary NOT NULL DEFAULT '4',
+  `usersGroupId` char(22) binary NOT NULL DEFAULT '2',
+  `templateId` char(22) binary NOT NULL DEFAULT 'DashboardViewTmpl00001',
   `isInitialized` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `assetsToHide` text,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `Dashboard_dashlets` (
-  `dashboardAssetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '',
-  `dashletAssetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '',
+  `dashboardAssetId` char(22) binary NOT NULL DEFAULT '',
+  `dashletAssetId` char(22) binary NOT NULL DEFAULT '',
   `isStatic` tinyint(1) DEFAULT NULL,
   `isRequired` tinyint(1) DEFAULT NULL,
   PRIMARY KEY (`dashboardAssetId`,`dashletAssetId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `Dashboard_userPrefs` (
-  `dashboardAssetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '',
-  `dashletAssetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '',
-  `userId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '',
+  `dashboardAssetId` char(22) binary NOT NULL DEFAULT '',
+  `dashletAssetId` char(22) binary NOT NULL DEFAULT '',
+  `userId` char(22) binary NOT NULL DEFAULT '',
   `isMinimized` tinyint(1) DEFAULT NULL,
   `properties` longtext,
   PRIMARY KEY (`dashboardAssetId`,`dashletAssetId`,`userId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `DataForm` (
   `acknowledgement` text,
   `mailData` int(11) NOT NULL DEFAULT '1',
-  `emailTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `acknowlegementTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `listTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `templateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `emailTemplateId` char(22) binary NOT NULL,
+  `acknowlegementTemplateId` char(22) binary NOT NULL,
+  `listTemplateId` char(22) binary NOT NULL,
+  `assetId` char(22) binary NOT NULL,
+  `templateId` char(22) binary NOT NULL,
   `defaultView` int(11) NOT NULL DEFAULT '0',
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
-  `groupToViewEntries` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '7',
+  `groupToViewEntries` char(22) binary NOT NULL DEFAULT '7',
   `mailAttachments` int(11) DEFAULT '0',
   `useCaptcha` int(1) DEFAULT '0',
   `storeData` int(1) DEFAULT '1',
   `fieldConfiguration` longtext,
   `tabConfiguration` longtext,
-  `workflowIdAddEntry` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `htmlAreaRichEditor` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT '**Use_Default_Editor**',
+  `workflowIdAddEntry` char(22) binary DEFAULT NULL,
+  `htmlAreaRichEditor` char(22) binary DEFAULT '**Use_Default_Editor**',
   PRIMARY KEY (`assetId`,`revisionDate`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `DataForm_entry` (
-  `DataForm_entryId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `userId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `DataForm_entryId` char(22) binary NOT NULL,
+  `userId` char(22) binary NOT NULL,
   `username` char(255) DEFAULT NULL,
   `ipAddress` char(255) DEFAULT NULL,
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) binary NOT NULL,
   `entryData` longtext,
   `submissionDate` datetime DEFAULT NULL,
   PRIMARY KEY (`DataForm_entryId`),
   KEY `assetId` (`assetId`),
   KEY `assetId_submissionDate` (`assetId`,`submissionDate`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `DataTable` (
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
   `data` longtext,
-  `templateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `templateId` char(22) binary DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `EMSBadge` (
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
   `price` float NOT NULL DEFAULT '0',
   `seatsAvailable` int(11) NOT NULL DEFAULT '100',
   `relatedBadgeGroups` mediumtext,
-  `templateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `templateId` char(22) binary NOT NULL,
   `earlyBirdPrice` float NOT NULL DEFAULT '0',
   `earlyBirdPriceEndDate` bigint(20) DEFAULT NULL,
   `preRegistrationPrice` float NOT NULL DEFAULT '0',
   `preRegistrationPriceEndDate` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `EMSBadgeGroup` (
-  `badgeGroupId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `emsAssetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `badgeGroupId` char(22) binary NOT NULL,
+  `emsAssetId` char(22) binary NOT NULL,
   `name` char(100) DEFAULT NULL,
   `ticketsPerBadge` int(11) DEFAULT NULL,
   PRIMARY KEY (`badgeGroupId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `EMSEventMetaField` (
-  `fieldId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `fieldId` char(22) binary NOT NULL,
+  `assetId` char(22) binary DEFAULT NULL,
   `label` char(100) DEFAULT NULL,
   `dataType` char(20) DEFAULT NULL,
   `visible` tinyint(4) DEFAULT '0',
@@ -260,14 +245,13 @@ CREATE TABLE `EMSEventMetaField` (
   `sequenceNumber` int(5) DEFAULT NULL,
   `helpText` mediumtext,
   PRIMARY KEY (`fieldId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `EMSRegistrant` (
-  `badgeId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `userId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `badgeId` char(22) binary NOT NULL,
+  `userId` char(22) binary DEFAULT NULL,
   `badgeNumber` int(11) NOT NULL AUTO_INCREMENT,
-  `badgeAssetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `emsAssetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `badgeAssetId` char(22) binary NOT NULL,
+  `emsAssetId` char(22) binary NOT NULL,
   `name` char(35) NOT NULL,
   `address1` char(35) DEFAULT NULL,
   `address2` char(35) DEFAULT NULL,
@@ -282,53 +266,48 @@ CREATE TABLE `EMSRegistrant` (
   `notes` mediumtext,
   `purchaseComplete` tinyint(1) DEFAULT NULL,
   `hasCheckedIn` tinyint(1) DEFAULT NULL,
-  `transactionItemId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `transactionItemId` char(22) binary DEFAULT NULL,
   PRIMARY KEY (`badgeId`),
   UNIQUE KEY `badgeNumber` (`badgeNumber`),
   KEY `badgeAssetId_purchaseComplete` (`badgeAssetId`,`purchaseComplete`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `EMSRegistrantRibbon` (
-  `badgeId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `ribbonAssetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `transactionItemId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `badgeId` char(22) binary NOT NULL,
+  `ribbonAssetId` char(22) binary NOT NULL,
+  `transactionItemId` char(22) binary DEFAULT NULL,
   PRIMARY KEY (`badgeId`,`ribbonAssetId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `EMSRegistrantTicket` (
-  `badgeId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `ticketAssetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `badgeId` char(22) binary NOT NULL,
+  `ticketAssetId` char(22) binary NOT NULL,
   `purchaseComplete` tinyint(1) DEFAULT NULL,
-  `transactionItemId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `transactionItemId` char(22) binary DEFAULT NULL,
   PRIMARY KEY (`badgeId`,`ticketAssetId`),
   KEY `ticketAssetId_purchaseComplete` (`ticketAssetId`,`purchaseComplete`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `EMSRegistrantToken` (
-  `badgeId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `tokenAssetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `badgeId` char(22) binary NOT NULL,
+  `tokenAssetId` char(22) binary NOT NULL,
   `quantity` int(11) DEFAULT NULL,
   `transactionItemIds` text,
   PRIMARY KEY (`badgeId`,`tokenAssetId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `EMSRibbon` (
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
   `percentageDiscount` float NOT NULL DEFAULT '10',
   `price` float NOT NULL DEFAULT '0',
   PRIMARY KEY (`assetId`,`revisionDate`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `EMSSubmission` (
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
   `submissionId` int(11) NOT NULL,
   `submissionStatus` char(30) DEFAULT NULL,
-  `ticketId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `ticketId` char(22) binary DEFAULT NULL,
   `description` mediumtext,
   `sku` char(35) DEFAULT NULL,
-  `vendorId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `vendorId` char(22) binary DEFAULT NULL,
   `displayTitle` tinyint(1) DEFAULT NULL,
   `shipsSeparately` tinyint(1) DEFAULT NULL,
   `price` float DEFAULT NULL,
@@ -341,22 +320,20 @@ CREATE TABLE `EMSSubmission` (
   `relatedRibbons` mediumtext,
   `eventMetaData` mediumtext,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `EMSSubmissionForm` (
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
-  `canSubmitGroupId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `canSubmitGroupId` char(22) binary DEFAULT NULL,
   `daysBeforeCleanup` int(11) DEFAULT NULL,
   `deleteCreatedItems` int(1) DEFAULT NULL,
   `formDescription` text,
   `submissionDeadline` date DEFAULT NULL,
   `pastDeadlineMessage` text,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `EMSTicket` (
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
   `price` float NOT NULL DEFAULT '0',
   `seatsAvailable` int(11) NOT NULL DEFAULT '100',
@@ -368,19 +345,17 @@ CREATE TABLE `EMSTicket` (
   `relatedRibbons` mediumtext,
   `eventMetaData` mediumtext,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `EMSToken` (
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
   `price` float NOT NULL DEFAULT '0',
   PRIMARY KEY (`assetId`,`revisionDate`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `Event` (
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
-  `feedId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `feedId` char(22) binary DEFAULT NULL,
   `feedUid` char(255) DEFAULT NULL,
   `startDate` date DEFAULT NULL,
   `endDate` date DEFAULT NULL,
@@ -389,93 +364,86 @@ CREATE TABLE `Event` (
   `userDefined3` text,
   `userDefined4` text,
   `userDefined5` text,
-  `recurId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `recurId` char(22) binary DEFAULT NULL,
   `description` longtext,
   `startTime` time DEFAULT NULL,
   `endTime` time DEFAULT NULL,
   `relatedLinks` longtext,
   `location` char(255) DEFAULT NULL,
-  `storageId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `storageId` char(22) binary NOT NULL,
   `timeZone` char(255) DEFAULT 'America/Chicago',
   `sequenceNumber` bigint(20) DEFAULT NULL,
   `iCalSequenceNumber` int(11) DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `EventManagementSystem` (
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
   `timezone` char(30) NOT NULL DEFAULT 'America/Chicago',
-  `templateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '2rC4ErZ3c77OJzJm7O5s3w',
-  `badgeBuilderTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'BMybD3cEnmXVk2wQ_qEsRQ',
-  `lookupRegistrantTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'OOyMH33plAy6oCj_QWrxtg',
-  `printBadgeTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'PsFn7dJt4wMwBa8hiE3hOA',
-  `printTicketTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'yBwydfooiLvhEFawJb0VTQ',
+  `templateId` char(22) binary NOT NULL DEFAULT '2rC4ErZ3c77OJzJm7O5s3w',
+  `badgeBuilderTemplateId` char(22) binary NOT NULL DEFAULT 'BMybD3cEnmXVk2wQ_qEsRQ',
+  `lookupRegistrantTemplateId` char(22) binary NOT NULL DEFAULT 'OOyMH33plAy6oCj_QWrxtg',
+  `printBadgeTemplateId` char(22) binary NOT NULL DEFAULT 'PsFn7dJt4wMwBa8hiE3hOA',
+  `printTicketTemplateId` char(22) binary NOT NULL DEFAULT 'yBwydfooiLvhEFawJb0VTQ',
   `printRemainingTicketsTemplateId` char(22) NOT NULL DEFAULT 'hreA_bgxiTX-EzWCSZCZJw',
   `badgeInstructions` mediumtext,
   `ribbonInstructions` mediumtext,
   `ticketInstructions` mediumtext,
   `tokenInstructions` mediumtext,
-  `registrationStaffGroupId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `scheduleTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `registrationStaffGroupId` char(22) binary NOT NULL,
+  `scheduleTemplateId` char(22) binary DEFAULT NULL,
   `scheduleColumnsPerPage` int(11) DEFAULT NULL,
-  `eventSubmissionTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `eventSubmissionQueueTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `eventSubmissionMainTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `eventSubmissionTemplateId` char(22) binary DEFAULT NULL,
+  `eventSubmissionQueueTemplateId` char(22) binary DEFAULT NULL,
+  `eventSubmissionMainTemplateId` char(22) binary DEFAULT NULL,
   `eventSubmissionGroups` mediumtext,
   `submittedLocationsList` mediumtext,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `Event_recur` (
-  `recurId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `recurId` char(22) binary NOT NULL,
   `recurType` char(16) DEFAULT NULL,
   `pattern` char(255) DEFAULT NULL,
   `startDate` date DEFAULT NULL,
   `endDate` char(10) DEFAULT NULL,
   PRIMARY KEY (`recurId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `Event_relatedlink` (
-  `eventlinkId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `eventlinkId` char(22) binary NOT NULL,
+  `assetId` char(22) binary NOT NULL,
   `linkURL` tinytext,
   `linktext` char(80) DEFAULT NULL,
-  `groupIdView` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `groupIdView` char(22) binary NOT NULL,
   `sequenceNumber` bigint(20) DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `FileAsset` (
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `storageId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) binary NOT NULL,
+  `storageId` char(22) binary NOT NULL,
   `filename` char(255) NOT NULL,
-  `templateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `templateId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
   `cacheTimeout` int(11) NOT NULL DEFAULT '3600',
   PRIMARY KEY (`assetId`,`revisionDate`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `FlatDiscount` (
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
-  `templateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '63ix2-hU0FchXGIWkG3tow',
+  `templateId` char(22) binary NOT NULL DEFAULT '63ix2-hU0FchXGIWkG3tow',
   `mustSpend` float NOT NULL DEFAULT '0',
   `percentageDiscount` int(3) NOT NULL DEFAULT '0',
   `priceDiscount` float NOT NULL DEFAULT '0',
   `thankYouMessage` mediumtext,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `Folder` (
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `templateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) binary NOT NULL,
+  `templateId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
   `visitorCacheTimeout` int(11) NOT NULL DEFAULT '3600',
   `sortAlphabetically` int(11) NOT NULL DEFAULT '0',
   `sortOrder` enum('ASC','DESC') DEFAULT 'ASC',
   PRIMARY KEY (`assetId`,`revisionDate`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `Fork` (
   `id` char(22) NOT NULL DEFAULT '',
   `userId` char(22) DEFAULT NULL,
@@ -488,52 +456,50 @@ CREATE TABLE `Fork` (
   `latch` tinyint(1) DEFAULT '0',
   `redirect` char(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `Gallery` (
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
-  `groupIdAddComment` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `groupIdAddFile` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `groupIdAddComment` char(22) binary DEFAULT NULL,
+  `groupIdAddFile` char(22) binary DEFAULT NULL,
   `imageResolutions` text,
   `imageViewSize` int(11) DEFAULT NULL,
   `imageThumbnailSize` int(11) DEFAULT NULL,
   `maxSpacePerUser` char(20) DEFAULT NULL,
-  `richEditIdComment` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `templateIdAddArchive` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `templateIdDeleteAlbum` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `templateIdDeleteFile` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `templateIdEditAlbum` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `templateIdEditFile` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `templateIdListAlbums` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `templateIdListAlbumsRss` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `templateIdListFilesForUser` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `templateIdListFilesForUserRss` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `templateIdMakeShortcut` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `templateIdSearch` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `templateIdViewSlideshow` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `templateIdViewThumbnails` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `templateIdViewAlbum` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `templateIdViewAlbumRss` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `templateIdViewFile` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `viewAlbumAssetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `richEditIdComment` char(22) binary DEFAULT NULL,
+  `templateIdAddArchive` char(22) binary DEFAULT NULL,
+  `templateIdDeleteAlbum` char(22) binary DEFAULT NULL,
+  `templateIdDeleteFile` char(22) binary DEFAULT NULL,
+  `templateIdEditAlbum` char(22) binary DEFAULT NULL,
+  `templateIdEditFile` char(22) binary DEFAULT NULL,
+  `templateIdListAlbums` char(22) binary DEFAULT NULL,
+  `templateIdListAlbumsRss` char(22) binary DEFAULT NULL,
+  `templateIdListFilesForUser` char(22) binary DEFAULT NULL,
+  `templateIdListFilesForUserRss` char(22) binary DEFAULT NULL,
+  `templateIdMakeShortcut` char(22) binary DEFAULT NULL,
+  `templateIdSearch` char(22) binary DEFAULT NULL,
+  `templateIdViewSlideshow` char(22) binary DEFAULT NULL,
+  `templateIdViewThumbnails` char(22) binary DEFAULT NULL,
+  `templateIdViewAlbum` char(22) binary DEFAULT NULL,
+  `templateIdViewAlbumRss` char(22) binary DEFAULT NULL,
+  `templateIdViewFile` char(22) binary DEFAULT NULL,
+  `viewAlbumAssetId` char(22) binary DEFAULT NULL,
   `viewDefault` enum('album','list') DEFAULT NULL,
   `viewListOrderBy` char(40) DEFAULT NULL,
   `viewListOrderDirection` enum('ASC','DESC') DEFAULT NULL,
-  `workflowIdCommit` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `templateIdEditComment` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `richEditIdAlbum` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `richEditIdFile` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `workflowIdCommit` char(22) binary DEFAULT NULL,
+  `templateIdEditComment` char(22) binary DEFAULT NULL,
+  `richEditIdAlbum` char(22) binary DEFAULT NULL,
+  `richEditIdFile` char(22) binary DEFAULT NULL,
   `defaultFilesPerPage` int(11) DEFAULT NULL,
   `imageDensity` int(11) DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `GalleryAlbum` (
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
   `allowComments` int(11) DEFAULT NULL,
-  `assetIdThumbnail` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `assetIdThumbnail` char(22) binary DEFAULT NULL,
   `userDefined1` text,
   `userDefined2` text,
   `userDefined3` text,
@@ -541,10 +507,9 @@ CREATE TABLE `GalleryAlbum` (
   `userDefined5` text,
   `othersCanAdd` int(11) DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `GalleryFile` (
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
   `userDefined1` longtext,
   `userDefined2` longtext,
@@ -555,19 +520,17 @@ CREATE TABLE `GalleryFile` (
   `friendsOnly` int(1) DEFAULT '0',
   `rating` int(1) DEFAULT '0',
   PRIMARY KEY (`assetId`,`revisionDate`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `GalleryFile_comment` (
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `commentId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `userId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `assetId` char(22) binary NOT NULL,
+  `commentId` char(22) binary NOT NULL,
+  `userId` char(22) binary DEFAULT NULL,
   `visitorIp` char(255) DEFAULT NULL,
   `creationDate` datetime DEFAULT NULL,
   `bodyText` longtext,
   PRIMARY KEY (`assetId`,`commentId`),
   KEY `commentId` (`commentId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `HttpProxy` (
   `proxiedUrl` text,
   `timeout` int(11) DEFAULT NULL,
@@ -581,91 +544,83 @@ CREATE TABLE `HttpProxy` (
   `rewriteUrls` int(11) DEFAULT NULL,
   `searchFor` char(255) DEFAULT NULL,
   `stopAt` char(255) DEFAULT NULL,
-  `cookieJarStorageId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `templateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `cookieJarStorageId` char(22) binary NOT NULL,
+  `assetId` char(22) binary NOT NULL,
+  `templateId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
   `cacheTimeout` int(11) NOT NULL DEFAULT '0',
   `useAmpersand` int(11) NOT NULL DEFAULT '0',
   `urlPatternFilter` mediumtext,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `ImageAsset` (
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) binary NOT NULL,
   `thumbnailSize` int(11) NOT NULL DEFAULT '50',
   `parameters` text,
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
   `annotations` mediumtext,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `InOutBoard` (
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
   `statusList` text,
-  `reportViewerGroup` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '3',
-  `inOutGroup` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '2',
-  `inOutTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'IOB0000000000000000001',
-  `reportTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'IOB0000000000000000002',
+  `reportViewerGroup` char(22) binary NOT NULL DEFAULT '3',
+  `inOutGroup` char(22) binary NOT NULL DEFAULT '2',
+  `inOutTemplateId` char(22) binary NOT NULL DEFAULT 'IOB0000000000000000001',
+  `reportTemplateId` char(22) binary NOT NULL DEFAULT 'IOB0000000000000000002',
   `paginateAfter` int(11) NOT NULL DEFAULT '50',
   `reportPaginateAfter` int(11) NOT NULL DEFAULT '50',
   PRIMARY KEY (`assetId`,`revisionDate`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `InOutBoard_delegates` (
-  `userId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `delegateUserId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+  `userId` char(22) binary NOT NULL,
+  `delegateUserId` char(22) binary NOT NULL,
+  `assetId` char(22) binary NOT NULL
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `InOutBoard_status` (
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `userId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) binary NOT NULL,
+  `userId` char(22) binary NOT NULL,
   `status` char(255) DEFAULT NULL,
   `dateStamp` int(11) NOT NULL,
   `message` text
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `InOutBoard_statusLog` (
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `userId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) binary NOT NULL,
+  `userId` char(22) binary NOT NULL,
   `status` char(255) DEFAULT NULL,
   `dateStamp` int(11) NOT NULL,
   `message` text,
-  `createdBy` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+  `createdBy` char(22) binary DEFAULT NULL
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `Layout` (
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `templateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) binary NOT NULL,
+  `templateId` char(22) binary NOT NULL,
   `contentPositions` text,
   `assetsToHide` text,
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
   `assetOrder` char(20) DEFAULT 'asc',
-  `mobileTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT 'PBtmpl0000000000000054',
+  `mobileTemplateId` char(22) binary DEFAULT 'PBtmpl0000000000000054',
   PRIMARY KEY (`assetId`,`revisionDate`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `Map` (
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
-  `groupIdAddPoint` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `groupIdAddPoint` char(22) binary DEFAULT NULL,
   `mapApiKey` text,
   `mapHeight` char(12) DEFAULT NULL,
   `mapWidth` char(12) DEFAULT NULL,
   `startLatitude` float DEFAULT NULL,
   `startLongitude` float DEFAULT NULL,
   `startZoom` tinyint(3) unsigned DEFAULT NULL,
-  `templateIdEditPoint` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `templateIdView` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `templateIdViewPoint` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `workflowIdPoint` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `templateIdEditPoint` char(22) binary DEFAULT NULL,
+  `templateIdView` char(22) binary DEFAULT NULL,
+  `templateIdViewPoint` char(22) binary DEFAULT NULL,
+  `workflowIdPoint` char(22) binary DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `MapPoint` (
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
   `latitude` double DEFAULT NULL,
   `longitude` double DEFAULT NULL,
@@ -679,7 +634,7 @@ CREATE TABLE `MapPoint` (
   `phone` char(255) DEFAULT NULL,
   `fax` char(255) DEFAULT NULL,
   `email` char(255) DEFAULT NULL,
-  `storageIdPhoto` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `storageIdPhoto` char(22) binary DEFAULT NULL,
   `userDefined1` char(255) DEFAULT NULL,
   `userDefined2` char(255) DEFAULT NULL,
   `userDefined3` char(255) DEFAULT NULL,
@@ -687,43 +642,41 @@ CREATE TABLE `MapPoint` (
   `userDefined5` char(255) DEFAULT NULL,
   `isGeocoded` tinyint(1) DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `Matrix` (
-  `detailTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `compareTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `searchTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `detailTemplateId` char(22) binary DEFAULT NULL,
+  `compareTemplateId` char(22) binary DEFAULT NULL,
+  `searchTemplateId` char(22) binary DEFAULT NULL,
   `categories` text,
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `templateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) binary NOT NULL,
+  `templateId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
   `maxComparisons` int(11) NOT NULL DEFAULT '10',
   `maxComparisonsPrivileged` int(11) NOT NULL DEFAULT '10',
-  `defaultSort` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'score',
-  `compareColorNo` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT '#ffaaaa',
-  `compareColorLimited` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '#ffffaa',
-  `compareColorCostsExtra` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '#ffffaa',
-  `compareColorFreeAddOn` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '#ffffaa',
-  `compareColorYes` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '#aaffaa',
-  `submissionApprovalWorkflowId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `defaultSort` char(22) binary NOT NULL DEFAULT 'score',
+  `compareColorNo` char(22) binary DEFAULT '#ffaaaa',
+  `compareColorLimited` char(22) binary NOT NULL DEFAULT '#ffffaa',
+  `compareColorCostsExtra` char(22) binary NOT NULL DEFAULT '#ffffaa',
+  `compareColorFreeAddOn` char(22) binary NOT NULL DEFAULT '#ffffaa',
+  `compareColorYes` char(22) binary NOT NULL DEFAULT '#aaffaa',
+  `submissionApprovalWorkflowId` char(22) binary NOT NULL,
   `ratingsDuration` int(11) NOT NULL DEFAULT '7776000',
-  `editListingTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `groupToAdd` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT '2',
-  `screenshotsConfigTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `screenshotsTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `editListingTemplateId` char(22) binary DEFAULT NULL,
+  `groupToAdd` char(22) binary DEFAULT '2',
+  `screenshotsConfigTemplateId` char(22) binary DEFAULT NULL,
+  `screenshotsTemplateId` char(22) binary DEFAULT NULL,
   `statisticsCacheTimeout` int(11) NOT NULL DEFAULT '3600',
   `maxScreenshotWidth` int(11) DEFAULT NULL,
   `maxScreenshotHeight` int(11) DEFAULT NULL,
   `listingsCacheTimeout` int(11) NOT NULL DEFAULT '3600',
-  `maxComparisonsGroup` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `maxComparisonsGroup` char(22) binary DEFAULT NULL,
   `maxComparisonsGroupInt` int(11) DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `MatrixListing` (
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
-  `screenshots` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `screenshots` char(22) binary DEFAULT NULL,
   `description` text,
   `version` char(255) DEFAULT NULL,
   `views` int(11) DEFAULT NULL,
@@ -733,74 +686,67 @@ CREATE TABLE `MatrixListing` (
   `comparesLastIp` char(255) DEFAULT NULL,
   `clicksLastIp` char(255) DEFAULT NULL,
   `lastUpdated` int(11) DEFAULT NULL,
-  `maintainer` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `maintainer` char(22) binary DEFAULT NULL,
   `manufacturerName` char(255) DEFAULT NULL,
   `manufacturerURL` char(255) DEFAULT NULL,
   `productURL` char(255) DEFAULT NULL,
   `score` int(11) DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `MatrixListing_attribute` (
-  `matrixId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `matrixListingId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `attributeId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `matrixId` char(22) binary NOT NULL,
+  `matrixListingId` char(22) binary NOT NULL,
+  `attributeId` char(22) binary NOT NULL,
   `value` char(255) DEFAULT NULL,
   PRIMARY KEY (`attributeId`,`matrixListingId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `MatrixListing_rating` (
   `timeStamp` int(11) NOT NULL DEFAULT '0',
   `category` char(255) DEFAULT NULL,
   `rating` int(11) NOT NULL DEFAULT '1',
-  `listingId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `listingId` char(22) binary NOT NULL,
   `ipAddress` char(15) DEFAULT NULL,
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `userId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+  `assetId` char(22) binary NOT NULL,
+  `userId` char(22) binary DEFAULT NULL
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `MatrixListing_ratingSummary` (
-  `listingId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `listingId` char(22) binary NOT NULL,
   `category` char(255) NOT NULL,
   `meanValue` decimal(3,2) DEFAULT NULL,
   `medianValue` int(11) DEFAULT NULL,
   `countValue` int(11) DEFAULT NULL,
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) binary NOT NULL,
   PRIMARY KEY (`listingId`,`category`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `Matrix_attribute` (
-  `attributeId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `attributeId` char(22) binary NOT NULL,
   `category` char(255) NOT NULL,
   `name` char(255) DEFAULT NULL,
   `description` text,
   `fieldType` char(255) NOT NULL DEFAULT 'MatrixCompare',
   `defaultValue` char(255) DEFAULT NULL,
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) binary NOT NULL,
   `options` text,
   PRIMARY KEY (`attributeId`),
   KEY `categoryIndex` (`category`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `MessageBoard` (
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `templateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) binary NOT NULL,
+  `templateId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
   `visitorCacheTimeout` int(11) NOT NULL DEFAULT '3600',
   PRIMARY KEY (`assetId`,`revisionDate`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `MultiSearch` (
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
-  `templateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'MultiSearchTmpl0000001',
+  `templateId` char(22) binary NOT NULL DEFAULT 'MultiSearchTmpl0000001',
   `predefinedSearches` text,
   `cacheTimeout` int(11) NOT NULL DEFAULT '3600',
   PRIMARY KEY (`assetId`,`revisionDate`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `Navigation` (
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) binary NOT NULL,
   `assetsToInclude` text,
   `startType` char(35) DEFAULT NULL,
   `startPoint` char(255) DEFAULT NULL,
@@ -808,128 +754,118 @@ CREATE TABLE `Navigation` (
   `showSystemPages` int(11) NOT NULL DEFAULT '0',
   `showHiddenPages` int(11) NOT NULL DEFAULT '0',
   `showUnprivilegedPages` int(11) NOT NULL DEFAULT '0',
-  `templateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `templateId` char(22) binary NOT NULL,
   `ancestorEndPoint` int(11) NOT NULL DEFAULT '55',
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
   `mimeType` char(50) DEFAULT 'text/html',
   `reversePageLoop` tinyint(1) DEFAULT '0',
   PRIMARY KEY (`assetId`,`revisionDate`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `Newsletter` (
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
-  `newsletterTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'newsletter000000000001',
-  `mySubscriptionsTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'newslettersubscrip0001',
+  `newsletterTemplateId` char(22) binary NOT NULL DEFAULT 'newsletter000000000001',
+  `mySubscriptionsTemplateId` char(22) binary NOT NULL DEFAULT 'newslettersubscrip0001',
   `newsletterHeader` mediumtext,
   `newsletterFooter` mediumtext,
   `newsletterCategories` text,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `Newsletter_subscriptions` (
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `userId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) binary NOT NULL,
+  `userId` char(22) binary NOT NULL,
   `subscriptions` text,
   `lastTimeSent` bigint(20) NOT NULL DEFAULT '0',
   PRIMARY KEY (`assetId`,`userId`),
   KEY `lastTimeSent_assetId_userId` (`lastTimeSent`,`assetId`,`userId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `PA_lastLog` (
-  `userId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `sessionId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `userId` char(22) binary NOT NULL,
+  `assetId` char(22) binary NOT NULL,
+  `sessionId` char(22) binary NOT NULL,
   `timeStamp` bigint(20) DEFAULT NULL,
   `url` char(255) NOT NULL,
   PRIMARY KEY (`userId`,`sessionId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `PM_project` (
-  `projectId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `projectId` char(22) binary NOT NULL,
+  `assetId` char(22) binary DEFAULT NULL,
   `name` char(255) NOT NULL,
   `description` text,
   `startDate` bigint(20) DEFAULT NULL,
   `endDate` bigint(20) DEFAULT NULL,
-  `projectManager` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `projectManager` char(22) binary DEFAULT NULL,
   `durationUnits` enum('hours','days') DEFAULT 'hours',
   `hoursPerDay` float DEFAULT NULL,
   `targetBudget` float(15,2) DEFAULT '0.00',
   `percentComplete` float NOT NULL DEFAULT '0',
-  `parentId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `parentId` char(22) binary DEFAULT NULL,
   `creationDate` bigint(20) NOT NULL,
-  `createdBy` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `lastUpdatedBy` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `createdBy` char(22) binary NOT NULL,
+  `lastUpdatedBy` char(22) binary NOT NULL,
   `lastUpdateDate` bigint(20) NOT NULL,
-  `projectObserver` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT '7',
+  `projectObserver` char(22) binary DEFAULT '7',
   PRIMARY KEY (`projectId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `PM_task` (
-  `taskId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `projectId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `taskId` char(22) binary NOT NULL,
+  `projectId` char(22) binary NOT NULL,
   `taskName` char(255) NOT NULL,
   `duration` float DEFAULT NULL,
   `startDate` bigint(20) DEFAULT NULL,
   `endDate` bigint(20) DEFAULT NULL,
   `dependants` char(50) DEFAULT NULL,
-  `parentId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `parentId` char(22) binary DEFAULT NULL,
   `percentComplete` float DEFAULT NULL,
   `sequenceNumber` int(11) NOT NULL DEFAULT '1',
   `creationDate` bigint(20) NOT NULL,
-  `createdBy` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `lastUpdatedBy` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `createdBy` char(22) binary NOT NULL,
+  `lastUpdatedBy` char(22) binary NOT NULL,
   `lastUpdateDate` bigint(20) NOT NULL,
   `lagTime` bigint(20) DEFAULT '0',
   `taskType` enum('timed','progressive','milestone') NOT NULL DEFAULT 'timed',
   PRIMARY KEY (`taskId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `PM_taskResource` (
-  `taskResourceId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `taskId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `taskResourceId` char(22) binary NOT NULL,
+  `taskId` char(22) binary NOT NULL,
   `sequenceNumber` int(11) NOT NULL,
   `resourceKind` enum('user','group') NOT NULL,
-  `resourceId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `resourceId` char(22) binary NOT NULL,
   PRIMARY KEY (`taskResourceId`),
   UNIQUE KEY `taskId` (`taskId`,`resourceKind`,`resourceId`),
   UNIQUE KEY `taskId_2` (`taskId`,`sequenceNumber`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `PM_wobject` (
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `projectDashboardTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'ProjectManagerTMPL0001',
-  `projectDisplayTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'ProjectManagerTMPL0002',
-  `ganttChartTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'ProjectManagerTMPL0003',
-  `editTaskTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'ProjectManagerTMPL0004',
-  `groupToAdd` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '3',
+  `assetId` char(22) binary NOT NULL,
+  `projectDashboardTemplateId` char(22) binary NOT NULL DEFAULT 'ProjectManagerTMPL0001',
+  `projectDisplayTemplateId` char(22) binary NOT NULL DEFAULT 'ProjectManagerTMPL0002',
+  `ganttChartTemplateId` char(22) binary NOT NULL DEFAULT 'ProjectManagerTMPL0003',
+  `editTaskTemplateId` char(22) binary NOT NULL DEFAULT 'ProjectManagerTMPL0004',
+  `groupToAdd` char(22) binary NOT NULL DEFAULT '3',
   `revisionDate` bigint(20) NOT NULL,
-  `resourcePopupTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'ProjectManagerTMPL0005',
-  `resourceListTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'ProjectManagerTMPL0006',
+  `resourcePopupTemplateId` char(22) binary NOT NULL DEFAULT 'ProjectManagerTMPL0005',
+  `resourceListTemplateId` char(22) binary NOT NULL DEFAULT 'ProjectManagerTMPL0006',
   PRIMARY KEY (`assetId`,`revisionDate`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `Photo` (
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
   `exifData` longtext,
   `location` char(255) DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `Photo_rating` (
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `userId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `assetId` char(22) binary NOT NULL,
+  `userId` char(22) binary DEFAULT NULL,
   `visitorIp` char(255) DEFAULT NULL,
   `rating` int(11) DEFAULT NULL,
   KEY `assetId` (`assetId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `Poll` (
   `active` int(11) NOT NULL DEFAULT '1',
   `graphWidth` int(11) NOT NULL DEFAULT '150',
-  `voteGroup` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `voteGroup` char(22) binary DEFAULT NULL,
   `question` char(255) DEFAULT NULL,
   `a1` char(255) DEFAULT NULL,
   `a2` char(255) DEFAULT NULL,
@@ -953,24 +889,22 @@ CREATE TABLE `Poll` (
   `a20` char(255) DEFAULT NULL,
   `karmaPerVote` int(11) NOT NULL DEFAULT '0',
   `randomizeAnswers` int(11) NOT NULL DEFAULT '0',
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `templateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) binary NOT NULL,
+  `templateId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
   `graphConfiguration` blob,
   `generateGraph` tinyint(1) DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `Poll_answer` (
   `answer` char(3) DEFAULT NULL,
-  `userId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `userId` char(22) binary NOT NULL,
   `ipAddress` char(50) DEFAULT NULL,
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+  `assetId` char(22) binary NOT NULL
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `Post` (
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `threadId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) binary NOT NULL,
+  `threadId` char(22) binary NOT NULL,
   `username` char(30) DEFAULT NULL,
   `content` mediumtext,
   `views` int(11) NOT NULL DEFAULT '0',
@@ -980,24 +914,22 @@ CREATE TABLE `Post` (
   `userDefined3` text,
   `userDefined4` text,
   `userDefined5` text,
-  `storageId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `storageId` char(22) binary NOT NULL,
   `rating` int(11) NOT NULL DEFAULT '0',
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
   `originalEmail` mediumtext,
   PRIMARY KEY (`assetId`,`revisionDate`),
   KEY `threadId_rating` (`threadId`,`rating`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `Post_rating` (
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `userId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) binary NOT NULL,
+  `userId` char(22) binary NOT NULL,
   `ipAddress` char(15) NOT NULL,
   `dateOfRating` bigint(20) DEFAULT NULL,
   `rating` int(11) NOT NULL DEFAULT '0',
   KEY `assetId_userId` (`assetId`,`userId`),
   KEY `assetId_ipAddress` (`assetId`,`ipAddress`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `Product` (
   `image1` char(255) DEFAULT NULL,
   `image2` char(255) DEFAULT NULL,
@@ -1005,8 +937,8 @@ CREATE TABLE `Product` (
   `brochure` char(255) DEFAULT NULL,
   `manual` char(255) DEFAULT NULL,
   `warranty` char(255) DEFAULT NULL,
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `templateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) binary NOT NULL,
+  `templateId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
   `cacheTimeout` int(11) NOT NULL DEFAULT '3600',
   `thankYouMessage` mediumtext,
@@ -1018,10 +950,9 @@ CREATE TABLE `Product` (
   `variantsJSON` longtext,
   `isShippingRequired` int(11) DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `RichEdit` (
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) binary NOT NULL,
   `askAboutRichEdit` int(11) NOT NULL DEFAULT '0',
   `preformatted` int(11) NOT NULL DEFAULT '0',
   `editorWidth` int(11) NOT NULL DEFAULT '0',
@@ -1045,33 +976,32 @@ CREATE TABLE `RichEdit` (
   `inlinePopups` int(11) NOT NULL DEFAULT '0',
   `allowMedia` int(11) DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `SQLReport` (
   `dbQuery1` text,
   `paginateAfter` int(11) NOT NULL DEFAULT '50',
   `preprocessMacros1` int(11) DEFAULT '0',
   `debugMode` int(11) NOT NULL DEFAULT '0',
-  `databaseLinkId1` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `databaseLinkId1` char(22) binary NOT NULL,
   `placeholderParams1` text,
   `preprocessMacros2` int(11) DEFAULT '0',
   `dbQuery2` text,
   `placeholderParams2` text,
-  `databaseLinkId2` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `databaseLinkId2` char(22) binary NOT NULL,
   `preprocessMacros3` int(11) DEFAULT '0',
   `dbQuery3` text,
   `placeholderParams3` text,
-  `databaseLinkId3` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `databaseLinkId3` char(22) binary NOT NULL,
   `preprocessMacros4` int(11) DEFAULT '0',
   `dbQuery4` text,
   `placeholderParams4` text,
-  `databaseLinkId4` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `databaseLinkId4` char(22) binary NOT NULL,
   `preprocessMacros5` int(11) DEFAULT '0',
   `dbQuery5` text,
   `placeholderParams5` text,
-  `databaseLinkId5` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `templateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `databaseLinkId5` char(22) binary NOT NULL,
+  `assetId` char(22) binary NOT NULL,
+  `templateId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
   `cacheTimeout` int(11) NOT NULL DEFAULT '0',
   `prequeryStatements1` text,
@@ -1081,60 +1011,55 @@ CREATE TABLE `SQLReport` (
   `prequeryStatements5` text,
   `downloadType` char(255) DEFAULT NULL,
   `downloadFilename` char(255) DEFAULT NULL,
-  `downloadTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `downloadTemplateId` char(22) binary DEFAULT NULL,
   `downloadMimeType` char(255) DEFAULT NULL,
-  `downloadUserGroup` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `downloadUserGroup` char(22) binary DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `Shelf` (
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
-  `templateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'nFen0xjkZn8WkpM93C9ceQ',
+  `templateId` char(22) binary NOT NULL DEFAULT 'nFen0xjkZn8WkpM93C9ceQ',
   PRIMARY KEY (`assetId`,`revisionDate`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `Shortcut` (
   `overrideTitle` int(11) NOT NULL DEFAULT '0',
   `overrideDescription` int(11) NOT NULL DEFAULT '0',
   `overrideTemplate` int(11) NOT NULL DEFAULT '0',
   `overrideDisplayTitle` int(11) NOT NULL DEFAULT '0',
-  `overrideTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `overrideTemplateId` char(22) binary NOT NULL,
   `shortcutByCriteria` int(11) NOT NULL DEFAULT '0',
   `resolveMultiples` char(30) DEFAULT 'mostRecent',
   `shortcutCriteria` text NOT NULL,
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `templateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `shortcutToAssetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) binary NOT NULL,
+  `templateId` char(22) binary NOT NULL,
+  `shortcutToAssetId` char(22) binary NOT NULL,
   `disableContentLock` int(11) NOT NULL DEFAULT '0',
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
   `prefFieldsToShow` text,
   `prefFieldsToImport` text,
   `showReloadIcon` tinyint(3) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`assetId`,`revisionDate`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `Shortcut_overrides` (
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) binary NOT NULL,
   `fieldName` char(255) NOT NULL,
   `newValue` text,
   PRIMARY KEY (`assetId`,`fieldName`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `StockData` (
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `templateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'StockListTMPL000000001',
-  `displayTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'StockListTMPL000000002',
+  `assetId` char(22) binary NOT NULL,
+  `templateId` char(22) binary NOT NULL DEFAULT 'StockListTMPL000000001',
+  `displayTemplateId` char(22) binary NOT NULL DEFAULT 'StockListTMPL000000002',
   `defaultStocks` text,
   `source` char(50) DEFAULT 'usa',
   `failover` int(11) DEFAULT '1',
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
   `cacheTimeout` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `Story` (
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
   `headline` char(255) DEFAULT NULL,
   `subtitle` char(255) DEFAULT NULL,
@@ -1144,111 +1069,103 @@ CREATE TABLE `Story` (
   `story` mediumtext,
   `photo` longtext,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `StoryArchive` (
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
   `storiesPerPage` int(11) DEFAULT NULL,
-  `groupToPost` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `templateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `storyTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `editStoryTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `keywordListTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `groupToPost` char(22) binary DEFAULT NULL,
+  `templateId` char(22) binary DEFAULT NULL,
+  `storyTemplateId` char(22) binary DEFAULT NULL,
+  `editStoryTemplateId` char(22) binary DEFAULT NULL,
+  `keywordListTemplateId` char(22) binary DEFAULT NULL,
   `archiveAfter` int(11) DEFAULT NULL,
-  `richEditorId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `approvalWorkflowId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT 'pbworkflow000000000003',
+  `richEditorId` char(22) binary DEFAULT NULL,
+  `approvalWorkflowId` char(22) binary DEFAULT 'pbworkflow000000000003',
   `photoWidth` int(11) DEFAULT NULL,
   `storySortOrder` char(22) DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `StoryTopic` (
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
   `storiesPer` int(11) DEFAULT NULL,
   `storiesShort` int(11) DEFAULT NULL,
-  `templateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `storyTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `templateId` char(22) binary DEFAULT NULL,
+  `storyTemplateId` char(22) binary DEFAULT NULL,
   `storySortOrder` char(22) DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `Subscription` (
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
-  `templateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `templateId` char(22) binary NOT NULL,
   `thankYouMessage` mediumtext,
   `price` float NOT NULL DEFAULT '0',
-  `subscriptionGroup` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '2',
+  `subscriptionGroup` char(22) binary NOT NULL DEFAULT '2',
   `duration` char(12) NOT NULL DEFAULT 'Monthly',
   `executeOnSubscription` char(255) DEFAULT NULL,
   `karma` int(6) DEFAULT '0',
   `recurringSubscription` tinyint(1) NOT NULL DEFAULT '1',
-  `redeemSubscriptionCodeTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `redeemSubscriptionCodeTemplateId` char(22) binary NOT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `Subscription_code` (
   `code` char(64) NOT NULL,
-  `batchId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `batchId` char(22) binary NOT NULL,
   `status` char(10) NOT NULL DEFAULT 'Unused',
   `dateUsed` bigint(20) DEFAULT NULL,
-  `usedBy` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `usedBy` char(22) binary DEFAULT NULL,
   PRIMARY KEY (`code`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `Subscription_codeBatch` (
-  `batchId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `batchId` char(22) binary NOT NULL,
   `name` char(255) DEFAULT NULL,
   `description` mediumtext,
-  `subscriptionId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `subscriptionId` char(22) binary NOT NULL,
   `expirationDate` bigint(20) NOT NULL,
   `dateCreated` bigint(20) NOT NULL,
   PRIMARY KEY (`batchId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `Survey` (
-  `groupToTakeSurvey` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '2',
-  `groupToEditSurvey` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '3',
-  `groupToViewReports` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '3',
-  `overviewTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `groupToTakeSurvey` char(22) binary NOT NULL DEFAULT '2',
+  `groupToEditSurvey` char(22) binary NOT NULL DEFAULT '3',
+  `groupToViewReports` char(22) binary NOT NULL DEFAULT '3',
+  `overviewTemplateId` char(22) binary NOT NULL,
   `maxResponsesPerUser` int(11) NOT NULL DEFAULT '1',
-  `gradebookTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `templateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `gradebookTemplateId` char(22) binary NOT NULL,
+  `assetId` char(22) binary NOT NULL,
+  `templateId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
-  `surveyEditTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `answerEditTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `questionEditTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `sectionEditTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `surveyTakeTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `surveyQuestionsId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `surveyEditTemplateId` char(22) binary DEFAULT NULL,
+  `answerEditTemplateId` char(22) binary DEFAULT NULL,
+  `questionEditTemplateId` char(22) binary DEFAULT NULL,
+  `sectionEditTemplateId` char(22) binary DEFAULT NULL,
+  `surveyTakeTemplateId` char(22) binary DEFAULT NULL,
+  `surveyQuestionsId` char(22) binary DEFAULT NULL,
   `exitURL` text,
   `surveyJSON` longtext,
   `timeLimit` mediumint(8) unsigned NOT NULL,
   `showProgress` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `showTimeLimit` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  `doAfterTimeLimit` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `onSurveyEndWorkflowId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `doAfterTimeLimit` char(22) binary DEFAULT NULL,
+  `onSurveyEndWorkflowId` char(22) binary DEFAULT NULL,
   `quizModeSummary` tinyint(3) DEFAULT NULL,
-  `surveySummaryTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `surveySummaryTemplateId` char(22) binary DEFAULT NULL,
   `allowBackBtn` tinyint(3) DEFAULT NULL,
-  `feedbackTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `testResultsTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `feedbackTemplateId` char(22) binary DEFAULT NULL,
+  `testResultsTemplateId` char(22) binary DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `Survey_questionTypes` (
   `questionType` char(56) NOT NULL,
   `answers` text NOT NULL,
   PRIMARY KEY (`questionType`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `Survey_response` (
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `Survey_responseId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `userId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `assetId` char(22) binary NOT NULL,
+  `Survey_responseId` char(22) binary NOT NULL,
+  `userId` char(22) binary DEFAULT NULL,
   `username` char(255) DEFAULT NULL,
   `ipAddress` char(15) DEFAULT NULL,
   `startDate` bigint(20) NOT NULL DEFAULT '0',
@@ -1258,11 +1175,10 @@ CREATE TABLE `Survey_response` (
   `responseJSON` longtext,
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
   PRIMARY KEY (`Survey_responseId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `Survey_tempReport` (
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `Survey_responseId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) binary NOT NULL,
+  `Survey_responseId` char(22) binary NOT NULL,
   `order` smallint(5) unsigned NOT NULL,
   `sectionNumber` smallint(5) unsigned NOT NULL,
   `sectionName` text,
@@ -1275,13 +1191,12 @@ CREATE TABLE `Survey_tempReport` (
   `entryDate` bigint(20) unsigned NOT NULL COMMENT 'UTC Unix Time',
   `isCorrect` tinyint(3) unsigned DEFAULT NULL,
   `value` int(11) DEFAULT NULL,
-  `fileStoreageId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `fileStoreageId` char(22) binary DEFAULT NULL,
   PRIMARY KEY (`assetId`,`Survey_responseId`,`order`),
   KEY `assetId` (`assetId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `Survey_test` (
-  `testId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `testId` char(22) binary NOT NULL,
   `sequenceNumber` int(11) NOT NULL DEFAULT '1',
   `dateCreated` datetime DEFAULT NULL,
   `lastUpdated` datetime DEFAULT NULL,
@@ -1290,104 +1205,94 @@ CREATE TABLE `Survey_test` (
   `test` mediumtext NOT NULL,
   PRIMARY KEY (`testId`),
   KEY `assetId` (`assetId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `SyndicatedContent` (
   `rssUrl` text,
   `maxHeadlines` int(11) NOT NULL DEFAULT '0',
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `templateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) binary NOT NULL,
+  `templateId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
   `hasTerms` char(255) NOT NULL,
   `cacheTimeout` int(11) NOT NULL DEFAULT '3600',
   `processMacroInRssUrl` int(11) DEFAULT '0',
   `sortItems` char(255) DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `TT_projectList` (
-  `projectId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `projectId` char(22) binary NOT NULL,
+  `assetId` char(22) binary DEFAULT NULL,
   `projectName` char(255) NOT NULL,
   `creationDate` bigint(20) NOT NULL,
-  `createdBy` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `lastUpdatedBy` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `createdBy` char(22) binary NOT NULL,
+  `lastUpdatedBy` char(22) binary NOT NULL,
   `lastUpdateDate` bigint(20) NOT NULL,
   PRIMARY KEY (`projectId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `TT_projectResourceList` (
-  `projectId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `resourceId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `projectId` char(22) binary NOT NULL,
+  `resourceId` char(22) binary NOT NULL,
   PRIMARY KEY (`projectId`,`resourceId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `TT_projectTasks` (
-  `taskId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `projectId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `taskId` char(22) binary NOT NULL,
+  `projectId` char(22) binary NOT NULL,
   `taskName` char(255) NOT NULL,
   PRIMARY KEY (`taskId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `TT_report` (
-  `reportId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `reportId` char(22) binary NOT NULL,
+  `assetId` char(22) binary NOT NULL,
   `startDate` char(10) NOT NULL,
   `endDate` char(10) NOT NULL,
   `reportComplete` int(11) NOT NULL DEFAULT '0',
-  `resourceId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `resourceId` char(22) binary NOT NULL,
   `creationDate` bigint(20) NOT NULL,
-  `createdBy` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `lastUpdatedBy` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `createdBy` char(22) binary NOT NULL,
+  `lastUpdatedBy` char(22) binary NOT NULL,
   `lastUpdateDate` bigint(20) NOT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `TT_timeEntry` (
-  `entryId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `projectId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `taskId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `entryId` char(22) binary NOT NULL,
+  `projectId` char(22) binary NOT NULL,
+  `taskId` char(22) binary NOT NULL,
   `taskDate` char(10) NOT NULL,
   `hours` float DEFAULT '0',
   `comments` text,
-  `reportId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `reportId` char(22) binary NOT NULL,
   PRIMARY KEY (`entryId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `TT_wobject` (
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `userViewTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'TimeTrackingTMPL000001',
-  `managerViewTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'TimeTrackingTMPL000002',
-  `timeRowTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'TimeTrackingTMPL000003',
-  `pmAssetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `groupToManage` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '3',
+  `assetId` char(22) binary NOT NULL,
+  `userViewTemplateId` char(22) binary NOT NULL DEFAULT 'TimeTrackingTMPL000001',
+  `managerViewTemplateId` char(22) binary NOT NULL DEFAULT 'TimeTrackingTMPL000002',
+  `timeRowTemplateId` char(22) binary NOT NULL DEFAULT 'TimeTrackingTMPL000003',
+  `pmAssetId` char(22) binary DEFAULT NULL,
+  `groupToManage` char(22) binary NOT NULL DEFAULT '3',
   `revisionDate` bigint(20) NOT NULL,
   `pmIntegration` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`assetId`,`revisionDate`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `Thingy` (
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
-  `templateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `defaultThingId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `templateId` char(22) binary NOT NULL,
+  `defaultThingId` char(22) binary DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `ThingyRecord` (
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
-  `templateIdView` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `thingId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `templateIdView` char(22) binary DEFAULT NULL,
+  `thingId` char(22) binary DEFAULT NULL,
   `thingFields` longtext,
   `thankYouText` longtext,
   `price` float DEFAULT NULL,
   `duration` bigint(20) DEFAULT NULL,
   `fieldPrice` longtext,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `ThingyRecord_record` (
-  `recordId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `recordId` char(22) binary NOT NULL,
   `sequenceNumber` int(11) NOT NULL DEFAULT '1',
   `dateCreated` datetime DEFAULT NULL,
   `lastUpdated` datetime DEFAULT NULL,
@@ -1399,17 +1304,16 @@ CREATE TABLE `ThingyRecord_record` (
   `isHidden` tinyint(1) NOT NULL DEFAULT '0',
   `sentExpiresNotice` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`recordId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `Thingy_fields` (
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `thingId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `fieldId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) binary NOT NULL,
+  `thingId` char(22) binary NOT NULL,
+  `fieldId` char(22) binary NOT NULL,
   `sequenceNumber` int(11) NOT NULL,
   `dateCreated` bigint(20) NOT NULL,
-  `createdBy` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `createdBy` char(22) binary NOT NULL,
   `dateUpdated` bigint(20) NOT NULL,
-  `updatedBy` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `updatedBy` char(22) binary NOT NULL,
   `label` char(255) NOT NULL,
   `fieldType` char(255) NOT NULL,
   `defaultValue` longtext,
@@ -1424,73 +1328,69 @@ CREATE TABLE `Thingy_fields` (
   `viewScreenTitle` int(11) DEFAULT NULL,
   `displayInSearch` int(11) DEFAULT NULL,
   `searchIn` int(11) DEFAULT NULL,
-  `fieldInOtherThingId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `fieldInOtherThingId` char(22) binary DEFAULT NULL,
   `size` int(11) DEFAULT NULL,
   `pretext` char(255) DEFAULT NULL,
   `isUnique` int(1) DEFAULT '0',
   PRIMARY KEY (`fieldId`,`thingId`,`assetId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `Thingy_things` (
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `thingId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) binary NOT NULL,
+  `thingId` char(22) binary NOT NULL,
   `label` char(255) NOT NULL,
   `editScreenTitle` char(255) NOT NULL,
   `editInstructions` text,
-  `groupIdAdd` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `groupIdEdit` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `groupIdAdd` char(22) binary NOT NULL,
+  `groupIdEdit` char(22) binary NOT NULL,
   `saveButtonLabel` char(255) NOT NULL,
   `afterSave` char(255) NOT NULL,
-  `editTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `onAddWorkflowId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `onEditWorkflowId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `onDeleteWorkflowId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `groupIdView` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `viewTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `editTemplateId` char(22) binary NOT NULL,
+  `onAddWorkflowId` char(22) binary DEFAULT NULL,
+  `onEditWorkflowId` char(22) binary DEFAULT NULL,
+  `onDeleteWorkflowId` char(22) binary DEFAULT NULL,
+  `groupIdView` char(22) binary NOT NULL,
+  `viewTemplateId` char(22) binary NOT NULL,
   `defaultView` char(255) NOT NULL,
   `searchScreenTitle` char(255) NOT NULL,
   `searchDescription` text,
-  `groupIdSearch` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `groupIdImport` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `groupIdExport` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `searchTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `groupIdSearch` char(22) binary NOT NULL,
+  `groupIdImport` char(22) binary NOT NULL,
+  `groupIdExport` char(22) binary NOT NULL,
+  `searchTemplateId` char(22) binary NOT NULL,
   `thingsPerPage` int(11) NOT NULL DEFAULT '25',
-  `sortBy` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `sortBy` char(22) binary DEFAULT NULL,
   `display` int(11) DEFAULT NULL,
   `exportMetaData` int(11) DEFAULT NULL,
   `maxEntriesPerUser` int(11) DEFAULT NULL,
   `maxEntriesTotal` int(11) DEFAULT NULL,
   PRIMARY KEY (`thingId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `Thread` (
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) binary NOT NULL,
   `replies` int(11) NOT NULL DEFAULT '0',
-  `lastPostId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `lastPostId` char(22) binary NOT NULL,
   `lastPostDate` bigint(20) DEFAULT NULL,
   `isLocked` int(11) NOT NULL DEFAULT '0',
   `isSticky` int(11) NOT NULL DEFAULT '0',
-  `subscriptionGroupId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `subscriptionGroupId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
   `karma` int(11) NOT NULL DEFAULT '0',
   `karmaScale` int(11) NOT NULL DEFAULT '1',
   `karmaRank` float(11,6) DEFAULT NULL,
   `threadRating` int(11) DEFAULT '0',
   PRIMARY KEY (`assetId`,`revisionDate`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `Thread_read` (
-  `threadId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `userId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `threadId` char(22) binary NOT NULL,
+  `userId` char(22) binary NOT NULL,
   KEY `threadId_userId` (`threadId`,`userId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `UserList` (
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
-  `templateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `showGroupId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `hideGroupId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `templateId` char(22) binary DEFAULT NULL,
+  `showGroupId` char(22) binary DEFAULT NULL,
+  `hideGroupId` char(22) binary DEFAULT NULL,
   `usersPerPage` int(11) DEFAULT NULL,
   `alphabet` text,
   `alphabetSearchField` char(128) DEFAULT NULL,
@@ -1500,100 +1400,92 @@ CREATE TABLE `UserList` (
   `overridePublicEmail` int(11) DEFAULT NULL,
   `overridePublicProfile` int(11) DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `WeatherData` (
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) unsigned NOT NULL DEFAULT '0',
-  `templateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'WeatherDataTmpl0000001',
+  `templateId` char(22) binary NOT NULL DEFAULT 'WeatherDataTmpl0000001',
   `locations` text,
   `partnerId` char(100) DEFAULT NULL,
   `licenseKey` char(100) DEFAULT NULL,
   `cacheTimeout` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `WikiMaster` (
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
-  `groupToEditPages` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '2',
-  `groupToAdminister` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '3',
-  `richEditor` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'PBrichedit000000000002',
-  `frontPageTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'WikiFrontTmpl000000001',
-  `pageTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'WikiPageTmpl0000000001',
-  `pageEditTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'WikiPageEditTmpl000001',
-  `recentChangesTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'WikiRCTmpl000000000001',
-  `mostPopularTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'WikiMPTmpl000000000001',
-  `pageHistoryTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'WikiPHTmpl000000000001',
-  `searchTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'WikiSearchTmpl00000001',
+  `groupToEditPages` char(22) binary NOT NULL DEFAULT '2',
+  `groupToAdminister` char(22) binary NOT NULL DEFAULT '3',
+  `richEditor` char(22) binary NOT NULL DEFAULT 'PBrichedit000000000002',
+  `frontPageTemplateId` char(22) binary NOT NULL DEFAULT 'WikiFrontTmpl000000001',
+  `pageTemplateId` char(22) binary NOT NULL DEFAULT 'WikiPageTmpl0000000001',
+  `pageEditTemplateId` char(22) binary NOT NULL DEFAULT 'WikiPageEditTmpl000001',
+  `recentChangesTemplateId` char(22) binary NOT NULL DEFAULT 'WikiRCTmpl000000000001',
+  `mostPopularTemplateId` char(22) binary NOT NULL DEFAULT 'WikiMPTmpl000000000001',
+  `pageHistoryTemplateId` char(22) binary NOT NULL DEFAULT 'WikiPHTmpl000000000001',
+  `searchTemplateId` char(22) binary NOT NULL DEFAULT 'WikiSearchTmpl00000001',
   `recentChangesCount` int(11) NOT NULL DEFAULT '50',
   `recentChangesCountFront` int(11) NOT NULL DEFAULT '10',
   `mostPopularCount` int(11) NOT NULL DEFAULT '50',
   `mostPopularCountFront` int(11) NOT NULL DEFAULT '10',
   `thumbnailSize` int(11) NOT NULL DEFAULT '0',
   `maxImageSize` int(11) NOT NULL DEFAULT '0',
-  `approvalWorkflow` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'pbworkflow000000000003',
+  `approvalWorkflow` char(22) binary NOT NULL DEFAULT 'pbworkflow000000000003',
   `useContentFilter` int(11) DEFAULT '0',
   `filterCode` char(30) DEFAULT 'javascript',
-  `byKeywordTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'WikiKeyword00000000001',
+  `byKeywordTemplateId` char(22) binary NOT NULL DEFAULT 'WikiKeyword00000000001',
   `allowAttachments` int(11) NOT NULL DEFAULT '0',
   `topLevelKeywords` longtext,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `WikiMasterKeywords` (
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) binary NOT NULL,
   `keyword` char(64) NOT NULL,
   `subKeyword` char(64) NOT NULL DEFAULT '',
   PRIMARY KEY (`assetId`,`keyword`,`subKeyword`),
   KEY `assetId` (`assetId`),
   KEY `keyword` (`keyword`),
   KEY `subKeyword` (`subKeyword`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `WikiPage` (
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
   `content` mediumtext,
   `views` bigint(20) NOT NULL DEFAULT '0',
   `isProtected` int(11) NOT NULL DEFAULT '0',
   `actionTaken` char(35) NOT NULL,
-  `actionTakenBy` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `actionTakenBy` char(22) binary NOT NULL,
   `isFeatured` int(1) DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `Workflow` (
-  `workflowId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `workflowId` char(22) binary NOT NULL,
   `title` char(255) NOT NULL DEFAULT 'Untitled',
   `description` text,
   `enabled` int(11) NOT NULL DEFAULT '0',
   `type` char(255) NOT NULL DEFAULT 'None',
   `mode` char(20) NOT NULL DEFAULT 'parallel',
   PRIMARY KEY (`workflowId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `WorkflowActivity` (
-  `activityId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `workflowId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `activityId` char(22) binary NOT NULL,
+  `workflowId` char(22) binary NOT NULL,
   `title` char(255) NOT NULL DEFAULT 'Untitled',
   `description` text,
   `sequenceNumber` int(11) NOT NULL DEFAULT '1',
   `className` char(255) DEFAULT NULL,
   PRIMARY KEY (`activityId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `WorkflowActivityData` (
-  `activityId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `activityId` char(22) binary NOT NULL,
   `name` char(255) NOT NULL,
   `value` text,
   PRIMARY KEY (`activityId`,`name`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `WorkflowInstance` (
-  `instanceId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `workflowId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `currentActivityId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `instanceId` char(22) binary NOT NULL,
+  `workflowId` char(22) binary NOT NULL,
+  `currentActivityId` char(22) binary NOT NULL,
   `priority` int(11) NOT NULL DEFAULT '2',
   `className` char(255) DEFAULT NULL,
   `methodName` char(255) DEFAULT NULL,
@@ -1603,17 +1495,15 @@ CREATE TABLE `WorkflowInstance` (
   `lastStatus` char(15) DEFAULT NULL,
   `noSession` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`instanceId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `WorkflowInstanceScratch` (
-  `instanceId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `instanceId` char(22) binary NOT NULL,
   `name` char(255) NOT NULL,
   `value` text,
   PRIMARY KEY (`instanceId`,`name`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `WorkflowSchedule` (
-  `taskId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `taskId` char(22) binary NOT NULL,
   `title` char(255) NOT NULL DEFAULT 'Untitled',
   `enabled` int(11) NOT NULL DEFAULT '0',
   `runOnce` int(11) NOT NULL DEFAULT '0',
@@ -1622,24 +1512,22 @@ CREATE TABLE `WorkflowSchedule` (
   `dayOfMonth` char(255) NOT NULL DEFAULT '*',
   `monthOfYear` char(255) NOT NULL DEFAULT '*',
   `dayOfWeek` char(255) NOT NULL DEFAULT '*',
-  `workflowId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `workflowId` char(22) binary NOT NULL,
   `className` char(255) DEFAULT NULL,
   `methodName` char(255) DEFAULT NULL,
   `priority` int(11) NOT NULL DEFAULT '2',
   `parameters` longtext,
   PRIMARY KEY (`taskId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `ZipArchiveAsset` (
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `templateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) binary NOT NULL,
+  `templateId` char(22) binary NOT NULL,
   `showPage` char(255) NOT NULL DEFAULT 'index.html',
   `revisionDate` bigint(20) NOT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `adSkuPurchase` (
-  `adSkuPurchaseId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `adSkuPurchaseId` char(22) binary NOT NULL,
   `sequenceNumber` int(11) NOT NULL DEFAULT '1',
   `dateCreated` datetime DEFAULT NULL,
   `lastUpdated` datetime DEFAULT NULL,
@@ -1647,15 +1535,14 @@ CREATE TABLE `adSkuPurchase` (
   `clicksPurchased` bigint(20) DEFAULT NULL,
   `dateOfPurchase` bigint(20) DEFAULT NULL,
   `impressionsPurchased` bigint(20) DEFAULT NULL,
-  `transactionItemId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `userId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `adId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `storedImage` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `transactionItemId` char(22) binary DEFAULT NULL,
+  `userId` char(22) binary DEFAULT NULL,
+  `adId` char(22) binary DEFAULT NULL,
+  `storedImage` char(22) binary DEFAULT NULL,
   PRIMARY KEY (`adSkuPurchaseId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `adSpace` (
-  `adSpaceId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `adSpaceId` char(22) binary NOT NULL,
   `name` char(35) NOT NULL,
   `title` char(255) NOT NULL,
   `description` text,
@@ -1665,11 +1552,10 @@ CREATE TABLE `adSpace` (
   `height` int(11) NOT NULL DEFAULT '60',
   PRIMARY KEY (`adSpaceId`),
   UNIQUE KEY `name` (`name`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `address` (
-  `addressId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `addressBookId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `addressId` char(22) binary NOT NULL,
+  `addressBookId` char(22) binary NOT NULL,
   `label` char(35) DEFAULT NULL,
   `firstName` char(35) DEFAULT NULL,
   `lastName` char(35) DEFAULT NULL,
@@ -1686,23 +1572,21 @@ CREATE TABLE `address` (
   `isProfile` tinyint(4) DEFAULT '0',
   PRIMARY KEY (`addressId`),
   KEY `addressBookId_addressId` (`addressBookId`,`addressId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `addressBook` (
-  `addressBookId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `userId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `defaultAddressId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `addressBookId` char(22) binary NOT NULL,
+  `userId` char(22) binary DEFAULT NULL,
+  `defaultAddressId` char(22) binary DEFAULT NULL,
   PRIMARY KEY (`addressBookId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `advertisement` (
-  `adId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `adSpaceId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `ownerUserId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `adId` char(22) binary NOT NULL,
+  `adSpaceId` char(22) binary NOT NULL,
+  `ownerUserId` char(22) binary NOT NULL,
   `isActive` int(11) NOT NULL DEFAULT '0',
   `title` char(255) NOT NULL,
   `type` char(15) NOT NULL DEFAULT 'text',
-  `storageId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `storageId` char(22) binary DEFAULT NULL,
   `adText` char(255) DEFAULT NULL,
   `url` text,
   `richMedia` text,
@@ -1718,29 +1602,27 @@ CREATE TABLE `advertisement` (
   `renderedAd` text,
   PRIMARY KEY (`adId`),
   KEY `adSpaceId_isActive` (`adSpaceId`,`isActive`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `analyticRule` (
-  `ruleId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `ruleId` char(22) binary NOT NULL,
   `sequenceNumber` int(11) NOT NULL DEFAULT '1',
   `dateCreated` datetime DEFAULT NULL,
   `lastUpdated` datetime DEFAULT NULL,
   `bucketName` char(255) DEFAULT NULL,
   `regexp` char(255) NOT NULL DEFAULT '.+',
   PRIMARY KEY (`ruleId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `asset` (
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `parentId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) binary NOT NULL,
+  `parentId` char(22) binary NOT NULL,
   `lineage` char(255) NOT NULL,
   `state` char(35) NOT NULL,
   `className` char(255) NOT NULL,
   `creationDate` bigint(20) NOT NULL DEFAULT '997995720',
-  `createdBy` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '3',
-  `stateChanged` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '997995720',
-  `stateChangedBy` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '3',
-  `isLockedBy` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `createdBy` char(22) binary NOT NULL DEFAULT '3',
+  `stateChanged` char(22) binary NOT NULL DEFAULT '997995720',
+  `stateChangedBy` char(22) binary NOT NULL DEFAULT '3',
+  `isLockedBy` char(22) binary DEFAULT NULL,
   `isSystem` int(11) NOT NULL DEFAULT '0',
   `lastExportedAs` char(255) DEFAULT NULL,
   PRIMARY KEY (`assetId`),
@@ -1750,50 +1632,46 @@ CREATE TABLE `asset` (
   KEY `isPrototype_className_assetId` (`className`,`assetId`),
   KEY `className_assetId_state` (`className`,`assetId`,`state`),
   KEY `state_lineage` (`state`,`lineage`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `assetAspectComments` (
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
   `comments` longtext,
   `averageCommentRating` int(11) DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `assetAspectRssFeed` (
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
   `itemsPerFeed` int(11) DEFAULT '25',
   `feedCopyright` text,
   `feedTitle` text,
   `feedDescription` mediumtext,
-  `feedImage` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `feedImage` char(22) binary DEFAULT NULL,
   `feedImageLink` text,
   `feedImageDescription` mediumtext,
   `feedHeaderLinks` char(32) DEFAULT 'rss\natom',
   PRIMARY KEY (`assetId`,`revisionDate`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `assetAspect_Subscribable` (
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
-  `subscriptionGroupId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `subscriptionTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `subscriptionGroupId` char(22) binary DEFAULT NULL,
+  `subscriptionTemplateId` char(22) binary DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `assetData` (
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
-  `revisedBy` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `tagId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `revisedBy` char(22) binary NOT NULL,
+  `tagId` char(22) binary NOT NULL,
   `status` char(35) NOT NULL DEFAULT 'pending',
   `title` char(255) NOT NULL DEFAULT 'untitled',
   `menuTitle` char(255) NOT NULL DEFAULT 'untitled',
   `url` char(255) NOT NULL,
-  `ownerUserId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `groupIdView` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `groupIdEdit` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `ownerUserId` char(22) binary NOT NULL,
+  `groupIdView` char(22) binary NOT NULL,
+  `groupIdEdit` char(22) binary NOT NULL,
   `synopsis` text,
   `newWindow` int(11) NOT NULL DEFAULT '0',
   `isHidden` int(11) NOT NULL DEFAULT '0',
@@ -1814,78 +1692,71 @@ CREATE TABLE `assetData` (
   KEY `url` (`url`),
   KEY `assetId_status_tagId_revisionDate` (`assetId`,`status`,`tagId`,`revisionDate`),
   KEY `assetId_status` (`assetId`,`status`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `assetHistory` (
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `userId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) binary NOT NULL,
+  `userId` char(22) binary NOT NULL,
   `dateStamp` bigint(20) NOT NULL DEFAULT '0',
   `actionTaken` char(255) NOT NULL,
   `url` char(255) DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `assetIndex` (
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) binary NOT NULL,
   `title` char(255) DEFAULT NULL,
   `synopsis` text,
   `url` char(255) NOT NULL DEFAULT '',
   `creationDate` bigint(20) DEFAULT NULL,
   `revisionDate` bigint(20) DEFAULT NULL,
-  `ownerUserId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `groupIdView` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `groupIdEdit` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `ownerUserId` char(22) binary DEFAULT NULL,
+  `groupIdView` char(22) binary DEFAULT NULL,
+  `groupIdEdit` char(22) binary DEFAULT NULL,
   `className` char(255) DEFAULT NULL,
   `isPublic` int(11) NOT NULL DEFAULT '1',
   `keywords` mediumtext,
   `lineage` char(255) DEFAULT NULL,
-  `subId` char(255) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `subId` char(255) binary DEFAULT NULL,
   PRIMARY KEY (`assetId`,`url`),
   FULLTEXT KEY `keywords` (`keywords`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `assetKeyword` (
   `keyword` char(64) NOT NULL,
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) binary NOT NULL,
   PRIMARY KEY (`keyword`,`assetId`),
   KEY `keyword` (`keyword`),
   KEY `assetId` (`assetId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `assetVersionTag` (
-  `tagId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `tagId` char(22) binary NOT NULL,
   `name` char(255) NOT NULL,
   `isCommitted` int(11) NOT NULL DEFAULT '0',
   `creationDate` bigint(20) NOT NULL DEFAULT '0',
-  `createdBy` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `createdBy` char(22) binary NOT NULL,
   `commitDate` bigint(20) NOT NULL DEFAULT '0',
-  `committedBy` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `committedBy` char(22) binary NOT NULL,
   `isLocked` int(11) NOT NULL DEFAULT '0',
-  `lockedBy` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `groupToUse` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `workflowId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `workflowInstanceId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `lockedBy` char(22) binary NOT NULL,
+  `groupToUse` char(22) binary NOT NULL,
+  `workflowId` char(22) binary NOT NULL,
+  `workflowInstanceId` char(22) binary DEFAULT NULL,
   `comments` text,
   `startTime` datetime DEFAULT NULL,
   `endTime` datetime DEFAULT NULL,
   `isSiteWide` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`tagId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `authentication` (
-  `userId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `userId` char(22) binary NOT NULL,
   `authMethod` char(30) NOT NULL,
   `fieldName` char(128) NOT NULL,
   `fieldData` text,
   PRIMARY KEY (`userId`,`authMethod`,`fieldName`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `bucketLog` (
-  `userId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `userId` char(22) binary NOT NULL,
   `Bucket` char(255) DEFAULT NULL,
   `duration` int(11) DEFAULT NULL,
   `timeStamp` datetime DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `cache` (
   `namespace` char(128) NOT NULL,
   `cachekey` char(128) NOT NULL,
@@ -1894,36 +1765,33 @@ CREATE TABLE `cache` (
   `content` mediumblob,
   PRIMARY KEY (`namespace`,`cachekey`),
   KEY `namespace_cachekey_size` (`namespace`,`cachekey`,`expires`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `cart` (
-  `cartId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `sessionId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `shippingAddressId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `shipperId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `posUserId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `cartId` char(22) binary NOT NULL,
+  `sessionId` char(22) binary NOT NULL,
+  `shippingAddressId` char(22) binary DEFAULT NULL,
+  `shipperId` char(22) binary DEFAULT NULL,
+  `posUserId` char(22) binary DEFAULT NULL,
   `creationDate` int(20) DEFAULT NULL,
   `billingAddressId` char(22) DEFAULT NULL,
   `gatewayId` char(22) DEFAULT NULL,
   PRIMARY KEY (`cartId`),
   KEY `sessionId` (`sessionId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `cartItem` (
-  `itemId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `cartId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `itemId` char(22) binary NOT NULL,
+  `cartId` char(22) binary NOT NULL,
+  `assetId` char(22) binary NOT NULL,
   `dateAdded` datetime NOT NULL,
   `options` longtext,
   `configuredTitle` char(255) DEFAULT NULL,
-  `shippingAddressId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `shippingAddressId` char(22) binary DEFAULT NULL,
   `quantity` int(11) NOT NULL DEFAULT '1',
   PRIMARY KEY (`itemId`),
   KEY `cartId_assetId_dateAdded` (`cartId`,`assetId`,`dateAdded`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `databaseLink` (
-  `databaseLinkId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `databaseLinkId` char(22) binary NOT NULL,
   `title` char(255) DEFAULT NULL,
   `DSN` char(255) DEFAULT NULL,
   `username` char(255) DEFAULT NULL,
@@ -1932,27 +1800,24 @@ CREATE TABLE `databaseLink` (
   `allowMacroAccess` int(11) NOT NULL DEFAULT '0',
   `additionalParameters` char(255) NOT NULL,
   PRIMARY KEY (`databaseLinkId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `deltaLog` (
-  `userId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `userId` char(22) binary NOT NULL,
+  `assetId` char(22) binary NOT NULL,
   `delta` int(11) DEFAULT NULL,
   `timeStamp` bigint(20) DEFAULT NULL,
   `url` char(255) NOT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `donation` (
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
   `defaultPrice` float NOT NULL DEFAULT '100',
   `thankYouMessage` mediumtext,
-  `templateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `templateId` char(22) binary NOT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `filePumpBundle` (
-  `bundleId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `bundleId` char(22) binary NOT NULL,
   `sequenceNumber` int(11) NOT NULL DEFAULT '1',
   `dateCreated` datetime DEFAULT NULL,
   `lastUpdated` datetime DEFAULT NULL,
@@ -1963,36 +1828,32 @@ CREATE TABLE `filePumpBundle` (
   `cssFiles` longtext NOT NULL,
   `otherFiles` longtext NOT NULL,
   PRIMARY KEY (`bundleId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `friendInvitations` (
-  `inviteId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `inviterId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `friendId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `inviteId` char(22) binary NOT NULL,
+  `inviterId` char(22) binary NOT NULL,
+  `friendId` char(22) binary NOT NULL,
   `dateSent` datetime NOT NULL,
   `comments` char(255) NOT NULL,
-  `messageId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `messageId` char(22) binary NOT NULL,
   PRIMARY KEY (`inviteId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `groupGroupings` (
-  `groupId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `inGroup` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `groupId` char(22) binary NOT NULL,
+  `inGroup` char(22) binary NOT NULL,
   PRIMARY KEY (`groupId`,`inGroup`),
   KEY `inGroup` (`inGroup`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `groupings` (
-  `groupId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `userId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `groupId` char(22) binary NOT NULL,
+  `userId` char(22) binary NOT NULL,
   `expireDate` bigint(20) NOT NULL DEFAULT '2114402400',
   `groupAdmin` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`groupId`,`userId`),
   KEY `userId` (`userId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `groups` (
-  `groupId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `groupId` char(22) binary NOT NULL,
   `groupName` char(100) DEFAULT NULL,
   `description` char(255) DEFAULT NULL,
   `expireOffset` int(11) NOT NULL DEFAULT '314496000',
@@ -2007,7 +1868,7 @@ CREATE TABLE `groups` (
   `scratchFilter` text,
   `autoAdd` int(11) NOT NULL DEFAULT '0',
   `autoDelete` int(11) NOT NULL DEFAULT '0',
-  `databaseLinkId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `databaseLinkId` char(22) binary NOT NULL,
   `groupCacheTimeout` int(11) NOT NULL DEFAULT '3600',
   `dbQuery` text,
   `isEditable` int(11) NOT NULL DEFAULT '1',
@@ -2015,87 +1876,78 @@ CREATE TABLE `groups` (
   `ldapGroup` char(255) DEFAULT NULL,
   `ldapGroupProperty` char(255) DEFAULT NULL,
   `ldapRecursiveProperty` char(255) DEFAULT NULL,
-  `ldapLinkId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `ldapLinkId` char(22) binary DEFAULT NULL,
   `ldapRecursiveFilter` mediumtext,
   `isAdHocMailGroup` tinyint(4) NOT NULL DEFAULT '0',
   PRIMARY KEY (`groupId`),
   KEY `groupName` (`groupName`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `imageColor` (
-  `colorId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `colorId` char(22) binary NOT NULL,
   `name` char(255) NOT NULL DEFAULT 'untitled',
   `fillTriplet` char(7) NOT NULL DEFAULT '#000000',
   `fillAlpha` char(2) NOT NULL DEFAULT '00',
   `strokeTriplet` char(7) NOT NULL DEFAULT '#000000',
   `strokeAlpha` char(2) NOT NULL DEFAULT '00',
   PRIMARY KEY (`colorId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `imageFont` (
-  `fontId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `fontId` char(22) binary NOT NULL,
   `name` char(255) DEFAULT NULL,
-  `storageId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `storageId` char(22) binary DEFAULT NULL,
   `filename` char(255) DEFAULT NULL,
   PRIMARY KEY (`fontId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `imagePalette` (
-  `paletteId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `paletteId` char(22) binary NOT NULL,
   `name` char(255) NOT NULL DEFAULT 'untitled',
   PRIMARY KEY (`paletteId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `imagePaletteColors` (
-  `paletteId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `colorId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `paletteId` char(22) binary NOT NULL,
+  `colorId` char(22) binary NOT NULL,
   `paletteOrder` int(11) NOT NULL,
   PRIMARY KEY (`paletteId`,`paletteOrder`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `inbox` (
-  `messageId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `messageId` char(22) binary NOT NULL,
   `status` char(15) NOT NULL DEFAULT 'pending',
   `dateStamp` bigint(20) NOT NULL,
   `completedOn` bigint(20) DEFAULT NULL,
-  `completedBy` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `userId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `groupId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `completedBy` char(22) binary DEFAULT NULL,
+  `userId` char(22) binary DEFAULT NULL,
+  `groupId` char(22) binary DEFAULT NULL,
   `subject` char(255) NOT NULL DEFAULT 'No Subject',
   `message` mediumtext,
-  `sentBy` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '3',
+  `sentBy` char(22) binary NOT NULL DEFAULT '3',
   PRIMARY KEY (`messageId`),
   KEY `completedOn_dateStamp` (`completedOn`,`dateStamp`),
   KEY `pb_userId` (`userId`),
   KEY `pb_groupId` (`groupId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `inbox_messageState` (
-  `messageId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `userId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `messageId` char(22) binary NOT NULL,
+  `userId` char(22) binary NOT NULL,
   `isRead` tinyint(4) NOT NULL DEFAULT '0',
   `repliedTo` tinyint(4) NOT NULL DEFAULT '0',
   `deleted` tinyint(4) NOT NULL DEFAULT '0',
   PRIMARY KEY (`messageId`,`userId`),
   KEY `userId_deleted_isRead` (`userId`,`deleted`,`isRead`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `incrementer` (
   `incrementerId` char(50) NOT NULL,
   `nextValue` int(11) NOT NULL DEFAULT '1',
   PRIMARY KEY (`incrementerId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `karmaLog` (
-  `userId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `userId` char(22) binary NOT NULL,
   `amount` int(11) NOT NULL DEFAULT '1',
   `source` char(255) DEFAULT NULL,
   `description` text,
   `dateModified` bigint(20) NOT NULL DEFAULT '0'
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `ldapLink` (
-  `ldapLinkId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `ldapLinkId` char(22) binary NOT NULL,
   `ldapLinkName` char(255) NOT NULL,
   `ldapUrl` char(255) NOT NULL,
   `connectDn` char(255) NOT NULL,
@@ -2106,29 +1958,26 @@ CREATE TABLE `ldapLink` (
   `ldapPasswordName` char(255) DEFAULT NULL,
   `ldapSendWelcomeMessage` char(2) DEFAULT NULL,
   `ldapWelcomeMessage` text,
-  `ldapAccountTemplate` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `ldapCreateAccountTemplate` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `ldapLoginTemplate` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `ldapAccountTemplate` char(22) binary NOT NULL,
+  `ldapCreateAccountTemplate` char(22) binary NOT NULL,
+  `ldapLoginTemplate` char(22) binary NOT NULL,
   `ldapGlobalRecursiveFilter` mediumtext,
   `ldapDeactivateAccountTemplate` char(22) NOT NULL,
   PRIMARY KEY (`ldapLinkId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `mailQueue` (
-  `messageId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `messageId` char(22) binary NOT NULL,
   `message` mediumtext,
-  `toGroup` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `toGroup` char(22) binary DEFAULT NULL,
   `isInbox` tinyint(4) DEFAULT '0',
   PRIMARY KEY (`messageId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `metaData_classes` (
   `className` char(255) DEFAULT NULL,
   `fieldId` char(22) DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `metaData_properties` (
-  `fieldId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `fieldId` char(22) binary NOT NULL,
   `fieldName` char(100) NOT NULL,
   `description` mediumtext NOT NULL,
   `fieldType` char(30) DEFAULT NULL,
@@ -2136,110 +1985,97 @@ CREATE TABLE `metaData_properties` (
   `defaultValue` char(255) DEFAULT NULL,
   PRIMARY KEY (`fieldId`),
   UNIQUE KEY `field_unique` (`fieldName`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `metaData_values` (
-  `fieldId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `fieldId` char(22) binary NOT NULL,
   `value` char(255) DEFAULT NULL,
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
   PRIMARY KEY (`fieldId`,`assetId`,`revisionDate`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `passiveAnalyticsStatus` (
   `startDate` datetime DEFAULT NULL,
   `endDate` datetime DEFAULT NULL,
   `running` int(2) DEFAULT '0',
   `userId` char(255) NOT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `passiveLog` (
-  `userId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `sessionId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `userId` char(22) binary NOT NULL,
+  `assetId` char(22) binary NOT NULL,
+  `sessionId` char(22) binary NOT NULL,
   `timeStamp` bigint(20) DEFAULT NULL,
   `url` char(255) NOT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `passiveProfileAOI` (
-  `userId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `fieldId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `userId` char(22) binary NOT NULL,
+  `fieldId` char(22) binary NOT NULL,
   `value` char(100) NOT NULL,
   `count` int(11) DEFAULT NULL,
   PRIMARY KEY (`userId`,`fieldId`,`value`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `passiveProfileLog` (
-  `passiveProfileLogId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `userId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `sessionId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `passiveProfileLogId` char(22) binary NOT NULL,
+  `userId` char(22) binary NOT NULL,
+  `sessionId` char(22) binary NOT NULL,
+  `assetId` char(22) binary NOT NULL,
   `dateOfEntry` bigint(20) NOT NULL DEFAULT '0',
   PRIMARY KEY (`passiveProfileLogId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `paymentGateway` (
-  `paymentGatewayId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `paymentGatewayId` char(22) binary NOT NULL,
   `className` char(255) DEFAULT NULL,
   `options` longtext,
   PRIMARY KEY (`paymentGatewayId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `redirect` (
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) binary NOT NULL,
   `redirectUrl` text,
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
   `redirectType` int(11) NOT NULL DEFAULT '302',
   PRIMARY KEY (`assetId`,`revisionDate`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `replacements` (
-  `replacementId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `replacementId` char(22) binary NOT NULL,
   `searchFor` char(255) DEFAULT NULL,
   `replaceWith` text,
   PRIMARY KEY (`replacementId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `search` (
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
   `classLimiter` text,
-  `searchRoot` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'PBasset000000000000001',
-  `templateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'PBtmpl0000000000000200',
+  `searchRoot` char(22) binary NOT NULL DEFAULT 'PBasset000000000000001',
+  `templateId` char(22) binary NOT NULL DEFAULT 'PBtmpl0000000000000200',
   `useContainers` int(11) NOT NULL DEFAULT '0',
   `paginateAfter` int(11) NOT NULL DEFAULT '25',
   PRIMARY KEY (`assetId`,`revisionDate`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `settings` (
   `name` char(255) NOT NULL,
   `value` text,
   PRIMARY KEY (`name`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `shipper` (
-  `shipperId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `shipperId` char(22) binary NOT NULL,
   `className` char(255) DEFAULT NULL,
   `options` longtext,
   PRIMARY KEY (`shipperId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `shopCredit` (
-  `creditId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `userId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `creditId` char(22) binary NOT NULL,
+  `userId` char(22) binary NOT NULL,
   `amount` float NOT NULL DEFAULT '0',
   `comment` text,
   `dateOfAdjustment` datetime DEFAULT NULL,
   PRIMARY KEY (`creditId`),
   KEY `userId` (`userId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `sku` (
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
   `description` mediumtext,
   `sku` char(35) NOT NULL,
-  `vendorId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'defaultvendor000000000',
+  `vendorId` char(22) binary NOT NULL DEFAULT 'defaultvendor000000000',
   `displayTitle` tinyint(1) NOT NULL DEFAULT '1',
   `overrideTaxRate` tinyint(1) NOT NULL DEFAULT '0',
   `taxRateOverride` float NOT NULL DEFAULT '0',
@@ -2248,10 +2084,9 @@ CREATE TABLE `sku` (
   PRIMARY KEY (`assetId`,`revisionDate`),
   KEY `sku` (`sku`),
   KEY `vendorId` (`vendorId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `snippet` (
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) binary NOT NULL,
   `snippet` mediumtext,
   `mimeType` char(50) NOT NULL DEFAULT 'text/html',
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
@@ -2260,40 +2095,36 @@ CREATE TABLE `snippet` (
   `usePacked` int(1) DEFAULT NULL,
   `templateParser` char(255) DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `taxDriver` (
   `className` char(255) NOT NULL,
   `options` longtext,
   PRIMARY KEY (`className`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `tax_eu_vatNumbers` (
-  `userId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `userId` char(22) binary NOT NULL,
   `countryCode` char(3) NOT NULL,
   `vatNumber` char(20) NOT NULL,
   `viesValidated` tinyint(1) DEFAULT NULL,
   `viesErrorCode` int(3) DEFAULT NULL,
   `approved` tinyint(1) DEFAULT NULL,
   PRIMARY KEY (`userId`,`vatNumber`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `tax_generic_rates` (
-  `taxId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `taxId` char(22) binary NOT NULL,
   `country` char(100) NOT NULL,
   `state` char(100) DEFAULT NULL,
   `city` char(100) DEFAULT NULL,
   `code` char(100) DEFAULT NULL,
   `taxRate` float NOT NULL DEFAULT '0',
   PRIMARY KEY (`taxId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `template` (
   `template` mediumtext,
   `namespace` char(35) NOT NULL DEFAULT 'Page',
   `isEditable` int(11) NOT NULL DEFAULT '1',
   `showInForms` int(11) NOT NULL DEFAULT '1',
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
   `parser` char(255) NOT NULL DEFAULT 'WebGUI::Asset::Template::HTMLTemplate',
   `isDefault` int(1) DEFAULT '0',
@@ -2303,21 +2134,20 @@ CREATE TABLE `template` (
   `attachmentsJson` longtext,
   PRIMARY KEY (`assetId`,`revisionDate`),
   KEY `namespace_showInForms` (`namespace`,`showInForms`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `transaction` (
-  `transactionId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `originatingTransactionId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `transactionId` char(22) binary NOT NULL,
+  `originatingTransactionId` char(22) binary DEFAULT NULL,
   `isSuccessful` tinyint(1) NOT NULL DEFAULT '0',
   `orderNumber` int(11) NOT NULL AUTO_INCREMENT,
   `transactionCode` char(100) DEFAULT NULL,
   `statusCode` char(35) DEFAULT NULL,
   `statusMessage` char(255) DEFAULT NULL,
-  `userId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `userId` char(22) binary NOT NULL,
   `username` char(35) NOT NULL,
   `amount` float DEFAULT NULL,
   `shopCreditDeduction` float DEFAULT NULL,
-  `shippingAddressId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `shippingAddressId` char(22) binary DEFAULT NULL,
   `shippingAddressName` char(35) DEFAULT NULL,
   `shippingAddress1` char(35) DEFAULT NULL,
   `shippingAddress2` char(35) DEFAULT NULL,
@@ -2327,10 +2157,10 @@ CREATE TABLE `transaction` (
   `shippingCountry` char(35) DEFAULT NULL,
   `shippingCode` char(35) DEFAULT NULL,
   `shippingPhoneNumber` char(35) DEFAULT NULL,
-  `shippingDriverId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `shippingDriverId` char(22) binary DEFAULT NULL,
   `shippingDriverLabel` char(35) DEFAULT NULL,
   `shippingPrice` float DEFAULT NULL,
-  `paymentAddressId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `paymentAddressId` char(22) binary DEFAULT NULL,
   `paymentAddressName` char(35) DEFAULT NULL,
   `paymentAddress1` char(35) DEFAULT NULL,
   `paymentAddress2` char(35) DEFAULT NULL,
@@ -2340,26 +2170,25 @@ CREATE TABLE `transaction` (
   `paymentCountry` char(35) DEFAULT NULL,
   `paymentCode` char(35) DEFAULT NULL,
   `paymentPhoneNumber` char(35) DEFAULT NULL,
-  `paymentDriverId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `paymentDriverId` char(22) binary DEFAULT NULL,
   `paymentDriverLabel` char(35) DEFAULT NULL,
   `taxes` float DEFAULT NULL,
   `dateOfPurchase` datetime DEFAULT NULL,
   `isRecurring` tinyint(1) DEFAULT NULL,
   `notes` mediumtext,
-  `cashierUserId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `cashierUserId` char(22) binary DEFAULT NULL,
   `shippingOrganization` char(35) DEFAULT NULL,
   `paymentOrganization` char(35) DEFAULT NULL,
   PRIMARY KEY (`transactionId`),
   UNIQUE KEY `orderNumber` (`orderNumber`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `transactionItem` (
-  `itemId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `transactionId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `itemId` char(22) binary NOT NULL,
+  `transactionId` char(22) binary NOT NULL,
+  `assetId` char(22) binary DEFAULT NULL,
   `configuredTitle` char(255) DEFAULT NULL,
   `options` longtext,
-  `shippingAddressId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `shippingAddressId` char(22) binary DEFAULT NULL,
   `shippingName` char(35) DEFAULT NULL,
   `shippingAddress1` char(35) DEFAULT NULL,
   `shippingAddress2` char(35) DEFAULT NULL,
@@ -2374,7 +2203,7 @@ CREATE TABLE `transactionItem` (
   `lastUpdated` datetime DEFAULT NULL,
   `quantity` int(11) NOT NULL DEFAULT '1',
   `price` float DEFAULT NULL,
-  `vendorId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'defaultvendor000000000',
+  `vendorId` char(22) binary NOT NULL DEFAULT 'defaultvendor000000000',
   `vendorPayoutStatus` char(10) DEFAULT 'NotPaid',
   `vendorPayoutAmount` decimal(8,2) DEFAULT '0.00',
   `taxRate` decimal(6,3) DEFAULT NULL,
@@ -2383,33 +2212,30 @@ CREATE TABLE `transactionItem` (
   PRIMARY KEY (`itemId`),
   KEY `transactionId` (`transactionId`),
   KEY `vendorId` (`vendorId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `userInvitations` (
-  `inviteId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `userId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `inviteId` char(22) binary NOT NULL,
+  `userId` char(22) binary NOT NULL,
   `dateSent` date DEFAULT NULL,
   `email` char(255) NOT NULL,
-  `newUserId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `newUserId` char(22) binary DEFAULT NULL,
   `dateCreated` date DEFAULT NULL,
   PRIMARY KEY (`inviteId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `userLoginLog` (
-  `userId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `userId` char(22) binary NOT NULL,
   `status` char(30) DEFAULT NULL,
   `timeStamp` int(11) DEFAULT NULL,
   `ipAddress` char(128) DEFAULT NULL,
   `userAgent` text,
-  `sessionId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `sessionId` char(22) binary DEFAULT NULL,
   `lastPageViewed` int(11) DEFAULT NULL,
   KEY `sessionId` (`sessionId`),
   KEY `userId` (`userId`),
   KEY `timeStamp` (`timeStamp`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `userProfileCategory` (
-  `profileCategoryId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `profileCategoryId` char(22) binary NOT NULL,
   `label` char(255) NOT NULL DEFAULT 'Undefined',
   `shortLabel` char(255) DEFAULT NULL,
   `sequenceNumber` int(11) NOT NULL DEFAULT '1',
@@ -2417,10 +2243,9 @@ CREATE TABLE `userProfileCategory` (
   `editable` int(11) NOT NULL DEFAULT '1',
   `protected` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`profileCategoryId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `userProfileData` (
-  `userId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `userId` char(22) binary NOT NULL,
   `email` char(255) DEFAULT NULL,
   `firstName` char(255) DEFAULT NULL,
   `middleName` char(255) DEFAULT NULL,
@@ -2460,8 +2285,8 @@ CREATE TABLE `userProfileData` (
   `signature` longtext,
   `publicProfile` longtext,
   `toolbar` char(255) DEFAULT NULL,
-  `photo` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `avatar` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `photo` char(22) binary DEFAULT NULL,
+  `avatar` char(22) binary DEFAULT NULL,
   `department` char(255) DEFAULT NULL,
   `allowPrivateMessages` longtext,
   `ableToBeFriend` tinyint(4) DEFAULT NULL,
@@ -2475,8 +2300,7 @@ CREATE TABLE `userProfileData` (
   `assetManagerSortDirection` char(255) DEFAULT NULL,
   PRIMARY KEY (`userId`),
   KEY `email` (`email`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `userProfileField` (
   `fieldName` char(128) NOT NULL,
   `label` char(255) NOT NULL DEFAULT 'Undefined',
@@ -2486,7 +2310,7 @@ CREATE TABLE `userProfileField` (
   `possibleValues` text,
   `dataDefault` text,
   `sequenceNumber` int(11) NOT NULL DEFAULT '1',
-  `profileCategoryId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `profileCategoryId` char(22) binary NOT NULL,
   `protected` int(11) NOT NULL DEFAULT '0',
   `editable` int(11) NOT NULL DEFAULT '1',
   `forceImageOnly` int(11) DEFAULT '1',
@@ -2495,55 +2319,50 @@ CREATE TABLE `userProfileField` (
   `extras` text,
   `defaultPrivacySetting` char(128) DEFAULT NULL,
   PRIMARY KEY (`fieldName`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `userSession` (
-  `sessionId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `sessionId` char(22) binary NOT NULL,
   `expires` int(11) DEFAULT NULL,
   `lastPageView` int(11) DEFAULT NULL,
   `adminOn` int(11) NOT NULL DEFAULT '0',
   `lastIP` char(50) DEFAULT NULL,
-  `userId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `userId` char(22) binary NOT NULL,
   PRIMARY KEY (`sessionId`),
   KEY `expires` (`expires`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `userSessionScratch` (
-  `sessionId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `sessionId` char(22) binary NOT NULL,
   `name` char(255) NOT NULL,
   `value` text,
   PRIMARY KEY (`sessionId`,`name`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `users` (
-  `userId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `userId` char(22) binary NOT NULL,
   `username` char(100) DEFAULT NULL,
   `authMethod` char(30) NOT NULL DEFAULT 'WebGUI',
   `dateCreated` int(11) NOT NULL DEFAULT '1019867418',
   `lastUpdated` int(11) NOT NULL DEFAULT '1019867418',
   `karma` int(11) NOT NULL DEFAULT '0',
   `status` char(35) NOT NULL DEFAULT 'Active',
-  `referringAffiliate` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `friendsGroup` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `referringAffiliate` char(22) binary NOT NULL,
+  `friendsGroup` char(22) binary NOT NULL,
   PRIMARY KEY (`userId`),
   UNIQUE KEY `username_unique` (`username`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `vendor` (
-  `vendorId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `vendorId` char(22) binary NOT NULL,
   `dateCreated` datetime DEFAULT NULL,
   `name` char(255) DEFAULT NULL,
-  `userId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '3',
+  `userId` char(22) binary NOT NULL DEFAULT '3',
   `preferredPaymentType` char(255) DEFAULT NULL,
   `paymentInformation` text,
-  `paymentAddressId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `paymentAddressId` char(22) binary DEFAULT NULL,
   `url` text,
   PRIMARY KEY (`vendorId`),
   KEY `userId` (`userId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `vendorPayoutLog` (
-  `payoutId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `payoutId` char(22) binary NOT NULL,
   `isSuccessful` tinyint(1) NOT NULL,
   `errorCode` char(10) DEFAULT NULL,
   `errorMessage` char(255) DEFAULT NULL,
@@ -2553,31 +2372,28 @@ CREATE TABLE `vendorPayoutLog` (
   `correlationId` char(13) NOT NULL,
   `paymentInformation` char(255) NOT NULL,
   PRIMARY KEY (`payoutId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `vendorPayoutLog_items` (
-  `payoutId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `transactionItemId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `payoutId` char(22) binary NOT NULL,
+  `transactionItemId` char(22) binary NOT NULL,
   `amount` decimal(7,2) NOT NULL,
   PRIMARY KEY (`payoutId`,`transactionItemId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `webguiVersion` (
   `webguiVersion` char(10) DEFAULT NULL,
   `versionType` char(30) DEFAULT NULL,
   `dateApplied` int(11) DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+) TYPE=MyISAM CHARSET=utf8;
 CREATE TABLE `wobject` (
   `displayTitle` int(11) NOT NULL DEFAULT '1',
   `description` mediumtext,
-  `assetId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `styleTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `printableStyleTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `assetId` char(22) binary NOT NULL,
+  `styleTemplateId` char(22) binary NOT NULL,
+  `printableStyleTemplateId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
-  `mobileStyleTemplateId` char(22) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT 'PBtmpl0000000000000060',
+  `mobileStyleTemplateId` char(22) binary DEFAULT 'PBtmpl0000000000000060',
   PRIMARY KEY (`assetId`,`revisionDate`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) TYPE=MyISAM CHARSET=utf8;
 ALTER TABLE `Article` DISABLE KEYS;
 INSERT INTO `Article` VALUES (NULL,NULL,'bX5rYxb6tZ9docY6sUhBlw','PBtmpl0000000000000002',1278013772,3600,'AHrUFHib-cqwIz1x7RI9sA'),(NULL,NULL,'ix1p0AbwKAz8QWB-T-HHfg','PBtmpl0000000000000002',1271359087,3600,'VF2bqXTRUBoYb_u7dmH70w'),(NULL,NULL,'iCYOjohB9SKvAPr6bXElKA','PBtmpl0000000000000103',1271445525,3600,'TEXVtOhmF_RHM11-_xJLyw'),(NULL,NULL,'4Yfz9hqBqM8OYMGuQK8oLw','PBtmpl0000000000000002',1271352537,3600,'TngTkH6qB76os2nf2S9bDA'),(NULL,NULL,'Wl8WZ43g2rK5AYr9o4zY7w','PBtmpl0000000000000103',1271445539,3600,'HUItbZl7TpOPC06NlO62QA'),(NULL,NULL,'LBuiKzg2mWwmOPS9AgV3bg','PBtmpl0000000000000002',1271348789,3600,'6zKDCX1Jpqbi4banD1EFNQ'),(NULL,NULL,'jTNggl7AoVSUc_ZzrvuCmw','PBtmpl0000000000000002',1271348789,3600,'t_CTIcSnLSuqOumw7LwxFA'),(NULL,NULL,'k2Qj03FrAOXYra8kDJYYXw','PBtmpl0000000000000002',1271357513,3600,'g8L2HOTFkZv5mYtYBarDCQ'),(NULL,NULL,'ksSfkZdsr0uC62NwIk6hFQ','PBtmpl0000000000000002',1271356973,3600,'iiraeaTpGWVrs4uzfvaU2A'),(NULL,NULL,'nWxS5jnA3o3DgPEwBeR7yQ','PBtmpl0000000000000002',1271357239,3600,'MALauel3oVVPZNrm53m3Uw'),(NULL,NULL,'OhdaFLE7sXOzo_SIP2ZUgA','PBtmpl0000000000000002',1271445348,3600,'3g2hbILhcxQA_7UOep0B3Q'),(NULL,NULL,'IWFxZDyGhQ3-SLZhELa3qw','PBtmpl0000000000000002',1277737686,3600,'0MZ-Ua1Gcv25yT-3JxXX8A'),(NULL,NULL,'l0guT3vTR3B8cL6vtP-g3A','PBtmpl0000000000000002',1285124369,3600,'sH36uWhF3AHO8sKBy4ZBIw'),(NULL,NULL,'NK8bqlwVRILJknqeCDPBHg','PBtmpl0000000000000002',1285796040,3600,'RcOVW6oW5IqpdPJskCPscA'),(NULL,NULL,'diZvW4bSgZWwyyGP3qXi1g','PBtmpl0000000000000002',1285610019,3600,'JkzwMnShoIjz0EfwqoXPJA'),(NULL,NULL,'j_1qEqM6iLfQLiR6VKy0aA','PBtmpl0000000000000002',1299872071,3600,'_o7GMxFGJ5flJrIozstBFA');
 ALTER TABLE `Article` ENABLE KEYS;
@@ -2615,7 +2431,7 @@ ALTER TABLE `Workflow` DISABLE KEYS;
 INSERT INTO `Workflow` VALUES ('pbworkflow000000000001','Daily Maintenance Tasks','This workflow runs daily maintenance tasks such as cleaning up old temporary files and cache.',1,'None','singleton'),('pbworkflow000000000002','Weekly Maintenance Tasks','This workflow runs once per week to perform maintenance tasks like cleaning up log files.',1,'None','singleton'),('pbworkflow000000000004','Hourly Maintenance Tasks','This workflow runs once per hour to perform maintenance tasks like deleting expired user sessions.',1,'None','singleton'),('pbworkflow000000000003','Commit Without Approval','This workflow commits all the assets in this version tag without asking for any approval.',1,'WebGUI::VersionTag','parallel'),('pbworkflow000000000005','Commit With Approval','This workflow commits all the assets in this version tag after getting approval from content managers.',1,'WebGUI::VersionTag','parallel'),('pbworkflow000000000006','Unlock Version Tag and Notify Owner','This workflow is used when a version tag approval is denied. It unlocks the version tag, making it available for editing, and notifies the tag owner.',1,'WebGUI::VersionTag','parallel'),('pbworkflow000000000007','Send Queued Email Messages','Sends all the messages in the mail queue.',1,'None','singleton'),('csworkflow000000000001','Get CS Mail','Retrieves mail from a POP3 account for the given Collaboration System.',1,'WebGUI::Asset::Wobject::Collaboration','singleton'),('AuthLDAPworkflow000001','Synchronize Profile To LDAP','Synchronizes a users LDAP information to their WebGUI User Profile',1,'WebGUI::User','singleton'),('DPWwf20061030000000002','Delete Exported Files','Deletes exported files from an asset being deleted or moved.',1,'None','parallel'),('PassiveAnalytics000001','Analyze Passive Analytics','Manual changes to this workflow will be lost.  Please only use the Passive Analytics screen to make changes',1,'None','singleton'),('send_webgui_statistics','Send WebGUI Stats','This workflow sends some information about your site to the central WebGUI statistics repository. No personal information is sent. The information is used to help determine the future direction WebGUI should take.',0,'None','singleton'),('taxeurecheckworkflow01','Recheck unverified EU VAT numbers','Utility workflow that automatically rechecks VAT numbers that could not be checked when they were submitted',1,'None','parallel'),('xR-_GRRbjBojgLsFx3dEMA','Update CS Subscription members','This workflow will be run whenever the viewing permissions are changed on an Asset.  It will update the members of the subscription group, and remove members who can no longer view the Asset.',1,'WebGUI::Asset','parallel');
 ALTER TABLE `Workflow` ENABLE KEYS;
 ALTER TABLE `WorkflowActivity` DISABLE KEYS;
-INSERT INTO `WorkflowActivity` VALUES ('pbwfactivity0000000001','pbworkflow000000000001','Delete temp files older than 24 hours',NULL,1,'WebGUI::Workflow::Activity::CleanTempStorage'),('pbwfactivity0000000002','pbworkflow000000000001','Prune file cache larger than 100MB',NULL,3,'WebGUI::Workflow::Activity::CleanFileCache'),('pbwfactivity0000000022','pbworkflow000000000001','Prune database cache larger than 100MB',NULL,4,'WebGUI::Workflow::Activity::CleanDatabaseCache'),('pbwfactivity0000000005','pbworkflow000000000001','Archive old CS threads',NULL,5,'WebGUI::Workflow::Activity::ArchiveOldThreads'),('vtagactivity0000000002','pbworkflow000000000003','Wait Until','This workflow waits until the value chosen in the \"Wait Until\" field has passed and then continues',1,'WebGUI::Workflow::Activity::WaitUntil'),('pbwfactivity0000000007','pbworkflow000000000001','deal with user groupings that have expired',NULL,6,'WebGUI::Workflow::Activity::ExpireGroupings'),('pbwfactivity0000000011','pbworkflow000000000001','Expire old subscription codes',NULL,7,'WebGUI::Workflow::Activity::ExpireSubscriptionCodes'),('pbwfactivity0000000014','pbworkflow000000000001','Summarize Passive Profiling Data',NULL,8,'WebGUI::Workflow::Activity::SummarizePassiveProfileLog'),('pbwfactivity0000000015','pbworkflow000000000001','Sync User Profiles With LDAP',NULL,9,'WebGUI::Workflow::Activity::SyncProfilesToLdap'),('pbwfactivity0000000003','pbworkflow000000000002','Delete login entries older than 90 days',NULL,1,'WebGUI::Workflow::Activity::CleanLoginHistory'),('pbwfactivity0000000004','pbworkflow000000000002','Move clipboard items older than 30 days to trash',NULL,2,'WebGUI::Workflow::Activity::TrashClipboard'),('pbwfactivity0000000008','pbworkflow000000000002','delete asset revisions older than a year from the database',NULL,3,'WebGUI::Workflow::Activity::PurgeOldAssetRevisions'),('pbwfactivity0000000010','pbworkflow000000000002','delete assets from trash that have been sitting around for 30 days',NULL,4,'WebGUI::Workflow::Activity::PurgeOldTrash'),('pbwfactivity0000000009','pbworkflow000000000004','delete expired sessions',NULL,1,'WebGUI::Workflow::Activity::DeleteExpiredSessions'),('pbwfactivity0000000012','pbworkflow000000000004','Get syndicated content',NULL,2,'WebGUI::Workflow::Activity::GetSyndicatedContent'),('vtagactivity0000000001','pbworkflow000000000005','Wait Until','This workflow waits until the value chosen in the \"Wait Until\" field has passed and then continues',2,'WebGUI::Workflow::Activity::WaitUntil'),('pbwfactivity0000000017','pbworkflow000000000005','Get Approval from Content Managers',NULL,1,'WebGUI::Workflow::Activity::RequestApprovalForVersionTag'),('pbwfactivity0000000019','pbworkflow000000000006','Unlock Version Tag',NULL,1,'WebGUI::Workflow::Activity::UnlockVersionTag'),('pbwfactivity0000000020','pbworkflow000000000006','Notify Committer of Denial',NULL,2,'WebGUI::Workflow::Activity::NotifyAboutVersionTag'),('pbwfactivity0000000021','pbworkflow000000000007','Send Queued Messages',NULL,1,'WebGUI::Workflow::Activity::SendQueuedMailMessages'),('csactivity000000000001','csworkflow000000000001','Get the mail',NULL,1,'WebGUI::Workflow::Activity::GetCsMail'),('Dl_3P-4y1OoOTf3cRwQ7EA','AuthLDAPworkflow000001','Synchronize Profile To LDAP',NULL,1,'WebGUI::Workflow::Activity::SyncProfileToLdap'),('DPWwfa2006103000000002','DPWwf20061030000000002','Delete Exported Files',NULL,1,'WebGUI::Workflow::Activity::DeleteExportedFiles'),('SWHs3shndnc8LuLpmLeeNw','pbworkflow000000000004','Update Calendar Feeds','This activity imports calendar events from calendar feeds',3,'WebGUI::Workflow::Activity::CalendarUpdateFeeds'),('pbwfactivity0000000006','pbworkflow000000000003','Commit Assets',NULL,2,'WebGUI::Workflow::Activity::CommitVersionTag'),('newslettersendactivity','pbworkflow000000000002','Send Newsletters For Newsletter Assets',NULL,5,'WebGUI::Workflow::Activity::SendNewsletters'),('unansweredfriends_____','pbworkflow000000000001','Deny Friend Requests Older Than A Month',NULL,10,'WebGUI::Workflow::Activity::DenyUnansweredFriends'),('pbwfactivity0000000016','pbworkflow000000000005','Commit Assets',NULL,3,'WebGUI::Workflow::Activity::CommitVersionTag'),('pbwfactivity0000000018','pbworkflow000000000005','Notify Committer of Approval',NULL,4,'WebGUI::Workflow::Activity::NotifyAboutVersionTag'),('4X02MxKDfvNwzyY4u_yEwQ','PassiveAnalytics000001','Perform duration analysis',NULL,1,'WebGUI::Workflow::Activity::SummarizePassiveAnalytics'),('zUZZLAyKNUl933pI4RspPg','PassiveAnalytics000001','Please log entries into buckets',NULL,2,'WebGUI::Workflow::Activity::BucketPassiveAnalytics'),('1BbO0rpY9-fGqlfpMDHang','pbworkflow000000000001','Remove old carts',NULL,11,'WebGUI::Workflow::Activity::RemoveOldCarts'),('C2v8fZHn-epffECKPWE87g','pbworkflow000000000004','Expire Purchased Thingy Records','Expire any expired thingy records. Send notifications of imminent expiration.',4,'WebGUI::Workflow::Activity::ExpirePurchasedThingyRecords'),('LT8Y9qSH4mOkgH7GVlj6ww','pbworkflow000000000001','Archive Old Stories','Archive old stories, based on the settings of the Story Archives that own them',12,'WebGUI::Workflow::Activity::ArchiveOldStories'),('send_webgui_statistics','send_webgui_statistics','Send WebGUI Stats',NULL,1,'WebGUI::Workflow::Activity::SendWebguiStats'),('ixOnGnjE6D1m71WzhSxcFQ','pbworkflow000000000001','Expire Incomplete Survey Responses','Expires incomplete Survey Responses according to per-instance Survey settings',13,'WebGUI::Workflow::Activity::ExpireIncompleteSurveyResponses'),('g6jJY1hPVgrUm5PKzrfZaQ','pbworkflow000000000001','Purge Denied EMS Submissions','Purges EMS Submissions that were denied and are aged according to parameters.',14,'WebGUI::Workflow::Activity::CleanupEMSSubmissions'),('w5DtU9T4SzFLwiXjP5hEbg','pbworkflow000000000004','Process Approves EMS Submissions','Create EMS Ticket Assets for approved submissions.',5,'WebGUI::Workflow::Activity::ProcessEMSApprovals'),('taxeurecheckactivity01','taxeurecheckworkflow01','Untitled',NULL,1,'WebGUI::Workflow::Activity::RecheckVATNumber'),('ZATo3t_rm09J74Cs_Xavyg','pbworkflow000000000002','Extend Calendar Recurrences','Create events for live recurrences up to two years from the current date',6,'WebGUI::Workflow::Activity::ExtendCalendarRecurrences'),('XqxlXlGJ4SWSVtslEWgSQw','pbworkflow000000000001','Remove Old Forks',NULL,15,'WebGUI::Workflow::Activity::RemoveOldForks'),('giPru6RaHW6SiPHOXIHkyQ','xR-_GRRbjBojgLsFx3dEMA','Untitled',NULL,1,'WebGUI::Workflow::Activity::UpdateAssetSubscribers');
+INSERT INTO `WorkflowActivity` VALUES ('pbwfactivity0000000001','pbworkflow000000000001','Delete temp files older than 24 hours',NULL,1,'WebGUI::Workflow::Activity::CleanTempStorage'),('pbwfactivity0000000002','pbworkflow000000000001','Prune file cache larger than 100MB',NULL,3,'WebGUI::Workflow::Activity::CleanFileCache'),('pbwfactivity0000000022','pbworkflow000000000001','Prune database cache larger than 100MB',NULL,4,'WebGUI::Workflow::Activity::CleanDatabaseCache'),('pbwfactivity0000000005','pbworkflow000000000001','Archive old CS threads',NULL,5,'WebGUI::Workflow::Activity::ArchiveOldThreads'),('vtagactivity0000000002','pbworkflow000000000003','Wait Until','This workflow waits until the value chosen in the \"Wait Until\" field has passed and then continues',1,'WebGUI::Workflow::Activity::WaitUntil'),('pbwfactivity0000000007','pbworkflow000000000001','deal with user groupings that have expired',NULL,6,'WebGUI::Workflow::Activity::ExpireGroupings'),('pbwfactivity0000000011','pbworkflow000000000001','Expire old subscription codes',NULL,7,'WebGUI::Workflow::Activity::ExpireSubscriptionCodes'),('pbwfactivity0000000014','pbworkflow000000000001','Summarize Passive Profiling Data',NULL,8,'WebGUI::Workflow::Activity::SummarizePassiveProfileLog'),('pbwfactivity0000000015','pbworkflow000000000001','Sync User Profiles With LDAP',NULL,9,'WebGUI::Workflow::Activity::SyncProfilesToLdap'),('pbwfactivity0000000003','pbworkflow000000000002','Delete login entries older than 90 days',NULL,1,'WebGUI::Workflow::Activity::CleanLoginHistory'),('pbwfactivity0000000004','pbworkflow000000000002','Move clipboard items older than 30 days to trash',NULL,2,'WebGUI::Workflow::Activity::TrashClipboard'),('pbwfactivity0000000008','pbworkflow000000000002','delete asset revisions older than a year from the database',NULL,3,'WebGUI::Workflow::Activity::PurgeOldAssetRevisions'),('pbwfactivity0000000010','pbworkflow000000000002','delete assets from trash that have been sitting around for 30 days',NULL,4,'WebGUI::Workflow::Activity::PurgeOldTrash'),('pbwfactivity0000000009','pbworkflow000000000004','delete expired sessions',NULL,1,'WebGUI::Workflow::Activity::DeleteExpiredSessions'),('pbwfactivity0000000012','pbworkflow000000000004','Get syndicated content',NULL,2,'WebGUI::Workflow::Activity::GetSyndicatedContent'),('vtagactivity0000000001','pbworkflow000000000005','Wait Until','This workflow waits until the value chosen in the \"Wait Until\" field has passed and then continues',2,'WebGUI::Workflow::Activity::WaitUntil'),('pbwfactivity0000000017','pbworkflow000000000005','Get Approval from Content Managers',NULL,1,'WebGUI::Workflow::Activity::RequestApprovalForVersionTag'),('pbwfactivity0000000019','pbworkflow000000000006','Unlock Version Tag',NULL,1,'WebGUI::Workflow::Activity::UnlockVersionTag'),('pbwfactivity0000000020','pbworkflow000000000006','Notify Committer of Denial',NULL,2,'WebGUI::Workflow::Activity::NotifyAboutVersionTag'),('pbwfactivity0000000021','pbworkflow000000000007','Send Queued Messages',NULL,1,'WebGUI::Workflow::Activity::SendQueuedMailMessages'),('csactivity000000000001','csworkflow000000000001','Get the mail',NULL,1,'WebGUI::Workflow::Activity::GetCsMail'),('Dl_3P-4y1OoOTf3cRwQ7EA','AuthLDAPworkflow000001','Synchronize Profile To LDAP',NULL,1,'WebGUI::Workflow::Activity::SyncProfileToLdap'),('DPWwfa2006103000000002','DPWwf20061030000000002','Delete Exported Files',NULL,1,'WebGUI::Workflow::Activity::DeleteExportedFiles'),('SWHs3shndnc8LuLpmLeeNw','pbworkflow000000000004','Update Calendar Feeds','This activity imports calendar events from calendar feeds',3,'WebGUI::Workflow::Activity::CalendarUpdateFeeds'),('pbwfactivity0000000006','pbworkflow000000000003','Commit Assets',NULL,2,'WebGUI::Workflow::Activity::CommitVersionTag'),('newslettersendactivity','pbworkflow000000000002','Send Newsletters For Newsletter Assets',NULL,5,'WebGUI::Workflow::Activity::SendNewsletters'),('unansweredfriends_____','pbworkflow000000000001','Deny Friend Requests Older Than A Month',NULL,10,'WebGUI::Workflow::Activity::DenyUnansweredFriends'),('pbwfactivity0000000016','pbworkflow000000000005','Commit Assets',NULL,3,'WebGUI::Workflow::Activity::CommitVersionTag'),('pbwfactivity0000000018','pbworkflow000000000005','Notify Committer of Approval',NULL,4,'WebGUI::Workflow::Activity::NotifyAboutVersionTag'),('4X02MxKDfvNwzyY4u_yEwQ','PassiveAnalytics000001','Perform duration analysis',NULL,1,'WebGUI::Workflow::Activity::SummarizePassiveAnalytics'),('zUZZLAyKNUl933pI4RspPg','PassiveAnalytics000001','Please log entries into buckets',NULL,2,'WebGUI::Workflow::Activity::BucketPassiveAnalytics'),('1BbO0rpY9-fGqlfpMDHang','pbworkflow000000000001','Remove old carts',NULL,11,'WebGUI::Workflow::Activity::RemoveOldCarts'),('C2v8fZHn-epffECKPWE87g','pbworkflow000000000004','Expire Purchased Thingy Records','Expire any expired thingy records. Send notifications of imminent expiration.',4,'WebGUI::Workflow::Activity::ExpirePurchasedThingyRecords'),('LT8Y9qSH4mOkgH7GVlj6ww','pbworkflow000000000001','Archive Old Stories','Archive old stories, based on the settings of the Story Archives that own them',12,'WebGUI::Workflow::Activity::ArchiveOldStories'),('send_webgui_statistics','send_webgui_statistics','Send WebGUI Stats',NULL,1,'WebGUI::Workflow::Activity::SendWebguiStats'),('ixOnGnjE6D1m71WzhSxcFQ','pbworkflow000000000001','Expire Incomplete Survey Responses','Expires incomplete Survey Responses according to per-instance Survey settings',13,'WebGUI::Workflow::Activity::ExpireIncompleteSurveyResponses'),('g6jJY1hPVgrUm5PKzrfZaQ','pbworkflow000000000001','Purge Denied EMS Submissions','Purges EMS Submissions that were denied and are aged according to parameters.',14,'WebGUI::Workflow::Activity::CleanupEMSSubmissions'),('w5DtU9T4SzFLwiXjP5hEbg','pbworkflow000000000004','Process Approves EMS Submissions','Create EMS Ticket Assets for approved submissions.',5,'WebGUI::Workflow::Activity::ProcessEMSApprovals'),('taxeurecheckactivity01','taxeurecheckworkflow01','Untitled',NULL,1,'WebGUI::Workflow::Activity::RecheckVATNumber'),('ZATo3t_rm09J74Cs_Xavyg','pbworkflow000000000002','Extend Calendar Recurrences','Create events for live recurrences up to two years from the current date',6,'WebGUI::Workflow::Activity::ExtendCalendarRecurrences'),('XqxlXlGJ4SWSVtslEWgSQw','pbworkflow000000000001','Remove Old Forks',NULL,15,'WebGUI::Workflow::Activity::RemoveOldForks'),('giPru6RaHW6SiPHOXIHkyQ','xR-_GRRbjBojgLsFx3dEMA','Untitled',NULL,1,'WebGUI::Workflow::Activity::UpdateAssetSubscribers'),('Qo-F__ePtghA-rESrFeNcg','pbworkflow000000000001','Clean HttpProxy Cookie jars','Removes cookie jar files from the HttpProxy asset that are older than 1 day',16,'WebGUI::Workflow::Activity::CleanCookieJars');
 ALTER TABLE `WorkflowActivity` ENABLE KEYS;
 ALTER TABLE `WorkflowActivityData` DISABLE KEYS;
 INSERT INTO `WorkflowActivityData` VALUES ('pbwfactivity0000000001','storageTimeout','86400'),('pbwfactivity0000000002','sizeLimit','100000000'),('pbwfactivity0000000022','sizeLimit','100000000'),('vtagactivity0000000002','type','startTime'),('pbwfactivity0000000003','ageToDelete','7776000'),('pbwfactivity0000000004','trashAfter','2592000'),('pbwfactivity0000000008','purgeAfter','31536000'),('pbwfactivity0000000010','purgeAfter','2592000'),('vtagactivity0000000001','type','startTime'),('pbwfactivity0000000017','message','A new version tag awaits your approval.'),('pbwfactivity0000000017','doOnDeny','pbworkflow000000000006'),('pbwfactivity0000000017','groupToApprove','4'),('pbwfactivity0000000020','message','Your version tag was denied. Please take corrective actions and recommit your changes.'),('pbwfactivity0000000020','who','committer'),('unansweredfriends_____','timeout','2592000'),('pbwfactivity0000000006','trashAfter','2592000'),('pbwfactivity0000000018','who','committer'),('pbwfactivity0000000018','message','Your version tag was approved.'),('pbwfactivity0000000017','templateId','lYhMheuuLROK_iNjaQuPKg'),('pbwfactivity0000000018','templateId','lYhMheuuLROK_iNjaQuPKg'),('pbwfactivity0000000020','templateId','lYhMheuuLROK_iNjaQuPKg');
@@ -2636,7 +2452,7 @@ ALTER TABLE `assetIndex` DISABLE KEYS;
 INSERT INTO `assetIndex` VALUES ('PBasset000000000000003','Media','','media',1147642437,1147642437,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'Media Media media','000001000003',NULL),('PBtmpl0000000000000112','Weblog','','weblog',1124395696,1277868921,'3','7','12','WebGUI::Asset::Template',0,'Weblog Weblog weblog Collaboration','000001000001000008000004',NULL),('PBtmplBlankStyle000001','WebGUI 6 Blank Style','','pbtmplblankstyle000001',1133743239,1258524916,'3','7','12','WebGUI::Asset::Template',0,'WebGUI 6 Blank Style WebGUI 6 Blank Style pbtmplblankstyle000001 style','000001000001000041000005',NULL),('PBtmpl0000000000000079','Topics','','topics',1124395696,1277868921,'3','7','12','WebGUI::Asset::Template',0,'Topics Topics topics Collaboration','000001000001000008000009',NULL),('PBtmpl0000000000000097','Traditional with Thumbnails','','traditional_with_thumbnails',1124395696,1277868921,'3','7','12','WebGUI::Asset::Template',0,'Traditional with Thumbnails Traditional with Thumbnails traditional with thumbnails Collaboration','000001000001000008000003',NULL),('PBtmpl0000000000000082','Unordered List','','unordered_list',1124395696,1277868921,'3','7','12','WebGUI::Asset::Template',0,'Unordered List Unordered List unordered list Collaboration','000001000001000008000011',NULL),('PBtmpl0000000000000124','Tabs','','tabs',1124395696,1259133275,'3','7','12','WebGUI::Asset::Template',0,'Tabs Tabs tabs Navigation','000001000001000025000004',NULL),('GNvjCFQWjY2AF2uf0aCM8Q','Syndicated Articles','','syndicated_articles',1124395696,1259133274,'3','7','12','WebGUI::Asset::Template',0,'Syndicated Articles Syndicated Articles syndicated articles SyndicatedContent','000001000001000043000002',NULL),('PBtmpl0000000000000136','Synopsis','','synopsis2',1124395696,1259133274,'3','7','12','WebGUI::Asset::Template',0,'Synopsis Synopsis synopsis2 Navigation','000001000001000025000007',NULL),('PBtmpl0000000000000116','Tab Form','','tab_form',1124395696,1257311888,'3','7','12','WebGUI::Asset::Template',0,'Tab Form Tab Form tab form DataForm','000001000001000010000005',NULL),('GRUNFctldUgop-qRLuo_DA','Default Survey Edit','','root/import/survey/default-survey-edit',1227254010,1269401469,'3','7','12','WebGUI::Asset::Template',0,'Default Survey Edit Default Survey Edit root import survey default survey edit Survey/Edit','000001000001000042000004',NULL),('ProjectManagerTMPL0004','Default Project Manager Edit Task','','default-pm-template-edit-task',1147642415,1222574693,'3','7','12','WebGUI::Asset::Template',0,'Default Project Manager Edit Task Default Project Manager Edit Task default pm template edit task ProjectManager_editTask','000001000001000030000002000001',NULL),('ProjectManagerTMPL0002','Default Project Display','','default-pm-template-project-display',1147642415,1222574693,'3','7','12','WebGUI::Asset::Template',0,'Default Project Display Default Project Display default pm template project display ProjectManager_project','000001000001000030000004000001',NULL),('PBtmpl0000000000000137','Admin Console Style','','admin_console',1124395696,1258524916,'3','7','12','WebGUI::Asset::Template',0,'Admin Console Style Admin Console admin console style','000001000001000041000003',NULL),('StockDataTMPL000000001','StockData Default View','','stockdatatmpl000000001',1133743239,1315877144,'3','7','12','WebGUI::Asset::Template',0,'StockData Default View StockData Default View stockdatatmpl000000001 StockData','000001000001000039000002',NULL),('PBtmpl0000000000000135','Side By Side','','side_by_side',1124395696,1259133276,'3','7','12','WebGUI::Asset::Template',0,'Side By Side Side By Side side by side Layout','000001000001000019000001',NULL),('PBtmpl0000000000000200','Default Search','','default_search2',1147642427,1301974000,'3','7','12','WebGUI::Asset::Template',0,'Default Search Default Search default search2 Search','000001000001000034000001',NULL),('PBtmpl0000000000000101','Ordered List','','ordered_list',1124395696,1277868922,'3','7','12','WebGUI::Asset::Template',0,'Ordered List Ordered List ordered list Collaboration','000001000001000008000024',NULL),('PBtmpl0000000000000121','Photo Gallery','','photo_gallery',1124395696,1277868921,'3','7','12','WebGUI::Asset::Template',0,'Photo Gallery Photo Gallery photo gallery Collaboration','000001000001000008000005',NULL),('PBtmpl0000000000000081','Q and A','','q_and_a',1124395696,1277868922,'3','7','12','WebGUI::Asset::Template',0,'Q and A Q and A q and a Collaboration','000001000001000008000023',NULL),('WVtmpl0000000000000001','Random Thread Macro Default Template','','randomthread-template',1133743240,1147642426,'3','7','12','WebGUI::Asset::Template',0,'Random Thread Macro Default Template Random Thread Macro Default Template randomthread template Macro/RandomThread','000001000001000021000010000001',NULL),('PBtmpl0000000000000131','Right Column','','right_column',1124395696,1259133275,'3','7','12','WebGUI::Asset::Template',0,'Right Column Right Column right column Layout','000001000001000019000002',NULL),('PBtmpl0000000000000094','News','','plainblacknews',1124395696,1220655703,'3','7','12','WebGUI::Asset::Template',0,'News News plainblacknews Layout','000001000001000019000005',NULL),('matrixtmpl000000000005','Matrix Default Search','','matrix-search-template',1133743239,1281501163,'3','7','12','WebGUI::Asset::Template',0,'Matrix Default Search Matrix Default Search matrix search template Matrix/Search','000001000001000022000005',NULL),('MultiSearchTmpl0000001','MultiSearch Default Display','','multisearchtmpl0000001',1133743239,1230269962,'3','7','12','WebGUI::Asset::Template',0,'MultiSearch Default Display MultiSearch Default Display multisearchtmpl0000001 MultiSearch','000001000001000024000001',NULL),('matrixtmpl000000000002','Matrix Default Compare','','matrix-default-compare-template',1133743238,1281501162,'3','7','12','WebGUI::Asset::Template',0,'Matrix Default Compare Matrix Default Compare matrix default compare template Matrix/Compare','000001000001000022000001',NULL),('PBtmpl0000000000000111','Make Page Printable','','make_page_printable',1124395696,1286336607,'3','7','12','WebGUI::Asset::Template',0,'Make Page Printable Make Page Printable make page printable style','000001000001000041000002',NULL),('PBtmpl0000000000000020','Mail Form','','mail_form',1124395696,1257311887,'3','7','12','WebGUI::Asset::Template',0,'Mail Form Mail Form mail form DataForm','000001000001000010000001',NULL),('PBtmpl0000000000000113','Link','','link',1124395696,1277868922,'3','7','12','WebGUI::Asset::Template',0,'Link Link link Collaboration/Thread','000001000001000008000025',NULL),('PBtmpl0000000000000083','Link List','','link_list',1124395696,1277868921,'3','7','12','WebGUI::Asset::Template',0,'Link List Link List link list Collaboration','000001000001000008000010',NULL),('PBtmpl0000000000000114','Link List Submission Form','','link_list_submission_form',1124395696,1277868922,'3','7','12','WebGUI::Asset::Template',0,'Link List Submission Form Link List Submission Form link list submission form Collaboration/PostForm','000001000001000008000019',NULL),('PBtmpl0000000000000115','Linked Image with Caption','','linked_image_with_caption',1124395696,1259133276,'3','7','12','WebGUI::Asset::Template',0,'Linked Image with Caption Linked Image with Caption linked image with caption Article','000001000001000004000003',NULL),('PBtmpl0000000000000098','Job','','job',1124395696,1277868922,'3','7','12','WebGUI::Asset::Template',0,'Job Job job Collaboration/Thread','000001000001000008000021',NULL),('PBtmpl0000000000000077','Job Listing','','job_listing',1124395696,1298351263,'3','7','12','WebGUI::Asset::Template',0,'Job Listing Job Listing job listing Collaboration','000001000001000008000020',NULL),('PBtmpl0000000000000122','Job Submission Form','','job_submission_form',1124395696,1277868922,'3','7','12','WebGUI::Asset::Template',0,'Job Submission Form Job Submission Form job submission form Collaboration/PostForm','000001000001000008000022',NULL),('PBtmpl0000000000000103','Article With Image','','article-with-image',1124395696,1259133275,'3','7','12','WebGUI::Asset::Template',0,'Article With Image Article With Image article with image Article','000001000001000004000001',NULL),('PBtmpl0000000000000092','Horizontal Login Box','','horizontal_login_box',1124395696,1148579524,'3','7','12','WebGUI::Asset::Template',0,'Horizontal Login Box Horizontal Login Box horizontal login box Macro/L_loginBox','000001000001000021000009000001',NULL),('PBtmpl0000000000000108','horizontalMenu','','horizontalmenu',1124395696,1259133276,'3','7','12','WebGUI::Asset::Template',0,'horizontalMenu horizontalMenu horizontalmenu Navigation','000001000001000025000002',NULL),('PBtmpl0000000000000088','Image','','image',1124395696,1300763663,'3','7','12','WebGUI::Asset::Template',0,'Image Image image ImageAsset','000001000001000017000001',NULL),('IOB0000000000000000002','Default InOutBoard Report Template','','iob-report-template',1133743239,1166019641,'3','7','12','WebGUI::Asset::Template',0,'Default InOutBoard Report Template Default InOutBoard Report Template iob report template InOutBoard/Report','000001000001000018000001',NULL),('IOB0000000000000000001','Default InOutBoard Template','','iob-template',1133743239,1169795123,'3','7','12','WebGUI::Asset::Template',0,'Default InOutBoard Template Default InOutBoard Template iob template InOutBoard','000001000001000018000002',NULL),('PBtmpl0000000000000123','Item','','item',1124395696,1259133276,'3','7','12','WebGUI::Asset::Template',0,'Item Item item Article','000001000001000004000004',NULL),('PBtmpl0000000000000024','File','','file',1124395696,1259133275,'3','7','12','WebGUI::Asset::Template',0,'File File file FileAsset','000001000001000013000001',NULL),('PBtmpl0000000000000078','File Folder','','file_folder',1124395696,1259133275,'3','7','12','WebGUI::Asset::Template',0,'File Folder File Folder file folder Folder','000001000001000014000001',NULL),('PBtmpl0000000000000107','File with size','','file_with_size',1124395696,1147642420,'3','7','12','WebGUI::Asset::Template',0,'File with size File with size file with size Macro/File','000001000001000021000004000003',NULL),('PBtmpl0000000000000133','Guest Book','','guest_book',1124395696,1277868921,'3','7','12','WebGUI::Asset::Template',0,'Guest Book Guest Book guest book Collaboration','000001000001000008000012',NULL),('PBtmpl0000000000000117','DropMenu','','dropmenu',1124395696,1259133274,'3','7','12','WebGUI::Asset::Template',0,'DropMenu DropMenu dropmenu Navigation','000001000001000025000003',NULL),('PBtmpl0000000000000130','Tree Navigation','','root/import/navigation/tree-navigation',1124395696,1259133276,'3','7','12','WebGUI::Asset::Template',0,'Tree Navigation Tree Navigation root import navigation tree navigation Navigation','000001000001000025000005',NULL),('PBtmpl0000000000000060','Fail Safe','','fail_safe',1124395696,1258524916,'3','7','12','WebGUI::Asset::Template',0,'Fail Safe Fail Safe fail safe style','000001000001000041000001',NULL),('PBtmpl0000000000000080','FAQ','','faqtemplate',1124395696,1277868921,'3','7','12','WebGUI::Asset::Template',0,'FAQ FAQ faqtemplate Collaboration','000001000001000008000002',NULL),('PBtmpl0000000000000099','FAQ Submission Form','','faq_submission_form',1124395696,1277868921,'3','7','12','WebGUI::Asset::Template',0,'FAQ Submission Form FAQ Submission Form faq submission form Collaboration/PostForm','000001000001000008000018',NULL),('PBtmpl0000000000000010','Default WebGUI Account Display Template','','default_webgui_account_display_template',1124395696,1287545014,'3','7','12','WebGUI::Asset::Template',0,'Default WebGUI Account Display Template Default WebGUI Account Display Template default webgui account display template Auth/WebGUI/Account','000001000001000005000004000001',NULL),('PBtmpl0000000000000013','Default WebGUI Login Template','','default_webgui_login_template',1124395696,1287545014,'3','7','12','WebGUI::Asset::Template',0,'Default WebGUI Login Template Default WebGUI Login Template default webgui login template Auth/WebGUI/Login','000001000001000005000007000001',NULL),('PBtmpl0000000000000012','Default WebGUI Password Reset Template','','default_webgui_password_reset_template',1124395696,1287545014,'3','7','12','WebGUI::Asset::Template',0,'Default WebGUI Password Reset Template Default WebGUI Password Reset Template default webgui password reset template Auth/WebGUI/Expired','000001000001000005000006000001',NULL),('PBtmpl0000000000000057','Default WebGUI Yes/No Prompt','','default_webgui_yes/no_prompt',1124395696,1147642418,'3','7','12','WebGUI::Asset::Template',0,'Default WebGUI Yes/No Prompt Default WebGUI Yes/No Prompt default webgui yes no prompt prompt','000001000001000031000001',NULL),('PBtmpl0000000000000066','Default USS','','default_uss',1124395696,1277868921,'3','7','12','WebGUI::Asset::Template',0,'Default USS Default USS default uss Collaboration','000001000001000008000001',NULL),('TimeTrackingTMPL000001','Default Time Tracking User View','','default-tt-template-user',1147642417,1201205738,'3','7','12','WebGUI::Asset::Template',0,'Default Time Tracking User View Default Time Tracking User View default tt template user TimeTracking_user','000001000001000046000003000001',NULL),('TimeTrackingTMPL000003','Default Time Tracking Row Template','','default-tt-template-row',1147642417,1229311434,'3','7','12','WebGUI::Asset::Template',0,'Default Time Tracking Row Template Default Time Tracking Row Template default tt template row TimeTracking_row','000001000001000046000002000001',NULL),('TimeTrackingTMPL000002','Default Time Tracking Manager View','','default-tt-template-manager',1147642417,1147642417,'3','7','12','WebGUI::Asset::Template',0,'Default Time Tracking Manager View Default Time Tracking Manager View default tt template manager TimeTracking_manager','000001000001000046000001000001',NULL),('X7DrzUcj8pOKFa_6k9D5iw','Newsletter','','root/import/newsletter',1185754569,1222804045,'3','12','3','WebGUI::Asset::Wobject::Folder',1,'Newsletter Newsletter root import newsletter','000001000001000026',NULL),('PBtmpl0000000000000065','Default Syndicated Content','','default_syndicated_content',1124395696,1259133275,'3','7','12','WebGUI::Asset::Template',0,'Default Syndicated Content Default Syndicated Content default syndicated content SyndicatedContent','000001000001000043000001',NULL),('CxMpE_UPauZA3p8jdrOABw','Default Questions','','root/import/survey/default-questions',1227556536,1250243000,'3','7','12','WebGUI::Asset::Template',0,'Default Questions Default Questions root import survey default questions Survey/Take','000001000001000042000006',NULL),('PBtmpl0000000000000059','Default SQL Report','','default_sql_report',1124395696,1229907401,'3','7','12','WebGUI::Asset::Template',0,'Default SQL Report Default SQL Report default sql report SQLReport','000001000001000038000001',NULL),('PBtmpl0000000000000067','Default Submission','','default_submission',1124395696,1277868921,'3','7','12','WebGUI::Asset::Template',0,'Default Submission Default Submission default submission Collaboration/Thread','000001000001000008000006',NULL),('PBtmpl0000000000000068','Default Submission Form','','default_submission_form',1124395696,1277868921,'3','7','12','WebGUI::Asset::Template',0,'Default Submission Form Default Submission Form default submission form Collaboration/PostForm','000001000001000008000017',NULL),('ProjectManagerTMPL0003','Default Project Manager Gantt Chart','','default-pm-template-gantt-chart',1147642415,1159989349,'3','7','12','WebGUI::Asset::Template',0,'Default Project Manager Gantt Chart Default Project Manager Gantt Chart default pm template gantt chart ProjectManager_gantt','000001000001000030000003000001',NULL),('ProjectManagerTMPL0001','Default Project Management System Dashboard','','default-pm-template-dashboard',1147642415,1229579830,'3','7','12','WebGUI::Asset::Template',0,'Default Project Management System Dashboard Default Project Management System Dashboard default pm template dashboard ProjectManager_dashboard','000001000001000030000001000001',NULL),('PBtmpl0000000000000055','Default Poll','','default_poll',1124395696,1259133275,'3','7','12','WebGUI::Asset::Template',0,'Default Poll Default Poll default poll Poll','000001000001000027000001',NULL),('PBtmpl0000000000000029','Default Post Form','','default_post_form',1124395696,1277868921,'3','7','12','WebGUI::Asset::Template',0,'Default Post Form Default Post Form default post form Collaboration/PostForm','000001000001000008000013',NULL),('PBtmpl0000000000000056','Default Product','','default_product',1124395696,1248729559,'3','7','12','WebGUI::Asset::Template',0,'Default Product Default Product default product Product','000001000001000028000001',NULL),('PBtmpl0000000000000033','Default HTTP Proxy','','default_http_proxy',1124395696,1230159454,'3','7','12','WebGUI::Asset::Template',0,'Default HTTP Proxy Default HTTP Proxy default http proxy HttpProxy','000001000001000016000001',NULL),('PBtmpl0000000000000004','Default LDAP Account Display Template','','default_ldap_account_display_template',1124395696,1287545014,'3','7','12','WebGUI::Asset::Template',0,'Default LDAP Account Display Template Default LDAP Account Display Template default ldap account display template Auth/LDAP/Account','000001000001000005000001000001',NULL),('PBtmpl0000000000000006','Default LDAP Login Template','','default_ldap_login_template',1124395696,1287545014,'3','7','12','WebGUI::Asset::Template',0,'Default LDAP Login Template Default LDAP Login Template default ldap login template Auth/LDAP/Login','000001000001000005000003000001',NULL),('PBtmpl0000000000000044','Default Login Box','','default_login_box',1124395696,1148579524,'3','7','12','WebGUI::Asset::Template',0,'Default Login Box Default Login Box default login box Macro/L_loginBox','000001000001000021000009000002',NULL),('PBtmpl0000000000000047','Default Message Board','','default_message_board',1124395696,1147642414,'3','7','12','WebGUI::Asset::Template',0,'Default Message Board Default Message Board default message board MessageBoard','000001000001000023000001',NULL),('PBtmpl0000000000000054','Default Page','','default_page',1124395696,1259133276,'3','7','12','WebGUI::Asset::Template',0,'Default Page Default Page default page Layout','000001000001000019000003',NULL),('Q4uX_C557arTp6D_jwB1jQ','Wiki','','root/import/wiki',1165460175,1273032720,'3','12','12','WebGUI::Asset::Wobject::Folder',1,'Wiki Wiki root import wiki','000001000001000052',NULL),('BmLaN4rmAANkCglXUViEbg','Resource','','root/import/projectmanager/resource',1157679165,1222803871,'3','12','12','WebGUI::Asset::Wobject::Folder',1,'Resource Resource root import projectmanager resource','000001000001000030000005',NULL),('PBtmpl0000000000000039','Default File Macro','','default_file_macro',1124395696,1154535073,'3','7','12','WebGUI::Asset::Template',0,'Default File Macro Default File Macro default file macro Macro/File','000001000001000021000004000001',NULL),('PBtmpl0000000000000026','Default Forum','','default_forum',1124395696,1277868921,'3','7','12','WebGUI::Asset::Template',0,'Default Forum Default Forum default forum Collaboration','000001000001000008000007',NULL),('PBtmpl0000000000000031','Default Forum Search','','default_forum_search',1124395696,1277868921,'3','7','12','WebGUI::Asset::Template',0,'Default Forum Search Default Forum Search default forum search Collaboration/Search','000001000001000008000016',NULL),('PBtmpl0000000000000093','crumbTrail','','crumbtrail2',1124395696,1259133274,'3','7','12','WebGUI::Asset::Template',0,'crumbTrail crumbTrail crumbtrail2 Navigation','000001000001000025000001',NULL),('DashboardViewTmpl00001','Dashboard Default View','','dashboard-default-view-template',1133743239,1300763664,'3','7','12','WebGUI::Asset::Template',0,'Dashboard Default View Dashboard Default View dashboard default view template Dashboard','000001000001000009000001',NULL),('PBtmpl0000000000000021','Data List','','data_list',1124395696,1294721945,'3','7','12','WebGUI::Asset::Template',0,'Data List Data List data list DataForm/List','000001000001000010000004',NULL),('PBtmpl0000000000000104','Default Acknowledgement','','default_acknowledgement',1124395696,1257311888,'3','7','12','WebGUI::Asset::Template',0,'Default Acknowledgement Default Acknowledgement default acknowledgement DataForm','000001000001000010000003',NULL),('PBtmpl0000000000000002','Default Article','','default_article',1124395696,1259133276,'3','7','12','WebGUI::Asset::Template',0,'Default Article Default Article default article Article','000001000001000004000002',NULL),('PBtmpl0000000000000141','Default DataForm','','pbtmpl0000000000000141',1124395696,1257311888,'3','7','12','WebGUI::Asset::Template',0,'Default DataForm Default DataForm pbtmpl0000000000000141 DataForm','000001000001000010000006',NULL),('WikiRCTmpl000000000001','Default Recent Changes','','default-wiki-recent-changes',1165460175,1273032720,'3','7','12','WebGUI::Asset::Template',0,'Default Recent Changes Default Recent Changes default wiki recent changes WikiMaster_recentChanges','000001000001000052000001',NULL),('PBtmpl0000000000000128','Classifieds','','classifieds',1124395696,1277868921,'3','7','12','WebGUI::Asset::Template',0,'Classifieds Classifieds classifieds Collaboration','000001000001000008000008',NULL),('PBtmpl0000000000000134','Hierarchical Top Nav','','import/hierarchical-top-nav',1124395696,1259133275,'3','7','12','WebGUI::Asset::Template',0,'Hierarchical Top Nav Hierarchical Top Nav import hierarchical top nav Navigation','000001000001000025000006',NULL),('PBtmpl0000000000000208','Request Tracker','','request-tracker-template',1147642410,1277868922,'3','7','12','WebGUI::Asset::Template',0,'Request Tracker Request Tracker request tracker template Collaboration','000001000001000008000026',NULL),('wAc4azJViVTpo-2NYOXWvg','Default Question Edit','','root/import/survey/default-question-edit',1226009650,1250243000,'3','7','12','WebGUI::Asset::Template',0,'Default Question Edit Default Question Edit root import survey default question edit Survey/Edit','000001000001000042000008',NULL),('1z9J1O08n_7gVVlBwSRBJQ','Auth','','root/import/auth',1222803099,1287545014,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'Auth Auth root import auth','000001000001000005',NULL),('zyWi26q9na-iiZqL4yedog','Macro','','root/import/macro',1222803114,1222803114,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'Macro Macro root import macro','000001000001000021',NULL),('PBtmpl0000000000000209','Request Tracker Thread','','request-tracker-post-template',1147642410,1277868922,'3','7','12','WebGUI::Asset::Template',0,'Request Tracker Thread Request Tracker Thread request tracker post template Collaboration/Thread','000001000001000008000027',NULL),('PBtmpl0000000000000109','One Over Three','','one_over_three',1124395696,1259133276,'3','7','12','WebGUI::Asset::Template',0,'One Over Three One Over Three one over three Layout','000001000001000019000004',NULL),('PBtmpl0000000000000001','Admin Console','','admin_console2',1124395696,1247535846,'3','7','12','WebGUI::Asset::Template',0,'Admin Console Admin Console admin console2 AdminConsole','000001000001000003000001',NULL),('LBuiKzg2mWwmOPS9AgV3bg','Get Translated','Let our team of professional translators bring your site to new customers by translating your content into additional languages. Our translation services are never machine automated. They\'re always done by professional translators that have years of exper','yns/translated',1147642517,1271348789,'3','7','4','WebGUI::Asset::Wobject::Article',1,'Get Translated Get Translated yns translated Let our team of professional translators bring your site to new customers by translating your content into additional languages Our translation services are never machine automated They\'re always done by professional translators that have years of experience reading writing and speaking many languages  ','000001000002000002000005',NULL),('jTNggl7AoVSUc_ZzrvuCmw','Get Promoted','Now that you have a brilliant WebGUI site, you need to get people to visit it. We can help there too. Our marketing specialists can work with you to develop and execute the right combination of search engine placement, advertising buys, and affilliate pro','yns/promotion',1147642517,1271348789,'3','7','4','WebGUI::Asset::Wobject::Article',1,'Get Promoted Get Promoted yns promotion Now that you have a brilliant WebGUI site you need to get people to visit it We can help there too Our marketing specialists can work with you to develop and execute the right combination of search engine placement advertising buys and affilliate programs to ensure your site gets the traffic it needs  ','000001000002000002000006',NULL),('Vzv1pWpg_w6R_o-b0rM2qQ','Ad','','home/ad2',1147642515,1147642515,'3','7','4','WebGUI::Asset::File',1,'Ad Ad home ad2','000001000002000001000002',NULL),('NK8bqlwVRILJknqeCDPBHg','Getting Started (part 2)','\nTo begin managing content, you should log in and click the Turn Admin On! link. The default username is \"admin\" and the default password is \"123qwe\", but you probably customized both of those when you visited this site for the very first time.\n \n\nNow tha','getting_started/getting-started-part2',1147642515,1285796040,'3','7','4','WebGUI::Asset::Wobject::Article',1,'Getting Started part 2 Getting Started part 2 getting started getting started part2 To begin managing content you should log in and click the Turn Admin On link The default username is admin and the default password is 123qwe but you probably customized both of those when you visited this site for the very first time Now that you\'re logged in we recommend that you add a new user for yourself with admin privileges just in case you forget the login information for your primary admin account Don\'t worry if you lock yourself out you can always contact Plain Black® support to get instructions to get back in NOTE If you appear to get logged out while moving between pages this is most likely your browser displaying a cached version of the page Click on your browser\'s refresh button to correct the problem For more information about services related to WebGUI click here Enjoy your new WebGUI site  ','000001000002000001000003',NULL),('IWFxZDyGhQ3-SLZhELa3qw','Benefits','\n\n\n\nRich User Interface\n \n\nPowerful API\n \n\n\n\nWebGUI has a rich user experience that allows users to place their \ncontent\nthrough a drag-n-drop interface; helps users pick dates, colors, and\nmore; and has a highly customizable rich editor to allow users to','home/key-benefits',1147642514,1277737686,'3','7','4','WebGUI::Asset::Wobject::Article',1,'Benefits Benefits home key benefits Rich User Interface Powerful API WebGUI has a rich user experience that allows users to place their content through a drag-n-drop interface helps users pick dates colors and more and has a highly customizable rich editor to allow users to quickly and easily format content WebGUI allows developers to quickly plug-in new functionality to get the most from a site In addition WebGUI\'s standardized plug-in points maintain the upgrade path even with customizations Short Friendly URLs Internationalization Never worry about ugly numeric ID\'s or other things in URL\'s that make it hard for search engines and people to use a site Users can work in an interface in their native language and content can be published in as many languages as necessary Personalization Easy To Install Users see their own view of the site through dynamically generated navigation and content In addition content can be displayed based upon users viewing habits With the use of the WebGUI Runtime Environment Unix Mac OS X Linux BSD and VMWare Appliance Windows setup takes minutes rather than hours  ','000001000002000007',NULL),('OhdaFLE7sXOzo_SIP2ZUgA','Welcome','The WebGUI Content Engine&reg; is a powerful, easy to use web application framework and content management system. WebGUI contains dozens of built-in features, and allows for full customization through its rich API. It\'s easy enough for the average busine','home/welcome',1147642513,1271445348,'3','7','4','WebGUI::Asset::Wobject::Article',1,'Welcome Welcome home welcome The WebGUI Content Engine® is a powerful easy to use web application framework and content management system WebGUI contains dozens of built-in features and allows for full customization through its rich API It\'s easy enough for the average business user to use but powerful enough for any large enterprise WebGUI serves thousands of small and large businesses schools universities governments associations churches projects and communities throughout the world For examples of who is using WebGUI visit the WebGUI Sightings page Shouldn\'t your site be on this list If you\'re new to WebGUI visit the Getting Started section Once you feel comfortable explore some of the professional services available for your new WebGUI site No matter what level you\'re at tell your friends about WebGUI  ','000001000002000006',NULL),('7-0-style0000000000071','wg.jpg','','style3/wg.jpg',1147642511,1147642511,'3','7','12','WebGUI::Asset::File::Image',1,'wg.jpg wg.jpg style3 wg.jpg','000001000001000051000022',NULL),('7-0-style0000000000068','spacer.gif','','style3/spacer.gif',1147642510,1147642510,'3','7','12','WebGUI::Asset::File::Image',1,'spacer.gif spacer.gif style3 spacer.gif','000001000001000051000019',NULL),('7-0-style0000000000070','Style3 Coolmenu','','style3_coolmenu',1147642510,1147642510,'3','7','12','WebGUI::Asset::Wobject::Navigation',1,'Style3 Coolmenu Style3 Coolmenu style3 coolmenu','000001000001000051000021',NULL),('7-0-style0000000000066','nav_bg_on.jpg','','style3/nav_bg_on.jpg',1147642509,1147642509,'3','7','12','WebGUI::Asset::File::Image',1,'nav_bg_on.jpg nav_bg_on.jpg style3 nav bg on.jpg','000001000001000051000017',NULL),('7-0-style0000000000064','nav_bg2.jpg','','style3/nav_bg2.jpg',1147642509,1147642509,'3','7','12','WebGUI::Asset::File::Image',1,'nav_bg2.jpg nav_bg2.jpg style3 nav bg2.jpg','000001000001000051000015',NULL),('7-0-style0000000000065','nav_bg2_on.jpg','','style3/nav_bg2_on.jpg',1147642509,1147642509,'3','7','12','WebGUI::Asset::File::Image',1,'nav_bg2_on.jpg nav_bg2_on.jpg style3 nav bg2 on.jpg','000001000001000051000016',NULL),('7-0-style0000000000067','pb.jpg','','style3/pb.jpg',1147642509,1147642509,'3','7','12','WebGUI::Asset::File::Image',1,'pb.jpg pb.jpg style3 pb.jpg','000001000001000051000018',NULL),('7-0-style0000000000063','nav_bg1_on.jpg','','style3/nav_bg1_on.jpg',1147642508,1147642508,'3','7','12','WebGUI::Asset::File::Image',1,'nav_bg1_on.jpg nav_bg1_on.jpg style3 nav bg1 on.jpg','000001000001000051000014',NULL),('7-0-style0000000000060','main_top_bg.jpg','','style3/main_top_bg.jpg',1147642508,1147642508,'3','7','12','WebGUI::Asset::File::Image',1,'main_top_bg.jpg main_top_bg.jpg style3 main top bg.jpg','000001000001000051000011',NULL),('7-0-style0000000000062','nav_bg1.jpg','','style3/nav_bg1.jpg',1147642508,1147642508,'3','7','12','WebGUI::Asset::File::Image',1,'nav_bg1.jpg nav_bg1.jpg style3 nav bg1.jpg','000001000001000051000013',NULL),('7-0-style0000000000061','nav_bg.jpg','','style3/nav_bg.jpg',1147642508,1147642508,'3','7','12','WebGUI::Asset::File::Image',1,'nav_bg.jpg nav_bg.jpg style3 nav bg.jpg','000001000001000051000012',NULL),('7-0-style0000000000059','main_top.jpg','','style3/main_top.jpg',1147642507,1213386091,'3','7','12','WebGUI::Asset::File::Image',1,'main_top.jpg main_top.jpg style3 main top.jpg','000001000001000051000010',NULL),('7-0-style0000000000057','main_bg.jpg','','style3/main_bg.jpg',1147642507,1147642507,'3','7','12','WebGUI::Asset::File::Image',1,'main_bg.jpg main_bg.jpg style3 main bg.jpg','000001000001000051000008',NULL),('7-0-style0000000000058','main_bottom.jpg','','style3/main_bottom.jpg',1147642507,1147642507,'3','7','12','WebGUI::Asset::File::Image',1,'main_bottom.jpg main_bottom.jpg style3 main bottom.jpg','000001000001000051000009',NULL),('7-0-style0000000000055','header_left.jpg','','style3/header_left.jpg',1147642506,1147642506,'3','7','12','WebGUI::Asset::File::Image',1,'header_left.jpg header_left.jpg style3 header left.jpg','000001000001000051000006',NULL),('7-0-style0000000000056','header_right.jpg','','style3/header_right.jpg',1147642506,1147642506,'3','7','12','WebGUI::Asset::File::Image',1,'header_right.jpg header_right.jpg style3 header right.jpg','000001000001000051000007',NULL),('7-0-style0000000000054','header_bg.jpg','','style3/header_bg.jpg',1147642506,1147642506,'3','7','12','WebGUI::Asset::File::Image',1,'header_bg.jpg header_bg.jpg style3 header bg.jpg','000001000001000051000005',NULL),('7-0-style0000000000052','footer_bg.jpg','','style3/footer_bg.jpg',1147642505,1147642505,'3','7','12','WebGUI::Asset::File::Image',1,'footer_bg.jpg footer_bg.jpg style3 footer bg.jpg','000001000001000051000003',NULL),('7-0-style0000000000053','footer_right.jpg','','style3/footer_right.jpg',1147642505,1147642505,'3','7','12','WebGUI::Asset::File::Image',1,'footer_right.jpg footer_right.jpg style3 footer right.jpg','000001000001000051000004',NULL),('7-0-style0000000000046','rightCol_bg.jpg','','style2/rightcol_bg.jpg',1147642504,1147642504,'3','7','12','WebGUI::Asset::File::Image',1,'rightCol_bg.jpg rightCol_bg.jpg style2 rightcol bg.jpg','000001000001000050000015',NULL),('7-0-style0000000000049','WebGUI 7 Style 3','','root/import/webgui-7-style-3',1147642504,1224117144,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'WebGUI 7 Style 3 WebGUI 7 Style 3 root import webgui 7 style 3','000001000001000051',NULL),('7-0-style0000000000048','wg.jpg','','style2/wg.jpg',1147642504,1147642504,'3','7','12','WebGUI::Asset::File::Image',1,'wg.jpg wg.jpg style2 wg.jpg','000001000001000050000017',NULL),('7-0-style0000000000045','pb_wg_bg.jpg','','style2/pb_wg_bg.jpg',1147642503,1147642503,'3','7','12','WebGUI::Asset::File::Image',1,'pb_wg_bg.jpg pb_wg_bg.jpg style2 pb wg bg.jpg','000001000001000050000014',NULL),('7-0-style0000000000044','pb_wg.jpg','','style2/pb_wg.jpg',1147642503,1147642503,'3','7','12','WebGUI::Asset::File::Image',1,'pb_wg.jpg pb_wg.jpg style2 pb wg.jpg','000001000001000050000013',NULL),('7-0-style0000000000043','pb.jpg','','style2/pb.jpg',1147642503,1147642503,'3','7','12','WebGUI::Asset::File::Image',1,'pb.jpg pb.jpg style2 pb.jpg','000001000001000050000012',NULL),('7-0-style0000000000042','page_title_bg.jpg','','style2/page_title_bg.jpg',1147642502,1147642502,'3','7','12','WebGUI::Asset::File::Image',1,'page_title_bg.jpg page_title_bg.jpg style2 page title bg.jpg','000001000001000050000011',NULL),('7-0-style0000000000041','page_title.jpg','','style2/page_title.jpg',1147642502,1147642502,'3','7','12','WebGUI::Asset::File::Image',1,'page_title.jpg page_title.jpg style2 page title.jpg','000001000001000050000010',NULL),('7-0-style0000000000040','navbar_right.jpg','','style2/navbar_right.jpg',1147642502,1147642502,'3','7','12','WebGUI::Asset::File::Image',1,'navbar_right.jpg navbar_right.jpg style2 navbar right.jpg','000001000001000050000009',NULL),('7-0-style0000000000039','navbar_left.jpg','','style2/navbar_left.jpg',1147642502,1147642502,'3','7','12','WebGUI::Asset::File::Image',1,'navbar_left.jpg navbar_left.jpg style2 navbar left.jpg','000001000001000050000008',NULL),('7-0-style0000000000036','main_bg.jpg','','style2/main_bg.jpg',1147642501,1147642501,'3','7','12','WebGUI::Asset::File::Image',1,'main_bg.jpg main_bg.jpg style2 main bg.jpg','000001000001000050000005',NULL),('7-0-style0000000000038','navbar_bg.jpg','','style2/navbar_bg.jpg',1147642501,1147642501,'3','7','12','WebGUI::Asset::File::Image',1,'navbar_bg.jpg navbar_bg.jpg style2 navbar bg.jpg','000001000001000050000007',NULL),('7-0-style0000000000035','leftCol_header02.jpg','','style2/leftcol_header02.jpg',1147642501,1147642501,'3','7','12','WebGUI::Asset::File::Image',1,'leftCol_header02.jpg leftCol_header02.jpg style2 leftcol header02.jpg','000001000001000050000004',NULL),('7-0-style0000000000037','nav_bg.jpg','','style2/nav_bg.jpg',1147642501,1147642501,'3','7','12','WebGUI::Asset::File::Image',1,'nav_bg.jpg nav_bg.jpg style2 nav bg.jpg','000001000001000050000006',NULL),('7-0-style0000000000032','context_bg.jpg','','style2/context_bg.jpg',1147642500,1147642500,'3','7','12','WebGUI::Asset::File::Image',1,'context_bg.jpg context_bg.jpg style2 context bg.jpg','000001000001000050000001',NULL),('7-0-style0000000000031','WebGUI 7 Style 2','','root/import/webgui-7-style-2',1147642500,1147642500,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'WebGUI 7 Style 2 WebGUI 7 Style 2 root import webgui 7 style 2','000001000001000050',NULL),('7-0-style0000000000033','css02.css','','style2/css02.css',1147642500,1147642500,'3','7','12','WebGUI::Asset::Snippet',0,'css02.css css02.css style2 css02.css body html  height:100  body  background:#7c9ab0 url(\'^FileUrl(style2/main_bg.jpg repeat-y right margin:0px  rightColumn  width:20 height:100 background eeeeee url(\'^FileUrl(style2/rightCol_bg.jpg repeat-y right text-align:center  rightColumn pb_wg_bg  background url(\'^FileUrl(style2/pb_wg_bg.jpg repeat-x width:100 text-align:left  rightColumn pb_wg  background url(\'^FileUrl(style2/pb_wg.jpg left no-repeat height:53px  leftColumn  width:80 background white url(\'^FileUrl(style2/context_bg.jpg repeat-y right  leftColumn header  width:100 background:#7c9ab0 url(\'^FileUrl(style2/leftCol_header.jpg right no-repeat height:86px position:relative  leftColumn header title leftColumn header title_bg  color:white font-size:36pt font-weight:bold font-family:arial font-variant:small-caps letter-spacing:12px top:15px left:5px position:absolute z-index:10  leftColumn header title a  color:white text-decoration:none  leftColumn header title_bg  color:black z-index:5 top:17px left:7px  leftColumn context  background fff url(\'^FileUrl(style2/context_bg.jpg repeat-y right  width:95 font-family:verdana font-size:9pt color:#242424 moz-box-sizing:border-box position:relative padding-left:1 padding-right:1 padding-bottom:15px  leftColumn context a  color:#7C9AB0 font-weight:bold  leftColumn context a:hover  text-decoration:none  leftColumn pageTitleBG  background url(\'^FileUrl(style2/page_title_bg.jpg repeat-x width:100  leftColumn pageTitleBG pageTitle  background url(\'^FileUrl(style2/page_title.jpg right no-repeat width:100 height:50px  leftColumn pageTitleBG pageTitle h2  font-size:14pt color:#696969 font-family:arial font-weight:normal margin:0px padding-top:2px padding-left:25px letter-spacing:3px  rightColumn nav  width:85 background b5b5b5 url(\'^FileUrl(style2/nav_bg.jpg repeat-x top border-right:solid 848484 1px margin-left:auto margin-right:auto text-align:left padding-left:3px padding-top:7px padding-bottom:7px  rightColumn nav a  color:white font-size:8pt font-weight:bold text-decoration:none font-family:arial line-height:8pt  rightColumn nav selectedMenuItem  color:yellow  loginStyles  font-size:8pt font-family:arial padding-bottom:25px  loginStyles a  color:#89ACCF font-weight:bold border-bottom:solid transparent 2px text-decoration:none  loginStyles a:hover  border-bottom:dotted B2C9D9 2px  copyright  border-top:solid silver 3px background-color:gray font-family:arial font-size:9pt color:silver text-align:center ','000001000001000050000002',NULL),('7-0-style0000000000034','leftCol_header.jpg','','style2/leftcol_header.jpg',1147642500,1147642500,'3','7','12','WebGUI::Asset::File::Image',1,'leftCol_header.jpg leftCol_header.jpg style2 leftcol header.jpg','000001000001000050000003',NULL),('stevenav00000000000001','Style 01 Nav','','style1_nav',1147642499,1147642499,'3','7','12','WebGUI::Asset::Template',0,'Style 01 Nav Style 01 Nav style1 nav Navigation','000001000001000049000027',NULL),('PBnav000000style01lvl2','Style 01 Nav lvl2','','style1_nav_lvl2',1147642499,1147642499,'3','7','12','WebGUI::Asset::Template',0,'Style 01 Nav lvl2 untitled style1 nav lvl2 Navigation','000001000001000049000028',NULL),('7-0-style0000000000030','webgui_btn.jpg','','style1/webgui_btn.jpg',1147642499,1147642499,'3','7','12','WebGUI::Asset::File::Image',1,'webgui_btn.jpg webgui_btn.jpg style1 webgui btn.jpg','000001000001000049000029',NULL),('7-0-style0000000000026','RootTab Level 1','','roottab_level1',1147642499,1147642499,'3','7','12','WebGUI::Asset::Wobject::Navigation',1,'RootTab Level 1 RootTab Level 1 roottab level1','000001000001000049000025',NULL),('7-0-style0000000000024','orange_left01.jpg','','style1/orange_left01.jpg',1147642498,1147642498,'3','7','12','WebGUI::Asset::File::Image',1,'orange_left01.jpg orange_left01.jpg style1 orange left01.jpg','000001000001000049000023',NULL),('7-0-style0000000000023','nav_on.jpg','','style1/nav_on.jpg',1147642498,1147642498,'3','7','12','WebGUI::Asset::File::Image',1,'nav_on.jpg nav_on.jpg style1 nav on.jpg','000001000001000049000022',NULL),('7-0-style0000000000025','RootTab Level 0','','roottab_level0',1147642498,1147642498,'3','7','12','WebGUI::Asset::Wobject::Navigation',1,'RootTab Level 0 RootTab Level 0 roottab level0','000001000001000049000024',NULL),('7-0-style0000000000019','nav2_off_right.jpg','','style1/nav2_off_right.jpg',1147642497,1147642497,'3','7','12','WebGUI::Asset::File::Image',1,'nav2_off_right.jpg nav2_off_right.jpg style1 nav2 off right.jpg','000001000001000049000018',NULL),('7-0-style0000000000020','nav2_on_left.jpg','','style1/nav2_on_left.jpg',1147642497,1147642497,'3','7','12','WebGUI::Asset::File::Image',1,'nav2_on_left.jpg nav2_on_left.jpg style1 nav2 on left.jpg','000001000001000049000019',NULL),('7-0-style0000000000022','nav_bg.jpg','','style1/nav_bg.jpg',1147642497,1147642497,'3','7','12','WebGUI::Asset::File::Image',1,'nav_bg.jpg nav_bg.jpg style1 nav bg.jpg','000001000001000049000021',NULL),('7-0-style0000000000021','nav2_on_right.jpg','','style1/nav2_on_right.jpg',1147642497,1147642497,'3','7','12','WebGUI::Asset::File::Image',1,'nav2_on_right.jpg nav2_on_right.jpg style1 nav2 on right.jpg','000001000001000049000020',NULL),('7-0-style0000000000017','nav2_off_center.jpg','','style1/nav2_off_center.jpg',1147642496,1147642496,'3','7','12','WebGUI::Asset::File::Image',1,'nav2_off_center.jpg nav2_off_center.jpg style1 nav2 off center.jpg','000001000001000049000016',NULL),('7-0-style0000000000016','nav2_center_on.jpg','','style1/nav2_center_on.jpg',1147642496,1147642496,'3','7','12','WebGUI::Asset::File::Image',1,'nav2_center_on.jpg nav2_center_on.jpg style1 nav2 center on.jpg','000001000001000049000015',NULL),('7-0-style0000000000018','nav2_off_left.jpg','','style1/nav2_off_left.jpg',1147642496,1147642496,'3','7','12','WebGUI::Asset::File::Image',1,'nav2_off_left.jpg nav2_off_left.jpg style1 nav2 off left.jpg','000001000001000049000017',NULL),('7-0-style0000000000015','nav1_on_right.jpg','','style1/nav1_on_right.jpg',1147642496,1147642496,'3','7','12','WebGUI::Asset::File::Image',1,'nav1_on_right.jpg nav1_on_right.jpg style1 nav1 on right.jpg','000001000001000049000014',NULL),('7-0-style0000000000014','nav1_on_left.jpg','','style1/nav1_on_left.jpg',1147642495,1147642495,'3','7','12','WebGUI::Asset::File::Image',1,'nav1_on_left.jpg nav1_on_left.jpg style1 nav1 on left.jpg','000001000001000049000013',NULL),('7-0-style0000000000013','nav1_on.jpg','','style1/nav1_on.jpg',1147642495,1147642495,'3','7','12','WebGUI::Asset::File::Image',1,'nav1_on.jpg nav1_on.jpg style1 nav1 on.jpg','000001000001000049000012',NULL),('7-0-style0000000000011','nav1_off_left.jpg','','style1/nav1_off_left.jpg',1147642495,1147642495,'3','7','12','WebGUI::Asset::File::Image',1,'nav1_off_left.jpg nav1_off_left.jpg style1 nav1 off left.jpg','000001000001000049000010',NULL),('7-0-style0000000000012','nav1_off_right.jpg','','style1/nav1_off_right.jpg',1147642495,1147642495,'3','7','12','WebGUI::Asset::File::Image',1,'nav1_off_right.jpg nav1_off_right.jpg style1 nav1 off right.jpg','000001000001000049000011',NULL),('7-0-style0000000000009','nav1_off.jpg','','style1/nav1_off.jpg',1147642494,1147642494,'3','7','12','WebGUI::Asset::File::Image',1,'nav1_off.jpg nav1_off.jpg style1 nav1 off.jpg','000001000001000049000008',NULL),('7-0-style0000000000010','nav1_off_center.jpg','','style1/nav1_off_center.jpg',1147642494,1147642494,'3','7','12','WebGUI::Asset::File::Image',1,'nav1_off_center.jpg nav1_off_center.jpg style1 nav1 off center.jpg','000001000001000049000009',NULL),('7-0-style0000000000008','nav1_center_on.jpg','','style1/nav1_center_on.jpg',1147642494,1147642494,'3','7','12','WebGUI::Asset::File::Image',1,'nav1_center_on.jpg nav1_center_on.jpg style1 nav1 center on.jpg','000001000001000049000007',NULL),('7-0-style0000000000006','main_bg.gif','','style1/main_bg.gif',1147642493,1147642493,'3','7','12','WebGUI::Asset::File::Image',1,'main_bg.gif main_bg.gif style1 main bg.gif','000001000001000049000005',NULL),('7-0-style0000000000007','main_bg.jpg','','style1/main_bg.jpg',1147642493,1147642493,'3','7','12','WebGUI::Asset::File::Image',1,'main_bg.jpg main_bg.jpg style1 main bg.jpg','000001000001000049000006',NULL),('7-0-style0000000000004','gui_bottom.jpg','','style1/gui_bottom.jpg',1147642493,1147642493,'3','7','12','WebGUI::Asset::File::Image',1,'gui_bottom.jpg gui_bottom.jpg style1 gui bottom.jpg','000001000001000049000003',NULL),('7-0-style0000000000005','header.jpg','','style1/header.jpg',1147642493,1147642493,'3','7','12','WebGUI::Asset::File::Image',1,'header.jpg header.jpg style1 header.jpg','000001000001000049000004',NULL),('7-0-style0000000000001','WebGUI 7 Style 1','','root/import/webgui-7-style-1',1147642492,1147642492,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'WebGUI 7 Style 1 WebGUI 7 Style 1 root import webgui 7 style 1','000001000001000049',NULL),('7-0-style0000000000002','body_bg.jpg','','style1/body_bg.jpg',1147642492,1147642492,'3','7','12','WebGUI::Asset::File::Image',1,'body_bg.jpg body_bg.jpg style1 body bg.jpg','000001000001000049000001',NULL),('7-0-style0000000000003','css01.css','','style1/css01.css',1147642492,1147642492,'3','7','12','WebGUI::Asset::Snippet',0,'css01.css css01.css style1 css01.css body html  text-align:center margin:0px height:100 background-color:#494949  main  width:800px background url(\'^FileUrl(style1/main_bg.jpg repeat-y height:100 margin-left:auto margin-right:auto margin-top:0px margin-bottom:0px position:relative  body > main  height:auto min-height:100  main mainHeader  width:800px height:133px background url(\'^FileUrl(style1/header.jpg top left no-repeat margin-bottom:0px position:relative  main mainHeader title  position:absolute top:23px left:145px font-size:32pt font-family:arial color:white font-weight:bold  main mainHeader title a  color:white text-decoration:none  main mainContent  background url(\'^FileUrl(style1/orange_left01.jpg left top no-repeat width:100 height:100 margin-top:0px text-align:left border:solid red 0px  main > mainContent  margin-top:0px min-height:500px  main > mainContent > p  margin-top:0px  main mainContent mainText a:link  color:#FF7F23  main mainContent mainText a:visited  color:#D25900   LEVEL 1 AND 2 NAVIGATION  main mainNav_1 main mainNav_2  border-bottom:dashed DADADA 1px width:621px height:25px text-align:left position:relative margin-left:137px clear:both  main mainNav_1 a:link main mainNav_1 a:visited main mainNav_2 a:link main mainNav_2 a:visited  color:white text-decoration:none top:5px position:relative moz-box-sizing:border-box  main mainNav_1 a:hover,#main mainNav_2 a:hover  color:black  main mainNav_1 div left main mainNav_2 div left  width:12px height:25px display:block float:left background url(\'^FileUrl(style1/nav1_off_left.jpg no-repeat top left  main mainNav_2 div left  background url(\'^FileUrl(style1/nav2_off_left.jpg no-repeat top left  main mainNav_1 div center main mainNav_2 div center  height:25px display:block float:left background url(\'^FileUrl(style1/nav1_off_center.jpg repeat-x top left color:white font-family:arial verdana font-size:8pt  main mainNav_2 div center  background url(\'^FileUrl(style1/nav2_off_center.jpg repeat-x top left  main mainNav_1 div right main mainNav_2 div right  width:10px height:25px display:block float:left background url(\'^FileUrl(style1/nav1_off_right.jpg no-repeat top left  main mainNav_2 div right  background url(\'^FileUrl(style1/nav2_off_right.jpg no-repeat top left  main mainNav_1 div.navOn left  background url(\'^FileUrl(style1/nav1_on_left.jpg no-repeat top left  main mainNav_1 div.navOn center  background url(\'^FileUrl(style1/nav1_center_on.jpg repeat-x top left  main mainNav_1 div.navOn right  background url(\'^FileUrl(style1/nav1_on_right.jpg no-repeat top left  main mainNav_2 div.navOn left  background url(\'^FileUrl(style1/nav2_on_left.jpg no-repeat top left  main mainNav_2 div.navOn center  background url(\'^FileUrl(style1/nav2_center_on.jpg repeat-x top left  main mainNav_2 div.navOn right  background url(\'^FileUrl(style1/nav2_on_right.jpg no-repeat top left  main mainNav_1 div.navOn a:link main mainNav_1 div.navOn a:visited main mainNav_2 div.navOn a:link main mainNav_2 div.navOn a:visited  color:black   ENDOF LEVEL 1 AND 2 NAVIGATION  main crumbTrail  margin-left:177px margin-bottom:0px color:gray font-size:8pt font-weight:bold  main crumbTrail a.crumbTrail:visited main crumbTrail a.crumbTrail:link  color:silver font-size:8pt font-family:arial text-decoration:none font-weight:normal  main crumbTrail a.crumbTrail:hover  color:gray  main mainText  padding-left:150px font-family:verdana font-size:9pt width:600px margin-top:0px  main gui  bottom:0px left:0px position:absolute width:135px font-size:8pt color:black font-family:arial text-align:right  main gui loginBox  padding-right:12px moz-box-sizing:border-box width:100px float:right margin-bottom:10px  main gui loginBox loginBoxField  width:75px  main gui loginBox loginBoxButton  background-color:#D65501 color:white border:solid white 2px margin-top:4px font-variant:small-caps  main gui a  color:white  copyright  color:#fff position:absolute top:110px right:40px font-family:verdana font-size:8pt font-weight:bold background-color:#2D2D2D opacity:0.4 moz-opacity:0.4 khtml-opacity:0.4 padding:2px   html copyright  background transparent ','000001000001000049000002',NULL),('7F-BuEHi7t9bPi008H8xZQ','Default Survey Summary','','root/import/survey/default-survey-summary',1239248021,1250243000,'3','7','12','WebGUI::Asset::Template',0,'Default Survey Summary Default Survey Summary root import survey default survey summary Survey/Summary','000001000001000042000012',NULL),('CSN-ZON7Uwv8kxf3F1fh5Q','ZipArchiveAsset','','root/import/ziparchiveasset',1147642484,1147642484,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'ZipArchiveAsset ZipArchiveAsset root import ziparchiveasset','000001000001000053',NULL),('TCtybxdqmdwdvRn555zpCQ','RichEdit','','root/import/richedit',1147642484,1147642484,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'RichEdit RichEdit root import richedit','000001000001000032',NULL),('NywJYmGWe1f6EBXJnWg9Xg','Profile','','root/import/profile',1222803606,1222803638,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'Profile Profile root import profile','000001000001000029',NULL),('9wKWdum0_8z-OhhquWLtSQ','WeatherData','','root/import/weatherdata',1147642483,1147642483,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'WeatherData WeatherData root import weatherdata','000001000001000048',NULL),('AgyFhx3eXlfZXNp2MkrsiQ','Edit','','root/import/profile/edit',1147642477,1222803665,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'Edit Edit root import profile edit','000001000001000029000001',NULL),('F7MAQ-cpuvQ1KuC7J4P5zQ','View','','root/import/profile/view',1147642477,1222803673,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'View View root import profile view','000001000001000029000002',NULL),('oGfxez5sksyB_PcaAsEm_Q','SyndicatedContent','','root/import/syndicatedcontent',1147642482,1247053097,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'SyndicatedContent SyndicatedContent root import syndicatedcontent','000001000001000043',NULL),('5bnNzteN7w3NnK9mF4XiCg','Survey','','root/import/survey',1147642481,1250243000,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'Survey Survey root import survey','000001000001000042',NULL),('Efe2W0UgrSRDltNJ87jlfg','StockData','','root/import/stockdata',1147642480,1147642480,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'StockData StockData root import stockdata','000001000001000039',NULL),('bbiA9Zq5Gy2oCFBlILO3QA','SQLReport','','root/import/sqlreport',1147642480,1147642480,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'SQLReport SQLReport root import sqlreport','000001000001000038',NULL),('RrV4aAPnn4dM0ZcU3OXnlw','style','','root/import/style',1147642480,1286336607,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'style style root import style','000001000001000041',NULL),('Ik9HHky10DIyFTKehUD1dw','Prompt','','root/import/prompt',1147642479,1222803478,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'Prompt Prompt root import prompt','000001000001000031',NULL),('f_tn9FfoSfKWX43F83v_3w','Search','','root/import/search',1147642479,1247053009,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'Search Search root import search','000001000001000034',NULL),('Da6KWn805L4B5e4HFgQRQA','Shortcut','','root/import/shortcut',1147642479,1147642479,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'Shortcut Shortcut root import shortcut','000001000001000037',NULL),('TYo2Bwl7aafzTtdHlS-arQ','Product','','root/import/product',1147642478,1211664878,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'Product Product root import product','000001000001000028',NULL),('VZK3CRgiMb8r4dBjUmCTgQ','Poll','','root/import/poll',1147642477,1247046242,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'Poll Poll root import poll','000001000001000027',NULL),('jEz8iTGNWEt2I05IhVV19Q','Operation/RedeemSubscription','','root/import/operation/redeemsubscription',1147642477,1326776037,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'Operation/RedeemSubscription Operation/RedeemSubscription root import operation redeemsubscription','000001000001000036000016',NULL),('BFfNj5wA9bDw8H3cnr8pTw','Navigation','','root/import/navigation',1147642475,1247046273,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'Navigation Navigation root import navigation','000001000001000025',NULL),('bBzO4CWjqU_ile3gf5Iypw','MultiSearch','','root/import/multisearch',1147642475,1147642475,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'MultiSearch MultiSearch root import multisearch','000001000001000024',NULL),('cj2y4papTVGZRFdwTI-_fw','MessageBoard','','root/import/messageboard',1147642475,1147642475,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'MessageBoard MessageBoard root import messageboard','000001000001000023',NULL),('3womoo7Teyy2YKFa25-MZg','Address Book (Default)','','shopping-cart-collateral-items/address-book-default',1212098997,1326776037,'3','7','3','WebGUI::Asset::Template',0,'Address Book Default Address Book Default shopping cart collateral items address book default Shop/AddressBook','000001000001000036000013',NULL),('g8W53Pd71uHB9pxaXhWf_A','My Purchases Detail (Default)','','shopping-cart-collateral-items/my-purchases-detail-default',1213184121,1326776037,'3','7','3','WebGUI::Asset::Template',0,'My Purchases Detail Default My Purchases Detail Default shopping cart collateral items my purchases detail default Shop/MyPurchasesDetail','000001000001000036000015',NULL),('-WM2dt0ZGpDasuL2wWocxg','ProjectManager','','root/import/projectmanager',1222803056,1222803056,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'ProjectManager ProjectManager root import projectmanager','000001000001000030',NULL),('LdiozcIUciWuvt3Z-na5Ww','Matrix','','root/import/matrix',1147642474,1281501162,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'Matrix Matrix root import matrix','000001000001000022',NULL),('default_post_received1','Default Post Received','','default_post_received',1222708029,1277868922,'3','7','4','WebGUI::Asset::Template',0,'Default Post Received Default Post Received default post received Collaboration/PostReceived','000001000001000008000029',NULL),('aNNC62qLAS6TB-0_MCYjsw','Layout','','root/import/layout',1147642471,1246969327,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'Layout Layout root import layout','000001000001000019',NULL),('GYaFxnMu9UsEG8oanwB6TA','Folder','','root/import/folder',1147642470,1246965871,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'Folder Folder root import folder','000001000001000014',NULL),('N13SD1Fpqk00UgBt1Z8ivQ','HttpProxy','','root/import/httpproxy',1147642470,1147642470,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'HttpProxy HttpProxy root import httpproxy','000001000001000016',NULL),('tPagC0AQErZXjLFZQ6OI1g','ImageAsset','','root/import/imageasset',1147642470,1246966459,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'ImageAsset ImageAsset root import imageasset','000001000001000017',NULL),('3uuBf8cYuj1sew2OJXl9tg','InOutBoard','','root/import/inoutboard',1147642470,1147642470,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'InOutBoard InOutBoard root import inoutboard','000001000001000018',NULL),('PBtmpl0000000000000005','Default LDAP Anonymous Registration Template','','default_ldap_anonymous_registration_template',1124395696,1287545014,'3','7','12','WebGUI::Asset::Template',0,'Default LDAP Anonymous Registration Template Default LDAP Anonymous Registration Template default ldap anonymous registration template Auth/LDAP/Create','000001000001000005000002000001',NULL),('PBtmpl0000000000000011','Default WebGUI Anonymous Registration Template','','default_webgui_anonymous_registration_template',1124395696,1287545014,'3','7','12','WebGUI::Asset::Template',0,'Default WebGUI Anonymous Registration Template Default WebGUI Anonymous Registration Template default webgui anonymous registration template Auth/WebGUI/Create','000001000001000005000005000001',NULL),('tXwf1zaOXTvsqPn6yu-GSw','FileAsset','','root/import/fileasset',1147642469,1246965607,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'FileAsset FileAsset root import fileasset','000001000001000013',NULL),('S1A9iAwKcQQ6P20uTqw-Ew','Dashboard','','root/import/dashboard',1147642468,1300763664,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'Dashboard Dashboard root import dashboard','000001000001000009',NULL),('-K8Hj45mbelljN9-0CXZxg','DataForm','  ','root/import/dataform',1147642468,1257311887,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'DataForm DataForm root import dataform','000001000001000010',NULL),('GNOAsX98vCsl0JRwfwL-gg','Collaboration','','root/import/collaboration',1147642466,1277868921,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'Collaboration Collaboration root import collaboration','000001000001000008',NULL),('pbtmpl0000000000000220','Flash Style 3 Template','','flash-style-3-template',1147642465,1247488979,'3','7','12','WebGUI::Asset::Template',0,'Flash Style 3 Template Flash Style 3 Template flash style 3 template FileAsset','000001000001000013000002',NULL),('pbtmpl0000000000000221','Flash Tutorial Template','','flash-tutorial-template',1147642465,1247487940,'3','7','12','WebGUI::Asset::Template',0,'Flash Tutorial Template Flash Tutorial Template flash tutorial template FileAsset','000001000001000013000003',NULL),('nbSrhXZQuxIjhWFaFPSuVA','AdminConsole','','root/import/adminconsole',1147642465,1147642465,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'AdminConsole AdminConsole root import adminconsole','000001000001000003',NULL),('TvOZs8U1kRXLtwtmyW75pg','Article','','root/import/article',1147642465,1256092368,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'Article Article root import article','000001000001000004',NULL),('PBtmpl0000000000000027','Default Forum Notification','','default_forum_notification',1124395696,1311652541,'3','7','12','WebGUI::Asset::Template',0,'Default Forum Notification Default Forum Notification default forum notification Collaboration/Notification','000001000001000008000015',NULL),('-PkdI8l1idu-8gDX3iOdcw','One Over Two','','one_over_two',1247482172,1259133274,'3','7','12','WebGUI::Asset::Template',0,'One Over Two One Over Two one over two Layout','000001000001000019000007',NULL),('FEDP3dk8J3Chw_gyr7_XEQ','navigation.css','','navigation.css',1246278679,1246278679,'3','7','12','WebGUI::Asset::Snippet',0,'navigation.css navigation.css navigation.css Horizontal Menu styles horizontalMenu ul.menu  padding 0 margin 0 0 1em list-style none width 100 clear floated li elements overflow auto clear floated li elements  horizontalMenu ul.menu li  float left  horizontalMenu ul.menu li a  float left padding 4px 8px margin-right 1px background ddd color 000 text-decoration none  horizontalMenu ul.menu li.current a  background:#eee  horizontalMenu ul.menu li a:hover  background:#fff  Tabs tabbed navigation styles tabsMenu ul.menu  margin 0 0 1em  tabsMenu ul.menu li  display inline  tabsMenu ul.menu li a  border 1px solid 999 border-bottom 0 padding 5px 10px 2px color 777 text-decoration:none  tabsMenu ul.menu li.current a tabsMenu ul.menu li a:hover  border 1px solid 000 border-bottom 0 color 000  Indent Nav styles indentMenu a.level0  margin-left:0px display:block  indentMenu a.level1  margin-left:15px display:block  indentMenu a.level2  margin-left:30px display:block  indentMenu a.level3  margin-left:45px display:block  indentMenu a.level4  margin-left:60px display:block ','000001000001000025000028',NULL),('PBnav00000000indentnav','Indent Nav','','indent_nav',1148579525,1259133275,'3','7','12','WebGUI::Asset::Template',0,'Indent Nav Indent Nav indent nav Navigation','000001000001000025000027',NULL),('PBtmpl0000000000000085','Default Email','','default_email',1124395696,1288747840,'3','7','12','WebGUI::Asset::Template',0,'Default Email Default Email default email DataForm','000001000001000010000002',NULL),('PBnav00000000000bullet','Bulleted List','','bulleted_list',1148579524,1259133276,'3','7','12','WebGUI::Asset::Template',0,'Bulleted List Bulleted List bulleted list Navigation','000001000001000025000026',NULL),('StockDataTMPL000000002','StockData Default Display','','stockdatatmpl000000002',1133743239,1229494994,'3','7','12','WebGUI::Asset::Template',0,'StockData Default Display StockData Default Display stockdatatmpl000000002 StockData/Display','000001000001000039000001',NULL),('2OcUWHVsu_L1sDFzIMWYqw','TimeTracking','','root/import/timetracking',1222803070,1222803070,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'TimeTracking TimeTracking root import timetracking','000001000001000046',NULL),('PBtmpl0000000000000014','Default WebGUI Password Recovery Template','','default_webgui_password_recovery_template',1124395696,1287545015,'3','7','12','WebGUI::Asset::Template',0,'Default WebGUI Password Recovery Template Default WebGUI Password Recovery Template default webgui password recovery template Auth/WebGUI/Recovery2','000001000001000005000008000001',NULL),('ProjectManagerTMPL0006','Default Resource List','','default-pm-resource-list',1157679165,1157679165,'3','7','12','WebGUI::Asset::Template',0,'Default Resource List Default Resource List default pm resource list ProjectManager_resourceList','000001000001000030000005000001',NULL),('ProjectManagerTMPL0005','Default Resource Popup','','default-pm-resource-popup',1157679165,1229579830,'3','7','12','WebGUI::Asset::Template',0,'Default Resource Popup Default Resource Popup default pm resource popup ProjectManager_resourcePopup','000001000001000030000005000002',NULL),('PBtmpl0000000000000032','Default Thread','','default_thread',1124395696,1277868921,'3','7','12','WebGUI::Asset::Template',0,'Default Thread Default Thread default thread Collaboration/Thread','000001000001000008000014',NULL),('WeatherDataTmpl0000001','WeatherData Default View','','weatherdatatmpl0000001',1133743239,1210711353,'3','7','12','WebGUI::Asset::Template',0,'WeatherData Default View WeatherData Default View weatherdatatmpl0000001 WeatherData','000001000001000048000001',NULL),('PBasset000000000000001','Root','','root',1124395696,1124395696,'3','7','3','WebGUI::Asset',0,'Root Root root','000001',NULL),('PBrichedit000000000001','Content Manager\'s Rich Edit','','content_managers_rich_edit',1124395696,1256092369,'3','7','12','WebGUI::Asset::RichEdit',0,'Content Manager\'s Rich Edit Content Manager\'s Rich Edit content managers rich edit','000001000001000032000001',NULL),('PBrichedit000000000002','Forum Rich Edit','','forum_rich_edit',1124395696,1124395696,'3','7','12','WebGUI::Asset::RichEdit',0,'Forum Rich Edit Forum Rich Edit forum rich edit','000001000001000032000002',NULL),('SynConXSLT000000000001','RSS 0.9 XSLT Stylesheet','','xslt/rss0.9.xsl',1124395707,1124395707,'3','7','12','WebGUI::Asset::Snippet',0,'RSS 0.9 XSLT Stylesheet RSS 0.9 XSLT xslt rss0.9.xsl You\'re viewing an RSS version 0.9 feed Please use an RSS feed reader to view this content as intended','000001000001000043000003',NULL),('SynConXSLT000000000002','RSS 0.91 XSLT Stylesheet','','xslt/rss0.91.xsl',1124395707,1124395707,'3','7','12','WebGUI::Asset::Snippet',0,'RSS 0.91 XSLT Stylesheet RSS 0.91 XSLT xslt rss0.91.xsl You\'re viewing an RSS version 0.91 feed Please use an RSS feed reader to view this content as intended','000001000001000043000004',NULL),('SynConXSLT000000000003','RSS 1.0 XSLT Stylesheet','','xslt/rss1.0.xsl',1124395707,1124395707,'3','7','12','WebGUI::Asset::Snippet',0,'RSS 1.0 XSLT Stylesheet RSS 1.0 XSLT xslt rss1.0.xsl You\'re viewing an RSS version 1.0 feed Please use an RSS feed reader to view this content as intended  ','000001000001000043000005',NULL),('SynConXSLT000000000004','RSS 2.0 XSLT Stylesheet','','xslt/rss2.0.xsl',1124395707,1124395707,'3','7','12','WebGUI::Asset::Snippet',0,'RSS 2.0 XSLT Stylesheet RSS 2.0 XSLT xslt rss2.0.xsl You\'re viewing an RSS version 2.0 feed Please use an RSS feed reader to view this content as intended ','000001000001000043000006',NULL),('vrKXEtluIhbmAS9xmPukDA','Donation (Default)','','root/import/default-donation-template',1212092352,1326776037,'3','7','12','WebGUI::Asset::Template',0,'Donation Default Donation Default root import default donation template Donation','000001000001000036000010',NULL),('eqb9sWjFEVq0yHunGV8IGw','Subscription (Default)','','root/import/subscription-default',1213182595,1326776037,'3','7','12','WebGUI::Asset::Template',0,'Subscription Default Subscription Default root import subscription default Subscription','000001000001000036000012',NULL),('PBtmpl0000000000000036','Default Admin Toggle Macro','','default_admin_toggle_macro',1124395696,1129049186,'3','7','12','WebGUI::Asset::Template',0,'Default Admin Toggle Macro Default Admin Toggle Macro default admin toggle macro Macro/AdminToggle','000001000001000021000001000001',NULL),('PBtmpl0000000000000037','Default Account Macro','','default_account_macro',1124395696,1129049186,'3','7','12','WebGUI::Asset::Template',0,'Default Account Macro Default Account Macro default account macro Macro/a_account','000001000001000021000002000001',NULL),('PBtmpl0000000000000038','Default Editable Toggle Macro','','default_editable_toggle_macro',1124395696,1129049186,'3','7','12','WebGUI::Asset::Template',0,'Default Editable Toggle Macro Default Editable Toggle Macro default editable toggle macro Macro/EditableToggle','000001000001000021000003000001',NULL),('PBtmpl0000000000000040','Default Group Add Macro','','default_group_add_macro',1124395696,1129049186,'3','7','12','WebGUI::Asset::Template',0,'Default Group Add Macro Default Group Add Macro default group add macro Macro/GroupAdd','000001000001000021000005000001',NULL),('PBtmpl0000000000000041','Default Group Delete Macro','','default_group_delete_macro',1124395696,1129049186,'3','7','12','WebGUI::Asset::Template',0,'Default Group Delete Macro Default Group Delete Macro default group delete macro Macro/GroupDelete','000001000001000021000006000001',NULL),('PBtmpl0000000000000042','Default Homelink','','default_homelink',1124395696,1129049186,'3','7','12','WebGUI::Asset::Template',0,'Default Homelink Default Homelink default homelink Macro/H_homeLink','000001000001000021000007000001',NULL),('PBtmpl0000000000000043','Default LoginToggle','','default_logintoggle',1124395696,1129049186,'3','7','12','WebGUI::Asset::Template',0,'Default LoginToggle Default LoginToggle default logintoggle Macro/LoginToggle','000001000001000021000008000001',NULL),('PBtmpl0000000000000045','Default Make Printable','','default_make_printable',1124395696,1129049186,'3','7','12','WebGUI::Asset::Template',0,'Default Make Printable Default Make Printable default make printable Macro/r_printable','000001000001000021000011000001',NULL),('PBtmpl0000000000000091','File no icon','','file_no_icon',1124395696,1129049189,'3','7','12','WebGUI::Asset::Template',0,'File no icon File no icon file no icon Macro/File','000001000001000021000004000002',NULL),('MK4fCNoyrx5SE8eyDfOpxg','Flash File','','flash-file',1247489252,1259133276,'3','7','12','WebGUI::Asset::Template',0,'Flash File Flash File flash file FileAsset','000001000001000013000004',NULL),('PBtmpl0000000000000132','Empty','','empty',1124395696,1258524916,'3','7','12','WebGUI::Asset::Template',0,'Empty Empty empty style','000001000001000041000004',NULL),('PBtmpl0000000000000140','Default Shortcut','','pbtmpl0000000000000140',1124395696,1129573244,'3','7','12','WebGUI::Asset::Template',0,'Default Shortcut Default Shortcut pbtmpl0000000000000140 Shortcut','000001000001000037000001',NULL),('hkj6WeChxFyqfP85UlRP8w','matrix.css','','new-matrix/matrix.css',1232664229,1281501163,'3','7','12','WebGUI::Asset::Snippet',0,'matrix.css matrix.css new matrix matrix.css wg-clear  display inline clear both font-size:0px line-height:0px   COLUMN STYLES  matrixLeft  float:left width:65 padding:1 min-height:1 background-color:#d2d2d2 moz-border-radius:4px webkit-border-radius 4px  matrixRight  float:left width:25 padding:0px min-height:1 moz-border-radius:4px webkit-border-radius 4px border solid silver 1px background-color:white margin-left:5px   DROPSHADOW BUTTONS  matrixLeft buttons span  background-color:#888 position:relative padding:5px 0px 0px 0px moz-border-radius:4px webkit-border-radius 4px  matrixLeft buttons button matrixLeft buttons a#return  border:solid 2f495e 2px position:relative background-color:#e1e1e1 padding:auto 3px margin:0px font-size:11px line-height:13px position:relative top:-6px left:-2px height:22px cursor:pointer moz-border-radius:4px webkit-border-radius 4px font-weight:bold text-decoration:none color:#333  matrixLeft buttons a#return  font-size:10px padding:3px 10px 2px 10px  matrixLeft buttons button:hover matrixLeft buttons a#return:hover  border-color:black color:white background-color:#444   WHITE AREA FOR THE LISTING OF OBJECTS TO COMPARE  matrixLeft matrixListing  background-color:white height:300px min-height:300px moz-border-radius:4px webkit-border-radius 4px margin:10px 2px 20px 2px padding:auto 10px  matrixLeft matrixListing table  border-collapse:collapse margin:0px padding:0px display:block  matrixLeft matrixListing table a:link  font-size:12px color:#111  matrixLeft matrixListing table a:visited  color:#333 font-size:12px text-decoration:none  matrixLeft matrixListing table a:hover  text-decoration:none   GRAY BAR THAT HOLDS THE SORT BUTTONS  matrixLeft matrixListing sortButtons  background-color:#f1f1f1 border:solid silver 1px moz-border-radius-topLeft:4px moz-border-radius-topRight:4px webkit-border-radius-topLeft 4px webkit-border-radius-topRight 4px border-bottom:solid D2D2D2 2px display:block   STYLES TO OVERRIDE THE SORT BUTTON CSS BUILT INTO THE PERL CODE  sortByViews-button sortByCompares-button sortByUpdated-button sortByClicks-button sortByName-button  background none white-space:nowrap border-style:none cursor:pointer padding-bottom:4px border-style:none background-color:transparent border-right:solid silver 1px color:#555  sortByViews-button:hover sortByCompares-button:hover sortByUpdated-button:hover sortByClicks-button:hover sortByName-button:hover  color:black   MATRIX STATISTICS  matrixRight mainTitle  font-size:20px padding:5px 10px border-bottom solid gray 1px background-color:#d2d2d2  matrixRight textBox  border-top:solid silver 1px padding:10px 5px  matrixStatistics  padding:10px  matrixStatistics title  font-weight:bold background-color:#f1f1f1 padding:2px 5px font-size:11px moz-border-radius:4px border:solid d2d2d2 1px  matrixStatistics statistics  margin-bottom:15px  matrixStatistics label  text-align:right width:100px font-size:10px  matrixStatistics data  font-size:10px  matrixStatistics data a  color:#111  matrixStatistics data a:hover  text-decoration:none   LINKS TO CONTROL ADMIN FUNCTIONS  adminLinks  background-color:#f1f1f1  adminLinks a:link adminLinks a:visited  display:block text-align:center text-decoration:none color:#555 font-weight:normal font-size:10px padding:2px 5px border-top:solid silver 1px  adminLinks a:hover  color:black  adminLinks a.newLink:link adminLinks a.newLink:visited  background-color:#3498d1 color:white display:block  adminLinks a.newLink:hover  background-color:#39a6e5   STYLE FOR THE DETAILED LISTING  matrixDetail  min-width:1000px  matrixDetail editBtns  font-size:9px line-height:11px vertical-align:middle font-weight:normal margin-left:10px  matrixDetail editBtns a  color:black text-decoration:underline  matrixDetail editBtns a:hover  text-decoration:none  matrixDetail stats screenshot  float:left margin-right:20px  matrixDetail commentsMail strong.title  margin-bottom:0px margin-top:20px display:block background-color:#d2d2d2 padding:2px 10px border:solid 1px gray border-bottom-color:silver moz-border-radius-topLeft:4px moz-border-radius-topRight:4px  matrixDetail assetAspectComments  margin:0px 0px 20px 0px border:solid gray 1px background-color:#f1f1f1 moz-border-radius-bottomLeft:4px moz-border-radius-bottomRight:4px  matrixDetail assetAspectComments assetAspectComment  border-top:solid silver 1px border-bottom:solid gray 1px padding:3px background-color:#f5f5f5  matrixDetail assetAspectComments assetAspectCommentForm  border-top:solid d2d2d2 5px padding:20px  matrixDetail stats ul matrixDetail stats ul li  list-style-type:none margin:0px padding:0px  matrixDetail stats ul li  display:block line-height:20px margin:4px 0px  matrixDetail stats ul li strong  display:block float:left width:130px text-align:right background-color:#f1f1f1 padding-right:5px margin-right:5px moz-border-radius:4px webkit-border-radius:3px font-size:11px border:solid d2d2d2 1px  showLink  background-color:#e1e1e1 border:2px solid 2F495E moz-border-radius:4px webkit-border-radius:4px padding:3px 10px text-decoration:none color:black  showLink:hover hideLink:hover  background-color:#555 color:white  hideLink  background-color:#f1f1f1 border:2px solid 2F495E border-bottom-style:none moz-border-radius-topLeft:4px moz-border-radius-topRight:4px webkit-border-radius-topLeft:4px webkit-border-radius-topRight:4px padding:3px 10px text-decoration:none color:black  matrixMail  background-color:#f1f1f1 padding:15px border:2px solid 2F495E moz-border-radius:4px moz-border-radius-topLeft:0px webkit-border-radius:4px webkit-border-radius-topLeft:0px margin-top:1px  matrixMail  tableData  padding:5px margin:0px  matrixMail  input  padding:0px margin:0px  matrixMail  formDescription  text-align:right vertical-align:middle padding-right:10px font-weight:bold  matrixMail form  img  margin-top:-18px  matrixMail verify_formId  height:45px line-height:45px font-size:35px padding:0px margin:0px margin-right:20px  matrixRatings  width:264px position:relative left:-2px top:12px  matrixRatings table  margin-left:0px  matrixRatings td  overflow:hidden  matrixRatings formDescription  text-align:right background-color:#97BCD1 border:solid 4D606B 1px padding:2px 5px font-weight:bold font-size:10x moz-border-radius:4px webkit-border-radius:4px color:#333  matrixRatings formDescription a:before  text-decoration:none  matrixRatings formDescription a  display:block color:red text-decoration:none  matrixRatings formDescription a:hover  text-decoration:underline  matrixAttributes  float:left width:40 min-width:20 max-width:45 margin-right:20px  rightDetails  float:left width:20 min-width:20 max-width:45  attributes  border:solid d2d2d2 1px background-color:#f1f1f1 margin-top:10px moz-border-radius:4px webkit-border-radius:4px padding:10px  attributes table  border-collapse:collapse padding:0px margin:0px  attributes table  td  padding:2px margin:0px  yui-dt0-col-value  font-weight:bold font-size:14px padding:3px white-space:no-wrap   COMPARISON STYLES  compareList table  border-collapse:collapse border:solid silver 1px margin-top:5px  compareList table  th a  color:black padding:1px 5px  compareList table  td  background-color:#f1f1f1 border-top:solid gray 1px border-bottom:solid silver 1px  compareList yui-dt-liner  color:#39A6E5  compareList yui-dt-col-name yui-dt-liner  font-style:italic font-size:10px color:#555  compareList yui-dt-col-name yui-dt-liner b  font-size:15px font-style:normal padding-right:25px color:black ','000001000001000022000006',NULL),('ZipArchiveTMPL00000001','Default Zip Archive Template','','zip-archive-template',1133743240,1169738426,'3','7','12','WebGUI::Asset::Template',0,'Default Zip Archive Template Default Zip Archive Template zip archive template ZipArchiveAsset','000001000001000053000001',NULL),('PBasset000000000000002','Import Node','','root/import',1124395696,1124395696,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'Import Node Import root import','000001000001',NULL),('_iHetEvMQUOoxS-T2CM0sQ','Getting Started','','getting_started',1124395696,1273172789,'3','7','3','WebGUI::Asset::Wobject::Layout',1,'Getting Started Getting Started getting started','000001000002000001',NULL),('x3OFY6OJh_qsXkZfPwug4A','Site Map','','site_map',1124395696,1271348790,'3','7','3','WebGUI::Asset::Wobject::Layout',1,'Site Map Site Map site map','000001000002000005',NULL),('PBnav00000000000000001','crumbTrail','','crumbtrail',1124395696,1124395696,'3','7','12','WebGUI::Asset::Wobject::Navigation',1,'crumbTrail crumbTrail crumbtrail','000001000001000025000008',NULL),('PBnav00000000000000002','SpecificSubMenuVertical','','specificsubmenuvertical',1124395696,1124395696,'3','7','12','WebGUI::Asset::Wobject::Navigation',1,'SpecificSubMenuVertical SpecificSubMenuVertical specificsubmenuvertical','000001000001000025000017',NULL),('PBnav00000000000000006','SpecificSubMenuHorizontal','','specificsubmenuhorizontal',1124395696,1124395696,'3','7','12','WebGUI::Asset::Wobject::Navigation',1,'SpecificSubMenuHorizontal SpecificSubMenuHorizontal specificsubmenuhorizontal','000001000001000025000018',NULL),('PBnav00000000000000007','TopLevelMenuVertical','','toplevelmenuvertical',1124395696,1124395696,'3','7','12','WebGUI::Asset::Wobject::Navigation',1,'TopLevelMenuVertical TopLevelMenuVertical toplevelmenuvertical','000001000001000025000019',NULL),('PBnav00000000000000008','TopLevelMenuHorizontal','','toplevelmenuhorizontal',1124395696,1124395696,'3','7','12','WebGUI::Asset::Wobject::Navigation',1,'TopLevelMenuHorizontal TopLevelMenuHorizontal toplevelmenuhorizontal','000001000001000025000020',NULL),('PBnav00000000000000009','RootTab','','roottab',1124395696,1124395696,'3','7','12','WebGUI::Asset::Wobject::Navigation',1,'RootTab RootTab roottab','000001000001000025000021',NULL),('PBnav00000000000000010','TopDropMenu','','topdropmenu',1124395696,1124395696,'3','7','12','WebGUI::Asset::Wobject::Navigation',1,'TopDropMenu TopDropMenu topdropmenu','000001000001000025000022',NULL),('PBnav00000000000000011','dtree','','dtree',1124395696,1124395696,'3','7','12','WebGUI::Asset::Wobject::Navigation',1,'dtree dtree dtree','000001000001000025000023',NULL),('PBnav00000000000000012','coolmenu','','coolmenu',1124395696,1124395696,'3','7','12','WebGUI::Asset::Wobject::Navigation',1,'coolmenu coolmenu coolmenu','000001000001000025000024',NULL),('PBnav00000000000000013','Synopsis','','synopsis',1124395696,1124395696,'3','7','12','WebGUI::Asset::Wobject::Navigation',1,'Synopsis Synopsis synopsis','000001000001000025000025',NULL),('PBnav00000000000000014','FlexMenu','','flexmenu',1124395696,1124395696,'3','7','12','WebGUI::Asset::Wobject::Navigation',1,'FlexMenu FlexMenu flexmenu','000001000001000025000009',NULL),('PBnav00000000000000015','currentMenuVertical','','currentmenuvertical',1124395696,1124395696,'3','7','12','WebGUI::Asset::Wobject::Navigation',1,'currentMenuVertical currentMenuVertical currentmenuvertical','000001000001000025000010',NULL),('PBnav00000000000000016','currentMenuHorizontal','','currentmenuhorizontal',1124395696,1124395696,'3','7','12','WebGUI::Asset::Wobject::Navigation',1,'currentMenuHorizontal currentMenuHorizontal currentmenuhorizontal','000001000001000025000011',NULL),('PBnav00000000000000017','PreviousDropMenu','','previousdropmenu',1124395696,1124395696,'3','7','12','WebGUI::Asset::Wobject::Navigation',1,'PreviousDropMenu PreviousDropMenu previousdropmenu','000001000001000025000012',NULL),('PBnav00000000000000018','previousMenuVertical','','previousmenuvertical',1124395696,1124395696,'3','7','12','WebGUI::Asset::Wobject::Navigation',1,'previousMenuVertical previousMenuVertical previousmenuvertical','000001000001000025000013',NULL),('PBnav00000000000000019','previousMenuHorizontal','','previousmenuhorizontal',1124395696,1124395696,'3','7','12','WebGUI::Asset::Wobject::Navigation',1,'previousMenuHorizontal previousMenuHorizontal previousmenuhorizontal','000001000001000025000014',NULL),('PBnav00000000000000020','rootmenu','','rootmenu',1124395696,1124395696,'3','7','12','WebGUI::Asset::Wobject::Navigation',1,'rootmenu rootmenu rootmenu','000001000001000025000015',NULL),('PBnav00000000000000021','SpecificDropMenu','','specificdropmenu',1124395696,1124395696,'3','7','12','WebGUI::Asset::Wobject::Navigation',1,'SpecificDropMenu SpecificDropMenu specificdropmenu','000001000001000025000016',NULL),('pJd5TLAjfWMVXD6sCRLwUg','Site Map','','site_map/site_map',1124395696,1271348790,'3','7','3','WebGUI::Asset::Wobject::Navigation',1,'Site Map Site Map site map site map','000001000002000005000001',NULL),('fK-HMSboA3uu0c1KYkYspA','The Latest News','This is the latest news from Plain Black and WebGUI pulled directly from the site every hour.','the_latest_news/the_latest_news',1124395696,1124395696,'3','7','3','WebGUI::Asset::Wobject::SyndicatedContent',1,'The Latest News The Latest News the latest news the latest news This is the latest news from Plain Black and WebGUI pulled directly from the site every hour','000001000002000004000001',NULL),('WikiFrontTmpl000000001','Default Wiki Front Page','','default-wiki-front-page',1165460175,1273032720,'3','7','12','WebGUI::Asset::Template',0,'Default Wiki Front Page Default Wiki Front Page default wiki front page WikiMaster_front','000001000001000052000002',NULL),('WikiSearchTmpl00000001','Default Wiki Search','','default-wiki-search',1165460175,1273032720,'3','7','12','WebGUI::Asset::Template',0,'Default Wiki Search Default Wiki Search default wiki search WikiMaster_search','000001000001000052000003',NULL),('WikiPHTmpl000000000001','Default Page History','','default-wiki-page-history',1165460175,1273032720,'3','7','12','WebGUI::Asset::Template',0,'Default Page History Default Page History default wiki page history WikiPage_pageHistory','000001000001000052000004',NULL),('WikiPageTmpl0000000001','Default Wiki Page','','default-wiki-page',1165460175,1273032720,'3','7','12','WebGUI::Asset::Template',0,'Default Wiki Page Default Wiki Page default wiki page WikiPage','000001000001000052000005',NULL),('WikiPageEditTmpl000001','Default Wiki Page Edit','','default-wiki-page-edit',1165460175,1273032720,'3','7','12','WebGUI::Asset::Template',0,'Default Wiki Page Edit Default Wiki Page Edit default wiki page edit WikiPage_edit','000001000001000052000006',NULL),('WikiMPTmpl000000000001','Default Most Popular','','default-wiki-most-popular',1165460175,1273032720,'3','7','12','WebGUI::Asset::Template',0,'Default Most Popular Default Most Popular default wiki most popular WikiMaster_mostPopular','000001000001000052000007',NULL),('SQLReportDownload00001','SQLReport Download Default Template','','SQLReportDownload0001',1171466654,1171466654,'3','7','12','WebGUI::Asset::Template',0,'SQLReport Download Default Template untitled SQLReportDownload0001 SQLReport/Download','000001000001000038000002',NULL),('newsletter000000000001',' Summary Newsletter (default)','','newsletterdefaulttemplate',1185754569,1185754569,'3','7','3','WebGUI::Asset::Template',0,'Summary Newsletter default Summary Newsletter newsletterdefaulttemplate newsletter','000001000001000026000001',NULL),('newslettersubscrip0001','My Subscriptions (default)','','newslettermysubscriptionstemplate',1185754569,1221692339,'3','7','3','WebGUI::Asset::Template',0,'My Subscriptions default My Subscriptions newslettermysubscriptionstemplate newsletter/mysubscriptions','000001000001000026000003',NULL),('AjhlNO3wZvN5k4i4qioWcg','Default Answer Edit','','root/import/survey/default-answer-edit',1226009658,1250243000,'3','7','12','WebGUI::Asset::Template',0,'Default Answer Edit Default Answer Edit root import survey default answer edit Survey/Edit','000001000001000042000009',NULL),('QHn6T9rU7KsnS3Y70KCNTg','Account','','root/import/account',1227080251,1233173545,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'Account Account root import account','000001000001000002',NULL),('HPDOcsj4gBme8D4svHodBw','Profile','','root/import/account/profile',1225404573,1225404573,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'Profile Profile root import account profile','000001000001000002000001',NULL),('WikiKeyword00000000001',' Wiki Pages By Keyword (default)','','wiki-master-by-keyword-template.tmpl',1185754571,1274238756,'3','7','3','WebGUI::Asset::Template',0,'Wiki Pages By Keyword default Wiki Pages By Keyword wiki master by keyword template.tmpl WikiMaster_byKeyword','000001000001000052000008',NULL),('tempspace0000000000000','Tempspace','','tempspace',1185754574,1185754574,'3','7','3','WebGUI::Asset::Wobject::Folder',1,'Tempspace Tempspace tempspace','000001000004',NULL),('QpmlAiYZz6VsKBM-_0wXaw','UsersOnline Macro','  ','users-online-macro-templates',1224616691,1224616691,'3','7','3','WebGUI::Asset::Wobject::Folder',1,'UsersOnline Macro UsersOnline Macro users online macro templates','000001000001000021000012',NULL),('h_T2xtOxGRQ9QJOR6ebLpQ','UsersOnline Default View','','users-online-macro-templates/usersonline-default-view',1224616545,1224616545,'3','7','3','WebGUI::Asset::Template',0,'UsersOnline Default View UsersOnline Default View users online macro templates usersonline default view Macro/UsersOnline','000001000001000021000012000001',NULL),('4Ekp0kJoJllRRRo_J1Rj6w','UsersOnline Detailed View','','users-online-macro-templates/usersonline-detailed-view',1224616672,1224616672,'3','7','3','WebGUI::Asset::Template',0,'UsersOnline Detailed View UsersOnline Detailed View users online macro templates usersonline detailed view Macro/UsersOnline','000001000001000021000012000002',NULL),('THQhn1C-ooj-TLlEP7aIJQ','gallery-ie.css','','root/import/gallery-templates/gallery-ie.css',1225313951,1285124158,'3','7','3','WebGUI::Asset::Snippet',0,'gallery-ie.css gallery-ie.css root import gallery templates gallery ie.css wgPicture  float:left  wgAlbum  float:left  wgGallery pagination li wgGallery pagination a  float:left  wgGallery container  display:inline-block ','000001000001000015000025',NULL),('itransact_credentials1','ITransact Credentials (Default)','','shopping-cart-collateral-items/itransact-credentials',1228953856,1326776037,'3','7','4','WebGUI::Asset::Template',0,'ITransact Credentials Default ITransact Credentials Default shopping cart collateral items itransact credentials Shop/Credentials','000001000001000036000018',NULL),('1oBRscNIcFOI-pETrCOspA','Default Section Edit','','root/import/survey/default-section-edit',1226009642,1250243000,'3','7','12','WebGUI::Asset::Template',0,'Default Section Edit Default Section Edit root import survey default section edit Survey/Edit','000001000001000042000007',NULL),('gI_TxK-5S4DNuv42wpImmw','Gallery Templates','  ','root/import/gallery-templates',1197330678,1285124155,'3','7','3','WebGUI::Asset::Wobject::Folder',1,'Gallery Templates Gallery Templates root import gallery templates','000001000001000015',NULL),('jME5BEDYVDlBZ8jIQA9-jQ','Default Gallery Search','','root/import/gallery-templates/default-gallery-search',1197927169,1285124155,'3','7','3','WebGUI::Asset::Template',0,'Default Gallery Search Default Gallery Search root import gallery templates default gallery search Gallery/Search','000001000001000015000001',NULL),('azCqD0IjdQSlM3ar29k5Sg','Default Gallery List Albums View','','root/import/gallery-templates/default-gallery-list-albums-view',1197881748,1285124155,'3','7','3','WebGUI::Asset::Template',0,'Default Gallery List Albums View Default Gallery List Albums View root import gallery templates default gallery list albums view Gallery/ListAlbums','000001000001000015000002',NULL),('05FpjceLYhq4csF1Kww1KQ','Default Gallery View Album','','root/import/gallery-templates/default-gallery-view-album',1197879361,1285124155,'3','7','3','WebGUI::Asset::Template',0,'Default Gallery View Album Default Gallery View Album root import gallery templates default gallery view album GalleryAlbum/View','000001000001000015000003',NULL),('KAMdiUdJykjN02CPHpyZOw','Default Gallery View Album Slideshow','','root/import/gallery-templates/default-gallery-view-album-slideshow',1197825787,1285124155,'3','7','3','WebGUI::Asset::Template',0,'Default Gallery View Album Slideshow Default Gallery View Album Slideshow root import gallery templates default gallery view album slideshow GalleryAlbum/ViewSlideshow','000001000001000015000005',NULL),('OkphOEdaSGTXnFGhK4GT5A','Default Gallery List Files For User','','root/import/gallery-templates/default-gallery-list-files-for-user',1197825794,1285124155,'3','7','3','WebGUI::Asset::Template',0,'Default Gallery List Files For User Default Gallery List Files For User root import gallery templates default gallery list files for user Gallery/ListFilesForUser','000001000001000015000006',NULL),('TEId5V-jEvUULsZA0wuRuA','Default Gallery View Photo','','root/import/gallery-templates/default-gallery-view-photo',1197989443,1285124155,'3','7','3','WebGUI::Asset::Template',0,'Default Gallery View Photo Default Gallery View Photo root import gallery templates default gallery view photo GalleryFile/View','000001000001000015000007',NULL),('6X-7Twabn5KKO_AbgK3PEw','Default Gallery Edit Album','','root/import/gallery-templates/default-gallery-edit-album',1197987780,1285124155,'3','7','3','WebGUI::Asset::Template',0,'Default Gallery Edit Album Default Gallery Edit Album root import gallery templates default gallery edit album GalleryAlbum/Edit','000001000001000015000008',NULL),('7JCTAiu1U_bT9ldr655Blw','Default Gallery Edit Photo','','root/import/gallery-templates/default-gallery-edit-photo',1197825824,1285124155,'3','7','3','WebGUI::Asset::Template',0,'Default Gallery Edit Photo Default Gallery Edit Photo root import gallery templates default gallery edit photo GalleryFile/Edit','000001000001000015000009',NULL),('0X4Q3tBWUb_thsVbsYz9xQ','Default Gallery Add Archive','','root/import/gallery-templates/default-gallery-add-archive',1197987372,1285124155,'3','7','3','WebGUI::Asset::Template',0,'Default Gallery Add Archive Default Gallery Add Archive root import gallery templates default gallery add archive GalleryAlbum/AddArchive','000001000001000015000010',NULL),('m3IbBavqzuKDd2PGGhKPlA','Default Gallery Make Shortcut','','root/import/gallery-templates/default-gallery-make-shortcut',1197825845,1285124155,'3','7','3','WebGUI::Asset::Template',0,'Default Gallery Make Shortcut Default Gallery Make Shortcut root import gallery templates default gallery make shortcut GalleryFile/MakeShortcut','000001000001000015000011',NULL),('UTNFeV7B_aSCRmmaFCq4Vw','Default Gallery Delete Album','','root/import/gallery-templates/default-gallery-delete-album',1197825856,1285124155,'3','7','3','WebGUI::Asset::Template',0,'Default Gallery Delete Album Default Gallery Delete Album root import gallery templates default gallery delete album GalleryAlbum/Delete','000001000001000015000012',NULL),('zcX-wIUct0S_np14xxOA-A','Default Gallery Delete File','','root/import/gallery-templates/default-gallery-delete-file',1197825866,1285124155,'3','7','3','WebGUI::Asset::Template',0,'Default Gallery Delete File Default Gallery Delete File root import gallery templates default gallery delete file GalleryFile/Delete','000001000001000015000013',NULL),('MBZK_LPVzqhb4TV4mMRTJg','admin_ie7.css','','root/import/gallery-templates/admin_ie7.css',1197330678,1285124155,'3','7','3','WebGUI::Asset::Snippet',0,'admin_ie7.css admin_ie7.css root import gallery templates admin ie7.css input.captionEnter  margin-left 5px width 92px ','000001000001000015000014',NULL),('bANo8aiAPA7aY_oQZKxIWw','rss.gif','','root/import/gallery-templates/images/rss.gif',1197330678,1285124155,'3','7','3','WebGUI::Asset::File::Image',1,'rss.gif rss.gif root import gallery templates images rss.gif','000001000001000015000017000001',NULL),('2ci_v2d4x4uvyjTRlC49OA','moveDown.gif','','root/import/gallery-templates/images/movedown.gif',1197330678,1285124156,'3','7','3','WebGUI::Asset::File::Image',1,'moveDown.gif moveDown.gif root import gallery templates images movedown.gif','000001000001000015000017000002',NULL),('O-EsSzKgAk1KolFT-x_KsA','moveUp.gif','','root/import/gallery-templates/images/moveup.gif',1197330678,1285124156,'3','7','3','WebGUI::Asset::File::Image',1,'moveUp.gif moveUp.gif root import gallery templates images moveup.gif','000001000001000015000017000003',NULL),('fdd8tGExyVwHyrB8RBbKXg','next.gif','','root/import/gallery-templates/images/next.gif',1197330839,1285124156,'3','7','3','WebGUI::Asset::File::Image',1,'next.gif next.gif root import gallery templates images next.gif','000001000001000015000017000004',NULL),('BpisgHl4ZDcSECJp6oib1w','play.gif','','root/import/gallery-templates/images/play.gif',1197330840,1285124156,'3','7','3','WebGUI::Asset::File::Image',1,'play.gif play.gif root import gallery templates images play.gif','000001000001000015000017000005',NULL),('zshreRgPAXtnF0DtVbQ1Yg','previous.gif','','root/import/gallery-templates/images/previous.gif',1197330840,1285124156,'3','7','3','WebGUI::Asset::File::Image',1,'previous.gif previous.gif root import gallery templates images previous.gif','000001000001000015000017000006',NULL),('mM3bjP_iG9sv5nQb4S17tQ','Default Gallery View Album RSS','','root/import/gallery-templates/default-gallery-album-rss',1197879662,1285124158,'3','7','3','WebGUI::Asset::Template',0,'Default Gallery View Album RSS Default Gallery View Album RSS root import gallery templates default gallery album rss GalleryAlbum/ViewRss','000001000001000015000018',NULL),('ilu5BrM-VGaOsec9Lm7M6Q','Default Gallery List Albums RSS','','root/import/gallery-templates/default-gallery-list-albums-rss',1197878780,1285124158,'3','7','3','WebGUI::Asset::Template',0,'Default Gallery List Albums RSS Default Gallery List Albums RSS root import gallery templates default gallery list albums rss Gallery/ListAlbumsRss','000001000001000015000019',NULL),('-ANLpoTEP-n4POAdRxCzRw','Default Gallery List Files For User RSS','','root/import/gallery-templates/default-gallery-list-files-for-user-rss',1197880641,1285124158,'3','7','3','WebGUI::Asset::Template',0,'Default Gallery List Files For User RSS Default Gallery List Files For User RSS root import gallery templates default gallery list files for user rss Gallery/ListFilesForUserRss','000001000001000015000020',NULL),('OxJWQgnGsgyGohP2L3zJPQ','Default Gallery Edit Comment','','root/import/gallery-templates/default-gallery-edit-comment',1204663962,1285124158,'3','7','3','WebGUI::Asset::Template',0,'Default Gallery Edit Comment Default Gallery Edit Comment root import gallery templates default gallery edit comment GalleryFile/EditComment','000001000001000015000021',NULL),('Tsg7xmPYv782j6IVz7yHFg','Calendar Templates','','root/import/calendar-templates',1204890713,1213244777,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'Calendar Templates Calendar Templates root import calendar templates','000001000001000006',NULL),('kj3b-X3i6zRKnhLb4ZiCLw','Default Calendar List View','','root/import/calendar-templates/default-calendar-list-view',1204890713,1295931508,'3','7','3','WebGUI::Asset::Template',0,'Default Calendar List View Default Calendar List View root import calendar templates default calendar list view Calendar/List','000001000001000006000001',NULL),('uRL9qtk7Rb0YRJ41LmHOJw','Default Calendar Print List View','','root/import/calendar-templates/default-calendar-print-list-view',1204890713,1229311072,'3','7','3','WebGUI::Asset::Template',0,'Default Calendar Print List View Default Calendar Print List View root import calendar templates default calendar print list view Calendar/Print/List','000001000001000006000002',NULL),('CalendarWeek0000000001','Default Calendar Week','','root/import/calendar-templates/default-calendar-week',1204890713,1230358389,'3','7','12','WebGUI::Asset::Template',0,'Default Calendar Week Default Calendar Week root import calendar templates default calendar week Calendar/Week','000001000001000006000003',NULL),('CalendarDay00000000001','Default Calendar Day','','root/import/calendar-templates/default-calendar-day',1204890713,1230358389,'3','7','12','WebGUI::Asset::Template',0,'Default Calendar Day Default Calendar Day root import calendar templates default calendar day Calendar/Day','000001000001000006000004',NULL),('CalendarEvent000000001','Default Calendar Event','','root/import/calendar-templates/default-calendar-event',1204890713,1295931508,'3','7','12','WebGUI::Asset::Template',0,'Default Calendar Event Default Calendar Event root import calendar templates default calendar event Calendar/Event','000001000001000006000005',NULL),('CalendarEventEdit00001','Default Calendar Event Edit','','root/import/calendar-templates/default-calendar-event-edit',1205160982,1269401468,'3','7','12','WebGUI::Asset::Template',0,'Default Calendar Event Edit Default Calendar Event Edit root import calendar templates default calendar event edit Calendar/EventEdit','000001000001000006000006',NULL),('CalendarSearch00000001','Default Calendar Search','','root/import/calendar-templates/default-calendar-search',1204890713,1326776038,'3','7','12','WebGUI::Asset::Template',0,'Default Calendar Search Default Calendar Search root import calendar templates default calendar search Calendar/Search','000001000001000006000008',NULL),('CalendarPrintEvent0001','Default Calendar Print Event','','root/import/calendar-templates/default-calendar-print-event',1204890714,1215396964,'3','7','12','WebGUI::Asset::Template',0,'Default Calendar Print Event Default Calendar Print Event root import calendar templates default calendar print event Calendar/Print/Event','000001000001000006000009',NULL),('CalendarPrintMonth0001','Default Calendar Print Month','','root/import/calendar-templates/default-calendar-print-month',1204890714,1204890714,'3','7','12','WebGUI::Asset::Template',0,'Default Calendar Print Month Default Calendar Print Month root import calendar templates default calendar print month Calendar/Print/Month','000001000001000006000010',NULL),('CalendarPrintWeek00001','Default Calendar Print Week','','root/import/calendar-templates/default-calendar-print-week',1204890714,1204890714,'3','7','12','WebGUI::Asset::Template',0,'Default Calendar Print Week Default Calendar Print Week root import calendar templates default calendar print week Calendar/Print/Week','000001000001000006000011',NULL),('CalendarPrintDay000001','Default Calendar Print Day','','root/import/calendar-templates/default-calendar-print-day',1204890714,1204890714,'3','7','12','WebGUI::Asset::Template',0,'Default Calendar Print Day Default Calendar Print Day root import calendar templates default calendar print day Calendar/Print/Day','000001000001000006000012',NULL),('jnYdqDkUR8x7Pv2eGR1qTA','Thingy Templates','','root/import/thingy-templates',1205431513,1216250666,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'Thingy Templates Thingy Templates root import thingy templates','000001000001000044',NULL),('ThingyTmpl000000000001','Default Thingy','','templates/thingy-default',1205003608,1237914005,'3','7','12','WebGUI::Asset::Template',0,'Default Thingy Default Thingy templates thingy default Thingy','000001000001000044000001',NULL),('ThingyTmpl000000000002','Default Thingy View Thing','','templates/thingy-default-view-thing',1205003676,1299559129,'3','7','12','WebGUI::Asset::Template',0,'Default Thingy View Thing Default Thingy View Thing templates thingy default view thing Thingy/ViewThing','000001000001000044000002',NULL),('ThingyTmpl000000000003','Default Thingy Edit Thing','','templates/thingy-default-edit-thing',1205003711,1224518002,'3','7','12','WebGUI::Asset::Template',0,'Default Thingy Edit Thing Default Thingy Edit Thing templates thingy default edit thing Thingy/EditThing','000001000001000044000003',NULL),('ThingyTmpl000000000004','Default Thingy Search Thing','','templates/thingy-default-search-thing',1205158717,1277868920,'3','7','12','WebGUI::Asset::Template',0,'Default Thingy Search Thing Default Thingy Search Thing templates thingy default search thing Thingy/SearchThing','000001000001000044000004',NULL),('7fE8md51vTCcuJFOvxNaGA','thumbnails.js','','root/import/gallery-templates/thumbnails.js',1205443600,1285124158,'3','7','3','WebGUI::Asset::Snippet',0,'thumbnails.js thumbnails.js root import gallery templates thumbnails.js  Depends on BrowserDetect.js  Make the thumbnails a little bigger while the mouse is over them function scaleThumbUp  e anchor    IE6 doesn\'t like to do the right thing with the CSS stuff below exclude it if  BrowserDetect   if  BrowserDetect.browser == Explorer  BrowserDetect.version < 7   return    Make a new image with the same image src as the anchor var oldImage = anchor.getElementsByTagName(\"img\")[0 var newContainer = document.createElement(\"div newContainer.className = thumb-popup newContainer.style.position = absolute newContainer.style.zIndex = 1 var newWidth = oldImage.offsetWidth  3 var newHeight = oldImage.offsetHeight  3 var newLeft =   anchor.offsetLeft +  anchor.offsetWidth  2     newWidth  2   var newTop =   anchor.offsetTop +  anchor.offsetHeight  2     newHeight  2   newContainer.style.left = newLeft + px newContainer.style.top = newTop + px newContainer.style.width = newWidth + px newContainer.style.height = newHeight + px var newImage = document.createElement(\"img newImage.src = oldImage.src newImage.style.width = 100 newImage.style.height = 100 newContainer.appendChild newImage   Make some text for the caption var caption = document.createElement(\"div caption.appendChild document.createTextNode anchor.title   caption.className = caption newContainer.appendChild caption  var newBox = document.createElement(\"a newBox.href = anchor.href newBox.style.display = block newBox.style.position = absolute newBox.style.zIndex = 10 newBox.style.left =  anchor.offsetLeft  + px newBox.style.top =  anchor.offsetTop  + px newBox.style.height =  anchor.offsetHeight  + px newBox.style.width =  anchor.offsetWidth  + px newBox.style.border = 1px solid transparent anchor.parentNode.appendChild newContainer  anchor.parentNode.appendChild newBox  YAHOO.util.Event.addListener newBox click function   window.location.href = anchor.href   YAHOO.util.Event.addListener newContainer mouseout scaleThumbDown  newBox newContainer caption   YAHOO.util.Event.addListener newBox mouseout scaleThumbDown  newBox newContainer caption    function scaleThumbDown  e elements   for  var i = 0 i < elements.length i++   elements[i].parentNode.removeChild elements[i    var anchorTimeout function enterAnchor  e anchor   if  typeof anchorTimeout = undefined   clearTimeout anchorTimeout   anchorTimeout = setTimeout function  scaleThumbUp e anchor   150   function leaveAnchor  e anchor   if  typeof anchorTimeout = undefined   clearTimeout anchorTimeout    function initThumb   var anchors = YAHOO.util.Dom.getElementsByClassName thumb  for  var i = 0 i < anchors.length i++   YAHOO.util.Event.addListener anchors[i mouseover enterAnchor anchors[i  YAHOO.util.Event.addListener anchors[i mouseout leaveAnchor anchors[i    YAHOO.util.Event.onDOMReady initThumb ','000001000001000015000022',NULL),('1oGhfj00KkCzP1ez01AfKA','slideshow.js','','root/import/gallery-templates/slideshow.js',1205635970,1285124158,'3','7','3','WebGUI::Asset::Snippet',0,'slideshow.js slideshow.js root import gallery templates slideshow.js if  typeof WebGUI == undefined   WebGUI =    WebGUI.Slideshow  config  Configure and return a new Slideshow object config is an object with the following properties containerId  The ID of the element that contains the Slideshow items Defaults to slideshow-container currentIndex  The index of the first item in the Slideshow Defaults to 0 isPlaying  If true the slideshow will begin immediately itemClassName  The class name of the slideshow items Defaults to slideshow-item nextButtonId  The id of the button to go to the next item pauseImageSrc  The URL to the pause button image playDelay  The delay in milliseconds between slides Defaults to 5000 playImageSrc  The URL to the play button image playPauseButtonId  The id of the button to toggle between play and pause previousButtonId  The id of the button to go to the previous item wrap  If true the slideshow will wrap around  Control the slideshow To control the slideshow you can use the following methods next  Pause the slideshow and go to the next slide previous  Pause the slideshow and go to the previous slide play  Play the slideshow pause  Pause the slideshow togglePlay  If it\'s playing pause it If it\'s paused play it  WebGUI.Slideshow = function  config   this.containerId = config  config.containerId  config.containerId  slideshow-container this.currentIndex = config  config.currentIndex  config.currentIndex  0 this.isPlaying = config  config.isPlaying  config.isPlaying  false this.itemClassName = config  config.itemClassName  config.itemClassName  slideshow-item this.nextButtonId = config  config.nextButtonId  undefined this.pauseImageSrc = config  config.pauseImageSrc  undefined this.playDelay = config  config.playDelay  config.playDelay  5000 this.playImageSrc = config  config.playImageSrc  undefined this.playPauseButtonId = config  config.playPauseButtonId  undefined this.previousButtonId = config  config.previousButtonId  undefined this.wrap = config  config.wrap  config.wrap  false YAHOO.util.Event.onDOMReady this.init this true    clearPlayTimeout   Clears the timeout to move to the next slide  WebGUI.Slideshow.prototype.clearPlayTimeout = function   clearTimeout this.playTimeout  this.playTimeout = undefined   doPlayTick  self  Performs the action to move to the next slide and start a new timeout self is a new reference to the object to get around the scoping issues with setTimeout  WebGUI.Slideshow.prototype.doPlayTick = function self  self.showNext self.setPlayTimeout   getSlideshowContainer   Returns the HTMLElement for the Slideshow container  WebGUI.Slideshow.prototype.getSlideshowContainer = function   return document.getElementById this.containerId    getSlideshowItems   Returns an array of HTMLElements for the Slideshow\'s items  WebGUI.Slideshow.prototype.getSlideshowItems = function   var items = YAHOO.util.Dom.getElementsByClassName this.itemClassName undefined this.getSlideshowContainer  return items   init   Initialize the slideshow Performed after the DOM is ready  WebGUI.Slideshow.prototype.init = function    Add handlers to buttons if  this.playPauseButtonId   YAHOO.util.Event.addListener this.playPauseButtonId click this.togglePlay this true   if  this.nextButtonId   YAHOO.util.Event.addListener this.nextButtonId click this.next this true   if  this.previousButtonId   YAHOO.util.Event.addListener this.previousButtonId click this.previous this true    Hide all but the currentIndex var items = this.getSlideshowItems for  var i = 0 i < items.length i++   if  i = this.currentIndex   items i style.display = none  else  items i style.display = block    Start it off if necessary if  this.isPlaying   this.setPlayTimeout this.updatePlayPauseButton    next   Pause the slideshow and go to the next slide  WebGUI.Slideshow.prototype.next = function   this.pause this.showNext   play   Start the slideshow  WebGUI.Slideshow.prototype.play = function   if  this.isPlaying   this.isPlaying = true this.setPlayTimeout this.updatePlayPauseButton    previous   Pause the slideshow and show the previous slide  WebGUI.Slideshow.prototype.previous = function   this.pause this.showPrevious   pause   Pause the slideshow  WebGUI.Slideshow.prototype.pause = function   if  this.isPlaying   this.isPlaying = false this.clearPlayTimeout this.updatePlayPauseButton    setPlayTimeout   Sets the timeout to move to the next slide  WebGUI.Slideshow.prototype.setPlayTimeout = function   var self = this this.playTimeout = setTimeout function   self.doPlayTick(self  this.playDelay    showNext   Show the next slide  WebGUI.Slideshow.prototype.showNext = function   var items = this.getSlideshowItems var hideIndex = this.currentIndex var showIndex = this.currentIndex + 1  Wrap around if  this.wrap  showIndex >= items.length   showIndex = 0   Don\'t allow going past the last item else if  showIndex >= items.length   return   Do the switch if  items hideIndex   items hideIndex style.display = none if  items showIndex    items showIndex style.display = block this.currentIndex = showIndex    showPrevious   Show the previous slide  WebGUI.Slideshow.prototype.showPrevious = function   var items = this.getSlideshowItems var hideIndex = this.currentIndex var showIndex = this.currentIndex  1  Wrap around if  this.wrap  showIndex < 0   showIndex = items.length  1   Don\'t allow going past the last item else if  showIndex < 0   return   Do the switch items hideIndex style.display = none items showIndex style.display = block this.currentIndex = showIndex   togglePlay   If it\'s paused play it If it\'s playing pause it Return true if the slideshow is now playing  WebGUI.Slideshow.prototype.togglePlay = function   if  this.isPlaying == false   this.play return true  else  this.pause    updatePlayPauseButton   Update the Play/Pause button to have the correct image  WebGUI.Slideshow.prototype.updatePlayPauseButton = function   if  this.playPauseButtonId   if  this.isPlaying  this.playImageSrc   document.getElementById this.playPauseButtonId src = this.pauseImageSrc  else if  this.pauseImageSrc   document.getElementById this.playPauseButtonId src = this.playImageSrc   ','000001000001000015000023',NULL),('3qiVYhNTXMVC5hfsumVHgg','browserdetect.js','','root/import/gallery-templates/browserdetect.js',1206743306,1285124158,'3','7','3','WebGUI::Asset::Snippet',0,'browserdetect.js browserdetect.js root import gallery templates browserdetect.js var BrowserDetect =  init function   this.browser = this.searchString(this.dataBrowser || An unknown browser this.version = this.searchVersion(navigator.userAgent || this.searchVersion(navigator.appVersion || an unknown version this.OS = this.searchString(this.dataOS || an unknown OS  searchString function data  for var i=0;i','000001000001000015000024',NULL),('usuxw9V3jN4d4pujRiEYxg','css03-ie.css','','style3/css03-ie.css',1209494150,1209494150,'3','7','12','WebGUI::Asset::Snippet',0,'css03-ie.css css03-ie.css style3 css03 ie.css contentArea  height:500px padding-bottom:300px ','000001000001000051000023',NULL),('POVcY79vIqAHR8OfGt36aw','pagination_button.jpg','','root/import/gallery-templates/images/pagination_button.jpg',1209499189,1285124156,'3','7','12','WebGUI::Asset::File::Image',1,'pagination_button.jpg pagination_button.jpg root import gallery templates images pagination button.jpg','000001000001000015000017000007',NULL),('hIB-z34r8Xl-vYVYCkKr-w','bar-btn-r.jpg','','root/import/gallery-templates/images/bar-btn-r.jpg',1209499189,1285124156,'3','7','12','WebGUI::Asset::File::Image',1,'bar-btn-r.jpg bar-btn-r.jpg root import gallery templates images bar btn r.jpg','000001000001000015000017000008',NULL),('-mPUoFlYcjqjPUPRLAlxNQ','search-field-r.jpg','','root/import/gallery-templates/images/search-field-r.jpg',1209499189,1285124156,'3','7','12','WebGUI::Asset::File::Image',1,'search-field-r.jpg search-field-r.jpg root import gallery templates images search field r.jpg','000001000001000015000017000009',NULL),('MDpUOR-N8KMyt1J7Hh_h4w','bar-btn.jpg','','root/import/gallery-templates/images/bar-btn.jpg',1209499189,1285124156,'3','7','12','WebGUI::Asset::File::Image',1,'bar-btn.jpg bar-btn.jpg root import gallery templates images bar btn.jpg','000001000001000015000017000010',NULL),('YfXKByTwDZVituMc4h13Dg','pagination_bg.jpg','','root/import/gallery-templates/images/pagination_bg.jpg',1209499189,1285124156,'3','7','12','WebGUI::Asset::File::Image',1,'pagination_bg.jpg pagination_bg.jpg root import gallery templates images pagination bg.jpg','000001000001000015000017000011',NULL),('esko_HSU0Gh-uJZ1h3xRmQ','search-field-l.jpg','','root/import/gallery-templates/images/search-field-l.jpg',1209499189,1285124156,'3','7','12','WebGUI::Asset::File::Image',1,'search-field-l.jpg search-field-l.jpg root import gallery templates images search field l.jpg','000001000001000015000017000012',NULL),('oSqpGswzpBG_ErdfYwIO8A','top_bg.jpg','','root/import/gallery-templates/images/top_bg.jpg',1209499189,1285124156,'3','7','12','WebGUI::Asset::File::Image',1,'top_bg.jpg top_bg.jpg root import gallery templates images top bg.jpg','000001000001000015000017000013',NULL),('MXJklShZvLLB_DSnZQmXrQ','title_bg.jpg','','root/import/gallery-templates/images/title_bg.jpg',1209499189,1285124156,'3','7','12','WebGUI::Asset::File::Image',1,'title_bg.jpg title_bg.jpg root import gallery templates images title bg.jpg','000001000001000015000017000014',NULL),('BthxD5oJ0idmsyI3ioA2FA','bar-btn-l.jpg','','root/import/gallery-templates/images/bar-btn-l.jpg',1209499189,1285124156,'3','7','12','WebGUI::Asset::File::Image',1,'bar-btn-l.jpg bar-btn-l.jpg root import gallery templates images bar btn l.jpg','000001000001000015000017000015',NULL),('aZ-1HYQamkRHYXvzAra8WQ','search-field.jpg','','root/import/gallery-templates/images/search-field.jpg',1209499189,1285124156,'3','7','12','WebGUI::Asset::File::Image',1,'search-field.jpg search-field.jpg root import gallery templates images search field.jpg','000001000001000015000017000016',NULL),('eRkb94OYcS5AdcrrerOP5Q','rss.gif','','root/import/gallery-templates/images/rss2.gif',1209499189,1285124157,'3','7','12','WebGUI::Asset::File::Image',1,'rss.gif rss.gif root import gallery templates images rss2.gif','000001000001000015000017000017',NULL),('TbnkjAJQEASORXIpYqDkcA','blank-image.jpg','','root/import/gallery-templates/images/blank-image.jpg',1209499189,1285124157,'3','7','12','WebGUI::Asset::File::Image',1,'blank-image.jpg blank-image.jpg root import gallery templates images blank image.jpg','000001000001000015000017000018',NULL),('er-3faBjY-hhlDcc5aKqdQ','top_bg.jpg','','root/import/gallery-templates/images/top_bg2.jpg',1209499189,1285124157,'3','7','12','WebGUI::Asset::File::Image',1,'top_bg.jpg top_bg.jpg root import gallery templates images top bg2.jpg','000001000001000015000017000019',NULL),('8bFsu2FJUqHRUiHcozcVFw','sub-btn-l.jpg','','root/import/gallery-templates/images/sub-btn-l.jpg',1209499189,1285124157,'3','7','12','WebGUI::Asset::File::Image',1,'sub-btn-l.jpg sub-btn-l.jpg root import gallery templates images sub btn l.jpg','000001000001000015000017000020',NULL),('34Aayx5eA320D8VfhdfDBw','sub-btn-r.jpg','','root/import/gallery-templates/images/sub-btn-r.jpg',1209499189,1285124157,'3','7','12','WebGUI::Asset::File::Image',1,'sub-btn-r.jpg sub-btn-r.jpg root import gallery templates images sub btn r.jpg','000001000001000015000017000021',NULL),('TlhKOVmWblZOsAdqmhEpeg','sub-btn.jpg','','root/import/gallery-templates/images/sub-btn.jpg',1209499189,1285124157,'3','7','12','WebGUI::Asset::File::Image',1,'sub-btn.jpg sub-btn.jpg root import gallery templates images sub btn.jpg','000001000001000015000017000022',NULL),('Nx0ypjO3cN6QdZUBUEE0lA','pic-title-bg.jpg','','root/import/gallery-templates/images/pic-title-bg.jpg',1209499189,1285124157,'3','7','12','WebGUI::Asset::File::Image',1,'pic-title-bg.jpg pic-title-bg.jpg root import gallery templates images pic title bg.jpg','000001000001000015000017000023',NULL),('CmFZLN7iPS7XXvUEsxKPKA','row-2.jpg','','root/import/gallery-templates/images/row-2.jpg',1209499190,1285124157,'3','7','12','WebGUI::Asset::File::Image',1,'row-2.jpg row-2.jpg root import gallery templates images row 2.jpg','000001000001000015000017000024',NULL),('v_XBgwwZqgW1D5s4y05qfg','addtl-info.gif','','root/import/gallery-templates/images/addtl-info.gif',1209499190,1285124157,'3','7','12','WebGUI::Asset::File::Image',1,'addtl-info.gif addtl-info.gif root import gallery templates images addtl info.gif','000001000001000015000017000025',NULL),('4TdAkKoQbSCvI7QWcW889A','row-1.jpg','','root/import/gallery-templates/images/row-1.jpg',1209499190,1285124157,'3','7','12','WebGUI::Asset::File::Image',1,'row-1.jpg row-1.jpg root import gallery templates images row 1.jpg','000001000001000015000017000026',NULL),('SAgK6eDPCG1cgkJ59WapHQ','prev-btn.gif','','root/import/gallery-templates/images/prev-btn.gif',1209499190,1285124157,'3','7','12','WebGUI::Asset::File::Image',1,'prev-btn.gif prev-btn.gif root import gallery templates images prev btn.gif','000001000001000015000017000027',NULL),('XJYLuvGy9ubF7JNKyINtpA','play-btn.gif','','root/import/gallery-templates/images/play-btn.gif',1209499190,1285124157,'3','7','12','WebGUI::Asset::File::Image',1,'play-btn.gif play-btn.gif root import gallery templates images play btn.gif','000001000001000015000017000028',NULL),('RWj7hyv2SpZuXxwj1Wocug','next-btn.gif','','root/import/gallery-templates/images/next-btn.gif',1209499190,1285124157,'3','7','12','WebGUI::Asset::File::Image',1,'next-btn.gif next-btn.gif root import gallery templates images next btn.gif','000001000001000015000017000029',NULL),('aq8QElnlm3YufAoxRz9Pcg','data-bg.jpg','','root/import/gallery-templates/images/data-bg.jpg',1209499190,1285124158,'3','7','12','WebGUI::Asset::File::Image',1,'data-bg.jpg data-bg.jpg root import gallery templates images data bg.jpg','000001000001000015000017000030',NULL),('6D4Z-oruXPS6OlH_Kx8pBg','images','','root/import/thingy-templates/images',1209509389,1209509389,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'images images root import thingy templates images','000001000001000044000005',NULL),('hQ7z33_jOYkQ8WNX5xy9Sw','style-button.gif','','root/import/thingy-templates/images/style-button.gif',1209509455,1209509455,'3','7','12','WebGUI::Asset::File::Image',1,'style-button.gif style-button.gif root import thingy templates images style button.gif','000001000001000044000005000001',NULL),('vWW_DcHiYSrKZOkkIfEfcQ','row-2.jpg','','root/import/thingy-templates/images/row-2.jpg',1209509433,1209509433,'3','7','12','WebGUI::Asset::File::Image',1,'row-2.jpg row-2.jpg root import thingy templates images row 2.jpg','000001000001000044000005000002',NULL),('_bPYzRA87NTAUIKlfrJMHg','row-1.jpg','','root/import/thingy-templates/images/row-1.jpg',1209509433,1209509433,'3','7','12','WebGUI::Asset::File::Image',1,'row-1.jpg row-1.jpg root import thingy templates images row 1.jpg','000001000001000044000005000003',NULL),('nJjZHRwdDs5MAZYsAyioHw','title-bg.jpg','','root/import/thingy-templates/images/title-bg.jpg',1209509433,1209509433,'3','7','12','WebGUI::Asset::File::Image',1,'title-bg.jpg title-bg.jpg root import thingy templates images title bg.jpg','000001000001000044000005000004',NULL),('8hxfkrJPeFVRWF5piCNJ1A','field-bg.jpg','','root/import/thingy-templates/images/field-bg.jpg',1209509433,1209509433,'3','7','12','WebGUI::Asset::File::Image',1,'field-bg.jpg field-bg.jpg root import thingy templates images field bg.jpg','000001000001000044000005000005',NULL),('Osx7WN52iIKHZFT4vqUBHQ','search-btn.gif','','root/import/thingy-templates/images/search-btn.gif',1209509433,1209509433,'3','7','12','WebGUI::Asset::File::Image',1,'search-btn.gif search-btn.gif root import thingy templates images search btn.gif','000001000001000044000005000006',NULL),('oWff8fGzRdHPyq5VNREe9Q','top-bg.jpg','','root/import/thingy-templates/images/top-bg.jpg',1209509433,1209509433,'3','7','12','WebGUI::Asset::File::Image',1,'top-bg.jpg top-bg.jpg root import thingy templates images top bg.jpg','000001000001000044000005000007',NULL),('uqbkvb1b9443VvfkyRz95w','save-button.gif','','root/import/thingy-templates/images/save-button.gif',1209509433,1209509433,'3','7','12','WebGUI::Asset::File::Image',1,'save-button.gif save-button.gif root import thingy templates images save button.gif','000001000001000044000005000008',NULL),('8YiMkcz32xalkAn3WBLpag','go-btn.gif','','root/import/thingy-templates/images/go-btn.gif',1210181860,1210181860,'3','7','12','WebGUI::Asset::File::Image',1,'go-btn.gif go-btn.gif root import thingy templates images go btn.gif','000001000001000044000005000009',NULL),('5m5I7__l40C4hhv4ydqAHQ','thingy-ie.css','','root/import/thingy-templates/thingy-ie.css',1210181698,1216227786,'3','7','12','WebGUI::Asset::Snippet',0,'thingy-ie.css thingy-ie.css root import thingy templates thingy ie.css thingyList things  padding:0px margin:0px width:200px z-index:5000 position:absolute top:27px left:20px border:solid a2a2a2 1px border-top-style:none  thingyList things a:link thingyList things a:visited  display:block background-color:#f1f1f1 border-top:solid a2a2a2 1px border-bottom:solid 727272 1px line-height:12px font-size:10px height:12px padding:2px 5px text-decoration:none font-weight:bold color:#a2a2a2 width:190px  thingyList things a:hover  background-color:white ','000001000001000044000007',NULL),('2rC4ErZ3c77OJzJm7O5s3w','EMS Badge Listing (default)','','root/import/ems/ems-badge-listing-default',1208721232,1288747841,'3','7','12','WebGUI::Asset::Template',0,'EMS Badge Listing default EMS Badge Listing default root import ems ems badge listing default EMS','000001000001000012000003',NULL),('PsFn7dJt4wMwBa8hiE3hOA','Print Badge (Default)','','root/import/ems/print-badge-default',1208558071,1257311886,'3','7','12','WebGUI::Asset::Template',0,'Print Badge Default Print Badge Default root import ems print badge default EMS/PrintBadge','000001000001000012000004',NULL),('yBwydfooiLvhEFawJb0VTQ','Print Ticket (Default)','','root/import/ems/print-ticket-default',1208629936,1257311887,'3','7','12','WebGUI::Asset::Template',0,'Print Ticket Default Print Ticket Default root import ems print ticket default EMS/PrintTicket','000001000001000012000005',NULL),('63ix2-hU0FchXGIWkG3tow','Flat Discount (Default)','','root/import/flat-discount-default',1209588387,1326776037,'3','7','12','WebGUI::Asset::Template',0,'Flat Discount Default Flat Discount Default root import flat discount default FlatDiscount','000001000001000036000011',NULL),('gbnRhcWNk1iQe32LFEB5eQ','Shelf','','root/import/shelf2',1210779723,1212086102,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'Shelf Shelf root import shelf2','000001000001000035',NULL),('1XOJDcg_ITRYwVM-QnIcPw','shelf.css','','root/import/shelf2/shelf.css',1210779441,1219175575,'3','7','12','WebGUI::Asset::Snippet',0,'shelf.css shelf.css root import shelf2 shelf.css wgShelf  font-size:12px font-family:arial verdana margin:15px 0px  wgShelf h2  background black padding:5px padding-left:15px line-height:32px color:white margin:0px height:32px  wgShelf wgShelves  background F1F1F1 height:29px padding:3px line-height:29px padding-left:30px  wgShelf product  margin:15px margin-left:0px text-align:left background-color:#f1f1f1 border:solid e1e1e1 1px width 200px display moz-inline-box  Moz  display inline-block  Op Saf IE  vertical-align top  IE Mac non capisce e a volte crea extra v space   wgShelf product thumbnail  display:block text-align:left margin:3px float:left  wgShelf product link  background e1e1e1 height:30px padding:3px line-height:24px margin-bottom:5px text-align:left display:block  wgShelf product link a:link wgShelf product link a:visited  color:#000 display:block  wgShelf product link a:hover  text-decoration:underline  wgShelf product price  display:block text-align:right font-size:18px font-weight:bold ','000001000001000035000003',NULL),('C5fPz-Wg85vkYRvCdl-Xqw','UserList','','root/import/userlist',1212160830,1212160830,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'UserList UserList root import userlist','000001000001000047',NULL),('aNmgn0cd6tldmC1FpW4KbA','Shop','','shopping-cart-collateral-items',1213122695,1326776036,'3','7','3','WebGUI::Asset::Wobject::Folder',1,'Shop Shop shopping cart collateral items','000001000001000036',NULL),('2q5fxatSFLgIhXaUX-oSvg','bottom-left.jpg','','shopping-cart-collateral-items/bottom-left.jpg',1204149033,1326776036,'3','7','3','WebGUI::Asset::File::Image',1,'bottom-left.jpg bottom-left.jpg shopping cart collateral items bottom left.jpg','000001000001000036000001',NULL),('_d5WTkKjnwct-_Dk7gZHvQ','bottom-right.jpg','','shopping-cart-collateral-items/bottom-right.jpg',1204149033,1326776036,'3','7','3','WebGUI::Asset::File::Image',1,'bottom-right.jpg bottom-right.jpg shopping cart collateral items bottom right.jpg','000001000001000036000002',NULL),('Iz2mUR3jCPKyemwAea4b2g','input_bg.jpg','','shopping-cart-collateral-items/input_bg.jpg',1204149033,1326776036,'3','7','3','WebGUI::Asset::File::Image',1,'input_bg.jpg input_bg.jpg shopping cart collateral items input bg.jpg','000001000001000036000003',NULL),('JU9bjsLRoWj7GVHs__prig','top-left.jpg','','shopping-cart-collateral-items/top-left.jpg',1204149033,1326776036,'3','7','3','WebGUI::Asset::File::Image',1,'top-left.jpg top-left.jpg shopping cart collateral items top left.jpg','000001000001000036000004',NULL),('noOlnjQGexHg8c4bGVUo9g','top-right.jpg','','shopping-cart-collateral-items/top-right.jpg',1204149033,1326776036,'3','7','3','WebGUI::Asset::File::Image',1,'top-right.jpg top-right.jpg shopping cart collateral items top right.jpg','000001000001000036000005',NULL),('aIpCmr9Hi__vgdZnDTz1jw','Cart (Default)','','default-shopping-cart-template',1209921197,1326776036,'3','7','3','WebGUI::Asset::Template',0,'Cart Default Cart Default default shopping cart template Shop/Cart','000001000001000036000006',NULL),('4e-_rNs6mSWedZhQ_V5kJA','shelf-ie.css','','root/import/shelf2/shelf-ie.css',1210779672,1210779672,'3','7','12','WebGUI::Asset::Snippet',0,'shelf-ie.css shelf-ie.css root import shelf2 shelf ie.css wgShelf product  margin:15px margin-left:0px float:left text-align:left background-color:#f1f1f1 border:solid e1e1e1 1px min-height:100px min-width:200px width:200px height:100px  wgShelf product link  background url(^FileUrl(root/import/shelf2/images/shelf-titles.jpg no-repeat top right height:30px padding:3px line-height:24px margin-bottom:5px text-align:left display:block ','000001000001000035000004',NULL),('2gtFt7c0qAFNU3BG_uvNvg','My Purchases (Default)','','shopping-cart-collateral-items/my-purchases-default',1211824430,1326776037,'3','7','3','WebGUI::Asset::Template',0,'My Purchases Default My Purchases Default shopping cart collateral items my purchases default Shop/MyPurchases','000001000001000036000008',NULL),('bPz1yk6Y9uwMDMBcmMsSCg','Email Receipt (Default)','','shopping-cart-collateral-items/email-receipt-default',1211829604,1326776037,'3','7','3','WebGUI::Asset::Template',0,'Email Receipt Default Email Receipt Default shopping cart collateral items email receipt default Shop/EmailReceipt','000001000001000036000009',NULL),('EBlxJpZQ9o-8VBOaGQbChA','MiniCart','','shopping-cart-collateral-items/minicart',1212093746,1326776037,'3','7','3','WebGUI::Asset::Template',0,'MiniCart MiniCart shopping cart collateral items minicart Shop/MiniCart','000001000001000036000014',NULL),('PBtmpl0000000000000053','Subscription code redemption','','subscription_code_redemption',1124395696,1326776037,'3','7','12','WebGUI::Asset::Template',0,'Subscription code redemption Subscription code redemption subscription code redemption Operation/RedeemSubscription','000001000001000036000017',NULL),('6tK47xsaIH-ELw0IBo0uRQ','images','','root/import/shelf2/images',1210777115,1210777115,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'images images root import shelf2 images','000001000001000035000001',NULL),('XNd7a_g_cTvJVYrVHcx2Mw','Address (Default)','','shopping-cart-collateral-items/address-default',1212099009,1326776037,'3','7','3','WebGUI::Asset::Template',0,'Address Default Address Default shopping cart collateral items address default Shop/Address','000001000001000036000007',NULL),('_bZJ9LA_KNekZiFPaP2SeQ','shelf-titles.jpg','','root/import/shelf2/images/shelf-titles.jpg',1210777868,1210777868,'3','7','12','WebGUI::Asset::File::Image',1,'shelf-titles.jpg shelf-titles.jpg root import shelf2 images shelf titles.jpg','000001000001000035000001000001',NULL),('nFen0xjkZn8WkpM93C9ceQ','Shelf (Default)','','root/import/shelf-default',1210779326,1247864696,'3','7','12','WebGUI::Asset::Template',0,'Shelf Default Shelf Default root import shelf default Shelf','000001000001000035000002',NULL),('mTOiwwk3q4k9g5-XykXhPA','Documentation','With any large system, having the right documentation to get you started is mandatory. The good news is that WebGUI has abundant documentation. ','documentation',1215717999,1271349647,'3','7','3','WebGUI::Asset::Wobject::Layout',1,'Documentation Documentation documentation With any large system having the right documentation to get you started is mandatory The good news is that WebGUI has abundant documentation','000001000002000003',NULL),('o_pq_e4vRyhMOKFzs61eag','book-covers.jpg','','documentation/book-covers.jpg',1215714957,1215714957,'3','7','3','WebGUI::Asset::File::Image',1,'book-covers.jpg book-covers.jpg documentation book covers.jpg','000001000002000003000002',NULL),('PBEmsBadgeTemplate0000','Default EMS Badge Template','','default_emsbadge',1221077977,1313542962,'3','7','4','WebGUI::Asset::Template',0,'Default EMS Badge Template Default EMS Badge Template default emsbadge EMSBadge','000001000001000012000006',NULL),('9A-mg2gwWmaYi9o_1C7ArQ','dashboard','','root/import/projectmanager/dashboard',1147642478,1222803338,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'dashboard dashboard root import projectmanager dashboard','000001000001000030000001',NULL),('yD1SMHelczihzjEmx6eXBA','editTask','','root/import/projectmanager/edittask',1147642478,1222803342,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'editTask editTask root import projectmanager edittask','000001000001000030000002',NULL),('pV7GnZdpjR3XpZaSINIoeg','gantt','','root/import/projectmanager/gantt',1147642478,1222803347,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'gantt gantt root import projectmanager gantt','000001000001000030000003',NULL),('71e17KeduiXgODLMlUxiow','project','','root/import/projectmanager/project',1147642479,1222803352,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'project project root import projectmanager project','000001000001000030000004',NULL),('vTymIDYL2YqEh6PV50F7ew','manager','','root/import/timetracking/manager',1147642482,1222803302,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'manager manager root import timetracking manager','000001000001000046000001',NULL),('lo1ac3BsoJx3ijGQ3gR-bQ','row','','root/import/timetracking/row',1147642482,1222803309,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'row row root import timetracking row','000001000001000046000002',NULL),('huASapWvFDzqwOSbcN-JFQ','user','','root/import/timetracking/user',1147642483,1222803313,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'user user root import timetracking user','000001000001000046000003',NULL),('xSmREZO3GNzK3M5PaueOOQ','LDAP/Account','','root/import/auth/ldap/account',1147642466,1287545014,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'LDAP/Account LDAP/Account root import auth ldap account','000001000001000005000001',NULL),('0bx-xoL8TSXXubFuqKAoVQ','LDAP/Create','','root/import/auth/ldap/create',1147642466,1287545014,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'LDAP/Create LDAP/Create root import auth ldap create','000001000001000005000002',NULL),('taX2UYkFF21ALpFZY2rhMw','LDAP/Login','','root/import/auth/ldap/login',1147642466,1287545014,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'LDAP/Login LDAP/Login root import auth ldap login','000001000001000005000003',NULL),('K0q_N885Httqev1VCqUWxg','WebGUI/Account','','root/import/auth/webgui/account',1147642466,1287545014,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'WebGUI/Account WebGUI/Account root import auth webgui account','000001000001000005000004',NULL),('fq1ZkYhH24R5tb96kuT10Q','WebGUI/Create','','root/import/auth/webgui/create',1147642466,1287545014,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'WebGUI/Create WebGUI/Create root import auth webgui create','000001000001000005000005',NULL),('oHk7fAFhEEkB7dHzi0QOQA','WebGUI/Expired','','root/import/auth/webgui/expired',1147642466,1287545014,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'WebGUI/Expired WebGUI/Expired root import auth webgui expired','000001000001000005000006',NULL),('9M-lrlPQWeeNWfvnDnK_Xg','WebGUI/Login','','root/import/auth/webgui/login',1147642466,1287545014,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'WebGUI/Login WebGUI/Login root import auth webgui login','000001000001000005000007',NULL),('_gBYAdTcbkiyamnqi2Xskg','WebGUI/Recovery','','root/import/auth/webgui/recovery',1147642466,1287545014,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'WebGUI/Recovery WebGUI/Recovery root import auth webgui recovery','000001000001000005000008',NULL),('tBL7BWiQRZFed2Y-Zjo9tQ','AdminToggle','','root/import/macro/admintoggle',1147642471,1222803200,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'AdminToggle AdminToggle root import macro admintoggle','000001000001000021000001',NULL),('GdkQpvjRtJqtzOUbwIIQRA','a_account','','root/import/macro/a_account',1147642471,1222803205,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'a_account a_account root import macro a account','000001000001000021000002',NULL),('tnc5iYyynX2hfdEs9D3P8w','EditableToggle','','root/import/macro/editabletoggle',1147642472,1222803213,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'EditableToggle EditableToggle root import macro editabletoggle','000001000001000021000003',NULL),('vgXdBcFTqU7h4wBG1ewdBw','File','','root/import/macro/file',1147642472,1222803217,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'File File root import macro file','000001000001000021000004',NULL),('hcFlqnXlsmC1ujN6Id0F0A','GroupAdd','','root/import/macro/groupadd',1147642473,1222803234,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'GroupAdd GroupAdd root import macro groupadd','000001000001000021000005',NULL),('eRJR52fvlaxfetv3DQkQYw','GroupDelete','','root/import/macro/groupdelete',1147642473,1222803238,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'GroupDelete GroupDelete root import macro groupdelete','000001000001000021000006',NULL),('5HIDHq5lAWHV5gpYGS0zLg','H_homeLink','','root/import/macro/h_homelink',1147642473,1222803244,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'H_homeLink H_homeLink root import macro h homelink','000001000001000021000007',NULL),('rYEFwXXo0tkGhQTcbDibvg','LoginToggle','','root/import/macro/logintoggle',1147642473,1222803249,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'LoginToggle LoginToggle root import macro logintoggle','000001000001000021000008',NULL),('V3l5S5TtI7wMm1WpIMhvOA','L_loginBox','','root/import/macro/l_loginbox',1147642473,1222803253,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'L_loginBox L_loginBox root import macro l loginbox','000001000001000021000009',NULL),('nqNbSUAhk9Vd1zda2SCz9A','RandomThread','','root/import/macro/randomthread',1147642474,1222803258,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'RandomThread RandomThread root import macro randomthread','000001000001000021000010',NULL),('y8XkRdxIperLKkJ3bL5sSQ','r_printable','','root/import/macro/r_printable',1147642474,1222803264,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'r_printable r_printable root import macro r printable','000001000001000021000011',NULL),('UserListTmpl0000000002','UserList with search field selection','','root/import/userlist/userlist-with-search-field-selection',1212000800,1228125752,'3','7','12','WebGUI::Asset::Template',0,'UserList with search field selection UserList with search field selection root import userlist userlist with search field selection UserList','000001000001000047000002',NULL),('UserListTmpl0000000003','UserList with multiple search keywords','','root/import/userlist/userlist-with-multiple-search-keywords',1212001437,1228125758,'3','7','12','WebGUI::Asset::Template',0,'UserList with multiple search keywords UserList with multiple search keywords root import userlist userlist with multiple search keywords UserList','000001000001000047000003',NULL),('UserListTmpl0000000001','Default UserList','','root/import/userlist/default-userlist',1212159641,1228125743,'3','7','12','WebGUI::Asset::Template',0,'Default UserList Default UserList root import userlist default userlist UserList','000001000001000047000001',NULL),('BMybD3cEnmXVk2wQ_qEsRQ','Badge Builder (Default)','','root/import/ems/badge-builder-default',1208530113,1263962529,'3','7','12','WebGUI::Asset::Template',0,'Badge Builder Default Badge Builder Default root import ems badge builder default EMS/BadgeBuilder','000001000001000012000001',NULL),('OOyMH33plAy6oCj_QWrxtg','Lookup Registrant (Default)','','root/import/ems/lookup-registrant-default',1207951375,1257311886,'3','7','12','WebGUI::Asset::Template',0,'Lookup Registrant Default Lookup Registrant Default root import ems lookup registrant default EMS/LookupRegistrant','000001000001000012000002',NULL),('stevecoolmenu000000001','Site Nav','','webgui7/style3/hierarchical-top-nav',1147642505,1224116942,'3','7','12','WebGUI::Asset::Template',0,'Site Nav Site Nav webgui7 style3 hierarchical top nav Navigation','000001000001000051000001',NULL),('7-0-style0000000000051','css03.css','','style3/css03.css',1147642505,1224117026,'3','7','12','WebGUI::Asset::Snippet',0,'css03.css css03.css style3 css03.css body html  margin:0px background-color:#b53018 padding:0px  body a  color:#EE963E;font-weight:bold letter-spacing:1px font-size:8pt  main  width:98 min-width:790px margin:0px padding:0px padding-top:20px padding-bottom:20px position:relative  header  background url(\'^FileUrl(style3/header_bg.jpg repeat-x width:100 margin:0px height:115px  headerTitle  background url(\'^FileUrl(style3/header_left.jpg no-repeat left top height:100 width:100  headerRight  background url(\'^FileUrl(style3/header_right.jpg no-repeat right top width:100 height:100 text-align:right position:relative  headerRight title  position:absolute top:25px left:20px font-family:arial text-align:left  title h1  text-transform:uppercase margin-bottom:0px font-weight:normal font-size:26pt margin-top:0px color:white  title h1 a  color:white text-decoration:none font-size 26pt font-weight normal  title h2  margin:0px font-size:12pt color:#bebebe padding-left:20px  title img  z-index:5  login  position:absolute font-size:8pt top:45 right:150px color:white z-index:6 font-family:arial  login a  color:white font-weight normal letter-spacing 0px  loginBox  font-size:8pt margin:0px display:inline  loginBox input  font-size:8pt  mainBody  width:100 margin:0px height:500px background fff position:relative z-index:0  main > mainBody  height:auto min-height:500px  contentArea  z-index:2 position:relative padding-top:10px padding-left:10px padding-right:20px padding-bottom:20px moz-box-sizing:border-box font-family:verdana font-size:9pt min-height:500px  html main mainBody contentArea  height:1  topCorner  width:100 height:214px position:absolute top:0px left:0px background url(^FileUrl(/style3/main_top.jpg no-repeat z-index:1  bottomCorner  width:100 height:211px position:absolute bottom:59px right:0px background url(\'^FileUrl(style3/main_bottom.jpg no-repeat right z-index:1   html bottomCorner  bottom:58px  footer  width:100 margin:0px background:#000 url(\'^FileUrl(style3/footer_right.jpg no-repeat right top height:57px border-top:solid B53018 2px text-align:right position:relative z-index:0  footer copyright  color:#3b3b3b font-family:arial position:absolute top:20px left:30px font-size:8pt  main yui-skin-sam  font-family:verdana font-size:9pt font-weight:normal ','000001000001000051000002',NULL),('jVKLVakT_iA2010_oEuAwg','Style3 Coolmenu','','department_nav',1224116526,1224116526,'3','7','12','WebGUI::Asset::Wobject::Navigation',1,'Style3 Coolmenu Style3 Coolmenu department nav','000001000001000051000024',NULL),('UL-ItI4L1Z6-WSuhuXVvsQ','DataTable','','root/import/datatable',1225139673,1225139673,'3','7','3','WebGUI::Asset::Wobject::Folder',1,'DataTable DataTable root import datatable','000001000001000011',NULL),('3rjnBVJRO6ZSkxlFkYh_ug','Default DataTable Template (YUI)','','root/import/datatable/default-datatable-template-yui',1225139643,1233861835,'3','7','3','WebGUI::Asset::Template',0,'Default DataTable Template YUI Default DataTable Template YUI root import datatable default datatable template yui DataTable','000001000001000011000001',NULL),('TuYPpHx7TUyk08639Pc8Bg','Default DataTable Template (HTML)','','root/import/datatable/default-datatable-template-html',1225139643,1233861621,'3','7','3','WebGUI::Asset::Template',0,'Default DataTable Template HTML Default DataTable Template HTML root import datatable default datatable template html DataTable','000001000001000011000002',NULL),('IZkrow_zwvbf4FCH-taVTQ','Inbox','','root/import/account/inbox',1226011853,1226011853,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'Inbox Inbox root import account inbox','000001000001000002000002',NULL),('K0YjxqOqr7RupSo6sIdcAg','Friends','','root/import/account/friends',1227074310,1227074310,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'Friends Friends root import account friends','000001000001000002000003',NULL),('_ilRXNR3s8F2vGJ_k9ePcg','User','','root/import/account/user',1226643205,1226643205,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'User User root import account user','000001000001000002000004',NULL),('AOjPG2NHgfL9Cq6dDJ7mew','Shop','','root/import/account/shop',1226659753,1236960881,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'Shop Shop root import account shop','000001000001000002000005',NULL),('qaVcU0FFzzraMX_bzELqzw','Contributions','','root/import/account/contributions',1227074362,1227074362,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'Contributions Contributions root import account contributions','000001000001000002000006',NULL),('matrixtmpl000000000004','Matrix Default Edit Listing','','default-matrix-edit-listing-template',1133743239,1281501163,'3','7','12','WebGUI::Asset::Template',0,'Matrix Default Edit Listing Matrix Default Edit Listing default matrix edit listing template Matrix/EditListing','000001000001000022000004',NULL),('kJf77eCr9GAMiEzWrzsBTA','matrix-ie.css','','new-matrix/matrix-ie.css',1229639255,1281501163,'3','7','12','WebGUI::Asset::Snippet',0,'matrix-ie.css matrix-ie.css new matrix matrix ie.css matrixLeft buttons span matrixRight buttons span  padding:0px 0px 0px 0px  matrixLeft buttons button matrixRight buttons a  top:-3px left:-2px height:22px  matrixRight buttons a  color:black text-decoration:none padding:1px 3px ','000001000001000022000007',NULL),('4LQT4-bGW4FkiEQLSY5gvQ','show-hide.js','','new-matrix/show-hide.js',1232400287,1281501163,'3','7','12','WebGUI::Asset::Snippet',0,'show-hide.js show-hide.js new matrix show hide.js function showHide(theLink,theId  var theId = document.getElementById(theId var theLink = document.getElementById(theLink if(theId.style.display == block  theId.style.display = none theLink.innerHTML = Send Creator a Message theLink.className = showLink  else  theId.style.display = block theLink.innerHTML = Hide theLink.className = hideLink  ','000001000001000022000008',NULL),('Vch1Ww7G_JpBhOhXX07RDg','matrx-nav','','new-matrix/matrix-nav',1232664082,1281501163,'3','7','12','WebGUI::Asset::Wobject::Navigation',1,'matrx-nav matrix-nav new matrix matrix nav','000001000001000022000010',NULL),('PBtmpl0000000000000063','Default Overview Report','','root/import/survey/default-overview-report',1124395696,1250243000,'3','7','12','WebGUI::Asset::Template',0,'Default Overview Report Default Overview Report root import survey default overview report Survey/Overview','000001000001000042000001',NULL),('HW-sPoDDZR8wBZ0YgFgPtg','images','','root/import/account/images',1227634350,1227634350,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'images images root import account images','000001000001000002000009',NULL),('hBpisL-_URyZnh9clR5ohA','no_photo.gif','','root/import/account/images/no_photo.gif',1227634417,1227634417,'3','7','12','WebGUI::Asset::File::Image',1,'no_photo.gif no_photo.gif root import account images no photo.gif','000001000001000002000009000001',NULL),('FOBV6KkifreXa4GmEAUU4A','no_photo_sm.gif','','root/import/account/images/no_photo_sm.gif',1227634447,1227634447,'3','7','12','WebGUI::Asset::File::Image',1,'no_photo_sm.gif no_photo_sm.gif root import account images no photo sm.gif','000001000001000002000009000002',NULL),('PBtmpl0000000000000061','Default Survey','','root/import/survey/default-survey',1124395696,1250243000,'3','7','12','WebGUI::Asset::Template',0,'Default Survey Default Survey root import survey default survey Survey','000001000001000042000003',NULL),('S2_LsvVa95OSqc66ITAoig','EMS Schedule Listing (default)','','root/import/ems/ems-schedule-listing-default2',1242730712,1257311887,'3','7','12','WebGUI::Asset::Template',0,'EMS Schedule Listing default EMS Schedule Listing default root import ems ems schedule listing default2 EMS/Schedule','000001000001000012000007',NULL),('VyCINX2KixKYr2pzQGX9Mg','layout.css','','layout.css',1246968584,1254881103,'3','7','12','WebGUI::Asset::Snippet',0,'layout.css layout.css layout.css  styles for the layout asset  wg-left  float left  wg-right  float right  wg-clear  clear both  sidebyside wg-content-position oneovertwo wg-content-position  width 49  oneovertwo wg-top  width 100  oneoverthree wg-first-column oneoverthree wg-second-column oneoverthree wg-third-column threeColumns wg-first-column threeColumns wg-second-column threeColumns wg-third-column  width 32  oneoverthree wg-first-column threeColumns wg-first-column  margin-right:2  rightcolumn wg-first-column  width 65  rightcolumn wg-second-column  width 33 ','000001000001000019000006',NULL),('jmlI9IK-lV8n2WMYmmPhAA','Ad Sku','','root/import/ad-sku',1238106173,1238106173,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'Ad Sku Ad Sku root import ad sku','000001000001000001',NULL),('AldPGu0u-jm_5xK13atCSQ','Default Purchase Ad Sku Template','','root/import/ad-sku/default-purchase-ad-sku-template',1238106805,1251419124,'3','7','12','WebGUI::Asset::Template',0,'Default Purchase Ad Sku Template Default Purchase Ad Sku Template root import ad sku default purchase ad sku template AdSku/Purchase','000001000001000001000001',NULL),('ohjyzab5i-yW6GOWTeDUHg','Default Manage Ad Sku Template','','root/import/ad-sku/default-manage-ad-sku-template',1238106805,1251425384,'3','7','12','WebGUI::Asset::Template',0,'Default Manage Ad Sku Template Default Manage Ad Sku Template root import ad sku default manage ad sku template AdSku/Manage','000001000001000001000002',NULL),('PBtmpl0000000000000015','Default WebGUI Welcome Message Template','','root/import/auth/webgui/create/default-webgui-welcome-message-template',1237647040,1287545014,'3','7','12','WebGUI::Asset::Template',0,'Default WebGUI Welcome Message Template Default WebGUI Welcome Message Template root import auth webgui create default webgui welcome message template Auth/WebGUI/Welcome','000001000001000005000005000002',NULL),('PBtmpl0000000000000016','Default WebGUI Account Activation Template','','root/import/auth/webgui/create/default-webgui-account-activation-template',1237407798,1287545014,'3','7','3','WebGUI::Asset::Template',0,'Default WebGUI Account Activation Template Default WebGUI Account Activation Template root import auth webgui create default webgui account activation template Auth/WebGUI/Activation','000001000001000005000005000003',NULL),('wrq7hMxb1ewQqZ46xmd8Gg','equal-cols.js','','matrix/equal-cols.js',1235706620,1281501163,'3','7','12','WebGUI::Asset::Snippet',0,'equal-cols.js equal-cols.js matrix equal cols.js function equalCol  var colOne = document.getElementById(\'compareForm var colTwo = document.getElementById(\'matrixRight var colOneH = colOne.offsetHeight var colTwoH = colTwo.offsetHeight alert(colOneH +   + colTwoH colOne.style.overflow = scroll colOne.style.height = colTwoH  150 + px ','000001000001000022000011',NULL),('matrixtmpl000000000007','Matrix Default Screenshots Config','','matrix-default-screenshots-config',1236594030,1281501163,'3','7','12','WebGUI::Asset::Template',0,'Matrix Default Screenshots Config Matrix Default Screenshots Config matrix default screenshots config Matrix/ScreenshotsConfig','000001000001000022000012',NULL),('matrixtmpl000000000006','Matrix Default Screenshots','','matrix-default-screenshots',1236889702,1281501163,'3','7','12','WebGUI::Asset::Template',0,'Matrix Default Screenshots Matrix Default Screenshots matrix default screenshots Matrix/Screenshots','000001000001000022000013',NULL),('RSAMkc6WQmfRE3TOr1_3Mw','ExpireIncompleteSurveyResponses','','root/import/expireincompletesurveyresponses',1234828062,1250243000,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'ExpireIncompleteSurveyResponses ExpireIncompleteSurveyResponses root import expireincompletesurveyresponses','000001000001000042000011',NULL),('ExpireIncResptmpl00001','ExpireIncompleteSurveyResponses','','root/import/expireincompletesurveyresponses/expireincompletesurveyresponses',1236752721,1250243000,'3','7','12','WebGUI::Asset::Template',0,'ExpireIncompleteSurveyResponses ExpireIncompleteSurveyResponses root import expireincompletesurveyresponses expireincompletesurveyresponses ExpireIncompleteSurveyResponses','000001000001000042000011000001',NULL),('NBVSVNLp9X_bV7WrCprtCA','Annotate Image','','image3',1237842096,1237842096,'3','7','12','WebGUI::Asset::Template',0,'Annotate Image Annotate Image image3 ImageAsset','000001000001000017000002',NULL),('qsG6B24a0SC5KrhQjmdZBw','survey.css','','survey.css',1233860274,1287545015,'3','7','12','WebGUI::Asset::Snippet',0,'survey.css survey.css survey.css body  margin 0 background-repeat repeat-y background-position 0px 0px  survey-header  width 80 height 20px margin-left 80px  survey  margin-left 80px width 85  div.dateanswer  overflow auto  div.slider-bg  position relative background:url(/extras/wobject/Survey/bg-fader-500.gif 5px 0 no-repeat height:68px width:529px  div.slider-thumb  cursor:default position absolute top 30px left 4px  div.slider-min-thumb  cursor:default position absolute top 4px  div.slider-max-thumb  cursor:default position absolute top 4px  headertitle  display none  headertext  display none  questions  display none  input.mcbutton font-size 10px font-weight bold text-decoration none background-color CCCCCC background-repeat repeat-x text-align center display block margin 0.5em padding 8em min-width 60px font-family Verdana Arial Helvetica sans-serif color 000000 background-image url(/extras/wobject/Survey/gradient-glossy.png  input.mcbutton:hover background-color B6D2F1 font-family Verdana Arial Helvetica sans-serif font-size 10px color 000000  input.mcbutton-selected background-color 172D9D background-repeat repeat-x color FFFFFF font-family Verdana Arial Helvetica sans-serif font-size 10px margin 0.5em padding 8em width 60px text-align center display block font-weight bold background-image url(/extras/wobject/Survey/gradient-glossy.png background-position 0px 0px   By default the marker for invalid required fields is a red   survey-invalid-marker  color FF0000  survey  font-family Verdana Arial Helvetica sans-serif font-size 10px border 3px solid 1e1e1e  survey survey-header  background-color cfcfcf padding-top 1px  survey headertitle  padding-left 5px  survey progress  position relative top 26px right 5px text-align right font-style italic  survey progress:before  content Progress   survey headertext  border-bottom 2px solid 1e1e1e padding 5px  survey questions   survey question  background-color dfdfdf padding 10px 5px 10px 5px  survey question p:before  content Q   survey scale:before  content A   survey submitbutton  margin-left 5px  restartMessage  color FF0000  chart  float left width 200px height 113px ','000001000001000042000010',NULL),('6uvSLY-ak_w4p_wS8q33cA','Carousel','','root/import/carousel',1239213092,1239213092,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'Carousel Carousel root import carousel','000001000001000007',NULL),('CarouselTmpl0000000001','Default Carousel','','root/import/carousel/carousel-default',1239290719,1301973997,'3','7','12','WebGUI::Asset::Template',0,'Default Carousel Default Carousel root import carousel carousel default Carousel','000001000001000007000001',NULL),('CarouselTmpl0000000002','Carousel hidden textareas','','root/import/carousel/carousel-hidden-textareas',1238878995,1239475937,'3','7','12','WebGUI::Asset::Template',0,'Carousel hidden textareas Carousel hidden textareas root import carousel carousel hidden textareas Carousel','000001000001000007000002',NULL),('GaBAW-2iVhLMJaZQzVLE5A','ThingyRecord Templates','','root/import/thingyrecord-templates',1240103565,1240103565,'3','7','3','WebGUI::Asset::Wobject::Folder',1,'ThingyRecord Templates ThingyRecord Templates root import thingyrecord templates','000001000001000045',NULL),('TKmhv8boP3TD2xwSwUBq0g','Default ThingyRecord View','','home/thinyrecord-templates/default-thingyrecord-view',1240103436,1250243000,'3','7','3','WebGUI::Asset::Template',0,'Default ThingyRecord View Default ThingyRecord View home thinyrecord templates default thingyrecord view ThingyRecord/View','000001000001000045000001',NULL),('fowHfgOkJtAxdst7rugTog','Story Manager','','root/import/storymanager',1236184911,1252595993,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'Story Manager Story Manager root import storymanager','000001000001000040',NULL),('3QpYtHrq_jmAk1FNutQM5A','Story Template','','root/import/storymanager/storytemplate',1239237827,1253636379,'3','7','4','WebGUI::Asset::Template',0,'Story Template Story Template root import storymanager storytemplate Story','000001000001000040000001',NULL),('yxD5ka7XHebPLD-LXBwJqw','StoryArchive','','root/import/storymanager/storyarchive',1239918573,1253635396,'3','7','4','WebGUI::Asset::Template',0,'StoryArchive StoryArchive root import storymanager storyarchive StoryArchive','000001000001000040000002',NULL),('A16v-YjWAShXWvSACsraeg','StoryTopic','','root/import/storymanager/storytopic',1239918710,1285124154,'3','7','4','WebGUI::Asset::Template',0,'StoryTopic StoryTopic root import storymanager storytopic StoryTopic','000001000001000040000005',NULL),('0EAJ9EYb9ap2XwfrcXfdLQ','Story Archive Asset List','','root/import/storymanager/keywordlist',1240262820,1250243000,'3','7','4','WebGUI::Asset::Template',0,'Story Archive Asset List Story Archive Asset List root import storymanager keywordlist StoryArchive/KeywordList','000001000001000040000006',NULL),('9j0_Z1j3Jd0QBbY2akb6qw','Default Map View','','home/map/map-templates/default-map-view',1238053232,1304392055,'3','7','3','WebGUI::Asset::Template',0,'Default Map View Default Map View home map map templates default map view Map/View','000001000001000020000001',NULL),('oHh0UqAJeY7u2n--WD-BAA','Default Edit Map Point','','home/map/map-templates/default-edit-map-point',1238040667,1304392055,'3','7','3','WebGUI::Asset::Template',0,'Default Edit Map Point Default Edit Map Point home map map templates default edit map point MapPoint/Edit','000001000001000020000002',NULL),('u9vfx33XDk5la1-QC5FK7g','Default Map Point View','','home/map/map-templates/default-map-point-view',1238048383,1304392055,'3','7','3','WebGUI::Asset::Template',0,'Default Map Point View Default Map Point View home map map templates default map point view MapPoint/View','000001000001000020000003',NULL),('kwTL1SWCk0GlpiJ5zAAEPQ','surveyedit.css','','root/import/survey/surveyedit.css',1244488512,1287545015,'3','7','12','WebGUI::Asset::Snippet',0,'surveyedit.css surveyedit.css root import survey surveyedit.css editor_container  visibility hidden z-index 100  loading-mask  position absolute left 0 top 0 width 100 height 100 z-index 20000 background-color white opacity:0.6 filter:alpha(opacity=60  loading  position absolute left 50 top 50 padding 2px z-index 20001 height auto margin 35px 0 0 30px  loading loading-indicator  background url(^Extras(\"wobject/Survey/rel_interstitial_loading.gif no-repeat color 555 font bold 13px tahoma,arial,helvetica padding 18px 80px margin 0 text-align center height auto z-index 20002  div.testarea  width 200px height 100px z-index 999 border 1px solid gray background f7f7f7 position absolute top 5 left:5  div.trashcan  border 1px solid gray width 175px height 50px  div.editarea  margin-top:40px padding:10px float:left border 1px solid gray  div.editquestion  padding:10px float:left  div.editanswer  padding:10px float:left  submitbutton  padding:20px  div.entry  padding-bottom:10px padding-left:10px  ul.draglist  list-style none margin:0 padding:0  ul.draglist li  margin 1px  ul.questionList  position relative background f7f7f7 border 1px solid gray list-style none margin:0 padding:0 min-height 40px  li.section  background-color CCCCFF border:1px solid 7EA6B2 cursor move min-height 10px  li.question  background-color D1E6EC border:1px solid 7EA6B2 cursor move padding-left:10px min-height 10px  li.answer  background-color F1FFB8 border:1px solid 7EA6B2 cursor move padding-left:15px min-height 10px  sections-panel li.selected  background-image url(^Extras(\"toolbar/bullet/moveRight.gif background-position:99 center background-repeat no-repeat font-weight:bold  goto-yui-ac  width:15em margin-top:0.5em  wGwarning  background-color:#FF6666 border:1px solid red margin:5px padding:10px  warning  padding 5px  sections-panel bd  overflow auto background-color:#fff padding:10px  buttons  height 30px  sections-panel_c yui-resize yui-resize-handle-r  right 6px  make room for the scroll-bars   sections-panel div.ft  font-size 100 ','000001000001000042000014',NULL),('i5kt5aodVs_oepNEkE7Okw','poll.css','','poll.css',1242312883,1242312883,'3','7','12','WebGUI::Asset::Snippet',0,'poll.css poll.css poll.css styles for the poll asset pollColor  background-color:#808080  pollOptions pollSubmit  border:0 margin:0 padding:0 ','000001000001000027000002',NULL),('uCn31PzislTZlgt_79j7cQ','style.css','','css/style.css',1258524916,1258524916,'3','7','12','WebGUI::Asset::Snippet',0,'style.css style.css css style.css  fail safe  topWrapper  font:82.5%/1.3 helvetica,arial,sans-serif width:98 overflow:hidden margin:0 auto 2em  nav  float:left width:20 margin:1em 0 2em  nav menu  list-style:none margin:0 padding:0  contentArea  float:right width:77 margin:1em 0 2em padding:5px 1 border:1px solid ccc  adminControls  margin:1em 0 padding:1em 0 0 border-top:1px dotted ccc ','000001000001000041000006',NULL),('FJbUTvZ2nUTn65LpW6gjsA','Profile Account Layout','','root/import/account/profile/profile-account-layout',1227070381,1256092369,'3','7','12','WebGUI::Asset::Template',0,'Profile Account Layout Profile Account Layout root import account profile profile account layout Account/Layout','000001000001000002000001000001',NULL),('75CmQgpcCSkdsL-oawdn3Q','Default Edit Profile Template','','root/import/account/profile/default-edit-profile-template',1227052575,1253555614,'3','7','12','WebGUI::Asset::Template',0,'Default Edit Profile Template Default Edit Profile Template root import account profile default edit profile template Account/Profile/Edit','000001000001000002000001000002',NULL),('2CS-BErrjMmESOtGT90qOg','Default View Profile Template','','root/import/account/profile/default-view-profile-template',1227070888,1248549087,'3','7','12','WebGUI::Asset::Template',0,'Default View Profile Template Default View Profile Template root import account profile default view profile template Account/Profile/View','000001000001000002000001000003',NULL),('MBmWlA_YEA2I6D29OMGtRg','Default Profile Error Template','','root/import/account/profile/default-profile-error-template',1226542675,1248549086,'3','7','12','WebGUI::Asset::Template',0,'Default Profile Error Template Default Profile Error Template root import account profile default profile error template Account/Profile/Error','000001000001000002000001000004',NULL),('gfZOwaTWYjbSoVaQtHBBEw','Inbox Account Layout','','root/import/account/inbox-account-layout',1226974679,1249407461,'3','7','12','WebGUI::Asset::Template',0,'Inbox Account Layout Inbox Account Layout root import account inbox account layout Account/Layout','000001000001000002000002000001',NULL),('c8xrwVuu5QE0XtF9DiVzLw','Default Inbox View Template','','root/import/account/inbox/default-inbox-view-template',1226894351,1273032723,'3','7','12','WebGUI::Asset::Template',0,'Default Inbox View Template Default Inbox View Template root import account inbox default inbox view template Account/Inbox/View','000001000001000002000002000002',NULL),('0n4HtbXaWa_XJHkFjetnLQ','Default Inbox View Message Template','','root/import/account/inbox/default-inbox-view-message-template',1226894994,1248549086,'3','7','12','WebGUI::Asset::Template',0,'Default Inbox View Message Template Default Inbox View Message Template root import account inbox default inbox view message template Account/Inbox/ViewMessage','000001000001000002000002000003',NULL),('ErEzulFiEKDkaCDVmxUavw','Default Inbox Error Template','','root/import/account/inbox/default-inbox-error-template',1226895484,1248549086,'3','7','12','WebGUI::Asset::Template',0,'Default Inbox Error Template Default Inbox Error Template root import account inbox default inbox error template Account/Inbox/Error','000001000001000002000002000004',NULL),('6uQEULvXFgCYlRWnYzZsuA','Default Inbox Send Message Template','','root/import/account/inbox/default-inbox-send-message-template',1226896682,1279073450,'3','7','12','WebGUI::Asset::Template',0,'Default Inbox Send Message Template Default Inbox Send Message Template root import account inbox default inbox send message template Account/Inbox/SendMessage','000001000001000002000002000005',NULL),('DUoxlTBXhVS-Zl3CFDpt9g','Default Message Confirm Template','','root/import/account/inbox/default-message-confirm-template',1226896802,1248549086,'3','7','12','WebGUI::Asset::Template',0,'Default Message Confirm Template Default Message Confirm Template root import account inbox default message confirm template Account/Inbox/Confirm','000001000001000002000002000006',NULL),('1Q4Je3hKCJzeo0ZBB5YB8g','Default Manage Invitations Template','','root/import/account/inbox/default-manage-invitations-template',1226898445,1248549086,'3','7','12','WebGUI::Asset::Template',0,'Default Manage Invitations Template Default Manage Invitations Template root import account inbox default manage invitations template Account/Inbox/ManageInvitations','000001000001000002000002000007',NULL),('5A8Hd9zXvByTDy4x-H28qw','Default Invitation Confirmation Template','','root/import/account/inbox/default-invitation-confirmation-template',1226899462,1248549086,'3','7','12','WebGUI::Asset::Template',0,'Default Invitation Confirmation Template Default Invitation Confirmation Template root import account inbox default invitation confirmation template Account/Inbox/Confirm','000001000001000002000002000008',NULL),('VBkY05f-E3WJS50WpdKd1Q','Default View Invitation Template','','root/import/account/inbox/default-view-invitation-template',1226899241,1248549087,'3','7','12','WebGUI::Asset::Template',0,'Default View Invitation Template Default View Invitation Template root import account inbox default view invitation template Account/Inbox/ViewInvitation','000001000001000002000002000009',NULL),('XgcsoDrbC0duVla7N7JAdw','Default Invite User Email Template','','root/import/account/inbox/default-invite-user-email-template',1226973330,1248549086,'3','7','12','WebGUI::Asset::Template',0,'Default Invite User Email Template Default Invite User Email Template root import account inbox default invite user email template Account/Inbox/InviteUserMessage','000001000001000002000002000010',NULL),('cR0UFm7I1qUI2Wbpj--08Q','Default Invite User Form Template','','root/import/account/inbox/default-invite-user-form-template',1226964738,1248549086,'3','7','12','WebGUI::Asset::Template',0,'Default Invite User Form Template Default Invite User Form Template root import account inbox default invite user form template Account/Inbox/InviteUser','000001000001000002000002000011',NULL),('SVIhz68689hwUGgcDM-gWw','Default Invite User Confirm Template','','root/import/account/inbox/default-invite-user-confirm-template',1226973314,1248549086,'3','7','12','WebGUI::Asset::Template',0,'Default Invite User Confirm Template Default Invite User Confirm Template root import account inbox default invite user confirm template Account/Inbox/InviteUserConfirm','000001000001000002000002000012',NULL),('zrNpGbT3odfIkg6nFSUy8Q','Friends Layout Template','','root/import/account/friends/friends-layout-template',1226994016,1249407461,'3','7','12','WebGUI::Asset::Template',0,'Friends Layout Template Friends Layout Template root import account friends friends layout template Account/Layout','000001000001000002000003000001',NULL),('1Yn_zE_dSiNuaBGNLPbxtw','Default Friends View Template','','root/import/account/friends/default-friends-view-template',1226994422,1248549086,'3','7','12','WebGUI::Asset::Template',0,'Default Friends View Template Default Friends View Template root import account friends default friends view template Account/Friends/View','000001000001000002000003000002',NULL),('AZFU33p0jpPJ-E6qLSWZng','Default Friends Edit Template','','root/import/account/friends/default-friends-edit-template',1226994865,1248549086,'3','7','12','WebGUI::Asset::Template',0,'Default Friends Edit Template Default Friends Edit Template root import account friends default friends edit template Account/Friends/Edit','000001000001000002000003000003',NULL),('AGJBGviWGAwjnwziiPjvDg','Default Send Request Template','','root/import/account/friends/default-send-request-template',1226995497,1248549087,'3','7','12','WebGUI::Asset::Template',0,'Default Send Request Template Default Send Request Template root import account friends default send request template Account/Friends/SendRequest','000001000001000002000003000004',NULL),('7Ijdd8SW32lVgg2H8R-Aqw','Default Friends Error Template','','root/import/account/friends/default-friends-error-template',1226995714,1248549086,'3','7','12','WebGUI::Asset::Template',0,'Default Friends Error Template Default Friends Error Template root import account friends default friends error template Account/Friends/Error','000001000001000002000003000005',NULL),('K8F0j_cq_jgo8dvWY_26Ag','Default Friends Confirmation Template','','root/import/account/friends/default-friends-confirmation-template',1226995643,1248549086,'3','7','12','WebGUI::Asset::Template',0,'Default Friends Confirmation Template Default Friends Confirmation Template root import account friends default friends confirmation template Account/Friends/Confirm','000001000001000002000003000006',NULL),('G5V6neXIDiFXN05oL-U3AQ','Default Remove Friends Confirmation Template','','root/import/account/friends/default-remove-friends-confirmation-template',1226995768,1248549087,'3','7','12','WebGUI::Asset::Template',0,'Default Remove Friends Confirmation Template Default Remove Friends Confirmation Template root import account friends default remove friends confirmation template Account/Friends/Confirm','000001000001000002000003000007',NULL),('9ThW278DWLV0-Svf68ljFQ','Account Layout','','root/import/account/user/account-layout',1226647187,1249407460,'3','7','12','WebGUI::Asset::Template',0,'Account Layout Account Layout root import account user account layout Account/Layout','000001000001000002000004000001',NULL),('aUDsJ-vB9RgP-AYvPOy8FQ','Shop Account Layout','','root/import/account/shop/shop-account-layout',1226660439,1263962529,'3','7','12','WebGUI::Asset::Template',0,'Shop Account Layout Shop Account Layout root import account shop shop account layout Account/Layout','000001000001000002000005000001',NULL),('-zxyB-O50W8YnL39Ouoc4Q','Default My Sales Template','','root/import/default-my-sales-template',1236959717,1248563425,'3','7','12','WebGUI::Asset::Template',0,'Default My Sales Template Default My Sales Template root import default my sales template Shop/MySales','000001000001000002000005000002',NULL),('b4n3VyUIsAHyIvT-W-jziA','Contributions Layout','','root/import/account/contributions/contributions-layout',1227074747,1249407461,'3','7','12','WebGUI::Asset::Template',0,'Contributions Layout Contributions Layout root import account contributions contributions layout Account/Layout','000001000001000002000006000001',NULL),('1IzRpX0tgW7iuCfaU2Kk0A','Default Contributions View','','root/import/account/contributions/default-contributions-view',1227079721,1250243000,'3','7','12','WebGUI::Asset::Template',0,'Default Contributions View Default Contributions View root import account contributions default contributions view Account/Contrib/View','000001000001000002000006000002',NULL),('N716tpSna0iIQTKxS4gTWA','Default Account Layout','','root/import/account/default-account-layout2',1226604666,1281501163,'3','7','12','WebGUI::Asset::Template',0,'Default Account Layout Default Account Layout root import account default account layout2 Account/Layout','000001000001000002000007',NULL),('CalendarMonth000000001','Default Calendar Month','','root/import/calendar-templates/default-calendar-month',1204890713,1279073449,'3','7','12','WebGUI::Asset::Template',0,'Default Calendar Month Default Calendar Month root import calendar templates default calendar month Calendar/Month','000001000001000006000007',NULL),('q5O62aH4pjUXsrQR3Pq4lw','Default Gallery View Album Thumbnails','','root/import/gallery-templates/default-gallery-view-album-thumbnails',1197825772,1285124155,'3','7','3','WebGUI::Asset::Template',0,'Default Gallery View Album Thumbnails Default Gallery View Album Thumbnails root import gallery templates default gallery view album thumbnails GalleryAlbum/ViewThumbnails','000001000001000015000004',NULL),('kaPRSaf8UKiskiGEgJgLAw','images','','root/import/gallery-templates/images',1197330678,1285124155,'3','7','3','WebGUI::Asset::Wobject::Folder',1,'images images root import gallery templates images','000001000001000015000017',NULL),('matrixtmpl000000000001','Matrix Default View','','matrix-default-view-template',1133743238,1281501162,'3','7','12','WebGUI::Asset::Template',0,'Matrix Default View Matrix Default View matrix default view template Matrix','000001000001000022000002',NULL),('matrixtmpl000000000003','Matrix Default Detailed Listing','','matrix-default-detailed-listing',1133743238,1281501163,'3','7','12','WebGUI::Asset::Template',0,'Matrix Default Detailed Listing Matrix Default Detailed Listing matrix default detailed listing Matrix/Detail','000001000001000022000003',NULL),('alraubvBu-YJJ614jAHD5w','matrix-nav-tmpl','','new-matrix/matrix-nav-tmpl',1232664015,1281501163,'3','7','12','WebGUI::Asset::Template',0,'matrix-nav-tmpl matrix-nav-tmpl new matrix matrix nav tmpl Navigation','000001000001000022000009',NULL),('PBtmpl0000000000000062','Default Gradebook Report','','root/import/survey/default-gradebook-report',1124395696,1250243000,'3','7','12','WebGUI::Asset::Template',0,'Default Gradebook Report Default Gradebook Report root import survey default gradebook report Survey/Gradebook','000001000001000042000002',NULL),('d8jMMMRddSQ7twP4l1ZSIw','Default Survey Take','','root/import/survey/default-survey-take',1227248175,1253555614,'3','7','12','WebGUI::Asset::Template',0,'Default Survey Take Default Survey Take root import survey default survey take Survey/Take','000001000001000042000005',NULL),('E3tzZjzhmYoNlAyP2VW33Q','Edit Story','','root/import/storymanager/editstory',1239236292,1303183716,'3','7','4','WebGUI::Asset::Template',0,'Edit Story Edit Story root import storymanager editstory Story/Edit','000001000001000040000003',NULL),('TbDcVLbbznPi0I0rxQf2CQ','Story Template Topic','','root/import/storymanager/storytemplatetopic',1237524306,1253636379,'3','7','4','WebGUI::Asset::Template',0,'Story Template Topic Story Template Topic root import storymanager storytemplatetopic Story','000001000001000040000004',NULL),('brxm_faNdZX5tRo3p50g3g','Map Templates','','home/map/map-templates',1238054297,1304392055,'3','7','3','WebGUI::Asset::Wobject::Folder',1,'Map Templates Map Templates home map map templates','000001000001000020',NULL),('i9-G00ALhJOr0gMh-vHbKA','Inbox SMS Notification','','root/import/inbox-sms-notification',1250408924,1250408924,'3','7','4','WebGUI::Asset::Template',0,'Inbox SMS Notification Inbox SMS Notification root import inbox sms notification Account/Inbox/Notification','000001000001000002000002000014',NULL),('S3zpVitAmhy58CAioH359Q','Default Test Results','','root/import/survey/default-test-results',1242893798,1250243000,'3','7','12','WebGUI::Asset::Template',0,'Default Test Results Default Test Results root import survey default test results Survey/TestResults','000001000001000042000013',NULL),('b1316COmd9xRv4fCI3LLGA','Inbox Notification','','inbox_notification',1236956475,1236956475,'3','7','4','WebGUI::Asset::Template',0,'Inbox Notification Inbox Notification inbox notification Account/Inbox/Notification','000001000001000002000002000013',NULL),('nWNVoMLrMo059mDRmfOp9g','Default Feedback','','root/import/survey/default-feedback',1242259265,1250243000,'3','7','12','WebGUI::Asset::Template',0,'Default Feedback Default Feedback root import survey default feedback Survey/Feedback','000001000001000042000015',NULL),('l0guT3vTR3B8cL6vtP-g3A','Contribute','You don\'t have to be a developer to become a project contributor. Examples of how you can contribute include:\n \n\nTranslators - Visit i18n.webgui.org\n and either help translate a few items in an existing language, or \ncreate a new translation. \nGraphic Des','contribute',1271445611,1285124369,'3','7','3','WebGUI::Asset::Wobject::Article',1,'Contribute contribute contribute You don\'t have to be a developer to become a project contributor Examples of how you can contribute include Translators  Visit i18n.webgui.org and either help translate a few items in an existing language or create a new translation Graphic Designers  Create WebGUI style themes icons or fix UI bugs You can contribute your items to WebGUI\'s Addons and Plugins area for others to download and use Usability Experts  Help make WebGUI more accessable and easier to use by submitting RFEs Even better submit an RFE that\'s ready to implement by including the code Doc Writers  Write documents in WebGUI\'s wiki help out on the boards improve WebGUI\'s built in documentation Testers  Validate WebGUI\'s features against its documentation search for errors and report bugs Test writers  If you have some Perl abilities you can help develop unit tests to make sure the WebGUI API is behaving as documented Developers  Write a new feature for WebGUI like a macro asset wobject auth module or workflow activity and contribute it to the Addons and Plugins If you\'re interested in developing for WebGUI be sure to check out the Development Best Practices wiki article Bug Fixers  Cruise the bug list and submit patches to correct the problem Core Developers  Becoming a core developer is a privilege To earn it you have to demonstrate through bug fixes and/or contributions that you can make sound programming decisions without the need for someone to scrutinize everything you check in WebGUI is a very large and complex application so getting to this level can take some time Core developers are developers with commit privileges to the subversion repository Advocate  Spread the word about WebGUI tell people about how you use it and how it\'s helped you.Encourage people to try it out Marketing and Promotion  If you have a talent for marketing advertising or promotion you can be a super advocate Have a marketing idea Contact tavis AT plainblack DOT com Make a WebGUI banner or print ad and contribute it Maybe you have a design for a cool wallpaper or t-shirt anything to get the word out  ','000001000002000004000002',NULL),('D6cJpRcey35aSkh9Q_FPUQ','Default EU User Screen','','root/import/default-eu-user-screen',1242407725,1326776037,'3','7','12','WebGUI::Asset::Template',0,'Default EU User Screen Default EU User Screen root import default eu user screen TaxDriver/EU/User','000001000001000036000019',NULL),('lo1rpxn3t8YPyKGers5eQg','Friend Manager','Templates for the Friend Manager ','root/import/account/friendmanager',1238625621,1238625621,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'Friend Manager Friend Manager root import account friendmanager Templates for the Friend Manager','000001000001000002000010',NULL),('64tqS80D53Z0JoAs2cX2VQ','FriendManager View Template','','root/import/account/friendmanager/view',1239400975,1295931508,'3','7','4','WebGUI::Asset::Template',0,'FriendManager View Template FriendManager View Template root import account friendmanager view Account/FriendManager/View','000001000001000002000010000001',NULL),('lG2exkH9FeYvn4pA63idNg','Friend Manager Edit Friends','','root/import/account/friendmanager/edit',1239383808,1289967962,'3','7','4','WebGUI::Asset::Template',0,'Friend Manager Edit Friends Friend Manager Edit Friends root import account friendmanager edit Account/FriendManager/Edit','000001000001000002000010000002',NULL),('newslettercs0000000001','Newsletter Manager (default)','','newslettercstemplate',1185754569,1252682678,'3','7','3','WebGUI::Asset::Template',0,'Newsletter Manager default Newsletter Manager newslettercstemplate Collaboration','000001000001000026000002',NULL),('iCM9pRY5yYyjufROgaCDlg','storyManager.css','','storymanager.css',1253305659,1253305659,'3','7','12','WebGUI::Asset::Snippet',0,'storyManager.css storyManager.css storymanager.css editStory  width 100  editStory legend  font-size 1.8em border-bottom 2px solid  editStory tbody  width 943px  editStory td  padding 5px  editStory story  float:left  editStory story label editStory photo label  display block width 100 text-align right editStory photoContainer  border 1px solid float:left margin 10px 0 0 20px  editStory photoContainer photoHeader  font-size 1.2em font-weight bold  editStory buttons  clear both text-align right padding 10px 0  editStory story_formId_tbl  width 100 important  editStory fieldset  border none  storyArchive  width 100  storyArchive h3  border-bottom 2px solid margin-bottom 10px  storyArchive storyList  list-style-type none padding-left 0  storyArchive storyList li  padding-left 10px margin-bottom 10px  storyArchive pagination  float left list-style-type none  storyArchive keywords  width 100 clear both  storyArchive img  border none  storyArchive controls a  margin-right 10px  viewStory storyTitle viewStory storyUpdated viewStoryTopic storyTitle viewStoryTopic storyUpdated  float left  viewStory storyTitle viewStoryTopic storyTitle  font-size 1.5em width 100  viewStory storyHighlights viewStoryTopic storyHighlights  float:right margin-top 1.5em  viewStory storyPhoto viewStoryTopic storyPhoto  float left margin 0 10px 10px 0  viewStory photoCaption viewStoryTopic photoCaption  width 496px padding 5px display:block  viewStory clear viewStoryTopic clear  clear both  storyTopic  width 100  storyTopic h3 border-bottom 2px solid  storyTopic topStory  width 340px float left  storyTopic storyList  width 250px float left  storyTopic storyListBig  width 100 float left  htmltagcloud wg-clear  clear:both ','000001000001000040000007',NULL),('zb_OPKNqcTuIjdvvbEkRjw','article.css','','article.css',1247484073,1256092368,'3','7','12','WebGUI::Asset::Snippet',0,'article.css article.css article.css  styles for the article asset  withImage articleContent linkedImage articleContent  width:100 overflow:hidden  withImage articleImage linkedImage articleImage  float:right margin:0 0 10px 10px  linkedImage caption  display:block ','000001000001000004000005',NULL),('PBtmpl0000000000000210','Request Tracker Post Form','','request-tracker-template2',1147642410,1277868922,'3','7','12','WebGUI::Asset::Template',0,'Request Tracker Post Form Request Tracker Post Form request tracker template2 Collaboration/PostForm','000001000001000008000028',NULL),('pbrobot000000000000001','robots.txt','','robots.txt',1147642511,1256092369,'3','7','12','WebGUI::Asset::Snippet',0,'robots.txt robots.txt robots.txt User-agent  Disallow op=auth Disallow op=account Disallow op=ajaxGetI18N Disallow op=makePrintable Disallow op=viewHelp Disallow op=viewHelpIndex','000001000001000033',NULL),('4qh0kIsFUdd4Ox-Iu1JZgg','EMS','','root/import/ems',1208725439,1257311886,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'EMS EMS root import ems','000001000001000012',NULL),('hreA_bgxiTX-EzWCSZCZJw','Print Remaining Tickets Template (default)','','root/import/ems/default-print-remaining-tickets-template',1257311887,1257311887,'3','7','12','WebGUI::Asset::Template',0,'Print Remaining Tickets Template default Print Remaining Tickets Template default root import ems default print remaining tickets template EMS/PrintRemainingTickets','000001000001000012000008',NULL),('P_4uog81vSUK4KxuW_4GUA','css','','css',1258524916,1258524916,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'css css css','000001000001000054',NULL),('H_-8zjtWsO1FUpQqNtkxNQ','wg-base.css','','css/wg-base.css',1258524916,1258524916,'3','7','12','WebGUI::Asset::Snippet',0,'wg-base.css wg-base.css css wg base.css  In this stylesheet you can find the styles that are used in more than one template For example file/attachment icons pagination etc   Elements that are styled with this stylesheet have a classname that starts with wg   general  wg-icon  border:0px none vertical-align middle  wg-clear  clear:both   inline list pagination  wg-inline  margin:0 0 1em padding:0  wg-inline li  display:inline margin:0 padding:0  wg-inline li.active  font-weight:bold   forms  wg-captchaImage  border:0 none vertical-align:middle margin-left:5px ','000001000001000054000001',NULL),('0iMMbGN3BevuCBHjjLiQNA','WebGUI/Deactivate','','root/import/auth/webgui/deactivate',1269401469,1287545015,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'WebGUI/Deactivate WebGUI/Deactivate root import auth webgui deactivate','000001000001000005000009',NULL),('zaHUYsE_PgKk8hnVd8ffEQ','WebGUI Deactivate Account Template','','default_webgui_deactivate_account_template',1269401469,1287545015,'3','7','12','WebGUI::Asset::Template',0,'WebGUI Deactivate Account Template WebGUI Deactivate Account Template default webgui deactivate account template Auth/WebGUI/Deactivate','000001000001000005000009000001',NULL),('6A4yIjWwJfIE0Ep-I0jutg','LDAP/Deactivate','','root/import/auth/ldap/deactivate',1269401469,1287545015,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'LDAP/Deactivate LDAP/Deactivate root import auth ldap deactivate','000001000001000005000010',NULL),('_P4PMiraGsLTfOjK4fYQPQ','LDAP Deactivate Account Template','','default_ldap_deactivate_account_template',1269401469,1287545015,'3','7','12','WebGUI::Asset::Template',0,'LDAP Deactivate Account Template LDAP Deactivate Account Template default ldap deactivate account template Auth/LDAP/Deactivate','000001000001000005000010000001',NULL),('_XfvgNH__bY1ykMiKYSobQ','account.css','','root/import/account/account.css',1233168041,1281501163,'3','7','12','WebGUI::Asset::Snippet',0,'account.css account.css root import account account.css  general  WGsubContent WGsubContent a WGsubContent a:link  color:#000000 important  WGbutton  float:right padding-right:10px  centered  text-align center  WGaccount_message  background-color white border solid BECEF8 1px height 300px margin-bottom 10px margin-left 60px margin-top 20px overflow:-moz-scrollbars-vertical overflow-x:hidden overflow-y:scroll padding:10px text-align left vertical-align:top width 90  WGprofileMember  font-size:9px margin-right:20px text-align:right  WGmember  color:#3e4f77 font 9px Verdana Arial Helvetica sans-serif text-align:center  WGphotostyle  border:solid 3e4f77 2px margin-bottom:5px margin-top:5px  rightalign  float right  WGsend  float:right padding-right 75px   bio addtonetwork network  WGbordered  border-bottom dashed BECEF8 2px padding-bottom 10px  WGfriendpic  border solid BECEF8 1px  WGinvitemsg  width 600px height 150px  ol.WGProfile_interests  color:#0B2259 font-size:15px font-weight:bold list-style-type:none margin:0px padding:0px padding:5px 5px  ol.WGProfile_interests li  margin-bottom:15px  ol.WGProfile_interests span  font-size:12px font-weight:normal color:black  WGpBio  border-bottom:solid DDE6FB 1px margin:0px margin-bottom:5px padding-bottom:5px  WGpBio div  background-color:#DDE6FB padding:2px 5px margin-bottom:2px  WGprogram  font-size 9px   contributions  WGContribCount  font-size:12px text-align:left padding:3px  WGContribTitle  background-color:#f2f5fa border solid d8dee8 1px color:#0B2259 font-size:12px font-weight:bold min-height:25px padding:3px text-align:center text-decoration underline  WGContribTitleLeft  background-color:#f2f5fa border solid d8dee8 1px color:#0B2259 font-size:12px font-weight:bold min-height:25px padding:3px text-align:center text-decoration underline  WGContribEntry  text-align:center padding:3px  WGContribEntryLeft  text-align:left padding:3px   edit box  WGeditBox  background:white url(images/edit_box_bg.jpg no-repeat bottom left border:solid 8DABF1 2px display:block font-family:verdana font-size:9px font-weight:bold left:100px moz-box-sizing:border-box padding:5px position:absolute top:100px width:590px z-index:100  WGeditBox input WGeditBox select  font-size:9px   friends  WGfriends_name  font-weight:bold width:90  WGfriends_photo  font-weight:bold width:10  WGfriends_photo img  height 50px width 50px  WGfriends_private  float:right padding-bottom 5px width 50  WGfriends_ninety  vertical-align:top width 90  WGfriends_seventy  vertical-align:top width 70  WGfriends_ten  width 10  WGfriends_ten img  height 50px width 50px  WGfriends_twenty  width 20  WGaccepts  padding-bottom 5px   inbox  WGProfile_msgcontainer  padding:2px  WGinbox_count  font-size:12px font-weight:bold padding:3px text-align:left  WGinbox_errors  font-weight:bold color:red text-align:center  WG_inbox_InviteLabel  width:50px text-align:right  WG_inbox_InviteLabelView  font-weight:bold width:120px  WGmsgcontainer  padding:6px display:block margin-bottom:6px   inbox contacts  WGdatacells  border-bottom dashed BECEF8 1px  WGinbox_contactsTbl  background-color:#EEF2FD font-family:arial font-size:9pt width:100  contacts  height 275px overflow auto   inbox forms  WGbuttons_left  float left  WGbuttons_right  float right  WGinbox_from  color black font-weight normal text-decoration none  WGinbox_subject  width 530px  WGinbox_messageTo  background-color white border solid BECEF8 1px height 50px overflow:-moz-scrollbars-vertical overflow-x:hidden overflow-y:scroll width 530px   inbox pagination  WGinbox_buttons  display:inline float:left font-size:10px text-align:left width:70  WGinbox_pagination  display:inline text-align:right width:20  WGinbox_messagerpp  font-size:10px display:inline text-align:right width:20  WGmessage  display:inline float:left font-size:10px text-align:left width:70  WGmessagerpp  font-size:10px display:inline text-align:right float right  WG-previous-next  float right   inbox threads  WGevenThread  background-color e1e8fb border-bottom 1px solid bfcef9 padding 8px text-align:center  WGoddThread  background-color eef2fd border-bottom 1px solid bfcef9 padding 8px text-align center   pagination  WGProfile_pagination  font-size:10px text-align:right width:20  WGProfile_messagerpp  font-size:10px display:inline text-align:right width:20  WGProfile_paginationLeft  font-size:10px text-align:left width:20  WGProfile_paginationCenter  font-size:10px text-align:center width:20  WGProfile_pagination a  background-color:#f2f5fa border:solid bfc8dc 1px font-size:10px font-weight:bold padding:1px 5px text-decoration:none  WGProfile_pagination a:hover  background-color:#d8dee8 color:white  WGProfile_pagination prevNext  background-color transparent border none color black  WGProfile_pagination prevNext:hover  background-color transparent border none color black  WGProfile_pagination active  background-color:#d8dee8 border:solid bfc8dc 1px color:white font-size:10px font-weight:bold padding:1px 5px text-decoration:none  WGProfile_pagination img  vertical-align:middle margin-top:2px border:none   profile  WGProfile_registration  background:none border:none font-size:9pt font-family:arial margin:0 padding:0 width:100  WGProfile_registration header  background-color:#818997 color:#3e4f77 font-size:10px font-weight:bold text-align:left  WGProfile_registration header a  color:white text-decoration:none  WGProfile_registration help a  font-weight:bold text-decoration:none  WGProfile_registration inputText  font-size:10px margin-right:1px  WGProfile_registration label  font-size:9pt font-weight:bold text-align:right white-space:nowrap width:1  WGProfile_registration labelLeft  font-size:9pt font-weight:bold white-space:nowrap width:1 text-align left vertical-align top  WGProfile_registration smallLabel  font-size:8px text-align:center  WGProfile_registration smallText  font-size:9px  WGinboxTbl  display:block margin 4px padding 2px  WGProfile_registration bar WGProfile_registration barRight  background-color:#f2f5fa border solid d8dee8 1px color:#3e4f77 font-size:14px font-weight:bold margin:10px 0px 10px 0px min-height:25px padding:4px 4px 0px 4px vertical-align:middle  WGProfile_registration bar  text-align center  WGProfile_registration barRight  text-align right  WGProfile_registration bar a  color:#0B2259 font-size:10px font-weight:bold  WGProfile_registration barFive  background-color:#f2f5fa border solid d8dee8 1px color:#3e4f77 font-size:14px font-weight:bold text-align:center margin-right:3px min-height:25px padding:2px width:4.3  WGProfile_registration barTen  background-color:#f2f5fa border solid d8dee8 1px color:#3e4f77 font-size:14px font-weight:bold min-height:25px padding:2px text-align:center width:7.2  WGProfile_registration barFifteen  background-color:#f2f5fa border solid d8dee8 1px color:#3e4f77 font-size:14px font-weight:bold margin-right:3px min-height:25px padding:2px text-align:center width:15  WGProfile_registration barFifty  background-color:#f2f5fa border solid d8dee8 1px color:#3e4f77 font-size:14px font-weight:bold margin-right:3px min-height:25px padding:2px text-align:center width:50  WGbarContainer  display:block margin:10px 0px 10px 0px width:100   profile edit  WGfields  padding 2px  WGfields_left  padding:2px vertical-align:top width 15  WGfields_right  display:inline float:right padding:2px text-align:right width:80 vertical-align top  WGProfile  display:table margin 0 padding 0 width:100  WGProfileFields  border:0 padding 0 margin:0 width 100  WGProfileFields ol  display inline list-style-type none  WGProfileFields ul  list-style-type none display inline  WGProfileFields ul li  display inline-block display inline zoom 1   profile view  WGProfile_accepts  text-align:right background-color:gray padding:4px width:100  WGviewContainer  margin:0 padding:0 width:90  WGinternational  background-color:red color:white display:inline font-weight:bold padding:4px text-align:center  WGcategoryLabel  vertical-align:top width:90  WGprivateMessage  background-color:gray padding:4px text-align:right  WGprofileAlert  background-color:red color:white font-weight:bold padding:4px text-align:center width:100  WGprofilePhoto  vertical-align:top   profile errors  WGprofileErrors  background-color ff0000 color ffffff font-weight bold text-align center  WGprofilefield_required_off   WGprofilefield_required  background-color ffd6bb  WGprofilefield_error  background-color FF9494  WGerrorMsg  font-weight:bold color:red text-align:center   user  WGuserInvite_subject  background-color white border solid BECEF8 1px height 25px text-align left width 500px margin-left 50px margin-bottom 20px overflow:-moz-scrollbars-vertical overflow-x:hidden overflow-y:scroll   view profile  WGprofile_canEdit  text-align:center background-color:red padding:4px color:white font-weight:bold  WGprofile_fieldLabel  background DDE6FB padding:2px width:200px  WGprofile_fieldData  margin-left 5px  WGprofile_fieldStatus  padding:4px color:white font-weight:bold    TABS    TABS  outer  WGbottombutton  float:right padding-right:2px padding-top 2px position relative  WGcontent  padding:10px  WGcleartab  clear both height:0  WGsubContent   color setting for border under outer tabs that surrounds inner tabs  border solid d8dee8 6px  WGtopbutton  float:right clear:both padding-right:2px padding-top 2px position relative  ul.WGtopTabs ul.WGtopTabs li  list-style-type:none margin:10px 0px 0px 0px padding:0px position:relative width:auto Xposition:relative zoom:1  ul.WGtopTabs li  display:block float:left margin-right 3px  ul.WGtopTabs li b  background-color eef2fd border-top:solid d8dee8 1px display:block padding:4px 8px position:relative top:-1px  ul.WGtopTabs a   non-selected tabs color settings  display:block color:#9ea0bb important font-size:12px font-family Arial Helvetica sans-serif text-decoration:none background-color:#f2f5fa border-left solid d8dee8 1px border-right solid d8dee8 1px  ul.WGtopTabs a:hover ul.WGtopTabs a:hover b ul.WGtopTabs a.selected ul.WGtopTabs a.selected b   selected tab color settings  background-color:#d8dee8 color:#3e4f77  text-align right  TABS  YUI  WGcleardiv  clear both margin 0px 0px 0px 0px padding 0px  WGviewProfile wgView  border none font bold 10px Verdana color 3e4f77 text-decoration:none  WGview  position absolute right 4px top:4px  WGprofile_displayView  x-system-font:none border:medium none color:#0B2258 display:inline float:right font-family:Verdana font-size:10px font-size-adjust:none font-stretch:normal font-style:normal font-variant:normal font-weight:bold line-height:normal padding-right:8px padding-top:3px text-decoration none  WGprofile_displaySubContent   border around friends tab content  border solid d8dee8 6px border-top solid d8dee8 18px   Copyright c 2008 Yahoo Inc All rights reserved Code licensed under the BSD License http://developer.yahoo.net/yui/license.txt version 2.6.0   yui tabs color settings below   yui-navset defaults to yui-navset-top  WGsubContent yui-skin-sam yui-navset yui-nav WGsubContent yui-skin-sam yui-navset yui-navset-top yui-nav   protect nested tabviews from other orientations  border:solid eef2fd  color between tab list and content  border-width:0 0 5px Xposition:relative zoom:1  WGsubContent yui-skin-sam yui-navset yui-nav a WGsubContent yui-skin-sam yui-navset yui-navset-top yui-nav a  background:#ffffff  tab background  border:solid ffffff border-width:0 1px color:#bfccdd position:relative text-decoration:none font-size:12px font-family Arial Helvetica sans-serif font-weight bold  WGsubContent yui-skin-sam yui-navset yui-nav a em WGsubContent yui-skin-sam yui-navset yui-navset-top yui-nav a em  border:solid eef2fd border-width:1px 0 0 cursor:hand padding:0.25em 75em left:0 right 0 bottom 0  protect from other orientations  top:-1px  for 1px rounded corners  position:relative  WGsubContent yui-skin-sam yui-navset yui-nav selected a WGsubContent yui-skin-sam yui-navset yui-nav selected a:focus  no focus effect for selected  WGsubContent yui-skin-sam yui-navset yui-nav selected a:hover   no hover effect for selected  background eef2fd  selected tab background  color 3e4f77 font-size:12px font-family Arial Helvetica sans-serif text-decoration:none font-weight bold  WGsubContent yui-skin-sam yui-navset yui-nav selected a WGsubContent yui-skin-sam yui-navset yui-nav selected a em  border-color:#eef2fd  selected tab border color   WGsubContent yui-skin-sam yui-navset yui-nav a:hover WGsubContent yui-skin-sam yui-navset yui-nav a:focus  background eef2fd  hover tab background  color 3e4f77 outline:0 font-size:12px font-family Arial Helvetica sans-serif text-decoration:none font-weight bold  WGsubContent yui-skin-sam yui-navset yui-content  background eef2fd  content background color   WGsubContent yui-skin-sam yui-navset yui-content WGsubContent yui-skin-sam yui-navset yui-navset-top yui-content  border:5px solid eef2fd  content border  padding:0.75em 1em  content padding    left and right orientations  WGsubContent yui-skin-sam yui-navset-left yui-nav WGsubContent yui-skin-sam yui-navset yui-navset-left yui-nav WGsubContent yui-skin-sam yui-navset yui-navset-right yui-nav WGsubContent yui-skin-sam yui-navset-right yui-nav  border-width:0 5px 0 0 Xposition:absolute  from tabview-core have to reiterate for skin-sam due to pos:rel on skin-sam yui-nav  top:0 bottom:0  stretch to fill content height   WGsubContent yui-skin-sam yui-navset yui-navset-right yui-nav WGsubContent yui-skin-sam yui-navset-right yui-nav  border-width:0 0 0 5px  WGsubContent yui-skin-sam yui-navset-left yui-nav li WGsubContent yui-skin-sam yui-navset yui-navset-left yui-nav li WGsubContent yui-skin-sam yui-navset-right yui-nav li  margin:0 0 0.3em  space between tabs  padding:0 0 0 1px  gecko make room for overflow   WGsubContent yui-skin-sam yui-navset-right yui-nav li  padding:0 1px 0 0  gecko make room for overflow   WGsubContent yui-skin-sam yui-navset-left yui-nav selected WGsubContent yui-skin-sam yui-navset yui-navset-left yui-nav selected  margin:0 1px 0.16em 0  WGsubContent yui-skin-sam yui-navset-right yui-nav selected  margin:0 0 0.16em 1px  WGsubContent yui-skin-sam yui-navset-left yui-nav a WGsubContent yui-skin-sam yui-navset-right yui-nav a  border-width:1px 0  WGsubContent yui-skin-sam yui-navset-left yui-nav a em WGsubContent yui-skin-sam yui-navset yui-navset-left yui-nav a em WGsubContent yui-skin-sam yui-navset-right yui-nav a em  border-width:0 0 0 1px padding:0.2em 75em top:auto left:-1px  for 1px rounded corners   WGsubContent yui-skin-sam yui-navset-right yui-nav a em  border-width:0 1px 0 0 left:auto right:-1px  for 1px rounded corners   WGsubContent yui-skin-sam yui-navset-left yui-nav a WGsubContent yui-skin-sam yui-navset-left yui-nav selected a WGsubContent yui-skin-sam yui-navset-left yui-nav a:hover WGsubContent yui-skin-sam yui-navset-right yui-nav a WGsubContent yui-skin-sam yui-navset-right yui-nav selected a WGsubContent yui-skin-sam yui-navset-right yui-nav a:hover WGsubContent yui-skin-sam yui-navset-bottom yui-nav a WGsubContent yui-skin-sam yui-navset-bottom yui-nav selected a WGsubContent yui-skin-sam yui-navset-bottom yui-nav a:hover  background-image:none  no left-right or bottom-top gradient   WGsubContent yui-skin-sam yui-navset-left yui-content  border:1px solid d8dee8  content border    bottom orientation  WGsubContent yui-skin-sam yui-navset-bottom yui-nav WGsubContent yui-skin-sam yui-navset yui-navset-bottom yui-nav  border-width:5px 0 0  color between tab list and content   WGsubContent yui-skin-sam yui-navset yui-navset-bottom yui-nav selected WGsubContent yui-skin-sam yui-navset-bottom yui-nav selected  margin:-1px 0.3em 0 0  for overlap   WGsubContent yui-skin-sam yui-navset yui-navset-bottom yui-nav li WGsubContent yui-skin-sam yui-navset-bottom yui-nav li  padding:0 0 1px 0  gecko make room for overflow  vertical-align:top  WGsubContent yui-skin-sam yui-navset yui-navset-bottom yui-nav li a WGsubContent yui-skin-sam yui-navset-bottom yui-nav li a   WGsubContent yui-skin-sam yui-navset yui-navset-bottom yui-nav a em WGsubContent yui-skin-sam yui-navset-bottom yui-nav a em  border-width:0 0 1px top:auto bottom:-1px  for 1px rounded corners   WGsubContent yui-skin-sam yui-navset-bottom yui-content WGsubContent yui-skin-sam yui-navset yui-navset-bottom yui-content  border:1px solid f2f5fa  content border   WGsubContent yui-skin-sam  background-color d8dee8 padding 10px 5 5 5px display:block   yui tab placement settings below  WGsubContent yui-skin-sam yui-navset yui-nav li WGsubContent yui-skin-sam yui-navset yui-navset-top yui-nav li  margin:0 0.3em 0 0  space between tabs  padding:5px 0 0  gecko make room for overflow  zoom:1  WGsubContent yui-skin-sam yui-navset yui-nav selected WGsubContent yui-skin-sam yui-navset yui-navset-top yui-nav selected  margin:0 0.3em 1px 0  for overlap   WGsubContent yui-navset yui-nav li,.yui-navset yui-navset-top yui-nav li WGsubContent yui-navset yui-navset-bottom yui-nav li  margin:0 0.5em 0 0  WGsubContent yui-navset-left yui-nav li,.yui-navset-right yui-nav li  margin:0 0 0.5em  WGsubContent yui-navset yui-content yui-hidden  display:none  WGsubContent yui-navset yui-navset-left yui-nav,.yui-navset yui-navset-right yui-nav WGsubContent yui-navset-left yui-nav,.yui-navset-right yui-nav  width:6em  WGsubContent yui-navset-top yui-nav,.yui-navset-bottom yui-nav  width:auto  WGsubContent yui-navset yui-navset-left,.yui-navset-left  padding:0 0 0 6em  WGsubContent yui-navset-right  padding:0 6em 0 0  WGsubContent yui-navset-top,.yui-navset-bottom  padding:auto  WGsubContent yui-nav,.yui-nav li  list-style:none margin:0 padding:0  WGsubContent yui-navset li em  font-style:normal  WGsubContent yui-navset  position:relative zoom:1  WGsubContent yui-navset yui-content  zoom:1  WGsubContent yui-navset yui-nav li,.yui-navset yui-navset-top yui-nav li WGsubContent yui-navset yui-navset-bottom yui-nav li  display:inline-block display:-moz-inline-stack display:inline vertical-align:bottom cursor:pointer zoom:1  WGsubContent yui-navset-left yui-nav li,.yui-navset-right yui-nav li  display:block  WGsubContent yui-navset yui-nav a  position:relative  WGsubContent yui-navset yui-nav li a,.yui-navset-top yui-nav li a WGsubContent yui-navset-bottom yui-nav li a  display:block display:inline-block vertical-align:bottom zoom:1  WGsubContent yui-navset-left yui-nav li a,.yui-navset-right yui-nav li a  display:block  WGsubContent yui-navset-bottom yui-nav li a  vertical-align:text-top  WGsubContent yui-navset yui-nav li a em,.yui-navset-top yui-nav li a em WGsubContent yui-navset-bottom yui-nav li a em  display:block  WGsubContent yui-navset yui-navset-left yui-nav,.yui-navset yui-navset-right yui-nav WGsubContent yui-navset-left yui-nav,.yui-navset-right yui-nav  position:absolute z-index:1  WGsubContent yui-navset-top yui-nav,.yui-navset-bottom yui-nav  position:static  WGsubContent yui-navset yui-navset-left yui-nav,.yui-navset-left yui-nav  left:0 right:auto  WGsubContent yui-navset yui-navset-right yui-nav,.yui-navset-right yui-nav  left:auto right:0  WGsubContent yui-skin-sam yui-navset yui-nav selected a em  padding:0.35em 0.75em  WGsubContent yui-skin-sam yui-navset-left yui-nav,.yui-skin-sam yui-navset yui-navset-left yui-nav WGsubContent yui-skin-sam yui-navset yui-navset-right yui-nav,.yui-skin-sam yui-navset-right yui-nav  border-width:0 5px 0 0 bottom:0 top:0 Xposition:absolute  WGsubContent yui-skin-sam yui-navset yui-navset-right yui-nav,.yui-skin-sam yui-navset-right yui-nav  border-width:0 0 0 5px  WGsubContent yui-skin-sam yui-navset-left yui-nav li,.yui-skin-sam yui-navset yui-navset-left yui-nav li WGsubContent yui-skin-sam yui-navset-right yui-nav li  margin:0 0 0.16em padding:0 0 0 1px  WGsubContent yui-skin-sam yui-navset-right yui-nav li  padding:0 1px 0 0  WGsubContent yui-skin-sam yui-navset-left yui-nav a,.yui-skin-sam yui-navset-right yui-nav a  border-width:1px 0  WGsubContent yui-skin-sam yui-navset-left yui-nav a em,.yui-skin-sam yui-navset yui-navset-left yui-nav a em,.yui-skin-sam yui-navset-right yui-nav a em  border-width:0 0 0 1px left:-1px padding:0.2em 75em top:auto  WGsubContent yui-skin-sam yui-navset-right yui-nav a em  border-width:0 1px 0 0 left:auto right:-1px  WGsubContent yui-skin-sam yui-navset-left yui-nav a,.yui-skin-sam yui-navset-left yui-nav selected a,.yui-skin-sam yui-navset-left yui-nav a:hover WGsubContent yui-skin-sam yui-navset-right yui-nav a,.yui-skin-sam yui-navset-right yui-nav selected a,.yui-skin-sam yui-navset-right yui-nav a:hover WGsubContent yui-skin-sam yui-navset-bottom yui-nav a,.yui-skin-sam yui-navset-bottom yui-nav selected a WGsubContent yui-skin-sam yui-navset-bottom yui-nav a:hover  background-image:none  WGsubContent yui-skin-sam yui-navset yui-navset-bottom yui-nav selected WGsubContent yui-skin-sam yui-navset-bottom yui-nav selected  margin:-1px 0.16em 0 0  WGsubContent yui-skin-sam yui-navset yui-navset-bottom yui-nav li WGsubContent yui-skin-sam yui-navset-bottom yui-nav li  padding:0 0 1px 0 vertical-align:top ','000001000001000002000008',NULL),('_9_eiaPgxzF_x_upt6-PNQ','gallery.css','','root/import/gallery-templates/gallery.css',1197988920,1304392055,'3','7','3','WebGUI::Asset::Snippet',0,'gallery.css gallery.css root import gallery templates gallery.css  FIXES FLOAT ISSUES WITHOUT THIS FLOATS GET ALL NUTSY ESPECIALLY IN OPERA AND SAFARI  clearfix:after  content  display block height 0 clear both visibility hidden  clearfix display inline-block  END FLOAT FIX  wgGallery  font-family:verdana arial text-align:left  firstBar  background black color:white font-size:18px font-weight:bold  firstBar title  margin-left:20px line-height:42px  firstBar title a  font-size:18px font-weight:bold color:white  firstBar buttons  float:right  firstBar buttons a  display:block float:left height:42px line-height:42px font-size:10px color:white font-weight:bold text-align:center padding:0px 5px  firstBar buttons rss  display:block height:29px position:relative background:transparent padding-top:13px  secondBar  background F1F1F1 text-align:left border-top:solid 8B8B8B 5px color black overflow hidden  secondBar author  font-size:10px  secondBar desc p  margin-left 20px margin-top 0 color black  pictures   searchArea  float:right  searchArea   float:left  searchArea input.searchText  border:solid black 1px width:100px margin:0px padding:2px margin-top:5px font-size:10px height:15px margin-right:10px  searchArea input.searchBtn  border:solid black 1px margin:0px padding:3px margin-top:5px font-size:10px vertical-align:middle cursor:pointer height:21px  searchArea a:link searchArea a:visited secondBar author a:link secondBar author a:visited  font-size:11px color:black  searchArea current  font-weight:bold text-transform:uppercase text-decoration:none font-size:10px  wgAlbum   display moz-inline-box Although this works in later versions of FireFox it does not work in 2.x  display:block display inline-block  Op Saf IE  vertical-align top  IE Mac non capisce e a volte crea extra v space  width:250px margin:10px  wgAlbum albumTitle  background black color:white font-size:12px font-weight:bold padding:10px padding-right:50px border:solid 475f6f 1px border-bottom:solid 8B8B8B 5px text-align:left display:block  wgAlbum albumImage  background F1F1F1 border-left solid black 1px border-right solid black 1px padding-top:15px height:135px  wgAlbum albumImage a  height:135px width:200px overflow:hidden display:block margin:0px 23px  wgAlbum albumImage img  border-style:none display:block width:200px height:auto border:solid black 1px  wgAlbum albumDesc  background F1F1F1 border-left solid black 1px border-right solid black 1px border-bottom solid black 1px text-align:center padding 5px 23px  wgAlbum description  font-size:10px height:40px overflow:auto text-align:left border:solid silver 1px padding:5px background-color fff color:#222  albumDesc description   margin:2px 0px   PAGINATION STYLES  wgGallery paginationContainer  text-align:center background black height:42px  wgGallery container  clear:both text-align:center  wgGallery pagination  margin:0px auto 20px auto display:table list-style-type:none white-space:nowrap padding:0px height:42px  wgGallery pagination li  display:table-cell  wgGallery pagination a  display:block width:50px line-height:42px color:white font-size:10px text-align:center  wgPicture a:link wgPicture a:visited  color:black  wgPicture  width:250px margin:10px display moz-inline-box This does not work in earlier versions of Firefox  display:block float:left display inline-block  Op Saf IE  vertical-align top  IE Mac non capisce e a volte crea extra v space   wgPicture title  background:#e0e0e0 display:block font-size:12px text-align:center padding:2px 5px border:solid black 1px border-bottom:solid 8B8B8B 4px  wgPicture title a  font-size:12px  wgPicture thumbnail  text-align:center background F1F1F1 padding:15px 23px 15px 23px margin:0px border-left:solid black 1px border-right:solid black 1px  wgPicture thumbnail a  display:block width:200px height:120px overflow:hidden border:solid black 1px  wgPicture thumbnail img  border-style:none width:200px height:auto  wgPicture pictureDesc  padding:0px border-top:solid e1e1e1 1px border-bottom:solid gray 1px border-left:solid black 1px border-right:solid black 1px background:#F1F1F1 margin:0px  wgPicture pictureDesc description  margin:0px padding:5px font-size:10px  wgPicture details  background:#e0e0e0 border:solid 999 1px border-top:solid aaa 1px font-size:9px padding:1px 3px  wgPicture details date  float:right  wgPicture details comments  float:left  wgPicture details a  font-size:9px    BEGIN STYLES FOR PHOTO VIEW   The Photo view uses some/all of the above classes plus those in this section  wgSnapshot  float:left margin:10px max-width:250px width:25  wgSnapshot fieldset  background-color:#fefefe border:solid 555 2px padding:10px background-color:#f9f9f9 text-align:center  navigation  width 100 text-align center font-weight bold color navy  wgSnapshot p  max-width:230px  wgSnapshot navigation  width:100 margin:5px 0 0 text-align:center  wgSnapshot navigation img  border none  wgSnapshot legend  color:#333 font-size:15px font-weight:bold max-width:250px  wgSnapshot a.thumbnail img  width:200px height:auto border:solid 555 2px  wgSnapshot description  font-size:9px border:solid 555555 2px padding:5px width:190px margin:0px auto background-color:#fff height:50px overflow:auto text-align:left overflow:auto  wgSnapshot a.fullSize  margin:0px auto  wgPictureDetails  float:left width:70 margin:10px overflow hidden  wgPictureDetails a:link wgPictureDetails a:visited  color:black  wgPictureDetails fieldset  background-color:#fefefe border:solid 555 2px padding:10px background-color:#f9f9f9 margin-bottom:10px  wgPictureDetails legend  color:#333 font-size:15px font-weight:bold  rowOne rowTwo  margin:1px color:black padding:3px  rowOne  background EFEFEF border:solid CDCDCD 1px  rowTwo  background DCDCDC border:solid DDDDDD 1px  rowOne label rowTwo label  margin-left:15px text-align:left font-weight:bold font-size:11px  rowOne data rowTwo data  font-size:10px margin-left:5px  a.fullSize:link a.fullSize:visited  color:black display:block text-align:center font-weight:bold font-size:10px  wgComments  font-size:9px margin:10px width:90  wgComments title  font-size:14px font-weight:bold color:#333 border-bottom:solid 555555 2px padding-bottom:2px  wgComments title a  color:navy text-decoration:none  wgComments comment wgComments commentAlt  position:relative padding:5px  wgComments comment  background-color:#e1e1e1 border-top:solid F7F7F7 1px border-bottom:solid C9C9C9 1px  wgComments commentAlt  background-color:#f0f0f0 border-bottom:solid CDCDCD 1px border-top:solid FBFBFB 1px  wgComments number  float:left font-size:30px color:silver margin:5px 10px 5px 5px  wgComments posted  font-style:italic padding-top:3px font-size:9px color:gray  wgComments posted a  color:navy text-decoration:underline    BEGIN STYLES FOR THUMBNAIL VIEW   The Thumbnail view uses some/all of the above classes plus those in this section  thumbView  width:400px height:auto  thumbView thumbnail a  display:block width:350px height:auto border:solid black 1px  thumbView thumbnail img  border-style:none width:350px height:auto  thumb  width:100px height:65px overflow:hidden display:block float:left border:solid black 2px margin:10px z-index 0 position relative  thumb:hover  background-color transparent z-index 50 overflow visible  thumb img  width:100px height:auto border-style:none  thumb:hover img  bottom 65px left 75px position absolute width 250px    BEGIN STYLES FOR SLIDESHOW VIEW   The Slideshow view uses some/all of the above classes plus those in this section  wgSlideshow controls  background url(^FileUrl(root/import/gallery-templates/images/pagination_bg.jpg repeat-x width:500px height:42px margin:0px auto border:solid black 2px  wgSlideshow  text-align:center  slideshow-container  width:500px height:auto margin:0px auto text-align:center border:solid black 2px position:relative z-index:0  slideshow-container slideshow-item img  width:100 height:auto border-style:none display:block  slideshow-container slideshow-item title  background-color:black padding:3px color:white border-top:solid white 1px border-bottom:solid white 1px  slideshow-container slideshow-item title a  color:white font-size:11px font-weight:bold  slideshow-container slideshow-item counter  background-color:black padding:3px color:white font-size:11px font-weight:bold  slideshow-container slideshow-item synopsis  width:494px background-color:white padding:3px color:black font-size:11px font-weight:bold border-top:solid black 1px text-align:left    BEGIN STYLES FOR SEARCH VIEW   The Search view uses some/all of the above classes plus those in this section  adminWrapper  margin-top:20px  adminWrapper label  background:black font-weight:bold font-size:10px color:white  adminWrapper td.data input  background f1f1f1 vertical-align:middle  adminWrapper td.radio input  border-style:none background:none  adminWrapper forwardButton  cursor:pointer float:rigbt  adminWrapper forwardButton:hover  color:gold ','000001000001000015000016',NULL),('i6-BofrJJYozovlzFBByXg','first-photo-button.png','','root/import/gallery-templates/images/first-photo-button.png',1270612331,1285124158,'3','7','3','WebGUI::Asset::File::Image',1,'first-photo-button.png first-photo-button.png root import gallery templates images first photo button.png','000001000001000015000017000031',NULL),('fU_OZCmtdFNJ8a6bMve8ng','previous-photo-button.png','','root/import/gallery-templates/images/previous-photo-button.png',1270612331,1285124158,'3','7','3','WebGUI::Asset::File::Image',1,'previous-photo-button.png previous-photo-button.png root import gallery templates images previous photo button.png','000001000001000015000017000032',NULL),('YXCtusAxb4vzZ5sTnUA5DA','next-photo-button.png','','root/import/gallery-templates/images/next-photo-button.png',1270612331,1285124158,'3','7','3','WebGUI::Asset::File::Image',1,'next-photo-button.png next-photo-button.png root import gallery templates images next photo button.png','000001000001000015000017000033',NULL),('k_xuE82wwp8gFVl9aaaG8g','last-photo-button.png','','root/import/gallery-templates/images/last-photo-button.png',1270612331,1285124158,'3','7','3','WebGUI::Asset::File::Image',1,'last-photo-button.png last-photo-button.png root import gallery templates images last photo button.png','000001000001000015000017000034',NULL),('NPM_WItpM5IzLWBhWjYfCA','photo-navigation-spacer.png','','root/import/gallery-templates/images/photo-navigation-spacer.png',1270612331,1285124158,'3','7','3','WebGUI::Asset::File::Image',1,'photo-navigation-spacer.png photo-navigation-spacer.png root import gallery templates images photo navigation spacer.png','000001000001000015000017000035',NULL),('30h5rHxzE_Q0CyI3Gg7EJw','Cash Summary Screen (Default)','','shopping-cart-collateral-items/cash-summary',1273032715,1326776037,'3','7','4','WebGUI::Asset::Template',0,'Cash Summary Screen Default Cash Summary Screen Default shopping cart collateral items cash summary Shop/Credentials','000001000001000036000020',NULL),('jysVZeUR0Bx2NfrKs5sulg','Ogone Summary Screen (Default)','','shopping-cart-collateral-items/ogone-summary',1273032715,1326776037,'3','7','4','WebGUI::Asset::Template',0,'Ogone Summary Screen Default Ogone Summary Screen Default shopping cart collateral items ogone summary Shop/Credentials','000001000001000036000021',NULL),('300AozDaeveAjB_KN0ljlQ','PayPal Standard Summary Screen (Default)','','shopping-cart-collateral-items/paypal-std-summary',1273032715,1326776037,'3','7','4','WebGUI::Asset::Template',0,'PayPal Standard Summary Screen Default PayPal Standard Summary Screen Default shopping cart collateral items paypal std summary Shop/Credentials','000001000001000036000022',NULL),('GqnZPB0gLoZmqQzYFaq7bg','PayPal Express Checkout Summary Screen (Default)','','shopping-cart-collateral-items/paypal-express-summary',1273032716,1326776037,'3','7','4','WebGUI::Asset::Template',0,'PayPal Express Checkout Summary Screen Default PayPal Express Checkout Summary Screen Default shopping cart collateral items paypal express summary Shop/Credentials','000001000001000036000023',NULL),('stevestyle000000000001','Style 01','by Steve from Plain Black http://plainblack.com\r\n\r\nThe first of the WebGUI 7 styles','style_01',1147642499,1273032722,'3','7','12','WebGUI::Asset::Template',0,'Style 01 Style 01 by Steve from Plain Black http://plainblack.com The first of the WebGUI 7 styles style 01 style','000001000001000049000026',NULL),('stevestyle000000000002','Style 02','by Steve from Plain Black http://plainblack.com\r\n\r\nThe second of the WebGUI 7 styles','style_02',1147642504,1273032718,'3','7','12','WebGUI::Asset::Template',0,'Style 02 Style 02 by Steve from Plain Black http://plainblack.com The second of the WebGUI 7 styles style 02 style','000001000001000050000016',NULL),('stevestyle000000000003','Style 03','by Steve from Plain Black http://plainblack.com\r\n\r\nThe last of the WebGUI 7 style templates.','style_03',1147642510,1273032720,'3','7','12','WebGUI::Asset::Template',0,'Style 03 Style 03 by Steve from Plain Black http://plainblack.com The last of the WebGUI 7 style templates style 03 style','000001000001000051000020',NULL),('t87D1138NhPHhA23-hozBA','CrystalX','','crystalx',1273032716,1273032716,'3','7','3','WebGUI::Asset::Wobject::Folder',1,'CrystalX CrystalX crystalx','000001000001000055',NULL),('QtBumey5ffc-xffRp1-7Aw','img','','crystalx/img',1273032716,1273032716,'3','7','3','WebGUI::Asset::Wobject::Folder',1,'img img crystalx img','000001000001000055000001',NULL),('-0sK2rX1cwQt1ipUSqsiQQ','bg.gif','','crystalx/img/bg.gif',1273032716,1273032716,'3','7','3','WebGUI::Asset::File::Image',1,'bg.gif bg.gif crystalx img bg.gif','000001000001000055000001000001',NULL),('hS_eOaVz9Qb5ixndK9EXAw','header.jpg','','crystalx/img/header.jpg',1273032716,1273032716,'3','7','3','WebGUI::Asset::File::Image',1,'header.jpg header.jpg crystalx img header.jpg','000001000001000055000001000002',NULL),('k2p-Be8C98pf2cRq7E-JHg','tab_link.gif','','crystalx/img/tab_link.gif',1273032716,1273032716,'3','7','3','WebGUI::Asset::File::Image',1,'tab_link.gif tab_link.gif crystalx img tab link.gif','000001000001000055000001000003',NULL),('aYG4fjbMPbC4LCuuMp4gGA','tab_hover.gif','','crystalx/img/tab_hover.gif',1273032716,1273032716,'3','7','3','WebGUI::Asset::File::Image',1,'tab_hover.gif tab_hover.gif crystalx img tab hover.gif','000001000001000055000001000004',NULL),('F122Ey0NtVAw6Lfv1M6G_Q','ico_archive.gif','','crystalx/img/ico_archive.gif',1273032716,1273032716,'3','7','3','WebGUI::Asset::File::Image',1,'ico_archive.gif ico_archive.gif crystalx img ico archive.gif','000001000001000055000001000005',NULL),('qmXHKrQ6EDLSOGkrEKRUDA','bg_page_in.jpg','','crystalx/img/bg_page_in.jpg',1273032716,1273032716,'3','7','3','WebGUI::Asset::File::Image',1,'bg_page_in.jpg bg_page_in.jpg crystalx img bg page in.jpg','000001000001000055000001000006',NULL),('4qZgXjPPO4fwV879yu5XUg','bg_page.JPG','','crystalx/img/bg_page.jpg',1273032716,1273032716,'3','7','3','WebGUI::Asset::File::Image',1,'bg_page.JPG bg_page.JPG crystalx img bg page.jpg','000001000001000055000001000007',NULL),('mb-xeAugm5GJdvu-Wh0MtQ','search_submit.gif','','crystalx/img/search_submit.gif',1273032717,1273032717,'3','7','3','WebGUI::Asset::File::Image',1,'search_submit.gif search_submit.gif crystalx img search submit.gif','000001000001000055000001000008',NULL),('84Y9CwgzP6eNU7wZnk019Q','ico_date.gif','','crystalx/img/ico_date.gif',1273032717,1273032717,'3','7','3','WebGUI::Asset::File::Image',1,'ico_date.gif ico_date.gif crystalx img ico date.gif','000001000001000055000001000009',NULL),('ikXTtJKZfHVxqw-47E4AQA','ico_user.gif','','crystalx/img/ico_user.gif',1273032717,1273032717,'3','7','3','WebGUI::Asset::File::Image',1,'ico_user.gif ico_user.gif crystalx img ico user.gif','000001000001000055000001000010',NULL),('DhRWPTgzhvju_-TbMN3CwA','ico_comments.gif','','crystalx/img/ico_comments.gif',1273032717,1273032717,'3','7','3','WebGUI::Asset::File::Image',1,'ico_comments.gif ico_comments.gif crystalx img ico comments.gif','000001000001000055000001000011',NULL),('6njI-pZz2bwsjWh-Q1_11g','ico_list.gif','','crystalx/img/ico_list2.gif',1273032717,1273032717,'3','7','3','WebGUI::Asset::File::Image',1,'ico_list.gif ico_list.gif crystalx img ico list2.gif','000001000001000055000001000012',NULL),('_Hz1Gnd3yEnJzVS7l7nJMQ','content_all_bg.PNG','','crystalx/img/content_all_bg.png',1273032717,1273032717,'3','7','3','WebGUI::Asset::File::Image',1,'content_all_bg.PNG content_all_bg.PNG crystalx img content all bg.png','000001000001000055000001000013',NULL),('VOOrXK5dFnkGih7aTkuDWA','search.PNG','','crystalx/img/search.png',1273032717,1273032717,'3','7','3','WebGUI::Asset::File::Image',1,'search.PNG search.PNG crystalx img search.png','000001000001000055000001000014',NULL),('ruf-QejOkUHDRtfgakHlbA','col_title_bg_long.GIF','','crystalx/img/col_title_bg_long.gif',1273032717,1273032717,'3','7','3','WebGUI::Asset::File::Image',1,'col_title_bg_long.GIF col_title_bg_long.GIF crystalx img col title bg long.gif','000001000001000055000001000015',NULL),('FSHy5KjQjkt599PHS41seA','footer.jpg','','crystalx/img/footer.jpg',1273032717,1273032717,'3','7','3','WebGUI::Asset::File::Image',1,'footer.jpg footer.jpg crystalx img footer.jpg','000001000001000055000001000016',NULL),('nuYYXAz4KNNxgfumfnpo_g','ico_top.gif','','crystalx/img/ico_top.gif',1273032718,1273032718,'3','7','3','WebGUI::Asset::File::Image',1,'ico_top.gif ico_top.gif crystalx img ico top.gif','000001000001000055000001000017',NULL),('Mr7ljjoy6n4fZojpQWajKQ','ico_links.gif','','crystalx/img/ico_links.gif',1273032718,1273032718,'3','7','3','WebGUI::Asset::File::Image',1,'ico_links.gif ico_links.gif crystalx img ico links.gif','000001000001000055000001000018',NULL),('ApkqpDOrJDxK3QrWBGSRIg','ico_archive2.gif','','crystalx/img/ico_archive2.gif',1273032718,1273032718,'3','7','3','WebGUI::Asset::File::Image',1,'ico_archive2.gif ico_archive2.gif crystalx img ico archive2.gif','000001000001000055000001000019',NULL),('AzzTY0Lay1f_YGeQJFnQCA','ico_list.gif','','crystalx/img/ico_list.gif',1273032718,1273032718,'3','7','3','WebGUI::Asset::File::Image',1,'ico_list.gif ico_list.gif crystalx img ico list.gif','000001000001000055000001000020',NULL),('OiJNwP1gAlcva8_yOtL4gA','CrystalX_style','by Ning from Pluton -- http://pluton.nl\n\nCrystalX gives your site a crystal-ish look and a strictly formal style. Feel free to download and apply it to your own site.\n\nOriginally designed by \"Nuvio Webdesign\" and collected by Open Source Web Design, converted to WebGUI theme by Ning.','crystalx_style',1273032718,1273032718,'3','7','3','WebGUI::Asset::Template',0,'CrystalX_style CrystalX_style by Ning from Pluton  http://pluton.nl CrystalX gives your site a crystal-ish look and a strictly formal style Feel free to download and apply it to your own site Originally designed by Nuvio Webdesign and collected by Open Source Web Design converted to WebGUI theme by Ning crystalx style style','000001000001000055000002',NULL),('JOuCU4x5BJfVHfkfMkVQdQ','crystalx.css','','crystalx/crystalx.css',1273032718,1273032718,'3','7','3','WebGUI::Asset::Snippet',0,'crystalx.css crystalx.css crystalx crystalx.css  Project CrystalX URL http://www.nuvio.cz Output device screen projection Author Vit Dlouhy vit.dlouhy@nuvio.cz Nuvio www.nuvio.cz Last revision 2006-12-05 12:00 GMT+1 Structure display | position | float | overflow | width | height | border | margin | padding | background | align | font   min-height:1px body border:0 margin:0 padding:0 background:#F2F5FE url(\'^FileUrl(/crystalx/img/bg.gif 0 0 repeat-x font:70%/160 verdana\",sans-serif color:#192666 text-align:center a color:#192666 a:hover color:#4F6AD7 p border:0 margin:15px 0 padding:0 div display:block border:0 margin:0 padding:0 overflow:hidden h1 h2 h3 h4 h5 border:0 margin:15px 0 10px 0 padding:0 font-weight:bold h1 font-size:260 line-height:100 font-family:\"georgia\",serif font-weight:normal h2 font-size:180 line-height:100 font-family:\"georgia\",serif font-weight:normal h3 font-size:120 line-height:100 font-weight:bold h4 font-size:120 h5 font-size:100 table display:table border-collapse:collapse margin:15px 1px padding:0 border:1px solid B7CAF6 font-size:100 tr display:table-row th td display table-cell border:1px solid B7CAF6 margin:0 padding:5px vertical-align:top text-align:left th background:#E7ECFD text-align:center color:#192666 font-weight:bold ul ol display:block border:0 margin:15px 0 15px 40px padding:0 ol list-style-type:decimal li display:list-item border:0 margin:0 padding:0 min-height:1px ul ul ul ol ol ol ol ul margin 0 0 0 20px dl border-bottom:1px solid E0E8FA margin:0 padding:5px 10px background:#CEDBF9 dt border:0 margin:0 padding:0 font-weight:bold dd border:0 margin:0 0 0 30px padding:0 form border:0 margin:0 padding:0 fieldset border:1px solid ccc margin:15px 0 padding:10px legend margin-left:10px font-size:100 font-weight:bold color:#008 hr height:1px width:724px margin 5px 23px padding 0 background:#CCC border:0 solid CCC color:#CCC a img span border:0 margin:0 padding:0 overflow:hidden abbr acronym border-bottom:1px dotted CCC cursor:help del through text-decoration:line-through strong strong font-weight:bold cite em q var font-style:italic code kbd samp font-family:monospace font-size:110 box min-height:1px box:after content display:block line-height:0px font-size:0px visibility:hidden clear:both nom margin:0 noscreen display:none    main width:770px margin:0 auto text-align:left  Top empty space for the background img to fit  main topspace position:relative top:0 left:0 height:50px margin:0 padding:0  Header  header position:relative width:770px height:100px margin:0 padding:0 background:#233C9B url(\'^FileUrl(/crystalx/img/header.jpg 0 0 no-repeat color:#FFFFFF  Header  logo  header logo position:absolute top:35px left:35px margin:0 header logo a font-size:260 line-height:100 font-family:\"georgia\",serif font-weight:bold color:#FFF header logo a:hover color:#B5C4E3 text-decoration:none  Header  Search  header search form position:absolute top:35px right:20px height:30px header search formContents position:absolute top:0 right:0px width:200px height:28px margin:0 padding:0 border:0 background:url(\'^FileUrl(/crystalx/img/search.png 0 0 no-repeat font:bold 90%/100 verdana\",sans-serif color:#192666 header search input#keywords_formId width:140px margin:5px 8px padding:3px 0 border:0 background:#FFF font:bold 100%/100 verdana\",sans-serif color:#192666 header search search_form position:absolute top:0 right:0px width:41px height:28px cursor:point margin:0 padding:0  Search Result header search search_result position:absolute top:220px header search home_link header search no_result header search pagination visibility:hidden page page-in pagination color:#6182D1 font-weight:bold padding:5px text-align:right page page-in pagination a color:#6182D1 page page-in pagination a:hover color:#192666 page page-in home_link padding:5px 5px 15px color:#6182D1 font-weight:bold text-align:right page page-in home_link a color:#6182D1 page page-in home_link a:hover color:#192666 search_result margin:10px 0 dl#odd background:#A0B9F3 page page-in no_result margin:0 10px color:#192666 font-weight:bold  Main menu tabs  menu background:#192666 margin:0 5px padding:10px 10px 0 height:32px overflow:hidden menu a cursor:pointer font-size:11px  Page dynamic  page width:770px background:#FFFFFF url(\'^FileUrl(/crystalx/img/bg_page.jpg 0 0 repeat-y page-in min-height:400px background:url(\'^FileUrl(/crystalx/img/bg_page_in.jpg 0 0 no-repeat padding:10px 0 0  Strip  strip position:relative clear:both padding:3px 20px 10px 20px color:#6182D1  Strip  Location  strip location float left background:url(\'^FileUrl(/crystalx/img/ico_comments.gif 0 50 no-repeat padding 0 15px strip location a color:#6182D1 strip location a:hover color:#192666 strip location a#currentpage font-weight:bold text-decoration:none  Strip  DateTime  strip datetime float:right background:url(\'^FileUrl(/crystalx/img/ico_date.gif 0 50 no-repeat padding 0 10px 0 15px  Content Container  contentContainer margin:0 padding:0 20px width:730px overflow:hidden  Contents  contentContainer content clear:both margin:10px 10px 0 0 padding:20px max-width:710px background:url(\'^FileUrl(/crystalx/img/content_all_bg.png 0 0 no-repeat overflow:hidden contentContainer content h2 margin:0 10px padding:10px 25px color:#192666 background:url(\'^FileUrl(/crystalx/img/ico_list.gif 0 50 no-repeat contentContainer content p text-align:justify  Utility  utility background FFFFFF url(\'^FileUrl(/crystalx/img/bg_page.jpg 0 0 repeat-y padding 10px 0 15px  Utility  Toggles  toggles font-size:10px font-weight:bold text-align:left margin-left:42px toggles a margin:0 10px padding:2px 0 text-decoration:none border-bottom:1px dashed color:#6182D1 toggles a:hover border-bottom:1px solid color:#4F6AD7 toggles span.userAcc background:url(\'^FileUrl(/crystalx/img/ico_user.gif 0 50 no-repeat margin 0 0 0 8px  Footer  footer position:relative clear:both width:770px height:80px margin-bottom:30px background:url(\'^FileUrl(/crystalx/img/footer.jpg 0 0 no-repeat color:#6685CC footer a color:#6685CC footer a:hover color:#192666  Footer  back on top  top position:absolute top:55px left:550px top p position:relative width:30px height:25px margin:0 overflow:hidden top p a display:block position:absolute left:0 top:0 z-index:1 width:30px height:25px background:url(\'^FileUrl(/crystalx/img/ico_top.gif 0 0 no-repeat cursor:pointer top a:hover background:url(\'^FileUrl(/crystalx/img/ico_top.gif 30px 0 no-repeat  Footer  copyright  footer p#copyright position:absolute top:10px left:40px margin:0  Footer  created by  createdby position:absolute top:10px left:562px margin:0 color:#8CA3D8 createdby a color:#8CA3D8','000001000001000055000003',NULL),('Am1J-meNBmhqFfEIWy6Gag','crystalX_Navigation','','crystalx/crystalx_navigation',1273032718,1287545014,'3','7','3','WebGUI::Asset::Wobject::Navigation',1,'crystalX_Navigation crystalX_Navigation crystalx crystalx navigation','000001000001000055000004',NULL),('gaIOm5cr2TkT9Fk6QmZWug','crystalX_navi','','crystalx/crystalx_navi',1273032718,1273032718,'3','7','3','WebGUI::Asset::Template',0,'crystalX_navi crystalX_navi crystalx crystalx navi Navigation','000001000001000055000005',NULL),('w0QifHLhsrzeOpFKl-DX-Q','crystalx_navi.css','','crystalx/crystalx_navi.css',1273032718,1273032718,'3','7','3','WebGUI::Asset::Snippet',0,'crystalx_navi.css crystalx_navi.css crystalx crystalx navi.css ','000001000001000055000006',NULL),('x_hiUi1XZloBvV47Obnu8Q','crystalX_NavigationTrail','','crystalx/crystalx_navigationtrail',1273032718,1273032718,'3','7','12','WebGUI::Asset::Wobject::Navigation',1,'crystalX_NavigationTrail crystalX_NavigationTrail crystalx crystalx navigationtrail','000001000001000055000007',NULL),('hpCk0B3vQzgc-QJhSol41w','crystalX_navitrail','','crystalx/crystalx_navitrail',1273032718,1273032718,'3','7','12','WebGUI::Asset::Template',0,'crystalX_navitrail crystalX_navitrail crystalx crystalx navitrail Navigation','000001000001000055000008',NULL),('UUwEL6hLEPdrnkZnKRzFYQ','Site Search','','crystalx/site-search',1273032718,1273032718,'3','7','3','WebGUI::Asset::Wobject::Search',1,'Site Search Site Search crystalx site search','000001000001000055000009',NULL),('OfKbvK7CrfMnfc8WDoF4Rg','crystalx_search','','crystalx/crystalx_search',1273032718,1273032718,'3','7','3','WebGUI::Asset::Template',0,'crystalx_search crystalx_search crystalx crystalx search Search','000001000001000055000010',NULL),('CQp-RFA2pMh5lFSggPPPYg','[Style] Underground','Templates and images for the \"Underground\" style from StyleShout.com ','style-underground',1273032719,1301973995,'3','7','3','WebGUI::Asset::Wobject::Folder',1,'Style Underground Style Underground style underground Templates and images for the Underground style from StyleShout.com','000001000001000056',NULL),('_Mi_NTd3x8UB96LWezWHnw','Images','','style-underground/images',1273032719,1301973995,'3','7','3','WebGUI::Asset::Wobject::Folder',1,'Images Images style underground images','000001000001000056000001',NULL),('A_5LVQQWR73QZR8FFbny_w','bg.gif','','style-underground/images/bg.gif',1273032719,1301973995,'3','7','3','WebGUI::Asset::File::Image',1,'bg.gif bg.gif style underground images bg.gif','000001000001000056000001000001',NULL),('wywIfa_VuTsq0c5Ed-W-MA','bullet.gif','','style-underground/images/bullet.gif',1273032719,1301973995,'3','7','3','WebGUI::Asset::File::Image',1,'bullet.gif bullet.gif style underground images bullet.gif','000001000001000056000001000002',NULL),('xmykMFjri1O2NrYHbeToVQ','footerbg.gif','','style-underground/images/footerbg.gif',1273032719,1301973995,'3','7','3','WebGUI::Asset::File::Image',1,'footerbg.gif footerbg.gif style underground images footerbg.gif','000001000001000056000001000003',NULL),('0IIGNBs_-INzqBC5VLeJgw','headerbg.gif','','style-underground/images/headerbg.gif',1273032719,1301973996,'3','7','3','WebGUI::Asset::File::Image',1,'headerbg.gif headerbg.gif style underground images headerbg.gif','000001000001000056000001000004',NULL),('FXmePdyS0YKuZ1VCGGpK9w','quote.gif','','style-underground/images/quote.gif',1273032719,1301973996,'3','7','3','WebGUI::Asset::File::Image',1,'quote.gif quote.gif style underground images quote.gif','000001000001000056000001000005',NULL),('66qCywiE_fiL9u5YIaJhgw','tableft.gif','','style-underground/images/tableft.gif',1273032719,1301973996,'3','7','3','WebGUI::Asset::File::Image',1,'tableft.gif tableft.gif style underground images tableft.gif','000001000001000056000001000006',NULL),('n5VpG4lFsOG1elaWDQbilw','tabright.gif','','style-underground/images/tabright.gif',1273032719,1301973996,'3','7','3','WebGUI::Asset::File::Image',1,'tabright.gif tabright.gif style underground images tabright.gif','000001000001000056000001000007',NULL),('g3JH1PRq6m6Bj_PnGpcrSQ','CSS','','style-underground/css',1273032719,1301973996,'3','7','3','WebGUI::Asset::Wobject::Folder',1,'CSS CSS style underground css','000001000001000056000002',NULL),('egpnaaFqWmJwYTZ5CvFH9g','Underground.css','','style-underground/css/underground.css',1273032719,1301973996,'3','7','3','WebGUI::Asset::Snippet',0,'Underground.css Underground.css style underground css underground.css  AUTHOR Erwin Aligam WEBSITE http://www.styleshout.com TEMPLATE NAME Underground TEMPLATE CODE S-0006 VERSION 1.1 Changes for WebGUI by Doug Bell Preaction doug@plainblack.com   HTML ELEMENTS   top elements    margin 0 padding 0  body  margin 0 padding 0 font 70%/1.5 Verdana Tahoma Arial Helvetica sans-serif color 333 background FFF url(^FileUrl(style-underground/images/bg.gif repeat-x   links  a  color 003366 background-color inherit text-decoration none  a:hover  color CC0001 background-color inherit   headers  h1 h2 h3  font-family Arial Trebuchet MS Sans-Serif font-weight bold color 333  h1  font-size 120 letter-spacing 5px  h2  font-size 115 text-transform uppercase  h3  font-size 115 color 003366   images  img  border 2px solid CCC  img.float-right  margin 5px 0px 10px 10px  img.float-left  margin 5px 10px 10px 0px  h1 h2 h3 p  padding 0 margin 10px  ul ol  margin 10px 20px padding 0 20px  code  margin 10px 0 padding 10px text-align left display block overflow auto font 500 1em/1.5em Lucida Console courier new monospace  white-space pre  background FAFAFA border 1px solid f2f2f2 border-left 4px solid CC0000  acronym  cursor help border-bottom 1px solid 777  blockquote  margin 10px padding 0 0 0 32px background FAFAFA url(^FileUrl(style-underground/images/quote.gif no-repeat 5px 10px important background-position 8px 10px border 1px solid f2f2f2 border-left 4px solid CC0000 font-weight bold   form elements  form  margin:10px padding 0 5px border 1px solid f2f2f2 background-color FAFAFA  label  display:block font-weight:bold margin:5px 0  input  padding 2px border:1px solid eee font normal 1em Verdana sans-serif color:#777  textarea  width:400px padding:2px font normal 1em Verdana sans-serif border:1px solid eee height:100px display:block color:#777  input.button  margin 0 font bolder 12px Arial Sans-serif border 1px solid CCC padding 1px background FFF color CC0000   search form  form.search  position absolute top 5px right 5px padding 0 margin 0 border none background-color transparent  form.search input.textbox  margin 0 width 120px border 1px solid CCC background FFF color 333  form.search input.searchbutton  margin 0 font-size 100 font-family Arial Sans-serif border 1px solid CCC background FFFFFF url(^FileUrl(style-underground/images/headerbg.gif repeat-x bottom left padding 1px font-weight bold height 23px color 333 width 60px   LAYOUT  wrap  margin 0 auto width 90   header  header  position relative margin 0 padding 0 height 60px  header span#slogan  z-index 3 position absolute left 3px bottom 7px font bold 1.2em Verdana Arial Tahoma Sans-serif color FFF  header-logo  position relative clear both height 50px margin 0 padding 0  header-logo logo  position absolute top 3px left 5px font bold 30px trebuchet MS Arial Tahoma Sans-Serif margin 0 padding 0 letter-spacing 1px color 000   navigation tabs  header ul  position absolute margin:0 list-style:none right:-18px  bottom 3px font bold 13px Trebuchet MS Arial Sans-serif  header li  display:inline margin:0 padding:0  header a  float:left background url(^FileUrl(style-underground/images/tableft.gif no-repeat left top margin:0 padding:0 0 0 4px text-decoration:none  header a span  float:left display:block background url(^FileUrl(style-underground/images/tabright.gif no-repeat right top padding:5px 15px 4px 6px color:#FFF   Commented Backslash Hack hides rule from IE5-Mac  header a span float:none  End IE5-Mac hack  header a:hover span  color:#FFF  header a:hover  background-position:0 42px  header a:hover span  background-position:100 42px  header current a  background-position:0 42px  header current a span  background-position:100 42px   main column  main  float right margin 0 padding 0 width 78  main h1  margin 10px 0 padding 4px 0 4px 8px font-size 105 color FFF text-transform uppercase background-color CC0000 letter-spacing 5px   sidebar  sidebar  float left width 20 margin 0 padding 0 background-color FFFFFF  sidebar h1  margin 10px 0 0 0 padding 4px 0 4px 8px font bold 105 Arial Sans-Serif color FFF text-transform uppercase background 333 letter-spacing 1px  sidebar left-box  border 1px solid EBEBEB margin 0 0 5px 0 background FFF  sidebar ul.sidemenu  list-style none text-align left margin 3px 0px 8px 0 padding 0 text-decoration none  sidebar ul.sidemenu li  border-bottom 1px solid f2f2f2 background url(^FileUrl(style-underground/images/bullet.gif no-repeat 3px 2px padding 3px 5px 3px 25px margin 0  sidebar ul.sidemenu a  font-weight bolder padding 3px 0px background none   footer  footer  clear both border-top 1px solid f2f2f2 background FFF url(^FileUrl(style-underground/images/footerbg.gif repeat-x padding 2px 0 10px 0 text-align center line-height 1.5em font-size 95  footer a  text-decoration none font-weight bold   alignment classes  float-left  float left  float-right  float right  align-left  text-align left  align-right  text-align right   display and additional classes  clear  clear both  red  color CC0000  comments  margin 20px 10px 5px 10px padding 3px 0 border-bottom 1px dashed EFF0F1 border-top 1px dashed EFF0F1 ','000001000001000056000002000001',NULL),('G0hl4VilbFKipToyxKqFrg','Prototypes','This folder holds prototype WebGUI assets with the correct templates pre-selected. ','style-underground/prototypes',1273032719,1301973997,'3','7','3','WebGUI::Asset::Wobject::Folder',1,'Prototypes Prototypes style underground prototypes This folder holds prototype WebGUI assets with the correct templates pre-selected','000001000001000056000003',NULL),('GWU2qZqe6yEuAKG-5HtBdg','Templates','','style-underground/templates',1273032719,1301973997,'3','7','3','WebGUI::Asset::Wobject::Folder',1,'Templates Templates style underground templates','000001000001000056000004',NULL),('Qk24uXao2yowR6zxbVJ0xA','[style] Underground','by Doug from Plain Black http://plainblack.com\r\n\r\nThis is the Underground style from http://www.styleshout.com/ made into a WebGUI package. A simple, functional style.','style-underground/style-underground',1273032719,1301973997,'3','7','3','WebGUI::Asset::Template',0,'style Underground style Underground by Doug from Plain Black http://plainblack.com This is the Underground style from http://www.styleshout.com made into a WebGUI package A simple functional style style underground style underground style','000001000001000056000004000001',NULL),('39KNX53B4nYJAyIE1lu8ZQ','[nav] Underground Top Navigation','','style-underground/nav-underground-top-navigation',1273032720,1301973997,'3','7','3','WebGUI::Asset::Template',0,'nav Underground Top Navigation nav Underground Top Navigation style underground nav underground top navigation Navigation','000001000001000056000004000002',NULL),('ztfi__vHJLsQDsMenrEn-w','[nav] Underground Side Navigation','','style-underground/nav-underground-side-navigation',1273032720,1301973997,'3','7','3','WebGUI::Asset::Template',0,'nav Underground Side Navigation nav Underground Side Navigation style underground nav underground side navigation Navigation','000001000001000056000004000003',NULL),('8qyrDCNeggB4dzKiOoRuiQ','[admintoggle] Underground Admin Toggle','','style-underground/templates/admintoggle-underground-admin-toggle',1273032720,1301973997,'3','7','3','WebGUI::Asset::Template',0,'admintoggle Underground Admin Toggle admintoggle Underground Admin Toggle style underground templates admintoggle underground admin toggle AdminToggle','000001000001000056000004000004',NULL),('M1NyNeS5jpdIsiIWFiJprw','View My Account','','style-underground/templates/view-my-account',1273032720,1301973997,'3','7','3','WebGUI::Asset::Template',0,'View My Account View My Account style underground templates view my account Macro/a_account','000001000001000056000004000005',NULL),('AsfpsOpsGzZCb9m7MyxPuw','Navigation','','style-underground/navigation',1273032720,1301973997,'3','7','3','WebGUI::Asset::Wobject::Folder',1,'Navigation Navigation style underground navigation','000001000001000056000005',NULL),('n-Vr_wgxOkwiHGt1nJto9w','Top Navigation','','style-underground/top-navigation',1273032720,1309236774,'3','7','3','WebGUI::Asset::Wobject::Navigation',1,'Top Navigation Top Navigation style underground top navigation','000001000001000056000005000001',NULL),('jmqLxnoWb6p92Cr12lf1hw','Side Navigation','','style-underground/side-navigation',1273032720,1301973997,'3','7','3','WebGUI::Asset::Wobject::Navigation',1,'Side Navigation Side Navigation style underground side navigation','000001000001000056000005000002',NULL),('8E2UOnj_XPEghTj7nfVM0g','Search','','style-underground/search',1273032720,1301973997,'3','7','3','WebGUI::Asset::Wobject::Search',1,'Search Search style underground search','000001000001000056000006',NULL),('1qFjOEiILIwr1xB5_ebppQ','Greenportal','','greenportal',1273032721,1301973998,'3','7','3','WebGUI::Asset::Wobject::Folder',1,'Greenportal Greenportal greenportal','000001000001000057',NULL),('xD76UfQ_JnSgTLBNvytcpQ','greenportal_image','','greenportal_image',1273032721,1301973998,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'greenportal_image greenportal_image greenportal image','000001000001000057000001',NULL),('pAXR7Kby4O-dSxOwLp1GaA','menu_top.png','','greenportal_image/menu_top.png',1273032721,1301973998,'3','7','12','WebGUI::Asset::File::Image',1,'menu_top.png menu_top.png greenportal image menu top.png','000001000001000057000001000001',NULL),('TthzMLO4n3qxy59QZ5YBHg','menu_dark.png','','greenportal_image/menu_dark.png',1273032721,1301973998,'3','7','12','WebGUI::Asset::File::Image',1,'menu_dark.png menu_dark.png greenportal image menu dark.png','000001000001000057000001000002',NULL),('3n31SQjYa150TBrRBgMPhA','menu_light.png','','greenportal_image/menu_light.png',1273032721,1301973998,'3','7','12','WebGUI::Asset::File::Image',1,'menu_light.png menu_light.png greenportal image menu light.png','000001000001000057000001000003',NULL),('R4RxDufGbbIzEmpcoEcLrw','logo.jpg','','greenportal_image/logo.jpg',1273032721,1301973998,'3','7','12','WebGUI::Asset::File::Image',1,'logo.jpg logo.jpg greenportal image logo.jpg','000001000001000057000001000004',NULL),('KKt0VB_eoQxw9xEsHsAhag','Greenportal_style','by Ning from PlutonIT http://pluton.nl\n\nA Joomla! Open Source design released under the GNU/GPL License. Enhanced and converted into WebGUI theme by Ning. The original PHP and CSS file can be downloaded following the author\'s link: http://www.studentsdesign.de/','greenportal_style',1273032721,1301973998,'3','7','12','WebGUI::Asset::Template',0,'Greenportal_style Greenportal_style by Ning from PlutonIT http://pluton.nl A Joomla Open Source design released under the GNU/GPL License Enhanced and converted into WebGUI theme by Ning The original PHP and CSS file can be downloaded following the author\'s link http://www.studentsdesign.de greenportal style style','000001000001000057000003',NULL),('h0bOzz7WvdaVZXsjpwtkww','greenportal_Navigation','','greenportal_navigation',1273032721,1301973998,'3','7','3','WebGUI::Asset::Wobject::Navigation',1,'greenportal_Navigation greenportal_Navigation greenportal navigation','000001000001000057000004',NULL),('_z3ukLCqvoaUygfsbbkBzw','Greenportal_menu','','greenportal_menu',1273032721,1301973999,'3','7','3','WebGUI::Asset::Template',0,'Greenportal_menu Greenportal_menu greenportal menu Navigation','000001000001000057000005',NULL),('qFOfW1sKyOTnGNcP6BXbwg','greenportal_NavigationTop','','greenportal_navigationtop',1273032721,1301973999,'3','7','12','WebGUI::Asset::Wobject::Navigation',1,'greenportal_NavigationTop greenportal_NavigationTop greenportal navigationtop','000001000001000057000006',NULL),('Pt38T5_MWSue2e1N36MLdw','Greenportal_menuTop','','greenportal_menutop',1273032721,1301973999,'3','7','12','WebGUI::Asset::Template',0,'Greenportal_menuTop Greenportal_menuTop greenportal menutop Navigation','000001000001000057000007',NULL),('LDcM1Iop17nF2MoSa7zo_Q','Greenportal_dataform','','greenportal_dataform',1273032721,1301973999,'3','7','3','WebGUI::Asset::Template',0,'Greenportal_dataform Greenportal_dataform greenportal dataform DataForm','000001000001000057000008',NULL),('hVF1taXj4bfd7DuL4XDMYg','Greenportal_datalist','','greenportal_datalist',1273032721,1301973999,'3','7','3','WebGUI::Asset::Template',0,'Greenportal_datalist Greenportal_datalist greenportal datalist DataForm/List','000001000001000057000009',NULL),('x4-2QYRSrIB_BJfnSKKj4w','Greenportal_acknowledgement','','greenportal_acknowledgement',1273032721,1301973999,'3','7','3','WebGUI::Asset::Template',0,'Greenportal_acknowledgement Greenportal_acknowledgement greenportal acknowledgement DataForm','000001000001000057000010',NULL),('423R4Y6XIt3wUzlnLo-chg','Greenportal_forum','','greenportal_forum',1273032721,1301973999,'3','7','3','WebGUI::Asset::Template',0,'Greenportal_forum Greenportal_forum greenportal forum Collaboration','000001000001000057000011',NULL),('oZ1Mk-zExYUyD-JsjTvaHg','Greenportal_thread','','greenportal_thread',1273032722,1301973999,'3','7','3','WebGUI::Asset::Template',0,'Greenportal_thread Greenportal_thread greenportal thread Collaboration/Thread','000001000001000057000012',NULL),('mYwS8CZaOLMt0raaKXGZcQ','Greenportal_postform','','greenportal_postform',1273032722,1301973999,'3','7','3','WebGUI::Asset::Template',0,'Greenportal_postform Greenportal_postform greenportal postform Collaboration/PostForm','000001000001000057000013',NULL),('kSGR4OHsKmhLQTuLkisOww','Greenportal_search','','greenportal_search',1273032722,1301973999,'3','7','3','WebGUI::Asset::Template',0,'Greenportal_search Greenportal_search greenportal search Collaboration/Search','000001000001000057000014',NULL),('G5DgNizuG3jXkjPp6UaGrA','Greenportal_Calendar','','greenportal_calendar',1273032722,1301973999,'3','7','3','WebGUI::Asset::Wobject::Folder',1,'Greenportal_Calendar Greenportal_Calendar greenportal calendar','000001000001000057000015',NULL),('U78V5IJHVljvRTb6ydsTHg','Greenportal_calendarMonth','','greenportal_calendar/greenportal_calendarmonth',1273032722,1301973999,'3','7','3','WebGUI::Asset::Template',0,'Greenportal_calendarMonth Greenportal_calendarMonth greenportal calendar greenportal calendarmonth Calendar/Month','000001000001000057000015000001',NULL),('Xqc3qPUXoFE8dt9qocdWig','Greenportal_calendarWeek','','greenportal_calendar/greenportal_calendarweek',1273032722,1301973999,'3','7','3','WebGUI::Asset::Template',0,'Greenportal_calendarWeek Greenportal_calendarWeek greenportal calendar greenportal calendarweek Calendar/Week','000001000001000057000015000002',NULL),('IBTb7wllSt7RxFmmvm9pkQ','Greenportal_calendarDay','','greenportal_calendar/greenportal_calendarday',1273032722,1301973999,'3','7','3','WebGUI::Asset::Template',0,'Greenportal_calendarDay Greenportal_calendarDay greenportal calendar greenportal calendarday Calendar/Day','000001000001000057000015000003',NULL),('Z1EM7JMI_4SkyfaZffSElw','Greenportal_calendarEvent','','greenportal_calendar/greenportal_calendarevent',1273032722,1301973999,'3','7','3','WebGUI::Asset::Template',0,'Greenportal_calendarEvent Greenportal_calendarEvent greenportal calendar greenportal calendarevent Calendar/Event','000001000001000057000015000004',NULL),('fJg7SKpGZwzSNx3_ebki1A','Greenportal_calendarEventEdit','','greenportal_calendar/greenportal_calendareventedit',1273032722,1301973999,'3','7','3','WebGUI::Asset::Template',0,'Greenportal_calendarEventEdit Greenportal_calendarEventEdit greenportal calendar greenportal calendareventedit Calendar/EventEdit','000001000001000057000015000005',NULL),('ihf4Rx6p72xn_nVKaIeOaw','Greenportal_calendarSearch','','greenportal_calendar/greenportal_calendarsearch',1273032722,1301973999,'3','7','3','WebGUI::Asset::Template',0,'Greenportal_calendarSearch Greenportal_calendarSearch greenportal calendar greenportal calendarsearch Calendar/Search','000001000001000057000015000006',NULL),('jrWJ6nHXkqgFbml7BZ9chw','Greenportal_submission','','greenportal_submission',1273032722,1301974000,'3','7','3','WebGUI::Asset::Template',0,'Greenportal_submission Greenportal_submission greenportal submission Collaboration/Thread','000001000001000057000016',NULL),('Ys6f3vpe0y1uRcaCJ2TlFw','Greenportal_messageboard','','greenportal_messageboard',1273032722,1301974000,'3','7','3','WebGUI::Asset::Template',0,'Greenportal_messageboard Greenportal_messageboard greenportal messageboard MessageBoard','000001000001000057000017',NULL),('default_CS_unsubscribe','Default Collaboration System Unsubscribe','','collaboration_unsubscribe',1274238758,1277868922,'3','7','4','WebGUI::Asset::Template',0,'Default Collaboration System Unsubscribe Default Collaboration System Unsubscribe collaboration unsubscribe Collaboration/Unsubscribe','000001000001000008000030',NULL),('_hELmIJfgbAyXFNqPyApxQ','admin.css','','root/import/gallery-templates/admin.css',1197330678,1285124155,'3','7','3','WebGUI::Asset::Snippet',0,'admin.css admin.css root import gallery templates admin.css adminWrapper  text-align:left font-family:arial font-size:11px position relative z-index 2  h2  font-size:15px  messageStyle  font-weight:bold font-family:arial font-size:10px margin-bottom:8px  adminButton  border:solid silver 1px background-color:#e0e0e0 font-weight:bold font-size:10px color:#333 cursor:pointer padding 0.5em 1em  adminTable  border:solid silver 1px background-color:#F0F0F0 color black width:320px padding:5px  adminTable select adminTable input adminTable textarea border:solid gray 1px font-size:10px padding-left:5px  label  white-space:nowrap text-align:right padding-right:10px font-weight:bold width:1px vertical-align:top  galleryOrg  list-style-type:none display:block width:95 margin-top:3px padding-top:10px margin-left:5px border:gray solid 1px text-align:center font-family:verdana,arial font-size:9pt background-color:#dedede  galleryOrgList  margin 0px padding 0px  galleryOrg left  float left width 36  galleryOrg right  width 63  galleryOrg img  display:block height:150px margin:0px auto border none  galleryOrg select galleryOrg input galleryOrg textarea  border:solid gray 1px font-size:10px padding-left:5px  promote  margin-left:3px  promote img  height:14px width:16px  demote  margin-right:3px  demote img  height:14px width:16px  delete img  height 14px  numbering  position:absolute top:0px left:0px padding:1px background-color:black color:white moz-border-radius-bottomRight:5px  input.captionEnter  width:93px clear:both margin-bottom:3px  galleryOrg button  border-style:none background:none  galleryOrg button img  width:16px height:auto  galleryOrg synopsis input  width:80px ','000001000001000015000015',NULL),('68sKwDgf9cGH58-NZcU4lg','Welcome','','home',1124395696,1286336676,'3','7','3','WebGUI::Asset::Wobject::Layout',1,'Welcome Home home','000001000002',NULL),('bX5rYxb6tZ9docY6sUhBlw','Getting Started','\nCongratulations on successfully installing the WebGUI Content Engine&reg;. If you used the Site Starter to select a set of default pages, you will see those pages in the site navigation. You will also notice that a number of additional pages appear, such','getting_started/getting-started',1147642514,1278013772,'3','7','4','WebGUI::Asset::Wobject::Article',1,'Getting Started Getting Started getting started getting started Congratulations on successfully installing the WebGUI Content Engine® If you used the Site Starter to select a set of default pages you will see those pages in the site navigation You will also notice that a number of additional pages appear such as this page These are default pages added for your convenience to help you get started with WebGUI and find the resources you need Feel free to remove these extra pages whenever you are ready To get started managing content download the PDF document below This document provides a basic introduction to the WebGUI user interface WebGUI Basics PDF Once you have read this document you may want to head over to the Documentation section where you can find more WebGUI resources  ','000001000002000001000001',NULL),('8Bb8gu-me2mhL3ljFyiWLg','Talk to the Experts','Plain Black&reg; created the WebGUI Content Engine&reg; and is here to answer \nyour questions and provide you with services to make sure your WebGUI \nimplementation is entirely successful. We bend over backwards to make \nsure you\'re a success. Contact us ','your_next_step',1124395696,1271359194,'3','7','3','WebGUI::Asset::Wobject::Layout',1,'Talk to the Experts Your Next Step your next step Plain Black® created the WebGUI Content Engine® and is here to answer your questions and provide you with services to make sure your WebGUI implementation is entirely successful We bend over backwards to make sure you\'re a success Contact us today to see how we can help you','000001000002000002',NULL),('ix1p0AbwKAz8QWB-T-HHfg','Get Support','Plain Black provides support packages to fit any budget or need. Start out with online support which costs only $500 per year, or work with Plain Black to build a custom support package tailored to your specific needs. No matter what level of support you ','yns/support',1147642516,1271359087,'3','7','4','WebGUI::Asset::Wobject::Article',1,'Get Support Get Support yns support Plain Black provides support packages to fit any budget or need Start out with online support which costs only $500 per year or work with Plain Black to build a custom support package tailored to your specific needs No matter what level of support you purchase you will get personalized and friendly service in a timely manner  ','000001000002000002000001',NULL),('iCYOjohB9SKvAPr6bXElKA','Get Hosting','Plain Black\'s professionally trained WebGUI experts can handle the task\nof hosting your web site, intranet, or extranet. Let us deal with upgrades, security, and server management so you focus on building your WebGUI site, which is where your time and exp','yns/hosting',1147642516,1271445525,'3','7','4','WebGUI::Asset::Wobject::Article',1,'Get Hosting Get Hosting yns hosting Plain Black\'s professionally trained WebGUI experts can handle the task of hosting your web site intranet or extranet Let us deal with upgrades security and server management so you focus on building your WebGUI site which is where your time and expertise should be spent And when you sign up with hosting online support is included  ','000001000002000002000002',NULL),('4Yfz9hqBqM8OYMGuQK8oLw','Get Features','WebGUI\'s robust API allows for easy customization. Plain Black\'s team of developers can create any features you need for your site. We\'ve built hundreds of custom applications for people. From simple macros, to custom single sign on systems, to applicatio','yns/features',1147642516,1271352537,'3','7','4','WebGUI::Asset::Wobject::Article',1,'Get Features Get Features yns features WebGUI\'s robust API allows for easy customization Plain Black\'s team of developers can create any features you need for your site We\'ve built hundreds of custom applications for people From simple macros to custom single sign on systems to applications that will manage your entire company our team will leverage the power of WebGUI to your advantage  ','000001000002000002000003',NULL),('Wl8WZ43g2rK5AYr9o4zY7w','Get Style','Branding and visual appeal are powerful marketing tools. Don\'t let your site become a wallflower. Plain Black\'s professional design team can create a custom design to make your site stand out. Our team is fast, easy to work with, and can even migrate your','yns/style',1147642516,1271445539,'3','7','4','WebGUI::Asset::Wobject::Article',1,'Get Style Get Style yns style Branding and visual appeal are powerful marketing tools Don\'t let your site become a wallflower Plain Black\'s professional design team can create a custom design to make your site stand out Our team is fast easy to work with and can even migrate your existing content into your new WebGUI site  ','000001000002000002000004',NULL),('2TqQc4OISddWCZmRY1_m8A','Join Us','The WebGUI project community is a diverse and talented group. If you \nwould like to contribute back to the project there are many ways to \nbecome involved. ','join_us',1124395696,1271357565,'3','7','3','WebGUI::Asset::Wobject::Layout',1,'Join Us Join Us join us The WebGUI project community is a diverse and talented group If you would like to contribute back to the project there are many ways to become involved','000001000002000004',NULL),('k2Qj03FrAOXYra8kDJYYXw','IRC (Internet Relay Chat)','You can find members of the community on the #webgui chat channel on the Freenode IRC network. If you\'re not \nfamiliar with IRC, it\'s essentially like a chat room. A few things you\'ll need to know: \n\n\n\nYou need an IRC client program. There are many availa','join_us/irc',1271357513,1271357513,'3','7','3','WebGUI::Asset::Wobject::Article',1,'IRC Internet Relay Chat IRC join us irc You can find members of the community on the webgui chat channel on the Freenode IRC network If you\'re not familiar with IRC it\'s essentially like a chat room A few things you\'ll need to know You need an IRC client program There are many available that can be downloaded free of charge The IRC network we use is Freenode Our channel is webgui Channel operators have an  next to their name All channel operators in webgui are Plain Black employees Someone with a + next to their name is a recognized contributor in the WebGUI community People who have been recognized as one of the People Behind WebGUI are often given this designation If you\'re looking for a mentor recognized contributors are a good place to start  ','000001000002000004000003',NULL),('ksSfkZdsr0uC62NwIk6hFQ','WebGUI Users Conference','An annual event, this is the one time a year when WebGUI users and Plain\n Black\'s staff come together to do all things WebGUI.  This is by far \nthe best way to get involved with the community as nothing can replace \nface to face interaction and mentoring.','join_us/wuc',1271356973,1271356973,'3','7','3','WebGUI::Asset::Wobject::Article',1,'WebGUI Users Conference WUC join us wuc An annual event this is the one time a year when WebGUI users and Plain Black\'s staff come together to do all things WebGUI This is by far the best way to get involved with the community as nothing can replace face to face interaction and mentoring The conference is usually held in the fall of each year and more information on attending can be found on the WebGUI Users Conference website as details become available  ','000001000002000004000004',NULL),('nWxS5jnA3o3DgPEwBeR7yQ','The Forums','WebGUI \nForums are available for WebGUI related\n discussion and community support. Bounce around ideas, discuss \nimportant issues, and ask community members for help and advice. WebGUI \nForums are broken up into: \n\nEt Cetera: general WebGUI discussion \nWe','join_us/forums',1271357239,1271357239,'3','7','3','WebGUI::Asset::Wobject::Article',1,'The Forums forums join us forums WebGUI Forums are available for WebGUI related discussion and community support Bounce around ideas discuss important issues and ask community members for help and advice WebGUI Forums are broken up into Et Cetera general WebGUI discussion Web Design Templates and Themes discuss making your site look pretty Admin Forum get your questions answered about everything from security to configuration Install/Upgrade Help get answers to your installation and upgrade questions WebGUI Dev a place to discuss WebGUI and WRE core development as well as writing your own custom modules  ','000001000002000004000005',NULL),('AssetReportFolder00001','Asset Report','','asset_report',1281501163,1281501163,'3','3','4','WebGUI::Asset::Wobject::Folder',1,'Asset Report Asset Report asset report','000001000001000058',NULL),('sJtcUCfn0CVbKdb4QM61Yw','Asset Report Default Template','','asset-report/asset-report-default-template',1281501163,1283921584,'3','3','4','WebGUI::Asset::Template',0,'Asset Report Default Template Asset Report Default Template asset report asset report default template AssetReport','000001000001000058000001',NULL),('N7uMnnicbyTEulcuRi1sSg','PDFs','','media/pdfs',1283900195,1283900195,'3','7','4','WebGUI::Asset::Wobject::Folder',1,'PDFs PDFs media pdfs','000001000003000001',NULL),('bCGr7FRtZt-XYlBVUEJBjw','Getting_Started_doc.pdf','','media/pdfs/getting_started_doc.pdf',1278013724,1278013724,'3','7','4','WebGUI::Asset::File::Image',1,'Getting_Started_doc.pdf Getting_Started_doc.pdf media pdfs getting started doc.pdf','000001000003000001000001',NULL),('A3T7jpTBKLYws1h5mJ0t8A','makepageprintable.css','','makepageprintable.css',1286336607,1286336607,'3','7','12','WebGUI::Asset::Snippet',0,'makepageprintable.css makepageprintable.css makepageprintable.css  This is the stylesheet for the Make Page Printable Style template  reset html body div span applet object iframe h1 h2 h3 h4 h5 h6 p blockquote pre a abbr acronym address big cite code del dfn em font img ins kbd q s samp small strike strong sub sup tt var b u i center dl dt dd ol ul li fieldset form label legend table caption tbody tfoot thead tr th td  margin:0 padding:0 border:0 outline:0 font-size:100 vertical-align:baseline background:transparent text-decoration:none font-weight:normal font-style:normal  basic formatting body  font:12px/18px Georgia,\"Bitstream Charter\",\"Liberation Serif\",\"Times New Roman\",Times,serif color:#000  h1 h2 h3 h4 h5 h6  font:12px/18px Helvetica,Arial,\"Liberation Sans\",sans-serif  code  font:11px/18px Lucida Console\",\"Courier New\",\"Liberation Mono\",monospace  h1 h2  font-size:18px line-height:24px margin:24px 0 12px  h3  font-size:14px margin:0 0 12px  h4  margin:0 0 6px font-weight:bold  h5  margin:0 0 6px  h6  font-style:italic margin:0 0 6px  p ul ol dl blockquote table form fieldset  margin:0 0 18px  a:link a:visited  text-decoration:underline color:#000  a:hover a:active  text-decoration:none color:#000  ol ul blockquote  padding:0 0 0 27px  ol ol ol ul ul ul ul ol  margin:0  dd  margin:0 0 3px  blockquote  font-style:italic font-size:15px quotes:none  blockquote p  font-style:italic margin:0 0 9px  q  quotes:none font-style:italic  blockquote:before blockquote:after q:before q:after  content content:none  b strong dt  font-weight:bold  cite dfn i em ins  font-style:italic  abbr acronym  text-transform:lowercase font-variant:small-caps  del  text-decoration:line-through  sub  vertical-align:sub font-size:8px  sup  vertical-align:super font-size:8px  hr  border-color:#aaa border-style:dotted border-width:1px 0 0 color:#fff background:#fff margin:18px 0 padding:0 width:100  legend  font-weight:bold  label  display:block  table  border-collapse:collapse border-spacing:0  caption  font-style:italic margin:0 0 6px  tr  border-bottom:1px dotted ccc  thead tr  border-top:1px solid ccc border-bottom:1px solid ccc  th td  padding:5px 9px 4px  th  font-variant:small-caps  very basic positioning  design header  border-top:1px dotted aaa border-bottom:1px dotted aaa padding:17px 6px color:#666  header h1  font-weight:bold margin:0 text-transform:uppercase  header a  text-decoration:none font-style:italic color:#666 font-size:11px  content  padding:0 6px margin:18px 0 36px  content a  font-weight:bold  content img  margin:0 0 18px  footer  border-top:1px dotted aaa border-bottom:1px dotted aaa padding:17px 6px color:#666 ','000001000001000041000007',NULL),('j_1qEqM6iLfQLiR6VKy0aA','Free Documentation','There are hundreds of pages of free documentation available for WebGUI, provided by both Plain Black and the community at large. The following list is by no means comprehensive, but it should get you started in the right direction. \n  \n\nPrimer - A downloa','documentation/free-documentation',1215718151,1299872071,'3','7','3','WebGUI::Asset::Wobject::Article',1,'Free Documentation Free Documentation documentation free documentation There are hundreds of pages of free documentation available for WebGUI provided by both Plain Black and the community at large The following list is by no means comprehensive but it should get you started in the right direction Primer  A downloadable PDF that shows you the basics of publishing content in WebGUI WebGUI User Guides all commercial user guides previously published by Plain Black are in the process of being converted into wikis You can find these wikis on the WebGUI User Guides page of www.webgui.org This is an ongoing process until all books have been converted remaining books are being made available as free PDF downloads Wiki  Hundreds of pages of WebGUI community contributed content featuring a variety of tutorials Worldwide  A collection of WebGUI related web sites from all over the world that have documentation and other resources for WebGUI API Docs  The documentation of all of the WebGUI source code Template Help  The documentation of all of WebGUI\'s template variables  ','000001000002000003000001',NULL),('diZvW4bSgZWwyyGP3qXi1g','Commercial Documentation','Plain Black has created a line of commercial books which total over 1500 pages of detailed documentation about WebGUI. Both black and white and full color editions of these books are available. Visit the book store today to stock your WebGUI library. Othe','documentation/commercial-documentation',1215717972,1285610019,'3','7','3','WebGUI::Asset::Wobject::Article',1,'Commercial Documentation Commercial Documentation documentation commercial documentation Plain Black has created a line of commercial books which total over 1500 pages of detailed documentation about WebGUI Both black and white and full color editions of these books are available Visit the book store today to stock your WebGUI library Other than hands on training there is no better way to hone your WebGUI skills No matter what your need Plain Black has created a book that\'s right for you and is creating new books each year In the fall of 2010 Plain Black announced that these books will be converted into free wikis You can now access all WebGUI user guides for free on the WebGUI User Guides page on www.webgui.org These books are available for WebGUI version 7.7 and earlier For later documentation see the free resources available on the WebGUI project website  ','000001000002000003000003',NULL),('sK_0zVw4kwdJ1sqREIsSzA','WebGUI Auth Password Recovery Email Template','','root/import/auth/webgui/recoveryemail',1287545015,1287545015,'3','7','4','WebGUI::Asset::Template',0,'WebGUI Auth Password Recovery Email Template Password Recovery Email root import auth webgui recoveryemail Auth/WebGUI/RecoveryEmail','000001000001000005000011',NULL),('_cD6DLM_Fs5IlrLeWUjrjg','Workflow Activity Templates','Folder for holding Workflow Activity templates. ','root/import/workflow-activity-templates',1287545015,1287545015,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'Workflow Activity Templates Workflow Activity Templates root import workflow activity templates Folder for holding Workflow Activity templates','000001000001000059',NULL),('lYhMheuuLROK_iNjaQuPKg','Notify About Version Tag','','root/import/workflow-activity-templates/notify-about-version-tag',1287545015,1287545015,'3','7','12','WebGUI::Asset::Template',0,'Notify About Version Tag Notify About Version Tag root import workflow activity templates notify about version tag NotifyAboutVersionTag','000001000001000059000001',NULL),('PBtmplHelp000000000001','Help','','root/import/adminconsole/help',1124395706,1147642410,'3','7','12','WebGUI::Asset::Template',0,'Help Help root import adminconsole help AdminConsole','000001000001000003000002',NULL),('2GxjjkRuRkdUg_PccRPjpA','Select Gateway (Default)','','shopping-cart-collateral-items/select-gateway-default',1257311888,1326776038,'3','7','3','WebGUI::Asset::Template',0,'Select Gateway Default Select Gateway Default shopping cart collateral items select gateway default Shop/selectGateway','000001000001000036000024',NULL),('qxd0WpRGqDPWP8WBicYvEA','dragdropsorting.js','','root/import/gallery-templates/dragdropsorting.js',1271820952,1285124158,'3','7','12','WebGUI::Asset::Snippet',0,'dragdropsorting.js dragdropsorting.js root import gallery templates dragdropsorting.js  Create our own namespace For the moment we leave this here since  there are no other JS modules for the gallery if typeof Gallery == undefined  Gallery =  Gallery.DDSorting =    Configure the drag\'n\'drop sorting app Gallery.DDSorting.parentId = photos  Element Id of the container element Gallery.DDSorting.draggableNodeTags = li  Type of tag used for draggable items Gallery.DDSorting.idPrefix = photoId  Prefix used in Ids of draggable items  Create some shortcuts var Dom = YAHOO.util.Dom var Event = YAHOO.util.Event var DDM = YAHOO.util.DragDropMgr   Drag\'n\'drop sorting app for the gallery  Gallery.DDSorting.init = function   Make list element containing photos a drop target new YAHOO.util.DDTarget(this.parentId  Get all items within list of photos var items = document.getElementById(this.parentId).getElementsByTagName(this.draggableNodeTags  Initialize DDList object for all list items for i=0 i < items.length i=i+1  new Gallery.DDList(this items[i].id gallery     Custom drag and drop implementation  Gallery.DDList = function(app id sGroup config  Gallery.DDList.superclass.constructor.call(this id sGroup config var el = this.getDragEl Dom.setStyle(el opacity 0.67  The proxy is slightly transparent  Assign reference to application object this.app = app  Init variables for direction and replacement tracking this.goingUp = false this.goingLeft = false this.lastY = 0 this.lastX = 0 this.before = false this.lastReplaced = null  YAHOO.extend(Gallery.DDList YAHOO.util.DDProxy  startDrag function(x y   Make the proxy look like the source element var dragEl = this.getDragEl var clickEl = this.getEl Dom.setStyle(clickEl visibility hidden  Copy source element to proxy and set class dragEl.className = clickEl.className dragEl.innerHTML = clickEl.innerHTML  endDrag function(e  var srcEl = this.getEl var proxy = this.getDragEl  Show the proxy element and animate it to the src element\'s location Dom.setStyle(proxy visibility  var a = new YAHOO.util.Motion proxy  points  to Dom.getXY(srcEl   0.2 YAHOO.util.Easing.easeOut  var proxyid = proxy.id var thisid = this.id  Hide the proxy and show the source element when finished with the animation a.onComplete.subscribe(function  Dom.setStyle(proxyid visibility hidden Dom.setStyle(thisid visibility   a.animate  Do nothing more if no element has been replaced if this.lastReplaced == null return  Get assed ids of the target to move and the last photo replaced var target = srcEl.id.replace(this.app.idPrefix  var dest = this.lastReplaced.id.replace(this.app.idPrefix   Prepare call to ajax service of the gallery asset We need  to set the action argument to moveFile provide the asset  id of the target photo in target and the asset id of the  photo replaced in before or after depending on order var args =  args.action = moveFile args.target = target if this.before  args.before = dest  else  args.after = dest   Callback function for asynchronous request This is  required for error handling var callback =  success function o   Parse answer from ajax service result = YAHOO.lang.JSON.parse(o.responseText  Check for errors if result.err   Display error message alert(\'Failed to move photo  + result.errMessage  Request a reload of the page so we are back in sync location.reload   failure function o   Display generic error message alert(\'AJAX service for moving photos is currently not available Failed to move photo  Request a reload of the page so we are back in sync location.reload    Convert args object to JSON string var postData = func=ajax;args= + encodeURI(YAHOO.lang.JSON.stringify(args  Make asynchronous call to gallery asset YAHOO.util.Connect.asyncRequest(\"POST this.app.url callback postData  onDrag function(e   Keep track of the direction of the drag for use during onDragOver var y = Event.getPageY(e var x = Event.getPageX(e  Check in vertical direction if y < this.lastY  this.goingUp = true  else if y > this.lastY  this.goingUp = false   Check in horizontal direction if x < this.lastX  this.goingLeft = true  else if x > this.lastX  this.goingLeft = false  this.lastY = y this.lastX = x  onDragOver function(e id  var srcEl = this.getEl var destEl = Dom.get(id  We are only concerned with list items we ignore the dragover  notifications for the list if destEl.nodeName.toLowerCase == this.app.draggableNodeTags  var orig_p = srcEl.parentNode var p = destEl.parentNode if this.goingUp || this.goingLeft   Insert above/before p.insertBefore(srcEl destEl  Keep track of where we moved this.lastReplaced = destEl this.before = true  else   Insert below/after p.insertBefore(srcEl destEl.nextSibling  Keep track of where we moved this.lastReplaced = destEl this.before = false  DDM.refreshCache     Start application after DOM is ready Event.onDOMReady(Gallery.DDSorting.init Gallery.DDSorting true','000001000001000015000026',NULL),('f2EktltCvwQpl_3-B1yR7g','Asset Templates','','root/import/asset_templates',1288748251,1288748251,'3','7','12','WebGUI::Asset::Wobject::Folder',1,'Asset Templates Asset Templates root import asset templates','000001000001000060',NULL),('BBpxqoSseIor5C9ei9JEFQ','Underground WebGUI.css','','style-underground/css/underground-webgui.css',1273032719,1301973996,'3','7','3','WebGUI::Asset::Snippet',0,'Underground WebGUI.css Underground WebGUI.css style underground css underground webgui.css wg-toolbar p  margin 0px  img.wg-toolbar-icon  border 0px none  toolbarIcon  margin 0px  label  display inline ','000001000001000056000002000002',NULL),('xyyn5mz3xGyvrcI1rY8C-w','greenportal.css','','greenportal.css',1273032721,1301973998,'3','7','12','WebGUI::Asset::Snippet',0,'greenportal.css greenportal.css greenportal.css  CSS Document  body,html  text-align:center height 100  margin 3px 3px 3px 3px font-family Verdana Sans-Serif line-height 125 color:#CCCCCC background 222625  h1,h2,h3,h4,h5,h6{font-weight:bold h1{font-size:18px h2{font-size:16px h3{font-size:14px h4{font-size:12px h5{font-size:11px h6{font-size:10px main  width:80 height:100 margin-left:auto margin-right:auto position:relative  body > main  height:auto min-height:100 font-size:10px  main mainHeader  width:100 height:125px background url(\'^FileUrl(/greenportal_image/logo.jpg top center no-repeat margin-bottom:5px position:relative  main mainHeader title  position:absolute top:55px left:180px font-size:36pt font-family Edwardian Script ITC Arial Sans-Serif  font-variant small-caps   font-style italic  color:#CCCCCC font-weight bold overflow visible padding 20px  main mainHeader title a  color:#CCCCCC text-decoration:none  main mainHeader title a:hover  color:#FFFFFF text-decoration:none font-size:37pt  main mainMenu  width:186px position:absolute top:125px left:0px  main mainMenu li  list-style none font-size 9pt text-align:left  main mainMenu menuTop  color:#99CC33 background url(\'^FileUrl(/greenportal_image/menu_top.png no-repeat margin-left:-3px padding:2px 0px 3px 26px width:162px  186px-24px font-size:10pt font-weight bold  main mainMenu indent1  margin-left:0px width:186px  main mainMenu indent2  margin-left:17px width:168px  186-17px  main mainMenu a  display:block height:24px font-weight:bold text-decoration:none color:#CCCCCC background url(\'^FileUrl(/greenportal_image/menu_dark.png no-repeat padding:2px 0px 0px 24px  main mainMenu a:hover,active  display:block height:24px font-weight:bold text-decoration:none color:#FFFFFF background url(\'^FileUrl(/greenportal_image/menu_light.png no-repeat padding:2px 0px 0px 24px  main mainContent   width:75 height:100 margin-top:5px margin-left:215px text-align:left border 1px solid CCCCCC  main > mainContent  margin-top:0px  min-height:500px  main > mainContent > p  margin-top:0px  main mainContent topMenu margin-right 10px text-align right font-size 8pt font-weight bold  main mainContent topMenu a color 99CC33 text-decoration none  main mainContent topMenu a:hover text-decoration:underline  main mainContent mainText  margin 10px 5px 5px 10px font-size:8pt padding 5px min-height 423px text-align left  main mainContent mainText a color:#FFFFFF text-decoration none font-weight bold  main mainContent mainText a:hover  color:#FFFF00 text-decoration none font-weight bold  main mainContent mainText yui-skin-sam a color 222625 text-decoration none font-weight bold  main mainFooter  text-align:left padding:10px margin:5px 0px 5px 200px  width:75 font-size:9px background:url(^FileUrl(/greenportal_image/logo.jpg no-repeat  main mainFooter a  color:#CCCCCC font-weight:bold text-decoration:none  main mainFooter a:hover  color:#FFFFFF font-weight:bold text-decoration:none ','000001000001000057000002',NULL),('XdlKhCDvArs40uqBhvzR3w','Article With Pagination','','article-with-pagination',1254881103,1259133275,'3','7','12','WebGUI::Asset::Template',0,'Article With Pagination Article With Pagination article with pagination Article','000001000001000004000006',NULL),('mRtqRuVikSe82BQsYBlD0A','Bare Image','','bare_image',1263962529,1263962529,'3','7','12','WebGUI::Asset::Template',0,'Bare Image Bare Image bare image ImageAsset','000001000001000017000003',NULL),('8tqyQx-LwYUHIWOlKPjJrA','EMS Event Submission Template','','root/import/ems/ems-event-submission',1258524917,1279073449,'3','7','12','WebGUI::Asset::Template',0,'EMS Event Submission Template EMS Event Submission Template root import ems ems event submission EMS/Submission','000001000001000012000009',NULL),('DoVNijm6lMDE0cYrtvEbDQ','EMS Event Submission Main Template','','root/import/ems/ems-event-submission-main',1258524917,1279073449,'3','7','12','WebGUI::Asset::Template',0,'EMS Event Submission Main Template EMS Event Submission Main Template root import ems ems event submission main EMS/SubmissionMain','000001000001000012000010',NULL),('ktSvKU8riGimhcsxXwqvPQ','EMS Event Submission Queue','','root/import/ems/ems-event-submission-queue',1258524917,1279073450,'3','7','12','WebGUI::Asset::Template',0,'EMS Event Submission Queue EMS Event Submission Queue root import ems ems event submission queue EMS/SubmissionQueue','000001000001000012000011',NULL),('pbproto000000000000002','Request Tracker','','request-tracker-prototype',1147642465,1163019036,'3','7','12','WebGUI::Asset::Wobject::Collaboration',1,'Request Tracker Request Tracker request tracker prototype','000001000001000008000031',NULL),('VCFhB9WOsDsH2Apj3c6DpQ','Three Columns','','three-columns',1254881103,1259133276,'3','7','12','WebGUI::Asset::Template',0,'Three Columns Three Columns three columns Layout','000001000001000019000008',NULL),('_aE16Rr1-bXBf8SIaLZjCg','picklanguage','','media/picklanguage',1257311888,1257311888,'3','7','12','WebGUI::Asset::Template',0,'picklanguage picklanguage media picklanguage Macro/PickLanguage','000001000001000021000013',NULL),('mfHGkp6t9gdclmzN33OEnw','Default Twitter Choose Username','','root/import/auth/twitter/chooseusername/default-twitter-choose-username',1277868927,1277868927,'3','7','12','WebGUI::Asset::Template',0,'Default Twitter Choose Username Default Twitter Choose Username root import auth twitter chooseusername default twitter choose username Auth/Twitter/ChooseUsername','000001000001000005000012',NULL),('limMkk80fMB3fqNZVf162w','Default Asset Subscription','','root/import/default-asset-subscription',1253507213,1281501163,'3','7','3','WebGUI::Asset::Template',0,'Default Asset Subscription Default Asset Subscription root import default asset subscription AssetAspect/Subscribable','000001000001000060000001',NULL),('YP9WaMPJHvCJl-YwrLVcPw','Progress Bar','','admin_progress_bar',1245376837,1245376837,'3','7','12','WebGUI::Asset::Template',0,'Progress Bar Progress Bar admin progress bar AdminConsole/ProgressBar','000001000001000060000002',NULL),('Rqwgh50A3gGcOKIrdi_kxw','Authorize.net Credentials (Default)','','shopping-cart-collateral-items/authorizenet-credentials',1313542962,1326776038,'3','7','4','WebGUI::Asset::Template',0,'Authorize.net Credentials Default Authorize.net Credentials Default shopping cart collateral items authorizenet credentials Shop/Credentials','000001000001000036000025',NULL),('3n3H85BsdeRQ0I08WmvlOg','thingy.css','','root/import/thingy-templates/thingy.css',1212091492,1313542960,'3','7','12','WebGUI::Asset::Snippet',0,'thingy.css thingy.css root import thingy templates thingy.css wgThingy  margin:5px  wgThingy  styleButton  color:black margin:0px 5px display:block float:left  wgThingy  spacerOne  padding-left:15px  wgThingy  rowOne wgThingy  tr.rowOne td  background EEEEEE margin:1px border:solid CDCDCD 1px color:#000 padding:2px  wgThingy  rowTwo wgThingy  tr.rowTwo td  background DBDBDB margin:1px border:solid DDDDDD 1px color:#000 padding:2px  wgThingsWrapper img  display:block vertical-align:middle float:left  wgThingsWrapper label  font-weight:bold padding-left:15px  wgThingy h2.title  background 000 height:42px color:white font-size:18px font-weight:bold letter-spacing:1px line-height:42px padding-left:15px margin-bottom:0px  wgThingy  span.smaller  font-size:13px color:white  wgThingy controls  line-height:35px height:35px background f1f1f1 margin-top:0px margin-bottom:20px padding:0px overflow:visible  wgThingy  label  background:black color:white padding:2px 5px font-family:arial font-size:11px font-weight:bold vertical-align:middle  wgThingy label a  color:white  searchTable  input editThing  input  background white border:solid 555 1px  editThing  margin-top:15px  thingyList thingyList   margin:0px padding:0px  thingyList  position:relative float:left overflow:visible  thingyList goButton:link thingyList goButton:visited  padding:2px 25px 2px 2px background F1F1F1 url(^FileUrl(root/import/thingy-templates/images/go-btn.gif no-repeat right line-height:20px border:solid a2a2a2 1px color:#a2a2a2 text-decoration:none font-family:verdana arial font-size:10px font-weight:bold margin-left:20px letter-spacing:0px  thingyList goButton:hover  background-color:white  thingyList things  padding:0px margin:0px width:300px z-index:5000 position:absolute top:27px left:20px border:solid a2a2a2 1px border-top-style:none  thingyList things a:link thingyList things a:visited  display:block background-color:#f1f1f1 border-top:solid a2a2a2 1px border-bottom:solid 727272 1px line-height:12px font-size:10px height:12px padding:2px 5px text-decoration:none font-weight:bold color:#a2a2a2  thingyList things a:hover  background-color:white ','000001000001000044000006',NULL);
 ALTER TABLE `assetIndex` ENABLE KEYS;
 ALTER TABLE `assetVersionTag` DISABLE KEYS;
-INSERT INTO `assetVersionTag` VALUES ('pbversion0000000000001','Base 7.10.24 Install',1,1326776041,'3',1326776041,'3',0,'','3','',NULL,NULL,NULL,NULL,0);
+INSERT INTO `assetVersionTag` VALUES ('pbversion0000000000001','Base 7.10.26 Install',1,1345524877,'3',1345524877,'3',0,'','3','',NULL,NULL,NULL,NULL,0);
 ALTER TABLE `assetVersionTag` ENABLE KEYS;
 ALTER TABLE `authentication` DISABLE KEYS;
 INSERT INTO `authentication` VALUES ('1','LDAP','ldapUrl',NULL),('3','LDAP','ldapUrl',''),('1','LDAP','connectDN',NULL),('3','LDAP','connectDN',''),('1','WebGUI','identifier','No Login'),('3','WebGUI','identifier','RvlMjeFPs2aAhQdo/xt/Kg'),('1','WebGUI','passwordLastUpdated','1078704037'),('1','WebGUI','passwordTimeout','3122064000'),('1','WebGUI','changeUsername','1'),('1','WebGUI','changePassword','1'),('3','WebGUI','passwordLastUpdated','1078704037'),('3','WebGUI','passwordTimeout','3122064000'),('3','WebGUI','changeUsername','1'),('3','WebGUI','changePassword','1');
@@ -2714,7 +2530,7 @@ ALTER TABLE `vendor` ENABLE KEYS;
 ALTER TABLE `wobject` DISABLE KEYS;
 INSERT INTO `wobject` VALUES (0,'This is the latest news from Plain Black and WebGUI pulled directly from the site every hour.','fK-HMSboA3uu0c1KYkYspA','stevestyle000000000003','PBtmpl0000000000000111',1124395696,'stevestyle000000000003'),(1,NULL,'PBasset000000000000002','PBtmpl0000000000000060','PBtmpl0000000000000111',1124395696,'PBtmpl0000000000000060'),(0,NULL,'7-0-style0000000000026','PBtmpl0000000000000060','',1147642499,'PBtmpl0000000000000060'),(0,NULL,'PBnav00000000000000001','PBtmpl0000000000000060','PBtmpl0000000000000111',1124395696,'PBtmpl0000000000000060'),(0,NULL,'PBnav00000000000000014','PBtmpl0000000000000060','PBtmpl0000000000000111',1124395696,'PBtmpl0000000000000060'),(0,NULL,'PBnav00000000000000015','PBtmpl0000000000000060','PBtmpl0000000000000111',1124395696,'PBtmpl0000000000000060'),(0,NULL,'PBnav00000000000000016','PBtmpl0000000000000060','PBtmpl0000000000000111',1124395696,'PBtmpl0000000000000060'),(0,NULL,'PBnav00000000000000017','PBtmpl0000000000000060','PBtmpl0000000000000111',1124395696,'PBtmpl0000000000000060'),(0,NULL,'PBnav00000000000000018','PBtmpl0000000000000060','PBtmpl0000000000000111',1124395696,'PBtmpl0000000000000060'),(0,NULL,'PBnav00000000000000019','PBtmpl0000000000000060','PBtmpl0000000000000111',1124395696,'PBtmpl0000000000000060'),(0,NULL,'PBnav00000000000000020','PBtmpl0000000000000060','PBtmpl0000000000000111',1124395696,'PBtmpl0000000000000060'),(0,NULL,'PBnav00000000000000021','PBtmpl0000000000000060','PBtmpl0000000000000111',1124395696,'PBtmpl0000000000000060'),(0,NULL,'PBnav00000000000000002','PBtmpl0000000000000060','PBtmpl0000000000000111',1124395696,'PBtmpl0000000000000060'),(0,NULL,'PBnav00000000000000006','PBtmpl0000000000000060','PBtmpl0000000000000111',1124395696,'PBtmpl0000000000000060'),(0,NULL,'PBnav00000000000000007','PBtmpl0000000000000060','PBtmpl0000000000000111',1124395696,'PBtmpl0000000000000060'),(0,NULL,'PBnav00000000000000008','PBtmpl0000000000000060','PBtmpl0000000000000111',1124395696,'PBtmpl0000000000000060'),(0,NULL,'PBnav00000000000000009','PBtmpl0000000000000060','PBtmpl0000000000000111',1124395696,'PBtmpl0000000000000060'),(0,NULL,'PBnav00000000000000010','PBtmpl0000000000000060','PBtmpl0000000000000111',1124395696,'PBtmpl0000000000000060'),(0,NULL,'PBnav00000000000000011','PBtmpl0000000000000060','PBtmpl0000000000000111',1124395696,'PBtmpl0000000000000060'),(0,NULL,'PBnav00000000000000012','PBtmpl0000000000000060','PBtmpl0000000000000111',1124395696,'PBtmpl0000000000000060'),(0,NULL,'PBnav00000000000000013','PBtmpl0000000000000060','PBtmpl0000000000000111',1124395696,'PBtmpl0000000000000060'),(0,NULL,'7-0-style0000000000070','PBtmpl0000000000000060','PBtmpl0000000000000060',1147642510,'PBtmpl0000000000000060'),(1,NULL,'7-0-style0000000000001','PBtmpl0000000000000060','',1147642492,'PBtmpl0000000000000060'),(1,NULL,'7-0-style0000000000031','PBtmpl0000000000000060','',1147642500,'PBtmpl0000000000000060'),(0,NULL,'7-0-style0000000000025','PBtmpl0000000000000060','',1147642498,'PBtmpl0000000000000060'),(1,NULL,'PBasset000000000000003','PBtmpl0000000000000060','PBtmpl0000000000000111',1147642437,'PBtmpl0000000000000060'),(1,NULL,'nbSrhXZQuxIjhWFaFPSuVA','PBtmpl0000000000000060','',1147642465,'PBtmpl0000000000000060'),(1,NULL,'N13SD1Fpqk00UgBt1Z8ivQ','PBtmpl0000000000000060','',1147642470,'PBtmpl0000000000000060'),(1,NULL,'-WM2dt0ZGpDasuL2wWocxg','PBtmpl0000000000000060','PBtmpl0000000000000111',1222803056,'PBtmpl0000000000000060'),(1,NULL,'3uuBf8cYuj1sew2OJXl9tg','PBtmpl0000000000000060','',1147642470,'PBtmpl0000000000000060'),(1,NULL,'cj2y4papTVGZRFdwTI-_fw','PBtmpl0000000000000060','',1147642475,'PBtmpl0000000000000060'),(1,NULL,'bBzO4CWjqU_ile3gf5Iypw','PBtmpl0000000000000060','',1147642475,'PBtmpl0000000000000060'),(1,NULL,'Da6KWn805L4B5e4HFgQRQA','PBtmpl0000000000000060','',1147642479,'PBtmpl0000000000000060'),(1,NULL,'bbiA9Zq5Gy2oCFBlILO3QA','PBtmpl0000000000000060','',1147642480,'PBtmpl0000000000000060'),(1,NULL,'Efe2W0UgrSRDltNJ87jlfg','PBtmpl0000000000000060','',1147642480,'PBtmpl0000000000000060'),(1,NULL,'9wKWdum0_8z-OhhquWLtSQ','PBtmpl0000000000000060','',1147642483,'PBtmpl0000000000000060'),(1,NULL,'CSN-ZON7Uwv8kxf3F1fh5Q','PBtmpl0000000000000060','',1147642484,'PBtmpl0000000000000060'),(1,NULL,'TCtybxdqmdwdvRn555zpCQ','PBtmpl0000000000000060','',1147642484,'PBtmpl0000000000000060'),(1,NULL,'pbproto000000000000002','PBtmpl0000000000000060','',1163019036,'PBtmpl0000000000000060'),(1,NULL,'tempspace0000000000000','PBtmpl0000000000000060','PBtmpl0000000000000060',1185754574,'PBtmpl0000000000000060'),(1,NULL,'Tsg7xmPYv782j6IVz7yHFg','PBtmpl0000000000000060','PBtmpl0000000000000111',1213244777,'PBtmpl0000000000000060'),(1,NULL,'TYo2Bwl7aafzTtdHlS-arQ','PBtmpl0000000000000060','PBtmpl0000000000000060',1211664878,'PBtmpl0000000000000060'),(1,NULL,'6tK47xsaIH-ELw0IBo0uRQ','PBtmpl0000000000000060','PBtmpl0000000000000111',1210777115,'PBtmpl0000000000000060'),(1,NULL,'gbnRhcWNk1iQe32LFEB5eQ','PBtmpl0000000000000060','PBtmpl0000000000000111',1212086102,'PBtmpl0000000000000060'),(1,NULL,'6D4Z-oruXPS6OlH_Kx8pBg','PBtmpl0000000000000060','PBtmpl0000000000000111',1209509389,'PBtmpl0000000000000060'),(1,NULL,'C5fPz-Wg85vkYRvCdl-Xqw','PBtmpl0000000000000060','PBtmpl0000000000000111',1212160830,'PBtmpl0000000000000060'),(1,NULL,'jnYdqDkUR8x7Pv2eGR1qTA','PBtmpl0000000000000060','PBtmpl0000000000000111',1216250666,'PBtmpl0000000000000060'),(1,NULL,'2OcUWHVsu_L1sDFzIMWYqw','PBtmpl0000000000000060','PBtmpl0000000000000111',1222803070,'PBtmpl0000000000000060'),(1,NULL,'zyWi26q9na-iiZqL4yedog','PBtmpl0000000000000060','PBtmpl0000000000000111',1222803114,'PBtmpl0000000000000060'),(1,NULL,'tBL7BWiQRZFed2Y-Zjo9tQ','PBtmpl0000000000000060','PBtmpl0000000000000060',1222803200,'PBtmpl0000000000000060'),(1,NULL,'GdkQpvjRtJqtzOUbwIIQRA','PBtmpl0000000000000060','PBtmpl0000000000000060',1222803205,'PBtmpl0000000000000060'),(1,NULL,'tnc5iYyynX2hfdEs9D3P8w','PBtmpl0000000000000060','PBtmpl0000000000000060',1222803213,'PBtmpl0000000000000060'),(1,NULL,'vgXdBcFTqU7h4wBG1ewdBw','PBtmpl0000000000000060','PBtmpl0000000000000060',1222803217,'PBtmpl0000000000000060'),(1,NULL,'hcFlqnXlsmC1ujN6Id0F0A','PBtmpl0000000000000060','PBtmpl0000000000000060',1222803234,'PBtmpl0000000000000060'),(1,NULL,'eRJR52fvlaxfetv3DQkQYw','PBtmpl0000000000000060','PBtmpl0000000000000060',1222803238,'PBtmpl0000000000000060'),(1,NULL,'5HIDHq5lAWHV5gpYGS0zLg','PBtmpl0000000000000060','PBtmpl0000000000000060',1222803244,'PBtmpl0000000000000060'),(1,NULL,'rYEFwXXo0tkGhQTcbDibvg','PBtmpl0000000000000060','PBtmpl0000000000000060',1222803249,'PBtmpl0000000000000060'),(1,NULL,'V3l5S5TtI7wMm1WpIMhvOA','PBtmpl0000000000000060','PBtmpl0000000000000060',1222803253,'PBtmpl0000000000000060'),(1,NULL,'nqNbSUAhk9Vd1zda2SCz9A','PBtmpl0000000000000060','PBtmpl0000000000000060',1222803258,'PBtmpl0000000000000060'),(1,NULL,'y8XkRdxIperLKkJ3bL5sSQ','PBtmpl0000000000000060','PBtmpl0000000000000060',1222803264,'PBtmpl0000000000000060'),(1,NULL,'vTymIDYL2YqEh6PV50F7ew','PBtmpl0000000000000060','PBtmpl0000000000000060',1222803302,'PBtmpl0000000000000060'),(1,NULL,'lo1ac3BsoJx3ijGQ3gR-bQ','PBtmpl0000000000000060','PBtmpl0000000000000060',1222803309,'PBtmpl0000000000000060'),(1,NULL,'huASapWvFDzqwOSbcN-JFQ','PBtmpl0000000000000060','PBtmpl0000000000000060',1222803313,'PBtmpl0000000000000060'),(1,NULL,'9A-mg2gwWmaYi9o_1C7ArQ','PBtmpl0000000000000060','PBtmpl0000000000000060',1222803338,'PBtmpl0000000000000060'),(1,NULL,'yD1SMHelczihzjEmx6eXBA','PBtmpl0000000000000060','PBtmpl0000000000000060',1222803342,'PBtmpl0000000000000060'),(1,NULL,'pV7GnZdpjR3XpZaSINIoeg','PBtmpl0000000000000060','PBtmpl0000000000000060',1222803347,'PBtmpl0000000000000060'),(1,NULL,'71e17KeduiXgODLMlUxiow','PBtmpl0000000000000060','PBtmpl0000000000000060',1222803352,'PBtmpl0000000000000060'),(1,NULL,'Ik9HHky10DIyFTKehUD1dw','PBtmpl0000000000000060','PBtmpl0000000000000060',1222803478,'PBtmpl0000000000000060'),(1,NULL,'NywJYmGWe1f6EBXJnWg9Xg','PBtmpl0000000000000060','PBtmpl0000000000000111',1222803638,'PBtmpl0000000000000060'),(1,NULL,'AgyFhx3eXlfZXNp2MkrsiQ','PBtmpl0000000000000060','PBtmpl0000000000000060',1222803665,'PBtmpl0000000000000060'),(1,NULL,'F7MAQ-cpuvQ1KuC7J4P5zQ','PBtmpl0000000000000060','PBtmpl0000000000000060',1222803673,'PBtmpl0000000000000060'),(1,NULL,'BmLaN4rmAANkCglXUViEbg','PBtmpl0000000000000060','PBtmpl0000000000000060',1222803871,'PBtmpl0000000000000060'),(1,NULL,'X7DrzUcj8pOKFa_6k9D5iw','PBtmpl0000000000000060','PBtmpl0000000000000060',1222804045,'PBtmpl0000000000000060'),(1,NULL,'UL-ItI4L1Z6-WSuhuXVvsQ','stevestyle000000000003','PBtmpl0000000000000111',1225139673,'stevestyle000000000003'),(1,NULL,'7-0-style0000000000049','PBtmpl0000000000000060','PBtmpl0000000000000060',1224117144,'PBtmpl0000000000000060'),(0,NULL,'jVKLVakT_iA2010_oEuAwg','PBtmpl0000000000000060','PBtmpl0000000000000060',1224116526,'PBtmpl0000000000000060'),(1,'<p>&nbsp;</p>','QpmlAiYZz6VsKBM-_0wXaw','stevestyle000000000003','PBtmpl0000000000000111',1224616691,'stevestyle000000000003'),(1,NULL,'HPDOcsj4gBme8D4svHodBw','PBtmpl0000000000000060','PBtmpl0000000000000111',1225404573,'PBtmpl0000000000000060'),(1,NULL,'IZkrow_zwvbf4FCH-taVTQ','PBtmpl0000000000000060','PBtmpl0000000000000111',1226011853,'PBtmpl0000000000000060'),(1,NULL,'K0YjxqOqr7RupSo6sIdcAg','PBtmpl0000000000000060','PBtmpl0000000000000111',1227074310,'PBtmpl0000000000000060'),(1,NULL,'_ilRXNR3s8F2vGJ_k9ePcg','PBtmpl0000000000000060','PBtmpl0000000000000111',1226643205,'PBtmpl0000000000000060'),(1,NULL,'qaVcU0FFzzraMX_bzELqzw','PBtmpl0000000000000060','PBtmpl0000000000000111',1227074362,'PBtmpl0000000000000060'),(1,NULL,'QHn6T9rU7KsnS3Y70KCNTg','PBtmpl0000000000000060','PBtmpl0000000000000111',1233173545,'PBtmpl0000000000000060'),(1,NULL,'HW-sPoDDZR8wBZ0YgFgPtg','PBtmpl0000000000000060','PBtmpl0000000000000111',1227634350,'PBtmpl0000000000000060'),(1,NULL,'AOjPG2NHgfL9Cq6dDJ7mew','PBtmpl0000000000000060','PBtmpl0000000000000111',1236960881,'PBtmpl0000000000000060'),(1,NULL,'jmlI9IK-lV8n2WMYmmPhAA','PBtmpl0000000000000060','PBtmpl0000000000000111',1238106173,'PBtmpl0000000000000060'),(1,NULL,'6uvSLY-ak_w4p_wS8q33cA','PBtmpl0000000000000060','PBtmpl0000000000000111',1239213092,'PBtmpl0000000000000060'),(1,NULL,'GaBAW-2iVhLMJaZQzVLE5A','stevestyle000000000003','PBtmpl0000000000000111',1240103565,'stevestyle000000000003'),(1,'<p>Templates for the Friend Manager</p>','lo1rpxn3t8YPyKGers5eQg','PBtmpl0000000000000060','PBtmpl0000000000000111',1238625621,'PBtmpl0000000000000060'),(1,NULL,'aNNC62qLAS6TB-0_MCYjsw','PBtmpl0000000000000060','PBtmpl0000000000000060',1246969327,'PBtmpl0000000000000060'),(1,NULL,'BFfNj5wA9bDw8H3cnr8pTw','PBtmpl0000000000000060','PBtmpl0000000000000060',1247046273,'PBtmpl0000000000000060'),(1,NULL,'f_tn9FfoSfKWX43F83v_3w','PBtmpl0000000000000060','PBtmpl0000000000000060',1247053009,'PBtmpl0000000000000060'),(1,NULL,'oGfxez5sksyB_PcaAsEm_Q','PBtmpl0000000000000060','PBtmpl0000000000000060',1247053097,'PBtmpl0000000000000060'),(1,NULL,'tPagC0AQErZXjLFZQ6OI1g','PBtmpl0000000000000060','PBtmpl0000000000000060',1246966459,'PBtmpl0000000000000060'),(1,NULL,'GYaFxnMu9UsEG8oanwB6TA','PBtmpl0000000000000060','PBtmpl0000000000000060',1246965871,'PBtmpl0000000000000060'),(1,NULL,'VZK3CRgiMb8r4dBjUmCTgQ','PBtmpl0000000000000060','PBtmpl0000000000000060',1247046242,'PBtmpl0000000000000060'),(1,NULL,'tXwf1zaOXTvsqPn6yu-GSw','PBtmpl0000000000000060','PBtmpl0000000000000060',1246965607,'PBtmpl0000000000000060'),(1,NULL,'5bnNzteN7w3NnK9mF4XiCg','PBtmpl0000000000000060','PBtmpl0000000000000060',1250243000,'PBtmpl0000000000000060'),(1,NULL,'RSAMkc6WQmfRE3TOr1_3Mw','PBtmpl0000000000000060','PBtmpl0000000000000111',1250243000,'PBtmpl0000000000000060'),(1,NULL,'fowHfgOkJtAxdst7rugTog','PBtmpl0000000000000060','PBtmpl0000000000000111',1252595993,'PBtmpl0000000000000060'),(1,NULL,'TvOZs8U1kRXLtwtmyW75pg','PBtmpl0000000000000060','PBtmpl0000000000000060',1256092368,'PBtmpl0000000000000060'),(1,NULL,'4qh0kIsFUdd4Ox-Iu1JZgg','PBtmpl0000000000000060','PBtmpl0000000000000111',1257311886,'PBtmpl0000000000000060'),(1,'<p>&nbsp;</p>','-K8Hj45mbelljN9-0CXZxg','PBtmpl0000000000000060','PBtmpl0000000000000060',1257311887,'PBtmpl0000000000000060'),(1,NULL,'P_4uog81vSUK4KxuW_4GUA','PBtmpl0000000000000060','PBtmpl0000000000000111',1258524916,'PBtmpl0000000000000060'),(0,NULL,'t87D1138NhPHhA23-hozBA','PBtmpl0000000000000060','PBtmpl0000000000000060',1273032716,'PBtmpl0000000000000060'),(0,NULL,'QtBumey5ffc-xffRp1-7Aw','PBtmpl0000000000000060','PBtmpl0000000000000060',1273032716,'PBtmpl0000000000000060'),(1,NULL,'x_hiUi1XZloBvV47Obnu8Q','OiJNwP1gAlcva8_yOtL4gA','PBtmpl0000000000000111',1273032718,'PBtmpl0000000000000060'),(0,NULL,'UUwEL6hLEPdrnkZnKRzFYQ','OiJNwP1gAlcva8_yOtL4gA','PBtmpl0000000000000111',1273032718,'PBtmpl0000000000000060'),(1,NULL,'Q4uX_C557arTp6D_jwB1jQ','PBtmpl0000000000000060','PBtmpl0000000000000060',1273032720,'PBtmpl0000000000000060'),(1,NULL,'GNOAsX98vCsl0JRwfwL-gg','PBtmpl0000000000000060','PBtmpl0000000000000060',1277868921,'PBtmpl0000000000000060'),(1,NULL,'_iHetEvMQUOoxS-T2CM0sQ','Qk24uXao2yowR6zxbVJ0xA','PBtmpl0000000000000111',1273172789,'stevestyle000000000003'),(0,'<p>\nCongratulations on successfully installing the WebGUI Content Engine&reg;. If you used the Site Starter to select a set of default pages, you will see those pages in the site navigation. You will also notice that a number of additional pages appear, such as this page. These are default pages added for your convenience to help you get started with WebGUI and find the resources you need. Feel free to remove these extra pages whenever you are ready.</p>\n<p>To get started managing content, download the PDF document below. This document provides a basic introduction to the WebGUI user interface.&nbsp;</p>\n<p><strong><a href=\"^/(media/pdfs/getting_started_doc.pdf);\">WebGUI Basics</a></strong> (PDF)</p>\n<p>Once you have read this document, you may want to head over to the <a href=\"^/(documentation);\">Documentation</a> section where you can find more WebGUI resources.</p>','bX5rYxb6tZ9docY6sUhBlw','Qk24uXao2yowR6zxbVJ0xA','stevestyle000000000003',1278013772,'stevestyle000000000003'),(1,'<p>Plain Black&reg; created the WebGUI Content Engine&reg; and is here to answer \nyour questions and provide you with services to make sure your WebGUI \nimplementation is entirely successful. We bend over backwards to make \nsure you\'re a success. <a target=\"_blank\" title=\"Contact Us\" href=\"http://www.plainblack.com/contact_us\">Contact us</a> today to \nsee how we can help you.</p>','8Bb8gu-me2mhL3ljFyiWLg','Qk24uXao2yowR6zxbVJ0xA','PBtmpl0000000000000111',1271359194,'stevestyle000000000003'),(1,'<p>Plain Black provides <a href=\"http://www.plainblack.com/services/support\">support packages</a> to fit any budget or need. Start out with online support which costs only $500 per year, or work with Plain Black to build a custom support package tailored to your specific needs. No matter what level of support you purchase, you will get personalized and friendly service in a timely manner.</p>','ix1p0AbwKAz8QWB-T-HHfg','Qk24uXao2yowR6zxbVJ0xA','stevestyle000000000003',1271359087,'stevestyle000000000003'),(1,'<p>Plain Black\'s professionally trained WebGUI experts can handle the task\nof hosting your web site, intranet, or extranet. Let us deal with upgrades, security, and server management so you focus on building your WebGUI site, which is where your time and expertise should be spent. And when you <a href=\"http://www.plainblack.com/services/hosting\">sign up with hosting</a>, online support is included!</p>','iCYOjohB9SKvAPr6bXElKA','Qk24uXao2yowR6zxbVJ0xA','stevestyle000000000003',1271445525,'stevestyle000000000003'),(1,'<p>WebGUI\'s robust API allows for easy customization. Plain Black\'s team of developers can <a href=\"http://www.plainblack.com/services/development\">create any features you need</a> for your site. We\'ve built hundreds of custom applications for people. From simple macros, to custom single sign on systems, to applications that will manage your entire company, our team will leverage the power of WebGUI to your advantage.</p>','4Yfz9hqBqM8OYMGuQK8oLw','Qk24uXao2yowR6zxbVJ0xA','stevestyle000000000003',1271352537,'stevestyle000000000003'),(1,'<p>Branding and visual appeal are powerful marketing tools. Don\'t let your site become a wallflower. Plain Black\'s professional <a href=\"http://www.plainblack.com/services/design\">design</a> team can create a custom design to make your site stand out. Our team is fast, easy to work with, and can even migrate your existing content into your new WebGUI site.</p>','Wl8WZ43g2rK5AYr9o4zY7w','Qk24uXao2yowR6zxbVJ0xA','stevestyle000000000003',1271445539,'stevestyle000000000003'),(1,'<p>Let our team of professional translators bring your site to new customers by <a href=\"http://www.plainblack.com/services/translation\">translating your content</a> into additional languages. Our translation services are never machine automated. They\'re always done by professional translators that have years of experience reading, writing, and speaking many languages.</p>','LBuiKzg2mWwmOPS9AgV3bg','Qk24uXao2yowR6zxbVJ0xA','stevestyle000000000003',1271348789,'stevestyle000000000003'),(1,'<p>Now that you have a brilliant WebGUI site, you need to get people to visit it. We can help there too. Our marketing specialists can work with you to develop and execute the right combination of search engine placement, advertising buys, and affilliate programs to <a href=\"http://www.plainblack.com/services/promotion\">ensure your site gets the traffic it needs</a>.</p>','jTNggl7AoVSUc_ZzrvuCmw','Qk24uXao2yowR6zxbVJ0xA','stevestyle000000000003',1271348789,'stevestyle000000000003'),(1,'<p>With any large system, having the right documentation to get you started is mandatory. The good news is that WebGUI has abundant documentation.</p>','mTOiwwk3q4k9g5-XykXhPA','Qk24uXao2yowR6zxbVJ0xA','PBtmpl0000000000000111',1271349647,'stevestyle000000000003'),(1,'<p>The WebGUI project community is a diverse and talented group. If you \nwould like to contribute back to the project there are many ways to \nbecome involved.</p>','2TqQc4OISddWCZmRY1_m8A','Qk24uXao2yowR6zxbVJ0xA','PBtmpl0000000000000111',1271357565,'stevestyle000000000003'),(1,'<p>You can find members of the community on the #webgui chat channel on the Freenode IRC network. If you\'re not \nfamiliar with IRC, it\'s essentially like a chat room. A few things you\'ll need to know:</p>\n<ol>\n</ol>\n<ul>\n<li>You need an IRC client program. There are many available that \ncan be downloaded free of charge.</li>\n<li>The IRC network we use is Freenode</li>\n<li>Our channel is #webgui.</li>\n<li>Channel operators have an @ next to their name. All channel operators in #webgui are Plain Black employees.</li>\n<li>Someone with a + next to their name is a recognized contributor in the WebGUI community. People who have been recognized as one of the People Behind WebGUI are often given this designation.</li>\n</ul>\n<ol>\n\n\n</ol>\n<p>If you\'re looking for a mentor, recognized contributors are a good place\n to start<strong>.</strong></p>','k2Qj03FrAOXYra8kDJYYXw','Qk24uXao2yowR6zxbVJ0xA','PBtmpl0000000000000111',1271357513,'PBtmpl0000000000000060'),(1,'<p>An annual event, this is the one time a year when WebGUI users and Plain\n Black\'s staff come together to do all things WebGUI.&nbsp; This is by far \nthe best way to get involved with the community as nothing can replace \nface to face interaction and mentoring. The conference is usually held \nin the fall of each year and more information on attending can be found \non the <a target=\"_blank\" href=\"http://www.plainblack.com/wuc\" title=\"WUC\">WebGUI Users \nConference</a> website as details become available.</p>','ksSfkZdsr0uC62NwIk6hFQ','Qk24uXao2yowR6zxbVJ0xA','PBtmpl0000000000000111',1271356973,'PBtmpl0000000000000060'),(1,'<p><a target=\"_blank\" href=\"http://www.webgui.org/forums\" title=\"WebGUI Forums\">WebGUI \nForums</a> are available for WebGUI related\n discussion and community support. Bounce around ideas, discuss \nimportant issues, and ask community members for help and advice. WebGUI \nForums are broken up into:</p>\n<ul>\n<li><a target=\"_blank\" href=\"http://www.webgui.org/etcetera\" title=\"Et  Cetera\">Et Cetera</a>: general WebGUI discussion</li>\n<li><a target=\"_blank\" href=\"http://www.webgui.org/forums/design\" title=\"Design, Templates,\n and Themes\">Web Design, Templates and Themes</a>: discuss making your \nsite look pretty</li>\n<li><a title=\"Admin\" target=\"_blank\" href=\"http://www.webgui.org/forums/admin\">Admin\n Forum</a>: get your questions answered about everything from security \nto \nconfiguration.</li>\n<li><a target=\"_blank\" href=\"http://www.webgui.org/forums/install\" title=\"Install/Upgrade \nHelp\">Install/Upgrade\n Help</a>: get answers to your installation and upgrade questions</li>\n<li><a target=\"_blank\" href=\"http://www.webgui.org/forums/dev\" title=\"WebGUI Dev\">WebGUI \nDev</a>: a \nplace to discuss WebGUI and WRE core development as well as writing your\n own custom modules.</li>\n</ul>','nWxS5jnA3o3DgPEwBeR7yQ','Qk24uXao2yowR6zxbVJ0xA','PBtmpl0000000000000111',1271357239,'PBtmpl0000000000000060'),(0,NULL,'x3OFY6OJh_qsXkZfPwug4A','Qk24uXao2yowR6zxbVJ0xA','PBtmpl0000000000000111',1271348790,'stevestyle000000000003'),(0,NULL,'pJd5TLAjfWMVXD6sCRLwUg','Qk24uXao2yowR6zxbVJ0xA','PBtmpl0000000000000111',1271348790,'stevestyle000000000003'),(0,'<p>The <a target=\"_blank\" title=\"WebGUI\" href=\"http://www.webgui.org\">WebGUI Content Engine&reg;</a> is a powerful, easy to use web application framework and content management system. WebGUI contains dozens of built-in features, and allows for full customization through its rich API. It\'s easy enough for the average business user to use, but powerful enough for any large enterprise.</p>\n<p>WebGUI serves thousands of <a target=\"_blank\" title=\"Jeff Miller Photography\" href=\"http://www.jeffmillerphotography.com\">small</a> and <a target=\"_blank\" title=\"Brunswick Bowling\" href=\"http://www.bowlbrunswick.com/\">large</a> businesses, <a target=\"_blank\" title=\"School District of Philadelphia\" href=\"http://www.phila.k12.pa.us\">schools</a>, <a target=\"_blank\" title=\"CSU Math Success\" href=\"http://www.csumathsuccess.org\">universities</a>, <a target=\"_blank\" title=\"America.gov\" href=\"http://america.gov\">governments</a>, <a target=\"_blank\" title=\"Environment America\" href=\"http://www.environmentamerica.org/\">associations</a>, <a target=\"_blank\" title=\"Evangelical Covenant\" href=\"http://www.covchurch.org/\">churches</a>, <a target=\"_blank\" title=\"K3b\" href=\"http://k3b.plainblack.com\">projects</a> and <a target=\"_blank\" title=\"Klettern in Magdeburg\" href=\"http://www.klettern-md.de/\">communities</a> throughout the world. For examples of who is using WebGUI, visit the <a target=\"_blank\" title=\"WebGUI Sightings\" href=\"http://www.webgui.org/sightings\">WebGUI Sightings </a>page. Shouldn\'t your site be on this list?</p>\n<p>If you\'re new to WebGUI, visit the <a href=\"^/(getting_started);\">Getting Started</a> section. Once you feel comfortable, explore some of the <a href=\"^/(your_next_step);\">professional services</a> available for your new WebGUI site. No matter what level you\'re at, <a href=\"^/;tell_a_friend\">tell your friends</a> about WebGUI.</p>','OhdaFLE7sXOzo_SIP2ZUgA','Qk24uXao2yowR6zxbVJ0xA','stevestyle000000000003',1271445348,'stevestyle000000000003'),(1,'<table style=\"text-align: left; width: 80%;\" align=\"center\" border=\"0\">\n<tbody>\n<tr>\n<td>\n<h4>Rich User Interface</h4>\n</td>\n<td>\n<h4>Powerful API</h4>\n</td>\n</tr>\n<tr>\n<td>\n<p>WebGUI has a rich user experience that allows users to place their \ncontent\nthrough a drag-n-drop interface; helps users pick dates, colors, and\nmore; and has a highly customizable rich editor to allow users to \nquickly and easily format\ncontent.</p>\n</td>\n<td>\n<p>WebGUI allows developers to quickly plug-in new functionality to\nget the most from a site. In addition, WebGUI\'s standardized plug-in\npoints maintain the upgrade path even with customizations.</p>\n</td>\n</tr>\n<tr>\n<td>\n<h4>Short Friendly URLs</h4>\n</td>\n<td>\n<h4>Internationalization</h4>\n</td>\n</tr>\n<tr>\n<td>\n<p>Never worry about ugly numeric \nID\'s or other things in URL\'s that\nmake it hard for search engines and people to use a site.</p>\n</td>\n<td>\n<p>Users can work in an interface in their native language, and content can\n be published in as many languages as necessary.</p>\n</td>\n</tr>\n<tr>\n<td>\n<h4>Personalization</h4>\n</td>\n<td>\n<h4>Easy To Install</h4>\n</td>\n</tr>\n<tr>\n<td>\n<p>Users see their own view of the site through dynamically\ngenerated navigation and content. In addition, content can be displayed \nbased upon users\' viewing habits.</p>\n</td>\n<td>\n<p>With the use of the WebGUI Runtime Environment (Unix, Mac OS X, Linux, \nBSD) and VMWare Appliance (Windows) setup takes minutes rather than\nhours. </p>\n</td>\n</tr>\n</tbody>\n</table>','IWFxZDyGhQ3-SLZhELa3qw','Qk24uXao2yowR6zxbVJ0xA','stevestyle000000000003',1277737686,'stevestyle000000000003'),(1,NULL,'LdiozcIUciWuvt3Z-na5Ww','PBtmpl0000000000000060','PBtmpl0000000000000060',1281501162,'PBtmpl0000000000000060'),(1,NULL,'Vch1Ww7G_JpBhOhXX07RDg','PBtmpl0000000000000060','PBtmpl0000000000000111',1281501163,'PBtmpl0000000000000060'),(1,NULL,'AssetReportFolder00001','PBtmpl0000000000000060','PBtmpl0000000000000060',1281501163,'PBtmpl0000000000000060'),(1,'<p>You don\'t have to be a developer to become a project contributor. Examples of how you can contribute include:\n</p>\n<ul>\n<li>Translators - Visit <a href=\"http://i18n.webgui.org\" title=\"WebGUI translation site\">i18n.webgui.org</a>\n and either help translate a few items in an existing language, or \ncreate a new translation.<a href=\"http://i18n.webgui.org\" title=\"WebGUI translation site\"><br /><br /></a></li>\n<li>Graphic Designers - Create WebGUI style themes, icons, or fix UI\n bugs. You can contribute your items to WebGUI\'s <a target=\"_blank\" title=\"Marketplace\" href=\"http://www.webgui.org/addons\">Addons and Plugins</a> area for others to download and use.<br /><br /></li>\n<li>Usability Experts - Help make WebGUI more accessable and \neasier to use by submitting RFEs. Even better, submit an RFE that\'s ready to implement by including the code!<br /><br /></li>\n<li>Doc Writers - Write documents in WebGUI\'s wiki, help\n out on the boards, improve WebGUI\'s built in documentation. <br /><br /></li>\n<li>Testers - Validate WebGUI\'s features against its \ndocumentation, search for errors, and report bugs.<br /><br /></li>\n<li>Test writers - If you have some Perl abilities, you can help \ndevelop unit tests to make sure the WebGUI API is behaving as \ndocumented.<br /><br /></li>\n<li>Developers - Write a new feature for WebGUI like a macro, \nasset, wobject, auth module or workflow activity and contribute it to \nthe <a target=\"_blank\" title=\"Marketplace\" href=\"http://www.webgui.org/addons\">Addons and Plugins</a>. If you\'re interested in developing for WebGUI, be sure to check out the <a target=\"_blank\" title=\"Best Practices\" href=\"http://www.webgui.org/develop/wiki/development-best-practices\">Development Best Practices</a> wiki article.<br /><br /></li>\n<li>Bug Fixers - Cruise the <a target=\"_blank\" title=\"Bugs\" href=\"http://www.webgui.org/bugs\">bug list</a> and submit patches to \ncorrect the problem.<br /><br /></li>\n<li>Core Developers - Becoming a core developer is a privilege. To earn it, you have to demonstrate through bug fixes and/or \ncontributions that you can make sound programming decisions without the \nneed for someone to scrutinize everything you check in. WebGUI is a \nvery large and complex application so getting to this level can take \nsome time. Core developers are developers with commit privileges to the\n subversion repository.<br /><br /></li>\n<li>Advocate - Spread the word about WebGUI, tell people about \nhow you use it and how it\'s helped you.Encourage people to try it out.<br /><br /></li>\n<li>Marketing and Promotion - If you have a talent for marketing,\n advertising, or promotion you can be a super advocate!&nbsp;Have a marketing\n idea? Contact&nbsp;tavis AT plainblack DOT com.&nbsp; Make a WebGUI banner or \nprint ad and contribute it!&nbsp; Maybe you have a design for a cool \nwallpaper or t-shirt, anything to get the word out. </li>\n</ul>','l0guT3vTR3B8cL6vtP-g3A','Qk24uXao2yowR6zxbVJ0xA','PBtmpl0000000000000111',1285124369,'PBtmpl0000000000000060'),(1,NULL,'N7uMnnicbyTEulcuRi1sSg','PBtmpl0000000000000060','PBtmpl0000000000000111',1283900195,'PBtmpl0000000000000060'),(1,'<p>&nbsp;</p>','gI_TxK-5S4DNuv42wpImmw','PBtmpl0000000000000060','PBtmpl0000000000000111',1285124155,'PBtmpl0000000000000060'),(1,NULL,'kaPRSaf8UKiskiGEgJgLAw','PBtmpl0000000000000060','PBtmpl0000000000000111',1285124155,'2p9ygcqH_Z11qOUvQ1uBvw'),(1,NULL,'RrV4aAPnn4dM0ZcU3OXnlw','PBtmpl0000000000000060','PBtmpl0000000000000060',1286336607,'PBtmpl0000000000000060'),(0,'<p>\nTo begin managing content, you should <a href=\"^PageUrl;?op=auth\">log in</a> and click the Turn Admin On! link. The default username is \"admin\" and the default password is \"123qwe\", but you probably customized both of those when you visited this site for the very first time.\n</p>\n<p>\nNow that you\'re logged in, we recommend that you <a href=\"^/;?op=listUsers\">add a new user</a> for yourself with admin privileges just in case you forget the login information for your primary admin account. Don\'t worry if you lock yourself out, you can always contact <a target=\"_blank\" title=\"Plain Black Corporation\" href=\"http://www.plainblack.com\">Plain Black&reg;</a> support to get instructions to get back in.\n</p>\n<p><strong>NOTE:</strong> If you appear to get logged out while moving between pages, this is most likely your browser displaying a cached version of the page. Click on your browser\'s refresh button to correct the problem.</p>\n<p>&nbsp;</p>\n<p>\nFor more information about services related to WebGUI <a href=\"http://www.plainblack.com/services\">click here</a>.\n</p>\n<p>\nEnjoy your new WebGUI site!\n</p>','NK8bqlwVRILJknqeCDPBHg','Qk24uXao2yowR6zxbVJ0xA','stevestyle000000000003',1285796040,'stevestyle000000000003'),(1,'<p><a target=\"_blank\" title=\"Plain Black Corporation\" href=\"http://www.plainblack.com/\">Plain Black</a> has created a line of commercial books which total over 1500 pages of detailed documentation about WebGUI. Both black and white and full color editions of these books are available. <a href=\"https://www.plainblack.com/store/services/books2\"></a><a target=\"_blank\" title=\"Plain Black Books\" href=\"https://www.plainblack.com/store/services/books2\">Visit the book store today to stock your WebGUI library</a>. Other than hands on <a target=\"_blank\" title=\"Training\" href=\"https://www.plainblack.com/services/training\">training</a>, there is no better way to hone your WebGUI skills. No matter what your need, Plain Black has created a book that\'s right for you and is creating new books each year.</p>\n<p><strong>In the fall of 2010, Plain Black announced that these books will be converted into free wikis.</strong> You can now access all WebGUI user guides for free on the <a target=\"_blank\" title=\"WebGUI User Guides\" href=\"http://www.webgui.org/user-guides\">WebGUI User Guides</a> page on www.webgui.org.</p>\n<p>*These books are available for WebGUI version 7.7 and earlier. For later documentation, see the free resources available on the <a target=\"_blank\" title=\"WebGUI Project Site\" href=\"http://www.webgui.org\">WebGUI</a> project website.</p>','diZvW4bSgZWwyyGP3qXi1g','Qk24uXao2yowR6zxbVJ0xA','PBtmpl0000000000000111',1285610019,'stevestyle000000000003'),(1,NULL,'68sKwDgf9cGH58-NZcU4lg','Qk24uXao2yowR6zxbVJ0xA','PBtmpl0000000000000111',1286336676,'stevestyle000000000003'),(0,NULL,'Am1J-meNBmhqFfEIWy6Gag','OiJNwP1gAlcva8_yOtL4gA','PBtmpl0000000000000111',1287545014,'PBtmpl0000000000000060'),(1,NULL,'1z9J1O08n_7gVVlBwSRBJQ','PBtmpl0000000000000060','PBtmpl0000000000000111',1287545014,'PBtmpl0000000000000060'),(1,NULL,'xSmREZO3GNzK3M5PaueOOQ','PBtmpl0000000000000060','PBtmpl0000000000000060',1287545014,'PBtmpl0000000000000060'),(1,NULL,'0bx-xoL8TSXXubFuqKAoVQ','PBtmpl0000000000000060','PBtmpl0000000000000060',1287545014,'PBtmpl0000000000000060'),(1,NULL,'taX2UYkFF21ALpFZY2rhMw','PBtmpl0000000000000060','PBtmpl0000000000000060',1287545014,'PBtmpl0000000000000060'),(1,NULL,'K0q_N885Httqev1VCqUWxg','PBtmpl0000000000000060','PBtmpl0000000000000060',1287545014,'PBtmpl0000000000000060'),(1,NULL,'fq1ZkYhH24R5tb96kuT10Q','PBtmpl0000000000000060','PBtmpl0000000000000060',1287545014,'PBtmpl0000000000000060'),(1,NULL,'oHk7fAFhEEkB7dHzi0QOQA','PBtmpl0000000000000060','PBtmpl0000000000000060',1287545014,'PBtmpl0000000000000060'),(1,NULL,'9M-lrlPQWeeNWfvnDnK_Xg','PBtmpl0000000000000060','PBtmpl0000000000000060',1287545014,'PBtmpl0000000000000060'),(1,NULL,'_gBYAdTcbkiyamnqi2Xskg','PBtmpl0000000000000060','PBtmpl0000000000000060',1287545014,'PBtmpl0000000000000060'),(1,NULL,'0iMMbGN3BevuCBHjjLiQNA','PBtmpl0000000000000060','PBtmpl0000000000000111',1287545015,'PBtmpl0000000000000060'),(1,NULL,'6A4yIjWwJfIE0Ep-I0jutg','PBtmpl0000000000000060','PBtmpl0000000000000111',1287545015,'PBtmpl0000000000000060'),(1,'<p>Folder for holding Workflow Activity templates.</p>','_cD6DLM_Fs5IlrLeWUjrjg','PBtmpl0000000000000060','PBtmpl0000000000000111',1287545015,'PBtmpl0000000000000060'),(1,NULL,'f2EktltCvwQpl_3-B1yR7g','PBtmpl0000000000000060','PBtmpl0000000000000111',1288748251,'PBtmpl0000000000000060'),(1,NULL,'S1A9iAwKcQQ6P20uTqw-Ew','PBtmpl0000000000000060','PBtmpl0000000000000060',1300763664,'PBtmpl0000000000000060'),(1,'<p>There are hundreds of pages of free documentation available for WebGUI, provided by both Plain Black and the community at large. The following list is by no means comprehensive, but it should get you started in the right direction.</p>\n<p>&nbsp;</p>\n<ul>\n<li><a href=\"https://www.plainblack.com/services/training/webgui-primer\" title=\"WebGUI Primer\" target=\"_blank\">Primer</a> - A downloadable PDF that shows you the basics of publishing content in WebGUI.</li>\n<li><a href=\"http://www.webgui.org/user-guides\" title=\"WebGUI User Guides\" target=\"_blank\">WebGUI User Guides</a>: all commercial user guides previously published by Plain Black are in the process of being converted into wikis. You can find these wikis on the <a href=\"http://www.webgui.org/user-guides\" title=\"WebGUI User Guides\" target=\"_blank\">WebGUI User Guides</a> page of www.webgui.org. This is an ongoing process; until all books have been converted, remaining books are being made available as free PDF downloads.</li>\n<li><a href=\"http://wiki.webgui.org/\" title=\"WebGUI Community Wiki\" target=\"_blank\">Wiki</a> - Hundreds of pages of WebGUI community contributed content featuring a variety of tutorials.</li>\n<li><a href=\"http://www.webguiworldwide.org/\" title=\"WebGUI Worldwide\" target=\"_blank\">Worldwide</a> - A collection of WebGUI related web sites from all over the world that have documentation and other resources for WebGUI.</li>\n<li><a href=\"http://www.webgui.org/api\" title=\"API Documentation\" target=\"_blank\">API Docs</a> - The documentation of all of the WebGUI source code.</li>\n<li><a href=\"^PageUrl(,op=viewHelpIndex);\" title=\"Template Help\" target=\"_blank\">Template Help</a> - The documentation of all of WebGUI\'s template variables.</li>\n</ul>','j_1qEqM6iLfQLiR6VKy0aA','Qk24uXao2yowR6zxbVJ0xA','PBtmpl0000000000000111',1299872071,'stevestyle000000000003'),(1,'<p>Templates and images for the \"Underground\" style from <a href=\"http://styleshout.com\">StyleShout.com</a></p>','CQp-RFA2pMh5lFSggPPPYg','Qk24uXao2yowR6zxbVJ0xA','PBtmpl0000000000000111',1301973995,'PBtmpl0000000000000060'),(1,NULL,'_Mi_NTd3x8UB96LWezWHnw','Qk24uXao2yowR6zxbVJ0xA','PBtmpl0000000000000111',1301973995,'PBtmpl0000000000000060'),(1,NULL,'g3JH1PRq6m6Bj_PnGpcrSQ','Qk24uXao2yowR6zxbVJ0xA','PBtmpl0000000000000111',1301973996,'PBtmpl0000000000000060'),(1,'<p>This folder holds prototype WebGUI assets with the correct templates pre-selected.</p>','G0hl4VilbFKipToyxKqFrg','Qk24uXao2yowR6zxbVJ0xA','PBtmpl0000000000000111',1301973997,'PBtmpl0000000000000060'),(1,NULL,'GWU2qZqe6yEuAKG-5HtBdg','Qk24uXao2yowR6zxbVJ0xA','PBtmpl0000000000000111',1301973997,'PBtmpl0000000000000060'),(1,NULL,'AsfpsOpsGzZCb9m7MyxPuw','Qk24uXao2yowR6zxbVJ0xA','PBtmpl0000000000000111',1301973997,'PBtmpl0000000000000060'),(1,NULL,'jmqLxnoWb6p92Cr12lf1hw','Qk24uXao2yowR6zxbVJ0xA','PBtmpl0000000000000111',1301973997,'PBtmpl0000000000000060'),(1,NULL,'8E2UOnj_XPEghTj7nfVM0g','Qk24uXao2yowR6zxbVJ0xA','PBtmpl0000000000000111',1301973997,'PBtmpl0000000000000060'),(1,NULL,'1qFjOEiILIwr1xB5_ebppQ','PBtmpl0000000000000060','PBtmpl0000000000000060',1301973998,'PBtmpl0000000000000060'),(1,NULL,'xD76UfQ_JnSgTLBNvytcpQ','PBtmpl0000000000000060','PBtmpl0000000000000111',1301973998,'PBtmpl0000000000000060'),(0,NULL,'h0bOzz7WvdaVZXsjpwtkww','KKt0VB_eoQxw9xEsHsAhag','PBtmpl0000000000000111',1301973998,'PBtmpl0000000000000060'),(1,NULL,'qFOfW1sKyOTnGNcP6BXbwg','6D98D8TIuhExiSoo2U1eqw','PBtmpl0000000000000111',1301973999,'PBtmpl0000000000000060'),(1,NULL,'G5DgNizuG3jXkjPp6UaGrA','PBtmpl0000000000000060','PBtmpl0000000000000060',1301973999,'PBtmpl0000000000000060'),(1,NULL,'brxm_faNdZX5tRo3p50g3g','PBtmpl0000000000000060','PBtmpl0000000000000111',1304392055,'PBtmpl0000000000000060'),(1,NULL,'n-Vr_wgxOkwiHGt1nJto9w','OiJNwP1gAlcva8_yOtL4gA','PBtmpl0000000000000111',1309236774,'PBtmpl0000000000000060'),(1,NULL,'aNmgn0cd6tldmC1FpW4KbA','PBtmpl0000000000000060','PBtmpl0000000000000060',1326776036,'PBtmpl0000000000000060'),(1,NULL,'jEz8iTGNWEt2I05IhVV19Q','PBtmpl0000000000000060','PBtmpl0000000000000060',1326776037,'PBtmpl0000000000000060');
 ALTER TABLE `wobject` ENABLE KEYS;
-INSERT INTO webguiVersion (webguiVersion,versionType,dateApplied) VALUES ('7.10.24','Initial Install',UNIX_TIMESTAMP());
+INSERT INTO webguiVersion (webguiVersion,versionType,dateApplied) VALUES ('7.10.26','Initial Install',UNIX_TIMESTAMP());
 SET CHARACTER_SET_CLIENT        = @OLD_CHARACTER_SET_CLIENT;
 SET CHARACTER_SET_RESULTS       = @OLD_CHARACTER_SET_RESULTS;
 SET CHARACTER_SET_CONNECTION    = @OLD_CHARACTER_SET_CONNECTION;

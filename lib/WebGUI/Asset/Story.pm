@@ -709,7 +709,7 @@ sub purge {
     ##Delete all storage locations from all revisions of the Asset
     my $sth = $self->session->db->read("select photo from Story where assetId=?",[$self->getId]);
     STORAGE: while (my ($json) = $sth->array) {
-        my $photos = from_json($json);
+        my $photos = from_json($json || '[]');
         PHOTO: foreach my $photo (@{ $photos }) {
             next PHOTO unless $photo->{storageId};
             my $storage = WebGUI::Storage->get($self->session,$photo->{storageId});

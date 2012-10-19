@@ -178,7 +178,7 @@ sub getStatusReport {
     foreach my $instance (@{JSON->new->decode($result)}) {
 		my $originalPriority = ($instance->{priority} - 1) * 10;
         my $priority = $instance->{workingPriority}."/".$originalPriority;
-		$output .= sprintf $pattern, $priority, $instance->{status}, $instance->{sitename}, $instance->{instanceId}, $instance->{lastState}, $instance->{lastRunTime};
+		$output .= sprintf $pattern, $priority, $instance->{status}, $instance->{sitename}, $instance->{instanceId}, $instance->{lastState}, ($instance->{lastRunTime} || '');
         $total++;
     }
     $output .= sprintf "\n%19.19s %4d\n", "Total Workflows", $total;

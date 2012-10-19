@@ -1,3 +1,37 @@
+7.10.26
+ - fixed: Template diagnostics when called without a session asset.
+ - fixed: #12378 Wiki search does not work with some metacharacters
+
+7.10.25
+ - fixed: #12373: Asset::Wobject::Search::view() so HTML highlite not broken by search phrase with unmatched char pairs
+ - fixed: if user1 adds user2 as a friend, user2 doesn't see user1 as a friend
+ - fixed: data sync bug in WebGUI::User::friends
+ - added: give WebGUI::PseudoRequest a hostname method
+ - fixed: don't clobber the request handler if WebGUI::Test was loaded inside of mod_perl
+ - fixed #12365: editing a metadata may cause a fatal error (Arjan Widlak / United Knowledge)
+ - fixed #12346: toVersion in upgrade_7.9.34-7.10.22.pl was "0.0.0"
+ - fixed #12010 related link duplication where links have group view restrictions
+ - fixed #12297: keywords.form missing from Post template help
+ - fixed #12321: Error while deleting a group.
+ - fixed #12322: Cache/CHI stomps on the config file
+ - fixed #12327: HttpProxy does not clean up cookie jar storage locations
+ - fixed #12329: FlatDiscount Sku forces you to enter in negative numbers for price
+ - fixed #12334: Company name with : in it breaks email sender identity
+ - fixed #12328: invalid wgaccess file in uploads
+ - RFE: 9730 (actually missing documentation)
+ - fixed: Crud updateFromFormPost
+ - fixed: encryptLogin and sslEnabled both need to be true
+ - fixed: Cache's setByHTTP method returns content, even when it gets an error in the request.  This gives the SC asset fits.
+ - fixed #12349: Friends invitation error
+ - fixed #12353: Dataform List mode
+ - fixed #12364: Site export loses session info
+ - fixed #12345: tickets in trash still show up
+ - fixed #12305: dbSlave breaks WebGUI when not able to connect
+ - fixed: Http Proxy assets with no URL to proxy cannot be deleted.
+ - fixed: Friends request messages that no longer exist throw a warning.
+ - fixed: Asset Report asset can search for all wobjects in addition to all assets.
+ - fixed #12375: Gateway URL ignored for password recovery
+
 7.10.24
  - fixed #12318: asset error causes asset manager to fail
  - fixed #12308: error message used scalar as reference

@@ -180,7 +180,7 @@ sub addHtml {
 	my $self = shift;
 	my $text = shift;
 	if ($text !~ /<(?:html|body)/) {
-	    my $site = $self->session->url->getSiteURL;
+	    my $site = $self->session->url->getSiteURL.$self->session->url->gateway;
 	    $text = <<END_HTML;
 <html>
 <head>
@@ -343,7 +343,14 @@ sub create {
 			}	
 		}
 	}
-    my $from    = $headers->{from}        || $session->setting->get('companyName') . " <".$session->setting->get("companyEmail").">";
+    my $from    = $headers->{from};
+    $from ||= do {
+        my $CoNa = $session->setting->get('companyName');
+        my $CoEm = $session->setting->get("companyEmail");
+        $CoNa =~ s/"//g;
+        qq{"$CoNa" <$CoEm>}
+    };
+
 	my $type    = $headers->{contentType} || "multipart/mixed";
     my $replyTo = $headers->{replyTo}     || $session->setting->get("mailReturnPath");
 

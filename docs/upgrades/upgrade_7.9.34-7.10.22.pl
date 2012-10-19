@@ -23,7 +23,7 @@ use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::Asset;
 
-my $toVersion = "0.0.0"; # make this match what version you're going to
+my $toVersion = "7.10.22"; # make this match what version you're going to
 my $quiet; # this line required
 
 
@@ -433,14 +433,15 @@ sub addLinkedProfileAddress {
     my $session = shift;
     print "\tAdding linked profile addresses for existing users... " unless $quiet;
 
-    my $users = $session->db->buildArrayRef( q{
-        select userId from users where userId not in ('1','3')
-    } );
+    my $users = $session->db->read( q{ select userId from users } );
 
     use WebGUI::User;
     use WebGUI::Shop::AddressBook;
-    foreach my $userId (@$users) {
+
+    while (my ($userId) = $users->array()) {
         #check to see if there is user profile information available
+        next if $userId eq '1' or $userId eq '3';
+        last unless $userId;
         my $u = WebGUI::User->new($session,$userId);
         #skip if user does not have any homeAddress fields filled in
         next unless (

@@ -248,6 +248,23 @@ sub getBackToSiteURL {
 
 #-------------------------------------------------------------------
 
+=head2 getRawUrl ( )
+
+Gets the URL from the request object and decodes it from UTF8.  This has the gateway and
+query and fragment parts.
+
+=cut
+
+sub getRawUrl {
+	my $self = shift;
+	unless ($self->{_rawUrl}) {
+		$self->{_rawUrl} = decode_utf8($self->session->request->uri);
+	}
+	return $self->{_rawUrl};
+}
+
+#-------------------------------------------------------------------
+
 =head2 getRefererUrl ( )
 
 Returns the URL of the page this request was refered from (no gateway, no query params, just the page url). Returns undef if there was no referer.

@@ -230,11 +230,11 @@ sub setByHTTP {
 	my $self = shift;
 	my $url = shift;
 	my $ttl = shift;
-        my $userAgent = new LWP::UserAgent;
+        my $userAgent = LWP::UserAgent->new();
 	$userAgent->env_proxy;
         $userAgent->agent("WebGUI/".$WebGUI::VERSION);
         $userAgent->timeout(30);
-        my $header = new HTTP::Headers;
+        my $header = HTTP::Headers->new();
         my $referer = "http://webgui.http.request/".$self->session->env->get("SERVER_NAME").$self->session->env->get("REQUEST_URI");
         chomp $referer;
         $header->referer($referer);
@@ -242,11 +242,11 @@ sub setByHTTP {
     my $response = $userAgent->request($request);
     if ($response->is_error) {
         $self->session->errorHandler->error($url." could not be retrieved.");
+        return undef;
     }
-    else {
-        $self->set($response->decoded_content,$ttl);
-    }
-    return $response->decoded_content;
+    my $value = $response->decoded_content;
+    $self->set($value ,$ttl);
+    return $value;
 }
 
 #-------------------------------------------------------------------

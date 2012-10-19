@@ -19,21 +19,25 @@ use strict;
 use Test::MockObject;
 
 BEGIN {
-    Test::MockObject->fake_module(
-        'Apache2::Cookie',
-        new => sub {
-            my $class = shift;
-            my $self = Test::MockObject->new;
-            $self->set_isa($class);
-            $self->set_true(qw(expires domain bake));
-        },
-    );
+    if( do { no strict 'refs'; ! exists ${"Apache2::"}{"Cookie::"} } ) {
+        Test::MockObject->fake_module(
+            'Apache2::Cookie',
+            new => sub {
+                my $class = shift;
+                my $self = Test::MockObject->new;
+                $self->set_isa($class);
+                $self->set_true(qw(expires domain bake));
+            },
+        );
+    }
 
-    Test::MockObject->fake_module('APR::Request::Apache2',
-        handle => sub {
-            return $_[1];
-        },
-    );
+    if( do { no strict 'refs'; ! exists ${"APR::"}{"Request::"} } ) {
+        Test::MockObject->fake_module('APR::Request::Apache2',
+            handle => sub {
+                return $_[1];
+            },
+        );
+    }
 }
 
 use WebGUI::PseudoRequest::Headers;
@@ -68,6 +72,8 @@ sub new {
 	bless $self, $class;
 	return $self;
 }
+
+sub hostname { 'localhost' }
 
 #----------------------------------------------------------------------------
 

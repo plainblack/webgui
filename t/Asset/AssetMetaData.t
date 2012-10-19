@@ -24,7 +24,7 @@ use WebGUI::VersionTag;
 
 use Test::More; # increment this value for each test you create
 use Test::Deep;
-plan tests => 16;
+plan tests => 17;
 
 my $session = WebGUI::Test->session;
 $session->user({userId => 3});
@@ -304,6 +304,22 @@ subtest 'asset metadata versioning' => sub {
     is $count_all->($asset), 1, 'one value for original';
     is $count_all->($dup), 1, 'one value for dup';
 };
+
+# Check that www_editMetaDataField doesn't return assets that are not configured
+# for this site and that sub definition is not executed if the asset is not 
+# configured in the config, which may cause a fatal error. 
+
+# Temporarily remove asset Article from config
+my $article_config = $session->config->get( 'assets' )->{ 'WebGUI::Asset::Wobject::Article' };
+$session->config->deleteFromHash( 'assets', 'WebGUI::Asset::Wobject::Article' );
+unlike( 
+    my  $got = $root->www_editMetaDataField(),
+    qr/WebGUI::Asset::Wobject::Article/,
+    'article was (temporarily) not in config and should not appear in form'
+);
+# Restore config:
+$session->config->addToHash( 'assets', 'WebGUI::Asset::Wobject::Article', $article_config );
+
 
 sub buildNameIndex {
     my ($fidStruct) = @_;

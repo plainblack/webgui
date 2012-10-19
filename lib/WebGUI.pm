@@ -1,6 +1,6 @@
 package WebGUI;
 
-our $VERSION = '7.10.24';
+our $VERSION = '7.10.26';
 our $STATUS = 'stable';
 
 =head1 LEGAL

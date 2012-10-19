@@ -228,6 +228,8 @@ sub toHtml {
             className
     });
 
+    push @{ $classes }, 'WebGUI::Asset::Wobject';
+
     #Hard code these for now
     my %asset = (
         "asset.creationDate"   => $i18n->get("creationDate (asset)"),

@@ -589,7 +589,7 @@ sub displayLogin {
     my $i18n = WebGUI::International->new($self->session);
     $vars->{title} = $i18n->get(66);
     my $action;
-    if ($self->session->setting->get("encryptLogin")) {
+    if ($self->session->config->get('sslEnabled') && $self->session->setting->get("encryptLogin")) {
         my $uri = URI->new($self->session->url->page(undef,1));
         $uri->scheme('https');
         $uri->host_port($uri->host);
@@ -924,7 +924,7 @@ sub login {
         $self->session->http->setRedirect($self->session->setting->get("redirectAfterLoginUrl"));
         $self->session->scratch->delete("redirectAfterLogin");
     }
-	elsif ($self->session->setting->get('encryptLogin')) {
+	elsif ($self->session->config->get('sslEnabled') && $self->session->setting->get('encryptLogin')) {
 		my $currentUrl = URI->new($self->session->url->page(undef,1));
         $currentUrl->scheme('http');
         $currentUrl->port($self->session->config->get('webServerPort') || 80);
@@ -1109,7 +1109,7 @@ sub showMessageOnLogin {
                     || $session->url->getBackToSiteURL
                     ;
 
-    if ($session->setting->get('encryptLogin') && ( ! $redirectUrl =~ /^http/)) {
+    if ($self->session->config->get('sslEnabled') && $session->setting->get('encryptLogin') && ( ! $redirectUrl =~ /^http/)) {
         ##A scheme-less URL has been supplied.  We need to make it an absolute one
         ##with a non-encrypted scheme.  Otherwise the user will stay in SSL mode.
         ##We assume that the user put the gateway URL into their URL.

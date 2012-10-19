@@ -488,7 +488,7 @@
    }
 },
 
-# Specify a the list of assets you want to appear in your
+# Specify the list of assets you want to appear in your
 # "New Content" menu categories. See "assetCategories" for details
 # about categories. Each listing has a key of class name, and then
 # has several properties, which are:
@@ -897,6 +897,7 @@
         "WebGUI::Workflow::Activity::ArchiveOldStories",
         "WebGUI::Workflow::Activity::ArchiveOldThreads",
         "WebGUI::Workflow::Activity::CalendarUpdateFeeds",
+        "WebGUI::Workflow::Activity::CleanCookieJars",
         "WebGUI::Workflow::Activity::CleanDatabaseCache",
         "WebGUI::Workflow::Activity::CleanFileCache",
         "WebGUI::Workflow::Activity::CleanLoginHistory",

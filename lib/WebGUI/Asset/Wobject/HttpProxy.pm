@@ -256,14 +256,36 @@ sub prepareView {
 
 =head2 purge
 
-Extend the base method to delete the cookie jar
+Extend the base method to delete all cookie jars for this HttpProxy
 
 =cut
 
 sub purge {
+    my $self = shift;
+    my $id      = $self->getId;
+    my $session = $self->session;
+    my @storageIds = $session->db->buildArray("select cookieJarStorageId from HttpProxy where assetId=?",[$id]);
+    my $success    = $self->SUPER::purge;
+    return 0 unless $success;
+    foreach my $storageId (@storageIds) {
+        my $storage = WebGUI::Storage->get($session, $storageId);
+        $storage->delete if defined $storage;
+    }
+    return 1;
+}
+
+#-------------------------------------------------------------------
+
+=head2 purgeRevision
+
+Extend the base method to delete the cookie jar for this revision.
+
+=cut
+
+sub purgeRevision {
 	my $self = shift;
 	$self->getCookieJar->delete;	
-	$self->SUPER::purge;
+	$self->SUPER::purgeRevision;
 }
 
 
@@ -277,8 +299,10 @@ See WebGUI::Asset::purgeCache() for details.
 
 sub purgeCache {
 	my $self = shift;
-	WebGUI::Cache->new($self->session,$self->get("proxiedUrl"),"URL")->delete;
-	WebGUI::Cache->new($self->session,$self->get("proxiedUrl"),"HEADER")->delete;
+    if (my $proxiedUrl = $self->get("proxiedUrl")) {
+        WebGUI::Cache->new($self->session,$proxiedUrl,"URL")->delete;
+        WebGUI::Cache->new($self->session,$proxiedUrl,"HEADER")->delete;
+    }
 	$self->SUPER::purgeCache;
 }
 

@@ -687,8 +687,9 @@ sub www_deleteMessages {
 
     my @messages = $session->form->process("message","checkList");
 
-    foreach my $messageId (@messages) {
+    MESSAGE: foreach my $messageId (@messages) {
         my $message = WebGUI::Inbox::Message->new($session, $messageId);
+        next MESSAGE unless $message;
         $message->delete;
     }
 
@@ -938,7 +939,7 @@ sub www_inviteUserSave {
         ##Create the invitation url for each individual invitation
         my $inviteId = $session->id->generate();
         $var->{'url'}
-            = $session->url->append( $session->url->getSiteURL, 'op=auth;method=createAccount;code=' . $inviteId );
+            = $session->url->append( $session->url->getSiteURL . $session->url->gateway, 'op=auth;method=createAccount;code=' . $inviteId );
 
         ##Create the invitation record.
         my $now = WebGUI::DateTime->new( $session, DateTime->now->set_time_zone('UTC')->epoch )->toMysqlDate;
@@ -1365,7 +1366,7 @@ sub www_sendMessageSave {
                     fromUsername => $fromUser->username,
                     subject      => $messageProperties->{subject},
                     message      => $messageProperties->{message},
-                    inboxLink    => $session->url->append($session->url->getSiteURL, 'op=account;module=inbox'),
+                    inboxLink    => $session->url->append($session->url->getSiteURL . $session->url->gateway, 'op=account;module=inbox'),
                 };
                 ##Fill in template
                 my $output = $smsNotificationTemplate->process($var);
@@ -1398,7 +1399,7 @@ sub www_sendMessageSave {
                         fromUsername => $fromUser->username,
                         subject      => $messageProperties->{subject},
                         message      => $messageProperties->{message},
-                        inboxLink    => $session->url->append($session->url->getSiteURL, 'op=account;module=inbox'),
+                        inboxLink    => $session->url->append($session->url->getSiteURL . $session->url->gateway, 'op=account;module=inbox'),
                     };
                     ##Fill in template
                     my $output = $template->process($var);

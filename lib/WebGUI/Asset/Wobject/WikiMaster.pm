@@ -998,7 +998,7 @@ sub www_search {
 		$search->search({ keywords => $queryString,
 				  lineage => [$self->get('lineage')],
 				  classes => ['WebGUI::Asset::WikiPage'] });
-		my $rs = $search->getPaginatorResultSet($self->getUrl("func=search;query=".$queryString));
+		my $rs = $search->getPaginatorResultSet($self->getUrl("func=search;query=".$self->session->url->escape($queryString)));
 		$rs->appendTemplateVars($var);
 		my @results = ();
 		foreach my $row (@{$rs->getPageData}) {

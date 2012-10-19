@@ -96,7 +96,7 @@ sub process {
         }
 
 	my $action;
-        if ($session->setting->get("encryptLogin")) {
+        if ($session->config->get('sslEnabled') && $session->setting->get("encryptLogin")) {
                 my $uri = URI->new($session->url->page(undef,1));
                 $uri->scheme('https');
                 $uri->host_port($uri->host);

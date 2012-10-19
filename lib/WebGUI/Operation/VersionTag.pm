@@ -582,7 +582,7 @@ sub www_managePendingVersions {
 	$ac->addSubmenuItem($session->url->page('op=manageCommittedVersions'), $i18n->get("manage committed versions")) if canView($session);
         my $output = '<table width="100%" class="content">
         <tr><th>'.$i18n->get("version tag name").'</th></tr> ';
-        my $sth = $session->db->read("select tagId,name,commitDate,committedBy from assetVersionTag where isCommitted=0 and isLocked=1");
+        my $sth = $session->db->read("select tagId,name from assetVersionTag where isCommitted=0 and isLocked=1");
         while (my ($id,$name) = $sth->array) {
                 $output .= '<tr>
 			<td><a href="'.$session->url->page("op=manageRevisionsInTag;tagId=".$id).'">'.$name.'</a></td>
@@ -613,8 +613,8 @@ sub www_manageVersions {
 	my $i18n = WebGUI::International->new($session,"VersionTag");
     my ($icon, $url, $datetime, $user) = $session->quick(qw(icon url datetime user));
 	$ac->addSubmenuItem($url->page('op=editVersionTag'), $i18n->get("add a version tag"));
-	$ac->addSubmenuItem($url->page('op=managePendingVersions'), $i18n->get("manage pending versions")) if canView($session);
-	$ac->addSubmenuItem($url->page('op=manageCommittedVersions'), $i18n->get("manage committed versions")) if canView($session);
+	$ac->addSubmenuItem($url->page('op=managePendingVersions'), $i18n->get("manage pending versions"));
+	$ac->addSubmenuItem($url->page('op=manageCommittedVersions'), $i18n->get("manage committed versions"));
 	my ($tag,$workingTagId) = $session->db->quickArray("select name,tagId from assetVersionTag where tagId=?",[$session->scratch->get("versionTag")]);
 	$tag ||= "None";
 	my $rollback = $i18n->get("rollback");
@@ -630,9 +630,7 @@ sub www_manageVersions {
 		my $u = WebGUI::User->new($session,$tag->get("createdBy"));
 		$output .= '<tr>
 			<td>';
-        if (canView($session)) {
-				$output .= $icon->delete("op=rollbackVersionTag;tagId=".$tag->getId,undef,$rollbackPrompt);
-        }
+        $output .= $icon->delete("op=rollbackVersionTag;tagId=".$tag->getId,undef,$rollbackPrompt);
         $output .= $icon->edit("op=editVersionTag;tagId=".$tag->getId)
 			.'</td>
 			<td><a href="'.$url->page("op=manageRevisionsInTag;tagId=".$tag->getId).'">'.$tag->get("name").'</a></td>
@@ -691,7 +689,7 @@ sub www_manageRevisionsInTag {
                 sprintf $html, 
                     $i18n->get( "error permission www_manageRevisionsInTag title" ),
                     $i18n->get( "error permission www_manageRevisionsInTag body" ),
-                    $session->url->getSiteURL,
+                    $session->url->getSiteURL . $session->url->gateway,
                     $i18n->get( "back to site" ),
                 );
         }

@@ -527,11 +527,18 @@ sub friends {
     my $self = shift;
     my $myFriends;
 
+    # did another copy of this object just get a friends group?
+    $self->{_user}{friendsGroup} ||= $self->session->db->quickScalar(qq{
+        select friendsGroup from users where userId = ? 
+    }, [
+        $self->getId,
+    ]);
+
     # If the user already has a friend group fetch it.
-    if ( $self->{_user}{"friendsGroup"} ne "" ) {
+    if ( $self->{_user}{friendsGroup} ) {
         if ( ! exists $self->{_friendsGroup} ) {
             # Friends group is not in cache, so instantiate and cache it.
-            $myFriends = WebGUI::Group->new($self->session, $self->{_user}{"friendsGroup"});
+            $myFriends = WebGUI::Group->new($self->session, $self->{_user}{friendsGroup});
             $self->{_friendsGroup} = $myFriends;
         }
         else {
