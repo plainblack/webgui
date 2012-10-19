@@ -2,9 +2,10 @@ use strict;
 
 my $webguiRoot = '/data/WebGUI';
 
-@INC = grep { $_ ne q{.} } @INC;
+#@INC = grep { $_ ne q{.} } @INC;
 
 unshift @INC, "$webguiRoot/lib";
+unshift @INC, "$webguiRoot/lib/plebgui_mock";
 
 # add custom lib directories to library search path
 unshift @INC, grep {
@@ -43,7 +44,8 @@ WebGUI::Config->loadAllConfigs($webguiRoot);
 #----------------------------------------
 # WebGUI::Fork initialization
 #----------------------------------------
-WebGUI::Fork->init();
+# Initialize this in the psgi
+#WebGUI::Fork->init();
 
 #----------------------------------------
 # Logger
@@ -58,9 +60,9 @@ Log::Log4perl->init( $webguiRoot."/etc/log.conf" );
 require DBI;
 DBI->install_driver("mysql"); # Change to match your database driver.
 
-require APR::Request::Apache2;
-require Apache2::Cookie;
-require Apache2::ServerUtil;
+#require APR::Request::Apache2;
+#require Apache2::Cookie;
+#require Apache2::ServerUtil;
 
 if ( $ENV{MOD_PERL} ) {
     # Add WebGUI to Apache version tokens
