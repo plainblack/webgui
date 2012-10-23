@@ -437,7 +437,7 @@ our $I18N = {
         lastUpdated => 0,
     },
 
-    'photoWidth' => {
+    'photoHeight' => {
         message => q|The height of slides, set in the Story Archive for this Story.|,
         context => q|Template variable|,
         lastUpdated => 0,
