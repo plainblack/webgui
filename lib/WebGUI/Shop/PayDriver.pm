@@ -27,7 +27,7 @@ use WebGUI::Macro;
 use WebGUI::User;
 use WebGUI::Shop::Cart;
 use JSON;
-use Clone qw/clone/;
+use Storable qw/dclone/;
 use Scalar::Util qw/blessed/;
 
 =head1 NAME
@@ -708,7 +708,7 @@ sub update {
         $jsonOptions,
         $self->paymentGatewayId
     ]);
-    my $storedProperties = clone $properties;
+    my $storedProperties = dclone $properties;
     $options{ id $self } = $storedProperties;
 
     return;

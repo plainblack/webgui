@@ -9,7 +9,7 @@ use lib "$FindBin::Bin/../../../lib";
 use Test::More;
 use Test::Deep;
 use Data::Dumper;
-use Clone qw/clone/;
+use Storable qw/dclone/;
 use WebGUI::Test;    # Must use this before any other WebGUI modules
 use WebGUI::Session;
 WebGUI::Error->Trace(1);    # Turn on tracing of uncaught Exception::Class exceptions
@@ -52,7 +52,7 @@ ok exists $asset_data->{question_types}->{toes}, 'the toes type in a question ty
     explain $asset_data;
 ok !exists $asset_data->{question_types}->{name}, 'name question not in question types';
 
-$asset_data->{question_types}->{fingers} = clone $asset_data->{question_types}->{toes};
+$asset_data->{question_types}->{fingers} = $asset_data->{question_types}->{toes};
 
 $survey->importAssetCollateralData($asset_data);
 

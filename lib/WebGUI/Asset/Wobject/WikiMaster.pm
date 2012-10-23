@@ -24,7 +24,7 @@ use HTML::Parser;
 use URI::Escape;
 use WebGUI::Form;
 use WebGUI::Search;
-use Clone qw/clone/;
+use Storable qw/dclone/;
 
 #-------------------------------------------------------------------
 
@@ -618,7 +618,7 @@ sub getKeywordVariables {
     my $variables = [];
 
     KEYWORD: foreach my $member (@{ $hierarchy }) {
-        my $varBlock             = clone $member;
+        my $varBlock             = dclone $member;
         $varBlock->{level}       = $level;
         $varBlock->{isTopLevel}  = $level == 0;
         $varBlock->{indent_loop} = [ map { { indent => $_ } } 1..$level ];

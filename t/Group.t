@@ -396,7 +396,7 @@ cmp_ok($expirationDate-time(), '>', 50, 'checking expire offset override on addU
 
 $session->db->dbh->do('DROP TABLE IF EXISTS myUserTable');
 WebGUI::Test->addToCleanup(SQL => 'DROP TABLE IF EXISTS myUserTable');
-$session->db->dbh->do(q!CREATE TABLE myUserTable (userId CHAR(22) binary NOT NULL default '', PRIMARY KEY(userId)) TYPE=InnoDB!);
+$session->db->dbh->do(q!CREATE TABLE myUserTable (userId CHAR(22) binary NOT NULL default '', PRIMARY KEY(userId)) ENGINE=InnoDB!);
 
 my $sth = $session->db->prepare('INSERT INTO myUserTable VALUES(?)');
 foreach my $mob (@mob) {

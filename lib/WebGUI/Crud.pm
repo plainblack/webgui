@@ -20,7 +20,7 @@ use strict;
 use Class::InsideOut qw(readonly private id register);
 use JSON;
 use Tie::IxHash;
-use Clone qw/clone/;
+use Storable qw/dclone/;
 use WebGUI::DateTime;
 use WebGUI::Exception;
 use WebGUI::Utility;
@@ -579,11 +579,16 @@ sub get {
 
 	# return a specific property
 	if (defined $name) {
-		return clone $objectData{id $self}{$name};
+        if (ref $objectData{id $self}{$name}) {
+            return dclone $objectData{id $self}{$name};
+        }
+        else {
+            return $objectData{id $self}{$name};
+        }
 	}
 
 	# return a copy of all properties
-	return clone $objectData{id $self};
+	return dclone $objectData{id $self};
 }
 
 #-------------------------------------------------------------------

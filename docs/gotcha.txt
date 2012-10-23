@@ -7,6 +7,12 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+7.10.27
+--------------------------------------------------------------------
+    * Due to instability in the Clone module, WebGUI is now using Storable's
+      dclone instead.  Storable is a core Perl module, so you do not need
+      to install anything new.
+
 7.10.25
 --------------------------------------------------------------------
     * Custom WebGUI plugins written using WebGUI::Crud with hand built forms

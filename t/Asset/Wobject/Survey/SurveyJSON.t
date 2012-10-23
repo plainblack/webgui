@@ -13,7 +13,7 @@ use Data::Dumper;
 use WebGUI::Test;    # Must use this before any other WebGUI modules
 use WebGUI::Session;
 use JSON;
-use Clone qw/clone/;
+use Storable qw/dclone/;
 
 #----------------------------------------------------------------------------
 # Init
@@ -2112,13 +2112,13 @@ sub buildSectionSkeleton {
     my $sections = [];
     my ($bareSection, $bareQuestion, $bareAnswer) = getBareSkeletons();
     foreach my $questionSpec ( @{ $spec } ) {
-        my $section = clone $bareSection;
+        my $section = dclone $bareSection;
         push @{ $sections }, $section;
         foreach my $answers ( @{$questionSpec} ) {
-            my $question = clone $bareQuestion;
+            my $question = dclone $bareQuestion;
             push @{ $section->{questions} }, $question;
             while ($answers-- > 0) {
-                my $answer = clone $bareAnswer;
+                my $answer = dclone $bareAnswer;
                 push @{ $question->{answers} }, $answer;
             }
         }

@@ -18,7 +18,7 @@ use WebGUI::Asset;
 
 use Test::More;
 use Test::Deep;
-use Clone qw/clone/;
+use Storable qw/dclone/;
 
 plan tests => 1;
 
@@ -39,7 +39,7 @@ my $templateMock = Test::MockObject->new({});
 $templateMock->set_isa('WebGUI::Asset::Template');
 $templateMock->set_always('getId', $templateId);
 my $templateVars;
-$templateMock->mock('process', sub { $templateVars = clone($_[1]); } );
+$templateMock->mock('process', sub { $templateVars = dclone($_[1]); } );
 
 {
     WebGUI::Test->mockAssetId($templateId, $templateMock);

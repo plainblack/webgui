@@ -23,7 +23,7 @@ use WebGUI::Form;
 use WebGUI::Exception;
 use List::MoreUtils qw{ any };
 use Tie::IxHash;
-use Clone qw/clone/;
+use Storable qw/dclone/;
 use HTML::Packer;
 use JSON qw{ to_json from_json };
 use Try::Tiny;
@@ -914,8 +914,8 @@ on this being here.
 
 sub update {
     my $self = shift;
-    my $requestedProperties = shift;
-    my $properties = clone($requestedProperties);
+    my $requestedProperties = shift || {};
+    my $properties = dclone($requestedProperties);
 
     if (exists $properties->{headBlock}) {
         $properties->{extraHeadTags} .= $properties->{headBlock};

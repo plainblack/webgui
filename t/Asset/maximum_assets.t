@@ -18,7 +18,7 @@ use WebGUI::Asset;
 
 use Test::More;
 use Test::Deep;
-use Clone qw/clone/;
+use Storable qw/dclone/;
 
 plan tests => 1;
 
@@ -37,7 +37,7 @@ my $templateMock = Test::MockObject->new({});
 $templateMock->set_isa('WebGUI::Asset::Template');
 $templateMock->set_always('getId', $templateId);
 my $templateVars;
-$templateMock->mock('process', sub { $templateVars = clone($_[1]); } );
+$templateMock->mock('process', sub { $templateVars = dclone($_[1]); } );
 $session->setting->set('userFunctionStyleId', $templateId);
 
 ##Have to have a user who can add assets to the root node

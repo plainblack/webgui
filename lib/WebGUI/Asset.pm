@@ -16,7 +16,7 @@ package WebGUI::Asset;
 
 use Carp qw( croak confess );
 use Scalar::Util qw( blessed weaken );
-use Clone qw(clone);
+use Storable qw/dclone/;
 use JSON;
 use HTML::Packer;
 
@@ -2721,7 +2721,7 @@ to set the keywords for this asset.
 sub update {
 	my $self = shift;
 	my $requestedProperties = shift;
-    my $properties = clone($requestedProperties);
+    my $properties = dclone($requestedProperties);
 	$properties->{lastModified} = time();
 	
     # if keywords were specified, then let's set them the right way

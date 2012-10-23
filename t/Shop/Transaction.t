@@ -23,7 +23,7 @@ use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
 use WebGUI::Shop::Transaction;
 use WebGUI::Inbox;
-use Clone qw/clone/;
+use Storable qw/dclone/;
 
 #----------------------------------------------------------------------------
 # Init
@@ -269,7 +269,7 @@ my $templateMock = Test::MockObject->new({});
 $templateMock->set_isa('WebGUI::Asset::Template');
 $templateMock->set_always('getId', $templateId);
 my @templateVars;
-$templateMock->mock('process', sub { push @templateVars, clone $_[1]; } );
+$templateMock->mock('process', sub { push @templateVars, dclone $_[1]; } );
 
 $session->setting->set('shopReceiptEmailTemplateId', $templateId);
 

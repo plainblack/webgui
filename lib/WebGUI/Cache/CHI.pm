@@ -3,7 +3,7 @@ package WebGUI::Cache::CHI;
 use strict;
 use base 'WebGUI::Cache';
 use File::Temp qw/tempdir/;
-use Clone qw/clone/;
+use Storable qw/dclone/;
 use CHI;
 
 =head1 NAME
@@ -93,7 +93,7 @@ sub new {
     # Create CHI object from config
     my $chi;
     unless ( $chi = $session->stow->get( "CHI" ) ) {
-        my $cacheConf    = clone $session->config->get('cache');
+        my $cacheConf    = dclone $session->config->get('cache');
         $cacheConf->{namespace}     = $namespace;
         $cacheConf->{is_size_aware} = 1;
 

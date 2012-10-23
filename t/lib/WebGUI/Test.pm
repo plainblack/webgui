@@ -29,7 +29,7 @@ use base qw(Test::Builder::Module);
 use Test::MockObject;
 use Test::MockObject::Extends;
 use Log::Log4perl;  # load early to ensure proper order of END blocks
-use Clone               qw(clone);
+use Storable            qw(dclone);
 use File::Basename      qw(dirname fileparse);
 use File::Spec::Functions qw(abs2rel rel2abs catdir catfile updir);
 use IO::Handle          ();
@@ -108,7 +108,7 @@ sub import {
 sub _initSession {
     my $session = our $SESSION = $CLASS->newSession(1);
 
-    my $originalSetting = clone $session->setting->get;
+    my $originalSetting = dclone $session->setting->get;
     $CLASS->addToCleanup(sub {
         while (my ($param, $value) = each %{ $originalSetting }) {
             $session->setting->set($param, $value);
@@ -612,7 +612,7 @@ sub originalConfig {
     my ($class, $param) = @_;
     my $safeValue = my $value = $CLASS->session->config->get($param);
     if (ref $value) {
-        $safeValue = clone $value;
+        $safeValue = dclone $value;
     }
     # add cleanup handler if this is the first time we were run
     if (! keys %originalConfig) {

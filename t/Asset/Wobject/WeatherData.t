@@ -19,7 +19,7 @@ use strict;
 use lib "$FindBin::Bin/../../lib";
 use Test::More;
 use Test::Deep;
-use Clone qw/clone/;
+use Storable qw/dclone/;
 
 use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
@@ -64,7 +64,7 @@ my $templateMock = Test::MockObject->new({});
 $templateMock->set_isa('WebGUI::Asset::Template');
 $templateMock->set_always('getId', $templateId);
 my $templateVars;
-$templateMock->mock('process', sub { $templateVars = clone $_[1]; } );
+$templateMock->mock('process', sub { $templateVars = dclone $_[1]; } );
 
 my $asset  = $node->addChild( {
     className     => 'WebGUI::Asset::Wobject::WeatherData',

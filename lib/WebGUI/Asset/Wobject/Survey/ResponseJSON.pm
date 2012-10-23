@@ -45,7 +45,7 @@ use strict;
 use JSON;
 use Params::Validate qw(:all);
 use List::Util qw(shuffle);
-use Clone qw/clone/;
+use Storable qw/dclone/;
 use Safe;
 use WebGUI::Asset::Wobject::Survey::ExpressionEngine;
 Params::Validate::validation_options( on_fail => sub { WebGUI::Error::InvalidParam->throw( error => shift ) } );
@@ -368,7 +368,12 @@ sub surveyOrderIndex {
     if ($variable) {
         return $self->response->{surveyOrderLookup}{$variable};
     } else {
-        return clone $self->response->{surveyOrderLookup};
+        if (ref $self->response->{surveyOrderLookup}) {
+            return dclone $self->response->{surveyOrderLookup};
+        }
+        else {
+            return {};
+        }
     }
 }
 
@@ -1465,7 +1470,10 @@ sub responseReport {
             my $answer = $self->survey->answer( [ $sIndex, $qIndex, $aIndex ] );
 
             # Massage each answer response and push it onto the list
-            if ( my $response = clone $self->responses->{$answerId} ) {
+            if ( my $response = $self->responses->{$answerId} ) {
+                if (ref $response) {
+                    $response = dclone $response;
+                }
                 $response->{isCorrect} = $answer->{isCorrect} ? 1 : 0;
                 $response->{id} = $aIndex;
                 $response->{score} = $answer->{value};    # N.B. answer score is consistently misnamed 'value'

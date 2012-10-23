@@ -50,7 +50,7 @@ use strict;
 use JSON;
 use Params::Validate qw(:all);
 Params::Validate::validation_options( on_fail => sub { WebGUI::Error::InvalidParam->throw( error => shift ) } );
-use Clone qw/clone/;
+use Storable qw/dclone/;
 use WebGUI::Asset::Wobject::Survey::ExpressionEngine;
 
 # The maximum value of questionsPerPage is currently hardcoded here
@@ -407,13 +407,13 @@ sub getObject {
     return if !$count;
 
     if ( $count == 1 ) {
-        return clone $self->sections->[ sIndex($address) ];
+        return dclone $self->sections->[ sIndex($address) ];
     }
     elsif ( $count == 2 ) {
-        return clone $self->sections->[ sIndex($address) ]->{questions}->[ qIndex($address) ];
+        return dclone $self->sections->[ sIndex($address) ]->{questions}->[ qIndex($address) ];
     }
     else {
-        return clone $self->sections->[ sIndex($address) ]->{questions}->[ qIndex($address) ]->{answers}
+        return dclone $self->sections->[ sIndex($address) ]->{questions}->[ qIndex($address) ]->{answers}
             ->[ aIndex($address) ];
     }
 }
@@ -950,21 +950,21 @@ sub copy {
 
     if ( $count == 1 ) {
         # Clone the indexed section onto the end of the list of sections..
-        push @{ $self->{_sections} }, clone $self->section($address);
+        push @{ $self->{_sections} }, dclone $self->section($address);
 
         # Update $address with the index of the newly created section
         $address->[0] = $self->lastSectionIndex;
     }
     elsif ( $count == 2 ) {
         # Clone the indexed question onto the end of the list of questions..
-        push @{ $self->section($address)->{questions} }, clone $self->question($address);
+        push @{ $self->section($address)->{questions} }, dclone $self->question($address);
 
         # Update $address with the index of the newly created question
         $address->[1] = $self->lastQuestionIndex($address);
     }
     elsif ( $count == 3 ) {
         # Clone the indexed answer onto the end of the list of answers..
-        push @{ $self->question($address)->{answers} }, clone $self->answer($address);
+        push @{ $self->question($address)->{answers} }, dclone $self->answer($address);
 
         # Update $address with the index of the newly created answer
         $address->[2]++;
@@ -1194,7 +1194,10 @@ sub getMultiChoiceBundle {
     my ($type) = validate_pos( @_, { type => SCALAR | UNDEF } );
 
     # Return a cloned copy of the bundle structure
-    return clone $self->{multipleChoiceTypes}->{$type};
+    if ($self->{multipleChoiceTypes}->{$type}) {
+        return dclone $self->{multipleChoiceTypes}->{$type};
+    }
+    return undef;
 }
 
 =head2 addAnswersToQuestion ($address, $answers)

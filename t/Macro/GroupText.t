@@ -49,7 +49,7 @@ is($output, 'Group Not a Group was not found', 'Non-existant group returns an er
 
 ##Create a small database
 $session->db->dbh->do('DROP TABLE IF EXISTS myUserTable');
-$session->db->dbh->do(q!CREATE TABLE myUserTable (userId CHAR(22) binary NOT NULL default '', PRIMARY KEY(userId)) TYPE=InnoDB!);
+$session->db->dbh->do(q!CREATE TABLE myUserTable (userId CHAR(22) binary NOT NULL default '', PRIMARY KEY(userId)) Engine=InnoDB!);
 WebGUI::Test->addToCleanup(SQL => 'DROP TABLE IF EXISTS myUserTable');
 
 ##Create a bunch of users and put them in the table.
