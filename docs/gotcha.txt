@@ -13,6 +13,8 @@ save you many hours of grief.
       dclone instead.  Storable is a core Perl module, so you do not need
       to install anything new.
 
+    * YUI has been upgraded to 2.9.0 in this release.
+
 7.10.25
 --------------------------------------------------------------------
     * Custom WebGUI plugins written using WebGUI::Crud with hand built forms

@@ -16,7 +16,7 @@
 <div id="doc3" class="yui-t2">
 	<div id="hd">
         <h1><a href="http://developer.yahoo.com/yui/" title="Yahoo! UI Library">Yahoo! UI Library</a></h1>
-        <h3>Storage&nbsp; <span class="subtitle">2.8.0r4</span></h3>
+        <h3>Storage&nbsp; <span class="subtitle">2.9.0</span></h3>
         <a href="./index.html" title="Yahoo! UI Library">Yahoo! UI Library</a> 
             &gt; <a href="./module_storage.html" title="Storage">Storage</a>
                  &gt; YAHOO.util.Storage 
@@ -72,23 +72,23 @@
   
                                         
                                                 
-                                                location
+                                                sLocation
 
                                                 , 
-                                                conf
+                                                oConf
                                     )
                                 </code>
                                 <div class="description">
                                         <dl rel="yui:parameters">
                                             <dt>Parameters:</dt>
                                                 <dd rel="yui:parameter">
-                                                    <code><span property="yui:name">location</span>
+                                                    <code><span property="yui:name">sLocation</span>
                                                     &lt;<span property="yui:type">String</span>&gt;
                                                     </code>
                                                     <span property="yui:description">  Required. The storage location.</span>
                                                 </dd>
                                                 <dd rel="yui:parameter">
-                                                    <code><span property="yui:name">conf</span>
+                                                    <code><span property="yui:name">oConf</span>
                                                     &lt;<span property="yui:type">Object</span>&gt;
                                                     </code>
                                                     <span property="yui:description">  Required. A configuration object.</span>
@@ -180,21 +180,6 @@
 
                                     <hr />
                                     </div>
-                                    <div class="" rel="yui:property" resource="#property_DELIMITER">
-                                    <h4><a name="property_DELIMITER" property="yui:name">DELIMITER</a>
-                                        - <code><span property="yui:type">{String}</span></code>
-                                    </h4>
-                                    <div class="detail">
-                                        <div class="description" property="yui:description">
-                                            The delimiter uesed between the data type and the data.
-                                        </div>
-                                    </div>
-     
-                                        
-
-
-                                    <hr />
-                                    </div>
                                     <div class="protected" rel="yui:property" resource="#property_isReady">
                                     <h4><a name="property_isReady" property="yui:name">isReady</a>
                                         - <code>protected <span property="yui:type">{String}</span></code>
@@ -255,13 +240,6 @@
                                         <div class="description">
 
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        void
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
-                                                </dl>
 
 
              
@@ -284,7 +262,7 @@
                                            (
                                                 
                                                         
-                                                         s
+                                                         o
                                                     
                                                 
                                             )
@@ -299,20 +277,13 @@
                                                 <dl rel="yui:parameters">
                                                     <dt>Parameters:</dt>
                                                         <dd rel="yui:parameter">
-                                                        <code><span property="yui:name">s</span>
+                                                        <code><span property="yui:name">o</span>
                                                         &lt;<span property="yui:type">Object</span>&gt;
                                                         </code>
                                                         <span property="yui:description">  Required. An object to store.</span>
                                                         </dd>
                                                 </dl>
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        void
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
-                                                </dl>
 
 
              
@@ -335,7 +306,7 @@
                                            (
                                                 
                                                         
-                                                         key
+                                                         sKey
                                                     
                                                 
                                             )
@@ -350,7 +321,7 @@
                                                 <dl rel="yui:parameters">
                                                     <dt>Parameters:</dt>
                                                         <dd rel="yui:parameter">
-                                                        <code><span property="yui:name">key</span>
+                                                        <code><span property="yui:name">sKey</span>
                                                         &lt;<span property="yui:type">String</span>&gt;
                                                         </code>
                                                         <span property="yui:description">  Required. The key used to reference this value.</span>
@@ -360,7 +331,7 @@
                                                 <dl>
                                                     <dt>Returns:
                                                     <code property="yui:return">
-                                                        String|NULL
+                                                            String|NULL
                                                     </code></dt>
                                                     <dd property="yui:returnInfo">The value stored at the provided key.</dd>
                                                 </dl>
@@ -408,13 +379,6 @@
                                                         </dd>
                                                 </dl>
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        void
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
-                                                </dl>
 
 
              
@@ -437,7 +401,7 @@
                                            (
                                                 
                                                         
-                                                         index
+                                                         nIndex
                                                     
                                                 
                                             )
@@ -452,7 +416,7 @@
                                                 <dl rel="yui:parameters">
                                                     <dt>Parameters:</dt>
                                                         <dd rel="yui:parameter">
-                                                        <code><span property="yui:name">index</span>
+                                                        <code><span property="yui:name">nIndex</span>
                                                         &lt;<span property="yui:type">Number</span>&gt;
                                                         </code>
                                                         <span property="yui:description">  Required. The index to retrieve (unsigned long in HTML 5 spec).</span>
@@ -462,7 +426,7 @@
                                                 <dl>
                                                     <dt>Returns:
                                                     <code property="yui:return">
-                                                        String|NULL
+                                                            String|NULL
                                                     </code></dt>
                                                     <dd property="yui:returnInfo">Required. The key at the provided index (DOMString in HTML 5 spec).</dd>
                                                 </dl>
@@ -488,7 +452,7 @@
                                            (
                                                 
                                                         
-                                                         key
+                                                         sKey
                                                     
                                                 
                                             )
@@ -503,20 +467,13 @@
                                                 <dl rel="yui:parameters">
                                                     <dt>Parameters:</dt>
                                                         <dd rel="yui:parameter">
-                                                        <code><span property="yui:name">key</span>
+                                                        <code><span property="yui:name">sKey</span>
                                                         &lt;<span property="yui:type">String</span>&gt;
                                                         </code>
                                                         <span property="yui:description">  Required. The key to remove.</span>
                                                         </dd>
                                                 </dl>
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        void
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
-                                                </dl>
 
 
              
@@ -539,11 +496,11 @@
                                            (
                                                 
                                                         
-                                                         key
+                                                         sKey
                                                     
                                                 
                                                         , 
-                                                         data
+                                                         oData
                                                     
                                                 
                                             )
@@ -558,13 +515,13 @@
                                                 <dl rel="yui:parameters">
                                                     <dt>Parameters:</dt>
                                                         <dd rel="yui:parameter">
-                                                        <code><span property="yui:name">key</span>
+                                                        <code><span property="yui:name">sKey</span>
                                                         &lt;<span property="yui:type">String</span>&gt;
                                                         </code>
                                                         <span property="yui:description">  Required. The key used to reference this value.</span>
                                                         </dd>
                                                         <dd rel="yui:parameter">
-                                                        <code><span property="yui:name">data</span>
+                                                        <code><span property="yui:name">oData</span>
                                                         &lt;<span property="yui:type">Object</span>&gt;
                                                         </code>
                                                         <span property="yui:description">  Required. The data to storage at key.</span>
@@ -574,7 +531,7 @@
                                                 <dl>
                                                     <dt>Returns:
                                                     <code property="yui:return">
-                                                        Boolean
+                                                            Boolean
                                                     </code></dt>
                                                     <dd property="yui:returnInfo">True when successful, false when size QUOTA exceeded.</dd>
                                                 </dl>
@@ -608,13 +565,6 @@
                                         <div class="description">
 
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        void
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
-                                                </dl>
 
 
              
@@ -637,7 +587,7 @@
                                            (
                                                 
                                                         
-                                                         key
+                                                         sKey
                                                     
                                                 
                                             )
@@ -652,7 +602,7 @@
                                                 <dl rel="yui:parameters">
                                                     <dt>Parameters:</dt>
                                                         <dd rel="yui:parameter">
-                                                        <code><span property="yui:name">key</span>
+                                                        <code><span property="yui:name">sKey</span>
                                                         &lt;<span property="yui:type">String</span>&gt;
                                                         </code>
                                                         <span property="yui:description">  Required. The key used to reference this value (DOMString in HTML 5 spec).</span>
@@ -662,7 +612,7 @@
                                                 <dl>
                                                     <dt>Returns:
                                                     <code property="yui:return">
-                                                        String|NULL
+                                                            String|NULL
                                                     </code></dt>
                                                     <dd property="yui:returnInfo">The value stored at the provided key (DOMString in HTML 5 spec).</dd>
                                                 </dl>
@@ -699,7 +649,7 @@
                                                 <dl>
                                                     <dt>Returns:
                                                     <code property="yui:return">
-                                                        String
+                                                            String
                                                     </code></dt>
                                                     <dd property="yui:returnInfo">The name of the data storage object.</dd>
                                                 </dl>
@@ -725,7 +675,7 @@
                                            (
                                                 
                                                         
-                                                         key
+                                                         sKey
                                                     
                                                 
                                             )
@@ -740,7 +690,7 @@
                                                 <dl rel="yui:parameters">
                                                     <dt>Parameters:</dt>
                                                         <dd rel="yui:parameter">
-                                                        <code><span property="yui:name">key</span>
+                                                        <code><span property="yui:name">sKey</span>
                                                         &lt;<span property="yui:type">String</span>&gt;
                                                         </code>
                                                         <span property="yui:description">  Required. The key to search for.</span>
@@ -750,7 +700,7 @@
                                                 <dl>
                                                     <dt>Returns:
                                                     <code property="yui:return">
-                                                        Boolean
+                                                            Boolean
                                                     </code></dt>
                                                     <dd property="yui:returnInfo">True when key has been set.</dd>
                                                 </dl>
@@ -776,7 +726,7 @@
                                            (
                                                 
                                                         
-                                                         index
+                                                         nIndex
                                                     
                                                 
                                             )
@@ -791,7 +741,7 @@
                                                 <dl rel="yui:parameters">
                                                     <dt>Parameters:</dt>
                                                         <dd rel="yui:parameter">
-                                                        <code><span property="yui:name">index</span>
+                                                        <code><span property="yui:name">nIndex</span>
                                                         &lt;<span property="yui:type">Number</span>&gt;
                                                         </code>
                                                         <span property="yui:description">  Required. The index to retrieve (unsigned long in HTML 5 spec).</span>
@@ -801,10 +751,54 @@
                                                 <dl>
                                                     <dt>Returns:
                                                     <code property="yui:return">
-                                                        String
+                                                            String
                                                     </code></dt>
                                                     <dd property="yui:returnInfo">Required. The key at the provided index (DOMString in HTML 5 spec).</dd>
                                                 </dl>
+
+
+             
+
+                                        </div>
+
+                                    </div>
+                                    <hr />
+                                    </div>
+                                    <div class="" rel="yui:method" resource="#method_removeItem">
+                                    <h4>
+                                        <a name="method_removeItem">removeItem</a></h4>
+                                    <div class="detail" >
+                                        <code>
+                                        
+                                        
+                                        
+                                        void
+                                            <strong property="yui:name">removeItem</strong>
+                                           (
+                                                
+                                                        
+                                                         sKey
+                                                    
+                                                
+                                            )
+                                        </code>
+                                        
+                                        <div class="description" property="yui:description">
+                                            Remove an item from the data storage.
+                                        </div>
+
+                                        <div class="description">
+
+                                                <dl rel="yui:parameters">
+                                                    <dt>Parameters:</dt>
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">sKey</span>
+                                                        &lt;<span property="yui:type">String</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description">  Required. The key to remove (DOMString in HTML 5 spec).</span>
+                                                        </dd>
+                                                </dl>
+
 
 
              
@@ -827,14 +821,18 @@
                                            (
                                                 
                                                         
-                                                         key
+                                                         sKey
+                                                    
+                                                
+                                                        , 
+                                                         oData
                                                     
                                                 
                                             )
                                         </code>
                                         
                                         <div class="description" property="yui:description">
-                                            Remove an item from the data storage.
+                                            Adds an item to the data storage.
                                         </div>
 
                                         <div class="description">
@@ -842,20 +840,19 @@
                                                 <dl rel="yui:parameters">
                                                     <dt>Parameters:</dt>
                                                         <dd rel="yui:parameter">
-                                                        <code><span property="yui:name">key</span>
+                                                        <code><span property="yui:name">sKey</span>
                                                         &lt;<span property="yui:type">String</span>&gt;
                                                         </code>
-                                                        <span property="yui:description">  Required. The key to remove (DOMString in HTML 5 spec).</span>
+                                                        <span property="yui:description">  Required. The key used to reference this value (DOMString in HTML 5 spec).</span>
+                                                        </dd>
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">oData</span>
+                                                        &lt;<span property="yui:type">Object</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description">  Required. The data to store at key (DOMString in HTML 5 spec).</span>
                                                         </dd>
                                                 </dl>
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        void
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
-                                                </dl>
 
 
              
@@ -973,7 +970,6 @@
                                 <li class="protected"><a href="#property__name" title="_name">_name</a></li>
                                 <li class=""><a href="#property_CE_CHANGE" title="CE_CHANGE">CE_CHANGE</a></li>
                                 <li class=""><a href="#property_CE_READY" title="CE_READY">CE_READY</a></li>
-                                <li class=""><a href="#property_DELIMITER" title="DELIMITER">DELIMITER</a></li>
                                 <li class="protected"><a href="#property_isReady" title="isReady">isReady</a></li>
                                 <li class=""><a href="#property_length" title="length">length</a></li>
                         </ul>
@@ -994,6 +990,7 @@
                                 <li class=""><a href="#method_getName" title="getName">getName</a></li>
                                 <li class=""><a href="#method_hasKey" title="hasKey">hasKey</a></li>
                                 <li class=""><a href="#method_key" title="key">key</a></li>
+                                <li class=""><a href="#method_removeItem" title="removeItem">removeItem</a></li>
                                 <li class=""><a href="#method_setItem" title="setItem">setItem</a></li>
                         </ul>
                     </div>
@@ -1005,11 +1002,12 @@
 	</div>
 	<div id="ft">
         <hr />
-        Copyright &copy; 2009 Yahoo! Inc. All rights reserved.
+        Copyright &copy; 2011 Yahoo! Inc. All rights reserved.
 	</div>
 </div>
 <script type="text/javascript">
-    ALL_YUI_PROPS = [{"access": "", "host": "YAHOO.util.Storage", "name": "CE_CHANGE", "url": "YAHOO.util.Storage.html#property_CE_CHANGE", "type": "property"}, {"access": "", "host": "YAHOO.util.Storage", "name": "CE_READY", "url": "YAHOO.util.Storage.html#property_CE_READY", "type": "property"}, {"access": "protected", "host": "YAHOO.util.Storage", "name": "_cfg", "url": "YAHOO.util.Storage.html#property__cfg", "type": "property"}, {"access": "protected", "host": "YAHOO.util.Storage", "name": "_clear", "url": "YAHOO.util.Storage.html#method__clear", "type": "method"}, {"access": "", "host": "YAHOO.util.Storage", "name": "clear", "url": "YAHOO.util.Storage.html#method_clear", "type": "method"}, {"access": "protected", "host": "YAHOO.util.Storage", "name": "_createValue", "url": "YAHOO.util.Storage.html#method__createValue", "type": "method"}, {"access": "", "host": "YAHOO.util.Storage", "name": "DELIMITER", "url": "YAHOO.util.Storage.html#property_DELIMITER", "type": "property"}, {"access": "", "host": "YAHOO.util.StorageManager", "name": "get", "url": "YAHOO.util.StorageManager.html#method_get", "type": "method"}, {"access": "private", "host": "YAHOO.util.StorageManager", "name": "_getClass", "url": "YAHOO.util.StorageManager.html#method__getClass", "type": "method"}, {"access": "protected", "host": "YAHOO.util.Storage", "name": "_getItem", "url": "YAHOO.util.Storage.html#method__getItem", "type": "method"}, {"access": "", "host": "YAHOO.util.Storage", "name": "getItem", "url": "YAHOO.util.Storage.html#method_getItem", "type": "method"}, {"access": "", "host": "YAHOO.util.Storage", "name": "getName", "url": "YAHOO.util.Storage.html#method_getName", "type": "method"}, {"access": "private", "host": "YAHOO.util.StorageManager", "name": "_getStorageEngine", "url": "YAHOO.util.StorageManager.html#method__getStorageEngine", "type": "method"}, {"access": "private", "host": "YAHOO.util.StorageManager", "name": "_getValidLocation", "url": "YAHOO.util.StorageManager.html#method__getValidLocation", "type": "method"}, {"access": "protected", "host": "YAHOO.util.Storage", "name": "_getValue", "url": "YAHOO.util.Storage.html#method__getValue", "type": "method"}, {"access": "", "host": "YAHOO.util.Storage", "name": "hasKey", "url": "YAHOO.util.Storage.html#method_hasKey", "type": "method"}, {"access": "protected", "host": "YAHOO.util.Storage", "name": "isReady", "url": "YAHOO.util.Storage.html#property_isReady", "type": "property"}, {"access": "protected", "host": "YAHOO.util.Storage", "name": "_key", "url": "YAHOO.util.Storage.html#method__key", "type": "method"}, {"access": "", "host": "YAHOO.util.Storage", "name": "key", "url": "YAHOO.util.Storage.html#method_key", "type": "method"}, {"access": "", "host": "YAHOO.util.Storage", "name": "length", "url": "YAHOO.util.Storage.html#property_length", "type": "property"}, {"access": "protected", "host": "YAHOO.util.Storage", "name": "_location", "url": "YAHOO.util.Storage.html#property__location", "type": "property"}, {"access": "", "host": "YAHOO.util.StorageManager", "name": "LOCATION_LOCAL", "url": "YAHOO.util.StorageManager.html#property_LOCATION_LOCAL", "type": "property"}, {"access": "", "host": "YAHOO.util.StorageManager", "name": "LOCATION_SESSION", "url": "YAHOO.util.StorageManager.html#property_LOCATION_SESSION", "type": "property"}, {"access": "protected", "host": "YAHOO.util.Storage", "name": "_name", "url": "YAHOO.util.Storage.html#property__name", "type": "property"}, {"access": "", "host": "YAHOO.util.StorageManager", "name": "register", "url": "YAHOO.util.StorageManager.html#method_register", "type": "method"}, {"access": "protected", "host": "YAHOO.util.Storage", "name": "_removeItem", "url": "YAHOO.util.Storage.html#method__removeItem", "type": "method"}, {"access": "protected", "host": "YAHOO.util.Storage", "name": "_setItem", "url": "YAHOO.util.Storage.html#method__setItem", "type": "method"}, {"access": "", "host": "YAHOO.util.Storage", "name": "setItem", "url": "YAHOO.util.Storage.html#method_setItem", "type": "method"}];
+
+    var ALL_YUI_PROPS = [{"access": "", "host": "YAHOO.util.Storage", "name": "CE_CHANGE", "url": "YAHOO.util.Storage.html#property_CE_CHANGE", "type": "property"}, {"access": "", "host": "YAHOO.util.Storage", "name": "CE_READY", "url": "YAHOO.util.Storage.html#property_CE_READY", "type": "property"}, {"access": "protected", "host": "YAHOO.util.Storage", "name": "_cfg", "url": "YAHOO.util.Storage.html#property__cfg", "type": "property"}, {"access": "protected", "host": "YAHOO.util.Storage", "name": "_clear", "url": "YAHOO.util.Storage.html#method__clear", "type": "method"}, {"access": "", "host": "YAHOO.util.Storage", "name": "clear", "url": "YAHOO.util.Storage.html#method_clear", "type": "method"}, {"access": "protected", "host": "YAHOO.util.Storage", "name": "_createValue", "url": "YAHOO.util.Storage.html#method__createValue", "type": "method"}, {"access": "protected", "host": "YAHOO.util.Storage", "name": "_getItem", "url": "YAHOO.util.Storage.html#method__getItem", "type": "method"}, {"access": "", "host": "YAHOO.util.Storage", "name": "getItem", "url": "YAHOO.util.Storage.html#method_getItem", "type": "method"}, {"access": "", "host": "YAHOO.util.Storage", "name": "getName", "url": "YAHOO.util.Storage.html#method_getName", "type": "method"}, {"access": "protected", "host": "YAHOO.util.Storage", "name": "_getValue", "url": "YAHOO.util.Storage.html#method__getValue", "type": "method"}, {"access": "", "host": "YAHOO.util.Storage", "name": "hasKey", "url": "YAHOO.util.Storage.html#method_hasKey", "type": "method"}, {"access": "protected", "host": "YAHOO.util.Storage", "name": "isReady", "url": "YAHOO.util.Storage.html#property_isReady", "type": "property"}, {"access": "protected", "host": "YAHOO.util.Storage", "name": "_key", "url": "YAHOO.util.Storage.html#method__key", "type": "method"}, {"access": "", "host": "YAHOO.util.Storage", "name": "key", "url": "YAHOO.util.Storage.html#method_key", "type": "method"}, {"access": "", "host": "YAHOO.util.Storage", "name": "length", "url": "YAHOO.util.Storage.html#property_length", "type": "property"}, {"access": "protected", "host": "YAHOO.util.Storage", "name": "_location", "url": "YAHOO.util.Storage.html#property__location", "type": "property"}, {"access": "protected", "host": "YAHOO.util.Storage", "name": "_name", "url": "YAHOO.util.Storage.html#property__name", "type": "property"}, {"access": "protected", "host": "YAHOO.util.Storage", "name": "_removeItem", "url": "YAHOO.util.Storage.html#method__removeItem", "type": "method"}, {"access": "", "host": "YAHOO.util.Storage", "name": "removeItem", "url": "YAHOO.util.Storage.html#method_removeItem", "type": "method"}, {"access": "protected", "host": "YAHOO.util.Storage", "name": "_setItem", "url": "YAHOO.util.Storage.html#method__setItem", "type": "method"}, {"access": "", "host": "YAHOO.util.Storage", "name": "setItem", "url": "YAHOO.util.Storage.html#method_setItem", "type": "method"}];
 </script>
 </body>
 </html>

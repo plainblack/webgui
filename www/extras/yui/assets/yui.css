@@ -309,3 +309,108 @@ p.loggerButton {text-align:center;}
 /*RSS links*/
 #yuiblogTitle a, #ydnJsTitle a, #delicious a, #yui-theater h3 a { color: #E76300; text-decoration: none; }
 #yuiblogTitle a:hover, #ydnJsTitle a:hover, #delicious a:hover, #yui-theater h3 a:hover { text-decoration: underline; }
+
+
+/* New syntax Highlighter Core */
+.yui-syntax-highlight {
+    background-color: #F5F5F5;
+    border: 1px solid #D9D9D9;
+    padding: .75em;
+    overflow-x: auto;
+    position: relative;
+    margin-bottom: 15px;
+    _width: 97%;
+    _margin-bottom: 1.5em;
+}
+
+.yui-syntax-highlight .numbers {
+    display: none;
+}
+
+.yui-syntax-highlight-linenumbers .numbers {
+    display: block;
+}
+
+.yui-syntax-highlight-linenumbers .nonumbers {
+    display: none;
+}
+
+.yui-syntax-highlight ol {
+    margin-top: 0;
+    margin-left: 2em;
+}
+
+.yui-syntax-highlight ol li {
+    margin-bottom: 0;
+}
+
+.yui-syntax-highlight textarea {
+    display: none;
+}
+
+.yui-syntax-highlight .syn-header {
+    position: absolute;
+    right: 5px;
+    top: 0;
+}
+.yui-syntax-highlight .hidden {
+    visibility: hidden;
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 0px;
+    width: 0px;
+}
+
+/* HTML Colors */
+.yui-syntax-highlight .html4strict  {font-family:monospace;}
+.yui-syntax-highlight .html4strict .imp {font-weight: bold; color: red;}
+.yui-syntax-highlight .html4strict .kw2 {color: #000000; font-weight: bold;}
+.yui-syntax-highlight .html4strict .kw3 {color: #000066;}
+.yui-syntax-highlight .html4strict .es0 {color: #000099; font-weight: bold;}
+.yui-syntax-highlight .html4strict .br0 {color: #66cc66;}
+.yui-syntax-highlight .html4strict .sy0 {color: #66cc66;}
+.yui-syntax-highlight .html4strict .st0 {color: #ff0000;}
+.yui-syntax-highlight .html4strict .nu0 {color: #cc66cc;}
+.yui-syntax-highlight .html4strict .sc-1 {color: #808080; font-style: italic;}
+.yui-syntax-highlight .html4strict .sc0 {color: #00bbdd;}
+.yui-syntax-highlight .html4strict .sc1 {color: #ddbb00;}
+.yui-syntax-highlight .html4strict .sc2 {color: #009900;}
+.yui-syntax-highlight .html4strict span.xtra { display:block; }
+
+/* Javascript Colors */
+.yui-syntax-highlight .javascript  {font-family:monospace;}
+.yui-syntax-highlight .javascript .imp {font-weight: bold; color: red;}
+.yui-syntax-highlight .javascript .kw1 {color: #000066; font-weight: bold;}
+.yui-syntax-highlight .javascript .kw2 {color: #003366; font-weight: bold;}
+.yui-syntax-highlight .javascript .kw3 {color: #000066;}
+.yui-syntax-highlight .javascript .co1 {color: #006600; font-style: italic;}
+.yui-syntax-highlight .javascript .co2 {color: #009966; font-style: italic;}
+.yui-syntax-highlight .javascript .coMULTI {color: #006600; font-style: italic;}
+.yui-syntax-highlight .javascript .es0 {color: #000099; font-weight: bold;}
+.yui-syntax-highlight .javascript .br0 {color: #009900;}
+.yui-syntax-highlight .javascript .sy0 {color: #339933;}
+.yui-syntax-highlight .javascript .st0 {color: #3366CC;}
+.yui-syntax-highlight .javascript .nu0 {color: #CC0000;}
+.yui-syntax-highlight .javascript .me1 {color: #660066;}
+.yui-syntax-highlight .javascript span.xtra { display:block; }
+
+/* CSS Colors */
+.yui-syntax-highlight .css  {font-family:monospace;}
+.yui-syntax-highlight .css .imp {font-weight: bold; color: red;}
+.yui-syntax-highlight .css .kw1 {color: #000000; font-weight: bold;}
+.yui-syntax-highlight .css .kw2 {color: #993333;}
+.yui-syntax-highlight .css .co1 {color: #a1a100;}
+.yui-syntax-highlight .css .co2 {color: #ff0000; font-style: italic;}
+.yui-syntax-highlight .css .coMULTI {color: #808080; font-style: italic;}
+.yui-syntax-highlight .css .es0 {color: #000099; font-weight: bold;}
+.yui-syntax-highlight .css .br0 {color: #00AA00;}
+.yui-syntax-highlight .css .sy0 {color: #00AA00;}
+.yui-syntax-highlight .css .st0 {color: #ff0000;}
+.yui-syntax-highlight .css .nu0 {color: #cc66cc;}
+.yui-syntax-highlight .css .re0 {color: #cc00cc;}
+.yui-syntax-highlight .css .re1 {color: #6666ff;}
+.yui-syntax-highlight .css .re2 {color: #3333ff;}
+.yui-syntax-highlight .css .re3 {color: #933;}
+.yui-syntax-highlight .css span.xtra { display:block; }
+

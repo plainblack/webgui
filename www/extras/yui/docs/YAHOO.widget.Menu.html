@@ -16,7 +16,7 @@
 <div id="doc3" class="yui-t2">
 	<div id="hd">
         <h1><a href="http://developer.yahoo.com/yui/" title="Yahoo! UI Library">Yahoo! UI Library</a></h1>
-        <h3>Menu&nbsp; <span class="subtitle">2.8.0r4</span></h3>
+        <h3>Menu&nbsp; <span class="subtitle">2.9.0</span></h3>
         <a href="./index.html" title="Yahoo! UI Library">Yahoo! UI Library</a> 
             &gt; <a href="./module_menu.html" title="menu">menu</a>
                  &gt; YAHOO.widget.Menu 
@@ -521,6 +521,10 @@ create the menu.
                                         <a class=" deprecated" href="YAHOO.widget.Module.html#property_browser" property="yui:name" title="browser">browser</a><span class=" deprecated">,</span>
                                         </span>
                                     
+                                        <span rel="yui:property" resource="YAHOO.widget.Module.html#property_cacheEffects">
+                                        <a class="" href="YAHOO.widget.Module.html#property_cacheEffects" property="yui:name" title="cacheEffects">cacheEffects</a><span class="">,</span>
+                                        </span>
+                                    
                                         <span rel="yui:property" resource="YAHOO.widget.Module.html#property_cfg">
                                         <a class="" href="YAHOO.widget.Module.html#property_cfg" property="yui:name" title="cfg">cfg</a><span class="">,</span>
                                         </span>
@@ -562,7 +566,7 @@ create the menu.
                                         </span>
                                     
                                         <span rel="yui:property" resource="YAHOO.widget.Module.html#property_platform">
-                                        <a class="" href="YAHOO.widget.Module.html#property_platform" property="yui:name" title="platform">platform</a>
+                                        <a class=" deprecated" href="YAHOO.widget.Module.html#property_platform" property="yui:name" title="platform">platform</a>
                                         </span>
                                     
                                 </code>
@@ -654,10 +658,10 @@ instance to be added to the menu.</span>
                                                         </dd>
                                                         <dd rel="yui:parameter">
                                                         <code><span property="yui:name">p_oItem</span>
-                                                        &lt;<span property="yui:type">String</span>&gt;
+                                                        &lt;<span property="yui:type">HTML</span>&gt;
                                                         </code>
-                                                        <span property="yui:description"> String specifying the text of the item to be added 
-to the menu.</span>
+                                                        <span property="yui:description"> String or markup specifying the content of the item to be added 
+to the menu. The item is inserted into the DOM as HTML, and should be escaped by the implementor if coming from an external source.</span>
                                                         </dd>
                                                         <dd rel="yui:parameter">
                                                         <code><span property="yui:name">p_oItem</span>
@@ -675,13 +679,36 @@ which the menu item should be added.</span>
                                                         </dd>
                                                 </dl>
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        YAHOO.widget.MenuItem
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
-                                                </dl>
+
+
+             
+
+                                        </div>
+
+                                    </div>
+                                    <hr />
+                                    </div>
+                                    <div class="protected" rel="yui:method" resource="#method__addShadowVisibleClass">
+                                    <h4>
+                                        <a name="method__addShadowVisibleClass">_addShadowVisibleClass</a></h4>
+                                    <div class="detail" >
+                                        <code>
+                                         protected 
+                                        
+                                        
+                                        void
+                                            <strong property="yui:name">_addShadowVisibleClass</strong>
+                                           (
+                                            )
+                                        </code>
+                                        
+                                        <div class="description" property="yui:description">
+                                            Adds the classname marker for a visible shadow, to the shadow element
+                                        </div>
+
+                                        <div class="description">
+
+
 
 
              
@@ -712,13 +739,6 @@ which the menu item should be added.</span>
                                         <div class="description">
 
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        void
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
-                                                </dl>
 
 
              
@@ -749,13 +769,6 @@ which the menu item should be added.</span>
                                         <div class="description">
 
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        void
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
-                                                </dl>
 
 
              
@@ -791,13 +804,6 @@ scrolling functionality, it will maintain the Menu's new width rather than reset
                                         <div class="description">
 
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        void
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
-                                                </dl>
 
 
              
@@ -843,13 +849,6 @@ instance with the submenu to be configured.</span>
                                                         </dd>
                                                 </dl>
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        void
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
-                                                </dl>
 
 
              
@@ -895,12 +894,86 @@ instance with the submenu to be configured.</span>
                                                         </dd>
                                                 </dl>
 
+
+
+             
+
+                                        </div>
+
+                                    </div>
+                                    <hr />
+                                    </div>
+                                    <div class="protected" rel="yui:method" resource="#method__createShadow">
+                                    <h4>
+                                        <a name="method__createShadow">_createShadow</a></h4>
+                                    <div class="detail" >
+                                        <code>
+                                         protected 
+                                        
+                                        
+                                        void
+                                            <strong property="yui:name">_createShadow</strong>
+                                           (
+                                            )
+                                        </code>
+                                        
+                                        <div class="description" property="yui:description">
+                                            Used to create the shadow element, add it to the DOM, and subscribe listeners to keep it in sync.
+                                        </div>
+
+                                        <div class="description">
+
+
+
+
+             
+
+                                        </div>
+
+                                    </div>
+                                    <hr />
+                                    </div>
+                                    <div class="protected" rel="yui:method" resource="#method__didMouseLeave">
+                                    <h4>
+                                        <a name="method__didMouseLeave">_didMouseLeave</a></h4>
+                                    <div class="detail" >
+                                        <code>
+                                         protected 
+                                        
+                                        
+                                        boolean
+                                            <strong property="yui:name">_didMouseLeave</strong>
+                                           (
+                                                
+                                                        
+                                                         oRelatedTarget
+                                                    
+                                                
+                                            )
+                                        </code>
+                                        
+                                        <div class="description" property="yui:description">
+                                            Utilility method to determine if we really moused out of the menu based on the related target
+                                        </div>
+
+                                        <div class="description">
+
+                                                <dl rel="yui:parameters">
+                                                    <dt>Parameters:</dt>
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">oRelatedTarget</span>
+                                                        &lt;<span property="yui:type">HTMLElement</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> The related target based on which we're making the decision</span>
+                                                        </dd>
+                                                </dl>
+
                                                 <dl>
                                                     <dt>Returns:
                                                     <code property="yui:return">
-                                                        Array
+                                                            boolean
                                                     </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
+                                                    <dd property="yui:returnInfo">true if it's OK to hide based on the related target.</dd>
                                                 </dl>
 
 
@@ -932,13 +1005,6 @@ instance with the submenu to be configured.</span>
                                         <div class="description">
 
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        void
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
-                                                </dl>
 
 
              
@@ -969,13 +1035,6 @@ instance with the submenu to be configured.</span>
                                         <div class="description">
 
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        void
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
-                                                </dl>
 
 
              
@@ -1006,13 +1065,6 @@ instance with the submenu to be configured.</span>
                                         <div class="description">
 
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        void
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
-                                                </dl>
 
 
              
@@ -1043,13 +1095,6 @@ instance with the submenu to be configured.</span>
                                         <div class="description">
 
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        void
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
-                                                </dl>
 
 
              
@@ -1081,13 +1126,6 @@ the "hidedelay" configuration property.
                                         <div class="description">
 
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        void
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
-                                                </dl>
 
 
              
@@ -1126,7 +1164,7 @@ the "hidedelay" configuration property.
                                         
                                         <div class="description" property="yui:description">
                                             Hides a submenu after the number of milliseconds specified by 
-the "submenuhidedelay" configuration property have ellapsed.
+the "submenuhidedelay" configuration property have elapsed.
                                         </div>
 
                                         <div class="description">
@@ -1156,13 +1194,6 @@ before the submenu is hidden.</span>
                                                         </dd>
                                                 </dl>
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        void
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
-                                                </dl>
 
 
              
@@ -1193,13 +1224,6 @@ before the submenu is hidden.</span>
                                         <div class="description">
 
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        YAHOO.widget.MenuItem
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
-                                                </dl>
 
 
              
@@ -1245,13 +1269,6 @@ to be retrieved.</span>
                                                         </dd>
                                                 </dl>
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        Array
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
-                                                </dl>
 
 
              
@@ -1283,13 +1300,6 @@ used to instantiate menu and menu items.
                                         <div class="description">
 
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        void
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
-                                                </dl>
 
 
              
@@ -1345,13 +1355,6 @@ was fired.</span>
                                                         </dd>
                                                 </dl>
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        void
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
-                                                </dl>
 
 
              
@@ -1409,13 +1412,6 @@ was fired.</span>
                                                         </dd>
                                                 </dl>
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        void
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
-                                                </dl>
 
 
              
@@ -1471,13 +1467,6 @@ was fired.</span>
                                                         </dd>
                                                 </dl>
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        void
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
-                                                </dl>
 
 
              
@@ -1533,13 +1522,6 @@ was fired.</span>
                                                         </dd>
                                                 </dl>
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        void
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
-                                                </dl>
 
 
              
@@ -1595,13 +1577,6 @@ was fired.</span>
                                                         </dd>
                                                 </dl>
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        void
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
-                                                </dl>
 
 
              
@@ -1657,13 +1632,6 @@ was fired.</span>
                                                         </dd>
                                                 </dl>
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        void
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
-                                                </dl>
 
 
              
@@ -1719,13 +1687,6 @@ was fired.</span>
                                                         </dd>
                                                 </dl>
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        void
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
-                                                </dl>
 
 
              
@@ -1781,13 +1742,6 @@ was fired.</span>
                                                         </dd>
                                                 </dl>
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        void
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
-                                                </dl>
 
 
              
@@ -1843,13 +1797,6 @@ was fired.</span>
                                                         </dd>
                                                 </dl>
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        void
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
-                                                </dl>
 
 
              
@@ -1905,13 +1852,6 @@ was fired.</span>
                                                         </dd>
                                                 </dl>
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        void
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
-                                                </dl>
 
 
              
@@ -1978,13 +1918,6 @@ that fired the event.</span>
                                                         </dd>
                                                 </dl>
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        void
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
-                                                </dl>
 
 
              
@@ -2051,13 +1984,6 @@ that fired the event.</span>
                                                         </dd>
                                                 </dl>
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        void
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
-                                                </dl>
 
 
              
@@ -2114,13 +2040,6 @@ fired the event.</span>
                                                         </dd>
                                                 </dl>
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        void
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
-                                                </dl>
 
 
              
@@ -2176,13 +2095,6 @@ was fired.</span>
                                                         </dd>
                                                 </dl>
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        void
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
-                                                </dl>
 
 
              
@@ -2238,13 +2150,6 @@ was fired.</span>
                                                         </dd>
                                                 </dl>
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        void
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
-                                                </dl>
 
 
              
@@ -2311,13 +2216,6 @@ subscribed to the event.</span>
                                                         </dd>
                                                 </dl>
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        void
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
-                                                </dl>
 
 
              
@@ -2385,13 +2283,6 @@ subscribed to the event.</span>
                                                         </dd>
                                                 </dl>
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        void
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
-                                                </dl>
 
 
              
@@ -2447,13 +2338,6 @@ was fired.</span>
                                                         </dd>
                                                 </dl>
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        void
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
-                                                </dl>
 
 
              
@@ -2512,13 +2396,6 @@ fired the event.</span>
                                                         </dd>
                                                 </dl>
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        void
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
-                                                </dl>
 
 
              
@@ -2577,13 +2454,6 @@ fired the event.</span>
                                                         </dd>
                                                 </dl>
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        void
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
-                                                </dl>
 
 
              
@@ -2639,13 +2509,6 @@ was fired.</span>
                                                         </dd>
                                                 </dl>
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        void
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
-                                                </dl>
 
 
              
@@ -2702,13 +2565,6 @@ was fired.</span>
                                                         </dd>
                                                 </dl>
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        void
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
-                                                </dl>
 
 
              
@@ -2764,13 +2620,6 @@ was fired.</span>
                                                         </dd>
                                                 </dl>
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        void
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
-                                                </dl>
 
 
              
@@ -2828,13 +2677,6 @@ to be removed.</span>
                                                         </dd>
                                                 </dl>
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        YAHOO.widget.MenuItem
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
-                                                </dl>
 
 
              
@@ -2892,13 +2734,97 @@ instance to be removed.</span>
                                                         </dd>
                                                 </dl>
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        YAHOO.widget.MenuItem
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
-                                                </dl>
+
+
+             
+
+                                        </div>
+
+                                    </div>
+                                    <hr />
+                                    </div>
+                                    <div class="protected" rel="yui:method" resource="#method__removeShadow">
+                                    <h4>
+                                        <a name="method__removeShadow">_removeShadow</a></h4>
+                                    <div class="detail" >
+                                        <code>
+                                         protected 
+                                        
+                                        
+                                        void
+                                            <strong property="yui:name">_removeShadow</strong>
+                                           (
+                                            )
+                                        </code>
+                                        
+                                        <div class="description" property="yui:description">
+                                            Removes the shadow element from the DOM, and unsubscribes all the listeners used to keep it in sync. Used
+to handle setting the shadow to false.
+                                        </div>
+
+                                        <div class="description">
+
+
+
+
+             
+
+                                        </div>
+
+                                    </div>
+                                    <hr />
+                                    </div>
+                                    <div class="protected" rel="yui:method" resource="#method__removeShadowVisibleClass">
+                                    <h4>
+                                        <a name="method__removeShadowVisibleClass">_removeShadowVisibleClass</a></h4>
+                                    <div class="detail" >
+                                        <code>
+                                         protected 
+                                        
+                                        
+                                        void
+                                            <strong property="yui:name">_removeShadowVisibleClass</strong>
+                                           (
+                                            )
+                                        </code>
+                                        
+                                        <div class="description" property="yui:description">
+                                            Removes the classname marker for a visible shadow, from the shadow element
+                                        </div>
+
+                                        <div class="description">
+
+
+
+
+             
+
+                                        </div>
+
+                                    </div>
+                                    <hr />
+                                    </div>
+                                    <div class="protected" rel="yui:method" resource="#method__replaceShadow">
+                                    <h4>
+                                        <a name="method__replaceShadow">_replaceShadow</a></h4>
+                                    <div class="detail" >
+                                        <code>
+                                         protected 
+                                        
+                                        
+                                        void
+                                            <strong property="yui:name">_replaceShadow</strong>
+                                           (
+                                            )
+                                        </code>
+                                        
+                                        <div class="description" property="yui:description">
+                                            Replaces the shadow element in the DOM with the current shadow element (this._shadow)
+                                        </div>
+
+                                        <div class="description">
+
+
 
 
              
@@ -2967,13 +2893,6 @@ was fired.</span>
                                                         </dd>
                                                 </dl>
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        void
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
-                                                </dl>
 
 
              
@@ -3018,13 +2937,152 @@ was fired.</span>
                                                         </dd>
                                                 </dl>
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        void
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
+
+
+             
+
+                                        </div>
+
+                                    </div>
+                                    <hr />
+                                    </div>
+                                    <div class="protected" rel="yui:method" resource="#method__shadowBeforeShow">
+                                    <h4>
+                                        <a name="method__shadowBeforeShow">_shadowBeforeShow</a></h4>
+                                    <div class="detail" >
+                                        <code>
+                                         protected 
+                                        
+                                        
+                                        void
+                                            <strong property="yui:name">_shadowBeforeShow</strong>
+                                           (
+                                            )
+                                        </code>
+                                        
+                                        <div class="description" property="yui:description">
+                                            The beforeShow event handler used to set up the shadow lazily when the menu is made visible.
+                                        </div>
+
+                                        <div class="description">
+
+
+
+
+             
+
+                                        </div>
+
+                                    </div>
+                                    <hr />
+                                    </div>
+                                    <div class="protected" rel="yui:method" resource="#method__sizeShadow">
+                                    <h4>
+                                        <a name="method__sizeShadow">_sizeShadow</a></h4>
+                                    <div class="detail" >
+                                        <code>
+                                         protected 
+                                        
+                                        
+                                        void
+                                            <strong property="yui:name">_sizeShadow</strong>
+                                           (
+                                            )
+                                        </code>
+                                        
+                                        <div class="description" property="yui:description">
+                                            Resizes the shadow to match the container bounding element
+                                        </div>
+
+                                        <div class="description">
+
+
+
+
+             
+
+                                        </div>
+
+                                    </div>
+                                    <hr />
+                                    </div>
+                                    <div class="private" rel="yui:method" resource="#method__stopMouseEventHandlers">
+                                    <h4>
+                                        <a name="method__stopMouseEventHandlers">_stopMouseEventHandlers</a></h4>
+                                    <div class="detail" >
+                                        <code>
+                                         private 
+                                        
+                                        
+                                        void
+                                            <strong property="yui:name">_stopMouseEventHandlers</strong>
+                                           (
+                                            )
+                                        </code>
+                                        
+                                        <div class="description" property="yui:description">
+                                            Utility method to stop mouseevents from being fired if the DOM
+changes under a stationary mouse pointer (as opposed to the mouse moving
+over a DOM element).
+                                        </div>
+
+                                        <div class="description">
+
+
+
+
+             
+
+                                        </div>
+
+                                    </div>
+                                    <hr />
+                                    </div>
+                                    <div class="" rel="yui:method" resource="#method__subscribeScrollHandlers">
+                                    <h4>
+                                        <a name="method__subscribeScrollHandlers">_subscribeScrollHandlers</a></h4>
+                                    <div class="detail" >
+                                        <code>
+                                        
+                                        
+                                        
+                                        void
+                                            <strong property="yui:name">_subscribeScrollHandlers</strong>
+                                           (
+                                                
+                                                        
+                                                         oHeader
+                                                    
+                                                
+                                                        , 
+                                                         oFooter
+                                                    
+                                                
+                                            )
+                                        </code>
+                                        
+                                        <div class="description" property="yui:description">
+                                            
+                                        </div>
+
+                                        <div class="description">
+
+                                                <dl rel="yui:parameters">
+                                                    <dt>Parameters:</dt>
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">oHeader</span>
+                                                        &lt;<span property="yui:type">HTMLElement</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> The scroll header element</span>
+                                                        </dd>
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">oFooter</span>
+                                                        &lt;<span property="yui:type">HTMLElement</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> The scroll footer element</span>
+                                                        </dd>
                                                 </dl>
+
 
 
              
@@ -3070,13 +3128,60 @@ instance whose events should be subscribed to.</span>
                                                         </dd>
                                                 </dl>
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        void
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
+
+
+             
+
+                                        </div>
+
+                                    </div>
+                                    <hr />
+                                    </div>
+                                    <div class="" rel="yui:method" resource="#method__unsubscribeScrollHandlers">
+                                    <h4>
+                                        <a name="method__unsubscribeScrollHandlers">_unsubscribeScrollHandlers</a></h4>
+                                    <div class="detail" >
+                                        <code>
+                                        
+                                        
+                                        
+                                        void
+                                            <strong property="yui:name">_unsubscribeScrollHandlers</strong>
+                                           (
+                                                
+                                                        
+                                                         oHeader
+                                                    
+                                                
+                                                        , 
+                                                         oFooter
+                                                    
+                                                
+                                            )
+                                        </code>
+                                        
+                                        <div class="description" property="yui:description">
+                                            
+                                        </div>
+
+                                        <div class="description">
+
+                                                <dl rel="yui:parameters">
+                                                    <dt>Parameters:</dt>
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">oHeader</span>
+                                                        &lt;<span property="yui:type">HTMLElement</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> The scroll header element</span>
+                                                        </dd>
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">oFooter</span>
+                                                        &lt;<span property="yui:type">HTMLElement</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> The scroll footer element</span>
+                                                        </dd>
                                                 </dl>
+
 
 
              
@@ -3122,13 +3227,6 @@ of the menu items in the specified group.
                                                         </dd>
                                                 </dl>
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        void
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
-                                                </dl>
 
 
              
@@ -3182,10 +3280,10 @@ instance to be added to the menu.</span>
                                                         </dd>
                                                         <dd rel="yui:parameter">
                                                         <code><span property="yui:name">p_oItem</span>
-                                                        &lt;<span property="yui:type">String</span>&gt;
+                                                        &lt;<span property="yui:type">HTML</span>&gt;
                                                         </code>
-                                                        <span property="yui:description"> String specifying the text of the item to be added 
-to the menu.</span>
+                                                        <span property="yui:description"> String or markup specifying content of the item to be added 
+to the menu. The item text is inserted into the DOM as HTML, and should be escaped by the implementor if coming from an external source.</span>
                                                         </dd>
                                                         <dd rel="yui:parameter">
                                                         <code><span property="yui:name">p_oItem</span>
@@ -3203,13 +3301,6 @@ which the item belongs.</span>
                                                         </dd>
                                                 </dl>
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        YAHOO.widget.MenuItem
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
-                                                </dl>
 
 
              
@@ -3255,9 +3346,9 @@ which the item belongs.</span>
                                                         &lt;<span property="yui:type">Array</span>&gt;
                                                         </code>
                                                         <span property="yui:description"> Array of items to be added to the menu.  The array 
-can contain strings specifying the text for each item to be created, object
+can contain strings specifying the markup for the content of each item to be created, object
 literals specifying each of the menu item configuration properties, 
-or MenuItem instances.</span>
+or MenuItem instances. The item content if provided as a string is inserted into the DOM as HTML, and should be escaped by the implementor if coming from an external source.</span>
                                                         </dd>
                                                         <dd rel="yui:parameter">
                                                         <code><span property="yui:name">p_nGroupIndex</span>
@@ -3268,13 +3359,6 @@ which the items belongs.</span>
                                                         </dd>
                                                 </dl>
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        Array
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
-                                                </dl>
 
 
              
@@ -3305,13 +3389,6 @@ which the items belongs.</span>
                                         <div class="description">
 
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        void
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
-                                                </dl>
 
 
              
@@ -3357,13 +3434,6 @@ is one of the supported strings. Returns true if the position is supported.
                                                         </dd>
                                                 </dl>
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        Boolean
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
-                                                </dl>
 
 
              
@@ -3410,13 +3480,6 @@ should be blurred.</span>
                                                         </dd>
                                                 </dl>
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        void
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
-                                                </dl>
 
 
              
@@ -3448,13 +3511,6 @@ items, group titles, header and footer.
                                         <div class="description">
 
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        void
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
-                                                </dl>
 
 
              
@@ -3520,13 +3576,6 @@ a menu changes.
                                                         </dd>
                                                 </dl>
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        void
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
-                                                </dl>
 
 
              
@@ -3594,13 +3643,6 @@ fired the event.</span>
                                                         </dd>
                                                 </dl>
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        void
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
-                                                </dl>
 
 
              
@@ -3666,13 +3708,6 @@ a menu changes.
                                                         </dd>
                                                 </dl>
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        void
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
-                                                </dl>
 
 
              
@@ -3740,13 +3775,6 @@ fired the event.</span>
                                                         </dd>
                                                 </dl>
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        void
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
-                                                </dl>
 
 
              
@@ -3814,13 +3842,6 @@ fired the event.</span>
                                                         </dd>
                                                 </dl>
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        void
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
-                                                </dl>
 
 
              
@@ -3888,13 +3909,6 @@ the event.</span>
                                                         </dd>
                                                 </dl>
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        void
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
-                                                </dl>
 
 
              
@@ -3962,13 +3976,6 @@ fired the event.</span>
                                                         </dd>
                                                 </dl>
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        void
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
-                                                </dl>
 
 
              
@@ -4034,13 +4041,6 @@ a menu changes.
                                                         </dd>
                                                 </dl>
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        void
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
-                                                </dl>
 
 
              
@@ -4108,13 +4108,6 @@ fired the event.</span>
                                                         </dd>
                                                 </dl>
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        void
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
-                                                </dl>
 
 
              
@@ -4135,6 +4128,11 @@ fired the event.</span>
                                         void
                                             <strong property="yui:name">destroy</strong>
                                            (
+                                                
+                                                        
+                                                         shallowPurge
+                                                    
+                                                
                                             )
                                         </code>
                                         
@@ -4145,14 +4143,17 @@ fired the event.</span>
 
                                         <div class="description">
 
-
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        void
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
+                                                <dl rel="yui:parameters">
+                                                    <dt>Parameters:</dt>
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">shallowPurge</span>
+                                                        &lt;<span property="yui:type">boolean</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> If true, only the parent element's DOM event listeners are purged. If false, or not provided, all children are also purged of DOM event listeners. 
+NOTE: The flag is a "shallowPurge" flag, as opposed to what may be a more intuitive "purgeChildren" flag to maintain backwards compatibility with behavior prior to 2.9.0.</span>
+                                                        </dd>
                                                 </dl>
+
 
 
              
@@ -4183,13 +4184,6 @@ fired the event.</span>
                                         <div class="description">
 
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        void
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
-                                                </dl>
 
 
              
@@ -4246,13 +4240,6 @@ the item belongs.</span>
                                                         </dd>
                                                 </dl>
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        YAHOO.widget.MenuItem
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
-                                                </dl>
 
 
              
@@ -4284,13 +4271,6 @@ are grouped in the menu.
                                         <div class="description">
 
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        Array
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
-                                                </dl>
 
 
              
@@ -4321,13 +4301,6 @@ are grouped in the menu.
                                         <div class="description">
 
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        Array
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
-                                                </dl>
 
 
              
@@ -4358,13 +4331,6 @@ are grouped in the menu.
                                         <div class="description">
 
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        void
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
-                                                </dl>
 
 
              
@@ -4396,13 +4362,6 @@ children of the menu.
                                         <div class="description">
 
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        Array
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
-                                                </dl>
 
 
              
@@ -4433,13 +4392,6 @@ children of the menu.
                                         <div class="description">
 
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        Boolean
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
-                                                </dl>
 
 
              
@@ -4531,13 +4483,6 @@ more details.</span>
                                                         </dd>
                                                 </dl>
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        void
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
-                                                </dl>
 
 
              
@@ -4569,13 +4514,6 @@ changed using the menu's Config object ("cfg").
                                         <div class="description">
 
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        void
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
-                                                </dl>
 
 
              
@@ -4606,13 +4544,6 @@ changed using the menu's Config object ("cfg").
                                         <div class="description">
 
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        void
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
-                                                </dl>
 
 
              
@@ -4698,13 +4629,6 @@ the item belongs.</span>
                                                         </dd>
                                                 </dl>
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        YAHOO.widget.MenuItem
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
-                                                </dl>
 
 
              
@@ -4737,13 +4661,6 @@ it doesn't force the browser to render uncessary scrollbars.
                                         <div class="description">
 
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        void
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
-                                                </dl>
 
 
              
@@ -4809,13 +4726,6 @@ which the item belongs.</span>
                                                         </dd>
                                                 </dl>
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        YAHOO.widget.MenuItem
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
-                                                </dl>
 
 
              
@@ -4846,13 +4756,6 @@ which the item belongs.</span>
                                         <div class="description">
 
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        void
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
-                                                </dl>
 
 
              
@@ -4884,13 +4787,6 @@ enabled item to "true."
                                         <div class="description">
 
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        void
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
-                                                </dl>
 
 
              
@@ -4933,9 +4829,9 @@ enabled item to "true."
                                                     <dt>Parameters:</dt>
                                                         <dd rel="yui:parameter">
                                                         <code><span property="yui:name">p_sGroupTitle</span>
-                                                        &lt;<span property="yui:type">String</span>&gt;
+                                                        &lt;<span property="yui:type">HTML</span>&gt;
                                                         </code>
-                                                        <span property="yui:description"> String specifying the title of the group.</span>
+                                                        <span property="yui:description"> String or markup specifying the title of the group. The title is inserted into the DOM as HTML, and should be escaped by the implementor if coming from an external source.</span>
                                                         </dd>
                                                         <dd rel="yui:parameter">
                                                         <code><span property="yui:name">p_nGroupIndex</span>
@@ -4946,13 +4842,6 @@ the title belongs.</span>
                                                         </dd>
                                                 </dl>
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        void
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
-                                                </dl>
 
 
              
@@ -5030,13 +4919,6 @@ execution scope of the listener</span>
                                                         </dd>
                                                 </dl>
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        void
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
-                                                </dl>
 
 
              
@@ -5067,13 +4949,6 @@ execution scope of the listener</span>
                                         <div class="description">
 
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        String
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
-                                                </dl>
 
 
              
@@ -5093,6 +4968,9 @@ execution scope of the listener</span>
                                     <code>
                                             <span rel="yui:method" resource="YAHOO.widget.Module.html#method__addToParent">                                        
                                             <a class="protected" href="YAHOO.widget.Module.html#method__addToParent" property="yui:name" title="_addToParent">_addToParent</a><span class="protected">,</span>
+                                            </span>
+                                            <span rel="yui:method" resource="YAHOO.widget.Module.html#method__createEffects">                                        
+                                            <a class="protected" href="YAHOO.widget.Module.html#method__createEffects" property="yui:name" title="_createEffects">_createEffects</a><span class="protected">,</span>
                                             </span>
                                             <span rel="yui:method" resource="YAHOO.widget.Module.html#method__initResizeMonitor">                                        
                                             <a class="protected" href="YAHOO.widget.Module.html#method__initResizeMonitor" property="yui:name" title="_initResizeMonitor">_initResizeMonitor</a><span class="protected">,</span>
@@ -5117,6 +4995,9 @@ execution scope of the listener</span>
                                             </span>
                                             <span rel="yui:method" resource="YAHOO.widget.Module.html#method_appendToHeader">                                        
                                             <a class="" href="YAHOO.widget.Module.html#method_appendToHeader" property="yui:name" title="appendToHeader">appendToHeader</a><span class="">,</span>
+                                            </span>
+                                            <span rel="yui:method" resource="YAHOO.widget.Module.html#method_configEffect">                                        
+                                            <a class="" href="YAHOO.widget.Module.html#method_configEffect" property="yui:name" title="configEffect">configEffect</a><span class="">,</span>
                                             </span>
                                             <span rel="yui:method" resource="YAHOO.widget.Module.html#method_configMonitorResize">                                        
                                             <a class="" href="YAHOO.widget.Module.html#method_configMonitorResize" property="yui:name" title="configMonitorResize">configMonitorResize</a><span class="">,</span>
@@ -5665,7 +5546,7 @@ over the menu.  Passes back the DOM Event object as an argument.
                                         <a class="" href="YAHOO.widget.Module.html#event_hideEvent" property="yui:name" title="hideEvent">hideEvent</a><span class="">,</span>
                                         </span>
                                                                             <span rel="yui:event" resource="YAHOO.widget.Module.html#event_initEvent">
-                                        <a class="" href="YAHOO.widget.Module.html#event_initEvent" property="yui:name" title="initEvent">initEvent</a>
+                                        <a class="" href="YAHOO.widget.Module.html#event_initEvent" property="yui:name" title="initEvent">initEvent</a><span class="">,</span>
                                         </span>
                                                                             <span rel="yui:event" resource="YAHOO.widget.Module.html#event_renderEvent">
                                         <a class="" href="YAHOO.widget.Module.html#event_renderEvent" property="yui:name" title="renderEvent">renderEvent</a>
@@ -6221,13 +6102,13 @@ configuration property is set to dynamic.
                                         <a class="" href="YAHOO.widget.Module.html#config_appendtodocumentbody" property="yui:name" title="appendtodocumentbody">appendtodocumentbody</a><span class="">,</span>
                                         </span>
                                                                                 <span rel="yui:attribute" resource="YAHOO.widget.Module.html#config_effect">                                        
-                                        <a class="" href="YAHOO.widget.Module.html#config_effect" property="yui:name" title="effect">effect</a><span class="">,</span>
+                                        <a class="" href="YAHOO.widget.Module.html#config_effect" property="yui:name" title="effect">effect</a>
                                         </span>
                                                                                 <span rel="yui:attribute" resource="YAHOO.widget.Module.html#config_monitorresize">                                        
-                                        <a class="" href="YAHOO.widget.Module.html#config_monitorresize" property="yui:name" title="monitorresize">monitorresize</a><span class="">,</span>
+                                        <a class="" href="YAHOO.widget.Module.html#config_monitorresize" property="yui:name" title="monitorresize">monitorresize</a>
                                         </span>
                                                                                 <span rel="yui:attribute" resource="YAHOO.widget.Module.html#config_visible">                                        
-                                        <a class="" href="YAHOO.widget.Module.html#config_visible" property="yui:name" title="visible">visible</a><span class="">,</span>
+                                        <a class="" href="YAHOO.widget.Module.html#config_visible" property="yui:name" title="visible">visible</a>
                                         </span>
                                         
                                 </code>
@@ -6253,25 +6134,25 @@ configuration property is set to dynamic.
                                         <a class="" href="YAHOO.widget.Overlay.html#config_height" property="yui:name" title="height">height</a><span class="">,</span>
                                         </span>
                                                                                 <span rel="yui:attribute" resource="YAHOO.widget.Overlay.html#config_iframe">                                        
-                                        <a class="" href="YAHOO.widget.Overlay.html#config_iframe" property="yui:name" title="iframe">iframe</a><span class="">,</span>
+                                        <a class="" href="YAHOO.widget.Overlay.html#config_iframe" property="yui:name" title="iframe">iframe</a>
                                         </span>
                                                                                 <span rel="yui:attribute" resource="YAHOO.widget.Overlay.html#config_preventcontextoverlap">                                        
-                                        <a class="" href="YAHOO.widget.Overlay.html#config_preventcontextoverlap" property="yui:name" title="preventcontextoverlap">preventcontextoverlap</a><span class="">,</span>
+                                        <a class="" href="YAHOO.widget.Overlay.html#config_preventcontextoverlap" property="yui:name" title="preventcontextoverlap">preventcontextoverlap</a>
                                         </span>
                                                                                 <span rel="yui:attribute" resource="YAHOO.widget.Overlay.html#config_width">                                        
-                                        <a class="" href="YAHOO.widget.Overlay.html#config_width" property="yui:name" title="width">width</a><span class="">,</span>
+                                        <a class="" href="YAHOO.widget.Overlay.html#config_width" property="yui:name" title="width">width</a>
                                         </span>
                                                                                 <span rel="yui:attribute" resource="YAHOO.widget.Overlay.html#config_x">                                        
-                                        <a class="" href="YAHOO.widget.Overlay.html#config_x" property="yui:name" title="x">x</a><span class="">,</span>
+                                        <a class="" href="YAHOO.widget.Overlay.html#config_x" property="yui:name" title="x">x</a>
                                         </span>
                                                                                 <span rel="yui:attribute" resource="YAHOO.widget.Overlay.html#config_xy">                                        
-                                        <a class="" href="YAHOO.widget.Overlay.html#config_xy" property="yui:name" title="xy">xy</a><span class="">,</span>
+                                        <a class="" href="YAHOO.widget.Overlay.html#config_xy" property="yui:name" title="xy">xy</a>
                                         </span>
                                                                                 <span rel="yui:attribute" resource="YAHOO.widget.Overlay.html#config_y">                                        
-                                        <a class="" href="YAHOO.widget.Overlay.html#config_y" property="yui:name" title="y">y</a><span class="">,</span>
+                                        <a class="" href="YAHOO.widget.Overlay.html#config_y" property="yui:name" title="y">y</a>
                                         </span>
                                                                                 <span rel="yui:attribute" resource="YAHOO.widget.Overlay.html#config_zIndex">                                        
-                                        <a class="" href="YAHOO.widget.Overlay.html#config_zIndex" property="yui:name" title="zIndex">zIndex</a><span class="">,</span>
+                                        <a class="" href="YAHOO.widget.Overlay.html#config_zIndex" property="yui:name" title="zIndex">zIndex</a>
                                         </span>
                                         
                                 </code>
@@ -6394,11 +6275,14 @@ configuration property is set to dynamic.
                         <h4>Methods</h4>
                         <ul class="content">        
                                 <li class="private"><a href="#method__addItemToGroup" title="_addItemToGroup">_addItemToGroup</a></li>
+                                <li class="protected"><a href="#method__addShadowVisibleClass" title="_addShadowVisibleClass">_addShadowVisibleClass</a></li>
                                 <li class="private"><a href="#method__cancelHideDelay" title="_cancelHideDelay">_cancelHideDelay</a></li>
                                 <li class="private"><a href="#method__cancelShowDelay" title="_cancelShowDelay">_cancelShowDelay</a></li>
                                 <li class="private"><a href="#method__clearSetWidthFlag" title="_clearSetWidthFlag">_clearSetWidthFlag</a></li>
                                 <li class="private"><a href="#method__configureSubmenu" title="_configureSubmenu">_configureSubmenu</a></li>
                                 <li class="private"><a href="#method__createItemGroup" title="_createItemGroup">_createItemGroup</a></li>
+                                <li class="protected"><a href="#method__createShadow" title="_createShadow">_createShadow</a></li>
+                                <li class="protected"><a href="#method__didMouseLeave" title="_didMouseLeave">_didMouseLeave</a></li>
                                 <li class="protected"><a href="#method__disableScrollFooter" title="_disableScrollFooter">_disableScrollFooter</a></li>
                                 <li class="protected"><a href="#method__disableScrollHeader" title="_disableScrollHeader">_disableScrollHeader</a></li>
                                 <li class="protected"><a href="#method__enableScrollFooter" title="_enableScrollFooter">_enableScrollFooter</a></li>
@@ -6433,9 +6317,17 @@ configuration property is set to dynamic.
                                 <li class="protected"><a href="#method__onYChange" title="_onYChange">_onYChange</a></li>
                                 <li class="private"><a href="#method__removeItemFromGroupByIndex" title="_removeItemFromGroupByIndex">_removeItemFromGroupByIndex</a></li>
                                 <li class="private"><a href="#method__removeItemFromGroupByValue" title="_removeItemFromGroupByValue">_removeItemFromGroupByValue</a></li>
+                                <li class="protected"><a href="#method__removeShadow" title="_removeShadow">_removeShadow</a></li>
+                                <li class="protected"><a href="#method__removeShadowVisibleClass" title="_removeShadowVisibleClass">_removeShadowVisibleClass</a></li>
+                                <li class="protected"><a href="#method__replaceShadow" title="_replaceShadow">_replaceShadow</a></li>
                                 <li class="private"><a href="#method__setMaxHeight" title="_setMaxHeight">_setMaxHeight</a></li>
                                 <li class="private"><a href="#method__setScrollHeight" title="_setScrollHeight">_setScrollHeight</a></li>
+                                <li class="protected"><a href="#method__shadowBeforeShow" title="_shadowBeforeShow">_shadowBeforeShow</a></li>
+                                <li class="protected"><a href="#method__sizeShadow" title="_sizeShadow">_sizeShadow</a></li>
+                                <li class="private"><a href="#method__stopMouseEventHandlers" title="_stopMouseEventHandlers">_stopMouseEventHandlers</a></li>
+                                <li class=""><a href="#method__subscribeScrollHandlers" title="_subscribeScrollHandlers">_subscribeScrollHandlers</a></li>
                                 <li class="private"><a href="#method__subscribeToItemEvents" title="_subscribeToItemEvents">_subscribeToItemEvents</a></li>
+                                <li class=""><a href="#method__unsubscribeScrollHandlers" title="_unsubscribeScrollHandlers">_unsubscribeScrollHandlers</a></li>
                                 <li class="private"><a href="#method__updateItemProperties" title="_updateItemProperties">_updateItemProperties</a></li>
                                 <li class=""><a href="#method_addItem" title="addItem">addItem</a></li>
                                 <li class=""><a href="#method_addItems" title="addItems">addItems</a></li>
@@ -6526,11 +6418,12 @@ configuration property is set to dynamic.
 	</div>
 	<div id="ft">
         <hr />
-        Copyright &copy; 2009 Yahoo! Inc. All rights reserved.
+        Copyright &copy; 2011 Yahoo! Inc. All rights reserved.
 	</div>
 </div>
 <script type="text/javascript">
-    ALL_YUI_PROPS = [{"access": "", "host": "YAHOO.widget.Menu", "name": "activeItem", "url": "YAHOO.widget.Menu.html#property_activeItem", "type": "property"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "addItem", "url": "YAHOO.widget.Menu.html#method_addItem", "type": "method"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "addItems", "url": "YAHOO.widget.Menu.html#method_addItems", "type": "method"}, {"access": "private", "host": "YAHOO.widget.Menu", "name": "_addItemToGroup", "url": "YAHOO.widget.Menu.html#method__addItemToGroup", "type": "method"}, {"access": "", "host": "YAHOO.widget.MenuManager", "name": "addMenu", "url": "YAHOO.widget.MenuManager.html#method_addMenu", "type": "method"}, {"access": "private", "host": "YAHOO.widget.Menu", "name": "_aGroupTitleElements", "url": "YAHOO.widget.Menu.html#property__aGroupTitleElements", "type": "property"}, {"access": "private", "host": "YAHOO.widget.Menu", "name": "_aItemGroups", "url": "YAHOO.widget.Menu.html#property__aItemGroups", "type": "property"}, {"access": "private", "host": "YAHOO.widget.Menu", "name": "_aListElements", "url": "YAHOO.widget.Menu.html#property__aListElements", "type": "property"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "autosubmenudisplay", "url": "YAHOO.widget.Menu.html#config_autosubmenudisplay", "type": "config"}, {"access": "private", "host": "YAHOO.widget.Menu", "name": "_bHandledMouseOutEvent", "url": "YAHOO.widget.Menu.html#property__bHandledMouseOutEvent", "type": "property"}, {"access": "private", "host": "YAHOO.widget.Menu", "name": "_bHandledMouseOverEvent", "url": "YAHOO.widget.Menu.html#property__bHandledMouseOverEvent", "type": "property"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "blur", "url": "YAHOO.widget.Menu.html#method_blur", "type": "method"}, {"access": "private", "host": "YAHOO.widget.Menu", "name": "_bStopMouseEventHandlers", "url": "YAHOO.widget.Menu.html#property__bStopMouseEventHandlers", "type": "property"}, {"access": "private", "host": "YAHOO.widget.Menu", "name": "_cancelHideDelay", "url": "YAHOO.widget.Menu.html#method__cancelHideDelay", "type": "method"}, {"access": "private", "host": "YAHOO.widget.Menu", "name": "_cancelShowDelay", "url": "YAHOO.widget.Menu.html#method__cancelShowDelay", "type": "method"}, {"access": "private", "host": "YAHOO.widget.Menu", "name": "checkPosition", "url": "YAHOO.widget.Menu.html#method_checkPosition", "type": "method"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "classname", "url": "YAHOO.widget.Menu.html#config_classname", "type": "config"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "clearActiveItem", "url": "YAHOO.widget.Menu.html#method_clearActiveItem", "type": "method"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "clearContent", "url": "YAHOO.widget.Menu.html#method_clearContent", "type": "method"}, {"access": "private", "host": "YAHOO.widget.Menu", "name": "_clearSetWidthFlag", "url": "YAHOO.widget.Menu.html#method__clearSetWidthFlag", "type": "method"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "clickEvent", "url": "YAHOO.widget.Menu.html#event_clickEvent", "type": "event"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "clicktohide", "url": "YAHOO.widget.Menu.html#config_clicktohide", "type": "config"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "configClassName", "url": "YAHOO.widget.Menu.html#method_configClassName", "type": "method"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "configContainer", "url": "YAHOO.widget.Menu.html#method_configContainer", "type": "method"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "configDisabled", "url": "YAHOO.widget.Menu.html#method_configDisabled", "type": "method"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "configHideDelay", "url": "YAHOO.widget.Menu.html#method_configHideDelay", "type": "method"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "configIframe", "url": "YAHOO.widget.Menu.html#method_configIframe", "type": "method"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "configMaxHeight", "url": "YAHOO.widget.Menu.html#method_configMaxHeight", "type": "method"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "configPosition", "url": "YAHOO.widget.Menu.html#method_configPosition", "type": "method"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "configShadow", "url": "YAHOO.widget.Menu.html#method_configShadow", "type": "method"}, {"access": "private", "host": "YAHOO.widget.Menu", "name": "_configureSubmenu", "url": "YAHOO.widget.Menu.html#method__configureSubmenu", "type": "method"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "configVisible", "url": "YAHOO.widget.Menu.html#method_configVisible", "type": "method"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "constraintoviewport", "url": "YAHOO.widget.Menu.html#config_constraintoviewport", "type": "config"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "container", "url": "YAHOO.widget.Menu.html#config_container", "type": "config"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "context", "url": "YAHOO.widget.Menu.html#config_context", "type": "config"}, {"access": "private", "host": "YAHOO.widget.Menu", "name": "_createItemGroup", "url": "YAHOO.widget.Menu.html#method__createItemGroup", "type": "method"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "CSS_CLASS_NAME", "url": "YAHOO.widget.Menu.html#property_CSS_CLASS_NAME", "type": "property"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "destroy", "url": "YAHOO.widget.Menu.html#method_destroy", "type": "method"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "disabled", "url": "YAHOO.widget.Menu.html#config_disabled", "type": "config"}, {"access": "protected", "host": "YAHOO.widget.Menu", "name": "_disableScrollFooter", "url": "YAHOO.widget.Menu.html#method__disableScrollFooter", "type": "method"}, {"access": "protected", "host": "YAHOO.widget.Menu", "name": "_disableScrollHeader", "url": "YAHOO.widget.Menu.html#method__disableScrollHeader", "type": "method"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "effect", "url": "YAHOO.widget.Menu.html#config_effect", "type": "config"}, {"access": "protected", "host": "YAHOO.widget.Menu", "name": "_enableScrollFooter", "url": "YAHOO.widget.Menu.html#method__enableScrollFooter", "type": "method"}, {"access": "protected", "host": "YAHOO.widget.Menu", "name": "_enableScrollHeader", "url": "YAHOO.widget.Menu.html#method__enableScrollHeader", "type": "method"}, {"access": "private", "host": "YAHOO.widget.Menu", "name": "_execHideDelay", "url": "YAHOO.widget.Menu.html#method__execHideDelay", "type": "method"}, {"access": "private", "host": "YAHOO.widget.Menu", "name": "_execSubmenuHideDelay", "url": "YAHOO.widget.Menu.html#method__execSubmenuHideDelay", "type": "method"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "fixedcenter", "url": "YAHOO.widget.Menu.html#config_fixedcenter", "type": "config"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "focus", "url": "YAHOO.widget.Menu.html#method_focus", "type": "method"}, {"access": "private", "host": "YAHOO.widget.Menu", "name": "_getFirstEnabledItem", "url": "YAHOO.widget.Menu.html#method__getFirstEnabledItem", "type": "method"}, {"access": "", "host": "YAHOO.widget.MenuManager", "name": "getFocusedMenu", "url": "YAHOO.widget.MenuManager.html#method_getFocusedMenu", "type": "method"}, {"access": "", "host": "YAHOO.widget.MenuManager", "name": "getFocusedMenuItem", "url": "YAHOO.widget.MenuManager.html#method_getFocusedMenuItem", "type": "method"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "getItem", "url": "YAHOO.widget.Menu.html#method_getItem", "type": "method"}, {"access": "private", "host": "YAHOO.widget.Menu", "name": "_getItemGroup", "url": "YAHOO.widget.Menu.html#method__getItemGroup", "type": "method"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "getItemGroups", "url": "YAHOO.widget.Menu.html#method_getItemGroups", "type": "method"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "getItems", "url": "YAHOO.widget.Menu.html#method_getItems", "type": "method"}, {"access": "", "host": "YAHOO.widget.MenuManager", "name": "getMenu", "url": "YAHOO.widget.MenuManager.html#method_getMenu", "type": "method"}, {"access": "", "host": "YAHOO.widget.MenuManager", "name": "getMenuItem", "url": "YAHOO.widget.MenuManager.html#method_getMenuItem", "type": "method"}, {"access": "", "host": "YAHOO.widget.MenuManager", "name": "getMenuItemGroup", "url": "YAHOO.widget.MenuManager.html#method_getMenuItemGroup", "type": "method"}, {"access": "private", "host": "YAHOO.widget.MenuManager", "name": "getMenuRootElement", "url": "YAHOO.widget.MenuManager.html#method_getMenuRootElement", "type": "method"}, {"access": "", "host": "YAHOO.widget.MenuManager", "name": "getMenus", "url": "YAHOO.widget.MenuManager.html#method_getMenus", "type": "method"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "getRoot", "url": "YAHOO.widget.Menu.html#method_getRoot", "type": "method"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "getSubmenus", "url": "YAHOO.widget.Menu.html#method_getSubmenus", "type": "method"}, {"access": "", "host": "YAHOO.widget.MenuManager", "name": "getVisible", "url": "YAHOO.widget.MenuManager.html#method_getVisible", "type": "method"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "GROUP_TITLE_TAG_NAME", "url": "YAHOO.widget.Menu.html#property_GROUP_TITLE_TAG_NAME", "type": "property"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "hasFocus", "url": "YAHOO.widget.Menu.html#method_hasFocus", "type": "method"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "hidedelay", "url": "YAHOO.widget.Menu.html#config_hidedelay", "type": "config"}, {"access": "", "host": "YAHOO.widget.MenuManager", "name": "hideVisible", "url": "YAHOO.widget.MenuManager.html#method_hideVisible", "type": "method"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "iframe", "url": "YAHOO.widget.Menu.html#config_iframe", "type": "config"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "init", "url": "YAHOO.widget.Menu.html#method_init", "type": "method"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "initDefaultConfig", "url": "YAHOO.widget.Menu.html#method_initDefaultConfig", "type": "method"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "initEvents", "url": "YAHOO.widget.Menu.html#method_initEvents", "type": "method"}, {"access": "private", "host": "YAHOO.widget.Menu", "name": "_initSubTree", "url": "YAHOO.widget.Menu.html#method__initSubTree", "type": "method"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "insertItem", "url": "YAHOO.widget.Menu.html#method_insertItem", "type": "method"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "itemAddedEvent", "url": "YAHOO.widget.Menu.html#event_itemAddedEvent", "type": "event"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "itemData", "url": "YAHOO.widget.Menu.html#property_itemData", "type": "property"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "itemRemovedEvent", "url": "YAHOO.widget.Menu.html#event_itemRemovedEvent", "type": "event"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "ITEM_TYPE", "url": "YAHOO.widget.Menu.html#property_ITEM_TYPE", "type": "property"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "keepopen", "url": "YAHOO.widget.Menu.html#config_keepopen", "type": "config"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "keyDownEvent", "url": "YAHOO.widget.Menu.html#event_keyDownEvent", "type": "event"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "keyPressEvent", "url": "YAHOO.widget.Menu.html#event_keyPressEvent", "type": "event"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "keyUpEvent", "url": "YAHOO.widget.Menu.html#event_keyUpEvent", "type": "event"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "lazyLoad", "url": "YAHOO.widget.Menu.html#property_lazyLoad", "type": "property"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "maxheight", "url": "YAHOO.widget.Menu.html#config_maxheight", "type": "config"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "minscrollheight", "url": "YAHOO.widget.Menu.html#config_minscrollheight", "type": "config"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "mouseDownEvent", "url": "YAHOO.widget.Menu.html#event_mouseDownEvent", "type": "event"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "mouseOutEvent", "url": "YAHOO.widget.Menu.html#event_mouseOutEvent", "type": "event"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "mouseOverEvent", "url": "YAHOO.widget.Menu.html#event_mouseOverEvent", "type": "event"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "mouseUpEvent", "url": "YAHOO.widget.Menu.html#event_mouseUpEvent", "type": "event"}, {"access": "private", "host": "YAHOO.widget.Menu", "name": "_nCurrentMouseX", "url": "YAHOO.widget.Menu.html#property__nCurrentMouseX", "type": "property"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "OFF_SCREEN_POSITION", "url": "YAHOO.widget.Menu.html#property_OFF_SCREEN_POSITION", "type": "property"}, {"access": "private", "host": "YAHOO.widget.Menu", "name": "_onBeforeHide", "url": "YAHOO.widget.Menu.html#method__onBeforeHide", "type": "method"}, {"access": "private", "host": "YAHOO.widget.Menu", "name": "_onBeforeRender", "url": "YAHOO.widget.Menu.html#method__onBeforeRender", "type": "method"}, {"access": "private", "host": "YAHOO.widget.Menu", "name": "_onBeforeShow", "url": "YAHOO.widget.Menu.html#method__onBeforeShow", "type": "method"}, {"access": "protected", "host": "YAHOO.widget.Menu", "name": "_onBlur", "url": "YAHOO.widget.Menu.html#method__onBlur", "type": "method"}, {"access": "protected", "host": "YAHOO.widget.Menu", "name": "_onClick", "url": "YAHOO.widget.Menu.html#method__onClick", "type": "method"}, {"access": "private", "host": "YAHOO.widget.MenuManager", "name": "onDOMEvent", "url": "YAHOO.widget.MenuManager.html#method_onDOMEvent", "type": "method"}, {"access": "private", "host": "YAHOO.widget.Menu", "name": "_onHide", "url": "YAHOO.widget.Menu.html#method__onHide", "type": "method"}, {"access": "private", "host": "YAHOO.widget.Menu", "name": "_onInit", "url": "YAHOO.widget.Menu.html#method__onInit", "type": "method"}, {"access": "private", "host": "YAHOO.widget.MenuManager", "name": "onItemAdded", "url": "YAHOO.widget.MenuManager.html#method_onItemAdded", "type": "method"}, {"access": "private", "host": "YAHOO.widget.Menu", "name": "_onItemAdded", "url": "YAHOO.widget.Menu.html#method__onItemAdded", "type": "method"}, {"access": "private", "host": "YAHOO.widget.MenuManager", "name": "onItemDestroy", "url": "YAHOO.widget.MenuManager.html#method_onItemDestroy", "type": "method"}, {"access": "protected", "host": "YAHOO.widget.Menu", "name": "_onKeyDown", "url": "YAHOO.widget.Menu.html#method__onKeyDown", "type": "method"}, {"access": "protected", "host": "YAHOO.widget.Menu", "name": "_onKeyPress", "url": "YAHOO.widget.Menu.html#method__onKeyPress", "type": "method"}, {"access": "private", "host": "YAHOO.widget.MenuManager", "name": "onMenuBlur", "url": "YAHOO.widget.MenuManager.html#method_onMenuBlur", "type": "method"}, {"access": "private", "host": "YAHOO.widget.MenuManager", "name": "onMenuDestroy", "url": "YAHOO.widget.MenuManager.html#method_onMenuDestroy", "type": "method"}, {"access": "private", "host": "YAHOO.widget.MenuManager", "name": "onMenuFocus", "url": "YAHOO.widget.MenuManager.html#method_onMenuFocus", "type": "method"}, {"access": "private", "host": "YAHOO.widget.Menu", "name": "_onMenuItemConfigChange", "url": "YAHOO.widget.Menu.html#method__onMenuItemConfigChange", "type": "method"}, {"access": "private", "host": "YAHOO.widget.Menu", "name": "_onMenuItemDestroy", "url": "YAHOO.widget.Menu.html#method__onMenuItemDestroy", "type": "method"}, {"access": "private", "host": "YAHOO.widget.MenuManager", "name": "onMenuVisibleConfigChange", "url": "YAHOO.widget.MenuManager.html#method_onMenuVisibleConfigChange", "type": "method"}, {"access": "protected", "host": "YAHOO.widget.Menu", "name": "_onMouseMove", "url": "YAHOO.widget.Menu.html#method__onMouseMove", "type": "method"}, {"access": "protected", "host": "YAHOO.widget.Menu", "name": "_onMouseOut", "url": "YAHOO.widget.Menu.html#method__onMouseOut", "type": "method"}, {"access": "protected", "host": "YAHOO.widget.Menu", "name": "_onMouseOver", "url": "YAHOO.widget.Menu.html#method__onMouseOver", "type": "method"}, {"access": "private", "host": "YAHOO.widget.Menu", "name": "_onParentMenuConfigChange", "url": "YAHOO.widget.Menu.html#method__onParentMenuConfigChange", "type": "method"}, {"access": "private", "host": "YAHOO.widget.Menu", "name": "_onParentMenuRender", "url": "YAHOO.widget.Menu.html#method__onParentMenuRender", "type": "method"}, {"access": "private", "host": "YAHOO.widget.Menu", "name": "_onRender", "url": "YAHOO.widget.Menu.html#method__onRender", "type": "method"}, {"access": "protected", "host": "YAHOO.widget.Menu", "name": "_onScrollTargetMouseOut", "url": "YAHOO.widget.Menu.html#method__onScrollTargetMouseOut", "type": "method"}, {"access": "protected", "host": "YAHOO.widget.Menu", "name": "_onScrollTargetMouseOver", "url": "YAHOO.widget.Menu.html#method__onScrollTargetMouseOver", "type": "method"}, {"access": "private", "host": "YAHOO.widget.Menu", "name": "_onShow", "url": "YAHOO.widget.Menu.html#method__onShow", "type": "method"}, {"access": "private", "host": "YAHOO.widget.Menu", "name": "_onVisibleChange", "url": "YAHOO.widget.Menu.html#method__onVisibleChange", "type": "method"}, {"access": "protected", "host": "YAHOO.widget.Menu", "name": "_onYChange", "url": "YAHOO.widget.Menu.html#method__onYChange", "type": "method"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "parent", "url": "YAHOO.widget.Menu.html#property_parent", "type": "property"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "position", "url": "YAHOO.widget.Menu.html#config_position", "type": "config"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "positionOffScreen", "url": "YAHOO.widget.Menu.html#method_positionOffScreen", "type": "method"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "preventcontextoverlap", "url": "YAHOO.widget.Menu.html#config_preventcontextoverlap", "type": "config"}, {"access": "private", "host": "YAHOO.widget.MenuManager", "name": "removeItem", "url": "YAHOO.widget.MenuManager.html#method_removeItem", "type": "method"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "removeItem", "url": "YAHOO.widget.Menu.html#method_removeItem", "type": "method"}, {"access": "private", "host": "YAHOO.widget.Menu", "name": "_removeItemFromGroupByIndex", "url": "YAHOO.widget.Menu.html#method__removeItemFromGroupByIndex", "type": "method"}, {"access": "private", "host": "YAHOO.widget.Menu", "name": "_removeItemFromGroupByValue", "url": "YAHOO.widget.Menu.html#method__removeItemFromGroupByValue", "type": "method"}, {"access": "", "host": "YAHOO.widget.MenuManager", "name": "removeMenu", "url": "YAHOO.widget.MenuManager.html#method_removeMenu", "type": "method"}, {"access": "private", "host": "YAHOO.widget.Menu", "name": "_sClassName", "url": "YAHOO.widget.Menu.html#property__sClassName", "type": "property"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "scrollincrement", "url": "YAHOO.widget.Menu.html#config_scrollincrement", "type": "config"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "setInitialFocus", "url": "YAHOO.widget.Menu.html#method_setInitialFocus", "type": "method"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "setInitialSelection", "url": "YAHOO.widget.Menu.html#method_setInitialSelection", "type": "method"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "setItemGroupTitle", "url": "YAHOO.widget.Menu.html#method_setItemGroupTitle", "type": "method"}, {"access": "private", "host": "YAHOO.widget.Menu", "name": "_setMaxHeight", "url": "YAHOO.widget.Menu.html#method__setMaxHeight", "type": "method"}, {"access": "private", "host": "YAHOO.widget.Menu", "name": "_setScrollHeight", "url": "YAHOO.widget.Menu.html#method__setScrollHeight", "type": "method"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "shadow", "url": "YAHOO.widget.Menu.html#config_shadow", "type": "config"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "showdelay", "url": "YAHOO.widget.Menu.html#config_showdelay", "type": "config"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "srcElement", "url": "YAHOO.widget.Menu.html#property_srcElement", "type": "property"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "submenualignment", "url": "YAHOO.widget.Menu.html#config_submenualignment", "type": "config"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "submenuhidedelay", "url": "YAHOO.widget.Menu.html#config_submenuhidedelay", "type": "config"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "subscribe", "url": "YAHOO.widget.Menu.html#method_subscribe", "type": "method"}, {"access": "private", "host": "YAHOO.widget.Menu", "name": "_subscribeToItemEvents", "url": "YAHOO.widget.Menu.html#method__subscribeToItemEvents", "type": "method"}, {"access": "", "host": "YAHOO.widget.MenuManager", "name": "toString", "url": "YAHOO.widget.MenuManager.html#method_toString", "type": "method"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "toString", "url": "YAHOO.widget.Menu.html#method_toString", "type": "method"}, {"access": "private", "host": "YAHOO.widget.Menu", "name": "_updateItemProperties", "url": "YAHOO.widget.Menu.html#method__updateItemProperties", "type": "method"}, {"access": "private", "host": "YAHOO.widget.Menu", "name": "_useHideDelay", "url": "YAHOO.widget.Menu.html#property__useHideDelay", "type": "property"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "visible", "url": "YAHOO.widget.Menu.html#config_visible", "type": "config"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "x", "url": "YAHOO.widget.Menu.html#config_x", "type": "config"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "xy", "url": "YAHOO.widget.Menu.html#config_xy", "type": "config"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "y", "url": "YAHOO.widget.Menu.html#config_y", "type": "config"}];
+
+    var ALL_YUI_PROPS = [{"access": "", "host": "YAHOO.widget.Menu", "name": "activeItem", "url": "YAHOO.widget.Menu.html#property_activeItem", "type": "property"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "addItem", "url": "YAHOO.widget.Menu.html#method_addItem", "type": "method"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "addItems", "url": "YAHOO.widget.Menu.html#method_addItems", "type": "method"}, {"access": "private", "host": "YAHOO.widget.Menu", "name": "_addItemToGroup", "url": "YAHOO.widget.Menu.html#method__addItemToGroup", "type": "method"}, {"access": "protected", "host": "YAHOO.widget.Menu", "name": "_addShadowVisibleClass", "url": "YAHOO.widget.Menu.html#method__addShadowVisibleClass", "type": "method"}, {"access": "private", "host": "YAHOO.widget.Menu", "name": "_aGroupTitleElements", "url": "YAHOO.widget.Menu.html#property__aGroupTitleElements", "type": "property"}, {"access": "private", "host": "YAHOO.widget.Menu", "name": "_aItemGroups", "url": "YAHOO.widget.Menu.html#property__aItemGroups", "type": "property"}, {"access": "private", "host": "YAHOO.widget.Menu", "name": "_aListElements", "url": "YAHOO.widget.Menu.html#property__aListElements", "type": "property"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "autosubmenudisplay", "url": "YAHOO.widget.Menu.html#config_autosubmenudisplay", "type": "config"}, {"access": "private", "host": "YAHOO.widget.ContextMenu", "name": "_bCancelled", "url": "YAHOO.widget.ContextMenu.html#property__bCancelled", "type": "property"}, {"access": "private", "host": "YAHOO.widget.Menu", "name": "_bHandledMouseOutEvent", "url": "YAHOO.widget.Menu.html#property__bHandledMouseOutEvent", "type": "property"}, {"access": "private", "host": "YAHOO.widget.Menu", "name": "_bHandledMouseOverEvent", "url": "YAHOO.widget.Menu.html#property__bHandledMouseOverEvent", "type": "property"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "blur", "url": "YAHOO.widget.Menu.html#method_blur", "type": "method"}, {"access": "private", "host": "YAHOO.widget.Menu", "name": "_bStopMouseEventHandlers", "url": "YAHOO.widget.Menu.html#property__bStopMouseEventHandlers", "type": "property"}, {"access": "", "host": "YAHOO.widget.ContextMenu", "name": "cancel", "url": "YAHOO.widget.ContextMenu.html#method_cancel", "type": "method"}, {"access": "private", "host": "YAHOO.widget.Menu", "name": "_cancelHideDelay", "url": "YAHOO.widget.Menu.html#method__cancelHideDelay", "type": "method"}, {"access": "private", "host": "YAHOO.widget.Menu", "name": "_cancelShowDelay", "url": "YAHOO.widget.Menu.html#method__cancelShowDelay", "type": "method"}, {"access": "private", "host": "YAHOO.widget.Menu", "name": "checkPosition", "url": "YAHOO.widget.Menu.html#method_checkPosition", "type": "method"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "classname", "url": "YAHOO.widget.Menu.html#config_classname", "type": "config"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "clearActiveItem", "url": "YAHOO.widget.Menu.html#method_clearActiveItem", "type": "method"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "clearContent", "url": "YAHOO.widget.Menu.html#method_clearContent", "type": "method"}, {"access": "private", "host": "YAHOO.widget.Menu", "name": "_clearSetWidthFlag", "url": "YAHOO.widget.Menu.html#method__clearSetWidthFlag", "type": "method"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "clickEvent", "url": "YAHOO.widget.Menu.html#event_clickEvent", "type": "event"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "clicktohide", "url": "YAHOO.widget.Menu.html#config_clicktohide", "type": "config"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "configClassName", "url": "YAHOO.widget.Menu.html#method_configClassName", "type": "method"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "configContainer", "url": "YAHOO.widget.Menu.html#method_configContainer", "type": "method"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "configDisabled", "url": "YAHOO.widget.Menu.html#method_configDisabled", "type": "method"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "configHideDelay", "url": "YAHOO.widget.Menu.html#method_configHideDelay", "type": "method"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "configIframe", "url": "YAHOO.widget.Menu.html#method_configIframe", "type": "method"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "configMaxHeight", "url": "YAHOO.widget.Menu.html#method_configMaxHeight", "type": "method"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "configPosition", "url": "YAHOO.widget.Menu.html#method_configPosition", "type": "method"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "configShadow", "url": "YAHOO.widget.Menu.html#method_configShadow", "type": "method"}, {"access": "", "host": "YAHOO.widget.ContextMenu", "name": "configTrigger", "url": "YAHOO.widget.ContextMenu.html#method_configTrigger", "type": "method"}, {"access": "private", "host": "YAHOO.widget.Menu", "name": "_configureSubmenu", "url": "YAHOO.widget.Menu.html#method__configureSubmenu", "type": "method"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "configVisible", "url": "YAHOO.widget.Menu.html#method_configVisible", "type": "method"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "constraintoviewport", "url": "YAHOO.widget.Menu.html#config_constraintoviewport", "type": "config"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "container", "url": "YAHOO.widget.Menu.html#config_container", "type": "config"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "context", "url": "YAHOO.widget.Menu.html#config_context", "type": "config"}, {"access": "", "host": "YAHOO.widget.ContextMenu", "name": "contextEventTarget", "url": "YAHOO.widget.ContextMenu.html#property_contextEventTarget", "type": "property"}, {"access": "private", "host": "YAHOO.widget.Menu", "name": "_createItemGroup", "url": "YAHOO.widget.Menu.html#method__createItemGroup", "type": "method"}, {"access": "protected", "host": "YAHOO.widget.Menu", "name": "_createShadow", "url": "YAHOO.widget.Menu.html#method__createShadow", "type": "method"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "CSS_CLASS_NAME", "url": "YAHOO.widget.Menu.html#property_CSS_CLASS_NAME", "type": "property"}, {"access": "private", "host": "YAHOO.widget.ContextMenu", "name": "DEFAULT_CONFIG", "url": "YAHOO.widget.ContextMenu.html#property_DEFAULT_CONFIG", "type": "property"}, {"access": "", "host": "YAHOO.widget.ContextMenu", "name": "destroy", "url": "YAHOO.widget.ContextMenu.html#method_destroy", "type": "method"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "destroy", "url": "YAHOO.widget.Menu.html#method_destroy", "type": "method"}, {"access": "protected", "host": "YAHOO.widget.Menu", "name": "_didMouseLeave", "url": "YAHOO.widget.Menu.html#method__didMouseLeave", "type": "method"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "disabled", "url": "YAHOO.widget.Menu.html#config_disabled", "type": "config"}, {"access": "protected", "host": "YAHOO.widget.Menu", "name": "_disableScrollFooter", "url": "YAHOO.widget.Menu.html#method__disableScrollFooter", "type": "method"}, {"access": "protected", "host": "YAHOO.widget.Menu", "name": "_disableScrollHeader", "url": "YAHOO.widget.Menu.html#method__disableScrollHeader", "type": "method"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "effect", "url": "YAHOO.widget.Menu.html#config_effect", "type": "config"}, {"access": "protected", "host": "YAHOO.widget.Menu", "name": "_enableScrollFooter", "url": "YAHOO.widget.Menu.html#method__enableScrollFooter", "type": "method"}, {"access": "protected", "host": "YAHOO.widget.Menu", "name": "_enableScrollHeader", "url": "YAHOO.widget.Menu.html#method__enableScrollHeader", "type": "method"}, {"access": "private", "host": "YAHOO.widget.ContextMenu", "name": "EVENT_TYPES", "url": "YAHOO.widget.ContextMenu.html#property_EVENT_TYPES", "type": "property"}, {"access": "private", "host": "YAHOO.widget.Menu", "name": "_execHideDelay", "url": "YAHOO.widget.Menu.html#method__execHideDelay", "type": "method"}, {"access": "private", "host": "YAHOO.widget.Menu", "name": "_execSubmenuHideDelay", "url": "YAHOO.widget.Menu.html#method__execSubmenuHideDelay", "type": "method"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "fixedcenter", "url": "YAHOO.widget.Menu.html#config_fixedcenter", "type": "config"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "focus", "url": "YAHOO.widget.Menu.html#method_focus", "type": "method"}, {"access": "private", "host": "YAHOO.widget.Menu", "name": "_getFirstEnabledItem", "url": "YAHOO.widget.Menu.html#method__getFirstEnabledItem", "type": "method"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "getItem", "url": "YAHOO.widget.Menu.html#method_getItem", "type": "method"}, {"access": "private", "host": "YAHOO.widget.Menu", "name": "_getItemGroup", "url": "YAHOO.widget.Menu.html#method__getItemGroup", "type": "method"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "getItemGroups", "url": "YAHOO.widget.Menu.html#method_getItemGroups", "type": "method"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "getItems", "url": "YAHOO.widget.Menu.html#method_getItems", "type": "method"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "getRoot", "url": "YAHOO.widget.Menu.html#method_getRoot", "type": "method"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "getSubmenus", "url": "YAHOO.widget.Menu.html#method_getSubmenus", "type": "method"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "GROUP_TITLE_TAG_NAME", "url": "YAHOO.widget.Menu.html#property_GROUP_TITLE_TAG_NAME", "type": "property"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "hasFocus", "url": "YAHOO.widget.Menu.html#method_hasFocus", "type": "method"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "hidedelay", "url": "YAHOO.widget.Menu.html#config_hidedelay", "type": "config"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "iframe", "url": "YAHOO.widget.Menu.html#config_iframe", "type": "config"}, {"access": "", "host": "YAHOO.widget.ContextMenu", "name": "init", "url": "YAHOO.widget.ContextMenu.html#method_init", "type": "method"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "init", "url": "YAHOO.widget.Menu.html#method_init", "type": "method"}, {"access": "", "host": "YAHOO.widget.ContextMenu", "name": "initDefaultConfig", "url": "YAHOO.widget.ContextMenu.html#method_initDefaultConfig", "type": "method"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "initDefaultConfig", "url": "YAHOO.widget.Menu.html#method_initDefaultConfig", "type": "method"}, {"access": "", "host": "YAHOO.widget.ContextMenu", "name": "initEvents", "url": "YAHOO.widget.ContextMenu.html#method_initEvents", "type": "method"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "initEvents", "url": "YAHOO.widget.Menu.html#method_initEvents", "type": "method"}, {"access": "private", "host": "YAHOO.widget.Menu", "name": "_initSubTree", "url": "YAHOO.widget.Menu.html#method__initSubTree", "type": "method"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "insertItem", "url": "YAHOO.widget.Menu.html#method_insertItem", "type": "method"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "itemAddedEvent", "url": "YAHOO.widget.Menu.html#event_itemAddedEvent", "type": "event"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "itemData", "url": "YAHOO.widget.Menu.html#property_itemData", "type": "property"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "itemRemovedEvent", "url": "YAHOO.widget.Menu.html#event_itemRemovedEvent", "type": "event"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "ITEM_TYPE", "url": "YAHOO.widget.Menu.html#property_ITEM_TYPE", "type": "property"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "keepopen", "url": "YAHOO.widget.Menu.html#config_keepopen", "type": "config"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "keyDownEvent", "url": "YAHOO.widget.Menu.html#event_keyDownEvent", "type": "event"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "keyPressEvent", "url": "YAHOO.widget.Menu.html#event_keyPressEvent", "type": "event"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "keyUpEvent", "url": "YAHOO.widget.Menu.html#event_keyUpEvent", "type": "event"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "lazyLoad", "url": "YAHOO.widget.Menu.html#property_lazyLoad", "type": "property"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "maxheight", "url": "YAHOO.widget.Menu.html#config_maxheight", "type": "config"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "minscrollheight", "url": "YAHOO.widget.Menu.html#config_minscrollheight", "type": "config"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "mouseDownEvent", "url": "YAHOO.widget.Menu.html#event_mouseDownEvent", "type": "event"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "mouseOutEvent", "url": "YAHOO.widget.Menu.html#event_mouseOutEvent", "type": "event"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "mouseOverEvent", "url": "YAHOO.widget.Menu.html#event_mouseOverEvent", "type": "event"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "mouseUpEvent", "url": "YAHOO.widget.Menu.html#event_mouseUpEvent", "type": "event"}, {"access": "private", "host": "YAHOO.widget.Menu", "name": "_nCurrentMouseX", "url": "YAHOO.widget.Menu.html#property__nCurrentMouseX", "type": "property"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "OFF_SCREEN_POSITION", "url": "YAHOO.widget.Menu.html#property_OFF_SCREEN_POSITION", "type": "property"}, {"access": "private", "host": "YAHOO.widget.Menu", "name": "_onBeforeHide", "url": "YAHOO.widget.Menu.html#method__onBeforeHide", "type": "method"}, {"access": "private", "host": "YAHOO.widget.Menu", "name": "_onBeforeRender", "url": "YAHOO.widget.Menu.html#method__onBeforeRender", "type": "method"}, {"access": "private", "host": "YAHOO.widget.Menu", "name": "_onBeforeShow", "url": "YAHOO.widget.Menu.html#method__onBeforeShow", "type": "method"}, {"access": "protected", "host": "YAHOO.widget.Menu", "name": "_onBlur", "url": "YAHOO.widget.Menu.html#method__onBlur", "type": "method"}, {"access": "protected", "host": "YAHOO.widget.Menu", "name": "_onClick", "url": "YAHOO.widget.Menu.html#method__onClick", "type": "method"}, {"access": "private", "host": "YAHOO.widget.Menu", "name": "_onHide", "url": "YAHOO.widget.Menu.html#method__onHide", "type": "method"}, {"access": "private", "host": "YAHOO.widget.Menu", "name": "_onInit", "url": "YAHOO.widget.Menu.html#method__onInit", "type": "method"}, {"access": "private", "host": "YAHOO.widget.Menu", "name": "_onItemAdded", "url": "YAHOO.widget.Menu.html#method__onItemAdded", "type": "method"}, {"access": "protected", "host": "YAHOO.widget.Menu", "name": "_onKeyDown", "url": "YAHOO.widget.Menu.html#method__onKeyDown", "type": "method"}, {"access": "protected", "host": "YAHOO.widget.Menu", "name": "_onKeyPress", "url": "YAHOO.widget.Menu.html#method__onKeyPress", "type": "method"}, {"access": "private", "host": "YAHOO.widget.Menu", "name": "_onMenuItemConfigChange", "url": "YAHOO.widget.Menu.html#method__onMenuItemConfigChange", "type": "method"}, {"access": "private", "host": "YAHOO.widget.Menu", "name": "_onMenuItemDestroy", "url": "YAHOO.widget.Menu.html#method__onMenuItemDestroy", "type": "method"}, {"access": "protected", "host": "YAHOO.widget.Menu", "name": "_onMouseMove", "url": "YAHOO.widget.Menu.html#method__onMouseMove", "type": "method"}, {"access": "protected", "host": "YAHOO.widget.Menu", "name": "_onMouseOut", "url": "YAHOO.widget.Menu.html#method__onMouseOut", "type": "method"}, {"access": "protected", "host": "YAHOO.widget.Menu", "name": "_onMouseOver", "url": "YAHOO.widget.Menu.html#method__onMouseOver", "type": "method"}, {"access": "private", "host": "YAHOO.widget.Menu", "name": "_onParentMenuConfigChange", "url": "YAHOO.widget.Menu.html#method__onParentMenuConfigChange", "type": "method"}, {"access": "private", "host": "YAHOO.widget.Menu", "name": "_onParentMenuRender", "url": "YAHOO.widget.Menu.html#method__onParentMenuRender", "type": "method"}, {"access": "private", "host": "YAHOO.widget.Menu", "name": "_onRender", "url": "YAHOO.widget.Menu.html#method__onRender", "type": "method"}, {"access": "protected", "host": "YAHOO.widget.Menu", "name": "_onScrollTargetMouseOut", "url": "YAHOO.widget.Menu.html#method__onScrollTargetMouseOut", "type": "method"}, {"access": "protected", "host": "YAHOO.widget.Menu", "name": "_onScrollTargetMouseOver", "url": "YAHOO.widget.Menu.html#method__onScrollTargetMouseOver", "type": "method"}, {"access": "private", "host": "YAHOO.widget.Menu", "name": "_onShow", "url": "YAHOO.widget.Menu.html#method__onShow", "type": "method"}, {"access": "private", "host": "YAHOO.widget.ContextMenu", "name": "_onTriggerClick", "url": "YAHOO.widget.ContextMenu.html#method__onTriggerClick", "type": "method"}, {"access": "private", "host": "YAHOO.widget.ContextMenu", "name": "_onTriggerContextMenu", "url": "YAHOO.widget.ContextMenu.html#method__onTriggerContextMenu", "type": "method"}, {"access": "private", "host": "YAHOO.widget.Menu", "name": "_onVisibleChange", "url": "YAHOO.widget.Menu.html#method__onVisibleChange", "type": "method"}, {"access": "protected", "host": "YAHOO.widget.Menu", "name": "_onYChange", "url": "YAHOO.widget.Menu.html#method__onYChange", "type": "method"}, {"access": "private", "host": "YAHOO.widget.ContextMenu", "name": "_oTrigger", "url": "YAHOO.widget.ContextMenu.html#property__oTrigger", "type": "property"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "parent", "url": "YAHOO.widget.Menu.html#property_parent", "type": "property"}, {"access": "private", "host": "YAHOO.widget.ContextMenu", "name": "position", "url": "YAHOO.widget.ContextMenu.html#method_position", "type": "method"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "position", "url": "YAHOO.widget.Menu.html#config_position", "type": "config"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "positionOffScreen", "url": "YAHOO.widget.Menu.html#method_positionOffScreen", "type": "method"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "preventcontextoverlap", "url": "YAHOO.widget.Menu.html#config_preventcontextoverlap", "type": "config"}, {"access": "private", "host": "YAHOO.widget.ContextMenu", "name": "_removeEventHandlers", "url": "YAHOO.widget.ContextMenu.html#method__removeEventHandlers", "type": "method"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "removeItem", "url": "YAHOO.widget.Menu.html#method_removeItem", "type": "method"}, {"access": "private", "host": "YAHOO.widget.Menu", "name": "_removeItemFromGroupByIndex", "url": "YAHOO.widget.Menu.html#method__removeItemFromGroupByIndex", "type": "method"}, {"access": "private", "host": "YAHOO.widget.Menu", "name": "_removeItemFromGroupByValue", "url": "YAHOO.widget.Menu.html#method__removeItemFromGroupByValue", "type": "method"}, {"access": "protected", "host": "YAHOO.widget.Menu", "name": "_removeShadow", "url": "YAHOO.widget.Menu.html#method__removeShadow", "type": "method"}, {"access": "protected", "host": "YAHOO.widget.Menu", "name": "_removeShadowVisibleClass", "url": "YAHOO.widget.Menu.html#method__removeShadowVisibleClass", "type": "method"}, {"access": "protected", "host": "YAHOO.widget.Menu", "name": "_replaceShadow", "url": "YAHOO.widget.Menu.html#method__replaceShadow", "type": "method"}, {"access": "private", "host": "YAHOO.widget.Menu", "name": "_sClassName", "url": "YAHOO.widget.Menu.html#property__sClassName", "type": "property"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "scrollincrement", "url": "YAHOO.widget.Menu.html#config_scrollincrement", "type": "config"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "setInitialFocus", "url": "YAHOO.widget.Menu.html#method_setInitialFocus", "type": "method"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "setInitialSelection", "url": "YAHOO.widget.Menu.html#method_setInitialSelection", "type": "method"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "setItemGroupTitle", "url": "YAHOO.widget.Menu.html#method_setItemGroupTitle", "type": "method"}, {"access": "private", "host": "YAHOO.widget.Menu", "name": "_setMaxHeight", "url": "YAHOO.widget.Menu.html#method__setMaxHeight", "type": "method"}, {"access": "private", "host": "YAHOO.widget.Menu", "name": "_setScrollHeight", "url": "YAHOO.widget.Menu.html#method__setScrollHeight", "type": "method"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "shadow", "url": "YAHOO.widget.Menu.html#config_shadow", "type": "config"}, {"access": "protected", "host": "YAHOO.widget.Menu", "name": "_shadowBeforeShow", "url": "YAHOO.widget.Menu.html#method__shadowBeforeShow", "type": "method"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "showdelay", "url": "YAHOO.widget.Menu.html#config_showdelay", "type": "config"}, {"access": "protected", "host": "YAHOO.widget.Menu", "name": "_sizeShadow", "url": "YAHOO.widget.Menu.html#method__sizeShadow", "type": "method"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "srcElement", "url": "YAHOO.widget.Menu.html#property_srcElement", "type": "property"}, {"access": "private", "host": "YAHOO.widget.Menu", "name": "_stopMouseEventHandlers", "url": "YAHOO.widget.Menu.html#method__stopMouseEventHandlers", "type": "method"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "submenualignment", "url": "YAHOO.widget.Menu.html#config_submenualignment", "type": "config"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "submenuhidedelay", "url": "YAHOO.widget.Menu.html#config_submenuhidedelay", "type": "config"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "subscribe", "url": "YAHOO.widget.Menu.html#method_subscribe", "type": "method"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "_subscribeScrollHandlers", "url": "YAHOO.widget.Menu.html#method__subscribeScrollHandlers", "type": "method"}, {"access": "private", "host": "YAHOO.widget.Menu", "name": "_subscribeToItemEvents", "url": "YAHOO.widget.Menu.html#method__subscribeToItemEvents", "type": "method"}, {"access": "", "host": "YAHOO.widget.ContextMenu", "name": "toString", "url": "YAHOO.widget.ContextMenu.html#method_toString", "type": "method"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "toString", "url": "YAHOO.widget.Menu.html#method_toString", "type": "method"}, {"access": "", "host": "YAHOO.widget.ContextMenu", "name": "trigger", "url": "YAHOO.widget.ContextMenu.html#config_trigger", "type": "config"}, {"access": "", "host": "YAHOO.widget.ContextMenu", "name": "triggerContextMenuEvent", "url": "YAHOO.widget.ContextMenu.html#event_triggerContextMenuEvent", "type": "event"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "_unsubscribeScrollHandlers", "url": "YAHOO.widget.Menu.html#method__unsubscribeScrollHandlers", "type": "method"}, {"access": "private", "host": "YAHOO.widget.Menu", "name": "_updateItemProperties", "url": "YAHOO.widget.Menu.html#method__updateItemProperties", "type": "method"}, {"access": "private", "host": "YAHOO.widget.Menu", "name": "_useHideDelay", "url": "YAHOO.widget.Menu.html#property__useHideDelay", "type": "property"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "visible", "url": "YAHOO.widget.Menu.html#config_visible", "type": "config"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "x", "url": "YAHOO.widget.Menu.html#config_x", "type": "config"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "xy", "url": "YAHOO.widget.Menu.html#config_xy", "type": "config"}, {"access": "", "host": "YAHOO.widget.Menu", "name": "y", "url": "YAHOO.widget.Menu.html#config_y", "type": "config"}];
 </script>
 </body>
 </html>

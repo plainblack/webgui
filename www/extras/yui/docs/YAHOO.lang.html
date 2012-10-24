@@ -16,7 +16,7 @@
 <div id="doc3" class="yui-t2">
 	<div id="hd">
         <h1><a href="http://developer.yahoo.com/yui/" title="Yahoo! UI Library">Yahoo! UI Library</a></h1>
-        <h3>YAHOO Global&nbsp; <span class="subtitle">2.8.0r4</span></h3>
+        <h3>YAHOO Global&nbsp; <span class="subtitle">2.9.0</span></h3>
         <a href="./index.html" title="Yahoo! UI Library">Yahoo! UI Library</a> 
             &gt; <a href="./module_yahoo.html" title="yahoo">yahoo</a>
                  &gt; YAHOO.lang 
@@ -74,7 +74,7 @@
                                     <div class="detail">
                                         <div class="description" property="yui:description">
                                             IE will not enumerate native functions in a derived object even if the
-function was overridden.  This is a workaround for specific functions 
+function was overridden.  This is a workaround for specific functions
 we care about on the Object prototype.
                                         </div>
                                     </div>
@@ -121,7 +121,7 @@ we care about on the Object prototype.
                                         </code>
                                         
                                         <div class="description" property="yui:description">
-                                            Same as YAHOO.lang.augmentObject, except it only applies prototype 
+                                            Same as YAHOO.lang.augmentObject, except it only applies prototype
 properties.  This is an alias for augmentProto.
                                         </div>
 
@@ -145,7 +145,7 @@ properties.  This is an alias for augmentProto.
                                                         <code><span property="yui:name">arguments</span>
                                                         &lt;<span property="yui:type">String*|boolean</span>&gt;
                                                         </code>
-                                                        <span property="yui:description"> zero or more properties methods to 
+                                                        <span property="yui:description"> zero or more properties methods to
 augment the receiver with.  If none specified, everything
 in the supplier will be used unless it would
 overwrite an existing property in the receiver.  if true
@@ -155,13 +155,6 @@ the receiver</span>
                                                         </dd>
                                                 </dl>
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        void
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
-                                                </dl>
 
 
              
@@ -200,11 +193,11 @@ the receiver</span>
                                         
                                         <div class="description" property="yui:description">
                                             Applies all properties in the supplier to the receiver if the
-receiver does not have these properties yet.  Optionally, one or 
-more methods/properties can be specified (as additional 
-parameters).  This option will overwrite the property if receiver 
-has it already.  If true is passed as the third parameter, all 
-properties will be applied and _will_ overwrite properties in 
+receiver does not have these properties yet.  Optionally, one or
+more methods/properties can be specified (as additional
+parameters).  This option will overwrite the property if receiver
+has it already.  If true is passed as the third parameter, all
+properties will be applied and _will_ overwrite properties in
 the receiver.
                                         </div>
 
@@ -228,7 +221,7 @@ the receiver.
                                                         <code><span property="yui:name">arguments</span>
                                                         &lt;<span property="yui:type">String*|boolean</span>&gt;
                                                         </code>
-                                                        <span property="yui:description"> zero or more properties methods 
+                                                        <span property="yui:description"> zero or more properties methods
 to augment the receiver with.  If none specified, everything
 in the supplier will be used unless it would
 overwrite an existing property in the receiver. If true
@@ -238,13 +231,6 @@ the receiver</span>
                                                         </dd>
                                                 </dl>
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        void
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
-                                                </dl>
 
 
              
@@ -305,22 +291,15 @@ the receiver</span>
                                                         <code><span property="yui:name">arguments</span>
                                                         &lt;<span property="yui:type">String*|boolean</span>&gt;
                                                         </code>
-                                                        <span property="yui:description"> zero or more properties methods 
-to augment the receiver with.  If none specified, everything 
-in the supplier will be used unless it would overwrite an existing 
-property in the receiver.  if true is specified as the third 
-parameter, all properties will be applied and will overwrite an 
+                                                        <span property="yui:description"> zero or more properties methods
+to augment the receiver with.  If none specified, everything
+in the supplier will be used unless it would overwrite an existing
+property in the receiver.  if true is specified as the third
+parameter, all properties will be applied and will overwrite an
 existing property in the receiver</span>
                                                         </dd>
                                                 </dl>
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        void
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
-                                                </dl>
 
 
              
@@ -381,9 +360,73 @@ associative arrays.
                                                 <dl>
                                                     <dt>Returns:
                                                     <code property="yui:return">
-                                                        String
+                                                            String
                                                     </code></dt>
                                                     <dd property="yui:returnInfo">the dump result</dd>
+                                                </dl>
+
+
+             
+
+                                        </div>
+
+                                    </div>
+                                    <hr />
+                                    </div>
+                                    <div class="" rel="yui:method" resource="#method_escapeHTML">
+                                    <h4>
+                                        <a name="method_escapeHTML">escapeHTML</a></h4>
+                                    <div class="detail" >
+                                        <code>
+                                        
+                                         static 
+                                        
+                                        String
+                                            <strong property="yui:name">escapeHTML</strong>
+                                           (
+                                                
+                                                        
+                                                         html
+                                                    
+                                                
+                                            )
+                                        </code>
+                                        
+                                        <div class="description" property="yui:description">
+                                            <p>
+Returns a copy of the specified string with special HTML characters
+escaped. The following characters will be converted to their
+corresponding character entities:
+<code>&amp; &lt; &gt; &quot; &#x27; &#x2F; &#x60;</code>
+</p>
+<p>
+This implementation is based on the
+<a href="http://www.owasp.org/index.php/XSS_(Cross_Site_Scripting)_Prevention_Cheat_Sheet">OWASP
+HTML escaping recommendations</a>. In addition to the characters
+in the OWASP recommendation, we also escape the <code>&#x60;</code>
+character, since IE interprets it as an attribute delimiter when used in
+innerHTML.
+</p>
+                                        </div>
+
+                                        <div class="description">
+
+                                                <dl rel="yui:parameters">
+                                                    <dt>Parameters:</dt>
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">html</span>
+                                                        &lt;<span property="yui:type">String</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> String to escape.</span>
+                                                        </dd>
+                                                </dl>
+
+                                                <dl>
+                                                    <dt>Returns:
+                                                    <code property="yui:return">
+                                                            String
+                                                    </code></dt>
+                                                    <dd property="yui:returnInfo">Escaped string.</dd>
                                                 </dl>
 
 
@@ -449,18 +492,11 @@ Static members will not be inherited.
                                                         </code>
                                                         <span property="yui:description">  additional properties/methods to add to the
 subclass prototype.  These will override the
-matching items obtained from the superclass 
+matching items obtained from the superclass
 if present.</span>
                                                         </dd>
                                                 </dl>
 
-                                                <dl>
-                                                    <dt>Returns:
-                                                    <code property="yui:return">
-                                                        void
-                                                    </code></dt>
-                                                    <dd property="yui:returnInfo"></dd>
-                                                </dl>
 
 
              
@@ -532,7 +568,7 @@ alert(YAHOO.lang.hasOwnProperty(a, 'foo')); // false when using fallback
                                                 <dl>
                                                     <dt>Returns:
                                                     <code property="yui:return">
-                                                        boolean
+                                                            boolean
                                                     </code></dt>
                                                     <dd property="yui:returnInfo">the result</dd>
                                                 </dl>
@@ -583,7 +619,7 @@ alert(YAHOO.lang.hasOwnProperty(a, 'foo')); // false when using fallback
                                                 <dl>
                                                     <dt>Returns:
                                                     <code property="yui:return">
-                                                        boolean
+                                                            boolean
                                                     </code></dt>
                                                     <dd property="yui:returnInfo">the result</dd>
                                                 </dl>
@@ -634,7 +670,7 @@ alert(YAHOO.lang.hasOwnProperty(a, 'foo')); // false when using fallback
                                                 <dl>
                                                     <dt>Returns:
                                                     <code property="yui:return">
-                                                        boolean
+                                                            boolean
                                                     </code></dt>
                                                     <dd property="yui:returnInfo">the result</dd>
                                                 </dl>
@@ -692,7 +728,7 @@ matter to you.
                                                 <dl>
                                                     <dt>Returns:
                                                     <code property="yui:return">
-                                                        boolean
+                                                            boolean
                                                     </code></dt>
                                                     <dd property="yui:returnInfo">the result</dd>
                                                 </dl>
@@ -743,7 +779,7 @@ matter to you.
                                                 <dl>
                                                     <dt>Returns:
                                                     <code property="yui:return">
-                                                        boolean
+                                                            boolean
                                                     </code></dt>
                                                     <dd property="yui:returnInfo">the result</dd>
                                                 </dl>
@@ -794,7 +830,7 @@ matter to you.
                                                 <dl>
                                                     <dt>Returns:
                                                     <code property="yui:return">
-                                                        boolean
+                                                            boolean
                                                     </code></dt>
                                                     <dd property="yui:returnInfo">the result</dd>
                                                 </dl>
@@ -846,7 +882,7 @@ or function
                                                 <dl>
                                                     <dt>Returns:
                                                     <code property="yui:return">
-                                                        boolean
+                                                            boolean
                                                     </code></dt>
                                                     <dd property="yui:returnInfo">the result</dd>
                                                 </dl>
@@ -897,7 +933,7 @@ or function
                                                 <dl>
                                                     <dt>Returns:
                                                     <code property="yui:return">
-                                                        boolean
+                                                            boolean
                                                     </code></dt>
                                                     <dd property="yui:returnInfo">the result</dd>
                                                 </dl>
@@ -948,7 +984,7 @@ or function
                                                 <dl>
                                                     <dt>Returns:
                                                     <code property="yui:return">
-                                                        boolean
+                                                            boolean
                                                     </code></dt>
                                                     <dd property="yui:returnInfo">the result</dd>
                                                 </dl>
@@ -982,7 +1018,7 @@ or function
                                         
                                         <div class="description" property="yui:description">
                                             A convenience method for detecting a legitimate non-null value.
-Returns false for null/undefined/NaN, true for other values, 
+Returns false for null/undefined/NaN, true for other values,
 including 0/false/''
                                         </div>
 
@@ -1001,7 +1037,7 @@ including 0/false/''
                                                 <dl>
                                                     <dt>Returns:
                                                     <code property="yui:return">
-                                                        boolean
+                                                            boolean
                                                     </code></dt>
                                                     <dd property="yui:returnInfo">true if it is not null/undefined/NaN || false</dd>
                                                 </dl>
@@ -1050,8 +1086,8 @@ including 0/false/''
                                         </code>
                                         
                                         <div class="description" property="yui:description">
-                                            Executes the supplied function in the context of the supplied 
-object 'when' milliseconds later.  Executes the function a 
+                                            Executes the supplied function in the context of the supplied
+object 'when' milliseconds later.  Executes the function a
 single time unless periodic is set to true.
                                         </div>
 
@@ -1063,7 +1099,7 @@ single time unless periodic is set to true.
                                                         <code><span property="yui:name">when</span>
                                                         &lt;<span property="yui:type">int</span>&gt;
                                                         </code>
-                                                        <span property="yui:description">  the number of milliseconds to wait until the fn 
+                                                        <span property="yui:description">  the number of milliseconds to wait until the fn
 is executed</span>
                                                         </dd>
                                                         <dd rel="yui:parameter">
@@ -1076,7 +1112,7 @@ is executed</span>
                                                         <code><span property="yui:name">fn</span>
                                                         &lt;<span property="yui:type">Function|String</span>&gt;
                                                         </code>
-                                                        <span property="yui:description">  the function to execute or the name of 
+                                                        <span property="yui:description">  the function to execute or the name of
 the method in the 'o' object to execute</span>
                                                         </dd>
                                                         <dd rel="yui:parameter">
@@ -1093,11 +1129,18 @@ an array [myarray]</span>
                                                         <code><span property="yui:name">periodic</span>
                                                         &lt;<span property="yui:type">boolean</span>&gt;
                                                         </code>
-                                                        <span property="yui:description">  if true, executes continuously at supplied 
+                                                        <span property="yui:description">  if true, executes continuously at supplied
 interval until canceled</span>
                                                         </dd>
                                                 </dl>
 
+                                                <dl>
+                                                    <dt>Returns:
+                                                    <code property="yui:return">
+                                                    </code></dt>
+                                                    <dd property="yui:returnInfo">a timer object. Call the cancel() method on this object to
+stop the timer.</dd>
+                                                </dl>
 
 
              
@@ -1144,6 +1187,12 @@ will overwrite those in earlier objects.
                                                         </dd>
                                                 </dl>
 
+                                                <dl>
+                                                    <dt>Returns:
+                                                    <code property="yui:return">
+                                                    </code></dt>
+                                                    <dd property="yui:returnInfo">the new merged object</dd>
+                                                </dl>
 
 
              
@@ -1177,22 +1226,30 @@ will overwrite those in earlier objects.
                                                          f
                                                     
                                                 
+                                                        , 
+                                                         recurse
+                                                    
+                                                
                                             )
                                         </code>
                                         
                                         <div class="description" property="yui:description">
-                                            Does variable substitution on a string. It scans through the string 
-looking for expressions enclosed in { } braces. If an expression 
+                                            Does variable substitution on a string. It scans through the string
+looking for expressions enclosed in { } braces. If an expression
 is found, it is used a key on the object.  If there is a space in
 the key, the first word is used for the key and the rest is provided
 to an optional function to be used to programatically determine the
-value (the extra information might be used for this decision). If 
+value (the extra information might be used for this decision). If
 the value for the key in the object, or what is returned from the
-function has a string value, number value, or object value, it is 
+function has a string value, number value, or object value, it is
 substituted for the bracket expression and it repeats.  If this
 value is an object, it uses the Object's toString() if this has
 been overridden, otherwise it does a shallow dump of the key/value
 pairs.
+By specifying the recurse option, the string is rescanned after
+every replacement, allowing for nested template substitutions.
+The side effect of this option is that curly braces in the
+replacement content must be encoded.
                                         </div>
 
                                         <div class="description">
@@ -1220,12 +1277,19 @@ process each match.  It receives the key,
 value, and any extra metadata included with
 the key inside of the braces.</span>
                                                         </dd>
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">recurse</span>
+                                                        &lt;<span property="yui:type">boolean</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description">  default true - if not false, the replaced
+string will be rescanned so that nested substitutions are possible.</span>
+                                                        </dd>
                                                 </dl>
 
                                                 <dl>
                                                     <dt>Returns:
                                                     <code property="yui:return">
-                                                        String
+                                                            String
                                                     </code></dt>
                                                     <dd property="yui:returnInfo">the substituted string</dd>
                                                 </dl>
@@ -1258,7 +1322,7 @@ the key inside of the braces.</span>
                                         </code>
                                         
                                         <div class="description" property="yui:description">
-                                            Returns a string without any leading or trailing whitespace.  If 
+                                            Returns a string without any leading or trailing whitespace.  If
 the input is not a string, the input will be returned untouched.
                                         </div>
 
@@ -1277,7 +1341,7 @@ the input is not a string, the input will be returned untouched.
                                                 <dl>
                                                     <dt>Returns:
                                                     <code property="yui:return">
-                                                        string
+                                                            string
                                                     </code></dt>
                                                     <dd property="yui:returnInfo">the trimmed string</dd>
                                                 </dl>
@@ -1397,6 +1461,7 @@ the input is not a string, the input will be returned untouched.
                                 <li class=""><a href="#method_augmentObject" title="augmentObject">augmentObject</a></li>
                                 <li class=""><a href="#method_augmentProto" title="augmentProto">augmentProto</a></li>
                                 <li class=""><a href="#method_dump" title="dump">dump</a></li>
+                                <li class=""><a href="#method_escapeHTML" title="escapeHTML">escapeHTML</a></li>
                                 <li class=""><a href="#method_extend" title="extend">extend</a></li>
                                 <li class=""><a href="#method_hasOwnProperty" title="hasOwnProperty">hasOwnProperty</a></li>
                                 <li class=""><a href="#method_isArray" title="isArray">isArray</a></li>
@@ -1422,11 +1487,12 @@ the input is not a string, the input will be returned untouched.
 	</div>
 	<div id="ft">
         <hr />
-        Copyright &copy; 2009 Yahoo! Inc. All rights reserved.
+        Copyright &copy; 2011 Yahoo! Inc. All rights reserved.
 	</div>
 </div>
 <script type="text/javascript">
-    ALL_YUI_PROPS = [{"access": "", "host": "YAHOO.lang", "name": "augment", "url": "YAHOO.lang.html#method_augment", "type": "method"}, {"access": "", "host": "YAHOO.lang", "name": "augmentObject", "url": "YAHOO.lang.html#method_augmentObject", "type": "method"}, {"access": "", "host": "YAHOO.lang", "name": "augmentProto", "url": "YAHOO.lang.html#method_augmentProto", "type": "method"}, {"access": "", "host": "YAHOO.lang", "name": "dump", "url": "YAHOO.lang.html#method_dump", "type": "method"}, {"access": "", "host": "YAHOO.lang", "name": "extend", "url": "YAHOO.lang.html#method_extend", "type": "method"}, {"access": "", "host": "YAHOO.lang", "name": "hasOwnProperty", "url": "YAHOO.lang.html#method_hasOwnProperty", "type": "method"}, {"access": "private", "host": "YAHOO.lang", "name": "_IEEnumFix", "url": "YAHOO.lang.html#property__IEEnumFix", "type": "property"}, {"access": "", "host": "YAHOO.lang", "name": "isArray", "url": "YAHOO.lang.html#method_isArray", "type": "method"}, {"access": "", "host": "YAHOO.lang", "name": "isBoolean", "url": "YAHOO.lang.html#method_isBoolean", "type": "method"}, {"access": "", "host": "YAHOO.lang", "name": "isFunction", "url": "YAHOO.lang.html#method_isFunction", "type": "method"}, {"access": "", "host": "YAHOO.lang", "name": "isNull", "url": "YAHOO.lang.html#method_isNull", "type": "method"}, {"access": "", "host": "YAHOO.lang", "name": "isNumber", "url": "YAHOO.lang.html#method_isNumber", "type": "method"}, {"access": "", "host": "YAHOO.lang", "name": "isObject", "url": "YAHOO.lang.html#method_isObject", "type": "method"}, {"access": "", "host": "YAHOO.lang", "name": "isString", "url": "YAHOO.lang.html#method_isString", "type": "method"}, {"access": "", "host": "YAHOO.lang", "name": "isUndefined", "url": "YAHOO.lang.html#method_isUndefined", "type": "method"}, {"access": "", "host": "YAHOO.lang", "name": "isValue", "url": "YAHOO.lang.html#method_isValue", "type": "method"}, {"access": "", "host": "YAHOO.lang", "name": "later", "url": "YAHOO.lang.html#method_later", "type": "method"}, {"access": "", "host": "YAHOO.lang", "name": "merge", "url": "YAHOO.lang.html#method_merge", "type": "method"}, {"access": "", "host": "YAHOO.lang", "name": "substitute", "url": "YAHOO.lang.html#method_substitute", "type": "method"}, {"access": "", "host": "YAHOO.lang", "name": "trim", "url": "YAHOO.lang.html#method_trim", "type": "method"}];
+
+    var ALL_YUI_PROPS = [{"access": "", "host": "YAHOO.env.ua", "name": "air", "url": "YAHOO.env.ua.html#property_air", "type": "property"}, {"access": "", "host": "YAHOO.env.ua", "name": "android", "url": "YAHOO.env.ua.html#property_android", "type": "property"}, {"access": "", "host": "YAHOO.lang", "name": "augment", "url": "YAHOO.lang.html#method_augment", "type": "method"}, {"access": "", "host": "YAHOO.lang", "name": "augmentObject", "url": "YAHOO.lang.html#method_augmentObject", "type": "method"}, {"access": "", "host": "YAHOO.lang", "name": "augmentProto", "url": "YAHOO.lang.html#method_augmentProto", "type": "method"}, {"access": "", "host": "YAHOO.env.ua", "name": "caja", "url": "YAHOO.env.ua.html#property_caja", "type": "property"}, {"access": "", "host": "YAHOO.env.ua", "name": "chrome", "url": "YAHOO.env.ua.html#property_chrome", "type": "property"}, {"access": "", "host": "YAHOO.lang", "name": "dump", "url": "YAHOO.lang.html#method_dump", "type": "method"}, {"access": "", "host": "YAHOO.lang", "name": "escapeHTML", "url": "YAHOO.lang.html#method_escapeHTML", "type": "method"}, {"access": "", "host": "YAHOO.lang", "name": "extend", "url": "YAHOO.lang.html#method_extend", "type": "method"}, {"access": "", "host": "YAHOO.env.ua", "name": "gecko", "url": "YAHOO.env.ua.html#property_gecko", "type": "property"}, {"access": "", "host": "YAHOO.env", "name": "getVersion", "url": "YAHOO.env.html#method_getVersion", "type": "method"}, {"access": "", "host": "YAHOO.lang", "name": "hasOwnProperty", "url": "YAHOO.lang.html#method_hasOwnProperty", "type": "method"}, {"access": "", "host": "YAHOO.env.ua", "name": "ie", "url": "YAHOO.env.ua.html#property_ie", "type": "property"}, {"access": "private", "host": "YAHOO.lang", "name": "_IEEnumFix", "url": "YAHOO.lang.html#property__IEEnumFix", "type": "property"}, {"access": "", "host": "YAHOO.env.ua", "name": "ios", "url": "YAHOO.env.ua.html#property_ios", "type": "property"}, {"access": "", "host": "YAHOO.env.ua", "name": "ipad", "url": "YAHOO.env.ua.html#property_ipad", "type": "property"}, {"access": "", "host": "YAHOO.env.ua", "name": "iphone", "url": "YAHOO.env.ua.html#property_iphone", "type": "property"}, {"access": "", "host": "YAHOO.env.ua", "name": "ipod", "url": "YAHOO.env.ua.html#property_ipod", "type": "property"}, {"access": "", "host": "YAHOO.lang", "name": "isArray", "url": "YAHOO.lang.html#method_isArray", "type": "method"}, {"access": "", "host": "YAHOO.lang", "name": "isBoolean", "url": "YAHOO.lang.html#method_isBoolean", "type": "method"}, {"access": "", "host": "YAHOO.lang", "name": "isFunction", "url": "YAHOO.lang.html#method_isFunction", "type": "method"}, {"access": "", "host": "YAHOO.lang", "name": "isNull", "url": "YAHOO.lang.html#method_isNull", "type": "method"}, {"access": "", "host": "YAHOO.lang", "name": "isNumber", "url": "YAHOO.lang.html#method_isNumber", "type": "method"}, {"access": "", "host": "YAHOO.lang", "name": "isObject", "url": "YAHOO.lang.html#method_isObject", "type": "method"}, {"access": "", "host": "YAHOO.lang", "name": "isString", "url": "YAHOO.lang.html#method_isString", "type": "method"}, {"access": "", "host": "YAHOO.lang", "name": "isUndefined", "url": "YAHOO.lang.html#method_isUndefined", "type": "method"}, {"access": "", "host": "YAHOO.lang", "name": "isValue", "url": "YAHOO.lang.html#method_isValue", "type": "method"}, {"access": "", "host": "YAHOO.lang", "name": "later", "url": "YAHOO.lang.html#method_later", "type": "method"}, {"access": "", "host": "YAHOO.env", "name": "listeners", "url": "YAHOO.env.html#property_listeners", "type": "property"}, {"access": "", "host": "YAHOO.lang", "name": "merge", "url": "YAHOO.lang.html#method_merge", "type": "method"}, {"access": "", "host": "YAHOO.env.ua", "name": "mobile", "url": "YAHOO.env.ua.html#property_mobile", "type": "property"}, {"access": "", "host": "YAHOO.env", "name": "modules", "url": "YAHOO.env.html#property_modules", "type": "property"}, {"access": "", "host": "YAHOO.env.ua", "name": "opera", "url": "YAHOO.env.ua.html#property_opera", "type": "property"}, {"access": "", "host": "YAHOO.env.ua", "name": "os", "url": "YAHOO.env.ua.html#property_os", "type": "property"}, {"access": "", "host": "YAHOO.env.ua", "name": "parseUA", "url": "YAHOO.env.ua.html#method_parseUA", "type": "method"}, {"access": "", "host": "YAHOO.env.ua", "name": "secure", "url": "YAHOO.env.ua.html#property_secure", "type": "property"}, {"access": "", "host": "YAHOO.lang", "name": "substitute", "url": "YAHOO.lang.html#method_substitute", "type": "method"}, {"access": "", "host": "YAHOO.lang", "name": "trim", "url": "YAHOO.lang.html#method_trim", "type": "method"}, {"access": "", "host": "YAHOO.env.ua", "name": "webkit", "url": "YAHOO.env.ua.html#property_webkit", "type": "property"}, {"access": "", "host": "YAHOO.env.ua", "name": "webos", "url": "YAHOO.env.ua.html#property_webos", "type": "property"}];
 </script>
 </body>
 </html>

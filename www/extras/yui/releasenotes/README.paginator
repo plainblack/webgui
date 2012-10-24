@@ -1,6 +1,18 @@
 Paginator Release Notes
 
-Development master
+2.9.0
+    * alwaysVisible=false now works when rowsPerPageOptions is supplied
+      an array of objects (e.g. [{ label: 'A few', value: '5' }, ... ]
+    * Added JumpToPageDropdown UI Component (hat tip to Matt Parker)
+    * renderUIComponent is now chainable
+    * Add link title configuration attributes (hat tip to Pete Peterson)
+    * RowsPerPageDropdown configuration rowsPerPageOptions text now assigned
+      to option.text rather than option.innerHTML.
+    * IDs generated for UI components now use Dom.generateId for safety from
+      creating duplicate IDs when using in YUI 3 as yui2-paginator
+
+2.8.1
+    * No changes
 
 2.8.0
     * Replaced non-breaking space entity with regular space in next, previous,
