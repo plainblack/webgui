@@ -15,7 +15,6 @@
  - fixed #12384: Click and drag reordering does not work in IE9
  - fixed: MessageBoard tolerates Collaboration children not yet having a value for lastPostId
  - on invalid proceed method in call to editSave, warn and recover rather than run time error
- - gracefully handle Collaborations having no lastPostId in the MessageBoard asset
 
 7.10.26
  - fixed: Template diagnostics when called without a session asset.
