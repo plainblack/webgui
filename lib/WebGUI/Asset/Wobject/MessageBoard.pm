@@ -129,21 +129,23 @@ sub view {
 			$first = $child;
 		}
 		my %lastPostVars;
-		my $lastPost = WebGUI::Asset::Wobject::MessageBoard->newByDynamicClass($self->session, $child->get("lastPostId"));
-		if (defined $lastPost) {
-			%lastPostVars = (
-				'forum.lastPost.url' => $lastPost->getUrl,
-				'forum.lastPost.date' => $self->session->datetime->epochToHuman($lastPost->get("creationDate"),"%z"),
-				'forum.lastPost.time' => $self->session->datetime->epochToHuman($lastPost->get("creationDate"),"%Z"),
-				'forum.lastPost.epoch' => $lastPost->get("creationDate"),
-				'forum.lastPost.subject' => $lastPost->get("title"),
-				'forum.lastPost.user.hasRead' => $lastPost->getThread->isMarkedRead,
-				'forum.lastPost.user.id' => $lastPost->get("ownerUserId"),
-				'forum.lastPost.user.name' => $lastPost->get("username"),
-				'forum.lastPost.user.alias' => $lastPost->get("username"),
-				'forum.lastPost.user.profile' => $lastPost->getPosterProfileUrl,
-				'forum.lastPost.user.isVisitor' => ($lastPost->get("ownerUserId") eq '1')
-				);
+        if( $child->get('lastPostId') ) {
+			my $lastPost = WebGUI::Asset::Wobject::MessageBoard->newByDynamicClass($self->session, $child->get("lastPostId"));
+			if (defined $lastPost) {
+				%lastPostVars = (
+					'forum.lastPost.url' => $lastPost->getUrl,
+					'forum.lastPost.date' => $self->session->datetime->epochToHuman($lastPost->get("creationDate"),"%z"),
+					'forum.lastPost.time' => $self->session->datetime->epochToHuman($lastPost->get("creationDate"),"%Z"),
+					'forum.lastPost.epoch' => $lastPost->get("creationDate"),
+					'forum.lastPost.subject' => $lastPost->get("title"),
+					'forum.lastPost.user.hasRead' => $lastPost->getThread->isMarkedRead,
+					'forum.lastPost.user.id' => $lastPost->get("ownerUserId"),
+					'forum.lastPost.user.name' => $lastPost->get("username"),
+					'forum.lastPost.user.alias' => $lastPost->get("username"),
+					'forum.lastPost.user.profile' => $lastPost->getPosterProfileUrl,
+					'forum.lastPost.user.isVisitor' => ($lastPost->get("ownerUserId") eq '1')
+					);
+			}
 		}
 
 		push(@forum_loop, {
