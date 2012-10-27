@@ -1,4 +1,5 @@
 #-------------------------------------------------------------------
+warn "warning = $warning";
 # WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
@@ -172,7 +173,7 @@ sub definition {
 
 package main;
 
-plan tests => 138
+plan tests => 140
             + scalar(@fixIdTests)
             + scalar(@fixTitleTests)
             + 2*scalar(@getTitleTests) #same tests used for getTitle and getMenuTitle
@@ -309,6 +310,23 @@ cmp_deeply(
     [ "two", "three" ],
     "serialized property returns deserialized ref",
 );
+
+do {
+    sleep 2;  # so that we don't collide revisionDates
+    my $fatal_error;
+    my $warning;
+    local *WebGUI::Session::ErrorHandler::fatal = sub { my $self = shift; $fatal_error = shift; };
+    local *WebGUI::Session::ErrorHandler::warn = sub { my $self = shift; $warning = shift; };
+    local *WebGUI::Session::Form::validToken = sub { 1 };
+    my $html = WebGUI::Test->getPage($ta, "www_editSave", {
+        userId      => 3,
+        formParams  => { synopsis => '[ "two", "three" ]', proceed => 'asfd' },
+    });
+    ok ! $fatal_error, "no fatal error on invalid &proceed argument to www_editSave";
+    like $warning, qr/proceed method of www_asfd specified/, "warning about invalid proceed method generated";
+};
+
+
 $ta->purge;
 
 ################################################################
@@ -1235,3 +1253,12 @@ subtest 'canAdd tolerates being called as an object method', sub {
     ok !$class->canAdd($session), 'Cannot add when called as a class method';
     ok !$snip->canAdd($session), '...or an object method';
 };
+
+################################################################
+#
+# www_editSave proceed parameter
+#
+################################################################
+{
+}
+

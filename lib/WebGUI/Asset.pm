@@ -3162,9 +3162,14 @@ sub www_editSave {
     elsif ($proceed ne "") {
         my $method = "www_".$session->form->process("proceed");
         $session->asset($object);
-        return $session->asset->$method();
+        if( $session->asset->can($method) ) { 
+            return $session->asset->$method();
+        }
+        else {
+            $session->log->warn("proceed method of $method specified but that method doesn't exist in " . ref($session->asset));
+            # else fall through to the default handling below
+        }
     }
-
     $session->asset($object->getContainer);
     return $session->asset->www_view;
 }
