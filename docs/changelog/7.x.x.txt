@@ -1,3 +1,5 @@
+7.10.28
+
 7.10.27
  - fixed #12379: userImport documentation error
  - fixed #12382: WebGUI::Crud does not work with all form types
