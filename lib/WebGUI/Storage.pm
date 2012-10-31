@@ -1231,6 +1231,7 @@ sub getSizeInPixels {
 		$self->session->log->error("Can't check the size of something that's not an image.");
 		return 0;
 	}
+    my $image = Imager->new;
     $image->read(file => $self->getPath($filename));
     return ($image->getwidth, $image->getheight);
 }
