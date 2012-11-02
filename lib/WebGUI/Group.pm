@@ -277,7 +277,8 @@ sub clearCaches {
     my $session = $self->session;
 	##Clear my cache and the cache of all groups above me.
 	my $groups = $self->getAllGroupsFor();
-	foreach my $groupId ( $self->getId, @{ $groups } ) {
+	GROUPID: foreach my $groupId ( $self->getId, @{ $groups } ) {
+        next GROUPID if !$groupId;
 		WebGUI::Cache->new($session, $groupId)->delete;
         WebGUI::Cache->new($session, ["groupMembers", $groupId])->delete;
 	}
