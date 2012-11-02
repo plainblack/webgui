@@ -1612,7 +1612,7 @@ sub resize {
             $width = $height * $x / $y;
         }
         $self->session->errorHandler->info( "Resizing $filename to w:$width h:$height" );
-        $image = $image->scale(xpixels => $n, ypixels => $n, type => 'nonprop')
+        $image = $image->scale(xpixels => $width, ypixels => $height, type => 'nonprop')
             or die $image->errstr;
     }
 
