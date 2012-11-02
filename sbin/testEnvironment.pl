@@ -16,6 +16,15 @@ use File::Spec;
 
 my $webguiRoot;
 BEGIN {
+    if( $] < 5.010 ) {
+        print <<EOF;
+WebGUI8 requires Perl 5.10.1 or later.  Please upgrade your system perl,
+install a newer perl in /usr/local, or build one with the 'perlbrew'
+utility.  Perl 5.10.0 has serious Unicode bugs that will corrupt 
+Unicode data.  5.16.x or 5.14.x should work fine.
+EOF
+        exit 1;
+    }
     $webguiRoot = File::Spec->rel2abs(File::Spec->catdir(File::Basename::dirname(__FILE__), File::Spec->updir));
     unshift @INC, File::Spec->catdir($webguiRoot, 'lib');
 }

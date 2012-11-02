@@ -1,4 +1,5 @@
 8.0.1
+ - #12377 - add verbiage about requiring a post Apollo era perl if such a perl is detected
 
 8.0.0
  - #10012 - larger meta data values for multi-value fields
