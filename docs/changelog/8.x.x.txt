@@ -1,5 +1,4 @@
 8.0.1
- - #12377 - add verbiage about requiring a post Apollo era perl if such a perl is detected
  - #11849 - Use a different image library -- partially implemented; WebGUI::Image still uses Image::Magick
 
 8.0.0
