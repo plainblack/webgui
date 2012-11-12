@@ -105,7 +105,7 @@ checkModule("Net::LDAP",                    0.39         );
 checkModule("HTML::Highlight",              0.20         );
 checkModule("HTML::TagFilter",              1.03         );
 checkModule("HTML::Template",               2.9          );
-checkModule("HTML::Template::Expr",         0.07,      2 );
+checkModule("HTML::Template::Expr",         0.07,        );
 checkModule("Template",                     2.20         );
 checkModule("XML::FeedPP",                  0.40         );
 checkModule("XML::FeedPP::MediaRSS",        0.02         );
