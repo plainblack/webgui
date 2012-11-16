@@ -20,7 +20,7 @@ use HTTP::Cookies;
 use POE qw(Component::Client::HTTP);
 use Tie::IxHash;
 use JSON qw/ encode_json /;
-use Clone qw(clone);
+use Storable qw(dclone);
 
 #-------------------------------------------------------------------
 
@@ -258,7 +258,7 @@ The id of the instance to retrieve.
 
 sub getInstance {
     my ($self, $instanceId) = @_;
-    return clone($self->{_queue}{$instanceId});
+    return dclone($self->{_queue}{$instanceId});
 }
 
 
@@ -273,7 +273,7 @@ Returns the array of instances from the queue.
 sub getInstances {
     my ($self) = @_;
     my @instances = values %{$self->{_queue}};
-    return @{clone(\@instances)};
+    return @{dclone(\@instances)};
 }
 
 #-------------------------------------------------------------------
@@ -305,7 +305,7 @@ sub getJsonStatus {
         foreach my $instance ($self->getInstances) {
             my $site = $instance->{sitename};
             unless (exists $output{$site}) { # must have an entry for each queue in each site
-                $output{$site} = clone \%queues;
+                $output{$site} = dclone \%queues;
             }
             my $queue = ucfirst($instance->{status});
             push @{$output{$site}{$queue}}, $instance;
