@@ -15,7 +15,6 @@ package WebGUI::HTMLForm;
 =cut
 
 use strict;
-use CGI::Util qw(rearrange);
 use WebGUI::Form;
 use WebGUI::International;
 use WebGUI::Pluggable;
@@ -304,12 +303,37 @@ The UI level for this field. See the WebGUI developer's site for details. Defaul
 
 =cut
 
-sub raw {
-        my ($self, @p) = @_;
-        my ($value, $uiLevel) = rearrange([qw(value uiLevel)], @p);
-        if ($self->_uiLevelChecksOut($uiLevel)) {
-		$self->{_data} .= $value;
+sub _rearrange {
+    my $keys = shift;
+    my @keys = @$keys;
+    my @params = @_;
+
+    for (@keys) {
+        s/^-//;
+        $_ = lc $_;
+    }
+
+    if (ref $params[0] ne 'HASH') {
+        return @params;
+    }
+    else {
+        my $params = shift;
+        my %params;
+        for my $key (%$params) {
+            (my $newkey = lc $key) =~ s/^-//;
+            $params{$newkey} = $params->{$key};
         }
+        return @params{@keys};
+    }
+}
+
+sub raw {
+    my $self = shift;
+    my ($value, $uiLevel) = _rearrange([qw(value uiLevel)], @_);
+
+    if ($self->_uiLevelChecksOut($uiLevel)) {
+        $self->{_data} .= $value;
+    }
 }
 
 
