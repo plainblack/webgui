@@ -11,7 +11,6 @@ package WebGUI::Macro::Include;
 #-------------------------------------------------------------------
 
 use strict;
-use FileHandle;
 use WebGUI::International;
 
 =head1 NAME
@@ -21,6 +20,8 @@ Package WebGUI::Macro::Include
 =head1 DESCRIPTION
 
 Macro for returning the contents of a file from the filesystem.
+This macro is an extreme security risk and you are advised not to
+use it.
 
 =head2 process ( filename )
 
@@ -36,22 +37,15 @@ The complete path to a file in the local filesystem.
 
 #-------------------------------------------------------------------
 sub process {
-	my $session = shift;
-        my (@param, $temp, $file);
-        @param = @_;
-	my $i18n = WebGUI::International->new($session,'Macro_Include');
-	if ($param[0] =~ /passwd/i || $param[0] =~ /shadow/i || $param[0] =~ m{\.conf$}i) {
-                return $i18n->get('security');
-        }
-	$file = FileHandle->new($param[0],"r");
-	if ($file) {
-		local $/;
-		$temp = $file->getline();
-		$file->close;
-	} else {
-		$temp = $i18n->get('not found');
-	}
-        return $temp;
+    my $session = shift;
+    my $filename = shift;
+    my $i18n = WebGUI::International->new($session,'Macro_Include');
+    if ($filename =~ /passwd/i || $filename =~ /shadow/i || $filename =~ m{\.conf$}i) {
+        return $i18n->get('security');
+    }
+    open my $fh, '<', $filename
+        or return $i18n->get('not found');
+    return scalar do { local $/; readline $fh };
 }
 
 
