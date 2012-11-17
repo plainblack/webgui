@@ -22,7 +22,7 @@ use Carp qw(croak);
 use Cwd qw(realpath);
 use File::Spec::Functions qw(catdir splitpath catpath splitpath updir catfile);
 use Try::Tiny;
-use namespace::autoclean -also => qr/^_/;
+use namespace::clean;
 
 =head1 NAME
 
@@ -92,7 +92,6 @@ Returns the base directory for WebGUI auxiliary files.
 =cut
 
 BEGIN {
-    use Class::MOP;
     my $root = realpath(catdir(
         catpath((splitpath(__FILE__))[0,1], ''), (updir) x 2
     ));
@@ -109,10 +108,10 @@ BEGIN {
         share              => catdir($root, 'share'),
         defaultPSGI        => catdir($root, 'share', 'site.psgi'),
     );
-    my $meta = Class::MOP::Class->initialize(__PACKAGE__);
     for my $sub (keys %paths) {
         my $path = $paths{$sub};
-        $meta->add_method( $sub, sub { $path } );
+        no strict;
+        *{ $sub } = sub { $path };
     }
 }
 
@@ -227,6 +226,7 @@ sub preloadAll {
     });
 }
 
+no namespace::clean;
 sub _readTextLines {
     my $file = shift;
     my @lines;
@@ -241,5 +241,6 @@ sub _readTextLines {
     }
     return @lines;
 }
+use namespace::clean;
 
 1;
