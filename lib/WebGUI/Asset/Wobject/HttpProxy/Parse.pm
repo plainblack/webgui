@@ -19,8 +19,7 @@ use strict;
 use HTML::Parser;
 use HTML::Entities;
 use URI::URL;
-use vars qw(@ISA);
-@ISA = qw(HTML::Parser);
+use parent qw(HTML::Parser);
 
 =head1 NAME
 
