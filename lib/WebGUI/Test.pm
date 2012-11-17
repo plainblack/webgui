@@ -31,8 +31,6 @@ use Test::MockObject::Extends;
 use Clone               qw(clone);
 use File::Basename      qw(dirname fileparse);
 use File::Spec::Functions qw(abs2rel rel2abs catdir catfile updir splitdir);
-use IO::Handle          ();
-use IO::Select          ();
 use Cwd                 qw( realpath );
 use Scalar::Util        qw( blessed );
 use Carp                qw( carp croak );
@@ -44,9 +42,6 @@ use Monkey::Patch       qw( patch_object );
 use Scope::Guard;
 use WebGUI::Paths -inc;
 use namespace::clean;
-use WebGUI::User;
-use WebGUI::Test::Mechanize;
-use HTTP::Request::Common;
 
 our @EXPORT = qw(cleanupGuard addToCleanup);
 our @EXPORT_OK = qw(session config collateral);
@@ -241,6 +236,8 @@ sub newEnv {
 sub clientTest (&) {
     my $client = shift;
     local $ENV{WEBGUI_CONFIG} = $CLASS->file;
+    require Plack::Test;
+    require Plack::Util;
     my $test_psgi = Plack::Util::load_psgi(
         $CLASS->config->get('psgiFile')
         || WebGUI::Paths->defaultPSGI,
@@ -290,6 +287,7 @@ to adding a layout
 sub asset {
     my ( $class, %props ) = @_;
     $props{className} ||= "WebGUI::Asset::Wobject::Layout";
+    require WebGUI::Asset;
     my $asset = WebGUI::Asset->getImportNode( $class->session )->addChild( \%props );
     addToCleanup( $asset );
     return $asset;
@@ -306,6 +304,7 @@ is run.
 
 sub user {
     my ( $class, %props ) = @_;
+    require WebGUI::User;
     my $user = WebGUI::User->create( $class->session );
     $user->update( %props );
     addToCleanup( $user );
@@ -390,6 +389,7 @@ sub getPage {
                                 # user      => A user object to set
                                 # userId    => A user ID to set, "user" takes
                                 #              precedence
+    require WebGUI::Session::Request;
 
     my $session = $CLASS->session;
     # Set the appropriate user
@@ -469,6 +469,10 @@ sub getPage2 {
 
     die "not supported" if exists $optionsRef->{args};
     die "not supported" if exists $optionsRef->{uploads};
+
+    require WebGUI::Test::Mechanize;
+    require HTTP::Request;
+    require HTTP::Request::Common;
 
     my $session = $CLASS->session;
 
@@ -687,6 +691,8 @@ This is a class method.
 
 sub cleanupAdminInbox {
     my $class = shift;
+    require WebGUI::User;
+    require WebGUI::Inbox;
     my $admin = WebGUI::User->new($class->session, '3');
     my $inbox = WebGUI::Inbox->new($class->session);
     $inbox->deleteMessagesForUser($admin);
