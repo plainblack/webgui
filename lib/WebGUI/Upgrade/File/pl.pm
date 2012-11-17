@@ -18,7 +18,7 @@ WebGUI::Upgrade::File::pl - Upgrade class for Perl scripts
 
 package WebGUI::Upgrade::File::pl;
 use Moose;
-use Class::MOP::Class;
+use Class::MOP::Package;
 use File::Spec::Functions qw(devnull);
 use Scope::Guard;
 use namespace::autoclean -also => qr/^_/;
@@ -52,9 +52,9 @@ sub _runScript {
         local *_;
         # use an anonymous package for this code.  the namespace will
         # automatically be deleted when this goes out of scope.
-        my $anon_class = Class::MOP::Class->create_anon_class;
+        my $anon_package = Class::MOP::Package->create_anon;
         my $wanted = wantarray;
-        eval sprintf(<<'END_CODE', $anon_class->name);
+        eval sprintf(<<'END_CODE', $anon_package->name);
             package %s;
             # maintain context
             if ($wanted) {
