@@ -61,6 +61,7 @@ if ($] >= 5.008009) {
 ##Doing this as a global is not nice, but it works
 my $missingModule = 0;
 
+checkModule("String::Random",               0.22         );  # used by the WRE
 checkModule("LWP",                          5.833        );
 checkModule("HTML::Form",                   5.800,     2 );
 checkModule("Net::DNS",                     0.66,        );
