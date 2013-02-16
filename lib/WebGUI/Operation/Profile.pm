@@ -95,7 +95,7 @@ sub isDuplicateEmail {
 Saves profile data to a user's profile.  Does not validate any of the data.
 
 DEPRECATED - This method is deprecated, and should not be used in new code.  Use
-the updateProfileFields method in WebGUI::User
+the update method in WebGUI::User
 
 =head3 session
 
@@ -115,7 +115,7 @@ sub saveProfileFields {
 	my $session = shift;
 	my $u       = shift;
 	my $profile = shift;
-    $u->updateProfileFields($profile);
+    $u->update($profile);
 }
 
 #-------------------------------------------------------------------

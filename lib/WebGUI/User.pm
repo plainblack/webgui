@@ -1516,22 +1516,6 @@ sub update {
 
 #-------------------------------------------------------------------
 
-=head2 updateProfileFields ( profile )
-
-DEPRECATED! Use update(profile)
-
-Saves profile data to a user's profile.  Does not validate any of the data.
-
-=head3 profile
-
-Hash ref of key/value pairs of data in the users's profile to update.
-
-=cut
-
-deprecate updateProfileFields => 'update';
-
-#-------------------------------------------------------------------
-
 =head2 username ( [ value ] )
 
 Returns the username. 
