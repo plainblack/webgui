@@ -99,6 +99,7 @@ checkModule("DateTime::Format::Strptime",   1.0800       );
 checkModule("DateTime::Format::Mail",       0.3001       );
 checkModule("DateTime::Format::HTTP",       0.38         );
 checkModule("Imager",                       0.93         );
+checkModule("Imager::File::PNG",            0.86         );
 checkModule("Image::Magick",                "6.0"        );
 checkModule("Log::Log4perl",                1.20         );
 checkModule("Net::LDAP",                    0.39         );
