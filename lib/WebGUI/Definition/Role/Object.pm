@@ -179,6 +179,20 @@ sub getFormProperties {
 
 #-------------------------------------------------------------------
 
+=head2 getProperty ( $property_name )
+
+Returns the structure used to create a property.
+
+=cut
+
+sub getProperty {
+    my $self = shift;
+    my $property_name = shift;
+    return $self->meta->find_attribute_by_name( $property_name );
+}
+
+#-------------------------------------------------------------------
+
 =head2 getProperties ( )
 
 Returns a list of the names of all properties of the object, as set by the Definition.
@@ -189,6 +203,7 @@ sub getProperties {
     my $self = shift;
     return $self->meta->get_all_property_list;
 }
+
 
 1;
 
