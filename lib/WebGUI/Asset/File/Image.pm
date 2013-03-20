@@ -748,8 +748,8 @@ sub www_crop {
             $newSelf->get("filename"),
             $session->form->process("Width"),
             $session->form->process("Height"),
+            $session->form->process("Left"),
             $session->form->process("Top"),
-            $session->form->process("Left")
         );
 		$self = $newSelf;
 		$self->generateThumbnail;
