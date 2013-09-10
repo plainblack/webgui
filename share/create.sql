@@ -29,7 +29,7 @@ CREATE TABLE `AdSku` (
   `impressionDiscounts` char(22) DEFAULT NULL,
   `karma` int(11) DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `Article` (
   `linkTitle` char(255) DEFAULT NULL,
   `linkURL` text,
@@ -39,7 +39,7 @@ CREATE TABLE `Article` (
   `cacheTimeout` int(11) NOT NULL DEFAULT '3600',
   `storageId` char(22) binary DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `AssetReport` (
   `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
@@ -47,7 +47,7 @@ CREATE TABLE `AssetReport` (
   `templateId` char(22) binary DEFAULT NULL,
   `paginateAfter` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `Calendar` (
   `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
@@ -75,7 +75,7 @@ CREATE TABLE `Calendar` (
   `workflowIdCommit` char(22) binary DEFAULT NULL,
   `icalFeeds` longtext,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `Carousel` (
   `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
@@ -87,7 +87,7 @@ CREATE TABLE `Carousel` (
   `autoPlayInterval` int(11) DEFAULT NULL,
   `richEditor` char(22) binary DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `Collaboration` (
   `assetId` char(22) binary NOT NULL,
   `postGroupId` char(22) binary NOT NULL DEFAULT '2',
@@ -148,7 +148,7 @@ CREATE TABLE `Collaboration` (
   `replyFilterCode` char(30) binary DEFAULT 'javascript',
   `unsubscribeTemplateId` char(22) NOT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `Dashboard` (
   `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
@@ -158,14 +158,14 @@ CREATE TABLE `Dashboard` (
   `isInitialized` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `assetsToHide` text,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `Dashboard_dashlets` (
   `dashboardAssetId` char(22) binary NOT NULL DEFAULT '',
   `dashletAssetId` char(22) binary NOT NULL DEFAULT '',
   `isStatic` tinyint(1) DEFAULT NULL,
   `isRequired` tinyint(1) DEFAULT NULL,
   PRIMARY KEY (`dashboardAssetId`,`dashletAssetId`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `Dashboard_userPrefs` (
   `dashboardAssetId` char(22) binary NOT NULL DEFAULT '',
   `dashletAssetId` char(22) binary NOT NULL DEFAULT '',
@@ -173,7 +173,7 @@ CREATE TABLE `Dashboard_userPrefs` (
   `isMinimized` tinyint(1) DEFAULT NULL,
   `properties` longtext,
   PRIMARY KEY (`dashboardAssetId`,`dashletAssetId`,`userId`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `DataForm` (
   `acknowledgement` text,
   `mailData` int(11) NOT NULL DEFAULT '1',
@@ -193,7 +193,7 @@ CREATE TABLE `DataForm` (
   `workflowIdAddEntry` char(22) binary DEFAULT NULL,
   `htmlAreaRichEditor` char(22) binary DEFAULT '**Use_Default_Editor**',
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `DataForm_entry` (
   `DataForm_entryId` char(22) binary NOT NULL,
   `userId` char(22) binary NOT NULL,
@@ -205,14 +205,14 @@ CREATE TABLE `DataForm_entry` (
   PRIMARY KEY (`DataForm_entryId`),
   KEY `assetId` (`assetId`),
   KEY `assetId_submissionDate` (`assetId`,`submissionDate`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `DataTable` (
   `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
   `data` longtext,
   `templateId` char(22) binary DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `EMSBadge` (
   `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
@@ -225,14 +225,14 @@ CREATE TABLE `EMSBadge` (
   `preRegistrationPrice` float NOT NULL DEFAULT '0',
   `preRegistrationPriceEndDate` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `EMSBadgeGroup` (
   `badgeGroupId` char(22) binary NOT NULL,
   `emsAssetId` char(22) binary NOT NULL,
   `name` char(100) DEFAULT NULL,
   `ticketsPerBadge` int(11) DEFAULT NULL,
   PRIMARY KEY (`badgeGroupId`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `EMSEventMetaField` (
   `fieldId` char(22) binary NOT NULL,
   `assetId` char(22) binary DEFAULT NULL,
@@ -245,7 +245,7 @@ CREATE TABLE `EMSEventMetaField` (
   `sequenceNumber` int(5) DEFAULT NULL,
   `helpText` mediumtext,
   PRIMARY KEY (`fieldId`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `EMSRegistrant` (
   `badgeId` char(22) binary NOT NULL,
   `userId` char(22) binary DEFAULT NULL,
@@ -270,13 +270,13 @@ CREATE TABLE `EMSRegistrant` (
   PRIMARY KEY (`badgeId`),
   UNIQUE KEY `badgeNumber` (`badgeNumber`),
   KEY `badgeAssetId_purchaseComplete` (`badgeAssetId`,`purchaseComplete`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `EMSRegistrantRibbon` (
   `badgeId` char(22) binary NOT NULL,
   `ribbonAssetId` char(22) binary NOT NULL,
   `transactionItemId` char(22) binary DEFAULT NULL,
   PRIMARY KEY (`badgeId`,`ribbonAssetId`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `EMSRegistrantTicket` (
   `badgeId` char(22) binary NOT NULL,
   `ticketAssetId` char(22) binary NOT NULL,
@@ -284,21 +284,21 @@ CREATE TABLE `EMSRegistrantTicket` (
   `transactionItemId` char(22) binary DEFAULT NULL,
   PRIMARY KEY (`badgeId`,`ticketAssetId`),
   KEY `ticketAssetId_purchaseComplete` (`ticketAssetId`,`purchaseComplete`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `EMSRegistrantToken` (
   `badgeId` char(22) binary NOT NULL,
   `tokenAssetId` char(22) binary NOT NULL,
   `quantity` int(11) DEFAULT NULL,
   `transactionItemIds` text,
   PRIMARY KEY (`badgeId`,`tokenAssetId`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `EMSRibbon` (
   `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
   `percentageDiscount` float NOT NULL DEFAULT '10',
   `price` float NOT NULL DEFAULT '0',
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `EMSSubmission` (
   `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
@@ -320,7 +320,7 @@ CREATE TABLE `EMSSubmission` (
   `relatedRibbons` mediumtext,
   `eventMetaData` mediumtext,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `EMSSubmissionForm` (
   `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
@@ -331,7 +331,7 @@ CREATE TABLE `EMSSubmissionForm` (
   `submissionDeadline` date DEFAULT NULL,
   `pastDeadlineMessage` text,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `EMSTicket` (
   `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
@@ -345,13 +345,13 @@ CREATE TABLE `EMSTicket` (
   `relatedRibbons` mediumtext,
   `eventMetaData` mediumtext,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `EMSToken` (
   `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
   `price` float NOT NULL DEFAULT '0',
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `Event` (
   `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
@@ -375,7 +375,7 @@ CREATE TABLE `Event` (
   `sequenceNumber` bigint(20) DEFAULT NULL,
   `iCalSequenceNumber` int(11) DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `EventManagementSystem` (
   `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
@@ -399,7 +399,7 @@ CREATE TABLE `EventManagementSystem` (
   `eventSubmissionGroups` mediumtext,
   `submittedLocationsList` mediumtext,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `Event_recur` (
   `recurId` char(22) binary NOT NULL,
   `recurType` char(16) DEFAULT NULL,
@@ -407,7 +407,7 @@ CREATE TABLE `Event_recur` (
   `startDate` date DEFAULT NULL,
   `endDate` char(10) DEFAULT NULL,
   PRIMARY KEY (`recurId`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `Event_relatedlink` (
   `eventlinkId` char(22) binary NOT NULL,
   `assetId` char(22) binary NOT NULL,
@@ -415,7 +415,7 @@ CREATE TABLE `Event_relatedlink` (
   `linktext` char(80) DEFAULT NULL,
   `groupIdView` char(22) binary NOT NULL,
   `sequenceNumber` bigint(20) DEFAULT NULL
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `FileAsset` (
   `assetId` char(22) binary NOT NULL,
   `storageId` char(22) binary NOT NULL,
@@ -424,7 +424,7 @@ CREATE TABLE `FileAsset` (
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
   `cacheTimeout` int(11) NOT NULL DEFAULT '3600',
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `FlatDiscount` (
   `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
@@ -434,7 +434,7 @@ CREATE TABLE `FlatDiscount` (
   `priceDiscount` float NOT NULL DEFAULT '0',
   `thankYouMessage` mediumtext,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `Folder` (
   `assetId` char(22) binary NOT NULL,
   `templateId` char(22) binary NOT NULL,
@@ -443,7 +443,7 @@ CREATE TABLE `Folder` (
   `sortAlphabetically` int(11) NOT NULL DEFAULT '0',
   `sortOrder` enum('ASC','DESC') DEFAULT 'ASC',
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `Fork` (
   `id` char(22) NOT NULL DEFAULT '',
   `userId` char(22) DEFAULT NULL,
@@ -456,7 +456,7 @@ CREATE TABLE `Fork` (
   `latch` tinyint(1) DEFAULT '0',
   `redirect` char(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `Gallery` (
   `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
@@ -494,7 +494,7 @@ CREATE TABLE `Gallery` (
   `defaultFilesPerPage` int(11) DEFAULT NULL,
   `imageDensity` int(11) DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `GalleryAlbum` (
   `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
@@ -507,7 +507,7 @@ CREATE TABLE `GalleryAlbum` (
   `userDefined5` text,
   `othersCanAdd` int(11) DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `GalleryFile` (
   `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
@@ -520,7 +520,7 @@ CREATE TABLE `GalleryFile` (
   `friendsOnly` int(1) DEFAULT '0',
   `rating` int(1) DEFAULT '0',
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `GalleryFile_comment` (
   `assetId` char(22) binary NOT NULL,
   `commentId` char(22) binary NOT NULL,
@@ -530,7 +530,7 @@ CREATE TABLE `GalleryFile_comment` (
   `bodyText` longtext,
   PRIMARY KEY (`assetId`,`commentId`),
   KEY `commentId` (`commentId`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `HttpProxy` (
   `proxiedUrl` text,
   `timeout` int(11) DEFAULT NULL,
@@ -552,7 +552,7 @@ CREATE TABLE `HttpProxy` (
   `useAmpersand` int(11) NOT NULL DEFAULT '0',
   `urlPatternFilter` mediumtext,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `ImageAsset` (
   `assetId` char(22) binary NOT NULL,
   `thumbnailSize` int(11) NOT NULL DEFAULT '50',
@@ -560,7 +560,7 @@ CREATE TABLE `ImageAsset` (
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
   `annotations` mediumtext,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `InOutBoard` (
   `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
@@ -572,19 +572,19 @@ CREATE TABLE `InOutBoard` (
   `paginateAfter` int(11) NOT NULL DEFAULT '50',
   `reportPaginateAfter` int(11) NOT NULL DEFAULT '50',
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `InOutBoard_delegates` (
   `userId` char(22) binary NOT NULL,
   `delegateUserId` char(22) binary NOT NULL,
   `assetId` char(22) binary NOT NULL
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `InOutBoard_status` (
   `assetId` char(22) binary NOT NULL,
   `userId` char(22) binary NOT NULL,
   `status` char(255) DEFAULT NULL,
   `dateStamp` int(11) NOT NULL,
   `message` text
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `InOutBoard_statusLog` (
   `assetId` char(22) binary NOT NULL,
   `userId` char(22) binary NOT NULL,
@@ -592,7 +592,7 @@ CREATE TABLE `InOutBoard_statusLog` (
   `dateStamp` int(11) NOT NULL,
   `message` text,
   `createdBy` char(22) binary DEFAULT NULL
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `Layout` (
   `assetId` char(22) binary NOT NULL,
   `templateId` char(22) binary NOT NULL,
@@ -602,7 +602,7 @@ CREATE TABLE `Layout` (
   `assetOrder` char(20) DEFAULT 'asc',
   `mobileTemplateId` char(22) binary DEFAULT 'PBtmpl0000000000000054',
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `Map` (
   `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
@@ -618,7 +618,7 @@ CREATE TABLE `Map` (
   `templateIdViewPoint` char(22) binary DEFAULT NULL,
   `workflowIdPoint` char(22) binary DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `MapPoint` (
   `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
@@ -642,7 +642,7 @@ CREATE TABLE `MapPoint` (
   `userDefined5` char(255) DEFAULT NULL,
   `isGeocoded` tinyint(1) DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `Matrix` (
   `detailTemplateId` char(22) binary DEFAULT NULL,
   `compareTemplateId` char(22) binary DEFAULT NULL,
@@ -672,7 +672,7 @@ CREATE TABLE `Matrix` (
   `maxComparisonsGroup` char(22) binary DEFAULT NULL,
   `maxComparisonsGroupInt` int(11) DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `MatrixListing` (
   `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
@@ -692,14 +692,14 @@ CREATE TABLE `MatrixListing` (
   `productURL` char(255) DEFAULT NULL,
   `score` int(11) DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `MatrixListing_attribute` (
   `matrixId` char(22) binary NOT NULL,
   `matrixListingId` char(22) binary NOT NULL,
   `attributeId` char(22) binary NOT NULL,
   `value` char(255) DEFAULT NULL,
   PRIMARY KEY (`attributeId`,`matrixListingId`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `MatrixListing_rating` (
   `timeStamp` int(11) NOT NULL DEFAULT '0',
   `category` char(255) DEFAULT NULL,
@@ -708,7 +708,7 @@ CREATE TABLE `MatrixListing_rating` (
   `ipAddress` char(15) DEFAULT NULL,
   `assetId` char(22) binary NOT NULL,
   `userId` char(22) binary DEFAULT NULL
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `MatrixListing_ratingSummary` (
   `listingId` char(22) binary NOT NULL,
   `category` char(255) NOT NULL,
@@ -717,7 +717,7 @@ CREATE TABLE `MatrixListing_ratingSummary` (
   `countValue` int(11) DEFAULT NULL,
   `assetId` char(22) binary NOT NULL,
   PRIMARY KEY (`listingId`,`category`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `Matrix_attribute` (
   `attributeId` char(22) binary NOT NULL,
   `category` char(255) NOT NULL,
@@ -729,14 +729,14 @@ CREATE TABLE `Matrix_attribute` (
   `options` text,
   PRIMARY KEY (`attributeId`),
   KEY `categoryIndex` (`category`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `MessageBoard` (
   `assetId` char(22) binary NOT NULL,
   `templateId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
   `visitorCacheTimeout` int(11) NOT NULL DEFAULT '3600',
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `MultiSearch` (
   `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
@@ -744,7 +744,7 @@ CREATE TABLE `MultiSearch` (
   `predefinedSearches` text,
   `cacheTimeout` int(11) NOT NULL DEFAULT '3600',
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `Navigation` (
   `assetId` char(22) binary NOT NULL,
   `assetsToInclude` text,
@@ -760,7 +760,7 @@ CREATE TABLE `Navigation` (
   `mimeType` char(50) DEFAULT 'text/html',
   `reversePageLoop` tinyint(1) DEFAULT '0',
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `Newsletter` (
   `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
@@ -770,7 +770,7 @@ CREATE TABLE `Newsletter` (
   `newsletterFooter` mediumtext,
   `newsletterCategories` text,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `Newsletter_subscriptions` (
   `assetId` char(22) binary NOT NULL,
   `userId` char(22) binary NOT NULL,
@@ -778,7 +778,7 @@ CREATE TABLE `Newsletter_subscriptions` (
   `lastTimeSent` bigint(20) NOT NULL DEFAULT '0',
   PRIMARY KEY (`assetId`,`userId`),
   KEY `lastTimeSent_assetId_userId` (`lastTimeSent`,`assetId`,`userId`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `PA_lastLog` (
   `userId` char(22) binary NOT NULL,
   `assetId` char(22) binary NOT NULL,
@@ -786,7 +786,7 @@ CREATE TABLE `PA_lastLog` (
   `timeStamp` bigint(20) DEFAULT NULL,
   `url` char(255) NOT NULL,
   PRIMARY KEY (`userId`,`sessionId`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `PM_project` (
   `projectId` char(22) binary NOT NULL,
   `assetId` char(22) binary DEFAULT NULL,
@@ -806,7 +806,7 @@ CREATE TABLE `PM_project` (
   `lastUpdateDate` bigint(20) NOT NULL,
   `projectObserver` char(22) binary DEFAULT '7',
   PRIMARY KEY (`projectId`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `PM_task` (
   `taskId` char(22) binary NOT NULL,
   `projectId` char(22) binary NOT NULL,
@@ -825,7 +825,7 @@ CREATE TABLE `PM_task` (
   `lagTime` bigint(20) DEFAULT '0',
   `taskType` enum('timed','progressive','milestone') NOT NULL DEFAULT 'timed',
   PRIMARY KEY (`taskId`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `PM_taskResource` (
   `taskResourceId` char(22) binary NOT NULL,
   `taskId` char(22) binary NOT NULL,
@@ -835,7 +835,7 @@ CREATE TABLE `PM_taskResource` (
   PRIMARY KEY (`taskResourceId`),
   UNIQUE KEY `taskId` (`taskId`,`resourceKind`,`resourceId`),
   UNIQUE KEY `taskId_2` (`taskId`,`sequenceNumber`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `PM_wobject` (
   `assetId` char(22) binary NOT NULL,
   `projectDashboardTemplateId` char(22) binary NOT NULL DEFAULT 'ProjectManagerTMPL0001',
@@ -847,21 +847,21 @@ CREATE TABLE `PM_wobject` (
   `resourcePopupTemplateId` char(22) binary NOT NULL DEFAULT 'ProjectManagerTMPL0005',
   `resourceListTemplateId` char(22) binary NOT NULL DEFAULT 'ProjectManagerTMPL0006',
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `Photo` (
   `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
   `exifData` longtext,
   `location` char(255) DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `Photo_rating` (
   `assetId` char(22) binary NOT NULL,
   `userId` char(22) binary DEFAULT NULL,
   `visitorIp` char(255) DEFAULT NULL,
   `rating` int(11) DEFAULT NULL,
   KEY `assetId` (`assetId`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `Poll` (
   `active` int(11) NOT NULL DEFAULT '1',
   `graphWidth` int(11) NOT NULL DEFAULT '150',
@@ -895,13 +895,13 @@ CREATE TABLE `Poll` (
   `graphConfiguration` blob,
   `generateGraph` tinyint(1) DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `Poll_answer` (
   `answer` char(3) DEFAULT NULL,
   `userId` char(22) binary NOT NULL,
   `ipAddress` char(50) DEFAULT NULL,
   `assetId` char(22) binary NOT NULL
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `Post` (
   `assetId` char(22) binary NOT NULL,
   `threadId` char(22) binary NOT NULL,
@@ -920,7 +920,7 @@ CREATE TABLE `Post` (
   `originalEmail` mediumtext,
   PRIMARY KEY (`assetId`,`revisionDate`),
   KEY `threadId_rating` (`threadId`,`rating`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `Post_rating` (
   `assetId` char(22) binary NOT NULL,
   `userId` char(22) binary NOT NULL,
@@ -929,7 +929,7 @@ CREATE TABLE `Post_rating` (
   `rating` int(11) NOT NULL DEFAULT '0',
   KEY `assetId_userId` (`assetId`,`userId`),
   KEY `assetId_ipAddress` (`assetId`,`ipAddress`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `Product` (
   `image1` char(255) DEFAULT NULL,
   `image2` char(255) DEFAULT NULL,
@@ -950,7 +950,7 @@ CREATE TABLE `Product` (
   `variantsJSON` longtext,
   `isShippingRequired` int(11) DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `RichEdit` (
   `assetId` char(22) binary NOT NULL,
   `askAboutRichEdit` int(11) NOT NULL DEFAULT '0',
@@ -976,7 +976,7 @@ CREATE TABLE `RichEdit` (
   `inlinePopups` int(11) NOT NULL DEFAULT '0',
   `allowMedia` int(11) DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `SQLReport` (
   `dbQuery1` text,
   `paginateAfter` int(11) NOT NULL DEFAULT '50',
@@ -1015,13 +1015,13 @@ CREATE TABLE `SQLReport` (
   `downloadMimeType` char(255) DEFAULT NULL,
   `downloadUserGroup` char(22) binary DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `Shelf` (
   `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
   `templateId` char(22) binary NOT NULL DEFAULT 'nFen0xjkZn8WkpM93C9ceQ',
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `Shortcut` (
   `overrideTitle` int(11) NOT NULL DEFAULT '0',
   `overrideDescription` int(11) NOT NULL DEFAULT '0',
@@ -1040,13 +1040,13 @@ CREATE TABLE `Shortcut` (
   `prefFieldsToImport` text,
   `showReloadIcon` tinyint(3) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `Shortcut_overrides` (
   `assetId` char(22) binary NOT NULL,
   `fieldName` char(255) NOT NULL,
   `newValue` text,
   PRIMARY KEY (`assetId`,`fieldName`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `StockData` (
   `assetId` char(22) binary NOT NULL,
   `templateId` char(22) binary NOT NULL DEFAULT 'StockListTMPL000000001',
@@ -1057,7 +1057,7 @@ CREATE TABLE `StockData` (
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
   `cacheTimeout` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `Story` (
   `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
@@ -1069,7 +1069,7 @@ CREATE TABLE `Story` (
   `story` mediumtext,
   `photo` longtext,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `StoryArchive` (
   `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
@@ -1085,7 +1085,7 @@ CREATE TABLE `StoryArchive` (
   `photoWidth` int(11) DEFAULT NULL,
   `storySortOrder` char(22) DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `StoryTopic` (
   `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
@@ -1095,7 +1095,7 @@ CREATE TABLE `StoryTopic` (
   `storyTemplateId` char(22) binary DEFAULT NULL,
   `storySortOrder` char(22) DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `Subscription` (
   `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
@@ -1109,7 +1109,7 @@ CREATE TABLE `Subscription` (
   `recurringSubscription` tinyint(1) NOT NULL DEFAULT '1',
   `redeemSubscriptionCodeTemplateId` char(22) binary NOT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `Subscription_code` (
   `code` char(64) NOT NULL,
   `batchId` char(22) binary NOT NULL,
@@ -1117,7 +1117,7 @@ CREATE TABLE `Subscription_code` (
   `dateUsed` bigint(20) DEFAULT NULL,
   `usedBy` char(22) binary DEFAULT NULL,
   PRIMARY KEY (`code`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `Subscription_codeBatch` (
   `batchId` char(22) binary NOT NULL,
   `name` char(255) DEFAULT NULL,
@@ -1126,7 +1126,7 @@ CREATE TABLE `Subscription_codeBatch` (
   `expirationDate` bigint(20) NOT NULL,
   `dateCreated` bigint(20) NOT NULL,
   PRIMARY KEY (`batchId`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `Survey` (
   `groupToTakeSurvey` char(22) binary NOT NULL DEFAULT '2',
   `groupToEditSurvey` char(22) binary NOT NULL DEFAULT '3',
@@ -1156,12 +1156,12 @@ CREATE TABLE `Survey` (
   `feedbackTemplateId` char(22) binary DEFAULT NULL,
   `testResultsTemplateId` char(22) binary DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `Survey_questionTypes` (
   `questionType` char(56) NOT NULL,
   `answers` text NOT NULL,
   PRIMARY KEY (`questionType`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `Survey_response` (
   `assetId` char(22) binary NOT NULL,
   `Survey_responseId` char(22) binary NOT NULL,
@@ -1175,7 +1175,7 @@ CREATE TABLE `Survey_response` (
   `responseJSON` longtext,
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
   PRIMARY KEY (`Survey_responseId`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `Survey_tempReport` (
   `assetId` char(22) binary NOT NULL,
   `Survey_responseId` char(22) binary NOT NULL,
@@ -1194,7 +1194,7 @@ CREATE TABLE `Survey_tempReport` (
   `fileStoreageId` char(22) binary DEFAULT NULL,
   PRIMARY KEY (`assetId`,`Survey_responseId`,`order`),
   KEY `assetId` (`assetId`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `Survey_test` (
   `testId` char(22) binary NOT NULL,
   `sequenceNumber` int(11) NOT NULL DEFAULT '1',
@@ -1205,7 +1205,7 @@ CREATE TABLE `Survey_test` (
   `test` mediumtext NOT NULL,
   PRIMARY KEY (`testId`),
   KEY `assetId` (`assetId`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `SyndicatedContent` (
   `rssUrl` text,
   `maxHeadlines` int(11) NOT NULL DEFAULT '0',
@@ -1217,7 +1217,7 @@ CREATE TABLE `SyndicatedContent` (
   `processMacroInRssUrl` int(11) DEFAULT '0',
   `sortItems` char(255) DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `TT_projectList` (
   `projectId` char(22) binary NOT NULL,
   `assetId` char(22) binary DEFAULT NULL,
@@ -1227,18 +1227,18 @@ CREATE TABLE `TT_projectList` (
   `lastUpdatedBy` char(22) binary NOT NULL,
   `lastUpdateDate` bigint(20) NOT NULL,
   PRIMARY KEY (`projectId`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `TT_projectResourceList` (
   `projectId` char(22) binary NOT NULL,
   `resourceId` char(22) binary NOT NULL,
   PRIMARY KEY (`projectId`,`resourceId`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `TT_projectTasks` (
   `taskId` char(22) binary NOT NULL,
   `projectId` char(22) binary NOT NULL,
   `taskName` char(255) NOT NULL,
   PRIMARY KEY (`taskId`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `TT_report` (
   `reportId` char(22) binary NOT NULL,
   `assetId` char(22) binary NOT NULL,
@@ -1250,7 +1250,7 @@ CREATE TABLE `TT_report` (
   `createdBy` char(22) binary NOT NULL,
   `lastUpdatedBy` char(22) binary NOT NULL,
   `lastUpdateDate` bigint(20) NOT NULL
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `TT_timeEntry` (
   `entryId` char(22) binary NOT NULL,
   `projectId` char(22) binary NOT NULL,
@@ -1260,7 +1260,7 @@ CREATE TABLE `TT_timeEntry` (
   `comments` text,
   `reportId` char(22) binary NOT NULL,
   PRIMARY KEY (`entryId`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `TT_wobject` (
   `assetId` char(22) binary NOT NULL,
   `userViewTemplateId` char(22) binary NOT NULL DEFAULT 'TimeTrackingTMPL000001',
@@ -1271,14 +1271,14 @@ CREATE TABLE `TT_wobject` (
   `revisionDate` bigint(20) NOT NULL,
   `pmIntegration` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `Thingy` (
   `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
   `templateId` char(22) binary NOT NULL,
   `defaultThingId` char(22) binary DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `ThingyRecord` (
   `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
@@ -1290,7 +1290,7 @@ CREATE TABLE `ThingyRecord` (
   `duration` bigint(20) DEFAULT NULL,
   `fieldPrice` longtext,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `ThingyRecord_record` (
   `recordId` char(22) binary NOT NULL,
   `sequenceNumber` int(11) NOT NULL DEFAULT '1',
@@ -1304,7 +1304,7 @@ CREATE TABLE `ThingyRecord_record` (
   `isHidden` tinyint(1) NOT NULL DEFAULT '0',
   `sentExpiresNotice` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`recordId`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `Thingy_fields` (
   `assetId` char(22) binary NOT NULL,
   `thingId` char(22) binary NOT NULL,
@@ -1333,7 +1333,7 @@ CREATE TABLE `Thingy_fields` (
   `pretext` char(255) DEFAULT NULL,
   `isUnique` int(1) DEFAULT '0',
   PRIMARY KEY (`fieldId`,`thingId`,`assetId`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `Thingy_things` (
   `assetId` char(22) binary NOT NULL,
   `thingId` char(22) binary NOT NULL,
@@ -1364,7 +1364,7 @@ CREATE TABLE `Thingy_things` (
   `maxEntriesPerUser` int(11) DEFAULT NULL,
   `maxEntriesTotal` int(11) DEFAULT NULL,
   PRIMARY KEY (`thingId`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `Thread` (
   `assetId` char(22) binary NOT NULL,
   `replies` int(11) NOT NULL DEFAULT '0',
@@ -1379,12 +1379,12 @@ CREATE TABLE `Thread` (
   `karmaRank` float(11,6) DEFAULT NULL,
   `threadRating` int(11) DEFAULT '0',
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `Thread_read` (
   `threadId` char(22) binary NOT NULL,
   `userId` char(22) binary NOT NULL,
   KEY `threadId_userId` (`threadId`,`userId`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `UserList` (
   `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
@@ -1400,7 +1400,7 @@ CREATE TABLE `UserList` (
   `overridePublicEmail` int(11) DEFAULT NULL,
   `overridePublicProfile` int(11) DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `WeatherData` (
   `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) unsigned NOT NULL DEFAULT '0',
@@ -1410,7 +1410,7 @@ CREATE TABLE `WeatherData` (
   `licenseKey` char(100) DEFAULT NULL,
   `cacheTimeout` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `WikiMaster` (
   `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
@@ -1437,7 +1437,7 @@ CREATE TABLE `WikiMaster` (
   `allowAttachments` int(11) NOT NULL DEFAULT '0',
   `topLevelKeywords` longtext,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `WikiMasterKeywords` (
   `assetId` char(22) binary NOT NULL,
   `keyword` char(64) NOT NULL,
@@ -1446,7 +1446,7 @@ CREATE TABLE `WikiMasterKeywords` (
   KEY `assetId` (`assetId`),
   KEY `keyword` (`keyword`),
   KEY `subKeyword` (`subKeyword`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `WikiPage` (
   `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
@@ -1457,7 +1457,7 @@ CREATE TABLE `WikiPage` (
   `actionTakenBy` char(22) binary NOT NULL,
   `isFeatured` int(1) DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `Workflow` (
   `workflowId` char(22) binary NOT NULL,
   `title` char(255) NOT NULL DEFAULT 'Untitled',
@@ -1466,7 +1466,7 @@ CREATE TABLE `Workflow` (
   `type` char(255) NOT NULL DEFAULT 'None',
   `mode` char(20) NOT NULL DEFAULT 'parallel',
   PRIMARY KEY (`workflowId`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `WorkflowActivity` (
   `activityId` char(22) binary NOT NULL,
   `workflowId` char(22) binary NOT NULL,
@@ -1475,13 +1475,13 @@ CREATE TABLE `WorkflowActivity` (
   `sequenceNumber` int(11) NOT NULL DEFAULT '1',
   `className` char(255) DEFAULT NULL,
   PRIMARY KEY (`activityId`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `WorkflowActivityData` (
   `activityId` char(22) binary NOT NULL,
   `name` char(255) NOT NULL,
   `value` text,
   PRIMARY KEY (`activityId`,`name`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `WorkflowInstance` (
   `instanceId` char(22) binary NOT NULL,
   `workflowId` char(22) binary NOT NULL,
@@ -1495,13 +1495,13 @@ CREATE TABLE `WorkflowInstance` (
   `lastStatus` char(15) DEFAULT NULL,
   `noSession` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`instanceId`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `WorkflowInstanceScratch` (
   `instanceId` char(22) binary NOT NULL,
   `name` char(255) NOT NULL,
   `value` text,
   PRIMARY KEY (`instanceId`,`name`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `WorkflowSchedule` (
   `taskId` char(22) binary NOT NULL,
   `title` char(255) NOT NULL DEFAULT 'Untitled',
@@ -1518,14 +1518,14 @@ CREATE TABLE `WorkflowSchedule` (
   `priority` int(11) NOT NULL DEFAULT '2',
   `parameters` longtext,
   PRIMARY KEY (`taskId`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `ZipArchiveAsset` (
   `assetId` char(22) binary NOT NULL,
   `templateId` char(22) binary NOT NULL,
   `showPage` char(255) NOT NULL DEFAULT 'index.html',
   `revisionDate` bigint(20) NOT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `adSkuPurchase` (
   `adSkuPurchaseId` char(22) binary NOT NULL,
   `sequenceNumber` int(11) NOT NULL DEFAULT '1',
@@ -1540,7 +1540,7 @@ CREATE TABLE `adSkuPurchase` (
   `adId` char(22) binary DEFAULT NULL,
   `storedImage` char(22) binary DEFAULT NULL,
   PRIMARY KEY (`adSkuPurchaseId`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `adSpace` (
   `adSpaceId` char(22) binary NOT NULL,
   `name` char(35) NOT NULL,
@@ -1552,7 +1552,7 @@ CREATE TABLE `adSpace` (
   `height` int(11) NOT NULL DEFAULT '60',
   PRIMARY KEY (`adSpaceId`),
   UNIQUE KEY `name` (`name`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `address` (
   `addressId` char(22) binary NOT NULL,
   `addressBookId` char(22) binary NOT NULL,
@@ -1572,13 +1572,13 @@ CREATE TABLE `address` (
   `isProfile` tinyint(4) DEFAULT '0',
   PRIMARY KEY (`addressId`),
   KEY `addressBookId_addressId` (`addressBookId`,`addressId`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `addressBook` (
   `addressBookId` char(22) binary NOT NULL,
   `userId` char(22) binary DEFAULT NULL,
   `defaultAddressId` char(22) binary DEFAULT NULL,
   PRIMARY KEY (`addressBookId`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `advertisement` (
   `adId` char(22) binary NOT NULL,
   `adSpaceId` char(22) binary NOT NULL,
@@ -1602,7 +1602,7 @@ CREATE TABLE `advertisement` (
   `renderedAd` text,
   PRIMARY KEY (`adId`),
   KEY `adSpaceId_isActive` (`adSpaceId`,`isActive`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `analyticRule` (
   `ruleId` char(22) binary NOT NULL,
   `sequenceNumber` int(11) NOT NULL DEFAULT '1',
@@ -1611,7 +1611,7 @@ CREATE TABLE `analyticRule` (
   `bucketName` char(255) DEFAULT NULL,
   `regexp` char(255) NOT NULL DEFAULT '.+',
   PRIMARY KEY (`ruleId`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `asset` (
   `assetId` char(22) binary NOT NULL,
   `parentId` char(22) binary NOT NULL,
@@ -1632,14 +1632,14 @@ CREATE TABLE `asset` (
   KEY `isPrototype_className_assetId` (`className`,`assetId`),
   KEY `className_assetId_state` (`className`,`assetId`,`state`),
   KEY `state_lineage` (`state`,`lineage`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `assetAspectComments` (
   `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
   `comments` longtext,
   `averageCommentRating` int(11) DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `assetAspectRssFeed` (
   `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
@@ -1652,14 +1652,14 @@ CREATE TABLE `assetAspectRssFeed` (
   `feedImageDescription` mediumtext,
   `feedHeaderLinks` char(32) DEFAULT 'rss\natom',
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `assetAspect_Subscribable` (
   `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
   `subscriptionGroupId` char(22) binary DEFAULT NULL,
   `subscriptionTemplateId` char(22) binary DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `assetData` (
   `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
@@ -1692,14 +1692,14 @@ CREATE TABLE `assetData` (
   KEY `url` (`url`),
   KEY `assetId_status_tagId_revisionDate` (`assetId`,`status`,`tagId`,`revisionDate`),
   KEY `assetId_status` (`assetId`,`status`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `assetHistory` (
   `assetId` char(22) binary NOT NULL,
   `userId` char(22) binary NOT NULL,
   `dateStamp` bigint(20) NOT NULL DEFAULT '0',
   `actionTaken` char(255) NOT NULL,
   `url` char(255) DEFAULT NULL
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `assetIndex` (
   `assetId` char(22) binary NOT NULL,
   `title` char(255) DEFAULT NULL,
@@ -1717,14 +1717,14 @@ CREATE TABLE `assetIndex` (
   `subId` char(255) binary DEFAULT NULL,
   PRIMARY KEY (`assetId`,`url`),
   FULLTEXT KEY `keywords` (`keywords`)
-) TYPE=MyISAM CHARSET=utf8;
+) ENGINE=MyISAM CHARSET=utf8;
 CREATE TABLE `assetKeyword` (
   `keyword` char(64) NOT NULL,
   `assetId` char(22) binary NOT NULL,
   PRIMARY KEY (`keyword`,`assetId`),
   KEY `keyword` (`keyword`),
   KEY `assetId` (`assetId`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `assetVersionTag` (
   `tagId` char(22) binary NOT NULL,
   `name` char(255) NOT NULL,
@@ -1743,20 +1743,20 @@ CREATE TABLE `assetVersionTag` (
   `endTime` datetime DEFAULT NULL,
   `isSiteWide` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`tagId`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `authentication` (
   `userId` char(22) binary NOT NULL,
   `authMethod` char(30) NOT NULL,
   `fieldName` char(128) NOT NULL,
   `fieldData` text,
   PRIMARY KEY (`userId`,`authMethod`,`fieldName`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `bucketLog` (
   `userId` char(22) binary NOT NULL,
   `Bucket` char(255) binary NOT NULL,
   `duration` int(11) DEFAULT NULL,
   `timeStamp` datetime DEFAULT NULL
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `cart` (
   `cartId` char(22) binary NOT NULL,
   `sessionId` char(22) binary NOT NULL,
@@ -1768,7 +1768,7 @@ CREATE TABLE `cart` (
   `gatewayId` char(22) DEFAULT NULL,
   PRIMARY KEY (`cartId`),
   KEY `sessionId` (`sessionId`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `cartItem` (
   `itemId` char(22) binary NOT NULL,
   `cartId` char(22) binary NOT NULL,
@@ -1780,7 +1780,7 @@ CREATE TABLE `cartItem` (
   `quantity` int(11) NOT NULL DEFAULT '1',
   PRIMARY KEY (`itemId`),
   KEY `cartId_assetId_dateAdded` (`cartId`,`assetId`,`dateAdded`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `databaseLink` (
   `databaseLinkId` char(22) binary NOT NULL,
   `title` char(255) DEFAULT NULL,
@@ -1791,14 +1791,14 @@ CREATE TABLE `databaseLink` (
   `allowMacroAccess` int(11) NOT NULL DEFAULT '0',
   `additionalParameters` char(255) NOT NULL,
   PRIMARY KEY (`databaseLinkId`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `deltaLog` (
   `userId` char(22) binary NOT NULL,
   `assetId` char(22) binary NOT NULL,
   `delta` int(11) DEFAULT NULL,
   `timeStamp` bigint(20) DEFAULT NULL,
   `url` char(255) NOT NULL
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `donation` (
   `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
@@ -1806,7 +1806,7 @@ CREATE TABLE `donation` (
   `thankYouMessage` mediumtext,
   `templateId` char(22) binary NOT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `filePumpBundle` (
   `bundleId` char(22) binary NOT NULL,
   `sequenceNumber` int(11) NOT NULL DEFAULT '1',
@@ -1819,7 +1819,7 @@ CREATE TABLE `filePumpBundle` (
   `cssFiles` longtext NOT NULL,
   `otherFiles` longtext NOT NULL,
   PRIMARY KEY (`bundleId`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `friendInvitations` (
   `inviteId` char(22) binary NOT NULL,
   `inviterId` char(22) binary NOT NULL,
@@ -1828,13 +1828,13 @@ CREATE TABLE `friendInvitations` (
   `comments` char(255) NOT NULL,
   `messageId` char(22) binary NOT NULL,
   PRIMARY KEY (`inviteId`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `groupGroupings` (
   `groupId` char(22) binary NOT NULL,
   `inGroup` char(22) binary NOT NULL,
   PRIMARY KEY (`groupId`,`inGroup`),
   KEY `inGroup` (`inGroup`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `groupings` (
   `groupId` char(22) binary NOT NULL,
   `userId` char(22) binary NOT NULL,
@@ -1842,7 +1842,7 @@ CREATE TABLE `groupings` (
   `groupAdmin` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`groupId`,`userId`),
   KEY `userId` (`userId`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `groups` (
   `groupId` char(22) binary NOT NULL,
   `groupName` char(100) DEFAULT NULL,
@@ -1872,7 +1872,7 @@ CREATE TABLE `groups` (
   `isAdHocMailGroup` tinyint(4) NOT NULL DEFAULT '0',
   PRIMARY KEY (`groupId`),
   KEY `groupName` (`groupName`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `imageColor` (
   `colorId` char(22) binary NOT NULL,
   `name` char(255) NOT NULL DEFAULT 'untitled',
@@ -1881,25 +1881,25 @@ CREATE TABLE `imageColor` (
   `strokeTriplet` char(7) NOT NULL DEFAULT '#000000',
   `strokeAlpha` char(2) NOT NULL DEFAULT '00',
   PRIMARY KEY (`colorId`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `imageFont` (
   `fontId` char(22) binary NOT NULL,
   `name` char(255) DEFAULT NULL,
   `storageId` char(22) binary DEFAULT NULL,
   `filename` char(255) DEFAULT NULL,
   PRIMARY KEY (`fontId`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `imagePalette` (
   `paletteId` char(22) binary NOT NULL,
   `name` char(255) NOT NULL DEFAULT 'untitled',
   PRIMARY KEY (`paletteId`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `imagePaletteColors` (
   `paletteId` char(22) binary NOT NULL,
   `colorId` char(22) binary NOT NULL,
   `paletteOrder` int(11) NOT NULL,
   PRIMARY KEY (`paletteId`,`paletteOrder`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `inbox` (
   `messageId` char(22) binary NOT NULL,
   `status` char(15) NOT NULL DEFAULT 'pending',
@@ -1915,7 +1915,7 @@ CREATE TABLE `inbox` (
   KEY `completedOn_dateStamp` (`completedOn`,`dateStamp`),
   KEY `pb_userId` (`userId`),
   KEY `pb_groupId` (`groupId`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `inbox_messageState` (
   `messageId` char(22) binary NOT NULL,
   `userId` char(22) binary NOT NULL,
@@ -1924,19 +1924,19 @@ CREATE TABLE `inbox_messageState` (
   `deleted` tinyint(4) NOT NULL DEFAULT '0',
   PRIMARY KEY (`messageId`,`userId`),
   KEY `userId_deleted_isRead` (`userId`,`deleted`,`isRead`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `incrementer` (
   `incrementerId` char(50) NOT NULL,
   `nextValue` int(11) NOT NULL DEFAULT '1',
   PRIMARY KEY (`incrementerId`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `karmaLog` (
   `userId` char(22) binary NOT NULL,
   `amount` int(11) NOT NULL DEFAULT '1',
   `source` char(255) DEFAULT NULL,
   `description` text,
   `dateModified` bigint(20) NOT NULL DEFAULT '0'
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `ldapLink` (
   `ldapLinkId` char(22) binary NOT NULL,
   `ldapLinkName` char(255) NOT NULL,
@@ -1955,18 +1955,18 @@ CREATE TABLE `ldapLink` (
   `ldapGlobalRecursiveFilter` mediumtext,
   `ldapDeactivateAccountTemplate` char(22) NOT NULL,
   PRIMARY KEY (`ldapLinkId`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `mailQueue` (
   `messageId` char(22) binary NOT NULL,
   `message` mediumtext,
   `toGroup` char(22) binary DEFAULT NULL,
   `isInbox` tinyint(4) DEFAULT '0',
   PRIMARY KEY (`messageId`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `metaData_classes` (
   `className` char(255) DEFAULT NULL,
   `fieldId` char(22) DEFAULT NULL
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `metaData_properties` (
   `fieldId` char(22) binary NOT NULL,
   `fieldName` char(100) NOT NULL,
@@ -1976,34 +1976,34 @@ CREATE TABLE `metaData_properties` (
   `defaultValue` char(255) DEFAULT NULL,
   PRIMARY KEY (`fieldId`),
   UNIQUE KEY `field_unique` (`fieldName`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `metaData_values` (
   `fieldId` char(22) binary NOT NULL,
   `value` varchar(1024) DEFAULT NULL,
   `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
   PRIMARY KEY (`fieldId`,`assetId`,`revisionDate`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `passiveAnalyticsStatus` (
   `startDate` datetime DEFAULT NULL,
   `endDate` datetime DEFAULT NULL,
   `running` int(2) DEFAULT '0',
   `userId` char(255) NOT NULL
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `passiveLog` (
   `userId` char(22) binary NOT NULL,
   `assetId` char(22) binary NOT NULL,
   `sessionId` char(22) binary NOT NULL,
   `timeStamp` bigint(20) DEFAULT NULL,
   `url` char(255) NOT NULL
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `passiveProfileAOI` (
   `userId` char(22) binary NOT NULL,
   `fieldId` char(22) binary NOT NULL,
   `value` char(100) NOT NULL,
   `count` int(11) DEFAULT NULL,
   PRIMARY KEY (`userId`,`fieldId`,`value`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `passiveProfileLog` (
   `passiveProfileLogId` char(22) binary NOT NULL,
   `userId` char(22) binary NOT NULL,
@@ -2011,26 +2011,26 @@ CREATE TABLE `passiveProfileLog` (
   `assetId` char(22) binary NOT NULL,
   `dateOfEntry` bigint(20) NOT NULL DEFAULT '0',
   PRIMARY KEY (`passiveProfileLogId`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `paymentGateway` (
   `paymentGatewayId` char(22) binary NOT NULL,
   `className` char(255) DEFAULT NULL,
   `options` longtext,
   PRIMARY KEY (`paymentGatewayId`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `redirect` (
   `assetId` char(22) binary NOT NULL,
   `redirectUrl` text,
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
   `redirectType` int(11) NOT NULL DEFAULT '302',
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `replacements` (
   `replacementId` char(22) binary NOT NULL,
   `searchFor` char(255) DEFAULT NULL,
   `replaceWith` text,
   PRIMARY KEY (`replacementId`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `search` (
   `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
@@ -2040,18 +2040,18 @@ CREATE TABLE `search` (
   `useContainers` int(11) NOT NULL DEFAULT '0',
   `paginateAfter` int(11) NOT NULL DEFAULT '25',
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `settings` (
   `name` char(255) NOT NULL,
   `value` text,
   PRIMARY KEY (`name`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `shipper` (
   `shipperId` char(22) binary NOT NULL,
   `className` char(255) DEFAULT NULL,
   `options` longtext,
   PRIMARY KEY (`shipperId`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `shopCredit` (
   `creditId` char(22) binary NOT NULL,
   `userId` char(22) binary NOT NULL,
@@ -2060,7 +2060,7 @@ CREATE TABLE `shopCredit` (
   `dateOfAdjustment` datetime DEFAULT NULL,
   PRIMARY KEY (`creditId`),
   KEY `userId` (`userId`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `sku` (
   `assetId` char(22) binary NOT NULL,
   `revisionDate` bigint(20) NOT NULL,
@@ -2075,7 +2075,7 @@ CREATE TABLE `sku` (
   PRIMARY KEY (`assetId`,`revisionDate`),
   KEY `sku` (`sku`),
   KEY `vendorId` (`vendorId`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `snippet` (
   `assetId` char(22) binary NOT NULL,
   `snippet` mediumtext,
@@ -2086,12 +2086,12 @@ CREATE TABLE `snippet` (
   `usePacked` int(1) DEFAULT NULL,
   `templateParser` char(255) DEFAULT NULL,
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `taxDriver` (
   `className` char(255) NOT NULL,
   `options` longtext,
   PRIMARY KEY (`className`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `tax_eu_vatNumbers` (
   `userId` char(22) binary NOT NULL,
   `countryCode` char(3) NOT NULL,
@@ -2100,7 +2100,7 @@ CREATE TABLE `tax_eu_vatNumbers` (
   `viesErrorCode` int(3) DEFAULT NULL,
   `approved` tinyint(1) DEFAULT NULL,
   PRIMARY KEY (`userId`,`vatNumber`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `tax_generic_rates` (
   `taxId` char(22) binary NOT NULL,
   `country` char(100) NOT NULL,
@@ -2109,7 +2109,7 @@ CREATE TABLE `tax_generic_rates` (
   `code` char(100) DEFAULT NULL,
   `taxRate` float NOT NULL DEFAULT '0',
   PRIMARY KEY (`taxId`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `template` (
   `template` mediumtext,
   `namespace` char(35) NOT NULL DEFAULT 'Page',
@@ -2125,7 +2125,7 @@ CREATE TABLE `template` (
   `attachmentsJson` longtext,
   PRIMARY KEY (`assetId`,`revisionDate`),
   KEY `namespace_showInForms` (`namespace`,`showInForms`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `transaction` (
   `transactionId` char(22) binary NOT NULL,
   `originatingTransactionId` char(22) binary DEFAULT NULL,
@@ -2172,7 +2172,7 @@ CREATE TABLE `transaction` (
   `paymentOrganization` char(35) DEFAULT NULL,
   PRIMARY KEY (`transactionId`),
   UNIQUE KEY `orderNumber` (`orderNumber`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `transactionItem` (
   `itemId` char(22) binary NOT NULL,
   `transactionId` char(22) binary NOT NULL,
@@ -2203,7 +2203,7 @@ CREATE TABLE `transactionItem` (
   PRIMARY KEY (`itemId`),
   KEY `transactionId` (`transactionId`),
   KEY `vendorId` (`vendorId`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `userInvitations` (
   `inviteId` char(22) binary NOT NULL,
   `userId` char(22) binary NOT NULL,
@@ -2212,7 +2212,7 @@ CREATE TABLE `userInvitations` (
   `newUserId` char(22) binary DEFAULT NULL,
   `dateCreated` date DEFAULT NULL,
   PRIMARY KEY (`inviteId`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `userLoginLog` (
   `userId` char(22) binary NOT NULL,
   `status` char(30) DEFAULT NULL,
@@ -2224,7 +2224,7 @@ CREATE TABLE `userLoginLog` (
   KEY `sessionId` (`sessionId`),
   KEY `userId` (`userId`),
   KEY `timeStamp` (`timeStamp`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `userProfileCategory` (
   `profileCategoryId` char(22) binary NOT NULL,
   `label` char(255) NOT NULL DEFAULT 'Undefined',
@@ -2234,7 +2234,7 @@ CREATE TABLE `userProfileCategory` (
   `editable` int(11) NOT NULL DEFAULT '1',
   `protected` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`profileCategoryId`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `userProfileData` (
   `userId` char(22) binary NOT NULL,
   `middleName` char(255) DEFAULT NULL,
@@ -2267,7 +2267,7 @@ CREATE TABLE `userProfileData` (
   `assetManagerSortColumn` char(255) DEFAULT NULL,
   `assetManagerSortDirection` char(255) DEFAULT NULL,
   PRIMARY KEY (`userId`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `userProfileField` (
   `fieldName` char(128) NOT NULL,
   `label` char(255) NOT NULL DEFAULT 'Undefined',
@@ -2286,7 +2286,7 @@ CREATE TABLE `userProfileField` (
   `extras` text,
   `defaultPrivacySetting` char(128) DEFAULT NULL,
   PRIMARY KEY (`fieldName`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `userSession` (
   `sessionId` char(22) binary NOT NULL,
   `expires` int(11) DEFAULT NULL,
@@ -2296,13 +2296,13 @@ CREATE TABLE `userSession` (
   `userId` char(22) binary NOT NULL,
   PRIMARY KEY (`sessionId`),
   KEY `expires` (`expires`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `userSessionScratch` (
   `sessionId` char(22) binary NOT NULL,
   `name` char(255) NOT NULL,
   `value` text,
   PRIMARY KEY (`sessionId`,`name`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `users` (
   `userId` char(22) binary NOT NULL,
   `username` char(100) DEFAULT NULL,
@@ -2338,7 +2338,7 @@ CREATE TABLE `users` (
   `privacyFields` longtext,
   PRIMARY KEY (`userId`),
   UNIQUE KEY `username_unique` (`username`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `vendor` (
   `vendorId` char(22) binary NOT NULL,
   `dateCreated` datetime DEFAULT NULL,
@@ -2350,7 +2350,7 @@ CREATE TABLE `vendor` (
   `url` text,
   PRIMARY KEY (`vendorId`),
   KEY `userId` (`userId`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `vendorPayoutLog` (
   `payoutId` char(22) binary NOT NULL,
   `isSuccessful` tinyint(1) NOT NULL,
@@ -2362,18 +2362,18 @@ CREATE TABLE `vendorPayoutLog` (
   `correlationId` char(13) NOT NULL,
   `paymentInformation` char(255) NOT NULL,
   PRIMARY KEY (`payoutId`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `vendorPayoutLog_items` (
   `payoutId` char(22) binary NOT NULL,
   `transactionItemId` char(22) binary NOT NULL,
   `amount` decimal(7,2) NOT NULL,
   PRIMARY KEY (`payoutId`,`transactionItemId`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `webguiVersion` (
   `webguiVersion` char(10) DEFAULT NULL,
   `versionType` char(30) DEFAULT NULL,
   `dateApplied` int(11) DEFAULT NULL
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 CREATE TABLE `wobject` (
   `displayTitle` int(11) NOT NULL DEFAULT '1',
   `description` mediumtext,
@@ -2383,7 +2383,7 @@ CREATE TABLE `wobject` (
   `revisionDate` bigint(20) NOT NULL DEFAULT '0',
   `mobileStyleTemplateId` char(22) binary DEFAULT 'PBtmpl0000000000000060',
   PRIMARY KEY (`assetId`,`revisionDate`)
-) TYPE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB CHARSET=utf8;
 ALTER TABLE `Article` DISABLE KEYS;
 INSERT INTO `Article` VALUES (NULL,NULL,'4Yfz9hqBqM8OYMGuQK8oLw','PBtmpl0000000000000002',1271352537,3600,'TngTkH6qB76os2nf2S9bDA'),(NULL,NULL,'IWFxZDyGhQ3-SLZhELa3qw','PBtmpl0000000000000002',1277737686,3600,'0MZ-Ua1Gcv25yT-3JxXX8A'),(NULL,NULL,'LBuiKzg2mWwmOPS9AgV3bg','PBtmpl0000000000000002',1271348789,3600,'6zKDCX1Jpqbi4banD1EFNQ'),(NULL,NULL,'NK8bqlwVRILJknqeCDPBHg','PBtmpl0000000000000002',1285796040,3600,'RcOVW6oW5IqpdPJskCPscA'),(NULL,NULL,'OhdaFLE7sXOzo_SIP2ZUgA','PBtmpl0000000000000002',1271445348,3600,'3g2hbILhcxQA_7UOep0B3Q'),(NULL,NULL,'Wl8WZ43g2rK5AYr9o4zY7w','PBtmpl0000000000000103',1271445539,3600,'HUItbZl7TpOPC06NlO62QA'),(NULL,NULL,'bX5rYxb6tZ9docY6sUhBlw','PBtmpl0000000000000002',1278013772,3600,'AHrUFHib-cqwIz1x7RI9sA'),(NULL,NULL,'diZvW4bSgZWwyyGP3qXi1g','PBtmpl0000000000000002',1285610019,3600,'JkzwMnShoIjz0EfwqoXPJA'),(NULL,NULL,'iCYOjohB9SKvAPr6bXElKA','PBtmpl0000000000000103',1271445525,3600,'TEXVtOhmF_RHM11-_xJLyw'),(NULL,NULL,'ix1p0AbwKAz8QWB-T-HHfg','PBtmpl0000000000000002',1271359087,3600,'VF2bqXTRUBoYb_u7dmH70w'),(NULL,NULL,'jTNggl7AoVSUc_ZzrvuCmw','PBtmpl0000000000000002',1271348789,3600,'t_CTIcSnLSuqOumw7LwxFA'),(NULL,NULL,'j_1qEqM6iLfQLiR6VKy0aA','PBtmpl0000000000000002',1331415129,3600,'WIaynMkCRCqu_kH0LAYGYg'),(NULL,NULL,'k2Qj03FrAOXYra8kDJYYXw','PBtmpl0000000000000002',1271357513,3600,'g8L2HOTFkZv5mYtYBarDCQ'),(NULL,NULL,'ksSfkZdsr0uC62NwIk6hFQ','PBtmpl0000000000000002',1271356973,3600,'iiraeaTpGWVrs4uzfvaU2A'),(NULL,NULL,'l0guT3vTR3B8cL6vtP-g3A','PBtmpl0000000000000002',1285124369,3600,'sH36uWhF3AHO8sKBy4ZBIw'),(NULL,NULL,'nWxS5jnA3o3DgPEwBeR7yQ','PBtmpl0000000000000002',1271357239,3600,'MALauel3oVVPZNrm53m3Uw');
 ALTER TABLE `Article` ENABLE KEYS;
