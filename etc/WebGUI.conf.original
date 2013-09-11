@@ -425,13 +425,6 @@
       "title" : "^International(spectre,Spectre);",
       "groupSetting" : "groupIdAdminSpectre"
    },
-   "adminConsoleOff" : {
-      "icon" : "adminConsoleOff.gif",
-      "uiLevel" : 1,
-      "group" : "12",
-      "url" : "^PageUrl(\"\",op=switchOffAdmin);",
-      "title" : "^International(12,WebGUI);"
-   },
    "addons" : {
       "icon" : "addons.png",
       "uiLevel" : 1,
