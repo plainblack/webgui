@@ -39,6 +39,20 @@ WebGUI.Layout = function (elem, cfg) {
             for ( var x = 0; x < children.length; x++ ) {
                 var elem = children[x];
                 if ( elem.id.match(/wg-content-asset-(.{22})/) ) {
+
+                    // when flipping between Tree and View tabs with edit on, clear out the containers for the drag controls before re-adding them
+                    var elem_yui = new YAHOO.util.Element( elem );
+                    var child = YAHOO.util.Dom.getFirstChild( elem );
+                    while( child ) {
+                        var child_yui = new YAHOO.util.Element( child );
+                        if( child_yui.hasClass('draggable') ) {
+                            elem_yui.removeChild( child );
+                            // console.log("removing in drag and drop control: " + child + " from " + elem_yui);
+                        }
+                        // nested assets are also children in here, with ids like "wg-content-asset-xxxxxxxxxxx"; leave those alone
+                        child = YAHOO.util.Dom.getNextSibling( child );
+                    }
+
                     new WebGUI.LayoutItem( elem, null, null, this );
                 }
             }
