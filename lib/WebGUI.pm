@@ -66,8 +66,6 @@ sub call {
     my $self = shift;
     my $env = shift;
 
-local $SIG{USR1} = sub { Carp::confess; };
-
     ##Enable size limiting
     $env->{'psgix.harakiri'} = 1;
 
