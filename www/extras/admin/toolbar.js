@@ -32,10 +32,6 @@ WebGUI.Toolbar.createAll = function( ) {
     var holders = YAHOO.util.Selector.query( '.wg-admin-toolbar' );
     for ( var i = 0; i < holders.length; i++ ) {
         var holder = holders[i];
-
-        // when flipping between Tree and View tabs with edit on, clear out the containers for the toolbars before re-adding the toolbars
-        $(holder).empty();
-
         var assetId = holder.id.match( /wg-admin-toolbar-(.+)/ )[1];
         var toolbar = new WebGUI.Toolbar( assetId, { "parent" : holder } );
         toolbar.getAssetData( assetId, bind( toolbar, toolbar.render ) );
