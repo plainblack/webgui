@@ -1877,6 +1877,8 @@ WebGUI.Admin.Tree.prototype.runHelperForSelected
     var self = this;
     var assetIds = this.getSelected();
 
+    alert("ok");
+
     // Open the dialog with two progress bars
     var dialog  = new YAHOO.widget.Panel( 'helperForkModalDialog', {
         "width"             : '350px',

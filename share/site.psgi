@@ -48,18 +48,18 @@ builder {
     # enable_if { $_[0]->{'webgui.debug'} } 'StackTrace';
     enable_if { $_[0]->{'webgui.debug'} } '+WebGUI::Middleware::StackTrace';
 
-    enable_if { $_[0]->{'webgui.debug'} } 'Debug', panels => [
-        'Timer',
-        'Memory',
-        'Session',
-        'Parameters',
-        'PerlConfig',
-        [ 'MySQLTrace', skip_packages => qr/\AWebGUI::SQL(?:\z|::)/ ],
-        'Response',
-        'Logger',
-    ];
-    enable_if { $_[0]->{'webgui.debug'} } '+WebGUI::Middleware::Debug::Environment';
-    enable_if { $_[0]->{'webgui.debug'} } '+WebGUI::Middleware::Debug::Performance';
+#    enable_if { $_[0]->{'webgui.debug'} } 'Debug', panels => [
+#        'Timer',
+#        'Memory',
+#        'Session',
+#        'Parameters',
+#        'PerlConfig',
+#        [ 'MySQLTrace', skip_packages => qr/\AWebGUI::SQL(?:\z|::)/ ],
+#        'Response',
+#        'Logger',
+#    ];
+#    enable_if { $_[0]->{'webgui.debug'} } '+WebGUI::Middleware::Debug::Environment';
+#    enable_if { $_[0]->{'webgui.debug'} } '+WebGUI::Middleware::Debug::Performance';
 
     # This one uses the Session object, so it comes after WebGUI::Middleware::Session
     mount $config->get('uploadsURL') => builder {
