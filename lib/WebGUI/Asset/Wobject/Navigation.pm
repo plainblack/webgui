@@ -286,7 +286,7 @@ override getEditForm => sub {
             . ">.././ (-1)</option><option value=\"0\""
             . ( ( $start == 0 || $start > 0 ) ? ' selected=\"1\"' : '' )
             . ">./ (0)</option></select>';
-                    document.getElementById('navStartPoint_formId').innerHTML=document.getElementById('navStartType').selectedIndex;
+                    document.getElementById('navStartPoint').innerHTML=types[document.getElementById('navStartType').options[document.getElementById('navStartType').selectedIndex].value];
             }
             " . $afterScript . "
             YAHOO.util.Event.onDOMReady( initWebGUINavigation );
