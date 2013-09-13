@@ -43,28 +43,33 @@ property    assetsToInclude => (
                 default      => "descendants",
                 label        => ["Relatives To Include", 'Asset_Navigation'],
                 hoverHelp    => ["Relatives To Include description", 'Asset_Navigation'],
+                noFormPost   => 1,
             );
 property    startType => (
                 fieldType    => 'selectBox',
                 default      => "relativeToCurrentUrl",
                 label        => ["Start Point Type", 'Asset_Navigation'],
                 hoverHelp    => ["Start Point Type description", 'Asset_Navigation'],
+                noFormPost   => 1,
             );
 property    startPoint => (
                 fieldType   => 'text',
                 default     => 0,
                 label       => ["Start Point", 'Asset_Navigation'],
                 hoverHelp   => ["Start Point description", 'Asset_Navigation'],
+                noFormPost   => 1,
             );
 property    ancestorEndPoint => (
                 noFormPost  => 1,
                 fieldType   => 'selectBox',
                 default     => 55,
+                noFormPost   => 1,
             );
 property    descendantEndPoint => (
                 noFormPost  => 1,
                 fieldType   => 'selectBox',
                 default     => 55,
+                noFormPost   => 1,
             );
 property    showSystemPages => (
                 label        => [30, 'Asset_Navigation'],
@@ -160,51 +165,51 @@ override getEditForm => sub {
     $fb->getTab("properties")->addField( "ReadOnly" => 
         label     => $i18n->get("Relatives To Include"),
         hoverHelp => $i18n->get("Relatives To Include description"),
-        value     => WebGUI::Form::checkbox(
+        value     => WebGUI::Form::Checkbox->new(
             $self->session, {
                 checked => $ancestorsChecked,
                 name    => "assetsToInclude",
                 extras  => 'onchange="toggleAncestorEndPoint()"',
                 value   => "ancestors"
             }
-            )
+            )->toHtml
             . $i18n->get('Ancestors')
             . '<br />'
-            . WebGUI::Form::checkbox(
+            . WebGUI::Form::Checkbox->new(
             $self->session, {
                 checked => $selfChecked,
                 name    => "assetsToInclude",
                 value   => "self"
             }
-            )
+            )->toHtml
             . $i18n->get('Self')
             . '<br />'
-            . WebGUI::Form::checkbox(
+            . WebGUI::Form::Checkbox->new(
             $self->session, {
                 checked => $siblingsChecked,
                 name    => "assetsToInclude",
                 value   => "siblings"
             }
-            )
+            )->toHtml
             . $i18n->get('Siblings')
             . '<br />'
-            . WebGUI::Form::checkbox(
+            . WebGUI::Form::Checkbox->new(
             $self->session, {
                 checked => $descendantsChecked,
                 name    => "assetsToInclude",
                 value   => "descendants",
                 extras  => 'onchange="toggleDescendantEndPoint()"'
             }
-            )
+            )->toHtml
             . $i18n->get('Descendants')
             . '<br />'
-            . WebGUI::Form::checkbox(
+            . WebGUI::Form::Checkbox->new(
             $self->session, {
                 checked => $pedigreeChecked,
                 name    => "assetsToInclude",
                 value   => "pedigree"
             }
-            )
+            )->toHtml
             . $i18n->get('Pedigree')
             . '<br />'
     );
@@ -232,19 +237,19 @@ override getEditForm => sub {
             var displayNavAncestorEndPoint = true;
             function toggleDescendantEndPoint () {
                     if (displayNavDescendantEndPoint) {
-                            document.getElementById('navDescendantEnd').style.display='none';
+                            document.getElementById('descendantEndPoint_formId_row').style.display='none';
                             displayNavDescendantEndPoint = false;
                     } else {
-                            document.getElementById('navDescendantEnd').style.display='';
+                            document.getElementById('descendantEndPoint_formId_row').style.display='';
                             displayNavDescendantEndPoint = true;
                     }
             }
             function toggleAncestorEndPoint () {
                     if (displayNavAncestorEndPoint) {
-                            document.getElementById('navAncestorEnd').style.display='none';
+                            document.getElementById('ancestorEndPoint_formId_row').style.display='none';
                             displayNavAncestorEndPoint = false;
                     } else {
-                            document.getElementById('navAncestorEnd').style.display='';
+                            document.getElementById('ancestorEndPoint_formId_row').style.display='';
                             displayNavAncestorEndPoint = true;
                     }
             }
@@ -281,15 +286,19 @@ override getEditForm => sub {
             . ">.././ (-1)</option><option value=\"0\""
             . ( ( $start == 0 || $start > 0 ) ? ' selected=\"1\"' : '' )
             . ">./ (0)</option></select>';
-                    document.getElementById('navStartPoint').innerHTML=types[document.getElementById('navStartType').descendantEndPointOptions,[document.getElementById('navStartType').selectedIndex].value];
+                    document.getElementById('navStartPoint_formId').innerHTML=document.getElementById('navStartType').selectedIndex;
             }
             " . $afterScript . "
+            YAHOO.util.Event.onDOMReady( initWebGUINavigation );
+            function initWebGUINavigation() {
             changeStartPoint();
             " . ( $descendantsChecked ? "" : "toggleDescendantEndPoint();" ) . "
             " . ( $ancestorsChecked   ? "" : "toggleAncestorEndPoint();" ) . "
+            }
             //]]>
             </script>"
     );
+    #document.getElementById('navStartPoint_formId').innerHTML=types[document.getElementById('navStartType').options[document.getElementById('navStartType').selectedIndex].value];
     return $fb;
 };
 
