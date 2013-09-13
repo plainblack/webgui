@@ -171,7 +171,6 @@ WebGUI.Admin = function(cfg){
         }
     } );
 
-
 };
 
 /**
@@ -284,6 +283,27 @@ WebGUI.Admin.prototype.gotoAsset
     else if ( this.currentTab == "tree" ) {
         // Make tree request
         this.tree.goto( url );
+        this.viewDirty = 1;
+    }
+};
+
+/**
+ * reload()
+ * Open the appropriate tab (View or Tree) and force a reload of the current URL
+ */
+WebGUI.Admin.prototype.reload
+= function () {
+    if ( this.tabBar.get('activeIndex') > 1 ) {
+        this.tabBar.selectTab( 0 );
+        this.currentTab = "view";
+    }
+    if ( this.currentTab == "view" ) {
+        window.frames[ "view" ].location.reload(1);
+        this.treeDirty = 1;
+    }
+    else if ( this.currentTab == "tree" ) {
+        // Make tree request
+        this.tree.goto( window.frames[ "view" ].location.href );
         this.viewDirty = 1;
     }
 };
@@ -695,6 +715,7 @@ WebGUI.Admin.prototype.requestHelper
  *      scriptFile  : Load a JS file
  *      scriptFunc  : Run a JS function. Used with scriptFile
  *      scriptArgs  : Arguments to scriptFunc. Used with scriptFile
+ *      reload      : Reload the current page eg after an asset cut or paste
  */
 WebGUI.Admin.prototype.processPlugin
 = function ( resp ) {
@@ -718,6 +739,9 @@ WebGUI.Admin.prototype.processPlugin
     }
     else if ( resp.redirect ) {
         this.gotoAsset( resp.redirect );
+    }
+    else if ( resp.reload ) {
+        this.reload();
     }
     else {
         alert( "Unknown plugin response: " + YAHOO.lang.JSON.stringify(resp) );
@@ -851,6 +875,7 @@ WebGUI.Admin.prototype.openForkDialog
         url     : '?op=fork;pid=' + forkId,
         draw    : function(data) {
             var status = YAHOO.lang.JSON.parse( data.status );
+            // console.log(status);
             if ( status ) {
                 pbTaskBar.set( 'maxValue', status.total );
                 pbTaskBar.set( 'value', status.finished );
@@ -859,9 +884,14 @@ WebGUI.Admin.prototype.openForkDialog
         },
         finish  : function(data){
             var status = YAHOO.lang.JSON.parse( data.status );
+            // console.log(status);
             if ( status.redirect ) {
-                alert("Dispensing product...");
+                // alert("Dispensing product...");
                 window.admin.gotoAsset( status.redirect );
+            }
+            if ( status.reload ) {
+                // alert("Reload requested...");
+                window.admin.reload();
             }
             dialog.destroy();
             dialog = null;
@@ -1876,6 +1906,8 @@ WebGUI.Admin.Tree.prototype.runHelperForSelected
 = function ( helperId, title ) {
     var self = this;
     var assetIds = this.getSelected();
+
+    // alert("ok");
 
     // Open the dialog with two progress bars
     var dialog  = new YAHOO.widget.Panel( 'helperForkModalDialog', {
