@@ -145,11 +145,25 @@ sub focus {
 
 =head2 tree
 
-A hashy representation of the status of this tree of assets.
+Return an arrayref of hashes of the root nodes of the assets being worked on.
+Entries in the hashes include C<assetId>, C<parentId>, C<url>, and possibily C<children>.
+If C<chlidren> is present, it contains an array of similar hash nodes which might also have C<children>.
 
 =cut
 
 sub tree { $_[0]->{tree} }
+
+#-------------------------------------------------------------------
+
+=head2 flat
+
+Return a hashref mapping C<assetId> to a hash of C<assetId>, C<parentId>, and C<url>.
+This is a flattened representation of what C<tree> returns.
+
+=cut
+
+sub flat { $_[0]->{flat} }
+
 
 #-------------------------------------------------------------------
 
