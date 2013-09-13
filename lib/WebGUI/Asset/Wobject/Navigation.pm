@@ -328,6 +328,45 @@ override prepareView => sub {
 
 #-------------------------------------------------------------------
 
+=head2 processEditForm ( )
+
+Extend the super class to handle saving the form fields that we've drawn ourselves.
+
+=cut
+
+override processEditForm => sub {
+    my $self = shift;
+    my $form      = $self->session->form;
+    my $overrides = $self->session->config->get( "assets/" . $self->get("className") . "/fields" );
+    my %data;
+    super();
+    foreach my $property ( qw/assetsToInclude startType startPoint ancestorEndPoint descendantEndPoint/ ) {
+
+        my $fieldType      = $self->meta->find_attribute_by_name($property)->fieldType;
+        my $fieldOverrides = $overrides->{$property} || {};
+        my $fieldHash      = {
+            tab => "properties",
+            %{ $self->getFormProperties($property) },
+            %{$overrides},
+            name  => $property,
+            value => $self->$property,
+        };
+
+
+        # process the form element
+        my $defaultValue = $overrides->{defaultValue} // $self->$property;
+        $data{$property} = $form->process( $property, $fieldType, $defaultValue, $fieldHash );
+    } ## end foreach my $property ( $self...)
+
+    $self->session->db->beginTransaction;
+    $self->update( \%data );
+    $self->session->db->commit;
+
+};
+
+
+#-------------------------------------------------------------------
+
 =head2 view ( )
 
 See WebGUI::Asset::view() for details.
