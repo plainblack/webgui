@@ -40,6 +40,22 @@ use WebGUI::Form::DataTable;
 
 #----------------------------------------------------------------------------
 
+=head2 addEditSaveTabs ( form )
+
+Add the tab for managing the table data and schema.
+
+=cut
+
+override addEditSaveTabs => sub {
+    my ( $self, $form ) = @_;
+    $form = super();
+    my $i18n = WebGUI::International->new($self->session, 'Asset_DataTable');
+    $form->addTab( name => "data", label => $i18n->get("tab label data") );
+    return $form;
+};
+
+#----------------------------------------------------------------------------
+
 =head2 getDataJson ( )
 
 Get the data as a JSON object with the following structure:
