@@ -76,6 +76,29 @@ sub copy {
     $tree->success($asset->getId);
     $process->update(sub { $tree->json });
 
+    # flat() return s a hash of all nodes to be done
+    my $maxValue = keys %{ $tree->flat };
+
+    my $update_progress = sub {
+        # update the Fork's progress with how many are done
+        my $flat = $tree->flat;
+        my @done = grep { $_->{success} or $_->{failure} } values %$flat;
+        my $current_value = scalar @done;
+        my $info = {
+            maxValue     => $maxValue,
+            value        => $current_value,
+            message      => 'Copying...',
+            reload       => 1,                # this won't take effect until Fork.pm returns finished => 1 and this status is pro
+            @_,
+        };
+        $info->{refresh} = 1 if $maxValue == $current_value;
+        my $json = JSON::encode_json( $info );
+        $process->update( $json );
+    };
+
+    $update_progress->( debug_initial => 1 );
+
+
     my $tag = WebGUI::VersionTag->getWorking($session);
     if ($tag->canAutoCommit) {
         $tag->commit;
