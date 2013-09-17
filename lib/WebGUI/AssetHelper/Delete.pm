@@ -104,8 +104,6 @@ sub delete {
         $process->update( $json );
     };
 
-    $update_progress->( debug_initial => 1 );
-
     # Patch a sub to get a status update
     my $patch = Monkey::Patch::patch_class(
         'WebGUI::Asset',
