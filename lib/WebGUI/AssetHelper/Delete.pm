@@ -83,7 +83,28 @@ sub delete {
             }
         );
     my $tree = WebGUI::ProgressTree->new( $session, $ids );
-    $process->update(sub { $tree->json });
+    my $maxValue = keys %{ $tree->flat };
+
+    my $update_progress = sub {
+        # update the Fork's progress with how many are done
+        my $flat = $tree->flat;
+        my @done = grep { $_->{success} or $_->{failure} } values %$flat;
+        my $current_value = scalar @done;
+        my $info = {
+            maxValue     => $maxValue,
+            value        => $current_value,
+            message      => 'Working...',
+            reload       => 1,                # this won't take effect until Fork.pm returns finished => 1 and this status is propogated to WebGUI.Admin.prototype.openForkDialog's callback
+            @_,
+        };
+        $info->{refresh} = 1 if $maxValue == $current_value;
+        # $info->{debug_flat_keys} = join ',', keys %$flat;
+        # $info->{debug_tree} = Dumper( $tree->tree );
+        my $json = JSON::encode_json( $info );
+        $process->update( $json );
+    };
+
+    $update_progress->( debug_initial => 1 );
 
     # Patch a sub to get a status update
     my $patch = Monkey::Patch::patch_class(
