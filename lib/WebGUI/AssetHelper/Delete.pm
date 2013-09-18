@@ -93,13 +93,11 @@ sub delete {
         my $info = {
             maxValue     => $maxValue,
             value        => $current_value,
-            message      => 'Working...',
+            message      => 'Deleting...',
             reload       => 1,                # this won't take effect until Fork.pm returns finished => 1 and this status is propogated to WebGUI.Admin.prototype.openForkDialog's callback
             @_,
         };
         $info->{refresh} = 1 if $maxValue == $current_value;
-        # $info->{debug_flat_keys} = join ',', keys %$flat;
-        # $info->{debug_tree} = Dumper( $tree->tree );
         my $json = JSON::encode_json( $info );
         $process->update( $json );
     };
