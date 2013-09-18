@@ -281,6 +281,7 @@ WebGUI.Admin.prototype.gotoAsset
         // Make tree request
         // XXX this is currently failing... arg is eg  /home?func=pasteList&assetId=x4wzjypIRIaDFISifViMgA  which should be okay
         // XXX FIXME: a lot of Tree view operations fail after this point.  where the View version just directly goes to the URL, the Tree view tries to modify the URL to pass the extjs-style grid's parameters back.  this winds up creating unworkable URLs that try to do two things at once, with two '?'s, two 'op='s, etc.  there are two ways to fix this:  if we're trying to go to an asset (gotoAsset) and we're in Tree view, flop back to View mode first; or else two distinct requests, one for the remote request (which might generate additional requests to draw in dialog boxes, progress bars, forms, etc) and then when that's all done, refresh the grid view.  WebGUI.Admin.prototype.pasteAsset takes the route of flopping to Tree view first.
+        // XXX gotoAsset() should probably not be feed urls with query strings on them
         this.tree.goto( url );
         this.viewDirty = 1;
     }
@@ -301,8 +302,8 @@ WebGUI.Admin.prototype.reload
         this.treeDirty = 1;
     }
     else if ( this.currentTab == "tree" ) {
-        // Make tree request
-        this.tree.goto( window.frames[ "view" ].location.href );
+        // console.log( window.frames[ "view" ].location.pathname ); // XXX
+        this.tree.goto( window.frames[ "view" ].location.pathname );
         this.viewDirty = 1;
     }
 };
@@ -643,7 +644,7 @@ WebGUI.Admin.prototype.getHelperHandler
             if ( helper.confirm && !confirm( helper.confirm ) ) {
                 return;
             }
-            this.gotoAsset( helper.url ) 
+            this.gotoAsset( helper.url )  // gotoAsset() in this case should be safe as getHelperHerlp() only runs from View mode, so the URL won't be mangled
         } );
     }
 
@@ -904,11 +905,17 @@ WebGUI.Admin.prototype.openForkDialog
             if ( status ) {
                 pbTaskBar.set( 'maxValue', status.total );
                 pbTaskBar.set( 'value', status.finished );
+                if( status.message ) {
+                    document.getElementById( 'pbTaskStatus' ).innerHTML = status.message;
                 document.getElementById( 'pbTaskStatus' ).innerHTML = status.message;
+            }
             }
         },
         finish  : function(data){
             var status = YAHOO.lang.JSON.parse( data.status );
+            if( status.message ) {
+                document.getElementById( 'pbTaskStatus' ).innerHTML = status.message;
+            }
             // console.log(status);
             if ( status.redirect ) {
                 // alert("Dispensing product...");
