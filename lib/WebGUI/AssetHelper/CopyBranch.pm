@@ -120,7 +120,6 @@ sub copyBranch {
 
     my $tree  = WebGUI::ProgressTree->new($session, $assetIds );
     my $maxValue = keys %{ $tree->flat };
-    $process->update(sub { $tree->json });
     my $update_progress = sub {
         # update the Fork's progress with how many are done
         my $flat = $tree->flat;
