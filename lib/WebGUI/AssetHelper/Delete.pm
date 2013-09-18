@@ -114,7 +114,7 @@ sub delete {
             $tree->focus($id);
             my $ret = $self->$setState($state);
             $tree->success($id);
-            $process->update(sub { $tree->json });
+            $update_progress->();
             return $ret;
         }
     );
