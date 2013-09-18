@@ -96,6 +96,8 @@ sub copy {
         $process->update( $json );
     };
 
+    $update_progress->();
+
     my $tag = WebGUI::VersionTag->getWorking($session);
     if ($tag->canAutoCommit) {
         $tag->commit;
