@@ -269,18 +269,15 @@ WebGUI.Admin.prototype.editAsset
 /**
  * gotoAsset( url )
  * Open the appropriate tab (View or Tree) and go to the given asset URL
+ * Cannot go to a URL that has parameters in Tree view
  */
 WebGUI.Admin.prototype.gotoAsset
 = function ( url ) {
-    if ( this.tabBar.get('activeIndex') > 1 ) {
-        this.tabBar.selectTab( 0 );
-        this.currentTab = "view";
-    }
-    if ( this.currentTab == "view" ) {
+    if ( this.currentTabName() == "view" ) {
         window.frames[ "view" ].location.href = url;
         this.treeDirty = 1;
     }
-    else if ( this.currentTab == "tree" ) {
+    else if ( this.currentTabName() == "tree" ) {
         // Make tree request
         // XXX this is currently failing... arg is eg  /home?func=pasteList&assetId=x4wzjypIRIaDFISifViMgA  which should be okay
         // XXX FIXME: a lot of Tree view operations fail after this point.  where the View version just directly goes to the URL, the Tree view tries to modify the URL to pass the extjs-style grid's parameters back.  this winds up creating unworkable URLs that try to do two things at once, with two '?'s, two 'op='s, etc.  there are two ways to fix this:  if we're trying to go to an asset (gotoAsset) and we're in Tree view, flop back to View mode first; or else two distinct requests, one for the remote request (which might generate additional requests to draw in dialog boxes, progress bars, forms, etc) and then when that's all done, refresh the grid view.  WebGUI.Admin.prototype.pasteAsset takes the route of flopping to Tree view first.
@@ -481,17 +478,32 @@ WebGUI.Admin.prototype.updateClipboard
  */
 WebGUI.Admin.prototype.addPasteHandler
 = function ( elem, assetId ) {
-    var self    = this;
+    var self = this;
     YAHOO.util.Event.on( elem, "click", function(){
         // Update clipboard after paste in case paste fails
         var updateAfterPaste = function(){
-            this.requestUpdateClipboard();
-            this.afterNavigate.unsubscribe( updateAfterPaste );
+            self.requestUpdateClipboard();
+            self.afterNavigate.unsubscribe( updateAfterPaste );
         };
-        self.afterNavigate.subscribe(updateAfterPaste, self );
+
+        self.afterNavigate.subscribe(updateAfterPaste, self);
         self.pasteAsset( assetId );
     }, self );
 };
+
+/**
+ * currentTabName()
+ * Returns the name of the current tab, either "tree" or "view", for callbacks that need to distinguish them
+ */
+WebGUI.Admin.prototype.currentTabName
+= function() {
+    if ( this.tabBar.get('activeIndex') > 1 ) {
+        this.tabBar.selectTab( 0 );
+        this.currentTab = "view";
+    }
+    return this.currentTab;
+}
+
 
 /**
  * pasteAsset( id )
@@ -499,9 +511,20 @@ WebGUI.Admin.prototype.addPasteHandler
  */
 WebGUI.Admin.prototype.pasteAsset
 = function ( id ) {
-    var url = appendToUrl( this.currentAssetDef.url, 'func=pasteList&assetId=' + id );
-    console.log(url);
-    this.gotoAsset( url );
+    if ( this.currentTabName() == "view" ) {
+        var url = appendToUrl( this.currentAssetDef.url, 'func=pasteList&assetId=' + id );
+        this.gotoAsset( url );
+    }
+    else if ( this.currentTabName() == "tree" ) {
+        this.tabBar.set('activeIndex', 0);
+        // as above...
+        var url = appendToUrl( this.currentAssetDef.url, 'func=pasteList&assetId=' + id );
+        this.treeDirty = true;
+        // this.gotoAsset( url ); // the change notification handler hasn't run yet at this point (and doesn't until we're done here) so this thinks we're still in the Tree view, so we have to do this directly
+        window.frames[ "view" ].location.href = url;
+        this.treeDirty = 1;
+    }
+    
 };
 
 /**
@@ -1910,9 +1933,12 @@ YAHOO.lang.extend( WebGUI.Admin.Tree, WebGUI.Admin.AssetTable );
  * runHelperForSelected( helperId )
  * Run the named asset helper for each selected asset
  * Show the status of the task in a dialog box
+ * sdw: I think this is dead code
  */
 WebGUI.Admin.Tree.prototype.runHelperForSelected
 = function ( helperId, title ) {
+// XXXX this is busted
+alert("running WebGUI.Admin.Tree.prototype.runHelperForSelected which I think is dead code");
     var self = this;
     var assetIds = this.getSelected();
 
@@ -1971,7 +1997,8 @@ WebGUI.Admin.Tree.prototype.runHelperForSelected
     };
 
     // Build a function to call the helper for the next asset
-    var callHelper = function( assetIds ) {
+    var callHelper;
+    callHelper = function( assetIds ) {
         var assetId = assetIds.shift();
 
         var callback = {
@@ -2030,6 +2057,7 @@ WebGUI.Admin.Tree.prototype.runHelperForSelected
 /**
  * cut( e )
  * Run the cut assethelper for the selected assets
+ * sdw: I think these are all dead code
  */
 WebGUI.Admin.Tree.prototype.cut
 = function ( e ) {
@@ -2069,6 +2097,7 @@ WebGUI.Admin.Tree.prototype.delete
 = function ( e ) {
     this.runHelperForSelected( "delete", "Delete" );
 };
+
 
 /**
  * Update the selected assets' ranks
@@ -2208,13 +2237,14 @@ WebGUI.Admin.Tree.prototype.buildQueryString
 /**
  * Update the tree with a new asset
  * Do not call this directly, use Admin.gotoAsset(url)
+ * If the assetUrl parameter itself has parameters, this will not generate a correct URL
  */
 WebGUI.Admin.Tree.prototype.goto
 = function ( assetUrl ) {
     // TODO: Show loading screen
     var callback = {
         success : this.onDataReturnInitializeTable,
-        failure : this.onDataReturnInitializeTable,
+        failure : function() { console.error("Failed to fetch data"); alert("Failed to fetch data of some sort...") }, // XXX see the FIXME in WebGUI.Admin.prototype.gotoAsset.  this generally fails for that reason when it fails.
         scope   : this,
         argument: this.dataTable.getState()
     };
