@@ -1,7 +1,7 @@
 package WebGUI::AssetHelper::CopyBranch;
 
 use strict;
-use base qw/WebGUI::AssetHelper::Copy/;
+use base qw/WebGUI::AssetHelper/;
 use Scalar::Util qw{ blessed };
 use WebGUI::VersionTag;
 
@@ -119,13 +119,46 @@ sub copyBranch {
     }
 
     my $tree  = WebGUI::ProgressTree->new($session, $assetIds );
+    my $maxValue = keys %{ $tree->flat };
     $process->update(sub { $tree->json });
+    my $update_progress = sub {
+        # update the Fork's progress with how many are done
+        my $flat = $tree->flat;
+        my @done = grep { $_->{success} or $_->{failure} } values %$flat;
+        my $current_value = scalar @done;
+        my $info = {
+            maxValue     => $maxValue,
+            value        => $current_value,
+            message      => 'Copying...',
+            reload       => 1,                # this won't take effect until Fork.pm returns finished => 1 and this status is propogated to WebGUI.Admin.prototype.openForkDialog's callback
+            @_,
+        };
+        $info->{refresh} = 1 if $maxValue == $current_value;
+        my $json = JSON::encode_json( $info );
+        $process->update( $json );
+    };
+
+    # Patch a sub to get a status update
+    my $patch = Monkey::Patch::patch_class(
+        'WebGUI::Asset',
+        'duplicate',
+        sub {
+            my ( $duplicate, $self, @args ) = @_;
+            my $id = $self->getId;
+            $tree->focus($id);
+            my $ret = $self->$duplicate(@args);
+            $tree->success($id);
+            $update_progress->();
+            return $ret;
+        }
+    );
+
     my $newAsset = $asset->duplicateBranch( $args->{childrenOnly} ? 1 : 0, 'clipboard' );
 
     $newAsset->update({ title => $newAsset->getTitle . ' (copy)'});
 
     $tree->success($asset->getId);
-    $process->update(sub { $tree->json });
+    $update_progress->();
 
     my $tag = WebGUI::VersionTag->getWorking($session);
     if ($tag->canAutoCommit) {
