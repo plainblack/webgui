@@ -4,6 +4,7 @@ use strict;
 use base qw/WebGUI::AssetHelper/;
 use Scalar::Util qw{ blessed };
 use WebGUI::VersionTag;
+use JSON;
 
 =head1 LEGAL
 
@@ -61,10 +62,52 @@ sub www_getWith {
     my $session = $self->session;
     my $i18n    = WebGUI::International->new($session, 'Asset');
 
-    my $f   = $self->getForm( 'copy' );
-    $f->addField( 'submit', name => 'with', value => 'Children' );
-    $f->addField( 'submit', name => 'with', value => 'Descendants' );
-    return $f->toHtml;
+    my $copy_url = $self->getUrl( 'copy' );  # call this URL to start the copy; it returns a forkId
+    my $url = $self->session->url->page; 
+
+    # XXX should probably be in a template
+     return qq{
+<link rel="stylesheet" type="text/css" href="/extras/yui/build/button/assets/skins/sam/button.css" />
+<link rel="stylesheet" type="text/css" href="/extras/yui/build/menu/assets/skins/sam/menu.css" />
+<link rel="stylesheet" type="text/css" href="/extras/yui/build/container/assets/skins/sam/container.css" />
+<link rel="stylesheet" type="text/css" href="/extras/admin/admin.css" />
+<script type="text/javascript" src="/extras/yui/build/yahoo-dom-event/yahoo-dom-event.js"></script>
+<script type="text/javascript" src="/extras/yui/build/utilities/utilities.js"></script>
+<script type="text/javascript" src="/extras/yui/build/element/element-debug.js"></script>
+<script type="text/javascript" src="/extras/yui/build/connection/connection-debug.js"></script>
+<script type="text/javascript" src="/extras/yui/build/dragdrop/dragdrop-debug.js"></script>
+<script type="text/javascript" src="/extras/yui/build/container/container-debug.js"></script>
+<script type="text/javascript" src="/extras/yui/build/button/button-debug.js"></script>
+<script type="text/javascript" src="/extras/yui/build/json/json-debug.js"></script>
+<script type="text/javascript" src="/extras/yui/build/get/get-debug.js"></script>
+<script type="text/javascript" src="/extras/yui/build/selector/selector-debug.js"></script>
+
+<form action="$url" method="POST" enctype="multipart/form-data" onsubmit="do_submit(this); return false;">
+<div><input type="submit" name="with" value="Children"  /><!-- <script type="text/javascript">new YAHOO.widget.Button("with_formId");</script> --></div>
+<div><input type="submit" name="with" id="with_formId" value="Descendants"  /></div>
+</form>
+<script type="text/javascript">
+
+function do_submit(form) {
+   var callback = {
+        success : function (o) {
+            var resp = YAHOO.lang.JSON.parse( o.responseText );
+            window.parent.admin.processPlugin(resp);
+            window.parent.admin.closeModalDialog();
+        },
+        failure : function (o) {
+            alert("Failed to fetch $copy_url: " + o.statusText);
+            console.error("Failed to fetch $copy_url: " + o.statusText);
+        },
+        cache: false
+    };      
+                
+    var url = "$copy_url";
+    var ajax = YAHOO.util.Connect.asyncRequest( 'GET', url, callback );
+}
+
+</script>
+     };
 }
 
 
@@ -91,9 +134,9 @@ sub www_copy {
         $session, blessed( $self ), 'copyBranch', { childrenOnly => $childrenOnly, assetId => $asset->getId, commit => $commit },
     );
 
-    return {
+    return JSON->new->encode( {
         forkId      => $fork->getId,
-    };
+    } );
 }
 
 #-------------------------------------------------------------------
