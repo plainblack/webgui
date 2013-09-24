@@ -19,7 +19,9 @@ Package WebGUI::Operation::Admin
 
 =head1 DESCRIPTION
 
-Operation handler for admin functions
+Operation handler for admin functions.
+
+See also L<WebGUI::Content::Admin>, which handles C<op=admin> requests.
 
 =cut
 
