@@ -163,6 +163,7 @@ sub copyBranch {
 
     my $tree  = WebGUI::ProgressTree->new($session, $assetIds );
     my $maxValue = keys %{ $tree->flat };
+    $process->update(sub { $tree->json });
     my $update_progress = sub {
         # update the Fork's progress with how many are done
         my $flat = $tree->flat;
@@ -172,7 +173,7 @@ sub copyBranch {
             maxValue     => $maxValue,
             value        => $current_value,
             message      => 'Copying...',
-            reload       => 1,                # this won't take effect until Fork.pm returns finished => 1 and this status is propogated to WebGUI.Admin.prototype.openForkDialog's callback
+            # reload       => 1,                # this won't take effect until Fork.pm returns finished => 1 and this status is propogated to WebGUI.Admin.prototype.openForkDialog's callback; Copy Branch is non-mutating of the Tree/View mode so we don't need reload
             @_,
         };
         $info->{refresh} = 1 if $maxValue == $current_value;
