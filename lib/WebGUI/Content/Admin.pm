@@ -47,6 +47,8 @@ Handle every op=admin request
 sub handler {
     my ($session) = @_;
 
+    return "" unless ($session->user->canUseAdminMode);
+
     if ( $session->form->get("op") eq "admin" ) {
         if ( $session->form->get("plugin") ) {
             my $id      = $session->form->get('id');
