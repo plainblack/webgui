@@ -41,6 +41,7 @@ The URL of a template from the Macro/AdminToggle namespace to use for formatting
 #-------------------------------------------------------------------
 sub process {
     my $session = shift;
+    return "" if $session->isAdminOn;
     return ""
         unless $session->user->canUseAdminMode;
     my ($turnOn, $templateName) = @_;
