@@ -82,6 +82,7 @@ ENDHTML
     $tabform->hidden({name=>"op",value=>"assetHelper"});
     $tabform->hidden({name=>"helperId",value=>$self->id});
     $tabform->hidden({name=>"method",value=>"uploadFilesSave"});
+    $tabform->hidden({name=>"assetId",value=> $session->form->process('assetId'), });
     if ($session->config->get("enableSaveAndCommit")) {
         $tabform->submitAppend(WebGUI::Form::submit($session, {
             name    => "saveAndCommit", 
@@ -197,9 +198,8 @@ sub www_uploadFilesSave {
             value => $asset->$property_name,
         };
 
-
         # process the form element
-        my $defaultValue = $overrides->{defaultValue} // $asset->$property;
+        my $defaultValue = $overrides->{defaultValue} // $asset->$property_name;
         $asset_defaults{$property_name} = $form->process( $property_name, $fieldType, $defaultValue, $fieldHash );
     } ## end foreach my $property ( $asset...)
 
@@ -235,12 +235,21 @@ sub www_uploadFilesSave {
     }
     $tempStorage->delete;
 
-    if (WebGUI::VersionTag->autoCommitWorkingIfEnabled($session, {
+    WebGUI::VersionTag->autoCommitWorkingIfEnabled($session, {
         override        => scalar $session->form->process("saveAndCommit"),
         allowComments   => 1,
         returnUrl       => $asset->getUrl,
-    }) eq 'redirect') {
-        return undef;
+    });
+
+    # return JavaScript to close the pop-up window that got opened in process().
+
+    return qq{
+        <html><head>
+        <script type="text/javascript">
+            window.parent.admin.showInfoMessage( "File upload successful." );
+            window.parent.admin.closeModalDialog();
+        </script>
+        </head></html>
     };
 
 }
