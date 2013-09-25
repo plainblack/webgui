@@ -689,7 +689,7 @@ sub process {
     elsif ($self->state =~ /^clipboard/) {
         my $i18n = WebGUI::International->new($session, 'Asset_Template');
         $session->log->warn('process called on template in clipboard: '.$self->getId
-            .'. The template was called through this url: '.$session->asset->url);
+            .'. The template was called through this url: ' . $session->asset ? $session->asset->url : '(none)' );
         return $session->isAdminOn ? $i18n->get('template in clipboard') : '';
     }
 
