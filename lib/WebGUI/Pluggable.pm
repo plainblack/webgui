@@ -17,6 +17,7 @@ package WebGUI::Pluggable;
 use strict;
 use Module::Find;
 use Carp qw(croak);
+use Scalar::Util 'blessed';
 
 # Carps should always bypass this package in error reporting
 $Carp::Internal{ __PACKAGE__ }++;
@@ -258,7 +259,7 @@ sub load {
         else {
             $moduleError{$module} = "Could not load $module because $@";
         }
-        croak $moduleError{$module};
+        die $@;  # rethrow the error so that we preserve the full stack trace of where the error came from
     }
 }
 
