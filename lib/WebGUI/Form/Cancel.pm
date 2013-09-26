@@ -47,7 +47,7 @@ sub new {
     my $cancelURL = $session->request->referer;
     my $cancelJS_fragment = $cancelURL ? sprintf("window.location.href='%s'", $cancelURL) : ' history.go(-1)';
     my $cancelJS  = q{
-        if( window.parent && window.parent.admin window.parent.admin.modalDialog ) {
+        if( window.parent && window.parent.admin && window.parent.admin.modalDialog ) {
             window.parent.admin.closeModalDialog();
         } else {
             $cancelJS_fragment;
