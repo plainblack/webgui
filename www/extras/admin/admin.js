@@ -439,7 +439,7 @@ WebGUI.Admin.prototype.requestUpdateClipboard
             this.updateClipboard( clipboard );
         },
         failure : function (o) {
-
+            alert("Failed to refresh the clipboard");
         },
         scope: this
     };
@@ -772,6 +772,7 @@ WebGUI.Admin.prototype.processPlugin
     else {
         alert( "Unknown plugin response: " + YAHOO.lang.JSON.stringify(resp) );
     }
+    this.requestUpdateClipboard();  // always do this
 };
 
 /**
@@ -1938,7 +1939,7 @@ YAHOO.lang.extend( WebGUI.Admin.Tree, WebGUI.Admin.AssetTable );
 WebGUI.Admin.Tree.prototype.runHelperForSelected
 = function ( helperId, title ) {
 // XXXX this is busted
-alert("running WebGUI.Admin.Tree.prototype.runHelperForSelected which I think is dead code");
+// alert("running WebGUI.Admin.Tree.prototype.runHelperForSelected which I think is dead code"); // it isn't; see the buttons on the bottom of tree view
     var self = this;
     var assetIds = this.getSelected();
 
