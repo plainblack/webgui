@@ -745,32 +745,33 @@ WebGUI.Admin.prototype.requestHelper
  */
 WebGUI.Admin.prototype.processPlugin
 = function ( resp ) {
+    if( ! ( resp.openTab || resp.openDialog || resp.scriptFile || resp.message || resp.error || resp.forkId || resp.redirect || resp.reload ) ) {
+        alert( "Unknown plugin response: " + YAHOO.lang.JSON.stringify(resp) );
+        return;
+    }
     if ( resp.openTab ) {
         this.openTab( resp.openTab );
     }
-    else if ( resp.openDialog ) {
+    if ( resp.openDialog ) {
         this.openModalDialog( resp.openDialog, resp.width, resp.height );
     }
-    else if ( resp.scriptFile ) {
+    if ( resp.scriptFile ) {
         this.loadAndRun( resp.scriptFile, resp.scriptFunc, resp.scriptArgs );
     }
-    else if ( resp.message ) {
+    if ( resp.message ) {
         this.showInfoMessage( resp.message );
     }
-    else if ( resp.error ) {
+    if ( resp.error ) {
         this.showInfoMessage( resp.error );
     }
-    else if ( resp.forkId ) {
+    if ( resp.forkId ) {
         this.openForkDialog( resp.forkId );
     }
-    else if ( resp.redirect ) {
+    if ( resp.redirect ) {
         this.gotoAsset( resp.redirect );
     }
-    else if ( resp.reload ) {
+    if ( resp.reload ) {
         this.reload();
-    }
-    else {
-        alert( "Unknown plugin response: " + YAHOO.lang.JSON.stringify(resp) );
     }
     this.requestUpdateClipboard();  // always do this
 };

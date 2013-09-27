@@ -55,6 +55,7 @@ sub process {
     $asset->addRevision;
     return {
         message         => sprintf($i18n->get('locked asset'), $asset->getTitle),
+        reload => 1,
     };
 }
 
