@@ -268,8 +268,10 @@ WebGUI.Admin.prototype.editAsset
 
 /**
  * gotoAsset( url )
- * Open the appropriate tab (View or Tree) and go to the given asset URL
- * Cannot go to a URL that has parameters in Tree view
+ * In View mode, replace the central frame with the specified URL.
+ * In Tree mode, request asset data for the asset at the specified URL and re-draw the data table.
+ * Tree view cannot go to a URL that has parameters; URL munging done in tree.goto() breaks that, and assets are identified by the path part anyway;
+ * use showView() instead if you want to display something other than the Tree view (eg, the HTML view of an asset, or an admin screen of some sort).
  */
 WebGUI.Admin.prototype.gotoAsset
 = function ( url ) {
@@ -279,9 +281,6 @@ WebGUI.Admin.prototype.gotoAsset
     }
     else if ( this.currentTabName() == "tree" ) {
         // Make tree request
-        // XXX this is currently failing... arg is eg  /home?func=pasteList&assetId=x4wzjypIRIaDFISifViMgA  which should be okay
-        // XXX FIXME: a lot of Tree view operations fail after this point.  where the View version just directly goes to the URL, the Tree view tries to modify the URL to pass the extjs-style grid's parameters back.  this winds up creating unworkable URLs that try to do two things at once, with two '?'s, two 'op='s, etc.  there are two ways to fix this:  if we're trying to go to an asset (gotoAsset) and we're in Tree view, flop back to View mode first; or else two distinct requests, one for the remote request (which might generate additional requests to draw in dialog boxes, progress bars, forms, etc) and then when that's all done, refresh the grid view.  WebGUI.Admin.prototype.pasteAsset takes the route of flopping to Tree view first.
-        // XXX gotoAsset() should probably not be feed urls with query strings on them
         this.tree.goto( url );
         this.viewDirty = 1;
     }
@@ -302,7 +301,6 @@ WebGUI.Admin.prototype.reload
         this.treeDirty = 1;
     }
     else if ( this.currentTab == "tree" ) {
-        // console.log( window.frames[ "view" ].location.pathname ); // XXX
         this.tree.goto( window.frames[ "view" ].location.pathname );
         this.viewDirty = 1;
     }
@@ -520,9 +518,8 @@ WebGUI.Admin.prototype.pasteAsset
         // as above...
         var url = appendToUrl( this.currentAssetDef.url, 'func=pasteList&assetId=' + id );
         this.treeDirty = true;
-        // this.gotoAsset( url ); // the change notification handler hasn't run yet at this point (and doesn't until we're done here) so this thinks we're still in the Tree view, so we have to do this directly
+        // this.gotoAsset( url ); // the change notification handler hasn't run yet at this point (and doesn't until we're done here) so this thinks we're still in the Tree view, so we have to do this directly:
         window.frames[ "view" ].location.href = url;
-        this.treeDirty = 1;
     }
     
 };
@@ -639,12 +636,17 @@ WebGUI.Admin.prototype.updateAssetHelpers
 WebGUI.Admin.prototype.getHelperHandler
 = function ( assetId, helperId, helper ) {
     if ( helper.url ) {
-        return bind( this, function(){ 
+        return bind( this, function(){
             // a confirmation dialog
             if ( helper.confirm && !confirm( helper.confirm ) ) {
                 return;
             }
-            this.gotoAsset( helper.url )  // gotoAsset() in this case should be safe as getHelperHerlp() only runs from View mode, so the URL won't be mangled
+            // if we're in Tree view, there are two different scenarios here:  bailing out of the Tree view because we're running an admin (eg asset edit screen),
+            // or else we're being navigated to a different url to show in Tree view.  in View view, these cases are identical as the HTML is directly shown.
+            // ... but really, from *here*, we are never just navigating the tree to another asset.  other parts of the admin change which assets are shown in
+            // the Tree view, but in stuff from WebGUI::Asset->getHelpers, it's always invoking an admin.  so this now does showView() instead of gotoAsset().
+            // this flops things back over to the View tab and then loads the URL, which is correct for displaying admin screens like asset?func=edit.
+            this.showView( helper.url );
         } );
     }
 
@@ -653,7 +655,8 @@ WebGUI.Admin.prototype.getHelperHandler
         if ( helper.confirm && !confirm( helper.confirm ) ) {
             return;
         }
-        this.requestHelper( helperId, assetId ) 
+        // requestHelper() makes a background request and then processes commands in the result.  it works fine in both Tree and View views.
+        this.requestHelper( helperId, assetId );
     } );
 };
 
