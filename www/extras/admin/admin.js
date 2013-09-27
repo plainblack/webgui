@@ -270,6 +270,10 @@ WebGUI.Admin.prototype.editAsset
  * gotoAsset( url )
  * Open the appropriate tab (View or Tree) and go to the given asset URL
  * Cannot go to a URL that has parameters in Tree view
+ * In View mode, replace the central frame with the specified URL.
+ * In Tree mode, request asset data for the asset at the specified URL and re-draw the data table.
+ * Tree view cannot go to a URL that has parameters; URL munging done in tree.goto() breaks that, and assets are identified by the path part anyway;
+ * use showView() instead if you want to display something other than the Tree view (eg, the HTML view of an asset, or an admin screen of some sort).
  */
 WebGUI.Admin.prototype.gotoAsset
 = function ( url ) {
@@ -439,7 +443,7 @@ WebGUI.Admin.prototype.requestUpdateClipboard
             this.updateClipboard( clipboard );
         },
         failure : function (o) {
-
+            alert("Failed to refresh the clipboard");
         },
         scope: this
     };
@@ -639,12 +643,18 @@ WebGUI.Admin.prototype.updateAssetHelpers
 WebGUI.Admin.prototype.getHelperHandler
 = function ( assetId, helperId, helper ) {
     if ( helper.url ) {
-        return bind( this, function(){ 
+        return bind( this, function(){
             // a confirmation dialog
             if ( helper.confirm && !confirm( helper.confirm ) ) {
                 return;
             }
-            this.gotoAsset( helper.url )  // gotoAsset() in this case should be safe as getHelperHerlp() only runs from View mode, so the URL won't be mangled
+            // this.gotoAsset( helper.url )  // gotoAsset() in this case should be safe as getHelperHerlp() only runs from View mode, so the URL won't be mangled
+            // if we're in Tree view, there are two different scenarios here:  bailing out of the Tree view because we're running an admin (eg asset edit screen),
+            // or else we're being navigated to a different url to show in Tree view.  in View view, these cases are identical as the HTML is directly shown.
+            // ... but really, from *here*, we are never just navigating the tree to another asset.  other parts of the admin change which assets are shown in
+            // the Tree view, but in stuff from WebGUI::Asset->getHelpers, it's always invoking an admin.  so this now does showView() instead of gotoAsset().
+            // this flops things back over to the View tab and then loads the URL, which is correct for displaying admin screens like asset?func=edit.
+            this.showView( helper.url );
         } );
     }
 
@@ -653,7 +663,8 @@ WebGUI.Admin.prototype.getHelperHandler
         if ( helper.confirm && !confirm( helper.confirm ) ) {
             return;
         }
-        this.requestHelper( helperId, assetId ) 
+        // requestHelper() makes a background request and then processes commands in the result.  it works fine in both Tree and View views.
+        this.requestHelper( helperId, assetId );
     } );
 };
 
@@ -745,33 +756,43 @@ WebGUI.Admin.prototype.requestHelper
  */
 WebGUI.Admin.prototype.processPlugin
 = function ( resp ) {
+    if( ! ( resp.openTab || resp.openDialog || resp.scriptFile || resp.message || resp.error || resp.forkId || resp.redirect || resp.reload ) ) {
+        alert( "Unknown plugin response: " + YAHOO.lang.JSON.stringify(resp) );
+        return;
+    }
     if ( resp.openTab ) {
         this.openTab( resp.openTab );
     }
-    else if ( resp.openDialog ) {
+    if ( resp.openDialog ) {
         this.openModalDialog( resp.openDialog, resp.width, resp.height );
     }
-    else if ( resp.scriptFile ) {
+    if ( resp.scriptFile ) {
         this.loadAndRun( resp.scriptFile, resp.scriptFunc, resp.scriptArgs );
     }
-    else if ( resp.message ) {
+    if ( resp.message ) {
         this.showInfoMessage( resp.message );
     }
-    else if ( resp.error ) {
+    if ( resp.error ) {
         this.showInfoMessage( resp.error );
     }
-    else if ( resp.forkId ) {
+    if ( resp.forkId ) {
         this.openForkDialog( resp.forkId );
     }
-    else if ( resp.redirect ) {
+    if ( resp.redirect ) {
         this.gotoAsset( resp.redirect );
     }
+// <<<<<<< HEAD
     else if ( resp.reload ) {
         this.reload();
     }
     else {
         alert( "Unknown plugin response: " + YAHOO.lang.JSON.stringify(resp) );
+// =======
+//    if ( resp.reload ) {
+//        this.reload();
+// >>>>>>> cc7c0412421d34ee3f8b70062a5ae78bc2cef658
     }
+    this.requestUpdateClipboard();  // always do this
 };
 
 /**
@@ -1938,7 +1959,7 @@ YAHOO.lang.extend( WebGUI.Admin.Tree, WebGUI.Admin.AssetTable );
 WebGUI.Admin.Tree.prototype.runHelperForSelected
 = function ( helperId, title ) {
 // XXXX this is busted
-alert("running WebGUI.Admin.Tree.prototype.runHelperForSelected which I think is dead code");
+// alert("running WebGUI.Admin.Tree.prototype.runHelperForSelected which I think is dead code"); // it isn't; see the buttons on the bottom of tree view
     var self = this;
     var assetIds = this.getSelected();
 

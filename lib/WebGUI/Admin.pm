@@ -147,7 +147,7 @@ sub getAssetData {
         icon            => $asset->getIcon("small"),
         type            => $asset->getName,
         className       => $asset->className,
-        revisions       => [ $asset->getRevisionDates ],
+        revisions       => $asset->getRevisionDates,
     );
 
     return \%fields;

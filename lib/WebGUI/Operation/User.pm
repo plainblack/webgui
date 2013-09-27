@@ -646,17 +646,39 @@ Provides a form for editing a user, or adding a new user.
 =cut
 
 sub www_editUser {
+
 	my $session = shift;
 	return $session->privilege->adminOnly() unless canAdd($session);
 	my $error = shift;
 	my $uid = shift || $session->form->process("uid");
+
 	my $u = WebGUI::User->new($session,($uid eq 'new') ? '' : $uid); #Setting uid to '' when uid is 'new' so visitor defaults prefill field for new user
 	my $username = ($u->isVisitor && $uid ne "1") ? '' : $u->username;
+
 	my $i18n = WebGUI::International->new($session, "WebGUI");
+
     my $f = WebGUI::FormBuilder->new( $session, 
         action => $session->url->page,
         extras => 'autocomplete="off"',
     );
+
+    # something, probably YUI, winds up striping the styling off of this, including the position, leaving this hanging awkwardly off to the left above the tabs
+    # the Button class styles it up in YUI trappings; skip that; abuse the Control control to render raw HTML
+    #$f->addField( 'Button',
+    #    name    => 'submit',
+    #    value   => 'Save',
+    #    extras  => 'style="position: absolute; top: 10px; right: 10px; z-index: 50000;"',
+    #);
+    $f->addField( 'Control',
+        name    => 'submit',
+        value   => q{
+            <div style="position: absolute; top: 10px; right: 10px; z-index: 50000;">
+                <input type="submit" name="submit" value="Save"/>
+                <input type="button" value="cancel" onclick="history.go(-1);" class="backwardButton" />
+            </div>
+        },
+    );
+
     $f->addField( 'csrfToken', name => 'csrfToken' );
     $f->addField( "hidden",
         name => 'op',
@@ -788,7 +810,16 @@ sub www_editUser {
 		size=>15,
 		value=>\@groupsToDelete
 		);
-	return '<h1>' . $i18n->get(168) . '</h1>' . $error . $f->toHtml;
+
+    # my $html = '<h1>' . $i18n->get(168) . '</h1>' . $error . $f->toHtml;  # skip the large header
+    my $html = $error . $f->toHtml;
+
+    return $session->style->process( 
+        '<div class="yui-skin-sam">' . $html . '</div>',
+        "PBtmpl0000000000000137"
+    );
+
+
 }
 
 #-------------------------------------------------------------------

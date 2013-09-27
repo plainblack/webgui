@@ -85,7 +85,7 @@ sub handler {
 
     if ( $session->form->get("op") eq "assetHelper" ) {
         # Load and run the requested asset helper www_ method
-        my $assetId = $session->form->get('assetId');
+        my $assetId = $session->form->get('assetId') or $session->log->fatal("no assetId passed to op=assetHelper");
         my $asset   = WebGUI::Asset->newById( $session, $assetId );
 
         my $helperId = $session->form->get('helperId');

@@ -209,10 +209,7 @@ sub new {
     if (my $cancelURL = $session->request->referer) {
         $cancelJS = sprintf q{window.location.href='%s';}, $cancelURL;
     }
-	my $cancel = WebGUI::Form::button($session,{
-			value=>$i18n->get('cancel'),
-			extras=>sprintf(q|onclick="%s" class="backwardButton"|, $cancelJS),
-			});
+    my $cancel = WebGUI::Form::cancel($session);
 	bless {	_session=>$session, _cancel=>$cancel, _submit=>WebGUI::Form::submit($session), 
         _form=>WebGUI::Form::formHeader($session), _hidden=>"", _tab=>\%tabs, _css=>$css }, $class;
 }
