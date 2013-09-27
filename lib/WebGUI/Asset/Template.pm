@@ -65,6 +65,7 @@ property parser => (
                  for my $class ( @{$session->config->get('templateParsers')} ) {
                      $parsers{$class} = $self->getParser($session, $class)->getName();
                  }
+                 return \%parsers;
              },
          );
 sub _default_parser {
