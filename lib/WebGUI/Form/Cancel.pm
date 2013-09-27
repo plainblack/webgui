@@ -55,7 +55,7 @@ sub new {
     };
 
     $package->SUPER::new( $session, 
-        value  => $i18n->get('cancel'), 
+        value  => ucfirst( $i18n->get('cancel') ), 
         extras => qq{onclick="javascript: $cancelJS" class="backwardButton"},
         @_,
     );
