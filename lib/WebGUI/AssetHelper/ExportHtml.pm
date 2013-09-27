@@ -133,14 +133,22 @@ ENDHTML
             'none'     => $i18n->get('rootUrl form option none') },
         value          => ['none'],
     );
-    $f->addField( "submit", name => "send" );
+
+    # $f->addField( "submit", name => "send", value => "Save" );
+    $f->addField( 'control', name => 'save', value => '<br><input type="submit" name="submit" value="Save">' );
+    $f->addField( 'cancel', value => 'Cancel', );
+
     my $message;
     eval { $asset->exportCheckPath };
     if($@) {
         $message = $@;
     }
+
+    my $html = $f->toHtml;
+    $html =~ s{<div class="wg-hoverhelp">.*?</div>}{}g;  # XXX see http://www.webgui.org/community/webgui-8/issues/12433
+
     return $session->style->process( 
-        $message . $f->toHtml,
+        join('', $message, $html, ),
         "PBtmpl0000000000000137"
     );
 }
