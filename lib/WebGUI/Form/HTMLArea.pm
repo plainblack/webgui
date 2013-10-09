@@ -323,9 +323,9 @@ JS
         if ($child->isa('WebGUI::Asset::File::Image')) {
             $output .= '<a href="#" class="selectLink" onclick="selectImage(\''
                 . ($useAssetUrls ? $child->getUrl : $child->getFileUrl) . '\',\''
-                . $session->url->gateway($child->get('url'), 'op=formHelper;class=HTMLArea;sub=viewThumbnail,')
-                . $useAssetUrls ? 1 : 0, ','
-                . '\'); return false;">[' . $i18n->get("select", 'WebGUI') . ']</a>';
+                . $session->url->gateway($child->get('url'), 'op=formHelper;class=HTMLArea;sub=viewThumbnail\',')
+                . ($useAssetUrls ? 1 : 0)
+                . '); return false;">[' . $i18n->get("select", 'WebGUI') . ']</a>';
         }
         else {
             $output .= '<span class="noselect">[' . $i18n->get("select", 'WebGUI') . ']</span>';
