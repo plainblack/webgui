@@ -321,8 +321,15 @@ JS
         next unless $child->canView;
         $output .= '<li>';
         if ($child->isa('WebGUI::Asset::File::Image')) {
+            my $url;
+            if ($useAssetUrls) {
+                $url = '^FileUrl('.$child->getUrl.');';
+            }
+            else {
+                $url = $child->getFileUrl;
+            }
             $output .= '<a href="#" class="selectLink" onclick="selectImage(\''
-                . ($useAssetUrls ? $child->getUrl : $child->getFileUrl) . '\',\''
+                . $url . '\',\''
                 . $session->url->gateway($child->get('url'), 'op=formHelper;class=HTMLArea;sub=viewThumbnail')
                 . '\'); return false;">[' . $i18n->get("select", 'WebGUI') . ']</a>';
         }
