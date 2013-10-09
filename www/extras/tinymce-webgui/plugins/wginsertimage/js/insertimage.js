@@ -6,7 +6,10 @@ var WGInsertImageDialog = {
         }, 100);
     },
 
-    setUrl : function(url, thumburl) {
+    setUrl : function(url, thumburl, useAssetUrl) {
+        if (useAssetUrl) {
+            url = '^FileUrl(' + url + ');';
+        }
         document.getElementById('image-url').value = url;
         var iframe = document.getElementById('image-preview');
         iframe.src = thumburl;

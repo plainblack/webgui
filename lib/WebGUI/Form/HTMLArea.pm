@@ -273,9 +273,9 @@ sub www_imageTree {
     $session->style->setRawHeadTags(<<"JS");
 <style type="text/css">body { margin: 0 }</style>
 <script type="text/javascript">//<![CDATA[
-function selectImage(url, thumburl) {
+function selectImage(url, thumburl, useAssetUrl) {
     if (window.parent && window.parent.WGInsertImageDialog) {
-        window.parent.WGInsertImageDialog.setUrl(url, thumburl);
+        window.parent.WGInsertImageDialog.setUrl(url, thumburl, useAssetUrl);
     }
 }
 //]]></script>
@@ -323,7 +323,8 @@ JS
         if ($child->isa('WebGUI::Asset::File::Image')) {
             $output .= '<a href="#" class="selectLink" onclick="selectImage(\''
                 . ($useAssetUrls ? $child->getUrl : $child->getFileUrl) . '\',\''
-                . $session->url->gateway($child->get('url'), 'op=formHelper;class=HTMLArea;sub=viewThumbnail')
+                . $session->url->gateway($child->get('url'), 'op=formHelper;class=HTMLArea;sub=viewThumbnail,')
+                . $useAssetUrls ? 1 : 0, ','
                 . '\'); return false;">[' . $i18n->get("select", 'WebGUI') . ']</a>';
         }
         else {
