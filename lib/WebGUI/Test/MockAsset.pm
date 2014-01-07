@@ -120,7 +120,7 @@ sub new {
     };
 
     my $stash = Package::Stash->new(ref $mock);
-    $stash->add_package_symbol('&DESTROY', sub {
+    $stash->add_symbol('&DESTROY', sub {
         my $self = shift;
         $self->unmock_id;
         $self->unmock_url;
@@ -134,7 +134,7 @@ sub new {
         # remove our namespace
         delete $ns_root->{ $ns_last };
     });
-    $stash->add_package_symbol('&mock_id', sub {
+    $stash->add_symbol('&mock_id', sub {
         my $self = shift;
         $self->unmock_id;
         $mocked_id = shift;
@@ -145,14 +145,14 @@ sub new {
 
         return $self;
     });
-    $stash->add_package_symbol('&unmock_id', sub {
+    $stash->add_symbol('&unmock_id', sub {
         my $self = shift;
         if ($mocked_id) {
             $CLASS->unmock_id($mocked_id);
         }
         return $self;
     });
-    $stash->add_package_symbol('&mock_url', sub {
+    $stash->add_symbol('&mock_url', sub {
         my $self = shift;
         $self->unmock_url;
         $mocked_url = shift;
@@ -162,7 +162,7 @@ sub new {
 
         return $self;
     });
-    $stash->add_package_symbol('&unmock_url', sub {
+    $stash->add_symbol('&unmock_url', sub {
         my $self = shift;
         if ($mocked_url) {
             $CLASS->unmock_url($mocked_url);

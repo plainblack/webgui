@@ -71,15 +71,15 @@ sub deprecate ($$) {
 
     my %deep;
     # keep a copy since it will be replaced
-    my $new_sub = $stash->get_package_symbol('&'.$new_method);
+    my $new_sub = $stash->get_symbol('&'.$new_method);
     # call new method instead.  if 
-    $stash->add_package_symbol('&'.$old_method, sub {
+    $stash->add_symbol('&'.$old_method, sub {
         my $self = shift;
         derp "$package\::$old_method is deprecated and should be replaced with $new_method";
         local $deep{1} = 1;
         $self->$new_method(@_);
     });
-    $stash->add_package_symbol('&'.$new_method, sub {
+    $stash->add_symbol('&'.$new_method, sub {
         my $self = $_[0];
         if (!$deep{1}) {
             my $old_sub = $self->can($old_method);
