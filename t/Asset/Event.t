@@ -15,7 +15,7 @@ use WebGUI::Test;
 use Test::More; # increment this value for each test you create
 use Test::Deep;
 
-plan tests => 30;
+plan tests => 31;
 
 use WebGUI::Session;
 use WebGUI::Storage;
@@ -174,10 +174,11 @@ $event6->setRelatedLinks([
     sequenceNumber => 2,
     linkurl => 'http://www.somewhere.com',
     linktext => 'Another great link',
-    groupIdView => '7',
+    groupIdView => '2',
     eventlinkId => '28',
 },
 ]);
+$session->user({userId => 3});   # admin can see all the links
 cmp_deeply(
     $event6->getRelatedLinks(),
     [{
@@ -192,11 +193,24 @@ cmp_deeply(
         sequenceNumber => 2,
         linkURL        => 'http://www.somewhere.com',
         linktext       => 'Another great link',
-        groupIdView    => '7',
+        groupIdView    => '2',
         eventlinkId    => '28',
         assetId        => $event6->getId,
     }],
     'related links stored in the database correctly'
+);
+$session->user({userId => 1});   # visitor can only see one link
+cmp_deeply(
+    $event6->getRelatedLinks(),
+    [{
+        sequenceNumber => 1,
+        linkURL        => 'http://www.nowhere.com',
+        linktext       => 'Great link',
+        groupIdView    => '7',
+        eventlinkId    => '27',
+        assetId        => $event6->getId,
+    }],
+    'related links:user access restriction works'
 );
 
 #######################################
@@ -208,6 +222,7 @@ cmp_deeply(
 my $event6b = $event6->duplicate();
 ok($session->id->valid($event6b->get('storageId')), 'duplicated event got a valid storageId');
 isnt($event6b->get('storageId'), $event6->get('storageId'), 'duplicating an asset creates a new storage location');
+$session->user({userId => 3});   # admin can see all the links
 cmp_deeply(
     $event6b->getRelatedLinks(),
     [{
@@ -222,12 +237,13 @@ cmp_deeply(
         sequenceNumber => 2,
         linkURL        => 'http://www.somewhere.com',
         linktext       => 'Another great link',
-        groupIdView    => '7',
+        groupIdView    => '2',
         eventlinkId    => ignore(),
         assetId        => $event6b->getId,
     }],
     'duplicated event has relatedLinks'
 );
+$session->user({userId => 1});   # run remaining tests as visitor
 
 #######################################
 #

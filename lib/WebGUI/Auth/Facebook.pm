@@ -46,9 +46,9 @@ sub createFacebookUser {
     my ( $self, $fbuser ) = @_;
     my $user    = WebGUI::User->create( $self->session );
     $user->username( $fbuser->{name} );
-    $user->get('email', $fbuser->{email});
-    $user->get('firstName', $fbuser->{first_name});
-    $user->get('lastName', $fbuser->{last_name});
+    $user->update('email', $fbuser->{email});
+    $user->update('firstName', $fbuser->{first_name});
+    $user->update('lastName', $fbuser->{last_name});
     $self->update(
         "facebookUserId" => $fbuser->{id},
     );
