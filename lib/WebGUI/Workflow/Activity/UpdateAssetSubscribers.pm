@@ -73,7 +73,7 @@ sub execute {
     my $asset = shift;
     my $session = $self->session;
 
-    return unless $asset->get('subscriptionGroupId');
+    return $self->COMPLETE unless $asset->get('subscriptionGroupId');
 
     my $expireTime = time() + $self->getTTL();
     my $subscriptionGroup = WebGUI::Group->new($session, $asset->get('subscriptionGroupId'));
