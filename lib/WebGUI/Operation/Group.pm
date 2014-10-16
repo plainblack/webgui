@@ -868,6 +868,8 @@ sub www_emailGroupSend {
 			status                  => 'unread',
 			message                 => $f->process('message', 'HTMLArea'),
 			sentBy                  => $session->user->userId,
+        },
+        {
 			overridePerUserDelivery => $f->get('override'),
 			extraHeaders            => { from => $f->get('from') }
 		}
