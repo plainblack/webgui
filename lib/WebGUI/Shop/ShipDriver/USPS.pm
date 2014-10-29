@@ -48,16 +48,17 @@ result by the quantity, rather than doing several identical checks.
 sub buildXML {
     my ($self, $cart, @packages) = @_;
     tie my %xmlHash, 'Tie::IxHash';
-    %xmlHash = ( RateV3Request => {}, );
-    my $xmlTop = $xmlHash{RateV3Request};
+    %xmlHash = ( RateV4Request => {}, );
+    my $xmlTop = $xmlHash{RateV4Request};
     $xmlTop->{USERID}  = $self->get('userId');
     $xmlTop->{Package} = [];
     ##Do a request for each package.
     my $packageIndex;
     my $shipType  = $self->get('shipType');
-    my $service   = $shipType eq 'PRIORITY VARIABLE'
-                  ? 'PRIORITY'
-                  : $shipType;
+    my $service   = $shipType eq 'PRIORITY VARIABLE' ? 'PRIORITY'
+                  : $shipType eq 'PARCEL'            ? 'STANDARD POST'
+                  : $shipType
+                  ;
     my $sourceZip = $self->get('sourceZip');
     $sourceZip    =~ s/^(\d{5}).*$/$1/;
     PACKAGE: for(my $packageIndex = 0; $packageIndex < scalar @packages; $packageIndex++) {
@@ -92,8 +93,8 @@ sub buildXML {
         if ($shipType eq 'PRIORITY') {
             $packageData{Container}   = [ 'FLAT RATE BOX'         ];
         }
-        elsif ($shipType eq 'PRIORITY VARIABLE') {
-            #$packageData{Container}   = [ 'VARIABLE'           ];
+        else  {
+            $packageData{Container}   = [ 'VARIABLE'           ];
         }
         $packageData{Size}            = [ 'REGULAR'               ];
         $packageData{Machinable}      = [ 'true'                  ];
@@ -178,7 +179,7 @@ Processed XML data from an XML rate request, processed in perl data structure.  
 have this structure:
 
     {
-        RateV3Response => {
+        RateV4Response => {
             Package => [
                 {
                     ID => 0,
@@ -199,7 +200,7 @@ The set of shippable units, which are required to do quantity lookups.
 sub _calculateFromXML {
     my ($self, $xmlData, @shippableUnits) = @_;
     my $cost = 0;
-    foreach my $package (@{ $xmlData->{RateV3Response}->{Package} }) {
+    foreach my $package (@{ $xmlData->{RateV4Response}->{Package} }) {
         my $id   = $package->{ID};
         my $rate = $package->{Postage}->{Rate};
         ##Error check for invalid index
@@ -397,7 +398,7 @@ sub _doXmlRequest {
     $userAgent->env_proxy;
     $userAgent->agent('WebGUI');
     $userAgent->timeout('45');
-    my $url = 'http://production.shippingapis.com/ShippingAPI.dll?API=RateV3&XML=';
+    my $url = 'http://production.shippingapis.com/ShippingAPI.dll?API=RateV4&XML=';
     $url .= $xml;
     my $request = HTTP::Request->new(GET => $url);
     my $response = $userAgent->request($request);

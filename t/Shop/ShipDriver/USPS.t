@@ -25,7 +25,7 @@ use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
 use WebGUI::Shop::ShipDriver::USPS;
 
-plan tests => 69;
+plan tests => 73;
 
 #----------------------------------------------------------------------------
 # Init
@@ -325,7 +325,7 @@ $driver->update($properties);
 is($driver->_calculateInsurance(@shippableUnits), 0, '_calculateInsurance: returns 0 if rates are not set');
 
 my $xml = $driver->buildXML($cart, @shippableUnits);
-like($xml, qr/<RateV3Request USERID="[^"]+"/, 'buildXML: checking userId is an attribute of the RateV3Request tag');
+like($xml, qr/<RateV4Request USERID="[^"]+"/, 'buildXML: checking userId is an attribute of the RateV4Request tag');
 like($xml, qr/<Package ID="0"/, 'buildXML: checking ID is an attribute of the Package tag');
 
 my $xmlData = XMLin($xml,
@@ -335,15 +335,15 @@ my $xmlData = XMLin($xml,
 cmp_deeply(
     $xmlData,
     {
-        RateV3Request => {
+        RateV4Request => {
             USERID => $userId,
             Package => [
                 {
                     ID => 0,
                     ZipDestination => '53715',    ZipOrigination => '97123',
                     Pounds         => '1',        Ounces         => '8.0',
-                    Size           => 'REGULAR',  Service        => 'PARCEL',
-                    Machinable     => 'true',
+                    Size           => 'REGULAR',  Service        => 'STANDARD POST',
+                    Machinable     => 'true',     Container      => 'VARIABLE',
                 },
             ],
         }
@@ -351,7 +351,7 @@ cmp_deeply(
     'buildXML: PARCEL service, 1 item in cart'
 );
 
-like($xml, qr/RateV3Request USERID.+?Package ID=.+?Service.+?ZipOrigination.+?ZipDestination.+?Pounds.+?Ounces.+?Size.+?Machinable/, '... and tag order');
+like($xml, qr/RateV4Request USERID.+?Package ID=.+?Service.+?ZipOrigination.+?ZipDestination.+?Pounds.+?Ounces.+?Size.+?Machinable/, '... and tag order');
 
 SKIP: {
 
@@ -369,7 +369,7 @@ SKIP: {
                     ZipOrigination => ignore(), ZipDestination => ignore(),
                     Machinable     => ignore(), Ounces         => ignore(),
                     Pounds         => ignore(), Size           => ignore(),
-                    Zone           => ignore(), Container      => {},
+                    Zone           => ignore(), Container      => 'VARIABLE',
                     Postage        => {
                         CLASSID     => ignore(),
                         MailService => ignore(),
@@ -379,13 +379,13 @@ SKIP: {
             ],
         },
         '... returned data from USPS in correct format.  If this test fails, the driver may need to be updated'
-    );
+    ) or diag $xml."\n".$response->content;
 
 }
 
 my $cost = $driver->_calculateFromXML(
     {
-        RateV3Response => {
+        RateV4Response => {
             Package => [
                 {
                     ID => 0,
@@ -415,22 +415,22 @@ $xmlData = XMLin( $xml,
 cmp_deeply(
     $xmlData,
     {
-        RateV3Request => {
+        RateV4Request => {
             USERID => $userId,
             Package => [
                 {
                     ID => 0,
                     ZipDestination => '53715',    ZipOrigination => '97123',
                     Pounds         => '2',        Ounces         => '0.0',
-                    Size           => 'REGULAR',  Service        => 'PARCEL',
-                    Machinable     => 'true',
+                    Size           => 'REGULAR',  Service        => 'STANDARD POST',
+                    Machinable     => 'true',     Container      => 'VARIABLE',
                 },
                 {
                     ID => 1,
                     ZipDestination => '53715',    ZipOrigination => '97123',
                     Pounds         => '1',        Ounces         => '8.0',
-                    Size           => 'REGULAR',  Service        => 'PARCEL',
-                    Machinable     => 'true',
+                    Size           => 'REGULAR',  Service        => 'STANDARD POST',
+                    Machinable     => 'true',     Container      => 'VARIABLE',
                 },
             ],
         }
@@ -454,7 +454,7 @@ SKIP: {
                     ZipOrigination => ignore(), ZipDestination => ignore(),
                     Machinable     => ignore(), Ounces         => '0.0',
                     Pounds         => 2,        Size           => ignore(),
-                    Zone           => ignore(), Container      => {},
+                    Zone           => ignore(), Container      => ignore(),
                     Postage        => {
                         CLASSID     => ignore(),
                         MailService => ignore(),
@@ -466,7 +466,7 @@ SKIP: {
                     ZipOrigination => ignore(), ZipDestination => ignore(),
                     Machinable     => ignore(), Ounces         => '8.0',
                     Pounds         => 1,        Size           => ignore(),
-                    Zone           => ignore(), Container      => {},
+                    Zone           => ignore(), Container      => ignore(),
                     Postage        => {
                         CLASSID     => ignore(),
                         MailService => ignore(),
@@ -482,7 +482,7 @@ SKIP: {
 
 $cost = $driver->_calculateFromXML(
     {
-        RateV3Response => {
+        RateV4Response => {
             Package => [
                 {
                     ID => 0,
@@ -511,7 +511,7 @@ is(calculateInsurance($driver), 8, '_calculateInsurance: two items in cart with 
 
 $cost = $driver->_calculateFromXML(
     {
-        RateV3Response => {
+        RateV4Response => {
             Package => [
                 {
                     ID => 0,
@@ -546,29 +546,29 @@ $xmlData = XMLin( $xml,
 cmp_deeply(
     $xmlData,
     {
-        RateV3Request => {
+        RateV4Request => {
             USERID => $userId,
             Package => [
                 {
                     ID => 0,
                     ZipDestination => '53715',    ZipOrigination => '97123',
                     Pounds         => '2',        Ounces         => '0.0',
-                    Size           => 'REGULAR',  Service        => 'PARCEL',
-                    Machinable     => 'true',
+                    Size           => 'REGULAR',  Service        => 'STANDARD POST',
+                    Machinable     => 'true',     Container      => 'VARIABLE',
                 },
                 {
                     ID => 1,
                     ZipDestination => '53715',    ZipOrigination => '97123',
                     Pounds         => '1',        Ounces         => '8.0',
-                    Size           => 'REGULAR',  Service        => 'PARCEL',
-                    Machinable     => 'true',
+                    Size           => 'REGULAR',  Service        => 'STANDARD POST',
+                    Machinable     => 'true',     Container      => 'VARIABLE',
                 },
                 {
                     ID => 2,
                     ZipDestination => '53703',    ZipOrigination => '97123',
                     Pounds         => '12',       Ounces         => '0.0',
-                    Size           => 'REGULAR',  Service        => 'PARCEL',
-                    Machinable     => 'true',
+                    Size           => 'REGULAR',  Service        => 'STANDARD POST',
+                    Machinable     => 'true',     Container      => 'VARIABLE',
                 },
             ],
         }
@@ -592,7 +592,7 @@ SKIP: {
                     ZipOrigination => ignore(), ZipDestination => ignore(),
                     Machinable     => ignore(), Ounces         => '0.0',
                     Pounds         => 2,        Size           => ignore(),
-                    Zone           => ignore(), Container      => {},
+                    Zone           => ignore(), Container      => ignore(),
                     Postage        => {
                         CLASSID     => ignore(),
                         MailService => ignore(),
@@ -604,7 +604,7 @@ SKIP: {
                     ZipOrigination => ignore(), ZipDestination => ignore(),
                     Machinable     => ignore(), Ounces         => '8.0',
                     Pounds         => 1,        Size           => ignore(),
-                    Zone           => ignore(), Container      => {},
+                    Zone           => ignore(), Container      => ignore(),
                     Postage        => {
                         CLASSID     => ignore(),
                         MailService => ignore(),
@@ -616,7 +616,7 @@ SKIP: {
                     ZipOrigination => ignore(), ZipDestination => 53703,
                     Machinable     => ignore(), Ounces         => '0.0',
                     Pounds         => 12,       Size           => ignore(),
-                    Zone           => ignore(), Container      => {},
+                    Zone           => ignore(), Container      => ignore(),
                     Postage        => {
                         CLASSID     => ignore(),
                         MailService => ignore(),
@@ -631,7 +631,7 @@ SKIP: {
 }
 
 my $xmlData = XMLin(q{<?xml version="1.0"?>
-<RateV3Response><Package ID="0"><ZipOrigination>97123</ZipOrigination><ZipDestination>53715</ZipDestination><Pounds>2</Pounds><Ounces>0.0</Ounces><Size>REGULAR</Size><Machinable>TRUE</Machinable><Zone>7</Zone><Postage CLASSID="4"><MailService>Parcel Post</MailService><Rate>7.62</Rate></Postage></Package><Package ID="1"><ZipOrigination>97123</ZipOrigination><ZipDestination>53715</ZipDestination><Pounds>1</Pounds><Ounces>8.0</Ounces><Size>REGULAR</Size><Machinable>TRUE</Machinable><Zone>7</Zone><Postage CLASSID="4"><MailService>Parcel Post</MailService><Rate>7.62</Rate></Postage></Package><Package ID="2"><ZipOrigination>97123</ZipOrigination><ZipDestination>53703</ZipDestination><Pounds>12</Pounds><Ounces>0.0</Ounces><Size>REGULAR</Size><Machinable>TRUE</Machinable><Zone>7</Zone><Postage CLASSID="4"><MailService>Parcel Post</MailService><Rate>16.67</Rate></Postage></Package></RateV3Response>
+<RateV4Response><Package ID="0"><ZipOrigination>97123</ZipOrigination><ZipDestination>53715</ZipDestination><Pounds>2</Pounds><Ounces>0.0</Ounces><Size>REGULAR</Size><Machinable>TRUE</Machinable><Zone>7</Zone><Postage CLASSID="4"><MailService>Parcel Post</MailService><Rate>7.62</Rate></Postage></Package><Package ID="1"><ZipOrigination>97123</ZipOrigination><ZipDestination>53715</ZipDestination><Pounds>1</Pounds><Ounces>8.0</Ounces><Size>REGULAR</Size><Machinable>TRUE</Machinable><Zone>7</Zone><Postage CLASSID="4"><MailService>Parcel Post</MailService><Rate>7.62</Rate></Postage></Package><Package ID="2"><ZipOrigination>97123</ZipOrigination><ZipDestination>53703</ZipDestination><Pounds>12</Pounds><Ounces>0.0</Ounces><Size>REGULAR</Size><Machinable>TRUE</Machinable><Zone>7</Zone><Postage CLASSID="4"><MailService>Parcel Post</MailService><Rate>16.67</Rate></Postage></Package></RateV4Response>
 }, KeepRoot => 1, ForceArray => [qw/Package/],);
 
 my $cost = $driver->_calculateFromXML($xmlData, @shippableUnits);
@@ -658,7 +658,7 @@ my $xmlData = XMLin($xml,
 cmp_deeply(
     $xmlData,
     {
-        RateV3Request => {
+        RateV4Request => {
             USERID => $userId,
             Package => [
                 {
@@ -673,7 +673,7 @@ cmp_deeply(
     },
     'buildXML: PRIORITY service, 1 item in cart'
 );
-like($xml, qr/RateV3Request USERID.+?Package ID=.+?Service.+?ZipOrigination.+?ZipDestination.+?Pounds.+?Ounces.+?Container.+?Size.+?Machinable/, '... and tag order');
+like($xml, qr/RateV4Request USERID.+?Package ID=.+?Service.+?ZipOrigination.+?ZipDestination.+?Pounds.+?Ounces.+?Container.+?Size.+?Machinable/, '... and tag order');
 
 SKIP: {
 
@@ -723,7 +723,7 @@ my $xmlData = XMLin($xml,
 cmp_deeply(
     $xmlData,
     {
-        RateV3Request => {
+        RateV4Request => {
             USERID => $userId,
             Package => [
                 {
@@ -731,14 +731,14 @@ cmp_deeply(
                     ZipDestination => '53715',    ZipOrigination => '97123',
                     Pounds         => '1',        Ounces         => '8.0',
                     Size           => 'REGULAR',  Service        => 'EXPRESS',
-                    Machinable     => 'true',
+                    Machinable     => 'true',     Container      => 'VARIABLE',
                 },
             ],
         }
     },
     'buildXML: EXPRESS service, 1 item in cart'
 );
-like($xml, qr/RateV3Request USERID.+?Package ID=.+?Service.+?ZipOrigination.+?ZipDestination.+?Pounds.+?Ounces.+?Size.+?Machinable/, '... and tag order');
+like($xml, qr/RateV4Request USERID.+?Package ID=.+?Service.+?ZipOrigination.+?ZipDestination.+?Pounds.+?Ounces.+?Size.+?Machinable/, '... and tag order');
 
 SKIP: {
 
@@ -752,7 +752,7 @@ SKIP: {
         {
             Package => [
                 {
-                    ID             => 0,        Container      => {},
+                    ID             => 0,        Container      => ignore(),
                     ZipOrigination => ignore(), ZipDestination => ignore(),
                     Ounces         => ignore(), Pounds         => ignore(),
                     Size           => ignore(), Zone           => ignore(),
@@ -787,7 +787,7 @@ my $xmlData = XMLin($xml,
 cmp_deeply(
     $xmlData,
     {
-        RateV3Request => {
+        RateV4Request => {
             USERID => $userId,
             Package => [
                 {
@@ -795,14 +795,14 @@ cmp_deeply(
                     ZipDestination => '53715',    ZipOrigination => '97123',
                     Pounds         => '1',        Ounces         => '8.0',
                     Size           => 'REGULAR',  Service        => 'PRIORITY',
-                    Machinable     => 'true',#     Container      => 'VARIABLE',
+                    Machinable     => 'true',     Container      => 'VARIABLE',
                 },
             ],
         }
     },
     'buildXML: PRIORITY, VARIABLE service, 1 item in cart'
 );
-like($xml, qr/RateV3Request USERID.+?Package ID=.+?Service.+?ZipOrigination.+?ZipDestination.+?Pounds.+?Ounces.+?Size.+?Machinable/, '... and tag order');
+like($xml, qr/RateV4Request USERID.+?Package ID=.+?Service.+?ZipOrigination.+?ZipDestination.+?Pounds.+?Ounces.+?Size.+?Machinable/, '... and tag order');
 
 SKIP: {
 
@@ -816,7 +816,7 @@ SKIP: {
         {
             Package => [
                 {
-                    ID             => 0,        Container      => {},
+                    ID             => 0,        Container      => 'VARIABLE',
                     ZipOrigination => ignore(), ZipDestination => ignore(),
                     Ounces         => ignore(), Pounds         => ignore(),
                     Size           => ignore(), Zone           => ignore(),
@@ -829,7 +829,71 @@ SKIP: {
             ],
         },
         '... returned data from USPS in correct format.  If this test fails, the driver may need to be updated'
-    );
+    ) or diag $xml."\n".$response->content;
+
+}
+
+#######################################################################
+#
+# Test PRIORITY shipping setup
+#
+#######################################################################
+
+$properties = $driver->get();
+$properties->{shipType} = 'PRIORITY';
+$driver->update($properties);
+
+$xml = $driver->buildXML($cart, @shippableUnits);
+my $xmlData = XMLin($xml,
+    KeepRoot   => 1,
+    ForceArray => ['Package'],
+);
+cmp_deeply(
+    $xmlData,
+    {
+        RateV4Request => {
+            USERID => $userId,
+            Package => [
+                {
+                    ID => 0,
+                    ZipDestination => '53715',    ZipOrigination => '97123',
+                    Pounds         => '1',        Ounces         => '8.0',
+                    Size           => 'REGULAR',  Service        => 'PRIORITY',
+                    Machinable     => 'true',     Container      => 'FLAT RATE BOX',
+                },
+            ],
+        }
+    },
+    'buildXML: PRIORITY, VARIABLE service, 1 item in cart'
+);
+like($xml, qr/RateV4Request USERID.+?Package ID=.+?Service.+?ZipOrigination.+?ZipDestination.+?Pounds.+?Ounces.+?Size.+?Machinable/, '... and tag order');
+
+SKIP: {
+
+    skip 'No userId for testing', 2 unless $hasRealUserId;
+
+    my $response = $driver->_doXmlRequest($xml);
+    ok($response->is_success, '... _doXmlRequest to USPS successful');
+    my $xmlData = XMLin($response->content, ForceArray => [qw/Package/],);
+    cmp_deeply(
+        $xmlData,
+        {
+            Package => [
+                {
+                    ID             => 0,        Container      => 'FLAT RATE BOX',
+                    ZipOrigination => ignore(), ZipDestination => ignore(),
+                    Ounces         => ignore(), Pounds         => ignore(),
+                    Size           => ignore(), Zone           => ignore(),
+                    Postage        => {
+                        CLASSID     => ignore(),
+                        MailService => ignore(),
+                        Rate        => num(8,8),  ##A number around 10...
+                    }
+                },
+            ],
+        },
+        '... returned data from USPS in correct format.  If this test fails, the driver may need to be updated'
+    ) or diag $xml."\n".$response->content;
 
 }
 
@@ -847,7 +911,7 @@ my $xmlData = XMLin($driver->buildXML($cart, @shippableUnits),
 cmp_deeply(
     $xmlData,
     {
-        RateV3Request => {
+        RateV4Request => {
             USERID => $userId,
             Package => [
                 {
@@ -855,7 +919,7 @@ cmp_deeply(
                     ZipDestination => '53715',    ZipOrigination => '97123',
                     Pounds         => '1',        Ounces         => '8.0',
                     Size           => 'REGULAR',  Service        => 'PRIORITY',
-                    Machinable     => 'true',#     Container      => 'VARIABLE',
+                    Machinable     => 'true',     Container      => 'FLAT RATE BOX',
                 },
             ],
         }
@@ -908,10 +972,10 @@ isa_ok($e, 'WebGUI::Error::InvalidParam', "calculate won't calculate for foreign
 $cart->update({shippingAddressId => $workAddress->getId});
 
 #<?xml version="1.0"?>
-#<RateV3Response><Package ID="0"><Error><Number>-2147219500</Number>
-#<Source>DomesticRatesV3;clsRateV3.ValidateWeight;RateEngineV3.ProcessRequest</Source>
+#<RateV4Response><Package ID="0"><Error><Number>-2147219500</Number>
+#<Source>DomesticRatesV4;clsRateV4.ValidateWeight;RateEngineV4.ProcessRequest</Source>
 #<Description>Please enter the package weight.  </Description>
-#<HelpFile></HelpFile><HelpContext>1000440</HelpContext></Error></Package></RateV3Response>
+#<HelpFile></HelpFile><HelpContext>1000440</HelpContext></Error></Package></RateV4Response>
 
 #######################################################################
 #

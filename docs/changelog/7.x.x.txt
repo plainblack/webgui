@@ -1,5 +1,6 @@
 7.10.29
  - fixed #12454: Email to Group ignores the From field
+ - fixed #12455: USPS Ship driver fails
 
 7.10.28
  - fixed: Clearing the caches for groups that don't exist, but have created group objects.
