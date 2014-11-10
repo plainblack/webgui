@@ -48,9 +48,10 @@ result by the quantity, rather than doing several identical checks.
 sub buildXML {
     my ($self, $cart, @packages) = @_;
     tie my %xmlHash, 'Tie::IxHash';
-    %xmlHash = ( IntlRateRequest => {}, );
-    my $xmlTop = $xmlHash{IntlRateRequest};
+    %xmlHash = ( IntlRateV2Request => {}, );
+    my $xmlTop = $xmlHash{IntlRateV2Request};
     $xmlTop->{USERID}  = $self->get('userId');
+    $xmlTop->{Revision}  = ['2'];
     $xmlTop->{Package} = [];
     ##Do a request for each package.
     my $packageIndex;
@@ -86,10 +87,20 @@ sub buildXML {
         $packageData{Ounces}     = [ $ounces   ];
         $packageData{Machinable} = [ 'true'    ];
         $packageData{MailType}   = [ 'Package' ];
-        if ($self->get('addInsurance')) {
-            $packageData{ValueOfContents} = [ $value ];
-        }
+        $packageData{ValueOfContents} = [ $value ];
         $packageData{Country}    = [ $country  ];
+        $packageData{Container}  = [ 'RECTANGULAR' ];
+        $packageData{Size}       = [ 'REGULAR' ];
+        $packageData{Width}      = [ '1.0' ];
+        $packageData{Length}     = [ '1.0' ];
+        $packageData{Height}     = [ '1.0' ];
+        $packageData{Girth}      = [ '4.0' ];
+        if ($self->get('addInsurance')) {
+            $packageData{ExtraServices} = [
+                { ExtraService => [ '1' ], },
+            ];
+        }
+
         push @{ $xmlTop->{Package} }, \%packageData;
     }
     my $xml = XMLout(\%xmlHash,
@@ -168,7 +179,7 @@ Processed XML data from an XML rate request, processed in perl data structure.  
 have this structure:
 
     {
-        IntlRateResponse => {
+        IntlRateV2Response => {
             Package => [
                 {
                     ID => 0,
@@ -189,7 +200,7 @@ The set of shippable units, which are required to do quantity lookups.
 sub _calculateFromXML {
     my ($self, $xmlData, @shippableUnits) = @_;
     my $cost = 0;
-    foreach my $package (@{ $xmlData->{IntlRateResponse}->{Package} }) {
+    foreach my $package (@{ $xmlData->{IntlRateV2Response}->{Package} }) {
         my $id   = $package->{ID};
         ##Error check for invalid index
         if ($id < 0 || $id > $#shippableUnits || $id !~ /^\d+$/) {
@@ -203,11 +214,9 @@ sub _calculateFromXML {
         SERVICE: foreach my $service (@{ $package->{Service} }) {
             next SERVICE unless $service->{ID} eq $self->get('shipType');
             $rate = $service->{Postage};
+            #print Dumper $service;
             if ($self->get('addInsurance')) {
-                if (exists $service->{InsComment}) {
-                    WebGUI::Error::Shop::RemoteShippingRate->throw(error => "No insurance because of: ".$service->{InsComment});
-                }
-                $rate += $service->{Insurance};
+                $rate += $service->{ExtraServices}->{ExtraService}->{Price};
             }
         }
         if (!$rate) {
@@ -357,7 +366,7 @@ sub _doXmlRequest {
     $userAgent->env_proxy;
     $userAgent->agent('WebGUI');
     $userAgent->timeout('45');
-    my $url = 'http://production.shippingapis.com/ShippingAPI.dll?API=IntlRate&XML=';
+    my $url = 'http://production.shippingapis.com/ShippingAPI.dll?API=IntlRateV2&XML=';
     $url .= $xml;
     my $request = HTTP::Request->new(GET => $url);
     my $response = $userAgent->request($request);

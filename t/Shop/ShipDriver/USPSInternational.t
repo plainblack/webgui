@@ -25,7 +25,7 @@ use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
 use WebGUI::Shop::ShipDriver::USPSInternational;
 
-plan tests => 40;
+plan tests => 41;
 
 #----------------------------------------------------------------------------
 # Init
@@ -284,7 +284,7 @@ $rockHammer->addToCart($rockHammer->getCollateral('variantsJSON', 'variantId', $
 my @shippableUnits = $driver->_getShippableUnits($cart);
 
 my $xml = $driver->buildXML($cart, @shippableUnits);
-like($xml, qr/<IntlRateRequest USERID="[^"]+"/, 'buildXML: checking userId is an attribute of the IntlRateRequest tag');
+like($xml, qr/<IntlRateV2Request USERID="[^"]+"/, 'buildXML: checking userId is an attribute of the IntlRateV2Request tag');
 like($xml, qr/<Package ID="0"/, 'buildXML: checking ID is an attribute of the Package tag');
 
 my $xmlData = XMLin($xml,
@@ -294,14 +294,18 @@ my $xmlData = XMLin($xml,
 cmp_deeply(
     $xmlData,
     {
-        IntlRateRequest => {
+        IntlRateV2Request => {
             USERID => $userId,
+            Revision => '2',
             Package => [
                 {
                     ID => 0,
                     Pounds      => '1',        Ounces         => '8.0',
                     Machinable  => 'true',     Country        => 'Netherlands',
-                    MailType    => 'Package',  
+                    MailType    => 'Package',  ValueOfContents =>  '7.50',
+                    Size        => 'REGULAR',  Container      => 'RECTANGULAR',
+                    Length      => '1.0',      Width          => '1.0',
+                    Height      => '1.0',      Girth          => '4.0',
                 },
             ],
         }
@@ -309,7 +313,7 @@ cmp_deeply(
     'buildXML: 1 item in cart'
 );
 
-like($xml, qr/IntlRateRequest USERID.+?Package ID=.+?Pounds.+?Ounces.+?Machinable.+?MailType.+?Country.+?/, '... and tag order');
+like($xml, qr/IntlRateV2Request USERID.+?Package ID=.+?Pounds.+?Ounces.+?Machinable.+?MailType.+?Country.+?/, '... and tag order');
 
 SKIP: {
 
@@ -327,31 +331,26 @@ SKIP: {
                     AreasServed    => ignore(), Prohibitions   => ignore(),
                     ExpressMail    => ignore(), CustomsForms   => ignore(),
                     Observations   => ignore(), Restrictions   => ignore(),
+                    AdditionalRestrictions => ignore(),
                     Service        => superbagof(
-                        {
-                            ID             => ignore(),
-                            MaxWeight      => ignore(),
-                            MaxDimensions  => ignore(),
-                            MailType       => 'Package',
-                            Ounces         => '8',
+                        superhashof({
+                            ID             => 1,
+                            Ounces         => '8.0',
                             Pounds         => '1',
                             Country        => 'NETHERLANDS',
-                            Machinable     => 'true',
                             Postage        => num(100,99),
-                            SvcCommitments => ignore(),
-                            SvcDescription => ignore(),
-                        },
+                        }),
                     ),
                 },
             ],
         },
         '... returned data from USPS in correct format.  If this test fails, the driver may need to be updated'
-    ) or diag Dumper $xmlData;
+    ) or diag $xml."\n".$response->content."\n".Dumper($xmlData);
 }
 
 my $cost = $driver->_calculateFromXML(
     {
-        IntlRateResponse => {
+        IntlRateV2Response => {
             Package => [
                 {
                     ID => 0,
@@ -388,20 +387,27 @@ $xmlData = XMLin( $xml,
 cmp_deeply(
     $xmlData,
     {
-        IntlRateRequest => {
+        IntlRateV2Request => {
             USERID => $userId,
+            Revision => '2',
             Package => [
                 {
                     ID => 0,
                     Pounds      => '2',        Ounces         => '0.0',
                     Machinable  => 'true',     Country        => 'Netherlands',
-                    MailType    => 'Package',  
+                    MailType    => 'Package',  ValueOfContents =>  '22.50',
+                    Size        => 'REGULAR',  Container      => 'RECTANGULAR',
+                    Length      => '1.0',      Width          => '1.0',
+                    Height      => '1.0',      Girth          => '4.0',
                 },
                 {
                     ID => 1,
                     Pounds      => '1',        Ounces         => '8.0',
                     Machinable  => 'true',     Country        => 'Netherlands',
-                    MailType    => 'Package',  
+                    MailType    => 'Package',  ValueOfContents =>  '7.50',
+                    Size        => 'REGULAR',  Container      => 'RECTANGULAR',
+                    Length      => '1.0',      Width          => '1.0',
+                    Height      => '1.0',      Girth          => '4.0',
                 },
             ],
         }
@@ -419,7 +425,7 @@ SKIP: {
 
 $cost = $driver->_calculateFromXML(
     {
-        IntlRateResponse => {
+        IntlRateV2Response => {
             Package => [
                 {
                     ID => 0,
@@ -464,7 +470,7 @@ $bibleItem->setQuantity(2);
 
 $cost = $driver->_calculateFromXML(
     {
-        IntlRateResponse => {
+        IntlRateV2Response => {
             Package => [
                 {
                     ID => 0,
@@ -516,26 +522,36 @@ $xmlData = XMLin( $xml,
 cmp_deeply(
     $xmlData,
     {
-        IntlRateRequest => {
+        IntlRateV2Request => {
             USERID  => $userId,
+            Revision => '2',
             Package => [
                 {
                     ID => 0,
                     Pounds      => '2',        Ounces         => '0.0',
                     Machinable  => 'true',     Country        => 'Netherlands',
-                    MailType    => 'Package',  
+                    MailType    => 'Package',  ValueOfContents =>  '22.50',
+                    Size        => 'REGULAR',  Container      => 'RECTANGULAR',
+                    Length      => '1.0',      Width          => '1.0',
+                    Height      => '1.0',      Girth          => '4.0',
                 },
                 {
                     ID => 1,
                     Pounds      => '12',       Ounces         => '0.0',
                     Machinable  => 'true',     Country        => 'Australia',
-                    MailType    => 'Package',  
+                    MailType    => 'Package',  ValueOfContents =>  '19.99',
+                    Size        => 'REGULAR',  Container      => 'RECTANGULAR',
+                    Length      => '1.0',      Width          => '1.0',
+                    Height      => '1.0',      Girth          => '4.0',
                 },
                 {
                     ID => 2,
                     Pounds      => '1',        Ounces         => '8.0',
                     Machinable  => 'true',     Country        => 'Netherlands',
-                    MailType    => 'Package',  
+                    MailType    => 'Package',  ValueOfContents =>  '7.50',
+                    Size        => 'REGULAR',  Container      => 'RECTANGULAR',
+                    Length      => '1.0',      Width          => '1.0',
+                    Height      => '1.0',      Girth          => '4.0',
                 },
             ],
         }
@@ -571,14 +587,18 @@ $xmlData = XMLin($xml,
 cmp_deeply(
     $xmlData,
     {
-        IntlRateRequest => {
+        IntlRateV2Request => {
             USERID => $userId,
+            Revision => '2',
             Package => [
                 {
                     ID => 0,
                     Pounds      => '0',        Ounces          => '0.1',
                     Machinable  => 'true',     Country         => 'Netherlands',
-                    MailType    => 'Package',
+                    MailType    => 'Package',  ValueOfContents =>  '0.01',
+                    Size        => 'REGULAR',  Container      => 'RECTANGULAR',
+                    Length      => '1.0',      Width          => '1.0',
+                    Height      => '1.0',      Girth          => '4.0',
                 },
             ],
         }
@@ -635,6 +655,7 @@ SKIP: {
     $cart->empty;
     $properties              = $driver->get();
     $properties->{shipType}  = '9';
+    $properties->{addInsurance} = 0;
     $driver->update($properties);
     $rockHammer->addToCart($rockHammer->getCollateral('variantsJSON', 'variantId', $bigHammer));
 
@@ -653,21 +674,30 @@ SKIP: {
     cmp_deeply(
         $xmlData,
         {
-            IntlRateRequest => {
+            IntlRateV2Request => {
                 USERID => $userId,
+                Revision => '2',
                 Package => [
                     {
                         ID => 0,
                         Pounds      => '12',       Ounces          => '0.0',
                         Machinable  => 'true',     Country         => 'Netherlands',
                         MailType    => 'Package',  ValueOfContents => '19.99',
+                        Size        => 'REGULAR',  Container      => 'RECTANGULAR',
+                        Length      => '1.0',      Width          => '1.0',
+                        Height      => '1.0',      Girth          => '4.0',
+                        ExtraServices => {ExtraService => 1},
                     },
                 ],
             }
         },
         'buildXML: 1 item in cart'
     );
-    like($xml, qr/IntlRateRequest USERID.+?Package ID=.+?Pounds.+?Ounces.+?Machinable.+?MailType.+?ValueOfContents.+?Country.+?/, '... and tag order');
+    like($xml, qr/IntlRateV2Request USERID.+?Package ID=.+?Pounds.+?Ounces.+?Machinable.+?MailType.+?ValueOfContents.+?Country.+?/, '... and tag order');
+
+    my $response = $driver->_doXmlRequest($xml);
+    ok($response->is_success, '_doXmlRequest to USPS successful');
+    my $xmlData = XMLin($response->content, ForceArray => [qw/Package/],);
 
     my $insuredCost = $driver->calculate($cart);
     cmp_ok $noInsuranceCost, '<', $insuredCost, 'insured cost is higher than uninsured cost';
@@ -693,7 +723,7 @@ $rockHammer->addToCart($rockHammer->getCollateral('variantsJSON', 'variantId', $
 
 $cost = eval { $driver->_calculateFromXML(
     {
-        IntlRateResponse => {
+        IntlRateV2Response => {
             Package => [
                 {
                     ID => 11,
