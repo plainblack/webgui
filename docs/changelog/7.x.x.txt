@@ -1,3 +1,5 @@
+7.10.30
+
 7.10.29
  - fixed #12454: Email to Group ignores the From field
  - fixed #12455: USPS Ship driver fails
