@@ -108,7 +108,7 @@ This method returns the templateId for the layout of your new module.
 
 sub getLayoutTemplateId {
     my $self = shift;
-    return $self->session->setting->get("moduleLayoutTempalteId") || $self->SUPER::getLayoutTemplateId;
+    return $self->session->setting->get("moduleLayoutTemplateId") || $self->SUPER::getLayoutTemplateId;
 }
 
 
