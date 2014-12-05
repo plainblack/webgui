@@ -109,7 +109,9 @@ current user.
 sub canAdd {
     my $session     = shift;
     my $user        = shift || $session->user;
-    return canEdit($session, $user);
+    return $user->isInGroup( $session->setting->get("groupIdAdminUserAdd") )
+        || canEdit($session, $user)
+        ;
 }
 
 #----------------------------------------------------------------------------
@@ -117,20 +119,29 @@ sub canAdd {
 =head2 canEdit ( session [, user] )
 
 Returns true if the user is allowed to do everything in this module. user 
-defaults to the current user.
+defaults to the current user. Only Admins are allowed to edit Admins;
+
+=head3 $session
+
+A WebGUI::Session object
+
+=head3 $user
+
+A user to check for permissions.  If missing, uses the current session user.
 
 =cut
 
 sub canEdit {
     my $session     = shift;
     my $user        = shift || $session->user;
-    my $targetId    = $session->form->get('uid)';
-    my $target_editable = 1;
-    if ($targetId) {
-        my $target = WebGUI::User->new($session, $userId);
-        $target_editable = $target->isAdmin && $user->isAdmin;
+    return 0 if ! $user->isInGroup( $session->setting->get("groupIdAdminUser") );
+    my $targetId    = $session->form->get('uid');
+    return 1 unless $targetId;
+    my $target = WebGUI::User->new($session, $targetId);
+    if ($target->isAdmin) {
+        return $user->isAdmin;
     }
-    return $target_editable && $user->isInGroup( $session->setting->get("groupIdAdminUser") );
+    return 1;
 }
 
 #----------------------------------------------------------------------------
