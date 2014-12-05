@@ -109,9 +109,7 @@ current user.
 sub canAdd {
     my $session     = shift;
     my $user        = shift || $session->user;
-    return $user->isInGroup( $session->setting->get("groupIdAdminUserAdd") )
-        || canEdit($session, $user)
-        ;
+    return canEdit($session, $user);
 }
 
 #----------------------------------------------------------------------------
@@ -126,7 +124,13 @@ defaults to the current user.
 sub canEdit {
     my $session     = shift;
     my $user        = shift || $session->user;
-    return $user->isInGroup( $session->setting->get("groupIdAdminUser") );
+    my $targetId    = $session->form->get('uid)';
+    my $target_editable = 1;
+    if ($targetId) {
+        my $target = WebGUI::User->new($session, $userId);
+        $target_editable = $target->isAdmin && $user->isAdmin;
+    }
+    return $target_editable && $user->isInGroup( $session->setting->get("groupIdAdminUser") );
 }
 
 #----------------------------------------------------------------------------
@@ -613,9 +617,10 @@ Allows an administrator to assume another user.
 sub www_becomeUser {
 	my $session = shift;
 	return $session->privilege->adminOnly() unless canEdit($session) && $session->form->validToken;
-	return undef unless WebGUI::User->validUserId($session, $session->form->process("uid"));
+    my $userId = $session->form->process("uid");
+	return undef unless WebGUI::User->validUserId($session, $userId);
 	$session->var->end($session->var->get("sessionId"));
-	$session->user({userId=>$session->form->process("uid")});
+	$session->user({userId=>$userId});
 	return "";
 }
 
