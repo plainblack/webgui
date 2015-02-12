@@ -48,6 +48,12 @@ sub handler {
     my ($session) = @_;
 	$session->http->setStatus("404","Page Not Found");
     my $output = "";
+    my $requestedUrl = $session->url->getRequestedUrl;
+    ##If they requested some snippet that doesn't exist any longer, then just
+    ##return an empty string instead of generating the whole not found page.
+    if ($requestedUrl =~ /\.(?:js|css)$/) {
+        return '';
+    }
 	my $notFound = WebGUI::Asset->getNotFound($session);
 	if (defined $notFound) {
         $session->asset($notFound);
