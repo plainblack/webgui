@@ -131,6 +131,7 @@ sub toHtml {
     my $id = $self->get("id");
     my $value = $self->getOriginalValue;
     my $name = $self->get("name");
+    $self->headTags;
     return qq{<a href="javascript:YAHOO.WebGUI.Form.ColorPicker.display('$id', '${id}_swatch');" id="${id}_swatch" class="colorPickerFormSwatch" style="background-color: $value"></a>
 <input onchange="YAHOO.util.Dom.setStyle('${id}_swatch', 'background-color', this.value)" 
 maxlength="7" name="$name" type="text" size="8" value="$value" id="$id" />};
