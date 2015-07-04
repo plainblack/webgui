@@ -221,27 +221,27 @@ The following exit values are returned:
 
 =over 4
 
-=item 0
+=item Z<0>
 
 Successful execution.
 
-=item 1
+=item Z<1>
 
 Only super user may run the script.
 
-=item 2
+=item Z<2>
 
 Help requested.
 
-=item 3
+=item Z<3>
 
 Only one instance of this script can run at a time.
 
-=item 4
+=item Z<4>
 
 Error during invocation of the command.
 
-=item 5
+=item Z<5>
 
 Content Delivery Network (CDN) is not enabled.
 
