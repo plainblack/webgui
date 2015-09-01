@@ -156,7 +156,12 @@ sub getTemplateVars {
         my $value     = $db->quote($clause->{valText});
         
         $rules->{'whereClause'} .= qq{ $condition } if ($key > 1);
-        $rules->{'whereClause'} .= qq{$prop $op $value};
+        if ($op =~ /NULL/) {  ##NULL/IS NULL does not have any following values
+            $rules->{'whereClause'} .= qq{$prop $op};
+        }
+        else {
+            $rules->{'whereClause'} .= qq{$prop $op $value};
+        }
     }
 
     # Always join to the class, asset and assetData are excluded by getLineageSql
