@@ -1,6 +1,7 @@
 7.10.30
  - fixed: Do not generate the Not Found page when JS or CSS is requested.  In admin mode, this is bypassed so that admins can see which pages are really missing and can easily add them.
  - fixed: Allow IS NULL/IS NOT NULL queries in the Asset Report.
+ - fixed #12461: Carousel fails to initial the rich editor in multiple tabs
 
 7.10.29
  - fixed #12454: Email to Group ignores the From field

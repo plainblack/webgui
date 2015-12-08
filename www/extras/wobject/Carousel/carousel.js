@@ -75,7 +75,7 @@ WebGUI.Carousel.Editor.prototype.addTab
     ta.appendChild( document.createTextNode( data.text ) );
     el.appendChild( ta );
 
-    var conf    = this.mceConfig;
+    var conf    = JSON.parse(JSON.stringify(this.mceConfig));
     conf.mode = "exact";
     conf.elements = ta.name;
 
