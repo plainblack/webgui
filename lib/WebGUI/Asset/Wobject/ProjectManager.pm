@@ -585,6 +585,7 @@ SELECT DISTINCT PM_task.taskId, PM_task.taskName
  WHERE PM_task.projectId = ?
        AND ((PM_taskResource.resourceKind = 'user' AND PM_taskResource.resourceId = ?)
             OR (PM_taskResource.resourceKind = 'group' AND $groupIdQuery))
+ ORDER by creationDate DESC
 SQL
 }
 
