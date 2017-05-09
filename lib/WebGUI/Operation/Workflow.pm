@@ -318,7 +318,7 @@ sub www_editWorkflowPriority {
     }
 
     # make the request
-    my $remote = create_ikc_client(
+    my $remote = POE::Component::IKC::ClientLite->spawn(
 		port=>$session->config->get("spectrePort"),
 		ip=>$session->config->get("spectreIp"),
 		name=>rand(100000),
@@ -560,7 +560,7 @@ sub www_showRunningWorkflows {
     </script>
 ENDCODE
 
-    my $remote = create_ikc_client(
+    my $remote = POE::Component::IKC::ClientLite->spawn(
         port=>$session->config->get("spectrePort"),
         ip=>$session->config->get("spectreIp"),
         name=>rand(100000),

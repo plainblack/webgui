@@ -119,7 +119,7 @@ sub www_spectreStatus {
 
     $session->http->setCacheControl("none");
 
-    my $remote = create_ikc_client(
+    my $remote = POE::Component::IKC::ClientLite->spawn(
 		port=>$session->config->get("spectrePort"),
 		ip=>$session->config->get("spectreIp"),
 		name=>rand(100000),
@@ -203,7 +203,7 @@ do subnet checking, yet.
 
 sub spectreTest{
 	my $session = shift;
-	my $remote = create_ikc_client(
+	my $remote = POE::Component::IKC::ClientLite->spawn(
 		port=>$session->config->get("spectrePort"),
 		ip=>$session->config->get("spectreIp"),
 		name=>rand(100000),

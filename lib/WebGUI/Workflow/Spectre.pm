@@ -72,7 +72,7 @@ sub notify {
 	my $module = shift;
 	my $params = shift;
 	my ($config, $error) = $self->session->quick("config", "errorHandler");
-	my $remote = create_ikc_client(
+	my $remote = POE::Component::IKC::ClientLite->spawn(
                 port=>$config->get("spectrePort"),
                 ip=>$config->get("spectreIp"),
                 name=> (time() . int(rand(10000000))),

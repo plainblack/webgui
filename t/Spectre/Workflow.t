@@ -64,7 +64,7 @@ SKIP: {
         },
     );
     $instance->start;
-    my $remote = create_ikc_client(
+    my $remote = POE::Component::IKC::ClientLite->spawn(
         port    => $port,
         ip      => $ip,
         name    => rand(100000),
@@ -104,7 +104,7 @@ TODO: {
 
 sub spectre_ping {
     my $spectreConfig = shift;
-    my $remote = create_ikc_client(
+    my $remote = POE::Component::IKC::ClientLite->spawn(
         port    => $spectreConfig->get("port"),
         ip      => $spectreConfig->get("ip"),
         name    => rand(100000),
