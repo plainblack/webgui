@@ -230,7 +230,7 @@ sub setByHTTP {
 	my $self = shift;
 	my $url = shift;
 	my $ttl = shift;
-        my $userAgent = LWP::UserAgent->new();
+        my $userAgent = LWP::UserAgent->new(ssl_opts => { verify_hostname => 0, }, );
 	$userAgent->env_proxy;
         $userAgent->agent("WebGUI/".$WebGUI::VERSION);
         $userAgent->timeout(30);
