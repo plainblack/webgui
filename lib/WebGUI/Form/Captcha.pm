@@ -19,6 +19,7 @@ use base 'WebGUI::Form::Text';
 use WebGUI::International;
 use WebGUI::Storage;
 use LWP::UserAgent;
+use JSON;
 
 =head1 NAME
 
@@ -105,20 +106,24 @@ sub getValue {
 
     if ($self->session->setting->get('useRecaptcha')) {
         my $privKey = $self->session->setting->get('recaptchaPrivateKey');
-        my $challenge = $self->session->form->param('recaptcha_challenge_field');
-        my $response = $self->session->form->param('recaptcha_response_field');
+        my $response = $self->session->form->param('g-recaptcha-response');
 
         my $ua = LWP::UserAgent->new;
-        my $res = $ua->post('http://www.google.com/recaptcha/api/verify', {
-            privatekey  => $privKey,
+        my $res = $ua->post('https://www.google.com/recaptcha/api/siteverify', {
+            secret      => $privKey,
             remoteip    => $self->session->env->getIp,
-            challenge   => $challenge,
             response    => $response,
         });
         if ($res->is_success) {
-            my ($answer, $error) = split /\n/, $res->content, 2;
-            $self->{_error} = $error;
-            return $answer eq 'true';
+            my $json = $res->content;
+            my $data = eval { JSON::decode_json($json); };
+            if ($@) {
+                return undef;
+            }
+            return $data->{success} ? 1 : 0;
+        }
+        else {
+            $self->session->log->warn("Google lookup failed");
         }
         return undef;
     }
@@ -165,13 +170,9 @@ sub toHtml {
             $server = "https://www.google.com/recaptcha/api";
         }
         return
-            '<script type="text/javascript" src="' . $server . '/challenge?k=' . $pubKey . '"></script>'
-            . '<noscript>'
-            . '<iframe src="' . $server . '/noscript?k=' . $pubKey
-            . '" height="300" width="500" frameborder="0"></iframe>'
-            . '<textarea name="recaptcha_challenge_field" rows="3" cols="40"></textarea>'
-            . '<input type="hidden" name="recaptcha_response_field" value="manual_challenge" />'
-            . '</noscript>';
+            '<script type="text/javascript" src="https://www.google.com/recaptcha/api.js"></script>'
+            . qq!<div class="g-recaptcha" data-sitekey="$pubKey"></div>!
+            ;
     }
 
     my $storage = WebGUI::Storage->createTemp($self->session);

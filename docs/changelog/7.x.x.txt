@@ -1,6 +1,7 @@
 7.10.31
  - fixed: Warnings about API changes in POE::Component::IKC::ClientLite
  - fixed: Allow WebGUI::Cache and all consumers to fetch SSL URLs, but not verify the certificates.
+ - fixed: Migrate to reCAPTCHA v2
 
 7.10.30
  - fixed: Do not generate the Not Found page when JS or CSS is requested.  In admin mode, this is bypassed so that admins can see which pages are really missing and can easily add them.
