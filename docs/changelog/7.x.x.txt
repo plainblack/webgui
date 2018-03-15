@@ -1,4 +1,4 @@
-7.10.31
+7.10.32
 
 7.10.31
  - fixed: Warnings about API changes in POE::Component::IKC::ClientLite
