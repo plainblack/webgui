@@ -1,4 +1,6 @@
 7.10.31
+
+7.10.31
  - fixed: Warnings about API changes in POE::Component::IKC::ClientLite
  - fixed: Allow WebGUI::Cache and all consumers to fetch SSL URLs, but not verify the certificates.
  - fixed: Migrate to reCAPTCHA v2
