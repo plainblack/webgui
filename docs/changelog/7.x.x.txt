@@ -1,4 +1,5 @@
 7.10.32
+ - fixed: Bad asset redirect from AssetTrash www_delete if encryptPage is set
 
 7.10.31
  - fixed: Warnings about API changes in POE::Component::IKC::ClientLite
