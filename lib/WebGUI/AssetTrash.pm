@@ -445,7 +445,7 @@ sub www_delete {
     $self->forkWithStatusPage({
             plugin   => 'ProgressTree',
             title    => 'Delete Assets',
-            redirect => $asset->getUrl,
+            redirect => $self->session->url->gateway($asset->get('url')),
             method   => 'trashInFork',
             args     => [ $self->getId ],
         }
